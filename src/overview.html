@@ -1,0 +1,37 @@
+<html>
+	<body>
+		This document is the API specification for <b>Calimero 2.1</b>.
+		<p>
+		
+		Calimero 2 was developed and is maintained at the 
+        <a href="http://www.auto.tuwien.ac.at">		
+		Vienna University of Technology, Automation Systems Group</a>.<br>
+		
+		The source and documentation is hosted on 
+		<a href="https://github.com/calimero-project/calimero">this site</a>.<br>
+		
+		More information about this and similar projects can be found  
+		<a href="https://www.auto.tuwien.ac.at/a-lab/knx_eib.html">here</a>.
+		<p>
+		
+		<h3>Licence</h3>
+		Calimero is Open Source.<br>
+		Pay attention to the copyright declarations and license agreements.
+		See the license text file that ships with every Calimero distribution 
+		for more details.
+		<p>
+		
+		<h3>General rules of usage for this API</h3>
+		<p>
+		No <code>null</code> arguments are allowed, if not explicitly stated 
+		otherwise in the documentation of the interface or method declaration.
+		This means, applying a method -- which expects arguments of reference type --
+		to a <code>null</code> argument will lead to undefined behavior.<br>
+		In the absence of other explicit specification in type API comments, 
+		instances of types are thread-safe, that is, concurrent access is allowed.
+		<p>
+		A user application can obtain general information  
+		like the current library version, available bundles and similar by using  
+		<code>tuwien.auto.calimero.Settings</code>.
+	</body>
+</html>

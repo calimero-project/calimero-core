@@ -1,0 +1,16 @@
+<html>
+	<body>
+	Support for temporary storage of KNX network messages.<br>
+	This is done by using a network buffer with one or more configurations added to it.
+	This allows to build up and maintain a local process image to answer user queries.
+	Benefits might be a decreased network load and smaller response time.<br>
+	Using a network buffer allows polled mode of communication, since handling of 
+	incoming messages can be delayed to some later point in time.
+	<br>
+	A configuration determines what messages to keep and what messages to 
+	ignore by the use of filters. These filters might be user defined implementations 
+	set for that particular configuration. 
+	Two predefined filters are available to allow state based and command based 
+	network buffering.
+	</body>
+</html>

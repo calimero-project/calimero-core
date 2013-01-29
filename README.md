@@ -1,0 +1,4 @@
+calimero
+========
+
+Core library
