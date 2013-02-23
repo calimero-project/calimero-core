@@ -179,6 +179,9 @@ public class ConnectResponse extends ServiceType
 			return "could not accept new connection (maximum reached)";
 		case ErrorCodes.TUNNELING_LAYER:
 			return "the requested tunneling layer is not supported";
+		// this error code is also returned by N146 device for some reason
+		case ErrorCodes.KNX_CONNECTION:
+			return "server detected error concerning KNX subsystem connection";
 		default:
 			return "unknown status";
 		}
