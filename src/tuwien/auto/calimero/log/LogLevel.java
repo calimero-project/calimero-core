@@ -144,6 +144,8 @@ public class LogLevel
 			return "error";
 		case LOG_FATAL:
 			return "fatal";
+		case LOG_ALWAYS:
+			return "always";
 		case LOG_ALL:
 			return "all";
 		default:
