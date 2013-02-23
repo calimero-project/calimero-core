@@ -252,7 +252,7 @@ public class ManagementClientImpl implements ManagementClient
 			long wait = responseTimeout;
 			final long end = System.currentTimeMillis() + wait;
 			while (wait > 0) {
-				l.add(new IndividualAddress(waitForResponse(0, 0, wait)));
+				l.add(new IndividualAddress(waitForResponse(null, 0, 0, wait)));
 				if (oneAddressOnly)
 					break;
 				wait = end - System.currentTimeMillis();
@@ -298,7 +298,7 @@ public class ManagementClientImpl implements ManagementClient
 			svcResponse = IND_ADDR_SN_RESPONSE;
 			tl.broadcast(false, Priority.SYSTEM,
 					DataUnitBuilder.createAPDU(IND_ADDR_SN_READ, serialNo));
-			return new IndividualAddress(waitForResponse(10, 10, responseTimeout));
+			return new IndividualAddress(waitForResponse(null, 10, 10, responseTimeout));
 		}
 		finally {
 			svcResponse = 0;
@@ -481,7 +481,10 @@ public class ManagementClientImpl implements ManagementClient
 			try {
 				send(dst, priority, DataUnitBuilder.createAPDU(PROPERTY_READ, asdu),
 						PROPERTY_RESPONSE);
-				responses = waitForResponses(priority, 4, 14, oneResponseOnly);
+				// if we are waiting for several responses, we pass no from address to accept
+				// messages from any sender
+				responses = waitForResponses(oneResponseOnly ? dst.getAddress() : null, priority,
+						4, 14, oneResponseOnly);
 			}
 			finally {
 				svcResponse = 0;
@@ -731,7 +734,7 @@ public class ManagementClientImpl implements ManagementClient
 		try {
 			svcResponse = response;
 			tl.sendData(d, p, apdu);
-			return waitForResponse(minAsduLen, maxAsduLen, responseTimeout);
+			return waitForResponse(d.getAddress(), minAsduLen, maxAsduLen, responseTimeout);
 		}
 		finally {
 			svcResponse = 0;
@@ -745,7 +748,7 @@ public class ManagementClientImpl implements ManagementClient
 	{
 		try {
 			send(d, p, apdu, response);
-			return waitForResponse(minAsduLen, maxAsduLen, responseTimeout);
+			return waitForResponse(d.getAddress(), minAsduLen, maxAsduLen, responseTimeout);
 		}
 		finally {
 			svcResponse = 0;
@@ -754,8 +757,9 @@ public class ManagementClientImpl implements ManagementClient
 
 	// timeout in milliseconds
 	// min + max ASDU len are *not* including any field that contains ACPI
-	private byte[] waitForResponse(final int minAsduLen, final int maxAsduLen, final long timeout)
-		throws KNXInvalidResponseException, KNXTimeoutException, InterruptedException
+	private byte[] waitForResponse(final IndividualAddress from, final int minAsduLen,
+		final int maxAsduLen, final long timeout) throws KNXInvalidResponseException,
+		KNXTimeoutException, InterruptedException
 	{
 		long remaining = timeout;
 		final long end = System.currentTimeMillis() + remaining;
@@ -766,7 +770,11 @@ public class ManagementClientImpl implements ManagementClient
 					final byte[] apdu = frame.getPayload();
 					if (svcResponse != DataUnitBuilder.getAPDUService(apdu))
 						continue;
-
+					// broadcasts set parameter from to null; we then accept every sender address
+					if (from != null) {
+						if (!((CEMILData) frame).getSource().equals(from))
+							continue;
+					}
 					if (apdu.length < minAsduLen + 2 || apdu.length > maxAsduLen + 2) {
 						final String s = "invalid ASDU response length " + (apdu.length - 2)
 								+ " bytes, expected " + minAsduLen + " to " + maxAsduLen;
@@ -785,16 +793,16 @@ public class ManagementClientImpl implements ManagementClient
 		throw new KNXTimeoutException("timeout occurred while waiting for data response");
 	}
 
-	private List waitForResponses(final Priority p, final int minAsduLen, final int maxAsduLen,
-		final boolean oneOnly) throws KNXLinkClosedException, KNXInvalidResponseException,
-		InterruptedException
+	private List waitForResponses(final IndividualAddress from, final Priority p,
+		final int minAsduLen, final int maxAsduLen, final boolean oneOnly)
+		throws KNXLinkClosedException, KNXInvalidResponseException, InterruptedException
 	{
 		final List l = new ArrayList();
 		try {
 			long wait = responseTimeout;
 			final long end = System.currentTimeMillis() + wait;
 			while (wait > 0) {
-				l.add(waitForResponse(minAsduLen, maxAsduLen, wait));
+				l.add(waitForResponse(from, minAsduLen, maxAsduLen, wait));
 				if (oneOnly)
 					break;
 				wait = end - System.currentTimeMillis();
@@ -812,7 +820,7 @@ public class ManagementClientImpl implements ManagementClient
 		try {
 			svcResponse = response;
 			tl.broadcast(true, p, apdu);
-			final List l = waitForResponses(p, minAsduLen, maxAsduLen, oneOnly);
+			final List l = waitForResponses(null, p, minAsduLen, maxAsduLen, oneOnly);
 			if (l.isEmpty())
 				throw new KNXTimeoutException("timeout waiting for responses");
 			return l;
