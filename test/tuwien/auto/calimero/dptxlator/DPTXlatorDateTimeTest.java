@@ -151,20 +151,15 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertTrue(t.getDateTimeFlag(DPTXlatorDateTime.CLOCK_SYNC));
 		assertTrue(t.getDateTimeFlag(DPTXlatorDateTime.WORKDAY));
 		
-		t.setData(new byte[] { 107, 8, 31, (byte) ((5 << 5) | 22), 45, 33, 0x41,
-			(byte) 0x80 });
-		dataHelperThrow(new byte[] { 107, 8, 0, (byte) ((5 << 5) | 22), 45, 33, 0x41,
-			(byte) 0x80 });
-		dataHelperThrow(new byte[] { 107, 0, 30, (byte) ((5 << 5) | 22), 45, 33, 0x41,
-			(byte) 0x80 });
-		dataHelperThrow(new byte[] { 107, 13, 30, (byte) ((5 << 5) | 22), 45, 33, 0x41,
-			(byte) 0x80 });
-		dataHelperThrow(new byte[] { 107, 5, 30, (byte) ((5 << 5) | 24), 45, 33, 0x41,
-			(byte) 0x80 });
+		t.setData(new byte[] { 107, 8, 31, (byte) ((5 << 5) | 22), 45, 33, 0x41, (byte) 0x80 });
+		dataHelperThrow(new byte[] { 107, 8, 0, (byte) ((5 << 5) | 22), 45, 33, 0x41, (byte) 0x80 });
+		dataHelperThrow(new byte[] { 107, 0, 30, (byte) ((5 << 5) | 22), 45, 33, 0x41, (byte) 0x80 });
+		dataHelperThrow(new byte[] { 107, 13, 30, (byte) ((5 << 5) | 22), 45, 33, 0x41, (byte) 0x80 });
+		dataHelperThrow(new byte[] { 107, 5, 30, (byte) ((5 << 5) | 24), 45, 33, 0x41, (byte) 0x80 });
 		t.setData(new byte[] { 107, 9, 30, (byte) ((5 << 5) | 22), 1 << 6 | 62, 40, 0x43,
 			(byte) 0x80 });
-		dataHelperThrow(new byte[] { 107, 9, 30, (byte) ((5 << 5) | 22), 1 << 6 | 62,
-			40, 0x41, (byte) 0x80 });
+		dataHelperThrow(new byte[] { 107, 9, 30, (byte) ((5 << 5) | 22), 1 << 6 | 62, 40, 0x41,
+			(byte) 0x80 });
 	}
 
 	private void dataHelperThrow(final byte[] data)
@@ -231,7 +226,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 	 * 
 	 * @throws KNXFormatException
 	 */
-	public final void testIsValid() throws KNXFormatException
+	public final void testSetValueAndData() throws KNXFormatException
 	{
 		t.setValue("24:00:00");
 		t.setValue("00:00:00");
