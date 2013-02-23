@@ -62,7 +62,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 		 * 
 		 * @param typeID {@inheritDoc}
 		 * @param description {@inheritDoc}
-		 * @param control the DPT of the control information
+		 * @param value the DPT of the control information
 		 */
 		public DPT1BitControlled(final String typeID, final String description, final DPT value)
 		{
@@ -118,7 +118,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 			DPTXlatorBoolean.DPT_ALARM);
 
 	/**
-	 * DPT ID 2.006, Binary Controlled; values are {@link DPTXlatorBoolean#DPT_BINARY}.
+	 * DPT ID 2.006, Binary Controlled; values are {@link DPTXlatorBoolean#DPT_BINARYVALUE}.
 	 * <p>
 	 */
 	public static final DPT DPT_BINARY_CONTROL = new DPT1BitControlled("2.006",
@@ -243,7 +243,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 	 * <i>control</i>.<br>
 	 * This method does not reset other item data or discard other translation items.
 	 * 
-	 * @param value control direction
+	 * @param control control direction
 	 */
 	public final void setControlBit(final boolean control)
 	{
