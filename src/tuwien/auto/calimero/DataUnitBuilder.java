@@ -221,6 +221,13 @@ public final class DataUnitBuilder
 			// the field size was increased to 6 bits in 03/03/07 2007
 			mask = 0x3f;
 		}
+		// 0x300 A_DeviceDescriptor_Read-PDU
+		// 0x340 A_DeviceDescriptor_Response-PDU
+		else if (svc == 0x300 || svc == 0x340) {
+			offset = 1;
+			// we mask the descriptor type
+			mask = 0x3f;
+		}
 		final byte[] asdu = new byte[apdu.length - offset];
 		for (int i = 0; i < asdu.length; ++i)
 			asdu[i] = apdu[offset + i];
