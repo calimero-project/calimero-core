@@ -92,7 +92,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	 * 
 	 * @param netIf specifies the local network interface used to join the multicast group
 	 *        and send outgoing multicast data, use <code>null</code> to use the default
-	 *        interface; useful for multihomed hosts
+	 *        interface; useful for multi-homed hosts
 	 * @param mcGroup address of the multicast group this router is joined to, or
 	 *        <code>null</code> to use the default multicast ({@value #DEFAULT_MULTICAST}
 	 *        ); value of <code>mcGroup >= </code>{@value #DEFAULT_MULTICAST}
