@@ -290,8 +290,9 @@ public class LogStreamWriter extends LogWriter
 
 		b.append(": ").append(msg);
 		if (t != null) {
-			if (t.getMessage() != null)
-				b.append(" (").append(t.getMessage()).append(")");
+			final String s = t.getMessage() != null ? t.getMessage() : t.getClass().getName();
+			b.append(" (").append(s).append(")");
+			
 			if (logLevel.equals(LogLevel.FATAL)) {
 				final StackTraceElement[] trace = t.getStackTrace();
 				for (int i = 0; i < trace.length; ++i)
@@ -312,7 +313,8 @@ public class LogStreamWriter extends LogWriter
 		if (!isLoggable(level))
 			return;
 		try {
-			final String s = formatOutput ? formatOutput(logService, level, msg, t) : msg;
+			final String s = formatOutput ? formatOutput(logService, level, msg, t)
+					: (msg + (t != null ? ", " + t.getMessage() : ""));
 			synchronized (this) {
 				out.write(s);
 				out.write(lineSep);
