@@ -65,8 +65,36 @@ public class LogStreamWriter extends LogWriter
 	private boolean closeOut = true;
 
 	/**
-	 * Sets line separator; also called by subtypes creating the output stream on their
-	 * own.
+	 * Creates an <i>unformatted</i> <code>LogStreamWriter</code> with specified log level and
+	 * output stream.
+	 * <p>
+	 * A stream writer created by this method will not format the message (using
+	 * {@link #formatOutput(String, LogLevel, String, Throwable)}) before writing it to the output
+	 * stream. Parameter <code>autoFlush</code> sets flushing behavior on write() calls.
+	 * 
+	 * @param level log level assigned with this <code>LogStreamWriter</code>
+	 * @param os an OutputStream used by this <code>LogStreamWriter</code>
+	 * @param autoFlush flush output after every successful call to write()
+	 * @param close <code>true</code> to close the output stream <code>os</code> when
+	 *        {@link #close()} is executed, <code>false</code> to skip closing the supplied stream;
+	 *        this parameter is useful when setting <code>os</code> to global streams like
+	 *        <code>System.out</code> (in that case, <code>close</code> should be <code>false</code>
+	 *        )
+	 * @return the new log writer
+	 * @see #LogStreamWriter(LogLevel, OutputStream)
+	 */
+	public static LogStreamWriter newUnformatted(final LogLevel level, final OutputStream os,
+		final boolean autoFlush, final boolean close)
+	{
+		final LogStreamWriter w = new LogStreamWriter(level, os, autoFlush, close);
+		w.formatOutput = false;
+		return w;
+	}
+	
+	/**
+	 * Creates a <code>LogStreamWriter</code>.
+	 * <p>
+	 * Sets line separator; also called by subtypes creating the output stream on their own.
 	 */
 	protected LogStreamWriter()
 	{
@@ -93,6 +121,7 @@ public class LogStreamWriter extends LogWriter
 
 	/**
 	 * Creates a <code>LogStreamWriter</code> with specified log level and output stream.
+	 * <p>
 	 * 
 	 * @param level log level assigned with this <code>LogStreamWriter</code>
 	 * @param os an OutputStream used by this <code>LogStreamWriter</code>
@@ -106,6 +135,7 @@ public class LogStreamWriter extends LogWriter
 
 	/**
 	 * Creates a <code>LogStreamWriter</code> with specified log level and output stream.
+	 * <p>
 	 * Parameter <code>autoFlush</code> sets flushing behavior on write() calls.
 	 * 
 	 * @param level log level assigned with this <code>LogStreamWriter</code>
@@ -121,16 +151,17 @@ public class LogStreamWriter extends LogWriter
 
 	/**
 	 * Creates a <code>LogStreamWriter</code> with specified log level and output stream.
+	 * <p>
 	 * Parameter <code>autoFlush</code> sets flushing behavior on write() calls.
 	 * 
 	 * @param level log level assigned with this <code>LogStreamWriter</code>
 	 * @param os an OutputStream used by this <code>LogStreamWriter</code>
 	 * @param autoFlush flush output after every successful call to write()
 	 * @param close <code>true</code> to close the output stream <code>os</code> when
-	 *        {@link #close()} is executed, <code>false</code> to skip closing the
-	 *        supplied stream; this parameter is useful when setting <code>os</code> to
-	 *        global streams like <code>System.out</code> (in that case,
-	 *        <code>close</code> should be <code>false</code>)
+	 *        {@link #close()} is executed, <code>false</code> to skip closing the supplied stream;
+	 *        this parameter is useful when setting <code>os</code> to global streams like
+	 *        <code>System.out</code> (in that case, <code>close</code> should be <code>false</code>
+	 *        )
 	 * @see #LogStreamWriter(LogLevel, OutputStream)
 	 */
 	public LogStreamWriter(final LogLevel level, final OutputStream os, final boolean autoFlush,
