@@ -137,6 +137,9 @@ public class TransportLayerImpl implements TransportLayer
 
 	private final LogService logger;
 
+	// are we representing server side of this transport layer connection
+	private final boolean serverSide;
+	
 	private volatile boolean detached;
 	private final KNXNetworkLink lnk;
 	private final NetworkLinkListener lnkListener = new NLListener();
@@ -147,11 +150,13 @@ public class TransportLayerImpl implements TransportLayer
 	private final Map proxies = new HashMap();
 	private final Map incomingProxies = new HashMap();
 	private AggregatorProxy active;
+	
 	private volatile int repeated;
 	private final Object lock = new Object();
 
 	/**
-	 * Creates a new transport layer attached to the supplied KNX network link.
+	 * Creates a new client-side transport layer end-point attached to the supplied KNX network
+	 * link.
 	 * <p>
 	 * 
 	 * @param link network link used for communication with a KNX network
@@ -159,14 +164,30 @@ public class TransportLayerImpl implements TransportLayer
 	 */
 	public TransportLayerImpl(final KNXNetworkLink link) throws KNXLinkClosedException
 	{
+		this(link, false);
+	}
+
+	/**
+	 * Creates a new transport layer end-point attached to the supplied KNX network link.
+	 * <p>
+	 * 
+	 * @param link network link used for communication with a KNX network
+	 * @param serverEndpoint does this instance represent the client-side (<code>false</code>),
+	 *        or server-side (<code>true</code>) end-point
+	 * @throws KNXLinkClosedException if the network link is closed
+	 */
+	public TransportLayerImpl(final KNXNetworkLink link, final boolean serverEndpoint)
+		throws KNXLinkClosedException
+	{
 		if (!link.isOpen())
 			throw new KNXLinkClosedException();
 		lnk = link;
 		lnk.addLinkListener(lnkListener);
 		logger = LogManager.getManager().getLogService(getName());
 		listeners = new EventListeners(logger);
+		this.serverSide = serverEndpoint;
 	}
-
+	
 	/**
 	 * {@inheritDoc} Only one destination can be created per remote address. If a
 	 * destination with the supplied remote address already exists for this transport
@@ -409,9 +430,8 @@ public class TransportLayerImpl implements TransportLayer
 		// on proxy null (no destination found for sender) use 'no partner' placeholder
 		final Destination d = p != null ? p.getDestination() : unknownPartner;
 
-		final boolean server = false;
 		if (ctrl == CONNECT) {
-			if (server) {
+			if (serverSide) {
 				// allow incoming connect requests (server)
 				if (p == null) {
 					final AggregatorProxy ap = new AggregatorProxy(this);
