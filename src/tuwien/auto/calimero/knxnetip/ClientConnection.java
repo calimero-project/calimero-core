@@ -120,6 +120,8 @@ abstract class ClientConnection extends ConnectionBase
 		if (state != CLOSED)
 			throw new KNXIllegalStateException("open connection");
 		ctrlEndpt = serverCtrlEP;
+		if (ctrlEndpt.isUnresolved())
+			throw new KNXException("server control endpoint is unresolved: " + serverCtrlEP);
 		useNat = useNAT;
 		logger = LogManager.getManager().getLogService(getName());
 		Exception thrown = null;
