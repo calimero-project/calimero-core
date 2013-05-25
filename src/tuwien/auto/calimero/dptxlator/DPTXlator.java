@@ -113,6 +113,7 @@ public abstract class DPTXlator
 	public DPTXlator(final int dataTypeSize)
 	{
 		typeSize = dataTypeSize;
+		data = new short[typeSize == 0 ? 1 : typeSize];
 	}
 
 	/**
