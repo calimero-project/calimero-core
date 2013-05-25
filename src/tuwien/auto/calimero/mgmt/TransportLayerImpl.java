@@ -185,7 +185,7 @@ public class TransportLayerImpl implements TransportLayer
 		lnk.addLinkListener(lnkListener);
 		logger = LogManager.getManager().getLogService(getName());
 		listeners = new EventListeners(logger);
-		this.serverSide = serverEndpoint;
+		serverSide = serverEndpoint;
 	}
 	
 	/**
