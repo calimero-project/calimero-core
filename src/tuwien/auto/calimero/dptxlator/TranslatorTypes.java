@@ -163,6 +163,18 @@ public final class TranslatorTypes
 	public static final int TYPE_STRING = 16;
 
 	/**
+	 * DPT main number for <b>scene number</b>, number = {@value #TYPE_SCENE_NUMBER}.
+	 * <p>
+	 */
+	public static final int TYPE_SCENE_NUMBER = 17;
+	
+	/**
+	 * DPT main number for <b>scene control</b>, number = {@value #TYPE_SCENE_CONTROL}.
+	 * <p>
+	 */
+	public static final int TYPE_SCENE_CONTROL = 18;
+	
+	/**
 	 * DPT main number for <b>date/time</b>, number = {@value #TYPE_DATE_TIME}.
 	 * <p>
 	 */
@@ -344,6 +356,8 @@ public final class TranslatorTypes
 		addTranslator(TYPE_4OCTET_FLOAT, "DPTXlator4ByteFloat",
 				"4 octet float value (main type 14)");
 		addTranslator(TYPE_STRING, "DPTXlatorString", "String (main type 16)");
+		addTranslator(TYPE_SCENE_NUMBER, "DPTXlatorSceneNumber", "Scene number (main type 17)");
+		addTranslator(TYPE_SCENE_CONTROL, "DPTXlatorSceneControl", "Scene control (main type 18)");
 		addTranslator(TYPE_DATE_TIME, "DPTXlatorDateTime", "Date with time (main type 19)");
 	}
 
