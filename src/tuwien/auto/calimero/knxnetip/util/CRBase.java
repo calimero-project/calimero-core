@@ -36,8 +36,7 @@ import tuwien.auto.calimero.log.LogService;
  */
 class CRBase
 {
-	static final LogService logger =
-		LogManager.getManager().getLogService("KNXnet/IP service");
+	static final LogService logger = LogManager.getManager().getLogService("KNXnet/IP service");
 
 	byte[] opt;
 	private final int connType;
