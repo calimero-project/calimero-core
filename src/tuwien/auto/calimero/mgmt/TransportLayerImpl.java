@@ -251,8 +251,8 @@ public class TransportLayerImpl implements TransportLayer
 			if (p == null)
 				return;
 			if (p.getDestination() == d) {
-				proxies.remove(d.getAddress());
 				d.destroy();
+				proxies.remove(d.getAddress());
 			}
 			else
 				logger.warn("not owner of " + d.getAddress());
