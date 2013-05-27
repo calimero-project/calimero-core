@@ -60,13 +60,14 @@ final class TimerQueue extends Thread
 	{
 		try {
 			while (true) {
+				Runnable notify = null;
 				synchronized (notifiables) {
 					if (notifiables.isEmpty()) {
 						// nothing to do
 						notifiables.wait();
 					}
 					else {
-						final Runnable notify = (Runnable) notifiables.get(0);
+						final Runnable next = (Runnable) notifiables.get(0);
 						final Long end = (Long) endTimes.get(0);
 						long remaining = end.longValue() - System.currentTimeMillis();
 						if (remaining > 0) {
@@ -74,23 +75,27 @@ final class TimerQueue extends Thread
 							remaining = end.longValue() - System.currentTimeMillis();
 						}
 						// in addition to timed-out wait, we have to check whether the
-						// last endTime was shifted by cancelling or another submit
+						// last endTime was shifted by canceling or another submit
 						// immediately before. Using == for end time comparison ensures
 						// we have the correct entry, and not a subsequent submission
 						// using the same notifiable
 						if (remaining <= 0 && !notifiables.isEmpty()
-							&& notifiables.get(0) == notify && endTimes.get(0) == end) {
+							&& notifiables.get(0) == next && endTimes.get(0) == end) {
 							notifiables.remove(0);
 							endTimes.remove(0);
-							try {
-								notify.run();
-							}
-							catch (final RuntimeException e) {
-								// can't do a lot here
-								e.printStackTrace();
-							}
+							notify = next;
 						}
 					}
+				}
+				// invoke notifiable outside synchronized block, as a notifiable might destroy
+				// and remove itself from the timer queue
+				try {
+					if (notify != null)
+						notify.run();
+				}
+				catch (final RuntimeException e) {
+					// can't do a lot here
+					e.printStackTrace();
 				}
 			}
 		}
