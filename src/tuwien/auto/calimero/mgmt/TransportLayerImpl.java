@@ -550,6 +550,9 @@ public class TransportLayerImpl implements TransportLayer
 		final boolean sendDisconnectReq) throws KNXLinkClosedException
 	{
 		p.setState(Destination.DISCONNECTED);
+		// TODO add initiated by user and refactor into a method
+		p.getDestination().disconnectedBy = sendDisconnectReq ?
+				Destination.LOCAL_ENDPOINT : Destination.REMOTE_ENDPOINT;
 		try {
 			if (sendDisconnectReq)
 				sendDisconnect(p.getDestination().getAddress());

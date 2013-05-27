@@ -93,6 +93,8 @@ public class ManagementProceduresImpl implements ManagementProcedures
 
 		public void disconnected(final Destination d)
 		{
+			if (d.getDisconnectedBy() != Destination.REMOTE_ENDPOINT)
+				return;
 			final IndividualAddress addr = d.getAddress();
 			if (routers && addr.getDevice() == 0)
 				devices.add(addr);

@@ -220,6 +220,13 @@ public class Destination
 	 */
 	public static final int OPEN_WAIT = 4;
 
+	
+	static final int USER_REQUEST = 0;
+	static final int REMOTE_ENDPOINT = 1;
+	static final int LOCAL_ENDPOINT = 2;
+	
+	volatile int disconnectedBy = -1;
+	
 	private final TransportLayer tl;
 	private final IndividualAddress addr;
 	private volatile int state = DISCONNECTED;
@@ -373,6 +380,11 @@ public class Destination
 			+ " keep alive, " + (verify ? "" : "no") + " verify mode";
 	}
 
+	int getDisconnectedBy()
+	{
+		return disconnectedBy;
+	}
+	
 	private String getStateString()
 	{
 		switch (state) {
