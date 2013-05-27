@@ -220,7 +220,8 @@ public class TransportLayerImpl implements TransportLayer
 			final Destination d = new Destination(p, remote, connectionOriented,
 				keepAlive, verifyMode);
 			proxies.put(remote, p);
-			logger.trace("destination " + remote + " ready for use");
+			if (logger.isLoggable(LogLevel.TRACE))
+				logger.trace("destination " + remote + " ready for use");
 			return d;
 		}
 	}
@@ -295,7 +296,8 @@ public class TransportLayerImpl implements TransportLayer
 		final byte[] tpdu = new byte[] { (byte) CONNECT };
 		lnk.sendRequestWait(d.getAddress(), Priority.SYSTEM, tpdu);
 		p.setState(Destination.OPEN_IDLE);
-		logger.trace("connected with " + d.getAddress());
+		if (logger.isLoggable(LogLevel.TRACE))
+			logger.trace("connected with " + d.getAddress());
 	}
 
 	/* (non-Javadoc)
@@ -457,7 +459,8 @@ public class TransportLayerImpl implements TransportLayer
 		}
 		else if ((ctrl & 0xC0) == DATA_CONNECTED) {
 			if (d.getState() == Destination.DISCONNECTED || !sender.equals(d.getAddress())) {
-				logger.trace("send disconnect to " + sender);
+				if (logger.isLoggable(LogLevel.TRACE))
+					logger.trace("send disconnect to " + sender);
 				sendDisconnect(sender);
 			} else {
 				p.restartTimeout();
@@ -480,7 +483,8 @@ public class TransportLayerImpl implements TransportLayer
 			else if (d.getState() == Destination.OPEN_WAIT && seq == p.getSeqSend()) {
 				p.incSeqSend();
 				p.setState(Destination.OPEN_IDLE);
-				logger.trace("positive ack by " + d.getAddress());
+				if (logger.isLoggable(LogLevel.TRACE))
+					logger.trace("positive ack by " + d.getAddress());
 			}
 			else
 				disconnectIndicate(p, true);
@@ -552,7 +556,8 @@ public class TransportLayerImpl implements TransportLayer
 		}
 		finally {
 			fireDisconnected(p.getDestination());
-			logger.trace("disconnected from " + p.getDestination().getAddress());
+			if (logger.isLoggable(LogLevel.TRACE))
+				logger.trace("disconnected from " + p.getDestination().getAddress());
 		}
 	}
 
