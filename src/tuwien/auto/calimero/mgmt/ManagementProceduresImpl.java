@@ -271,7 +271,9 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			return false;
 		}
 		catch (final KNXDisconnectException e) {
-			// device with that address exists and does not support CO mode
+			// remote disconnect: device with that address exists but does not support CO mode
+			if (e.getDestination().getDisconnectedBy() != Destination.REMOTE_ENDPOINT)
+				return false;
 		}
 		finally {
 			dst.destroy();
