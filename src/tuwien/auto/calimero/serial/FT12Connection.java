@@ -152,7 +152,7 @@ public class FT12Connection
 	 */
 	public FT12Connection(final int portNumber) throws KNXException
 	{
-		this(Integer.toString(portNumber), defaultPortPrefix() + portNumber, DEFAULT_BAUDRATE);
+		this(Integer.toString(portNumber), defaultPortPrefixes()[0] + portNumber, DEFAULT_BAUDRATE);
 	}
 
 	/**
@@ -210,9 +210,9 @@ public class FT12Connection
 	/**
 	 * Attempts to gets the available serial communication ports on the host.
 	 * <p>
-	 * At first, the Java system property "microedition.commports" is queried. If there is
-	 * no property with that key, and the Calimero library has access to serial ports, the
-	 * lowest 10 ports numbers are enumerated and checked if present.<br>
+	 * At first, the Java system property "microedition.commports" is queried. If there is no
+	 * property with that key, and the Calimero library has access to serial ports, the lowest 10
+	 * port numbers of each of the default system name prefixes are checked if present.<br>
 	 * The empty array is returned if no ports are discovered.
 	 * 
 	 * @return array of strings with found port identifiers
@@ -232,11 +232,14 @@ public class FT12Connection
 			return portIds;
 		}
 		if (SerialComAdapter.isAvailable()) {
-			final String prefix = defaultPortPrefix();
+			final String[] prefixes = defaultPortPrefixes();
 			final List l = new ArrayList(10);
-			for (int i = 0; i < 10; ++i)
-				if (SerialComAdapter.portExists(prefix + i))
-					l.add(prefix + i);
+			for (int k = 0; k < prefixes.length; k++) {
+				String prefix = prefixes[k];
+				for (int i = 0; i < 10; ++i)
+					if (SerialComAdapter.portExists(prefix + i))
+						l.add(prefix + i);
+			}
 			return (String[]) l.toArray(new String[l.size()]);
 		}
 		// skip other possible adapters for now, and return empty list...
@@ -598,10 +601,10 @@ public class FT12Connection
 		return chk;
 	}
 
-	private static String defaultPortPrefix()
+	private static String[] defaultPortPrefixes()
 	{
-		return System.getProperty("os.name").toLowerCase().indexOf("windows") > -1 ? "\\\\.\\COM"
-				: "/dev/ttyS";
+		return System.getProperty("os.name").toLowerCase().indexOf("windows") > -1 
+				? new String[]{ "\\\\.\\COM" } : new String[]{ "/dev/ttyS", "/dev/ttyUSB" };
 	}
 
 	private final class Receiver extends Thread
