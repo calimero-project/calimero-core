@@ -336,7 +336,7 @@ public class DPTXlatorBoolean extends DPTXlator
 		else if (dpt.getUpperValue().equalsIgnoreCase(value))
 			dst[index] = 1;
 		else
-			throw logThrow(LogLevel.WARN, "translation error for " + value,
+			logThrow(LogLevel.WARN, "translation error for " + value,
 				"value not recognized", value);
 	}
 

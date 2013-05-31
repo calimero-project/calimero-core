@@ -331,7 +331,7 @@ public class DPTXlatorTime extends DPTXlator
 			tokens[count] = t.nextToken();
 		// we allow day of week to be omitted in value
 		if (count < 3)
-			throw logThrow(LogLevel.WARN, "invalid time " + value, null, value);
+			logThrow(LogLevel.WARN, "invalid time " + value, null, value);
 		// on 4 tokens, day of week is included
 		final int dow = count == 4 ? getDOW(tokens[0]) : 0;
 		try {
@@ -341,10 +341,10 @@ public class DPTXlatorTime extends DPTXlator
 			set(dow, h, m, s, dst, index);
 		}
 		catch (final KNXIllegalArgumentException e) {
-			throw logThrow(LogLevel.WARN, "invalid time " + value, e.getMessage(), value);
+			logThrow(LogLevel.WARN, "invalid time " + value, e.getMessage(), value);
 		}
 		catch (final NumberFormatException e) {
-			throw logThrow(LogLevel.WARN, "invalid number in " + value, null, value);
+			logThrow(LogLevel.WARN, "invalid number in " + value, null, value);
 		}
 	}
 
@@ -383,7 +383,8 @@ public class DPTXlatorTime extends DPTXlator
 		for (int i = 0; i < DAYS.length; ++i)
 			if (DAYS[i].equalsIgnoreCase(dow))
 				return i;
-		throw logThrow(LogLevel.WARN, "invalid day of week " + dow, null, dow);
+		logThrow(LogLevel.WARN, "invalid day of week " + dow, null, dow);
+		return 0;
 	}
 
 	private long parse(final String value) throws KNXFormatException
@@ -392,7 +393,8 @@ public class DPTXlatorTime extends DPTXlator
 			return sdf.parse(value).getTime();
 		}
 		catch (final ParseException e) {
-			throw logThrow(LogLevel.WARN, "invalid time format", e.getMessage(), value);
+			logThrow(LogLevel.WARN, "invalid time format", e.getMessage(), value);
+			return 0;
 		}
 	}
 

@@ -169,7 +169,7 @@ public class DPTXlatorString extends DPTXlator
 		throws KNXFormatException
 	{
 		if (value.length() > stringLength)
-			throw logThrow(LogLevel.WARN, "maximum KNX string length is 14 characters", null, value);
+			logThrow(LogLevel.WARN, "maximum KNX string length is 14 characters", null, value);
 		// check character set, default to ASCII 7 bit encoding
 		char rangeMax = '\u007f';
 		if (dpt.equals(DPT_STRING_8859_1))

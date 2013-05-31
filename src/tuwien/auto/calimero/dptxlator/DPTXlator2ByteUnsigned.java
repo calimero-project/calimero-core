@@ -291,7 +291,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 			toDPT(Integer.decode(removeUnit(value)).intValue(), dst, index);
 		}
 		catch (final NumberFormatException e) {
-			throw logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
 		}
 	}
 
@@ -299,7 +299,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	{
 		// prevent round up to 0 from negative milliseconds
 		if (ms < 0)
-			throw logThrow(LogLevel.WARN, "negative input value " + Long.toString(ms), null,
+			logThrow(LogLevel.WARN, "negative input value " + Long.toString(ms), null,
 					Long.toString(ms));
 		long v = ms;
 		if (dpt.equals(DPT_TIMEPERIOD_SEC))
@@ -316,7 +316,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	private void toDPT(final int value, final short[] dst, final int index) throws KNXFormatException
 	{
 		if (value < min || value > max)
-			throw logThrow(LogLevel.WARN, "translation error for " + value,
+			logThrow(LogLevel.WARN, "translation error for " + value,
 					"input value out of range [" + dpt.getLowerValue() + ".." + dpt.getUpperValue()
 							+ "]", Integer.toString(value));
 		int v = value;
@@ -338,6 +338,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 				return i;
 		}
 		catch (final NumberFormatException e) {}
-		throw logThrow(LogLevel.ERROR, "limit " + limit, "invalid DPT range", limit);
+		logThrow(LogLevel.ERROR, "limit " + limit, "invalid DPT range", limit);
+		return 0;
 	}
 }

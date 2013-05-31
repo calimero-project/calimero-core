@@ -360,7 +360,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 		if (value.startsWith("1 "))
 			c = 0x2;
 		else if (!value.startsWith("0 "))
-			throw logThrow(LogLevel.WARN, "invalid control bit " + value, null, value);
+			logThrow(LogLevel.WARN, "invalid control bit " + value, null, value);
 		dst[index] = (short) (c + (x.getValueBoolean() ? 1 : 0));
 	}
 }

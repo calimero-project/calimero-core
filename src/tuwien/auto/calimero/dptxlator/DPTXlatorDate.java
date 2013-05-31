@@ -299,14 +299,14 @@ public class DPTXlatorDate extends DPTXlator
 			for (; count < maxTokens && t.hasMoreTokens(); ++count)
 				tokens[count] = Short.parseShort(t.nextToken());
 			if (count < 3)
-				throw logThrow(LogLevel.WARN, "invalid date " + value, null, value);
+				logThrow(LogLevel.WARN, "invalid date " + value, null, value);
 			set(tokens[0], tokens[1], tokens[2], dst, index);
 		}
 		catch (final KNXIllegalArgumentException e) {
-			throw logThrow(LogLevel.WARN, "invalid date " + value, e.getMessage(), value);
+			logThrow(LogLevel.WARN, "invalid date " + value, e.getMessage(), value);
 		}
 		catch (final NumberFormatException e) {
-			throw logThrow(LogLevel.WARN, "invalid number in " + value, null, value);
+			logThrow(LogLevel.WARN, "invalid number in " + value, null, value);
 		}
 	}
 
@@ -350,7 +350,8 @@ public class DPTXlatorDate extends DPTXlator
 			return sdf.parse(value).getTime();
 		}
 		catch (final ParseException e) {
-			throw logThrow(LogLevel.WARN, "invalid date format", e.getMessage(), value);
+			logThrow(LogLevel.WARN, "invalid date format", e.getMessage(), value);
+			return 0;
 		}
 	}
 

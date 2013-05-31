@@ -151,7 +151,7 @@ public class DPTXlatorSceneNumber extends DPTXlator
 			dst[index] = toDPT(Short.decode(value.trim()).shortValue());
 		}
 		catch (final NumberFormatException e) {
-			throw logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
 		}
 	}
 

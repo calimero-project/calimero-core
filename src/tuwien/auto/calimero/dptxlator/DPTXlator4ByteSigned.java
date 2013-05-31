@@ -231,7 +231,7 @@ public class DPTXlator4ByteSigned extends DPTXlator
 			toDPT(Integer.decode(removeUnit(value)).intValue(), dst, index);
 		}
 		catch (final NumberFormatException e) {
-			throw logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
 		}
 	}
 

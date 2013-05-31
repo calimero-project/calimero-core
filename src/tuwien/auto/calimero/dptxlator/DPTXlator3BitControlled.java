@@ -365,14 +365,14 @@ public class DPTXlator3BitControlled extends DPTXlator
 	{
 		final StringTokenizer token = new StringTokenizer(value);
 		if (token.countTokens() < 2)
-			throw logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
 		int ctrl = 0;
 		String s = token.nextToken();
 		final DPT dptCtrl = ((DPT3BitControlled) dpt).getControlDPT();
 		if (s.equalsIgnoreCase(dptCtrl.getUpperValue()))
 			ctrl = 0x08;
 		else if (!s.equalsIgnoreCase(dptCtrl.getLowerValue()))
-			throw logThrow(LogLevel.WARN, "translation error for " + s,
+			logThrow(LogLevel.WARN, "translation error for " + s,
 					"unknown control value string", s);
 		try {
 			s = token.nextToken();
@@ -383,6 +383,6 @@ public class DPTXlator3BitControlled extends DPTXlator
 			}
 		}
 		catch (final NumberFormatException e) {}
-		throw logThrow(LogLevel.WARN, "invalid stepcode " + s, null, s);
+		logThrow(LogLevel.WARN, "invalid stepcode " + s, null, s);
 	}
 }

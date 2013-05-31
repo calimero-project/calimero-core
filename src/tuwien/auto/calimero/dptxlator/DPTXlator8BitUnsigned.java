@@ -255,7 +255,7 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 			dst[index] = toDPT(Short.decode(removeUnit(value)).shortValue());
 		}
 		catch (final NumberFormatException e) {
-			throw logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
 		}
 	}
 
@@ -263,18 +263,18 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	{
 		try {
 			if (value < 0 || value > Integer.parseInt(dpt.getUpperValue()))
-				throw logThrow(LogLevel.WARN, "translation error for " + value,
+				logThrow(LogLevel.WARN, "translation error for " + value,
 					"input value out of range [" + dpt.getLowerValue() + ".."
 						+ dpt.getUpperValue() + "]", Integer.toString(value));
-			int convert = value;
-			if (dpt.equals(DPT_SCALING))
-				convert = Math.round(value * 255.0f / 100);
-			else if (dpt.equals(DPT_ANGLE))
-				convert = Math.round(value * 255.0f / 360);
-			return (short) convert;
 		}
 		catch (final NumberFormatException e) {
-			throw logThrow(LogLevel.ERROR, "parsing " + dpt, null, dpt.getUpperValue());
+			logThrow(LogLevel.ERROR, "parsing " + dpt, null, dpt.getUpperValue());
 		}
+		int convert = value;
+		if (dpt.equals(DPT_SCALING))
+			convert = Math.round(value * 255.0f / 100);
+		else if (dpt.equals(DPT_ANGLE))
+			convert = Math.round(value * 255.0f / 360);
+		return (short) convert;
 	}
 }

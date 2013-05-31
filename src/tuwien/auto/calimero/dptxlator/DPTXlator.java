@@ -459,12 +459,13 @@ public abstract class DPTXlator
 	 *        <code>null</code>
 	 * @param excMsg exception message, if <code>null</code> <code>msg</code> is used
 	 * @param item item in KNXFormatException, might be <code>null</code>
+	 * @throws KNXFormatException the created format exception
 	 */
-	final KNXFormatException logThrow(final LogLevel level, final String msg,
-		final String excMsg, final String item)
+	final void logThrow(final LogLevel level, final String msg, final String excMsg,
+		final String item) throws KNXFormatException
 	{
 		final KNXFormatException e = new KNXFormatException(excMsg != null ? excMsg : msg, item);
 		logger.log(level, dpt.getID() + " - " + msg, excMsg != null ? e : null);
-		return e;
+		throw e;
 	}
 }

@@ -791,7 +791,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 		throws KNXFormatException
 	{
 		if (value < min || value > max)
-			throw logThrow(LogLevel.WARN, "translation error for " + value, "value out of range ["
+			logThrow(LogLevel.WARN, "translation error for " + value, "value out of range ["
 					+ dpt.getLowerValue() + ".." + dpt.getUpperValue() + "]", Float.toString(value));
 		final int raw = Float.floatToRawIntBits(value);
 		final int i = 4 * index;
@@ -808,7 +808,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 			toDPT(Float.parseFloat(removeUnit(value)), dst, index);
 		}
 		catch (final NumberFormatException e) {
-			throw logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
 		}
 	}
 
@@ -818,6 +818,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 			return Float.parseFloat(limit);
 		}
 		catch (final NumberFormatException e) {}
-		throw logThrow(LogLevel.ERROR, "limit " + limit, "invalid DPT range", limit);
+		logThrow(LogLevel.ERROR, "limit " + limit, "invalid DPT range", limit);
+		return 0;
 	}
 }

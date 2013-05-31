@@ -160,7 +160,7 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 			toDPT(Long.decode(removeUnit(value)).longValue(), dst, index);
 		}
 		catch (final NumberFormatException e) {
-			throw logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
 		}
 	}
 
@@ -168,7 +168,7 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 		throws KNXFormatException
 	{
 		if (value < 0 || value > 0xFFFFFFFFL)
-			throw logThrow(LogLevel.WARN, "translation error for " + value,
+			logThrow(LogLevel.WARN, "translation error for " + value,
 					"input value out of range", Long.toString(value));
 		final int i = 4 * index;
 		dst[i] = (short) ((value >> 24) & 0xFF);
