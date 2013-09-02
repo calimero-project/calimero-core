@@ -513,7 +513,8 @@ public class ManagementProceduresImpl implements ManagementProcedures
 				final Destination d = tl.createDestination(remote, true);
 				destinations.add(d);
 				tl.connect(d);
-				Thread.sleep(100);
+				// increased from 100 (the default) to minimize chance of overflow over FT1.2
+				Thread.sleep(115);
 			}
 			waitFor(disconnectTimeout);
 		}
@@ -525,7 +526,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			}
 		}
 		final IndividualAddress[] array = (IndividualAddress[]) devices
-			.toArray(new IndividualAddress[devices.size()]);
+				.toArray(new IndividualAddress[devices.size()]);
 		return array;
 	}
 
