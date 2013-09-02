@@ -282,8 +282,7 @@ public class TransportLayerImpl implements TransportLayer
 	 * @see tuwien.auto.calimero.mgmt.TransportLayer#connect
 	 * (tuwien.auto.calimero.mgmt.Destination)
 	 */
-	public void connect(final Destination d) throws KNXTimeoutException,
-		KNXLinkClosedException
+	public void connect(final Destination d) throws KNXTimeoutException, KNXLinkClosedException
 	{
 		final AggregatorProxy p = getProxy(d);
 		if (!d.isConnectionOriented()) {
