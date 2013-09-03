@@ -26,7 +26,7 @@ import tuwien.auto.calimero.link.KNXLinkClosedException;
 /**
  * Represents a transport layer logical connection destination.
  * <p>
- * It keeps settings to use for communication with a destination and maintains the logical
+ * It keeps the settings used for communication with a destination and maintains the logical
  * connection state. In connection oriented mode, a timer is used to detect the connection
  * timeout and send a disconnect.<br>
  * The actual layer 4 communication is done by a {@link TransportLayer} (the aggregator
@@ -50,7 +50,7 @@ public class Destination
 	 * Used by the owner of a destination handling the communication and used to modify
 	 * destination state and obtain internal connection settings.
 	 * <p>
-	 * By default, this proxy is created by a transport layer implementation.
+	 * By default, a proxy is created by a transport layer implementation.
 	 * 
 	 * @author B. Malinowsky
 	 */
