@@ -413,6 +413,7 @@ public class TransportLayerImpl implements TransportLayer
 			throw new KNXIllegalStateException("TL detached");
 		synchronized (proxies) {
 			final AggregatorProxy p = (AggregatorProxy) proxies.get(d.getAddress());
+			// TODO at this point, proxy might also be null because destination just got destroyed
 			// check identity, too, to prevent destination with only same address
 			if (p == null || p.getDestination() != d)
 				throw new KNXIllegalArgumentException("not the owner of " + d.toString());
