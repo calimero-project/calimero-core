@@ -6,3 +6,6 @@
 *.ear
 /.settings
 /.classpath
+
+.DS_Store
+/doc
