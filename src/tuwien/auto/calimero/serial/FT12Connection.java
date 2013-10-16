@@ -113,7 +113,7 @@ public class FT12Connection
 
 	// adapter for the used serial I/O connection:
 	// - on ME CDC platforms with CommConnection available, CommConnectionAdapter is used
-	// - for Calimero 2/NG native I/O, SerialComAdapter is used
+	// - for Calimero 2 native I/O, SerialComAdapter is used
 	// - with rx/tx available, RxtxAdapter is used
 	// - or some external serial I/O library adapter
 	private LibraryAdapter adapter;
@@ -235,7 +235,7 @@ public class FT12Connection
 			final String[] prefixes = defaultPortPrefixes();
 			final List l = new ArrayList(10);
 			for (int k = 0; k < prefixes.length; k++) {
-				String prefix = prefixes[k];
+				final String prefix = prefixes[k];
 				for (int i = 0; i < 10; ++i)
 					if (SerialComAdapter.portExists(prefix + i))
 						l.add(prefix + i);
@@ -603,7 +603,7 @@ public class FT12Connection
 
 	private static String[] defaultPortPrefixes()
 	{
-		return System.getProperty("os.name").toLowerCase().indexOf("windows") > -1 
+		return System.getProperty("os.name").toLowerCase().indexOf("windows") > -1
 				? new String[]{ "\\\\.\\COM" } : new String[]{ "/dev/ttyS", "/dev/ttyUSB" };
 	}
 
