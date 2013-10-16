@@ -27,7 +27,7 @@ package tuwien.auto.calimero;
  */
 public final class Settings
 {
-	private static final String version = "2.1.0-beta";
+	private static final String version = "2.1";
 	// ??? eventually drop the NG marker
 	private static final String library = "Calimero 2/NG";
 	private static final String desc = "A library for KNX network access";
