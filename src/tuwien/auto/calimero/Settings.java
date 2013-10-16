@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2013 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,21 +20,20 @@
 package tuwien.auto.calimero;
 
 /**
- * General settings used in Calimero 2/NG as well as library user information.
+ * General settings used in Calimero 2 as well as library user information.
  * <p>
  * 
  * @author B. Malinowsky
  */
 public final class Settings
 {
-	private static final String version = "2.1";
-	// ??? eventually drop the NG marker
-	private static final String library = "Calimero 2/NG";
+	private static final String version = "2.2.0-alpha";
+	private static final String library = "Calimero 2";
 	private static final String desc = "A library for KNX network access";
 	
 	private static final String tuwien = "Vienna University of Technology";
 	private static final String group = "Automation Systems Group";
-	private static final String copyright = "(c) 2007-2012";
+	private static final String copyright = "(c) 2007-2013";
 
 	// aligns the bundle package name following the friendly name,
 	// works for friendly name with max length of 20 chars
@@ -172,7 +171,7 @@ public final class Settings
 	 */
 	public static int getLibraryMode()
 	{
-		return DEPLOY_MODE;
+		return DEV_MODE;
 	}
 	
 	// for now, this works by loading one class as representative from a bundle
