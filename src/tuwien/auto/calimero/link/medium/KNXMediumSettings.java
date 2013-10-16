@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2013 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 package tuwien.auto.calimero.link.medium;
 
 import tuwien.auto.calimero.IndividualAddress;
+import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 
 /**
  * Container for device and medium specific settings for the KNX network.
@@ -67,6 +68,33 @@ public abstract class KNXMediumSettings
 	private IndividualAddress dev;
 
 	/**
+	 * Creates the medium settings for the specified KNX medium.
+	 * <p>
+	 * 
+	 * @param medium the KNX medium type code, see definitions in {@link KNXMediumSettings}
+	 * @param device individual address to use as source address in KNX messages, supplying
+	 *        <code>null</code> will use the individual address 0.0.0
+	 * @return the initialized medium-specific settings
+	 * @throws KNXIllegalArgumentException on unknown medium code
+	 */
+	/*public*/static KNXMediumSettings create(final int medium, final IndividualAddress device)
+	{
+		switch (medium) {
+		case MEDIUM_TP0:
+			return new TPSettings(device, false);
+		case MEDIUM_TP1:
+			return new TPSettings(device, true);
+		case MEDIUM_PL110:
+			return new PLSettings(device, null, false);
+		case MEDIUM_PL132:
+			return new PLSettings(device, null, true);
+		case MEDIUM_RF:
+			return new RFSettings(device);
+		}
+		throw new KNXIllegalArgumentException("unknown medium type " + medium);
+	}
+	
+	/**
 	 * Creates a new container for KNX device/medium settings.
 	 * <p>
 	 * 
@@ -108,6 +136,39 @@ public abstract class KNXMediumSettings
 	 * @return KNX medium type ID
 	 */
 	public abstract int getMedium();
+	
+	/**
+	 * Returns the KNX medium type code for the specified medium type name.
+	 * <p>
+	 * Allowed type names are, case is ignored:
+	 * <ul>
+	 * <li>TP0</li>
+	 * <li>TP1</li>
+	 * <li>PL110, P110</li>
+	 * <li>PL132, P132</li>
+	 * <li>RF</li>
+	 * </ul>
+	 * 
+	 * @param mediumName the textual representation of a medium type as returned by
+	 *        {@link #getMediumString()}, case-insensitive
+	 * @return the KNX medium type code
+	 * @throws KNXIllegalArgumentException on unknown medium code
+	 */
+	/*public*/static int getMedium(final String mediumName)
+	{
+		if ("tp0".equalsIgnoreCase(mediumName))
+			return MEDIUM_TP0;
+		else if ("tp1".equalsIgnoreCase(mediumName))
+			return MEDIUM_TP1;
+		else if ("p110".equalsIgnoreCase(mediumName) || "pl110".equalsIgnoreCase(mediumName))
+			return MEDIUM_PL110;
+		else if ("p132".equalsIgnoreCase(mediumName) || "pl132".equalsIgnoreCase(mediumName))
+			return MEDIUM_PL132;
+		else if ("rf".equalsIgnoreCase(mediumName))
+			return MEDIUM_RF;
+		else
+			throw new KNXIllegalArgumentException("unknown medium type " + mediumName);
+	}
 	
 	/**
 	 * Returns a textual representation of the KNX medium type.
