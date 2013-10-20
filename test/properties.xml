@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Calimero KNX property definitions -->
+<!-- Calimero 2 KNX property definitions -->
 <propertyDefinitions>
     <object type="global">
         <property pid="1" pidName="PID_OBJECT_TYPE" name="Interface Object Type" pdt="4" dpt="7.010" rw="R" writeEnabled="0">
@@ -86,6 +86,9 @@
         <property pid="28" pidName="PID_ERROR_CODE" name="Error code" pdt="17" rw="R" writeEnabled="0">
             <usage>error code when load state machine indicates "error"</usage>
         </property>
+        <property pid="29" pidName="PID_OBJECT_INDEX" name="Object Index" pdt="2" dpt="5.010" rw="(3/x)" writeEnabled="0">
+            <usage>Access to Object Index of any FB</usage>
+        </property>
     </object>
     <object type="0">
         <property pid="51" pidName="PID_ROUTING_COUNT" name="Routing Count" pdt="2" rw="R(/W)" writeEnabled="0/1">
@@ -155,7 +158,7 @@
             <usage>Descriptor for exteded device descriptor for mask version 0100 (so far only allowed for this mask). This property shall not be used for other masks.</usage>
         </property>
         <property pid="73" pidName="PID_PL110_PARAM" name="PL110 Parameters" pdt="17" rw="R/W" writeEnabled="1">
-            <usage>-          Frequency setting, Indication of whether a repeater is present, Indication of whether the device is a repeater or not</usage>
+            <usage>Frequency setting, Indication of whether a repeater is present, Indication of whether the device is a repeater or not</usage>
         </property>
         <property pid="74" pidName="PID_RF_REPEAT_COUNTER" name="RF Repeat Counter" pdt="2" rw="R/W" writeEnabled="W">
             <usage>To be  completed.</usage>
@@ -190,107 +193,107 @@
         <property pid="84" pidName="PID_METERING_FILTER_TABLE" name="Metering Filter Table" pdt="24" rw="R/W" writeEnabled="1">
             <usage>Metering Filter Table for RF M-Bus Repeater and for the M-Bus Data Collector.</usage>
         </property>
-        <property pid="85" pidName="PID_GROUP_TELEGR_RATE_LIMIT_TIME_BASE" name="group telegram rate limitation time base" pdt="4" rw="R/W*" writeEnabled="1">
+        <property pid="85" pidName="PID_GROUP_TELEGR_RATE_LIMIT_TIME_BASE" name="group telegram rate limitation time base" pdt="4" rw="R/W" writeEnabled="1">
             <usage>Telegram rate limitation time base</usage>
         </property>
-        <property pid="86" pidName="PID_GROUP_TELEGR_RATE_LIMIT_NO_OF_TELEGR" name="group telegram rate limitation number of telegrams" pdt="4" rw="R/W**" writeEnabled="1">
+        <property pid="86" pidName="PID_GROUP_TELEGR_RATE_LIMIT_NO_OF_TELEGR" name="group telegram rate limitation number of telegrams" pdt="4" rw="R/W" writeEnabled="1">
             <usage>Telegram rate limitation number</usage>
         </property>
         <property pid="101" pidName="PID_CHANNEL_01_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 1 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 1 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="102" pidName="PID_CHANNEL_02_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 2 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 2 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="103" pidName="PID_CHANNEL_03_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 3 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 3 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="104" pidName="PID_CHANNEL_04_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 4 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 4 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="105" pidName="PID_CHANNEL_05_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 5 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 5 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="106" pidName="PID_CHANNEL_06_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 6 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 6 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="107" pidName="PID_CHANNEL_07_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 7 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 7 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="108" pidName="PID_CHANNEL_08_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 8 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 8 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="109" pidName="PID_CHANNEL_09_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 9 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 9 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="110" pidName="PID_CHANNEL_10_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 10 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 10 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="111" pidName="PID_CHANNEL_11_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 11 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 11 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="112" pidName="PID_CHANNEL_12_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 12 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 12 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="113" pidName="PID_CHANNEL_13_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 13 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 13 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="114" pidName="PID_CHANNEL_14_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 14 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 14 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="115" pidName="PID_CHANNEL_15_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 15 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 15 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="116" pidName="PID_CHANNEL_16_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 16 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 16 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="117" pidName="PID_CHANNEL_17_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 17 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 17 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="118" pidName="PID_CHANNEL_18_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 18 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 18 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="119" pidName="PID_CHANNEL_19_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 19 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 19 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="120" pidName="PID_CHANNEL_20_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 20 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 20 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="121" pidName="PID_CHANNEL_21_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 21 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 21 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="122" pidName="PID_CHANNEL_22_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 22 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 22 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="123" pidName="PID_CHANNEL_23_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 23 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 23 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="124" pidName="PID_CHANNEL_24_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 24 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 24 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="125" pidName="PID_CHANNEL_25_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 25 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 25 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="126" pidName="PID_CHANNEL_26_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 26 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 26 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="127" pidName="PID_CHANNEL_27_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 27 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 27 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="128" pidName="PID_CHANNEL_28_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 28 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 28 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="129" pidName="PID_CHANNEL_29_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 29 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 29 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="130" pidName="PID_CHANNEL_30_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 30 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 30 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="131" pidName="PID_CHANNEL_31_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 31 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 31 Param, Easy configuration channel parameter</usage>
         </property>
         <property pid="132" pidName="PID_CHANNEL_32_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
-            <usage>Channel 32 Param, Easy configuration channel parameter</usage>
+            <usage>Channel 32 Param, Easy configuration channel parameter</usage>
         </property>
     </object>
     <object type="1">
@@ -416,7 +419,7 @@
             <usage>Indvidual Address of the EIBnet/IP server.</usage>
         </property>
         <property pid="53" pidName="PID_ADDITIONAL_INDIVIDUAL_ADDRESSES" name="Additional Individual Addresses" pdt="4" rw="R/W" writeEnabled="1">
-            <usage>Sorted list of additional KNX Individual Addresses for EIBnet/IP Routers and –Tunnelling Servers.</usage>
+            <usage>Sorted list of additional KNX Individual Addresses for EIBnet/IP Routers and Tunnelling Servers.</usage>
         </property>
         <property pid="54" pidName="PID_CURRENT_IP_ASSIGNMENT_METHOD" name="Current IP Assignment Method" pdt="2" rw="R" writeEnabled="0">
             <usage>Used IP address assignment method.</usage>
@@ -434,7 +437,7 @@
             <usage>Currently used IP subnet mask</usage>
         </property>
         <property pid="59" pidName="PID_CURRENT_DEFAULT_GATEWAY" name="Current Default Gateway" pdt="9" rw="R" writeEnabled="0">
-            <usage>IP Address of the EIBnet/IP device’s default gateway.</usage>
+            <usage>IP Address of the EIBnet/IP device's default gateway.</usage>
         </property>
         <property pid="60" pidName="PID_IP_ADDRESS" name="IP Address" pdt="9" rw="R/W" writeEnabled="1">
             <usage>Configured fixed IP Address.</usage>
@@ -469,7 +472,7 @@
         <property pid="70" pidName="PID_EIBNETIP_ROUTING_CAPABILITIES" name="EIBnet/IP Routing Capabilities" pdt="2" rw="R" writeEnabled="0">
             <usage>Supported features by the EIBnet/IP Router.</usage>
         </property>
-        <property pid="71" pidName="PID_PRIORITY_FIFO_ENABLED" name="Priority FIFO Enabled" pdt="2" rw="R/W " writeEnabled="0">
+        <property pid="71" pidName="PID_PRIORITY_FIFO_ENABLED" name="Priority FIFO Enabled" pdt="2" rw="R/W" writeEnabled="0">
             <usage>Indication of whether the priority FIFO is enabled of disabled.</usage>
         </property>
         <property pid="72" pidName="PID_QUEUE_OVERFLOW_TO_IP" name="Queue Overflow to IP" pdt="4" rw="R" writeEnabled="0">
