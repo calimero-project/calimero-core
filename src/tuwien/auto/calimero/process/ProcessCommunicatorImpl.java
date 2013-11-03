@@ -448,6 +448,13 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 			throw new KNXIllegalStateException("process communicator detached");
 		try {
 			wait = true;
+			
+			// before sending a request and waiting for response, clear previous indications
+			// that could be sitting there from previous timed-out commands or by another request
+			// for the same group
+			synchronized (indications) {
+				indications.clear();
+			}
 			lnk.sendRequestWait(dst, p, DataUnitBuilder.createCompactAPDU(GROUP_READ, null));
 			if (logger.isLoggable(LogLevel.TRACE))
 				logger.trace("sent group read request to " + dst);
