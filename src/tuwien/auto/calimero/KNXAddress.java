@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,9 +54,7 @@ public abstract class KNXAddress
 	 */
 	KNXAddress(final int address)
 	{
-		if (address < 0 || address > 0xffff)
-			throw new KNXIllegalArgumentException("address out of range [0..0xFFFF]");
-		this.address = address;
+		init(address);
 	}
 
 	/**
@@ -81,7 +79,7 @@ public abstract class KNXAddress
 	 * If the current XML element position is no start tag, the next element tag is read.
 	 * The KNX address element is then expected to be the current element in the reader.
 	 * 
-	 * @param r a xml reader
+	 * @param r a XML reader
 	 * @throws KNXMLException if the XML element represents no KNX address or the address
 	 *         couldn't be read correctly
 	 */
@@ -156,7 +154,9 @@ public abstract class KNXAddress
 	{
 		if (address.indexOf('.') != -1)
 			return new IndividualAddress(address);
-		return new GroupAddress(address);
+		if (address.indexOf('/') != -1)
+			return new GroupAddress(address);
+		throw new KNXFormatException("could not detect address type of " + address);
 	}
 
 	/**
@@ -212,7 +212,8 @@ public abstract class KNXAddress
 		else if (address.indexOf('.') > -1)
 			t = new StringTokenizer(address, ".");
 		else
-			throw new KNXFormatException("wrong KNX address format, no valid separator", address);
+			return new String[] { address };
+			//throw new KNXFormatException("wrong KNX address format, no valid separator", address);
 		final int count = t.countTokens();
 		if (count == 2)
 			return new String[] { t.nextToken(), t.nextToken() };
@@ -221,5 +222,12 @@ public abstract class KNXAddress
 		else
 			throw new KNXFormatException("wrong KNX address syntax with " + count + " levels",
 					address);
+	}
+
+	void init(final int address)
+	{
+		if (address < 0 || address > 0xffff)
+			throw new KNXIllegalArgumentException("address out of range [0..0xFFFF]");
+		this.address = address;
 	}
 }

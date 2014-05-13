@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -84,7 +84,8 @@ public class IndividualAddress extends KNXAddress
 	/**
 	 * Creates a KNX individual address from a string <code>address</code> representation.
 	 * <p>
-	 * The address consists of 3 levels (see class header specification). Allowed
+	 * The address string can either be formatted, e.g., "1.1.2", or the raw address, e.g., "4354".
+	 * A formatted address consists of 3 levels (see class header specification), the allowed
 	 * separators are '.' or '/', mutually exclusive.
 	 * 
 	 * @param address string containing the KNX address
@@ -94,12 +95,18 @@ public class IndividualAddress extends KNXAddress
 	public IndividualAddress(final String address) throws KNXFormatException
 	{
 		final String[] tokens = parse(address);
-		if (tokens.length != 3)
-			throw new KNXFormatException("wrong individual address syntax with "
-				+ tokens.length + " levels", address);
 		try {
-			init(Byte.parseByte(tokens[0]), Byte.parseByte(tokens[1]),
-				Short.parseShort(tokens[2]));
+			if (tokens.length == 1) {
+				init(Integer.parseInt(tokens[0]));
+				return;
+			}
+			if (tokens.length != 3)
+				throw new KNXFormatException("wrong individual address syntax with "
+					+ tokens.length + " levels", address);
+			init(Byte.parseByte(tokens[0]), Byte.parseByte(tokens[1]), Short.parseShort(tokens[2]));
+		}
+		catch (final NumberFormatException e) {
+			throw new KNXFormatException("invalid individual address", address);
 		}
 		catch (final KNXIllegalArgumentException e) {
 			throw new KNXFormatException(e.getMessage());

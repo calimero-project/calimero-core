@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -97,7 +97,8 @@ public class GroupAddress extends KNXAddress
 	/**
 	 * Creates a KNX group address from a string <code>address</code> representation.
 	 * <p>
-	 * The address might be formatted in 2- or 3-level groups. Allowed separators are '.'
+	 * The address string can either be formatted, e.g., "2/1/2", or the raw address, e.g., "4354".
+	 * A formatted address is a 2- or 3-level group address, the allowed separators are '.'
 	 * or '/', mutually exclusive.
 	 * 
 	 * @param address string containing the KNX address
@@ -108,11 +109,13 @@ public class GroupAddress extends KNXAddress
 	{
 		final String[] tokens = parse(address);
 		try {
-			if (tokens.length == 2)
+			if (tokens.length == 1)
+				init(Integer.parseInt(tokens[0]));
+			else if (tokens.length == 2)
 				init(Byte.parseByte(tokens[0]), Short.parseShort(tokens[1]));
 			else if (tokens.length == 3)
-				init(Byte.parseByte(tokens[0]), Byte.parseByte(tokens[1]), Short
-					.parseShort(tokens[2]));
+				init(Byte.parseByte(tokens[0]), Byte.parseByte(tokens[1]),
+						Short.parseShort(tokens[2]));
 		}
 		catch (final NumberFormatException e) {
 			throw new KNXFormatException("invalid group address", address);
