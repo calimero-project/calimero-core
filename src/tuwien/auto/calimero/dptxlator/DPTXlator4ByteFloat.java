@@ -15,13 +15,15 @@
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 
 package tuwien.auto.calimero.dptxlator;
 
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import tuwien.auto.calimero.exception.KNXFormatException;
@@ -775,8 +777,17 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	private String makeString(final int index)
 	{
 		final float f = fromDPT(index);
-		final String s = Math.abs(f) < 100000 ? String.valueOf(fromDPT(index))
-				: new DecimalFormat("0.#####E0").format(fromDPT(index));
+		String s="";
+		if (Math.abs(f) < 100000) {
+			String.valueOf(f);
+		}
+		else {
+			NumberFormat dcf = NumberFormat.getInstance(Locale.US);
+			if (dcf instanceof DecimalFormat) {
+				((DecimalFormat) dcf).applyPattern("0.#####E0");
+			}
+			s= dcf.format(f);
+		}
 		return appendUnit(s);
 	}
 
@@ -788,8 +799,8 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	}
 
 	private void toDPT(final float value, final short[] dst, final int index)
-		throws KNXFormatException
-	{
+			throws KNXFormatException
+			{
 		if (value < min || value > max)
 			logThrow(LogLevel.WARN, "translation error for " + value, "value out of range ["
 					+ dpt.getLowerValue() + ".." + dpt.getUpperValue() + "]", Float.toString(value));
@@ -799,18 +810,18 @@ public class DPTXlator4ByteFloat extends DPTXlator
 		dst[i + 1] = ubyte(raw >>> 16);
 		dst[i + 2] = ubyte(raw >>> 8);
 		dst[i + 3] = ubyte(raw);
-	}
+			}
 
 	protected void toDPT(final String value, final short[] dst, final int index)
-		throws KNXFormatException
-	{
+			throws KNXFormatException
+			{
 		try {
 			toDPT(Float.parseFloat(removeUnit(value)), dst, index);
 		}
 		catch (final NumberFormatException e) {
 			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
 		}
-	}
+			}
 
 	private float getLimit(final String limit) throws KNXFormatException
 	{
