@@ -777,9 +777,9 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	private String makeString(final int index)
 	{
 		final float f = fromDPT(index);
-		String s="";
+		String s;
 		if (Math.abs(f) < 100000) {
-			String.valueOf(f);
+			s=String.valueOf(f);
 		}
 		else {
 			NumberFormat dcf = NumberFormat.getInstance(Locale.US);
