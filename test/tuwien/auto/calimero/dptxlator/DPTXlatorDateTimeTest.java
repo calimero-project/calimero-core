@@ -168,9 +168,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 			t.setData(data);
 			fail("invalid data");
 		}
-		catch (final KNXIllegalArgumentException e) {
-			System.out.println(e.getMessage());
-		}
+		catch (final KNXIllegalArgumentException e) {}
 	}
 	
 	/**
@@ -697,7 +695,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 
 		t.setDateTimeFlag(DPTXlatorDateTime.DAYLIGHT, !t
 			.getDateTimeFlag(DPTXlatorDateTime.DAYLIGHT));
-		assertFalse(t.validate());
+		assertTrue(t.validate());
 
 		t.setValue(c.getTimeInMillis());
 		t.setDayOfWeek(c.get(Calendar.DAY_OF_WEEK));

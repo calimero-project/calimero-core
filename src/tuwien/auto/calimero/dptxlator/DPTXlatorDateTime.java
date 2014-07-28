@@ -205,12 +205,14 @@ public class DPTXlatorDateTime extends DPTXlator
 	private static final int[] FLAG_MASKS = { WD, DST, FAULT, QUALITY };
 
 	private static Calendar c;
-	private static final Map types;
+
+	private static int defaultDSTOffset;
+	private static final Map<String, Object> types;
 
 	private boolean extFormat = true;
 
 	static {
-		types = new HashMap(3);
+		types = new HashMap<String, Object>(3);
 		types.put(DPT_DATE_TIME.getID(), DPT_DATE_TIME);
 	}
 
@@ -635,7 +637,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
 	 */
-	public Map getSubTypes()
+	public Map<String, Object> getSubTypes()
 	{
 		return types;
 	}
@@ -644,7 +646,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * @return the subtypes of the date with time translator type
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
-	protected static Map getSubTypesStatic()
+	protected static Map<String, Object> getSubTypesStatic()
 	{
 		return types;
 	}
@@ -723,8 +725,9 @@ public class DPTXlatorDateTime extends DPTXlator
 					if ((data[i + 3] >> 5) != day)
 						throw new KNXFormatException("differing day of week");
 				}
-				if (getDateTimeFlag(index, DAYLIGHT) != (c.get(Calendar.DST_OFFSET) != 0))
-					throw new KNXFormatException("differing daylight saving time");
+				if (getDateTimeFlag(index, DAYLIGHT))
+					c.set(Calendar.DST_OFFSET, defaultDSTOffset);
+
 				return ms;
 			}
 			catch (final IllegalArgumentException e) {
@@ -884,6 +887,7 @@ public class DPTXlatorDateTime extends DPTXlator
 		if (c == null) {
 			c = Calendar.getInstance();
 			c.setLenient(false);
+			defaultDSTOffset=c.get(Calendar.DST_OFFSET);
 		}
 	}
 }
