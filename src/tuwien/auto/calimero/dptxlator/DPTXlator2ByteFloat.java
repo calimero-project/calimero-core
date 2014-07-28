@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,9 +32,9 @@ import tuwien.auto.calimero.log.LogLevel;
  * This type is a two byte floating format with a maximum usable range of -671088.64 to
  * +670760.96. DPTs adjust the usable range to reasonable limits for its values, the
  * translator will check and enforce those DPT specific limits in all methods working with
- * java values (e.g. {@link #setValue(float)}). Data methods for KNX data (e.g.
+ * java values (e.g. {@link #setValue(double)}). Data methods for KNX data (e.g.
  * {@link #setData(byte[])} accept all data within the maximum usable range.<br>
- * In value methods expecting a string type, the value is a float type representation.
+ * In value methods expecting a string type, the value is a floating type representation.
  * <p>
  * The default return value after creation is <code>0.0</code>.<br>
  * Note, that the floating type structure specified by this data type isn't really
@@ -204,8 +204,8 @@ public class DPTXlator2ByteFloat extends DPTXlator
 		types.put(DPT_WIND_SPEED_KMH.getID(), DPT_WIND_SPEED_KMH);
 	}
 
-	private final float min;
-	private final float max;
+	private final double min;
+	private final double max;
 
 	/**
 	 * Creates a translator for the given datapoint type.
@@ -243,7 +243,21 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	 * @param value the float value
 	 * @throws KNXFormatException if <code>value</code>doesn't fit into KNX data type
 	 */
+	// TODO eventually remove this method
 	public void setValue(final float value) throws KNXFormatException
+	{
+		setValue((double) value);
+	}
+
+	/**
+	 * Sets the translation value from a double.
+	 * <p>
+	 * If succeeded, any other items in the translator are discarded.
+	 * 
+	 * @param value the double value
+	 * @throws KNXFormatException if <code>value</code>doesn't fit into KNX data type
+	 */
+	public void setValue(final double value) throws KNXFormatException
 	{
 		final short[] buf = new short[2];
 		toDPT(value, buf, 0);
@@ -257,6 +271,17 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	 * @return value as float
 	 */
 	public final float getValueFloat()
+	{
+		return (float) fromDPT(0);
+	}
+
+	/**
+	 * Returns the first translation item formatted as double.
+	 * <p>
+	 * 
+	 * @return value as double
+	 */
+	public final double getValueDouble()
 	{
 		return fromDPT(0);
 	}
@@ -294,7 +319,7 @@ public class DPTXlator2ByteFloat extends DPTXlator
 		return appendUnit(String.valueOf(fromDPT(index)));
 	}
 
-	private float fromDPT(final int index)
+	private double fromDPT(final int index)
 	{
 		final int i = 2 * index;
 		// DPT bits high byte: MEEEEMMM, low byte: MMMMMMMM
@@ -303,25 +328,26 @@ public class DPTXlator2ByteFloat extends DPTXlator
 		// normalize
 		v >>= 20;
 		final int exp = (data[i] & 0x78) >> 3;
-		return (float) ((1 << exp) * v * 0.01);
+		return (1 << exp) * v * 0.01;
 	}
 
-	private void toDPT(final float value, final short[] dst, final int index)
+	private void toDPT(final double value, final short[] dst, final int index)
 		throws KNXFormatException
 	{
 		if (value < min || value > max)
-			logThrow(LogLevel.WARN, "translation error for " + value, "value out of range ["
-					+ dpt.getLowerValue() + ".." + dpt.getUpperValue() + "]", Float.toString(value));
+			logThrow(LogLevel.WARN, "translation error for " + value, "value out of range [" +
+					dpt.getLowerValue() + ".." + dpt.getUpperValue() + "]",
+					Double.toString(value));
 		// encoding: value = (0.01*M)*2^E
-		float v = value * 100.0f;
+		double v = value * 100.0f;
 		int e = 0;
 		for (; v < -2048.0f; v /= 2)
 			e++;
 		for (; v > 2047.0f; v /= 2)
 			e++;
-		final int m = Math.round(v) & 0x7FF;
+		final int m = (int) Math.round(v) & 0x7FF;
 		short msb = (short) (e << 3 | m >> 8);
-		if (value < 0.0f)
+		if (value < 0.0)
 			msb |= 0x80;
 		dst[2 * index] = msb;
 		dst[2 * index + 1] = ubyte(m);
@@ -330,19 +356,19 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	protected void toDPT(final String value, final short[] dst, final int index) throws KNXFormatException
 	{
 		try {
-			toDPT(Float.parseFloat(removeUnit(value)), dst, index);
+			toDPT(Double.parseDouble(removeUnit(value)), dst, index);
 		}
 		catch (final NumberFormatException e) {
 			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
 		}
 	}
 
-	private float getLimit(final String limit) throws KNXFormatException
+	private double getLimit(final String limit) throws KNXFormatException
 	{
 		try {
-			final float f = Float.parseFloat(limit);
-			if (f >= -671088.64f && f <= 670760.96f)
-				return f;
+			final double d = Double.parseDouble(limit);
+			if (d >= -671088.64d && d <= 670760.96d)
+				return d;
 		}
 		catch (final NumberFormatException e) {}
 		logThrow(LogLevel.ERROR, "limit " + limit, "invalid DPT range", limit);

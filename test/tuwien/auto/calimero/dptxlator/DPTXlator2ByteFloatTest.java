@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,8 +33,8 @@ import tuwien.auto.calimero.log.LogManager;
 public class DPTXlator2ByteFloatTest extends TestCase
 {
 	private DPTXlator2ByteFloat t;
-	private final String min = "-670760";
-	private final String max = "670760";
+	private final String min = "-671088.64";
+	private final String max = "670760.96";
 	private final String zero = "0.0";
 
 	private final String value1 = "735.763";
@@ -43,11 +43,11 @@ public class DPTXlator2ByteFloatTest extends TestCase
 	private final String value2 = "100.0";
 
 	private final String[] strings = { min, max, zero, "736.0", value2 };
-	private final float[] floats =
-		{ Float.parseFloat(min), Float.parseFloat(max), Float.parseFloat(zero),
-			Float.parseFloat(value1), Float.parseFloat(value2), };
+	private final double[] floats =
+		{ Double.parseDouble(min), Double.parseDouble(max), Double.parseDouble(zero),
+			Double.parseDouble(value1), Double.parseDouble(value2), };
 
-	private final byte[] dataMin = { (byte) 0xf8, 1, };
+	private final byte[] dataMin = { (byte) 0xf8, 0, };
 	private final byte[] dataMax = { 0x7f, -1 };
 	private final byte[] dataZero = { 0, 0 };
 	private final byte[] dataValue1 = { (byte) 0x34, (byte) 0x7e, };
@@ -81,7 +81,7 @@ public class DPTXlator2ByteFloatTest extends TestCase
 	{
 		super.setUp();
 		LogManager.getManager().addWriter("DPTXlator", Util.getLogWriter());
-		t = new DPTXlator2ByteFloat(DPTXlator2ByteFloat.DPT_TEMPERATURE_DIFFERENCE);
+		t = new DPTXlator2ByteFloat(DPTXlator2ByteFloat.DPT_RAIN_AMOUNT);
 	}
 
 	/* (non-Javadoc)
@@ -108,7 +108,7 @@ public class DPTXlator2ByteFloatTest extends TestCase
 		assertEquals(0.0, t.getValueFloat(), 0);
 		t.setValues(new String[] { min, max, zero, value1, value2, });
 		assertEquals(5, t.getItems());
-		assertEquals(-670760.0, t.getValueFloat(), 1.0);
+		assertEquals(-671088.64, t.getValueFloat(), 1.0);
 		t.setValue(100);
 		t.setValues(new String[] { t.getValue(), t.getValue() });
 	}
@@ -322,10 +322,12 @@ public class DPTXlator2ByteFloatTest extends TestCase
 	{
 		assertTrue(t.getValue().indexOf("0") >= 0);
 		assertTrue(t.getValue().indexOf(t.getType().getUnit()) >= 0);
-		t.setValue(265f);
-		final float f = t.getValueFloat();
-		assertEquals(265, f, 1.0);
-		assertTrue(t.getValue().indexOf(String.valueOf(f)) >= 0);
+
+		t.setValue(265);
+		final double d = t.getValueDouble();
+		assertEquals(265, d, 1.0);
+		final String s = String.valueOf(d);
+		assertTrue(t.getValue().indexOf(s) >= 0);
 	}
 
 	/**
@@ -333,7 +335,6 @@ public class DPTXlator2ByteFloatTest extends TestCase
 	 */
 	public final void testGetType()
 	{
-		assertEquals(t.getType(), dpts[1]);
+		assertEquals(t.getType(), dpts[16]);
 	}
-
 }
