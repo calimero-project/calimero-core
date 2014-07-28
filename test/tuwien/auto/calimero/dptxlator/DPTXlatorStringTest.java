@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ import java.util.Arrays;
 import junit.framework.TestCase;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.exception.KNXFormatException;
+import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.log.LogManager;
 
 /**
@@ -200,7 +201,20 @@ public class DPTXlatorStringTest extends TestCase
 	public final void testSetDataByteArrayInt()
 	{
 		t.setData(data, 0);
-		t.setData(new byte[] {}, 0);
+		try {
+			t.setData(new byte[] {}, 0);
+			fail("zero data length");
+		}
+		catch (final KNXIllegalArgumentException e) {
+			// ok
+		}
+		try {
+			t.setData(new byte[] {0, 1, 2, 3, 4, 5}, 0);
+			fail("only 6 bytes data length");
+		}
+		catch (final KNXIllegalArgumentException e) {
+			// ok
+		}
 		assertTrue(Arrays.equals(data, t.getData()));
 		final byte[] dataOffset = new byte[28];
 		System.arraycopy(data1, 0, dataOffset, 3, data1.length);

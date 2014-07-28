@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -112,8 +112,7 @@ public class DPTXlatorString extends DPTXlator
 	{
 		if (offset < 0 || offset > data.length)
 			throw new KNXIllegalArgumentException("illegal offset " + offset);
-		if (data.length - offset > 0)
-			toDPT(data, offset);
+		toDPT(data, offset);
 	}
 
 	/* (non-Javadoc)
@@ -153,8 +152,8 @@ public class DPTXlatorString extends DPTXlator
 			rangeMax = 0xff;
 		final int items = (buf.length - offset) / stringLength;
 		if (items == 0) {
-			logger.error("source range has to be multiple of 14 bytes for KNX strings");
-			return;
+			throw new KNXIllegalArgumentException("data length " + (buf.length - offset)
+					+ " < required 14 bytes for KNX strings");
 		}
 		data = new short[items * stringLength];
 		// 7 bit encoded characters of ISO-8859-1 are equal to ASCII
