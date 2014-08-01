@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -332,7 +332,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		}
 		else {
 			final DPTXlator2ByteFloat t = new DPTXlator2ByteFloat(
-					DPTXlator2ByteFloat.DPT_TEMPERATURE_DIFFERENCE);
+					DPTXlator2ByteFloat.DPT_RAIN_AMOUNT);
 			t.setValue(value);
 			write(dst, priority, t);
 		}
@@ -355,9 +355,9 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		}
 		final byte[] apdu = readFromGroup(dst, priority, 2, 2);
 		final DPTXlator2ByteFloat t = new DPTXlator2ByteFloat(
-				DPTXlator2ByteFloat.DPT_TEMPERATURE_DIFFERENCE);
+				DPTXlator2ByteFloat.DPT_RAIN_AMOUNT);
 		extractGroupASDU(apdu, t);
-		return t.getValueFloat();
+		return (float) t.getValueDouble();
 	}
 	
 	/* (non-Javadoc)
