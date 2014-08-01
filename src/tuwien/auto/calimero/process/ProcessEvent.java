@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,9 +49,9 @@ public class ProcessEvent extends EventObject
 	 * address and ASDU.
 	 * <p>
 	 * 
-	 * @param source the receiving process communicator
-	 * @param src KNX source individual address of message
-	 * @param dst KNX destination address of message
+	 * @param source the process communicator object on which the event initially occurred
+	 * @param src KNX source individual address of the corresponding KNX message
+	 * @param dst KNX destination address of the corresponding KNX message
 	 * @param asdu byte array with the application layer service data unit (ASDU), no
 	 *        copy is created
 	 */
