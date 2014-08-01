@@ -105,10 +105,10 @@ public class DPTXlator2ByteFloatTest extends TestCase
 	{
 		t.setValues(new String[] {});
 		assertEquals(1, t.getItems());
-		assertEquals(0.0, t.getValueFloat(), 0);
+		assertEquals(0.0, t.getValueDouble(), 0);
 		t.setValues(new String[] { min, max, zero, value1, value2, });
 		assertEquals(5, t.getItems());
-		assertEquals(-671088.64, t.getValueFloat(), 1.0);
+		assertEquals(-671088.64, t.getValueDouble(), 1.0);
 		t.setValue(100);
 		t.setValues(new String[] { t.getValue(), t.getValue() });
 	}
@@ -122,7 +122,7 @@ public class DPTXlator2ByteFloatTest extends TestCase
 	public final void testGetAllValues() throws KNXFormatException
 	{
 		assertEquals(t.getItems(), t.getItems());
-		assertEquals(0.0, t.getValueFloat(), 0);
+		assertEquals(0.0, t.getValueDouble(), 0);
 		t.setValues(strings);
 		final String[] returned = t.getAllValues();
 		assertEquals(strings.length, returned.length);
@@ -142,7 +142,7 @@ public class DPTXlator2ByteFloatTest extends TestCase
 	{
 		t.setValue(value1);
 		assertEquals(1, t.getItems());
-		assertEquals(floats[3], t.getValueFloat(), 1);
+		assertEquals(floats[3], t.getValueDouble(), 1);
 		assertTrue(t.getValue().startsWith(value1Enc));
 
 		t.setValue(t.getValue());
@@ -191,7 +191,7 @@ public class DPTXlator2ByteFloatTest extends TestCase
 		assertEquals(5, data.length);
 		assertTrue(Arrays.equals(dataValue2, data));
 
-		assertEquals(0f, t.getData(new byte[1], 0)[0], 0);
+		assertEquals(0, t.getData(new byte[1], 0)[0]);
 		assertNotNull(t.getData(new byte[0], 0));
 
 		final byte[] array =
@@ -230,10 +230,10 @@ public class DPTXlator2ByteFloatTest extends TestCase
 		Helper.checkDPTs(dpts, false);
 
 		for (int i = 0; i < dpts.length; i++) {
-			setValueFloatFail(new DPTXlator2ByteFloat(dpts[i]), Float.parseFloat(dpts[i]
-				.getLowerValue()) - 0.1f);
-			setValueFloatFail(new DPTXlator2ByteFloat(dpts[i]), Float.parseFloat(dpts[i]
-				.getUpperValue()) + 0.1f);
+			setValueFloatFail(new DPTXlator2ByteFloat(dpts[i]), Double.parseDouble(dpts[i]
+				.getLowerValue()) - 0.1d);
+			setValueFloatFail(new DPTXlator2ByteFloat(dpts[i]), Double.parseDouble(dpts[i]
+				.getUpperValue()) + 0.1d);
 		}
 
 		final DPT dpt = new DPT("0.00", "invalid", "invalid", "invalid", "invalid");
@@ -247,11 +247,11 @@ public class DPTXlator2ByteFloatTest extends TestCase
 		assertTrue(failed);
 	}
 
-	private void setValueFloatFail(final DPTXlator2ByteFloat tr, final float f)
+	private void setValueFloatFail(final DPTXlator2ByteFloat tr, final double d)
 	{
 		try {
-			tr.setValue(f);
-			fail("set value should fail: " + f);
+			tr.setValue(d);
+			fail("set value should fail: " + d);
 		}
 		catch (final KNXFormatException e) {}
 	}
@@ -285,6 +285,33 @@ public class DPTXlator2ByteFloatTest extends TestCase
 
 	/**
 	 * Test method for
+	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#getValueDouble()}.
+	 * 
+	 * @throws KNXFormatException
+	 */
+	public final void testGetValueDouble() throws KNXFormatException
+	{
+		assertEquals(0.0, t.getValueDouble(), 0);
+
+		t.setData(dataMin);
+		assertEquals(floats[0], t.getValueDouble(), 1.0);
+		t.setData(dataMax);
+		assertEquals(floats[1], t.getValueDouble(), 1.0);
+		t.setData(dataZero);
+		assertEquals(floats[2], t.getValueDouble(), 0);
+		t.setData(dataValue1);
+		assertEquals(floats[3], t.getValueDouble(), 1.0);
+		t.setData(dataValue2, 2);
+		assertEquals(floats[4], t.getValueDouble(), 1.0);
+
+		for (int i = 0; i < strings.length; i++) {
+			t.setValue(strings[i]);
+			assertEquals(floats[i], t.getValueDouble(), 1.0);
+		}
+	}
+	
+	/**
+	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#setValue(float)}.
 	 * 
 	 * @throws KNXFormatException
@@ -298,6 +325,21 @@ public class DPTXlator2ByteFloatTest extends TestCase
 		}
 	}
 
+	/**
+	 * Test method for
+	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#setValue(double)}.
+	 * 
+	 * @throws KNXFormatException
+	 */
+	public final void testSetValueDouble() throws KNXFormatException
+	{
+		for (int i = 0; i < floats.length; i++) {
+			t.setValue(floats[i]);
+			assertEquals(floats[i], t.getValueDouble(), 1.0);
+			assertTrue(t.getValue().startsWith(strings[i]));
+		}
+	}
+	
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#toString()}.
 	 * 
