@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2011 B. Malinowsky
+    Copyright (c) 2009, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,9 +19,12 @@
 
 package tuwien.auto.calimero.dptxlator;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import junit.framework.TestCase;
@@ -241,6 +244,31 @@ public class DPTXlator4ByteFloatTest extends TestCase
 		final float f = t.getValueFloat();
 		assertEquals(265, f, 1.0);
 		assertTrue(t.getValue().indexOf(String.valueOf(f)) >= 0);
+		
+		// test non-localized formatted output for bigger floating point values 
+		// that use scientific notation
+		// the difference is basically the decimal separator '.' vs ',' (depending on locale)
+		// we compare for all available locales
+		final float bigvalue = 123456.78f;
+		final Locale saved = Locale.getDefault();
+		final Locale[] locales = Locale.getAvailableLocales();
+		final List output = new ArrayList();
+		for (int i = 0; i < locales.length; ++i) {
+			final Locale l = locales[i];
+			Locale.setDefault(l);
+			//System.out.println("test language " + l);
+			final DPTXlator4ByteFloat t = new DPTXlator4ByteFloat(DPTXlator4ByteFloat.DPT_ACCELERATION);
+			t.setValue(bigvalue);
+			//System.out.println(t.getValue());
+			output.add(t.getValue());
+		}
+		Locale.setDefault(saved);
+		// check if outputs are the same
+		for(int i = 1; i < output.size(); ++i) {
+			final String first = (String) output.get(i - 1);
+			final String second = (String) output.get(i);
+			assertEquals(first, second);
+		}
 	}
 	
 	/**
