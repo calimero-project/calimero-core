@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2011 B. Malinowsky
+    Copyright (c) 2009, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,7 +21,9 @@ package tuwien.auto.calimero.dptxlator;
 
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import tuwien.auto.calimero.exception.KNXFormatException;
@@ -775,8 +777,17 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	private String makeString(final int index)
 	{
 		final float f = fromDPT(index);
-		final String s = Math.abs(f) < 100000 ? String.valueOf(fromDPT(index))
-				: new DecimalFormat("0.#####E0").format(fromDPT(index));
+		final String s;
+		if (Math.abs(f) < 100000) {
+			s = String.valueOf(f);
+		}
+		else {
+			final NumberFormat dcf = NumberFormat.getInstance(Locale.US);
+			if (dcf instanceof DecimalFormat) {
+				((DecimalFormat) dcf).applyPattern("0.#####E0");
+			}
+			s = dcf.format(f);
+		}
 		return appendUnit(s);
 	}
 
