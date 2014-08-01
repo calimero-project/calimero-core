@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,7 +27,9 @@ import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.datapoint.Datapoint;
 import tuwien.auto.calimero.datapoint.StateDP;
 import tuwien.auto.calimero.dptxlator.DPTXlator8BitUnsigned;
+import tuwien.auto.calimero.dptxlator.DPTXlatorString;
 import tuwien.auto.calimero.exception.KNXException;
+import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.KNXNetworkLinkIP;
@@ -42,13 +44,31 @@ public class ProcessCommunicatorTest extends TestCase
 	private ProcessCommunicator pc;
 	private ProcessCommunicator pc2;
 	private KNXNetworkLink link;
-
+	
+	private final GroupAddress dpBool;
+	private final GroupAddress dpBool2;
+	private final GroupAddress dpControl;
+	private final GroupAddress dpUnsigned1;
+	private final GroupAddress dpUnsigned2;
+	private final GroupAddress dpString;
+	private final GroupAddress dpFloat2;
+	private final GroupAddress dpFloat4;
+	
 	/**
 	 * @param name
+	 * @throws KNXFormatException
 	 */
-	public ProcessCommunicatorTest(final String name)
+	public ProcessCommunicatorTest(final String name) throws KNXFormatException
 	{
 		super(name);
+		dpBool = new GroupAddress("1/0/1");
+		dpBool2 = new GroupAddress("1/0/11");
+		dpControl = new GroupAddress("1/0/2");
+		dpUnsigned1 = new GroupAddress("1/0/3");
+		dpUnsigned2 = new GroupAddress("1/0/4");
+		dpString = new GroupAddress("1/0/5");
+		dpFloat2 = new GroupAddress("1/0/6");
+		dpFloat4 = new GroupAddress("1/0/7");
 	}
 
 	/* (non-Javadoc)
@@ -186,15 +206,14 @@ public class ProcessCommunicatorTest extends TestCase
 		// useful to see behavior when more than one indication is in the queue
 
 		// read from same address
-		final GroupAddress addr = new GroupAddress(1, 0, 1);
 		// if we are testing with a virtual network make sure we have some value set
-		pc.write(addr, true);
-		new Thread()
+		pc.write(dpBool, true);
+		new Thread("testReadBool Concurrent 1")
 		{
 			public void run()
 			{
 				try {
-					pc2.readBool(addr);
+					pc2.readBool(dpBool);
 				}
 				catch (final KNXException e) {
 					e.printStackTrace();
@@ -204,18 +223,17 @@ public class ProcessCommunicatorTest extends TestCase
 				}
 			};
 		}.start();
-		pc.readBool(addr);
+		pc.readBool(dpBool);
 
 		// read from different address
-		final GroupAddress addr2 = new GroupAddress(1, 0, 2);
 		// if we are testing with a virtual network make sure we have some value set
-		pc.write(addr2, false);
-		new Thread()
+		pc.write(dpBool2, false);
+		new Thread("testReadBool Concurrent 2")
 		{
 			public void run()
 			{
 				try {
-					pc2.readBool(addr);
+					pc2.readBool(dpBool);
 				}
 				catch (final KNXException e) {
 					e.printStackTrace();
@@ -225,15 +243,15 @@ public class ProcessCommunicatorTest extends TestCase
 				}
 			};
 		}.start();
-		pc.readBool(addr2);
+		pc.readBool(dpBool2);
 
 		// read from different address using same process communicator
-		new Thread()
+		new Thread("testReadBool Concurrent 3")
 		{
 			public void run()
 			{
 				try {
-					pc.readBool(addr);
+					pc.readBool(dpBool);
 				}
 				catch (final KNXException e) {
 					e.printStackTrace();
@@ -243,7 +261,7 @@ public class ProcessCommunicatorTest extends TestCase
 				}
 			};
 		}.start();
-		pc.readBool(addr2);
+		pc.readBool(dpBool2);
 	}
 
 	/**
@@ -258,14 +276,13 @@ public class ProcessCommunicatorTest extends TestCase
 		InterruptedException
 	{
 		// read from same address
-		final GroupAddress addr = new GroupAddress(1, 0, 1);
 		// if we are testing with a virtual network make sure we have some value set
-		pc.write(addr, true);
+		pc.write(dpBool, true);
 		Thread.sleep(100);
-		assertTrue(pc.readBool(addr));
-		pc.write(addr, false);
+		assertTrue(pc.readBool(dpBool));
+		pc.write(dpBool, false);
 		Thread.sleep(100);
-		assertFalse(pc.readBool(addr));
+		assertFalse(pc.readBool(dpBool));
 	}
 
 	/**
@@ -279,8 +296,7 @@ public class ProcessCommunicatorTest extends TestCase
 	public final void testReadUnsigned() throws KNXException, InterruptedException
 	{
 		// read from same address
-		final GroupAddress addr = new GroupAddress(1, 0, 1);
-		pc.readUnsigned(addr, ProcessCommunicationBase.UNSCALED);
+		pc.readUnsigned(dpUnsigned1, ProcessCommunicationBase.SCALING);
 	}
 
 	/**
@@ -292,8 +308,7 @@ public class ProcessCommunicatorTest extends TestCase
 	 */
 	public final void testWriteGroupAddressIntString() throws KNXException
 	{
-		final GroupAddress addr = new GroupAddress(1, 0, 1);
-		pc.write(addr, 80, ProcessCommunicationBase.SCALING);
+		pc.write(dpUnsigned1, 80, ProcessCommunicationBase.SCALING);
 	}
 
 	/**
@@ -306,8 +321,7 @@ public class ProcessCommunicatorTest extends TestCase
 	 */
 	public final void testReadControl() throws KNXException, InterruptedException
 	{
-		final GroupAddress addr = new GroupAddress(1, 0, 1);
-		pc.readControl(addr);
+		pc.readControl(dpControl);
 	}
 
 	/**
@@ -325,34 +339,30 @@ public class ProcessCommunicatorTest extends TestCase
 
 	/**
 	 * Test method for
-	 * {@link tuwien.auto.calimero.process.ProcessCommunicator#readFloat(tuwien.auto.calimero.GroupAddress)}
+	 * {@link tuwien.auto.calimero.process.ProcessCommunicator#readFloat(tuwien.auto.calimero.GroupAddress, boolean)}
 	 * .
 	 * 
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
-	public final void testReadFloat() throws KNXException, InterruptedException
+	public final void testReadFloatBoolean() throws KNXException, InterruptedException
 	{
-		// this test procedure now uses as direct replacement the 2 arg method
-		
-		final GroupAddress addr = new GroupAddress(1, 0, 1);
-		pc.readFloat(addr, false);
+		final float f2 = pc.readFloat(dpFloat2, false);
+		final float f4 = pc.readFloat(dpFloat4, true);
 	}
 
 	/**
 	 * Test method for
-	 * {@link tuwien.auto.calimero.process.ProcessCommunicator#write(tuwien.auto.calimero.GroupAddress, float)}
+	 * {@link tuwien.auto.calimero.process.ProcessCommunicator#write(tuwien.auto.calimero.GroupAddress, float, boolean)}
 	 * .
 	 * 
 	 * @throws KNXException
 	 */
-	public final void testWriteGroupAddressFloat() throws KNXException
+	public final void testWriteGroupAddressFloatBoolean() throws KNXException
 	{
-		// this test procedure now uses as direct replacement the 3 arg method
-		
-		final GroupAddress addr = new GroupAddress(1, 0, 1);
 		final float f = (float) 0.01;
-		pc.write(addr, f, false);
+		pc.write(dpFloat2, f, false);
+		pc.write(dpFloat4, f, true);
 	}
 
 	/**
@@ -365,8 +375,10 @@ public class ProcessCommunicatorTest extends TestCase
 	 */
 	public final void testReadString() throws KNXException, InterruptedException
 	{
-		final GroupAddress addr = new GroupAddress(1, 0, 1);
-		pc.readString(addr);
+		final String s = pc.readString(dpString);
+		assertTrue(s.length() > 0);
+		// adjust this or comment out, if testing with other hardware or strings
+		assertEquals("Hello KNX!", s);
 	}
 
 	/**
@@ -375,11 +387,14 @@ public class ProcessCommunicatorTest extends TestCase
 	 * .
 	 * 
 	 * @throws KNXException
+	 * @throws InterruptedException
 	 */
-	public final void testWriteGroupAddressString() throws KNXException
+	public final void testWriteGroupAddressString() throws KNXException, InterruptedException
 	{
-		final GroupAddress addr = new GroupAddress(1, 0, 1);
-		pc.write(addr, "test");
+		pc.write(dpString, "test");
+		pc.write(dpString, "test2");
+		Thread.sleep(100);
+		assertEquals("test2", pc.readString(dpString));
 	}
 
 	/**
@@ -392,8 +407,10 @@ public class ProcessCommunicatorTest extends TestCase
 	 */
 	public final void testRead() throws KNXException, InterruptedException
 	{
-		final Datapoint dp = new StateDP(new GroupAddress(1, 0, 0), "test datapoint");
+		final Datapoint dp = new StateDP(dpString, "test datapoint");
+		dp.setDPT(0, DPTXlatorString.DPT_STRING_8859_1.getID());
 		final String res = pc2.read(dp);
+		assertTrue(res.length() > 0);
 	}
 
 	/**
@@ -405,7 +422,7 @@ public class ProcessCommunicatorTest extends TestCase
 	 */
 	public final void testWriteDatapointString() throws KNXException
 	{
-		final Datapoint dp = new StateDP(new GroupAddress(1, 0, 0), "test datapoint");
+		final Datapoint dp = new StateDP(dpUnsigned1, "test datapoint");
 		dp.setDPT(0, DPTXlator8BitUnsigned.DPT_PERCENT_U8.getID());
 		pc2.write(dp, "80");
 	}
@@ -418,5 +435,4 @@ public class ProcessCommunicatorTest extends TestCase
 		final KNXNetworkLink ret = pc.detach();
 		assertEquals(link, ret);
 	}
-
 }
