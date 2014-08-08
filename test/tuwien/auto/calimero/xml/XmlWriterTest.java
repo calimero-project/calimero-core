@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -267,7 +267,7 @@ public class XmlWriterTest extends TestCase
 		final XMLReader r = XMLFactory.getInstance().createXMLReader(file);
 		r.read();
 		r.complete(r.getCurrent());
-		assertEquals("\nhello XML! hello tags &lt; < &gt; > ", r.getCurrent().getCharacterData());
+		assertEquals("\n    hello XML! hello tags &lt; < &gt; > ", r.getCurrent().getCharacterData());
 	}
 
 	private BufferedReader getInput(final String text)
