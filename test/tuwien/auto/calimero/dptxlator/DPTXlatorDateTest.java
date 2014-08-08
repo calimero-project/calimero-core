@@ -34,7 +34,7 @@ import tuwien.auto.calimero.log.LogManager;
 /**
  * Test for DPTXlatorDate.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public class DPTXlatorDateTest extends TestCase
@@ -79,7 +79,7 @@ public class DPTXlatorDateTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDate#setValues(java.lang.String[])}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValues() throws KNXFormatException
@@ -93,7 +93,7 @@ public class DPTXlatorDateTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorDate#getAllValues()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testGetAllValues() throws KNXFormatException
@@ -113,7 +113,7 @@ public class DPTXlatorDateTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDate#setValue(java.lang.String)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValueString() throws KNXFormatException
@@ -197,7 +197,7 @@ public class DPTXlatorDateTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorDate#useValueFormat
 	 * (java.lang.String)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testUseValueFormat() throws KNXFormatException
@@ -296,7 +296,7 @@ public class DPTXlatorDateTest extends TestCase
 		c.clear(Calendar.SECOND);
 		c.clear(Calendar.MILLISECOND);
 		assertEquals(c.getTimeInMillis(), t.getValueMilliseconds());
-		
+
 		t.setValue(2007, 2, 30);
 		try {
 			t.getValueMilliseconds();
