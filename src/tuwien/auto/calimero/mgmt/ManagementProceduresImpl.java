@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2012 B. Malinowsky
+    Copyright (c) 2010, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -174,7 +174,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	public boolean writeAddress(final IndividualAddress newAddress) throws KNXException,
 		InterruptedException
 	{
-		final Destination dst = mc.createDestination(newAddress, true);
+		final Destination dst = getOrCreateDestination(newAddress);
 		boolean exists = false;
 		try {
 			mc.readDeviceDesc(dst, 0);
@@ -379,7 +379,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		// ??? there also exists a KNX property for this, might query that property first
 
 		// conn.oriented
-		final Destination d = tl.createDestination(device, true);
+		final Destination d = getOrCreateDestination(device);
 		// read from memory where device keeps programming mode
 		final byte[] mem = mc.readMemory(d, memAddrProgMode, 1);
 		// store lowest 7 bits
@@ -409,7 +409,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			throw new KNXIllegalArgumentException(
 				"verify write and verify by server not both applicable");
 
-		final Destination d = tl.createDestination(device, true, false, verifyByServer);
+		final Destination d = getOrCreateDestination(device, false, verifyByServer);
 		// if automatic server verification is requested, turn verify flag on
 		if (verifyByServer) {
 			// reading description checks whether property exists
@@ -477,7 +477,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		// logger.warn("reading over 4K of device memory "
 		// + "(hope you know what you are doing)");
 
-		final Destination d = tl.createDestination(device, true);
+		final Destination d = getOrCreateDestination(device);
 
 		final byte[] read = new byte[bytes];
 		final int asduLength = readMaxAsduLength(d);
@@ -499,6 +499,21 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			mc.detach();
 	}
 
+	// work around for implementation in TL, which unconditionally throws if dst exists
+	private Destination getOrCreateDestination(final IndividualAddress device)
+	{
+		final Destination d = ((TransportLayerImpl) tl).getDestination(device);
+		return d != null ? d : tl.createDestination(device, true);
+	}
+
+	// work around for implementation in TL, which unconditionally throws if dst exists
+	private Destination getOrCreateDestination(final IndividualAddress device,
+		final boolean keepAlive, final boolean verifyByServer)
+	{
+		final Destination d = ((TransportLayerImpl) tl).getDestination(device);
+		return d != null ? d : tl.createDestination(device, true, keepAlive, verifyByServer);
+	}
+
 	private IndividualAddress[] scanAddresses(final List addresses, final boolean routers)
 		throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
@@ -510,7 +525,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		try {
 			for (final Iterator i = addresses.iterator(); i.hasNext();) {
 				final IndividualAddress remote = (IndividualAddress) i.next();
-				final Destination d = tl.createDestination(remote, true);
+				final Destination d = getOrCreateDestination(remote, true, false);
 				destinations.add(d);
 				tl.connect(d);
 				// increased from 100 (the default) to minimize chance of overflow over FT1.2
