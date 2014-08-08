@@ -90,9 +90,9 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 				fireGroupReadWrite(f, new byte[0], svc);
 			else if (svc == GROUP_RESPONSE || svc == GROUP_WRITE)
 				fireGroupReadWrite(f, DataUnitBuilder.extractASDU(apdu), svc);
-			else
-				logger.warn("unsupported APDU service - ignored, service code = 0x"
-						+ Integer.toHexString(svc));
+			else ;
+				//logger.warn("unsupported APDU service - ignored, service code = 0x"
+				//		+ Integer.toHexString(svc));
 		}
 
 		private void fireGroupReadWrite(final CEMILData f, final byte[] asdu, final int svc)
