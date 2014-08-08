@@ -195,7 +195,7 @@ public class TransportLayerImplTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.TransportLayerImpl#broadcast
 	 * (boolean, Priority, byte[])}.
-	 * 
+	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 * @throws InterruptedException
@@ -215,7 +215,7 @@ public class TransportLayerImplTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.TransportLayerImpl#connect
 	 * (tuwien.auto.calimero.mgmt.Destination)}.
-	 * 
+	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 */
@@ -274,7 +274,7 @@ public class TransportLayerImplTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.TransportLayerImpl#detach()}.
-	 * 
+	 *
 	 * @throws KNXLinkClosedException
 	 */
 	public final void testDetach() throws KNXLinkClosedException
@@ -299,7 +299,7 @@ public class TransportLayerImplTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.TransportLayerImpl#detach()}.
-	 * 
+	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 */
@@ -336,7 +336,7 @@ public class TransportLayerImplTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.TransportLayerImpl#disconnect
 	 * (tuwien.auto.calimero.mgmt.Destination)}.
-	 * 
+	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 */
@@ -399,7 +399,7 @@ public class TransportLayerImplTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.TransportLayerImpl#sendData
 	 * (tuwien.auto.calimero.mgmt.Destination, tuwien.auto.calimero.Priority, byte[])}.
-	 * 
+	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 * @throws KNXDisconnectException
@@ -491,6 +491,12 @@ public class TransportLayerImplTest extends TestCase
 		Thread.sleep(500);
 	}
 
+	/**
+	 * @throws KNXTimeoutException
+	 * @throws KNXLinkClosedException
+	 * @throws KNXDisconnectException
+	 * @throws InterruptedException
+	 */
 	public void testSendDataLinkClose() throws KNXTimeoutException,
 		KNXLinkClosedException, KNXDisconnectException, InterruptedException
 	{
@@ -504,7 +510,7 @@ public class TransportLayerImplTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.TransportLayerImpl#sendData
 	 * (tuwien.auto.calimero.KNXAddress, tuwien.auto.calimero.Priority, byte[])}.
-	 * 
+	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 * @throws InterruptedException
