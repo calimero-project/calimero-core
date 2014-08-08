@@ -534,7 +534,9 @@ public class ManagementProceduresImpl implements ManagementProcedures
 				// increased from 100 (the default) to minimize chance of overflow over FT1.2
 				Thread.sleep(115);
 			}
-			waitFor(disconnectTimeout);
+			// we wait in total (115 + 6000 + 1000 + 100) ms for a possible T-disconnect, taking
+			// into account the KNXnet/IP tunneling.req retransmit timeout plus some network delay
+			waitFor(disconnectTimeout + 1100);
 		}
 		finally {
 			tl.removeTransportListener(tll);
