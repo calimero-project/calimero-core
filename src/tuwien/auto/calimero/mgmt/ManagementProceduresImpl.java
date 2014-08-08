@@ -50,7 +50,7 @@ import tuwien.auto.calimero.log.LogService;
  * synchronized on the used management client instance if considered necessary ( {@ManagementClient
  * }). Note that this, although, is not sufficient to guarantee non-concurrent
  * execution of procedures on the same remote endpoint in general.
- * 
+ *
  * @author B. Malinowsky
  */
 public class ManagementProceduresImpl implements ManagementProcedures
@@ -68,7 +68,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	private final ManagementClient mc;
 	private final boolean detachMgmtClient;
 	private final TransportLayer tl;
-	
+
 	private final LogService logger = LogManager.getManager().getLogService("MgmtProc");
 
 	private static final class TLListener implements TransportListener
@@ -115,7 +115,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	/**
 	 * Creates a new management procedures instance, using the supplied KNX network link.
 	 * <p>
-	 * 
+	 *
 	 * @param link the KNX network link, with link in open state
 	 * @throws KNXLinkClosedException on closed {@link KNXNetworkLink}
 	 */
@@ -131,7 +131,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	 * Creates a new management procedures instance, using the supplied management client
 	 * for application layer services.
 	 * <p>
-	 * 
+	 *
 	 * @param mgmtClient the management client, with a network link attached and in open
 	 *        state
 	 * @param transportLayer
@@ -258,7 +258,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			dst.destroy();
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.ManagementProcedures
 	 * #isAddressOccupied(tuwien.auto.calimero.IndividualAddress)
@@ -283,7 +283,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		}
 		return true;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.ManagementProcedures#readAddress(byte[])
 	 */
@@ -370,14 +370,14 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		}
 		return Collections.EMPTY_LIST;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.ManagementProcedures#setProgrammingMode
 	 * (tuwien.auto.calimero.IndividualAddress, boolean)
 	 */
-	public void setProgrammingMode(final IndividualAddress device,
-		final boolean programming) throws KNXException, InterruptedException
+	public void setProgrammingMode(final IndividualAddress device, final boolean programming)
+		throws KNXException, InterruptedException
 	{
 		// ??? there also exists a KNX property for this, might query that property first
 
