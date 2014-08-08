@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,8 +23,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
-
-import tuwien.auto.calimero.Settings;
 
 /**
  * A LogService is used to categorize logging information with regard to logging level and
@@ -121,7 +119,7 @@ public class LogService
 
 		private void dispatch(final LogData d)
 		{
-			final boolean dev = Settings.getLibraryMode() == Settings.DEV_MODE;
+			final boolean dev = false; //Settings.getLibraryMode() == Settings.DEV_MODE;
 			final String svc = dev ? ("[" + d.thread.getName() + "] " + d.svc) : d.svc;
 			synchronized (d.wr) {
 				for (final Iterator i = d.wr.iterator(); i.hasNext();)
