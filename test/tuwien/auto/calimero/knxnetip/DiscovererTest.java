@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -241,7 +241,7 @@ public class DiscovererTest extends TestCase
 	public final void testStartSearchIntNetworkInterfaceIntBoolean()
 		throws SocketException, KNXException, InterruptedException
 	{
-		doStartSearchIF(ddef);
+		doStartSearchIF(ddef, false);
 	}
 
 	/**
@@ -262,7 +262,7 @@ public class DiscovererTest extends TestCase
 			return;
 		}
 		try {
-			doStartSearchIF(dnat);
+			doStartSearchIF(dnat, false);
 		}
 		catch (final AssertionFailedError e) {
 			fail("Probably no NAT support on router, " + e.getMessage());
@@ -281,15 +281,14 @@ public class DiscovererTest extends TestCase
 	public final void testMcastStartSearchIntNetworkInterfaceIntBoolean()
 		throws SocketException, KNXException, InterruptedException
 	{
-		doStartSearchIF(dmcast);
+		doStartSearchIF(dmcast, true);
 	}
 
-	private void doStartSearchIF(final Discoverer d) throws SocketException, KNXException,
-		InterruptedException
+	private void doStartSearchIF(final Discoverer d, final boolean usesMulticast)
+		throws SocketException, KNXException, InterruptedException
 	{
-		d.startSearch(40000,
-			NetworkInterface.getByInetAddress(Util.getLocalHost().getAddress()), timeout,
-			true);
+		d.startSearch(40000, NetworkInterface.getByInetAddress(Util.getLocalHost().getAddress()),
+				timeout, true);
 		final SearchResponse[] search = d.getSearchResponses();
 		assertTrue(search.length > 0);
 		for (int i = 0; i < search.length; ++i) {
@@ -301,15 +300,17 @@ public class DiscovererTest extends TestCase
 		// start 2 searches concurrently
 		final int responses = d.getSearchResponses().length;
 		d.clearSearchResponses();
-		d.startSearch(30000,
-			NetworkInterface.getByInetAddress(Util.getLocalHost().getAddress()), timeout,
-			false);
-		d.startSearch(30001,
-			NetworkInterface.getByInetAddress(Util.getLocalHost().getAddress()), timeout,
-			false);
+		d.startSearch(30000, NetworkInterface.getByInetAddress(Util.getLocalHost().getAddress()),
+				timeout, false);
+		d.startSearch(30001, NetworkInterface.getByInetAddress(Util.getLocalHost().getAddress()),
+				timeout, false);
 		while (d.isSearching())
 			Thread.sleep(200);
-		assertEquals(2 * responses, d.getSearchResponses().length);
+		// multicasts are not only received on sending IF
+		// but 3 * responses is not always true: the number of responses can
+		// vary based on network setup
+		final int expected = usesMulticast ? 3 * responses : 2 * responses;
+		assertEquals(expected, d.getSearchResponses().length);
 	}
 
 	/**
@@ -322,7 +323,7 @@ public class DiscovererTest extends TestCase
 	public final void testStartSearchIntBoolean() throws KNXException,
 		InterruptedException
 	{
-		doStartSeach(ddef);
+		doStartSeach(ddef, false);
 	}
 
 	/**
@@ -340,7 +341,7 @@ public class DiscovererTest extends TestCase
 			return;
 		}
 		try {
-			doStartSeach(dnat);
+			doStartSeach(dnat, false);
 		}
 		catch (final AssertionFailedError e) {
 			fail("Probably no NAT support on router, " + e.getMessage());
@@ -357,14 +358,14 @@ public class DiscovererTest extends TestCase
 	public final void testMcastStartSearchIntBoolean() throws KNXException,
 		InterruptedException
 	{
-		doStartSeach(dmcast);
+		doStartSeach(dmcast, true);
 	}
 
 	/**
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
-	private void doStartSeach(final Discoverer d) throws KNXException, InterruptedException
+	private void doStartSeach(final Discoverer d, final boolean usesMulticast) throws KNXException, InterruptedException
 	{
 		try {
 			d.startSearch(-1, true);
@@ -384,7 +385,12 @@ public class DiscovererTest extends TestCase
 		d.startSearch(timeout, false);
 		while (d.isSearching())
 			Thread.sleep(100);
-		assertEquals(2 * responses, d.getSearchResponses().length);
+		
+		// multicasts are not only received on sending IF
+		// but 3 * responses is not always true: the number of responses can
+		// vary based on network setup
+		final int expected = usesMulticast ? 3 * responses : 2 * responses;
+		assertEquals(expected, d.getSearchResponses().length);
 	}
 
 	/**
