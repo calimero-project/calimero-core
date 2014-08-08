@@ -33,7 +33,7 @@ import tuwien.auto.calimero.log.LogManager;
 /**
  * Test for DPTXlatorTime.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public class DPTXlatorTimeTest extends TestCase
@@ -78,7 +78,7 @@ public class DPTXlatorTimeTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#setValues(java.lang.String[])}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValues() throws KNXFormatException
@@ -93,7 +93,7 @@ public class DPTXlatorTimeTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#getAllValues()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testGetAllValues() throws KNXFormatException
@@ -111,7 +111,7 @@ public class DPTXlatorTimeTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#setValue(java.lang.String)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValueString() throws KNXFormatException
@@ -260,7 +260,7 @@ public class DPTXlatorTimeTest extends TestCase
 		final long time = t.getValueMilliseconds();
 		c.setTimeInMillis(time);
 		assertEquals(sdf.format(c.getTime()), sdf.format(new Date(time)));
-		
+
 		int dow = c.get(Calendar.DAY_OF_WEEK);
 		dow = dow == 1 ? 7 : dow - 1;
 		assertEquals(dow, t.getDayOfWeek());
@@ -273,7 +273,7 @@ public class DPTXlatorTimeTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#useValueFormat
 	 * (java.lang.String)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testUseValueFormat() throws KNXFormatException
