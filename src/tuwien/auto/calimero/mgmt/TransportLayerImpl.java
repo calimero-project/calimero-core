@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2012 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -217,8 +217,8 @@ public class TransportLayerImpl implements TransportLayer
 			if (proxies.containsKey(remote))
 				throw new KNXIllegalArgumentException("destination already created: " + remote);
 			final AggregatorProxy p = new AggregatorProxy(this);
-			final Destination d = new Destination(p, remote, connectionOriented,
-				keepAlive, verifyMode);
+			final Destination d = new Destination(p, remote, connectionOriented, keepAlive,
+					verifyMode);
 			proxies.put(remote, p);
 			if (logger.isLoggable(LogLevel.TRACE))
 				logger.trace("destination " + remote + " ready for use");
@@ -286,7 +286,7 @@ public class TransportLayerImpl implements TransportLayer
 	{
 		final AggregatorProxy p = getProxy(d);
 		if (!d.isConnectionOriented()) {
-			logger.error("destination not connection oriented: " + d.getAddress());
+			logger.error("destination not connection-oriented: " + d.getAddress());
 			return;
 		}
 		if (d.getState() != Destination.DISCONNECTED)

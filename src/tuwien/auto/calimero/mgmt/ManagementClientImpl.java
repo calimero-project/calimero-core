@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -220,8 +220,7 @@ public class ManagementClientImpl implements ManagementClient
 	 * (tuwien.auto.calimero.IndividualAddress, boolean, boolean, boolean)
 	 */
 	public Destination createDestination(final IndividualAddress remote,
-		final boolean connectionOriented, final boolean keepAlive,
-		final boolean verifyMode)
+		final boolean connectionOriented, final boolean keepAlive, final boolean verifyMode)
 	{
 		return tl.createDestination(remote, connectionOriented, keepAlive, verifyMode);
 	}
@@ -230,8 +229,8 @@ public class ManagementClientImpl implements ManagementClient
 	 * @see tuwien.auto.calimero.mgmt.ManagementClient#writeAddress
 	 * (tuwien.auto.calimero.IndividualAddress)
 	 */
-	public void writeAddress(final IndividualAddress newAddress)
-		throws KNXTimeoutException, KNXLinkClosedException
+	public void writeAddress(final IndividualAddress newAddress) throws KNXTimeoutException,
+		KNXLinkClosedException
 	{
 		tl.broadcast(false, Priority.SYSTEM,
 				DataUnitBuilder.createAPDU(IND_ADDR_WRITE, newAddress.toByteArray()));
