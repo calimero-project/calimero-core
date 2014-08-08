@@ -196,8 +196,11 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			final Destination verify = mc.createDestination(newAddress, true);
 			try {
 				mc.setResponseTimeout(1);
+				// ??? this does not conform to spec, where no max. attempts are given
+				// the problem is that we potentially loop forever (which would be correct)
+				int attempts = 20;
 				int count = 0;
-				while (count != 1) {
+				while (count != 1 && attempts-- > 0) {
 					try {
 						final IndividualAddress[] list = mc.readAddress(false);
 						count = list.length;
