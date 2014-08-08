@@ -98,7 +98,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		private void fireGroupReadWrite(final CEMILData f, final byte[] asdu, final int svc)
 		{
 			final ProcessEvent e = new ProcessEvent(ProcessCommunicatorImpl.this, f.getSource(),
-					(GroupAddress) f.getDestination(), asdu);
+					(GroupAddress) f.getDestination(), svc, asdu);
 			final EventListener[] el = listeners.listeners();
 			for (int i = 0; i < el.length; i++) {
 				final EventListener l = el[i];
