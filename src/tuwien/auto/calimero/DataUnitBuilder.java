@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -58,8 +58,8 @@ public final class DataUnitBuilder
 	public static int getAPDUService(final byte[] apdu)
 	{
 		if (apdu.length < 2)
-			throw new KNXIllegalArgumentException("getting APDU service from [0x"
-				+ toHex(apdu, "") + "], APCI length < 2");
+			throw new KNXIllegalArgumentException("getting APDU service from [0x" + toHex(apdu, "")
+					+ "], APCI length < 2");
 		// high 4 bits of APCI
 		final int apci4 = (apdu[0] & 0x03) << 2 | (apdu[1] & 0xC0) >> 6;
 		// lowest 6 bits of APCI
@@ -142,8 +142,7 @@ public final class DataUnitBuilder
 	public static byte[] createAPDU(final int service, final byte[] asdu)
 	{
 		if (asdu.length > 254)
-			throw new KNXIllegalArgumentException(
-				"ASDU length exceeds maximum of 254 bytes");
+			throw new KNXIllegalArgumentException("ASDU length exceeds maximum of 254 bytes");
 		final byte[] apdu = new byte[2 + asdu.length];
 		apdu[0] = (byte) ((service >> 8) & 0x03);
 		apdu[1] |= (byte) service;
@@ -170,8 +169,7 @@ public final class DataUnitBuilder
 		final byte[] apdu =
 			new byte[(asdu != null && asdu.length > 0) ? 1 + asdu.length : 2];
 		if (apdu.length > 255)
-			throw new KNXIllegalArgumentException(
-				"APDU length exceeds maximum of 255 bytes");
+			throw new KNXIllegalArgumentException("APDU length exceeds maximum of 255 bytes");
 		apdu[0] = (byte) ((service >> 8) & 0x03);
 		apdu[1] = (byte) service;
 		if (asdu != null && asdu.length > 0) {
