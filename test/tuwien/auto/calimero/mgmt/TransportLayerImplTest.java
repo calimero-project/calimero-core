@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -151,8 +151,8 @@ public class TransportLayerImplTest extends TestCase
 		tl = new TransportLayerImpl(nl);
 		ltl = new TLListener();
 		tl.addTransportListener(ltl);
-		dco = tl.createDestination(Util.getRouterAddress(), true);
-		dcl = tl.createDestination(new IndividualAddress(3, 1, 1), false);
+		dco = tl.createDestination(Util.getKnxDeviceCO(), true);
+		dcl = tl.createDestination(Util.getKnxDevice(), false);
 	}
 
 	/* (non-Javadoc)
