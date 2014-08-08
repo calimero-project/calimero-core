@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -108,14 +108,11 @@ public class KNXNetworkLinkIPTest extends TestCase
 		super.setUp();
 		LogManager.getManager().addWriter(null, Util.getLogWriter());
 
-		tnl =
-			new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, Util.getLocalHost(), Util
-				.getServer(), false, TPSettings.TP1);
-		rtr =
-			new KNXNetworkLinkIP(KNXNetworkLinkIP.ROUTING, Util.getLocalHost(),
-				new InetSocketAddress(InetAddress
-					.getByName(KNXnetIPRouting.DEFAULT_MULTICAST), 0), false,
-				TPSettings.TP1);
+		tnl = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, Util.getLocalHost(),
+				Util.getServer(), false, TPSettings.TP1);
+		rtr = new KNXNetworkLinkIP(KNXNetworkLinkIP.ROUTING, Util.getLocalHost(),
+				new InetSocketAddress(InetAddress.getByName(KNXnetIPRouting.DEFAULT_MULTICAST), 0),
+				false, TPSettings.TP1);
 		ltnl = new NLListenerImpl();
 		lrtr = new NLListenerImpl();
 		tnl.addLinkListener(ltnl);
@@ -194,7 +191,8 @@ public class KNXNetworkLinkIPTest extends TestCase
 
 	/**
 	 * Test method for
-	 * {@link tuwien.auto.calimero.link.KNXNetworkLinkIP#KNXNetworkLinkIP(java.net.NetworkInterface, java.net.InetAddress, tuwien.auto.calimero.link.medium.KNXMediumSettings)}.
+	 * {@link tuwien.auto.calimero.link.KNXNetworkLinkIP#KNXNetworkLinkIP(java.net.NetworkInterface,
+	 * java.net.InetAddress, tuwien.auto.calimero.link.medium.KNXMediumSettings)}.
 	 * 
 	 * @throws KNXException
 	 * @throws UnknownHostException
@@ -326,10 +324,9 @@ public class KNXNetworkLinkIPTest extends TestCase
 		doSend(false, new byte[] { 0, (byte) (0x80 | 0) });
 
 		// send an extended PL frame
-		final KNXNetworkLink plrtr =
-			new KNXNetworkLinkIP(KNXNetworkLinkIP.ROUTING, Util.getLocalHost(),
-				new InetSocketAddress(InetAddress
-					.getByName(KNXnetIPRouting.DEFAULT_MULTICAST), 0), false,
+		final KNXNetworkLink plrtr = new KNXNetworkLinkIP(KNXNetworkLinkIP.ROUTING,
+				Util.getLocalHost(), new InetSocketAddress(
+						InetAddress.getByName(KNXnetIPRouting.DEFAULT_MULTICAST), 0), false,
 				new PLSettings(true));
 		plrtr.sendRequest(new GroupAddress(0, 0, 1), Priority.LOW, new byte[] { 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (byte) (0x80 | 0) });
@@ -375,7 +372,8 @@ public class KNXNetworkLinkIPTest extends TestCase
 
 	/**
 	 * Test method for
-	 * {@link tuwien.auto.calimero.link.KNXNetworkLinkIP#sendRequestWait(tuwien.auto.calimero.KNXAddress, tuwien.auto.calimero.Priority, byte[])}.
+	 * {@link tuwien.auto.calimero.link.KNXNetworkLinkIP#sendRequestWait(
+	 * tuwien.auto.calimero.KNXAddress, tuwien.auto.calimero.Priority, byte[])}.
 	 * 
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
@@ -408,7 +406,8 @@ public class KNXNetworkLinkIPTest extends TestCase
 
 	/**
 	 * Test method for
-	 * {@link tuwien.auto.calimero.link.KNXNetworkLinkIP#send(tuwien.auto.calimero.cemi.CEMILData, boolean)}.
+	 * {@link tuwien.auto.calimero.link.KNXNetworkLinkIP#send(tuwien.auto.calimero.cemi.CEMILData,
+	 * boolean)}.
 	 * 
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
@@ -419,7 +418,7 @@ public class KNXNetworkLinkIPTest extends TestCase
 		ltnl.con = null;
 		try {
 			tnl.send(frameInd, true);
-			fail("should get timeout cos of wrong frame");
+			fail("should get timeout because of wrong frame");
 		}
 		catch (final KNXTimeoutException e) {}
 		assertNull(ltnl.con);
