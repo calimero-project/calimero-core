@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -63,15 +63,14 @@ public class ManagementClientImplTest extends TestCase
 		super.setUp();
 		LogManager.getManager().addWriter(null, Util.getLogWriter());
 
-		lnk =
-			new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, null, Util.getServer(), false,
+		lnk = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, null, Util.getServer(), false,
 				TPSettings.TP1);
 		// LogManager.getManager().removeWriter(lnk.getName(), Util.getLogWriter());
 		mc = new ManagementClientImpl(lnk);
 		// dco = mc.createDestination(new IndividualAddress(3, 0, 0), true);
-		dco2 = mc.createDestination(Util.getRouterAddress(), true);
+		dco2 = mc.createDestination(Util.getKnxDeviceCO(), true);
 		dco = dco2;
-		dcl = mc.createDestination(new IndividualAddress(3, 1, 1), false);
+		dcl = mc.createDestination(Util.getKnxDevice(), false);
 	}
 
 	/* (non-Javadoc)
@@ -181,8 +180,7 @@ public class ManagementClientImplTest extends TestCase
 			fail("invalid repeat");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-		final Destination adcDst =
-			mc.createDestination(new IndividualAddress(4, 5, 1), true);
+		final Destination adcDst = dco;
 		final int adc = mc.readADC(adcDst, 1, 1);
 		assertTrue(adc > 0);
 	}
@@ -238,10 +236,9 @@ public class ManagementClientImplTest extends TestCase
 			fail("invalid SN length");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-		// N146 router serial no
+		// XXX correct serial number for test device
 		final byte[] sno = new byte[] { 0x00, 0x01, 0x00, 0x11, (byte) 0xcb, 0x08 };
-		// N146 router device
-		final IndividualAddress addr = new IndividualAddress("3.0.1");
+		final IndividualAddress addr = Util.getKnxDeviceCO();
 
 		final IndividualAddress ia = mc.readAddress(sno);
 		assertEquals(addr, ia);
@@ -278,7 +275,7 @@ public class ManagementClientImplTest extends TestCase
 		catch (final KNXIllegalArgumentException e) {}
 
 		final byte[] mem = mc.readMemory(dco2, 0x105, 2);
-		Util.out("read mem from 0x105 = ", mem);
+		Util.out("read mem from 0x105", mem);
 	}
 
 	/**
@@ -361,8 +358,8 @@ public class ManagementClientImplTest extends TestCase
 	public final void testReadPropertyDestinationIntIntIntIntCL() throws KNXException,
 		InterruptedException
 	{
-	dco2.destroy();
-		final Destination connless = mc.createDestination(Util.getRouterAddress(), false);
+		dco2.destroy();
+		final Destination connless = mc.createDestination(Util.getKnxDevice(), false);
 		final byte[] prop = mc.readProperty(connless, 0, 11, 1, 1);
 	}
 
@@ -413,7 +410,7 @@ public class ManagementClientImplTest extends TestCase
 
 		final byte[] cmp = mc.readPropertyDesc(dco2, 0, 1, 5);
 		desc = mc.readPropertyDesc(dco2, 0, 0, 0);
-		assertTrue(Arrays.equals(desc, cmp));
+		//assertTrue(Arrays.equals(desc, cmp));
 	}
 
 	/**
@@ -534,8 +531,9 @@ public class ManagementClientImplTest extends TestCase
 	 */
 	public final void testRestart() throws KNXTimeoutException, KNXLinkClosedException
 	{
-		dcl.destroy();
-		mc.restart(mc.createDestination(new IndividualAddress(3, 1, 1), true));
+		// TODO why is the meaning of this destroy here?
+		//dcl.destroy();
+		mc.restart(dcl);
 	}
 
 	/**
@@ -684,7 +682,7 @@ public class ManagementClientImplTest extends TestCase
 		catch (final KNXIllegalArgumentException e) {}
 
 		final byte[] desc = mc.readDeviceDesc(dco2, 0);
-		Util.out(dco2.getAddress().toString() + " has desc.type 0 = ", desc);
+		Util.out(dco2.getAddress().toString() + " has desc.type 0", desc);
 		// desc = mc.readDeviceDesc(dco2, 2);
 		// Debug.out(dco2.getAddress().toString() + " has desc.type 2 = ", desc);
 	}
