@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -270,6 +270,7 @@ public class KNXnetIPTunnelTest extends TestCase
 		newNATTunnel();
 		doNATSend(frame, con, true);
 		doNATSend(frame2, con, true);
+		// XXX why is the confirmation here true?
 		doNATSend(frameNoDest, con, true);
 	}
 
@@ -346,7 +347,6 @@ public class KNXnetIPTunnelTest extends TestCase
 					Thread.sleep(10);
 				}
 				catch (final InterruptedException e) {}
-
 		}
 		assertNotNull(l.received);
 		final CEMILData fcon = (CEMILData) l.received;
@@ -452,7 +452,9 @@ public class KNXnetIPTunnelTest extends TestCase
 	{
 		newTunnel();
 		assertEquals(KNXnetIPConnection.OK, t.getState());
-		System.out.println("Testing heartbeat, will take some minutes");
+		System.out.println();
+		System.out.println("Testing heartbeat, this will take some minutes !!!");
+		System.out.println("...");
 		// give some seconds space for delay so we're on the save side
 		Thread.sleep(4000);
 		Thread.sleep(60000);
@@ -472,7 +474,9 @@ public class KNXnetIPTunnelTest extends TestCase
 	{
 		newMonitor();
 		assertEquals(KNXnetIPConnection.OK, mon.getState());
-		System.out.println("Testing heartbeat, will take some minutes");
+		System.out.println();
+		System.out.println("Testing heartbeat, this will take some minutes !!!");
+		System.out.println("...");
 		// give some seconds space for delay so we're on the save side
 		Thread.sleep(4000);
 		Thread.sleep(60000);
