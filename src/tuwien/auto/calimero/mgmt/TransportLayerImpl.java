@@ -434,14 +434,24 @@ public class TransportLayerImpl implements TransportLayer
 
 		if (ctrl == CONNECT) {
 			if (serverSide) {
+				AggregatorProxy proxy = p;
+				// TODO problem: if we receive a new connect, but an old destination is still
+				// here configured as connection-less, we get a problem with setting
+				// the connection timeout (connectionless has no support for that)
+				if (proxy != null && !d.isConnectionOriented()) {
+					logger.warn(d + ": recreate for conn-oriented");
+					d.destroy();
+					proxy = null;
+				}
+				
 				// allow incoming connect requests (server)
-				if (p == null) {
-					final AggregatorProxy ap = new AggregatorProxy(this);
+				if (proxy == null) {
+					proxy = new AggregatorProxy(this);
 					// constructor of destination assigns itself to ap
-					new Destination(ap, sender, true);
-					incomingProxies.put(sender, ap);
-					proxies.put(sender, ap);
-					ap.setState(Destination.OPEN_IDLE);
+					new Destination(proxy, sender, true);
+					incomingProxies.put(sender, proxy);
+					proxies.put(sender, proxy);
+					proxy.setState(Destination.OPEN_IDLE);
 				}
 				else {
 					p.setState(Destination.OPEN_IDLE);
