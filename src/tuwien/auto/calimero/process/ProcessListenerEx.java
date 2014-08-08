@@ -22,6 +22,7 @@ package tuwien.auto.calimero.process;
 import tuwien.auto.calimero.dptxlator.DPTXlator;
 import tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat;
 import tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled;
+import tuwien.auto.calimero.dptxlator.DPTXlator4ByteFloat;
 import tuwien.auto.calimero.dptxlator.DPTXlator8BitUnsigned;
 import tuwien.auto.calimero.dptxlator.DPTXlatorBoolean;
 import tuwien.auto.calimero.dptxlator.DPTXlatorString;
@@ -149,12 +150,42 @@ public abstract class ProcessListenerEx implements ProcessListener
 	 * @return the received value of type float
 	 * @throws KNXFormatException on not supported or not available float DPT
 	 */
+	// TODO prob. should get rid of in favor of the more versatile version
 	public float asFloat(final ProcessEvent e) throws KNXFormatException
 	{
 		final DPTXlator2ByteFloat t = new DPTXlator2ByteFloat(
 				DPTXlator2ByteFloat.DPT_RAIN_AMOUNT);
 		t.setData(e.getASDU());
 		return (float) t.getValueDouble();
+	}
+
+	/**
+	 * Returns the datapoint ASDU of the received process event as either 2-byte or 4-byte KNX float
+	 * value.
+	 * <p>
+	 * Invoke this method to get a translation of the received KNX floating point data.
+	 *
+	 * @param e the process event with the ASDU to translate
+	 * @param from4ByteFloat <true> to translate from 4-byte KNX float data, <false> to translate
+	 *        from 2-byte KNX float data
+	 * @return the received value of type double
+	 * @throws KNXFormatException on not supported or not available float DPT
+	 */
+	public double asFloat(final ProcessEvent e, final boolean from4ByteFloat)
+		throws KNXFormatException
+	{
+		if (from4ByteFloat) {
+			final DPTXlator4ByteFloat t = new DPTXlator4ByteFloat(
+					DPTXlator4ByteFloat.DPT_TEMPERATURE_DIFFERENCE);
+			t.setData(e.getASDU());
+			return t.getValueFloat();
+		}
+		else {
+			final DPTXlator2ByteFloat t = new DPTXlator2ByteFloat(
+					DPTXlator2ByteFloat.DPT_RAIN_AMOUNT);
+			t.setData(e.getASDU());
+			return t.getValueDouble();
+		}
 	}
 
 	/**
