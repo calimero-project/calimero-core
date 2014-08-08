@@ -342,6 +342,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	 * @see tuwien.auto.calimero.process.ProcessCommunicator#readFloat
 	 * (tuwien.auto.calimero.GroupAddress, boolean)
 	 */
+	// XXX make breaking change to return double?
 	public float readFloat(final GroupAddress dst, final boolean is4ByteFloat)
 		throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException, KNXFormatException,
 		InterruptedException
