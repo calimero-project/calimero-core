@@ -236,20 +236,6 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	}
 
 	/**
-	 * Sets the translation value from a float.
-	 * <p>
-	 * If succeeded, any other items in the translator are discarded.
-	 * 
-	 * @param value the float value
-	 * @throws KNXFormatException if <code>value</code>doesn't fit into KNX data type
-	 */
-	// TODO eventually remove this method
-	public void setValue(final float value) throws KNXFormatException
-	{
-		setValue((double) value);
-	}
-
-	/**
 	 * Sets the translation value from a double.
 	 * <p>
 	 * If succeeded, any other items in the translator are discarded.
