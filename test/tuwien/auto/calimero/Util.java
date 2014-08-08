@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,8 +46,15 @@ public final class Util
 	private static InetSocketAddress server;
 	private static IndividualAddress device;
 
-	private static final LogWriter w = new LogStreamWriter(LogLevel.ALL, System.out,
-		true, false);
+	// KNX test devices, for connection-less and connection-oriented mode
+	private static IndividualAddress testDeviceCL = new IndividualAddress(1, 1, 4);
+	private static IndividualAddress testDeviceCO = new IndividualAddress(1, 1, 5);
+
+	// make sure its the same subnet as the test device (for tests that set the address)
+	private static IndividualAddress nonExisting = new IndividualAddress(1, 1, 200);
+
+	private static final LogWriter w = new LogStreamWriter(LogLevel.ALL, System.out, true, false);
+
 
 	private Util()
 	{}
@@ -55,7 +62,7 @@ public final class Util
 	/**
 	 * Standard out desc and toHexDec(bytes).
 	 * <p>
-	 * 
+	 *
 	 * @param desc description
 	 * @param bytes bytes to print hex and decimal
 	 */
@@ -67,7 +74,7 @@ public final class Util
 	/**
 	 * Format first 200 bytes into hex, followed by decimal presentation.
 	 * <p>
-	 * 
+	 *
 	 * @param bytes bytes to format
 	 * @return formatted bytes as string
 	 */
@@ -100,7 +107,7 @@ public final class Util
 	/**
 	 * Returns a log writer for standard out.
 	 * <p>
-	 * 
+	 *
 	 * @return LogWriter
 	 */
 	public static LogWriter getLogWriter()
@@ -111,7 +118,7 @@ public final class Util
 	/**
 	 * Returns KNXnet/IP router address used for testing.
 	 * <p>
-	 * 
+	 *
 	 * @return router individual address
 	 */
 	public static IndividualAddress getRouterAddress()
@@ -136,8 +143,36 @@ public final class Util
 		return device;
 	}
 
+	/**
+	 * @return the individual address of the remote KNX device used for tests
+	 */
+	public static IndividualAddress getKnxDevice()
+	{
+		return testDeviceCL;
+	}
+
+	/**
+	 * @return the individual address of the remote KNX device used for tests, device supports
+	 *         Layer 4 connection-oriented mode
+	 */
+	public static IndividualAddress getKnxDeviceCO()
+	{
+		return testDeviceCO;
+	}
+
+	/**
+	 * @return the individual address for a non-existing KNX device used for tests
+	 */
+	public static IndividualAddress getNonExistingKnxDevice()
+	{
+		return nonExisting;
+	}
+
 	private static boolean printLocalHost = true;
-	
+
+	/**
+	 * @return the local host used for testing
+	 */
 	public static InetSocketAddress getLocalHost()
 	{
 		// don't trust default local host resolving of Java
@@ -165,7 +200,7 @@ public final class Util
 	/**
 	 * Returns the socket address of the KNXnet/IP router to use for testing.
 	 * <p>
-	 * 
+	 *
 	 * @return socket address
 	 * @throws KNXException if KNXnet/IP discovery failed
 	 */
@@ -199,7 +234,7 @@ public final class Util
 	 * <p>
 	 * The returned port has to correspond with the port identifier returned by
 	 * {@link #getSerialPortID()}.
-	 * 
+	 *
 	 * @return port number
 	 */
 	public static int getSerialPort()
@@ -211,7 +246,7 @@ public final class Util
 	/**
 	 * Returns the serial port identifier to use for testing the FT1.2 protocol.
 	 * <p>
-	 * 
+	 *
 	 * @return port ID, <code>null</code> if no ID found
 	 */
 	public static String getSerialPortID()
@@ -219,7 +254,10 @@ public final class Util
 		final String[] ids = FT12Connection.getPortIdentifiers();
 		return ids.length > 0 ? ids[0] : null;
 	}
-	
+
+	/**
+	 * @return the base directory used for unit testing
+	 */
 	public static String getPath()
 	{
 		return "./test/";
