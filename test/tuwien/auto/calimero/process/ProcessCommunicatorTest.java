@@ -305,10 +305,15 @@ public class ProcessCommunicatorTest extends TestCase
 	 * .
 	 * 
 	 * @throws KNXException
+	 * @throws InterruptedException
 	 */
-	public final void testWriteGroupAddressIntString() throws KNXException
+	public final void testWriteGroupAddressIntString() throws KNXException, InterruptedException
 	{
-		pc.write(dpUnsigned1, 80, ProcessCommunicationBase.SCALING);
+		final int v = 80;
+		pc.write(dpUnsigned1, v, ProcessCommunicationBase.SCALING);
+		Thread.sleep(100);
+		final int i = pc.readUnsigned(dpUnsigned1, ProcessCommunicationBase.SCALING);
+		assertEquals(v, i);
 	}
 
 	/**
