@@ -226,6 +226,13 @@ public final class DataUnitBuilder
 			// we mask the descriptor type
 			mask = 0x3f;
 		}
+		// 0x100 A_IndividualAddress_Read-PDU
+		// 0x140 A_IndividualAddress_Response-PDU
+		else if (svc == 0x100 || svc == 0x140) {
+			offset = 1;
+			// we mask the descriptor type
+			mask = 0x3f;
+		}
 		final byte[] asdu = new byte[apdu.length - offset];
 		for (int i = 0; i < asdu.length; ++i)
 			asdu[i] = apdu[offset + i];
