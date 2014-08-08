@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -63,6 +63,8 @@ public class DPTXlatorDateTest extends TestCase
 		super.setUp();
 		LogManager.getManager().addWriter("DPTXlator", Util.getLogWriter());
 		t = new DPTXlatorDate(dpt);
+		// reset to default to not interfere with tests
+		DPTXlatorDate.useValueFormat(null);
 	}
 
 	/* (non-Javadoc)
