@@ -37,7 +37,7 @@ import tuwien.auto.calimero.exception.KNXFormatException;
  * This listener contains predefined methods equal to the ones in the ProcessCommunicator
  * interface to convert received ASDUs into common Java data types.<br>
  * Usage example for group reads from datapoints with DPT main number 1:<br>
- * 
+ *
  * <pre>
  * public void groupWrite(ProcessEvent e)
  * {
@@ -56,7 +56,7 @@ import tuwien.auto.calimero.exception.KNXFormatException;
  *         catch (KNXFormatException kfe) { /* DPT not found ... *<!-- -->/ }
  * }
  * </pre>
- * 
+ *
  * @author B. Malinowsky
  * @see ProcessCommunicator
  */
@@ -65,7 +65,7 @@ public abstract class ProcessListenerEx implements ProcessListener
 	/**
 	 * Indicates that a KNX group read request message was received from the KNX network.
 	 * <p>
-	 * 
+	 *
 	 * @param e process event object
 	 */
 	public abstract void groupReadRequest(ProcessEvent e);
@@ -73,7 +73,7 @@ public abstract class ProcessListenerEx implements ProcessListener
 	/**
 	 * Indicates that a KNX group read response message was received from the KNX network.
 	 * <p>
-	 * 
+	 *
 	 * @param e process event object
 	 */
 	public abstract void groupReadResponse(ProcessEvent e);
@@ -85,7 +85,7 @@ public abstract class ProcessListenerEx implements ProcessListener
 	 * {@link #groupReadResponse(ProcessEvent)} or
 	 * {@link ProcessListener#groupWrite(ProcessEvent)}), depending on the received
 	 * datapoint type.
-	 * 
+	 *
 	 * @param e the process event with the ASDU to translate
 	 * @return the received value of type boolean
 	 * @throws KNXFormatException on not supported or not available boolean DPT
@@ -104,7 +104,7 @@ public abstract class ProcessListenerEx implements ProcessListener
 	 * {@link #groupReadResponse(ProcessEvent)} or
 	 * {@link ProcessListener#groupWrite(ProcessEvent)}), depending on the received
 	 * datapoint type.
-	 * 
+	 *
 	 * @param e the process event with the ASDU to translate
 	 * @param scale see {@link ProcessCommunicator#readUnsigned(
 	 *        tuwien.auto.calimero.GroupAddress, String)}
@@ -125,7 +125,7 @@ public abstract class ProcessListenerEx implements ProcessListener
 	 * {@link #groupReadResponse(ProcessEvent)} or
 	 * {@link ProcessListener#groupWrite(ProcessEvent)}), depending on the received
 	 * datapoint type.
-	 * 
+	 *
 	 * @param e the process event with the ASDU to translate
 	 * @return the received value of type 3 Bit controlled
 	 * @throws KNXFormatException on not supported or not available 3 Bit controlled DPT
@@ -145,7 +145,7 @@ public abstract class ProcessListenerEx implements ProcessListener
 	 * {@link #groupReadResponse(ProcessEvent)} or
 	 * {@link ProcessListener#groupWrite(ProcessEvent)}), depending on the received
 	 * datapoint type.
-	 * 
+	 *
 	 * @param e the process event with the ASDU to translate
 	 * @return the received value of type float
 	 * @throws KNXFormatException on not supported or not available float DPT
@@ -198,7 +198,7 @@ public abstract class ProcessListenerEx implements ProcessListener
 	 * {@link #groupReadResponse(ProcessEvent)} or
 	 * {@link ProcessListener#groupWrite(ProcessEvent)}), depending on the received
 	 * datapoint type.
-	 * 
+	 *
 	 * @param e the process event with the ASDU to translate
 	 * @return the received value of type String
 	 * @throws KNXFormatException on not supported or not available ISO-8859-1 DPT
@@ -218,7 +218,7 @@ public abstract class ProcessListenerEx implements ProcessListener
 	 * {@link #groupReadResponse(ProcessEvent)} or
 	 * {@link ProcessListener#groupWrite(ProcessEvent)}), depending on the received
 	 * datapoint type.
-	 * 
+	 *
 	 * @param e the process event with the ASDU to translate
 	 * @param dptMainNumber datapoint type main number, number >= 0; use 0 to infer
 	 *        translator type from <code>dptID</code> argument only
