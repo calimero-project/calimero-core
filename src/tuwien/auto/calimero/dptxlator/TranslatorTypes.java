@@ -187,6 +187,12 @@ public final class TranslatorTypes
 	public static final int TYPE_ENUM8 = 20;
 	
 	/**
+	 * DPT main number for <b>RGB color</b>, number = {@value #TYPE_RGB}.
+	 * <p>
+	 */
+	public static final int TYPE_RGB = 232;
+
+	/**
 	 * Maps a data type main number to a corresponding translator class doing the DPT
 	 * translations.
 	 * <p>
@@ -359,6 +365,7 @@ public final class TranslatorTypes
 		addTranslator(TYPE_SCENE_NUMBER, "DPTXlatorSceneNumber", "Scene number (main type 17)");
 		addTranslator(TYPE_SCENE_CONTROL, "DPTXlatorSceneControl", "Scene control (main type 18)");
 		addTranslator(TYPE_DATE_TIME, "DPTXlatorDateTime", "Date with time (main type 19)");
+		addTranslator(TYPE_RGB, "DPTXlatorRGB", "RGB color value (main type 232)");
 	}
 
 	private TranslatorTypes()
