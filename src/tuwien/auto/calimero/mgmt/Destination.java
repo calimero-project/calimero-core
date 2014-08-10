@@ -36,7 +36,7 @@ import tuwien.auto.calimero.link.KNXLinkClosedException;
  * {@link ManagementClient} instance.<br>
  * After a destination got destroyed, it can't be used for communication to that
  * destination anymore, i.e., it's not possible to change the connection state.
- * 
+ *
  * @author B. Malinowsky
  * @see TransportLayer
  * @see ManagementClient
@@ -51,7 +51,7 @@ public class Destination
 	 * destination state and obtain internal connection settings.
 	 * <p>
 	 * By default, a proxy is created by a transport layer implementation.
-	 * 
+	 *
 	 * @author B. Malinowsky
 	 */
 	public static final class AggregatorProxy implements Runnable
@@ -62,7 +62,7 @@ public class Destination
 		/**
 		 * Creates a new aggregator proxy.
 		 * <p>
-		 * 
+		 *
 		 * @param aggregator the transport layer serving the destination associated with
 		 *        this proxy and handles necessary transport layer communication
 		 */
@@ -74,7 +74,7 @@ public class Destination
 		/**
 		 * Returns the destination associated with this proxy.
 		 * <p>
-		 * 
+		 *
 		 * @return the Destination
 		 */
 		public Destination getDestination()
@@ -85,7 +85,7 @@ public class Destination
 		/**
 		 * Returns the receive sequence number of the connection.
 		 * <p>
-		 * 
+		 *
 		 * @return sequence number, 0 &lt;= number &lt;= 15
 		 */
 		public synchronized int getSeqReceive()
@@ -107,7 +107,7 @@ public class Destination
 		/**
 		 * Returns the send sequence number of the connection.
 		 * <p>
-		 * 
+		 *
 		 * @return sequence number, 0 &lt;= number &lt;= 15
 		 */
 		public synchronized int getSeqSend()
@@ -130,7 +130,7 @@ public class Destination
 		 * Restarts the connection timeout used for the destination connection.
 		 * <p>
 		 * This method is only used in connection oriented communication mode.
-		 * 
+		 *
 		 * @throws KNXIllegalStateException if invoked on not connection oriented mode
 		 */
 		public void restartTimeout()
@@ -145,19 +145,19 @@ public class Destination
 		 * or deactivated according the state transition.<br>
 		 * If the state of destination is {@link Destination#DESTROYED}, setting of a new
 		 * state is ignored.
-		 * 
+		 *
 		 * @param newState new destination state
 		 */
 		public void setState(final int newState)
 		{
 			d.setState(newState, this);
 		}
-		
+
 		void setDestination(final Destination dst)
 		{
 			d = dst;
 		}
-		
+
 		/**
 		 * The proxy acts as notifiable to the disconnect timer. If notified, the
 		 * connection timed out, and it will ensure the destination gets disconnected.
@@ -179,14 +179,14 @@ public class Destination
 
 	// idle timeout for a connection in milliseconds
 	private static final int TIMEOUT = 6000;
-	
+
 	// a disconnect timer for all active destination objects
 	private static TimerQueue disconnectTimer = new TimerQueue();
 
 	/**
 	 * Destination is destroyed.
 	 * <p>
-	 * 
+	 *
 	 * @see Destination#getState
 	 */
 	public static final int DESTROYED = 0;
@@ -194,7 +194,7 @@ public class Destination
 	/**
 	 * Connection state is disconnected.
 	 * <p>
-	 * 
+	 *
 	 * @see Destination#getState
 	 */
 	public static final int DISCONNECTED = 1;
@@ -202,7 +202,7 @@ public class Destination
 	/**
 	 * Connection state is connecting.
 	 * <p>
-	 * 
+	 *
 	 * @see Destination#getState
 	 */
 	public static final int CONNECTING = 2;
@@ -210,7 +210,7 @@ public class Destination
 	/**
 	 * Connection state is open and communication is in idle state.
 	 * <p>
-	 * 
+	 *
 	 * @see Destination#getState
 	 */
 	public static final int OPEN_IDLE = 3;
@@ -219,18 +219,18 @@ public class Destination
 	 * Connection state is open and communication is in waiting state for Layer 4
 	 * acknowledgment.
 	 * <p>
-	 * 
+	 *
 	 * @see Destination#getState
 	 */
 	public static final int OPEN_WAIT = 4;
 
-	
+
 	static final int USER_REQUEST = 0;
 	static final int REMOTE_ENDPOINT = 1;
 	static final int LOCAL_ENDPOINT = 2;
-	
+
 	volatile int disconnectedBy = -1;
-	
+
 	private final TransportLayer tl;
 	private final IndividualAddress addr;
 	private volatile int state = DISCONNECTED;
@@ -246,7 +246,7 @@ public class Destination
 	 * Creates a new destination.
 	 * <p>
 	 * Verify mode defaults to false and keep alive is not used.
-	 * 
+	 *
 	 * @param aggregator aggregator proxy to associate with this destination
 	 * @param remote KNX remote address specifying the connection destination
 	 * @param connectionOriented <code>true</code> for connection oriented mode,
@@ -269,7 +269,7 @@ public class Destination
 	 * The verify mode refers to the verify mode control in application layer services and
 	 * specifies whether the specified destination to communicate with supports verified
 	 * writing of data.
-	 * 
+	 *
 	 * @param aggregator aggregator proxy to associate with this destination
 	 * @param remote KNX remote address specifying the connection destination
 	 * @param connectionOriented <code>true</code> for connection oriented mode,
@@ -293,7 +293,7 @@ public class Destination
 
 	/**
 	 * Returns the destination address.
-	 * 
+	 *
 	 * @return the destination individual address
 	 */
 	public IndividualAddress getAddress()
@@ -305,7 +305,7 @@ public class Destination
 	 * Returns the state of this destination.
 	 * <p>
 	 * The returned value is one of the destination state constants.
-	 * 
+	 *
 	 * @return destination state
 	 */
 	public final int getState()
@@ -316,7 +316,7 @@ public class Destination
 	/**
 	 * Returns whether this destination uses connection oriented mode or connectionless
 	 * mode.
-	 * 
+	 *
 	 * @return <code>true</code> for connection oriented mode, <code>false</code>
 	 *         otherwise
 	 */
@@ -328,7 +328,7 @@ public class Destination
 	/**
 	 * Returns whether keep alive of connection is specified.
 	 * <p>
-	 * 
+	 *
 	 * @return <code>true</code> if keep alive is specified and connection oriented mode
 	 *         is used, <code>false</code> otherwise
 	 */
@@ -340,7 +340,7 @@ public class Destination
 	/**
 	 * Returns whether verify mode is supported by the destination.
 	 * <p>
-	 * 
+	 *
 	 * @return <code>true</code> for verify mode enabled, <code>false</code> otherwise
 	 */
 	public final boolean isVerifyMode()
@@ -388,7 +388,7 @@ public class Destination
 	{
 		return disconnectedBy;
 	}
-	
+
 	private String getStateString()
 	{
 		switch (state) {
