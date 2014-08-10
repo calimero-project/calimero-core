@@ -230,12 +230,19 @@ public final class DataUnitBuilder
 		// 0x140 A_IndividualAddress_Response-PDU
 		else if (svc == 0x100 || svc == 0x140) {
 			offset = 1;
-			// we mask the descriptor type
+			// we mask the lower 6 bits that need to be 0
+			mask = 0x3f;
+		}
+		// 0x380 A_Restart-PDU
+		else if (svc == 0x380) {
+			offset = 1;
+			// we mask the response bit and restart type bit
 			mask = 0x3f;
 		}
 		final byte[] asdu = new byte[apdu.length - offset];
 		for (int i = 0; i < asdu.length; ++i)
 			asdu[i] = apdu[offset + i];
+
 		asdu[0] &= mask;
 		return asdu;
 	}
