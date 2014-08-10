@@ -44,7 +44,7 @@ public class ProcessCommunicatorTest extends TestCase
 	private ProcessCommunicator pc;
 	private ProcessCommunicator pc2;
 	private KNXNetworkLink link;
-	
+
 	private final GroupAddress dpBool;
 	private final GroupAddress dpBool2;
 	private final GroupAddress dpControl;
@@ -53,7 +53,7 @@ public class ProcessCommunicatorTest extends TestCase
 	private final GroupAddress dpString;
 	private final GroupAddress dpFloat2;
 	private final GroupAddress dpFloat4;
-	
+
 	/**
 	 * @param name
 	 * @throws KNXFormatException
@@ -97,8 +97,7 @@ public class ProcessCommunicatorTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.process.ProcessCommunicator#setResponseTimeout(int)}.
+	 * Test method for {@link tuwien.auto.calimero.process.ProcessCommunicator#setResponseTimeout(int)}.
 	 */
 	public final void testSetResponseTimeout()
 	{
@@ -116,8 +115,7 @@ public class ProcessCommunicatorTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.process.ProcessCommunicator#getResponseTimeout()}.
+	 * Test method for {@link tuwien.auto.calimero.process.ProcessCommunicator#getResponseTimeout()}.
 	 */
 	public final void testGetResponseTimeout()
 	{
@@ -126,9 +124,8 @@ public class ProcessCommunicatorTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.process.ProcessCommunicator#setPriority(tuwien.auto.calimero.Priority)}
-	 * .
+	 * Test method for {@link tuwien.auto.calimero.process.ProcessCommunicator#setPriority(
+	 * tuwien.auto.calimero.Priority)}.
 	 */
 	public final void testSetPriority()
 	{
@@ -140,8 +137,7 @@ public class ProcessCommunicatorTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.process.ProcessCommunicator#getPriority()}.
+	 * Test method for {@link tuwien.auto.calimero.process.ProcessCommunicator#getPriority()}.
 	 */
 	public final void testGetPriority()
 	{
@@ -150,8 +146,7 @@ public class ProcessCommunicatorTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.process.ProcessCommunicator#addProcessListener
+	 * Test method for {@link tuwien.auto.calimero.process.ProcessCommunicator#addProcessListener
 	 * (tuwien.auto.calimero.process.ProcessListener)}.
 	 */
 	public final void testAddProcessListener()
@@ -172,8 +167,7 @@ public class ProcessCommunicatorTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.process.ProcessCommunicator#removeProcessListener
+	 * Test method for {@link tuwien.auto.calimero.process.ProcessCommunicator#removeProcessListener
 	 * (tuwien.auto.calimero.process.ProcessListener)}.
 	 */
 	public final void testRemoveProcessListener()
@@ -193,10 +187,9 @@ public class ProcessCommunicatorTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.process.ProcessCommunicator#readBool(tuwien.auto.calimero.GroupAddress)}
-	 * .
-	 * 
+	 * Test method for {@link tuwien.auto.calimero.process.ProcessCommunicator#readBool(
+	 * tuwien.auto.calimero.GroupAddress)}.
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -265,15 +258,13 @@ public class ProcessCommunicatorTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.process.ProcessCommunicator#write(tuwien.auto.calimero.GroupAddress, boolean)}
-	 * .
-	 * 
+	 * Test method for {@link tuwien.auto.calimero.process.ProcessCommunicator#write(
+	 * tuwien.auto.calimero.GroupAddress, boolean)}.
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
-	public final void testWriteGroupAddressBoolean() throws KNXException,
-		InterruptedException
+	public final void testWriteGroupAddressBoolean() throws KNXException, InterruptedException
 	{
 		// read from same address
 		// if we are testing with a virtual network make sure we have some value set
@@ -286,10 +277,9 @@ public class ProcessCommunicatorTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.process.ProcessCommunicator#readUnsigned(tuwien.auto.calimero.GroupAddress, java.lang.String)}
-	 * .
-	 * 
+	 * Test method for {@link tuwien.auto.calimero.process.ProcessCommunicator#readUnsigned(
+	 * tuwien.auto.calimero.GroupAddress, java.lang.String)}.
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -300,10 +290,9 @@ public class ProcessCommunicatorTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.process.ProcessCommunicator#write(tuwien.auto.calimero.GroupAddress, int, java.lang.String)}
-	 * .
-	 * 
+	 * Test method for {@link tuwien.auto.calimero.process.ProcessCommunicator#write(
+	 * tuwien.auto.calimero.GroupAddress, int, java.lang.String)}.
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -317,10 +306,9 @@ public class ProcessCommunicatorTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.process.ProcessCommunicator#readControl(tuwien.auto.calimero.GroupAddress)}
-	 * .
-	 * 
+	 * Test method for {@link tuwien.auto.calimero.process.ProcessCommunicator#readControl(
+	 * tuwien.auto.calimero.GroupAddress)}.
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -330,10 +318,9 @@ public class ProcessCommunicatorTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.process.ProcessCommunicator#write(tuwien.auto.calimero.GroupAddress, boolean, int)}
-	 * .
-	 * 
+	 * Test method for {@link tuwien.auto.calimero.process.ProcessCommunicator#write(
+	 * tuwien.auto.calimero.GroupAddress, boolean, int)}.
+	 *
 	 * @throws KNXException
 	 */
 	public final void testWriteGroupAddressBooleanInt() throws KNXException
@@ -343,10 +330,9 @@ public class ProcessCommunicatorTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.process.ProcessCommunicator#readFloat(tuwien.auto.calimero.GroupAddress, boolean)}
-	 * .
-	 * 
+	 * Test method for {@link tuwien.auto.calimero.process.ProcessCommunicator#readFloat(
+	 * tuwien.auto.calimero.GroupAddress, boolean)}.
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -357,10 +343,9 @@ public class ProcessCommunicatorTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.process.ProcessCommunicator#write(tuwien.auto.calimero.GroupAddress, float, boolean)}
-	 * .
-	 * 
+	 * Test method for {@link tuwien.auto.calimero.process.ProcessCommunicator#write(
+	 * tuwien.auto.calimero.GroupAddress, float, boolean)}.
+	 *
 	 * @throws KNXException
 	 */
 	public final void testWriteGroupAddressFloatBoolean() throws KNXException
@@ -371,10 +356,9 @@ public class ProcessCommunicatorTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.process.ProcessCommunicator#readString(tuwien.auto.calimero.GroupAddress)}
-	 * .
-	 * 
+	 * Test method for {@link tuwien.auto.calimero.process.ProcessCommunicator#readString(
+	 * tuwien.auto.calimero.GroupAddress)}.
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -387,10 +371,9 @@ public class ProcessCommunicatorTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.process.ProcessCommunicator#write(tuwien.auto.calimero.GroupAddress, java.lang.String)}
-	 * .
-	 * 
+	 * Test method for {@link tuwien.auto.calimero.process.ProcessCommunicator#write(
+	 * tuwien.auto.calimero.GroupAddress, java.lang.String)}.
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -403,10 +386,9 @@ public class ProcessCommunicatorTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.process.ProcessCommunicator#read(tuwien.auto.calimero.datapoint.Datapoint)}
-	 * .
-	 * 
+	 * Test method for {@link tuwien.auto.calimero.process.ProcessCommunicator#read(
+	 * tuwien.auto.calimero.datapoint.Datapoint)}.
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -419,10 +401,9 @@ public class ProcessCommunicatorTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.process.ProcessCommunicator#write(tuwien.auto.calimero.datapoint.Datapoint, java.lang.String)}
-	 * .
-	 * 
+	 * Test method for {@link tuwien.auto.calimero.process.ProcessCommunicator#write(
+	 * tuwien.auto.calimero.datapoint.Datapoint, java.lang.String)}.
+	 *
 	 * @throws KNXException
 	 */
 	public final void testWriteDatapointString() throws KNXException

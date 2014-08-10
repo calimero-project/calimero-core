@@ -59,7 +59,7 @@ import tuwien.auto.calimero.log.LogService;
  * {@link DPTXlatorBoolean}, {@link DPTXlator3BitControlled}, {@link DPTXlator8BitUnsigned},
  * {@link DPTXlator2ByteFloat}, {@link DPTXlator4ByteFloat}, {@link DPTXlatorString}. Other
  * translator types are loaded through {@link TranslatorTypes}.
- * 
+ *
  * @author B. Malinowsky
  */
 public class ProcessCommunicatorImpl implements ProcessCommunicator
@@ -146,7 +146,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	 * <p>
 	 * The log service used by this process communicator is named "process " +
 	 * <code>link.getName()</code>.
-	 * 
+	 *
 	 * @param link network link used for communication with a KNX network
 	 * @throws KNXLinkClosedException if the network link is closed
 	 */
@@ -360,7 +360,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		extractGroupASDU(apdu, t);
 		return (float) t.getValueDouble();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.process.ProcessCommunicator#readString
 	 * (tuwien.auto.calimero.GroupAddress)
@@ -449,7 +449,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 			throw new KNXIllegalStateException("process communicator detached");
 		try {
 			wait = true;
-			
+
 			// before sending a request and waiting for response, clear previous indications
 			// that could be sitting there from previous timed-out commands or by another request
 			// for the same group
@@ -487,7 +487,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 						// ok, got response we're waiting for
 						if (d.length >= minAPDU && d.length <= maxAPDU)
 							return d;
-						
+
 						final String s = "APDU response length " + d.length
 								+ " bytes, expected " + minAPDU + " to " + maxAPDU;
 						logger.error("received group read response with " + s);
@@ -529,7 +529,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	 * maximum length used for the ASDU is not checked.<br>
 	 * For DPTs occupying &lt;= 6 bits in length the optimized (compact) group write /
 	 * response format layout is used.
-	 * 
+	 *
 	 * @param service application layer group service code
 	 * @param t DPT translator with items to put into ASDU
 	 * @return group APDU as byte array
@@ -558,7 +558,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	 * supplied <code>apdu</code> is 2, a compact group APDU format layout is assumed.<br>
 	 * On return of this method, the supplied translator contains the DPT items from the
 	 * ASDU.
-	 * 
+	 *
 	 * @param apdu application layer protocol data unit, 2 &lt;= apdu.length
 	 * @param t the DPT translator to fill with the ASDU
 	 */

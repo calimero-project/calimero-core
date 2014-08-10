@@ -39,8 +39,7 @@ import tuwien.auto.calimero.log.LogManager;
 public class DPTXlatorTimeTest extends TestCase
 {
 	private DPTXlatorTime t;
-	private final String[] values =
-		new String[] { "mon, 00:00:00", "WED, 23:59:59", "  12:43:23  " };
+	private final String[] values = new String[] { "mon, 00:00:00", "WED, 23:59:59", "  12:43:23  " };
 	private final DPT dpt = DPTXlatorTime.DPT_TIMEOFDAY;
 
 	// wed, 22:33:44, offset 1
@@ -139,8 +138,7 @@ public class DPTXlatorTimeTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#setData(byte[], int)}.
+	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#setData(byte[], int)}.
 	 */
 	public final void testSetDataByteArrayInt()
 	{
@@ -161,8 +159,7 @@ public class DPTXlatorTimeTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#getData(byte[], int)}.
+	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#getData(byte[], int)}.
 	 */
 	public final void testGetDataByteArrayInt()
 	{
@@ -245,8 +242,7 @@ public class DPTXlatorTimeTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#getValueMilliseconds()}.
+	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#getValueMilliseconds()}.
 	 */
 	public final void testGetValueMilliseconds()
 	{
@@ -271,8 +267,7 @@ public class DPTXlatorTimeTest extends TestCase
 
 	/**
 	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#useValueFormat
-	 * (java.lang.String)}.
+	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#useValueFormat (java.lang.String)}.
 	 *
 	 * @throws KNXFormatException
 	 */
