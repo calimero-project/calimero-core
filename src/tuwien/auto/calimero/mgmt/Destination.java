@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -416,8 +416,12 @@ public class Destination
 			restartTimer(notify);
 		else if (state == OPEN_WAIT)
 			restartTimer(notify);
-		else if (state == DISCONNECTED)
+		else if (state == DISCONNECTED) {
 			disconnectTimer.cancel(notify);
+			// required for server-side, otherwise server would expect old sequence and return NAK
+			seqSend = 0;
+			seqRcv = 0;
+		}
 		else if (state == DESTROYED)
 			disconnectTimer.cancel(notify);
 	}
