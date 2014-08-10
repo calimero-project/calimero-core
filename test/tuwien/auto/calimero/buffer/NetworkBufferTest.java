@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -62,8 +62,6 @@ public class NetworkBufferTest extends TestCase
 		super.setUp();
 		lnk = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, null, Util.getServer(),
 			false, TPSettings.TP1);
-		//LogManager.getManager().addWriter(lnk.getName(), Util.getLogWriter());
-		//LogManager.getManager().addWriter(NetworkBuffer.LOG_SERVICE, Util.getLogWriter());
 		LogManager.getManager().addWriter("", Util.getLogWriter());
 		buffer = NetworkBuffer.createBuffer("test");
 	}
@@ -77,9 +75,6 @@ public class NetworkBufferTest extends TestCase
 			lnk.close();
 		buffer.destroy();
 		LogManager.getManager().removeWriter("", Util.getLogWriter());
-		//LogManager.getManager().removeWriter(lnk.getName(), Util.getLogWriter());
-		//LogManager.getManager().removeWriter(NetworkBuffer.LOG_SERVICE,
-		//	Util.getLogWriter());
 		super.tearDown();
 	}
 
@@ -145,9 +140,8 @@ public class NetworkBufferTest extends TestCase
 //	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.NetworkBuffer#addConfiguration(tuwien.auto.calimero.link.KNXNetworkLink)}
-	 * .
+	 * Test method for {@link tuwien.auto.calimero.buffer.NetworkBuffer#addConfiguration(
+	 * tuwien.auto.calimero.link.KNXNetworkLink)}.
 	 */
 	public final void testCreateConfigurationKNXNetworkLink()
 	{
@@ -156,9 +150,8 @@ public class NetworkBufferTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.NetworkBuffer#getConfiguration(tuwien.auto.calimero.link.KNXNetworkLink)}
-	 * .
+	 * Test method for {@link tuwien.auto.calimero.buffer.NetworkBuffer#getConfiguration(
+	 * tuwien.auto.calimero.link.KNXNetworkLink)}.
 	 */
 	public final void testGetConfiguration()
 	{
@@ -168,9 +161,8 @@ public class NetworkBufferTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.NetworkBuffer#removeConfiguration(tuwien.auto.calimero.buffer.Configuration)}
-	 * .
+	 * Test method for {@link tuwien.auto.calimero.buffer.NetworkBuffer#removeConfiguration(
+	 * tuwien.auto.calimero.buffer.Configuration)}.
 	 */
 	public final void testRemoveConfigurationConfiguration()
 	{
@@ -195,7 +187,7 @@ public class NetworkBufferTest extends TestCase
 
 	/**
 	 * Test method for state based buffering.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 * @throws KNXException
 	 */
@@ -251,7 +243,7 @@ public class NetworkBufferTest extends TestCase
 
 	/**
 	 * Test method for state based buffering.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -321,7 +313,7 @@ public class NetworkBufferTest extends TestCase
 
 	/**
 	 * Test method for command based buffering.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 * @throws KNXException
 	 */
@@ -398,7 +390,7 @@ public class NetworkBufferTest extends TestCase
 
 	/**
 	 * Test method for query buffer only mode.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 * @throws KNXException
 	 */

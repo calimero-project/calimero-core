@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2011 B. Malinowsky
+    Copyright (c) 2010, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ import tuwien.auto.calimero.exception.KNXException;
 /**
  * Common property services for accessing KNX properties and property descriptions.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public interface PropertyAccess
@@ -39,7 +39,7 @@ public interface PropertyAccess
 	 * The PIDs are put into their own class to create an encapsulation besides the
 	 * property access interface, since these constants are solely for the user's sake,
 	 * implementations of the {@link PropertyAccess} interface do not depend on them.<br>
-	 * 
+	 *
 	 * @author B. Malinowsky
 	 */
 	public static final class PID
@@ -272,7 +272,7 @@ public interface PropertyAccess
 		//
 		// properties of object type 0, Device Object
 		//
-		
+
 		/**
 		 * Device object property "Programming Mode".
 		 * <p>
@@ -315,7 +315,7 @@ public interface PropertyAccess
 		 */
 		// PDT,DPT: PDT_UNSIGNED_CHAR
 		public static final int DEVICE_ADDRESS = 58;
-		
+
 		/**
 		 * Device object property "Domain Address".
 		 * <p>
@@ -327,11 +327,11 @@ public interface PropertyAccess
 		//
 		// properties of object type 6, Router object
 		//
-		
+
 		//
 		// properties of object type 9, CEMI server object
 		//
-		
+
 		/**
 		 * Object type 8 property "Medium Type".
 		 * <p>
@@ -343,11 +343,11 @@ public interface PropertyAccess
 		 * Bit 4 - 15 (MSB): reserved
 		 */
 		public static final int MEDIUM_TYPE = 51;
-		
+
 		//
 		// properties of object type 11, KNXnet/IP parameter object
 		//
-		
+
 		/**
 		 * Object type 11 property "Project Installation Identification".
 		 * <p>
@@ -565,9 +565,9 @@ public interface PropertyAccess
 		 */
 		// PDT,DPT: PDT_UNSIGNED_CHAR[30]
 		public static final int FRIENDLY_NAME = 76;
-		
-		
-		
+
+
+
 		// enfore non-instantiability
 		private PID() {}
 	}
@@ -576,7 +576,7 @@ public interface PropertyAccess
 	 * Sets one element of a property, with the value given as string representation.
 	 * <p>
 	 * The value is translated according the associated property data type.
-	 * 
+	 *
 	 * @param objIndex interface object index in the device
 	 * @param pid property identifier
 	 * @param position property index in the array where to set the element value
@@ -590,7 +590,7 @@ public interface PropertyAccess
 	/**
 	 * Sets one or more elements of a property.
 	 * <p>
-	 * 
+	 *
 	 * @param objIndex interface object index in the device
 	 * @param pid property identifier
 	 * @param start index of the first array element to set
@@ -604,7 +604,7 @@ public interface PropertyAccess
 	/**
 	 * Gets one or more elements of a property.
 	 * <p>
-	 * 
+	 *
 	 * @param objIndex interface object index in the device
 	 * @param pid property identifier
 	 * @param start index of the first array element to get
@@ -619,7 +619,7 @@ public interface PropertyAccess
 	 * Gets one or more elements of a property with the returned data set in a DPT
 	 * translator of the associated data type.
 	 * <p>
-	 * 
+	 *
 	 * @param objIndex interface object index in the device
 	 * @param pid property identifier
 	 * @param start index of the first array element to get
@@ -639,7 +639,7 @@ public interface PropertyAccess
 	 * method, the description response is not required to contain the correct property
 	 * index associated with the PID, even though recommended. The default index is 0
 	 * then.
-	 * 
+	 *
 	 * @param objIndex interface object index in the device
 	 * @param pid property identifier, pid &gt; 0
 	 * @return the property description

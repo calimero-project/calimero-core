@@ -405,9 +405,8 @@ public class TransportLayerImplTest extends TestCase
 	 * @throws KNXDisconnectException
 	 * @throws InterruptedException
 	 */
-	public final void testSendDataDestinationPriorityByteArray()
-		throws KNXDisconnectException, KNXTimeoutException, KNXLinkClosedException,
-		InterruptedException
+	public final void testSendDataDestinationPriorityByteArray() throws KNXDisconnectException,
+		KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		try {
 			tl.sendData(dco, p, tsduDescRead);
@@ -433,8 +432,7 @@ public class TransportLayerImplTest extends TestCase
 		assertTrue(ltl.conn.size() == 2);
 
 		final TransportLayer tl2 = new TransportLayerImpl(nl);
-		final Destination d2 =
-			tl2.createDestination(new IndividualAddress(3, 1, 1), true);
+		final Destination d2 = tl2.createDestination(new IndividualAddress(3, 1, 1), true);
 		try {
 			tl.sendData(d2, p, tsduDescRead);
 			fail("not owning destination");
@@ -442,6 +440,13 @@ public class TransportLayerImplTest extends TestCase
 		catch (final KNXIllegalArgumentException e) {}
 	}
 
+	/**
+	 * Test method for {@link tuwien.auto.calimero.mgmt.TransportLayerImpl#sendData
+	 * 	(tuwien.auto.calimero.mgmt.Destination, tuwien.auto.calimero.Priority, byte[])}.
+	 * @throws KNXTimeoutException
+	 * @throws KNXLinkClosedException
+	 * @throws InterruptedException
+	 */
 	public void testSendDataNonExistingAddress() throws KNXTimeoutException,
 		KNXLinkClosedException, InterruptedException
 	{
@@ -514,13 +519,12 @@ public class TransportLayerImplTest extends TestCase
 	 * @throws KNXTimeoutException
 	 * @throws InterruptedException
 	 */
-	public final void testSendDataKNXAddressPriorityByteArray()
-		throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
+	public final void testSendDataKNXAddressPriorityByteArray() throws KNXTimeoutException,
+		KNXLinkClosedException, InterruptedException
 	{
 		final int propRead = 0x03D5;
 		// read pid max_apdu_length
-		final byte[] tsdu =
-			new byte[] { (byte) (propRead >> 8), (byte) propRead, 0, 56, 0x10, 1, };
+		final byte[] tsdu = new byte[] { (byte) (propRead >> 8), (byte) propRead, 0, 56, 0x10, 1, };
 		tl.sendData(Util.getRouterAddress(), p, tsdu);
 		Thread.sleep(1500);
 		assertFalse(ltl.ind.isEmpty());

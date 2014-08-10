@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ import tuwien.auto.calimero.log.LogService;
  * In general, one network buffer is created for one KNX installation, to easier
  * distinguish between different installations. Nevertheless, this is not enforced in any
  * way; a new configuration also might just always use a new network buffer.
- * 
+ *
  * @author B. Malinowsky
  */
 public final class NetworkBuffer
@@ -362,12 +362,11 @@ public final class NetworkBuffer
 	 * <p>
 	 * To identify the buffer a unique installation identifier can be given through
 	 * <code>installationId</code>.<br>
-	 * If <code>null</code> or an empty string is supplied for the installation ID, a new
-	 * default ID is generated of the form "Installation [ID]", where [ID] is a unique
-	 * incrementing number. Note, the installation ID string is treated case sensitive.
-	 * 
-	 * @param installationId installation identifier for the network buffer, or
-	 *        <code>null</code>
+	 * If <code>null</code> or an empty string is supplied for the installation ID, a new default ID
+	 * is generated of the form "Installation [ID]", where [ID] is a unique incrementing number.
+	 * Note, the installation ID string is treated case sensitive.
+	 *
+	 * @param installationId installation identifier for the network buffer, or <code>null</code>
 	 * @return the new network buffer
 	 */
 	public static synchronized NetworkBuffer createBuffer(final String installationId)
@@ -391,7 +390,7 @@ public final class NetworkBuffer
 	 * deactivated (see {@link Configuration#activate(boolean)}), and the buffered link of
 	 * the configuration, obtained with {@link Configuration#getBufferedLink()}, will get
 	 * closed as well.
-	 * 
+	 *
 	 * @param link KNX network link communicating with the KNX network
 	 * @return the new configuration
 	 */
@@ -409,7 +408,7 @@ public final class NetworkBuffer
 	 * The configuration is deactivated and will not receive any further events or
 	 * incoming messages from the base network link supplied at creation of that
 	 * configuration.
-	 * 
+	 *
 	 * @param c the configuration to remove
 	 */
 	public void removeConfiguration(final Configuration c)
@@ -425,7 +424,7 @@ public final class NetworkBuffer
 	 * <p>
 	 * If the network link is not a buffered link or not found in the current
 	 * configurations of this network buffer, <code>null</code> is returned.
-	 * 
+	 *
 	 * @param bufferedLink the buffered link to get the configuration for
 	 * @return the owning configuration of that link or <code>null</code>
 	 */
@@ -444,7 +443,7 @@ public final class NetworkBuffer
 	/**
 	 * Returns all configurations of this network buffer.
 	 * <p>
-	 * 
+	 *
 	 * @return a new Configuration array holding the configurations, with the array
 	 *         length equal to the number of network buffer configurations
 	 */
@@ -456,7 +455,7 @@ public final class NetworkBuffer
 	/**
 	 * Returns the installation identifier of this network buffer.
 	 * <p>
-	 * 
+	 *
 	 * @return installation ID
 	 */
 	public String getInstallationID()
