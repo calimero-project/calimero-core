@@ -85,8 +85,7 @@ public class PropertyClientTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		remote = Util.getRouterAddress();
-//		Util.getLogWriter().setLogLevel(LogLevel.INFO);
+		remote = Util.getKnxDeviceCO();
 		try {
 			LogManager.getManager().addWriter(null, Util.getLogWriter());
 
@@ -97,6 +96,9 @@ public class PropertyClientTest extends TestCase
 			ll = new PropertyListenerImpl();
 			localAdpt = new LocalDeviceMgmtAdapter(null, Util.getServer(), false, ll, true);
 			local = new PropertyClient(localAdpt);
+
+			rem.addDefinitions(PropertyClient.loadDefinitions(PIDResource, null));
+			local.addDefinitions(PropertyClient.loadDefinitions(PIDResource, null));
 		}
 		catch (final KNXException e) {
 			tearDown();
@@ -247,19 +249,21 @@ public class PropertyClientTest extends TestCase
 	public final void testGetDescriptionByIndex() throws KNXException
 	{
 		Description d, d2;
-		printDesc(d = rem.getDescriptionByIndex(0, 6));
-		printDesc(d2 = local.getDescriptionByIndex(0, 6));
+		printDesc(d = rem.getDescriptionByIndex(0, 1));
+		printDesc(d2 = local.getDescriptionByIndex(0, 1));
 
 		assertEquals(d.getObjectType(), d2.getObjectType());
 		assertEquals(d.getObjectIndex(), d2.getObjectIndex());
-		assertEquals(d.getPID(), d2.getPID());
+		//assertEquals(d.getPID(), d2.getPID());
 		assertEquals(d.getPropIndex(), d2.getPropIndex());
+
+		// we use two different devices for d and d2, the following asserts might not hold
 		assertEquals(-1, d2.getPDT());
 		assertEquals(d.getCurrentElements(), d2.getCurrentElements());
-		assertEquals(0, d2.getMaxElements());
+		//assertEquals(0, d2.getMaxElements());
 		assertEquals(0, d2.getReadLevel());
 		assertEquals(0, d2.getWriteLevel());
-		assertEquals(d.isWriteEnabled(), d2.isWriteEnabled());
+		//assertEquals(d.isWriteEnabled(), d2.isWriteEnabled());
 	}
 
 	/**
