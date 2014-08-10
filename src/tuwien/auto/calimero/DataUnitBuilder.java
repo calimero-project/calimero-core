@@ -27,7 +27,7 @@ import tuwien.auto.calimero.log.LogService;
  * Creates, extracts and decodes information of protocol data units.
  * <p>
  * The methods focus on transport layer and application layer data units.
- * 
+ *
  * @author B. Malinowsky
  */
 public final class DataUnitBuilder
@@ -50,7 +50,7 @@ public final class DataUnitBuilder
 	/**
 	 * Returns the application layer service of a given protocol data unit.
 	 * <p>
-	 * 
+	 *
 	 * @param apdu application layer protocol data unit, requires <code>apdu.length</code>
 	 *        > 1
 	 * @return APDU service code
@@ -101,7 +101,7 @@ public final class DataUnitBuilder
 	/**
 	 * Returns the transport layer service of a given protocol data unit.
 	 * <p>
-	 * 
+	 *
 	 * @param tpdu transport layer protocol data unit
 	 * @return TPDU service code
 	 */
@@ -133,7 +133,7 @@ public final class DataUnitBuilder
 	 * <p>
 	 * The transport layer bits in the first byte (TL / AL control field) are set 0. For
 	 * creating a compact APDU, refer to {@link #createCompactAPDU(int, byte[])}.
-	 * 
+	 *
 	 * @param service application layer service code
 	 * @param asdu application layer service data unit, <code>asdu.length</code> &lt;
 	 *        255
@@ -158,7 +158,7 @@ public final class DataUnitBuilder
 	 * The transport layer bits in the first byte (TL / AL control field) are set 0. If
 	 * the compact APDU shall not contain any ASDU information, <code>asdu</code> can be
 	 * left <code>null</code>.
-	 * 
+	 *
 	 * @param service application layer service code
 	 * @param asdu application layer service data unit, <code>asdu.length</code> &lt;
 	 *        255; or <code>null</code> for no ASDU
@@ -186,7 +186,7 @@ public final class DataUnitBuilder
 	 * <p>
 	 * The application layer service data unit (ASDU) is the APDU with the application
 	 * layer service code removed.
-	 * 
+	 *
 	 * @param apdu application layer protocol data unit for which to get the ASDU
 	 * @return the ASDU as byte array
 	 */
@@ -239,7 +239,7 @@ public final class DataUnitBuilder
 		asdu[0] &= mask;
 		return asdu;
 	}
-	
+
 	/**
 	 * Decodes a protocol data unit into a textual representation.
 	 * <p>
@@ -248,7 +248,7 @@ public final class DataUnitBuilder
 	 * extended in the future.<br>
 	 * The optional KNX destination address helps to determine the exact transport layer
 	 * service.
-	 * 
+	 *
 	 * @param tpdu transport layer protocol data unit to decode
 	 * @param dst KNX destination address belonging to the TPDU, might be
 	 *        <code>null</code>
@@ -268,7 +268,7 @@ public final class DataUnitBuilder
 	 * Decodes a transport layer protocol control information into a textual
 	 * representation.
 	 * <p>
-	 * 
+	 *
 	 * @param tpci transport layer protocol control information
 	 * @param dst KNX destination address belonging to the tpci, might be
 	 *        <code>null</code>
@@ -303,7 +303,7 @@ public final class DataUnitBuilder
 	 * Decodes an application layer protocol control information into a textual
 	 * representation.
 	 * <p>
-	 * 
+	 *
 	 * @param apci application layer protocol control information
 	 * @return textual representation of APCI
 	 */
@@ -374,13 +374,13 @@ public final class DataUnitBuilder
 			return "unknown APCI";
 		}
 	}
-	
+
 	/**
 	 * Returns the content of <code>data</code> as unsigned bytes in hexadecimal string
 	 * representation.
 	 * <p>
 	 * This method does not add hexadecimal prefixes (like 0x).
-	 * 
+	 *
 	 * @param data data array to format
 	 * @param sep separator to insert between 2 formatted data bytes, <code>null</code>
 	 *        or "" for no gap between byte tokens
@@ -399,12 +399,12 @@ public final class DataUnitBuilder
 		}
 		return sb.toString();
 	}
-	
+
 	/**
 	 * Returns a new byte array of { data[from], data[from + 1], .. , data[min(to,
 	 * data.length) - 1] }.
 	 * <p>
-	 * 
+	 *
 	 * @param data source data array
 	 * @param from start of range index
 	 * @param to end of range index, exclusive
