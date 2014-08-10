@@ -24,7 +24,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.exception.KNXFormatException;
@@ -105,7 +104,7 @@ public class DPTXlatorDateTest extends TestCase
 		assertEquals(1, t.getDay());
 
 		t.setValues(values);
-		Assert.assertEquals(values.length, t.getAllValues().length);
+		assertEquals(values.length, t.getAllValues().length);
 		final String[] all = t.getAllValues();
 		Helper.assertSimilar(all, values);
 	}

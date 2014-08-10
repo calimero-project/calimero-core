@@ -19,7 +19,8 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+
 import tuwien.auto.calimero.exception.KNXException;
 
 /**

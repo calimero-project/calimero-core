@@ -23,8 +23,10 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
+
+import org.junit.Assert;
+
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
