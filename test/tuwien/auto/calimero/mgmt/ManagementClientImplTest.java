@@ -361,9 +361,9 @@ public class ManagementClientImplTest extends TestCase
 	public final void testReadPropertyDestinationIntIntIntIntCL() throws KNXException,
 		InterruptedException
 	{
-		dco2.destroy();
+		dcl.destroy();
 		final Destination connless = mc.createDestination(Util.getKnxDevice(), false);
-		final byte[] prop = mc.readProperty(connless, 0, 11, 1, 1);
+		final byte[] prop = mc.readProperty(connless, 0, 14, 1, 1);
 	}
 
 	/**
