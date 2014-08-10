@@ -376,12 +376,15 @@ public class Destination
 	 */
 	public String toString()
 	{
-		final String s = "destination " + addr + " (" + tl.getName() + ") "
-			+ getStateString();
+		String s = "destination " + addr + " (" + tl.getName() + ") ";
 		if (state == DESTROYED)
-			return s;
-		return s + (co ? "" : " not") + " conn.oriented, " + (alive ? "" : "no")
-			+ " keep alive, " + (verify ? "" : "no") + " verify mode";
+			return s + getStateString();
+		// keep-alive and detailed state only apply in CO mode
+		if (co)
+			s = s + "conn-oriented, " + getStateString() + (alive ? " " : " no") + " keep-alive, ";
+		else
+			s = s + "connectionless, ";
+		return s + (verify ? "" : "no") + " verify mode";
 	}
 
 	int getDisconnectedBy()
