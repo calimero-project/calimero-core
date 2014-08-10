@@ -82,62 +82,12 @@ public class NetworkBufferTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.buffer.NetworkBuffer#createBuffer(java.lang.String)}.
 	 */
-//	public final void testCreateBuffer()
-//	{
-//		final NetworkBuffer b = NetworkBuffer.createBuffer("testInstallation");
-//		assertEquals(b, NetworkBuffer.getBuffer("testInstallation"));
-//	}
-
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.NetworkBuffer#getBuffer(java.lang.String)}.
-	 */
-//	public final void testGetBuffer()
-//	{
-//		assertNull(NetworkBuffer.getBuffer("notFound"));
-//		NetworkBuffer.createBuffer("notfound");
-//		assertNull(NetworkBuffer.getBuffer("notFound"));
-//	}
-
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.NetworkBuffer#removeBuffer(java.lang.String)}.
-	 */
-//	public final void testRemoveBuffer()
-//	{
-//		NetworkBuffer.removeBuffer("notAnInstallation");
-//		NetworkBuffer.createBuffer("forRemove");
-//		// same in lower case
-//		NetworkBuffer.createBuffer("forremove");
-//		NetworkBuffer.removeBuffer("forRemove");
-//		assertNull(NetworkBuffer.getBuffer("forRemove"));
-//		assertNotNull(NetworkBuffer.getBuffer("forremove"));
-//		NetworkBuffer.removeBuffer("forremove");
-//		assertNull(NetworkBuffer.getBuffer("forremove"));
-//	}
-
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.NetworkBuffer#createConfiguration(tuwien.auto.calimero.link.KNXNetworkLink, java.lang.String)}
-	 * .
-	 */
-//	public final void testCreateConfigurationKNXNetworkLinkString()
-//	{
-//		final Configuration c = NetworkBuffer.createConfiguration(lnk, null);
-//		final NetworkBuffer b = NetworkBuffer.getBuffer("Installation 1");
-//		assertEquals(c, b.getConfiguration(c.getBufferedLink()));
-//		assertFalse(c.isActive());
-//		assertEquals(lnk, c.getBaseLink());
-//		assertNull(c.getCache());
-//		assertNull(c.getDatapointModel());
-//		assertNull(c.getNetworkFilter());
-//
-//		// try to remove from different installation
-//		NetworkBuffer.removeConfiguration(c, "Installation 2");
-//		assertEquals(c, b.getConfiguration(c.getBufferedLink()));
-//		NetworkBuffer.removeConfiguration(c, "Installation 1");
-//		assertNull(b.getConfiguration(c.getBufferedLink()));
-//	}
+	public final void testCreateBuffer()
+	{
+		final String id = "testInstallation";
+		final NetworkBuffer b = NetworkBuffer.createBuffer(id);
+		assertEquals(id, b.getInstallationID());
+	}
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.buffer.NetworkBuffer#addConfiguration(
@@ -171,19 +121,6 @@ public class NetworkBufferTest extends TestCase
 		buffer.removeConfiguration(c);
 		assertNull(buffer.getConfiguration(buf));
 	}
-
-	/**
-	 * Test method for {@link tuwien.auto.calimero.buffer.NetworkBuffer#getAllBuffers()}.
-	 */
-//	public final void testGetAllBuffers()
-//	{
-//		final NetworkBuffer[] b = NetworkBuffer.getAllBuffers();
-//		assertNotNull(b);
-//		NetworkBuffer.createBuffer(null);
-//		final NetworkBuffer[] b2 = NetworkBuffer.getAllBuffers();
-//		assertEquals(1, b2.length);
-//		assertTrue(b2[0].getInstallationID().startsWith("Installation "));
-//	}
 
 	/**
 	 * Test method for state based buffering.
