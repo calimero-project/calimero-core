@@ -117,18 +117,21 @@ public class ManagementClientImplTest extends TestCase
 			fail("invalid key length");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-		int level = 0;
+
+		final byte[] invalidKey = new byte[] { 0x10, 0x10, 0x10, 0x10 };
+		final byte[] validKey = new byte[] { 0x10, 0x20, 0x30, 0x40 };
+		final byte[] defaultKey = new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff };
 		try {
-			level = mc.authorize(dco, new byte[] { 0x10, 0x10, 0x10, 0x10 });
-			fail("key does not exist");
-		}
-		catch (final KNXDisconnectException e) {}
-		final byte[] key = new byte[] { 0x10, 0x20, 0x30, 0x40 };
-		final byte[] key2 =
-			new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff };
-		final byte[] key3 = new byte[] { (byte) 0, (byte) 0, (byte) 0, (byte) 0 };
-		try {
-			level = mc.authorize(dco, key2);
+			int level = mc.authorize(dco, invalidKey);
+			assertEquals(15, level);
+
+			// 2 is the associated access level on the KNX test device for this valid key
+			level = mc.authorize(dco, validKey);
+			assertEquals(2, level);
+
+			level = mc.authorize(dco, defaultKey);
+			// 14 is selected on the KNX test device as max. unauthorized access level
+			assertEquals(14, level);
 		}
 		catch (final KNXTimeoutException e) {
 			// authorize not supported on every device, ignore for now..
@@ -426,19 +429,19 @@ public class ManagementClientImplTest extends TestCase
 		System.out.println("put device into prog mode for write address...");
 		Thread.sleep(5000);
 		final IndividualAddress[] orig = mc.readAddress(true);
-		// System.out.println(" readAddress finished ===========================");
+
 		assertEquals(1, orig.length);
-		final int dev = (int) (Math.random() * 15);
-		final IndividualAddress write = new IndividualAddress(4, 5, dev);
+		final IndividualAddress write = Util.getNonExistingKnxDevice();
 		mc.writeAddress(write);
 		Thread.sleep(50);
 		final IndividualAddress[] ias = mc.readAddress(true);
-		// System.out.println(" readAddress 2 finished ===========================");
 		assertEquals(1, ias.length);
 		assertEquals(write, ias[0]);
+
+		// write back original address
 		mc.writeAddress(orig[0]);
 		Thread.sleep(50);
-		// System.out.println(" writeAddress orig finished ===========================");
+		// test for original address
 		assertEquals(orig[0], mc.readAddress(true)[0]);
 		System.out.println("turn prog mode off...");
 		Thread.sleep(5000);
@@ -460,7 +463,7 @@ public class ManagementClientImplTest extends TestCase
 		final IndividualAddress read = mc.readAddress(sno);
 		assertEquals(write, read);
 
-		final IndividualAddress write2 = new IndividualAddress(3, 0, 2);
+		final IndividualAddress write2 = Util.getNonExistingKnxDevice();
 		mc.writeAddress(sno, write2);
 		final IndividualAddress read2 = mc.readAddress(sno);
 		assertEquals(write2, read2);
