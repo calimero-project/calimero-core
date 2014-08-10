@@ -646,4 +646,15 @@ public interface PropertyAccess
 	 * @throws KNXException on adapter errors while querying the description
 	 */
 	Description getDescription(int objIndex, int pid) throws KNXException;
+
+	/**
+	 * Gets the property description based on the property index.
+	 * <p>
+	 *
+	 * @param objIndex interface object index in the device
+	 * @param propIndex property index in the object, propIndex &geq; 0
+	 * @return a property description object
+	 * @throws KNXException on adapter errors while querying the description
+	 */
+	Description getDescriptionByIndex(int objIndex, int propIndex) throws KNXException;
 }
