@@ -260,7 +260,7 @@ public class TransportLayerImplTest extends TestCase
 	{
 		Destination d;
 		try {
-			d = tl.createDestination(Util.getRouterAddress(), true, false, true);
+			d = tl.createDestination(Util.getKnxDeviceCO(), true, false, true);
 			fail("already created");
 		}
 		catch (final KNXIllegalArgumentException e) {}
@@ -446,8 +446,7 @@ public class TransportLayerImplTest extends TestCase
 		KNXLinkClosedException, InterruptedException
 	{
 		// not existing device address
-		final Destination dunknown =
-			tl.createDestination(new IndividualAddress(5, 5, 5), true);
+		final Destination dunknown = tl.createDestination(Util.getNonExistingKnxDevice(), true);
 		tl.connect(dunknown);
 		try {
 			tl.sendData(dunknown, p, tsduDescRead);
@@ -473,7 +472,7 @@ public class TransportLayerImplTest extends TestCase
 						notify();
 					}
 					try {
-						sleep(10);
+						sleep(2);
 					}
 					catch (final InterruptedException e) {}
 					tl.detach();
