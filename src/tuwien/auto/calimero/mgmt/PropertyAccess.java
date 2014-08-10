@@ -283,14 +283,6 @@ public interface PropertyAccess
 		 */
 		// PDT,DPT: PDT_BITSET8
 		public static final int PROGMODE = 54;
-				
-		/**
-		 * Device object property "Interface Object List".
-		 * <p>
-		 * Used with cEMI functionality.
-		 */
-		// PDT,DPT: PDT_UNSIGNED_INT
-		public static final int IO_LIST = 71;
 
 		/**
 		 * Device object property "Max. APDU-Length".
@@ -323,6 +315,14 @@ public interface PropertyAccess
 		 */
 		// PDT,DPT: PDT_UNSIGNED_INT
 		public static final int DOMAIN_ADDRESS = 70;
+
+		/**
+		 * Device object property "Interface Object List".
+		 * <p>
+		 * Used with cEMI functionality.
+		 */
+		// PDT,DPT: PDT_UNSIGNED_INT
+		public static final int IO_LIST = 71;
 
 		//
 		// properties of object type 6, Router object
