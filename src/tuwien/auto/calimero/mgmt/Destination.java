@@ -164,6 +164,10 @@ public class Destination
 		 */
 		public void run()
 		{
+			// with keep-alive we do not disconnect on timeout
+			if (d.alive)
+				return;
+
 			final int state = d.getState();
 			if (state != DISCONNECTED && state != DESTROYED)
 				try {
