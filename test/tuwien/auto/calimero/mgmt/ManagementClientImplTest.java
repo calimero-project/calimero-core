@@ -239,8 +239,8 @@ public class ManagementClientImplTest extends TestCase
 			fail("invalid SN length");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-		// XXX correct serial number for test device
-		final byte[] sno = new byte[] { 0x00, 0x01, 0x00, 0x11, (byte) 0xcb, 0x08 };
+
+		final byte[] sno = new byte[] { 0x1, 0x2, 0x3, 0x4, 0x5, 0x6 };
 		final IndividualAddress addr = Util.getKnxDeviceCO();
 
 		final IndividualAddress ia = mc.readAddress(sno);
