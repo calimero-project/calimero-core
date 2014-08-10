@@ -106,7 +106,7 @@ public class ManagementClientImplTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#authorize
 	 * (tuwien.auto.calimero.mgmt.Destination, byte[])}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -138,7 +138,7 @@ public class ManagementClientImplTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#authorize
 	 * (tuwien.auto.calimero.mgmt.Destination, byte[])}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -154,7 +154,7 @@ public class ManagementClientImplTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readADC
 	 * (tuwien.auto.calimero.mgmt.Destination, int, int)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -188,7 +188,7 @@ public class ManagementClientImplTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readADC
 	 * (tuwien.auto.calimero.mgmt.Destination, int, int)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -204,7 +204,7 @@ public class ManagementClientImplTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readAddress(boolean)}.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 * @throws KNXException
 	 */
@@ -225,7 +225,7 @@ public class ManagementClientImplTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readAddress(byte[])}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -247,7 +247,7 @@ public class ManagementClientImplTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readMemory
 	 * (tuwien.auto.calimero.mgmt.Destination, int, int)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -281,7 +281,7 @@ public class ManagementClientImplTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readMemory
 	 * (tuwien.auto.calimero.mgmt.Destination, int, int)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -297,7 +297,7 @@ public class ManagementClientImplTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readProperty
 	 * (tuwien.auto.calimero.mgmt.Destination, int, int, int, int)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -351,7 +351,7 @@ public class ManagementClientImplTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readProperty
 	 * (tuwien.auto.calimero.mgmt.Destination, int, int, int, int)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -367,7 +367,7 @@ public class ManagementClientImplTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readPropertyDesc
 	 * (tuwien.auto.calimero.mgmt.Destination, int, int, int)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -416,7 +416,7 @@ public class ManagementClientImplTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#writeAddress
 	 * (tuwien.auto.calimero.IndividualAddress)}.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 * @throws KNXException
 	 */
@@ -447,14 +447,14 @@ public class ManagementClientImplTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#writeAddress
 	 * (byte[], tuwien.auto.calimero.IndividualAddress)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
 	public final void testWriteAddressByteArrayIndividualAddress() throws KNXException,
 		InterruptedException
 	{
-	final byte[] sno = new byte[] { 0x00, 0x01, 0x00, 0x11, (byte) 0xcb, 0x08 };
+		final byte[] sno = new byte[] { 0x00, 0x01, 0x00, 0x11, (byte) 0xcb, 0x08 };
 		final IndividualAddress write = mc.readAddress(sno);
 		mc.writeAddress(sno, write);
 		final IndividualAddress read = mc.readAddress(sno);
@@ -471,7 +471,7 @@ public class ManagementClientImplTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#writeKey
 	 * (tuwien.auto.calimero.mgmt.Destination, int, byte[])}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -499,7 +499,7 @@ public class ManagementClientImplTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#writeMemory
 	 * (tuwien.auto.calimero.mgmt.Destination, int, byte[])}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -513,7 +513,7 @@ public class ManagementClientImplTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#createDestination
 	 * (tuwien.auto.calimero.IndividualAddress, boolean, boolean, boolean)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testCreateDestination() throws KNXFormatException
@@ -525,7 +525,7 @@ public class ManagementClientImplTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#restart
 	 * (tuwien.auto.calimero.mgmt.Destination)}.
-	 * 
+	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 */
@@ -539,7 +539,7 @@ public class ManagementClientImplTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#writeProperty
 	 * (tuwien.auto.calimero.mgmt.Destination, int, int, int, int, byte[])}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -555,7 +555,7 @@ public class ManagementClientImplTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#detach()}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -596,7 +596,7 @@ public class ManagementClientImplTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readDomainAddress (byte[],
 	 * tuwien.auto.calimero.IndividualAddress, int)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -626,7 +626,7 @@ public class ManagementClientImplTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readDomainAddress(boolean)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -640,7 +640,7 @@ public class ManagementClientImplTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#writeDomainAddress(byte[])}.
-	 * 
+	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 */
@@ -664,7 +664,7 @@ public class ManagementClientImplTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readDeviceDesc
 	 * (tuwien.auto.calimero.mgmt.Destination, int)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
