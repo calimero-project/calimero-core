@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -171,7 +171,7 @@ public class DatapointMapTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.datapoint.DatapointMap#load(
 	 * tuwien.auto.calimero.xml.XMLReader)}.
-	 * 
+	 *
 	 * @throws KNXMLException
 	 */
 	public final void testLoad() throws KNXMLException
@@ -222,7 +222,7 @@ public class DatapointMapTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.datapoint.DatapointMap#save(
 	 * tuwien.auto.calimero.xml.XMLWriter)}.
-	 * 
+	 *
 	 * @throws KNXMLException
 	 */
 	public final void testSave() throws KNXMLException
