@@ -117,35 +117,15 @@ public interface ProcessCommunicator extends ProcessCommunicationBase
 	 */
 	int readControl(GroupAddress dst) throws KNXException, InterruptedException;
 
-	// Temp. keep the following method as forwarder, since i don't know how freq. it is used.
-	// Remove at 2.1/2.2
 	/**
-	 * Deprecated (> v2.0.5), do not longer use; replaced by the 3 arg write.
+	 * Reads a floating point datapoint value from a group destination.
 	 * <p>
-	 * Reads a 2-byte KNX float datapoint value from a group destination.
-	 * <p>
-	 * 
-	 * @param dst group destination to read from
-	 * @return the read value of type float
-	 * @throws KNXTimeoutException on a timeout during send or no read response was received
-	 * @throws KNXInvalidResponseException on invalid read response message
-	 * @throws KNXLinkClosedException if network link to KNX network is closed
-	 * @throws KNXFormatException on translation problem of the response data
-	 * @throws KNXException on other read problems
-	 * @throws InterruptedException on interrupt during read
-	 */
-	float readFloat(GroupAddress dst) throws KNXException, InterruptedException;
-
-
-	/**
-	 * Reads a float datapoint value from a group destination.
-	 * <p>
-	 * 
+	 *
 	 * @param dst group destination to read from
 	 * @param is4ByteFloat specifies the datapoint floating point type the datapoint is encoded
 	 *        with: either a 2-byte KNX float of DPT main number 9 (<code>false</code>), or a 4-byte
 	 *        float of DPT main number 14 (<code>true</code>)
-	 * @return the read value of type float
+	 * @return the read floating point value
 	 * @throws KNXTimeoutException on a timeout during send or no read response was received
 	 * @throws KNXInvalidResponseException on invalid read response message
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
@@ -153,7 +133,7 @@ public interface ProcessCommunicator extends ProcessCommunicationBase
 	 * @throws KNXException on other read problems
 	 * @throws InterruptedException on interrupt during read
 	 */
-	float readFloat(GroupAddress dst, boolean is4ByteFloat) throws KNXException,
+	double readFloat(GroupAddress dst, boolean is4ByteFloat) throws KNXException,
 		InterruptedException;
 
 	/**

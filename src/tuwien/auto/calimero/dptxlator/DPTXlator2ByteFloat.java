@@ -251,17 +251,6 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	}
 
 	/**
-	 * Returns the first translation item formatted as float.
-	 * <p>
-	 * 
-	 * @return value as float
-	 */
-	public final float getValueFloat()
-	{
-		return (float) fromDPT(0);
-	}
-
-	/**
 	 * Returns the first translation item formatted as double.
 	 * <p>
 	 *

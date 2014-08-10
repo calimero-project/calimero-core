@@ -294,18 +294,6 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	}
 
 	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#readFloat
-	 * (tuwien.auto.calimero.GroupAddress)
-	 */
-	public float readFloat(final GroupAddress dst) throws KNXTimeoutException,
-		KNXRemoteException, KNXLinkClosedException, KNXFormatException, InterruptedException
-	{
-		logger.warn("ProcessCommunicator::read(GroupAddress) is deprecated. " +
-				"Use ProcessCommunicator::read(GroupAddress, boolean).");
-		return readFloat(dst, false);
-	}
-
-	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.process.ProcessCommunicator#write
 	 * (tuwien.auto.calimero.GroupAddress, float)
 	 */
@@ -342,8 +330,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	 * @see tuwien.auto.calimero.process.ProcessCommunicator#readFloat
 	 * (tuwien.auto.calimero.GroupAddress, boolean)
 	 */
-	// XXX make breaking change to return double?
-	public float readFloat(final GroupAddress dst, final boolean is4ByteFloat)
+	public double readFloat(final GroupAddress dst, final boolean is4ByteFloat)
 		throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException, KNXFormatException,
 		InterruptedException
 	{
@@ -355,10 +342,9 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 			return t.getValueFloat();
 		}
 		final byte[] apdu = readFromGroup(dst, priority, 2, 2);
-		final DPTXlator2ByteFloat t = new DPTXlator2ByteFloat(
-				DPTXlator2ByteFloat.DPT_RAIN_AMOUNT);
+		final DPTXlator2ByteFloat t = new DPTXlator2ByteFloat(DPTXlator2ByteFloat.DPT_RAIN_AMOUNT);
 		extractGroupASDU(apdu, t);
-		return (float) t.getValueDouble();
+		return t.getValueDouble();
 	}
 
 	/* (non-Javadoc)

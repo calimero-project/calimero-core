@@ -338,8 +338,8 @@ public class ProcessCommunicatorTest extends TestCase
 	 */
 	public final void testReadFloatBoolean() throws KNXException, InterruptedException
 	{
-		final float f2 = pc.readFloat(dpFloat2, false);
-		final float f4 = pc.readFloat(dpFloat4, true);
+		/*final double f2 =*/ pc.readFloat(dpFloat2, false);
+		/*final double f4 =*/ pc.readFloat(dpFloat4, true);
 	}
 
 	/**
