@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2013 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ package tuwien.auto.calimero;
 /**
  * General settings used in Calimero 2 as well as library user information.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public final class Settings
@@ -30,7 +30,7 @@ public final class Settings
 	private static final String version = "2.2.0-alpha";
 	private static final String library = "Calimero 2";
 	private static final String desc = "A library for KNX network access";
-	
+
 	private static final String tuwien = "Vienna University of Technology";
 	private static final String group = "Automation Systems Group";
 	private static final String copyright = "(c) 2007-2013";
@@ -51,7 +51,7 @@ public final class Settings
 	 * <p>
 	 * The returned version is formatted something similar to
 	 * "main.minor[.milli][-phase]", for example, "2.0" or "2.0.0-alpha".
-	 * 
+	 *
 	 * @return version as string
 	 */
 	public static String getLibraryVersion()
@@ -65,7 +65,7 @@ public final class Settings
 	 * It includes stuff like the library name, library version, name and institute of the
 	 * Vienna University of Technology where the library was developed, and copyright.
 	 * The returned information parts are divided using the newline ('\n') character.
-	 * 
+	 *
 	 * @param verbose <code>true</code> to return all header information just mentioned,
 	 *        <code>false</code> to only return library name and version comprised of
 	 *        one line (no line separators)
@@ -96,7 +96,7 @@ public final class Settings
 	 * consists of a short name and is marked with the suffix "- not available".<br>
 	 * The bundle entries in the returned string are separated using the newline ('\n')
 	 * character.
-	 * 
+	 *
 	 * @return the bundle listing as string
 	 */
 	public static String getBundleListing()
@@ -134,7 +134,7 @@ public final class Settings
 	 * <li>no options: default library header information and bundle listing</li>
 	 * <li>-v, --version: prints library name and version</li>
 	 * </ul>
-	 * 
+	 *
 	 * @param args argument list with options controlling output information
 	 */
 	public static void main(final String[] args)
@@ -152,7 +152,7 @@ public final class Settings
 	 * This constant is for library internal use only: development mode identifier.
 	 */
 	public static final int DEV_MODE = 1;
-	
+
 	/**
 	 * This constant is for library internal use only: deployed mode identifier.
 	 */
@@ -166,14 +166,14 @@ public final class Settings
 	 * <p>
 	 * Querying library mode allows library functions to adapt its behavior, e.g.,
 	 * provide additional logging output.
-	 * 
+	 *
 	 * @return the current library mode
 	 */
 	public static int getLibraryMode()
 	{
 		return DEV_MODE;
 	}
-	
+
 	// for now, this works by loading one class as representative from a bundle
 	// to check availability, then class name is truncated to bundle id
 	private static String getBundle(final String friendlyName, final String className,

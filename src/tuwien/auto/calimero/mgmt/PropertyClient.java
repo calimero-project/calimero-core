@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -123,7 +123,7 @@ import tuwien.auto.calimero.xml.XMLWriter;
  * property is not available (only the current number of elements).<br>
  * All methods for property access invoked after a close of the property client will throw
  * a {@link KNXIllegalStateException}.
- * 
+ *
  * @author B. Malinowsky
  * @see PropertyAdapter
  * @see PropertyTypes
@@ -144,7 +144,7 @@ public class PropertyClient implements PropertyAccess
 	 * methods for concurrent access. All library access to a resource handler instance
 	 * will occur within the execution thread of the invoking method, or the library will
 	 * ensure its own appropriate synchronization on the handler.
-	 * 
+	 *
 	 * @author B. Malinowsky
 	 */
 	public static interface ResourceHandler
@@ -152,7 +152,7 @@ public class PropertyClient implements PropertyAccess
 		/**
 		 * Loads the properties from the resource.
 		 * <p>
-		 * 
+		 *
 		 * @param resource the identifier of the resource used for loading the properties
 		 * @return a collection containing the property definitions of type
 		 *         {@link PropertyClient.Property}
@@ -162,7 +162,7 @@ public class PropertyClient implements PropertyAccess
 
 		/**
 		 * Saves the properties to the resource.
-		 * 
+		 *
 		 * @param resource the identifier of the resource used for saving the properties
 		 * @param definitions the property definitions in a collection holding
 		 *        {@link PropertyClient.Property}-type values
@@ -177,7 +177,7 @@ public class PropertyClient implements PropertyAccess
 	 * A key consists of the interface object type and the property identifier of the
 	 * associated property. If the property is defined globally, the global object type
 	 * {@link PropertyClient.PropertyKey#GLOBAL_OBJTYPE} is used.
-	 * 
+	 *
 	 * @author B. Malinowsky
 	 */
 	public static final class PropertyKey implements Comparable
@@ -191,7 +191,7 @@ public class PropertyClient implements PropertyAccess
 		/**
 		 * Creates a new key for a global defined property.
 		 * <p>
-		 * 
+		 *
 		 * @param pid property identifier
 		 */
 		public PropertyKey(final int pid)
@@ -203,7 +203,7 @@ public class PropertyClient implements PropertyAccess
 		/**
 		 * Creates a new key for a property.
 		 * <p>
-		 * 
+		 *
 		 * @param objType object type of the property
 		 * @param pid property identifier
 		 */
@@ -216,7 +216,7 @@ public class PropertyClient implements PropertyAccess
 		/**
 		 * Returns the property identifier part of this key.
 		 * <p>
-		 * 
+		 *
 		 * @return the PID as unsigned number
 		 */
 		public int getPID()
@@ -227,7 +227,7 @@ public class PropertyClient implements PropertyAccess
 		/**
 		 * Returns whether the property is defined with global object type.
 		 * <p>
-		 * 
+		 *
 		 * @return <code>true</code> if property has global object type,
 		 *         <code>false</code> if property has a specific object type
 		 */
@@ -270,7 +270,7 @@ public class PropertyClient implements PropertyAccess
 	 * Stores property definition information of one property, used for type translation
 	 * and property lookup by a property client.
 	 * <p>
-	 * 
+	 *
 	 * @author B. Malinowsky
 	 */
 	public static class Property
@@ -287,7 +287,7 @@ public class PropertyClient implements PropertyAccess
 		/**
 		 * Creates a new property object of the supplied information.
 		 * <p>
-		 * 
+		 *
 		 * @param pid property identifier
 		 * @param pidName name of the property ID
 		 * @param propertyName property name, a friendly readable name for the property
@@ -326,7 +326,7 @@ public class PropertyClient implements PropertyAccess
 		/**
 		 * Returns the property identifier.
 		 * <p>
-		 * 
+		 *
 		 * @return the PID
 		 */
 		public final int getPID()
@@ -336,7 +336,7 @@ public class PropertyClient implements PropertyAccess
 
 		/**
 		 * Returns the PID name as string representation.
-		 * 
+		 *
 		 * @return the PID name as string
 		 */
 		public final String getPIDName()
@@ -347,7 +347,7 @@ public class PropertyClient implements PropertyAccess
 		/**
 		 * Returns the interface object type the property belongs to.
 		 * <p>
-		 * 
+		 *
 		 * @return the interface object type
 		 */
 		public final int getObjectType()
@@ -358,7 +358,7 @@ public class PropertyClient implements PropertyAccess
 		/**
 		 * Returns the property data type used for the property elements.
 		 * <p>
-		 * 
+		 *
 		 * @return the PDT
 		 */
 		public final int getPDT()
@@ -369,7 +369,7 @@ public class PropertyClient implements PropertyAccess
 		/**
 		 * Returns the datapoint type ID used for the property elements.
 		 * <p>
-		 * 
+		 *
 		 * @return the DPT ID as string, or <code>null</code> if no DPT was set
 		 */
 		public final String getDPT()
@@ -380,7 +380,7 @@ public class PropertyClient implements PropertyAccess
 		/**
 		 * Returns the property friendly name, a more readable name of the property.
 		 * <p>
-		 * 
+		 *
 		 * @return the property name
 		 */
 		public final String getName()
@@ -418,7 +418,7 @@ public class PropertyClient implements PropertyAccess
 	 * <p>
 	 * The property client obtains ownership of the adapter.<br>
 	 * The log service used by this property client is named "PC " + adapter.getName().
-	 * 
+	 *
 	 * @param adapter property adapter object
 	 * @throws KNXFormatException on missing DPT for translating interface object types (
 	 *         DPTXlator2ByteUnsigned.DPT_PROP_DATATYPE)
@@ -440,7 +440,7 @@ public class PropertyClient implements PropertyAccess
 	/**
 	 * Returns the object type name associated to the requested object type.
 	 * <p>
-	 * 
+	 *
 	 * @param objType object type to get name for
 	 * @return object type name as string
 	 */
@@ -455,7 +455,7 @@ public class PropertyClient implements PropertyAccess
 	 * Loads property definitions from a resource using the supplied
 	 * {@link ResourceHandler} or a default handler.
 	 * <p>
-	 * 
+	 *
 	 * @param resource the resource location identifier of a resource to load
 	 * @param handler the resource handler used for loading the property definitions, if
 	 *        <code>null</code>, a default handler is used
@@ -475,7 +475,7 @@ public class PropertyClient implements PropertyAccess
 	 * <p>
 	 * To save definitions of a property client <code>client</code>, invoke the method
 	 * with the argument <code>client.getDefinitions().values()</code>.
-	 * 
+	 *
 	 * @param resource the resource location identifier to a resource for saving the
 	 *        definitions
 	 * @param definitions the property definitions to save, the collection holds entries
@@ -505,7 +505,7 @@ public class PropertyClient implements PropertyAccess
 	 * manually.<br>
 	 * An added property definition will replace an existing definition with its property
 	 * key being equal to the one of the added definition.
-	 * 
+	 *
 	 * @param definitions collection of property definitions, containing entries of type
 	 *        {@link Property}
 	 */
@@ -525,7 +525,7 @@ public class PropertyClient implements PropertyAccess
 	 * client. Property definitions might be added or removed as required. Modifications
 	 * will influence subsequent lookup behavior of the property client.<br>
 	 * A map key is of type {@link PropertyKey}, a map value is of type {@link Property}.
-	 * 
+	 *
 	 * @return property map, or <code>null</code> if no definitions loaded
 	 */
 	public Map getDefinitions()
@@ -554,7 +554,7 @@ public class PropertyClient implements PropertyAccess
 	 * Gets the first property element using the associated property data type of the
 	 * requested property.
 	 * <p>
-	 * 
+	 *
 	 * @param objIndex interface object index in the device
 	 * @param pid property identifier
 	 * @return property element value represented as string
@@ -643,7 +643,7 @@ public class PropertyClient implements PropertyAccess
 	/**
 	 * Gets the property description based on the property index.
 	 * <p>
-	 * 
+	 *
 	 * @param objIndex interface object index in the device
 	 * @param propIndex property index in the object
 	 * @return a property description object
@@ -667,7 +667,7 @@ public class PropertyClient implements PropertyAccess
 	/**
 	 * Does a property description scan of the properties in all interface objects.
 	 * <p>
-	 * 
+	 *
 	 * @param allProperties <code>true</code> to scan all property descriptions in the
 	 *        interface objects, <code>false</code> to only scan the object type
 	 *        descriptions, i.e., ({@link PropertyAccess.PID#OBJECT_TYPE})
@@ -689,7 +689,7 @@ public class PropertyClient implements PropertyAccess
 	/**
 	 * Does a property description scan of the properties of one interface object.
 	 * <p>
-	 * 
+	 *
 	 * @param objIndex interface object index in the device
 	 * @param allProperties <code>true</code> to scan all property descriptions in that
 	 *        interface object, <code>false</code> to only scan the object type
@@ -725,7 +725,7 @@ public class PropertyClient implements PropertyAccess
 	/**
 	 * Returns whether the adapter used for property access is opened.
 	 * <p>
-	 * 
+	 *
 	 * @return <code>true</code> on open adapter, <code>false</code> on closed adapter
 	 */
 	public final boolean isOpen()

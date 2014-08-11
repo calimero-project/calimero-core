@@ -31,7 +31,7 @@ import tuwien.auto.calimero.link.KNXNetworkLink;
 /**
  * Process communication interface for writing to a KNX network.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public interface ProcessCommunicationBase
@@ -40,7 +40,7 @@ public interface ProcessCommunicationBase
 	 * Represents "on" of datapoint type <b>Switch</b> (DPT ID 1.001), value =
 	 * {@value #BOOL_ON}.
 	 * <p>
-	 * 
+	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
 	 */
@@ -50,7 +50,7 @@ public interface ProcessCommunicationBase
 	 * Represents "off" of datapoint type <b>Switch</b> (DPT ID 1.001), value =
 	 * {@value #BOOL_OFF}.
 	 * <p>
-	 * 
+	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
 	 */
@@ -60,7 +60,7 @@ public interface ProcessCommunicationBase
 	 * Represents "up" of datapoint type <b>Up/Down</b> (DPT ID 1.008), value =
 	 * {@value #BOOL_UP}.
 	 * <p>
-	 * 
+	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
 	 */
@@ -70,7 +70,7 @@ public interface ProcessCommunicationBase
 	 * Represents "down" of datapoint type <b>Up/Down</b> (DPT ID 1.008), value =
 	 * {@value #BOOL_DOWN}.
 	 * <p>
-	 * 
+	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
 	 */
@@ -80,7 +80,7 @@ public interface ProcessCommunicationBase
 	 * Represents "start" of datapoint type <b>Start</b> (DPT ID 1.010), value =
 	 * {@value #BOOL_START}.
 	 * <p>
-	 * 
+	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
 	 */
@@ -90,7 +90,7 @@ public interface ProcessCommunicationBase
 	 * Represents "stop" of datapoint type <b>Start</b> (DPT ID 1.010), value =
 	 * {@value #BOOL_STOP}.
 	 * <p>
-	 * 
+	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
 	 */
@@ -100,7 +100,7 @@ public interface ProcessCommunicationBase
 	 * Represents "increase" of datapoint type <b>Step</b> (DPT ID 1.007), value =
 	 * {@value #BOOL_INCREASE}.
 	 * <p>
-	 * 
+	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
 	 */
@@ -110,7 +110,7 @@ public interface ProcessCommunicationBase
 	 * Represents "decrease" of datapoint type <b>Step</b> (DPT ID 1.007), value =
 	 * {@value #BOOL_DECREASE}.
 	 * <p>
-	 * 
+	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
 	 */
@@ -120,7 +120,7 @@ public interface ProcessCommunicationBase
 	 * Represents the scaling format of datapoint type <b>Scaling</b> (DPT ID 5.001).
 	 * <p>
 	 * This format scales the 8 Bit unsigned value range from 0 to 100.
-	 * 
+	 *
 	 * @see #write(GroupAddress, int, String)
 	 */
 	String SCALING = "5.001";
@@ -129,7 +129,7 @@ public interface ProcessCommunicationBase
 	 * Represents the unscaled format, no scaling is used (like in datapoint types
 	 * <b>Unsigned count</b> (DPT ID 5.010) or <b>Decimal factor</b> (DPT ID 5.005) ).
 	 * <p>
-	 * 
+	 *
 	 * @see #write(GroupAddress, int, String)
 	 */
 	String UNSCALED = "5.010";
@@ -138,17 +138,17 @@ public interface ProcessCommunicationBase
 	 * Represents the scaling format of datapoint type <b>Angle</b> (DPT ID 5.003).
 	 * <p>
 	 * This format scales the 8 Bit unsigned value range from 0 to 360.
-	 * 
+	 *
 	 * @see #write(GroupAddress, int, String)
 	 */
 	String ANGLE = "5.003";
-	
-	
-	
+
+
+
 	/**
 	 * Sets the KNX message priority for KNX messages to send.
 	 * <p>
-	 * 
+	 *
 	 * @param p new priority to use
 	 */
 	void setPriority(Priority p);
@@ -156,7 +156,7 @@ public interface ProcessCommunicationBase
 	/**
 	 * Returns the currently used KNX message priority for KNX messages.
 	 * <p>
-	 * 
+	 *
 	 * @return message Priority
 	 */
 	Priority getPriority();
@@ -166,7 +166,7 @@ public interface ProcessCommunicationBase
 	 * process communicator.
 	 * <p>
 	 * If <code>l</code> was already added as listener, no action is performed.
-	 * 
+	 *
 	 * @param l the listener to add
 	 */
 	void addProcessListener(ProcessListener l);
@@ -176,7 +176,7 @@ public interface ProcessCommunicationBase
 	 * receive events from this process communicator.
 	 * <p>
 	 * If <code>l</code> was not added in the first place, no action is performed.
-	 * 
+	 *
 	 * @param l the listener to remove
 	 */
 	void removeProcessListener(ProcessListener l);
@@ -184,7 +184,7 @@ public interface ProcessCommunicationBase
 	/**
 	 * Writes a boolean datapoint value to a group destination.
 	 * <p>
-	 * 
+	 *
 	 * @param dst group destination to write to
 	 * @param value boolean value to write, consider the predefined BOOL_* constants (e.g.
 	 *        {@link #BOOL_ON})
@@ -199,7 +199,7 @@ public interface ProcessCommunicationBase
 	 * <p>
 	 * The predefined scaling format constants are equal to DPT identifiers of the 8 Bit
 	 * DPT translator, any other suiting IDs of that type might be specified as well.
-	 * 
+	 *
 	 * @param dst group destination to write to
 	 * @param value unsigned scaled value to write, 0 &lt;= value &lt;= scale format
 	 *        specific upper value
@@ -215,7 +215,7 @@ public interface ProcessCommunicationBase
 	/**
 	 * Writes a 3 bit controlled datapoint value to a group destination.
 	 * <p>
-	 * 
+	 *
 	 * @param dst group destination to write to
 	 * @param control control information, one of the predefined BOOL_* constants of DPT
 	 *        <b>Step</b> and DPT <b>Up/Down</b>
@@ -231,7 +231,7 @@ public interface ProcessCommunicationBase
 	 * Writes a float datapoint value to a group destination.
 	 * <p>
 	 * The supplied float value is written according to the specified float datapoint type.
-	 * 
+	 *
 	 * @param dst group destination to write to
 	 * @param value float value to write
 	 * @param use4ByteFloat specifies the float type of the datapoint; either writes a 2-byte KNX
@@ -243,13 +243,13 @@ public interface ProcessCommunicationBase
 	 * @throws KNXException on other write problems
 	 */
 	void write(GroupAddress dst, float value, boolean use4ByteFloat) throws KNXException;
-	
+
 	/**
 	 * Writes a string datapoint value to a group destination.
 	 * <p>
 	 * The supported character set covers at least ISO-8859-1 (Latin 1), with an allowed
 	 * string length of 14 characters.
-	 * 
+	 *
 	 * @param dst group destination to write to
 	 * @param value string value to write
 	 * @throws KNXTimeoutException on a timeout during send
@@ -263,7 +263,7 @@ public interface ProcessCommunicationBase
 	 * Writes a datapoint value to a group destination.
 	 * <p>
 	 * The used KNX message priority is according the supplied datapoint priority.
-	 * 
+	 *
 	 * @param dp the datapoint for write
 	 * @param value datapoint value in textual representation according the datapoint its
 	 *        type
@@ -281,7 +281,7 @@ public interface ProcessCommunicationBase
 	 * If no network link is attached, no action is performed.
 	 * <p>
 	 * Note that a detach does not trigger a close of the used network link.
-	 * 
+	 *
 	 * @return the formerly attached KNX network link, or <code>null</code> if already
 	 *         detached
 	 */
