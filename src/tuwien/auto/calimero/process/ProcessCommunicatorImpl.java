@@ -294,18 +294,6 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	}
 
 	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#write
-	 * (tuwien.auto.calimero.GroupAddress, float)
-	 */
-	public void write(final GroupAddress dst, final float value) throws KNXTimeoutException,
-		KNXFormatException, KNXLinkClosedException
-	{
-		logger.warn("ProcessCommunicator::write(GroupAddress, float) is deprecated. " +
-				"Use ProcessCommunicator::write(GroupAddress, float, boolean).");
-		write(dst, value, false);
-	}
-
-	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.process.ProcessCommunicationBase#write
 	 * (tuwien.auto.calimero.GroupAddress, float, boolean)
 	 */

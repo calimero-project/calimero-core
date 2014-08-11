@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2012 B. Malinowsky
+    Copyright (c) 2010, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -226,23 +226,6 @@ public interface ProcessCommunicationBase
 	 * @throws KNXException on other write problems
 	 */
 	void write(GroupAddress dst, boolean control, int stepcode) throws KNXException;
-
-	// Temp. keep the following method as forwarder, since i don't know how freq. it is used.
-	// Remove at 2.1/2.2
-	/**
-	 * Deprecated (> v2.0.5), do not longer use; replaced by the 3 arg write.
-	 * <p>
-	 * Writes a 2-byte KNX float datapoint value to a group destination.
-	 * <p>
-	 * 
-	 * @param dst group destination to write to
-	 * @param value float value to write
-	 * @throws KNXTimeoutException on a timeout during send
-	 * @throws KNXFormatException on translation problem of the supplied datapoint value
-	 * @throws KNXLinkClosedException if network link to KNX network is closed
-	 * @throws KNXException on other write problems
-	 */
-	void write(GroupAddress dst, float value) throws KNXException;
 
 	/**
 	 * Writes a float datapoint value to a group destination.
