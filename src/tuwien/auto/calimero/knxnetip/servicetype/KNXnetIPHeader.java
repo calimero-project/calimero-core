@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
  * The KNXnet/IP implementation status is 1.0.
  * <p>
  * Objects of this type are immutable.
- * 
+ *
  * @author B. Malinowsky
  */
 public class KNXnetIPHeader
@@ -160,7 +160,7 @@ public class KNXnetIPHeader
 	/**
 	 * Creates a new KNXnet/IP header by reading in the header of a KNXnet/IP frame.
 	 * <p>
-	 * 
+	 *
 	 * @param frame byte array with contained KNXnet/IP frame
 	 * @param offset start offset of KNXnet/IP header structure in <code>frame</code>
 	 * @throws KNXFormatException if <code>frame</code> is too short for header, on
@@ -192,7 +192,7 @@ public class KNXnetIPHeader
 	/**
 	 * Creates a new KNXnet/IP header for the given service.
 	 * <p>
-	 * 
+	 *
 	 * @param serviceType service type identifier specifying the service followed after
 	 *        the header, 0 &lt;= type &lt;= 0xFFFF
 	 * @param serviceLength length of the service structure in bytes
@@ -212,7 +212,7 @@ public class KNXnetIPHeader
 	/**
 	 * Returns the service type identifier.
 	 * <p>
-	 * 
+	 *
 	 * @return service type as unsigned 16 bit value
 	 */
 	public final int getServiceType()
@@ -223,7 +223,7 @@ public class KNXnetIPHeader
 	/**
 	 * Returns the KNXnet/IP protocol version of the frame.
 	 * <p>
-	 * 
+	 *
 	 * @return protocol version as unsigned 8 bit value
 	 */
 	public int getVersion()
@@ -234,7 +234,7 @@ public class KNXnetIPHeader
 	/**
 	 * Returns the length of the KNXnet/IP header structure.
 	 * <p>
-	 * 
+	 *
 	 * @return the length in bytes
 	 */
 	public int getStructLength()
@@ -247,7 +247,7 @@ public class KNXnetIPHeader
 	 * <p>
 	 * The total length is calculated by adding the header length and the length of the
 	 * service contained in the frame.
-	 * 
+	 *
 	 * @return the total length in bytes
 	 */
 	public final int getTotalLength()
@@ -258,7 +258,7 @@ public class KNXnetIPHeader
 	/**
 	 * Returns the byte representation of the KNXnet/IP header structure.
 	 * <p>
-	 * 
+	 *
 	 * @return byte array containing structure
 	 */
 	public byte[] toByteArray()
@@ -276,7 +276,7 @@ public class KNXnetIPHeader
 	/**
 	 * Returns a textual representation of this KNXnet/IP header.
 	 * <p>
-	 * 
+	 *
 	 * @return a string representation of the object
 	 */
 	public String toString()
@@ -286,6 +286,7 @@ public class KNXnetIPHeader
 				+ headersize + " total " + totalsize;
 	}
 
+	// TODO make public?
 	static String getSvcName(final int svcType)
 	{
 		switch (svcType) {
