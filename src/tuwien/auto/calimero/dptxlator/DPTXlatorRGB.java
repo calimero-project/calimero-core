@@ -113,8 +113,8 @@ public class DPTXlatorRGB extends DPTXlator {
 		final int i = index * 3;
 		
 		// return red green blue
-		return "r:" + Short.toString(data[i]) + " g:" + Short.toString(data[i+1]) + " b:"
-			+ Short.toString(data[i]);
+		return "r:" + Short.toString(data[i + RED]) + " g:" + Short.toString(data[i + GREEN]) + " b:"
+			+ Short.toString(data[i + BLUE]);
 	}
 
 	protected void toDPT(final String value, final short[] dst, final int index)
