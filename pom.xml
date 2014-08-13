@@ -29,6 +29,12 @@
 					<include>LICENSE.txt</include>
 				</includes>
 			</resource>
+			<resource>
+				<directory>resources</directory>
+				<includes>
+					<include>properties.xml</include>
+				</includes>
+			</resource>
 		</resources>
 		<plugins>
 			<plugin>
