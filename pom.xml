@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.calimero</groupId>
 	<artifactId>calimero-core</artifactId>
-	<version>2.2-SNAPSHOT</version>
+	<version>2.2-beta</version>
 	<name>Calimero-core Library</name>
 	<description>Calimero, a free KNX network library</description>
 	<scm>
@@ -17,7 +17,12 @@
 			<url>LICENSE.txt</url>
 		</license>
 	</licenses>
-
+	<developers>
+		<developer>
+			<name>Boris Malinowsky</name>
+			<email>b.malinowsky@gmail.com</email>
+		</developer>
+	</developers>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<testSourceDirectory>test</testSourceDirectory>
