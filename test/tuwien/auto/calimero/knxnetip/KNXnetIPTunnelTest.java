@@ -137,18 +137,12 @@ public class KNXnetIPTunnelTest extends TestCase
 
 		LogManager.getManager().addWriter(null, Util.getLogWriter());
 
-		frame =
-			new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0),
-				new GroupAddress(0, 0, 1), new byte[] { 0, (byte) (0x80 | 1) },
-				Priority.NORMAL);
-		frame2 =
-			new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0),
-				new GroupAddress(0, 0, 1), new byte[] { 0, (byte) (0x80 | 0) },
-				Priority.URGENT);
-		frameNoDest =
-			new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0),
-				new GroupAddress(10, 7, 10), new byte[] { 0, (byte) (0x80 | 0) },
-				Priority.LOW);
+		frame = new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0), new GroupAddress(0,
+				0, 1), new byte[] { 0, (byte) (0x80 | 1) }, Priority.NORMAL);
+		frame2 = new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0), new GroupAddress(
+				0, 0, 1), new byte[] { 0, (byte) (0x80 | 0) }, Priority.URGENT);
+		frameNoDest = new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0),
+				new GroupAddress(10, 7, 10), new byte[] { 0, (byte) (0x80 | 0) }, Priority.LOW);
 	}
 
 	/* (non-Javadoc)
@@ -172,7 +166,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#send
 	 * (tuwien.auto.calimero.cemi.CEMI,
 	 * tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -204,7 +198,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#send
 	 * (tuwien.auto.calimero.cemi.CEMI,
 	 * tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -274,7 +268,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#send
 	 * (tuwien.auto.calimero.cemi.CEMI,
 	 * tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -295,7 +289,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#send
 	 * (tuwien.auto.calimero.cemi.CEMI,
 	 * tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -386,7 +380,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#KNXnetIPTunnel
 	 * (short, java.net.InetSocketAddress, java.net.InetSocketAddress, boolean)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -413,7 +407,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#KNXnetIPTunnel
 	 * (short, java.net.InetSocketAddress, java.net.InetSocketAddress, boolean)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -425,7 +419,7 @@ public class KNXnetIPTunnelTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#close()}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -445,7 +439,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#getRemoteAddress()}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -460,7 +454,7 @@ public class KNXnetIPTunnelTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#getState()}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -482,7 +476,7 @@ public class KNXnetIPTunnelTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#getState()}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
