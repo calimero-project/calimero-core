@@ -15,6 +15,23 @@
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    Linking this library statically or dynamically with other modules is
+    making a combined work based on this library. Thus, the terms and
+    conditions of the GNU General Public License cover the whole
+    combination.
+
+    As a special exception, the copyright holders of this library give you
+    permission to link this library with independent modules to produce an
+    executable, regardless of the license terms of these independent
+    modules, and to copy and distribute the resulting executable under terms
+    of your choice, provided that you also meet, for each linked independent
+    module, the terms and conditions of the license of that module. An
+    independent module is a module which is not derived from or based on
+    this library. If you modify this library, you may extend this exception
+    to your version of the library, but you are not obligated to do so. If
+    you do not wish to do so, delete this exception statement from your
+    version.
 */
 
 package tuwien.auto.calimero.cemi;
@@ -37,7 +54,7 @@ import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
  * 16 bytes maximum. Additional information in the message structure is not supported.
  * <p>
  * Objects of this L-Data type are immutable.
- * 
+ *
  * @author B. Malinowsky
  */
 public class CEMILData implements CEMI
@@ -95,7 +112,7 @@ public class CEMILData implements CEMI
 	/**
 	 * Creates a new L-Data message from a byte stream.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte stream containing a cEMI L-Data message
 	 * @param offset start offset of cEMI frame in <code>data</code>
 	 * @throws KNXFormatException if no (valid) frame was found or the provided frame is
@@ -121,7 +138,7 @@ public class CEMILData implements CEMI
 	 * (for indication message this equals "not repeated frame"), broadcast is "don't
 	 * care", acknowledge of request is default medium behavior, hop count is 6 and
 	 * confirmation request is "don't care" in the control field.<br>
-	 * 
+	 *
 	 * @param msgCode a message code value specified in the L-Data type
 	 * @param src individual address of source
 	 * @param dst destination address
@@ -142,7 +159,7 @@ public class CEMILData implements CEMI
 	 * The message hop count is set to 6, send repetitions according to default medium
 	 * behavior, broadcast and request acknowledge are set to "don't care" in the control
 	 * field.<br>
-	 * 
+	 *
 	 * @param msgCode a message code value specified in the L-Data type
 	 * @param src individual address of source
 	 * @param dst destination address
@@ -167,7 +184,7 @@ public class CEMILData implements CEMI
 	 * exclusive with the rest of the control information and set to "don't care" (refer
 	 * to
 	 * {@link #CEMILData(int, IndividualAddress, KNXAddress, byte[], Priority, boolean)}).
-	 * 
+	 *
 	 * @param msgCode a message code value specified in the L-Data type
 	 * @param src individual address of source
 	 * @param dst destination address
@@ -234,7 +251,7 @@ public class CEMILData implements CEMI
 	/**
 	 * Creates a L-Data message, mainly for TP1 media.
 	 * <p>
-	 * 
+	 *
 	 * @param msgCode a message code value specified in the L-Data type
 	 * @param src individual address of source
 	 * @param dst destination address
@@ -281,7 +298,7 @@ public class CEMILData implements CEMI
 	 * <p>
 	 * The returned array is the NPDU without the length field of the message structure,
 	 * starting with the TPCI / APCI field.
-	 * 
+	 *
 	 * @return a copy of the TPDU as byte array
 	 */
 	public final byte[] getPayload()
@@ -292,7 +309,7 @@ public class CEMILData implements CEMI
 	/**
 	 * Returns the KNX individual source address.
 	 * <p>
-	 * 
+	 *
 	 * @return address as IndividualAddress
 	 */
 	public final IndividualAddress getSource()
@@ -303,7 +320,7 @@ public class CEMILData implements CEMI
 	/**
 	 * Returns the KNX destination address.
 	 * <p>
-	 * 
+	 *
 	 * @return destination address as KNXAddress
 	 */
 	public final KNXAddress getDestination()
@@ -315,7 +332,7 @@ public class CEMILData implements CEMI
 	 * Returns the hop count set in the control information.
 	 * <p>
 	 * The hop count value is in the range 0 &lt;= value &lt;= 7.
-	 * 
+	 *
 	 * @return hop count as 3 bit value
 	 */
 	public final int getHopCount()
@@ -326,7 +343,7 @@ public class CEMILData implements CEMI
 	/**
 	 * Returns the message priority.
 	 * <p>
-	 * 
+	 *
 	 * @return used {@link Priority}
 	 */
 	public final Priority getPriority()
@@ -355,7 +372,7 @@ public class CEMILData implements CEMI
 	 * <li>TP0, PL132: value of ack is relayed from the bus</li>
 	 * <li>TP1, PL110: unused, undefined value behavior</li>
 	 * </ul>
-	 * 
+	 *
 	 * @return acknowledge request as boolean
 	 */
 	public final boolean isAckRequested()
@@ -379,7 +396,7 @@ public class CEMILData implements CEMI
 	 * <p>
 	 * For L-Data confirmations the value behavior is undefined (it might have the same
 	 * value like the corresponding request).
-	 * 
+	 *
 	 * @return repeat state as boolean
 	 */
 	public final boolean isRepetition()
@@ -400,7 +417,7 @@ public class CEMILData implements CEMI
 	 * 1 for error).<br>
 	 * On messages types other than confirmation, this information is "don't care" and
 	 * always returns <code>true</code>.
-	 * 
+	 *
 	 * @return the confirmation state as boolean
 	 */
 	public final boolean isPositiveConfirmation()
@@ -479,7 +496,7 @@ public class CEMILData implements CEMI
 	 * This type does not support additional information; the additional info length is
 	 * set to 0, indicating no additional information.
 	 * <p>
-	 * 
+	 *
 	 * @param os the output stream
 	 */
 	void writeAddInfo(final ByteArrayOutputStream os)
@@ -577,7 +594,7 @@ public class CEMILData implements CEMI
 	 * Set repeat flag in control field.
 	 * <p>
 	 * Note: uses message code type for decision.
-	 * 
+	 *
 	 * @param repeat <code>true</code> for a repeat request or repeated frame,
 	 *        <code>false</code> otherwise
 	 */
