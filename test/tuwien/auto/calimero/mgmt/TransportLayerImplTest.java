@@ -261,7 +261,7 @@ public class TransportLayerImplTest extends TestCase
 	public final void testCreateDestinationIndividualAddressBoolean()
 	{
 		assertTrue(dco.isConnectionOriented());
-		assertEquals(Util.getRouterAddress(), dco.getAddress());
+		assertEquals(Util.getKnxDeviceCO(), dco.getAddress());
 		dco.destroy();
 		final Destination d = tl.createDestination(Util.getRouterAddress(), true);
 		assertNotSame(dco, d);

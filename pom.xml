@@ -17,6 +17,12 @@
 			<url>LICENSE.txt</url>
 		</license>
 	</licenses>
+	<developers>
+		<developer>
+			<name>Boris Malinowsky</name>
+			<email>b.malinowsky@gmail.com</email>
+		</developer>
+	</developers>
 
 	<build>
 		<sourceDirectory>src</sourceDirectory>
