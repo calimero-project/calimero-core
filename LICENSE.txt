@@ -1,4 +1,4 @@
-The software in this package is distributed under the 
+The software in this package is distributed under the
 GNU General Public License (GPL), version 2, with the Classpath Exception.
 
 See http://www.gnu.org/licenses/gpl-2.0.html.
