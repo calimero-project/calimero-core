@@ -59,7 +59,7 @@ import java.util.Vector;
  * into topics.<br>
  * A log service may restrict offered information through its own log level.<br>
  * - ...
- * 
+ *
  * @author B. Malinowsky
  * @see LogLevel
  * @see LogWriter
@@ -71,15 +71,15 @@ public class LogService
 	{
 		private static final class LogData
 		{
-			final List wr;
+			final List<? extends LogWriter> wr;
 			final String svc;
 			final LogLevel lvl;
 			final String msg;
 			final Throwable trow;
 			final Thread thread;
 
-			LogData(final List writers, final String service, final LogLevel level,
-				final String message, final Throwable t, final Thread thr)
+			LogData(final List<? extends LogWriter> writers, final String service,
+				final LogLevel level, final String message, final Throwable t, final Thread thr)
 			{
 				wr = writers;
 				svc = service;
@@ -90,7 +90,7 @@ public class LogService
 			}
 		}
 
-		private final List data = new LinkedList();
+		private final List<LogData> data = new LinkedList<>();
 		private volatile boolean quit;
 
 		Dispatcher()
@@ -108,7 +108,7 @@ public class LogService
 					synchronized (data) {
 						while (data.isEmpty())
 							data.wait();
-						d = (LogData) data.remove(0);
+						d = data.remove(0);
 					}
 					dispatch(d);
 				}
@@ -119,12 +119,12 @@ public class LogService
 			// empty log data list
 			synchronized (data) {
 				while (!data.isEmpty())
-					dispatch((LogData) data.remove(0));
+					dispatch(data.remove(0));
 			}
 		}
 
-		void add(final List writers, final String service, final LogLevel level, final String msg,
-			final Throwable t)
+		void add(final List<? extends LogWriter> writers, final String service,
+			final LogLevel level, final String msg, final Throwable t)
 		{
 			if (!quit) {
 				synchronized (data) {
@@ -139,8 +139,8 @@ public class LogService
 			final boolean dev = false; //Settings.getLibraryMode() == Settings.DEV_MODE;
 			final String svc = dev ? ("[" + d.thread.getName() + "] " + d.svc) : d.svc;
 			synchronized (d.wr) {
-				for (final Iterator i = d.wr.iterator(); i.hasNext();)
-					((LogWriter) i.next()).write(svc, d.lvl, d.msg, d.trow);
+				for (final Iterator<? extends LogWriter> i = d.wr.iterator(); i.hasNext();)
+					i.next().write(svc, d.lvl, d.msg, d.trow);
 			}
 		}
 	}
@@ -150,12 +150,12 @@ public class LogService
 	/** Name of this log service. */
 	protected final String name;
 	private LogLevel logLevel = LogLevel.ALL;
-	private List writers = new Vector();
+	private List<LogWriter> writers = new Vector<>();
 
 	/**
 	 * Creates a new log service with the specified <code>name</code>.
 	 * <p>
-	 * 
+	 *
 	 * @param name name of log service
 	 */
 	protected LogService(final String name)
@@ -167,7 +167,7 @@ public class LogService
 	 * Creates a new log service with the specified <code>name</code> and log
 	 * <code>level</code>.
 	 * <p>
-	 * 
+	 *
 	 * @param name name of log service
 	 * @param level log level for this log service
 	 */
@@ -180,7 +180,7 @@ public class LogService
 	/**
 	 * Returns the name of this log service.
 	 * <p>
-	 * 
+	 *
 	 * @return the log service name
 	 */
 	public String getName()
@@ -196,7 +196,7 @@ public class LogService
 	 * <p>
 	 * For example: set log level to {@link LogLevel#WARN} to allow log info with
 	 * {@link LogLevel#FATAL}, {@link LogLevel#ERROR} and {@link LogLevel#WARN}.
-	 * 
+	 *
 	 * @param level new log level
 	 */
 	public void setLogLevel(final LogLevel level)
@@ -207,7 +207,7 @@ public class LogService
 	/**
 	 * Returns the currently set log level of this log service.
 	 * <p>
-	 * 
+	 *
 	 * @return the log {@link LogLevel}
 	 */
 	public LogLevel getLogLevel()
@@ -222,7 +222,7 @@ public class LogService
 	 * this log service. Only output with a log level specified equal or below the level
 	 * of this service is logged, i.e., output of the same or less verbosity.<br>
 	 * Output with assigned log level {@link LogLevel#OFF} is never logged.
-	 * 
+	 *
 	 * @param level the log level to check for
 	 * @return <code>true</code> if output of that level is loggable, <code>false</code>
 	 *         otherwise
@@ -236,7 +236,7 @@ public class LogService
 	 * Adds the <code>writer</code> to this log service.
 	 * <p>
 	 * No check is made to detect (or prevent) duplicate writers.
-	 * 
+	 *
 	 * @param writer LogWriter to add
 	 */
 	public void addWriter(final LogWriter writer)
@@ -248,7 +248,7 @@ public class LogService
 	 * Removes <code>writer</code> from this log service.
 	 * <p>
 	 * No check is made to detect and remove duplicate writers.
-	 * 
+	 *
 	 * @param writer LogWriter to remove
 	 */
 	public void removeWriter(final LogWriter writer)
@@ -259,23 +259,23 @@ public class LogService
 	/**
 	 * Removes all registered log writer from this log service.
 	 * <p>
-	 * 
+	 *
 	 * @param close should the writers be closed before removal
 	 */
 	public void removeAllWriters(final boolean close)
 	{
 		if (close)
 			synchronized (writers) {
-				for (final Iterator i = writers.iterator(); i.hasNext();)
-					((LogWriter) i.next()).close();
+				for (final Iterator<LogWriter> i = writers.iterator(); i.hasNext();)
+					i.next().close();
 			}
-		writers = new Vector();
+		writers = new Vector<>();
 	}
 
 	/**
 	 * Offers <code>msg</code> with log level {@link LogLevel#TRACE}.
 	 * <p>
-	 * 
+	 *
 	 * @param msg log information
 	 */
 	public void trace(final String msg)
@@ -286,7 +286,7 @@ public class LogService
 	/**
 	 * Offers <code>msg</code> with log level {@link LogLevel#INFO}.
 	 * <p>
-	 * 
+	 *
 	 * @param msg log information
 	 */
 	public void info(final String msg)
@@ -297,7 +297,7 @@ public class LogService
 	/**
 	 * Offers <code>msg</code> with log level {@link LogLevel#WARN}.
 	 * <p>
-	 * 
+	 *
 	 * @param msg log information
 	 */
 	public void warn(final String msg)
@@ -309,7 +309,7 @@ public class LogService
 	 * Offers <code>msg</code> and the <code>throwable</code> object with log level
 	 * {@link LogLevel#WARN}.
 	 * <p>
-	 * 
+	 *
 	 * @param msg log information
 	 * @param t throwable object
 	 */
@@ -321,7 +321,7 @@ public class LogService
 	/**
 	 * Offers <code>msg</code> with log level {@link LogLevel#ERROR}.
 	 * <p>
-	 * 
+	 *
 	 * @param msg log information
 	 */
 	public void error(final String msg)
@@ -333,7 +333,7 @@ public class LogService
 	 * Offers <code>msg</code> and the <code>throwable</code> object with log level
 	 * {@link LogLevel#ERROR}.
 	 * <p>
-	 * 
+	 *
 	 * @param msg log information
 	 * @param t throwable object
 	 */
@@ -345,7 +345,7 @@ public class LogService
 	/**
 	 * Offers <code>msg</code> with log level {@link LogLevel#FATAL}.
 	 * <p>
-	 * 
+	 *
 	 * @param msg log information
 	 */
 	public void fatal(final String msg)
@@ -357,7 +357,7 @@ public class LogService
 	 * Offers <code>msg</code> and the <code>throwable</code> object with log level
 	 * {@link LogLevel#FATAL}.
 	 * <p>
-	 * 
+	 *
 	 * @param msg log information
 	 * @param t throwable object
 	 */
@@ -370,7 +370,7 @@ public class LogService
 	 * Offers <code>msg</code> and the <code>throwable</code> object with log
 	 * <code>level</code>.
 	 * <p>
-	 * 
+	 *
 	 * @param level log level for this message and throwable
 	 * @param msg log information
 	 * @param t throwable object, can be <code>null</code>

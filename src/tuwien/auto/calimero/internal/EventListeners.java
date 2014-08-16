@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@
 
 package tuwien.auto.calimero.internal;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EventListener;
@@ -49,33 +50,36 @@ import tuwien.auto.calimero.log.LogService;
  * <p>
  * The assumption for implementation of this class is that iterating over event listeners
  * is the predominant operation, adding and removing listeners not.
- * 
+ *
  * @author B. Malinowsky
  */
-public class EventListeners
+public class EventListeners<T extends EventListener>
 {
-	private final List listeners = new ArrayList();
-	private EventListener[] listenersCopy = new EventListener[0];
+	private final List<T> listeners = new ArrayList<>();
+	private T[] listenersCopy;
+	private final Class<T> type;
 	private final LogService logger;
 
 	/**
 	 * Creates a new event listeners container object.
 	 * <p>
 	 */
-	public EventListeners()
+	public EventListeners(final Class<T> listenerType)
 	{
-		this(null);
+		this(null, null);
 	}
 
 	/**
 	 * Creates a new event listeners container object.
 	 * <p>
-	 * 
+	 *
 	 * @param logger optional logger for log output
 	 */
-	public EventListeners(final LogService logger)
+	public EventListeners(final Class<T> listenerType, final LogService logger)
 	{
+		type = listenerType;
 		this.logger = logger;
+		createCopy();
 	}
 
 	/**
@@ -83,18 +87,17 @@ public class EventListeners
 	 * <p>
 	 * If <code>l</code> is
 	 * <code>null<code> or was already added as listener, no action is performed.
-	 * 
+	 *
 	 * @param l the listener to add
 	 */
-	public void add(final EventListener l)
+	public void add(final T l)
 	{
 		if (l == null)
 			return;
 		synchronized (listeners) {
 			if (!listeners.contains(l)) {
 				listeners.add(l);
-				listenersCopy = (EventListener[]) listeners
-					.toArray(new EventListener[listeners.size()]);
+				createCopy();
 			}
 			else if (logger != null)
 				logger.warn("event listener already registered");
@@ -105,15 +108,14 @@ public class EventListeners
 	 * Removes the specified event listener <code>l</code> from this container.
 	 * <p>
 	 * If <code>l</code> was not added in the first place, no action is performed.
-	 * 
+	 *
 	 * @param l the listener to remove
 	 */
-	public void remove(final EventListener l)
+	public void remove(final T l)
 	{
 		synchronized (listeners) {
 			if (listeners.remove(l))
-				listenersCopy = (EventListener[]) listeners
-					.toArray(new EventListener[listeners.size()]);
+				createCopy();
 		}
 	}
 
@@ -125,7 +127,7 @@ public class EventListeners
 	{
 		synchronized (listeners) {
 			listeners.clear();
-			listenersCopy = new EventListener[0];
+			createCopy();
 		}
 	}
 
@@ -135,11 +137,11 @@ public class EventListeners
 	 * While modifying the returned array will have no impact on the event listeners kept
 	 * by this class, the array might be reused for subsequent callers, who will be
 	 * affected.
-	 * 
+	 *
 	 * @return array with all event listeners in this container, with array size equal to
 	 *         the number of contained listeners
 	 */
-	public EventListener[] listeners()
+	public T[] listeners()
 	{
 		return listenersCopy;
 	}
@@ -147,12 +149,19 @@ public class EventListeners
 	/**
 	 * Returns an iterator for the contained event listeners.
 	 * <p>
-	 * 
+	 *
 	 * @return the iterator for the listeners
 	 */
-	public Iterator iterator()
+	public Iterator<T> iterator()
 	{
 		return Arrays.asList(listenersCopy).iterator();
+	}
+
+	private void createCopy()
+	{
+		@SuppressWarnings("unchecked")
+		final T[] t = (T[]) Array.newInstance(type, listeners.size());
+		listenersCopy = listeners.toArray(t);
 	}
 
 	// not for general use, quite slow due to reflection mechanism

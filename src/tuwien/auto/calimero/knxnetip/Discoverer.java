@@ -129,8 +129,8 @@ public class Discoverer
 	// see also RFC 5135
 	private final boolean mcast;
 
-	private final List receivers = Collections.synchronizedList(new ArrayList());
-	private final List responses = Collections.synchronizedList(new ArrayList());
+	private final List<ReceiverLoop> receivers = Collections.synchronizedList(new ArrayList<>());
+	private final List<SearchResponse> responses = Collections.synchronizedList(new ArrayList<>());
 
 	static {
 		InetAddress a = null;
@@ -316,7 +316,7 @@ public class Discoverer
 	{
 		if (timeout < 0)
 			throw new KNXIllegalArgumentException("timeout has to be >= 0");
-		final Enumeration eni;
+		final Enumeration<NetworkInterface> eni;
 		try {
 			eni = NetworkInterface.getNetworkInterfaces();
 		}
@@ -328,14 +328,14 @@ public class Discoverer
 			logger.error("no network interfaces found");
 			throw new KNXException("no network interfaces found");
 		}
-		final List rcv = new ArrayList();
+		final List<ReceiverLoop> rcv = new ArrayList<>();
 		// loopback flag, so we start at most one local search
 		boolean lo = false;
 		while (eni.hasMoreElements()) {
-			final NetworkInterface ni = (NetworkInterface) eni.nextElement();
+			final NetworkInterface ni = eni.nextElement();
 			// find one IP address we can use for our search on this interface
-			for (final Enumeration ea = ni.getInetAddresses(); ea.hasMoreElements();) {
-				final InetAddress a = (InetAddress) ea.nextElement();
+			for (final Enumeration<InetAddress> ea = ni.getInetAddresses(); ea.hasMoreElements();) {
+				final InetAddress a = ea.nextElement();
 				// without NAT, we only try IPv4 addresses
 				if (!nat && a.getAddress().length != 4)
 					logger.info("skipped " + a + ", not an IPv4 address");
@@ -355,8 +355,8 @@ public class Discoverer
 			throw new KNXException("search could not be started on any network interface");
 		if (wait)
 			try {
-				for (final Iterator i = rcv.iterator(); i.hasNext();)
-					join((ReceiverLoop) i.next());
+				for (final Iterator<ReceiverLoop> i = rcv.iterator(); i.hasNext();)
+					join(i.next());
 			}
 			finally {
 				stopSearch();
@@ -370,7 +370,7 @@ public class Discoverer
 	 */
 	public final void stopSearch()
 	{
-		final ReceiverLoop[] loopers = (ReceiverLoop[]) receivers
+		final ReceiverLoop[] loopers = receivers
 				.toArray(new ReceiverLoop[receivers.size()]);
 		for (int i = 0; i < loopers.length; i++) {
 			final ReceiverLoop loop = loopers[i];
@@ -401,7 +401,7 @@ public class Discoverer
 	 */
 	public final SearchResponse[] getSearchResponses()
 	{
-		return (SearchResponse[]) responses.toArray(new SearchResponse[responses.size()]);
+		return responses.toArray(new SearchResponse[responses.size()]);
 	}
 
 	/**

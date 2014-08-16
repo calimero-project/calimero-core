@@ -149,8 +149,8 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 
 	private final KNXNetworkLink lnk;
 	private final NetworkLinkListener lnkListener = new NLListener();
-	private final EventListeners listeners;
-	private final List indications = new LinkedList();
+	private final EventListeners<ProcessListener> listeners;
+	private final List<FrameEvent> indications = new LinkedList<>();
 	private volatile Priority priority = Priority.LOW;
 	// maximum wait time in seconds for a response message
 	private volatile int responseTimeout = 10;
@@ -174,7 +174,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		lnk = link;
 		lnk.addLinkListener(lnkListener);
 		logger = LogManager.getManager().getLogService("process " + link.getName());
-		listeners = new EventListeners(logger);
+		listeners = new EventListeners<>(ProcessListener.class, logger);
 	}
 
 	/* (non-Javadoc)
@@ -471,7 +471,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 				// - a shared KNX network link among several process communicators,
 				//   and therefore several group responses forwarded to each
 				while (indications.size() > 0) {
-					final FrameEvent e = (FrameEvent) indications.remove(0);
+					final FrameEvent e = indications.remove(0);
 					if (((CEMILData) e.getFrame()).getDestination().equals(from)) {
 						final byte[] d = e.getFrame().getPayload();
 						indications.clear();

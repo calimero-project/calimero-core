@@ -120,10 +120,10 @@ public class DPTXlator3BitControlled extends DPTXlator
 	public static final DPT DPT_CONTROL_BLINDS =
 		new DPT3BitControlled("3.008", "Blinds", DPTXlatorBoolean.DPT_UPDOWN);
 
-	private static final Map types;
+	private static final Map<String, DPT> types;
 
 	static {
-		types = new HashMap(3);
+		types = new HashMap<>(3);
 		types.put(DPT_CONTROL_DIMMING.getID(), DPT_CONTROL_DIMMING);
 		types.put(DPT_CONTROL_BLINDS.getID(), DPT_CONTROL_BLINDS);
 	}
@@ -341,7 +341,7 @@ public class DPTXlator3BitControlled extends DPTXlator
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
 	 */
-	public final Map getSubTypes()
+	public final Map<String, DPT> getSubTypes()
 	{
 		return types;
 	}
@@ -350,7 +350,7 @@ public class DPTXlator3BitControlled extends DPTXlator
 	 * @return the subtypes of the 3 Bit controlled translator type
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
-	protected static Map getSubTypesStatic()
+	protected static Map<String, DPT> getSubTypesStatic()
 	{
 		return types;
 	}

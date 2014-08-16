@@ -75,7 +75,7 @@ import tuwien.auto.calimero.mgmt.Destination.AggregatorProxy;
  * <br>
  * All methods invoked after a detach of the network link used for communication are
  * allowed to throw {@link KNXIllegalStateException}.
- * 
+ *
  * @author B. Malinowsky
  */
 public class TransportLayerImpl implements TransportLayer
@@ -114,7 +114,7 @@ public class TransportLayerImpl implements TransportLayer
 				try {
 					AggregatorProxy ap = null;
 					synchronized (proxies) {
-						ap = (AggregatorProxy) proxies.get(f.getSource());
+						ap = proxies.get(f.getSource());
 					}
 					handleConnected(f, ap);
 				}
@@ -150,24 +150,24 @@ public class TransportLayerImpl implements TransportLayer
 	private static final GroupAddress broadcast = new GroupAddress(0);
 	// used as default on incoming conn.oriented messages from unknown remote devices
 	private final Destination unknownPartner = new Destination(new AggregatorProxy(this),
-		new IndividualAddress(0), true);
+			new IndividualAddress(0), true);
 
 	private final LogService logger;
 
 	// are we representing server side of this transport layer connection
 	private final boolean serverSide;
-	
+
 	private volatile boolean detached;
 	private final KNXNetworkLink lnk;
 	private final NetworkLinkListener lnkListener = new NLListener();
-	private final List indications = new LinkedList();
-	private final EventListeners listeners;
+	private final List<FrameEvent> indications = new LinkedList<>();
+	private final EventListeners<TransportListener> listeners;
 
 	// holds the mapping of connection destination address to proxy
-	private final Map proxies = new HashMap();
-	private final Map incomingProxies = new HashMap();
+	private final Map<IndividualAddress, AggregatorProxy> proxies = new HashMap<>();
+	private final Map<IndividualAddress, AggregatorProxy> incomingProxies = new HashMap<>();
 	private AggregatorProxy active;
-	
+
 	private volatile int repeated;
 	private final Object lock = new Object();
 
@@ -175,7 +175,7 @@ public class TransportLayerImpl implements TransportLayer
 	 * Creates a new client-side transport layer end-point attached to the supplied KNX network
 	 * link.
 	 * <p>
-	 * 
+	 *
 	 * @param link network link used for communication with a KNX network
 	 * @throws KNXLinkClosedException if the network link is closed
 	 */
@@ -187,7 +187,7 @@ public class TransportLayerImpl implements TransportLayer
 	/**
 	 * Creates a new transport layer end-point attached to the supplied KNX network link.
 	 * <p>
-	 * 
+	 *
 	 * @param link network link used for communication with a KNX network
 	 * @param serverEndpoint does this instance represent the client-side (<code>false</code>),
 	 *        or server-side (<code>true</code>) end-point
@@ -201,10 +201,10 @@ public class TransportLayerImpl implements TransportLayer
 		lnk = link;
 		lnk.addLinkListener(lnkListener);
 		logger = LogManager.getManager().getLogService(getName());
-		listeners = new EventListeners(logger);
+		listeners = new EventListeners<>(TransportListener.class, logger);
 		serverSide = serverEndpoint;
 	}
-	
+
 	/**
 	 * {@inheritDoc} Only one destination can be created per remote address. If a
 	 * destination with the supplied remote address already exists for this transport
@@ -246,17 +246,17 @@ public class TransportLayerImpl implements TransportLayer
 	/**
 	 * Returns the destination object for the remote individual address, if such exists.
 	 * <p>
-	 * 
+	 *
 	 * @param remote the remote address to look up
 	 * @return the destination for that address, or <code>null</code> if no destination
 	 *         is currently maintained by the transport layer
 	 */
 	public Destination getDestination(final IndividualAddress remote)
 	{
-		final AggregatorProxy proxy = (AggregatorProxy) proxies.get(remote);
+		final AggregatorProxy proxy = proxies.get(remote);
 		return proxy != null ? proxy.getDestination() : null;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.TransportLayer#destroyDestination
 	 * (tuwien.auto.calimero.mgmt.Destination)
@@ -265,7 +265,7 @@ public class TransportLayerImpl implements TransportLayer
 	{
 		// method invocation is idempotent
 		synchronized (proxies) {
-			final AggregatorProxy p = (AggregatorProxy) proxies.get(d.getAddress());
+			final AggregatorProxy p = proxies.get(d.getAddress());
 			if (p == null)
 				return;
 			if (p.getDestination() == d) {
@@ -429,7 +429,7 @@ public class TransportLayerImpl implements TransportLayer
 		if (detached)
 			throw new KNXIllegalStateException("TL detached");
 		synchronized (proxies) {
-			final AggregatorProxy p = (AggregatorProxy) proxies.get(d.getAddress());
+			final AggregatorProxy p = proxies.get(d.getAddress());
 			// TODO at this point, proxy might also be null because destination just got destroyed
 			// check identity, too, to prevent destination with only same address
 			if (p == null || p.getDestination() != d)
@@ -460,7 +460,7 @@ public class TransportLayerImpl implements TransportLayer
 					d.destroy();
 					proxy = null;
 				}
-				
+
 				// allow incoming connect requests (server)
 				if (proxy == null) {
 					proxy = new AggregatorProxy(this);
@@ -536,7 +536,7 @@ public class TransportLayerImpl implements TransportLayer
 		while (remaining > 0) {
 			try {
 				while (indications.size() > 0)
-					handleConnected((CEMILData) ((FrameEvent) indications.remove(0)).getFrame(),
+					handleConnected((CEMILData) indications.remove(0).getFrame(),
 							active);
 				if (d.getState() == Destination.DISCONNECTED)
 					throw new KNXDisconnectException(d.getAddress()
@@ -560,7 +560,7 @@ public class TransportLayerImpl implements TransportLayer
 		// destroyDestination(), called by d.destroy()
 		AggregatorProxy[] allProxies = new AggregatorProxy[proxies.size()];
 		synchronized (proxies) {
-			allProxies = (AggregatorProxy[]) proxies.values().toArray(allProxies);
+			allProxies = proxies.values().toArray(allProxies);
 		}
 		for (int i = 0; i < allProxies.length; i++) {
 			final AggregatorProxy p = allProxies[i];

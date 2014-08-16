@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ import java.util.Vector;
  * A log service can be queried and removed. A log writer can be added (i.e., registered)
  * and removed, either to a particular log service or as a global log writer. A global log
  * writer will receive all logging output from all registered log services.
- * 
+ *
  * @author B. Malinowsky
  * @see LogWriter
  * @see LogService
@@ -59,20 +59,20 @@ import java.util.Vector;
 public final class LogManager
 {
 	private static final LogManager mgr = new LogManager();
-	
-	private final Map loggers;
-	private final List writers;
+
+	private final Map<String, LogService> loggers;
+	private final List<LogWriter> writers;
 
 	private LogManager()
 	{
-		loggers = Collections.synchronizedMap(new HashMap());
-		writers = new Vector();
+		loggers = Collections.synchronizedMap(new HashMap<>());
+		writers = new Vector<>();
 	}
 
 	/**
 	 * Returns the only instance of the log manager.
 	 * <p>
-	 * 
+	 *
 	 * @return the log manager object
 	 */
 	public static LogManager getManager()
@@ -85,7 +85,7 @@ public final class LogManager
 	 * <p>
 	 * A log service is only listed in the manager, if it was initially queried using
 	 * {@link #getLogService(String)}.
-	 * 
+	 *
 	 * @param name name of log service
 	 * @return <code>true</code> if log service exists, <code>false</code> otherwise
 	 */
@@ -102,19 +102,19 @@ public final class LogManager
 	 * If the log service with this name already exists in the manager, it will be
 	 * returned, otherwise a new log service with this name will be created and added to
 	 * the log services listed in the manager.
-	 * 
+	 *
 	 * @param name name of log service, the empty string is not allowed
 	 * @return the LogService object
 	 */
 	public LogService getLogService(final String name)
 	{
 		synchronized (loggers) {
-			LogService l = (LogService) loggers.get(name);
+			LogService l = loggers.get(name);
 			if (l == null) {
 				l = new LogService(name);
 				loggers.put(name, l);
-				for (final Iterator i = writers.iterator(); i.hasNext();)
-					l.addWriter((LogWriter) i.next());
+				for (final Iterator<LogWriter> i = writers.iterator(); i.hasNext();)
+					l.addWriter(i.next());
 			}
 			return l;
 		}
@@ -124,7 +124,7 @@ public final class LogManager
 	 * Removes a log service from the manager.
 	 * <p>
 	 * If no log service with the specified name is found, no action is performed.
-	 * 
+	 *
 	 * @param name name of log service
 	 */
 	public void removeLogService(final String name)
@@ -135,12 +135,12 @@ public final class LogManager
 	/**
 	 * Returns the names of all registered log services.
 	 * <p>
-	 * 
+	 *
 	 * @return array of type String with log service names
 	 */
 	public String[] getAllLogServices()
 	{
-		return (String[]) loggers.keySet().toArray(new String[loggers.size()]);
+		return loggers.keySet().toArray(new String[loggers.size()]);
 	}
 
 	/**
@@ -150,7 +150,7 @@ public final class LogManager
 	 * added before.<br>
 	 * If the writer is added globally, it will receive logging information from all log
 	 * services that are already registered or will be registered in the future.
-	 * 
+	 *
 	 * @param logService name of a log service; to add the writer globally, use an empty
 	 *        string or <code>null</code>
 	 * @param writer log writer to add
@@ -161,15 +161,15 @@ public final class LogManager
 	public boolean addWriter(final String logService, final LogWriter writer)
 	{
 		if (logService != null && logService.length() > 0) {
-			final LogService l = (LogService) loggers.get(logService);
+			final LogService l = loggers.get(logService);
 			if (l != null)
 				l.addWriter(writer);
 			return l != null;
 		}
 		synchronized (loggers) {
 			writers.add(writer);
-			for (final Iterator i = loggers.values().iterator(); i.hasNext();)
-				((LogService) i.next()).addWriter(writer);
+			for (final Iterator<LogService> i = loggers.values().iterator(); i.hasNext();)
+				i.next().addWriter(writer);
 			return true;
 		}
 	}
@@ -178,7 +178,7 @@ public final class LogManager
 	 * Removes a log writer, either global or from a particular <code>logService</code>.
 	 * <p>
 	 * Note that for a writer to be removed global, it had to be added global before.
-	 * 
+	 *
 	 * @param logService name of the log service of which the writer will be removed; to
 	 *        remove the writer global, use an empty string or <code>null</code>
 	 * @param writer log writer to remove
@@ -187,15 +187,15 @@ public final class LogManager
 	public void removeWriter(final String logService, final LogWriter writer)
 	{
 		if (logService != null && logService.length() > 0) {
-			final LogService l = (LogService) loggers.get(logService);
+			final LogService l = loggers.get(logService);
 			if (l != null)
 				l.removeWriter(writer);
 		}
 		else
 			synchronized (loggers) {
 				if (writers.remove(writer))
-					for (final Iterator i = loggers.values().iterator(); i.hasNext();)
-						((LogService) i.next()).removeWriter(writer);
+					for (final Iterator<LogService> i = loggers.values().iterator(); i.hasNext();)
+						i.next().removeWriter(writer);
 			}
 	}
 
@@ -204,12 +204,12 @@ public final class LogManager
 	 * <p>
 	 * Log writers are global if they were not were not registered at a particular log service,
 	 * receiving logging information from all log services.
-	 * 
+	 *
 	 * @return array with global log writers
 	 */
 	public LogWriter[] getAllGlobalWriters()
 	{
-		return (LogWriter[]) writers.toArray(new LogWriter[writers.size()]);
+		return writers.toArray(new LogWriter[writers.size()]);
 	}
 
 	/**
@@ -226,7 +226,7 @@ public final class LogManager
 	 * be queued and waiting to be processed, e.g., written to a file on disk. Then, by
 	 * calling this method, the log service handler mechanisms is guaranteed the required
 	 * amount of time to process the remaining log events.
-	 * 
+	 *
 	 * @param closeAllWriters if <code>true</code>, all writers in the log services known
 	 *        to the log manager ({@link #getAllLogServices()}), as well as global writers
 	 *        ({@link #getAllGlobalWriters()}), are closed ({@link LogWriter#close()});
@@ -241,7 +241,7 @@ public final class LogManager
 		// since closing file resources etc. can take some time
 		final LogService[] lsa;
 		synchronized (loggers) {
-			lsa = (LogService[]) loggers.values().toArray(new LogService[loggers.size()]);
+			lsa = loggers.values().toArray(new LogService[loggers.size()]);
 		}
 		for (int i = 0; i < lsa.length; i++)
 			lsa[i].removeAllWriters(true);

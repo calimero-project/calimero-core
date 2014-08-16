@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,15 +54,16 @@ import tuwien.auto.calimero.xml.XMLWriter;
  * A datapoint model storing datapoints with no defined order or hierarchy using a map
  * implementation.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public class DatapointMap implements DatapointModel, ChangeNotifier
 {
 	private static final String TAG_DATAPOINTS = "datapoints";
 
-	private final Map points;
-	private final EventListeners listeners = new EventListeners();
+	private final Map<GroupAddress, Datapoint> points;
+	private final EventListeners<ChangeListener> listeners = new EventListeners<>(
+			ChangeListener.class);
 
 	/**
 	 * Creates a new empty datapoint map.
@@ -70,7 +71,7 @@ public class DatapointMap implements DatapointModel, ChangeNotifier
 	 */
 	public DatapointMap()
 	{
-		points = Collections.synchronizedMap(new HashMap(20));
+		points = Collections.synchronizedMap(new HashMap<>(20));
 	}
 
 	/**
@@ -79,19 +80,18 @@ public class DatapointMap implements DatapointModel, ChangeNotifier
 	 * A datapoint to be added has to be unique according its main address, the attempt to
 	 * add two datapoints using the same main address results in a
 	 * KNXIllegalArgumentException.
-	 * 
+	 *
 	 * @param datapoints collection with entries of type {@link Datapoint}
 	 * @throws KNXIllegalArgumentException on duplicate datapoint
 	 */
-	public DatapointMap(final Collection datapoints)
+	public DatapointMap(final Collection<Datapoint> datapoints)
 	{
 		// not all HashSets put additional capacity in HashSet(Collection) ctor
-		final Map m = new HashMap(Math.max(2 * datapoints.size(), 11));
-		for (final Iterator i = datapoints.iterator(); i.hasNext();) {
-			final Datapoint dp = (Datapoint) i.next();
+		final Map<GroupAddress, Datapoint> m = new HashMap<>(Math.max(2 * datapoints.size(), 11));
+		for (final Iterator<Datapoint> i = datapoints.iterator(); i.hasNext();) {
+			final Datapoint dp = i.next();
 			if (m.containsKey(dp.getMainAddress()))
-				throw new KNXIllegalArgumentException("duplicate datapoint "
-					+ dp.getMainAddress());
+				throw new KNXIllegalArgumentException("duplicate datapoint " + dp.getMainAddress());
 			m.put(dp.getMainAddress(), dp);
 		}
 		points = Collections.synchronizedMap(m);
@@ -136,17 +136,17 @@ public class DatapointMap implements DatapointModel, ChangeNotifier
 	 */
 	public Datapoint get(final GroupAddress main)
 	{
-		return (Datapoint) points.get(main);
+		return points.get(main);
 	}
 
 	// ??? make this a super type interface method
 	/**
 	 * Returns all datapoints currently contained in this map.
 	 * <p>
-	 * 
+	 *
 	 * @return unmodifiable collection with entries of type {@link Datapoint}
 	 */
-	public Collection getDatapoints()
+	public Collection<Datapoint> getDatapoints()
 	{
 		return Collections.unmodifiableCollection(points.values());
 	}
@@ -199,10 +199,10 @@ public class DatapointMap implements DatapointModel, ChangeNotifier
 	 */
 	public void save(final XMLWriter w) throws KNXMLException
 	{
-		w.writeElement(TAG_DATAPOINTS, Collections.EMPTY_LIST, null);
+		w.writeElement(TAG_DATAPOINTS, Collections.emptyList(), null);
 		synchronized (points) {
-			for (final Iterator i = points.values().iterator(); i.hasNext();)
-				((Datapoint) i.next()).save(w);
+			for (final Iterator<Datapoint> i = points.values().iterator(); i.hasNext();)
+				i.next().save(w);
 		}
 		w.endElement();
 	}
@@ -227,8 +227,8 @@ public class DatapointMap implements DatapointModel, ChangeNotifier
 
 	private void fireChangeNotification(final Datapoint dp, final boolean added)
 	{
-		for (final Iterator i = listeners.iterator(); i.hasNext();) {
-			final ChangeListener l = (ChangeListener) i.next();
+		for (final Iterator<ChangeListener> i = listeners.iterator(); i.hasNext();) {
+			final ChangeListener l = i.next();
 			if (added)
 				l.onDatapointAdded(this, dp);
 			else

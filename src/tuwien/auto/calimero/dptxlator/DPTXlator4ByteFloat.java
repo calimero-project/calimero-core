@@ -61,7 +61,7 @@ import tuwien.auto.calimero.log.LogLevel;
  * In value methods expecting a string type, the value is a float type representation.
  * <p>
  * The default return value after creation is <code>0.0</code>.<br>
- * 
+ *
  * @author B. Malinowsky
  */
 public class DPTXlator4ByteFloat extends DPTXlator
@@ -691,7 +691,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	public static final DPT DPT_WORK = new DPT("14.079", "Work", "-3.40282347e+38f",
 			"3.40282347e+38f", "J");
 
-	private static final Map types = new HashMap(100);
+	private static final Map<String, DPT> types = new HashMap<>(100);
 
 	static {
 		final Field[] fields = DPTXlator4ByteFloat.class.getFields();
@@ -699,7 +699,8 @@ public class DPTXlator4ByteFloat extends DPTXlator
 			try {
 				final Object o = fields[i].get(null);
 				if (o instanceof DPT) {
-					types.put(((DPT) o).getID(), o);
+					final DPT dpt = (DPT) o;
+					types.put(dpt.getID(), dpt);
 				}
 			}
 			catch (final IllegalAccessException e) {}
@@ -712,7 +713,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type.
 	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -724,7 +725,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	/**
 	 * Creates a translator for <code>dptID</code>.
 	 * <p>
-	 * 
+	 *
 	 * @param dptId available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available) DPT
 	 */
@@ -741,7 +742,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	 * Sets the translation value from a float.
 	 * <p>
 	 * If succeeded, any other items in the translator are discarded.
-	 * 
+	 *
 	 * @param value the float value
 	 * @throws KNXFormatException if <code>value</code> doesn't fit into KNX data type
 	 */
@@ -755,7 +756,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	/**
 	 * Returns the first translation item formatted as float.
 	 * <p>
-	 * 
+	 *
 	 * @return value as float
 	 */
 	public final float getValueFloat()
@@ -777,7 +778,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
 	 */
-	public Map getSubTypes()
+	public Map<String, DPT> getSubTypes()
 	{
 		return types;
 	}
@@ -786,7 +787,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	 * @return the subtypes of the 2-byte float translator type
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
-	protected static Map getSubTypesStatic()
+	protected static Map<String, DPT> getSubTypesStatic()
 	{
 		return types;
 	}

@@ -175,7 +175,7 @@ public class PropertyClient implements PropertyAccess
 		 *         {@link PropertyClient.Property}
 		 * @throws KNXException on error reading from the resource
 		 */
-		Collection load(String resource) throws KNXException;
+		Collection<Property> load(String resource) throws KNXException;
 
 		/**
 		 * Saves the properties to the resource.
@@ -185,7 +185,7 @@ public class PropertyClient implements PropertyAccess
 		 *        {@link PropertyClient.Property}-type values
 		 * @throws KNXException on error writing to the resource
 		 */
-		void save(String resource, Collection definitions) throws KNXException;
+		void save(String resource, Collection<Property> definitions) throws KNXException;
 	}
 
 	/**
@@ -197,7 +197,7 @@ public class PropertyClient implements PropertyAccess
 	 *
 	 * @author B. Malinowsky
 	 */
-	public static final class PropertyKey implements Comparable
+	public static final class PropertyKey implements Comparable<PropertyKey>
 	{
 		/** Identifier for a property defined with global object type. */
 		public static final int GLOBAL_OBJTYPE = -1;
@@ -276,7 +276,7 @@ public class PropertyClient implements PropertyAccess
 		/* (non-Javadoc)
 		 * @see java.lang.Comparable#compareTo(java.lang.Object)
 		 */
-		public int compareTo(final Object o)
+		public int compareTo(final PropertyKey o)
 		{
 			final int rhs = o.hashCode();
 			return hashCode() < rhs ? -1 : hashCode() > rhs ? 1 : 0;
@@ -417,7 +417,8 @@ public class PropertyClient implements PropertyAccess
 
 	//private static ResourceHandler rh;
 
-	private final Map properties = Collections.synchronizedMap(new HashMap());
+	private final Map<PropertyKey, Property> properties = Collections
+			.synchronizedMap(new HashMap<>());
 
 	private final PropertyAdapter pa;
 	// helper flag to determine local DM mode, mainly for detecting absence of PDT
@@ -426,7 +427,7 @@ public class PropertyClient implements PropertyAccess
 	private final LogService logger;
 
 	// maps object index to object type
-	private final List objectTypes = new ArrayList();
+	private final List<Pair> objectTypes = new ArrayList<>();
 	private final DPTXlator2ByteUnsigned tObjType;
 
 	/**
@@ -479,8 +480,8 @@ public class PropertyClient implements PropertyAccess
 	 * @return collection with loaded property definitions of type {@link Property}
 	 * @throws KNXException on errors in the property resource handler
 	 */
-	public static Collection loadDefinitions(final String resource, final ResourceHandler handler)
-		throws KNXException
+	public static Collection<Property> loadDefinitions(final String resource,
+		final ResourceHandler handler) throws KNXException
 	{
 		final ResourceHandler rh = handler == null ? new XmlPropertyHandler() : handler;
 		return rh.load(resource);
@@ -501,8 +502,8 @@ public class PropertyClient implements PropertyAccess
 	 *        <code>null</code>, a default handler is used
 	 * @throws KNXException on errors in the property resource handler
 	 */
-	public static void saveDefinitions(final String resource, final Collection definitions,
-		final ResourceHandler handler) throws KNXException
+	public static void saveDefinitions(final String resource,
+		final Collection<Property> definitions, final ResourceHandler handler) throws KNXException
 	{
 		// for saving an ordered collection based on property key order,
 		// the saving procedure has to be called with the Collection argument
@@ -526,10 +527,10 @@ public class PropertyClient implements PropertyAccess
 	 * @param definitions collection of property definitions, containing entries of type
 	 *        {@link Property}
 	 */
-	public void addDefinitions(final Collection definitions)
+	public void addDefinitions(final Collection<Property> definitions)
 	{
-		for (final Iterator i = definitions.iterator(); i.hasNext();) {
-			final Property p = (Property) i.next();
+		for (final Iterator<Property> i = definitions.iterator(); i.hasNext();) {
+			final Property p = i.next();
 			properties.put(new PropertyKey(p.objType, p.id), p);
 		}
 	}
@@ -545,7 +546,7 @@ public class PropertyClient implements PropertyAccess
 	 *
 	 * @return property map, or <code>null</code> if no definitions loaded
 	 */
-	public Map getDefinitions()
+	public Map<PropertyKey, Property> getDefinitions()
 	{
 		return properties;
 	}
@@ -691,11 +692,11 @@ public class PropertyClient implements PropertyAccess
 	 * @return a list containing the property descriptions of type {@link Description}
 	 * @throws KNXException on adapter errors while querying the descriptions
 	 */
-	public List scanProperties(final boolean allProperties) throws KNXException
+	public List<Description> scanProperties(final boolean allProperties) throws KNXException
 	{
-		final List scan = new ArrayList();
+		final List<Description> scan = new ArrayList<>();
 		for (int index = 0;; ++index) {
-			final List l = scanProperties(index, allProperties);
+			final List<Description> l = scanProperties(index, allProperties);
 			if (l.size() == 0)
 				break;
 			scan.addAll(l);
@@ -715,10 +716,10 @@ public class PropertyClient implements PropertyAccess
 	 * @return a list containing the property descriptions of type {@link Description}
 	 * @throws KNXException on adapter errors while querying the descriptions
 	 */
-	public List scanProperties(final int objIndex, final boolean allProperties)
+	public List<Description> scanProperties(final int objIndex, final boolean allProperties)
 		throws KNXException
 	{
-		final List scan = new ArrayList();
+		final List<Description> scan = new ArrayList<>();
 		// property with index 0 is description of object type
 		// rest are ordinary properties of the object
 		try {
@@ -774,11 +775,11 @@ public class PropertyClient implements PropertyAccess
 		return d;
 	}
 
-	private int getObjectType(final int objIndex, final boolean queryObject)
-		throws KNXException, InterruptedException
+	private int getObjectType(final int objIndex, final boolean queryObject) throws KNXException,
+		InterruptedException
 	{
-		for (final Iterator i = objectTypes.iterator(); i.hasNext();) {
-			final Pair p = (Pair) i.next();
+		for (final Iterator<Pair> i = objectTypes.iterator(); i.hasNext();) {
+			final Pair p = i.next();
 			if (p.oindex == objIndex)
 				return p.otype;
 		}
@@ -787,8 +788,7 @@ public class PropertyClient implements PropertyAccess
 		throw new KNXException("couldn't deduce object type");
 	}
 
-	private int queryObjectType(final int objIndex) throws KNXException,
-		InterruptedException
+	private int queryObjectType(final int objIndex) throws KNXException, InterruptedException
 	{
 		tObjType.setData(pa.getProperty(objIndex, 1, 1, 1));
 		objectTypes.add(new Pair(objIndex, tObjType.getValueUnsigned()));
@@ -800,10 +800,10 @@ public class PropertyClient implements PropertyAccess
 	{
 		final int ot = getObjectType(objIndex, true);
 		int pdt = -1;
-		Property p = (Property) properties.get(new PropertyKey(ot, pid));
+		Property p = properties.get(new PropertyKey(ot, pid));
 		// if no property found, lookup global pid
 		if (p == null && pid < 50)
-			p = (Property) properties.get(new PropertyKey(pid));
+			p = properties.get(new PropertyKey(pid));
 		if (p != null) {
 			if (p.dpt != null)
 				try {
@@ -848,10 +848,10 @@ public class PropertyClient implements PropertyAccess
 		 * @see tuwien.auto.calimero.mgmt.PropertyClient.ResourceHandler#load
 		 * (java.lang.String)
 		 */
-		public Collection load(final String resource) throws KNXException
+		public Collection<Property> load(final String resource) throws KNXException
 		{
 			final XMLReader r = XMLFactory.getInstance().createXMLReader(resource);
-			final List list = new ArrayList(30);
+			final List<Property> list = new ArrayList<>(30);
 			int objType = -1;
 			try {
 				if (r.read() != XMLReader.START_TAG
@@ -892,7 +892,8 @@ public class PropertyClient implements PropertyAccess
 		 * @see tuwien.auto.calimero.mgmt.PropertyClient.ResourceHandler#save
 		 * (java.lang.String, java.util.Collection)
 		 */
-		public void save(final String resource, final Collection properties) throws KNXException
+		public void save(final String resource, final Collection<Property> properties)
+			throws KNXException
 		{
 			final XMLWriter w = XMLFactory.getInstance().createXMLWriter(resource);
 			try {
@@ -902,19 +903,19 @@ public class PropertyClient implements PropertyAccess
 				w.writeElement(PROPDEFS_TAG, null, null);
 				final int noType = -2;
 				int objType = noType;
-				for (final Iterator i = properties.iterator(); i.hasNext();) {
-					final Property p = (Property) i.next();
+				for (final Iterator<Property> i = properties.iterator(); i.hasNext();) {
+					final Property p = i.next();
 					if (p.objType != objType) {
 						if (objType != noType)
 							w.endElement();
 						objType = p.objType;
-						final List att = new ArrayList();
+						final List<Attribute> att = new ArrayList<>();
 						att.add(new Attribute(OBJECTTYPE_ATTR, objType == -1 ? "global"
 							: Integer.toString(objType)));
 						w.writeElement(OBJECT_TAG, att, null);
 					}
 					// property attributes
-					final List att = new ArrayList();
+					final List<Attribute> att = new ArrayList<>();
 					att.add(new Attribute(PID_ATTR, Integer.toString(p.id)));
 					att.add(new Attribute(PIDNAME_ATTR, p.name));
 					att.add(new Attribute(NAME_ATTR, p.propName));

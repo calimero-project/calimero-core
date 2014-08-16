@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -141,13 +141,13 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	public static final DPT DPT_BRIGHTNESS =
 		new DPT("7.013", "Brightness", "0", "65535", "lx");
 
-	private static final Map types;
+	private static final Map<String, DPT> types;
 
 	private final int min;
 	private final int max;
 
 	static {
-		types = new HashMap(15);
+		types = new HashMap<>(15);
 		types.put(DPT_VALUE_2_UCOUNT.getID(), DPT_VALUE_2_UCOUNT);
 		types.put(DPT_PROP_DATATYPE.getID(), DPT_PROP_DATATYPE);
 		types.put(DPT_TIMEPERIOD.getID(), DPT_TIMEPERIOD);
@@ -272,7 +272,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
 	 */
-	public final Map getSubTypes()
+	public final Map<String, DPT> getSubTypes()
 	{
 		return types;
 	}
@@ -281,7 +281,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	 * @return the subtypes of the 2-byte unsigned translator type
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
-	protected static Map getSubTypesStatic()
+	protected static Map<String, DPT> getSubTypesStatic()
 	{
 		return types;
 	}

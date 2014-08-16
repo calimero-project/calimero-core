@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ import tuwien.auto.calimero.log.LogLevel;
  * adjusted using the next, larger field.<br>
  * <p>
  * The default return value after creation is <code>2000-01-01</code>.
- * 
+ *
  * @author B. Malinowsky
  */
 public class DPTXlatorDate extends DPTXlator
@@ -77,17 +77,17 @@ public class DPTXlatorDate extends DPTXlator
 
 	private static Calendar c;
 	private static SimpleDateFormat sdf;
-	private static final Map types;
+	private static final Map<String, DPT> types;
 
 	static {
-		types = new HashMap(3);
+		types = new HashMap<>(3);
 		types.put(DPT_DATE.getID(), DPT_DATE);
 	}
 
 	/**
 	 * Creates a translator for the given datapoint type.
 	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -99,7 +99,7 @@ public class DPTXlatorDate extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type ID.
 	 * <p>
-	 * 
+	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
 	 *         <code>dptID</code>
@@ -122,7 +122,7 @@ public class DPTXlatorDate extends DPTXlator
 	 * If requesting a textual date representation, and using this value format leads to
 	 * errors due to an invalid calendar date, a short error message string will be
 	 * returned.
-	 * 
+	 *
 	 * @param pattern the new pattern specifying the value date format, <code>null</code>
 	 *        to reset to default value format
 	 */
@@ -153,7 +153,7 @@ public class DPTXlatorDate extends DPTXlator
 	 * Sets the year, month, and day of month for the first date item.
 	 * <p>
 	 * Any other items in the translator are discarded on successful set.<br>
-	 * 
+	 *
 	 * @param year year value, 1990 &lt;= year &lt;= 2089
 	 * @param month month value, 1 &lt;= month &lt;= 12
 	 * @param day day value, 1 &lt;= day &lt;= 31
@@ -166,7 +166,7 @@ public class DPTXlatorDate extends DPTXlator
 	/**
 	 * Returns the day information.
 	 * <p>
-	 * 
+	 *
 	 * @return day of month value, 1 &lt;= day &lt;= 31
 	 */
 	public final int getDay()
@@ -177,7 +177,7 @@ public class DPTXlatorDate extends DPTXlator
 	/**
 	 * Returns the month information.
 	 * <p>
-	 * 
+	 *
 	 * @return month value, 1 &lt;= month &lt;= 12
 	 */
 	public final int getMonth()
@@ -188,7 +188,7 @@ public class DPTXlatorDate extends DPTXlator
 	/**
 	 * Returns the year information.
 	 * <p>
-	 * 
+	 *
 	 * @return year value, 1990 &lt;= year &lt;= 2089
 	 */
 	public final short getYear()
@@ -201,7 +201,7 @@ public class DPTXlatorDate extends DPTXlator
 	 * <p>
 	 * The <code>milliseconds</code> is interpreted with the translator default
 	 * calendar.
-	 * 
+	 *
 	 * @param milliseconds time value in milliseconds, as used in {@link Calendar}
 	 */
 	public final void setValue(final long milliseconds)
@@ -215,7 +215,7 @@ public class DPTXlatorDate extends DPTXlator
 	 * <p>
 	 * The method uses year, month and day information for calculation. Any finer time
 	 * granularity defaults to 0.<br>
-	 * 
+	 *
 	 * @return the date as time in milliseconds as long, as used in {@link Calendar}
 	 * @throws KNXFormatException on invalid calendar date
 	 */
@@ -251,7 +251,7 @@ public class DPTXlatorDate extends DPTXlator
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
 	 */
-	public Map getSubTypes()
+	public Map<String, DPT> getSubTypes()
 	{
 		return types;
 	}
@@ -260,7 +260,7 @@ public class DPTXlatorDate extends DPTXlator
 	 * @return the subtypes of the date translator type
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
-	protected static Map getSubTypesStatic()
+	protected static Map<String, DPT> getSubTypesStatic()
 	{
 		return types;
 	}

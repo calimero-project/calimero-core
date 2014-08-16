@@ -65,7 +65,7 @@ import tuwien.auto.calimero.log.LogService;
  * Uses {@link TransportLayer} internally for communication. <br>
  * All management service methods invoked after a detach of the network link are allowed
  * to throw {@link KNXIllegalStateException}.
- * 
+ *
  * @author B. Malinowsky
  */
 public class ManagementClientImpl implements ManagementClient
@@ -161,7 +161,7 @@ public class ManagementClientImpl implements ManagementClient
 	private final TLListener tlListener = new TLListener();
 	private volatile Priority priority = Priority.LOW;
 	private volatile int responseTimeout = 5000; // [ms]
-	private final List indications = new LinkedList();
+	private final List<FrameEvent> indications = new LinkedList<>();
 	private volatile int svcResponse;
 	private volatile boolean detached;
 	private final LogService logger;
@@ -171,7 +171,7 @@ public class ManagementClientImpl implements ManagementClient
 	 * <p>
 	 * The log service used by this management client is named "MC " +
 	 * <code>link.getName()</code>.
-	 * 
+	 *
 	 * @param link network link used for communication with a KNX network
 	 * @throws KNXLinkClosedException if the network link is closed
 	 */
@@ -260,7 +260,7 @@ public class ManagementClientImpl implements ManagementClient
 		throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException,
 		InterruptedException
 	{
-		final List l = new ArrayList();
+		final List<IndividualAddress> l = new ArrayList<>();
 		try {
 			svcResponse = IND_ADDR_RESPONSE;
 			tl.broadcast(false, Priority.SYSTEM,
@@ -281,7 +281,7 @@ public class ManagementClientImpl implements ManagementClient
 		finally {
 			svcResponse = 0;
 		}
-		return (IndividualAddress[]) l.toArray(new IndividualAddress[l.size()]);
+		return l.toArray(new IndividualAddress[l.size()]);
 	}
 
 	/* (non-Javadoc)
@@ -335,7 +335,7 @@ public class ManagementClientImpl implements ManagementClient
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.ManagementClient#readDomainAddress(boolean)
 	 */
-	public synchronized List readDomainAddress(final boolean oneDomainOnly)
+	public synchronized List<byte[]> readDomainAddress(final boolean oneDomainOnly)
 		throws KNXLinkClosedException, KNXInvalidResponseException, KNXTimeoutException,
 		InterruptedException
 	{
@@ -348,7 +348,7 @@ public class ManagementClientImpl implements ManagementClient
 	 * @see tuwien.auto.calimero.mgmt.ManagementClient#readDomainAddress
 	 * (byte[], tuwien.auto.calimero.IndividualAddress, int)
 	 */
-	public List readDomainAddress(final byte[] domain, final IndividualAddress start,
+	public List<byte[]> readDomainAddress(final byte[] domain, final IndividualAddress start,
 		final int range) throws KNXInvalidResponseException, KNXLinkClosedException,
 		KNXTimeoutException, InterruptedException
 	{
@@ -400,7 +400,7 @@ public class ManagementClientImpl implements ManagementClient
 	{
 		return restart(false, dst, eraseCode, channel);
 	}
-	
+
 	// for erase codes 1,3,4 the channel should be 0
 	private int restart(final boolean basic, final Destination dst, final int eraseCode,
 		final int channel) throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException,
@@ -425,7 +425,7 @@ public class ManagementClientImpl implements ManagementClient
 				throw new KNXRemoteException("master reset: " + codes[error]);
 			time = ((apdu[3] & 0xff) << 8) | (apdu[4] & 0xff);
 		}
-		
+
 		if (dst.isConnectionOriented()) {
 			// a remote endpoint is allowed to not send a TL disconnect before restart, but
 			// a TL disconnect timeout shall not be treated as protocol error
@@ -455,7 +455,7 @@ public class ManagementClientImpl implements ManagementClient
 		}
 		return time;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.ManagementClient#readProperty
 	 * (tuwien.auto.calimero.mgmt.Destination, int, int, int, int)
@@ -464,21 +464,21 @@ public class ManagementClientImpl implements ManagementClient
 		final int start, final int elements) throws KNXTimeoutException, KNXRemoteException,
 		KNXDisconnectException, KNXLinkClosedException, InterruptedException
 	{
-		final List l = readProperty(dst, objIndex, propertyId, start, elements, true);
+		final List<byte[]> l = readProperty(dst, objIndex, propertyId, start, elements, true);
 		if (l.isEmpty())
 			throw new KNXTimeoutException("timeout waiting for property response");
-		return (byte[]) l.get(0);
+		return l.get(0);
 	}
 
 	// as readProperty, but collects all responses until response timeout is reached
-	List readProperty2(final Destination dst, final int objIndex, final int propertyId,
+	List<byte[]> readProperty2(final Destination dst, final int objIndex, final int propertyId,
 		final int start, final int elements) throws KNXTimeoutException, KNXRemoteException,
 		KNXDisconnectException, KNXLinkClosedException, InterruptedException
 	{
 		return readProperty(dst, objIndex, propertyId, start, elements, false);
 	}
-	
-	private List readProperty(final Destination dst, final int objIndex, final int propertyId,
+
+	private List<byte[]> readProperty(final Destination dst, final int objIndex, final int propertyId,
 		final int start, final int elements, final boolean oneResponseOnly)
 		throws KNXTimeoutException, KNXRemoteException, KNXDisconnectException,
 		KNXLinkClosedException, InterruptedException
@@ -491,8 +491,8 @@ public class ManagementClientImpl implements ManagementClient
 		asdu[1] = (byte) propertyId;
 		asdu[2] = (byte) ((elements << 4) | ((start >>> 8) & 0xF));
 		asdu[3] = (byte) start;
-		
-		final List responses;
+
+		final List<byte[]> responses;
 		synchronized (this) {
 			try {
 				send(dst, priority, DataUnitBuilder.createAPDU(PROPERTY_READ, asdu),
@@ -506,9 +506,9 @@ public class ManagementClientImpl implements ManagementClient
 				svcResponse = 0;
 			}
 		}
-		final List ret = new ArrayList();
-		for (final Iterator i = responses.iterator(); i.hasNext();) {
-			final byte[] apdu = (byte[]) i.next();
+		final List<byte[]> ret = new ArrayList<>();
+		for (final Iterator<byte[]> i = responses.iterator(); i.hasNext();) {
+			final byte[] apdu = i.next();
 			try {
 				ret.add(extractPropertyElements(apdu, elements));
 			}
@@ -519,7 +519,7 @@ public class ManagementClientImpl implements ManagementClient
 		}
 		return ret;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.ManagementClient#writeProperty
 	 * (tuwien.auto.calimero.mgmt.Destination, int, int, int, int, byte[])
@@ -741,7 +741,7 @@ public class ManagementClientImpl implements ManagementClient
 		else
 			tl.sendData(d.getAddress(), p, apdu);
 	}
-	
+
 	private synchronized byte[] sendWait(final Destination d, final Priority p,
 		final byte[] apdu, final int response, final int minAsduLen, final int maxAsduLen)
 		throws KNXDisconnectException, KNXTimeoutException, KNXInvalidResponseException,
@@ -782,7 +782,7 @@ public class ManagementClientImpl implements ManagementClient
 		synchronized (indications) {
 			while (remaining > 0) {
 				while (indications.size() > 0) {
-					final CEMI frame = ((FrameEvent) indications.remove(0)).getFrame();
+					final CEMI frame = indications.remove(0).getFrame();
 					final byte[] apdu = frame.getPayload();
 					if (svcResponse != DataUnitBuilder.getAPDUService(apdu))
 						continue;
@@ -809,11 +809,11 @@ public class ManagementClientImpl implements ManagementClient
 		throw new KNXTimeoutException("timeout occurred while waiting for data response");
 	}
 
-	private List waitForResponses(final IndividualAddress from, final Priority p,
+	private List<byte[]> waitForResponses(final IndividualAddress from, final Priority p,
 		final int minAsduLen, final int maxAsduLen, final boolean oneOnly)
 		throws KNXLinkClosedException, KNXInvalidResponseException, InterruptedException
 	{
-		final List l = new ArrayList();
+		final List<byte[]> l = new ArrayList<>();
 		try {
 			long wait = responseTimeout;
 			final long end = System.currentTimeMillis() + wait;
@@ -827,8 +827,8 @@ public class ManagementClientImpl implements ManagementClient
 		catch (final KNXTimeoutException e) {}
 		return l;
 	}
-	
-	private synchronized List readBroadcast(final Priority p, final byte[] apdu,
+
+	private synchronized List<byte[]> readBroadcast(final Priority p, final byte[] apdu,
 		final int response, final int minAsduLen, final int maxAsduLen, final boolean oneOnly)
 		throws KNXLinkClosedException, KNXInvalidResponseException, KNXTimeoutException,
 		InterruptedException
@@ -836,7 +836,7 @@ public class ManagementClientImpl implements ManagementClient
 		try {
 			svcResponse = response;
 			tl.broadcast(true, p, apdu);
-			final List l = waitForResponses(null, p, minAsduLen, maxAsduLen, oneOnly);
+			final List<byte[]> l = waitForResponses(null, p, minAsduLen, maxAsduLen, oneOnly);
 			if (l.isEmpty())
 				throw new KNXTimeoutException("timeout waiting for responses");
 			return l;
@@ -847,15 +847,15 @@ public class ManagementClientImpl implements ManagementClient
 	}
 
 	// cut domain addresses out of APDUs
-	private static List makeDOAs(final List l)
+	private static List<byte[]> makeDOAs(final List<byte[]> l)
 	{
 		for (int i = 0; i < l.size(); ++i) {
-			final byte[] pdu = (byte[]) l.get(i);
+			final byte[] pdu = l.get(i);
 			l.set(i, DataUnitBuilder.copyOfRange(pdu, 2, pdu.length));
 		}
 		return l;
 	}
-	
+
 	// returns property read.res element values
 	private static byte[] extractPropertyElements(final byte[] apdu, final int elements)
 		throws KNXRemoteException

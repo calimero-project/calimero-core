@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,13 +45,13 @@ import java.util.Map;
  * Does the replacement to and from references in strings.<br>
  * Predefined entities exist for
  * {@literal '&', '<', '>', '"' (quote) and ''' (single quote)}.
- * 
+ *
  * @author B. Malinowsky
  */
 final class References
 {
 	// TODO allow to add/remove user defined entities
-	
+
 	// entities predefined in XML:
 	// char | entity ref | num ref | hex ref
 	// &      &amp;        &#38;     &#x26;
@@ -69,16 +69,16 @@ final class References
 		{ "&apos;", "&#39;", "&#x27;", "'" },
 	};
 	// references to entity mapping
-	private static final Map map;
-	
+	private static final Map<String, String> map;
+
 	static
 	{
-		map = new HashMap(25);
+		map = new HashMap<>(25);
 		for (int i = 0; i < 5; ++i)
 			for (int k = 0; k < 3; ++k)
 				map.put(entityTable[i][k], entityTable[i][3]);
 	}
-	
+
 	private References()
 	{}
 
@@ -91,7 +91,7 @@ final class References
 			final int end = text.indexOf(';', pos + 1);
 			if (end == -1)
 				break;
-			final String entity = (String) map.get(text.substring(pos, end + 1));
+			final String entity = map.get(text.substring(pos, end + 1));
 			if (entity != null) {
 				mod.append(text.substring(oldpos, pos));
 				mod.append(entity);
@@ -125,7 +125,7 @@ final class References
 		}
 		return mod.toString();
 	}
-	
+
 	// wrapper for reference replacement
 	static String replace(final String text, final boolean toReference)
 	{

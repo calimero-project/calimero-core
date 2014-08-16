@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2012 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ import tuwien.auto.calimero.link.KNXLinkClosedException;
  * care of satisfying the required connection modes.<br>
  * If an object implementing this interface is not used any longer, {@link #detach()} has
  * to be called to release its resources and detach from the KNX network link.
- * 
+ *
  * @author B. Malinowsky
  */
 public interface ManagementProcedures
@@ -70,7 +70,7 @@ public interface ManagementProcedures
 	 * device with the same individual address is in programming mode, the returned array
 	 * will contain the same addresses several times.<br>
 	 * The read timeout is 3 seconds.
-	 * 
+	 *
 	 * @return a new array with {@link IndividualAddress}es of devices in programming
 	 *         mode, with the array length equal to the number of device responses
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
@@ -88,7 +88,7 @@ public interface ManagementProcedures
 	 * supplied by <code>newAddress</code>, and waits until exactly one device is in
 	 * programming mode. It checks for successful address programming and requests a
 	 * restart of the remote endpoint (thereby switching off its programming).
-	 * 
+	 *
 	 * @param newAddress the new address for the device in programming mode
 	 * @return <code>true</code> if address was written successfully, <code>false</code>
 	 *         if device with address exists but was not set to programming mode
@@ -104,18 +104,18 @@ public interface ManagementProcedures
 	 * This method corresponds to the KNX <i>NM_IndividualAddress_Reset</i> procedure.<br>
 	 * The default individual address is 0xffff. After setting the default address,
 	 * devices in programming mode are restarted.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
 	void resetAddress() throws KNXException, InterruptedException;
-	
+
 	/**
 	 * Determines whether the supplied <code>devAddr</code> is occupied by a device in the
 	 * KNX network or not.
 	 * <p>
 	 * This method corresponds to the KNX <i>NM_IndividualAddress_Check</i> procedure.<br>
-	 * 
+	 *
 	 * @param devAddr the individual address to check
 	 * @return <code>true</code> if address is occupied, <code>false</code> if not
 	 *         occupied
@@ -129,7 +129,7 @@ public interface ManagementProcedures
 	 * <p>
 	 * This method corresponds to the KNX <i>NM_IndividualAddress_SerialNumber_Read</i> procedure.
 	 * <br>
-	 * 
+	 *
 	 * @param serialNo byte array with serial number, <code>serialNo.length</code> = 6
 	 * @return the individual address
 	 * @throws KNXTimeoutException on a timeout during send or no address response was received
@@ -148,7 +148,7 @@ public interface ManagementProcedures
 	 * and checks for successful address programming.<br>
 	 * Note that this procedure, in contrast to {@link #writeAddress(IndividualAddress)}, does not
 	 * restart the programmed device.
-	 * 
+	 *
 	 * @param serialNo the device serial number to be programmed, <code>serialNo.length = 6</code>
 	 * @param newAddress the new address for the device identified by <code>serialNo</code>
 	 * @return <code>true</code> if the new address is set and was verified successfully,
@@ -165,7 +165,7 @@ public interface ManagementProcedures
 	// several responses; it's not that important, power-line isn't common anyway
 
 	// scanning procedures
-	
+
 	/**
 	 * Determines the installed KNX routers in a KNX network.
 	 * <p>
@@ -175,7 +175,7 @@ public interface ManagementProcedures
 	 * KNX routers.<br>
 	 * For routers to be found by this procedure, the individual address and domain address have to
 	 * be configured.
-	 * 
+	 *
 	 * @return a new array with {@link IndividualAddress}es of the installed KNX routers, with the
 	 *         array length equal to the number of installed routers
 	 * @throws KNXTimeoutException on communication timeouts during the scanning
@@ -195,7 +195,7 @@ public interface ManagementProcedures
 	 * <code>line</code> of the KNX network.<br>
 	 * For this procedure, the individual address of used routers in the KNX network and
 	 * the domain address have to be configured.
-	 * 
+	 *
 	 * @param area the KNX network area to scan for network devices,
 	 *        <code>0 <= area <= 0x0F</code>, devices in the backbone line of areas are
 	 *        assigned area address 0; for a definition of area, see
@@ -232,7 +232,7 @@ public interface ManagementProcedures
 	 * Choose one of the listed entries for the <code>medium</code> parameter.<br>
 	 * Implementation note: The number of each list entry for a medium equals the default subnetwork
 	 * address part for that medium.
-	 * 
+	 *
 	 * @param medium KNX network medium (for the medium-dependent default subnetwork identifier),
 	 *        <code>0 &lt; medium &lt; 6</code>
 	 * @return a new list with byte arrays of serial numbers, corresponding to KNX devices having
@@ -241,8 +241,8 @@ public interface ManagementProcedures
 	 * @throws InterruptedException
 	 */
 	// ??? can we automatically detect the medium in this procedure?
-	List scanSerialNumbers(int medium) throws KNXException, InterruptedException;
-	
+	List<byte[]> scanSerialNumbers(int medium) throws KNXException, InterruptedException;
+
 	// mode querying/setting procedures
 
 	/**
@@ -250,7 +250,7 @@ public interface ManagementProcedures
 	 * <p>
 	 * This method corresponds to the KNX <i>DM_ProgMode_Switch</i>
 	 * (<i>DMP_ProgModeSwitch_RCo</i>) procedure.<br>
-	 * 
+	 *
 	 * @param device the addressed KNX network device
 	 * @param programming <code>true</code> to set the device into programming mode,
 	 *        <code>false</code> to switch off programming mode
@@ -272,7 +272,7 @@ public interface ManagementProcedures
 	 * The memory is written in the order given by <code>data</code>, starting from
 	 * <code>data[0]</code>, to the device memory, starting from <code>startAddress</code>
 	 * (inclusive).
-	 * 
+	 *
 	 * @param device the destination device address
 	 * @param startAddress the memory destination start address,
 	 *        <code>0 <= startAddress <= 0xFFFFFFFF</code>
@@ -298,7 +298,7 @@ public interface ManagementProcedures
 	 * data into suitable packets for transfer over the KNX network, if necessary.<br>
 	 * The memory is read in increasing steps of memory addresses, starting from
 	 * <code>startAddress</code> (inclusive).
-	 * 
+	 *
 	 * @param device the destination device address
 	 * @param startAddress the memory source start address,
 	 *        <code>0 <= startAddress <= 0xFFFFFFFF</code>
@@ -319,7 +319,7 @@ public interface ManagementProcedures
 	 * is attached, no action is performed.
 	 * <p>
 	 * Note that a detach does not close the used network link.
-	 * 
+	 *
 	 * @see ManagementClient#detach()
 	 */
 	void detach();

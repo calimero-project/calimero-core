@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ import tuwien.auto.calimero.xml.XMLReader;
  * <p>
  * Does not add any feature not already documented in the implemented interface.<br>
  * This reader is not thread safe.
- * 
+ *
  * @author B. Malinowsky
  */
 public class DefaultXMLReader implements XMLReader
@@ -58,7 +58,7 @@ public class DefaultXMLReader implements XMLReader
 	private Reader r;
 	private boolean closeReader;
 	private Element elem;
-	private final Stack openElems = new Stack();
+	private final Stack<String> openElems = new Stack<>();
 	private int pos;
 	private int line;
 
@@ -74,7 +74,7 @@ public class DefaultXMLReader implements XMLReader
 	 * <p>
 	 * The {@link Reader} should already be buffered or wrapped with a buffered reader, if
 	 * necessary (e.g. when reading from a file).
-	 * 
+	 *
 	 * @param r a {@link Reader} for input
 	 * @param close <code>true</code> to close <code>r</code> if XML reader is closed,
 	 *        <code>false</code> otherwise
@@ -114,7 +114,7 @@ public class DefaultXMLReader implements XMLReader
 				continue;
 			final StringBuffer buf = new StringBuffer();
 			if (readCDATASection(str, buf)) {
-				elem = new DefaultElement((String) openElems.peek());
+				elem = new DefaultElement(openElems.peek());
 				elem.setCharacterData(buf.toString());
 				pos = CHAR_DATA;
 				return pos;
@@ -126,7 +126,7 @@ public class DefaultXMLReader implements XMLReader
 				if (!name.substring(1).equals(openElems.peek()))
 					throw new KNXMLException("element end tag does not match start tag",
 						name.substring(1), line);
-				elem = new DefaultElement((String) openElems.pop());
+				elem = new DefaultElement(openElems.pop());
 				pos = END_TAG;
 				return pos;
 			}
@@ -308,7 +308,7 @@ public class DefaultXMLReader implements XMLReader
 		buf.delete(buf.length() - 2, buf.length());
 		return true;
 	}
-	
+
 	// checks if '<' marks begin of a comment, and if so skips over it
 	private boolean skipComment(final String s) throws KNXMLException
 	{

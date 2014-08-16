@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2011 B. Malinowsky
+    Copyright (c) 2010, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ import tuwien.auto.calimero.log.LogService;
  * Generic implementation of a KNXnet/IP connection, used for tunneling, device management
  * and routing.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public abstract class ConnectionBase implements KNXnetIPConnection
@@ -109,7 +109,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	/** acknowledgment service type used for this connection type */
 	protected final int serviceAck;
 	/** container for event listeners */
-	protected final EventListeners listeners = new EventListeners();
+	protected final EventListeners<KNXListener> listeners = new EventListeners<>(KNXListener.class);
 	/** logger for this connection */
 	protected LogService logger;
 
@@ -128,9 +128,9 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	final int maxSendAttempts;
 	// timeout for response message in seconds
 	final int responseTimeout;
-	
+
 	private ReceiverLoop receiver;
-	
+
 	// lock object to do wait() on for protocol timeouts
 	Object lock = new Object();
 
@@ -143,7 +143,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	/**
 	 * Base constructor to assign the supplied arguments.
 	 * <p>
-	 * 
+	 *
 	 * @param serviceRequest
 	 * @param serviceAck
 	 * @param maxSendAttempts
@@ -317,7 +317,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	/**
 	 * Returns the protocol's current receive sequence number.
 	 * <p>
-	 * 
+	 *
 	 * @return receive sequence number as int
 	 */
 	protected synchronized int getSeqRcv()
@@ -338,7 +338,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	/**
 	 * Returns the protocol's current send sequence number.
 	 * <p>
-	 * 
+	 *
 	 * @return send sequence number as int
 	 */
 	protected synchronized int getSeqSend()
@@ -359,7 +359,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	/**
 	 * Fires a frame received event ({@link KNXListener#frameReceived(FrameEvent)}) for
 	 * the supplied cEMI <code>frame</code>.
-	 * 
+	 *
 	 * @param frame the cEMI to generate the event for
 	 */
 	protected void fireFrameReceived(final CEMI frame)
@@ -381,7 +381,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	/**
 	 * This stub always returns false.
 	 * <p>
-	 * 
+	 *
 	 * @param h received KNXnet/IP header
 	 * @param data received datagram data
 	 * @param offset datagram data start offset
@@ -403,7 +403,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	/**
 	 * Request to set this connection into a new connection state.
 	 * <p>
-	 * 
+	 *
 	 * @param newState new state to set
 	 */
 	protected final void setState(final int newState)
@@ -423,7 +423,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	/**
 	 * See {@link #setState(int)}, with additional notification of internal threads.
 	 * <p>
-	 * 
+	 *
 	 * @param newState new state to set
 	 */
 	protected final void setStateNotify(final int newState)
@@ -440,7 +440,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	 * <p>
 	 * It contains all protocol specific actions to close a connection. Before this method
 	 * returns, {@link #cleanup(int, String, LogLevel, Throwable)} is called.
-	 * 
+	 *
 	 * @param initiator one of the constants of {@link CloseEvent}
 	 * @param reason short text statement why close was called on this connection
 	 * @param level log level to use for logging, adjust this to the reason of closing
@@ -505,7 +505,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	 * Validates channel id received in a packet against the one assigned to this
 	 * connection.
 	 * <p>
-	 * 
+	 *
 	 * @param id received id to check
 	 * @param svcType packet service type
 	 * @return <code>true</code> if valid, <code>false</code> otherwise
@@ -522,7 +522,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	/**
 	 * Extracts the service request out of the supplied packet data.
 	 * <p>
-	 * 
+	 *
 	 * @param h packet KNXnet/IP header
 	 * @param data contains the data following the KNXnet/IP header
 	 * @param offset offset into <code>data</code> to message structure past KNXnet/IP
@@ -557,13 +557,13 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 			receiver = looper;
 		}
 	}
-	
+
 	final void stopReceiver()
 	{
 		if (receiver != null)
 			receiver.quit();
 	}
-	
+
 	boolean waitForStateChange(final int initialState, final int timeout)
 		throws InterruptedException
 	{
@@ -584,7 +584,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	 * Give chance to perform additional blocking modes called if mode is set to a
 	 * blocking mode not equal to NON_BLOCKING and WAIT_FOR_ACK. This method is called
 	 * from send() after WAIT_FOR_ACK was completed.
-	 * 
+	 *
 	 * @throws KNXTimeoutException
 	 * @throws InterruptedException
 	 */

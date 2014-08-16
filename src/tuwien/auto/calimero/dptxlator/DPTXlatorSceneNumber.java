@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2013 B. Malinowsky
+    Copyright (c) 2013, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -64,10 +64,10 @@ public class DPTXlatorSceneNumber extends DPTXlator
 	public static final DPT DPT_SCENE_NUMBER = new DPT("17.001", "Scene Number", "0",
 			 "63");
 
-	private static final Map types;
+	private static final Map<String, DPT> types;
 
 	static {
-		types = new HashMap();
+		types = new HashMap<>();
 		types.put(DPT_SCENE_NUMBER.getID(), DPT_SCENE_NUMBER);
 	}
 
@@ -141,7 +141,7 @@ public class DPTXlatorSceneNumber extends DPTXlator
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
 	 */
-	public final Map getSubTypes()
+	public final Map<String, DPT> getSubTypes()
 	{
 		return types;
 	}
@@ -150,7 +150,7 @@ public class DPTXlatorSceneNumber extends DPTXlator
 	 * @return the subtypes of the 8 Bit unsigned translator type
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
-	protected static Map getSubTypesStatic()
+	protected static Map<String, DPT> getSubTypesStatic()
 	{
 		return types;
 	}
