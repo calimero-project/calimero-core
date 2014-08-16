@@ -41,6 +41,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import org.slf4j.Logger;
+
+import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
+
 /**
  * A LogService is used to categorize logging information with regard to logging level and
  * topic, and offer it to its {@link LogWriter}s.
@@ -59,7 +63,7 @@ import java.util.Vector;
  * into topics.<br>
  * A log service may restrict offered information through its own log level.<br>
  * - ...
- * 
+ *
  * @author B. Malinowsky
  * @see LogLevel
  * @see LogWriter
@@ -152,10 +156,12 @@ public class LogService
 	private LogLevel logLevel = LogLevel.ALL;
 	private List writers = new Vector();
 
+	private Logger impl;
+
 	/**
 	 * Creates a new log service with the specified <code>name</code>.
 	 * <p>
-	 * 
+	 *
 	 * @param name name of log service
 	 */
 	protected LogService(final String name)
@@ -167,7 +173,7 @@ public class LogService
 	 * Creates a new log service with the specified <code>name</code> and log
 	 * <code>level</code>.
 	 * <p>
-	 * 
+	 *
 	 * @param name name of log service
 	 * @param level log level for this log service
 	 */
@@ -177,10 +183,29 @@ public class LogService
 		setLogLevel(level);
 	}
 
+	// sets the slf4j to do the work
+	protected LogService(final Logger l)
+	{
+		this(l.getName(), LogLevel.ALL);
+		this.impl = l;
+	}
+
+	/**
+	 * @deprecated Used for transition to slf4j.
+	 * Returns the slf4j logger implementation.
+	 * <p>
+	 *
+	 * @return the slf4j logger or <null> if none is used
+	 */
+	public final Logger slf4j()
+	{
+		return impl;
+	}
+
 	/**
 	 * Returns the name of this log service.
 	 * <p>
-	 * 
+	 *
 	 * @return the log service name
 	 */
 	public String getName()
@@ -196,7 +221,7 @@ public class LogService
 	 * <p>
 	 * For example: set log level to {@link LogLevel#WARN} to allow log info with
 	 * {@link LogLevel#FATAL}, {@link LogLevel#ERROR} and {@link LogLevel#WARN}.
-	 * 
+	 *
 	 * @param level new log level
 	 */
 	public void setLogLevel(final LogLevel level)
@@ -207,7 +232,7 @@ public class LogService
 	/**
 	 * Returns the currently set log level of this log service.
 	 * <p>
-	 * 
+	 *
 	 * @return the log {@link LogLevel}
 	 */
 	public LogLevel getLogLevel()
@@ -222,7 +247,7 @@ public class LogService
 	 * this log service. Only output with a log level specified equal or below the level
 	 * of this service is logged, i.e., output of the same or less verbosity.<br>
 	 * Output with assigned log level {@link LogLevel#OFF} is never logged.
-	 * 
+	 *
 	 * @param level the log level to check for
 	 * @return <code>true</code> if output of that level is loggable, <code>false</code>
 	 *         otherwise
@@ -236,7 +261,7 @@ public class LogService
 	 * Adds the <code>writer</code> to this log service.
 	 * <p>
 	 * No check is made to detect (or prevent) duplicate writers.
-	 * 
+	 *
 	 * @param writer LogWriter to add
 	 */
 	public void addWriter(final LogWriter writer)
@@ -248,7 +273,7 @@ public class LogService
 	 * Removes <code>writer</code> from this log service.
 	 * <p>
 	 * No check is made to detect and remove duplicate writers.
-	 * 
+	 *
 	 * @param writer LogWriter to remove
 	 */
 	public void removeWriter(final LogWriter writer)
@@ -259,7 +284,7 @@ public class LogService
 	/**
 	 * Removes all registered log writer from this log service.
 	 * <p>
-	 * 
+	 *
 	 * @param close should the writers be closed before removal
 	 */
 	public void removeAllWriters(final boolean close)
@@ -275,7 +300,7 @@ public class LogService
 	/**
 	 * Offers <code>msg</code> with log level {@link LogLevel#TRACE}.
 	 * <p>
-	 * 
+	 *
 	 * @param msg log information
 	 */
 	public void trace(final String msg)
@@ -286,7 +311,7 @@ public class LogService
 	/**
 	 * Offers <code>msg</code> with log level {@link LogLevel#INFO}.
 	 * <p>
-	 * 
+	 *
 	 * @param msg log information
 	 */
 	public void info(final String msg)
@@ -297,7 +322,7 @@ public class LogService
 	/**
 	 * Offers <code>msg</code> with log level {@link LogLevel#WARN}.
 	 * <p>
-	 * 
+	 *
 	 * @param msg log information
 	 */
 	public void warn(final String msg)
@@ -309,7 +334,7 @@ public class LogService
 	 * Offers <code>msg</code> and the <code>throwable</code> object with log level
 	 * {@link LogLevel#WARN}.
 	 * <p>
-	 * 
+	 *
 	 * @param msg log information
 	 * @param t throwable object
 	 */
@@ -321,7 +346,7 @@ public class LogService
 	/**
 	 * Offers <code>msg</code> with log level {@link LogLevel#ERROR}.
 	 * <p>
-	 * 
+	 *
 	 * @param msg log information
 	 */
 	public void error(final String msg)
@@ -333,7 +358,7 @@ public class LogService
 	 * Offers <code>msg</code> and the <code>throwable</code> object with log level
 	 * {@link LogLevel#ERROR}.
 	 * <p>
-	 * 
+	 *
 	 * @param msg log information
 	 * @param t throwable object
 	 */
@@ -345,7 +370,7 @@ public class LogService
 	/**
 	 * Offers <code>msg</code> with log level {@link LogLevel#FATAL}.
 	 * <p>
-	 * 
+	 *
 	 * @param msg log information
 	 */
 	public void fatal(final String msg)
@@ -357,7 +382,7 @@ public class LogService
 	 * Offers <code>msg</code> and the <code>throwable</code> object with log level
 	 * {@link LogLevel#FATAL}.
 	 * <p>
-	 * 
+	 *
 	 * @param msg log information
 	 * @param t throwable object
 	 */
@@ -370,13 +395,17 @@ public class LogService
 	 * Offers <code>msg</code> and the <code>throwable</code> object with log
 	 * <code>level</code>.
 	 * <p>
-	 * 
+	 *
 	 * @param level log level for this message and throwable
 	 * @param msg log information
 	 * @param t throwable object, can be <code>null</code>
 	 */
 	public void log(final LogLevel level, final String msg, final Throwable t)
 	{
+		if (impl != null) {
+			forwardToImpl(level, msg, t);
+			return;
+		}
 		if (level != LogLevel.OFF && level.level <= logLevel.level)
 			logger.add(writers, name, level, msg, t);
 	}
@@ -397,5 +426,26 @@ public class LogService
 				logger.join();
 			}
 			catch (final InterruptedException ignore) {}
+	}
+
+	// TODO slf4j_impl: temporarily used as forwarder to slf4j
+	private void forwardToImpl(final LogLevel level, final String msg, final Throwable t)
+	{
+		if (level.equals(LogLevel.OFF))
+			;
+		else if (level.equals( LogLevel.TRACE))
+			impl.trace(msg, t);
+		else if (level.equals( LogLevel.INFO))
+			impl.info(msg, t);
+		else if (level.equals( LogLevel.WARN))
+			impl.warn(msg, t);
+		else if (level.equals( LogLevel.ERROR))
+			impl.error(msg, t);
+		else if (level.equals(LogLevel.FATAL))
+			impl.error(msg, t);
+		else if (level.equals(LogLevel.ALWAYS))
+			impl.trace(msg, t);
+		else
+			throw new KNXIllegalArgumentException("unknown log level");
 	}
 }
