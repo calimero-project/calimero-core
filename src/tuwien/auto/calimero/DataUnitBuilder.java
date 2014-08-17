@@ -260,7 +260,9 @@ public final class DataUnitBuilder
 		for (int i = 0; i < asdu.length; ++i)
 			asdu[i] = apdu[offset + i];
 
-		asdu[0] &= mask;
+		// some ASDUs have length 0, e.g., DoA.read
+		if (asdu.length > 0)
+			asdu[0] &= mask;
 		return asdu;
 	}
 

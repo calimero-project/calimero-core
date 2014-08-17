@@ -415,7 +415,6 @@ public class PropertyClient implements PropertyAccess
 		"Group Object Table Object", "Polling Master", "KNXnet/IP Parameter Object",
 		"Application Controller", "File Server Object", };
 
-	//private static ResourceHandler rh;
 
 	private final Map<PropertyKey, Property> properties = Collections
 			.synchronizedMap(new HashMap<>());
