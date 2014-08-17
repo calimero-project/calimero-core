@@ -458,11 +458,11 @@ public class CEMILData implements CEMI
 	public String toString()
 	{
 		final StringBuffer buf = new StringBuffer();
-		buf.append("L-Data");
+		buf.append(source).append("->").append(dst);
+		buf.append(" L_Data");
 		buf.append(mc == MC_LDATA_IND ? ".ind" : mc == MC_LDATA_REQ ? ".req" : ".con");
 		if (mc == MC_LDATA_CON)
 			buf.append(isPositiveConfirmation() ? " (pos)" : " (neg)");
-		buf.append(" from ").append(source).append(" to ").append(dst);
 		buf.append(", ").append(p).append(" priority");
 		buf.append(" hop count ").append(getHopCount());
 		if (mc != MC_LDATA_CON) {
