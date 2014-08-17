@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2012 B. Malinowsky
+    Copyright (c) 2010, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,6 +15,23 @@
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    Linking this library statically or dynamically with other modules is
+    making a combined work based on this library. Thus, the terms and
+    conditions of the GNU General Public License cover the whole
+    combination.
+
+    As a special exception, the copyright holders of this library give you
+    permission to link this library with independent modules to produce an
+    executable, regardless of the license terms of these independent
+    modules, and to copy and distribute the resulting executable under terms
+    of your choice, provided that you also meet, for each linked independent
+    module, the terms and conditions of the license of that module. An
+    independent module is a module which is not derived from or based on
+    this library. If you modify this library, you may extend this exception
+    to your version of the library, but you are not obligated to do so. If
+    you do not wish to do so, delete this exception statement from your
+    version.
 */
 
 package tuwien.auto.calimero.mgmt;
@@ -50,7 +67,7 @@ import tuwien.auto.calimero.log.LogService;
  * synchronized on the used management client instance if considered necessary ( {@ManagementClient
  * }). Note that this, although, is not sufficient to guarantee non-concurrent
  * execution of procedures on the same remote endpoint in general.
- * 
+ *
  * @author B. Malinowsky
  */
 public class ManagementProceduresImpl implements ManagementProcedures
@@ -68,7 +85,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	private final ManagementClient mc;
 	private final boolean detachMgmtClient;
 	private final TransportLayer tl;
-	
+
 	private final LogService logger = LogManager.getManager().getLogService("MgmtProc");
 
 	private static final class TLListener implements TransportListener
@@ -115,7 +132,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	/**
 	 * Creates a new management procedures instance, using the supplied KNX network link.
 	 * <p>
-	 * 
+	 *
 	 * @param link the KNX network link, with link in open state
 	 * @throws KNXLinkClosedException on closed {@link KNXNetworkLink}
 	 */
@@ -131,7 +148,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	 * Creates a new management procedures instance, using the supplied management client
 	 * for application layer services.
 	 * <p>
-	 * 
+	 *
 	 * @param mgmtClient the management client, with a network link attached and in open
 	 *        state
 	 * @param transportLayer
@@ -174,7 +191,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	public boolean writeAddress(final IndividualAddress newAddress) throws KNXException,
 		InterruptedException
 	{
-		final Destination dst = mc.createDestination(newAddress, true);
+		final Destination dst = getOrCreateDestination(newAddress);
 		boolean exists = false;
 		try {
 			mc.readDeviceDesc(dst, 0);
@@ -196,8 +213,11 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			final Destination verify = mc.createDestination(newAddress, true);
 			try {
 				mc.setResponseTimeout(1);
+				// ??? this does not conform to spec, where no max. attempts are given
+				// the problem is that we potentially loop forever (which would be correct)
+				int attempts = 20;
 				int count = 0;
-				while (count != 1) {
+				while (count != 1 && attempts-- > 0) {
 					try {
 						final IndividualAddress[] list = mc.readAddress(false);
 						count = list.length;
@@ -255,7 +275,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			dst.destroy();
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.ManagementProcedures
 	 * #isAddressOccupied(tuwien.auto.calimero.IndividualAddress)
@@ -280,7 +300,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		}
 		return true;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.ManagementProcedures#readAddress(byte[])
 	 */
@@ -367,19 +387,19 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		}
 		return Collections.EMPTY_LIST;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.ManagementProcedures#setProgrammingMode
 	 * (tuwien.auto.calimero.IndividualAddress, boolean)
 	 */
-	public void setProgrammingMode(final IndividualAddress device,
-		final boolean programming) throws KNXException, InterruptedException
+	public void setProgrammingMode(final IndividualAddress device, final boolean programming)
+		throws KNXException, InterruptedException
 	{
 		// ??? there also exists a KNX property for this, might query that property first
 
 		// conn.oriented
-		final Destination d = tl.createDestination(device, true);
+		final Destination d = getOrCreateDestination(device);
 		// read from memory where device keeps programming mode
 		final byte[] mem = mc.readMemory(d, memAddrProgMode, 1);
 		// store lowest 7 bits
@@ -409,7 +429,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			throw new KNXIllegalArgumentException(
 				"verify write and verify by server not both applicable");
 
-		final Destination d = tl.createDestination(device, true, false, verifyByServer);
+		final Destination d = getOrCreateDestination(device, false, verifyByServer);
 		// if automatic server verification is requested, turn verify flag on
 		if (verifyByServer) {
 			// reading description checks whether property exists
@@ -477,7 +497,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		// logger.warn("reading over 4K of device memory "
 		// + "(hope you know what you are doing)");
 
-		final Destination d = tl.createDestination(device, true);
+		final Destination d = getOrCreateDestination(device);
 
 		final byte[] read = new byte[bytes];
 		final int asduLength = readMaxAsduLength(d);
@@ -499,6 +519,21 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			mc.detach();
 	}
 
+	// work around for implementation in TL, which unconditionally throws if dst exists
+	private Destination getOrCreateDestination(final IndividualAddress device)
+	{
+		final Destination d = ((TransportLayerImpl) tl).getDestination(device);
+		return d != null ? d : tl.createDestination(device, true);
+	}
+
+	// work around for implementation in TL, which unconditionally throws if dst exists
+	private Destination getOrCreateDestination(final IndividualAddress device,
+		final boolean keepAlive, final boolean verifyByServer)
+	{
+		final Destination d = ((TransportLayerImpl) tl).getDestination(device);
+		return d != null ? d : tl.createDestination(device, true, keepAlive, verifyByServer);
+	}
+
 	private IndividualAddress[] scanAddresses(final List addresses, final boolean routers)
 		throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
@@ -510,13 +545,15 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		try {
 			for (final Iterator i = addresses.iterator(); i.hasNext();) {
 				final IndividualAddress remote = (IndividualAddress) i.next();
-				final Destination d = tl.createDestination(remote, true);
+				final Destination d = getOrCreateDestination(remote, true, false);
 				destinations.add(d);
 				tl.connect(d);
 				// increased from 100 (the default) to minimize chance of overflow over FT1.2
 				Thread.sleep(115);
 			}
-			waitFor(disconnectTimeout);
+			// we wait in total (115 + 6000 + 1000 + 100) ms for a possible T-disconnect, taking
+			// into account the KNXnet/IP tunneling.req retransmit timeout plus some network delay
+			waitFor(disconnectTimeout + 1100);
 		}
 		finally {
 			tl.removeTransportListener(tll);

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,6 +15,23 @@
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    Linking this library statically or dynamically with other modules is
+    making a combined work based on this library. Thus, the terms and
+    conditions of the GNU General Public License cover the whole
+    combination.
+
+    As a special exception, the copyright holders of this library give you
+    permission to link this library with independent modules to produce an
+    executable, regardless of the license terms of these independent
+    modules, and to copy and distribute the resulting executable under terms
+    of your choice, provided that you also meet, for each linked independent
+    module, the terms and conditions of the license of that module. An
+    independent module is a module which is not derived from or based on
+    this library. If you modify this library, you may extend this exception
+    to your version of the library, but you are not obligated to do so. If
+    you do not wish to do so, delete this exception statement from your
+    version.
 */
 
 package tuwien.auto.calimero.buffer;
@@ -69,7 +86,7 @@ import tuwien.auto.calimero.log.LogService;
  * In general, one network buffer is created for one KNX installation, to easier
  * distinguish between different installations. Nevertheless, this is not enforced in any
  * way; a new configuration also might just always use a new network buffer.
- * 
+ *
  * @author B. Malinowsky
  */
 public final class NetworkBuffer
@@ -362,12 +379,11 @@ public final class NetworkBuffer
 	 * <p>
 	 * To identify the buffer a unique installation identifier can be given through
 	 * <code>installationId</code>.<br>
-	 * If <code>null</code> or an empty string is supplied for the installation ID, a new
-	 * default ID is generated of the form "Installation [ID]", where [ID] is a unique
-	 * incrementing number. Note, the installation ID string is treated case sensitive.
-	 * 
-	 * @param installationId installation identifier for the network buffer, or
-	 *        <code>null</code>
+	 * If <code>null</code> or an empty string is supplied for the installation ID, a new default ID
+	 * is generated of the form "Installation [ID]", where [ID] is a unique incrementing number.
+	 * Note, the installation ID string is treated case sensitive.
+	 *
+	 * @param installationId installation identifier for the network buffer, or <code>null</code>
 	 * @return the new network buffer
 	 */
 	public static synchronized NetworkBuffer createBuffer(final String installationId)
@@ -391,7 +407,7 @@ public final class NetworkBuffer
 	 * deactivated (see {@link Configuration#activate(boolean)}), and the buffered link of
 	 * the configuration, obtained with {@link Configuration#getBufferedLink()}, will get
 	 * closed as well.
-	 * 
+	 *
 	 * @param link KNX network link communicating with the KNX network
 	 * @return the new configuration
 	 */
@@ -409,7 +425,7 @@ public final class NetworkBuffer
 	 * The configuration is deactivated and will not receive any further events or
 	 * incoming messages from the base network link supplied at creation of that
 	 * configuration.
-	 * 
+	 *
 	 * @param c the configuration to remove
 	 */
 	public void removeConfiguration(final Configuration c)
@@ -425,7 +441,7 @@ public final class NetworkBuffer
 	 * <p>
 	 * If the network link is not a buffered link or not found in the current
 	 * configurations of this network buffer, <code>null</code> is returned.
-	 * 
+	 *
 	 * @param bufferedLink the buffered link to get the configuration for
 	 * @return the owning configuration of that link or <code>null</code>
 	 */
@@ -444,7 +460,7 @@ public final class NetworkBuffer
 	/**
 	 * Returns all configurations of this network buffer.
 	 * <p>
-	 * 
+	 *
 	 * @return a new Configuration array holding the configurations, with the array
 	 *         length equal to the number of network buffer configurations
 	 */
@@ -456,7 +472,7 @@ public final class NetworkBuffer
 	/**
 	 * Returns the installation identifier of this network buffer.
 	 * <p>
-	 * 
+	 *
 	 * @return installation ID
 	 */
 	public String getInstallationID()

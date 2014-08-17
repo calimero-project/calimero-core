@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,6 +15,23 @@
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    Linking this library statically or dynamically with other modules is
+    making a combined work based on this library. Thus, the terms and
+    conditions of the GNU General Public License cover the whole
+    combination.
+
+    As a special exception, the copyright holders of this library give you
+    permission to link this library with independent modules to produce an
+    executable, regardless of the license terms of these independent
+    modules, and to copy and distribute the resulting executable under terms
+    of your choice, provided that you also meet, for each linked independent
+    module, the terms and conditions of the license of that module. An
+    independent module is a module which is not derived from or based on
+    this library. If you modify this library, you may extend this exception
+    to your version of the library, but you are not obligated to do so. If
+    you do not wish to do so, delete this exception statement from your
+    version.
 */
 
 package tuwien.auto.calimero.knxnetip;
@@ -120,18 +137,12 @@ public class KNXnetIPTunnelTest extends TestCase
 
 		LogManager.getManager().addWriter(null, Util.getLogWriter());
 
-		frame =
-			new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0),
-				new GroupAddress(0, 0, 1), new byte[] { 0, (byte) (0x80 | 1) },
-				Priority.NORMAL);
-		frame2 =
-			new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0),
-				new GroupAddress(0, 0, 1), new byte[] { 0, (byte) (0x80 | 0) },
-				Priority.URGENT);
-		frameNoDest =
-			new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0),
-				new GroupAddress(10, 7, 10), new byte[] { 0, (byte) (0x80 | 0) },
-				Priority.LOW);
+		frame = new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0), new GroupAddress(0,
+				0, 1), new byte[] { 0, (byte) (0x80 | 1) }, Priority.NORMAL);
+		frame2 = new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0), new GroupAddress(
+				0, 0, 1), new byte[] { 0, (byte) (0x80 | 0) }, Priority.URGENT);
+		frameNoDest = new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0),
+				new GroupAddress(10, 7, 10), new byte[] { 0, (byte) (0x80 | 0) }, Priority.LOW);
 	}
 
 	/* (non-Javadoc)
@@ -155,7 +166,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#send
 	 * (tuwien.auto.calimero.cemi.CEMI,
 	 * tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -187,7 +198,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#send
 	 * (tuwien.auto.calimero.cemi.CEMI,
 	 * tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -257,7 +268,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#send
 	 * (tuwien.auto.calimero.cemi.CEMI,
 	 * tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -270,6 +281,7 @@ public class KNXnetIPTunnelTest extends TestCase
 		newNATTunnel();
 		doNATSend(frame, con, true);
 		doNATSend(frame2, con, true);
+		// XXX why is the confirmation here true?
 		doNATSend(frameNoDest, con, true);
 	}
 
@@ -277,7 +289,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#send
 	 * (tuwien.auto.calimero.cemi.CEMI,
 	 * tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -346,7 +358,6 @@ public class KNXnetIPTunnelTest extends TestCase
 					Thread.sleep(10);
 				}
 				catch (final InterruptedException e) {}
-
 		}
 		assertNotNull(l.received);
 		final CEMILData fcon = (CEMILData) l.received;
@@ -369,7 +380,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#KNXnetIPTunnel
 	 * (short, java.net.InetSocketAddress, java.net.InetSocketAddress, boolean)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -396,7 +407,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#KNXnetIPTunnel
 	 * (short, java.net.InetSocketAddress, java.net.InetSocketAddress, boolean)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -408,7 +419,7 @@ public class KNXnetIPTunnelTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#close()}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -428,7 +439,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#getRemoteAddress()}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -443,7 +454,7 @@ public class KNXnetIPTunnelTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#getState()}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -452,7 +463,9 @@ public class KNXnetIPTunnelTest extends TestCase
 	{
 		newTunnel();
 		assertEquals(KNXnetIPConnection.OK, t.getState());
-		System.out.println("Testing heartbeat, will take some minutes");
+		System.out.println();
+		System.out.println("Testing heartbeat, this will take some minutes !!!");
+		System.out.println("...");
 		// give some seconds space for delay so we're on the save side
 		Thread.sleep(4000);
 		Thread.sleep(60000);
@@ -463,7 +476,7 @@ public class KNXnetIPTunnelTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#getState()}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -472,7 +485,9 @@ public class KNXnetIPTunnelTest extends TestCase
 	{
 		newMonitor();
 		assertEquals(KNXnetIPConnection.OK, mon.getState());
-		System.out.println("Testing heartbeat, will take some minutes");
+		System.out.println();
+		System.out.println("Testing heartbeat, this will take some minutes !!!");
+		System.out.println("...");
 		// give some seconds space for delay so we're on the save side
 		Thread.sleep(4000);
 		Thread.sleep(60000);

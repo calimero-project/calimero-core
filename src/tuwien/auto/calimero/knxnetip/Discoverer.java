@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,6 +15,23 @@
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    Linking this library statically or dynamically with other modules is
+    making a combined work based on this library. Thus, the terms and
+    conditions of the GNU General Public License cover the whole
+    combination.
+
+    As a special exception, the copyright holders of this library give you
+    permission to link this library with independent modules to produce an
+    executable, regardless of the license terms of these independent
+    modules, and to copy and distribute the resulting executable under terms
+    of your choice, provided that you also meet, for each linked independent
+    module, the terms and conditions of the license of that module. An
+    independent module is a module which is not derived from or based on
+    this library. If you modify this library, you may extend this exception
+    to your version of the library, but you are not obligated to do so. If
+    you do not wish to do so, delete this exception statement from your
+    version.
 */
 
 package tuwien.auto.calimero.knxnetip;
@@ -77,7 +94,7 @@ import tuwien.auto.calimero.log.LogService;
  * Cancellation policy on thread interrupts: any running searches are canceled, see
  * {@link #stopSearch()}, blocking invocations of startSearch (i.e., parameter
  * <code>wait = true</code>) will return (before the specified timeout occurred).
- * 
+ *
  * @author B. Malinowsky
  */
 public class Discoverer
@@ -137,7 +154,7 @@ public class Discoverer
 	 * the HPAI structure is used by default.<br>
 	 * Setting the parameter for indicating use of NAT to <code>true</code> takes account
 	 * of such routers, leading to the desired behavior.
-	 * 
+	 *
 	 * @param localPort the port number used to bind a socket, a valid port is in the
 	 *        range of 1 to 65535, or use 0 to pick an arbitrary unused (ephemeral) port.
 	 *        Note that a specified valid port does not ensure a successful bind in
@@ -161,7 +178,7 @@ public class Discoverer
 	 * address is quite system dependent and might not always be useful in some
 	 * situations. So it can be overruled specifying a local host address using this
 	 * constructor.
-	 * 
+	 *
 	 * @param localHost local host address used for discovery/description responses, or
 	 *        <code>null</code> for the default local host
 	 * @param localPort the port number used to bind a socket, a valid port is in the
@@ -208,7 +225,7 @@ public class Discoverer
 	 * background.<br>
 	 * A search is finished if either the <code>timeout</code> was reached or the
 	 * background receiver stopped.<br>
-	 * 
+	 *
 	 * @param ni the {@link NetworkInterface} used for sending outgoing multicast
 	 *        messages, or <code>null</code> to use the default multicast interface
 	 * @param timeout time window in seconds during which search response messages will
@@ -237,7 +254,7 @@ public class Discoverer
 	 * running concurrently, this method allows to specify a dedicated
 	 * <code>localPort</code>, not using the port set with
 	 * {@link #Discoverer(int, boolean)}.
-	 * 
+	 *
 	 * @param localPort the port used to bind the socket, a valid port is 0 to 65535, if
 	 *        <code>localPort</code> is zero an arbitrary unused (ephemeral) port is
 	 *        picked
@@ -284,7 +301,7 @@ public class Discoverer
 	 * A search has finished if either the <code>timeout</code> was reached, all
 	 * background receivers stopped (all responses received) or {@link #stopSearch()} was
 	 * invoked.
-	 * 
+	 *
 	 * @param timeout time window in seconds during which search response messages will
 	 *        get collected, timeout >= 0. If timeout is 0, no timeout is set, the search
 	 *        has to be stopped with <code>stopSearch</code>.
@@ -365,7 +382,7 @@ public class Discoverer
 	/**
 	 * Returns <code>true</code> if a search is currently running.
 	 * <p>
-	 * 
+	 *
 	 * @return a <code>boolean</code> showing the search state
 	 */
 	public final boolean isSearching()
@@ -378,7 +395,7 @@ public class Discoverer
 	 * <p>
 	 * As long as searches are running, new responses might be added to the list of
 	 * responses.
-	 * 
+	 *
 	 * @return array of {@link SearchResponse}s
 	 * @see #stopSearch()
 	 */
@@ -400,7 +417,7 @@ public class Discoverer
 	 * Sends a description request to <code>server</code> and waits at most
 	 * <code>timeout</code> seconds for the answer message to arrive.
 	 * <p>
-	 * 
+	 *
 	 * @param server the socket address of the server the description is requested from
 	 * @param timeout time window in seconds to wait for answer message, 0 &lt; timeout
 	 *        &lt; ({@link Integer#MAX_VALUE} / 1000)
@@ -445,7 +462,7 @@ public class Discoverer
 	/**
 	 * Starts a search sending a search request message.
 	 * <p>
-	 * 
+	 *
 	 * @param localAddr local address to send search request from
 	 * @param localPort local port to send search request from
 	 * @param ni {@link NetworkInterface} used to send outgoing multicast, or
@@ -574,7 +591,7 @@ public class Discoverer
 		private DescriptionResponse res;
 		private KNXInvalidResponseException thrown;
 		private final String id;
-		
+
 		// use for search looper
 		// timeout in milliseconds
 		ReceiverLoop(final DatagramSocket socket, final int receiveBufferSize,

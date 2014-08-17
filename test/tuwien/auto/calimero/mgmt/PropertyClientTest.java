@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,6 +15,23 @@
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    Linking this library statically or dynamically with other modules is
+    making a combined work based on this library. Thus, the terms and
+    conditions of the GNU General Public License cover the whole
+    combination.
+
+    As a special exception, the copyright holders of this library give you
+    permission to link this library with independent modules to produce an
+    executable, regardless of the license terms of these independent
+    modules, and to copy and distribute the resulting executable under terms
+    of your choice, provided that you also meet, for each linked independent
+    module, the terms and conditions of the license of that module. An
+    independent module is a module which is not derived from or based on
+    this library. If you modify this library, you may extend this exception
+    to your version of the library, but you are not obligated to do so. If
+    you do not wish to do so, delete this exception statement from your
+    version.
 */
 
 package tuwien.auto.calimero.mgmt;
@@ -85,8 +102,7 @@ public class PropertyClientTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		remote = Util.getRouterAddress();
-//		Util.getLogWriter().setLogLevel(LogLevel.INFO);
+		remote = Util.getKnxDeviceCO();
 		try {
 			LogManager.getManager().addWriter(null, Util.getLogWriter());
 
@@ -97,6 +113,9 @@ public class PropertyClientTest extends TestCase
 			ll = new PropertyListenerImpl();
 			localAdpt = new LocalDeviceMgmtAdapter(null, Util.getServer(), false, ll, true);
 			local = new PropertyClient(localAdpt);
+
+			rem.addDefinitions(PropertyClient.loadDefinitions(PIDResource, null));
+			local.addDefinitions(PropertyClient.loadDefinitions(PIDResource, null));
 		}
 		catch (final KNXException e) {
 			tearDown();
@@ -123,7 +142,7 @@ public class PropertyClientTest extends TestCase
 
 	/**
 	 * Test method for property adapter.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -156,8 +175,7 @@ public class PropertyClientTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#getObjectTypeName(int)}.
+	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#getObjectTypeName(int)}.
 	 */
 	public final void testGetObjectTypeName()
 	{
@@ -172,10 +190,9 @@ public class PropertyClientTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#loadDefinitions(String,
+	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#loadDefinitions(String,
 	 * tuwien.auto.calimero.mgmt.PropertyClient.ResourceHandler)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testLoadDefinitions() throws KNXException
@@ -184,10 +201,9 @@ public class PropertyClientTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#saveDefinitions(String,
+	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#saveDefinitions(String,
 	 * Collection, tuwien.auto.calimero.mgmt.PropertyClient.ResourceHandler)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testSaveDefinitions() throws KNXException
@@ -200,7 +216,7 @@ public class PropertyClientTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#close()}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -222,9 +238,8 @@ public class PropertyClientTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#getDescription(int, int)}.
-	 * 
+	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#getDescription(int, int)}.
+	 *
 	 * @throws KNXException
 	 */
 	public final void testLocalGetDescription() throws KNXException
@@ -233,9 +248,8 @@ public class PropertyClientTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#getDescription(int, int)}.
-	 * 
+	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#getDescription(int, int)}.
+	 *
 	 * @throws KNXException
 	 */
 	public final void testRemoteGetDescription() throws KNXException
@@ -246,31 +260,32 @@ public class PropertyClientTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#getDescriptionByIndex(int, int)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testGetDescriptionByIndex() throws KNXException
 	{
 		Description d, d2;
-		printDesc(d = rem.getDescriptionByIndex(0, 6));
-		printDesc(d2 = local.getDescriptionByIndex(0, 6));
+		printDesc(d = rem.getDescriptionByIndex(0, 1));
+		printDesc(d2 = local.getDescriptionByIndex(0, 1));
 
 		assertEquals(d.getObjectType(), d2.getObjectType());
 		assertEquals(d.getObjectIndex(), d2.getObjectIndex());
-		assertEquals(d.getPID(), d2.getPID());
+		//assertEquals(d.getPID(), d2.getPID());
 		assertEquals(d.getPropIndex(), d2.getPropIndex());
+
+		// we use two different devices for d and d2, the following asserts might not hold
 		assertEquals(-1, d2.getPDT());
 		assertEquals(d.getCurrentElements(), d2.getCurrentElements());
-		assertEquals(0, d2.getMaxElements());
+		//assertEquals(0, d2.getMaxElements());
 		assertEquals(0, d2.getReadLevel());
 		assertEquals(0, d2.getWriteLevel());
-		assertEquals(d.isWriteEnabled(), d2.isWriteEnabled());
+		//assertEquals(d.isWriteEnabled(), d2.isWriteEnabled());
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#getProperty(int, int)}.
-	 * 
+	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#getProperty(int, int)}.
+	 *
 	 * @throws KNXException
 	 */
 	public final void testGetPropertyIntInt() throws KNXException
@@ -288,7 +303,7 @@ public class PropertyClientTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#getProperty(int, int, int, int)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testGetPropertyIntIntIntInt() throws KNXException
@@ -298,26 +313,25 @@ public class PropertyClientTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#getPropertyTranslated
+	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#getPropertyTranslated
 	 * (int, int, int, int)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testGetPropertyTranslated() throws KNXException
 	{
-		final DPTXlator2ByteUnsigned t = (DPTXlator2ByteUnsigned) rem
-			.getPropertyTranslated(0, 56, 1, 1);
+		final DPTXlator2ByteUnsigned t = (DPTXlator2ByteUnsigned) rem.getPropertyTranslated(0, 56,
+				1, 1);
 		assertEquals(15, t.getValueUnsigned());
-		final DPTXlator2ByteUnsigned t2 = (DPTXlator2ByteUnsigned) local
-			.getPropertyTranslated(0, 56, 1, 1);
+		final DPTXlator2ByteUnsigned t2 = (DPTXlator2ByteUnsigned) local.getPropertyTranslated(0,
+				56, 1, 1);
 		assertEquals(15, t2.getValueUnsigned());
 	}
 
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#scanProperties(boolean)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testScanPropertiesBoolean() throws KNXException
@@ -339,7 +353,7 @@ public class PropertyClientTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#scanProperties(int, boolean)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testScanPropertiesIntBoolean() throws KNXException
@@ -360,9 +374,8 @@ public class PropertyClientTest extends TestCase
 
 	/**
 	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#setProperty
-	 * (int, int, int, int, byte[])}.
-	 * 
+	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#setProperty(int, int, int, int, byte[])}.
+	 *
 	 * @throws KNXException
 	 */
 	public final void testSetPropertyIntIntIntIntByteArray() throws KNXException
@@ -379,9 +392,8 @@ public class PropertyClientTest extends TestCase
 
 	/**
 	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#setProperty
-	 * (int, int, int, java.lang.String)}.
-	 * 
+	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#setProperty(int, int, int, java.lang.String)}.
+	 *
 	 * @throws KNXException
 	 */
 	public final void testSetPropertyIntIntIntString() throws KNXException

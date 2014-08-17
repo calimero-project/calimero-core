@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,6 +15,23 @@
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    Linking this library statically or dynamically with other modules is
+    making a combined work based on this library. Thus, the terms and
+    conditions of the GNU General Public License cover the whole
+    combination.
+
+    As a special exception, the copyright holders of this library give you
+    permission to link this library with independent modules to produce an
+    executable, regardless of the license terms of these independent
+    modules, and to copy and distribute the resulting executable under terms
+    of your choice, provided that you also meet, for each linked independent
+    module, the terms and conditions of the license of that module. An
+    independent module is a module which is not derived from or based on
+    this library. If you modify this library, you may extend this exception
+    to your version of the library, but you are not obligated to do so. If
+    you do not wish to do so, delete this exception statement from your
+    version.
 */
 
 package tuwien.auto.calimero.mgmt;
@@ -36,7 +53,7 @@ import tuwien.auto.calimero.link.KNXLinkClosedException;
  * {@link ManagementClient} instance.<br>
  * After a destination got destroyed, it can't be used for communication to that
  * destination anymore, i.e., it's not possible to change the connection state.
- * 
+ *
  * @author B. Malinowsky
  * @see TransportLayer
  * @see ManagementClient
@@ -51,7 +68,7 @@ public class Destination
 	 * destination state and obtain internal connection settings.
 	 * <p>
 	 * By default, a proxy is created by a transport layer implementation.
-	 * 
+	 *
 	 * @author B. Malinowsky
 	 */
 	public static final class AggregatorProxy implements Runnable
@@ -62,7 +79,7 @@ public class Destination
 		/**
 		 * Creates a new aggregator proxy.
 		 * <p>
-		 * 
+		 *
 		 * @param aggregator the transport layer serving the destination associated with
 		 *        this proxy and handles necessary transport layer communication
 		 */
@@ -74,7 +91,7 @@ public class Destination
 		/**
 		 * Returns the destination associated with this proxy.
 		 * <p>
-		 * 
+		 *
 		 * @return the Destination
 		 */
 		public Destination getDestination()
@@ -85,7 +102,7 @@ public class Destination
 		/**
 		 * Returns the receive sequence number of the connection.
 		 * <p>
-		 * 
+		 *
 		 * @return sequence number, 0 &lt;= number &lt;= 15
 		 */
 		public synchronized int getSeqReceive()
@@ -107,7 +124,7 @@ public class Destination
 		/**
 		 * Returns the send sequence number of the connection.
 		 * <p>
-		 * 
+		 *
 		 * @return sequence number, 0 &lt;= number &lt;= 15
 		 */
 		public synchronized int getSeqSend()
@@ -130,7 +147,7 @@ public class Destination
 		 * Restarts the connection timeout used for the destination connection.
 		 * <p>
 		 * This method is only used in connection oriented communication mode.
-		 * 
+		 *
 		 * @throws KNXIllegalStateException if invoked on not connection oriented mode
 		 */
 		public void restartTimeout()
@@ -145,25 +162,29 @@ public class Destination
 		 * or deactivated according the state transition.<br>
 		 * If the state of destination is {@link Destination#DESTROYED}, setting of a new
 		 * state is ignored.
-		 * 
+		 *
 		 * @param newState new destination state
 		 */
 		public void setState(final int newState)
 		{
 			d.setState(newState, this);
 		}
-		
+
 		void setDestination(final Destination dst)
 		{
 			d = dst;
 		}
-		
+
 		/**
 		 * The proxy acts as notifiable to the disconnect timer. If notified, the
 		 * connection timed out, and it will ensure the destination gets disconnected.
 		 */
 		public void run()
 		{
+			// with keep-alive we do not disconnect on timeout
+			if (d.alive)
+				return;
+
 			final int state = d.getState();
 			if (state != DISCONNECTED && state != DESTROYED)
 				try {
@@ -175,14 +196,14 @@ public class Destination
 
 	// idle timeout for a connection in milliseconds
 	private static final int TIMEOUT = 6000;
-	
+
 	// a disconnect timer for all active destination objects
 	private static TimerQueue disconnectTimer = new TimerQueue();
 
 	/**
 	 * Destination is destroyed.
 	 * <p>
-	 * 
+	 *
 	 * @see Destination#getState
 	 */
 	public static final int DESTROYED = 0;
@@ -190,7 +211,7 @@ public class Destination
 	/**
 	 * Connection state is disconnected.
 	 * <p>
-	 * 
+	 *
 	 * @see Destination#getState
 	 */
 	public static final int DISCONNECTED = 1;
@@ -198,7 +219,7 @@ public class Destination
 	/**
 	 * Connection state is connecting.
 	 * <p>
-	 * 
+	 *
 	 * @see Destination#getState
 	 */
 	public static final int CONNECTING = 2;
@@ -206,7 +227,7 @@ public class Destination
 	/**
 	 * Connection state is open and communication is in idle state.
 	 * <p>
-	 * 
+	 *
 	 * @see Destination#getState
 	 */
 	public static final int OPEN_IDLE = 3;
@@ -215,18 +236,18 @@ public class Destination
 	 * Connection state is open and communication is in waiting state for Layer 4
 	 * acknowledgment.
 	 * <p>
-	 * 
+	 *
 	 * @see Destination#getState
 	 */
 	public static final int OPEN_WAIT = 4;
 
-	
+
 	static final int USER_REQUEST = 0;
 	static final int REMOTE_ENDPOINT = 1;
 	static final int LOCAL_ENDPOINT = 2;
-	
+
 	volatile int disconnectedBy = -1;
-	
+
 	private final TransportLayer tl;
 	private final IndividualAddress addr;
 	private volatile int state = DISCONNECTED;
@@ -242,7 +263,7 @@ public class Destination
 	 * Creates a new destination.
 	 * <p>
 	 * Verify mode defaults to false and keep alive is not used.
-	 * 
+	 *
 	 * @param aggregator aggregator proxy to associate with this destination
 	 * @param remote KNX remote address specifying the connection destination
 	 * @param connectionOriented <code>true</code> for connection oriented mode,
@@ -265,7 +286,7 @@ public class Destination
 	 * The verify mode refers to the verify mode control in application layer services and
 	 * specifies whether the specified destination to communicate with supports verified
 	 * writing of data.
-	 * 
+	 *
 	 * @param aggregator aggregator proxy to associate with this destination
 	 * @param remote KNX remote address specifying the connection destination
 	 * @param connectionOriented <code>true</code> for connection oriented mode,
@@ -289,7 +310,7 @@ public class Destination
 
 	/**
 	 * Returns the destination address.
-	 * 
+	 *
 	 * @return the destination individual address
 	 */
 	public IndividualAddress getAddress()
@@ -301,7 +322,7 @@ public class Destination
 	 * Returns the state of this destination.
 	 * <p>
 	 * The returned value is one of the destination state constants.
-	 * 
+	 *
 	 * @return destination state
 	 */
 	public final int getState()
@@ -312,7 +333,7 @@ public class Destination
 	/**
 	 * Returns whether this destination uses connection oriented mode or connectionless
 	 * mode.
-	 * 
+	 *
 	 * @return <code>true</code> for connection oriented mode, <code>false</code>
 	 *         otherwise
 	 */
@@ -324,7 +345,7 @@ public class Destination
 	/**
 	 * Returns whether keep alive of connection is specified.
 	 * <p>
-	 * 
+	 *
 	 * @return <code>true</code> if keep alive is specified and connection oriented mode
 	 *         is used, <code>false</code> otherwise
 	 */
@@ -336,7 +357,7 @@ public class Destination
 	/**
 	 * Returns whether verify mode is supported by the destination.
 	 * <p>
-	 * 
+	 *
 	 * @return <code>true</code> for verify mode enabled, <code>false</code> otherwise
 	 */
 	public final boolean isVerifyMode()
@@ -372,19 +393,22 @@ public class Destination
 	 */
 	public String toString()
 	{
-		final String s = "destination " + addr + " (" + tl.getName() + ") "
-			+ getStateString();
+		String s = "destination " + addr + " (" + tl.getName() + ") ";
 		if (state == DESTROYED)
-			return s;
-		return s + (co ? "" : " not") + " conn.oriented, " + (alive ? "" : "no")
-			+ " keep alive, " + (verify ? "" : "no") + " verify mode";
+			return s + getStateString();
+		// keep-alive and detailed state only apply in CO mode
+		if (co)
+			s = s + "conn-oriented, " + getStateString() + (alive ? " " : " no") + " keep-alive, ";
+		else
+			s = s + "connectionless, ";
+		return s + (verify ? "" : "no") + " verify mode";
 	}
 
 	int getDisconnectedBy()
 	{
 		return disconnectedBy;
 	}
-	
+
 	private String getStateString()
 	{
 		switch (state) {
@@ -416,8 +440,12 @@ public class Destination
 			restartTimer(notify);
 		else if (state == OPEN_WAIT)
 			restartTimer(notify);
-		else if (state == DISCONNECTED)
+		else if (state == DISCONNECTED) {
 			disconnectTimer.cancel(notify);
+			// required for server-side, otherwise server would expect old sequence and return NAK
+			seqSend = 0;
+			seqRcv = 0;
+		}
 		else if (state == DESTROYED)
 			disconnectTimer.cancel(notify);
 	}

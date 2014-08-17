@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,6 +15,23 @@
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    Linking this library statically or dynamically with other modules is
+    making a combined work based on this library. Thus, the terms and
+    conditions of the GNU General Public License cover the whole
+    combination.
+
+    As a special exception, the copyright holders of this library give you
+    permission to link this library with independent modules to produce an
+    executable, regardless of the license terms of these independent
+    modules, and to copy and distribute the resulting executable under terms
+    of your choice, provided that you also meet, for each linked independent
+    module, the terms and conditions of the license of that module. An
+    independent module is a module which is not derived from or based on
+    this library. If you modify this library, you may extend this exception
+    to your version of the library, but you are not obligated to do so. If
+    you do not wish to do so, delete this exception statement from your
+    version.
 */
 
 package tuwien.auto.calimero;
@@ -27,7 +44,7 @@ import tuwien.auto.calimero.log.LogService;
  * Creates, extracts and decodes information of protocol data units.
  * <p>
  * The methods focus on transport layer and application layer data units.
- * 
+ *
  * @author B. Malinowsky
  */
 public final class DataUnitBuilder
@@ -50,7 +67,7 @@ public final class DataUnitBuilder
 	/**
 	 * Returns the application layer service of a given protocol data unit.
 	 * <p>
-	 * 
+	 *
 	 * @param apdu application layer protocol data unit, requires <code>apdu.length</code>
 	 *        > 1
 	 * @return APDU service code
@@ -58,8 +75,8 @@ public final class DataUnitBuilder
 	public static int getAPDUService(final byte[] apdu)
 	{
 		if (apdu.length < 2)
-			throw new KNXIllegalArgumentException("getting APDU service from [0x"
-				+ toHex(apdu, "") + "], APCI length < 2");
+			throw new KNXIllegalArgumentException("getting APDU service from [0x" + toHex(apdu, "")
+					+ "], APCI length < 2");
 		// high 4 bits of APCI
 		final int apci4 = (apdu[0] & 0x03) << 2 | (apdu[1] & 0xC0) >> 6;
 		// lowest 6 bits of APCI
@@ -101,7 +118,7 @@ public final class DataUnitBuilder
 	/**
 	 * Returns the transport layer service of a given protocol data unit.
 	 * <p>
-	 * 
+	 *
 	 * @param tpdu transport layer protocol data unit
 	 * @return TPDU service code
 	 */
@@ -133,7 +150,7 @@ public final class DataUnitBuilder
 	 * <p>
 	 * The transport layer bits in the first byte (TL / AL control field) are set 0. For
 	 * creating a compact APDU, refer to {@link #createCompactAPDU(int, byte[])}.
-	 * 
+	 *
 	 * @param service application layer service code
 	 * @param asdu application layer service data unit, <code>asdu.length</code> &lt;
 	 *        255
@@ -142,8 +159,7 @@ public final class DataUnitBuilder
 	public static byte[] createAPDU(final int service, final byte[] asdu)
 	{
 		if (asdu.length > 254)
-			throw new KNXIllegalArgumentException(
-				"ASDU length exceeds maximum of 254 bytes");
+			throw new KNXIllegalArgumentException("ASDU length exceeds maximum of 254 bytes");
 		final byte[] apdu = new byte[2 + asdu.length];
 		apdu[0] = (byte) ((service >> 8) & 0x03);
 		apdu[1] |= (byte) service;
@@ -159,7 +175,7 @@ public final class DataUnitBuilder
 	 * The transport layer bits in the first byte (TL / AL control field) are set 0. If
 	 * the compact APDU shall not contain any ASDU information, <code>asdu</code> can be
 	 * left <code>null</code>.
-	 * 
+	 *
 	 * @param service application layer service code
 	 * @param asdu application layer service data unit, <code>asdu.length</code> &lt;
 	 *        255; or <code>null</code> for no ASDU
@@ -170,8 +186,7 @@ public final class DataUnitBuilder
 		final byte[] apdu =
 			new byte[(asdu != null && asdu.length > 0) ? 1 + asdu.length : 2];
 		if (apdu.length > 255)
-			throw new KNXIllegalArgumentException(
-				"APDU length exceeds maximum of 255 bytes");
+			throw new KNXIllegalArgumentException("APDU length exceeds maximum of 255 bytes");
 		apdu[0] = (byte) ((service >> 8) & 0x03);
 		apdu[1] = (byte) service;
 		if (asdu != null && asdu.length > 0) {
@@ -188,7 +203,7 @@ public final class DataUnitBuilder
 	 * <p>
 	 * The application layer service data unit (ASDU) is the APDU with the application
 	 * layer service code removed.
-	 * 
+	 *
 	 * @param apdu application layer protocol data unit for which to get the ASDU
 	 * @return the ASDU as byte array
 	 */
@@ -228,13 +243,27 @@ public final class DataUnitBuilder
 			// we mask the descriptor type
 			mask = 0x3f;
 		}
+		// 0x100 A_IndividualAddress_Read-PDU
+		// 0x140 A_IndividualAddress_Response-PDU
+		else if (svc == 0x100 || svc == 0x140) {
+			offset = 1;
+			// we mask the lower 6 bits that need to be 0
+			mask = 0x3f;
+		}
+		// 0x380 A_Restart-PDU
+		else if (svc == 0x380) {
+			offset = 1;
+			// we mask the response bit and restart type bit
+			mask = 0x3f;
+		}
 		final byte[] asdu = new byte[apdu.length - offset];
 		for (int i = 0; i < asdu.length; ++i)
 			asdu[i] = apdu[offset + i];
+
 		asdu[0] &= mask;
 		return asdu;
 	}
-	
+
 	/**
 	 * Decodes a protocol data unit into a textual representation.
 	 * <p>
@@ -243,7 +272,7 @@ public final class DataUnitBuilder
 	 * extended in the future.<br>
 	 * The optional KNX destination address helps to determine the exact transport layer
 	 * service.
-	 * 
+	 *
 	 * @param tpdu transport layer protocol data unit to decode
 	 * @param dst KNX destination address belonging to the TPDU, might be
 	 *        <code>null</code>
@@ -263,7 +292,7 @@ public final class DataUnitBuilder
 	 * Decodes a transport layer protocol control information into a textual
 	 * representation.
 	 * <p>
-	 * 
+	 *
 	 * @param tpci transport layer protocol control information
 	 * @param dst KNX destination address belonging to the tpci, might be
 	 *        <code>null</code>
@@ -298,7 +327,7 @@ public final class DataUnitBuilder
 	 * Decodes an application layer protocol control information into a textual
 	 * representation.
 	 * <p>
-	 * 
+	 *
 	 * @param apci application layer protocol control information
 	 * @return textual representation of APCI
 	 */
@@ -369,13 +398,13 @@ public final class DataUnitBuilder
 			return "unknown APCI";
 		}
 	}
-	
+
 	/**
 	 * Returns the content of <code>data</code> as unsigned bytes in hexadecimal string
 	 * representation.
 	 * <p>
 	 * This method does not add hexadecimal prefixes (like 0x).
-	 * 
+	 *
 	 * @param data data array to format
 	 * @param sep separator to insert between 2 formatted data bytes, <code>null</code>
 	 *        or "" for no gap between byte tokens
@@ -394,12 +423,12 @@ public final class DataUnitBuilder
 		}
 		return sb.toString();
 	}
-	
+
 	/**
 	 * Returns a new byte array of { data[from], data[from + 1], .. , data[min(to,
 	 * data.length) - 1] }.
 	 * <p>
-	 * 
+	 *
 	 * @param data source data array
 	 * @param from start of range index
 	 * @param to end of range index, exclusive

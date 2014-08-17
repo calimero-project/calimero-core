@@ -6,15 +6,15 @@
         <updatingAddresses></updatingAddresses>
         <invalidatingAddresses></invalidatingAddresses>
     </datapoint>
+    <datapoint stateBased="false" name="test2" mainNumber="0" dptID="" priority="low">
+        <!-- 2/2/2 -->
+        <knxAddress type="group">4610</knxAddress>
+    </datapoint>
     <datapoint stateBased="true" name="test3" mainNumber="0" dptID="" priority="low">
         <!-- 3/3/3 -->
         <knxAddress type="group">6915</knxAddress>
         <expiration timeout="0" />
         <updatingAddresses></updatingAddresses>
         <invalidatingAddresses></invalidatingAddresses>
-    </datapoint>
-    <datapoint stateBased="false" name="test2" mainNumber="0" dptID="" priority="low">
-        <!-- 2/2/2 -->
-        <knxAddress type="group">4610</knxAddress>
     </datapoint>
 </datapoints>

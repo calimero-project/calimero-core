@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,6 +15,23 @@
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    Linking this library statically or dynamically with other modules is
+    making a combined work based on this library. Thus, the terms and
+    conditions of the GNU General Public License cover the whole
+    combination.
+
+    As a special exception, the copyright holders of this library give you
+    permission to link this library with independent modules to produce an
+    executable, regardless of the license terms of these independent
+    modules, and to copy and distribute the resulting executable under terms
+    of your choice, provided that you also meet, for each linked independent
+    module, the terms and conditions of the license of that module. An
+    independent module is a module which is not derived from or based on
+    this library. If you modify this library, you may extend this exception
+    to your version of the library, but you are not obligated to do so. If
+    you do not wish to do so, delete this exception statement from your
+    version.
 */
 
 package tuwien.auto.calimero.dptxlator;
@@ -34,7 +51,7 @@ import tuwien.auto.calimero.log.LogManager;
 /**
  * Test for DPTXlatorDate.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public class DPTXlatorDateTest extends TestCase
@@ -63,6 +80,8 @@ public class DPTXlatorDateTest extends TestCase
 		super.setUp();
 		LogManager.getManager().addWriter("DPTXlator", Util.getLogWriter());
 		t = new DPTXlatorDate(dpt);
+		// reset to default to not interfere with tests
+		DPTXlatorDate.useValueFormat(null);
 	}
 
 	/* (non-Javadoc)
@@ -77,7 +96,7 @@ public class DPTXlatorDateTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDate#setValues(java.lang.String[])}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValues() throws KNXFormatException
@@ -91,7 +110,7 @@ public class DPTXlatorDateTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorDate#getAllValues()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testGetAllValues() throws KNXFormatException
@@ -111,7 +130,7 @@ public class DPTXlatorDateTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDate#setValue(java.lang.String)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValueString() throws KNXFormatException
@@ -195,7 +214,7 @@ public class DPTXlatorDateTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorDate#useValueFormat
 	 * (java.lang.String)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testUseValueFormat() throws KNXFormatException
@@ -294,7 +313,7 @@ public class DPTXlatorDateTest extends TestCase
 		c.clear(Calendar.SECOND);
 		c.clear(Calendar.MILLISECOND);
 		assertEquals(c.getTimeInMillis(), t.getValueMilliseconds());
-		
+
 		t.setValue(2007, 2, 30);
 		try {
 			t.getValueMilliseconds();
