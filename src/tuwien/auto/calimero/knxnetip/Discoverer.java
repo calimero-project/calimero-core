@@ -138,7 +138,7 @@ public class Discoverer
 			a = InetAddress.getByName(SEARCH_MULTICAST);
 		}
 		catch (final UnknownHostException e) {
-			logger.fatal("on resolving system setup multicast " + SEARCH_MULTICAST, e);
+			logger.error("on resolving system setup multicast " + SEARCH_MULTICAST, e);
 		}
 		SYSTEM_SETUP_MULTICAST = a;
 	}
