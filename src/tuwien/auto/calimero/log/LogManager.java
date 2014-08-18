@@ -125,6 +125,22 @@ public final class LogManager
 	}
 
 	/**
+	 * Queries for a slf4j logger with the specified <code>name</code>.
+	 * <p>
+	 * If the logger with that name already exists in the manager, it will be
+	 * returned, otherwise a new logger with that name will be created and added to
+	 * the log services listed in the manager.
+	 *
+	 * @param name name of logger, the empty string is not allowed
+	 * @return the Logger object
+	 * @deprecated Used for transition to slf4j
+	 */
+	public Logger getSlf4jLogger(final String name)
+	{
+		return getLogService(name).slf4j();
+	}
+
+	/**
 	 * Removes a log service from the manager.
 	 * <p>
 	 * If no log service with the specified name is found, no action is performed.
