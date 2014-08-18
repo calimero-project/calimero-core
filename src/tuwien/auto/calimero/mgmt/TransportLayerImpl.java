@@ -42,6 +42,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DetachEvent;
 import tuwien.auto.calimero.FrameEvent;
@@ -60,7 +62,6 @@ import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.NetworkLinkListener;
 import tuwien.auto.calimero.log.LogLevel;
 import tuwien.auto.calimero.log.LogManager;
-import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.mgmt.Destination.AggregatorProxy;
 
 /**
@@ -75,7 +76,7 @@ import tuwien.auto.calimero.mgmt.Destination.AggregatorProxy;
  * <br>
  * All methods invoked after a detach of the network link used for communication are
  * allowed to throw {@link KNXIllegalStateException}.
- * 
+ *
  * @author B. Malinowsky
  */
 public class TransportLayerImpl implements TransportLayer
@@ -152,11 +153,11 @@ public class TransportLayerImpl implements TransportLayer
 	private final Destination unknownPartner = new Destination(new AggregatorProxy(this),
 		new IndividualAddress(0), true);
 
-	private final LogService logger;
+	private final Logger logger;
 
 	// are we representing server side of this transport layer connection
 	private final boolean serverSide;
-	
+
 	private volatile boolean detached;
 	private final KNXNetworkLink lnk;
 	private final NetworkLinkListener lnkListener = new NLListener();
@@ -167,7 +168,7 @@ public class TransportLayerImpl implements TransportLayer
 	private final Map proxies = new HashMap();
 	private final Map incomingProxies = new HashMap();
 	private AggregatorProxy active;
-	
+
 	private volatile int repeated;
 	private final Object lock = new Object();
 
@@ -175,7 +176,7 @@ public class TransportLayerImpl implements TransportLayer
 	 * Creates a new client-side transport layer end-point attached to the supplied KNX network
 	 * link.
 	 * <p>
-	 * 
+	 *
 	 * @param link network link used for communication with a KNX network
 	 * @throws KNXLinkClosedException if the network link is closed
 	 */
@@ -187,7 +188,7 @@ public class TransportLayerImpl implements TransportLayer
 	/**
 	 * Creates a new transport layer end-point attached to the supplied KNX network link.
 	 * <p>
-	 * 
+	 *
 	 * @param link network link used for communication with a KNX network
 	 * @param serverEndpoint does this instance represent the client-side (<code>false</code>),
 	 *        or server-side (<code>true</code>) end-point
@@ -200,11 +201,11 @@ public class TransportLayerImpl implements TransportLayer
 			throw new KNXLinkClosedException();
 		lnk = link;
 		lnk.addLinkListener(lnkListener);
-		logger = LogManager.getManager().getLogService(getName());
+		logger = LogManager.getManager().getSlf4jLogger(getName());
 		listeners = new EventListeners(logger);
 		serverSide = serverEndpoint;
 	}
-	
+
 	/**
 	 * {@inheritDoc} Only one destination can be created per remote address. If a
 	 * destination with the supplied remote address already exists for this transport
@@ -237,7 +238,7 @@ public class TransportLayerImpl implements TransportLayer
 			final Destination d = new Destination(p, remote, connectionOriented, keepAlive,
 					verifyMode);
 			proxies.put(remote, p);
-			if (logger.isLoggable(LogLevel.TRACE))
+			if (logger.isTraceEnabled())
 				logger.trace("destination " + remote + " ready for use");
 			return d;
 		}
@@ -246,7 +247,7 @@ public class TransportLayerImpl implements TransportLayer
 	/**
 	 * Returns the destination object for the remote individual address, if such exists.
 	 * <p>
-	 * 
+	 *
 	 * @param remote the remote address to look up
 	 * @return the destination for that address, or <code>null</code> if no destination
 	 *         is currently maintained by the transport layer
@@ -256,7 +257,7 @@ public class TransportLayerImpl implements TransportLayer
 		final AggregatorProxy proxy = (AggregatorProxy) proxies.get(remote);
 		return proxy != null ? proxy.getDestination() : null;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.TransportLayer#destroyDestination
 	 * (tuwien.auto.calimero.mgmt.Destination)
@@ -312,7 +313,7 @@ public class TransportLayerImpl implements TransportLayer
 		final byte[] tpdu = new byte[] { (byte) CONNECT };
 		lnk.sendRequestWait(d.getAddress(), Priority.SYSTEM, tpdu);
 		p.setState(Destination.OPEN_IDLE);
-		if (logger.isLoggable(LogLevel.TRACE))
+		if (logger.isTraceEnabled())
 			logger.trace("connected with " + d.getAddress());
 	}
 
@@ -351,7 +352,7 @@ public class TransportLayerImpl implements TransportLayer
 					active = ap;
 					for (repeated = 0; repeated < MAX_REPEAT + 1; ++repeated) {
 						try {
-							if (logger.isLoggable(LogLevel.TRACE))
+							if (logger.isTraceEnabled())
 								logger.trace("sending data connected to " + d.getAddress()
 										+ ", attempt " + (repeated + 1));
 							// set state and timer
@@ -460,7 +461,7 @@ public class TransportLayerImpl implements TransportLayer
 					d.destroy();
 					proxy = null;
 				}
-				
+
 				// allow incoming connect requests (server)
 				if (proxy == null) {
 					proxy = new AggregatorProxy(this);
@@ -486,7 +487,7 @@ public class TransportLayerImpl implements TransportLayer
 		}
 		else if ((ctrl & 0xC0) == DATA_CONNECTED) {
 			if (d.getState() == Destination.DISCONNECTED || !sender.equals(d.getAddress())) {
-				if (logger.isLoggable(LogLevel.TRACE))
+				if (logger.isTraceEnabled())
 					logger.trace("send disconnect to " + sender);
 				sendDisconnect(sender);
 			} else {
@@ -510,7 +511,7 @@ public class TransportLayerImpl implements TransportLayer
 			else if (d.getState() == Destination.OPEN_WAIT && seq == p.getSeqSend()) {
 				p.incSeqSend();
 				p.setState(Destination.OPEN_IDLE);
-				if (logger.isLoggable(LogLevel.TRACE))
+				if (logger.isTraceEnabled())
 					logger.trace("positive ack by " + d.getAddress());
 			}
 			else
@@ -586,7 +587,7 @@ public class TransportLayerImpl implements TransportLayer
 		}
 		finally {
 			fireDisconnected(p.getDestination());
-			if (logger.isLoggable(LogLevel.TRACE))
+			if (logger.isTraceEnabled())
 				logger.trace("disconnected from " + p.getDestination().getAddress());
 		}
 	}

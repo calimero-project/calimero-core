@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import tuwien.auto.calimero.log.LogService;
+import org.slf4j.Logger;
 
 /**
  * Adapter for serial communication using a Calimero library platform dependent library API.
@@ -48,7 +48,7 @@ import tuwien.auto.calimero.log.LogService;
  * The implementation of this API contains platform dependent code. It is used as a
  * fallback to enable serial communication on a RS-232 port in case the runtime default
  * access mechanism are not available or there is no protocol support.
- * 
+ *
  * @author B. Malinowsky
  */
 class SerialComAdapter extends LibraryAdapter
@@ -166,7 +166,7 @@ class SerialComAdapter extends LibraryAdapter
 		loaded = b;
 	}
 
-	SerialComAdapter(final LogService logger, final String portId) throws IOException
+	SerialComAdapter(final Logger logger, final String portId) throws IOException
 	{
 		super(logger);
 		if (portId == null)
@@ -181,7 +181,7 @@ class SerialComAdapter extends LibraryAdapter
 	 * Returns whether the platform dependent serial communication library is available or
 	 * not.
 	 * <p>
-	 * 
+	 *
 	 * @return <code>true</code> if library was loaded and is available,
 	 *         <code>false</code> if SerialComAdapter functionality can not be used
 	 */

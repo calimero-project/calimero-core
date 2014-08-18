@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2011 B. Malinowsky
+    Copyright (c) 2010, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,18 +40,19 @@ import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.internal.UdpSocketLooper;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.log.LogLevel;
-import tuwien.auto.calimero.log.LogService;
 
 final class ReceiverLoop extends UdpSocketLooper implements Runnable
 {
 	private final ConnectionBase conn;
-	private final LogService logger;
-	
+	private final Logger logger;
+
 	// precondition: an initialized logger instance in ConnectionBase
 	ReceiverLoop(final ConnectionBase connection, final DatagramSocket socket,
 		final int receiveBufferSize)

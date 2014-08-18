@@ -44,6 +44,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.DetachEvent;
@@ -57,7 +59,6 @@ import tuwien.auto.calimero.exception.KNXTimeoutException;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.log.LogManager;
-import tuwien.auto.calimero.log.LogService;
 
 /**
  * An implementation of {@link ManagementProcedures}.
@@ -86,7 +87,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	private final boolean detachMgmtClient;
 	private final TransportLayer tl;
 
-	private final LogService logger = LogManager.getManager().getLogService("MgmtProc");
+	private final Logger logger = LogManager.getManager().getSlf4jLogger("MgmtProc");
 
 	private static final class TLListener implements TransportListener
 	{

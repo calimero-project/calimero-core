@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,6 +42,8 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.GroupAddress;
@@ -62,9 +64,7 @@ import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.link.medium.PLSettings;
 import tuwien.auto.calimero.link.medium.RFSettings;
 import tuwien.auto.calimero.link.medium.TPSettings;
-import tuwien.auto.calimero.log.LogLevel;
 import tuwien.auto.calimero.log.LogManager;
-import tuwien.auto.calimero.log.LogService;
 
 /**
  * Implementation of the KNX network link based on the KNXnet/IP protocol, using a
@@ -87,7 +87,7 @@ import tuwien.auto.calimero.log.LogService;
  * KNXnet/IP server of the remote endpoint supports it. Otherwise, connection timeouts
  * will occur. With NAT enabled, KNXnet/IP accepts IPv6 addresses. By default, the
  * KNXnet/IP protocol only works with IPv4 addresses.<br>
- * 
+ *
  * @author B. Malinowsky
  */
 public class KNXNetworkLinkIP implements KNXNetworkLink
@@ -106,7 +106,7 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 
 	private static final class LinkNotifier extends EventNotifier
 	{
-		LinkNotifier(final Object source, final LogService logger)
+		LinkNotifier(final Object source, final Logger logger)
 		{
 			super(source, logger);
 		}
@@ -143,7 +143,7 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 	private KNXMediumSettings medium;
 
 	private final String name;
-	private final LogService logger;
+	private final Logger logger;
 	// our link connection event notifier
 	private final EventNotifier notifier;
 
@@ -153,7 +153,7 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 	 * <p>
 	 * For more details on KNXnet/IP connections, refer to the various KNXnet/IP
 	 * implementations.<br>
-	 * 
+	 *
 	 * @param serviceMode mode of communication to open, <code>serviceMode</code> is one
 	 *        of the service mode constants (e.g. {@link #TUNNELING}); depending on the mode
 	 *        set, the expected local/remote endpoints might differ
@@ -216,8 +216,8 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 		// do our own IP:port string, since InetAddress.toString() always prepends a '/'
 		final InetSocketAddress a = conn.getRemoteAddress();
 		name = "link " + a.getAddress().getHostAddress() + ":" + a.getPort();
-		
-		logger = LogManager.getManager().getLogService(getName());
+
+		logger = LogManager.getManager().getSlf4jLogger(getName());
 		notifier = new LinkNotifier(this, logger);
 		conn.addConnectionListener(notifier);
 		// configure KNX medium stuff
@@ -231,7 +231,7 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 	 * The link is established using a KNXnet/IP tunnel, the local endpoint is the default
 	 * local host, the remote endpoint uses the default KNXnet/IP port number, network
 	 * address translation (NAT) is disabled.
-	 * 
+	 *
 	 * @param remoteHost remote host name
 	 * @param settings medium settings defining device and medium specifics needed for
 	 *        communication
@@ -249,7 +249,7 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 	 * Creates a new network link based on the KNXnet/IP routing protocol, using a
 	 * {@link KNXnetIPRouting}.
 	 * <p>
-	 * 
+	 *
 	 * @param netIf local network interface used to join the multicast group and for
 	 *        sending, use <code>null</code> for the host's default multicast interface
 	 * @param mcGroup address of the multicast group to join, use <code>null</code> for
@@ -265,12 +265,12 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 
 		// initialize our link with the opened connection
 		mode = ROUTING;
-		
+
 		// do our own IP:port string, since InetAddress.toString() always prepends a '/'
 		final InetSocketAddress a = conn.getRemoteAddress();
 		name = "link " + a.getAddress().getHostAddress() + ":" + a.getPort();
-		
-		logger = LogManager.getManager().getLogService(getName());
+
+		logger = LogManager.getManager().getSlf4jLogger(getName());
 		notifier = new LinkNotifier(this, logger);
 		conn.addConnectionListener(notifier);
 		// configure KNX medium stuff
@@ -441,7 +441,7 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 	{
 		if (closed)
 			throw new KNXLinkClosedException("link closed");
-		final boolean trace = logger.isLoggable(LogLevel.TRACE);
+		final boolean trace = logger.isTraceEnabled();
 		if (medium instanceof PLSettings) {
 			final CEMILDataEx f = (CEMILDataEx) msg;
 			if (f.getAdditionalInfo(CEMILDataEx.ADDINFO_PLMEDIUM) == null) {
@@ -466,7 +466,7 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 			}
 		}
 		try {
-			if (logger.isLoggable(LogLevel.INFO))
+			if (logger.isInfoEnabled())
 				logger.info("send message to " + msg.getDestination()
 						+ (waitForCon ? ", wait for confirmation" : ""));
 			if (trace)

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,13 +41,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.exception.KNXException;
-import tuwien.auto.calimero.log.LogService;
 
 /**
  * Adapter for Java ME CDC javax.microedition.io.CommConnection.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 class CommConnectionAdapter extends LibraryAdapter
@@ -67,7 +68,7 @@ class CommConnectionAdapter extends LibraryAdapter
 		connector = clazz;
 	}
 
-	CommConnectionAdapter(final LogService logger, final String portId, final int baudrate)
+	CommConnectionAdapter(final Logger logger, final String portId, final int baudrate)
 		throws KNXException
 	{
 		super(logger);
@@ -81,7 +82,7 @@ class CommConnectionAdapter extends LibraryAdapter
 	 * checks if CommConnectionAdapter functionality can be used.
 	 * <p>
 	 * This method does not check if the actual serial protocol connection is supported.
-	 * 
+	 *
 	 * @return <code>true</code>, if running in a ME CDC environment, and CommConnection
 	 *         can be queried, <code>false</code> otherwise
 	 */

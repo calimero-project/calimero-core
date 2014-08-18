@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,6 +42,8 @@ import java.util.EventListener;
 import java.util.Iterator;
 import java.util.List;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.log.LogService;
 
 /**
@@ -49,14 +51,14 @@ import tuwien.auto.calimero.log.LogService;
  * <p>
  * The assumption for implementation of this class is that iterating over event listeners
  * is the predominant operation, adding and removing listeners not.
- * 
+ *
  * @author B. Malinowsky
  */
 public class EventListeners
 {
 	private final List listeners = new ArrayList();
 	private EventListener[] listenersCopy = new EventListener[0];
-	private final LogService logger;
+	private final Logger logger;
 
 	/**
 	 * Creates a new event listeners container object.
@@ -70,10 +72,10 @@ public class EventListeners
 	/**
 	 * Creates a new event listeners container object.
 	 * <p>
-	 * 
+	 *
 	 * @param logger optional logger for log output
 	 */
-	public EventListeners(final LogService logger)
+	public EventListeners(final Logger logger)
 	{
 		this.logger = logger;
 	}
@@ -83,7 +85,7 @@ public class EventListeners
 	 * <p>
 	 * If <code>l</code> is
 	 * <code>null<code> or was already added as listener, no action is performed.
-	 * 
+	 *
 	 * @param l the listener to add
 	 */
 	public void add(final EventListener l)
@@ -105,7 +107,7 @@ public class EventListeners
 	 * Removes the specified event listener <code>l</code> from this container.
 	 * <p>
 	 * If <code>l</code> was not added in the first place, no action is performed.
-	 * 
+	 *
 	 * @param l the listener to remove
 	 */
 	public void remove(final EventListener l)
@@ -135,7 +137,7 @@ public class EventListeners
 	 * While modifying the returned array will have no impact on the event listeners kept
 	 * by this class, the array might be reused for subsequent callers, who will be
 	 * affected.
-	 * 
+	 *
 	 * @return array with all event listeners in this container, with array size equal to
 	 *         the number of contained listeners
 	 */
@@ -147,7 +149,7 @@ public class EventListeners
 	/**
 	 * Returns an iterator for the contained event listeners.
 	 * <p>
-	 * 
+	 *
 	 * @return the iterator for the listeners
 	 */
 	public Iterator iterator()

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,20 +38,20 @@ package tuwien.auto.calimero.knxnetip.servicetype;
 
 import java.io.ByteArrayOutputStream;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.log.LogManager;
-import tuwien.auto.calimero.log.LogService;
 
 /**
  * Common base for the different service type structures.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 abstract class ServiceType
 {
-	static final LogService logger =
-		LogManager.getManager().getLogService("KNXnet/IP service");
+	static final Logger logger = LogManager.getManager().getSlf4jLogger("KNXnet/IP service");
 
 	final int svcType;
 
@@ -65,7 +65,7 @@ abstract class ServiceType
 	/**
 	 * Returns the service type structure formatted into a byte array.
 	 * <p>
-	 * 
+	 *
 	 * @return service type structure as byte array
 	 * @see PacketHelper
 	 */
@@ -77,7 +77,7 @@ abstract class ServiceType
 	/**
 	 * Returns the service type name of this service type.
 	 * <p>
-	 * 
+	 *
 	 * @return service type as string
 	 */
 	public String toString()

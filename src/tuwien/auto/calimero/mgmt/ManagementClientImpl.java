@@ -41,6 +41,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.DetachEvent;
@@ -57,7 +59,6 @@ import tuwien.auto.calimero.exception.KNXTimeoutException;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.log.LogManager;
-import tuwien.auto.calimero.log.LogService;
 
 /**
  * Implementation of management client.
@@ -65,7 +66,7 @@ import tuwien.auto.calimero.log.LogService;
  * Uses {@link TransportLayer} internally for communication. <br>
  * All management service methods invoked after a detach of the network link are allowed
  * to throw {@link KNXIllegalStateException}.
- * 
+ *
  * @author B. Malinowsky
  */
 public class ManagementClientImpl implements ManagementClient
@@ -164,14 +165,14 @@ public class ManagementClientImpl implements ManagementClient
 	private final List indications = new LinkedList();
 	private volatile int svcResponse;
 	private volatile boolean detached;
-	private final LogService logger;
+	private final Logger logger;
 
 	/**
 	 * Creates a new management client attached to the supplied KNX network link.
 	 * <p>
 	 * The log service used by this management client is named "MC " +
 	 * <code>link.getName()</code>.
-	 * 
+	 *
 	 * @param link network link used for communication with a KNX network
 	 * @throws KNXLinkClosedException if the network link is closed
 	 */
@@ -184,7 +185,7 @@ public class ManagementClientImpl implements ManagementClient
 	{
 		tl = transportLayer;
 		tl.addTransportListener(tlListener);
-		logger = LogManager.getManager().getLogService("MC " + link.getName());
+		logger = LogManager.getManager().getSlf4jLogger("MC " + link.getName());
 	}
 
 	/* (non-Javadoc)
@@ -400,7 +401,7 @@ public class ManagementClientImpl implements ManagementClient
 	{
 		return restart(false, dst, eraseCode, channel);
 	}
-	
+
 	// for erase codes 1,3,4 the channel should be 0
 	private int restart(final boolean basic, final Destination dst, final int eraseCode,
 		final int channel) throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException,
@@ -425,7 +426,7 @@ public class ManagementClientImpl implements ManagementClient
 				throw new KNXRemoteException("master reset: " + codes[error]);
 			time = ((apdu[3] & 0xff) << 8) | (apdu[4] & 0xff);
 		}
-		
+
 		if (dst.isConnectionOriented()) {
 			// a remote endpoint is allowed to not send a TL disconnect before restart, but
 			// a TL disconnect timeout shall not be treated as protocol error
@@ -455,7 +456,7 @@ public class ManagementClientImpl implements ManagementClient
 		}
 		return time;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.ManagementClient#readProperty
 	 * (tuwien.auto.calimero.mgmt.Destination, int, int, int, int)
@@ -477,7 +478,7 @@ public class ManagementClientImpl implements ManagementClient
 	{
 		return readProperty(dst, objIndex, propertyId, start, elements, false);
 	}
-	
+
 	private List readProperty(final Destination dst, final int objIndex, final int propertyId,
 		final int start, final int elements, final boolean oneResponseOnly)
 		throws KNXTimeoutException, KNXRemoteException, KNXDisconnectException,
@@ -491,7 +492,7 @@ public class ManagementClientImpl implements ManagementClient
 		asdu[1] = (byte) propertyId;
 		asdu[2] = (byte) ((elements << 4) | ((start >>> 8) & 0xF));
 		asdu[3] = (byte) start;
-		
+
 		final List responses;
 		synchronized (this) {
 			try {
@@ -519,7 +520,7 @@ public class ManagementClientImpl implements ManagementClient
 		}
 		return ret;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.ManagementClient#writeProperty
 	 * (tuwien.auto.calimero.mgmt.Destination, int, int, int, int, byte[])
@@ -741,7 +742,7 @@ public class ManagementClientImpl implements ManagementClient
 		else
 			tl.sendData(d.getAddress(), p, apdu);
 	}
-	
+
 	private synchronized byte[] sendWait(final Destination d, final Priority p,
 		final byte[] apdu, final int response, final int minAsduLen, final int maxAsduLen)
 		throws KNXDisconnectException, KNXTimeoutException, KNXInvalidResponseException,
@@ -827,7 +828,7 @@ public class ManagementClientImpl implements ManagementClient
 		catch (final KNXTimeoutException e) {}
 		return l;
 	}
-	
+
 	private synchronized List readBroadcast(final Priority p, final byte[] apdu,
 		final int response, final int minAsduLen, final int maxAsduLen, final boolean oneOnly)
 		throws KNXLinkClosedException, KNXInvalidResponseException, KNXTimeoutException,
@@ -855,7 +856,7 @@ public class ManagementClientImpl implements ManagementClient
 		}
 		return l;
 	}
-	
+
 	// returns property read.res element values
 	private static byte[] extractPropertyElements(final byte[] apdu, final int elements)
 		throws KNXRemoteException

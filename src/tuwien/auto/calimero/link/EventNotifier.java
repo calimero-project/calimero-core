@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,16 +40,17 @@ import java.util.EventListener;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.internal.EventListeners;
-import tuwien.auto.calimero.log.LogService;
 
 /**
  * Threaded event notifier for network link and monitor.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 abstract class EventNotifier extends Thread implements KNXListener
@@ -60,7 +61,7 @@ abstract class EventNotifier extends Thread implements KNXListener
 		 * Invokes the appropriate listener method with the event contained in this event
 		 * callback.
 		 * <p>
-		 * 
+		 *
 		 * @param l the listener to notify
 		 */
 		void invoke(LinkListener l);
@@ -111,7 +112,7 @@ abstract class EventNotifier extends Thread implements KNXListener
 		}
 	}
 
-	final LogService logger;
+	final Logger logger;
 	final Object source;
 
 	private final EventListeners listeners;
@@ -119,7 +120,7 @@ abstract class EventNotifier extends Thread implements KNXListener
 	private final List events = new LinkedList();
 	private volatile boolean stop;
 
-	EventNotifier(final Object source, final LogService logger)
+	EventNotifier(final Object source, final Logger logger)
 	{
 		super("Link notifier");
 		this.logger = logger;

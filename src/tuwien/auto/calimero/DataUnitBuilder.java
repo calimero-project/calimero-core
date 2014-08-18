@@ -36,9 +36,10 @@
 
 package tuwien.auto.calimero;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.log.LogManager;
-import tuwien.auto.calimero.log.LogService;
 
 /**
  * Creates, extracts and decodes information of protocol data units.
@@ -52,8 +53,7 @@ public final class DataUnitBuilder
 	/** Name of the log service used by data-unit builder methods. */
 	public static final String LOG_SERVICE = "Data-unit builder";
 
-	private static final LogService logger =
-		LogManager.getManager().getLogService(LOG_SERVICE);
+	private static final Logger logger = LogManager.getManager().getSlf4jLogger(LOG_SERVICE);
 
 	private static final int T_DATA_CONNECTED = 0x40;
 	private static final int T_CONNECT = 0x80;

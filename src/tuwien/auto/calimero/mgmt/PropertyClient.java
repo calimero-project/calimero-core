@@ -45,6 +45,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.Settings;
 import tuwien.auto.calimero.dptxlator.DPTXlator;
 import tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned;
@@ -57,7 +59,6 @@ import tuwien.auto.calimero.exception.KNXIllegalStateException;
 import tuwien.auto.calimero.exception.KNXRemoteException;
 import tuwien.auto.calimero.exception.KNXTimeoutException;
 import tuwien.auto.calimero.log.LogManager;
-import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.xml.Attribute;
 import tuwien.auto.calimero.xml.Element;
 import tuwien.auto.calimero.xml.KNXMLException;
@@ -423,7 +424,7 @@ public class PropertyClient implements PropertyAccess
 	// helper flag to determine local DM mode, mainly for detecting absence of PDT
 	// detection is currently done by querying PropertyAdapter.getName()
 	private final boolean local;
-	private final LogService logger;
+	private final Logger logger;
 
 	// maps object index to object type
 	private final List objectTypes = new ArrayList();
@@ -451,7 +452,7 @@ public class PropertyClient implements PropertyAccess
 			pa.close();
 			throw e;
 		}
-		logger = LogManager.getManager().getLogService("PC " + pa.getName());
+		logger = LogManager.getManager().getSlf4jLogger("PC " + pa.getName());
 	}
 
 	/**
