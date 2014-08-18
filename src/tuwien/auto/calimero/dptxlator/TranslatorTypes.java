@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -294,11 +294,11 @@ public final class TranslatorTypes
 			catch (final NoSuchMethodException e) {
 				DPTXlator.logger.fatal("DPT translator is required to "
 					+ "have a public constructor(String dptID)");
-				throw new KNXException("interface specification error at translator");
+				throw new KNXException("interface specification error at translator", e);
 			}
 			catch (final Exception e) {
 				// for SecurityException, InstantiationException, IllegalAccessException
-				throw new KNXException("failed to create translator, " + e.getMessage());
+				throw new KNXException("failed to create translator", e);
 			}
 		}
 
