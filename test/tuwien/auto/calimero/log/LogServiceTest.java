@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -102,7 +102,7 @@ public class LogServiceTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.log.LogService#addWriter(tuwien.auto.calimero.log.LogWriter)}.
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws KNXLogException
 	 */
@@ -123,15 +123,16 @@ public class LogServiceTest extends TestCase
 		assertEquals(0, readLines(file).length);
 		ls.error("this string is allowed");
 		assertEquals(1, readLines(file).length);
-		ls.fatal("this string is allowed");
-		assertEquals(2, readLines(file).length);
+// TODO remove
+//		ls.fatal("this string is allowed");
+//		assertEquals(2, readLines(file).length);
 		ls.removeWriter(w);
 	}
 
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.log.LogService#removeWriter(tuwien.auto.calimero.log.LogWriter)}.
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws KNXLogException
 	 */
@@ -176,7 +177,7 @@ public class LogServiceTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.log.LogService#log(LogLevel, String, Throwable)}, with
 	 * no exception object used.
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws KNXLogException
 	 */
@@ -208,7 +209,7 @@ public class LogServiceTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.log.LogService#log(tuwien.auto.calimero.log.LogLevel, java.lang.String, java.lang.Throwable)}.
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws KNXLogException
 	 */
