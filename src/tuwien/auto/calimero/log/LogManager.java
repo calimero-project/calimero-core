@@ -63,13 +63,13 @@ public final class LogManager
 {
 	private static final LogManager mgr = new LogManager();
 
-	private final Map loggers;
-	private final List writers;
+	private final Map<String, LogService> loggers;
+	private final List<LogWriter> writers;
 
 	private LogManager()
 	{
-		loggers = Collections.synchronizedMap(new HashMap());
-		writers = new Vector();
+		loggers = Collections.synchronizedMap(new HashMap<>());
+		writers = new Vector<>();
 	}
 
 	/**
@@ -112,13 +112,13 @@ public final class LogManager
 	public LogService getLogService(final String name)
 	{
 		synchronized (loggers) {
-			LogService l = (LogService) loggers.get(name);
+			LogService l = loggers.get(name);
 			if (l == null) {
 				final Logger slf4jLogger = LoggerFactory.getLogger(name);
 				l = new LogService(slf4jLogger);
 				loggers.put(name, l);
-				for (final Iterator i = writers.iterator(); i.hasNext();)
-					l.addWriter((LogWriter) i.next());
+				for (final Iterator<LogWriter> i = writers.iterator(); i.hasNext();)
+					l.addWriter(i.next());
 			}
 			return l;
 		}

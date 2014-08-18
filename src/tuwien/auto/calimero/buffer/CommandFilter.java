@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ import tuwien.auto.calimero.exception.KNXIllegalStateException;
  * {@link Configuration.RequestFilter} for command-based datapoint messages.<br>
  * Command based messages are buffered using a {@link LDataObjectQueue} (an object of this
  * type is also expected when the request method or getNextIndication method is invoked).
- * 
+ *
  * @author B. Malinowsky
  */
 public class CommandFilter implements NetworkFilter, RequestFilter
@@ -89,7 +89,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 	}
 
 	// stores LDataObjectQueues objects
-	private final List indicationKeys = new LinkedList();
+	private final List<CacheObject> indicationKeys = new LinkedList<>();
 	private final QueueListener ql = new QueueListenerImpl();
 	private volatile QueueListener userListener;
 
@@ -112,7 +112,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 	 * queue objects.
 	 * <p>
 	 * The listener will replace any previously set listener.
-	 * 
+	 *
 	 * @param l the listener to set, use <code>null</code> for no listener
 	 */
 	public void setQueueListener(final QueueListener l)
@@ -123,7 +123,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 	/**
 	 * Returns whether new indications are available.
 	 * <p>
-	 * 
+	 *
 	 * @return <code>true</code> if at least one indication is available,
 	 *         <code>false</code> otherwise
 	 */
@@ -155,7 +155,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 	 * indication was added and this method call in such a way, that the original
 	 * indication is not available anymore (for example by removal or emptied queue), that
 	 * indication might be skipped or an empty QueueItem is returned.
-	 * 
+	 *
 	 * @return queue item containing cEMI frame indication
 	 */
 	public QueueItem getNextIndication()
@@ -182,8 +182,8 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 		if (m != null && ((dp = m.get((GroupAddress) dst)) == null || dp.isStateBased()))
 			return null;
 		synchronized (indicationKeys) {
-			for (final Iterator i = indicationKeys.iterator(); i.hasNext();) {
-				final CacheObject co = (CacheObject) i.next();
+			for (final Iterator<CacheObject> i = indicationKeys.iterator(); i.hasNext();) {
+				final CacheObject co = i.next();
 				if (co.getKey().equals(dst)) {
 					i.remove();
 					return ((LDataObjectQueue) co).getItem().getFrame();
@@ -209,7 +209,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 	 * 10 items.<br>
 	 * For uniform handling an accepted frame is always buffered with the L-data
 	 * indication message code.
-	 * 
+	 *
 	 * @param frame {@inheritDoc}
 	 * @param c {@inheritDoc}
 	 */

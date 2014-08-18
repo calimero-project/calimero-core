@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ import tuwien.auto.calimero.log.LogLevel;
  * adjusted using the next, larger field.<br>
  * <p>
  * The default return value after creation is <code>no-day, 00:00:00</code>.
- * 
+ *
  * @author B. Malinowsky
  */
 public class DPTXlatorTime extends DPTXlator
@@ -89,17 +89,17 @@ public class DPTXlatorTime extends DPTXlator
 
 	private static Calendar c;
 	private static SimpleDateFormat sdf;
-	private static final Map types;
+	private static final Map<String, DPT> types;
 
 	static {
-		types = new HashMap(3);
+		types = new HashMap<>(3);
 		types.put(DPT_TIMEOFDAY.getID(), DPT_TIMEOFDAY);
 	}
 
 	/**
 	 * Creates a translator for the given datapoint type.
 	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -111,7 +111,7 @@ public class DPTXlatorTime extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type ID.
 	 * <p>
-	 * 
+	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
 	 *         <code>dptID</code>
@@ -132,7 +132,7 @@ public class DPTXlatorTime extends DPTXlator
 	 * Note, the format will rely on calendar default time symbols (i.e., language for
 	 * example), and does not support the KNX DPT identifier "no-day" for day of week.
 	 * This identifier can not be used therefore.
-	 * 
+	 *
 	 * @param pattern the new pattern specifying the value time format, <code>null</code>
 	 *        to reset to default value format
 	 */
@@ -166,7 +166,7 @@ public class DPTXlatorTime extends DPTXlator
 	 * A day of week value of 0 corresponds to "no-day", indicating the day of week is not
 	 * used. The first day of week is Monday with a value of 1, the last day is Sunday
 	 * with a value of 7. <br>
-	 * 
+	 *
 	 * @param dayOfWeek day of week, 0 &lt;= day &lt;= 7
 	 * @param hour hour value, 0 &lt;= hour &lt;= 23
 	 * @param minute minute value, 0 &lt;= minute &lt;= 59
@@ -183,7 +183,7 @@ public class DPTXlatorTime extends DPTXlator
 	 * <p>
 	 * The return of 0 corresponds to "no-day", indicating the day of week is not used.
 	 * The first day of week is Monday with a value of 1, Sunday has a value of 7.
-	 * 
+	 *
 	 * @return day of week value, 0 &lt;= day of week &lt;= 7
 	 */
 	public final int getDayOfWeek()
@@ -194,7 +194,7 @@ public class DPTXlatorTime extends DPTXlator
 	/**
 	 * Returns the hour information.
 	 * <p>
-	 * 
+	 *
 	 * @return hour value, 0 &lt;= hour &lt;= 23
 	 */
 	public final int getHour()
@@ -205,7 +205,7 @@ public class DPTXlatorTime extends DPTXlator
 	/**
 	 * Returns the minute information.
 	 * <p>
-	 * 
+	 *
 	 * @return minute value, 0 &lt;= minute &lt;= 59
 	 */
 	public final int getMinute()
@@ -216,7 +216,7 @@ public class DPTXlatorTime extends DPTXlator
 	/**
 	 * Returns the second information.
 	 * <p>
-	 * 
+	 *
 	 * @return second value, 0 &lt;= second &lt;= 59
 	 */
 	public final int getSecond()
@@ -229,7 +229,7 @@ public class DPTXlatorTime extends DPTXlator
 	 * <p>
 	 * The <code>milliseconds</code> is interpreted with the translator default
 	 * calendar.
-	 * 
+	 *
 	 * @param milliseconds time value in milliseconds, as used in {@link Calendar}
 	 */
 	public final void setValue(final long milliseconds)
@@ -246,7 +246,7 @@ public class DPTXlatorTime extends DPTXlator
 	 * Note, since this is UTC time information, the initially returned local time
 	 * 00:00:00 does therefore not corresponding to 0 milliseconds, except in the case
 	 * when the local time zone is GMT.
-	 * 
+	 *
 	 * @return the time in milliseconds as long, as used in {@link Calendar}
 	 */
 	public final long getValueMilliseconds()
@@ -280,7 +280,7 @@ public class DPTXlatorTime extends DPTXlator
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
 	 */
-	public Map getSubTypes()
+	public Map<String, DPT> getSubTypes()
 	{
 		return types;
 	}
@@ -289,7 +289,7 @@ public class DPTXlatorTime extends DPTXlator
 	 * @return the subtypes of the time translator type
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
-	protected static Map getSubTypesStatic()
+	protected static Map<String, DPT> getSubTypesStatic()
 	{
 		return types;
 	}

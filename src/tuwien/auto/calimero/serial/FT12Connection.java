@@ -147,7 +147,7 @@ public class FT12Connection
 	private int exchangeTimeout;
 	private int idleTimeout;
 
-	private final EventListeners listeners = new EventListeners();
+	private final EventListeners<KNXListener> listeners = new EventListeners<>(KNXListener.class);
 
 	/**
 	 * Creates a new connection to a BCU2 using the FT1.2 protocol.
@@ -250,14 +250,14 @@ public class FT12Connection
 		}
 		if (SerialComAdapter.isAvailable()) {
 			final String[] prefixes = defaultPortPrefixes();
-			final List l = new ArrayList(10);
+			final List<String> l = new ArrayList<>(10);
 			for (int k = 0; k < prefixes.length; k++) {
 				final String prefix = prefixes[k];
 				for (int i = 0; i < 10; ++i)
 					if (SerialComAdapter.portExists(prefix + i))
 						l.add(prefix + i);
 			}
-			return (String[]) l.toArray(new String[l.size()]);
+			return l.toArray(new String[l.size()]);
 		}
 		// skip other possible adapters for now, and return empty list...
 		return new String[0];
@@ -481,12 +481,13 @@ public class FT12Connection
 			}
 		}
 		try {
-			final Class c = Class.forName("tuwien.auto.calimero.serial.RxtxAdapter");
+			final Class<?> c = Class.forName("tuwien.auto.calimero.serial.RxtxAdapter");
 			available = true;
 			// check whether a rxtx library is hanging around somewhere
 			logger.info("open rxtx library serial port connection");
-			return (LibraryAdapter) c.getConstructors()[0].newInstance(new Object[] {
-				logger, portId, new Integer(baudrate) });
+			final Class<? extends LibraryAdapter> adapter = LibraryAdapter.class;
+			return adapter.cast(c.getConstructors()[0].newInstance(new Object[] {
+				logger, portId, new Integer(baudrate) }));
 		}
 		catch (final ClassNotFoundException e) {
 			logger.warn("rxtx library adapter not found");

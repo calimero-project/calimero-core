@@ -67,7 +67,7 @@ import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
  * encoding, range and unit.
  * <p>
  * Note: main and sub refer to the former used terms major / minor.
- * 
+ *
  * @author B. Malinowsky
  * @see DPTXlator
  */
@@ -184,13 +184,13 @@ public final class TranslatorTypes
 	 * <p>
 	 */
 	public static final int TYPE_SCENE_NUMBER = 17;
-	
+
 	/**
 	 * DPT main number for <b>scene control</b>, number = {@value #TYPE_SCENE_CONTROL}.
 	 * <p>
 	 */
 	public static final int TYPE_SCENE_CONTROL = 18;
-	
+
 	/**
 	 * DPT main number for <b>date/time</b>, number = {@value #TYPE_DATE_TIME}.
 	 * <p>
@@ -202,7 +202,7 @@ public final class TranslatorTypes
 	 * <p>
 	 */
 	public static final int TYPE_ENUM8 = 20;
-	
+
 	/**
 	 * Maps a data type main number to a corresponding translator class doing the DPT
 	 * translations.
@@ -211,20 +211,21 @@ public final class TranslatorTypes
 	 */
 	public static class MainType
 	{
-		private final Class xlator;
+		private final Class<? extends DPTXlator> xlator;
 		private final String desc;
 		private final int main;
 
 		/**
 		 * Creates a new main number to translator mapping.
 		 * <p>
-		 * 
+		 *
 		 * @param mainNumber main number assigned to the data type
 		 * @param translator represents a translator class of type {@link DPTXlator}
 		 * @param description textual information describing this data type to a user, use
 		 *        <code>null</code> for no description
 		 */
-		public MainType(final int mainNumber, final Class translator, final String description)
+		public MainType(final int mainNumber, final Class<? extends DPTXlator> translator,
+			final String description)
 		{
 			if (mainNumber <= 0)
 				throw new KNXIllegalArgumentException("invalid main number");
@@ -239,7 +240,7 @@ public final class TranslatorTypes
 		/**
 		 * Returns the data type main number.
 		 * <p>
-		 * 
+		 *
 		 * @return main number as int
 		 */
 		public final int getMainNumber()
@@ -250,7 +251,7 @@ public final class TranslatorTypes
 		/**
 		 * Creates a new translator for the given datapoint type.
 		 * <p>
-		 * 
+		 *
 		 * @param dpt datapoint type specifying the particular translation behavior; if
 		 *        the datapoint type is not part of the translator of this main type, a
 		 *        {@link KNXFormatException} is thrown
@@ -268,7 +269,7 @@ public final class TranslatorTypes
 		/**
 		 * Creates a new instance of the translator for the given datapoint type ID.
 		 * <p>
-		 * 
+		 *
 		 * @param dptID datapoint type ID for selecting a particular kind of value
 		 *        translation; if the datapoint type ID is not part of the translator of
 		 *        this main type, a {@link KNXFormatException} is thrown
@@ -281,8 +282,7 @@ public final class TranslatorTypes
 		public DPTXlator createTranslator(final String dptID) throws KNXException
 		{
 			try {
-				return (DPTXlator) xlator.getConstructor(new Class[] { String.class }).newInstance(
-						new String[] { dptID });
+				return xlator.getConstructor(String.class).newInstance(dptID);
 			}
 			catch (final InvocationTargetException e) {
 				// try to forward encapsulated target exception
@@ -305,10 +305,10 @@ public final class TranslatorTypes
 		/**
 		 * Returns the translator class used for this main type.
 		 * <p>
-		 * 
+		 *
 		 * @return the translator class as {@link Class} object
 		 */
-		public Class getTranslator()
+		public Class<? extends DPTXlator> getTranslator()
 		{
 			return xlator;
 		}
@@ -316,7 +316,7 @@ public final class TranslatorTypes
 		/**
 		 * Returns the description to this main type, if any.
 		 * <p>
-		 * 
+		 *
 		 * @return description as String, or the empty string if no description set
 		 */
 		public final String getDescription()
@@ -327,17 +327,20 @@ public final class TranslatorTypes
 		/**
 		 * Returns a map containing all implemented subtypes.
 		 * <p>
-		 * 
+		 *
 		 * @return available subtypes as {@link Map}
 		 * @throws KNXException thrown on problems accessing the translator while
 		 *         retrieving sub types (e.g. security / access problem) for external,
 		 *         user supplied translators
 		 * @see DPTXlator#getSubTypes()
 		 */
-		public Map getSubTypes() throws KNXException
+		public Map<String, DPT> getSubTypes() throws KNXException
 		{
 			try {
-				return (Map) xlator.getDeclaredMethod("getSubTypesStatic", null).invoke(null, null);
+				@SuppressWarnings("unchecked")
+				final Map<String, DPT> m = (Map<String, DPT>) xlator.getDeclaredMethod(
+						"getSubTypesStatic", (Class<?>[]) null).invoke(null, (Object[]) null);
+				return m;
 			}
 			catch (final NoSuchMethodException e) {
 				throw new KNXException("no method to get subtypes, " + e.getMessage());
@@ -350,10 +353,10 @@ public final class TranslatorTypes
 		}
 	}
 
-	private static final Map map;
+	private static final Map<Integer, MainType> map;
 
 	static {
-		map = Collections.synchronizedMap(new HashMap(20));
+		map = Collections.synchronizedMap(new HashMap<>(20));
 		addTranslator(TYPE_BOOLEAN, "DPTXlatorBoolean", "Boolean (main type 1)");
 		addTranslator(TYPE_1BIT_CONTROLLED, "DPTXlator1BitControlled",
 				"Boolean controlled (main type 2");
@@ -380,30 +383,32 @@ public final class TranslatorTypes
 
 	private TranslatorTypes()
 	{}
-	
+
 	private static void addTranslator(final int main, final String className, final String desc)
 	{
 		try {
-			map.put(new Integer(main), new MainType(main,
-					Class.forName("tuwien.auto.calimero.dptxlator." + className), desc));
+			@SuppressWarnings("unchecked")
+			final Class<? extends DPTXlator> c = (Class<? extends DPTXlator>) Class
+					.forName("tuwien.auto.calimero.dptxlator." + className);
+			map.put(new Integer(main), new MainType(main, c, desc));
 			DPTXlator.logger.trace(desc + " loaded");
 		}
 		catch (final ClassNotFoundException e) {
 			DPTXlator.logger.warn(className + " not found, " + desc + " not added");
 		}
 	}
-	
+
 	/**
 	 * Returns the {@link MainType} object assigned the given data type main number.
 	 * <p>
-	 * 
+	 *
 	 * @param mainNumber main type to lookup
 	 * @return the main type information found, or <code>null</code> if main number not
 	 *         listed
 	 */
 	public static MainType getMainType(final int mainNumber)
 	{
-		return (MainType) map.get(new Integer(mainNumber));
+		return map.get(new Integer(mainNumber));
 	}
 
 	/**
@@ -412,10 +417,10 @@ public final class TranslatorTypes
 	 * <p>
 	 * The map returned is the same used by this class for type lookup. Map entries can be
 	 * added, likewise entries might be removed to change future lookup results.
-	 * 
+	 *
 	 * @return a {@link Map} containing all data types as {@link MainType} objects
 	 */
-	public static Map getAllMainTypes()
+	public static Map<Integer, MainType> getAllMainTypes()
 	{
 		return map;
 	}
@@ -423,7 +428,7 @@ public final class TranslatorTypes
 	/**
 	 * Does a lookup if the specified DPT is supported by a DPT translator.
 	 * <p>
-	 * 
+	 *
 	 * @param mainNumber data type main number, number >= 0; use 0 to infer translator
 	 *        type from <code>dptID</code> argument only
 	 * @param dptID datapoint type ID to lookup this particular kind of value translation
@@ -454,7 +459,7 @@ public final class TranslatorTypes
 	 * Note, that we don't enforce any particular or standardized format on the dptID
 	 * structure, so using a different formatted dptID solely without main number argument
 	 * results in undefined behavior.
-	 * 
+	 *
 	 * @param mainNumber data type main number, number >= 0; use 0 to infer translator
 	 *        type from <code>dptID</code> argument only
 	 * @param dptID datapoint type ID for selecting a particular kind of value translation
@@ -467,7 +472,7 @@ public final class TranslatorTypes
 	{
 		try {
 			final int main = getMainNumber(mainNumber, dptID);
-			final MainType type = (MainType) map.get(new Integer(main));
+			final MainType type = map.get(new Integer(main));
 			if (type != null)
 				return type.createTranslator(dptID);
 		}
@@ -483,7 +488,7 @@ public final class TranslatorTypes
 	 * <p>
 	 * If translator creation according {@link #createTranslator(int, String)} fails, all
 	 * available main types are enumerated to find an appropriate translator.
-	 * 
+	 *
 	 * @param dpt datapoint type selecting a particular kind of value translation
 	 * @return the new {@link DPTXlator} object
 	 * @throws KNXException if no translator could be found or creation failed
@@ -494,15 +499,15 @@ public final class TranslatorTypes
 			return createTranslator(0, dpt.getID());
 		}
 		catch (final KNXException e) {
-			for (final Iterator i = map.values().iterator(); i.hasNext(); )
+			for (final Iterator<MainType> i = map.values().iterator(); i.hasNext(); )
 				try {
-					return ((MainType) i.next()).createTranslator(dpt);
+					return i.next().createTranslator(dpt);
 				}
 				catch (final KNXException ignore) {}
 		}
 		throw new KNXException("failed to create translator for DPT " + dpt.getID());
 	}
-	
+
 	// throws NumberFormatException
 	private static int getMainNumber(final int mainNumber, final String dptID)
 	{

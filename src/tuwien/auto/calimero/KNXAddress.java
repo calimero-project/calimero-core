@@ -52,8 +52,8 @@ import tuwien.auto.calimero.xml.XMLWriter;
  * Represents a KNX address.
  * <p>
  * An address consists of a 16 Bit unsigned value. Concrete implementations of address are
- * {@link GroupAddress} and {@link IndividualAddress}. Instances of
- * <code>KNXAddress</code> are immutable.<br>
+ * {@link GroupAddress} and {@link IndividualAddress}. Instances of <code>KNXAddress</code> are
+ * immutable.<br>
  * Loading and saving KNX addresses in XML format is supported.
  */
 public abstract class KNXAddress
@@ -66,7 +66,7 @@ public abstract class KNXAddress
 	/**
 	 * Creates a KNX address from a 16 Bit address value.
 	 * <p>
-	 * 
+	 *
 	 * @param address the address value in the range [0..0xffff]
 	 */
 	KNXAddress(final int address)
@@ -77,11 +77,10 @@ public abstract class KNXAddress
 	/**
 	 * Creates a KNX address from a byte array.
 	 * <p>
-	 * The address is read out of the first 2 byte fields, while the address array itself
-	 * might be longer. The content of <code>address</code> is not modified.
-	 * 
-	 * @param address the address byte array in big-endian format, with address.length >=
-	 *        2
+	 * The address is read out of the first 2 byte fields, while the address array itself might be
+	 * longer. The content of <code>address</code> is not modified.
+	 *
+	 * @param address the address byte array in big-endian format, with address.length >= 2
 	 */
 	KNXAddress(final byte[] address)
 	{
@@ -95,7 +94,7 @@ public abstract class KNXAddress
 	 * <p>
 	 * If the current XML element position is no start tag, the next element tag is read.
 	 * The KNX address element is then expected to be the current element in the reader.
-	 * 
+	 *
 	 * @param r a XML reader
 	 * @throws KNXMLException if the XML element represents no KNX address or the address
 	 *         couldn't be read correctly
@@ -130,14 +129,13 @@ public abstract class KNXAddress
 	/**
 	 * Creates a KNX address from xml input.
 	 * <p>
-	 * The KNX address element is expected to be the current or next element from the
-	 * parser.
-	 * 
+	 * The KNX address element is expected to be the current or next element from the parser.
+	 *
 	 * @param r a XML reader
 	 * @return the created KNXAddress, either of subtype {@link GroupAddress} or
 	 *         {@link IndividualAddress}
-	 * @throws KNXMLException if the XML element is no KNX address, on unknown address
-	 *         type or wrong address syntax
+	 * @throws KNXMLException if the XML element is no KNX address, on unknown address type or wrong
+	 *         address syntax
 	 */
 	public static KNXAddress create(final XMLReader r) throws KNXMLException
 	{
@@ -160,7 +158,7 @@ public abstract class KNXAddress
 	 * individual address, i.e., an {@link IndividualAddress} is created, otherwise a
 	 * {@link GroupAddress} is created.<br>
 	 * Allowed separators are '.' or '/', mutually exclusive.
-	 * 
+	 *
 	 * @param address string containing the KNX address
 	 * @return the created KNX address, either of subtype {@link GroupAddress} or
 	 *         {@link IndividualAddress}
@@ -179,7 +177,7 @@ public abstract class KNXAddress
 	/**
 	 * Returns the KNX address type, identifying a group or individual address.
 	 * <p>
-	 * 
+	 *
 	 * @return address type as string
 	 */
 	public abstract String getType();
@@ -187,7 +185,7 @@ public abstract class KNXAddress
 	/**
 	 * Returns the KNX address in 16 Bit value representation.
 	 * <p>
-	 * 
+	 *
 	 * @return the 16 Bit address value
 	 */
 	public final int getRawAddress()
@@ -198,13 +196,13 @@ public abstract class KNXAddress
 	/**
 	 * Writes the KNX address in XML format to the supplied writer.
 	 * <p>
-	 * 
+	 *
 	 * @param w a XML writer
 	 * @throws KNXMLException on output error
 	 */
 	public void save(final XMLWriter w) throws KNXMLException
 	{
-		final List att = new ArrayList();
+		final List<Attribute> att = new ArrayList<>();
 		att.add(new Attribute(ATTR_TYPE, getType()));
 		w.writeComment(" " + toString() + " ");
 		w.writeElement(TAG_ADDRESS, att, Integer.toString(address));
@@ -213,7 +211,7 @@ public abstract class KNXAddress
 
 	/**
 	 * Returns the raw address value in a new byte array.
-	 * 
+	 *
 	 * @return The address value. The high byte of the address is placed at index 0.
 	 */
 	public final byte[] toByteArray()

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2011, 2012 B. Malinowsky
+    Copyright (c) 2011, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,15 +55,15 @@ import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
  * <p>
  * Implementation note: a newly submitted notifiable is always assumed to time out after
  * any previous submitted notifiable.
- * 
+ *
  * @author B. Malinowsky
  */
 final class TimerQueue extends Thread
 {
 	// synchronize on notifiables as monitor for both notifiables and endTimes lists
-	private final List notifiables = new ArrayList();
-	private final List endTimes = new ArrayList();
-	
+	private final List<Runnable> notifiables = new ArrayList<>();
+	private final List<Long> endTimes = new ArrayList<>();
+
 	public TimerQueue()
 	{
 		super("TimerQueue");
@@ -84,8 +84,8 @@ final class TimerQueue extends Thread
 						notifiables.wait();
 					}
 					else {
-						final Runnable next = (Runnable) notifiables.get(0);
-						final Long end = (Long) endTimes.get(0);
+						final Runnable next = notifiables.get(0);
+						final Long end = endTimes.get(0);
 						long remaining = end.longValue() - System.currentTimeMillis();
 						if (remaining > 0) {
 							notifiables.wait(remaining);
@@ -146,7 +146,7 @@ final class TimerQueue extends Thread
 			notifiables.notify();
 		}
 	}
-	
+
 	void quit()
 	{
 		interrupt();

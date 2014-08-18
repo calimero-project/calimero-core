@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,12 +44,13 @@ import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.Priority;
+import tuwien.auto.calimero.cemi.CEMILDataEx.AddInfo;
 import tuwien.auto.calimero.exception.KNXFormatException;
 
 /**
  * Factory helper for creating and copying cEMI messages.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public final class CEMIFactory
@@ -60,7 +61,7 @@ public final class CEMIFactory
 	/**
 	 * Creates a new cEMI message out of the given <code>data</code> byte stream.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte stream containing a cEMI message frame structure
 	 * @param offset start offset of cEMI message in <code>data</code>
 	 * @param length length in bytes of the whole cEMI message in <code>data</code>
@@ -112,7 +113,7 @@ public final class CEMIFactory
 	 * The <code>data</code> argument varies according to the supplied message code. For
 	 * L-Data frames, this is the tpdu, for busmonitor frames, this is the raw frame, for
 	 * device management frames, this is the data part or error information.
-	 * 
+	 *
 	 * @param msgCode the message code for the new cEMI frame
 	 * @param data the data for the frame
 	 * @param original the original frame providing all necessary information for the new
@@ -155,7 +156,7 @@ public final class CEMIFactory
 	 * <code>original</code>, and adjusts source and destination address to match the
 	 * supplied addresses.
 	 * <p>
-	 * 
+	 *
 	 * @param src the new KNX source address for the message, use <code>null</code> to
 	 *        use original address
 	 * @param dst the new KNX destination address for the message, use <code>null</code>
@@ -169,16 +170,15 @@ public final class CEMIFactory
 	public static CEMILData create(final IndividualAddress src, final KNXAddress dst,
 		final CEMILData original, final boolean extended)
 	{
-		return (CEMILData) create(0, src, dst, null, original, extended,
-			original.isRepetition());
+		return (CEMILData) create(0, src, dst, null, original, extended, original.isRepetition());
 	}
-	
+
 	/**
 	 * Creates a new cEMI L-Data message with information provided by
 	 * <code>original</code>, and adjusts source and destination address to match the
 	 * supplied addresses, and sets the repeat/is repeated frame indication.
 	 * <p>
-	 * 
+	 *
 	 * @param src the new KNX source address for the message, use <code>null</code> to
 	 *        use original address
 	 * @param dst the new KNX destination address for the message, use <code>null</code>
@@ -195,11 +195,11 @@ public final class CEMIFactory
 	{
 		return (CEMILData) create(0, src, dst, null, original, extended, repeat);
 	}
-	
+
 	/**
 	 * Creates a new cEMI message out of the supplied EMI frame.
 	 * <p>
-	 * 
+	 *
 	 * @param frame EMI frame
 	 * @return the new cEMI message
 	 * @throws KNXFormatException if no (valid) EMI structure was found or unsupported EMI
@@ -212,9 +212,8 @@ public final class CEMIFactory
 			throw new KNXFormatException("EMI frame too short");
 		final int mc = frame[0] & 0xff;
 		if (mc == CEMIBusMon.MC_BUSMON_IND) {
-			return CEMIBusMon.newWithStatus(frame[1] & 0xff, (frame[2] & 0xff) << 8
-				| frame[3] & 0xff, false,
-				DataUnitBuilder.copyOfRange(frame, 4, frame.length));
+			return CEMIBusMon.newWithStatus(frame[1] & 0xff, (frame[2] & 0xff) << 8 | frame[3]
+					& 0xff, false, DataUnitBuilder.copyOfRange(frame, 4, frame.length));
 		}
 		final Priority p = Priority.get(frame[1] >> 2 & 0x3);
 		final boolean ack = (frame[1] & 0x02) != 0;
@@ -227,16 +226,15 @@ public final class CEMIFactory
 		final byte[] tpdu = DataUnitBuilder.copyOfRange(frame, 7, len + 7);
 		// no long frames in EMI2
 		return c ? new CEMILData(mc, new IndividualAddress(0), a, tpdu, p, c)
-			: new CEMILData(mc, new IndividualAddress(0), a, tpdu, p, true, true, ack,
-				hops);
+				 : new CEMILData(mc, new IndividualAddress(0), a, tpdu, p, true, true, ack, hops);
 	}
-	
+
 	/**
 	 * Does a lazy copy of the supplied cEMI frame.
 	 * <p>
 	 * Only for cEMI frames which are <b>not</b> immutable a copy is created, for all
 	 * other frames <code>original</code> is returned.
-	 * 
+	 *
 	 * @param original the frame to copy
 	 * @return the <code>original</code> frame if immutable, a copy of it otherwise
 	 */
@@ -248,7 +246,7 @@ public final class CEMIFactory
 		// all other are immutable
 		return original;
 	}
-	
+
 	// leave msgcode/src/dst/data null/0 to use from original
 	private static CEMI create(final int msgCode, final IndividualAddress src,
 		final KNXAddress dst, final byte[] data, final CEMILData original, final boolean ext,
@@ -260,13 +258,12 @@ public final class CEMIFactory
 		final byte[] content = data != null ? data : original.getPayload();
 		if (original instanceof CEMILDataEx) {
 			final CEMILDataEx f = (CEMILDataEx) original;
-			final CEMILDataEx copy =
-				new CEMILDataEx(mc, s, d, content, f.getPriority(), repeat, f
-					.isDomainBroadcast(), f.isAckRequested(), f.getHopCount());
+			final CEMILDataEx copy = new CEMILDataEx(mc, s, d, content, f.getPriority(), repeat,
+					f.isDomainBroadcast(), f.isAckRequested(), f.getHopCount());
 			// copy additional info
-			final List l = f.getAdditionalInfo();
-			for (final Iterator i = l.iterator(); i.hasNext();) {
-				final CEMILDataEx.AddInfo info = (CEMILDataEx.AddInfo) i.next();
+			final List<AddInfo> l = f.getAdditionalInfo();
+			for (final Iterator<AddInfo> i = l.iterator(); i.hasNext();) {
+				final CEMILDataEx.AddInfo info = i.next();
 				copy.addAdditionalInfo(info.getType(), info.getInfo());
 			}
 			return copy;

@@ -260,7 +260,9 @@ public final class DataUnitBuilder
 		for (int i = 0; i < asdu.length; ++i)
 			asdu[i] = apdu[offset + i];
 
-		asdu[0] &= mask;
+		// some ASDUs have length 0, e.g., DoA.read
+		if (asdu.length > 0)
+			asdu[0] &= mask;
 		return asdu;
 	}
 
@@ -303,23 +305,23 @@ public final class DataUnitBuilder
 		final int ctrl = tpci & 0xff;
 		if ((ctrl & 0xFC) == 0) {
 			if (dst == null)
-				return "T-broadcast/group/ind";
+				return "T_Broadcast/group/ind";
 			if (dst.getRawAddress() == 0)
-				return "T-broadcast";
+				return "T_Broadcast";
 			if (dst instanceof GroupAddress)
-				return "T-group";
+				return "T_Group";
 			return "T-individual";
 		}
 		if ((ctrl & 0xC0) == 0x40)
-			return "T-connected seq " + (ctrl >> 2 & 0xF);
+			return "T_Connected seq " + (ctrl >> 2 & 0xF);
 		if (ctrl == T_CONNECT)
-			return "T-connect";
+			return "T_Connect";
 		if (ctrl == T_DISCONNECT)
-			return "T-disconnect";
+			return "T_Disconnect";
 		if ((ctrl & 0xC3) == T_ACK)
-			return "T-ack seq " + (ctrl >> 2 & 0xF);
+			return "T_Ack seq " + (ctrl >> 2 & 0xF);
 		if ((ctrl & 0xC3) == T_NAK)
-			return "T-nak seq " + (ctrl >> 2 & 0xF);
+			return "T_Nak seq " + (ctrl >> 2 & 0xF);
 		return "unknown TPCI";
 	}
 
@@ -335,65 +337,65 @@ public final class DataUnitBuilder
 	{
 		switch (apci) {
 		case 0x00:
-			return "A-group.read";
+			return "A_Group.read";
 		case 0x40:
-			return "A-group.response";
+			return "A_Group.response";
 		case 0x80:
-			return "A-group.write";
+			return "A_Group.write";
 		case 0x0180:
-			return "A-ADC.read";
+			return "A_ADC.read";
 		case 0x01C0:
-			return "A-ADC.response";
+			return "A_ADC.response";
 		case 0x03D1:
-			return "A-authorize.read";
+			return "A_Authorize.read";
 		case 0x03D2:
-			return "A-authorize.response";
+			return "A_Authorize.response";
 		case 0x3E0:
-			return "A-domain.write";
+			return "A_Domain.write";
 		case 0x3E1:
-			return "A-domain.read";
+			return "A_Domain.read";
 		case 0x3E2:
-			return "A-domain.response";
+			return "A_Domain.response";
 		case 0x3E3:
-			return "A-domain-selective.read";
+			return "A_Domain-selective.read";
 		case 0x0100:
-			return "A-ind.addr.read";
+			return "A_IndAddr.read";
 		case 0x0140:
-			return "A-ind.addr.response";
+			return "A_IndAddr.response";
 		case 0xC0:
-			return "A-ind.addr.write";
+			return "A_IndAddr.write";
 		case 0x03DC:
-			return "A-ind.addr-sno.read";
+			return "A_IndAddr-sno.read";
 		case 0x03DD:
-			return "A-ind.addr_sno.response";
+			return "A_IndAddr-sno.response";
 		case 0x03DE:
-			return "A-ind.addr_sno.write";
+			return "A_IndAddr-sno.write";
 		case 0x300:
-			return "A-device-desc.read";
+			return "A_Device-desc.read";
 		case 0x340:
-			return "A-device-desc.response";
+			return "A_Device-desc.response";
 		case 0x03D3:
-			return "A-key.write";
+			return "A_Key.write";
 		case 0x03D4:
-			return "A-key.response";
+			return "A_Key.response";
 		case 0x0200:
-			return "A-memory.read";
+			return "A_Memory.read";
 		case 0x0240:
-			return "A-memory.response";
+			return "A_Memory.response";
 		case 0x0280:
-			return "A-memory.write";
+			return "A_Memory.write";
 		case 0x03D8:
-			return "A-property-desc.read";
+			return "A_Property-desc.read";
 		case 0x03D9:
-			return "A-property-desc.response";
+			return "A_Property-desc.response";
 		case 0x03D5:
-			return "A-property.read";
+			return "A_Property.read";
 		case 0x03D6:
-			return "A-property.response";
+			return "A_Property.response";
 		case 0x03D7:
-			return "A-property.write";
+			return "A_Property.write";
 		case 0x0380:
-			return "A-restart";
+			return "A_Restart";
 		default:
 			return "unknown APCI";
 		}

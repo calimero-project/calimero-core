@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ import tuwien.auto.calimero.xml.XMLWriter;
  * <p>
  * Does not add any feature not already documented in the implemented interface.<br>
  * This writer is not thread safe.
- * 
+ *
  * @author B. Malinowsky
  */
 public class DefaultXMLWriter implements XMLWriter
@@ -65,7 +65,7 @@ public class DefaultXMLWriter implements XMLWriter
 	private BufferedWriter w;
 	private boolean closeWriter;
 	// xml layout stack
-	private Stack layout;
+	private Stack<Tag> layout;
 	// current layout indentation
 	private int indent;
 	// controls indentation for new tags
@@ -82,7 +82,7 @@ public class DefaultXMLWriter implements XMLWriter
 	 * Creates a new XML writer with output <code>w</code>.
 	 * <p>
 	 * The writer is buffered by this XML writer.
-	 * 
+	 *
 	 * @param w the output {@link Writer}
 	 * @param close <code>true</code> to close <code>w</code> if XML writer is closed,
 	 *        <code>false</code> otherwise
@@ -126,11 +126,11 @@ public class DefaultXMLWriter implements XMLWriter
 	 * @see tuwien.auto.calimero.xml.XMLWriter#writeElement
 	 * (java.lang.String, java.util.List, java.lang.String)
 	 */
-	public void writeElement(final String name, final List att, final String content)
-		throws KNXMLException
+	public void writeElement(final String name, final List<Attribute> attributes,
+		final String content) throws KNXMLException
 	{
 		try {
-			final Tag tag = new Tag(name, att, content, false);
+			final Tag tag = new Tag(name, attributes, content, false);
 			layout.push(tag);
 		}
 		catch (final IOException e) {
@@ -142,11 +142,11 @@ public class DefaultXMLWriter implements XMLWriter
 	 * @see tuwien.auto.calimero.xml.XMLWriter#writeEmptyElement
 	 * (java.lang.String, java.util.List)
 	 */
-	public void writeEmptyElement(final String name, final List att)
+	public void writeEmptyElement(final String name, final List<Attribute> attributes)
 		throws KNXMLException
 	{
 		try {
-			final Tag tag = new Tag(name, att, null, true);
+			final Tag tag = new Tag(name, attributes, null, true);
 			tag.endTag();
 		}
 		catch (final IOException e) {
@@ -202,7 +202,7 @@ public class DefaultXMLWriter implements XMLWriter
 		if (layout.empty())
 			throw new KNXIllegalStateException("no elements to end");
 		try {
-			((Tag) layout.pop()).endTag();
+			layout.pop().endTag();
 			if (layout.empty())
 				w.flush();
 		}
@@ -218,7 +218,7 @@ public class DefaultXMLWriter implements XMLWriter
 	{
 		try {
 			while (!layout.empty())
-				((Tag) layout.pop()).endTag();
+				layout.pop().endTag();
 			w.flush();
 		}
 		catch (final IOException e) {
@@ -251,7 +251,7 @@ public class DefaultXMLWriter implements XMLWriter
 
 	private void reset()
 	{
-		layout = new Stack();
+		layout = new Stack<Tag>();
 		indent = 0;
 		newTag = false;
 	}
@@ -266,15 +266,15 @@ public class DefaultXMLWriter implements XMLWriter
 		private static final String space = " ";
 		private String name;
 
-		Tag(final String name, final List att, final String cnt, final boolean empty)
-			throws IOException
+		Tag(final String name, final List<Attribute> attributes, final String cnt,
+			final boolean empty) throws IOException
 		{
 			if (newTag)
 				w.newLine();
 			indent().write(lt + name);
-			if (att != null)
-				for (final Iterator i = att.iterator(); i.hasNext();) {
-					final Attribute a = (Attribute) i.next();
+			if (attributes != null)
+				for (final Iterator<Attribute> i = attributes.iterator(); i.hasNext();) {
+					final Attribute a = i.next();
 					w.write(space + a.getName() + equal + quote
 							+ References.replace(a.getValue(), true) + quote);
 				}

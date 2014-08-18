@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ import java.util.Map;
  * Note that if the timestamp of a {@link CacheObject} changes after it was put into the
  * cache, the object has to be reinserted (see {@link #put(CacheObject)}) to keep the
  * cache in a consistent state. If no expiring is used, this might be omitted.<br>
- * 
+ *
  * @author B. Malinowsky
  */
 public abstract class ExpiringCache implements Cache
@@ -80,7 +80,7 @@ public abstract class ExpiringCache implements Cache
 	 * The map instance itself is not synchronized, synchronization is done using the
 	 * cache object (this).
 	 */
-	protected Map map;
+	protected Map<Object, CacheObject> map;
 	private CacheSweeper sweeper;
 	private final int timeToExpire;
 
@@ -89,7 +89,7 @@ public abstract class ExpiringCache implements Cache
 	 * <p>
 	 * Note that for the actual begin of cache sweeping {@link #startSweeper()} has to be
 	 * invoked.
-	 * 
+	 *
 	 * @param timeToExpire time > 0 in seconds for cache entries to stay valid, on time =
 	 *        0 no expiring of cache entries will occur
 	 */
@@ -97,11 +97,11 @@ public abstract class ExpiringCache implements Cache
 	{
 		if (timeToExpire > 0) {
 			this.timeToExpire = timeToExpire;
-			map = new LinkedHashMap();
+			map = new LinkedHashMap<>();
 		}
 		else {
 			this.timeToExpire = 0;
-			map = new HashMap();
+			map = new HashMap<>();
 		}
 	}
 
@@ -121,8 +121,8 @@ public abstract class ExpiringCache implements Cache
 		final long duration = timeToExpire * 1000;
 		CacheObject o = null;
 		synchronized (this) {
-			for (final Iterator i = map.values().iterator(); i.hasNext();) {
-				o = (CacheObject) i.next();
+			for (final Iterator<CacheObject> i = map.values().iterator(); i.hasNext();) {
+				o = i.next();
 				if (now >= o.getTimestamp() + duration) {
 					i.remove();
 					notifyRemoved(o);
@@ -137,7 +137,7 @@ public abstract class ExpiringCache implements Cache
 	 * Override this method to get notified when {@link #removeExpired()} removed a
 	 * {@link CacheObject} from the {@link #map}.
 	 * <p>
-	 * 
+	 *
 	 * @param obj removed {@link CacheObject}
 	 */
 	protected void notifyRemoved(final CacheObject obj)
@@ -166,7 +166,7 @@ public abstract class ExpiringCache implements Cache
 			sweeper = null;
 		}
 	}
-	
+
 	static void updateAccess(final CacheObject obj)
 	{
 		obj.incCount();

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2011 B. Malinowsky
+    Copyright (c) 2010, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ import tuwien.auto.calimero.log.LogLevel;
  * In value methods expecting string types, the item is composed of the control field
  * representation, followed by whitespace and the corresponding DPT 1.x value.<br>
  * This translator requires {@link DPTXlatorBoolean}.
- * 
+ *
  * @see DPTXlatorBoolean
  */
 public class DPTXlator1BitControlled extends DPTXlator
@@ -66,7 +66,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 	 * This DPT references the corresponding 1.x DPTs, with the value field of a DPT 2.x being
 	 * interpreted by the 1.x DPT of the same DPT sub number. For example, the value part of DPT
 	 * 2.001 is formatted according to DPT 1.001.
-	 * 
+	 *
 	 * @author B. Malinowsky
 	 */
 	public static class DPT1BitControlled extends DPT
@@ -76,7 +76,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 		/**
 		 * Creates a new datapoint type information structure for the 1 Bit controlled DPT.
 		 * <p>
-		 * 
+		 *
 		 * @param typeID {@inheritDoc}
 		 * @param description {@inheritDoc}
 		 * @param value the DPT of the control information
@@ -90,7 +90,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 		/**
 		 * Returns the DPT used to represent the value information of this DPT.
 		 * <p>
-		 * 
+		 *
 		 * @return the DPT for the value information
 		 */
 		public final DPT getValueDPT()
@@ -183,16 +183,17 @@ public class DPTXlator1BitControlled extends DPTXlator
 	public static final DPT DPT_INVERT_CONTROL = new DPT1BitControlled("2.012",
 			"Invert Controlled", DPTXlatorBoolean.DPT_INVERT);
 
-	private static final Map types;
+	private static final Map<String, DPT> types;
 
 	static {
-		types = new HashMap(15);
+		types = new HashMap<>(15);
 		final Field[] fields = DPTXlator1BitControlled.class.getFields();
 		for (int i = 0; i < fields.length; i++) {
 			try {
 				final Object o = fields[i].get(null);
 				if (o instanceof DPT) {
-					types.put(((DPT) o).getID(), o);
+					final DPT dpt = (DPT) o;
+					types.put(dpt.getID(), dpt);
 				}
 			}
 			catch (final IllegalAccessException e) {}
@@ -202,7 +203,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type.
 	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -214,7 +215,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type ID.
 	 * <p>
-	 * 
+	 *
 	 * @param dptId available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
 	 *         <code>dptID</code>
@@ -229,7 +230,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 	/**
 	 * Sets one new translation item, replacing any old items.
 	 * <p>
-	 * 
+	 *
 	 * @param control control field, <code>false</code> is <i>no control</i>, <code>true</code> is
 	 *        <i>control</i>
 	 * @param value value field
@@ -259,7 +260,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 	 * A value of <code>false</code> stands for <i>no control</i>, <code>true</code> for
 	 * <i>control</i>.<br>
 	 * This method does not reset other item data or discard other translation items.
-	 * 
+	 *
 	 * @param control control direction
 	 */
 	public final void setControlBit(final boolean control)
@@ -275,7 +276,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 	 * <p>
 	 * A value of <code>false</code> stands for decrease / up, <code>true</code> for
 	 * increase / down.
-	 * 
+	 *
 	 * @return control bit as boolean
 	 */
 	public final boolean getControlBit()
@@ -287,7 +288,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 	 * Sets the value field for the first translation item.
 	 * <p>
 	 * This method does not reset other item data or discard other translation items.
-	 * 
+	 *
 	 * @param value the value interpreted according to DPT 1.x
 	 */
 	public final void setValueBit(final boolean value)
@@ -301,7 +302,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 	/**
 	 * Returns the value field of the first translation item.
 	 * <p>
-	 * 
+	 *
 	 * @return value field
 	 */
 	public final boolean getValueBit()
@@ -334,7 +335,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
 	 */
-	public final Map getSubTypes()
+	public final Map<String, DPT> getSubTypes()
 	{
 		return types;
 	}
@@ -343,7 +344,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 	 * @return the subtypes of the 3 Bit controlled translator type
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
-	protected static Map getSubTypesStatic()
+	protected static Map<String, DPT> getSubTypesStatic()
 	{
 		return types;
 	}

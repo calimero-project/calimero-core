@@ -53,14 +53,14 @@ import tuwien.auto.calimero.exception.KNXException;
  */
 class CommConnectionAdapter extends LibraryAdapter
 {
-	private static final Class connector;
+	private static final Class<?> connector;
 
 	private Object conn;
 	private InputStream is;
 	private OutputStream os;
 
 	static {
-		Class clazz = null;
+		Class<?> clazz = null;
 		try {
 			clazz = Class.forName("javax.microedition.io.Connector");
 		}

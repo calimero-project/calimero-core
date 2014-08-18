@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,9 +40,10 @@ import java.io.Writer;
 import java.util.List;
 
 /**
+ * Common interface for XML writers.
  * <p>
  * XML writer implementations don't need to be thread safe.
- * 
+ *
  * @author B. Malinowsky
  */
 public interface XMLWriter
@@ -51,7 +52,7 @@ public interface XMLWriter
 	 * Sets the output destination for this XML writer.
 	 * <p>
 	 * If this XML writer was already closed, setting a new output has no effect.
-	 * 
+	 *
 	 * @param output a writer for output
 	 * @param close <code>true</code> if the specified writer should be closed on
 	 *        {@link #close()}, <code>false</code> to leave it open
@@ -67,7 +68,7 @@ public interface XMLWriter
 	 * necessarily checked by the XML writer whether the actual output meets that
 	 * encoding. The user is responsible to specify the encoding matching the output
 	 * writer.
-	 * 
+	 *
 	 * @param standalone <code>true</code> if there are no external markup declarations,
 	 *        <code>false</code> to indicates that there are or may be such external
 	 *        markup declarations
@@ -82,34 +83,34 @@ public interface XMLWriter
 	 * <p>
 	 * Predefined entities in <code>text</code> are replaced with references before
 	 * write.
-	 * 
+	 *
 	 * @param name element name, the element's type
-	 * @param att attribute specifications for this element, empty list or
+	 * @param attributes attribute specifications for this element, empty list or
 	 *        <code>null</code> for no attributes
 	 * @param text text to write, the character data, <code>null</code> for no data
 	 * @throws KNXMLException on output error
 	 */
-	void writeElement(String name, List att, String text) throws KNXMLException;
+	void writeElement(String name, List<Attribute> attributes, String text) throws KNXMLException;
 
 	/**
 	 * Writes an empty element tag to the current position in a document.
 	 * <p>
 	 * Note that an empty element tag has no content and {@link #endElement()} does not
 	 * recognize such elements.
-	 * 
+	 *
 	 * @param name element name, the element's type
-	 * @param att attribute specifications for this element, empty list or
+	 * @param attributes attribute specifications for this element, empty list or
 	 *        <code>null</code> for no attributes
 	 * @throws KNXMLException on output error
 	 */
-	void writeEmptyElement(String name, List att) throws KNXMLException;
+	void writeEmptyElement(String name, List<Attribute> attributes) throws KNXMLException;
 
 	/**
 	 * Writes a comment to the current position in a document.
 	 * <p>
 	 * The text of the comment is wrapped with "&lt;!--" and "--&gt;" by this method. The
 	 * string "--" (double-hyphen) must not occur within comments.
-	 * 
+	 *
 	 * @param comment text of the comment
 	 * @throws KNXMLException on output error
 	 */
@@ -125,7 +126,7 @@ public interface XMLWriter
 	 * Predefined entities in <code>text</code> are replaced before write, iff the
 	 * character data to write is no CDATA section. Data in CDATA sections is not
 	 * modified.
-	 * 
+	 *
 	 * @param text text to write, the character data
 	 * @param isCDATASection <code>true</code> to write data into CDATA section,
 	 *        <code>false</code> to write default character data
@@ -136,7 +137,7 @@ public interface XMLWriter
 	/**
 	 * Closes the current element.
 	 * <p>
-	 * 
+	 *
 	 * @throws KNXMLException on output error
 	 */
 	void endElement() throws KNXMLException;
@@ -144,7 +145,7 @@ public interface XMLWriter
 	/**
 	 * Closes all open elements and flushes buffered data to output.
 	 * <p>
-	 * 
+	 *
 	 * @throws KNXMLException on output error
 	 */
 	void endAllElements() throws KNXMLException;
@@ -155,7 +156,7 @@ public interface XMLWriter
 	 * If this XML writer is already closed, no action is performed. All open elements are
 	 * closed. If for an output source was specified to get closed on invocation of this
 	 * method, it is closed (calling {@link Writer#close()} before return.
-	 * 
+	 *
 	 * @throws KNXMLException
 	 * @see XMLWriter#endAllElements()
 	 */

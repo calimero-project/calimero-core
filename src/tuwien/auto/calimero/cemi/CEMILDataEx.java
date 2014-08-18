@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
  * bytes maximum. Additional information might be specified.
  * <p>
  * Objects of this L-Data type are <b>not</b> immutable.
- * 
+ *
  * @author B. Malinowsky
  */
 public class CEMILDataEx extends CEMILData implements Cloneable
@@ -72,7 +72,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		/**
 		 * Creates new wrapper for additional information.
 		 * <p>
-		 * 
+		 *
 		 * @param infoType additional information type ID
 		 * @param info information data
 		 */
@@ -85,7 +85,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		/**
 		 * Returns the additional information data wrapped by this type.
 		 * <p>
-		 * 
+		 *
 		 * @return the data as byte array
 		 */
 		public byte[] getInfo()
@@ -97,7 +97,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		 * Returns the type of additional information (see ADDINFO_* constants in class
 		 * CEMILDataEx).
 		 * <p>
-		 * 
+		 *
 		 * @return type ID
 		 */
 		public int getType()
@@ -154,7 +154,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/**
 	 * Creates a new L-Data message from a byte stream.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte stream containing a cEMI L-Data message
 	 * @param offset start offset of cEMI frame in <code>data</code>
 	 * @throws KNXFormatException if no (valid) frame was found
@@ -178,7 +178,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 * (for indication message this equals "not repeated frame"), broadcast is "don't
 	 * care", acknowledge of request is default medium behavior, hop count is 6 and
 	 * confirmation request is "don't care" in the control field.<br>
-	 * 
+	 *
 	 * @param msgCode a message code value specified in the L-Data type
 	 * @param src individual address of source
 	 * @param dst destination address
@@ -199,7 +199,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 * The message hop count is set to 6, send repetitions according to default medium
 	 * behavior, broadcast and acknowledge request are set to "don't care" in the control
 	 * field.<br>
-	 * 
+	 *
 	 * @param msgCode a message code value specified in the L-Data type
 	 * @param src individual address of source
 	 * @param dst destination address
@@ -226,7 +226,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 * exclusive with the rest of the control information and set to "don't care" (refer
 	 * to {@link #CEMILDataEx(int, IndividualAddress, KNXAddress, byte[], Priority,
 	 * boolean)}).
-	 * 
+	 *
 	 * @param msgCode a message code value specified in the L-Data type
 	 * @param src individual address of source
 	 * @param dst destination address
@@ -270,7 +270,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/**
 	 * Creates a L-Data message, mainly for TP1 media.
 	 * <p>
-	 * 
+	 *
 	 * @param msgCode a message code value specified in the L-Data type
 	 * @param src individual address of source
 	 * @param dst destination address
@@ -301,7 +301,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 * Adds additional information to the message.
 	 * <p>
 	 * It replaces additional information of the same type, if any was previously added.
-	 * 
+	 *
 	 * @param infoType type ID of additional information
 	 * @param info additional information data
 	 */
@@ -318,15 +318,15 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/**
 	 * Returns all additional information currently set.
 	 * <p>
-	 * 
+	 *
 	 * @return a List with {@link AddInfo} objects
 	 */
-	public synchronized List getAdditionalInfo()
+	public synchronized List<AddInfo> getAdditionalInfo()
 	{
-		final List l = new ArrayList();
+		final List<AddInfo> l = new ArrayList<>();
 		for (int i = 0; i < addInfo.length; ++i)
 			if (addInfo[i] != null)
-				l.add(new AddInfo(i, (byte[]) addInfo[i].clone()));
+				l.add(new AddInfo(i, addInfo[i].clone()));
 		return l;
 	}
 
@@ -334,7 +334,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 * Returns additional information data corresponding to the supplied type ID, if it is
 	 * contained in the message.
 	 * <p>
-	 * 
+	 *
 	 * @param infoType type ID of the request additional information
 	 * @return additional information data or <code>null</code> if no such information
 	 *         is available
@@ -342,7 +342,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	public synchronized byte[] getAdditionalInfo(final int infoType)
 	{
 		if (infoType < addInfo.length && addInfo[infoType] != null)
-			return (byte[]) addInfo[infoType].clone();
+			return addInfo[infoType].clone();
 		return null;
 	}
 
@@ -357,7 +357,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/**
 	 * Returns whether the message assembles an extended frame format.
 	 * <p>
-	 * 
+	 *
 	 * @return <code>true</code> if this is an extended frame, <code>false</code>
 	 *         otherwise
 	 */
@@ -369,7 +369,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/**
 	 * Specifies the kind of broadcast to use for sending.
 	 * <p>
-	 * 
+	 *
 	 * @param domainOnly <code>true</code> for doing a broadcast only within the domain,
 	 *        <code>false</code> for a system broadcast
 	 */
@@ -383,7 +383,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 * <p>
 	 * By default, <code>true</code> is returned, indicating "domain-only" broadcast on
 	 * open media or "don't care" on closed media.
-	 * 
+	 *
 	 * @return <code>true</code> if broadcast only within domain or "don't care" mode,
 	 *         <code>false</code> for system broadcast
 	 */
@@ -395,7 +395,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/**
 	 * Removes the additional information with the supplied type ID.
 	 * <p>
-	 * 
+	 *
 	 * @param infoType type ID of additional information to remove
 	 */
 	public synchronized void removeAdditionalInfo(final int infoType)
@@ -471,7 +471,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 			clone.data = getPayload();
 			// the byte arrays with additional info content are used internal only
 			// and don't need to be cloned
-			clone.addInfo = (byte[][]) clone.addInfo.clone();
+			clone.addInfo = clone.addInfo.clone();
 			return clone;
 		}
 		catch (final CloneNotSupportedException ignored) {}
@@ -525,7 +525,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/**
 	 * Writes all additional information to <code>os</code>.
 	 * <p>
-	 * 
+	 *
 	 * @param os the output stream
 	 */
 	synchronized void writeAddInfo(final ByteArrayOutputStream os)
@@ -584,9 +584,9 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 			System.arraycopy(addInfo, 0, newInfo, 0, addInfo.length);
 			addInfo = newInfo;
 		}
-		addInfo[infoType] = (byte[]) info.clone();
+		addInfo[infoType] = info.clone();
 	}
-	
+
 	private long toLong(final byte[] data)
 	{
 		final long l = (data[0] & 0xff) << 8 | data[1] & 0xff;

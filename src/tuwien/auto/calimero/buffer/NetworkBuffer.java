@@ -137,7 +137,8 @@ public final class NetworkBuffer
 		private final class SquirrelLink implements KNXNetworkLink
 		{
 			private final KNXNetworkLink base;
-			private final EventListeners listeners = new EventListeners();
+			private final EventListeners<NetworkLinkListener> listeners = new EventListeners<>(
+					NetworkLinkListener.class);
 
 			SquirrelLink(final KNXNetworkLink baseLink)
 			{
@@ -367,7 +368,7 @@ public final class NetworkBuffer
 	// private static final List buffers = new ArrayList();
 	private static int uniqueInstID;
 
-	private final List configs = Collections.synchronizedList(new ArrayList());
+	private final List<ConfigImpl> configs = Collections.synchronizedList(new ArrayList<>());
 	private final String name;
 
 	private NetworkBuffer(final String installation)
@@ -449,8 +450,8 @@ public final class NetworkBuffer
 	public Configuration getConfiguration(final KNXNetworkLink bufferedLink)
 	{
 		synchronized (configs) {
-			for (final Iterator i = configs.iterator(); i.hasNext();) {
-				final ConfigImpl lc = (ConfigImpl) i.next();
+			for (final Iterator<ConfigImpl> i = configs.iterator(); i.hasNext();) {
+				final ConfigImpl lc = i.next();
 				if (lc.getBufferedLink() == bufferedLink)
 					return lc;
 			}
@@ -467,7 +468,7 @@ public final class NetworkBuffer
 	 */
 	public Configuration[] getAllConfigurations()
 	{
-		return (Configuration[]) configs.toArray(new Configuration[configs.size()]);
+		return configs.toArray(new Configuration[configs.size()]);
 	}
 
 	/**
@@ -491,7 +492,7 @@ public final class NetworkBuffer
 	{
 		synchronized (configs) {
 			while (!configs.isEmpty())
-				removeConfiguration((Configuration) configs.get(configs.size() - 1));
+				removeConfiguration(configs.get(configs.size() - 1));
 		}
 	}
 

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@ import java.util.List;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXListener;
+import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.exception.KNXException;
 import tuwien.auto.calimero.exception.KNXIllegalStateException;
@@ -63,7 +64,7 @@ import tuwien.auto.calimero.knxnetip.KNXnetIPDevMgmt;
  * <p>
  * This adapter is based on a {@link KNXnetIPDevMgmt} connection.<br>
  * The object instance used is always the first one, i.e., object instance 1.
- * 
+ *
  * @author B. Malinowsky
  */
 public class LocalDeviceMgmtAdapter implements PropertyAdapter
@@ -104,14 +105,14 @@ public class LocalDeviceMgmtAdapter implements PropertyAdapter
 
 	private final KNXnetIPConnection conn;
 	private final PropertyAdapterListener listener;
-	private final List frames = Collections.synchronizedList(new LinkedList());
+	private final List<CEMI> frames = Collections.synchronizedList(new LinkedList<>());
 
-	private final List interfaceObjects = new ArrayList();
+	private final List<Pair> interfaceObjects = new ArrayList<>();
 	private final boolean checkRW;
 
 	private volatile boolean serverReset;
 	private volatile boolean closed;
-	
+
 	// little helpers to reduce a property scan to an acceptable level
 	private int lastObjIndex;
 	private int lastPropIndex;
@@ -129,7 +130,7 @@ public class LocalDeviceMgmtAdapter implements PropertyAdapter
 	 * check, the <code>queryWriteEnable</code> option has to be set appropriately.
 	 * Currently, the write enabled check is only of interest when getting a property
 	 * description {@link #getDescription(int, int, int)}.
-	 * 
+	 *
 	 * @param localEP the local endpoint of the connection, use <code>null</code> for
 	 *        assigning the default local host and an unused (ephemeral) port
 	 * @param serverCtrlEP the remote server control endpoint used for connect request
@@ -197,7 +198,7 @@ public class LocalDeviceMgmtAdapter implements PropertyAdapter
 			1, pid, start, elements), KNXnetIPConnection.WAIT_FOR_CON);
 		return findFrame(CEMIDevMgmt.MC_PROPREAD_CON);
 	}
-		
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.PropertyAdapter#getDescription(int, int, int)
 	 */
@@ -306,8 +307,8 @@ public class LocalDeviceMgmtAdapter implements PropertyAdapter
 
 	private int getObjectType(final int objIndex) throws KNXRemoteException
 	{
-		for (final Iterator i = interfaceObjects.iterator(); i.hasNext();) {
-			final Pair p = (Pair) i.next();
+		for (final Iterator<Pair> i = interfaceObjects.iterator(); i.hasNext();) {
+			final Pair p = i.next();
 			if (p.oindex == objIndex)
 				return p.otype;
 		}
@@ -340,7 +341,7 @@ public class LocalDeviceMgmtAdapter implements PropertyAdapter
 			lastObjType = objType;
 		}
 	}
-	
+
 	private void resetLastDescription()
 	{
 		lastObjIndex = -1;

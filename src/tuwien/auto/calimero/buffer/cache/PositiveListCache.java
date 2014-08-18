@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,20 +54,20 @@ import java.util.Set;
  * <p>
  * The usage value of {@link CacheObject#getUsage()} equals the access count,
  * {@link CacheObject#getCount()}.
- * 
+ *
  * @author B. Malinowsky
  */
 public class PositiveListCache extends ExpiringCache
 {
-	private Set posList = new HashSet();
+	private Set<Object> posList = new HashSet<>();
 	private long hits;
 	private long misses;
- 
+
 	/**
 	 * Creates a new {@link PositiveListCache}.
 	 * <p>
 	 * Optionally, an expiring time can be specified.
-	 * 
+	 *
 	 * @param timeToExpire timespan in seconds for cache objects to stay valid,
 	 *        or 0 for no expiring
 	 */
@@ -80,12 +80,12 @@ public class PositiveListCache extends ExpiringCache
 	 * Creates a new {@link PositiveListCache} and inits the positive key list.
 	 * <p>
 	 * Optionally, an expiring time can be specified.
-	 * 
+	 *
 	 * @param positiveList a Collection holding the allowed keys for this cache
 	 * @param timeToExpire timespan in seconds for cache objects to stay valid,
 	 *        or 0 for no expiring
 	 */
-	public PositiveListCache(final Collection positiveList, final int timeToExpire)
+	public PositiveListCache(final Collection<? extends Object> positiveList, final int timeToExpire)
 	{
 		this(timeToExpire);
 		setPositiveList(positiveList);
@@ -96,17 +96,17 @@ public class PositiveListCache extends ExpiringCache
 	 * <p>
 	 * The old list is discarded. All cache objects will be updated immediately
 	 * according to the new list.
-	 * 
+	 *
 	 * @param positiveList a Collection holding the allowed keys for this cache
 	 */
-	public final synchronized void setPositiveList(final Collection positiveList)
+	public final synchronized void setPositiveList(final Collection<? extends Object> positiveList)
 	{
 		if (posList.size() == 0)
 			posList.addAll(positiveList);
 		else {
-			posList = new HashSet(positiveList);
+			posList = new HashSet<>(positiveList);
 			// remove old keys not in the new list anymore
-			for (final Iterator i = map.keySet().iterator(); i.hasNext(); )
+			for (final Iterator<Object> i = map.keySet().iterator(); i.hasNext(); )
 				if (!posList.contains(i.next()))
 					i.remove();
 		}
@@ -116,7 +116,7 @@ public class PositiveListCache extends ExpiringCache
 	 * Adds a new allowed <code>key</code> to the positive list, if it is not
 	 * already present.
 	 * <p>
-	 * 
+	 *
 	 * @param key the new key object
 	 */
 	public final synchronized void addToPositiveList(final Object key)
@@ -129,7 +129,7 @@ public class PositiveListCache extends ExpiringCache
 	 * <p>
 	 * The cache objects will be updated immediately according to the removed
 	 * key.
-	 * 
+	 *
 	 * @param key key object to remove
 	 */
 	public final synchronized void removeFromPositiveList(final Object key)
@@ -140,7 +140,7 @@ public class PositiveListCache extends ExpiringCache
 
 	/**
 	 * Returns the positive list currently used by this cache.
-	 * 
+	 *
 	 * @return array of all allowed key objects.
 	 */
 	public final synchronized Object[] getPositiveList()
@@ -174,7 +174,7 @@ public class PositiveListCache extends ExpiringCache
 	 */
 	public synchronized CacheObject get(final Object key)
 	{
-		final CacheObject o = (CacheObject) map.get(key);
+		final CacheObject o = map.get(key);
 		if (o != null) {
 			updateAccess(o);
 			++hits;
@@ -201,7 +201,7 @@ public class PositiveListCache extends ExpiringCache
 		stopSweeper();
 		map.clear();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.buffer.cache.Cache#statistic()
 	 */

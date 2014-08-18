@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,26 +46,26 @@ import tuwien.auto.calimero.xml.Element;
 /**
  * Default implementation of XML element.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public class DefaultElement implements Element
 {
 	private final String type;
-	private final List attributes;
+	private final List<Attribute> attributes;
 	private String content;
 	private volatile boolean emptyTag;
 
 	/**
 	 * Creates a new element <code>name</code>.
 	 * <p>
-	 * 
+	 *
 	 * @param name name of element, the element's type
 	 */
 	public DefaultElement(final String name)
 	{
 		type = name;
-		attributes = new ArrayList();
+		attributes = new ArrayList<>();
 	}
 
 	/* (non-Javadoc)
@@ -93,8 +93,8 @@ public class DefaultElement implements Element
 	public final String getAttribute(final String name)
 	{
 		synchronized (attributes) {
-			for (final Iterator i = attributes.iterator(); i.hasNext();) {
-				final Attribute a = (Attribute) i.next();
+			for (final Iterator<Attribute> i = attributes.iterator(); i.hasNext();) {
+				final Attribute a = i.next();
 				if (a.getName().equals(name))
 					return a.getValue();
 			}

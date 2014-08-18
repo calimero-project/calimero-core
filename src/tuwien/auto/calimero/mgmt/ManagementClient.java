@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ import tuwien.auto.calimero.link.KNXNetworkLink;
  * Application layer services providing management related tasks in a KNX network for a
  * client.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public interface ManagementClient
@@ -60,7 +60,7 @@ public interface ManagementClient
 	 * Sets the response timeout to wait for a KNX response message to arrive to complete
 	 * a message exchange.
 	 * <p>
-	 * 
+	 *
 	 * @param timeout time in seconds, <code>timeout > 0</code>
 	 */
 	void setResponseTimeout(int timeout);
@@ -69,7 +69,7 @@ public interface ManagementClient
 	 * Returns the response timeout used when waiting for a KNX response message to
 	 * arrive.
 	 * <p>
-	 * 
+	 *
 	 * @return timeout in seconds
 	 */
 	int getResponseTimeout();
@@ -77,7 +77,7 @@ public interface ManagementClient
 	/**
 	 * Sets the KNX message priority for KNX messages to send.
 	 * <p>
-	 * 
+	 *
 	 * @param p new priority to use
 	 */
 	void setPriority(Priority p);
@@ -85,7 +85,7 @@ public interface ManagementClient
 	/**
 	 * Returns the current used KNX message priority for KNX messages.
 	 * <p>
-	 * 
+	 *
 	 * @return message Priority
 	 */
 	Priority getPriority();
@@ -95,7 +95,7 @@ public interface ManagementClient
 	 * communication.
 	 * <p>
 	 * A management client will use the transport layer for creating the destination.
-	 * 
+	 *
 	 * @param remote destination KNX individual address
 	 * @param connectionOriented <code>true</code> for connection oriented mode,
 	 *        <code>false</code> for connectionless mode
@@ -108,7 +108,7 @@ public interface ManagementClient
 	 * management communication.
 	 * <p>
 	 * A management client will use the transport layer for creating the destination.
-	 * 
+	 *
 	 * @param remote destination KNX individual address
 	 * @param connectionOriented <code>true</code> for connection oriented mode,
 	 *        <code>false</code> for connectionless mode
@@ -127,7 +127,7 @@ public interface ManagementClient
 	 * <p>
 	 * This service uses broadcast communication mode.<br>
 	 * The communication partner is a device in programming mode.
-	 * 
+	 *
 	 * @param newAddress new address
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
@@ -146,7 +146,7 @@ public interface ManagementClient
 	 * is waited for read responses. If <code>oneAddressOnly</code> is <code>true</code>,
 	 * the array size of returned addresses is 1, and the method returns after receiving
 	 * the first read response.
-	 * 
+	 *
 	 * @param oneAddressOnly <code>true</code> if method should return after receiving the
 	 *        first read response, <code>false</code> to wait the whole response timeout
 	 *        for read responses
@@ -166,7 +166,7 @@ public interface ManagementClient
 	 * unique serial number in the KNX network.
 	 * <p>
 	 * This service uses broadcast communication mode.<br>
-	 * 
+	 *
 	 * @param serialNo byte array with serial number, <code>serialNo.length</code> = 6
 	 * @param newAddress new address
 	 * @throws KNXTimeoutException on a timeout during send
@@ -180,7 +180,7 @@ public interface ManagementClient
 	 * serial number in the KNX network.
 	 * <p>
 	 * This service uses broadcast communication mode.<br>
-	 * 
+	 *
 	 * @param serialNo byte array with serial number, <code>serialNo.length</code> = 6
 	 * @return the individual address
 	 * @throws KNXTimeoutException on a timeout during send or no address response was
@@ -198,7 +198,7 @@ public interface ManagementClient
 	 * <p>
 	 * This service uses system broadcast communication mode.<br>
 	 * The communication partner is a device in programming mode.
-	 * 
+	 *
 	 * @param domain byte array with domain address, <code>domain.length</code> = 2 (on
 	 *        powerline medium) or <code>domain.length</code> = 6 (on RF medium)
 	 * @throws KNXTimeoutException on a timeout during send
@@ -218,7 +218,7 @@ public interface ManagementClient
 	 * waited for address responses. If <code>oneAddressOnly</code> is <code>true</code>,
 	 * the method returns after receiving the first read response, and the list contains
 	 * one domain address.
-	 * 
+	 *
 	 * @param oneAddressOnly <code>true</code> if method should return after receiving the
 	 *        first read response, <code>false</code> to wait the whole response timeout
 	 *        for read responses
@@ -231,7 +231,7 @@ public interface ManagementClient
 	 * @throws KNXException on other read domain address errors
 	 * @throws InterruptedException
 	 */
-	List readDomainAddress(boolean oneAddressOnly) throws KNXException,
+	List<byte[]> readDomainAddress(boolean oneAddressOnly) throws KNXException,
 		InterruptedException;
 
 	/**
@@ -245,7 +245,7 @@ public interface ManagementClient
 	 * A note on answering behavior when the specified <code>range</code> is &lt; 255:<br>
 	 * If an answering device 'A' receives a domain address response from another
 	 * answering device 'B', 'A' will terminate the transmission of its response.
-	 * 
+	 *
 	 * @param domain byte array with domain address to check for,
 	 *        <code>domain.length</code> = 2 (powerline medium only)
 	 * @param startAddress start from this individual address, lower bound of checked
@@ -260,7 +260,7 @@ public interface ManagementClient
 	 * @throws KNXException on other read domain address errors
 	 * @throws InterruptedException
 	 */
-	List readDomainAddress(byte[] domain, IndividualAddress startAddress, int range)
+	List<byte[]> readDomainAddress(byte[] domain, IndividualAddress startAddress, int range)
 		throws KNXException, InterruptedException;
 
 	/**
@@ -283,7 +283,7 @@ public interface ManagementClient
 	 * | Link Mgmt Service support (2 bit) | Logical Tag (LT) base value (6 bit) |<br>
 	 * | CI 1 (16 bit) | CI 2 (16 bit) | CI 3 (16 bit) | CI 4 (16 bit) |</code><br>
 	 * with <code>CI = channel info</code>
-	 * 
+	 *
 	 * @param dst destination to read from
 	 * @param descType device descriptor type, 0 for type 0 or 2 for type 2
 	 * @return byte array containing device descriptor information
@@ -304,7 +304,7 @@ public interface ManagementClient
 	 * communication mode.<br>
 	 * Invoking this method may result in a termination of the transport layer connection
 	 * (i.e., state transition into disconnected for the supplied destination).
-	 * 
+	 *
 	 * @param dst destination to reset
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
@@ -337,7 +337,7 @@ public interface ManagementClient
 	 * <li>7: factory reset without resetting the device individual address (used together with
 	 * <code>channel</code>)</li>
 	 * </ul>
-	 * 
+	 *
 	 * @param dst destination to reset
 	 * @param eraseCode specifies the resources that shall be reset prior to resetting the device
 	 * @param channel the number of the application channel that shall be reset and the application
@@ -367,7 +367,7 @@ public interface ManagementClient
 	 * <code>offset = (data.length / elements) * i</code>.<br>
 	 * Note that interface objects with active access protection are only accessible over
 	 * connection oriented communication.
-	 * 
+	 *
 	 * @param dst destination to read from
 	 * @param objIndex interface object index
 	 * @param propertyId property identifier
@@ -394,7 +394,7 @@ public interface ManagementClient
 	 * The value of the written property is explicitly read back after writing.<br>
 	 * Note that interface objects with active access protection are only accessible over
 	 * connection oriented communication.
-	 * 
+	 *
 	 * @param dst destination to write to
 	 * @param objIndex interface object index
 	 * @param propertyId property identifier
@@ -426,7 +426,7 @@ public interface ManagementClient
 	 * identifier is 0, otherwise the index is ignored.<br>
 	 * When using the property ID for access, the property index in the returned
 	 * description is either the correct property index of the addressed property or 0.
-	 * 
+	 *
 	 * @param dst destination to read from
 	 * @param objIndex interface object index
 	 * @param propertyId property identifier, specify 0 to use the property index
@@ -448,7 +448,7 @@ public interface ManagementClient
 	 * Reads the value of the A/D converter of a communication partner.
 	 * <p>
 	 * This service uses point-to-point connection-oriented communication mode.<br>
-	 * 
+	 *
 	 * @param dst destination to read from
 	 * @param channel channel number of the A/D converter
 	 * @param repeat number of consecutive converter read operations
@@ -469,7 +469,7 @@ public interface ManagementClient
 	 * This service uses point-to-point connection-oriented communication mode.<br>
 	 * Note that a remote application layer shall ignore a memory read if the amount of
 	 * read memory does not fit into an APDU of maximum length.
-	 * 
+	 *
 	 * @param dst destination to read from
 	 * @param startAddr 16 bit start address to read in memory
 	 * @param bytes number of data bytes to read (with increasing addresses),
@@ -495,7 +495,7 @@ public interface ManagementClient
 	 * write response and do an explicit read back of the written memory.<br>
 	 * Note that a remote application layer shall ignore a memory write if the amount of
 	 * memory does not fit into an APDU of maximum length the remote layer can handle.
-	 * 
+	 *
 	 * @param dst destination to write to
 	 * @param startAddr 16 bit start address to write in memory
 	 * @param data byte array containing the memory data to write
@@ -523,7 +523,7 @@ public interface ManagementClient
 	 * If no authorization is done at all or the supplied key is not valid, the default
 	 * access level used is set to minimum. A set access level is valid until disconnected
 	 * from the partner or a new authorization request is done.
-	 * 
+	 *
 	 * @param dst destination at which to authorize
 	 * @param key byte array containing authorization key
 	 * @return the granted access level
@@ -546,7 +546,7 @@ public interface ManagementClient
 	 * is removed. The write request has to be done using equal or higher access rights
 	 * than the access rights of the <code>level</code> which is to be modified (i.e.
 	 * current level &lt;= level to change).
-	 * 
+	 *
 	 * @param dst destination to write to
 	 * @param level access level to modify
 	 * @param key new key for the access level or 0xFFFFFFFF to remove key
@@ -563,7 +563,7 @@ public interface ManagementClient
 	/**
 	 * Returns whether a network link is attached to this management client.
 	 * <p>
-	 * 
+	 *
 	 * @return <code>true</code> if link attached, <code>false</code> if detached
 	 */
 	boolean isOpen();
@@ -575,7 +575,7 @@ public interface ManagementClient
 	 * consequences. If no network link is attached, no action is performed.
 	 * <p>
 	 * Note that a detach does not trigger a close of the used network link.
-	 * 
+	 *
 	 * @return the formerly attached KNX network link, or <code>null</code> if already
 	 *         detached
 	 * @see TransportLayer#detach()

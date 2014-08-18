@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ import tuwien.auto.calimero.exception.KNXFormatException;
  * message.<br>
  * To reflect subsequent changes of the datapoint model in the filter, the filter has to
  * be reinitialized (using {@link #init(Configuration)}.
- * 
+ *
  * @author B. Malinowsky
  */
 public class StateFilter implements NetworkFilter, RequestFilter
@@ -91,8 +91,8 @@ public class StateFilter implements NetworkFilter, RequestFilter
 	// contains cross references of datapoints: which datapoint (key, of
 	// type KNXAddress) invalidates/updates which datapoints (value,
 	// of type List with GroupAddress entries)
-	private Map invalidate;
-	private Map update;
+	private Map<KNXAddress, List<GroupAddress>> invalidate;
+	private Map<KNXAddress, List<GroupAddress>> update;
 
 	// keep a reference to a notifying model used by the change listener
 	private DatapointModel model;
@@ -165,7 +165,7 @@ public class StateFilter implements NetworkFilter, RequestFilter
 	 * <p>
 	 * If update and invalidation information is available, other dependent datapoint
 	 * state values will be updated or invalidated appropriately.
-	 * 
+	 *
 	 * @param frame {@inheritDoc}
 	 * @param c {@inheritDoc}
 	 */
@@ -218,7 +218,7 @@ public class StateFilter implements NetworkFilter, RequestFilter
 				copy = new CEMILData(copy.getMessageCode(), copy.getSource(),
 						copy.getDestination(), copy.getPayload(), copy.getPriority(), false, hops);
 		}
-		
+
 		// put into cache object
 		CacheObject co = cache.get(dst);
 		if (co != null)
@@ -260,9 +260,9 @@ public class StateFilter implements NetworkFilter, RequestFilter
 	private void update(final CEMILData f, final Cache c)
 	{
 		if (update != null) {
-			final List upd = (List) update.get(f.getDestination());
+			final List<GroupAddress> upd = update.get(f.getDestination());
 			if (upd != null)
-				for (final Iterator i = upd.iterator(); i.hasNext();) {
+				for (final Iterator<GroupAddress> i = upd.iterator(); i.hasNext();) {
 					final CacheObject co = c.get(i.next());
 					if (co != null)
 						((LDataObject) co).setFrame(CEMIFactory.create(null,
@@ -274,20 +274,20 @@ public class StateFilter implements NetworkFilter, RequestFilter
 	private void invalidate(final CEMILData f, final Cache c)
 	{
 		if (invalidate != null) {
-			final List inv = (List) invalidate.get(f.getDestination());
+			final List<GroupAddress> inv = invalidate.get(f.getDestination());
 			if (inv != null)
-				for (final Iterator i = inv.iterator(); i.hasNext();)
+				for (final Iterator<GroupAddress> i = inv.iterator(); i.hasNext();)
 					c.remove(i.next());
 		}
 	}
 
 	private void createReferences(final DatapointModel m)
 	{
-		invalidate = new HashMap();
-		update = new HashMap();
-		final Collection c = ((DatapointMap) m).getDatapoints();
+		invalidate = new HashMap<>();
+		update = new HashMap<>();
+		final Collection<Datapoint> c = ((DatapointMap) m).getDatapoints();
 		synchronized (c) {
-			for (final Iterator i = c.iterator(); i.hasNext();) {
+			for (final Iterator<Datapoint> i = c.iterator(); i.hasNext();) {
 				try {
 					createReferences((StateDP) i.next());
 				}
@@ -302,14 +302,14 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		createReferences(update, dp.getAddresses(true), dp.getMainAddress());
 	}
 
-	private void createReferences(final Map map, final Collection forAddr,
-		final GroupAddress toAddr)
+	private void createReferences(final Map<KNXAddress, List<GroupAddress>> map,
+		final Collection<GroupAddress> forAddr, final GroupAddress toAddr)
 	{
-		for (final Iterator i = forAddr.iterator(); i.hasNext();) {
-			final Object o = i.next();
-			List l = (List) map.get(o);
+		for (final Iterator<GroupAddress> i = forAddr.iterator(); i.hasNext();) {
+			final GroupAddress ga = i.next();
+			List<GroupAddress> l = map.get(ga);
 			if (l == null)
-				map.put(o, l = new ArrayList());
+				map.put(ga, l = new ArrayList<>());
 			l.add(toAddr);
 		}
 	}
@@ -320,16 +320,16 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		destroyReferences(update, dp.getAddresses(true), dp.getMainAddress());
 	}
 
-	private void destroyReferences(final Map map, final Collection forAddr,
-		final GroupAddress toAddr)
+	private void destroyReferences(final Map<KNXAddress, List<GroupAddress>> map,
+		final Collection<GroupAddress> forAddr, final GroupAddress toAddr)
 	{
-		for (final Iterator i = forAddr.iterator(); i.hasNext();) {
-			final Object o = i.next();
-			final List l = (List) map.get(o);
+		for (final Iterator<GroupAddress> i = forAddr.iterator(); i.hasNext();) {
+			final GroupAddress ga = i.next();
+			final List<GroupAddress> l = map.get(ga);
 			if (l != null) {
 				l.remove(toAddr);
 				if (l.isEmpty())
-					map.remove(o);
+					map.remove(ga);
 			}
 		}
 	}

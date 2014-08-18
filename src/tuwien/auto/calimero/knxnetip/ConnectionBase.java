@@ -110,7 +110,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	/** acknowledgment service type used for this connection type */
 	protected final int serviceAck;
 	/** container for event listeners */
-	protected final EventListeners listeners = new EventListeners();
+	protected final EventListeners<KNXListener> listeners = new EventListeners<>(KNXListener.class);
 	/** logger for this connection */
 	protected Logger logger;
 

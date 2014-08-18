@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -57,14 +57,14 @@ import tuwien.auto.calimero.xml.KNXMLException;
 /**
  * Default entity resolver.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public class DefaultEntityResolver implements EntityResolver
 {
 	// IANA to Java encoding names map, used to specify existing charset decoders,
 	// only IANA names which are different from the java encoding names are listed
-	private static final Map javaNames = new HashMap();
+	private static final Map<String, String> javaNames = new HashMap<>();
 
 	static {
 		// add a new mapping of names, if value from "encoding"
@@ -151,7 +151,7 @@ public class DefaultEntityResolver implements EntityResolver
 			String javaEncoding = encoding;
 			if (att[1] != null) {
 				final String ianaEncoding = att[1].toUpperCase(Locale.ENGLISH);
-				javaEncoding = (String) javaNames.get(ianaEncoding);
+				javaEncoding = javaNames.get(ianaEncoding);
 				if (javaEncoding == null)
 					javaEncoding = ianaEncoding;
 			}

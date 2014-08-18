@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ import tuwien.auto.calimero.exception.KNXException;
  * such a property type.<br>
  * It offers methods to work with and alter these PDT to DPT mappings, to look up DPT
  * translators or to do complete translation of data.<br>
- * 
+ *
  * @author B. Malinowsky
  */
 public final class PropertyTypes
@@ -71,7 +71,7 @@ public final class PropertyTypes
 		/**
 		 * Creates a new DPTID used to identify a DPT translator.
 		 * <p>
-		 * 
+		 *
 		 * @param mainNumber DPT main number identifying a data type matching the property
 		 *        data type
 		 * @param dpt appropriate datapoint type for the property type
@@ -87,7 +87,7 @@ public final class PropertyTypes
 		 * <p>
 		 * If the datapoint type returned by {@link #getDPT()} is formatted the preferred
 		 * way as described in {@link TranslatorTypes}, the main number might be 0.
-		 * 
+		 *
 		 * @return main number (or 0) as int
 		 */
 		public final int getMainNumber()
@@ -98,7 +98,7 @@ public final class PropertyTypes
 		/**
 		 * Returns the datapoint type ID to be used in the translator.
 		 * <p>
-		 * 
+		 *
 		 * @return datapoint type as string
 		 */
 		public final String getDPT()
@@ -308,10 +308,10 @@ public final class PropertyTypes
 	 */
 	// private static final int PDT_ESCAPE = 0x3F;
 
-	private static final Map pt;
+	private static final Map<Integer, DPTID> pt;
 
 	static {
-		final Map m = new HashMap(40);
+		final Map<Integer, DPTID> m = new HashMap<>(40);
 		m.put(new Integer(PDT_CHAR), new DPTID(TranslatorTypes.TYPE_8BIT_SIGNED, "6.010"));
 		m.put(new Integer(PDT_UNSIGNED_CHAR),
 				new DPTID(TranslatorTypes.TYPE_8BIT_UNSIGNED, "5.010"));
@@ -349,10 +349,10 @@ public final class PropertyTypes
 	 * implemented/available) DPT translator.
 	 * <p>
 	 * A map key is of type Integer, holding the PDT, a map value is of type {@link DPTID}.
-	 * 
+	 *
 	 * @return property type map
 	 */
-	public static Map getAllPropertyTypes()
+	public static Map<Integer, DPTID> getAllPropertyTypes()
 	{
 		return pt;
 	}
@@ -363,14 +363,14 @@ public final class PropertyTypes
 	 * <p>
 	 * The translator looked for is specified in the property map. An available translator
 	 * is implemented and can be used for translation.
-	 * 
+	 *
 	 * @param dataType property data type to lookup
 	 * @return <code>true</code> iff translator and its subtype was found,
 	 *         <code>false</code> otherwise
 	 */
 	public static boolean hasTranslator(final int dataType)
 	{
-		final DPTID dpt = (DPTID) pt.get(new Integer(dataType));
+		final DPTID dpt = pt.get(new Integer(dataType));
 		if (dpt != null)
 			try {
 				final MainType t = TranslatorTypes.getMainType(dpt.getMainNumber());
@@ -387,7 +387,7 @@ public final class PropertyTypes
 	 * <p>
 	 * The translator is initialized with a subtype as specified by the property map.
 	 * Also, appending of units is disabled in the returned translator.
-	 * 
+	 *
 	 * @param dataType property data type to get the associated translator for
 	 * @return the created DPT translator
 	 * @throws KNXException on PDT not found or translator could not be created
@@ -395,7 +395,7 @@ public final class PropertyTypes
 	 */
 	public static DPTXlator createTranslator(final int dataType) throws KNXException
 	{
-		final DPTID dpt = (DPTID) pt.get(new Integer(dataType));
+		final DPTID dpt = pt.get(new Integer(dataType));
 		if (dpt == null)
 			throw new KNXException("PDT not found");
 		final DPTXlator t = TranslatorTypes.createTranslator(dpt.getMainNumber(),
@@ -408,7 +408,7 @@ public final class PropertyTypes
 	 * Utility method, like {@link #createTranslator(int)}, with the additional capability
 	 * to set the data to be used by the DPT translator.
 	 * <p>
-	 * 
+	 *
 	 * @param dataType property data type to get the associated translator for
 	 * @param data array with KNX DPT formatted data, the number of contained items is
 	 *        determined by the used DPT
@@ -428,7 +428,7 @@ public final class PropertyTypes
 	 * Utility method for retrieving the string representations of the KNX DPT data of the
 	 * specified property data type.
 	 * <p>
-	 * 
+	 *
 	 * @param dataType property data type of the <code>data</code> items
 	 * @param data array with KNX DPT formatted data, the number of contained items is
 	 *        determined by the used DPT

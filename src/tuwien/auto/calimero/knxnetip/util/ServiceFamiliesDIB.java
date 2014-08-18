@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ package tuwien.auto.calimero.knxnetip.util;
 import java.io.ByteArrayInputStream;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
@@ -51,7 +52,7 @@ import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
  * families not listed can also be used in this DIB.
  * <p>
  * Objects of this type are immutable.
- * 
+ *
  * @author B. Malinowsky
  * @see tuwien.auto.calimero.knxnetip.servicetype.DescriptionResponse
  */
@@ -110,7 +111,7 @@ public class ServiceFamiliesDIB extends DIB
 	/**
 	 * Creates a service families DIB out of a byte array.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing the service families DIB structure
 	 * @param offset start offset of DIB in <code>data</code>
 	 * @throws KNXFormatException if no DIB found or invalid structure
@@ -139,7 +140,7 @@ public class ServiceFamiliesDIB extends DIB
 	 * length, <code>familyIDs.length == familyVersions.length</code>. A service family ID
 	 * shall be contained only once in <code>familyIDs</code>. Otherwise, all but the last
 	 * of that specific service family ID are ignored (as well as their version number).
-	 * 
+	 *
 	 * @param familyIDs array containing the supported service family identifiers, use the
 	 *        service family identifier constants as provided by this class;
 	 *        <code>0 <= familyIDs[i] <= 255</code>, for all i with
@@ -169,12 +170,12 @@ public class ServiceFamiliesDIB extends DIB
 	 * The family entries are added to the DIB in arbitrary order (for example, it might
 	 * be the order as returned by the <code>families</code> entry iterator).
 	 * <p>
-	 * 
+	 *
 	 * @param families (unmodifiable) map containing the supported service families, with
 	 *        the service family of type {@link Integer} being the key, and the version of
 	 *        type {@link Integer} being the value.
 	 */
-	public ServiceFamiliesDIB(final Map families)
+	public ServiceFamiliesDIB(final Map<Integer, Integer> families)
 	{
 		super(2 + 2 * families.size(), SUPP_SVC_FAMILIES);
 		// maximum size of 20 is arbitrarily chosen as sanitation measure, but considered
@@ -185,9 +186,10 @@ public class ServiceFamiliesDIB extends DIB
 		ids = new int[families.size()];
 		versions = new int[ids.length];
 		int count = 0;
-		for (final Iterator i = families.entrySet().iterator(); i.hasNext();) {
-			final Map.Entry e = (Map.Entry) i.next();
-			add(((Integer) e.getKey()).intValue(), ((Integer) e.getValue()).intValue(), count++);
+		for (final Iterator<Entry<Integer, Integer>> i = families.entrySet().iterator(); i
+				.hasNext();) {
+			final Entry<Integer, Integer> e = i.next();
+			add(e.getKey().intValue(), e.getValue().intValue(), count++);
 		}
 	}
 
@@ -198,7 +200,7 @@ public class ServiceFamiliesDIB extends DIB
 	 * The returned set holds <code>Map.Entry</code> items, with the service family of
 	 * type {@link Integer} being the key, and the version of type {@link Integer} being
 	 * the value.
-	 * 
+	 *
 	 * @return an unmodifiable set containing supported entries (family-version pair)
 	 */
 	//public final Map getFamilies()
@@ -209,20 +211,20 @@ public class ServiceFamiliesDIB extends DIB
 	/**
 	 * Returns the service families of this DIB as array of family IDs.
 	 * <p>
-	 * 
+	 *
 	 * @return a new array containing the IDs of the supported service families, the array
 	 *         size reflects the number of supported service families
 	 */
 	public final int[] getFamilyIds()
 	{
-		return (int[]) ids.clone();
+		return ids.clone();
 	}
 
 	/**
 	 * Returns the version associated to a given supported service family.
 	 * <p>
 	 * If the service family is not supported, 0 is returned.
-	 * 
+	 *
 	 * @param familyId supported service family ID to lookup
 	 * @return version as unsigned byte, or 0
 	 */
@@ -238,7 +240,7 @@ public class ServiceFamiliesDIB extends DIB
 	/**
 	 * Returns the service family name for the supplied family ID.
 	 * <p>
-	 * 
+	 *
 	 * @param familyId service family ID to get name for
 	 * @return family name as string, or <code>null</code> on no name available
 	 */
@@ -264,7 +266,7 @@ public class ServiceFamiliesDIB extends DIB
 	/**
 	 * Returns a textual representation of this supported service families DIB.
 	 * <p>
-	 * 
+	 *
 	 * @return a string representation of the DIB object
 	 */
 	public String toString()

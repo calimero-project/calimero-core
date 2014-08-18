@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ import tuwien.auto.calimero.log.LogLevel;
  * <code>1900/1/1 00:00:00</code> (year/month/day hh:mm:ss), no clock fault, not in
  * daylight saving time, no external clock synchronization signal, day of week and work
  * day fields are not used.
- * 
+ *
  * @author B. Malinowsky
  */
 public class DPTXlatorDateTime extends DPTXlator
@@ -84,7 +84,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * Field number for <code>get</code> and <code>set</code> indicating whether the
 	 * year field is used.
 	 * <p>
-	 * 
+	 *
 	 * @see #setValidField(int, boolean)
 	 * @see #isValidField(int)
 	 */
@@ -94,7 +94,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * Field number for <code>get</code> and <code>set</code> indicating whether the
 	 * date field (month and day of month) is used.
 	 * <p>
-	 * 
+	 *
 	 * @see #setValidField(int, boolean)
 	 * @see #isValidField(int)
 	 */
@@ -104,7 +104,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * Field number for <code>get</code> and <code>set</code> indicating whether the
 	 * time field (hour, minute and second) is used.
 	 * <p>
-	 * 
+	 *
 	 * @see #setValidField(int, boolean)
 	 * @see #isValidField(int)
 	 */
@@ -114,7 +114,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * Field number for <code>get</code> and <code>set</code> indicating whether the
 	 * day of week field is used.
 	 * <p>
-	 * 
+	 *
 	 * @see #setValidField(int, boolean)
 	 * @see #isValidField(int)
 	 */
@@ -127,7 +127,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * <p>
 	 * The work-day information can be specified in string values by using "workday" to
 	 * denote a working day.
-	 * 
+	 *
 	 * @see #setValidField(int, boolean)
 	 * @see #isValidField(int)
 	 * @see #setDateTimeFlag(int, boolean)
@@ -143,7 +143,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * <p>
 	 * If daylight saving time is used, this information can be specified in string values
 	 * by using "DST" to denote daylight saving time.
-	 * 
+	 *
 	 * @see #setDateTimeFlag(int, boolean)
 	 * @see #getDateTimeFlag(int)
 	 */
@@ -155,7 +155,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * A clock fault indicates one or more corrupted date/time fields, for example due to
 	 * power down of device, not configured clock, no reception of synchronization
 	 * message, ... .
-	 * 
+	 *
 	 * @see #setDateTimeFlag(int, boolean)
 	 * @see #getDateTimeFlag(int)
 	 */
@@ -168,7 +168,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * In string values, this information can be specified by using "in sync" or "no sync"
 	 * to set clock synchronization. Omitting this information defaults to no external
 	 * clock synchronization signal.
-	 * 
+	 *
 	 * @see #setDateTimeFlag(int, boolean)
 	 * @see #getDateTimeFlag(int)
 	 */
@@ -222,19 +222,19 @@ public class DPTXlatorDateTime extends DPTXlator
 	private static final int[] FLAG_MASKS = { WD, DST, FAULT, QUALITY };
 
 	private static Calendar c;
-	private static final Map types;
+	private static final Map<String, DPT> types;
 
 	private boolean extFormat = true;
 
 	static {
-		types = new HashMap(3);
+		types = new HashMap<>(3);
 		types.put(DPT_DATE_TIME.getID(), DPT_DATE_TIME);
 	}
 
 	/**
 	 * Creates a translator for the given datapoint type.
 	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -246,7 +246,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type ID.
 	 * <p>
-	 * 
+	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
 	 *         <code>dptID</code>
@@ -273,7 +273,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * Sets year, month and day of month information of the first date/time item.
 	 * <p>
 	 * This method does not reset other item data or discard other translation items.
-	 * 
+	 *
 	 * @param year year value, 1900 &lt;= year &lt;= 2155
 	 * @param month month value, 1 &lt;= month &lt;= 12
 	 * @param day day value, 1 &lt;= day &lt;= 31
@@ -288,7 +288,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	/**
 	 * Returns the year information.
 	 * <p>
-	 * 
+	 *
 	 * @return year value, 0 &lt;= second &lt;= 59
 	 */
 	public final short getYear()
@@ -299,7 +299,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	/**
 	 * Returns the month information.
 	 * <p>
-	 * 
+	 *
 	 * @return month value, 0 &lt; month &lt;= 12, might be 0 on unused field
 	 */
 	public final int getMonth()
@@ -311,7 +311,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * Returns the day of month information.
 	 * <p>
 	 * The first day of month equals 1.<br>
-	 * 
+	 *
 	 * @return day value, 0 &lt; day &lt;= 31, might be 0 on unused field
 	 */
 	public final int getDay()
@@ -326,7 +326,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * variable (used in scheduling). The first day of week is Monday with a value of 1.
 	 * <br>
 	 * This method does not reset other item data or discard other translation items.
-	 * 
+	 *
 	 * @param day day of week value, 0 &lt;= day &lt;= 7
 	 */
 	public final void setDayOfWeek(final int day)
@@ -339,7 +339,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * <p>
 	 * The return of 0 corresponds to "any day", indicating the day of week is variable
 	 * (used in scheduling). The first day of week is Monday with a value of 1.
-	 * 
+	 *
 	 * @return day of week value, 0 &lt;= day of week &lt;= 7
 	 */
 	public final int getDayOfWeek()
@@ -352,7 +352,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * <p>
 	 * On a hour value of 24, values of minute and second have to be 0.<br>
 	 * This method does not reset other item data or discard other translation items.
-	 * 
+	 *
 	 * @param hour hour value, 0 &lt;= hour &lt;= 24
 	 * @param minute minute value, 0 &lt;= minute &lt;= 59
 	 * @param second second value, 0 &lt;= second &lt;= 59
@@ -371,7 +371,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * <p>
 	 * An hour value of 24 represents midnight of the old day, the corresponding minute
 	 * and second are always 0.
-	 * 
+	 *
 	 * @return hour value, 0 &lt;= hour &lt;= 24
 	 */
 	public final int getHour()
@@ -382,7 +382,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	/**
 	 * Returns the minute information.
 	 * <p>
-	 * 
+	 *
 	 * @return minute value, 0 &lt;= minute &lt;= 59
 	 */
 	public final int getMinute()
@@ -393,7 +393,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	/**
 	 * Returns the second information.
 	 * <p>
-	 * 
+	 *
 	 * @return second value, 0 &lt;= second &lt;= 59
 	 */
 	public final int getSecond()
@@ -409,7 +409,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * The <code>value</code> is interpreted by a calendar obtained by
 	 * {@link Calendar#getInstance()}.<br>
 	 * The new value item replaces any other items contained in this translator.
-	 * 
+	 *
 	 * @param milliseconds time value in milliseconds, as used by {@link Calendar}
 	 */
 	public final void setValue(final long milliseconds)
@@ -446,7 +446,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * itself is changed permanently.<br>
 	 * The used calendar is obtained by {@link Calendar#getInstance()}, and the
 	 * calculation is done in non-lenient mode.
-	 * 
+	 *
 	 * @return the date/time in milliseconds as long,
 	 * @throws KNXFormatException on required, but not set fields, if date/time
 	 *         information does not represent a valid calendar time,
@@ -462,7 +462,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * Allowed fields are {@link #CLOCK_FAULT}, {@link #CLOCK_SYNC}, {@link #WORKDAY}
 	 * and {@link #DAYLIGHT}.<br>
 	 * This method does not reset other item data or discard other translation items.
-	 * 
+	 *
 	 * @param field field number
 	 * @param value <code>true</code> to set the information flag, <code>false</code>
 	 *        to clear
@@ -484,7 +484,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * <p>
 	 * Allowed fields are {@link #CLOCK_FAULT}, {@link #CLOCK_SYNC}, {@link #WORKDAY}
 	 * and {@link #DAYLIGHT}.
-	 * 
+	 *
 	 * @param field field number to query
 	 * @return the field value as boolean, <code>true</code> if set, <code>false</code>
 	 *         otherwise
@@ -500,7 +500,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * Equal to invoking {@link #setDateTimeFlag(int, boolean)} with field
 	 * {@link #CLOCK_FAULT}.<br>
 	 * This method does not reset other item data or discard other translation items.
-	 * 
+	 *
 	 * @param fault <code>true</code> if clock is faulty, <code>false</code> otherwise
 	 * @see #setDateTimeFlag(int, boolean)
 	 * @see #CLOCK_FAULT
@@ -515,7 +515,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * <p>
 	 * It should always queried first, before accessing further date/time information, to
 	 * assure correct values.
-	 * 
+	 *
 	 * @return <code>true</code> on clock fault, <code>false</code> otherwise
 	 * @see #getDateTimeFlag(int)
 	 * @see #CLOCK_FAULT
@@ -532,7 +532,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * otherwise the field should be set not valid with <code>false</code>.<br>
 	 * Possible fields allowed to be set valid or not valid are {@link #YEAR},
 	 * {@link #DATE}, {@link #TIME}, {@link #DAY_OF_WEEK} and {@link #WORKDAY}.
-	 * 
+	 *
 	 * @param field field number
 	 * @param valid <code>true</code> if field is supported and contains valid data,
 	 *        <code>false</code> otherwise
@@ -552,7 +552,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * valid shall be ignored, it is not supported and contains no valid data.<br>
 	 * Possible fields allowed to be set valid or not valid are {@link #YEAR},
 	 * {@link #DATE}, {@link #TIME}, {@link #DAY_OF_WEEK} and {@link #WORKDAY}.
-	 * 
+	 *
 	 * @param field field number
 	 * @return <code>true</code> if field is supported and in use, <code>false</code>
 	 *         otherwise
@@ -579,7 +579,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * common range check of a value. So set items always match these KNX value ranges.<br>
 	 * This validation method checks if the date/time fields represent a valid calendar
 	 * time, which is a much stronger requirement.
-	 * 
+	 *
 	 * @return <code>true</code> if date/times are valid, <code>false</code> otherwise
 	 */
 	public final boolean validate()
@@ -641,7 +641,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * minute and second will get used, if valid.
 	 * <p>
 	 * The used format is extended by default.
-	 * 
+	 *
 	 * @param extended string format to use, <code>true</code> for extended format
 	 */
 	public final void useValueFormat(final boolean extended)
@@ -652,7 +652,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
 	 */
-	public Map getSubTypes()
+	public Map<String, DPT> getSubTypes()
 	{
 		return types;
 	}
@@ -661,7 +661,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * @return the subtypes of the date with time translator type
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
-	protected static Map getSubTypesStatic()
+	protected static Map<String, DPT> getSubTypesStatic()
 	{
 		return types;
 	}

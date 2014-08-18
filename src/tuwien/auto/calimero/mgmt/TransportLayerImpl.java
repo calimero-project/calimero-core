@@ -161,12 +161,12 @@ public class TransportLayerImpl implements TransportLayer
 	private volatile boolean detached;
 	private final KNXNetworkLink lnk;
 	private final NetworkLinkListener lnkListener = new NLListener();
-	private final List indications = new LinkedList();
-	private final EventListeners listeners;
+	private final List<FrameEvent> indications = new LinkedList<>();
+	private final EventListeners<TransportListener> listeners;
 
 	// holds the mapping of connection destination address to proxy
-	private final Map proxies = new HashMap();
-	private final Map incomingProxies = new HashMap();
+	private final Map<IndividualAddress, AggregatorProxy> proxies = new HashMap<>();
+	private final Map<IndividualAddress, AggregatorProxy> incomingProxies = new HashMap<>();
 	private AggregatorProxy active;
 
 	private volatile int repeated;
@@ -202,7 +202,7 @@ public class TransportLayerImpl implements TransportLayer
 		lnk = link;
 		lnk.addLinkListener(lnkListener);
 		logger = LogManager.getManager().getSlf4jLogger(getName());
-		listeners = new EventListeners(logger);
+		listeners = new EventListeners<>(TransportListener.class, logger);
 		serverSide = serverEndpoint;
 	}
 
@@ -537,7 +537,7 @@ public class TransportLayerImpl implements TransportLayer
 		while (remaining > 0) {
 			try {
 				while (indications.size() > 0)
-					handleConnected((CEMILData) ((FrameEvent) indications.remove(0)).getFrame(),
+					handleConnected((CEMILData) indications.remove(0).getFrame(),
 							active);
 				if (d.getState() == Destination.DISCONNECTED)
 					throw new KNXDisconnectException(d.getAddress()

@@ -150,8 +150,8 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 
 	private final KNXNetworkLink lnk;
 	private final NetworkLinkListener lnkListener = new NLListener();
-	private final EventListeners listeners;
-	private final List indications = new LinkedList();
+	private final EventListeners<ProcessListener> listeners;
+	private final List<FrameEvent> indications = new LinkedList<>();
 	private volatile Priority priority = Priority.LOW;
 	// maximum wait time in seconds for a response message
 	private volatile int responseTimeout = 10;
@@ -175,7 +175,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		lnk = link;
 		lnk.addLinkListener(lnkListener);
 		logger = LogManager.getManager().getSlf4jLogger("process " + link.getName());
-		listeners = new EventListeners(logger);
+		listeners = new EventListeners<>(ProcessListener.class, logger);
 	}
 
 	/* (non-Javadoc)

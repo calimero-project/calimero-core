@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2011 B. Malinowsky
+    Copyright (c) 2009, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -126,16 +126,17 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	public static final DPT DPT_DELTA_TIME = new DPT("13.100", "Delta time in seconds",
 			"-2147483648", "2147483647", "s");
 
-	private static final Map types;
-	
+	private static final Map<String, DPT> types;
+
 	static {
-		types = new HashMap(15);
+		types = new HashMap<>(15);
 		final Field[] fields = DPTXlator4ByteSigned.class.getFields();
 		for (int i = 0; i < fields.length; i++) {
 			try {
 				final Object o = fields[i].get(null);
 				if (o instanceof DPT) {
-					types.put(((DPT) o).getID(), o);
+					final DPT dpt = (DPT) o;
+					types.put(dpt.getID(), dpt);
 				}
 			}
 			catch (final IllegalAccessException e) {}
@@ -145,7 +146,7 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type.
 	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -157,7 +158,7 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type ID.
 	 * <p>
-	 * 
+	 *
 	 * @param dptId available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
 	 *         <code>dptID</code>
@@ -172,7 +173,7 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	/**
 	 * Sets the value of the first translation item.
 	 * <p>
-	 * 
+	 *
 	 * @param value signed value
 	 * @throws KNXFormatException on input value out of range for DPT
 	 * @see #getType()
@@ -185,7 +186,7 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	/**
 	 * Returns the first translation item as signed 32 Bit value.
 	 * <p>
-	 * 
+	 *
 	 * @return signed 32 Bit value using type long
 	 * @see #getType()
 	 */
@@ -216,7 +217,7 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
 	 */
-	public final Map getSubTypes()
+	public final Map<String, DPT> getSubTypes()
 	{
 		return types;
 	}
@@ -225,7 +226,7 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	 * @return the subtypes of the 4-byte unsigned translator type
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
-	protected static Map getSubTypesStatic()
+	protected static Map<String, DPT> getSubTypesStatic()
 	{
 		return types;
 	}
