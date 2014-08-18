@@ -51,7 +51,7 @@ import tuwien.auto.calimero.log.LogLevel;
  * The type contains the color information red, green and blue. <br>
  * <p>
  * The default return value after creation is <code>0 0 0</code>.
- * 
+ *
  * @author T. Wegner
  */
 
@@ -60,8 +60,7 @@ public class DPTXlatorRGB extends DPTXlator {
 	 * DPT ID 232.600, RGB Color; values from <b>0 0 0</b> to <b>255 255 255</b>.
 	 * <p>
 	 */
-	public static final DPT DPT_RGB =
-		new DPT("232.600", "RGB", "0 0 0", "255 255 255", "r g b");
+	public static final DPT DPT_RGB = new DPT("232.600", "RGB", "0 0 0", "255 255 255", "r g b");
 
 	private static final int RED = 0;
 	private static final int GREEN = 1;
@@ -77,7 +76,7 @@ public class DPTXlatorRGB extends DPTXlator {
 	/**
 	 * Creates a translator for the given datapoint type.
 	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -89,7 +88,7 @@ public class DPTXlatorRGB extends DPTXlator {
 	/**
 	 * Creates a translator for the given datapoint type ID.
 	 * <p>
-	 * 
+	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
 	 *         <code>dptID</code>
@@ -100,7 +99,7 @@ public class DPTXlatorRGB extends DPTXlator {
 		setTypeID(types, dptID);
 		data = new short[] { 0, 0, 0 };
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getAllValues()
 	 */
@@ -111,12 +110,12 @@ public class DPTXlatorRGB extends DPTXlator {
 			buf[i] = fromDPT(i);
 		return buf;
 	}
-	
+
 	public final void setValue(final short red, final short green, final short blue)
 	{
 		data = set(red, green, blue, new short[3], 0);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
 	 */
@@ -124,14 +123,14 @@ public class DPTXlatorRGB extends DPTXlator {
 	{
 		return types;
 	}
-	
+
 	private String fromDPT(final int index)
 	{
 		final int i = index * 3;
-		
+
 		// return red green blue
-		return "r:" + Short.toString(data[i + RED]) + " g:" + Short.toString(data[i + GREEN]) + " b:"
-			+ Short.toString(data[i + BLUE]);
+		return "r:" + Short.toString(data[i + RED]) + " g:" + Short.toString(data[i + GREEN])
+				+ " b:" + Short.toString(data[i + BLUE]);
 	}
 
 	protected void toDPT(final String value, final short[] dst, final int index)
@@ -143,30 +142,41 @@ public class DPTXlatorRGB extends DPTXlator {
 		try {
 			int count = 0;
 			for (; count < maxTokens && t.hasMoreTokens(); ++count) {
-				String colorComponent = t.nextToken();
-				StringTokenizer t2 = new StringTokenizer(colorComponent, ":");
-				
+				final String colorComponent = t.nextToken();
+				final StringTokenizer t2 = new StringTokenizer(colorComponent, ":");
+
 				if (t2.hasMoreTokens()) {
-					String componentID = t2.nextToken();
-					
+					final String componentID = t2.nextToken();
+
 					if (t2.hasMoreTokens()) {
-						String componentValue = t2.nextToken();
-						
+						final String componentValue = t2.nextToken();
+
 						if (componentID.equals("r")) {
 							r = Short.parseShort(componentValue);
-						} else if (componentID.equals("g")) {
-							g = Short.parseShort(componentValue);
-						} else if (componentID.equals("b")) {
-							b = Short.parseShort(componentValue);
-						} else {
-							logThrow(LogLevel.WARN, "invalid color component " + componentID + " in " + value, null, value);
 						}
-					} else throw new KNXIllegalArgumentException("expected number after " + componentID + ":");
-				} else throw new KNXIllegalArgumentException("expected component identifier e.g. 'r:', 'g:', 'b:' in " + colorComponent);
+						else if (componentID.equals("g")) {
+							g = Short.parseShort(componentValue);
+						}
+						else if (componentID.equals("b")) {
+							b = Short.parseShort(componentValue);
+						}
+						else {
+							logThrow(LogLevel.WARN, "invalid color component " + componentID
+									+ " in " + value, null, value);
+						}
+					}
+					else
+						throw new KNXIllegalArgumentException("expected number after "
+								+ componentID + ":");
+				}
+				else
+					throw new KNXIllegalArgumentException(
+							"expected component identifier e.g. 'r:', 'g:', 'b:' in "
+									+ colorComponent);
 			}
 			if ((r == -1) || (g == -1) || (b == -1)) {
 				logThrow(LogLevel.WARN, "invalid color " + value, null, value);
-				
+
 				return;
 			} else {
 				set(r, g, b, dst, index);
@@ -177,9 +187,9 @@ public class DPTXlatorRGB extends DPTXlator {
 		}
 		catch (final NumberFormatException e) {
 			logThrow(LogLevel.WARN, "invalid number in " + value, null, value);
-		}		
-	}	
-	
+		}
+	}
+
 	private short[] set(final int red, final int green, final int blue, final short[] dst,
 		final int index)
 	{
@@ -194,5 +204,5 @@ public class DPTXlatorRGB extends DPTXlator {
 		dst[i + GREEN] = (short) green;
 		dst[i + BLUE] = (short) blue;
 		return dst;
-	}	
+	}
 }
