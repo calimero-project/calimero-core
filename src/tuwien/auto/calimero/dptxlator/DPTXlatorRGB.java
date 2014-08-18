@@ -48,9 +48,14 @@ import tuwien.auto.calimero.log.LogLevel;
  * Translator for KNX DPTs with main number 232, type <b>rgb</b>.
  * <p>
  * The KNX data type width is 3 bytes.<br>
- * The type contains the color information red, green and blue. <br>
+ * The type contains the color information red, green and blue, with a resolution of 1.<br>
  * <p>
  * The default return value after creation is <code>0 0 0</code>.
+ * <p>
+ * Note, that the RGB color model is device dependent, and RGB values are based on a
+ * device-dependent interpretation of RGB. Therefore, do not expect consistent behavior with respect
+ * to, e.g., linearity or brightness, across different applications or function block (FB)
+ * specifications.
  *
  * @author T. Wegner
  */
@@ -90,8 +95,7 @@ public class DPTXlatorRGB extends DPTXlator {
 	 * <p>
 	 *
 	 * @param dptID available implemented datapoint type ID
-	 * @throws KNXFormatException on wrong formatted or not expected (available)
-	 *         <code>dptID</code>
+	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptID</code>
 	 */
 	public DPTXlatorRGB(final String dptID) throws KNXFormatException
 	{
@@ -111,7 +115,17 @@ public class DPTXlatorRGB extends DPTXlator {
 		return buf;
 	}
 
-	public final void setValue(final short red, final short green, final short blue)
+	/**
+	 * Sets the translation value from a 3-tuple (R,G,B), specifying the red, green, and blue
+	 * color values.
+	 * <p>
+	 * If succeeded, any other items in the translator are discarded.
+	 *
+	 * @param red the red color component, <code>0 &le; red &le; 255</code>
+	 * @param green the green color component, <code>0 &le; red &le; 255</code>
+	 * @param blue the blue color component, <code>0 &le; red &le; 255</code>
+	 */
+	public final void setValue(final int red, final int green, final int blue)
 	{
 		data = set(red, green, blue, new short[3], 0);
 	}
@@ -170,9 +184,8 @@ public class DPTXlatorRGB extends DPTXlator {
 								+ componentID + ":");
 				}
 				else
-					throw new KNXIllegalArgumentException(
-							"expected component identifier e.g. 'r:', 'g:', 'b:' in "
-									+ colorComponent);
+					throw new KNXIllegalArgumentException("expected component identifier "
+							+ "e.g. 'r:', 'g:', 'b:' in " + colorComponent);
 			}
 			if ((r == -1) || (g == -1) || (b == -1)) {
 				logThrow(LogLevel.WARN, "invalid color " + value, null, value);
