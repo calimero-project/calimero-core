@@ -191,11 +191,11 @@ public class LogService
 	}
 
 	/**
-	 * @deprecated Used for transition to slf4j.
 	 * Returns the slf4j logger implementation.
 	 * <p>
 	 *
 	 * @return the slf4j logger or <null> if none is used
+	 * @deprecated Used for transition to slf4j.
 	 */
 	public final Logger slf4j()
 	{
@@ -373,10 +373,11 @@ public class LogService
 	 *
 	 * @param msg log information
 	 */
-	public void fatal(final String msg)
-	{
-		log(LogLevel.FATAL, msg, null);
-	}
+// TODO remove
+//	public void fatal(final String msg)
+//	{
+//		log(LogLevel.FATAL, msg, null);
+//	}
 
 	/**
 	 * Offers <code>msg</code> and the <code>throwable</code> object with log level
@@ -386,10 +387,10 @@ public class LogService
 	 * @param msg log information
 	 * @param t throwable object
 	 */
-	public void fatal(final String msg, final Throwable t)
-	{
-		log(LogLevel.FATAL, msg, t);
-	}
+//	public void fatal(final String msg, final Throwable t)
+//	{
+//		log(LogLevel.FATAL, msg, t);
+//	}
 
 	/**
 	 * Offers <code>msg</code> and the <code>throwable</code> object with log
@@ -428,24 +429,42 @@ public class LogService
 			catch (final InterruptedException ignore) {}
 	}
 
-	// TODO slf4j_impl: temporarily used as forwarder to slf4j
-	private void forwardToImpl(final LogLevel level, final String msg, final Throwable t)
+	/**
+	 * Logs a message and an exception with the specified log level using the supplied logger.
+	 * <p>
+	 * This method works around the limitation that slf4j loggers don't have a generic
+	 * <code>log</code> method.
+	 *
+	 * @param logger the logger
+	 * @param level log level to use for the message
+	 * @param msg the message to be logged
+	 * @param t the exception (throwable) to log, can be <code>null</code>
+	 * @deprecated Used for transition to slf4j.
+	 */
+	public static void log(final Logger logger, final LogLevel level, final String msg,
+		final Throwable t)
 	{
 		if (level.equals(LogLevel.OFF))
 			;
 		else if (level.equals( LogLevel.TRACE))
-			impl.trace(msg, t);
+			logger.trace(msg, t);
 		else if (level.equals( LogLevel.INFO))
-			impl.info(msg, t);
+			logger.info(msg, t);
 		else if (level.equals( LogLevel.WARN))
-			impl.warn(msg, t);
+			logger.warn(msg, t);
 		else if (level.equals( LogLevel.ERROR))
-			impl.error(msg, t);
+			logger.error(msg, t);
 		else if (level.equals(LogLevel.FATAL))
-			impl.error(msg, t);
+			logger.error(msg, t);
 		else if (level.equals(LogLevel.ALWAYS))
-			impl.trace(msg, t);
+			logger.trace(msg, t);
 		else
 			throw new KNXIllegalArgumentException("unknown log level");
+	}
+
+	// TODO slf4j_impl: temporarily used as forwarder to slf4j
+	private void forwardToImpl(final LogLevel level, final String msg, final Throwable t)
+	{
+		log(impl, level, msg, t);
 	}
 }
