@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ import java.util.Calendar;
  * Using <code>autoFlush = true</code> in the constructor ensures that no data buffering
  * will delay the output. Note that this may degrade performance.<br>
  * For occasional flushing use {@link #flush()} manually.
- * 
+ *
  * @author B. Malinowsky
  */
 public class LogStreamWriter extends LogWriter
@@ -88,7 +88,7 @@ public class LogStreamWriter extends LogWriter
 	 * A stream writer created by this method will not format the message (using
 	 * {@link #formatOutput(String, LogLevel, String, Throwable)}) before writing it to the output
 	 * stream. Parameter <code>autoFlush</code> sets flushing behavior on write() calls.
-	 * 
+	 *
 	 * @param level log level assigned with this <code>LogStreamWriter</code>
 	 * @param os an OutputStream used by this <code>LogStreamWriter</code>
 	 * @param autoFlush flush output after every successful call to write()
@@ -107,7 +107,7 @@ public class LogStreamWriter extends LogWriter
 		w.formatOutput = false;
 		return w;
 	}
-	
+
 	/**
 	 * Creates a <code>LogStreamWriter</code>.
 	 * <p>
@@ -127,7 +127,7 @@ public class LogStreamWriter extends LogWriter
 	 * Creates a <code>LogStreamWriter</code> with specified output stream.
 	 * <p>
 	 * The output stream is wrapped by a BufferedWriter.
-	 * 
+	 *
 	 * @param os an OutputStream used by this LogStreamWriter
 	 */
 	public LogStreamWriter(final OutputStream os)
@@ -139,7 +139,7 @@ public class LogStreamWriter extends LogWriter
 	/**
 	 * Creates a <code>LogStreamWriter</code> with specified log level and output stream.
 	 * <p>
-	 * 
+	 *
 	 * @param level log level assigned with this <code>LogStreamWriter</code>
 	 * @param os an OutputStream used by this <code>LogStreamWriter</code>
 	 * @see #LogStreamWriter(OutputStream)
@@ -154,7 +154,7 @@ public class LogStreamWriter extends LogWriter
 	 * Creates a <code>LogStreamWriter</code> with specified log level and output stream.
 	 * <p>
 	 * Parameter <code>autoFlush</code> sets flushing behavior on write() calls.
-	 * 
+	 *
 	 * @param level log level assigned with this <code>LogStreamWriter</code>
 	 * @param os an OutputStream used by this <code>LogStreamWriter</code>
 	 * @param autoFlush flush output after every successful call to write()
@@ -170,7 +170,7 @@ public class LogStreamWriter extends LogWriter
 	 * Creates a <code>LogStreamWriter</code> with specified log level and output stream.
 	 * <p>
 	 * Parameter <code>autoFlush</code> sets flushing behavior on write() calls.
-	 * 
+	 *
 	 * @param level log level assigned with this <code>LogStreamWriter</code>
 	 * @param os an OutputStream used by this <code>LogStreamWriter</code>
 	 * @param autoFlush flush output after every successful call to write()
@@ -226,7 +226,7 @@ public class LogStreamWriter extends LogWriter
 	 * {@inheritDoc} Depending on the parameter <code>close</code> of
 	 * {@link #LogStreamWriter(LogLevel, OutputStream, boolean, boolean)}, the assigned
 	 * output stream resource might not be closed
-	 * 
+	 *
 	 * @see #LogStreamWriter(LogLevel, OutputStream, boolean, boolean)
 	 */
 	public synchronized void close()
@@ -245,7 +245,7 @@ public class LogStreamWriter extends LogWriter
 	 * Sets the underlying writer to use for logging output.
 	 * <p>
 	 * The log stream writer obtains ownership of the writer object.
-	 * 
+	 *
 	 * @param w the Writer
 	 */
 	protected void setOutput(final Writer w)
@@ -259,7 +259,7 @@ public class LogStreamWriter extends LogWriter
 	 * <p>
 	 * Whether a log writer is prepared for logging is to check for a set output
 	 * destination, and, e.g., if the underlying output stream is open.
-	 * 
+	 *
 	 * @param level log level to check against
 	 * @return true if log is permitted, false otherwise
 	 */
@@ -286,7 +286,7 @@ public class LogStreamWriter extends LogWriter
 	 * '.' will be used. This way names like "package.subpackage.name" are shortened to
 	 * "name". Nevertheless, if the first character after '.' is numeric, no truncation
 	 * will be done to allow e.g. IP addresses in the log service name.
-	 * 
+	 *
 	 * @param logService name of the log service the message comes from
 	 * @param l log level of message and throwable
 	 * @param msg message to format
@@ -338,9 +338,8 @@ public class LogStreamWriter extends LogWriter
 
 		b.append(": ").append(msg);
 		if (t != null) {
-			final String s = t.getMessage() != null ? t.getMessage() : t.getClass().getName();
-			b.append(" (").append(s).append(")");
-			
+			b.append(" (").append(msgFromThrowable(t)).append(")");
+
 			if (logLevel.equals(LogLevel.FATAL)) {
 				final StackTraceElement[] trace = t.getStackTrace();
 				for (int i = 0; i < trace.length; ++i)
@@ -362,7 +361,7 @@ public class LogStreamWriter extends LogWriter
 			return;
 		try {
 			final String s = formatOutput ? formatOutput(logService, level, msg, t)
-					: (msg + (t != null ? ", " + t.getMessage() : ""));
+					: (msg + (t != null ? ", " + msgFromThrowable(t) : ""));
 			synchronized (this) {
 				out.write(s);
 				out.write(lineSep);
@@ -379,5 +378,10 @@ public class LogStreamWriter extends LogWriter
 	private static String pad2Digits(final int i)
 	{
 		return i > 9 ? Integer.toString(i) : "0" + Integer.toString(i);
+	}
+
+	private static String msgFromThrowable(final Throwable t)
+	{
+		return t.getMessage() != null ? t.getMessage() : t.getClass().getName();
 	}
 }
