@@ -66,7 +66,7 @@ public class EventListeners<T extends EventListener>
 	 */
 	public EventListeners(final Class<T> listenerType)
 	{
-		this(null, null);
+		this(listenerType, null);
 	}
 
 	/**
