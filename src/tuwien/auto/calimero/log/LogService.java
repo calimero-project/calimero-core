@@ -446,13 +446,13 @@ public class LogService
 	{
 		if (level.equals(LogLevel.OFF))
 			;
-		else if (level.equals( LogLevel.TRACE))
+		else if (level.equals(LogLevel.TRACE))
 			logger.trace(msg, t);
-		else if (level.equals( LogLevel.INFO))
+		else if (level.equals(LogLevel.INFO))
 			logger.info(msg, t);
-		else if (level.equals( LogLevel.WARN))
+		else if (level.equals(LogLevel.WARN))
 			logger.warn(msg, t);
-		else if (level.equals( LogLevel.ERROR))
+		else if (level.equals(LogLevel.ERROR))
 			logger.error(msg, t);
 		else if (level.equals(LogLevel.FATAL))
 			logger.error(msg, t);
