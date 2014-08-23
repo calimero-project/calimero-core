@@ -70,7 +70,7 @@ public class ExpiringCacheTest extends TestCase
 		 */
 		public CacheObject get(final Object key)
 		{
-			return (CacheObject) map.get(key);
+			return map.get(key);
 		}
 
 		/* (non-Javadoc)

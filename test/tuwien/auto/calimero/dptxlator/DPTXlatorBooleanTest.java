@@ -74,7 +74,7 @@ public class DPTXlatorBooleanTest extends TestCase
 		super.setUp();
 		LogManager.getManager().addWriter("DPTXlator", Util.getLogWriter());
 		t = new DPTXlatorBoolean(DPTXlatorBoolean.DPT_BOOL);
-		dpts = (DPT[]) t.getSubTypes().values().toArray(new DPT[0]);
+		dpts = t.getSubTypes().values().toArray(new DPT[0]);
 	}
 
 	/* (non-Javadoc)
