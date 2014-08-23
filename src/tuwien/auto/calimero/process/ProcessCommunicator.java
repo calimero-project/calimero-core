@@ -199,5 +199,6 @@ public interface ProcessCommunicator extends ProcessCommunicationBase
 	 * @return the formerly attached KNX network link, or <code>null</code> if already
 	 *         detached
 	 */
+	@Override
 	KNXNetworkLink detach();
 }

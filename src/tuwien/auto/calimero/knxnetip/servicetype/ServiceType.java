@@ -80,6 +80,7 @@ abstract class ServiceType
 	 *
 	 * @return service type as string
 	 */
+	@Override
 	public String toString()
 	{
 		return KNXnetIPHeader.getSvcName(svcType);

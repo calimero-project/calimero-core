@@ -93,6 +93,7 @@ public class TPSettings extends KNXMediumSettings
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.link.medium.KNXMediumSettings#getMedium()
 	 */
+	@Override
 	public int getMedium()
 	{
 		return tp1 ? MEDIUM_TP1 : MEDIUM_TP0;

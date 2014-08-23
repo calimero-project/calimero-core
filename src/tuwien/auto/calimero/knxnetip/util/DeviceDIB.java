@@ -284,7 +284,7 @@ public class DeviceDIB extends DIB
 	 */
 	public final byte[] getMACAddress()
 	{
-		return (byte[]) mac.clone();
+		return mac.clone();
 	}
 
 	/**
@@ -307,7 +307,7 @@ public class DeviceDIB extends DIB
 	 */
 	public final byte[] getMulticastAddress()
 	{
-		return (byte[]) mcast.clone();
+		return mcast.clone();
 	}
 
 	/**
@@ -359,7 +359,7 @@ public class DeviceDIB extends DIB
 	 */
 	public final byte[] getSerialNumber()
 	{
-		return (byte[]) serial.clone();
+		return serial.clone();
 	}
 
 	/**
@@ -392,6 +392,7 @@ public class DeviceDIB extends DIB
 	 * 
 	 * @return a string representation of the object
 	 */
+	@Override
 	public String toString()
 	{
 		InetAddress mc = null;
@@ -409,6 +410,7 @@ public class DeviceDIB extends DIB
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.knxnetip.util.DIB#toByteArray()
 	 */
+	@Override
 	public byte[] toByteArray()
 	{
 		final byte[] buf = super.toByteArray();

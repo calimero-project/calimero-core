@@ -69,17 +69,19 @@ public class DPTXlatorBooleanTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
 		LogManager.getManager().addWriter("DPTXlator", Util.getLogWriter());
 		t = new DPTXlatorBoolean(DPTXlatorBoolean.DPT_BOOL);
-		dpts = (DPT[]) t.getSubTypes().values().toArray(new DPT[0]);
+		dpts = t.getSubTypes().values().toArray(new DPT[0]);
 	}
 
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		Thread.sleep(100);

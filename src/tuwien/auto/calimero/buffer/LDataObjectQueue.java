@@ -207,6 +207,7 @@ public class LDataObjectQueue extends LDataObject
 	 * will replace the oldest inserted frame<br> - <code>false</code>,
 	 * <code>frame</code> is ignored and not queued.
 	 */
+	@Override
 	public synchronized void setFrame(final CEMILData frame)
 	{
 		if (!frame.getDestination().equals(getKey()))
@@ -234,6 +235,7 @@ public class LDataObjectQueue extends LDataObject
 	 * {@inheritDoc} Frames are returned in insertion order. If consuming read behavior is
 	 * enabled, the frame will be removed from the queue before return.
 	 */
+	@Override
 	public synchronized CEMILData getFrame()
 	{
 		final CEMILData[] c = (CEMILData[]) value;
@@ -256,6 +258,7 @@ public class LDataObjectQueue extends LDataObject
 	 * 
 	 * @return the queue as CEMILData array
 	 */
+	@Override
 	public Object getValue()
 	{
 		return getFrames();

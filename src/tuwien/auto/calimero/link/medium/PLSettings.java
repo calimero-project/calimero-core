@@ -103,7 +103,7 @@ public class PLSettings extends KNXMediumSettings
 		else if (domain.length != 2)
 			throw new KNXIllegalArgumentException("invalid length of domain address");
 		else
-			doa = (byte[]) domain.clone();
+			doa = domain.clone();
 	}
 
 	/**
@@ -115,12 +115,13 @@ public class PLSettings extends KNXMediumSettings
 	 */
 	public final synchronized byte[] getDomainAddress()
 	{
-		return (byte[]) doa.clone();
+		return doa.clone();
 	}
 
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.link.medium.KNXMediumSettings#getMedium()
 	 */
+	@Override
 	public int getMedium()
 	{
 		return pl132 ? MEDIUM_PL132 : MEDIUM_PL110;
@@ -140,6 +141,7 @@ public class PLSettings extends KNXMediumSettings
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.link.medium.KNXMediumSettings#toString()
 	 */
+	@Override
 	public String toString()
 	{
 		return super.toString() + " domain " + ((doa[0] & 0xff) << 8 | doa[1] & 0xff);

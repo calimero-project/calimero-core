@@ -43,6 +43,7 @@ import junit.framework.TestCase;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.Priority;
+import tuwien.auto.calimero.cemi.CEMILDataEx.AddInfo;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 
 /**
@@ -68,6 +69,7 @@ public class CEMILDataExTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -79,6 +81,7 @@ public class CEMILDataExTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		super.tearDown();
@@ -166,14 +169,14 @@ public class CEMILDataExTest extends TestCase
 	 */
 	public final void testGetAdditionalInfo()
 	{
-		final List l = f.getAdditionalInfo();
+		final List<AddInfo> l = f.getAdditionalInfo();
 		assertEquals(2, l.size());
-		assertEquals(CEMILDataEx.ADDINFO_PLMEDIUM, ((CEMILDataEx.AddInfo) l.get(0))
+		assertEquals(CEMILDataEx.ADDINFO_PLMEDIUM, l.get(0)
 			.getType());
-		assertEquals(2, ((CEMILDataEx.AddInfo) l.get(0)).getInfo().length);
-		assertEquals(CEMILDataEx.ADDINFO_TIMESTAMP_EXT, ((CEMILDataEx.AddInfo) l.get(1))
+		assertEquals(2, l.get(0).getInfo().length);
+		assertEquals(CEMILDataEx.ADDINFO_TIMESTAMP_EXT, l.get(1)
 			.getType());
-		assertEquals(4, ((CEMILDataEx.AddInfo) l.get(1)).getInfo().length);
+		assertEquals(4, l.get(1).getInfo().length);
 	}
 
 	/**
@@ -213,8 +216,8 @@ public class CEMILDataExTest extends TestCase
 	public final void testClone()
 	{
 		final CEMILDataEx f2 = (CEMILDataEx) f.clone();
-		final List l = f.getAdditionalInfo();
-		final List l2 = f2.getAdditionalInfo();
+		final List<AddInfo> l = f.getAdditionalInfo();
+		final List<AddInfo> l2 = f2.getAdditionalInfo();
 		for (int i = 0; i < l.size(); ++i)
 			assertNotSame(l.get(i), l2.get(i));
 	}

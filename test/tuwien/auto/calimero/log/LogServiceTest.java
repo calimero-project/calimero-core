@@ -67,6 +67,7 @@ public class LogServiceTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		ls = LogManager.getManager().getLogService("test-log");
@@ -75,6 +76,7 @@ public class LogServiceTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		ls = null;
@@ -246,7 +248,7 @@ public class LogServiceTest extends TestCase
 		}
 		final BufferedReader r = new BufferedReader(new FileReader(new File(file)));
 		String s = null;
-		final List v = new Vector();
+		final List<String> v = new Vector<>();
 		try {
 			while ((s = r.readLine()) != null)
 				v.add(s);
@@ -255,7 +257,7 @@ public class LogServiceTest extends TestCase
 			fail("reading back log file failed");
 		}
 		r.close();
-		return (String[]) v.toArray(new String[v.size()]);
+		return v.toArray(new String[v.size()]);
 	}
 
 }

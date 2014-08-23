@@ -257,6 +257,7 @@ public class PropertyClient implements PropertyAccess
 		/* (non-Javadoc)
 		 * @see java.lang.Object#hashCode()
 		 */
+		@Override
 		public int hashCode()
 		{
 			return ot << 16 | id;
@@ -265,6 +266,7 @@ public class PropertyClient implements PropertyAccess
 		/* (non-Javadoc)
 		 * @see java.lang.Object#equals(java.lang.Object)
 		 */
+		@Override
 		public boolean equals(final Object obj)
 		{
 			if (obj instanceof PropertyKey) {
@@ -277,6 +279,7 @@ public class PropertyClient implements PropertyAccess
 		/* (non-Javadoc)
 		 * @see java.lang.Comparable#compareTo(java.lang.Object)
 		 */
+		@Override
 		public int compareTo(final PropertyKey o)
 		{
 			final int rhs = o.hashCode();
@@ -555,6 +558,7 @@ public class PropertyClient implements PropertyAccess
 	 * @see tuwien.auto.calimero.mgmt.PropertyAccess
 	 * #setProperty(int, int, int, java.lang.String)
 	 */
+	@Override
 	public void setProperty(final int objIndex, final int pid, final int position,
 		final String value) throws KNXException
 	{
@@ -588,6 +592,7 @@ public class PropertyClient implements PropertyAccess
 	 * @see tuwien.auto.calimero.mgmt.PropertyAccess
 	 * #setProperty(int, int, int, int, byte[])
 	 */
+	@Override
 	public void setProperty(final int objIndex, final int pid, final int start,
 		final int elements, final byte[] data) throws KNXException
 	{
@@ -606,6 +611,7 @@ public class PropertyClient implements PropertyAccess
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.PropertyAccess#getProperty(int, int, int, int)
 	 */
+	@Override
 	public byte[] getProperty(final int objIndex, final int pid, final int start,
 		final int elements) throws KNXException
 	{
@@ -625,6 +631,7 @@ public class PropertyClient implements PropertyAccess
 	 * @see tuwien.auto.calimero.mgmt.PropertyAccess
 	 * #getPropertyTranslated(int, int, int, int)
 	 */
+	@Override
 	public DPTXlator getPropertyTranslated(final int objIndex, final int pid,
 		final int start, final int elements) throws KNXException
 	{
@@ -641,6 +648,7 @@ public class PropertyClient implements PropertyAccess
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.PropertyAccess#getDescription(int, int)
 	 */
+	@Override
 	public Description getDescription(final int objIndex, final int pid)
 		throws KNXException
 	{
@@ -667,6 +675,7 @@ public class PropertyClient implements PropertyAccess
 	 * @return a property description object
 	 * @throws KNXException on adapter errors while querying the description
 	 */
+	@Override
 	public Description getDescriptionByIndex(final int objIndex, final int propIndex)
 		throws KNXException
 	{
@@ -848,6 +857,7 @@ public class PropertyClient implements PropertyAccess
 		 * @see tuwien.auto.calimero.mgmt.PropertyClient.ResourceHandler#load
 		 * (java.lang.String)
 		 */
+		@Override
 		public Collection<Property> load(final String resource) throws KNXException
 		{
 			final XMLReader r = XMLFactory.getInstance().createXMLReader(resource);
@@ -892,6 +902,7 @@ public class PropertyClient implements PropertyAccess
 		 * @see tuwien.auto.calimero.mgmt.PropertyClient.ResourceHandler#save
 		 * (java.lang.String, java.util.Collection)
 		 */
+		@Override
 		public void save(final String resource, final Collection<Property> properties)
 			throws KNXException
 		{

@@ -90,7 +90,7 @@ public class ManufacturerDIB extends DIB
 		if (mfrID < 0 || mfrID > 0xffff)
 			throw new KNXIllegalArgumentException("manufacturer ID out of range [0..0xffff]");
 		id = mfrID;
-		mfrData = (byte[]) mfrSpecificData.clone();
+		mfrData = mfrSpecificData.clone();
 	}
 	
 	/**
@@ -114,12 +114,13 @@ public class ManufacturerDIB extends DIB
 	 */
 	public final byte[] getData()
 	{
-		return (byte[]) mfrData.clone();
+		return mfrData.clone();
 	}
 
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.knxnetip.util.DIB#toByteArray()
 	 */
+	@Override
 	public byte[] toByteArray()
 	{
 		final byte[] buf = super.toByteArray();
@@ -136,6 +137,7 @@ public class ManufacturerDIB extends DIB
 	 * 
 	 * @return a string representation of the DIB object
 	 */
+	@Override
 	public String toString()
 	{
 		return "KNX manufacturer ID 0x" + Integer.toHexString(id) + ", data 0x"

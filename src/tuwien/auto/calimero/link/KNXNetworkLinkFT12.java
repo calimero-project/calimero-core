@@ -74,6 +74,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 			super(source, logger);
 		}
 
+		@Override
 		public void frameReceived(final FrameEvent e)
 		{
 			try {
@@ -94,6 +95,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 			}
 		}
 
+		@Override
 		public void connectionClosed(final CloseEvent e)
 		{
 			((KNXNetworkLinkFT12) source).closed = true;
@@ -169,6 +171,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 	 * @see tuwien.auto.calimero.link.KNXNetworkLink#setKNXMedium
 	 * (tuwien.auto.calimero.link.medium.KNXMediumSettings)
 	 */
+	@Override
 	public void setKNXMedium(final KNXMediumSettings settings)
 	{
 		if (settings == null)
@@ -182,6 +185,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.link.KNXNetworkLink#getKNXMedium()
 	 */
+	@Override
 	public KNXMediumSettings getKNXMedium()
 	{
 		return medium;
@@ -191,6 +195,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 	 * @see tuwien.auto.calimero.link.KNXNetworkLink#addLinkListener
 	 * (tuwien.auto.calimero.link.event.NetworkLinkListener)
 	 */
+	@Override
 	public void addLinkListener(final NetworkLinkListener l)
 	{
 		notifier.addListener(l);
@@ -200,6 +205,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 	 * @see tuwien.auto.calimero.link.KNXNetworkLink#removeLinkListener
 	 * (tuwien.auto.calimero.link.event.NetworkLinkListener)
 	 */
+	@Override
 	public void removeLinkListener(final NetworkLinkListener l)
 	{
 		notifier.removeListener(l);
@@ -208,6 +214,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.link.KNXNetworkLink#setHopCount(int)
 	 */
+	@Override
 	public void setHopCount(final int count)
 	{
 		if (count < 0 || count > 7)
@@ -219,6 +226,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.link.KNXNetworkLink#getHopCount()
 	 */
+	@Override
 	public int getHopCount()
 	{
 		return hopCount;
@@ -228,6 +236,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 	 * @see tuwien.auto.calimero.link.KNXNetworkLink#sendRequest
 	 * (tuwien.auto.calimero.KNXAddress, tuwien.auto.calimero.Priority, byte[])
 	 */
+	@Override
 	public void sendRequest(final KNXAddress dst, final Priority p, final byte[] nsdu)
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
@@ -238,6 +247,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 	 * @see tuwien.auto.calimero.link.KNXNetworkLink#sendRequestWait
 	 * (tuwien.auto.calimero.KNXAddress, tuwien.auto.calimero.Priority, byte[])
 	 */
+	@Override
 	public void sendRequestWait(final KNXAddress dst, final Priority p, final byte[] nsdu)
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
@@ -248,6 +258,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 	 * @see tuwien.auto.calimero.link.KNXNetworkLink#send
 	 * (tuwien.auto.calimero.cemi.CEMILData, boolean)
 	 */
+	@Override
 	public void send(final CEMILData msg, final boolean waitForCon) throws KNXTimeoutException,
 		KNXLinkClosedException
 	{
@@ -257,6 +268,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.link.KNXNetworkLink#getName()
 	 */
+	@Override
 	public String getName()
 	{
 		return name;
@@ -265,6 +277,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.link.KNXNetworkLink#isOpen()
 	 */
+	@Override
 	public boolean isOpen()
 	{
 		return !closed;
@@ -273,6 +286,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.link.KNXNetworkLink#close()
 	 */
+	@Override
 	public void close()
 	{
 		synchronized (this) {
@@ -293,6 +307,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString()
 	{
 		return getName() + (closed ? "(closed), " : ", ") + medium.getMediumString()

@@ -96,6 +96,7 @@ public class DefaultXMLWriter implements XMLWriter
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.xml.XMLWriter#setOutput(java.io.Writer, boolean)
 	 */
+	@Override
 	public void setOutput(final Writer output, final boolean close)
 	{
 		reset();
@@ -106,6 +107,7 @@ public class DefaultXMLWriter implements XMLWriter
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.xml.XMLWriter#writeDeclaration(boolean, java.lang.String)
 	 */
+	@Override
 	public void writeDeclaration(final boolean standalone, final String encoding)
 		throws KNXMLException
 	{
@@ -126,6 +128,7 @@ public class DefaultXMLWriter implements XMLWriter
 	 * @see tuwien.auto.calimero.xml.XMLWriter#writeElement
 	 * (java.lang.String, java.util.List, java.lang.String)
 	 */
+	@Override
 	public void writeElement(final String name, final List<Attribute> attributes,
 		final String content) throws KNXMLException
 	{
@@ -142,6 +145,7 @@ public class DefaultXMLWriter implements XMLWriter
 	 * @see tuwien.auto.calimero.xml.XMLWriter#writeEmptyElement
 	 * (java.lang.String, java.util.List)
 	 */
+	@Override
 	public void writeEmptyElement(final String name, final List<Attribute> attributes)
 		throws KNXMLException
 	{
@@ -157,6 +161,7 @@ public class DefaultXMLWriter implements XMLWriter
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.xml.XMLWriter#writeCharData(java.lang.String, boolean)
 	 */
+	@Override
 	public void writeCharData(final String text, final boolean isCDATASection)
 		throws KNXMLException
 	{
@@ -177,6 +182,7 @@ public class DefaultXMLWriter implements XMLWriter
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.xml.XMLWriter#writeComment(java.lang.String)
 	 */
+	@Override
 	public void writeComment(final String comment) throws KNXMLException
 	{
 		try {
@@ -197,6 +203,7 @@ public class DefaultXMLWriter implements XMLWriter
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.xml.XMLWriter#endElement()
 	 */
+	@Override
 	public void endElement() throws KNXMLException
 	{
 		if (layout.empty())
@@ -214,6 +221,7 @@ public class DefaultXMLWriter implements XMLWriter
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.xml.XMLWriter#endAllElements()
 	 */
+	@Override
 	public void endAllElements() throws KNXMLException
 	{
 		try {
@@ -229,6 +237,7 @@ public class DefaultXMLWriter implements XMLWriter
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.xml.XMLWriter#close()
 	 */
+	@Override
 	public void close() throws KNXMLException
 	{
 		if (!layout.isEmpty())

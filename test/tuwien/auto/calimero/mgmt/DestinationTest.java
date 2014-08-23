@@ -68,26 +68,33 @@ public class DestinationTest extends TestCase
 		TLListener()
 		{}
 
+		@Override
 		public void broadcast(final FrameEvent e)
 		{}
 
+		@Override
 		public void dataConnected(final FrameEvent e)
 		{}
 
+		@Override
 		public void dataIndividual(final FrameEvent e)
 		{}
 
+		@Override
 		public void disconnected(final Destination d)
 		{
 			++disconnected;
 		}
 
+		@Override
 		public void group(final FrameEvent e)
 		{}
 
+		@Override
 		public void linkClosed(final CloseEvent e)
 		{}
 
+		@Override
 		public void detached(final DetachEvent e)
 		{}
 	};
@@ -103,6 +110,7 @@ public class DestinationTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -119,6 +127,7 @@ public class DestinationTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		if (lnk != null)

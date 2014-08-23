@@ -62,6 +62,7 @@ final class ReceiverLoop extends UdpSocketLooper implements Runnable
 		logger = connection.logger;
 	}
 
+	@Override
 	public void run()
 	{
 		try {
@@ -72,6 +73,7 @@ final class ReceiverLoop extends UdpSocketLooper implements Runnable
 		}
 	}
 
+	@Override
 	protected void onReceive(final InetSocketAddress source, final byte[] data,
 		final int offset, final int length) throws IOException
 	{

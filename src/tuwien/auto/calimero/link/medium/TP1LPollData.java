@@ -102,6 +102,7 @@ public class TP1LPollData extends RawFrameBase
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.link.medium.RawFrameBase#toString()
 	 */
+	@Override
 	public String toString()
 	{
 		return super.toString() + " exp. polldata " + expData;

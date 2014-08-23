@@ -110,18 +110,21 @@ public final class NetworkBuffer
 			SquirrelListener()
 			{}
 
+			@Override
 			public void confirmation(final FrameEvent e)
 			{
 				if (active && ((CEMILData) e.getFrame()).isPositiveConfirmation())
 					updateBuffer(e.getFrame());
 			}
 
+			@Override
 			public void indication(final FrameEvent e)
 			{
 				if (active)
 					updateBuffer(e.getFrame());
 			}
 
+			@Override
 			public void linkClosed(final CloseEvent e)
 			{
 				activate(false);
@@ -145,38 +148,45 @@ public final class NetworkBuffer
 				base = baseLink;
 			}
 
+			@Override
 			public void addLinkListener(final NetworkLinkListener l)
 			{
 				base.addLinkListener(l);
 				listeners.add(l);
 			}
 
+			@Override
 			public void removeLinkListener(final NetworkLinkListener l)
 			{
 				base.removeLinkListener(l);
 				listeners.remove(l);
 			}
 
+			@Override
 			public int getHopCount()
 			{
 				return base.getHopCount();
 			}
 
+			@Override
 			public void setHopCount(final int count)
 			{
 				base.setHopCount(count);
 			}
 
+			@Override
 			public KNXMediumSettings getKNXMedium()
 			{
 				return base.getKNXMedium();
 			}
 
+			@Override
 			public void setKNXMedium(final KNXMediumSettings a)
 			{
 				base.setKNXMedium(a);
 			}
 
+			@Override
 			public void sendRequest(final KNXAddress dst, final Priority p,
 				final byte[] nsdu) throws KNXLinkClosedException, KNXTimeoutException
 			{
@@ -184,6 +194,7 @@ public final class NetworkBuffer
 					base.sendRequest(dst, p, nsdu);
 			}
 
+			@Override
 			public void sendRequestWait(final KNXAddress dst, final Priority p,
 				final byte[] nsdu) throws KNXTimeoutException, KNXLinkClosedException
 			{
@@ -191,6 +202,7 @@ public final class NetworkBuffer
 					base.sendRequestWait(dst, p, nsdu);
 			}
 
+			@Override
 			public void send(final CEMILData msg, final boolean waitForCon)
 				throws KNXTimeoutException, KNXLinkClosedException
 			{
@@ -198,16 +210,19 @@ public final class NetworkBuffer
 					base.send(msg, waitForCon);
 			}
 
+			@Override
 			public String getName()
 			{
 				return "buffered " + base.getName();
 			}
 
+			@Override
 			public boolean isOpen()
 			{
 				return base.isOpen();
 			}
 
+			@Override
 			public void close()
 			{
 				activate(false);
@@ -256,6 +271,7 @@ public final class NetworkBuffer
 			link.addLinkListener(ll);
 		}
 
+		@Override
 		public void activate(final boolean activate)
 		{
 			active = activate;
@@ -265,6 +281,7 @@ public final class NetworkBuffer
 			if (active && nwFilter == null) {
 				nwFilter = new NetworkFilter()
 				{
+					@Override
 					public void accept(final CEMI frame, final Configuration c)
 					{
 						final Cache localCache = c.getCache();
@@ -281,6 +298,7 @@ public final class NetworkBuffer
 							localCache.put(new LDataObject(f));
 					}
 
+					@Override
 					public void init(final Configuration c)
 					{}
 				};
@@ -290,26 +308,31 @@ public final class NetworkBuffer
 				nwFilter.init(this);
 		}
 
+		@Override
 		public boolean isActive()
 		{
 			return active;
 		}
 
+		@Override
 		public KNXNetworkLink getBaseLink()
 		{
 			return lnk.base;
 		}
 
+		@Override
 		public KNXNetworkLink getBufferedLink()
 		{
 			return lnk;
 		}
 
+		@Override
 		public void setQueryBufferOnly(final boolean bufferOnly)
 		{
 			queryBufferOnly = bufferOnly;
 		}
 
+		@Override
 		public synchronized void setCache(final Cache c)
 		{
 			if (c == null && active)
@@ -317,11 +340,13 @@ public final class NetworkBuffer
 			cache = c;
 		}
 
+		@Override
 		public synchronized Cache getCache()
 		{
 			return cache;
 		}
 
+		@Override
 		public synchronized void setDatapointModel(final DatapointModel m)
 		{
 			model = m;
@@ -329,11 +354,13 @@ public final class NetworkBuffer
 				nwFilter.init(this);
 		}
 
+		@Override
 		public synchronized DatapointModel getDatapointModel()
 		{
 			return model;
 		}
 
+		@Override
 		public void setFilter(final NetworkFilter nf, final RequestFilter rf)
 		{
 			nwFilter = nf;
@@ -342,11 +369,13 @@ public final class NetworkBuffer
 				nwFilter.init(this);
 		}
 
+		@Override
 		public NetworkFilter getNetworkFilter()
 		{
 			return nwFilter;
 		}
 
+		@Override
 		public RequestFilter getRequestFilter()
 		{
 			return reqFilter;

@@ -83,8 +83,9 @@ public class KNXnetIPTunnelTest extends TestCase
 	{
 		boolean closed;
 		CEMI received;
-		List fifoReceived = new Vector();
+		List<CEMI> fifoReceived = new Vector<>();
 
+		@Override
 		public void frameReceived(final FrameEvent e)
 		{
 			assertNotNull(e);
@@ -102,6 +103,7 @@ public class KNXnetIPTunnelTest extends TestCase
 			fifoReceived.add(e.getFrame());
 		}
 
+		@Override
 		public void connectionClosed(final CloseEvent e)
 		{
 			assertNotNull(e);
@@ -128,6 +130,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -148,6 +151,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		if (t != null) {
@@ -206,7 +210,7 @@ public class KNXnetIPTunnelTest extends TestCase
 		InterruptedException
 	{
 		final int sends = 10;
-		final List frames = new Vector();
+		final List<CEMILData> frames = new Vector<>();
 		for (int i = 0; i < sends; i++) {
 			frames.add(new CEMILData(CEMILData.MC_LDATA_REQ,
 				new IndividualAddress(i + 1), new GroupAddress(2, 2, 2), new byte[] { 0,
@@ -219,10 +223,11 @@ public class KNXnetIPTunnelTest extends TestCase
 				super(name);
 			}
 
+			@Override
 			public void run()
 			{
 				try {
-					final CEMILData f = (CEMILData) frames.remove(0);
+					final CEMILData f = frames.remove(0);
 					synchronized (this) {
 						notify();
 					}

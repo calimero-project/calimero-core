@@ -91,7 +91,7 @@ public class TunnelCRD extends CRD
 	 */
 	TunnelCRD(final byte[] optionalData)
 	{
-		super(KNXnetIPTunnel.TUNNEL_CONNECTION, (byte[]) optionalData.clone());
+		super(KNXnetIPTunnel.TUNNEL_CONNECTION, optionalData.clone());
 		if (getStructLength() != 4)
 			throw new KNXIllegalArgumentException("wrong length for tunneling CRD");
 	}
@@ -113,6 +113,7 @@ public class TunnelCRD extends CRD
 	 * 
 	 * @return a string representation of the object
 	 */
+	@Override
 	public String toString()
 	{
 		return "tunneling CRD, assigned address " + getAssignedAddress();

@@ -47,25 +47,31 @@ public class CacheSweeperTest extends TestCase
 
 	class TestCache implements Cache
 	{
+		@Override
 		public void clear()
 		{}
 
+		@Override
 		public CacheObject get(final Object key)
 		{
 			return null;
 		}
 
+		@Override
 		public void put(final CacheObject obj)
 		{}
 
+		@Override
 		public void remove(final Object key)
 		{}
 
+		@Override
 		public synchronized void removeExpired()
 		{
 			notifyAll();
 		}
 
+		@Override
 		public Statistic statistic()
 		{
 			return null;
@@ -86,6 +92,7 @@ public class CacheSweeperTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		test = new TestCache();
@@ -97,6 +104,7 @@ public class CacheSweeperTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		if (sweeper != null)

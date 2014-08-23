@@ -259,6 +259,7 @@ public class CEMIBusMon implements CEMI
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.cemi.CEMI#getMessageCode()
 	 */
+	@Override
 	public final int getMessageCode()
 	{
 		return MC_BUSMON_IND;
@@ -271,9 +272,10 @@ public class CEMIBusMon implements CEMI
 	 * 
 	 * @return a copy of the raw frame on medium as byte array
 	 */
+	@Override
 	public final byte[] getPayload()
 	{
-		return (byte[]) raw.clone();
+		return raw.clone();
 	}
 
 //	/**
@@ -375,6 +377,7 @@ public class CEMIBusMon implements CEMI
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.cemi.CEMI#getStructLength()
 	 */
+	@Override
 	public final int getStructLength()
 	{
 		return raw.length + 9;
@@ -383,6 +386,7 @@ public class CEMIBusMon implements CEMI
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.cemi.CEMI#toByteArray()
 	 */
+	@Override
 	public byte[] toByteArray()
 	{
 		final byte stampLen = (byte) (tstampType == TYPEID_TIMESTAMP ? 2 : 4);
@@ -422,6 +426,7 @@ public class CEMIBusMon implements CEMI
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString()
 	{
 		final StringBuffer buf = new StringBuffer(30);
@@ -490,7 +495,7 @@ public class CEMIBusMon implements CEMI
 		final long max = extTimestamp ? 0xFFFFFFFFL : 0xFFFFL;
 		if (tstamp < 0 || tstamp > max)
 			throw new KNXIllegalArgumentException("timestamp out of range");
-		raw = (byte[]) rawFrame.clone();
+		raw = rawFrame.clone();
 		if (raw.length == 0 || raw.length > 23)
 			throw new KNXIllegalArgumentException("raw frame length out of range [1..23]");
 	}

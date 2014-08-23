@@ -71,6 +71,7 @@ public class KNXNetworkMonitorFT12Test extends TestCase
 		 * @see tuwien.auto.calimero.link.event.LinkListener#indication
 		 * (tuwien.auto.calimero.FrameEvent)
 		 */
+		@Override
 		public void indication(final FrameEvent e)
 		{
 			assertNotNull(e);
@@ -91,6 +92,7 @@ public class KNXNetworkMonitorFT12Test extends TestCase
 		 * @see tuwien.auto.calimero.link.event.LinkListener#linkClosed
 		 * (tuwien.auto.calimero.CloseEvent)
 		 */
+		@Override
 		public void linkClosed(final CloseEvent e)
 		{
 			assertNotNull(e);
@@ -112,6 +114,7 @@ public class KNXNetworkMonitorFT12Test extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -132,6 +135,7 @@ public class KNXNetworkMonitorFT12Test extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		if (mon != null)

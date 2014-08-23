@@ -252,6 +252,7 @@ public class ServiceFamiliesDIB extends DIB
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.knxnetip.util.DIB#toByteArray()
 	 */
+	@Override
 	public byte[] toByteArray()
 	{
 		final byte[] buf = super.toByteArray();
@@ -269,6 +270,7 @@ public class ServiceFamiliesDIB extends DIB
 	 *
 	 * @return a string representation of the DIB object
 	 */
+	@Override
 	public String toString()
 	{
 		final StringBuffer buf = new StringBuffer();

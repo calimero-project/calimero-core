@@ -50,7 +50,7 @@ import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 public class TranslatorTypesTest extends TestCase
 {
 	private final MainType[] types =
-		(MainType[]) TranslatorTypes.getAllMainTypes().values().toArray(new MainType[0]);
+		TranslatorTypes.getAllMainTypes().values().toArray(new MainType[0]);
 
 	/**
 	 * @param name name for test case
@@ -63,6 +63,7 @@ public class TranslatorTypesTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -71,7 +72,7 @@ public class TranslatorTypesTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.TranslatorTypes#getMainType(int)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testGetMainType() throws KNXException
@@ -85,7 +86,7 @@ public class TranslatorTypesTest extends TestCase
 		for (int i = 0; i < types.length; ++i) {
 			final MainType t = TranslatorTypes.getMainType(types[i].getMainNumber());
 			assertEquals(t.getMainNumber(), types[i].getMainNumber());
-			t.createTranslator(((DPT) t.getSubTypes().values().iterator().next())
+			t.createTranslator(t.getSubTypes().values().iterator().next()
 				.getID());
 		}
 	}
@@ -93,14 +94,14 @@ public class TranslatorTypesTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.TranslatorTypes#getAllMainTypes()}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testGetAllMainTypes() throws KNXException
 	{
 		assertTrue(TranslatorTypes.getAllMainTypes().size() > 7);
-		final Map m = TranslatorTypes.getAllMainTypes();
-		final Map copy = new HashMap(m);
+		final Map<Integer, MainType> m = TranslatorTypes.getAllMainTypes();
+		final Map<Integer, MainType> copy = new HashMap<>(m);
 		m.clear();
 		assertTrue(TranslatorTypes.getAllMainTypes().isEmpty());
 		DPTXlator t = null;
@@ -123,7 +124,7 @@ public class TranslatorTypesTest extends TestCase
 		}
 		assertNotNull(t);
 
-		newMainTypeFail(2000, Object.class);
+		//newMainTypeFail(2000, Object.class);
 		newMainTypeFail(2000, DPTXlator.class);
 		final MainType mt = new MainType(2000, DPTXlatorBoolean.class, "DPTXlatorBoolean.class");
 		TranslatorTypes.getAllMainTypes().put(new Integer(2000), mt);
@@ -131,7 +132,7 @@ public class TranslatorTypesTest extends TestCase
 			DPTXlatorBoolean.DPT_ENABLE).getClass(), DPTXlatorBoolean.class);
 	}
 
-	private void newMainTypeFail(final int mainNo, final Class cl)
+	private void newMainTypeFail(final int mainNo, final Class<? extends DPTXlator> cl)
 	{
 		try {
 			new MainType(mainNo, cl, "faulty main type");
@@ -144,7 +145,7 @@ public class TranslatorTypesTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.TranslatorTypes#createTranslator(int, java.lang.String)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testCreateTranslator() throws KNXException
@@ -152,19 +153,19 @@ public class TranslatorTypesTest extends TestCase
 		// with main number
 		for (int i = 0; i < types.length; i++) {
 			final int main = types[i].getMainNumber();
-			final String dptID = ((DPT) TranslatorTypes.getMainType(main).getSubTypes()
-				.values().iterator().next()).getID();
+			final String dptID = TranslatorTypes.getMainType(main).getSubTypes()
+				.values().iterator().next().getID();
 			TranslatorTypes.createTranslator(main, dptID);
 		}
 
 		// without main number
 		for (int i = 0; i < types.length; i++) {
 			final int main = types[i].getMainNumber();
-			final String dptID = ((DPT) TranslatorTypes.getMainType(main).getSubTypes()
-				.values().iterator().next()).getID();
+			final String dptID = TranslatorTypes.getMainType(main).getSubTypes()
+				.values().iterator().next().getID();
 			TranslatorTypes.createTranslator(0, dptID);
 		}
-		
+
 		try {
 			TranslatorTypes.createTranslator(0, "123");
 			fail("not supported dptID");
@@ -175,7 +176,7 @@ public class TranslatorTypesTest extends TestCase
 			fail("not supported dptID");
 		}
 		catch (final Exception e) { }
-		
+
 		TranslatorTypes.createTranslator(DPTXlatorBoolean.DPT_ACK);
 		TranslatorTypes.createTranslator(DPTXlator2ByteFloat.DPT_HUMIDITY);
 		try {

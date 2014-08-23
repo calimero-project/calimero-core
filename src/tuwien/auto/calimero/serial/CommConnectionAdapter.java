@@ -94,6 +94,7 @@ class CommConnectionAdapter extends LibraryAdapter
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.serial.LibraryAdapter#close()
 	 */
+	@Override
 	public void close() throws IOException
 	{
 		try {
@@ -109,6 +110,7 @@ class CommConnectionAdapter extends LibraryAdapter
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.serial.LibraryAdapter#getInputStream()
 	 */
+	@Override
 	public InputStream getInputStream()
 	{
 		return is;
@@ -117,6 +119,7 @@ class CommConnectionAdapter extends LibraryAdapter
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.serial.LibraryAdapter#getOutputStream()
 	 */
+	@Override
 	public OutputStream getOutputStream()
 	{
 		return os;

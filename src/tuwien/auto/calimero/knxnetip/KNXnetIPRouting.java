@@ -149,6 +149,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	 * @param mode arbitrary value, does not influence behavior, since routing is always a
 	 *        unconfirmed, nonblocking service
 	 */
+	@Override
 	public void send(final CEMI frame, final BlockingMode mode)
 		throws KNXConnectionClosedException
 	{
@@ -163,6 +164,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.knxnetip.KNXnetIPConnection#getName()
 	 */
+	@Override
 	public String getName()
 	{
 		return "KNXnet/IP Routing " + super.getName();
@@ -301,6 +303,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	 * (tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader, byte[], int,
 	 * java.net.InetAddress, int)
 	 */
+	@Override
 	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data,
 		final int offset, final InetAddress src, final int port)
 		throws KNXFormatException, IOException
@@ -324,6 +327,7 @@ public class KNXnetIPRouting extends ConnectionBase
 		return true;
 	}
 
+	@Override
 	protected void close(final int initiator, final String reason, final LogLevel level,
 		final Throwable t)
 	{

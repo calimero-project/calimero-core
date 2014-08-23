@@ -73,6 +73,7 @@ public class KNXnetIPDevMgmtTest extends TestCase
 		boolean closed;
 		CEMI received;
 
+		@Override
 		public void frameReceived(final FrameEvent e)
 		{
 			assertNotNull(e);
@@ -91,6 +92,7 @@ public class KNXnetIPDevMgmtTest extends TestCase
 				}
 		}
 
+		@Override
 		public void connectionClosed(final CloseEvent e)
 		{
 			assertNotNull(e);
@@ -112,6 +114,7 @@ public class KNXnetIPDevMgmtTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -128,6 +131,7 @@ public class KNXnetIPDevMgmtTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		if (m != null) {

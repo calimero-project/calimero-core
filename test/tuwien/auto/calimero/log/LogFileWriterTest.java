@@ -75,6 +75,7 @@ public class LogFileWriterTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		w = new LogFileWriter(test, false);
@@ -84,6 +85,7 @@ public class LogFileWriterTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		w.close();
@@ -283,6 +285,7 @@ public class LogFileWriterTest extends TestCase
 		LogFileWriter w3;
 		w3 = new LogFileWriter(test, false, true)
 		{
+			@Override
 			protected String formatOutput(final String logService, final LogLevel l, final String msg,
 				final Throwable t)
 			{
@@ -304,6 +307,7 @@ public class LogFileWriterTest extends TestCase
 
 		w3 = new LogFileWriter(test, false, true)
 		{
+			@Override
 			protected String formatOutput(final String logService, final LogLevel l,
 				final String msg, final Throwable t)
 			{

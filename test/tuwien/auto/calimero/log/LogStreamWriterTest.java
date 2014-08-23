@@ -64,6 +64,7 @@ public class LogStreamWriterTest extends TestCase
 
 	private class MyErrorHandler extends ErrorHandler
 	{
+		@Override
 		public synchronized void error(final LogWriter source, final String msg,
 			final Exception e)
 		{
@@ -82,6 +83,7 @@ public class LogStreamWriterTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		w = new LogStreamWriter(LogLevel.ALL, stream = new FileOutputStream(file), true);
@@ -92,6 +94,7 @@ public class LogStreamWriterTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		w.close();
@@ -104,7 +107,7 @@ public class LogStreamWriterTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.log.LogStreamWriter#LogStreamWriter(LogLevel, OutputStream, boolean, boolean)}
 	 * .
-	 * 
+	 *
 	 * @throws FileNotFoundException
 	 */
 	public void testLogStreamWriterLogLevelOutputStreamBooleanBoolean()
@@ -130,7 +133,7 @@ public class LogStreamWriterTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.log.LogStreamWriter#write(String, LogLevel, String)}.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public void testWriteLevelString() throws IOException
@@ -174,7 +177,7 @@ public class LogStreamWriterTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.log.LogStreamWriter#write (String, LogLevel, String, Throwable)}
 	 * .
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public void testWriteLevelStringThrowable() throws IOException
@@ -186,7 +189,7 @@ public class LogStreamWriterTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.log.LogStreamWriter#close()}.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public void testClose() throws IOException
@@ -200,7 +203,7 @@ public class LogStreamWriterTest extends TestCase
 
 	/**
 	 * Tests the log error handler.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public void testErrorHandler() throws IOException
@@ -224,7 +227,7 @@ public class LogStreamWriterTest extends TestCase
 	{
 		final BufferedReader r = new BufferedReader(new FileReader(new File(file)));
 		String s = null;
-		final List v = new Vector();
+		final List<String> v = new Vector<>();
 		try {
 			while ((s = r.readLine()) != null)
 				v.add(s);
@@ -233,7 +236,7 @@ public class LogStreamWriterTest extends TestCase
 			fail("reading back log file failed");
 		}
 		r.close();
-		return (String[]) v.toArray(new String[v.size()]);
+		return v.toArray(new String[v.size()]);
 	}
 
 }

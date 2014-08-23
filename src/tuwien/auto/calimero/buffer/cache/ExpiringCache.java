@@ -113,6 +113,7 @@ public abstract class ExpiringCache implements Cache
 	 * If no expiring time was specified at creation of cache, no cache object will be
 	 * expired.
 	 */
+	@Override
 	public void removeExpired()
 	{
 		if (timeToExpire == 0 || !(map instanceof LinkedHashMap))

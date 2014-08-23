@@ -74,6 +74,7 @@ public class NetworkBufferTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -86,6 +87,7 @@ public class NetworkBufferTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		if (lnk != null)
@@ -305,6 +307,7 @@ public class NetworkBufferTest extends TestCase
 		{
 			boolean filled;
 
+			@Override
 			public void queueFilled(final LDataObjectQueue queue)
 			{
 				filled = true;

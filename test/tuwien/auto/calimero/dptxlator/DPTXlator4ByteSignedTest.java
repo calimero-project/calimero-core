@@ -86,6 +86,7 @@ public class DPTXlator4ByteSignedTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -96,6 +97,7 @@ public class DPTXlator4ByteSignedTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		Thread.sleep(100);
@@ -135,16 +137,16 @@ public class DPTXlator4ByteSignedTest extends TestCase
 		t.setValues(strings);
 		assertEquals(strings.length, t.getItems());
 		Helper.assertSimilar(strings, t.getAllValues());
-	
+
 		t.setValues(new String[0]);
 		assertEquals(strings.length, t.getItems());
 		Helper.assertSimilar(strings, t.getAllValues());
-	
+
 		final String[] s = { value1 };
 		t.setValues(s);
 		assertEquals(s.length, t.getItems());
 		Helper.assertSimilar(s, t.getAllValues());
-	
+
 		t.setValues(new String[] { t.getValue(), t.getValue() });
 	}
 
@@ -254,11 +256,11 @@ public class DPTXlator4ByteSignedTest extends TestCase
 	public void testGetSubTypes()
 	{
 		assertEquals(9, t.getSubTypes().size());
-		final Map types = t.getSubTypes();
+		final Map<String, DPT> types = t.getSubTypes();
 		System.out.println("\n4 Byte Signed DPTs:");
-		final Collection c = types.values();
-		for (final Iterator i = c.iterator(); i.hasNext();) {
-			final DPT dpt = (DPT) i.next();
+		final Collection<DPT> c = types.values();
+		for (final Iterator<DPT> i = c.iterator(); i.hasNext();) {
+			final DPT dpt = i.next();
 			System.out.println(dpt.toString());
 		}
 	}

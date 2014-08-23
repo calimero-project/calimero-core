@@ -281,6 +281,7 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getAllValues()
 	 */
+	@Override
 	public String[] getAllValues()
 	{
 		final String[] buf = new String[data.length / 2];
@@ -292,6 +293,7 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
 	 */
+	@Override
 	public Map<String, DPT> getSubTypes()
 	{
 		return types;
@@ -345,6 +347,7 @@ public class DPTXlator2ByteFloat extends DPTXlator
 		dst[2 * index + 1] = ubyte(m);
 	}
 
+	@Override
 	protected void toDPT(final String value, final short[] dst, final int index) throws KNXFormatException
 	{
 		try {

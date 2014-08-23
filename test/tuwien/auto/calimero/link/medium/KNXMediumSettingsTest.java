@@ -55,6 +55,7 @@ public class KNXMediumSettingsTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -63,6 +64,7 @@ public class KNXMediumSettingsTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		super.tearDown();
@@ -79,7 +81,7 @@ public class KNXMediumSettingsTest extends TestCase
 		testCreate(KNXMediumSettings.MEDIUM_PL110, PLSettings.class);
 		testCreate(KNXMediumSettings.MEDIUM_PL132, PLSettings.class);
 		testCreate(KNXMediumSettings.MEDIUM_RF, RFSettings.class);
-		
+
 		try {
 			testCreate(0, RFSettings.class);
 			fail("invalid medium type");
@@ -96,13 +98,13 @@ public class KNXMediumSettingsTest extends TestCase
 		}
 	}
 
-	private void testCreate(final int medium, final Class type)
+	private void testCreate(final int medium, final Class<? extends KNXMediumSettings> type)
 	{
 		final KNXMediumSettings settings = KNXMediumSettings.create(medium, null);
 		assertEquals(settings.getClass(), type);
 		assertEquals(medium, settings.getMedium());
 	}
-	
+
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.link.medium.KNXMediumSettings#getMedium(java.lang.String)}.

@@ -94,6 +94,7 @@ public class ProcessCommunicatorTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -107,6 +108,7 @@ public class ProcessCommunicatorTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		pc.detach();
@@ -173,9 +175,17 @@ public class ProcessCommunicatorTest extends TestCase
 	{
 		final ProcessListener l = new ProcessListener()
 		{
+			@Override
+			public void groupReadRequest(final ProcessEvent e) {}
+
+			@Override
+			public void groupReadResponse(final ProcessEvent e) {}
+
+			@Override
 			public void groupWrite(final ProcessEvent e)
 			{}
 
+			@Override
 			public void detached(final DetachEvent e)
 			{}
 		};
@@ -194,9 +204,17 @@ public class ProcessCommunicatorTest extends TestCase
 	{
 		final ProcessListener l = new ProcessListener()
 		{
+			@Override
+			public void groupReadRequest(final ProcessEvent e) {}
+
+			@Override
+			public void groupReadResponse(final ProcessEvent e) {}
+
+			@Override
 			public void groupWrite(final ProcessEvent e)
 			{}
 
+			@Override
 			public void detached(final DetachEvent e)
 			{}
 		};
@@ -223,6 +241,7 @@ public class ProcessCommunicatorTest extends TestCase
 		pc.write(dpBool, true);
 		new Thread("testReadBool Concurrent 1")
 		{
+			@Override
 			public void run()
 			{
 				try {
@@ -243,6 +262,7 @@ public class ProcessCommunicatorTest extends TestCase
 		pc.write(dpBool2, false);
 		new Thread("testReadBool Concurrent 2")
 		{
+			@Override
 			public void run()
 			{
 				try {
@@ -261,6 +281,7 @@ public class ProcessCommunicatorTest extends TestCase
 		// read from different address using same process communicator
 		new Thread("testReadBool Concurrent 3")
 		{
+			@Override
 			public void run()
 			{
 				try {

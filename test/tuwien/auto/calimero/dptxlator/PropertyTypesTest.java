@@ -60,6 +60,7 @@ public class PropertyTypesTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -71,15 +72,15 @@ public class PropertyTypesTest extends TestCase
 	 */
 	public final void testGetAllPropertyTypes()
 	{
-		final Map m = PropertyTypes.getAllPropertyTypes();
+		final Map<Integer, DPTID> m = PropertyTypes.getAllPropertyTypes();
 		m.put(new Integer(1000), new DPTID(1000, "1000.001"));
 		m.remove(new Integer(1000));
-		for (final Iterator i = m.keySet().iterator(); i.hasNext();) {
-			final Integer type = (Integer) i.next();
+		for (final Iterator<Integer> i = m.keySet().iterator(); i.hasNext();) {
+			final Integer type = i.next();
 			System.out.println(type);
 		}
-		for (final Iterator i = m.values().iterator(); i.hasNext();) {
-			final DPTID type = (DPTID) i.next();
+		for (final Iterator<DPTID> i = m.values().iterator(); i.hasNext();) {
+			final DPTID type = i.next();
 			System.out.println(type.getMainNumber() + ", " + type.getDPT());
 		}
 	}
@@ -87,7 +88,7 @@ public class PropertyTypesTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.PropertyTypes#createTranslator(int)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testCreateTranslatorInt() throws KNXException
@@ -121,7 +122,7 @@ public class PropertyTypesTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.PropertyTypes#getValues(int, byte[])}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testGetValues() throws KNXException
@@ -138,7 +139,7 @@ public class PropertyTypesTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.PropertyTypes#createTranslator(int, byte[])}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testCreateTranslatorIntByteArray() throws KNXException

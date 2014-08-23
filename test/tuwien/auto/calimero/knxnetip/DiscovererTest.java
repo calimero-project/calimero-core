@@ -76,6 +76,7 @@ public class DiscovererTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -88,6 +89,7 @@ public class DiscovererTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		if (ddef != null)
@@ -416,6 +418,7 @@ public class DiscovererTest extends TestCase
 		{
 			volatile int res;
 
+			@Override
 			public void run()
 			{
 				try {
@@ -462,6 +465,7 @@ public class DiscovererTest extends TestCase
 		try {
 			final class Stopper extends Thread
 			{
+				@Override
 				public void run()
 				{
 					try {

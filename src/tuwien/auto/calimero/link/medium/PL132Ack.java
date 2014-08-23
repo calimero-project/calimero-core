@@ -119,6 +119,7 @@ public class PL132Ack extends RawAckBase
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.link.medium.RawAckBase#toString()
 	 */
+	@Override
 	public String toString()
 	{
 		return ack == ACK ? "ACK" : ack == FULL ? "FULL" : "unknown ack";

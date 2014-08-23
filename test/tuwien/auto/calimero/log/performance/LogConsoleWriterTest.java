@@ -53,7 +53,7 @@ import tuwien.auto.calimero.log.LogWriter;
 public class LogConsoleWriterTest extends PerfTestCase
 {
 	private static int iterations = 500;
-	private static List results = new ArrayList();
+	private static List<LogConsoleWriterTest> results = new ArrayList<>();
 	private LogWriter w;
 	private LogWriter w2;
 	private String s;
@@ -65,6 +65,7 @@ public class LogConsoleWriterTest extends PerfTestCase
 			setOutput(new OutputStreamWriter(System.out));
 		}
 
+		@Override
 		public void close()
 		{}
 	};
@@ -76,6 +77,7 @@ public class LogConsoleWriterTest extends PerfTestCase
 			setOutput(new BufferedWriter(new OutputStreamWriter(System.out), 150));
 		}
 
+		@Override
 		public void close()
 		{}
 	};
@@ -91,6 +93,7 @@ public class LogConsoleWriterTest extends PerfTestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -108,11 +111,12 @@ public class LogConsoleWriterTest extends PerfTestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		results.add(this);
-		for (final Iterator i = results.iterator(); i.hasNext();) {
-			final PerfTestCase test = (PerfTestCase) i.next();
+		for (final Iterator<LogConsoleWriterTest> i = results.iterator(); i.hasNext();) {
+			final PerfTestCase test = i.next();
 			test.printResults();
 		}
 	}

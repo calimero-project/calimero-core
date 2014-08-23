@@ -118,6 +118,7 @@ public final class CacheSweeper extends Thread
 	/* (non-Javadoc)
 	 * @see java.lang.Thread#run()
 	 */
+	@Override
 	public void run()
 	{
 		try {

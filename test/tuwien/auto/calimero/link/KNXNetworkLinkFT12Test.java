@@ -72,6 +72,7 @@ public class KNXNetworkLinkFT12Test extends TestCase
 		volatile CEMILData con;
 		volatile boolean closed;
 
+		@Override
 		public void indication(final FrameEvent e)
 		{
 			assertNotNull(e);
@@ -83,6 +84,7 @@ public class KNXNetworkLinkFT12Test extends TestCase
 			Debug.printLData(ind);
 		}
 
+		@Override
 		public void confirmation(final FrameEvent e)
 		{
 			assertNotNull(e);
@@ -95,6 +97,7 @@ public class KNXNetworkLinkFT12Test extends TestCase
 			Debug.printLData(f);
 		}
 
+		@Override
 		public void linkClosed(final CloseEvent e)
 		{
 			assertNotNull(e);
@@ -116,6 +119,7 @@ public class KNXNetworkLinkFT12Test extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -146,6 +150,7 @@ public class KNXNetworkLinkFT12Test extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		if (lnk != null)

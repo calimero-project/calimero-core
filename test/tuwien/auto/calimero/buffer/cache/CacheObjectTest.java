@@ -61,6 +61,7 @@ public class CacheObjectTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -69,6 +70,7 @@ public class CacheObjectTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		super.tearDown();
@@ -98,7 +100,7 @@ public class CacheObjectTest extends TestCase
 		assertEquals(value, o.getValue());
 
 		final String skey = "CacheObject";
-		final List vvalue = new Vector();
+		final List<Object> vvalue = new Vector<>();
 		o = new CacheObject(skey, vvalue);
 		assertEquals(skey, o.getKey());
 		assertEquals(vvalue, o.getValue());

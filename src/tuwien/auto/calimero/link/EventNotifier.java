@@ -76,6 +76,7 @@ abstract class EventNotifier extends Thread implements KNXListener
 			event = e;
 		}
 
+		@Override
 		public void invoke(final LinkListener l)
 		{
 			l.indication(event);
@@ -91,6 +92,7 @@ abstract class EventNotifier extends Thread implements KNXListener
 			event = e;
 		}
 
+		@Override
 		public void invoke(final LinkListener l)
 		{
 			((NetworkLinkListener) l).confirmation(event);
@@ -106,6 +108,7 @@ abstract class EventNotifier extends Thread implements KNXListener
 			event = e;
 		}
 
+		@Override
 		public void invoke(final LinkListener l)
 		{
 			l.linkClosed(event);
@@ -130,6 +133,7 @@ abstract class EventNotifier extends Thread implements KNXListener
 		start();
 	}
 
+	@Override
 	public final void run()
 	{
 		try {
@@ -151,8 +155,10 @@ abstract class EventNotifier extends Thread implements KNXListener
 		}
 	}
 
+	@Override
 	public abstract void frameReceived(FrameEvent e);
 
+	@Override
 	public void connectionClosed(final CloseEvent e)
 	{
 		addEvent(new Closed(new CloseEvent(source, e.getInitiator(), e.getReason())));

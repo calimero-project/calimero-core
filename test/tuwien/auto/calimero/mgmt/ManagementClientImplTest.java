@@ -75,6 +75,7 @@ public class ManagementClientImplTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -93,6 +94,7 @@ public class ManagementClientImplTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		if (mc != null)
@@ -624,23 +626,25 @@ public class ManagementClientImplTest extends TestCase
 		InterruptedException
 	{
 	try {
-			mc.readDomainAddress(new byte[] { 1, }, Util.getRouterAddress(), -1);
+			mc.readDomainAddress(new byte[] { 1, }, Util.getKnxDeviceCO(), -1);
 			fail("invalid arg");
 		}
 		catch (final KNXIllegalArgumentException e) {}
 		try {
-			mc.readDomainAddress(new byte[] { 1, 2 }, Util.getRouterAddress(), -1);
+			mc.readDomainAddress(new byte[] { 1, 2 }, Util.getKnxDeviceCO(), -1);
 			fail("invalid arg");
 		}
 		catch (final KNXIllegalArgumentException e) {}
 		try {
-			mc.readDomainAddress(new byte[] { 1, 2, }, Util.getRouterAddress(), 256);
+			mc.readDomainAddress(new byte[] { 1, 2, }, Util.getKnxDeviceCO(), 256);
 			fail("invalid arg");
 		}
 		catch (final KNXIllegalArgumentException e) {}
 
-		final List doas =
-			mc.readDomainAddress(new byte[] { 1, 2, }, Util.getRouterAddress(), 100);
+		List<byte[]> doas = mc.readDomainAddress(new byte[] { 1, 2, }, Util.getKnxDeviceCO(), 10);
+		final IndividualAddress start = new IndividualAddress(
+				Util.getKnxDeviceCO().getRawAddress() - 10);
+		doas = mc.readDomainAddress(new byte[] { 1, 2, }, start, 10);
 	}
 
 	/**
@@ -653,7 +657,7 @@ public class ManagementClientImplTest extends TestCase
 	public final void testReadDomainAddressBoolean() throws KNXException,
 		InterruptedException
 	{
-		final List domain = mc.readDomainAddress(true);
+		final List<byte[]> domain = mc.readDomainAddress(true);
 		assertTrue(domain.size() <= 1);
 	}
 

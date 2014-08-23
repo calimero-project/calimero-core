@@ -76,6 +76,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 		 * @see tuwien.auto.calimero.link.EventNotifier#frameReceived
 		 * (tuwien.auto.calimero.FrameEvent)
 		 */
+		@Override
 		public void frameReceived(final FrameEvent e)
 		{
 			try {
@@ -100,6 +101,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 			}
 		}
 
+		@Override
 		public void connectionClosed(final CloseEvent e)
 		{
 			((KNXNetworkMonitorFT12) source).closed = true;
@@ -176,6 +178,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 	 * @see tuwien.auto.calimero.link.KNXNetworkMonitor#setKNXMedium
 	 * (tuwien.auto.calimero.link.medium.KNXMediumSettings)
 	 */
+	@Override
 	public void setKNXMedium(final KNXMediumSettings settings)
 	{
 		if (settings == null)
@@ -189,6 +192,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.link.KNXNetworkMonitor#getKNXMedium()
 	 */
+	@Override
 	public KNXMediumSettings getKNXMedium()
 	{
 		return medium;
@@ -198,6 +202,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 	 * @see tuwien.auto.calimero.link.KNXNetworkMonitor#addMonitorListener
 	 * (tuwien.auto.calimero.link.event.LinkListener)
 	 */
+	@Override
 	public void addMonitorListener(final LinkListener l)
 	{
 		notifier.addListener(l);
@@ -207,6 +212,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 	 * @see tuwien.auto.calimero.link.KNXNetworkMonitor#removeMonitorListener
 	 * (tuwien.auto.calimero.link.event.LinkListener)
 	 */
+	@Override
 	public void removeMonitorListener(final LinkListener l)
 	{
 		notifier.removeListener(l);
@@ -215,6 +221,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.link.KNXNetworkMonitor#setDecodeRawFrames(boolean)
 	 */
+	@Override
 	public void setDecodeRawFrames(final boolean decode)
 	{
 		notifier.decode = decode;
@@ -225,6 +232,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 	 * {@inheritDoc}<br>
 	 * The returned name is "monitor " + port identifier.
 	 */
+	@Override
 	public String getName()
 	{
 		return name;
@@ -233,6 +241,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.link.KNXNetworkMonitor#isOpen()
 	 */
+	@Override
 	public boolean isOpen()
 	{
 		return !closed;
@@ -241,6 +250,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.link.KNXNetworkMonitor#close()
 	 */
+	@Override
 	public void close()
 	{
 		synchronized (this) {
@@ -261,6 +271,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString()
 	{
 		return getName() + (closed ? "(closed), " : ", ") + medium.getMediumString()

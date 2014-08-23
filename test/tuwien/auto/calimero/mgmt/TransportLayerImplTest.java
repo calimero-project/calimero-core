@@ -47,6 +47,7 @@ import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.Util;
+import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.exception.KNXIllegalStateException;
@@ -77,17 +78,18 @@ public class TransportLayerImplTest extends TestCase
 
 	private final class TLListener implements TransportListener
 	{
-		List broad = new Vector();
-		List conn = new Vector();
-		List ind = new Vector();
-		List group = new Vector();
-		List dis = new Vector();
+		List<CEMI> broad = new Vector<>();
+		List<CEMI> conn = new Vector<>();
+		List<CEMI> ind = new Vector<>();
+		List<CEMI> group = new Vector<>();
+		List<Destination> dis = new Vector<>();
 		volatile boolean closed;
 		volatile boolean detached;
 
 		TLListener()
 		{}
 
+		@Override
 		public void broadcast(final FrameEvent e)
 		{
 			assertNotNull(e);
@@ -98,6 +100,7 @@ public class TransportLayerImplTest extends TestCase
 			Debug.printLData(f);
 		}
 
+		@Override
 		public void dataConnected(final FrameEvent e)
 		{
 			assertNotNull(e);
@@ -107,6 +110,7 @@ public class TransportLayerImplTest extends TestCase
 			Debug.printLData(f);
 		}
 
+		@Override
 		public void dataIndividual(final FrameEvent e)
 		{
 			assertNotNull(e);
@@ -117,6 +121,7 @@ public class TransportLayerImplTest extends TestCase
 			Debug.printLData(f);
 		}
 
+		@Override
 		public void disconnected(final Destination d)
 		{
 			assertNotNull(d);
@@ -124,6 +129,7 @@ public class TransportLayerImplTest extends TestCase
 			System.out.println("disconnected: " + d);
 		}
 
+		@Override
 		public void group(final FrameEvent e)
 		{
 			assertNotNull(e);
@@ -133,6 +139,7 @@ public class TransportLayerImplTest extends TestCase
 			Debug.printLData(f);
 		}
 
+		@Override
 		public void linkClosed(final CloseEvent e)
 		{
 			assertNotNull(e);
@@ -142,6 +149,7 @@ public class TransportLayerImplTest extends TestCase
 			closed = true;
 		}
 
+		@Override
 		public void detached(final DetachEvent e)
 		{
 			detached = true;
@@ -159,6 +167,7 @@ public class TransportLayerImplTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -175,6 +184,7 @@ public class TransportLayerImplTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		if (tl != null) {
@@ -488,6 +498,7 @@ public class TransportLayerImplTest extends TestCase
 		try {
 			final Thread detacher = new Thread()
 			{
+				@Override
 				public void run()
 				{
 					synchronized (this) {

@@ -256,6 +256,7 @@ public final class Description
 	 * 
 	 * @return a string representation of the description
 	 */
+	@Override
 	public String toString()
 	{
 		return "OT " + otype + " OI " + oindex + " PID " + id + " PI " + pindex + " PDT "
