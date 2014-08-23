@@ -79,6 +79,7 @@ public class PerfTestCase extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#runBare()
 	 */
+	@Override
 	public void runBare() throws Throwable
 	{
 		setUp();

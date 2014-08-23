@@ -80,6 +80,7 @@ public class KNXnetIPRouterTest extends TestCase
 		volatile CEMI received;
 		List<LostMessageEvent> lost = new Vector<>();
 
+		@Override
 		public void frameReceived(final FrameEvent e)
 		{
 			assertNotNull(e);
@@ -88,6 +89,7 @@ public class KNXnetIPRouterTest extends TestCase
 			Debug.printLData((CEMILData) received);
 		}
 
+		@Override
 		public void connectionClosed(final CloseEvent e)
 		{
 			assertNotNull(e);
@@ -97,6 +99,7 @@ public class KNXnetIPRouterTest extends TestCase
 			closed = true;
 		}
 
+		@Override
 		public void lostMessage(final LostMessageEvent e)
 		{
 			assertNotNull(e);
@@ -115,6 +118,7 @@ public class KNXnetIPRouterTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -139,6 +143,7 @@ public class KNXnetIPRouterTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		if (r != null) {

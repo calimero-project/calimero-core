@@ -67,6 +67,7 @@ public class LogServiceTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		ls = LogManager.getManager().getLogService("test-log");
@@ -75,6 +76,7 @@ public class LogServiceTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		ls = null;

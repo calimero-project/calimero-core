@@ -65,6 +65,7 @@ public class LogConsoleWriterTest extends PerfTestCase
 			setOutput(new OutputStreamWriter(System.out));
 		}
 
+		@Override
 		public void close()
 		{}
 	};
@@ -76,6 +77,7 @@ public class LogConsoleWriterTest extends PerfTestCase
 			setOutput(new BufferedWriter(new OutputStreamWriter(System.out), 150));
 		}
 
+		@Override
 		public void close()
 		{}
 	};
@@ -91,6 +93,7 @@ public class LogConsoleWriterTest extends PerfTestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -108,6 +111,7 @@ public class LogConsoleWriterTest extends PerfTestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		results.add(this);

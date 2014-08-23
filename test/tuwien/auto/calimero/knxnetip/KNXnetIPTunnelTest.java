@@ -85,6 +85,7 @@ public class KNXnetIPTunnelTest extends TestCase
 		CEMI received;
 		List<CEMI> fifoReceived = new Vector<>();
 
+		@Override
 		public void frameReceived(final FrameEvent e)
 		{
 			assertNotNull(e);
@@ -102,6 +103,7 @@ public class KNXnetIPTunnelTest extends TestCase
 			fifoReceived.add(e.getFrame());
 		}
 
+		@Override
 		public void connectionClosed(final CloseEvent e)
 		{
 			assertNotNull(e);
@@ -128,6 +130,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -148,6 +151,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		if (t != null) {
@@ -219,6 +223,7 @@ public class KNXnetIPTunnelTest extends TestCase
 				super(name);
 			}
 
+			@Override
 			public void run()
 			{
 				try {

@@ -68,6 +68,7 @@ public class LogNetWriterTest extends TestCase
 			catch (final IOException e) {}
 		}
 
+		@Override
 		public void run()
 		{
 			try {
@@ -124,6 +125,7 @@ public class LogNetWriterTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		r = new Receiver();
@@ -136,6 +138,7 @@ public class LogNetWriterTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		synchronized (r) {

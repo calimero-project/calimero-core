@@ -79,6 +79,7 @@ public class PropertyClientTest extends TestCase
 	{
 		volatile boolean closed;
 
+		@Override
 		public void adapterClosed(final CloseEvent e)
 		{
 			assertTrue(localAdpt == e.getSource() || remAdpt == e.getSource());
@@ -100,6 +101,7 @@ public class PropertyClientTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -127,6 +129,7 @@ public class PropertyClientTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		if (rem != null)

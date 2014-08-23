@@ -64,6 +64,7 @@ public class LogStreamWriterTest extends TestCase
 
 	private class MyErrorHandler extends ErrorHandler
 	{
+		@Override
 		public synchronized void error(final LogWriter source, final String msg,
 			final Exception e)
 		{
@@ -82,6 +83,7 @@ public class LogStreamWriterTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		w = new LogStreamWriter(LogLevel.ALL, stream = new FileOutputStream(file), true);
@@ -92,6 +94,7 @@ public class LogStreamWriterTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		w.close();

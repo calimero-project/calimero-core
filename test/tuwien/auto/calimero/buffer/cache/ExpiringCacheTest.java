@@ -62,12 +62,14 @@ public class ExpiringCacheTest extends TestCase
 		/* (non-Javadoc)
 		 * @see tuwien.auto.calimero.cache.Cache#clear()
 		 */
+		@Override
 		public void clear()
 		{}
 
 		/* (non-Javadoc)
 		 * @see tuwien.auto.calimero.cache.Cache#get(java.lang.Object)
 		 */
+		@Override
 		public CacheObject get(final Object key)
 		{
 			return map.get(key);
@@ -76,6 +78,7 @@ public class ExpiringCacheTest extends TestCase
 		/* (non-Javadoc)
 		 * @see tuwien.auto.calimero.cache.Cache#put(tuwien.auto.calimero.cache.CacheObject)
 		 */
+		@Override
 		public void put(final CacheObject obj)
 		{
 			map.put(obj.getKey(), obj);
@@ -84,6 +87,7 @@ public class ExpiringCacheTest extends TestCase
 		/* (non-Javadoc)
 		 * @see tuwien.auto.calimero.cache.Cache#remove(java.lang.Object)
 		 */
+		@Override
 		public void remove(final Object key)
 		{
 			map.remove(key);
@@ -102,6 +106,7 @@ public class ExpiringCacheTest extends TestCase
 		/* (non-Javadoc)
 		 * @see tuwien.auto.calimero.cache.ExpiringCache#removeExpired()
 		 */
+		@Override
 		public void removeExpired()
 		{
 			remove = true;
@@ -115,6 +120,7 @@ public class ExpiringCacheTest extends TestCase
 		 * @see tuwien.auto.calimero.cache.ExpiringCache#notifyRemoved
 		 * (tuwien.auto.calimero.cache.CacheObject)
 		 */
+		@Override
 		protected void notifyRemoved(final CacheObject obj)
 		{
 			notified = true;
@@ -127,6 +133,7 @@ public class ExpiringCacheTest extends TestCase
 		/* (non-Javadoc)
 		 * @see tuwien.auto.calimero.cache.Cache#statistic()
 		 */
+		@Override
 		public Statistic statistic()
 		{
 			return null;
@@ -146,6 +153,7 @@ public class ExpiringCacheTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -155,6 +163,7 @@ public class ExpiringCacheTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		super.tearDown();

@@ -58,6 +58,7 @@ public class LDataObjectQueueTest extends TestCase
 	{
 		LDataObjectQueue q;
 
+		@Override
 		public void queueFilled(final LDataObjectQueue queue)
 		{
 			q = queue;
@@ -75,6 +76,7 @@ public class LDataObjectQueueTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		l = new QueueListener();
@@ -106,6 +108,7 @@ public class LDataObjectQueueTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		super.tearDown();

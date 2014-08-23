@@ -64,6 +64,7 @@ public class LogManagerTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception
 	{
 		m = LogManager.getManager();
@@ -72,6 +73,7 @@ public class LogManagerTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception
 	{
 		final String[] all = m.getAllLogServices();
@@ -271,6 +273,7 @@ public class LogManagerTest extends TestCase
 			super(level, file, append, maxSize, autoFlush);
 		}
 		
+		@Override
 		protected void setOutput(final Writer w)
 		{
 			super.setOutput(w);
