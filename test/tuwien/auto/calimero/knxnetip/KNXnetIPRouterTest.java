@@ -78,7 +78,7 @@ public class KNXnetIPRouterTest extends TestCase
 	{
 		volatile boolean closed;
 		volatile CEMI received;
-		List lost = new Vector();
+		List<LostMessageEvent> lost = new Vector<>();
 
 		public void frameReceived(final FrameEvent e)
 		{
@@ -151,7 +151,7 @@ public class KNXnetIPRouterTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.knxnetip.KNXnetIPRouting#send(tuwien.auto.calimero.cemi.CEMI, tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testSend() throws KNXException
@@ -166,7 +166,7 @@ public class KNXnetIPRouterTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPRouting#send
 	 * (tuwien.auto.calimero.cemi.CEMI,
 	 * tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws UnknownHostException
 	 * @throws SocketException
@@ -196,7 +196,7 @@ public class KNXnetIPRouterTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPRouting#KNXnetIPRouter
 	 * (java.net.NetworkInterface, java.net.InetAddress)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws UnknownHostException
 	 * @throws SocketException
@@ -235,7 +235,7 @@ public class KNXnetIPRouterTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.knxnetip.KNXnetIPRouting#setHopCount(int)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testSetHopCount() throws KNXException
@@ -266,7 +266,7 @@ public class KNXnetIPRouterTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPRouting#close()}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testClose() throws KNXException
@@ -285,7 +285,7 @@ public class KNXnetIPRouterTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.knxnetip.KNXnetIPRouting#getRemoteAddress()}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws UnknownHostException
 	 * @throws SocketException
@@ -327,8 +327,8 @@ public class KNXnetIPRouterTest extends TestCase
 			Thread.sleep(100);
 		}
 		catch (final InterruptedException e1) {}
-		for (final Iterator i = l.lost.iterator(); i.hasNext();) {
-			final LostMessageEvent e = (LostMessageEvent) i.next();
+		for (final Iterator<LostMessageEvent> i = l.lost.iterator(); i.hasNext();) {
+			final LostMessageEvent e = i.next();
 			System.out.println("dev.state:" + e.getDeviceState() + ", lost msgs:"
 				+ e.getLostMessages());
 		}

@@ -50,9 +50,9 @@ public class QueueTest extends PerfTestCase
 	private final int iterations = 100000;
 	private final int capacity = 30;
 	private LongVector primitive;
-	private List list;
+	private List<Long> list;
 	private LongVector primitiveFilled;
-	private List listFilled;
+	private List<Long> listFilled;
 
 	private static final class LongVector
 	{
@@ -126,10 +126,10 @@ public class QueueTest extends PerfTestCase
 		super.setUp();
 		setNormalize(iterations);
 		primitive = new LongVector(capacity);
-		list = new ArrayList(capacity);
+		list = new ArrayList<>(capacity);
 
 		primitiveFilled = new LongVector(capacity);
-		listFilled = new ArrayList(capacity);
+		listFilled = new ArrayList<>(capacity);
 		for (int i = 0; i < capacity; ++i) {
 			primitiveFilled.add(System.currentTimeMillis());
 			listFilled.add(new Long(System.currentTimeMillis()));

@@ -98,7 +98,7 @@ public class CacheObjectTest extends TestCase
 		assertEquals(value, o.getValue());
 
 		final String skey = "CacheObject";
-		final List vvalue = new Vector();
+		final List<Object> vvalue = new Vector<>();
 		o = new CacheObject(skey, vvalue);
 		assertEquals(skey, o.getKey());
 		assertEquals(vvalue, o.getValue());

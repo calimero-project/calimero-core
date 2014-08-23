@@ -102,7 +102,7 @@ public class LogServiceTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.log.LogService#addWriter(tuwien.auto.calimero.log.LogWriter)}.
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws KNXLogException
 	 */
@@ -131,7 +131,7 @@ public class LogServiceTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.log.LogService#removeWriter(tuwien.auto.calimero.log.LogWriter)}.
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws KNXLogException
 	 */
@@ -176,7 +176,7 @@ public class LogServiceTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.log.LogService#log(LogLevel, String, Throwable)}, with
 	 * no exception object used.
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws KNXLogException
 	 */
@@ -208,7 +208,7 @@ public class LogServiceTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.log.LogService#log(tuwien.auto.calimero.log.LogLevel, java.lang.String, java.lang.Throwable)}.
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws KNXLogException
 	 */
@@ -245,7 +245,7 @@ public class LogServiceTest extends TestCase
 		}
 		final BufferedReader r = new BufferedReader(new FileReader(new File(file)));
 		String s = null;
-		final List v = new Vector();
+		final List<String> v = new Vector<>();
 		try {
 			while ((s = r.readLine()) != null)
 				v.add(s);
@@ -254,7 +254,7 @@ public class LogServiceTest extends TestCase
 			fail("reading back log file failed");
 		}
 		r.close();
-		return (String[]) v.toArray(new String[v.size()]);
+		return v.toArray(new String[v.size()]);
 	}
 
 }

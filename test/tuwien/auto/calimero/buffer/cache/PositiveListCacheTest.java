@@ -96,7 +96,7 @@ public class PositiveListCacheTest extends TestCase
 	 */
 	public void testPositiveListCacheCollectionInt()
 	{
-		final List v = new Vector();
+		final List<Object> v = new Vector<>();
 		v.add(new String("1"));
 		v.add(o2.getKey());
 		v.add(o3.getKey());
@@ -117,7 +117,7 @@ public class PositiveListCacheTest extends TestCase
 	{
 		assertEquals(0, fix.getPositiveList().length);
 		final String[] a = { "1", "2", "3" };
-		final Collection list = Arrays.asList(a);
+		final Collection<String> list = Arrays.asList(a);
 		fix.setPositiveList(list);
 		final Object[] ret = fix.getPositiveList();
 		assertEquals(3, fix.getPositiveList().length);
@@ -135,7 +135,7 @@ public class PositiveListCacheTest extends TestCase
 		// will be overwritten by setPositiveList()
 		fix.addToPositiveList("bogus");
 
-		final List v = new Vector();
+		final List<String> v = new Vector<>();
 		v.add("1");
 		v.add("2");
 		fix.setPositiveList(v);
@@ -170,7 +170,7 @@ public class PositiveListCacheTest extends TestCase
 		fix.removeFromPositiveList("1");
 
 		final String[] a = { "1", "2", };
-		final Collection list = Arrays.asList(a);
+		final Collection<String> list = Arrays.asList(a);
 		fix.setPositiveList(list);
 		Object[] ret = fix.getPositiveList();
 		assertEquals(2, fix.getPositiveList().length);
@@ -198,14 +198,14 @@ public class PositiveListCacheTest extends TestCase
 		assertNull(fix.get(o2.getKey()));
 
 		final String[] a = { "1", "2", };
-		final Collection list = Arrays.asList(a);
+		final Collection<String> list = Arrays.asList(a);
 		fix.setPositiveList(list);
 		fix.put(o1);
 		fix.put(o2);
 		assertEquals(o1, fix.get(o1.getKey()));
 		assertEquals(o2, fix.get(o2.getKey()));
 
-		fix.setPositiveList(new Vector());
+		fix.setPositiveList(new Vector<String>());
 		assertNull(fix.get(o1.getKey()));
 		assertNull(fix.get(o2.getKey()));
 	}
@@ -230,7 +230,7 @@ public class PositiveListCacheTest extends TestCase
 		assertEquals(equal.getValue(), fix.get(o1.getKey()).getValue());
 		assertEquals(equal.getValue(), fix.get(equal.getKey()).getValue());
 
-		fix.setPositiveList(new Vector());
+		fix.setPositiveList(new Vector<String>());
 		fix.put(equal);
 		assertNull(fix.get(equal.getKey()));
 	}
@@ -253,7 +253,7 @@ public class PositiveListCacheTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.buffer.cache.PositiveListCache#removeExpired()}.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 */
 	public void testRemoveExpired() throws InterruptedException
@@ -288,7 +288,7 @@ public class PositiveListCacheTest extends TestCase
 	public void testStatistic()
 	{
 		final String[] a = { "1", "2", "3" };
-		final Collection list = Arrays.asList(a);
+		final Collection<String> list = Arrays.asList(a);
 		fix.setPositiveList(list);
 		fix.put(o1);
 		fix.put(o2);

@@ -57,8 +57,8 @@ public class StateDPTest extends TestCase
 	private static final GroupAddress ga = new GroupAddress(3, 2, 1);
 	private static final String dpFile = Util.getPath() + "stateDP.xml";
 
-	private List inv;
-	private List upd;
+	private List<GroupAddress> inv;
+	private List<GroupAddress> upd;
 
 	/**
 	 * @param name name of test case
@@ -74,11 +74,11 @@ public class StateDPTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		inv = new ArrayList();
+		inv = new ArrayList<>();
 		inv.add(new GroupAddress(1, 1, 1));
 		inv.add(new GroupAddress(2, 2, 2));
 		inv.add(new GroupAddress(3, 3, 3));
-		upd = new ArrayList();
+		upd = new ArrayList<>();
 		upd.add(new GroupAddress(4, 4, 4));
 		upd.add(new GroupAddress(5, 5, 5));
 	}
@@ -139,13 +139,13 @@ public class StateDPTest extends TestCase
 		assertEquals("test", dp.getName());
 		assertTrue(dp.isStateBased());
 
-		Collection c = dp.getAddresses(false);
+		Collection<GroupAddress> c = dp.getAddresses(false);
 		assertEquals(3, c.size());
 		assertTrue(c.contains(new GroupAddress(1, 1, 1)));
 		assertTrue(c.contains(new GroupAddress(2, 2, 2)));
 		assertTrue(c.contains(new GroupAddress(3, 3, 3)));
 		try {
-			c.add(new Object());
+			c.add(ga);
 			fail("collection should be unmodifiable");
 		}
 		catch (final UnsupportedOperationException e) {}
@@ -155,7 +155,7 @@ public class StateDPTest extends TestCase
 		assertTrue(c.contains(new GroupAddress(4, 4, 4)));
 		assertTrue(c.contains(new GroupAddress(5, 5, 5)));
 		try {
-			c.add(new Object());
+			c.add(ga);
 			fail("collection should be unmodifiable");
 		}
 		catch (final UnsupportedOperationException e) {}
@@ -164,7 +164,7 @@ public class StateDPTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.datapoint.StateDP#StateDP(
 	 * tuwien.auto.calimero.xml.XMLReader)}.
-	 * 
+	 *
 	 * @throws KNXMLException
 	 */
 	public final void testStateDPXMLReader() throws KNXMLException
@@ -183,13 +183,13 @@ public class StateDPTest extends TestCase
 		assertEquals(0, dp.getMainNumber());
 		assertNull(dp.getDPT());
 		assertEquals(15, dp.getExpirationTimeout());
-		assertEquals(upd, new ArrayList(dp.getAddresses(true)));
-		assertEquals(inv, new ArrayList(dp.getAddresses(false)));
+		assertEquals(upd, new ArrayList<>(dp.getAddresses(true)));
+		assertEquals(inv, new ArrayList<>(dp.getAddresses(false)));
 	}
 
 	/**
 	 * Test method for {@link Datapoint#create(XMLReader)}.
-	 * 
+	 *
 	 * @throws KNXMLException
 	 */
 	public final void testCreate() throws KNXMLException
@@ -218,13 +218,13 @@ public class StateDPTest extends TestCase
 	public final void testAdd()
 	{
 		final StateDP dp = new StateDP(ga, "name1", inv, upd);
-		for (final Iterator i = upd.iterator(); i.hasNext();) {
-			final GroupAddress a = (GroupAddress) i.next();
+		for (final Iterator<GroupAddress> i = upd.iterator(); i.hasNext();) {
+			final GroupAddress a = i.next();
 			dp.add(a, true);
 		}
 		assertEquals(upd.size(), dp.getAddresses(true).size());
-		for (final Iterator i = inv.iterator(); i.hasNext();) {
-			final GroupAddress a = (GroupAddress) i.next();
+		for (final Iterator<GroupAddress> i = inv.iterator(); i.hasNext();) {
+			final GroupAddress a = i.next();
 			dp.add(a, false);
 		}
 		assertEquals(inv.size(), dp.getAddresses(false).size());

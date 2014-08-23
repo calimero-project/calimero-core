@@ -45,8 +45,8 @@ import java.util.List;
  */
 public class PerfTimer
 {
-	private final List start = new ArrayList();
-	private final List stop = new ArrayList();
+	private final List<Long> start = new ArrayList<>();
+	private final List<Long> stop = new ArrayList<>();
 
 	/**
 	 * Creates a new performance timer.
@@ -73,7 +73,7 @@ public class PerfTimer
 
 	/**
 	 * Returns all timing durations in milliseconds.
-	 * 
+	 *
 	 * @return durations array
 	 */
 	Integer[] getDurations()
@@ -84,24 +84,23 @@ public class PerfTimer
 	/**
 	 * Returns all timing durations in milliseconds without <code>omitExtremes</code>
 	 * number of extremes in the durations value range.
-	 * 
+	 *
 	 * @param omitExtremes number of extremes to leave out, alternating one maximum and
 	 *        one minimum extreme is left out, starting with a maximum
 	 * @return durations array
 	 */
 	Integer[] getDurations(final int omitExtremes)
 	{
-		final List buf = new ArrayList();
+		final List<Integer> buf = new ArrayList<>();
 		final int size = Math.min(start.size(), stop.size());
 		for (int i = 0; i < size; ++i)
-			buf.add(new Integer((int) (((Long) stop.get(i)).longValue() - ((Long) start
-				.get(i)).longValue())));
+			buf.add(new Integer((int) (stop.get(i).longValue() - start.get(i).longValue())));
 		for (int i = 0; i < omitExtremes; ++i)
 			if (i % 2 == 0)
 				buf.remove(Collections.max(buf));
 			else
 				buf.remove(Collections.min(buf));
-		return (Integer[]) buf.toArray(new Integer[0]);
+		return buf.toArray(new Integer[0]);
 	}
 
 	float getAverageDuration()
@@ -111,7 +110,7 @@ public class PerfTimer
 			return 0;
 		long sum = 0;
 		for (int i = 0; i < durations; ++i)
-			sum += ((Long) stop.get(i)).longValue() - ((Long) start.get(i)).longValue();
+			sum += stop.get(i).longValue() - start.get(i).longValue();
 		return (float) sum / durations;
 	}
 }

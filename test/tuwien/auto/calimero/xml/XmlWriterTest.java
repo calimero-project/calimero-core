@@ -111,7 +111,7 @@ public class XmlWriterTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.xml.def.DefaultXMLWriter#endElement()}.
-	 * 
+	 *
 	 * @throws KNXMLException
 	 */
 	public void testEndElement() throws KNXMLException
@@ -127,7 +127,7 @@ public class XmlWriterTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.xml.def.DefaultXMLWriter#endElement()}.
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws KNXMLException
 	 */
@@ -150,13 +150,13 @@ public class XmlWriterTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.xml.def.DefaultXMLWriter#endElement()}.
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws KNXMLException
 	 */
 	public void testEndElement3() throws IOException, KNXMLException
 	{
-		final List att = new Vector();
+		final List<Attribute> att = new Vector<>();
 		att.add(new Attribute("att1", "value1"));
 
 		w2.writeElement("root", null, "test text");
@@ -196,13 +196,13 @@ public class XmlWriterTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.xml.def.DefaultXMLWriter#endAllElements()}.
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws KNXMLException
 	 */
 	public void testEndAllElements() throws IOException, KNXMLException
 	{
-		final List att = new Vector();
+		final List<Attribute> att = new Vector<>();
 		att.add(new Attribute("att1", "value1"));
 
 		w2.writeEmptyElement("root", null);
@@ -231,13 +231,13 @@ public class XmlWriterTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.xml.def.DefaultXMLWriter#writeElement
 	 * (String, List, String)}.
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws KNXMLException
 	 */
 	public void testWriteElement() throws IOException, KNXMLException
 	{
-		final List att = new Vector();
+		final List<Attribute> att = new Vector<>();
 		att.add(new Attribute("att1", "value1"));
 
 		w2.writeElement("root", null, "test text");

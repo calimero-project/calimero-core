@@ -48,19 +48,18 @@ public class LFUObjectCompareTest extends TestCase
 	Cache lfu = new LFUCache(0, 0);
 
 	// !! This is a copy of the private LFUObjectCompare class in LFUCache !!
-	private static class LFUObjectCompare implements Comparator
+	private static class LFUObjectCompare implements Comparator<CacheObject>
 	{
-		public int compare(final Object o1, final Object o2)
+		@Override
+		public int compare(final CacheObject o1, final CacheObject o2)
 		{
-			final CacheObject cmp1 = (CacheObject) o1;
-			final CacheObject cmp2 = (CacheObject) o2;
-			if (cmp1.getUsage() > cmp2.getUsage())
+			if (o1.getUsage() > o2.getUsage())
 				return 1;
-			if (cmp1.getUsage() < cmp2.getUsage())
+			if (o1.getUsage() < o2.getUsage())
 				return -1;
-			if (cmp1.getCount() > cmp2.getCount())
+			if (o1.getCount() > o2.getCount())
 				return 1;
-			if (cmp1.getCount() < cmp2.getCount())
+			if (o1.getCount() < o2.getCount())
 				return -1;
 			return 0;
 		}

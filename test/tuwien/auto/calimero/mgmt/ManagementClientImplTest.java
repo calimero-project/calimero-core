@@ -655,7 +655,7 @@ public class ManagementClientImplTest extends TestCase
 	public final void testReadDomainAddressBoolean() throws KNXException,
 		InterruptedException
 	{
-		final List domain = mc.readDomainAddress(true);
+		final List<byte[]> domain = mc.readDomainAddress(true);
 		assertTrue(domain.size() <= 1);
 	}
 

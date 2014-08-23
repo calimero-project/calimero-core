@@ -55,6 +55,7 @@ import tuwien.auto.calimero.link.medium.TPSettings;
 import tuwien.auto.calimero.log.LogLevel;
 import tuwien.auto.calimero.log.LogManager;
 import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
+import tuwien.auto.calimero.mgmt.PropertyClient.Property;
 
 /**
  * @author B. Malinowsky
@@ -208,9 +209,9 @@ public class PropertyClientTest extends TestCase
 	 */
 	public final void testSaveDefinitions() throws KNXException
 	{
-		PropertyClient.saveDefinitions(PIDResourceSave, new ArrayList(), null);
+		PropertyClient.saveDefinitions(PIDResourceSave, new ArrayList<>(), null);
 
-		final Collection c = PropertyClient.loadDefinitions(PIDResource, null);
+		final Collection<Property> c = PropertyClient.loadDefinitions(PIDResource, null);
 		PropertyClient.saveDefinitions(PIDResourceSave, c, null);
 	}
 
@@ -336,16 +337,16 @@ public class PropertyClientTest extends TestCase
 	 */
 	public final void testScanPropertiesBoolean() throws KNXException
 	{
-		List l = rem.scanProperties(true);
+		List<Description> l = rem.scanProperties(true);
 		assertTrue(l.size() > 0);
-		for (final Iterator i = l.iterator(); i.hasNext();) {
-			final Description d = (Description) i.next();
+		for (final Iterator<Description> i = l.iterator(); i.hasNext();) {
+			final Description d = i.next();
 			printDesc(d);
 		}
 		l = local.scanProperties(true);
 		assertTrue(l.size() > 0);
-		for (final Iterator i = l.iterator(); i.hasNext();) {
-			final Description d = (Description) i.next();
+		for (final Iterator<Description> i = l.iterator(); i.hasNext();) {
+			final Description d = i.next();
 			printDesc(d);
 		}
 	}
@@ -358,16 +359,16 @@ public class PropertyClientTest extends TestCase
 	 */
 	public final void testScanPropertiesIntBoolean() throws KNXException
 	{
-		List l = rem.scanProperties(0, true);
+		List<Description> l = rem.scanProperties(0, true);
 		assertTrue(l.size() > 0);
-		for (final Iterator i = l.iterator(); i.hasNext();) {
-			final Description d = (Description) i.next();
+		for (final Iterator<Description> i = l.iterator(); i.hasNext();) {
+			final Description d = i.next();
 			printDesc(d);
 		}
 		l = local.scanProperties(0, true);
 		assertTrue(l.size() > 0);
-		for (final Iterator i = l.iterator(); i.hasNext();) {
-			final Description d = (Description) i.next();
+		for (final Iterator<Description> i = l.iterator(); i.hasNext();) {
+			final Description d = i.next();
 			printDesc(d);
 		}
 	}

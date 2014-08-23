@@ -95,7 +95,7 @@ public class DatapointMapTest extends TestCase
 	 */
 	public final void testDatapointMapCollection()
 	{
-		final List l = new ArrayList();
+		final List<Datapoint> l = new ArrayList<>();
 		l.add(dp1);
 		l.add(dp2);
 		l.add(dp3);
@@ -152,7 +152,7 @@ public class DatapointMapTest extends TestCase
 	 */
 	public final void testRemoveAll()
 	{
-		final List l = new ArrayList();
+		final List<Datapoint> l = new ArrayList<>();
 		l.add(dp1);
 		l.add(dp2);
 		l.add(dp3);
@@ -168,7 +168,7 @@ public class DatapointMapTest extends TestCase
 	 */
 	public final void testGetDatapoints()
 	{
-		Collection c = ((DatapointMap) m).getDatapoints();
+		Collection<Datapoint> c = ((DatapointMap) m).getDatapoints();
 		assertEquals(0, c.size());
 		m.add(dp2);
 		c = ((DatapointMap) m).getDatapoints();

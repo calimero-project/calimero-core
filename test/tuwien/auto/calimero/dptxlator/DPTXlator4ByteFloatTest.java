@@ -59,23 +59,23 @@ public class DPTXlator4ByteFloatTest extends TestCase
 	private DPTXlator4ByteFloat x;
 	private DPTXlator4ByteFloat t;
 
-	
+
 	private final String min = "1.40239846e-45";
 	private final String max = "3.40282347e+38";
 	private final String value1 = "735";
 	private final String value2 = "54732.33334";
-	
+
 	private final String value1Enc = "735";
-	
+
 	private final String zero = "0.0";
 	private final String[] strings = { min, max, zero, value1, value2};
 	// TODO achieving a nice formatting of floats is cumbersome, use Java defaults here
 	private final String[] strCmp = { "1.4E-45", "3.40282E38", "0.0", "735", "54732.332"};
-	
+
 	private final float[] floats =
 		{ Float.parseFloat(min), Float.parseFloat(max), Float.parseFloat(zero),
 			Float.parseFloat(value1), Float.parseFloat(value2), };
-	
+
 	private final byte[] dataMin = toBytes(Float.floatToIntBits(floats[0]));
 	private final byte[] dataMax = toBytes(Float.floatToIntBits(floats[1]));
 	private final byte[] dataZero = toBytes(Float.floatToIntBits(floats[2]));
@@ -85,14 +85,14 @@ public class DPTXlator4ByteFloatTest extends TestCase
 		toBytes(Float.floatToIntBits(floats[4]))[0], toBytes(Float.floatToIntBits(floats[4]))[1],
 		toBytes(Float.floatToIntBits(floats[4]))[2], toBytes(Float.floatToIntBits(floats[4]))[3] };
 
-	private final DPT[] dpts = (DPT[]) DPTXlator4ByteFloat.getSubTypesStatic().values()
+	private final DPT[] dpts = DPTXlator4ByteFloat.getSubTypesStatic().values()
 			.toArray(new DPT[1]);
 
 	private static byte[] toBytes(final int i)
 	{
 		return new byte[] {(byte) (i >>> 24), (byte) (i >>> 16), (byte) (i >>> 8), (byte) (i) };
 	}
-	
+
 	/**
 	 * @param name
 	 */
@@ -125,7 +125,7 @@ public class DPTXlator4ByteFloatTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned#setValues(java.lang.String[])}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValues() throws KNXFormatException
@@ -146,7 +146,7 @@ public class DPTXlator4ByteFloatTest extends TestCase
 
 		t.setValues(new String[] { t.getValue(), t.getValue() });
 	}
-	
+
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator4ByteFloat#getAllValues()}.
 	 * @throws KNXFormatException
@@ -168,7 +168,7 @@ public class DPTXlator4ByteFloatTest extends TestCase
 	 */
 	public void testGetSubTypes()
 	{
-		final Map types = x.getSubTypes();
+		final Map<String, DPT> types = x.getSubTypes();
 		assertEquals(80, types.size());
 	}
 
@@ -177,12 +177,12 @@ public class DPTXlator4ByteFloatTest extends TestCase
 	 */
 	public void testGetSubTypesStatic()
 	{
-		final Map types = DPTXlator4ByteFloat.getSubTypesStatic();
+		final Map<String, DPT> types = DPTXlator4ByteFloat.getSubTypesStatic();
 		assertEquals(80, types.size());
 		System.out.println("\n4 Byte Float DPTs:");
-		final Collection c = types.values();
-		for (final Iterator i = c.iterator(); i.hasNext();) {
-			final DPT dpt = (DPT) i.next();
+		final Collection<DPT> c = types.values();
+		for (final Iterator<DPT> i = c.iterator(); i.hasNext();) {
+			final DPT dpt = i.next();
 			System.out.println(dpt.toString());
 		}
 	}
@@ -250,7 +250,7 @@ public class DPTXlator4ByteFloatTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#getValue()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testGetValue() throws KNXFormatException
@@ -261,15 +261,15 @@ public class DPTXlator4ByteFloatTest extends TestCase
 		final float f = t.getValueFloat();
 		assertEquals(265, f, 1.0);
 		assertTrue(t.getValue().indexOf(String.valueOf(f)) >= 0);
-		
-		// test non-localized formatted output for bigger floating point values 
+
+		// test non-localized formatted output for bigger floating point values
 		// that use scientific notation
 		// the difference is basically the decimal separator '.' vs ',' (depending on locale)
 		// we compare for all available locales
 		final float bigvalue = 123456.78f;
 		final Locale saved = Locale.getDefault();
 		final Locale[] locales = Locale.getAvailableLocales();
-		final List output = new ArrayList();
+		final List<String> output = new ArrayList<>();
 		for (int i = 0; i < locales.length; ++i) {
 			final Locale l = locales[i];
 			Locale.setDefault(l);
@@ -282,12 +282,12 @@ public class DPTXlator4ByteFloatTest extends TestCase
 		Locale.setDefault(saved);
 		// check if outputs are the same
 		for(int i = 1; i < output.size(); ++i) {
-			final String first = (String) output.get(i - 1);
-			final String second = (String) output.get(i);
+			final String first = output.get(i - 1);
+			final String second = output.get(i);
 			assertEquals(first, second);
 		}
 	}
-	
+
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#setData(byte[], int)}.
 	 */
@@ -318,7 +318,7 @@ public class DPTXlator4ByteFloatTest extends TestCase
 			assertEquals(array[i + 1], data[i]);
 		Helper.assertSimilar(new String[] { strCmp[1], value1Enc }, t.getAllValues());
 	}
-	
+
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#getType()}.
 	 */
@@ -337,7 +337,7 @@ public class DPTXlator4ByteFloatTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#toString()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testToString() throws KNXFormatException
@@ -349,5 +349,5 @@ public class DPTXlator4ByteFloatTest extends TestCase
 			assertTrue(s.indexOf(strCmp[i]) >= 0);
 		}
 	}
-	
+
 }
