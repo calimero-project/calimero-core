@@ -624,23 +624,25 @@ public class ManagementClientImplTest extends TestCase
 		InterruptedException
 	{
 	try {
-			mc.readDomainAddress(new byte[] { 1, }, Util.getRouterAddress(), -1);
+			mc.readDomainAddress(new byte[] { 1, }, Util.getKnxDeviceCO(), -1);
 			fail("invalid arg");
 		}
 		catch (final KNXIllegalArgumentException e) {}
 		try {
-			mc.readDomainAddress(new byte[] { 1, 2 }, Util.getRouterAddress(), -1);
+			mc.readDomainAddress(new byte[] { 1, 2 }, Util.getKnxDeviceCO(), -1);
 			fail("invalid arg");
 		}
 		catch (final KNXIllegalArgumentException e) {}
 		try {
-			mc.readDomainAddress(new byte[] { 1, 2, }, Util.getRouterAddress(), 256);
+			mc.readDomainAddress(new byte[] { 1, 2, }, Util.getKnxDeviceCO(), 256);
 			fail("invalid arg");
 		}
 		catch (final KNXIllegalArgumentException e) {}
 
-		final List doas =
-			mc.readDomainAddress(new byte[] { 1, 2, }, Util.getRouterAddress(), 100);
+		List<byte[]> doas = mc.readDomainAddress(new byte[] { 1, 2, }, Util.getKnxDeviceCO(), 10);
+		final IndividualAddress start = new IndividualAddress(
+				Util.getKnxDeviceCO().getRawAddress() - 10);
+		doas = mc.readDomainAddress(new byte[] { 1, 2, }, start, 10);
 	}
 
 	/**
