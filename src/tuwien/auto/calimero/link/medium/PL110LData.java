@@ -89,7 +89,7 @@ public class PL110LData extends RawFrameBase
 	 */
 	public final byte[] getDomainAddress()
 	{
-		return (byte[]) doa.clone();
+		return doa.clone();
 	}
 
 	/* (non-Javadoc)

@@ -284,7 +284,7 @@ public class DeviceDIB extends DIB
 	 */
 	public final byte[] getMACAddress()
 	{
-		return (byte[]) mac.clone();
+		return mac.clone();
 	}
 
 	/**
@@ -307,7 +307,7 @@ public class DeviceDIB extends DIB
 	 */
 	public final byte[] getMulticastAddress()
 	{
-		return (byte[]) mcast.clone();
+		return mcast.clone();
 	}
 
 	/**
@@ -359,7 +359,7 @@ public class DeviceDIB extends DIB
 	 */
 	public final byte[] getSerialNumber()
 	{
-		return (byte[]) serial.clone();
+		return serial.clone();
 	}
 
 	/**

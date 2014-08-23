@@ -91,7 +91,7 @@ public class TunnelCRI extends CRI
 	 */
 	TunnelCRI(final byte[] optionalData)
 	{
-		super(KNXnetIPTunnel.TUNNEL_CONNECTION, (byte[]) optionalData.clone());
+		super(KNXnetIPTunnel.TUNNEL_CONNECTION, optionalData.clone());
 		if (getStructLength() != 4)
 			throw new KNXIllegalArgumentException("wrong length for tunneling CRI");
 	}

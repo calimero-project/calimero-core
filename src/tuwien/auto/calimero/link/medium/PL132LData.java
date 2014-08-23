@@ -114,7 +114,7 @@ public class PL132LData extends RawFrameBase
 	 */
 	public final byte[] getDomainAddress()
 	{
-		return (byte[]) doa.clone();
+		return doa.clone();
 	}
 
 	/**

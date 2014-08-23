@@ -109,7 +109,7 @@ public class RFSettings extends KNXMediumSettings
 		else if (domain.length != 6)
 			throw new KNXIllegalArgumentException("invalid length of domain address");
 		else
-			doa = (byte[]) domain.clone();
+			doa = domain.clone();
 	}
 
 	/**
@@ -121,7 +121,7 @@ public class RFSettings extends KNXMediumSettings
 	 */
 	public final synchronized byte[] getDomainAddress()
 	{
-		return (byte[]) doa.clone();
+		return doa.clone();
 	}
 
 	/**
@@ -132,7 +132,7 @@ public class RFSettings extends KNXMediumSettings
 	 */
 	public final byte[] getSerialNumber()
 	{
-		return (byte[]) sno.clone();
+		return sno.clone();
 	}
 
 	/**
@@ -173,6 +173,6 @@ public class RFSettings extends KNXMediumSettings
 	{
 		if (serial.length != 6)
 			throw new KNXIllegalArgumentException("invalid length of serial number");
-		sno = (byte[]) serial.clone();
+		sno = serial.clone();
 	}
 }

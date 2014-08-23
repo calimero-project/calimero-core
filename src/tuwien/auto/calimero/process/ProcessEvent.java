@@ -113,7 +113,7 @@ public class ProcessEvent extends EventObject
 	 */
 	public final byte[] getASDU()
 	{
-		return (byte[]) asdu.clone();
+		return asdu.clone();
 	}
 
 	/**

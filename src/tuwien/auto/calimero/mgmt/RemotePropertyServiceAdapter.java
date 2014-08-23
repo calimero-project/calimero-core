@@ -118,7 +118,7 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 		final byte[] authorizeKey) throws KNXException, InterruptedException
 	{
 		this(link, remote, l, true);
-		key = (byte[]) authorizeKey.clone();
+		key = authorizeKey.clone();
 		try {
 			mc.authorize(dst, key);
 		}

@@ -103,7 +103,7 @@ public class PLSettings extends KNXMediumSettings
 		else if (domain.length != 2)
 			throw new KNXIllegalArgumentException("invalid length of domain address");
 		else
-			doa = (byte[]) domain.clone();
+			doa = domain.clone();
 	}
 
 	/**
@@ -115,7 +115,7 @@ public class PLSettings extends KNXMediumSettings
 	 */
 	public final synchronized byte[] getDomainAddress()
 	{
-		return (byte[]) doa.clone();
+		return doa.clone();
 	}
 
 	/* (non-Javadoc)

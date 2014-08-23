@@ -90,7 +90,7 @@ public class ManufacturerDIB extends DIB
 		if (mfrID < 0 || mfrID > 0xffff)
 			throw new KNXIllegalArgumentException("manufacturer ID out of range [0..0xffff]");
 		id = mfrID;
-		mfrData = (byte[]) mfrSpecificData.clone();
+		mfrData = mfrSpecificData.clone();
 	}
 	
 	/**
@@ -114,7 +114,7 @@ public class ManufacturerDIB extends DIB
 	 */
 	public final byte[] getData()
 	{
-		return (byte[]) mfrData.clone();
+		return mfrData.clone();
 	}
 
 	/* (non-Javadoc)

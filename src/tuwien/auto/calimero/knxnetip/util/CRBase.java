@@ -125,8 +125,8 @@ class CRBase
 		if (type != KNXnetIPDevMgmt.DEVICE_MGMT_CONNECTION)
 			logger.warn("unknown connection type 0x" + Integer.toHexString(type)
 					+ ", create default CRI/CRD");
-		return request ? (CRBase) new CRI(type, (byte[]) opt.clone()) : new CRD(type,
-				(byte[]) opt.clone());
+		return request ? (CRBase) new CRI(type, opt.clone()) : new CRD(type,
+				opt.clone());
 	}
 
 	/**
@@ -149,7 +149,7 @@ class CRBase
 	 */
 	public final byte[] getOptionalData()
 	{
-		return (byte[]) opt.clone();
+		return opt.clone();
 	}
 
 	/**

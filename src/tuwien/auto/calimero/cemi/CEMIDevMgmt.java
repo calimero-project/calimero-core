@@ -323,7 +323,7 @@ public class CEMIDevMgmt implements CEMI
 		final int propID, final int startIndex, final int elements, final byte[] data)
 	{
 		this(msgCode, objType, objInstance, propID, startIndex, elements);
-		this.data = (byte[]) data.clone();
+		this.data = data.clone();
 	}
 
 	/**
@@ -368,7 +368,7 @@ public class CEMIDevMgmt implements CEMI
 	 */
 	public final byte[] getPayload()
 	{
-		return (byte[]) data.clone();
+		return data.clone();
 	}
 
 	/**
