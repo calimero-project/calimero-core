@@ -116,19 +116,19 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		{
 			final ProcessEvent e = new ProcessEvent(ProcessCommunicatorImpl.this, f.getSource(),
 					(GroupAddress) f.getDestination(), svc, asdu);
-			final EventListener[] el = listeners.listeners();
+			final ProcessListener[] el = listeners.listeners();
 			for (int i = 0; i < el.length; i++) {
-				final EventListener l = el[i];
+				final ProcessListener l = el[i];
 				try {
-					if (svc == GROUP_READ && l instanceof ProcessListenerEx)
-						((ProcessListenerEx) l).groupReadRequest(e);
-					else if (svc == GROUP_RESPONSE && l instanceof ProcessListenerEx)
-						((ProcessListenerEx) l).groupReadResponse(e);
+					if (svc == GROUP_READ)
+						l.groupReadRequest(e);
+					else if (svc == GROUP_RESPONSE)
+						l.groupReadResponse(e);
 					else
-						((ProcessListener) l).groupWrite(e);
+						l.groupWrite(e);
 				}
 				catch (final RuntimeException rte) {
-					removeProcessListener((ProcessListener) l);
+					removeProcessListener(l);
 					logger.error("removed event listener", rte);
 				}
 			}

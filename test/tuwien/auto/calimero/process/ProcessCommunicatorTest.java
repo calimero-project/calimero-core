@@ -173,6 +173,12 @@ public class ProcessCommunicatorTest extends TestCase
 	{
 		final ProcessListener l = new ProcessListener()
 		{
+			@Override
+			public void groupReadRequest(final ProcessEvent e) {}
+
+			@Override
+			public void groupReadResponse(final ProcessEvent e) {}
+
 			public void groupWrite(final ProcessEvent e)
 			{}
 
@@ -194,6 +200,12 @@ public class ProcessCommunicatorTest extends TestCase
 	{
 		final ProcessListener l = new ProcessListener()
 		{
+			@Override
+			public void groupReadRequest(final ProcessEvent e) {}
+
+			@Override
+			public void groupReadResponse(final ProcessEvent e) {}
+
 			public void groupWrite(final ProcessEvent e)
 			{}
 
