@@ -124,6 +124,7 @@ public class LogLevel
 	 *         <code>LogLevel</code> and has the same log level as this object,
 	 *         <code>false</code> otherwise.
 	 */
+	@Override
 	public boolean equals(final Object obj)
 	{
 		if (obj instanceof LogLevel)
@@ -134,6 +135,7 @@ public class LogLevel
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
+	@Override
 	public int hashCode()
 	{
 		final int offset = 435273;
@@ -146,6 +148,7 @@ public class LogLevel
 	 * 
 	 * @return the log level as string
 	 */
+	@Override
 	public String toString()
 	{
 		switch (level) {

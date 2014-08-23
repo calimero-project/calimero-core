@@ -253,6 +253,7 @@ public class HPAI
 	 * 
 	 * @return a string representation of the HPAI object
 	 */
+	@Override
 	public String toString()
 	{
 		return "IPv4 " + (hostprot == IPV4_UDP ? "UDP" : "TCP") + " host " + getAddressString()

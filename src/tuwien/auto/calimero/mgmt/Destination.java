@@ -179,6 +179,7 @@ public class Destination
 		 * The proxy acts as notifiable to the disconnect timer. If notified, the
 		 * connection timed out, and it will ensure the destination gets disconnected.
 		 */
+		@Override
 		public void run()
 		{
 			// with keep-alive we do not disconnect on timeout
@@ -391,6 +392,7 @@ public class Destination
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString()
 	{
 		String s = "destination " + addr + " (" + tl.getName() + ") ";

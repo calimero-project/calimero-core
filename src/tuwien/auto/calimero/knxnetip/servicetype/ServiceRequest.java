@@ -176,6 +176,7 @@ public class ServiceRequest extends ServiceType
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceType#getStructLength()
 	 */
+	@Override
 	int getStructLength()
 	{
 		return CONN_HEADER_SIZE + (cemi != null ? cemi.getStructLength() : 0);
@@ -185,6 +186,7 @@ public class ServiceRequest extends ServiceType
 	 * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceType#toByteArray
 	 *      (java.io.ByteArrayOutputStream)
 	 */
+	@Override
 	byte[] toByteArray(final ByteArrayOutputStream os)
 	{
 		os.write(CONN_HEADER_SIZE);

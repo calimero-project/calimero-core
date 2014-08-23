@@ -149,6 +149,7 @@ public class RFSettings extends KNXMediumSettings
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.link.medium.KNXMediumSettings#getMedium()
 	 */
+	@Override
 	public int getMedium()
 	{
 		return MEDIUM_RF;
@@ -157,6 +158,7 @@ public class RFSettings extends KNXMediumSettings
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.link.medium.KNXMediumSettings#toString()
 	 */
+	@Override
 	public String toString()
 	{
 		return super.toString() + " domain 0x" + DataUnitBuilder.toHex(doa, null) + " s/n 0x"

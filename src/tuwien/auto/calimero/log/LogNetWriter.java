@@ -147,6 +147,7 @@ public class LogNetWriter extends LogStreamWriter
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.log.LogStreamWriter#close()
 	 */
+	@Override
 	public synchronized void close()
 	{
 		if (s != null) {

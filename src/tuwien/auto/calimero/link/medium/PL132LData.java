@@ -131,6 +131,7 @@ public class PL132LData extends RawFrameBase
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.link.medium.RawFrameBase#toString()
 	 */
+	@Override
 	public String toString()
 	{
 		final int domain = (doa[0] & 0xff) << 8 | (doa[1] & 0xff);

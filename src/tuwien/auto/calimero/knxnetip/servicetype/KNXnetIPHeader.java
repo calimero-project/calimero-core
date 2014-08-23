@@ -296,6 +296,7 @@ public class KNXnetIPHeader
 	 *
 	 * @return a string representation of the object
 	 */
+	@Override
 	public String toString()
 	{
 		return "KNXnet/IP " + (version / 0x10) + "." + (version % 0x10) + ", "

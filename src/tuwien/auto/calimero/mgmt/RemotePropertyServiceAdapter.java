@@ -63,12 +63,15 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 		NLListener()
 		{}
 
+		@Override
 		public void confirmation(final FrameEvent e)
 		{}
 
+		@Override
 		public void indication(final FrameEvent e)
 		{}
 
+		@Override
 		public void linkClosed(final CloseEvent e)
 		{
 			pal.adapterClosed(new CloseEvent(RemotePropertyServiceAdapter.this, e
@@ -132,6 +135,7 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 	 * @see tuwien.auto.calimero.mgmt.PropertyAdapter#setProperty
 	 * (int, int, int, int, byte[])
 	 */
+	@Override
 	public void setProperty(final int objIndex, final int pid, final int start,
 		final int elements, final byte[] data) throws KNXException, InterruptedException
 	{
@@ -141,6 +145,7 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.PropertyAdapter#getProperty(int, int, int, int)
 	 */
+	@Override
 	public byte[] getProperty(final int objIndex, final int pid, final int start,
 		final int elements) throws KNXException, InterruptedException
 	{
@@ -150,6 +155,7 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.PropertyAdapter#getDescription(int, int, int)
 	 */
+	@Override
 	public byte[] getDescription(final int objIndex, final int pid, final int propIndex)
 		throws KNXException, InterruptedException
 	{
@@ -160,6 +166,7 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 	 * {@inheritDoc} The name for this adapter starts with "remote PS " + remote KNX
 	 * individual address, allowing easier distinction of adapter types.
 	 */
+	@Override
 	public String getName()
 	{
 		return "remote PS " + dst.getAddress();
@@ -168,6 +175,7 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.PropertyAdapter#isOpen()
 	 */
+	@Override
 	public boolean isOpen()
 	{
 		return mc.isOpen();
@@ -176,6 +184,7 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.PropertyAdapter#close()
 	 */
+	@Override
 	public void close()
 	{
 		final KNXNetworkLink lnk = mc.detach();

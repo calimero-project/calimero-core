@@ -374,6 +374,7 @@ public abstract class DPTXlator
 	 *
 	 * @return a string representation of the translation values
 	 */
+	@Override
 	public String toString()
 	{
 		return "DPT " + dpt.getID() + " " + Arrays.asList(getAllValues()).toString();

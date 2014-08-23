@@ -86,11 +86,13 @@ public class LocalDeviceMgmtAdapter implements PropertyAdapter
 		KNXListenerImpl()
 		{}
 
+		@Override
 		public void frameReceived(final FrameEvent e)
 		{
 			frames.add(e.getFrame());
 		}
 
+		@Override
 		public void connectionClosed(final CloseEvent e)
 		{
 			if (listener == null)
@@ -175,6 +177,7 @@ public class LocalDeviceMgmtAdapter implements PropertyAdapter
 	 * @see tuwien.auto.calimero.mgmt.PropertyAdapter#setProperty
 	 * (int, int, int, int, byte[])
 	 */
+	@Override
 	public void setProperty(final int objIndex, final int pid, final int start, final int elements,
 		final byte[] data) throws KNXTimeoutException, KNXRemoteException,
 		KNXConnectionClosedException
@@ -189,6 +192,7 @@ public class LocalDeviceMgmtAdapter implements PropertyAdapter
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.PropertyAdapter#getProperty(int, int, int, int)
 	 */
+	@Override
 	public byte[] getProperty(final int objIndex, final int pid, final int start, final int elements)
 		throws KNXTimeoutException, KNXRemoteException, KNXConnectionClosedException
 	{
@@ -202,6 +206,7 @@ public class LocalDeviceMgmtAdapter implements PropertyAdapter
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.PropertyAdapter#getDescription(int, int, int)
 	 */
+	@Override
 	public byte[] getDescription(final int objIndex, final int pid, final int propIndex)
 		throws KNXTimeoutException, KNXConnectionClosedException, KNXRemoteException
 	{
@@ -260,6 +265,7 @@ public class LocalDeviceMgmtAdapter implements PropertyAdapter
 	 * {@inheritDoc} The name for this adapter starts with "local DM " + KNXnet/IP server
 	 * control endpoint, allowing easier distinction of adapter types.
 	 */
+	@Override
 	public String getName()
 	{
 		return "local DM " + conn.getRemoteAddress();
@@ -268,6 +274,7 @@ public class LocalDeviceMgmtAdapter implements PropertyAdapter
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.PropertyAdapter#isOpen()
 	 */
+	@Override
 	public boolean isOpen()
 	{
 		return !closed;
@@ -276,6 +283,7 @@ public class LocalDeviceMgmtAdapter implements PropertyAdapter
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.PropertyAdapter#close()
 	 */
+	@Override
 	public void close()
 	{
 		if (!closed) {

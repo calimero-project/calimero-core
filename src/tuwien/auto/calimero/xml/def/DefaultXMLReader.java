@@ -89,6 +89,7 @@ public class DefaultXMLReader implements XMLReader
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.xml.XMLReader#setInput(java.io.Reader, boolean)
 	 */
+	@Override
 	public void setInput(final Reader input, final boolean close)
 	{
 		if (r != null)
@@ -100,6 +101,7 @@ public class DefaultXMLReader implements XMLReader
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.xml.XMLReader#read()
 	 */
+	@Override
 	public int read() throws KNXMLException
 	{
 		while (canRead()) {
@@ -146,6 +148,7 @@ public class DefaultXMLReader implements XMLReader
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.xml.XMLReader#complete(tuwien.auto.calimero.xml.Element)
 	 */
+	@Override
 	public void complete(final Element e) throws KNXMLException
 	{
 		if (e.isEmptyElementTag())
@@ -196,6 +199,7 @@ public class DefaultXMLReader implements XMLReader
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.xml.XMLReader#getCurrent()
 	 */
+	@Override
 	public final Element getCurrent()
 	{
 		return elem;
@@ -204,6 +208,7 @@ public class DefaultXMLReader implements XMLReader
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.xml.XMLReader#getPosition()
 	 */
+	@Override
 	public final int getPosition()
 	{
 		return pos;
@@ -212,6 +217,7 @@ public class DefaultXMLReader implements XMLReader
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.xml.XMLReader#getLineNumber()
 	 */
+	@Override
 	public final int getLineNumber()
 	{
 		return line;
@@ -220,6 +226,7 @@ public class DefaultXMLReader implements XMLReader
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.xml.XMLReader#close()
 	 */
+	@Override
 	public void close() throws KNXMLException
 	{
 		if (closeReader)

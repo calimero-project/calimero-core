@@ -275,6 +275,7 @@ public class StateDP extends Datapoint
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.datapoint.Datapoint#toString()
 	 */
+	@Override
 	public String toString()
 	{
 		return "state DP " + super.toString();
@@ -284,6 +285,7 @@ public class StateDP extends Datapoint
 	 * @see tuwien.auto.calimero.datapoint.Datapoint#doLoad(
 	 * tuwien.auto.calimero.xml.XMLReader)
 	 */
+	@Override
 	void doLoad(final XMLReader r) throws KNXMLException
 	{
 		boolean main = false;
@@ -320,6 +322,7 @@ public class StateDP extends Datapoint
 	 * @see tuwien.auto.calimero.datapoint.Datapoint#doSave(
 	 * tuwien.auto.calimero.xml.XMLWriter)
 	 */
+	@Override
 	void doSave(final XMLWriter w) throws KNXMLException
 	{
 		// <expiration timeout=int />

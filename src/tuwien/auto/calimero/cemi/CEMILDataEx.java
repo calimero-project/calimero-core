@@ -349,6 +349,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.cemi.CEMILData#getStructLength()
 	 */
+	@Override
 	public int getStructLength()
 	{
 		return super.getStructLength() + getAddInfoLength();
@@ -373,6 +374,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 * @param domainOnly <code>true</code> for doing a broadcast only within the domain,
 	 *        <code>false</code> for a system broadcast
 	 */
+	@Override
 	public synchronized void setBroadcast(final boolean domainOnly)
 	{
 		super.setBroadcast(domainOnly);
@@ -407,6 +409,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.cemi.CEMILData#setHopCount(int)
 	 */
+	@Override
 	public final synchronized void setHopCount(final int hobbes)
 	{
 		super.setHopCount(hobbes);
@@ -415,6 +418,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.cemi.CEMILData#setPriority(tuwien.auto.calimero.Priority)
 	 */
+	@Override
 	public final void setPriority(final Priority p)
 	{
 		super.setPriority(p);
@@ -423,6 +427,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.cemi.CEMILData#toByteArray()
 	 */
+	@Override
 	public synchronized byte[] toByteArray()
 	{
 		return super.toByteArray();
@@ -431,6 +436,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.cemi.CEMILData#toString()
 	 */
+	@Override
 	public String toString()
 	{
 		final String s = super.toString();
@@ -464,6 +470,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/* (non-Javadoc)
 	 * @see java.lang.Object#clone()
 	 */
+	@Override
 	public Object clone()
 	{
 		try {
@@ -481,6 +488,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.cemi.CEMILData#readAddInfo(java.io.ByteArrayInputStream)
 	 */
+	@Override
 	void readAddInfo(final ByteArrayInputStream is) throws KNXFormatException
 	{
 		final int ail = is.read();
@@ -507,6 +515,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.cemi.CEMILData#readPayload(java.io.ByteArrayInputStream)
 	 */
+	@Override
 	void readPayload(final ByteArrayInputStream is) throws KNXFormatException
 	{
 		int len = is.read();
@@ -528,6 +537,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 *
 	 * @param os the output stream
 	 */
+	@Override
 	synchronized void writeAddInfo(final ByteArrayOutputStream os)
 	{
 		os.write(getAddInfoLength());
@@ -542,6 +552,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.cemi.CEMILData#writePayload(java.io.ByteArrayOutputStream)
 	 */
+	@Override
 	void writePayload(final ByteArrayOutputStream os)
 	{
 		// RF frames don't use NPDU length field
@@ -552,6 +563,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.cemi.CEMILData#isValidTPDULength(byte[])
 	 */
+	@Override
 	boolean isValidTPDULength(final byte[] tpdu)
 	{
 		// value of length field is limited to 254, 255 is reserved as ESC code

@@ -114,6 +114,7 @@ public interface KNXnetIPConnection
 		 * Returns a textual representation of this blocking mode.
 		 * <p>
 		 */
+		@Override
 		public String toString()
 		{
 			return mode;

@@ -71,6 +71,7 @@ public class DefaultElement implements Element
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.xml.Element#getName()
 	 */
+	@Override
 	public final String getName()
 	{
 		return type;
@@ -80,6 +81,7 @@ public class DefaultElement implements Element
 	 * @see tuwien.auto.calimero.xml.Element#addAttribute
 	 * (tuwien.auto.calimero.xml.Attribute)
 	 */
+	@Override
 	public final void addAttribute(final Attribute a)
 	{
 		synchronized (attributes) {
@@ -90,6 +92,7 @@ public class DefaultElement implements Element
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.xml.Element#getAttribute(java.lang.String)
 	 */
+	@Override
 	public final String getAttribute(final String name)
 	{
 		synchronized (attributes) {
@@ -105,6 +108,7 @@ public class DefaultElement implements Element
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.xml.Element#hasAttribute(java.lang.String)
 	 */
+	@Override
 	public boolean hasAttribute(final String name)
 	{
 		return getAttribute(name) != null;
@@ -113,6 +117,7 @@ public class DefaultElement implements Element
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.xml.Element#setCharacterData(java.lang.String)
 	 */
+	@Override
 	public final void setCharacterData(final String data)
 	{
 		content = data;
@@ -123,6 +128,7 @@ public class DefaultElement implements Element
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.xml.Element#getCharacterData()
 	 */
+	@Override
 	public final String getCharacterData()
 	{
 		return content;
@@ -131,6 +137,7 @@ public class DefaultElement implements Element
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.xml.Element#setEmptyElementTag(boolean)
 	 */
+	@Override
 	public final void setEmptyElementTag(final boolean empty)
 	{
 		emptyTag = empty;
@@ -141,6 +148,7 @@ public class DefaultElement implements Element
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.xml.Element#isEmptyElementTag()
 	 */
+	@Override
 	public final boolean isEmptyElementTag()
 	{
 		return emptyTag;

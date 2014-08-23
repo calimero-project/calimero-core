@@ -105,6 +105,7 @@ public class CommandDP extends Datapoint
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.datapoint.Datapoint#toString()
 	 */
+	@Override
 	public String toString()
 	{
 		return "command DP " + super.toString();
@@ -114,6 +115,7 @@ public class CommandDP extends Datapoint
 	 * @see tuwien.auto.calimero.datapoint.Datapoint#doSave(
 	 * tuwien.auto.calimero.xml.XMLWriter)
 	 */
+	@Override
 	void doSave(final XMLWriter w)
 	{}
 }

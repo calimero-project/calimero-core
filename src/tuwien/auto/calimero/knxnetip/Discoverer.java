@@ -614,6 +614,7 @@ public class Discoverer
 			id = "" + socket.getLocalSocketAddress();
 		}
 
+		@Override
 		public void run()
 		{
 			logger.trace("started on " + id);
@@ -626,6 +627,7 @@ public class Discoverer
 			logger.trace("stopped on " + id);
 		}
 
+		@Override
 		public void quit()
 		{
 			if (search) {
@@ -639,6 +641,7 @@ public class Discoverer
 			super.quit();
 		}
 
+		@Override
 		public void onReceive(final InetSocketAddress source, final byte[] data, final int offset,
 			final int length)
 		{

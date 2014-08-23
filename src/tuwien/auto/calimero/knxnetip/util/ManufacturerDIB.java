@@ -120,6 +120,7 @@ public class ManufacturerDIB extends DIB
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.knxnetip.util.DIB#toByteArray()
 	 */
+	@Override
 	public byte[] toByteArray()
 	{
 		final byte[] buf = super.toByteArray();
@@ -136,6 +137,7 @@ public class ManufacturerDIB extends DIB
 	 * 
 	 * @return a string representation of the DIB object
 	 */
+	@Override
 	public String toString()
 	{
 		return "KNX manufacturer ID 0x" + Integer.toHexString(id) + ", data 0x"

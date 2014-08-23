@@ -202,6 +202,7 @@ abstract class ClientConnection extends ConnectionBase
 		}
 	}
 
+	@Override
 	protected void cleanup(final int initiator, final String reason, final LogLevel level,
 		final Throwable t)
 	{
@@ -226,6 +227,7 @@ abstract class ClientConnection extends ConnectionBase
 	/* (non-Javadoc)
 	* @see tuwien.auto.calimero.knxnetip.ConnectionBase#doExtraBlockingModes()
 	*/
+	@Override
 	void doExtraBlockingModes() throws KNXTimeoutException, InterruptedException
 	{
 		// blocking mode is wait for .con
@@ -247,6 +249,7 @@ abstract class ClientConnection extends ConnectionBase
 	 *      java.net.InetAddress, int)
 	 * @throws IOException
 	 */
+	@Override
 	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data,
 		final int offset, final InetAddress src, final int port) throws KNXFormatException,
 		IOException
@@ -388,6 +391,7 @@ abstract class ClientConnection extends ConnectionBase
 			setDaemon(true);
 		}
 
+		@Override
 		public void run()
 		{
 			final byte[] buf = PacketHelper.toPacket(new ConnectionstateRequest(channelId,

@@ -288,6 +288,7 @@ public class CEMILData implements CEMI
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.cemi.CEMI#getMessageCode()
 	 */
+	@Override
 	public final int getMessageCode()
 	{
 		return mc;
@@ -301,6 +302,7 @@ public class CEMILData implements CEMI
 	 *
 	 * @return a copy of the TPDU as byte array
 	 */
+	@Override
 	public final byte[] getPayload()
 	{
 		return data.clone();
@@ -428,6 +430,7 @@ public class CEMILData implements CEMI
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.cemi.CEMI#getStructLength()
 	 */
+	@Override
 	public int getStructLength()
 	{
 		return BASIC_LENGTH + data.length;
@@ -436,6 +439,7 @@ public class CEMILData implements CEMI
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.cemi.CEMI#toByteArray()
 	 */
+	@Override
 	public byte[] toByteArray()
 	{
 		final ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -455,6 +459,7 @@ public class CEMILData implements CEMI
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString()
 	{
 		final StringBuffer buf = new StringBuffer();
