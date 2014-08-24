@@ -36,10 +36,8 @@
 
 package tuwien.auto.calimero.log;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
 
 import org.slf4j.Logger;
 
@@ -75,17 +73,15 @@ public class LogService
 	{
 		private static final class LogData
 		{
-			final List<? extends LogWriter> wr;
 			final String svc;
 			final LogLevel lvl;
 			final String msg;
 			final Throwable trow;
 			final Thread thread;
 
-			LogData(final List<? extends LogWriter> writers, final String service,
+			LogData(final String service,
 				final LogLevel level, final String message, final Throwable t, final Thread thr)
 			{
-				wr = writers;
 				svc = service;
 				lvl = level;
 				msg = message;
@@ -128,12 +124,11 @@ public class LogService
 			}
 		}
 
-		void add(final List<? extends LogWriter> writers, final String service,
-			final LogLevel level, final String msg, final Throwable t)
+		void add(final String service, final LogLevel level, final String msg, final Throwable t)
 		{
 			if (!quit) {
 				synchronized (data) {
-					data.add(new LogData(writers, service, level, msg, t, Thread.currentThread()));
+					data.add(new LogData(service, level, msg, t, Thread.currentThread()));
 					data.notify();
 				}
 			}
@@ -143,51 +138,17 @@ public class LogService
 		{
 			final boolean dev = false; //Settings.getLibraryMode() == Settings.DEV_MODE;
 			final String svc = dev ? ("[" + d.thread.getName() + "] " + d.svc) : d.svc;
-			synchronized (d.wr) {
-				for (final Iterator<? extends LogWriter> i = d.wr.iterator(); i.hasNext();)
-					i.next().write(svc, d.lvl, d.msg, d.trow);
-			}
 		}
 	}
 
 	private static final Dispatcher logger = new Dispatcher();
 
-	/** Name of this log service. */
-	protected final String name;
-	private LogLevel logLevel = LogLevel.ALL;
-	private List<LogWriter> writers = new Vector<>();
+	private final Logger impl;
 
-	private Logger impl;
-
-	/**
-	 * Creates a new log service with the specified <code>name</code>.
-	 * <p>
-	 *
-	 * @param name name of log service
-	 */
-	protected LogService(final String name)
-	{
-		this.name = name;
-	}
-
-	/**
-	 * Creates a new log service with the specified <code>name</code> and log
-	 * <code>level</code>.
-	 * <p>
-	 *
-	 * @param name name of log service
-	 * @param level log level for this log service
-	 */
-	protected LogService(final String name, final LogLevel level)
-	{
-		this.name = name;
-		setLogLevel(level);
-	}
 
 	// sets the slf4j to do the work
 	protected LogService(final Logger l)
 	{
-		this(l.getName(), LogLevel.ALL);
 		this.impl = l;
 	}
 
@@ -201,101 +162,6 @@ public class LogService
 	public final Logger slf4j()
 	{
 		return impl;
-	}
-
-	/**
-	 * Returns the name of this log service.
-	 * <p>
-	 *
-	 * @return the log service name
-	 */
-	public String getName()
-	{
-		return name;
-	}
-
-	/**
-	 * Sets a new log level for this log service.
-	 * <p>
-	 * All log information will be checked against and restricted to at most this level.<br>
-	 * Log information not allowed will be ignored.
-	 * <p>
-	 * For example: set log level to {@link LogLevel#WARN} to allow log info with
-	 * {@link LogLevel#FATAL}, {@link LogLevel#ERROR} and {@link LogLevel#WARN}.
-	 *
-	 * @param level new log level
-	 */
-	public void setLogLevel(final LogLevel level)
-	{
-		logLevel = level;
-	}
-
-	/**
-	 * Returns the currently set log level of this log service.
-	 * <p>
-	 *
-	 * @return the log {@link LogLevel}
-	 */
-	public LogLevel getLogLevel()
-	{
-		return logLevel;
-	}
-
-	/**
-	 * Checks whether output with a specified level will be logged by this log service.
-	 * <p>
-	 * The <code>level</code> parameter is checked against the currently set log level of
-	 * this log service. Only output with a log level specified equal or below the level
-	 * of this service is logged, i.e., output of the same or less verbosity.<br>
-	 * Output with assigned log level {@link LogLevel#OFF} is never logged.
-	 *
-	 * @param level the log level to check for
-	 * @return <code>true</code> if output of that level is loggable, <code>false</code>
-	 *         otherwise
-	 */
-	public final boolean isLoggable(final LogLevel level)
-	{
-		return !level.higher(logLevel) && level != LogLevel.OFF;
-	}
-
-	/**
-	 * Adds the <code>writer</code> to this log service.
-	 * <p>
-	 * No check is made to detect (or prevent) duplicate writers.
-	 *
-	 * @param writer LogWriter to add
-	 */
-	public void addWriter(final LogWriter writer)
-	{
-		writers.add(writer);
-	}
-
-	/**
-	 * Removes <code>writer</code> from this log service.
-	 * <p>
-	 * No check is made to detect and remove duplicate writers.
-	 *
-	 * @param writer LogWriter to remove
-	 */
-	public void removeWriter(final LogWriter writer)
-	{
-		writers.remove(writer);
-	}
-
-	/**
-	 * Removes all registered log writer from this log service.
-	 * <p>
-	 *
-	 * @param close should the writers be closed before removal
-	 */
-	public void removeAllWriters(final boolean close)
-	{
-		if (close)
-			synchronized (writers) {
-				for (final Iterator<LogWriter> i = writers.iterator(); i.hasNext();)
-					i.next().close();
-			}
-		writers = new Vector<>();
 	}
 
 	/**
@@ -369,31 +235,6 @@ public class LogService
 	}
 
 	/**
-	 * Offers <code>msg</code> with log level {@link LogLevel#FATAL}.
-	 * <p>
-	 *
-	 * @param msg log information
-	 */
-// TODO remove
-//	public void fatal(final String msg)
-//	{
-//		log(LogLevel.FATAL, msg, null);
-//	}
-
-	/**
-	 * Offers <code>msg</code> and the <code>throwable</code> object with log level
-	 * {@link LogLevel#FATAL}.
-	 * <p>
-	 *
-	 * @param msg log information
-	 * @param t throwable object
-	 */
-//	public void fatal(final String msg, final Throwable t)
-//	{
-//		log(LogLevel.FATAL, msg, t);
-//	}
-
-	/**
 	 * Offers <code>msg</code> and the <code>throwable</code> object with log
 	 * <code>level</code>.
 	 * <p>
@@ -404,21 +245,7 @@ public class LogService
 	 */
 	public void log(final LogLevel level, final String msg, final Throwable t)
 	{
-		if (impl != null) {
-			forwardToImpl(level, msg, t);
-			return;
-		}
-		if (level != LogLevel.OFF && level.level <= logLevel.level)
-			logger.add(writers, name, level, msg, t);
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		return name + ", log level " + logLevel + ", " + writers.size() + " log writers";
+		forwardToImpl(level, msg, t);
 	}
 
 	static final void stopDispatcher()
@@ -446,17 +273,13 @@ public class LogService
 	public static void log(final Logger logger, final LogLevel level, final String msg,
 		final Throwable t)
 	{
-		if (level.equals(LogLevel.OFF))
-			;
-		else if (level.equals(LogLevel.TRACE))
+		if (level.equals(LogLevel.TRACE))
 			logger.trace(msg, t);
 		else if (level.equals(LogLevel.INFO))
 			logger.info(msg, t);
 		else if (level.equals(LogLevel.WARN))
 			logger.warn(msg, t);
 		else if (level.equals(LogLevel.ERROR))
-			logger.error(msg, t);
-		else if (level.equals(LogLevel.FATAL))
 			logger.error(msg, t);
 		else if (level.equals(LogLevel.ALWAYS))
 			logger.trace(msg, t);
