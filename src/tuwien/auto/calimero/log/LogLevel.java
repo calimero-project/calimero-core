@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,33 +41,24 @@ package tuwien.auto.calimero.log;
  * <p>
  * Defines several severity levels used to categorize logging information and
  * loggers. It also gives a clue about the chattiness of the respective object.
- * 
+ *
  * @author B. Malinowsky
  */
 public class LogLevel
 {
-	private static final int LOG_OFF = 0;
 	private static final int LOG_ALWAYS = 50;
-	private static final int LOG_FATAL = 100;
 	private static final int LOG_ERROR = 200;
 	private static final int LOG_WARN = 300;
 	private static final int LOG_INFO = 400;
 	private static final int LOG_TRACE = 500;
 	private static final int LOG_ALL = 1000;
 
-	/**
-	 * The lowest log level, logging is turned off.
-	 */
-	public static final LogLevel OFF = new LogLevel(LOG_OFF);
+
 	/**
 	 * This level identifies the attached object to be always logged if possible (and
 	 * logging is not set to off).
 	 */
 	public static final LogLevel ALWAYS = new LogLevel(LOG_ALWAYS);
-	/**
-	 * This level identifies the attached object for fatal error purposes.
-	 */
-	public static final LogLevel FATAL = new LogLevel(LOG_FATAL);
 	/**
 	 * This level identifies the attached object for error purposes.
 	 */
@@ -106,7 +97,7 @@ public class LogLevel
 	/**
 	 * Compares for a higher log level than <code>l</code>.
 	 * <p>
-	 * 
+	 *
 	 * @param l level to compare
 	 * @return true iff this object has a higher log level than <code>l</code>.
 	 */
@@ -118,7 +109,7 @@ public class LogLevel
 	/**
 	 * Compares the log level with <code>obj</code>.
 	 * <p>
-	 * 
+	 *
 	 * @param obj {@inheritDoc}
 	 * @return <code>true</code> if <code>o</code> is of type
 	 *         <code>LogLevel</code> and has the same log level as this object,
@@ -145,15 +136,13 @@ public class LogLevel
 	/**
 	 * Returns the log level in textual format, like "off", "trace",
 	 * .&nbsp;.&nbsp;.&nbsp; or "unknown" if level is not defined.
-	 * 
+	 *
 	 * @return the log level as string
 	 */
 	@Override
 	public String toString()
 	{
 		switch (level) {
-		case LOG_OFF:
-			return "off";
 		case LOG_TRACE:
 			return "trace";
 		case LOG_INFO:
@@ -162,8 +151,6 @@ public class LogLevel
 			return "warn";
 		case LOG_ERROR:
 			return "error";
-		case LOG_FATAL:
-			return "fatal";
 		case LOG_ALWAYS:
 			return "always";
 		case LOG_ALL:
