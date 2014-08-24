@@ -55,7 +55,6 @@ import tuwien.auto.calimero.exception.KNXException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.exception.KNXIllegalStateException;
 import tuwien.auto.calimero.exception.KNXTimeoutException;
-import tuwien.auto.calimero.log.LogManager;
 
 /**
  * @author B. Malinowsky
@@ -138,7 +137,7 @@ public class KNXnetIPTunnelTest extends TestCase
 		lnat = new KNXListenerImpl();
 		lmon = new KNXListenerImpl();
 
-		LogManager.getManager().addWriter(null, Util.getLogWriter());
+		Util.setupLogging();
 
 		frame = new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0), new GroupAddress(0,
 				0, 1), new byte[] { 0, (byte) (0x80 | 1) }, Priority.NORMAL);
@@ -162,7 +161,7 @@ public class KNXnetIPTunnelTest extends TestCase
 		}
 		if (mon != null)
 			mon.close();
-		LogManager.getManager().removeWriter(null, Util.getLogWriter());
+		Util.tearDownLogging();
 		super.tearDown();
 	}
 

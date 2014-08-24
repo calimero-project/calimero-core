@@ -51,7 +51,6 @@ import tuwien.auto.calimero.knxnetip.Debug;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.KNXNetworkLinkIP;
 import tuwien.auto.calimero.link.medium.TPSettings;
-import tuwien.auto.calimero.log.LogManager;
 import tuwien.auto.calimero.process.ProcessCommunicator;
 import tuwien.auto.calimero.process.ProcessCommunicatorImpl;
 
@@ -80,7 +79,7 @@ public class NetworkBufferTest extends TestCase
 		super.setUp();
 		lnk = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, null, Util.getServer(),
 			false, TPSettings.TP1);
-		LogManager.getManager().addWriter("", Util.getLogWriter());
+		Util.setupLogging();
 		buffer = NetworkBuffer.createBuffer("test");
 	}
 
@@ -93,7 +92,7 @@ public class NetworkBufferTest extends TestCase
 		if (lnk != null)
 			lnk.close();
 		buffer.destroy();
-		LogManager.getManager().removeWriter("", Util.getLogWriter());
+		Util.tearDownLogging();
 		super.tearDown();
 	}
 

@@ -45,7 +45,6 @@ import junit.framework.TestCase;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
-import tuwien.auto.calimero.log.LogManager;
 
 /**
  * Test for DPTXlatorDate.
@@ -78,7 +77,7 @@ public class DPTXlatorDateTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		LogManager.getManager().addWriter("DPTXlator", Util.getLogWriter());
+		Util.setupLogging("DPTXlator");
 		t = new DPTXlatorDate(dpt);
 		// reset to default to not interfere with tests
 		DPTXlatorDate.useValueFormat(null);
@@ -90,7 +89,7 @@ public class DPTXlatorDateTest extends TestCase
 	@Override
 	protected void tearDown() throws Exception
 	{
-		LogManager.getManager().removeWriter("DPTXlator", Util.getLogWriter());
+		Util.tearDownLogging();
 		super.tearDown();
 	}
 

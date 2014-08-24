@@ -51,7 +51,6 @@ import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.KNXNetworkLinkIP;
 import tuwien.auto.calimero.link.medium.TPSettings;
-import tuwien.auto.calimero.log.LogManager;
 
 /**
  * @author B. Malinowsky
@@ -98,7 +97,7 @@ public class ProcessCommunicatorTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		LogManager.getManager().addWriter(null, Util.getLogWriter());
+		Util.setupLogging();
 		link = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, Util.getLocalHost(),
 			Util.getServer(), false, TPSettings.TP1);
 		pc = new ProcessCommunicatorImpl(link);
@@ -114,7 +113,7 @@ public class ProcessCommunicatorTest extends TestCase
 		pc.detach();
 		pc2.detach();
 		link.close();
-		LogManager.getManager().removeWriter(null, Util.getLogWriter());
+		Util.tearDownLogging();
 		super.tearDown();
 	}
 

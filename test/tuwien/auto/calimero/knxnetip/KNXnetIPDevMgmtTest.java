@@ -50,7 +50,6 @@ import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.exception.KNXException;
 import tuwien.auto.calimero.exception.KNXTimeoutException;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode;
-import tuwien.auto.calimero.log.LogManager;
 
 /**
  * @author B. Malinowsky
@@ -120,7 +119,7 @@ public class KNXnetIPDevMgmtTest extends TestCase
 		super.setUp();
 		l = new KNXListenerImpl();
 
-		LogManager.getManager().addWriter(null, Util.getLogWriter());
+		Util.setupLogging();
 
 		// pid 52 = individual address
 		frame = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, 11, 1, 52, 1, 1);
@@ -137,7 +136,7 @@ public class KNXnetIPDevMgmtTest extends TestCase
 		if (m != null) {
 			m.close();
 		}
-		LogManager.getManager().removeWriter(null, Util.getLogWriter());
+		Util.tearDownLogging();
 		super.tearDown();
 	}
 
