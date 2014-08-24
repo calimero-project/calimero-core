@@ -51,10 +51,7 @@ public class LogLevelTest extends TestCase
 	{
 		assertTrue(LogLevel.ALL.equals(LogLevel.ALL));
 		assertTrue(LogLevel.INFO.equals(LogLevel.INFO));
-		assertFalse(LogLevel.TRACE.equals(LogLevel.OFF));
 		assertFalse(LogLevel.WARN.equals(LogLevel.INFO));
-		assertFalse(LogLevel.FATAL.equals(new Object()));
-		assertFalse(LogLevel.FATAL.equals(null));
 	}
 
 	/**
@@ -67,9 +64,6 @@ public class LogLevelTest extends TestCase
 		assertTrue(LogLevel.TRACE.higher(LogLevel.INFO));
 		assertTrue(LogLevel.INFO.higher(LogLevel.WARN));
 		assertTrue(LogLevel.WARN.higher(LogLevel.ERROR));
-		assertTrue(LogLevel.ERROR.higher(LogLevel.FATAL));
-		assertTrue(LogLevel.FATAL.higher(LogLevel.OFF));
-		assertFalse(LogLevel.OFF.higher(LogLevel.OFF));
 	}
 
 }
