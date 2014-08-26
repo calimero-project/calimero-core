@@ -282,7 +282,7 @@ public class LogService
 		else if (level.equals(LogLevel.ERROR))
 			logger.error(msg, t);
 		else if (level.equals(LogLevel.ALWAYS))
-			logger.trace(msg, t);
+			logger.info(msg, t);
 		else
 			throw new KNXIllegalArgumentException("unknown log level");
 	}
