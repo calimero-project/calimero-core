@@ -85,6 +85,11 @@ public final class LogService
 		return LoggerFactory.getLogger(name);
 	}
 
+	// Note that with async loggers stack traces won't show the original location
+	public static Logger getAsyncLogger(final String name)
+	{
+		return new AsyncLogger(LogService.getLogger(name));
+	}
 
 	public static void removeLogger(final Logger l) {}
 
