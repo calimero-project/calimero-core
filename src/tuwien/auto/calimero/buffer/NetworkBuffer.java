@@ -61,7 +61,7 @@ import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.NetworkLinkListener;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
-import tuwien.auto.calimero.log.LogManager;
+import tuwien.auto.calimero.log.LogService;
 
 /**
  * A network buffer temporarily stores KNX network messages.
@@ -391,7 +391,7 @@ public final class NetworkBuffer
 	/** Name of the log service used for network buffer logging. */
 	public static final String LOG_SERVICE = "network buffer";
 
-	static final Logger logger = LogManager.getManager().getSlf4jLogger(LOG_SERVICE);
+	static final Logger logger = LogService.getLogger(LOG_SERVICE);
 
 	// all network buffers currently in use
 	// private static final List buffers = new ArrayList();

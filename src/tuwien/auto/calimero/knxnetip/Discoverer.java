@@ -66,7 +66,7 @@ import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchRequest;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
-import tuwien.auto.calimero.log.LogManager;
+import tuwien.auto.calimero.log.LogService;
 
 /**
  * Does KNXnet/IP discovery and retrieval of self description from other devices.
@@ -118,7 +118,7 @@ public class Discoverer
 
 	static final InetAddress SYSTEM_SETUP_MULTICAST;
 
-	private static final Logger logger = LogManager.getManager().getSlf4jLogger(LOG_SERVICE);
+	private static final Logger logger = LogService.getLogger(LOG_SERVICE);
 
 	// local host/port
 	private final InetAddress host;

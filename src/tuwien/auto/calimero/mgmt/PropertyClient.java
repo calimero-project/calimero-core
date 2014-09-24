@@ -58,7 +58,7 @@ import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.exception.KNXIllegalStateException;
 import tuwien.auto.calimero.exception.KNXRemoteException;
 import tuwien.auto.calimero.exception.KNXTimeoutException;
-import tuwien.auto.calimero.log.LogManager;
+import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.xml.Attribute;
 import tuwien.auto.calimero.xml.Element;
 import tuwien.auto.calimero.xml.KNXMLException;
@@ -455,7 +455,7 @@ public class PropertyClient implements PropertyAccess
 			pa.close();
 			throw e;
 		}
-		logger = LogManager.getManager().getSlf4jLogger("PC " + pa.getName());
+		logger = LogService.getLogger("PC " + pa.getName());
 	}
 
 	/**
@@ -769,7 +769,7 @@ public class PropertyClient implements PropertyAccess
 		if (pa.isOpen()) {
 			pa.close();
 			logger.info("closed property client");
-			LogManager.getManager().removeLogService(logger.getName());
+			LogService.removeLogger(logger);
 		}
 	}
 

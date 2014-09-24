@@ -61,8 +61,8 @@ import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingIndication;
 import tuwien.auto.calimero.knxnetip.servicetype.ServiceRequest;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
-import tuwien.auto.calimero.log.LogLevel;
-import tuwien.auto.calimero.log.LogManager;
+import tuwien.auto.calimero.log.LogService;
+import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * Generic implementation of a KNXnet/IP connection, used for tunneling, device management
@@ -506,7 +506,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		setState(CLOSED);
 		fireConnectionClosed(initiator, reason);
 		listeners.removeAll();
-		LogManager.getManager().removeLogService(logger.getName());
+		LogService.removeLogger(logger);
 	}
 
 	/**

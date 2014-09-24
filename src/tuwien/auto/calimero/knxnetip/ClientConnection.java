@@ -62,8 +62,7 @@ import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.servicetype.ServiceAck;
 import tuwien.auto.calimero.knxnetip.util.CRI;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
-import tuwien.auto.calimero.log.LogLevel;
-import tuwien.auto.calimero.log.LogManager;
+import tuwien.auto.calimero.log.LogService.LogLevel;
 import tuwien.auto.calimero.log.LogService;
 
 /**
@@ -141,7 +140,7 @@ abstract class ClientConnection extends ConnectionBase
 		if (ctrlEndpt.isUnresolved())
 			throw new KNXException("server control endpoint is unresolved: " + serverCtrlEP);
 		useNat = useNAT;
-		logger = LogManager.getManager().getSlf4jLogger(getName());
+		logger = LogService.getLogger(getName());
 		Exception thrown = null;
 		try {
 			// if we allow localEP to be null, we would create an unbound socket
@@ -172,7 +171,7 @@ abstract class ClientConnection extends ConnectionBase
 			logger.error("communication failure on connect", thrown);
 			if (localEP.getAddress().isLoopbackAddress())
 				logger.warn("try to specify the actual IP address of the local host");
-			LogManager.getManager().removeLogService(logger.getName());
+			LogService.removeLogger(logger);
 			throw new KNXException("on connect to " + serverCtrlEP + ": " + thrown.getMessage());
 		}
 
@@ -375,7 +374,7 @@ abstract class ClientConnection extends ConnectionBase
 		socket.close();
 		setState(CLOSED);
 		logger.error("establishing connection failed", thrown);
-		LogManager.getManager().removeLogService(logger.getName());
+		LogService.removeLogger(logger);
 	}
 
 	private final class HeartbeatMonitor extends Thread

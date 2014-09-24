@@ -58,7 +58,7 @@ import tuwien.auto.calimero.exception.KNXRemoteException;
 import tuwien.auto.calimero.exception.KNXTimeoutException;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
-import tuwien.auto.calimero.log.LogManager;
+import tuwien.auto.calimero.log.LogService;
 
 /**
  * Implementation of management client.
@@ -192,7 +192,7 @@ public class ManagementClientImpl implements ManagementClient
 	{
 		tl = transportLayer;
 		tl.addTransportListener(tlListener);
-		logger = LogManager.getManager().getSlf4jLogger("MC " + link.getName());
+		logger = LogService.getLogger("MC " + link.getName());
 	}
 
 	/* (non-Javadoc)
@@ -758,7 +758,7 @@ public class ManagementClientImpl implements ManagementClient
 		final KNXNetworkLink lnk = tl.detach();
 		if (lnk != null) {
 			logger.info("detached from " + lnk.getName());
-			LogManager.getManager().removeLogService(logger.getName());
+			LogService.removeLogger(logger);
 		}
 		detached = true;
 		return lnk;

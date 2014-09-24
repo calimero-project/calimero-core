@@ -64,7 +64,7 @@ import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.link.medium.PLSettings;
 import tuwien.auto.calimero.link.medium.RFSettings;
 import tuwien.auto.calimero.link.medium.TPSettings;
-import tuwien.auto.calimero.log.LogManager;
+import tuwien.auto.calimero.log.LogService;
 
 /**
  * Implementation of the KNX network link based on the KNXnet/IP protocol, using a
@@ -134,7 +134,7 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 			((KNXNetworkLinkIP) source).closed = true;
 			super.connectionClosed(e);
 			logger.info("link closed");
-			LogManager.getManager().removeLogService(logger.getName());
+			LogService.removeLogger(logger);
 		}
 	};
 
@@ -219,7 +219,7 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 		final InetSocketAddress a = conn.getRemoteAddress();
 		name = "link " + a.getAddress().getHostAddress() + ":" + a.getPort();
 
-		logger = LogManager.getManager().getSlf4jLogger(getName());
+		logger = LogService.getLogger(getName());
 		notifier = new LinkNotifier(this, logger);
 		conn.addConnectionListener(notifier);
 		// configure KNX medium stuff
@@ -272,7 +272,7 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 		final InetSocketAddress a = conn.getRemoteAddress();
 		name = "link " + a.getAddress().getHostAddress() + ":" + a.getPort();
 
-		logger = LogManager.getManager().getSlf4jLogger(getName());
+		logger = LogService.getLogger(getName());
 		notifier = new LinkNotifier(this, logger);
 		conn.addConnectionListener(notifier);
 		// configure KNX medium stuff

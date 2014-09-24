@@ -52,7 +52,7 @@ import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.link.medium.RawFrameFactory;
-import tuwien.auto.calimero.log.LogManager;
+import tuwien.auto.calimero.log.LogService;
 
 /**
  * Implementation of the KNX network monitor link based on the KNXnet/IP protocol, using a
@@ -109,7 +109,7 @@ public class KNXNetworkMonitorIP implements KNXNetworkMonitor
 			((KNXNetworkMonitorIP) source).closed = true;
 			super.connectionClosed(e);
 			logger.info("monitor closed");
-			LogManager.getManager().removeLogService(logger.getName());
+			LogService.removeLogger(logger);
 		}
 	};
 
@@ -157,7 +157,7 @@ public class KNXNetworkMonitorIP implements KNXNetworkMonitor
 		final InetSocketAddress a = conn.getRemoteAddress();
 		name = "monitor " + a.getAddress().getHostAddress() + ":" + a.getPort();
 
-		logger = LogManager.getManager().getSlf4jLogger(getName());
+		logger = LogService.getLogger(getName());
 		logger.info("in busmonitor mode - ready to receive");
 		notifier = new MonitorNotifier(this, logger);
 		conn.addConnectionListener(notifier);

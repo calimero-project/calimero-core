@@ -52,7 +52,7 @@ import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.exception.KNXTimeoutException;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
-import tuwien.auto.calimero.log.LogManager;
+import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.serial.FT12Connection;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
 
@@ -101,7 +101,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 			((KNXNetworkLinkFT12) source).closed = true;
 			super.connectionClosed(e);
 			logger.info("link closed");
-			LogManager.getManager().removeLogService(logger.getName());
+			LogService.removeLogger(logger);
 		}
 	};
 
@@ -135,7 +135,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 		conn = new FT12Connection(portID);
 		linkLayerMode();
 		name = "link " + conn.getPortID();
-		logger = LogManager.getManager().getSlf4jLogger(getName());
+		logger = LogService.getLogger(getName());
 		notifier = new LinkNotifier(this, logger);
 		conn.addConnectionListener(notifier);
 		// configure KNX medium stuff
@@ -160,7 +160,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 		conn = new FT12Connection(portNumber);
 		linkLayerMode();
 		name = "link " + conn.getPortID();
-		logger = LogManager.getManager().getSlf4jLogger(getName());
+		logger = LogService.getLogger(getName());
 		notifier = new LinkNotifier(this, logger);
 		conn.addConnectionListener(notifier);
 		// configure KNX medium stuff

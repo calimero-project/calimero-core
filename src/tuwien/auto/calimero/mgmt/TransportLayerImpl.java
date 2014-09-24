@@ -60,7 +60,7 @@ import tuwien.auto.calimero.internal.EventListeners;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.NetworkLinkListener;
-import tuwien.auto.calimero.log.LogManager;
+import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.mgmt.Destination.AggregatorProxy;
 
 /**
@@ -203,7 +203,7 @@ public class TransportLayerImpl implements TransportLayer
 			throw new KNXLinkClosedException();
 		lnk = link;
 		lnk.addLinkListener(lnkListener);
-		logger = LogManager.getManager().getSlf4jLogger(getName());
+		logger = LogService.getLogger(getName());
 		listeners = new EventListeners<>(TransportListener.class, logger);
 		serverSide = serverEndpoint;
 	}
@@ -435,7 +435,7 @@ public class TransportLayerImpl implements TransportLayer
 		detached = true;
 		fireDetached();
 		logger.info("detached from " + lnk.getName());
-		LogManager.getManager().removeLogService(logger.getName());
+		LogService.removeLogger(logger);
 		return lnk;
 	}
 

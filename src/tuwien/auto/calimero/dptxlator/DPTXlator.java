@@ -45,9 +45,8 @@ import org.slf4j.Logger;
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.exception.KNXIllegalStateException;
-import tuwien.auto.calimero.log.LogLevel;
-import tuwien.auto.calimero.log.LogManager;
 import tuwien.auto.calimero.log.LogService;
+import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * DPT translator interface for data conversion between KNX DPTs and java types.
@@ -86,7 +85,7 @@ public abstract class DPTXlator
 	 * Logger object for all translators.
 	 * <p>
 	 */
-	protected static final Logger logger = LogManager.getManager().getSlf4jLogger(LOG_SERVICE);
+	protected static final Logger logger = LogService.getLogger(LOG_SERVICE);
 
 	/**
 	 * Array containing KNX data type values.

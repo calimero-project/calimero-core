@@ -58,7 +58,7 @@ import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.servicetype.ServiceAck;
 import tuwien.auto.calimero.knxnetip.servicetype.ServiceRequest;
 import tuwien.auto.calimero.knxnetip.util.TunnelCRI;
-import tuwien.auto.calimero.log.LogLevel;
+import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * KNXnet/IP connection for KNX tunneling.

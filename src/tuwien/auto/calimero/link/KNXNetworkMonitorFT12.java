@@ -48,7 +48,7 @@ import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.link.medium.RawFrameFactory;
-import tuwien.auto.calimero.log.LogManager;
+import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.serial.FT12Connection;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
 
@@ -107,7 +107,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 			((KNXNetworkMonitorFT12) source).closed = true;
 			super.connectionClosed(e);
 			logger.info("monitor closed");
-			LogManager.getManager().removeLogService(logger.getName());
+			LogService.removeLogger(logger);
 		}
 	}
 
@@ -140,7 +140,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 		conn = new FT12Connection(portID);
 		enterBusmonitor();
 		name = "monitor " + conn.getPortID();
-		logger = LogManager.getManager().getSlf4jLogger(getName());
+		logger = LogService.getLogger(getName());
 		logger.info("in busmonitor mode - ready to receive");
 		notifier = new MonitorNotifier(this, logger);
 		conn.addConnectionListener(notifier);
@@ -166,7 +166,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 		conn = new FT12Connection(portNumber);
 		enterBusmonitor();
 		name = "monitor " + conn.getPortID();
-		logger = LogManager.getManager().getSlf4jLogger(getName());
+		logger = LogService.getLogger(getName());
 		logger.info("in busmonitor mode - ready to receive");
 		notifier = new MonitorNotifier(this, logger);
 		conn.addConnectionListener(notifier);

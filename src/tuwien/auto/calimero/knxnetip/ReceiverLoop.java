@@ -46,7 +46,7 @@ import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.internal.UdpSocketLooper;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
-import tuwien.auto.calimero.log.LogLevel;
+import tuwien.auto.calimero.log.LogService.LogLevel;
 
 final class ReceiverLoop extends UdpSocketLooper implements Runnable
 {

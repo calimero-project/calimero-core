@@ -36,12 +36,6 @@
 
 package tuwien.auto.calimero.log;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Global Manager for {@link LogService}s and {@link LogWriter}s.
@@ -60,11 +54,8 @@ public final class LogManager
 {
 	private static final LogManager mgr = new LogManager();
 
-	private final Map<String, LogService> loggers;
-
 	private LogManager()
 	{
-		loggers = Collections.synchronizedMap(new HashMap<>());
 	}
 
 	/**
@@ -78,68 +69,5 @@ public final class LogManager
 		return mgr;
 	}
 
-	/**
-	 * Queries for a log service with the specified <code>name</code>.
-	 * <p>
-	 * If the log service with this name already exists in the manager, it will be
-	 * returned, otherwise a new log service with this name will be created and added to
-	 * the log services listed in the manager.
-	 *
-	 * @param name name of log service, the empty string is not allowed
-	 * @return the LogService object
-	 */
-	LogService getLogService(final String name)
-	{
-		synchronized (loggers) {
-			LogService l = loggers.get(name);
-			if (l == null) {
-				final Logger slf4jLogger = LoggerFactory.getLogger(name);
-				l = new LogService(slf4jLogger);
-				loggers.put(name, l);
-			}
-			return l;
-		}
-	}
-
-	/**
-	 * Queries for a slf4j logger with the specified <code>name</code>.
-	 * <p>
-	 * If the logger with that name already exists in the manager, it will be
-	 * returned, otherwise a new logger with that name will be created and added to
-	 * the log services listed in the manager.
-	 *
-	 * @param name name of logger, the empty string is not allowed
-	 * @return the Logger object
-	 * @deprecated Used for transition to slf4j
-	 */
-	public Logger getSlf4jLogger(final String name)
-	{
-		return getLogService(name).slf4j();
-	}
-
-	public void removeLogService(final String name)
-	{
-		// nop
-	}
-
-	// XXX update doc
-	/**
-	 * Drains the log output queues of the underlying log handler mechanism and shuts down
-	 * logging.
-	 * <p>
-	 * An invocation blocks until all log messages currently (i.e., at the time of
-	 * invoking this method) waiting for being dispatched by the log services got written
-	 * out by the corresponding log writers.<br>
-	 * Subsequent log events passed to the standard {@link LogService} are not handled but
-	 * ignored.<br>
-	 * This method is useful if a Java process wants to terminate immediately after
-	 * shutting down all other KNX library services; in that case, log events might still
-	 * be queued and waiting to be processed, e.g., written to a file on disk. Then, by
-	 * calling this method, the log service handler mechanisms is guaranteed the required
-	 * amount of time to process the remaining log events.
-	 */
-	public void flush()
-	{
-		// NYI
-	}
+	public void flush() {}
 }

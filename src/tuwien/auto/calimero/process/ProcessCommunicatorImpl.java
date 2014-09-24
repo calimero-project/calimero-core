@@ -69,7 +69,7 @@ import tuwien.auto.calimero.internal.EventListeners;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.NetworkLinkListener;
-import tuwien.auto.calimero.log.LogManager;
+import tuwien.auto.calimero.log.LogService;
 
 /**
  * This implementation of the process communicator uses in any case the DPT translators
@@ -176,7 +176,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 			throw new KNXLinkClosedException();
 		lnk = link;
 		lnk.addLinkListener(lnkListener);
-		logger = LogManager.getManager().getSlf4jLogger("process " + link.getName());
+		logger = LogService.getLogger("process " + link.getName());
 		listeners = new EventListeners<>(ProcessListener.class, logger);
 	}
 
@@ -440,7 +440,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		lnk.removeLinkListener(lnkListener);
 		fireDetached();
 		logger.info("detached from " + lnk.getName());
-		LogManager.getManager().removeLogService(logger.getName());
+		LogService.removeLogger(logger);
 		return lnk;
 	}
 

@@ -41,7 +41,7 @@ import java.io.ByteArrayOutputStream;
 import org.slf4j.Logger;
 
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
-import tuwien.auto.calimero.log.LogManager;
+import tuwien.auto.calimero.log.LogService;
 
 /**
  * Common base for the different service type structures.
@@ -51,7 +51,7 @@ import tuwien.auto.calimero.log.LogManager;
  */
 abstract class ServiceType
 {
-	static final Logger logger = LogManager.getManager().getSlf4jLogger("KNXnet/IP service");
+	static final Logger logger = LogService.getLogger("KNXnet/IP service");
 
 	final int svcType;
 

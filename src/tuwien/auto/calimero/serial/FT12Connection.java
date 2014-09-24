@@ -57,6 +57,7 @@ import tuwien.auto.calimero.exception.KNXException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.internal.EventListeners;
 import tuwien.auto.calimero.log.LogManager;
+import tuwien.auto.calimero.log.LogService;
 
 /**
  * Provides a connection based on the FT1.2 protocol for communication with a BCU2 device.
@@ -213,7 +214,7 @@ public class FT12Connection
 	private FT12Connection(final String originalPortId, final String portId,
 		final int baudrate) throws KNXException
 	{
-		logger = LogManager.getManager().getSlf4jLogger("FT1.2 " + originalPortId);
+		logger = LogService.getLogger("FT1.2 " + originalPortId);
 		open(portId, baudrate);
 		try {
 			sendReset();
@@ -417,7 +418,7 @@ public class FT12Connection
 			logger.warn("failed to close all serial I/O resources", e);
 		}
 		fireConnectionClosed(user, reason);
-		LogManager.getManager().removeLogService(logger.getName());
+		LogService.removeLogger(logger);
 	}
 
 	private void open(final String portId, final int baudrate) throws KNXException

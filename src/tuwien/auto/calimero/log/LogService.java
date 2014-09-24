@@ -36,29 +36,31 @@
 
 package tuwien.auto.calimero.log;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
 
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 
 /**
- * A LogService is used to categorize logging information with regard to logging level and
- * topic, and offer it to its {@link LogWriter}s.
+ * A LogService is used to categorize logging information with regard to logging level and topic,
+ * and offer it to its {@link LogWriter}s.
  * <p>
- * The default log level by the LogService is {@link LogLevel#ALL}. This means all log
- * information levels (except {@link LogLevel#OFF}) will be offered.
+ * The default log level by the LogService is {@link LogLevel#ALL}. This means all log information
+ * levels (except {@link LogLevel#OFF}) will be offered.
  * <p>
- * A LogWriter can register at a log service to receive information the log service is
- * offering to its writers.
+ * A LogWriter can register at a log service to receive information the log service is offering to
+ * its writers.
  * <p>
  * Use {@link LogManager} to create new or get existing log services.<br>
  * Usage:<br>
- * - A log service may be created for different parts of the Calimero library, therefore,
- * it distinguishes log information by source.<br>
- * - A log service may be created for a particular subject, i.e., to divide information
- * into topics.<br>
+ * - A log service may be created for different parts of the Calimero library, therefore, it
+ * distinguishes log information by source.<br>
+ * - A log service may be created for a particular subject, i.e., to divide information into topics.
+ * <br>
  * A log service may restrict offered information through its own log level.<br>
  * - ...
  *
@@ -66,196 +68,56 @@ import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
  * @see LogLevel
  * @see LogWriter
  */
-public class LogService
+public final class LogService
 {
-	// Interruption policy: drain log event queue and quit
-	private static final class Dispatcher extends Thread
-	{
-		private static final class LogData
-		{
-			final String svc;
-			final LogLevel lvl;
-			final String msg;
-			final Throwable trow;
-			final Thread thread;
-
-			LogData(final String service,
-				final LogLevel level, final String message, final Throwable t, final Thread thr)
-			{
-				svc = service;
-				lvl = level;
-				msg = message;
-				trow = t;
-				thread = thr;
-			}
-		}
-
-		private final List<LogData> data = new LinkedList<>();
-		private volatile boolean quit;
-
-		Dispatcher()
-		{
-			super("Log dispatcher");
-			setDaemon(true);
-			start();
-		}
-
-		@Override
-		public void run()
-		{
-			try {
-				while (true) {
-					final LogData d;
-					synchronized (data) {
-						while (data.isEmpty())
-							data.wait();
-						d = data.remove(0);
-					}
-					dispatch(d);
-				}
-			}
-			catch (final InterruptedException ie) {
-				quit = true;
-			}
-			// empty log data list
-			synchronized (data) {
-				while (!data.isEmpty())
-					dispatch(data.remove(0));
-			}
-		}
-
-		void add(final String service, final LogLevel level, final String msg, final Throwable t)
-		{
-			if (!quit) {
-				synchronized (data) {
-					data.add(new LogData(service, level, msg, t, Thread.currentThread()));
-					data.notify();
-				}
-			}
-		}
-
-		private void dispatch(final LogData d)
-		{
-			final boolean dev = false; //Settings.getLibraryMode() == Settings.DEV_MODE;
-			final String svc = dev ? ("[" + d.thread.getName() + "] " + d.svc) : d.svc;
-		}
+	// Enumeration of the supported slf4j log levels
+	public static enum LogLevel {
+		ERROR, WARN, INFO, TRACE, DEBUG
 	}
 
-	private static final Dispatcher logger = new Dispatcher();
 
-	private final Logger impl;
+	private static final ExecutorService dispatcher = Executors.newFixedThreadPool(1);
 
+	private LogService() {}
 
-	// sets the slf4j to do the work
-	protected LogService(final Logger l)
+	public static Logger getLogger(final String name)
 	{
-		this.impl = l;
+		return LoggerFactory.getLogger(name);
 	}
 
-	/**
-	 * Returns the slf4j logger implementation.
-	 * <p>
-	 *
-	 * @return the slf4j logger or <null> if none is used
-	 * @deprecated Used for transition to slf4j.
-	 */
-	public final Logger slf4j()
+
+	public static void removeLogger(final Logger l) {}
+
+	static void async(final Logger l, final LogLevel level, final String msg, final Throwable t)
 	{
-		return impl;
+		async(l, level, null, msg, t);
 	}
 
-	/**
-	 * Offers <code>msg</code> with log level {@link LogLevel#TRACE}.
-	 * <p>
-	 *
-	 * @param msg log information
-	 */
-	public void trace(final String msg)
+	static void async(final Logger l, final LogLevel level, final Marker m, final String msg,
+		final Throwable t)
 	{
-		log(LogLevel.TRACE, msg, null);
+		final Thread thread = Thread.currentThread();
+		dispatcher.execute(() -> {
+			Thread.currentThread().setName(thread.getName());
+			// TODO add marker
+			log(l, level, msg, t);
+		});
 	}
 
-	/**
-	 * Offers <code>msg</code> with log level {@link LogLevel#INFO}.
-	 * <p>
-	 *
-	 * @param msg log information
-	 */
-	public void info(final String msg)
+	static void async(final Logger l, final LogLevel level, final String format, final Object... o)
 	{
-		log(LogLevel.INFO, msg, null);
+		async(l, level, null, format, o);
 	}
 
-	/**
-	 * Offers <code>msg</code> with log level {@link LogLevel#WARN}.
-	 * <p>
-	 *
-	 * @param msg log information
-	 */
-	public void warn(final String msg)
+	static void async(final Logger l, final LogLevel level, final Marker m, final String format,
+		final Object... o)
 	{
-		log(LogLevel.WARN, msg, null);
-	}
-
-	/**
-	 * Offers <code>msg</code> and the <code>throwable</code> object with log level
-	 * {@link LogLevel#WARN}.
-	 * <p>
-	 *
-	 * @param msg log information
-	 * @param t throwable object
-	 */
-	public void warn(final String msg, final Throwable t)
-	{
-		log(LogLevel.WARN, msg, t);
-	}
-
-	/**
-	 * Offers <code>msg</code> with log level {@link LogLevel#ERROR}.
-	 * <p>
-	 *
-	 * @param msg log information
-	 */
-	public void error(final String msg)
-	{
-		log(LogLevel.ERROR, msg, null);
-	}
-
-	/**
-	 * Offers <code>msg</code> and the <code>throwable</code> object with log level
-	 * {@link LogLevel#ERROR}.
-	 * <p>
-	 *
-	 * @param msg log information
-	 * @param t throwable object
-	 */
-	public void error(final String msg, final Throwable t)
-	{
-		log(LogLevel.ERROR, msg, t);
-	}
-
-	/**
-	 * Offers <code>msg</code> and the <code>throwable</code> object with log
-	 * <code>level</code>.
-	 * <p>
-	 *
-	 * @param level log level for this message and throwable
-	 * @param msg log information
-	 * @param t throwable object, can be <code>null</code>
-	 */
-	public void log(final LogLevel level, final String msg, final Throwable t)
-	{
-		forwardToImpl(level, msg, t);
-	}
-
-	static final void stopDispatcher()
-	{
-		logger.interrupt();
-		while (logger.isAlive())
-			try {
-				logger.join();
-			}
-			catch (final InterruptedException ignore) {}
+		final Thread thread = Thread.currentThread();
+		dispatcher.execute(() -> {
+			Thread.currentThread().setName(thread.getName());
+			// TODO add marker
+			log(l, level, format, o);
+		});
 	}
 
 	/**
@@ -273,23 +135,65 @@ public class LogService
 	public static void log(final Logger logger, final LogLevel level, final String msg,
 		final Throwable t)
 	{
-		if (level.equals(LogLevel.TRACE))
+		switch (level) {
+		case DEBUG:
+			logger.debug(msg, t);
+			break;
+		case TRACE:
 			logger.trace(msg, t);
-		else if (level.equals(LogLevel.INFO))
+			break;
+		case INFO:
 			logger.info(msg, t);
-		else if (level.equals(LogLevel.WARN))
+			break;
+		case WARN:
 			logger.warn(msg, t);
-		else if (level.equals(LogLevel.ERROR))
+			break;
+		case ERROR:
 			logger.error(msg, t);
-		else if (level.equals(LogLevel.ALWAYS))
-			logger.info(msg, t);
-		else
+			break;
+		default:
 			throw new KNXIllegalArgumentException("unknown log level");
+		}
 	}
 
-	// TODO slf4j_impl: temporarily used as forwarder to slf4j
-	private void forwardToImpl(final LogLevel level, final String msg, final Throwable t)
+	/**
+	 * Logs a message and an exception with the specified log level using the supplied logger.
+	 * <p>
+	 * This method works around the limitation that slf4j loggers don't have a generic
+	 * <code>log</code> method.
+	 *
+	 * @param logger the logger
+	 * @param level log level to use for the message
+	 * @param msg the message to be logged
+	 * @param t the exception (throwable) to log, can be <code>null</code>
+	 * @deprecated Used for transition to slf4j.
+	 */
+	public static void log(final Logger logger, final LogLevel level, final String format,
+		final Object... o)
 	{
-		log(impl, level, msg, t);
+		switch (level) {
+		case DEBUG:
+			logger.debug(format, o);
+			break;
+		case TRACE:
+			logger.trace(format, o);
+			break;
+		case INFO:
+			logger.info(format, o);
+			break;
+		case WARN:
+			logger.warn(format, o);
+			break;
+		case ERROR:
+			logger.error(format, o);
+			break;
+		default:
+			throw new KNXIllegalArgumentException("unknown log level");
+		}
+	}
+
+	static final void stopDispatcher()
+	{
+		dispatcher.shutdown();
 	}
 }

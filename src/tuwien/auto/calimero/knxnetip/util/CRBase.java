@@ -45,7 +45,7 @@ import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.knxnetip.KNXnetIPDevMgmt;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
-import tuwien.auto.calimero.log.LogManager;
+import tuwien.auto.calimero.log.LogService;
 
 /**
  * Package private container class acting as common base for connection request
@@ -54,7 +54,7 @@ import tuwien.auto.calimero.log.LogManager;
  */
 class CRBase
 {
-	static final Logger logger = LogManager.getManager().getSlf4jLogger("KNXnet/IP service");
+	static final Logger logger = LogService.getLogger("KNXnet/IP service");
 
 	byte[] opt;
 	private final int connType;
