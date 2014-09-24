@@ -197,6 +197,20 @@ public final class LogService
 		}
 	}
 
+	/**
+	 * Workaround for the previously supported log level ALWAYS, logging the message with level
+	 * INFO.
+	 * <p>
+	 *
+	 * @param logger the logger
+	 * @param msg the message to be logged
+	 * @deprecated Used for transition to slf4j.
+	 */
+	public static void logAlways(final Logger logger, final String msg)
+	{
+		logger.info(msg);
+	}
+
 	static final void stopDispatcher()
 	{
 		dispatcher.shutdown();
