@@ -38,6 +38,7 @@ package tuwien.auto.calimero.process;
 
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.datapoint.Datapoint;
+import tuwien.auto.calimero.dptxlator.DPT;
 import tuwien.auto.calimero.exception.KNXException;
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXInvalidResponseException;
@@ -51,7 +52,7 @@ import tuwien.auto.calimero.link.KNXNetworkLink;
  * The process communicator uses application layer group services for communication. Its
  * interface uses high level interaction based on Java data types and blocking read/write
  * functionality.
- * 
+ *
  * @author B. Malinowsky
  */
 public interface ProcessCommunicator extends ProcessCommunicationBase
@@ -63,7 +64,7 @@ public interface ProcessCommunicator extends ProcessCommunicationBase
 	 * Sets the response timeout to wait for a KNX response message to arrive to complete
 	 * a message exchange.
 	 * <p>
-	 * 
+	 *
 	 * @param timeout time in seconds, <code>timeout > 0</code>
 	 */
 	void setResponseTimeout(int timeout);
@@ -72,7 +73,7 @@ public interface ProcessCommunicator extends ProcessCommunicationBase
 	 * Returns the response timeout used when waiting for a KNX response message to
 	 * arrive.
 	 * <p>
-	 * 
+	 *
 	 * @return timeout in seconds
 	 */
 	int getResponseTimeout();
@@ -80,7 +81,7 @@ public interface ProcessCommunicator extends ProcessCommunicationBase
 	/**
 	 * Reads a boolean datapoint value from a group destination.
 	 * <p>
-	 * 
+	 *
 	 * @param dst group destination to read from
 	 * @return the read value of type boolean
 	 * @throws KNXTimeoutException on a timeout during send or no read response was
@@ -98,7 +99,7 @@ public interface ProcessCommunicator extends ProcessCommunicationBase
 	 * <p>
 	 * The predefined scaling format constants are equal to DPT identifiers of the 8 Bit
 	 * DPT translator, any other suiting IDs of that type might be specified as well.
-	 * 
+	 *
 	 * @param dst group destination to read from
 	 * @param scale scaling of the read value before return, one of {@link #SCALING},
 	 *        {@link #UNSCALED}, {@link #ANGLE}
@@ -121,7 +122,7 @@ public interface ProcessCommunicator extends ProcessCommunicationBase
 	 * used (i.e., control bit type <b>Step</b>). A control value of "decrease" results in
 	 * a negative value return, a control value of "increase" results in a positive value
 	 * return. The possible value range is -7 (decrease 7) to +7 (increase 7).
-	 * 
+	 *
 	 * @param dst group destination to read from
 	 * @return the read value of type 3 Bit controlled
 	 * @throws KNXTimeoutException on a timeout during send or no read response was
@@ -141,7 +142,7 @@ public interface ProcessCommunicator extends ProcessCommunicationBase
 	 * <p>
 	 * Reads a 2-byte KNX float datapoint value from a group destination.
 	 * <p>
-	 * 
+	 *
 	 * @param dst group destination to read from
 	 * @return the read value of type float
 	 * @throws KNXTimeoutException on a timeout during send or no read response was received
@@ -157,7 +158,7 @@ public interface ProcessCommunicator extends ProcessCommunicationBase
 	/**
 	 * Reads a float datapoint value from a group destination.
 	 * <p>
-	 * 
+	 *
 	 * @param dst group destination to read from
 	 * @param is4ByteFloat specifies the datapoint floating point type the datapoint is encoded
 	 *        with: either a 2-byte KNX float of DPT main number 9 (<code>false</code>), or a 4-byte
@@ -178,7 +179,7 @@ public interface ProcessCommunicator extends ProcessCommunicationBase
 	 * <p>
 	 * The supported character set covers at least ISO-8859-1 (Latin 1), with an allowed
 	 * string length of 14 characters.
-	 * 
+	 *
 	 * @param dst group destination to read from
 	 * @return the read value of type string
 	 * @throws KNXTimeoutException on a timeout during send or no read response was
@@ -194,17 +195,17 @@ public interface ProcessCommunicator extends ProcessCommunicationBase
 	/**
 	 * Reads a datapoint value from a group destination.
 	 * <p>
-	 * The used KNX message priority is according the supplied datapoint priority.
-	 * 
+	 * The used KNX message priority is according the supplied datapoint priority.<br>
+	 * If no {@link DPT} is set for <code>dp</code>, a non-translated representation of the ASDU is
+	 * returned, e.g., a hexadecimal value string.
+	 *
 	 * @param dp the datapoint for read
-	 * @return the read value in textual representation according the datapoint its type
-	 * @throws KNXTimeoutException on a timeout during send or no read response was
-	 *         received
+	 * @return the read datapoint value in textual representation (translated using the DPT)
+	 * @throws KNXTimeoutException on a timeout during send or no read response was received
 	 * @throws KNXInvalidResponseException on invalid read response message
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
-	 * @throws KNXFormatException on translation problem of the response data
-	 * @throws KNXException if no appropriate DPT translator for the datapoint type is
-	 *         available
+	 * @throws KNXFormatException on translation error of the response data
+	 * @throws KNXException if no appropriate DPT translator for the datapoint type is available
 	 * @throws InterruptedException on interrupt during read
 	 */
 	String read(Datapoint dp) throws KNXException, InterruptedException;
@@ -215,7 +216,7 @@ public interface ProcessCommunicator extends ProcessCommunicationBase
 	 * If no network link is attached, no action is performed.
 	 * <p>
 	 * Note that a detach does not trigger a close of the used network link.
-	 * 
+	 *
 	 * @return the formerly attached KNX network link, or <code>null</code> if already
 	 *         detached
 	 */
