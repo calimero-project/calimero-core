@@ -105,18 +105,19 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 			}
 			// notify listeners
 			if (svc == GROUP_READ)
-				fireGroupReadWrite(f, new byte[0], svc);
+				fireGroupReadWrite(f, new byte[0], svc, false);
 			else if (svc == GROUP_RESPONSE || svc == GROUP_WRITE)
-				fireGroupReadWrite(f, DataUnitBuilder.extractASDU(apdu), svc);
+				fireGroupReadWrite(f, DataUnitBuilder.extractASDU(apdu), svc, apdu.length <= 2);
 			else ;
 				//logger.warn("unsupported APDU service - ignored, service code = 0x"
 				//		+ Integer.toHexString(svc));
 		}
 
-		private void fireGroupReadWrite(final CEMILData f, final byte[] asdu, final int svc)
+		private void fireGroupReadWrite(final CEMILData f, final byte[] asdu, final int svc,
+			final boolean optimized)
 		{
 			final ProcessEvent e = new ProcessEvent(ProcessCommunicatorImpl.this, f.getSource(),
-					(GroupAddress) f.getDestination(), svc, asdu);
+					(GroupAddress) f.getDestination(), svc, asdu, optimized);
 			final EventListener[] el = listeners.listeners();
 			for (int i = 0; i < el.length; i++) {
 				final EventListener l = el[i];

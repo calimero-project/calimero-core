@@ -60,43 +60,48 @@ public class ProcessEvent extends EventObject
 	// the user application. The service code is implicitly known through the context
 	// of the called method anyway, or using getServiceCode.
 	private final byte[] asdu;
+	private final boolean optimized;
 
 	/**
-	 * Use {@link #ProcessEvent(ProcessCommunicator, IndividualAddress, GroupAddress, int, byte[])}.
+	 * Use {@link #ProcessEvent(ProcessCommunicator, IndividualAddress, GroupAddress,
+	 * int, byte[], boolean)}.
 	 *
 	 * @param source the process communicator object on which the event initially occurred
 	 * @param src KNX source individual address of the corresponding KNX message
 	 * @param dst KNX destination address of the corresponding KNX message
-	 * @param asdu byte array with the application layer service data unit (ASDU), no
-	 *        copy is created
+	 * @param asdu byte array with the application layer service data unit (ASDU), no copy is
+	 *        created
 	 */
 	// TODO remove, not correct anymore
 	public ProcessEvent(final ProcessCommunicator source, final IndividualAddress src,
 		final GroupAddress dst, final byte[] asdu)
 	{
-		this(source, src, dst, -1, asdu);
+		this(source, src, dst, -1, asdu, false);
 	}
 
 	/**
-	 * Creates a new process event with the KNX message source address, destination
-	 * address, service code, and ASDU.
+	 * Creates a new process event with the KNX message source address, destination address, service
+	 * code, and ASDU.
 	 * <p>
 	 *
 	 * @param source the process communicator object on which the event initially occurred
 	 * @param src KNX source individual address of the corresponding KNX message
 	 * @param dst KNX destination address of the corresponding KNX message
 	 * @param svcCode the process communication service code
-	 * @param asdu byte array with the application layer service data unit (ASDU), no
-	 *        copy is created
+	 * @param asdu byte array with the application layer service data unit (ASDU), no copy is
+	 *        created
+	 * @param optimized <code>true</code> iff ASDU is optimized, i.e., length of data &leq; 6 Bits;
+	 *        <code>false</code> otherwise
 	 */
 	public ProcessEvent(final ProcessCommunicator source, final IndividualAddress src,
-		final GroupAddress dst, final int svcCode, final byte[] asdu)
+		final GroupAddress dst, final int svcCode, final byte[] asdu, final boolean optimized)
 	{
 		super(source);
 		this.src = src;
 		this.dst = dst;
 		this.svcCode = svcCode;
 		this.asdu = asdu;
+		this.optimized = optimized;
 	}
 
 	/**
@@ -141,5 +146,16 @@ public class ProcessEvent extends EventObject
 	public final int getServiceCode()
 	{
 		return svcCode;
+	}
+
+	/**
+	 * Returns whether the ASDU is optimized, i.e., contains &leq; 6 Bits data.
+	 * <p>
+	 *
+	 * @return <code>true</code> if optimized, <code>false</code> otherwise
+	 */
+	public final boolean isOptimizedASDU()
+	{
+		return optimized;
 	}
 }
