@@ -62,7 +62,6 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 {
 	/**
 	 * Holds an additional info type with corresponding information data.
-	 * <p>
 	 */
 	public static final class AddInfo
 	{
@@ -71,7 +70,6 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 
 		/**
 		 * Creates new wrapper for additional information.
-		 * <p>
 		 *
 		 * @param infoType additional information type ID
 		 * @param info information data
@@ -110,38 +108,32 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 
 	/**
 	 * Additional information type for PL medium information.
-	 * <p>
 	 */
 	public static final int ADDINFO_PLMEDIUM = 0x01;
 
 	/**
 	 * Additional information type for RF medium information.
-	 * <p>
 	 */
 	public static final int ADDINFO_RFMEDIUM = 0x02;
 	// public static final int ADDINFO_BUSMON = 0x03;
 
 	/**
 	 * Additional information type for relative timestamp information.
-	 * <p>
 	 */
 	public static final int ADDINFO_TIMESTAMP = 0x04;
 
 	/**
 	 * Additional information type for time delay until sending information.
-	 * <p>
 	 */
 	public static final int ADDINFO_TIMEDELAY = 0x05;
 
 	/**
 	 * Additional information type for extended relative timestamp information.
-	 * <p>
 	 */
 	public static final int ADDINFO_TIMESTAMP_EXT = 0x06;
 
 	/**
 	 * Additional information type for BiBat information.
-	 * <p>
 	 */
 	public static final int ADDINFO_BIBAT = 0x07;
 
@@ -153,7 +145,6 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 
 	/**
 	 * Creates a new L-Data message from a byte stream.
-	 * <p>
 	 *
 	 * @param data byte stream containing a cEMI L-Data message
 	 * @param offset start offset of cEMI frame in <code>data</code>
@@ -269,7 +260,6 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 
 	/**
 	 * Creates a L-Data message, mainly for TP1 media.
-	 * <p>
 	 *
 	 * @param msgCode a message code value specified in the L-Data type
 	 * @param src individual address of source
@@ -333,7 +323,6 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/**
 	 * Returns additional information data corresponding to the supplied type ID, if it is
 	 * contained in the message.
-	 * <p>
 	 *
 	 * @param infoType type ID of the request additional information
 	 * @return additional information data or <code>null</code> if no such information
@@ -369,7 +358,6 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 
 	/**
 	 * Specifies the kind of broadcast to use for sending.
-	 * <p>
 	 *
 	 * @param domainOnly <code>true</code> for doing a broadcast only within the domain,
 	 *        <code>false</code> for a system broadcast
@@ -396,7 +384,6 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 
 	/**
 	 * Removes the additional information with the supplied type ID.
-	 * <p>
 	 *
 	 * @param infoType type ID of additional information to remove
 	 */
@@ -533,7 +520,6 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 
 	/**
 	 * Writes all additional information to <code>os</code>.
-	 * <p>
 	 *
 	 * @param os the output stream
 	 */

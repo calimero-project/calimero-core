@@ -70,7 +70,6 @@ public interface KNXnetIPConnection
 {
 	/**
 	 * Identifier for KNXnet/IP protocol version 1.0.
-	 * <p>
 	 */
 	// same as in KNXnetIPHeader type
 	int KNXNETIP_VERSION_10 = 0x10;
@@ -79,19 +78,16 @@ public interface KNXnetIPConnection
 	 * KNXnet/IP default transport layer port number (port {@value #DEFAULT_PORT}) used
 	 * for a communication endpoint (besides, this is the fixed port number used for
 	 * discovery and routing).
-	 * <p>
 	 */
 	int DEFAULT_PORT = 3671;
 
 	/**
 	 * State of communication: in idle state, no error, ready to send.
-	 * <p>
 	 */
 	int OK = 0;
 
 	/**
 	 * State of communication: in closed state, no send possible.
-	 * <p>
 	 */
 	int CLOSED = 1;
 
@@ -99,7 +95,6 @@ public interface KNXnetIPConnection
 	 * Type for blocking mode used in
 	 * {@link KNXnetIPConnection#send(CEMI,
 	 * tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
-	 * <p>
 	 */
 	class BlockingMode
 	{
@@ -112,7 +107,6 @@ public interface KNXnetIPConnection
 
 		/**
 		 * Returns a textual representation of this blocking mode.
-		 * <p>
 		 */
 		@Override
 		public String toString()
@@ -123,13 +117,11 @@ public interface KNXnetIPConnection
 
 	/**
 	 * Send mode without any blocking for a response.
-	 * <p>
 	 */
 	BlockingMode NONBLOCKING = new BlockingMode("non-blocking");
 
 	/**
 	 * Send mode with waiting for service acknowledgment response.
-	 * <p>
 	 */
 	BlockingMode WAIT_FOR_ACK = new BlockingMode("wait for ack");
 

@@ -65,7 +65,6 @@ public abstract class KNXAddress
 
 	/**
 	 * Creates a KNX address from a 16 Bit address value.
-	 * <p>
 	 *
 	 * @param address the address value in the range [0..0xffff]
 	 */
@@ -80,7 +79,7 @@ public abstract class KNXAddress
 	 * The address is read out of the first 2 byte fields, while the address array itself might be
 	 * longer. The content of <code>address</code> is not modified.
 	 *
-	 * @param address the address byte array in big-endian format, with address.length >= 2
+	 * @param address the address byte array in big-endian format, with address.length &ge; 2
 	 */
 	KNXAddress(final byte[] address)
 	{
@@ -121,7 +120,6 @@ public abstract class KNXAddress
 
 	/**
 	 * Creates KNX address 0 (reserved address).
-	 * <p>
 	 */
 	KNXAddress()
 	{}
@@ -195,7 +193,6 @@ public abstract class KNXAddress
 
 	/**
 	 * Writes the KNX address in XML format to the supplied writer.
-	 * <p>
 	 *
 	 * @param w a XML writer
 	 * @throws KNXMLException on output error

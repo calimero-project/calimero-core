@@ -50,7 +50,7 @@ import tuwien.auto.calimero.exception.KNXFormatException;
  * doesn't require any additional host protocol data.
  * <p>
  * Factory methods are provided for creation of CRI objects.
- * 
+ *
  * @author B. Malinowsky
  * @see tuwien.auto.calimero.knxnetip.servicetype.ConnectRequest
  */
@@ -59,7 +59,7 @@ public class CRI extends CRBase
 	/**
 	 * Creates a new CRI out of a byte array.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing a CRI structure
 	 * @param offset start offset of CRI in <code>data</code>
 	 * @throws KNXFormatException if no CRI found or invalid structure
@@ -74,11 +74,11 @@ public class CRI extends CRBase
 	 * <p>
 	 * The array of <code>optionalData</code> is not copied for internal storage. No
 	 * additional checks regarding content are done.
-	 * 
+	 *
 	 * @param connectionType connection type the CRI is used for (e.g. tunnel connection)
 	 * @param optionalData byte array containing optional host protocol independent and
 	 *        dependent data, this information is located starting at offset 2 in the CRI
-	 *        structure, <code>optionalData.length</code> < 254
+	 *        structure, <code>optionalData.length</code> &lt; 254
 	 */
 	protected CRI(final int connectionType, final byte[] optionalData)
 	{
@@ -91,7 +91,7 @@ public class CRI extends CRBase
 	 * If possible, a matching, more specific, CRI subtype is returned. Note, that CRIs
 	 * for specific communication types might expect certain characteristics on
 	 * <code>data</code> (regarding contained data).<br>
-	 * 
+	 *
 	 * @param data byte array containing the CRI structure
 	 * @param offset start offset of CRI in <code>data</code>
 	 * @return the new CRI object
@@ -108,12 +108,12 @@ public class CRI extends CRBase
 	 * If possible, a matching, more specific, CRI subtype is returned. Note, that CRIs
 	 * for specific communication types might expect certain characteristics on
 	 * <code>optionalData</code> (regarding length and/or content).<br>
-	 * 
+	 *
 	 * @param connectionType connection type this CRI is used for, e.g., a tunneling
 	 *        connection
 	 * @param optionalData byte array containing optional host protocol independent and
 	 *        dependent data, this information is located starting at offset 2 in the CRI
-	 *        structure, <code>optionalData.length</code> < 254, may be <code>null</code>
+	 *        structure, <code>optionalData.length</code> &lt; 254, may be <code>null</code>
 	 *        for no optional data
 	 * @return the new CRI object
 	 */

@@ -51,7 +51,6 @@ public class KNXFormatException extends KNXException
 
 	/**
 	 * Constructs a new <code>KNXFormatException</code> without a detail message.
-	 * <p>
 	 */
 	public KNXFormatException()
 	{

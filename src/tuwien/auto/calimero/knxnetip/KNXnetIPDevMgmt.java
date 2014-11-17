@@ -69,7 +69,6 @@ public class KNXnetIPDevMgmt extends ClientConnection
 {
 	/**
 	 * Connection type used to configure a KNXnet/IP device.
-	 * <p>
 	 */
 	public static final int DEVICE_MGMT_CONNECTION = 0x03;
 

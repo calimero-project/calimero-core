@@ -83,13 +83,11 @@ public interface PropertyAccess
 
 		/**
 		 * ! to be defined ! Property name:
-		 * <p>
 		 */
 		// PDT,DPT: <tbd>
 		// int SEMAPHOR = 3;
 		/**
 		 * ! to be defined ! Property name:
-		 * <p>
 		 */
 		// PDT,DPT: <tbd>
 		// int GROUP_OBJECT_REFERENCE = 4;
@@ -111,7 +109,6 @@ public interface PropertyAccess
 
 		/**
 		 * Global property "Table Reference".
-		 * <p>
 		 */
 		// PDT,DPT: PDT_UNSIGNED_LONG
 		public static final int TABLE_REFERENCE = 7;
@@ -213,7 +210,6 @@ public interface PropertyAccess
 
 		/**
 		 * ! to be defined ! Property name:
-		 * <p>
 		 */
 		// PDT,DPT: <tbd>
 		// int ENABLE = 20;
@@ -227,7 +223,6 @@ public interface PropertyAccess
 
 		/**
 		 * ! to be defined ! Property name:
-		 * <p>
 		 */
 		// PDT,DPT: <tbd>
 		// int FILE = 22;
@@ -258,7 +253,6 @@ public interface PropertyAccess
 
 		/**
 		 * ! to be defined ! Property name: Group Address Assignment.
-		 * <p>
 		 */
 		// PDT,DPT: PDT_FUNCTION
 		// int GROUP_OBJECT_LINK = 26;
@@ -606,7 +600,6 @@ public interface PropertyAccess
 
 	/**
 	 * Sets one or more elements of a property.
-	 * <p>
 	 *
 	 * @param objIndex interface object index in the device
 	 * @param pid property identifier
@@ -620,7 +613,6 @@ public interface PropertyAccess
 
 	/**
 	 * Gets one or more elements of a property.
-	 * <p>
 	 *
 	 * @param objIndex interface object index in the device
 	 * @param pid property identifier
@@ -635,7 +627,6 @@ public interface PropertyAccess
 	/**
 	 * Gets one or more elements of a property with the returned data set in a DPT
 	 * translator of the associated data type.
-	 * <p>
 	 *
 	 * @param objIndex interface object index in the device
 	 * @param pid property identifier
@@ -666,10 +657,9 @@ public interface PropertyAccess
 
 	/**
 	 * Gets the property description based on the property index.
-	 * <p>
 	 *
 	 * @param objIndex interface object index in the device
-	 * @param propIndex property index in the object, propIndex &geq; 0
+	 * @param propIndex property index in the object, propIndex &ge; 0
 	 * @return a property description object
 	 * @throws KNXException on adapter errors while querying the description
 	 */

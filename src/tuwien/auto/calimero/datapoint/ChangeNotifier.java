@@ -40,7 +40,7 @@ package tuwien.auto.calimero.datapoint;
  * This interface is implemented by classes that want to provide datapoint change
  * notifications to registered listeners.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public interface ChangeNotifier
@@ -50,8 +50,8 @@ public interface ChangeNotifier
 	 * implementing this interface.
 	 * <p>
 	 * If <code>l</code> is
-	 * <code>null<code> or was already added as listener, no action is performed.
-	 * 
+	 * <code>null</code> or was already added as listener, no action is performed.
+	 *
 	 * @param l the listener to add
 	 */
 	void addChangeListener(ChangeListener l);
@@ -61,7 +61,7 @@ public interface ChangeNotifier
 	 * this interface.
 	 * <p>
 	 * If <code>l</code> was not added in the first place, no action is performed.
-	 * 
+	 *
 	 * @param l the listener to remove
 	 */
 	void removeChangeListener(ChangeListener l);

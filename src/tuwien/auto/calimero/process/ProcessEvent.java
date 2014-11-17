@@ -64,7 +64,6 @@ public class ProcessEvent extends EventObject
 	/**
 	 * Creates a new process event with the KNX message source address, destination
 	 * address, service code, and ASDU.
-	 * <p>
 	 *
 	 * @param source the process communicator object on which the event initially occurred
 	 * @param src KNX source individual address of the corresponding KNX message

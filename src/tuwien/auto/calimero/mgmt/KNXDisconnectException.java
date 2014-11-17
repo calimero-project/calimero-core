@@ -52,7 +52,6 @@ public class KNXDisconnectException extends KNXException
 
 	/**
 	 * Constructs a <code>KNXDisconnectException</code> without a detail message.
-	 * <p>
 	 */
 	public KNXDisconnectException()
 	{

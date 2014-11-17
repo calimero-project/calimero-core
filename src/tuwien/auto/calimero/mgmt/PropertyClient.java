@@ -168,7 +168,6 @@ public class PropertyClient implements PropertyAccess
 	{
 		/**
 		 * Loads the properties from the resource.
-		 * <p>
 		 *
 		 * @param resource the identifier of the resource used for loading the properties
 		 * @return a collection containing the property definitions of type
@@ -207,7 +206,6 @@ public class PropertyClient implements PropertyAccess
 
 		/**
 		 * Creates a new key for a global defined property.
-		 * <p>
 		 *
 		 * @param pid property identifier
 		 */
@@ -219,7 +217,6 @@ public class PropertyClient implements PropertyAccess
 
 		/**
 		 * Creates a new key for a property.
-		 * <p>
 		 *
 		 * @param objType object type of the property
 		 * @param pid property identifier
@@ -306,7 +303,6 @@ public class PropertyClient implements PropertyAccess
 
 		/**
 		 * Creates a new property object of the supplied information.
-		 * <p>
 		 *
 		 * @param pid property identifier
 		 * @param pidName name of the property ID
@@ -459,7 +455,6 @@ public class PropertyClient implements PropertyAccess
 
 	/**
 	 * Returns the object type name associated to the requested object type.
-	 * <p>
 	 *
 	 * @param objType object type to get name for
 	 * @return object type name as string
@@ -474,7 +469,6 @@ public class PropertyClient implements PropertyAccess
 	/**
 	 * Loads property definitions from a resource using the supplied
 	 * {@link ResourceHandler} or a default handler.
-	 * <p>
 	 *
 	 * @param resource the resource location identifier of a resource to load
 	 * @param handler the resource handler used for loading the property definitions, if
@@ -574,7 +568,6 @@ public class PropertyClient implements PropertyAccess
 	/**
 	 * Gets the first property element using the associated property data type of the
 	 * requested property.
-	 * <p>
 	 *
 	 * @param objIndex interface object index in the device
 	 * @param pid property identifier
@@ -667,7 +660,6 @@ public class PropertyClient implements PropertyAccess
 
 	/**
 	 * Gets the property description based on the property index.
-	 * <p>
 	 *
 	 * @param objIndex interface object index in the device
 	 * @param propIndex property index in the object
@@ -692,7 +684,6 @@ public class PropertyClient implements PropertyAccess
 
 	/**
 	 * Does a property description scan of the properties in all interface objects.
-	 * <p>
 	 *
 	 * @param allProperties <code>true</code> to scan all property descriptions in the
 	 *        interface objects, <code>false</code> to only scan the object type
@@ -714,7 +705,6 @@ public class PropertyClient implements PropertyAccess
 
 	/**
 	 * Does a property description scan of the properties of one interface object.
-	 * <p>
 	 *
 	 * @param objIndex interface object index in the device
 	 * @param allProperties <code>true</code> to scan all property descriptions in that
@@ -761,7 +751,6 @@ public class PropertyClient implements PropertyAccess
 
 	/**
 	 * Closes the property client and the used adapter.
-	 * <p>
 	 */
 	public void close()
 	{

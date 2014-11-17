@@ -50,7 +50,6 @@ public class KNXRemoteException extends KNXException
 
 	/**
 	 * Constructs a new <code>KNXRemoteException</code> without a detail message.
-	 * <p>
 	 */
 	public KNXRemoteException()
 	{}

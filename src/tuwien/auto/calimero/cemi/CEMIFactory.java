@@ -60,7 +60,6 @@ public final class CEMIFactory
 
 	/**
 	 * Creates a new cEMI message out of the given <code>data</code> byte stream.
-	 * <p>
 	 *
 	 * @param data byte stream containing a cEMI message frame structure
 	 * @param offset start offset of cEMI message in <code>data</code>
@@ -155,7 +154,6 @@ public final class CEMIFactory
 	 * Creates a new cEMI L-Data message with information provided by
 	 * <code>original</code>, and adjusts source and destination address to match the
 	 * supplied addresses.
-	 * <p>
 	 *
 	 * @param src the new KNX source address for the message, use <code>null</code> to
 	 *        use original address
@@ -174,20 +172,19 @@ public final class CEMIFactory
 	}
 
 	/**
-	 * Creates a new cEMI L-Data message with information provided by
-	 * <code>original</code>, and adjusts source and destination address to match the
-	 * supplied addresses, and sets the repeat/is repeated frame indication.
-	 * <p>
+	 * Creates a new cEMI L-Data message with information provided by <code>original</code>, and
+	 * adjusts source and destination address to match the supplied addresses, and sets the
+	 * repeat/is repeated frame indication.
 	 *
-	 * @param src the new KNX source address for the message, use <code>null</code> to
-	 *        use original address
-	 * @param dst the new KNX destination address for the message, use <code>null</code>
-	 *        to use original address
-	 * @param original the original frame providing all missing information for the
-	 *        adjusted message
-	 * @param extended <code>true</code> to always created an extended frame,
-	 *        <code>false</code> to create type according to <code>original</code>
-	 * @param repeat @see {@link CEMILData#isRepetition()}
+	 * @param src the new KNX source address for the message, use <code>null</code> to use original
+	 *        address
+	 * @param dst the new KNX destination address for the message, use <code>null</code> to use
+	 *        original address
+	 * @param original the original frame providing all missing information for the adjusted message
+	 * @param extended <code>true</code> to always created an extended frame, <code>false</code> to
+	 *        create type according to <code>original</code>
+	 * @param repeat request frame repetition, or indicate a repeated frame; see
+	 *        {@link CEMILData#isRepetition()}
 	 * @return the new cEMI L-Data message adjusted with KNX addresses
 	 */
 	public static CEMILData create(final IndividualAddress src, final KNXAddress dst,
@@ -198,7 +195,6 @@ public final class CEMIFactory
 
 	/**
 	 * Creates a new cEMI message out of the supplied EMI frame.
-	 * <p>
 	 *
 	 * @param frame EMI frame
 	 * @return the new cEMI message

@@ -62,7 +62,7 @@ class CRBase
 	/**
 	 * Creates a new CR out of a byte array.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing a CRI or CRD structure
 	 * @param offset start offset
 	 * @throws KNXFormatException on invalid structure
@@ -84,11 +84,11 @@ class CRBase
 	 * <p>
 	 * The array of <code>optionalData</code> is not copied for internal storage. No
 	 * additional checks regarding content are done.
-	 * 
+	 *
 	 * @param connectionType connection type the CR is used for
 	 * @param optionalData byte array containing optional host protocol independent and
 	 *        dependent data, this information is located starting at offset 2 in the CR
-	 *        structure, <code>optionalData.length</code> < 254
+	 *        structure, <code>optionalData.length</code> &lt; 254
 	 */
 	CRBase(final int connectionType, final byte[] optionalData)
 	{
@@ -132,7 +132,7 @@ class CRBase
 	/**
 	 * Returns the used connection type code.
 	 * <p>
-	 * 
+	 *
 	 * @return connection type as unsigned byte
 	 */
 	public final int getConnectionType()
@@ -144,7 +144,7 @@ class CRBase
 	 * Returns a copy of the optional data field.
 	 * <p>
 	 * Optional data starts at offset 2 in the CR structure.
-	 * 
+	 *
 	 * @return byte array with optional data
 	 */
 	public final byte[] getOptionalData()
@@ -155,7 +155,7 @@ class CRBase
 	/**
 	 * Returns the structure length of this CR in bytes.
 	 * <p>
-	 * 
+	 *
 	 * @return structure length as unsigned byte
 	 */
 	public final int getStructLength()
@@ -166,7 +166,7 @@ class CRBase
 	/**
 	 * Returns a textual representation of the connection type, length and optional data.
 	 * <p>
-	 * 
+	 *
 	 * @return a string representation of this object
 	 */
 	@Override
@@ -175,11 +175,11 @@ class CRBase
 		return "connection type " + connType + " length " + length + " data "
 				+ (opt.length == 0 ? "-" : DataUnitBuilder.toHex(opt, " "));
 	}
-	
+
 	/**
 	 * Returns the byte representation of the whole CR structure.
 	 * <p>
-	 * 
+	 *
 	 * @return byte array containing structure
 	 */
 	public byte[] toByteArray()

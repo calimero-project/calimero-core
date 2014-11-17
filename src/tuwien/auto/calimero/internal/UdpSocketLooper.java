@@ -154,7 +154,6 @@ public abstract class UdpSocketLooper
 
 	/**
 	 * Invoked on socket timeout.
-	 * <p>
 	 */
 	protected void onTimeout()
 	{}

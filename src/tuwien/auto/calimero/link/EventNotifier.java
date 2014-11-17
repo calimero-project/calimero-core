@@ -59,7 +59,6 @@ abstract class EventNotifier extends Thread implements KNXListener
 		/**
 		 * Invokes the appropriate listener method with the event contained in this event
 		 * callback.
-		 * <p>
 		 *
 		 * @param l the listener to notify
 		 */

@@ -53,7 +53,6 @@ public class KNXMLException extends KNXException
 
 	/**
 	 * Constructs a new <code>KNXMLException</code> without a detail message.
-	 * <p>
 	 */
 	public KNXMLException()
 	{

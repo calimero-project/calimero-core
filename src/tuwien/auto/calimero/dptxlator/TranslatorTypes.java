@@ -75,131 +75,111 @@ public final class TranslatorTypes
 {
 	/**
 	 * DPT main number for <b>B1 (boolean)</b>, number = {@value #TYPE_BOOLEAN}.
-	 * <p>
 	 */
 	public static final int TYPE_BOOLEAN = 1;
 
 	/**
 	 * DPT main number for <b>B2 (1 Bit controlled)</b>, number =
 	 * {@value #TYPE_1BIT_CONTROLLED}.
-	 * <p>
 	 */
 	public static final int TYPE_1BIT_CONTROLLED = 2;
 
 	/**
 	 * DPT main number for <b>B1U3 (3 Bit controlled)</b>, number =
 	 * {@value #TYPE_3BIT_CONTROLLED}.
-	 * <p>
 	 */
 	public static final int TYPE_3BIT_CONTROLLED = 3;
 
 	/**
 	 * DPT main number for <b>character set</b>, number = {@value #TYPE_CHARACTER_SET}.
-	 * <p>
 	 */
 	public static final int TYPE_CHARACTER_SET = 4;
 
 	/**
 	 * DPT main number for <b>8 Bit unsigned value</b>, number =
 	 * {@value #TYPE_8BIT_UNSIGNED}.
-	 * <p>
 	 */
 	public static final int TYPE_8BIT_UNSIGNED = 5;
 
 	/**
 	 * DPT main number for <b>V8 (8 Bit signed value)</b>, shares main number with
 	 * "Status with mode", number = {@value #TYPE_8BIT_SIGNED}.
-	 * <p>
 	 */
 	public static final int TYPE_8BIT_SIGNED = 6;
 
 	/**
 	 * DPT main number for <b>2-octet unsigned value</b>, number =
 	 * {@value #TYPE_2OCTET_UNSIGNED}.
-	 * <p>
 	 */
 	public static final int TYPE_2OCTET_UNSIGNED = 7;
 
 	/**
 	 * DPT main number for <b>2-octet signed value</b>, number =
 	 * {@value #TYPE_2OCTET_SIGNED}.
-	 * <p>
 	 */
 	public static final int TYPE_2OCTET_SIGNED = 8;
 
 	/**
 	 * DPT main number for <b>2-octet float value</b>, number =
 	 * {@value #TYPE_2OCTET_FLOAT}.
-	 * <p>
 	 */
 	public static final int TYPE_2OCTET_FLOAT = 9;
 
 	/**
 	 * DPT main number for <b>time</b>, number = {@value #TYPE_TIME}.
-	 * <p>
 	 */
 	public static final int TYPE_TIME = 10;
 
 	/**
 	 * DPT main number for <b>date</b>, number = {@value #TYPE_DATE}.
-	 * <p>
 	 */
 	public static final int TYPE_DATE = 11;
 
 	/**
 	 * DPT main number for <b>4-octet unsigned value</b>, number =
 	 * {@value #TYPE_4OCTET_UNSIGNED}.
-	 * <p>
 	 */
 	public static final int TYPE_4OCTET_UNSIGNED = 12;
 
 	/**
 	 * DPT main number for <b>4-octet signed value</b>, number =
 	 * {@value #TYPE_4OCTET_SIGNED}.
-	 * <p>
 	 */
 	public static final int TYPE_4OCTET_SIGNED = 13;
 
 	/**
 	 * DPT main number for <b>4-octet float value</b>, number =
 	 * {@value #TYPE_4OCTET_FLOAT}.
-	 * <p>
 	 */
 	public static final int TYPE_4OCTET_FLOAT = 14;
 
 	/**
 	 * DPT main number for <b>access data</b>, number = {@value #TYPE_ACCESS}.
-	 * <p>
 	 */
 	public static final int TYPE_ACCESS = 15;
 
 	/**
 	 * DPT main number for <b>string</b>, number = {@value #TYPE_STRING}.
-	 * <p>
 	 */
 	public static final int TYPE_STRING = 16;
 
 	/**
 	 * DPT main number for <b>scene number</b>, number = {@value #TYPE_SCENE_NUMBER}.
-	 * <p>
 	 */
 	public static final int TYPE_SCENE_NUMBER = 17;
 
 	/**
 	 * DPT main number for <b>scene control</b>, number = {@value #TYPE_SCENE_CONTROL}.
-	 * <p>
 	 */
 	public static final int TYPE_SCENE_CONTROL = 18;
 
 	/**
 	 * DPT main number for <b>date/time</b>, number = {@value #TYPE_DATE_TIME}.
-	 * <p>
 	 */
 	public static final int TYPE_DATE_TIME = 19;
 
 	/**
 	 * DPT main number for <b>8 Bit enumeration</b>, number = {@value #TYPE_ENUM8}.
-	 * <p>
 	 */
 	public static final int TYPE_ENUM8 = 20;
 
@@ -217,7 +197,6 @@ public final class TranslatorTypes
 
 		/**
 		 * Creates a new main number to translator mapping.
-		 * <p>
 		 *
 		 * @param mainNumber main number assigned to the data type
 		 * @param translator represents a translator class of type {@link DPTXlator}
@@ -250,7 +229,6 @@ public final class TranslatorTypes
 
 		/**
 		 * Creates a new translator for the given datapoint type.
-		 * <p>
 		 *
 		 * @param dpt datapoint type specifying the particular translation behavior; if
 		 *        the datapoint type is not part of the translator of this main type, a
@@ -268,7 +246,6 @@ public final class TranslatorTypes
 
 		/**
 		 * Creates a new instance of the translator for the given datapoint type ID.
-		 * <p>
 		 *
 		 * @param dptID datapoint type ID for selecting a particular kind of value
 		 *        translation; if the datapoint type ID is not part of the translator of
@@ -400,7 +377,6 @@ public final class TranslatorTypes
 
 	/**
 	 * Returns the {@link MainType} object assigned the given data type main number.
-	 * <p>
 	 *
 	 * @param mainNumber main type to lookup
 	 * @return the main type information found, or <code>null</code> if main number not
@@ -427,9 +403,8 @@ public final class TranslatorTypes
 
 	/**
 	 * Does a lookup if the specified DPT is supported by a DPT translator.
-	 * <p>
 	 *
-	 * @param mainNumber data type main number, number >= 0; use 0 to infer translator
+	 * @param mainNumber data type main number, number &ge; 0; use 0 to infer translator
 	 *        type from <code>dptID</code> argument only
 	 * @param dptID datapoint type ID to lookup this particular kind of value translation
 	 * @return <code>true</code> iff translator was found, <code>false</code>
@@ -460,7 +435,7 @@ public final class TranslatorTypes
 	 * structure, so using a different formatted dptID solely without main number argument
 	 * results in undefined behavior.
 	 *
-	 * @param mainNumber data type main number, number >= 0; use 0 to infer translator
+	 * @param mainNumber data type main number, number &ge; 0; use 0 to infer translator
 	 *        type from <code>dptID</code> argument only
 	 * @param dptID datapoint type ID for selecting a particular kind of value translation
 	 * @return the new {@link DPTXlator} object

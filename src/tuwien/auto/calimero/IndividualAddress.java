@@ -53,7 +53,7 @@ import tuwien.auto.calimero.xml.XMLReader;
  * The combined address levels <i>area</i> and <i>line</i> are referred to as subnetwork
  * address, i.e., and described by the higher 8 bits of the address value.<br>
  * The sometimes used term <i>zone</i> is synonymous with <i>area</i>.
- * 
+ *
  * @see GroupAddress
  */
 public class IndividualAddress extends KNXAddress
@@ -63,8 +63,8 @@ public class IndividualAddress extends KNXAddress
 	/**
 	 * Creates a KNX individual address from a 16 Bit address value.
 	 * <p>
-	 * 
-	 * @param address the address value in the range 0 <= value <= 0xFFFF
+	 *
+	 * @param address the address value in the range 0 &le; value &le; 0xFFFF
 	 */
 	public IndividualAddress(final int address)
 	{
@@ -75,10 +75,10 @@ public class IndividualAddress extends KNXAddress
 	 * Creates a KNX individual address from the 3-level notation area-, line- and
 	 * device-address.
 	 * <p>
-	 * 
-	 * @param area area address value, in the range 0 <= value <= 0xF
-	 * @param line line address value, in the range 0 <= value <= 0xF
-	 * @param device device address value, in the range 0 <= value <= 0xFF
+	 *
+	 * @param area area address value, in the range 0 &le; value &le; 0xF
+	 * @param line line address value, in the range 0 &le; value &le; 0xF
+	 * @param device device address value, in the range 0 &le; value &le; 0xFF
 	 */
 	public IndividualAddress(final int area, final int line, final int device)
 	{
@@ -90,8 +90,8 @@ public class IndividualAddress extends KNXAddress
 	 * <p>
 	 * The address is read out of the first 2 byte fields, while the address array itself
 	 * might be longer. The content of <code>address</code> is not modified.
-	 * 
-	 * @param address the address byte array in big-endian format, with address.length > 1
+	 *
+	 * @param address the address byte array in big-endian format, with address.length &gt; 1
 	 */
 	public IndividualAddress(final byte[] address)
 	{
@@ -104,7 +104,7 @@ public class IndividualAddress extends KNXAddress
 	 * The address string can either be formatted, e.g., "1.1.2", or the raw address, e.g., "4354".
 	 * A formatted address consists of 3 levels (see class header specification), the allowed
 	 * separators are '.' or '/', mutually exclusive.
-	 * 
+	 *
 	 * @param address string containing the KNX address
 	 * @throws KNXFormatException on unknown address type, wrong address syntax, address
 	 *         values out of range, or wrong separator used
@@ -135,7 +135,7 @@ public class IndividualAddress extends KNXAddress
 	 * <p>
 	 * If the current XML element position is no start tag, the next element tag is read.
 	 * The KNX address element is then expected to be the current element in the reader.
-	 * 
+	 *
 	 * @param r a XML reader
 	 * @throws KNXMLException if the XML element is no KNXAddress or the address couldn't
 	 *         be read in correctly
@@ -149,7 +149,7 @@ public class IndividualAddress extends KNXAddress
 	 * Returns the area address.
 	 * <p>
 	 * The area address consists of the 4 most significant Bits in the address field.
-	 * 
+	 *
 	 * @return the area value (high nibble of the address high byte)
 	 */
 	public final int getArea()
@@ -162,7 +162,7 @@ public class IndividualAddress extends KNXAddress
 	 * <p>
 	 * The line address consists of 4 bits, starting with bit 8 to 11 in the address
 	 * field.
-	 * 
+	 *
 	 * @return the line value (low nibble of the address high byte)
 	 */
 	public final int getLine()
@@ -174,7 +174,7 @@ public class IndividualAddress extends KNXAddress
 	 * Returns the device address.
 	 * <p>
 	 * The device address consists of the low byte of the 16 Bit address field.
-	 * 
+	 *
 	 * @return the device value (8 least significant bits)
 	 */
 	public final int getDevice()
@@ -194,7 +194,7 @@ public class IndividualAddress extends KNXAddress
 	/**
 	 * Returns the address as a string using the 3-level "area.line.device" notation.
 	 * <p>
-	 * 
+	 *
 	 * @return the address string
 	 */
 	@Override
@@ -206,7 +206,7 @@ public class IndividualAddress extends KNXAddress
 	/**
 	 * Returns whether <code>obj</code> is equal to this KNX address type.
 	 * <p>
-	 * 
+	 *
 	 * @param obj knx address object
 	 * @return <code>true</code> iff <code>obj</code> is of this type and contains the
 	 *         same address, <code>false</code> otherwise

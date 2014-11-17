@@ -48,7 +48,6 @@ public class KNXException extends Exception
 
 	/**
 	 * Constructs a new <code>KNXException</code> without a detail message.
-	 * <p>
 	 */
 	public KNXException()
 	{}

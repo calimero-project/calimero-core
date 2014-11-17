@@ -61,7 +61,6 @@ public abstract class ExpiringCache implements Cache
 	/**
 	 * Default sweep interval in seconds used for a {@link CacheSweeper}
 	 * ({@value defaultSweepInterval} seconds).
-	 * <p>
 	 */
 	protected static final int defaultSweepInterval = 60;
 
@@ -90,7 +89,7 @@ public abstract class ExpiringCache implements Cache
 	 * Note that for the actual begin of cache sweeping {@link #startSweeper()} has to be
 	 * invoked.
 	 *
-	 * @param timeToExpire time > 0 in seconds for cache entries to stay valid, on time =
+	 * @param timeToExpire time &gt; 0 in seconds for cache entries to stay valid, on time =
 	 *        0 no expiring of cache entries will occur
 	 */
 	public ExpiringCache(final int timeToExpire)
@@ -137,7 +136,6 @@ public abstract class ExpiringCache implements Cache
 	/**
 	 * Override this method to get notified when {@link #removeExpired()} removed a
 	 * {@link CacheObject} from the {@link #map}.
-	 * <p>
 	 *
 	 * @param obj removed {@link CacheObject}
 	 */

@@ -51,7 +51,6 @@ public class KNXConnectionClosedException extends KNXException
 	/**
 	 * Constructs a new <code>KNXConnectionClosedException</code> without a detail
 	 * message.
-	 * <p>
 	 */
 	public KNXConnectionClosedException()
 	{}

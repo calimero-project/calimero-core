@@ -56,125 +56,105 @@ public class DPTXlatorBoolean extends DPTXlator
 {
 	/**
 	 * DPT ID 1.001, Switch; values <b>off</b>, <b>on</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_SWITCH = new DPT("1.001", "Switch", "off", "on");
 
 	/**
 	 * DPT ID 1.002, Boolean; values <b>false</b>, <b>true</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_BOOL = new DPT("1.002", "Boolean", "false", "true");
 
 	/**
 	 * DPT ID 1.003, Enable; values <b>enable</b>, <b>disable</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_ENABLE = new DPT("1.003", "Enable", "disable", "enable");
 
 	/**
 	 * DPT ID 1.004, Ramp; values <b>no ramp</b>, <b>ramp</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_RAMP = new DPT("1.004", "Ramp", "no ramp", "ramp");
 
 	/**
 	 * DPT ID 1.005, Alarm; values <b>no alarm</b>, <b>alarm</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_ALARM = new DPT("1.005", "Alarm", "no alarm", "alarm");
 
 	/**
 	 * DPT ID 1.006, Binary value; values <b>low</b>, <b>high</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_BINARYVALUE = new DPT("1.006", "Binary value", "low", "high");
 
 	/**
 	 * DPT ID 1.007, Step; values <b>decrease</b>, <b>increase</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_STEP = new DPT("1.007", "Step", "decrease", "increase");
 
 	/**
 	 * DPT ID 1.008, Up/Down; values <b>up</b>, <b>down</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_UPDOWN = new DPT("1.008", "Up/Down", "up", "down");
 
 	/**
 	 * DPT ID 1.009, Open/Close; values <b>open</b>, <b>close</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_OPENCLOSE = new DPT("1.009", "Open/Close", "open", "close");
 
 	/**
 	 * DPT ID 1.010, Start; values <b>stop</b>, <b>start</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_START = new DPT("1.010", "Start", "stop", "start");
 
 	/**
 	 * DPT ID 1.011, State; values <b>inactive</b>, <b>active</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_STATE = new DPT("1.011", "State", "inactive", "active");
 
 	/**
 	 * DPT ID 1.012, Invert; values <b>not inverted</b>, <b>inverted</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_INVERT = new DPT("1.012", "Invert", "not inverted", "inverted");
 
 	/**
 	 * DPT ID 1.013, DimSendStyle; values <b>start/stop</b>, <b>cyclic</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_DIMSENDSTYLE = new DPT("1.013", "Dim send-style", "start/stop",
 			"cyclic");
 
 	/**
 	 * DPT ID 1.014, Input source; values <b>fixed</b>, <b>calculated</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_INPUTSOURCE = new DPT("1.014", "Input source", "fixed",
 			"calculated");
 
 	/**
 	 * DPT ID 1.015, Reset; values <b>no action</b> (dummy), <b>reset</b> (trigger).
-	 * <p>
 	 */
 	public static final DPT DPT_RESET = new DPT("1.015", "Reset", "no action", "reset");
 
 	/**
 	 * DPT ID 1.016, Acknowledge; values <b>no action</b> (dummy), <b>acknowledge</b>
 	 * (trigger).
-	 * <p>
 	 */
 	public static final DPT DPT_ACK = new DPT("1.016", "Acknowledge", "no action", "acknowledge");
 
 	/**
 	 * DPT ID 1.017, Trigger; values <b>trigger</b>, <b>trigger</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_TRIGGER = new DPT("1.017", "Trigger", "trigger", "trigger");
 
 	/**
 	 * DPT ID 1.018, Occupancy; values <b>not occupied</b>, <b>occupied</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_OCCUPANCY = new DPT("1.018", "Occupancy", "not occupied",
 			"occupied");
 
 	/**
 	 * DPT ID 1.019, Window/Door; values <b>closed</b>, <b>open</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_WINDOW_DOOR = new DPT("1.019", "Window/Door", "closed", "open");
 
 	/**
 	 * DPT ID 1.021, Logical function; values <b>OR</b>, <b>AND</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_LOGICAL_FUNCTION = new DPT("1.021", "Logical function", "OR", "AND");
 
@@ -189,14 +169,12 @@ public class DPTXlatorBoolean extends DPTXlator
 	/**
 	 * DPT ID 1.023, Shutter/Blinds mode; values <b>only move up/down mode</b> (shutter),
 	 * <b>move up/down + step-stop mode</b> (blind).
-	 * <p>
 	 */
 	public static final DPT DPT_SHUTTER_BLINDS_MODE = new DPT("1.023", "Shutter/Blinds mode",
 			"only move up/down", "move up/down + step-stop");
 
 	/**
 	 * DPT ID 1.100, HVAC Heat/Cool; values <b>cooling</b>, <b>heating</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_HEAT_COOL = new DPT("1.100", "Heat/Cool", "cooling", "heating");
 	

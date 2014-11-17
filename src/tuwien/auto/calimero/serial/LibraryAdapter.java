@@ -97,7 +97,6 @@ public abstract class LibraryAdapter
 
 	/**
 	 * Sets a new baud rate for this connection.
-	 * <p>
 	 *
 	 * @param baudrate requested baud rate [Bit/s], 0 &lt; baud rate
 	 */

@@ -51,7 +51,6 @@ public interface Cache
 {
 	/**
 	 * Offers information about data counting and cache performance.
-	 * <p>
 	 */
 	public interface Statistic
 	{
@@ -122,13 +121,11 @@ public interface Cache
 	/**
 	 * Removes all {@link CacheObject}s which are not valid anymore, as defined
 	 * by a caching policy, from the cache.
-	 * <p>
 	 */
 	void removeExpired();
 
 	/**
 	 * Empties the cache of all {@link CacheObject}s.
-	 * <p>
 	 */
 	void clear();
 	

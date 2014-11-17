@@ -78,7 +78,6 @@ public final class Util
 
 	/**
 	 * Standard out desc and toHexDec(bytes).
-	 * <p>
 	 *
 	 * @param desc description
 	 * @param bytes bytes to print hex and decimal
@@ -90,7 +89,6 @@ public final class Util
 
 	/**
 	 * Format first 200 bytes into hex, followed by decimal presentation.
-	 * <p>
 	 *
 	 * @param bytes bytes to format
 	 * @return formatted bytes as string

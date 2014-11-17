@@ -47,7 +47,6 @@ public abstract class RawAckBase implements RawFrame
 {
 	/**
 	 * Positive acknowledge type.
-	 * <p>
 	 * 
 	 * @see #getAckType()
 	 */
@@ -55,7 +54,6 @@ public abstract class RawAckBase implements RawFrame
 
 	/**
 	 * Negative acknowledge type.
-	 * <p>
 	 * 
 	 * @see #getAckType()
 	 */
@@ -63,7 +61,6 @@ public abstract class RawAckBase implements RawFrame
 
 	/**
 	 * Acknowledge type transmitted with this frame.
-	 * <p>
 	 */
 	protected int ack;
 

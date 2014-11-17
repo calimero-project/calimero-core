@@ -74,20 +74,17 @@ public class FT12Connection
 {
 	/**
 	 * State of communication: in idle state, no error, ready to send.
-	 * <p>
 	 */
 	public static final int OK = 0;
 
 	/**
 	 * State of communication: in closed state, no send possible.
-	 * <p>
 	 */
 	public static final int CLOSED = 1;
 
 	/**
 	 * Status code of communication: waiting for acknowledge after send, no error, not
 	 * ready to send.
-	 * <p>
 	 */
 	public static final int ACK_PENDING = 2;
 
@@ -304,7 +301,6 @@ public class FT12Connection
 
 	/**
 	 * Sets a new baud rate for this connection.
-	 * <p>
 	 *
 	 * @param baud requested baud rate [bit/s], 0 &lt; baud rate
 	 */

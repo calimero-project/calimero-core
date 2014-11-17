@@ -64,19 +64,16 @@ public class CEMILData implements CEMI
 
 	/**
 	 * Message code for L-Data request, code = {@value #MC_LDATA_REQ}.
-	 * <p>
 	 */
 	public static final int MC_LDATA_REQ = 0x11;
 
 	/**
 	 * Message code for L-Data confirmation, code = {@value #MC_LDATA_CON}.
-	 * <p>
 	 */
 	public static final int MC_LDATA_CON = 0x2E;
 
 	/**
 	 * Message code for L-Data indication, code = {@value #MC_LDATA_IND}.
-	 * <p>
 	 */
 	public static final int MC_LDATA_IND = 0x29;
 
@@ -84,7 +81,6 @@ public class CEMILData implements CEMI
 
 	/**
 	 * Message code of this message.
-	 * <p>
 	 */
 	protected int mc;
 
@@ -93,13 +89,11 @@ public class CEMILData implements CEMI
 
 	/**
 	 * Control field 1, the lower 8 bits contain control information.
-	 * <p>
 	 */
 	protected int ctrl1;
 
 	/**
 	 * Control field 2, the lower 8 bits contain control information.
-	 * <p>
 	 */
 	protected int ctrl2;
 
@@ -111,7 +105,6 @@ public class CEMILData implements CEMI
 
 	/**
 	 * Creates a new L-Data message from a byte stream.
-	 * <p>
 	 *
 	 * @param data byte stream containing a cEMI L-Data message
 	 * @param offset start offset of cEMI frame in <code>data</code>
@@ -250,7 +243,6 @@ public class CEMILData implements CEMI
 
 	/**
 	 * Creates a L-Data message, mainly for TP1 media.
-	 * <p>
 	 *
 	 * @param msgCode a message code value specified in the L-Data type
 	 * @param src individual address of source
@@ -500,7 +492,6 @@ public class CEMILData implements CEMI
 	 * <p>
 	 * This type does not support additional information; the additional info length is
 	 * set to 0, indicating no additional information.
-	 * <p>
 	 *
 	 * @param os the output stream
 	 */

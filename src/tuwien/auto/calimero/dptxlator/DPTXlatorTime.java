@@ -72,7 +72,6 @@ public class DPTXlatorTime extends DPTXlator
 	/**
 	 * DPT ID 10.001, Time of day; values from <b>no-day, 00:00:00</b> to <b>Sun,
 	 * 23:59:59</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_TIMEOFDAY =
 		new DPT("10.001", "Time of day", "no-day, 00:00:00", "Sun, 23:59:59",
@@ -98,7 +97,6 @@ public class DPTXlatorTime extends DPTXlator
 
 	/**
 	 * Creates a translator for the given datapoint type.
-	 * <p>
 	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
@@ -110,7 +108,6 @@ public class DPTXlatorTime extends DPTXlator
 
 	/**
 	 * Creates a translator for the given datapoint type ID.
-	 * <p>
 	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)

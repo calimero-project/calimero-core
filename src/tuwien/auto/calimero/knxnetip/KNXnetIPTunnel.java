@@ -74,25 +74,21 @@ public class KNXnetIPTunnel extends ClientConnection
 {
 	/**
 	 * Connection type used to tunnel between two KNXnet/IP devices (client / server).
-	 * <p>
 	 */
 	public static final int TUNNEL_CONNECTION = 0x04;
 
 	/**
 	 * Tunneling on busmonitor layer, establishes a busmonitor tunnel to the KNX network.
-	 * <p>
 	 */
 	public static final int BUSMONITOR_LAYER = 0x80;
 
 	/**
 	 * Tunneling on link layer, establishes a link layer tunnel to the KNX network.
-	 * <p>
 	 */
 	public static final int LINK_LAYER = 0x02;
 
 	/**
 	 * Tunneling on raw layer, establishes a raw tunnel to the KNX network.
-	 * <p>
 	 */
 	public static final int RAW_LAYER = 0x04;
 

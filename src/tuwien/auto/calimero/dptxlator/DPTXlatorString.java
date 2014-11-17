@@ -59,13 +59,11 @@ public class DPTXlatorString extends DPTXlator
 {
 	/**
 	 * DPT ID 16.000, ASCII string; 7 Bit character set encoding.
-	 * <p>
 	 */
 	public static final DPT DPT_STRING_ASCII = new DPT("16.000", "ASCII string", "", "");
 
 	/**
 	 * DPT ID 16.001, ISO-8859-1 string (Latin 1); 8 Bit character set encoding.
-	 * <p>
 	 */
 	public static final DPT DPT_STRING_8859_1 =
 		new DPT("16.001", "ISO-8859-1 string (Latin 1)", "", "");

@@ -75,14 +75,12 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	/**
 	 * Status code of communication: waiting for service acknowledgment after send, no
 	 * error, not ready to send.
-	 * <p>
 	 */
 	public static final int ACK_PENDING = 2;
 
 	/**
 	 * Status code of communication: in idle state, received a service acknowledgment
 	 * error as response, ready to send.
-	 * <p>
 	 */
 	public static final int ACK_ERROR = 3;
 
@@ -142,7 +140,6 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 
 	/**
 	 * Base constructor to assign the supplied arguments.
-	 * <p>
 	 *
 	 * @param serviceRequest
 	 * @param serviceAck
@@ -335,7 +332,6 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	/**
 	 * Increments the protocol's receive sequence number, with increment on sequence
 	 * number 255 resulting in 0.
-	 * <p>
 	 */
 	protected synchronized void incSeqRcv()
 	{
@@ -356,7 +352,6 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	/**
 	 * Increments the protocol's send sequence number, with increment on sequence number
 	 * 255 resulting in 0.
-	 * <p>
 	 */
 	protected synchronized void incSeqSend()
 	{
@@ -387,7 +382,6 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 
 	/**
 	 * This stub always returns false.
-	 * <p>
 	 *
 	 * @param h received KNXnet/IP header
 	 * @param data received datagram data
@@ -409,7 +403,6 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 
 	/**
 	 * Request to set this connection into a new connection state.
-	 * <p>
 	 *
 	 * @param newState new state to set
 	 */
@@ -429,7 +422,6 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 
 	/**
 	 * See {@link #setState(int)}, with additional notification of internal threads.
-	 * <p>
 	 *
 	 * @param newState new state to set
 	 */
@@ -511,7 +503,6 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	/**
 	 * Validates channel id received in a packet against the one assigned to this
 	 * connection.
-	 * <p>
 	 *
 	 * @param id received id to check
 	 * @param svcType packet service type
@@ -528,7 +519,6 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 
 	/**
 	 * Extracts the service request out of the supplied packet data.
-	 * <p>
 	 *
 	 * @param h packet KNXnet/IP header
 	 * @param data contains the data following the KNXnet/IP header

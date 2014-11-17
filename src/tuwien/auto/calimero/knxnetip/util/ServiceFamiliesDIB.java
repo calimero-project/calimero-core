@@ -60,45 +60,38 @@ public class ServiceFamiliesDIB extends DIB
 {
 	/**
 	 * Service family identifier representing the service type 'KNXnet/IP Core'.
-	 * <p>
 	 */
 	public static final int CORE = 0x02;
 
 	/**
 	 * Service family identifier representing the service type 'KNXnet/IP Device
 	 * Management'.
-	 * <p>
 	 */
 	public static final int DEVICE_MANAGEMENT = 0x03;
 
 	/**
 	 * Service family identifier representing the service type 'KNXnet/IP Tunneling'.
-	 * <p>
 	 */
 	public static final int TUNNELING = 0x04;
 
 	/**
 	 * Service family identifier representing the service type 'KNXnet/IP Routing'.
-	 * <p>
 	 */
 	public static final int ROUTING = 0x05;
 
 	/**
 	 * Service family identifier representing the service type 'KNXnet/IP Remote Logging'.
-	 * <p>
 	 */
 	public static final int REMOTE_LOGGING = 0x06;
 
 	/**
 	 * Service family identifier representing the service type 'KNXnet/IP Remote
 	 * Configuration and Diagnosis'.
-	 * <p>
 	 */
 	public static final int REMOTE_CONFIGURATION_DIAGNOSIS = 0x07;
 
 	/**
 	 * Service family identifier representing the service type 'KNXnet/IP Object Server'.
-	 * <p>
 	 */
 	public static final int OBJECT_SERVER = 0x08;
 
@@ -110,7 +103,6 @@ public class ServiceFamiliesDIB extends DIB
 
 	/**
 	 * Creates a service families DIB out of a byte array.
-	 * <p>
 	 *
 	 * @param data byte array containing the service families DIB structure
 	 * @param offset start offset of DIB in <code>data</code>
@@ -143,12 +135,12 @@ public class ServiceFamiliesDIB extends DIB
 	 *
 	 * @param familyIDs array containing the supported service family identifiers, use the
 	 *        service family identifier constants as provided by this class;
-	 *        <code>0 <= familyIDs[i] <= 255</code>, for all i with
-	 *        <code>0 <= i < familyIDs.length</code>
+	 *        <code>0 &le; familyIDs[i] &le; 255</code>, for all i with
+	 *        <code>0 &le; i &lt; familyIDs.length</code>
 	 * @param familyVersions array containing the version of the corresponding items
 	 *        listed in the <code>familyIDs</code> parameter with the same index;
-	 *        <code>0 <= familyVersions[i] <= 255</code>, for all i with
-	 *        <code>0 <= i < familyVersions.length</code>
+	 *        <code>0 &le; familyVersions[i] &le; 255</code>, for all i with
+	 *        <code>0 &le; i &lt; familyVersions.length</code>
 	 */
 	public ServiceFamiliesDIB(final int[] familyIDs, final int[] familyVersions)
 	{
@@ -169,7 +161,6 @@ public class ServiceFamiliesDIB extends DIB
 	 * <p>
 	 * The family entries are added to the DIB in arbitrary order (for example, it might
 	 * be the order as returned by the <code>families</code> entry iterator).
-	 * <p>
 	 *
 	 * @param families (unmodifiable) map containing the supported service families, with
 	 *        the service family of type {@link Integer} being the key, and the version of
@@ -239,7 +230,6 @@ public class ServiceFamiliesDIB extends DIB
 
 	/**
 	 * Returns the service family name for the supplied family ID.
-	 * <p>
 	 *
 	 * @param familyId service family ID to get name for
 	 * @return family name as string, or <code>null</code> on no name available

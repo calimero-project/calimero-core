@@ -65,105 +65,88 @@ public class KNXnetIPHeader
 {
 	/**
 	 * Service type identifier for a connect request.
-	 * <p>
 	 */
 	public static final int CONNECT_REQ = 0x0205;
 
 	/**
 	 * Service type identifier for a connect response.
-	 * <p>
 	 */
 	public static final int CONNECT_RES = 0x0206;
 
 	/**
 	 * Service type identifier for a connection state request.
-	 * <p>
 	 */
 	public static final int CONNECTIONSTATE_REQ = 0x0207;
 
 	/**
 	 * Service type identifier for a connection state response.
-	 * <p>
 	 */
 	public static final int CONNECTIONSTATE_RES = 0x0208;
 
 	/**
 	 * Service type identifier for a disconnect request.
-	 * <p>
 	 */
 	public static final int DISCONNECT_REQ = 0x0209;
 
 	/**
 	 * Service type identifier for a disconnect response.
-	 * <p>
 	 */
 	public static final int DISCONNECT_RES = 0x020A;
 
 	/**
 	 * Service type identifier for a description request.
-	 * <p>
 	 */
 	public static final int DESCRIPTION_REQ = 0x0203;
 
 	/**
 	 * Service type identifier for a description response.
-	 * <p>
 	 */
 	public static final int DESCRIPTION_RES = 0x204;
 
 	/**
 	 * Service type identifier for a search request.
-	 * <p>
 	 */
 	public static final int SEARCH_REQ = 0x201;
 
 	/**
 	 * Service type identifier for a search response.
-	 * <p>
 	 */
 	public static final int SEARCH_RES = 0x202;
 
 	/**
 	 * Service type identifier for configuration request (read / write device
 	 * configuration data, interface properties).
-	 * <p>
 	 */
 	public static final int DEVICE_CONFIGURATION_REQ = 0x0310;
 
 	/**
 	 * Service type identifier to confirm the reception of the configuration request.
-	 * <p>
 	 */
 	public static final int DEVICE_CONFIGURATION_ACK = 0x0311;
 
 	/**
 	 * Service type identifier to send and receive single KNX frames between client and
 	 * server.
-	 * <p>
 	 */
 	public static final int TUNNELING_REQ = 0x0420;
 
 	/**
 	 * Service type identifier to confirm the reception of a tunneling request.
-	 * <p>
 	 */
 	public static final int TUNNELING_ACK = 0x0421;
 
 	/**
 	 * Service type identifier for sending KNX telegrams over IP networks with multicast.
-	 * <p>
 	 */
 	public static final int ROUTING_IND = 0x0530;
 
 	/**
 	 * Service type identifier to indicate the loss of routing messages with multicast.
-	 * <p>
 	 */
 	public static final int ROUTING_LOST_MSG = 0x0531;
 
 	/**
 	 * Version identifier for KNXnet/IP protocol version 1.0.
-	 * <p>
 	 */
 	public static final int KNXNETIP_VERSION_10 = 0x10;
 
@@ -176,7 +159,6 @@ public class KNXnetIPHeader
 
 	/**
 	 * Creates a new KNXnet/IP header by reading in the header of a KNXnet/IP frame.
-	 * <p>
 	 *
 	 * @param frame byte array with contained KNXnet/IP frame
 	 * @param offset start offset of KNXnet/IP header structure in <code>frame</code>
@@ -208,7 +190,6 @@ public class KNXnetIPHeader
 
 	/**
 	 * Creates a new KNXnet/IP header for the given service.
-	 * <p>
 	 *
 	 * @param serviceType service type identifier specifying the service followed after
 	 *        the header, 0 &lt;= type &lt;= 0xFFFF

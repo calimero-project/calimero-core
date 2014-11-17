@@ -74,7 +74,6 @@ public class DPTXlatorDateTime extends DPTXlator
 	/**
 	 * DPT ID 19.001, Date with time; values from <b>1900, 01/01 00:00:00</b> to
 	 * <b>2155, 12/31 24:00:00</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_DATE_TIME =
 		new DPT("19.001", "Date with time", "1900, 01/01 00:00:00",
@@ -83,7 +82,6 @@ public class DPTXlatorDateTime extends DPTXlator
 	/**
 	 * Field number for <code>get</code> and <code>set</code> indicating whether the
 	 * year field is used.
-	 * <p>
 	 *
 	 * @see #setValidField(int, boolean)
 	 * @see #isValidField(int)
@@ -93,7 +91,6 @@ public class DPTXlatorDateTime extends DPTXlator
 	/**
 	 * Field number for <code>get</code> and <code>set</code> indicating whether the
 	 * date field (month and day of month) is used.
-	 * <p>
 	 *
 	 * @see #setValidField(int, boolean)
 	 * @see #isValidField(int)
@@ -103,7 +100,6 @@ public class DPTXlatorDateTime extends DPTXlator
 	/**
 	 * Field number for <code>get</code> and <code>set</code> indicating whether the
 	 * time field (hour, minute and second) is used.
-	 * <p>
 	 *
 	 * @see #setValidField(int, boolean)
 	 * @see #isValidField(int)
@@ -113,7 +109,6 @@ public class DPTXlatorDateTime extends DPTXlator
 	/**
 	 * Field number for <code>get</code> and <code>set</code> indicating whether the
 	 * day of week field is used.
-	 * <p>
 	 *
 	 * @see #setValidField(int, boolean)
 	 * @see #isValidField(int)
@@ -176,13 +171,11 @@ public class DPTXlatorDateTime extends DPTXlator
 
 	/**
 	 * Minimum year representable by this type, year = {@value #MIN_YEAR}.
-	 * <p>
 	 */
 	public static final int MIN_YEAR = 1900;
 
 	/**
 	 * Maximum year representable by this type, year = {@value #MAX_YEAR}.
-	 * <p>
 	 */
 	public static final int MAX_YEAR = MIN_YEAR + 0xff;
 
@@ -233,7 +226,6 @@ public class DPTXlatorDateTime extends DPTXlator
 
 	/**
 	 * Creates a translator for the given datapoint type.
-	 * <p>
 	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
@@ -245,7 +237,6 @@ public class DPTXlatorDateTime extends DPTXlator
 
 	/**
 	 * Creates a translator for the given datapoint type ID.
-	 * <p>
 	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)

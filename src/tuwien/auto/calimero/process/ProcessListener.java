@@ -146,8 +146,8 @@ public interface ProcessListener extends EventListener
 	 * Invoke this method to get a translation of the received KNX floating point data.
 	 *
 	 * @param e the process event with the ASDU to translate
-	 * @param from4ByteFloat <true> to translate from 4-byte KNX float data, <false> to translate
-	 *        from 2-byte KNX float data
+	 * @param from4ByteFloat <code>true</code> to translate from 4-byte KNX float data,
+	 *        <code>false</code> to translate from 2-byte KNX float data
 	 * @return the received value of type double
 	 * @throws KNXFormatException on not supported or not available float DPT
 	 */
@@ -198,7 +198,7 @@ public interface ProcessListener extends EventListener
 	 * the received datapoint type.
 	 *
 	 * @param e the process event with the ASDU to translate
-	 * @param dptMainNumber datapoint type main number, number >= 0; use 0 to infer translator type
+	 * @param dptMainNumber datapoint type main number, number &ge; 0; use 0 to infer translator type
 	 *        from <code>dptID</code> argument only
 	 * @param dptID datapoint type ID for selecting a particular kind of value translation
 	 * @return the received value of the requested type as String representation
@@ -215,7 +215,6 @@ public interface ProcessListener extends EventListener
 
 	/**
 	 * Indicates that a KNX group read request message was received from the KNX network.
-	 * <p>
 	 *
 	 * @param e process event object
 	 */
@@ -223,7 +222,6 @@ public interface ProcessListener extends EventListener
 
 	/**
 	 * Indicates that a KNX group read response message was received from the KNX network.
-	 * <p>
 	 *
 	 * @param e process event object
 	 */
@@ -231,7 +229,6 @@ public interface ProcessListener extends EventListener
 
 	/**
 	 * Indicates that a KNX group write message indication was received from the KNX network.
-	 * <p>
 	 *
 	 * @param e process event object
 	 */
@@ -239,7 +236,6 @@ public interface ProcessListener extends EventListener
 
 	/**
 	 * The KNX network link was detached from the process communicator.
-	 * <p>
 	 *
 	 * @param e detach event object
 	 */

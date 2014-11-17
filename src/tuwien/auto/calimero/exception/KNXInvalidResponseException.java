@@ -51,7 +51,6 @@ public class KNXInvalidResponseException extends KNXRemoteException
 	/**
 	 * Constructs a new <code>KNXInvalidResponseException</code> without a detail
 	 * message.
-	 * <p>
 	 */
 	public KNXInvalidResponseException()
 	{}

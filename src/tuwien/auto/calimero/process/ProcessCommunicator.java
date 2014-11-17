@@ -62,9 +62,8 @@ public interface ProcessCommunicator extends ProcessCommunicationBase
 	/**
 	 * Sets the response timeout to wait for a KNX response message to arrive to complete
 	 * a message exchange.
-	 * <p>
 	 *
-	 * @param timeout time in seconds, <code>timeout > 0</code>
+	 * @param timeout time in seconds, <code>timeout &gt; 0</code>
 	 */
 	void setResponseTimeout(int timeout);
 
@@ -79,7 +78,6 @@ public interface ProcessCommunicator extends ProcessCommunicationBase
 
 	/**
 	 * Reads a boolean datapoint value from a group destination.
-	 * <p>
 	 *
 	 * @param dst group destination to read from
 	 * @return the read value of type boolean
@@ -136,7 +134,6 @@ public interface ProcessCommunicator extends ProcessCommunicationBase
 
 	/**
 	 * Reads a floating point datapoint value from a group destination.
-	 * <p>
 	 *
 	 * @param dst group destination to read from
 	 * @param is4ByteFloat specifies the datapoint floating point type the datapoint is encoded

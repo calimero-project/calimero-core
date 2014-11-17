@@ -70,7 +70,6 @@ public final class PropertyTypes
 
 		/**
 		 * Creates a new DPTID used to identify a DPT translator.
-		 * <p>
 		 *
 		 * @param mainNumber DPT main number identifying a data type matching the property
 		 *        data type
@@ -407,7 +406,6 @@ public final class PropertyTypes
 	/**
 	 * Utility method, like {@link #createTranslator(int)}, with the additional capability
 	 * to set the data to be used by the DPT translator.
-	 * <p>
 	 *
 	 * @param dataType property data type to get the associated translator for
 	 * @param data array with KNX DPT formatted data, the number of contained items is
@@ -427,7 +425,6 @@ public final class PropertyTypes
 	/**
 	 * Utility method for retrieving the string representations of the KNX DPT data of the
 	 * specified property data type.
-	 * <p>
 	 *
 	 * @param dataType property data type of the <code>data</code> items
 	 * @param data array with KNX DPT formatted data, the number of contained items is

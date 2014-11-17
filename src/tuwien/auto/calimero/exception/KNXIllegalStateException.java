@@ -49,7 +49,6 @@ public class KNXIllegalStateException extends RuntimeException
 
 	/**
 	 * Constructs a new <code>KNXIllegalStateException</code> without a detail message.
-	 * <p>
 	 */
 	public KNXIllegalStateException()
 	{}

@@ -62,7 +62,6 @@ public class EventListeners<T extends EventListener>
 
 	/**
 	 * Creates a new event listeners container object.
-	 * <p>
 	 */
 	public EventListeners(final Class<T> listenerType)
 	{
@@ -71,7 +70,6 @@ public class EventListeners<T extends EventListener>
 
 	/**
 	 * Creates a new event listeners container object.
-	 * <p>
 	 *
 	 * @param logger optional logger for log output
 	 */
@@ -86,7 +84,7 @@ public class EventListeners<T extends EventListener>
 	 * Adds the specified event listener <code>l</code> to this container.
 	 * <p>
 	 * If <code>l</code> is
-	 * <code>null<code> or was already added as listener, no action is performed.
+	 * <code>null</code> or was already added as listener, no action is performed.
 	 *
 	 * @param l the listener to add
 	 */
@@ -121,7 +119,6 @@ public class EventListeners<T extends EventListener>
 
 	/**
 	 * Removes all event listeners from this container.
-	 * <p>
 	 */
 	public void removeAll()
 	{

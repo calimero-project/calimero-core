@@ -123,7 +123,6 @@ public class StateFilter implements NetworkFilter, RequestFilter
 
 	/**
 	 * Creates a new state based filter.
-	 * <p>
 	 */
 	public StateFilter()
 	{}

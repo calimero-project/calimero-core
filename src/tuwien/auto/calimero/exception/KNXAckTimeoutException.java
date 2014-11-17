@@ -49,7 +49,6 @@ public class KNXAckTimeoutException extends KNXTimeoutException
 
 	/**
 	 * Constructs a new <code>KNXAckTimeoutException</code> without a detail message.
-	 * <p>
 	 */
 	public KNXAckTimeoutException()
 	{}

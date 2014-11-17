@@ -53,10 +53,12 @@ import tuwien.auto.calimero.log.LogLevel;
  * <p>
  * In value methods expecting string items, the item might be formatted using decimal, hexadecimal,
  * and octal numbers, distinguished by using these prefixes:
+ * <ul>
  * <li>no prefix for decimal numeral</li>
- * <li><code>0x</code>, <code>0X</code> or <code>#</code> for hexadecimal</li>
+ * <li><code>0x</code>, <code>0X</code> or <code>#</code> for hexadecimal numeral</li>
  * <li><code>0</code> for octal numeral</li>
- * 
+ * </ul>
+ *
  * @author Juan Ruzafa Millán
  * @author B. Malinowsky
  */
@@ -65,7 +67,6 @@ public class DPTXlatorSceneControl extends DPTXlator
 	/**
 	 * DPT ID 18.001, Scene Control; activate or learn a scene, with scene numbers from <b>0</b> to
 	 * <b>63</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_SCENE_CONTROL = new DPT("18.001", "Scene Control", "activate 0",
 			"learn 63");
@@ -80,7 +81,7 @@ public class DPTXlatorSceneControl extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type.
 	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -92,7 +93,7 @@ public class DPTXlatorSceneControl extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type ID.
 	 * <p>
-	 * 
+	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptID</code>
 	 */
@@ -115,7 +116,7 @@ public class DPTXlatorSceneControl extends DPTXlator
 	/**
 	 * Sets one new translation item, replacing any old items.
 	 * <p>
-	 * 
+	 *
 	 * @param control control bit to activate or learn a scene, <code>false</code> = activate,
 	 *        <code>true</code> = learn
 	 * @param scene number, 0 &lt;= scene number &lt;= 63
@@ -128,7 +129,7 @@ public class DPTXlatorSceneControl extends DPTXlator
 	/**
 	 * Returns the scene number of the first translation item.
 	 * <p>
-	 * 
+	 *
 	 * @return unsigned 6 Bit using type short
 	 */
 	public final short getSceneNumber()

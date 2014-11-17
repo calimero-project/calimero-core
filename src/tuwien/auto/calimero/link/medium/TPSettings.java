@@ -49,13 +49,11 @@ public class TPSettings extends KNXMediumSettings
 {
 	/**
 	 * Default setting for TP0, device address is 0.0.0.
-	 * <p>
 	 */
 	public static final TPSettings TP0 = new TPSettings(false);
 
 	/**
 	 * Default setting for TP1, device address is 0.0.0.
-	 * <p>
 	 */
 	public static final TPSettings TP1 = new TPSettings(true);
 

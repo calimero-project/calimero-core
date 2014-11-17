@@ -50,16 +50,17 @@ import tuwien.auto.calimero.log.LogLevel;
  * <p>
  * In value methods expecting string items, the item might be formatted using decimal,
  * hexadecimal, and octal numbers, distinguished by using these prefixes:
- * <dd>no prefix for decimal numeral
- * <dd><code>0x</code>, <code>0X</code> or <code>#</code> for hexadecimal
- * <dd><code>0</code> for octal numeral
+ * <dl>
+ * <dt>no prefix</dt><dd>for decimal numeral</dd>
+ * <dt><code>0x</code>, <code>0X</code>, <code>#</code><dd>for hexadecimal numeral</dd>
+ * <dt><code>0</code><dd>for octal numeral</dd>
+ * </dl>
  */
 public class DPTXlator4ByteUnsigned extends DPTXlator
 {
 	/**
 	 * DPT ID 12.001, Unsigned count; values from <b>0</b> to <b>4294967295</b> counter
 	 * pulses.
-	 * <p>
 	 */
 	public static final DPT DPT_VALUE_4_UCOUNT = new DPT("12.001", "Unsigned count", "0",
 			"4294967295", "counter pulses");
@@ -74,7 +75,7 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type.
 	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -86,7 +87,7 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type ID.
 	 * <p>
-	 * 
+	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
 	 *         <code>dptID</code>
@@ -101,7 +102,7 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 	/**
 	 * Sets the value of the first translation item.
 	 * <p>
-	 * 
+	 *
 	 * @param value unsigned value, 0 &lt;= value &lt;= 0xFFFFFFFF
 	 * @throws KNXFormatException on input value out of range for DPT
 	 * @see #getType()
@@ -114,7 +115,7 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 	/**
 	 * Returns the first translation item as unsigned 32 Bit value.
 	 * <p>
-	 * 
+	 *
 	 * @return unsigned 32 Bit value using type long
 	 * @see #getType()
 	 */

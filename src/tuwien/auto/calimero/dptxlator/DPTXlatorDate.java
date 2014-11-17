@@ -66,7 +66,6 @@ public class DPTXlatorDate extends DPTXlator
 {
 	/**
 	 * DPT ID 11.001, Date; values from <b>1990-01-01</b> to <b>2089-12-31</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_DATE =
 		new DPT("11.001", "Date", "1990-01-01", "2089-12-31", "yyyy-mm-dd");
@@ -86,7 +85,6 @@ public class DPTXlatorDate extends DPTXlator
 
 	/**
 	 * Creates a translator for the given datapoint type.
-	 * <p>
 	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
@@ -98,7 +96,6 @@ public class DPTXlatorDate extends DPTXlator
 
 	/**
 	 * Creates a translator for the given datapoint type ID.
-	 * <p>
 	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)

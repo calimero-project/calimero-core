@@ -50,24 +50,22 @@ import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
  * The address information is used to describe a communication channel. Its structure
  * varies according to the used underlying protocol. This class is implemented for IPv4.
  * <br>
- * For IP networks with NAT, consider use of {@link #HPAI(short, InetSocketAddress)}.<br>
+ * For IP networks with NAT, consider use of {@link #HPAI(int, InetSocketAddress)}.<br>
  * UDP is the default communication mode with mandatory support used in KNXnet/IP.
  * <p>
  * Objects of this type are immutable.
- * 
+ *
  * @author B. Malinowsky
  */
 public class HPAI
 {
 	/**
 	 * Internet protocol version 4 address, UDP communication.
-	 * <p>
 	 */
 	public static final int IPV4_UDP = 0x01;
 
 	/**
 	 * Internet protocol version 4 address, TCP communication.
-	 * <p>
 	 */
 	public static final int IPV4_TCP = 0x02;
 
@@ -81,7 +79,7 @@ public class HPAI
 	/**
 	 * Creates a HPAI out of a byte array.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing the HPAI structure
 	 * @param offset start offset of HPAI in <code>data</code>
 	 * @throws KNXFormatException if no HPAI found, invalid structure or unknown host
@@ -119,7 +117,7 @@ public class HPAI
 	 * {@link InetAddress#getLocalHost()}<br>
 	 * 3) if no local host could be found, fall back to safe state and initialize IP
 	 * <b>and</b> port to 0 (NAT aware mode)<br>
-	 * 
+	 *
 	 * @param addr local IP address, use <code>null</code> for setting local host
 	 * @param port local port number to set, 0 &lt;= <code>port</code> &lt;= 0xFFFF
 	 */
@@ -137,7 +135,7 @@ public class HPAI
 	/**
 	 * Creates a HPAI with the given address information.
 	 * <p>
-	 * 
+	 *
 	 * @param hostProtocol host protocol code (UDP or TCP on IP)
 	 * @param addr local IP address
 	 * @param port local port number to set, 0 &lt;= <code>port</code> &lt;= 0xFFFF
@@ -152,7 +150,7 @@ public class HPAI
 	 * <p>
 	 * To indicate the use of network address translation (NAT) to the receiver, leave
 	 * <code>addr</code> <code>null</code>.
-	 * 
+	 *
 	 * @param hostProtocol host protocol code (UDP or TCP, see class constants)
 	 * @param addr socket with IP address and port number, if <code>addr</code> =
 	 *        <code>null</code> address and port are initialized to 0
@@ -174,7 +172,7 @@ public class HPAI
 	/**
 	 * Returns the host protocol of this HPAI.
 	 * <p>
-	 * 
+	 *
 	 * @return host protocol code as unsigned byte
 	 */
 	public final int getHostProtocol()
@@ -185,7 +183,7 @@ public class HPAI
 	/**
 	 * Returns the raw IP network address.
 	 * <p>
-	 * 
+	 *
 	 * @return byte array with IP address in network byte order
 	 */
 	public final byte[] getRawAddress()
@@ -196,7 +194,7 @@ public class HPAI
 	/**
 	 * Returns the IP network address as {@link InetAddress} representation.
 	 * <p>
-	 * 
+	 *
 	 * @return IP address as InetAddress object
 	 */
 	public final InetAddress getAddress()
@@ -211,7 +209,7 @@ public class HPAI
 	/**
 	 * Returns the port number of this HPAI.
 	 * <p>
-	 * 
+	 *
 	 * @return port as unsigned 16 bit value
 	 */
 	public final int getPort()
@@ -222,7 +220,7 @@ public class HPAI
 	/**
 	 * Returns the structure length of this HPAI in bytes.
 	 * <p>
-	 * 
+	 *
 	 * @return structure length as unsigned byte
 	 */
 	public final int getStructLength()
@@ -233,7 +231,7 @@ public class HPAI
 	/**
 	 * Returns the byte representation of the whole HPAI structure.
 	 * <p>
-	 * 
+	 *
 	 * @return byte array containing structure
 	 */
 	public final byte[] toByteArray()
@@ -250,7 +248,7 @@ public class HPAI
 	/**
 	 * Returns this HPAI representation in textual format.
 	 * <p>
-	 * 
+	 *
 	 * @return a string representation of the HPAI object
 	 */
 	@Override

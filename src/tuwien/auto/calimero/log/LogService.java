@@ -155,7 +155,6 @@ public class LogService
 
 	/**
 	 * Creates a new log service with the specified <code>name</code>.
-	 * <p>
 	 *
 	 * @param name name of log service
 	 */
@@ -167,7 +166,6 @@ public class LogService
 	/**
 	 * Creates a new log service with the specified <code>name</code> and log
 	 * <code>level</code>.
-	 * <p>
 	 *
 	 * @param name name of log service
 	 * @param level log level for this log service
@@ -259,7 +257,6 @@ public class LogService
 
 	/**
 	 * Removes all registered log writer from this log service.
-	 * <p>
 	 *
 	 * @param close should the writers be closed before removal
 	 */
@@ -275,7 +272,6 @@ public class LogService
 
 	/**
 	 * Offers <code>msg</code> with log level {@link LogLevel#TRACE}.
-	 * <p>
 	 *
 	 * @param msg log information
 	 */
@@ -286,7 +282,6 @@ public class LogService
 
 	/**
 	 * Offers <code>msg</code> with log level {@link LogLevel#INFO}.
-	 * <p>
 	 *
 	 * @param msg log information
 	 */
@@ -297,7 +292,6 @@ public class LogService
 
 	/**
 	 * Offers <code>msg</code> with log level {@link LogLevel#WARN}.
-	 * <p>
 	 *
 	 * @param msg log information
 	 */
@@ -309,7 +303,6 @@ public class LogService
 	/**
 	 * Offers <code>msg</code> and the <code>throwable</code> object with log level
 	 * {@link LogLevel#WARN}.
-	 * <p>
 	 *
 	 * @param msg log information
 	 * @param t throwable object
@@ -321,7 +314,6 @@ public class LogService
 
 	/**
 	 * Offers <code>msg</code> with log level {@link LogLevel#ERROR}.
-	 * <p>
 	 *
 	 * @param msg log information
 	 */
@@ -333,7 +325,6 @@ public class LogService
 	/**
 	 * Offers <code>msg</code> and the <code>throwable</code> object with log level
 	 * {@link LogLevel#ERROR}.
-	 * <p>
 	 *
 	 * @param msg log information
 	 * @param t throwable object
@@ -345,7 +336,6 @@ public class LogService
 
 	/**
 	 * Offers <code>msg</code> with log level {@link LogLevel#FATAL}.
-	 * <p>
 	 *
 	 * @param msg log information
 	 */
@@ -357,7 +347,6 @@ public class LogService
 	/**
 	 * Offers <code>msg</code> and the <code>throwable</code> object with log level
 	 * {@link LogLevel#FATAL}.
-	 * <p>
 	 *
 	 * @param msg log information
 	 * @param t throwable object
@@ -370,7 +359,6 @@ public class LogService
 	/**
 	 * Offers <code>msg</code> and the <code>throwable</code> object with log
 	 * <code>level</code>.
-	 * <p>
 	 *
 	 * @param level log level for this message and throwable
 	 * @param msg log information

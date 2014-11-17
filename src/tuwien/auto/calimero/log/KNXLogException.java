@@ -50,7 +50,6 @@ public class KNXLogException extends KNXException
 
 	/**
 	 * Constructs a <code>KNXLogException</code> without a detail message.
-	 * <p>
 	 */
 	public KNXLogException()
 	{}

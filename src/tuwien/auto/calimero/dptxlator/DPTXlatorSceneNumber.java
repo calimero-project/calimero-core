@@ -51,15 +51,16 @@ import tuwien.auto.calimero.log.LogLevel;
  * <p>
  * In value methods expecting string items, the item might be formatted using decimal, hexadecimal,
  * and octal numbers, distinguished by using these prefixes:
+ * <ul>
  * <li>no prefix for decimal numeral</li>
  * <li><code>0x</code>, <code>0X</code> or <code>#</code> for hexadecimal</li>
  * <li><code>0</code> for octal numeral</li>
+ * </ul>
  */
 public class DPTXlatorSceneNumber extends DPTXlator
 {
 	/**
 	 * DPT ID 17.001, Scene Number; scenes are numbered with values from <b>0</b> to <b>63</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_SCENE_NUMBER = new DPT("17.001", "Scene Number", "0",
 			 "63");
@@ -74,7 +75,7 @@ public class DPTXlatorSceneNumber extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type.
 	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -86,7 +87,7 @@ public class DPTXlatorSceneNumber extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type ID.
 	 * <p>
-	 * 
+	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptID</code>
 	 */
@@ -109,7 +110,7 @@ public class DPTXlatorSceneNumber extends DPTXlator
 	/**
 	 * Sets one new translation item, replacing any old items.
 	 * <p>
-	 * 
+	 *
 	 * @param scene number, 0 &lt;= scene number &lt;= 63
 	 */
 	public final void setValue(final int scene)
@@ -120,7 +121,7 @@ public class DPTXlatorSceneNumber extends DPTXlator
 	/**
 	 * Returns the scene number of the first translation item.
 	 * <p>
-	 * 
+	 *
 	 * @return unsigned 6 Bit using type short
 	 */
 	public final short getSceneNumber()

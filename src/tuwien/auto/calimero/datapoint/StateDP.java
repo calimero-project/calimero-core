@@ -83,7 +83,6 @@ public class StateDP extends Datapoint
 
 	/**
 	 * Creates a new state based datapoint with a name.
-	 * <p>
 	 *
 	 * @param main the group address used to identify this datapoint
 	 * @param name user defined datapoint name
@@ -97,7 +96,6 @@ public class StateDP extends Datapoint
 
 	/**
 	 * Creates a new datapoint with a name and specifies datapoint translation type.
-	 * <p>
 	 *
 	 * @param main the group address used to identify this datapoint
 	 * @param name user defined datapoint name
@@ -115,7 +113,6 @@ public class StateDP extends Datapoint
 
 	/**
 	 * Creates a new state based datapoint and adds invalidating and updating addresses.
-	 * <p>
 	 *
 	 * @param main the group address used to identify this datapoint
 	 * @param name user defined datapoint name
@@ -235,7 +232,6 @@ public class StateDP extends Datapoint
 	/**
 	 * Returns the collection of KNX group addresses which are allowed to alter the state
 	 * of this datapoint.
-	 * <p>
 	 *
 	 * @param updatingAddresses <code>true</code> if the updating addresses should be
 	 *        returned, <code>false</code> for the invalidating addresses
@@ -249,7 +245,6 @@ public class StateDP extends Datapoint
 	/**
 	 * Returns whether KNX indication messages with destination group address
 	 * <code>a</code> will invalidate the associated datapoint state of this datapoint.
-	 * <p>
 	 *
 	 * @param a the address to check
 	 * @return <code>true</code> iff address is invalidating, <code>false</code> otherwise
@@ -262,7 +257,6 @@ public class StateDP extends Datapoint
 	/**
 	 * Returns whether KNX indication or response messages with destination address
 	 * <code>a</code> will update the associated datapoint state of this datapoint.
-	 * <p>
 	 *
 	 * @param a the address to check
 	 * @return <code>true</code> iff address is updating, <code>false</code> otherwise

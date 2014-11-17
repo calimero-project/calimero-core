@@ -56,7 +56,6 @@ public interface ProcessCommunicationBase
 	/**
 	 * Represents "on" of datapoint type <b>Switch</b> (DPT ID 1.001), value =
 	 * {@value #BOOL_ON}.
-	 * <p>
 	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
@@ -66,7 +65,6 @@ public interface ProcessCommunicationBase
 	/**
 	 * Represents "off" of datapoint type <b>Switch</b> (DPT ID 1.001), value =
 	 * {@value #BOOL_OFF}.
-	 * <p>
 	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
@@ -76,7 +74,6 @@ public interface ProcessCommunicationBase
 	/**
 	 * Represents "up" of datapoint type <b>Up/Down</b> (DPT ID 1.008), value =
 	 * {@value #BOOL_UP}.
-	 * <p>
 	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
@@ -86,7 +83,6 @@ public interface ProcessCommunicationBase
 	/**
 	 * Represents "down" of datapoint type <b>Up/Down</b> (DPT ID 1.008), value =
 	 * {@value #BOOL_DOWN}.
-	 * <p>
 	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
@@ -96,7 +92,6 @@ public interface ProcessCommunicationBase
 	/**
 	 * Represents "start" of datapoint type <b>Start</b> (DPT ID 1.010), value =
 	 * {@value #BOOL_START}.
-	 * <p>
 	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
@@ -106,7 +101,6 @@ public interface ProcessCommunicationBase
 	/**
 	 * Represents "stop" of datapoint type <b>Start</b> (DPT ID 1.010), value =
 	 * {@value #BOOL_STOP}.
-	 * <p>
 	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
@@ -116,7 +110,6 @@ public interface ProcessCommunicationBase
 	/**
 	 * Represents "increase" of datapoint type <b>Step</b> (DPT ID 1.007), value =
 	 * {@value #BOOL_INCREASE}.
-	 * <p>
 	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
@@ -126,7 +119,6 @@ public interface ProcessCommunicationBase
 	/**
 	 * Represents "decrease" of datapoint type <b>Step</b> (DPT ID 1.007), value =
 	 * {@value #BOOL_DECREASE}.
-	 * <p>
 	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
@@ -145,7 +137,6 @@ public interface ProcessCommunicationBase
 	/**
 	 * Represents the unscaled format, no scaling is used (like in datapoint types
 	 * <b>Unsigned count</b> (DPT ID 5.010) or <b>Decimal factor</b> (DPT ID 5.005) ).
-	 * <p>
 	 *
 	 * @see #write(GroupAddress, int, String)
 	 */
@@ -164,7 +155,6 @@ public interface ProcessCommunicationBase
 
 	/**
 	 * Sets the KNX message priority for KNX messages to send.
-	 * <p>
 	 *
 	 * @param p new priority to use
 	 */
@@ -200,7 +190,6 @@ public interface ProcessCommunicationBase
 
 	/**
 	 * Writes a boolean datapoint value to a group destination.
-	 * <p>
 	 *
 	 * @param dst group destination to write to
 	 * @param value boolean value to write, consider the predefined BOOL_* constants (e.g.
@@ -231,7 +220,6 @@ public interface ProcessCommunicationBase
 
 	/**
 	 * Writes a 3 bit controlled datapoint value to a group destination.
-	 * <p>
 	 *
 	 * @param dst group destination to write to
 	 * @param control control information, one of the predefined BOOL_* constants of DPT

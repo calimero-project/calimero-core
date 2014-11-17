@@ -78,7 +78,6 @@ public interface DatapointModel
 
 	/**
 	 * Removes all datapoints contained in this model.
-	 * <p>
 	 */
 	void removeAll();
 

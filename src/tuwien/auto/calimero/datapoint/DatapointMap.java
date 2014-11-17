@@ -67,7 +67,6 @@ public class DatapointMap implements DatapointModel, ChangeNotifier
 
 	/**
 	 * Creates a new empty datapoint map.
-	 * <p>
 	 */
 	public DatapointMap()
 	{

@@ -54,7 +54,6 @@ public class LogNetWriter extends LogStreamWriter
 {
 	/**
 	 * Socket connection used as logging destination.
-	 * <p>
 	 */
 	protected Socket s;
 

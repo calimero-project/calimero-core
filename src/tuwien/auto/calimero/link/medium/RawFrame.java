@@ -53,7 +53,6 @@ public interface RawFrame
 
 	/**
 	 * Indicates a L-data frame type.
-	 * <p>
 	 * 
 	 * @see #getFrameType()
 	 */
@@ -61,7 +60,6 @@ public interface RawFrame
 
 	/**
 	 * Indicates a L-poll-data frame type.
-	 * <p>
 	 * 
 	 * @see #getFrameType()
 	 */
@@ -69,7 +67,6 @@ public interface RawFrame
 
 	/**
 	 * Indicates an L-ack frame type.
-	 * <p>
 	 * 
 	 * @see #getFrameType()
 	 */

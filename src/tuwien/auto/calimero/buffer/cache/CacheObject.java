@@ -159,7 +159,6 @@ public class CacheObject
 
 	/**
 	 * Sets the access count to 0.
-	 * <p>
 	 */
 	protected final synchronized void resetCount()
 	{

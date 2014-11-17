@@ -108,7 +108,6 @@ public final class CacheSweeper extends Thread
 
 	/**
 	 * Stops the sweeper and quits the thread.
-	 * <p>
 	 */
 	public void stopSweeper()
 	{

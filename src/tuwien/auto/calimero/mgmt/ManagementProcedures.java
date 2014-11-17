@@ -66,7 +66,7 @@ public interface ManagementProcedures
 	 * <p>
 	 * This method corresponds to the KNX <i>NM_IndividualAddress_Read</i> procedure.<br>
 	 * Depending on whether none, one, or several devices are in programming mode, the
-	 * returned array length of addresses is 0, 1, or >1, respectively. If more than one
+	 * returned array length of addresses is 0, 1, or &gt; 1, respectively. If more than one
 	 * device with the same individual address is in programming mode, the returned array
 	 * will contain the same addresses several times.<br>
 	 * The read timeout is 3 seconds.
@@ -197,11 +197,11 @@ public interface ManagementProcedures
 	 * the domain address have to be configured.
 	 *
 	 * @param area the KNX network area to scan for network devices,
-	 *        <code>0 <= area <= 0x0F</code>, devices in the backbone line of areas are
+	 *        <code>0 &le; area &le; 0x0F</code>, devices in the backbone line of areas are
 	 *        assigned area address 0; for a definition of area, see
 	 *        {@link IndividualAddress}
 	 * @param line the KNX network line to scan for network devices,
-	 *        <code>0 <= line <= 0x0F</code>, devices in the main line of an area are
+	 *        <code>0 &le; line &le; 0x0F</code>, devices in the main line of an area are
 	 *        assigned line address 0; for a definition of line, see
 	 *        {@link IndividualAddress}
 	 * @return an array of {@link IndividualAddress}es of the existing network devices,
@@ -275,7 +275,7 @@ public interface ManagementProcedures
 	 *
 	 * @param device the destination device address
 	 * @param startAddress the memory destination start address,
-	 *        <code>0 <= startAddress <= 0xFFFFFFFF</code>
+	 *        <code>0 &le; startAddress &le; 0xFFFFFFFF</code>
 	 * @param data the data to be written, with <code>data.length</code> equal to the number of
 	 *        bytes to write
 	 * @param verifyWrite <code>true</code> to read back and compare any written memory for
@@ -301,8 +301,8 @@ public interface ManagementProcedures
 	 *
 	 * @param device the destination device address
 	 * @param startAddress the memory source start address,
-	 *        <code>0 <= startAddress <= 0xFFFFFFFF</code>
-	 * @param bytes number of bytes to read, <code>0 < bytes</code>
+	 *        <code>0 &le; startAddress &le; 0xFFFFFFFF</code>
+	 * @param bytes number of bytes to read, <code>0 &lt; bytes</code>
 	 * @return an array of bytes, with the length of the array equal to <code>bytes</code>
 	 * @throws KNXException on communication error or device access problems
 	 * @throws InterruptedException

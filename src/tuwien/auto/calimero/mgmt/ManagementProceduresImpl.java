@@ -64,9 +64,11 @@ import tuwien.auto.calimero.log.LogService;
  * <p>
  * In general, invoked procedures should not be run concurrently on the same remote endpoint. As
  * precaution, this implementation will guard against such behavior by executing procedures
- * synchronized on the used management client instance if considered necessary ( {@ManagementClient
- * }). Note that this, although, is not sufficient to guarantee non-concurrent
- * execution of procedures on the same remote endpoint in general.
+ * synchronized on the used management client instance ({@link ManagementClient}) where necessary.
+ * Hence, procedures over the same management client instance are executed in sequence. In general,
+ * this is not sufficient to guarantee non-concurrent execution of procedures on the same remote
+ * endpoint (e.g., one could create more than one management client object). It is the
+ * responsibility of the application logic to enforce the necessary limitations.
  *
  * @author B. Malinowsky
  */
@@ -138,7 +140,6 @@ public class ManagementProceduresImpl implements ManagementProcedures
 
 	/**
 	 * Creates a new management procedures instance, using the supplied KNX network link.
-	 * <p>
 	 *
 	 * @param link the KNX network link, with link in open state
 	 * @throws KNXLinkClosedException on closed {@link KNXNetworkLink}
@@ -154,7 +155,6 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	/**
 	 * Creates a new management procedures instance, using the supplied management client
 	 * for application layer services.
-	 * <p>
 	 *
 	 * @param mgmtClient the management client, with a network link attached and in open
 	 *        state

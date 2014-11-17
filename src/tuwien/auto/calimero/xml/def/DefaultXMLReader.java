@@ -64,7 +64,6 @@ public class DefaultXMLReader implements XMLReader
 
 	/**
 	 * Creates a new XML reader.
-	 * <p>
 	 */
 	public DefaultXMLReader()
 	{}

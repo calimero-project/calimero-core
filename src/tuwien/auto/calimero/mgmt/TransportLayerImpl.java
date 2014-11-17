@@ -177,7 +177,6 @@ public class TransportLayerImpl implements TransportLayer
 	/**
 	 * Creates a new client-side transport layer end-point attached to the supplied KNX network
 	 * link.
-	 * <p>
 	 *
 	 * @param link network link used for communication with a KNX network
 	 * @throws KNXLinkClosedException if the network link is closed
@@ -189,7 +188,6 @@ public class TransportLayerImpl implements TransportLayer
 
 	/**
 	 * Creates a new transport layer end-point attached to the supplied KNX network link.
-	 * <p>
 	 *
 	 * @param link network link used for communication with a KNX network
 	 * @param serverEndpoint does this instance represent the client-side (<code>false</code>),
@@ -250,7 +248,6 @@ public class TransportLayerImpl implements TransportLayer
 
 	/**
 	 * Returns the destination object for the remote individual address, if such exists.
-	 * <p>
 	 *
 	 * @param remote the remote address to look up
 	 * @return the destination for that address, or <code>null</code> if no destination

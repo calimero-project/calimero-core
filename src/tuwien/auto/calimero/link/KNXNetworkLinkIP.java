@@ -94,13 +94,11 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 {
 	/**
 	 * Service mode for link layer tunneling.
-	 * <p>
 	 */
 	public static final int TUNNELING = 1;
 
 	/**
 	 * Service mode for routing.
-	 * <p>
 	 */
 	public static final int ROUTING = 2;
 

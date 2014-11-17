@@ -50,7 +50,6 @@ public final class Helper
 
 	/**
 	 * Assert similar for String array.
-	 * <p>
 	 *
 	 * @param expected expected result
 	 * @param actual actual result
@@ -80,7 +79,6 @@ public final class Helper
 	/**
 	 * Creates DPT translator for given dpts and sets the dpts lower and upper value in
 	 * the translator.
-	 * <p>
 	 *
 	 * @param dpts dpts to check in translator
 	 * @param testSimilarity <code>true</code> to check if getValue() of translator

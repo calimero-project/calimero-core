@@ -63,26 +63,22 @@ public class CEMIBusMon implements CEMI
 
 	/**
 	 * Message code for busmonitor indication, code = {@value #MC_BUSMON_IND}.
-	 * <p>
 	 */
 	public static final int MC_BUSMON_IND = 0x2B;
 
 	/**
 	 * Additional information type ID for status info, ID = {@value #TYPEID_STATUSINFO}.
-	 * <p>
 	 */
 	public static final int TYPEID_STATUSINFO = 0x03;
 
 	/**
 	 * Additional information type ID for timestamp, ID = {@value #TYPEID_TIMESTAMP}.
-	 * <p>
 	 */
 	public static final int TYPEID_TIMESTAMP = 0x04;
 
 	/**
 	 * Additional information type ID for extended timestamp, ID = {@value
 	 * #TYPEID_TIMESTAMP_EXT}.
-	 * <p>
 	 */
 	public static final int TYPEID_TIMESTAMP_EXT = 0x06;
 

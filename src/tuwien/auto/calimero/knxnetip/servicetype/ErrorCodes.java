@@ -48,25 +48,21 @@ public final class ErrorCodes
 
 	/**
 	 * Error code: Operation successful.
-	 * <p>
 	 */
 	public static final int NO_ERROR = 0x00;
 
 	/**
 	 * Error code: The requested type of host protocol is not supported by the device.
-	 * <p>
 	 */
 	public static final int HOST_PROTOCOL_TYPE = 0x01;
 
 	/**
 	 * Error code: The requested protocol version is not supported by the device.
-	 * <p>
 	 */
 	public static final int VERSION_NOT_SUPPORTED = 0x02;
 
 	/**
 	 * Error code: The received sequence number is out of order.
-	 * <p>
 	 */
 	public static final int SEQUENCE_NUMBER = 0x04;
 
@@ -74,25 +70,21 @@ public final class ErrorCodes
 
 	/**
 	 * Error code: The server does not support the requested connection type.
-	 * <p>
 	 */
 	public static final int CONNECTION_TYPE = 0x22;
 
 	/**
 	 * Error code: The server does not support the requested connection options.
-	 * <p>
 	 */
 	public static final int CONNECTION_OPTION = 0x23;
 
 	/**
 	 * Error code: The server could not accept a new connection, maximum reached.
-	 * <p>
 	 */
 	public static final int NO_MORE_CONNECTIONS = 0x24;
 
 	/**
 	 * Error code: The requested tunneling layer is not supported by the server.
-	 * <p>
 	 */
 	public static final int TUNNELING_LAYER = 0x29;
 
@@ -101,21 +93,18 @@ public final class ErrorCodes
 	/**
 	 * Error code: The server device could not find an active data connection with the
 	 * specified ID.
-	 * <p>
 	 */
 	public static final int CONNECTION_ID = 0x21;
 
 	/**
 	 * Error code: The server detected an error concerning the data connection with the
 	 * specified ID.
-	 * <p>
 	 */
 	public static final int DATA_CONNECTION = 0x26;
 
 	/**
 	 * Error code: The server detected an error concerning the KNX subsystem connection
 	 * with the specified ID.
-	 * <p>
 	 */
 	public static final int KNX_CONNECTION = 0x27;
 

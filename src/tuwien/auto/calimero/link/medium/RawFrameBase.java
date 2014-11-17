@@ -60,13 +60,11 @@ public abstract class RawFrameBase implements RawFrame
 {
 	/**
 	 * Frame type identifier.
-	 * <p>
 	 */
 	protected int type;
 
 	/**
 	 * Source address.
-	 * <p>
 	 */
 	protected IndividualAddress src;
 
@@ -77,31 +75,26 @@ public abstract class RawFrameBase implements RawFrame
 
 	/**
 	 * Is this an extended (<code>true</code>) or a standard frame (<code>false</code>).
-	 * <p>
 	 */
 	protected boolean ext;
 
 	/**
 	 * Frame repetition flag.
-	 * <p>
 	 */
 	protected boolean repetition;
 
 	/**
 	 * Frame priority.
-	 * <p>
 	 */
 	protected Priority p;
 
 	/**
 	 * Frame hop count.
-	 * <p>
 	 */
 	protected int hopcount;
 
 	/**
 	 * Frame checksum.
-	 * <p>
 	 */
 	protected int fcs;
 

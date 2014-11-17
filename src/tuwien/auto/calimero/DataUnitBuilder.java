@@ -66,10 +66,8 @@ public final class DataUnitBuilder
 
 	/**
 	 * Returns the application layer service of a given protocol data unit.
-	 * <p>
 	 *
-	 * @param apdu application layer protocol data unit, requires <code>apdu.length</code>
-	 *        > 1
+	 * @param apdu application layer protocol data unit, requires <code>apdu.length</code> &gt; 1
 	 * @return APDU service code
 	 */
 	public static int getAPDUService(final byte[] apdu)
@@ -117,7 +115,6 @@ public final class DataUnitBuilder
 
 	/**
 	 * Returns the transport layer service of a given protocol data unit.
-	 * <p>
 	 *
 	 * @param tpdu transport layer protocol data unit
 	 * @return TPDU service code
@@ -293,7 +290,6 @@ public final class DataUnitBuilder
 	/**
 	 * Decodes a transport layer protocol control information into a textual
 	 * representation.
-	 * <p>
 	 *
 	 * @param tpci transport layer protocol control information
 	 * @param dst KNX destination address belonging to the tpci, might be
@@ -328,7 +324,6 @@ public final class DataUnitBuilder
 	/**
 	 * Decodes an application layer protocol control information into a textual
 	 * representation.
-	 * <p>
 	 *
 	 * @param apci application layer protocol control information
 	 * @return textual representation of APCI
@@ -429,7 +424,6 @@ public final class DataUnitBuilder
 	/**
 	 * Returns a new byte array of { data[from], data[from + 1], .. , data[min(to,
 	 * data.length) - 1] }.
-	 * <p>
 	 *
 	 * @param data source data array
 	 * @param from start of range index

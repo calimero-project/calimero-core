@@ -88,7 +88,6 @@ public abstract class Datapoint
 
 	/**
 	 * Creates a new datapoint with a name and specifies state/command based semantics.
-	 * <p>
 	 *
 	 * @param main the group address used to identify this datapoint
 	 * @param name user defined datapoint name
@@ -215,7 +214,6 @@ public abstract class Datapoint
 
 	/**
 	 * Sets the priority used for KNX messages of this datapoint.
-	 * <p>
 	 *
 	 * @param p the new priority to assign
 	 */
@@ -279,7 +277,6 @@ public abstract class Datapoint
 
 	/**
 	 * Saves this datapoint in XML format to the supplied XML writer.
-	 * <p>
 	 *
 	 * @param w a XML writer
 	 * @throws KNXMLException on error saving this datapoint

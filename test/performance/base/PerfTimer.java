@@ -50,7 +50,6 @@ public class PerfTimer
 
 	/**
 	 * Creates a new performance timer.
-	 * <p>
 	 */
 	public PerfTimer()
 	{}

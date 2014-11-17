@@ -53,7 +53,6 @@ public class KNXPortClosedException extends KNXException
 	/**
 	 * Constructs a new <code>KNXPortClosedException</code> without a detail
 	 * message.
-	 * <p>
 	 */
 	public KNXPortClosedException()
 	{

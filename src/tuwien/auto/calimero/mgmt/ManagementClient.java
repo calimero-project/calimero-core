@@ -59,9 +59,8 @@ public interface ManagementClient
 	/**
 	 * Sets the response timeout to wait for a KNX response message to arrive to complete
 	 * a message exchange.
-	 * <p>
 	 *
-	 * @param timeout time in seconds, <code>timeout > 0</code>
+	 * @param timeout time in seconds, <code>timeout &gt; 0</code>
 	 */
 	void setResponseTimeout(int timeout);
 
@@ -76,7 +75,6 @@ public interface ManagementClient
 
 	/**
 	 * Sets the KNX message priority for KNX messages to send.
-	 * <p>
 	 *
 	 * @param p new priority to use
 	 */
@@ -344,7 +342,7 @@ public interface ManagementClient
 	 *        parameters set to default values, use 0 to clear all link information in the group
 	 *        address table and group object association table and reset all application parameters
 	 * @return the worst case execution time of the device for the requested master reset in seconds
-	 *         or a default of 0, with time >= 0 (time is returned conforming to the datapoint
+	 *         or a default of 0, with time &ge; 0 (time is returned conforming to the datapoint
 	 *         encoding with DPT ID 7.005 (DPT_TimePeriodSec))
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXRemoteException
@@ -473,7 +471,7 @@ public interface ManagementClient
 	 * @param dst destination to read from
 	 * @param startAddr 16 bit start address to read in memory
 	 * @param bytes number of data bytes to read (with increasing addresses),
-	 *        <code>bytes > 0</code>
+	 *        <code>bytes &gt; 0</code>
 	 * @return byte array containing the data read from the memory
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXRemoteException on problems of the partner reading (part of) the memory
@@ -551,7 +549,7 @@ public interface ManagementClient
 	 * @param level access level to modify
 	 * @param key new key for the access level or 0xFFFFFFFF to remove key
 	 * @throws KNXTimeoutException on a timeout during send
-	 * @throws KNXRemoteException if the current access level > necessary access level for
+	 * @throws KNXRemoteException if the current access level &gt; necessary access level for
 	 *         writing a key
 	 * @throws KNXDisconnectException on disconnect during write
 	 * @throws KNXLinkClosedException if network link to KNX network is closed

@@ -96,7 +96,6 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 
 	/**
 	 * Creates a new command filter.
-	 * <p>
 	 */
 	public CommandFilter()
 	{}

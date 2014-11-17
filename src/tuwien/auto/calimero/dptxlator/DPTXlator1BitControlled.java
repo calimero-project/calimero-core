@@ -75,7 +75,6 @@ public class DPTXlator1BitControlled extends DPTXlator
 
 		/**
 		 * Creates a new datapoint type information structure for the 1 Bit controlled DPT.
-		 * <p>
 		 *
 		 * @param typeID {@inheritDoc}
 		 * @param description {@inheritDoc}
@@ -101,84 +100,72 @@ public class DPTXlator1BitControlled extends DPTXlator
 
 	/**
 	 * DPT ID 2.001, Switch Controlled; values are {@link DPTXlatorBoolean#DPT_SWITCH}.
-	 * <p>
 	 */
 	public static final DPT DPT_SWITCH_CONTROL = new DPT1BitControlled("2.001",
 			"Switch Controlled", DPTXlatorBoolean.DPT_SWITCH);
 
 	/**
 	 * DPT ID 2.002, Bool Controlled; values are {@link DPTXlatorBoolean#DPT_BOOL}.
-	 * <p>
 	 */
 	public static final DPT DPT_BOOL_CONTROL = new DPT1BitControlled("2.002", "Boolean Controlled",
 			DPTXlatorBoolean.DPT_BOOL);
 
 	/**
 	 * DPT ID 2.003, Enable Controlled; values are {@link DPTXlatorBoolean#DPT_ENABLE}.
-	 * <p>
 	 */
 	public static final DPT DPT_ENABLE_CONTROL = new DPT1BitControlled("2.003",
 			"Enable Controlled", DPTXlatorBoolean.DPT_ENABLE);
 
 	/**
 	 * DPT ID 2.004, Ramp Controlled; values are {@link DPTXlatorBoolean#DPT_RAMP}.
-	 * <p>
 	 */
 	public static final DPT DPT_RAMP_CONTROL = new DPT1BitControlled("2.004", "Ramp Controlled",
 			DPTXlatorBoolean.DPT_RAMP);
 
 	/**
 	 * DPT ID 2.005, Alarm Controlled; values are {@link DPTXlatorBoolean#DPT_ALARM}.
-	 * <p>
 	 */
 	public static final DPT DPT_ALARM_CONTROL = new DPT1BitControlled("2.005", "Alarm Controlled",
 			DPTXlatorBoolean.DPT_ALARM);
 
 	/**
 	 * DPT ID 2.006, Binary Controlled; values are {@link DPTXlatorBoolean#DPT_BINARYVALUE}.
-	 * <p>
 	 */
 	public static final DPT DPT_BINARY_CONTROL = new DPT1BitControlled("2.006",
 			"Binary Controlled", DPTXlatorBoolean.DPT_BINARYVALUE);
 
 	/**
 	 * DPT ID 2.007, Step Controlled; values are {@link DPTXlatorBoolean#DPT_STEP}.
-	 * <p>
 	 */
 	public static final DPT DPT_STEP_CONTROL = new DPT1BitControlled("2.007", "Step Controlled",
 			DPTXlatorBoolean.DPT_STEP);
 
 	/**
 	 * DPT ID 2.008, Up/Down Controlled; values are {@link DPTXlatorBoolean#DPT_UPDOWN}.
-	 * <p>
 	 */
 	public static final DPT DPT_UPDOWN_CONTROL = new DPT1BitControlled("2.008",
 			"Up/Down Controlled", DPTXlatorBoolean.DPT_UPDOWN);
 
 	/**
 	 * DPT ID 2.009, Open/Close Controlled; values are {@link DPTXlatorBoolean#DPT_OPENCLOSE}.
-	 * <p>
 	 */
 	public static final DPT DPT_OPENCLOSE_CONTROL = new DPT1BitControlled("2.009",
 			"Open/Close Controlled", DPTXlatorBoolean.DPT_OPENCLOSE);
 
 	/**
 	 * DPT ID 2.010, Start Controlled; values are {@link DPTXlatorBoolean#DPT_START}.
-	 * <p>
 	 */
 	public static final DPT DPT_START_CONTROL = new DPT1BitControlled("2.010", "Start Controlled",
 			DPTXlatorBoolean.DPT_START);
 
 	/**
 	 * DPT ID 2.011, State Controlled; values are {@link DPTXlatorBoolean#DPT_STATE}.
-	 * <p>
 	 */
 	public static final DPT DPT_STATE_CONTROL = new DPT1BitControlled("2.011", "State Controlled",
 			DPTXlatorBoolean.DPT_STATE);
 
 	/**
 	 * DPT ID 2.012, Invert Controlled; values are {@link DPTXlatorBoolean#DPT_INVERT}.
-	 * <p>
 	 */
 	public static final DPT DPT_INVERT_CONTROL = new DPT1BitControlled("2.012",
 			"Invert Controlled", DPTXlatorBoolean.DPT_INVERT);
@@ -202,7 +189,6 @@ public class DPTXlator1BitControlled extends DPTXlator
 
 	/**
 	 * Creates a translator for the given datapoint type.
-	 * <p>
 	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
@@ -214,7 +200,6 @@ public class DPTXlator1BitControlled extends DPTXlator
 
 	/**
 	 * Creates a translator for the given datapoint type ID.
-	 * <p>
 	 *
 	 * @param dptId available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
@@ -229,7 +214,6 @@ public class DPTXlator1BitControlled extends DPTXlator
 
 	/**
 	 * Sets one new translation item, replacing any old items.
-	 * <p>
 	 *
 	 * @param control control field, <code>false</code> is <i>no control</i>, <code>true</code> is
 	 *        <i>control</i>

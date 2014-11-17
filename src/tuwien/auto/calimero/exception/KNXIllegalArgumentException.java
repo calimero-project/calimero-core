@@ -50,7 +50,6 @@ public class KNXIllegalArgumentException extends RuntimeException
 
 	/**
 	 * Constructs a new <code>KNXIllegalArgumentException</code> without a detail message.
-	 * <p>
 	 */
 	public KNXIllegalArgumentException()
 	{

@@ -51,7 +51,7 @@ import tuwien.auto.calimero.exception.KNXFormatException;
  * doesn't require any additional host protocol data.
  * <p>
  * Factory methods are provided for creation of CRD objects.
- * 
+ *
  * @author B. Malinowsky
  * @see tuwien.auto.calimero.knxnetip.servicetype.ConnectResponse
  */
@@ -60,7 +60,7 @@ public class CRD extends CRBase
 	/**
 	 * Creates a new CRD out of a byte array.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing a CRD structure
 	 * @param offset start offset of CRD in <code>data</code>
 	 * @throws KNXFormatException if no CRD found or invalid structure
@@ -75,11 +75,11 @@ public class CRD extends CRBase
 	 * <p>
 	 * The array of <code>optionalData</code> is not copied for internal storage. No
 	 * additional checks regarding content are done.
-	 * 
+	 *
 	 * @param connectionType connection type the description is intended for
 	 * @param optionalData byte array containing optional host protocol independent and
 	 *        dependent data, this information is located starting at offset 2 in the CRD
-	 *        structure, <code>optionalData.length</code> < 254
+	 *        structure, <code>optionalData.length</code> &lt; 254
 	 */
 	public CRD(final int connectionType, final byte[] optionalData)
 	{
@@ -92,7 +92,7 @@ public class CRD extends CRBase
 	 * If possible, a matching, more specific, CRD subtype is returned. Note, that CRD for
 	 * specific communication types might expect certain characteristics on
 	 * <code>data</code> (regarding contained data).<br>
-	 * 
+	 *
 	 * @param data byte array containing the CRD structure
 	 * @param offset start offset of CRD in <code>data</code>
 	 * @return the new CRD object
@@ -109,12 +109,12 @@ public class CRD extends CRBase
 	 * If possible, a matching, more specific, CRD subtype is returned. Note, that CRD for
 	 * specific communication types might expect certain characteristics on
 	 * <code>optionalData</code> (regarding length and/or content).<br>
-	 * 
+	 *
 	 * @param connectionType connection type this CRD is used for, e.g., a tunneling
 	 *        connection
 	 * @param optionalData byte array containing optional host protocol independent and
 	 *        dependent data, this information is located starting at offset 2 in the CRD
-	 *        structure, <code>optionalData.length</code> < 254, may be <code>null</code>
+	 *        structure, <code>optionalData.length</code> &lt; 254, may be <code>null</code>
 	 *        for no optional data
 	 * @return the new CRD object
 	 */

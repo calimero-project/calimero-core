@@ -58,7 +58,6 @@ public class DefaultElement implements Element
 
 	/**
 	 * Creates a new element <code>name</code>.
-	 * <p>
 	 *
 	 * @param name name of element, the element's type
 	 */

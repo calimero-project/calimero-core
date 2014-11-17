@@ -56,26 +56,22 @@ public class CloseEvent extends EventObject
 	/**
 	 * Identifies the close event to originate from the user (or owner) of the network
 	 * endpoint or connection.
-	 * <p>
 	 */
 	public static final int USER_REQUEST = 0;
 
 	/**
 	 * Identifies the close event to originate from the KNXnet/IP server side.
-	 * <p>
 	 */
 	public static final int SERVER_REQUEST = 1;
 
 	/**
 	 * Identifies the close event to originate from the KNXnet/IP client side.
-	 * <p>
 	 */
 	public static final int CLIENT_REQUEST = 2;
 	
 	/**
 	 * Identifies the close event to originate from an internal communication event, for
 	 * example, initiated by an unsupported protocol version.
-	 * <p>
 	 */
 	public static final int INTERNAL = 3;
 	

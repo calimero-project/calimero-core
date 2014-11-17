@@ -101,7 +101,6 @@ public class Discoverer
 {
 	/**
 	 * Name of the log service used by a discoverer.
-	 * <p>
 	 */
 	public static final String LOG_SERVICE = "Discoverer";
 
@@ -229,7 +228,7 @@ public class Discoverer
 	 * @param ni the {@link NetworkInterface} used for sending outgoing multicast
 	 *        messages, or <code>null</code> to use the default multicast interface
 	 * @param timeout time window in seconds during which search response messages will
-	 *        get collected, timeout >= 0. If timeout is zero, no timeout is set, the
+	 *        get collected, timeout &ge; 0. If timeout is zero, no timeout is set, the
 	 *        search has to be stopped with {@link #stopSearch()}.
 	 * @param wait <code>true</code> to block until end of search before return
 	 * @throws KNXException on network I/O error
@@ -261,7 +260,7 @@ public class Discoverer
 	 * @param ni the {@link NetworkInterface} used for sending outgoing multicast
 	 *        messages, or <code>null</code> to use the default multicast interface
 	 * @param timeout time window in seconds during which search response messages will
-	 *        get collected, <code>timeout >= 0</code>. If timeout is zero, no timeout is
+	 *        get collected, <code>timeout &ge; 0</code>. If timeout is zero, no timeout is
 	 *        set, the search has to be stopped with {@link #stopSearch()}.
 	 * @param wait <code>true</code> to block until end of search before return
 	 * @throws KNXException on network I/O error
@@ -303,7 +302,7 @@ public class Discoverer
 	 * invoked.
 	 *
 	 * @param timeout time window in seconds during which search response messages will
-	 *        get collected, timeout >= 0. If timeout is 0, no timeout is set, the search
+	 *        get collected, timeout &ge; 0. If timeout is 0, no timeout is set, the search
 	 *        has to be stopped with <code>stopSearch</code>.
 	 * @param wait <code>true</code> to block until end of search before return
 	 * @throws KNXException on network I/O error
@@ -406,7 +405,6 @@ public class Discoverer
 
 	/**
 	 * Removes all search responses collected so far.
-	 * <p>
 	 */
 	public final void clearSearchResponses()
 	{
@@ -416,7 +414,6 @@ public class Discoverer
 	/**
 	 * Sends a description request to <code>server</code> and waits at most
 	 * <code>timeout</code> seconds for the answer message to arrive.
-	 * <p>
 	 *
 	 * @param server the socket address of the server the description is requested from
 	 * @param timeout time window in seconds to wait for answer message, 0 &lt; timeout
@@ -461,13 +458,12 @@ public class Discoverer
 
 	/**
 	 * Starts a search sending a search request message.
-	 * <p>
 	 *
 	 * @param localAddr local address to send search request from
 	 * @param localPort local port to send search request from
 	 * @param ni {@link NetworkInterface} used to send outgoing multicast, or
 	 *        <code>null</code> to use the default multicast interface
-	 * @param timeout timeout in seconds, timeout >= 0, 0 for an infinite time window
+	 * @param timeout timeout in seconds, timeout &ge; 0, 0 for an infinite time window
 	 * @return the receiver thread for the search started
 	 * @throws KNXException
 	 */

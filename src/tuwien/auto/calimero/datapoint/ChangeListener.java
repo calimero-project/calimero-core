@@ -40,7 +40,6 @@ import java.util.EventListener;
 
 /**
  * A listener interface to receive notifications about datapoint model events.
- * <p>
  * 
  * @see DatapointModel
  * @author B. Malinowsky

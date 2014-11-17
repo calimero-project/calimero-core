@@ -78,7 +78,6 @@ public class Destination
 
 		/**
 		 * Creates a new aggregator proxy.
-		 * <p>
 		 *
 		 * @param aggregator the transport layer serving the destination associated with
 		 *        this proxy and handles necessary transport layer communication
@@ -203,7 +202,6 @@ public class Destination
 
 	/**
 	 * Destination is destroyed.
-	 * <p>
 	 *
 	 * @see Destination#getState
 	 */
@@ -211,7 +209,6 @@ public class Destination
 
 	/**
 	 * Connection state is disconnected.
-	 * <p>
 	 *
 	 * @see Destination#getState
 	 */
@@ -219,7 +216,6 @@ public class Destination
 
 	/**
 	 * Connection state is connecting.
-	 * <p>
 	 *
 	 * @see Destination#getState
 	 */
@@ -227,7 +223,6 @@ public class Destination
 
 	/**
 	 * Connection state is open and communication is in idle state.
-	 * <p>
 	 *
 	 * @see Destination#getState
 	 */
@@ -236,7 +231,6 @@ public class Destination
 	/**
 	 * Connection state is open and communication is in waiting state for Layer 4
 	 * acknowledgment.
-	 * <p>
 	 *
 	 * @see Destination#getState
 	 */

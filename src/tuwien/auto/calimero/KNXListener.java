@@ -41,7 +41,6 @@ import java.util.EventListener;
 /**
  * The base listener interface to receive events of the communication with a KNX
  * network.
- * <p>
  */
 public interface KNXListener extends EventListener
 {

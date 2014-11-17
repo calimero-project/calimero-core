@@ -79,7 +79,6 @@ public class DefaultEntityResolver implements EntityResolver
 
 	/**
 	 * Creates a new entity resolver.
-	 * <p>
 	 */
 	public DefaultEntityResolver()
 	{}

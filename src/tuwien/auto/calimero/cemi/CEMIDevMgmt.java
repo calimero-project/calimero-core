@@ -49,7 +49,7 @@ import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
  * Function properties are not supported for the time being.
  * <p>
  * Objects of this type are immutable.
- * 
+ *
  * @author B. Malinowsky
  */
 public class CEMIDevMgmt implements CEMI
@@ -116,7 +116,7 @@ public class CEMIDevMgmt implements CEMI
 		 * in negative read/write message confirmations
 		 */
 		public static final int PROP_INDEX_RANGE_ERROR = 0x09;
-		
+
 		// enforce non-instantiability
 		private ErrorCodes() {}
 	}
@@ -125,37 +125,30 @@ public class CEMIDevMgmt implements CEMI
 
 	/**
 	 * Message code for property read request, code = {@value #MC_PROPREAD_REQ}.
-	 * <p>
 	 */
 	public static final int MC_PROPREAD_REQ = 0xFC;
 	/**
 	 * Message code for property read confirmation, code = {@value #MC_PROPREAD_CON}.
-	 * <p>
 	 */
 	public static final int MC_PROPREAD_CON = 0xFB;
 	/**
 	 * Message code for property write request, code = {@value #MC_PROPWRITE_REQ}.
-	 * <p>
 	 */
 	public static final int MC_PROPWRITE_REQ = 0xF6;
 	/**
 	 * Message code for property write confirmation, code = {@value #MC_PROPWRITE_CON}.
-	 * <p>
 	 */
 	public static final int MC_PROPWRITE_CON = 0xF5;
 	/**
 	 * Message code for property info indication, code = {@value #MC_PROPINFO_IND}.
-	 * <p>
 	 */
 	public static final int MC_PROPINFO_IND = 0xF7;
 	/**
 	 * Message code for property reset request, code = {@value #MC_RESET_REQ}.
-	 * <p>
 	 */
 	public static final int MC_RESET_REQ = 0xF1;
 	/**
 	 * Message code for property reset indication, code = {@value #MC_RESET_IND}.
-	 * <p>
 	 */
 	public static final int MC_RESET_IND = 0xF0;
 
@@ -164,35 +157,29 @@ public class CEMIDevMgmt implements CEMI
 	/**
 	 * Property for media types supported by cEMI server (read only), PID = {@value
 	 * #PID_MEDIUM_TYPE}.
-	 * <p>
 	 */
 	// public static final short PID_MEDIUM_TYPE = 51;
 	// optional properties for server objects
 	/**
 	 * Property for the domain address used on PL medium (read / write), PID = {@value
 	 * #PID_DOMAIN_ADDRESS}.
-	 * <p>
 	 */
 	// public static final short PID_DOMAIN_ADDRESS = 70;
 	/**
 	 * Property for list of interface objects (read / write), PID = {@value #PID_IO_LIST}.
-	 * <p>
 	 */
 	// public static final short PID_IO_LIST = 71;
 	/**
 	 * Property for communication mode (read / write), PID = {@value #PID_COMM_MODE}.
-	 * <p>
 	 */
 	// public static final short PID_COMM_MODE = 52;
 	/**
 	 * Property for time base in extended relative timestamps (read only), PID = {@value
 	 * #PID_TIMEBASE}.
-	 * <p>
 	 */
 	// public static final short PID_TIMEBASE = 55;
 	/**
 	 * Property for transparency mode (read / write), PID = {@value #PID_TRANSP_ENABLE}.
-	 * <p>
 	 */
 	// public static final short PID_TRANSP_ENABLE = 56;
 
@@ -235,7 +222,7 @@ public class CEMIDevMgmt implements CEMI
 	/**
 	 * Creates a new device management message from a byte stream.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte stream containing a cEMI device management message
 	 * @param offset start offset of cEMI frame in <code>data</code>
 	 * @param length length in bytes of the whole device management message
@@ -269,7 +256,7 @@ public class CEMIDevMgmt implements CEMI
 	 * return 0 or empty fields by default).
 	 * <p>
 	 * Used for reset messages.
-	 * 
+	 *
 	 * @param msgCode a message code value specified by this class
 	 */
 	public CEMIDevMgmt(final int msgCode)
@@ -282,7 +269,7 @@ public class CEMIDevMgmt implements CEMI
 	 * <p>
 	 * Used for messages without a data (or error information) part in the message
 	 * structure (like read request).
-	 * 
+	 *
 	 * @param msgCode a message code constant declared by this class
 	 * @param objType interface object type, value in the range 0 &lt;= value &lt;= 0xFFFF
 	 * @param objInstance object instance, value in the range 1 &lt;= value &lt;= 0xFF
@@ -306,7 +293,7 @@ public class CEMIDevMgmt implements CEMI
 	 * <p>
 	 * Used for messages containing a data (or error information) part in the message
 	 * structure (like read confirmation).
-	 * 
+	 *
 	 * @param msgCode a message code constant declared by this class
 	 * @param objType interface object type, value in the range 0 &lt;= value &lt;= 0xFFFF
 	 * @param objInstance object instance, value in the range 1 &lt;= value &lt;= 0xFF
@@ -330,8 +317,8 @@ public class CEMIDevMgmt implements CEMI
 	 * Returns a descriptive error message for the supplied error code parameter.
 	 * <p>
 	 * If the error code is not known, the string "unknown error code" is returned.
-	 * 
-	 * @param errorCode error code to get message for, <code>0 <= errorCode</code>
+	 *
+	 * @param errorCode error code to get message for, <code>0 &le; errorCode</code>
 	 * @return error status message as string
 	 */
 	public static String getErrorMessage(final int errorCode)
@@ -364,7 +351,7 @@ public class CEMIDevMgmt implements CEMI
 	 * use {@link #isNegativeResponse()}.<br>
 	 * If the message does not contain any data (or error information), a byte array with
 	 * length 0 is returned.
-	 * 
+	 *
 	 * @return a copy of the data part in the message structure as byte array
 	 */
 	@Override
@@ -390,7 +377,7 @@ public class CEMIDevMgmt implements CEMI
 	 * <ul>
 	 * <li>[100..399] HVAC</li>
 	 * <li>[400..599] Lighting</li>
-	 * <li>[600..799] HVAC (sensors & actuators)</li>
+	 * <li>[600..799] HVAC (sensors &amp; actuators)</li>
 	 * <li>[800..999] Shutters and blinds</li>
 	 * <li>...</li>
 	 * </ul>
@@ -401,7 +388,7 @@ public class CEMIDevMgmt implements CEMI
 	 * </ul>
 	 * </li>
 	 * </ul>
-	 * 
+	 *
 	 * @return the object type as 16 bit identifier
 	 */
 	public final int getObjectType()
@@ -414,7 +401,7 @@ public class CEMIDevMgmt implements CEMI
 	 * <p>
 	 * The instance value is in the range 1 to 0xFF.<br>
 	 * If the message structure does not contain this field, 0 is returned.
-	 * 
+	 *
 	 * @return the object instance
 	 */
 	public final int getObjectInstance()
@@ -428,7 +415,7 @@ public class CEMIDevMgmt implements CEMI
 	 * An element count in the range 1 to 15 indicates the presence of element data. A
 	 * value of 0 indicates a negative response.<br>
 	 * If the message structure does not contain this field, 0 is returned.
-	 * 
+	 *
 	 * @return number of elements as unsigned 4 bit value
 	 */
 	public final int getElementCount()
@@ -440,7 +427,7 @@ public class CEMIDevMgmt implements CEMI
 	 * Returns the property identifier used in the message.
 	 * <p>
 	 * If the message structure does not contain this field, 0 is returned.
-	 * 
+	 *
 	 * @return the PID
 	 */
 	public final int getPID()
@@ -452,7 +439,7 @@ public class CEMIDevMgmt implements CEMI
 	 * Returns the start index in the data array of the property.
 	 * <p>
 	 * If the message structure does not contain this field, 0 is returned.
-	 * 
+	 *
 	 * @return start index as 12 bit value
 	 */
 	public final int getStartIndex()
@@ -465,7 +452,7 @@ public class CEMIDevMgmt implements CEMI
 	 * <p>
 	 * A message contains a negative response, iff the message code equals
 	 * {@link #MC_PROPREAD_CON} or {@link #MC_PROPWRITE_CON} and number of elements is 0.
-	 * 
+	 *
 	 * @return response state as boolean
 	 */
 	public final boolean isNegativeResponse()
@@ -480,7 +467,7 @@ public class CEMIDevMgmt implements CEMI
 	 * A negative response contains an error information code, which is used to find the
 	 * associated message.<br>
 	 * If invoked on positive response, "no error" will be returned.
-	 * 
+	 *
 	 * @return error status message as string
 	 */
 	public String getErrorMessage()

@@ -50,22 +50,22 @@ import tuwien.auto.calimero.log.LogLevel;
  * <p>
  * Supplied string value items might be formatted using decimal, hexadecimal, and octal
  * numbers, distinguished by using these prefixes:
- * <dd>no prefix for decimal numeral
- * <dd><code>0x</code>, <code>0X</code> or <code>#</code> for hexadecimal
- * <dd><code>0</code> for octal numeral
+ * <dl>
+ * <dt>no prefix</dt><dd>for decimal numeral</dd>
+ * <dt><code>0x</code>, <code>0X</code>, <code>#</code><dd>for hexadecimal numeral</dd>
+ * <dt><code>0</code><dd>for octal numeral</dd>
+ * </dl>
  */
 public class DPTXlator2ByteUnsigned extends DPTXlator
 {
 	/**
 	 * DPT ID 7.001, Unsigned count; values from <b>0</b> to <b>65535</b> pulses.
-	 * <p>
 	 */
 	public static final DPT DPT_VALUE_2_UCOUNT =
 		new DPT("7.001", "Unsigned count", "0", "65535", "pulses");
 
 	/**
 	 * DPT ID 7.002, Time period in ms; values from <b>0</b> to <b>65535</b> ms.
-	 * <p>
 	 */
 	public static final DPT DPT_TIMEPERIOD =
 		new DPT("7.002", "Time period in ms", "0", "65535", "ms");
@@ -73,7 +73,6 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	/**
 	 * DPT ID 7.003, Time period (resolution 10 ms); values from <b>0</b> to <b>655350</b>
 	 * ms.
-	 * <p>
 	 */
 	public static final DPT DPT_TIMEPERIOD_10 =
 		new DPT("7.003", "Time period (resolution 10 ms)", "0", "655350", "ms");
@@ -81,7 +80,6 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	/**
 	 * DPT ID 7.004, Time period (resolution 100 ms); values from <b>0</b> to <b>6553500</b>
 	 * ms.
-	 * <p>
 	 */
 	public static final DPT DPT_TIMEPERIOD_100 =
 		new DPT("7.004", "Time period (resolution 100 ms)", "0", "6553500", "ms");
@@ -89,7 +87,6 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	/**
 	 * DPT ID 7.005, Time period in seconds; values from <b>0</b> to <b>65535</b> s
 	 * (~18,2 hours).
-	 * <p>
 	 */
 	public static final DPT DPT_TIMEPERIOD_SEC =
 		new DPT("7.005", "Time period in seconds", "0", "65535", "s");
@@ -97,7 +94,6 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	/**
 	 * DPT ID 7.006, Time period in minutes; values from <b>0</b> to <b>65535</b> min
 	 * (~45,5 days).
-	 * <p>
 	 */
 	public static final DPT DPT_TIMEPERIOD_MIN =
 		new DPT("7.006", "Time period in minutes", "0", "65535", "min");
@@ -105,24 +101,21 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	/**
 	 * DPT ID 7.007, Time period in hours; values from <b>0</b> to <b>65535</b> h (~7,4
 	 * years).
-	 * <p>
 	 */
 	public static final DPT DPT_TIMEPERIOD_HOURS =
 		new DPT("7.007", "Time period in hours", "0", "65535", "h");
 
 	/**
 	 * DPT ID 7.010, Interface object property ID; values from <b>0</b> to <b>65535</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_PROP_DATATYPE =
 		new DPT("7.010", "Interface object property ID", "0", "65535", "");
 
 	/**
 	 * DPT ID 7.011, Length in millimeters; values from <b>0</b> to <b>65535</b>, resolution 1.
-	 * <p>
 	 */
 	public static final DPT DPT_LENGTH = new DPT("7.011", "Length in mm", "0", "65535", "mm");
-	
+
 	/**
 	 * DPT ID 7.012, Electrical current; values from <b>0</b> to <b>65535</b> mA.
 	 * <p>
@@ -164,7 +157,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type.
 	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -176,7 +169,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type ID.
 	 * <p>
-	 * 
+	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
 	 *         <code>dptID</code>
@@ -207,7 +200,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	 * a value of DPT_TIMEPERIOD_100 by 100. The result is rounded to the nearest
 	 * representable value (with 0.5 rounded up). On any other DPT the value is expected
 	 * according to its unit.
-	 * 
+	 *
 	 * @param value unsigned value, 0 &lt;= value &lt;= max, with
 	 *        <ul>
 	 *        <li>max = 655350 on DPT {@link #DPT_TIMEPERIOD_10}</li>
@@ -231,7 +224,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	 * returned in unit millisecond, i.e., a KNX DPT_TIMEPERIOD_10 data value is multiplied
 	 * with 10, DPT_TIMEPERIOD_100 with 100.<br>
 	 * On any other DPT the value is returned according to its unit.
-	 * 
+	 *
 	 * @return value as unsigned 16 Bit using type int
 	 * @see #getType()
 	 */
@@ -262,7 +255,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	 * set DPT, with the result rounded to the nearest representable value (with 0.5
 	 * rounded up).<br>
 	 * On any other DPT, the input is treated equal to {@link #setValue(int)}.
-	 * 
+	 *
 	 * @param milliseconds the value in milliseconds, 0 &lt;= <code>milliseconds</code>
 	 * @throws KNXFormatException on milliseconds out of range for DPT
 	 */

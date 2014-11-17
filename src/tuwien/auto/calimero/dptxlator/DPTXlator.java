@@ -76,13 +76,11 @@ public abstract class DPTXlator
 {
 	/**
 	 * Name of the log service used in DPT translators.
-	 * <p>
 	 */
 	public static final String LOG_SERVICE = "DPTXlator";
 
 	/**
 	 * Logger object for all translators.
-	 * <p>
 	 */
 	protected static final LogService logger = LogManager.getManager().getLogService(LOG_SERVICE);
 
@@ -98,7 +96,6 @@ public abstract class DPTXlator
 
 	/**
 	 * The datapoint type set for the translator.
-	 * <p>
 	 */
 	protected DPT dpt;
 
@@ -205,7 +202,6 @@ public abstract class DPTXlator
 
 	/**
 	 * See {@link #setData(byte[], int)}, with offset 0.
-	 * <p>
 	 *
 	 * @param data byte array containing KNX DPT item(s)
 	 */
@@ -399,7 +395,6 @@ public abstract class DPTXlator
 	/**
 	 * Sets the DPT for the translator to use for translation, doing a lookup before in
 	 * the translator's map containing the available, implemented datapoint types.
-	 * <p>
 	 *
 	 * @param availableTypes map of the translator with available, implemented DPTs; the
 	 *        map key is a dptID string, map value is of type {@link DPT}

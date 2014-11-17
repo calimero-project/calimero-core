@@ -115,7 +115,6 @@ public class PositiveListCache extends ExpiringCache
 	/**
 	 * Adds a new allowed <code>key</code> to the positive list, if it is not
 	 * already present.
-	 * <p>
 	 *
 	 * @param key the new key object
 	 */

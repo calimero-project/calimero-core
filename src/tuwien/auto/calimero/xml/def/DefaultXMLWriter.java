@@ -73,7 +73,6 @@ public class DefaultXMLWriter implements XMLWriter
 
 	/**
 	 * Creates a new XML writer.
-	 * <p>
 	 */
 	public DefaultXMLWriter()
 	{}

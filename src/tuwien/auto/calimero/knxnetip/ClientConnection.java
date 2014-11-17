@@ -83,13 +83,11 @@ abstract class ClientConnection extends ConnectionBase
 	/**
 	 * Status code of communication: waiting for cEMI confirmation after receive service
 	 * acknowledgment, no error, not ready to send.
-	 * <p>
 	 */
 	public static final int CEMI_CON_PENDING = 4;
 
 	/**
 	 * Status code of communication: unknown error, no send possible.
-	 * <p>
 	 */
 	public static final int UNKNOWN_ERROR = -1;
 

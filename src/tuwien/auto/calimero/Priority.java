@@ -42,39 +42,34 @@ import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
  * Priority of KNX messages for access on a KNX medium.
  * <p>
  * All possible priority values are supplied as immutable Priority constants.
- * 
+ *
  * @author B. Malinowsky
  */
 public final class Priority
 {
 	/**
 	 * System priority, reserved for high priority management and system configuration.
-	 * <p>
 	 */
 	public static final Priority SYSTEM = new Priority(0x00);
 
 	/**
 	 * Urgent priority, for urgent frames.
-	 * <p>
 	 */
 	public static final Priority URGENT = new Priority(0x02);
 
 	/**
 	 * Normal priority, the default for short frames.
-	 * <p>
 	 */
 	public static final Priority NORMAL = new Priority(0x01);
 
 	/**
 	 * Low priority, used for long frames.
-	 * <p>
 	 */
 	public static final Priority LOW = new Priority(0x03);
 
 	/**
 	 * Constant with the 2 Bit representation of this priority used in the message
 	 * priority field.
-	 * <p>
 	 */
 	public final int value;
 
@@ -86,7 +81,7 @@ public final class Priority
 	/**
 	 * Returns the priority of the supplied priority value code.
 	 * <p>
-	 * 
+	 *
 	 * @param value priority value code, 0 &lt;= value &lt;= 3
 	 * @return the corresponding priority object
 	 */
@@ -114,7 +109,7 @@ public final class Priority
 	 * <li>"low"</li>
 	 * </ul>
 	 * These are in accordance with the ones returned by {@link #toString()}.
-	 * 
+	 *
 	 * @param value priority value in textual representation, value is treated case
 	 *        insensitive
 	 * @return the corresponding priority object
@@ -134,14 +129,14 @@ public final class Priority
 
 	/**
 	 * Returns the priority in textual representation.
-	 * <p>
+	 *
 	 * <ul>
 	 * <li>{@link #SYSTEM} returns "system"</li>
 	 * <li>{@link #NORMAL} returns "normal"</li>
 	 * <li>{@link #LOW} returns "low"</li>
 	 * <li>{@link #URGENT} returns "urgent"</li>
 	 * </ul>
-	 * 
+	 *
 	 * @return priority as string
 	 */
 	@Override
