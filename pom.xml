@@ -72,7 +72,6 @@
 				<version>2.9.1</version>
 				<configuration>
 					<overview>src/overview.html</overview>
-					<additionalparam>-Xdoclint:none</additionalparam>
 					<archive>
 						<manifestEntries>
 							<Built-By>calimero-project</Built-By>
