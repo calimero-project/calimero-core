@@ -315,6 +315,9 @@ public class StateDP extends Datapoint
 				throw new KNXMLException("invalid element", tag, r.getLineNumber());
 			r.read();
 		}
+		if (!main)
+			throw new KNXMLException("Datapoint is missing its address", "datapoint",
+					r.getLineNumber());
 	}
 
 	/* (non-Javadoc)
