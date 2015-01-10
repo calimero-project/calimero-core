@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ import tuwien.auto.calimero.xml.XMLWriter;
  * A datapoint model storing datapoints with no defined order or hierarchy using a map
  * implementation.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public class DatapointMap implements DatapointModel, ChangeNotifier
@@ -79,7 +79,7 @@ public class DatapointMap implements DatapointModel, ChangeNotifier
 	 * A datapoint to be added has to be unique according its main address, the attempt to
 	 * add two datapoints using the same main address results in a
 	 * KNXIllegalArgumentException.
-	 * 
+	 *
 	 * @param datapoints collection with entries of type {@link Datapoint}
 	 * @throws KNXIllegalArgumentException on duplicate datapoint
 	 */
@@ -143,7 +143,7 @@ public class DatapointMap implements DatapointModel, ChangeNotifier
 	/**
 	 * Returns all datapoints currently contained in this map.
 	 * <p>
-	 * 
+	 *
 	 * @return unmodifiable collection with entries of type {@link Datapoint}
 	 */
 	public Collection getDatapoints()
@@ -186,8 +186,8 @@ public class DatapointMap implements DatapointModel, ChangeNotifier
 				final Datapoint dp = Datapoint.create(r);
 				if (points.containsKey(dp.getMainAddress()))
 					throw new KNXMLException("list contains "
-							+ "duplicate KNX address in datapoint " + dp.getName(), dp.getMainAddress().toString(),
-							r.getLineNumber());
+							+ "duplicate KNX address in datapoint " + dp.getName(), dp
+							.getMainAddress().toString(), r.getLineNumber());
 				points.put(dp.getMainAddress(), dp);
 			}
 		}
