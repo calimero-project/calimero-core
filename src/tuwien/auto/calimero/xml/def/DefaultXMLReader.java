@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ import tuwien.auto.calimero.xml.XMLReader;
  * <p>
  * Does not add any feature not already documented in the implemented interface.<br>
  * This reader is not thread safe.
- * 
+ *
  * @author B. Malinowsky
  */
 public class DefaultXMLReader implements XMLReader
@@ -74,7 +74,7 @@ public class DefaultXMLReader implements XMLReader
 	 * <p>
 	 * The {@link Reader} should already be buffered or wrapped with a buffered reader, if
 	 * necessary (e.g. when reading from a file).
-	 * 
+	 *
 	 * @param r a {@link Reader} for input
 	 * @param close <code>true</code> to close <code>r</code> if XML reader is closed,
 	 *        <code>false</code> otherwise
@@ -121,7 +121,9 @@ public class DefaultXMLReader implements XMLReader
 			}
 			str = str.trim();
 			// extract element name
-			final String name = splitOnSpace(str);
+			String name = splitOnSpace(str);
+			if (name.charAt(name.length() - 1) == '/')
+				name = name.substring(0, name.length() - 1);
 			if (name.charAt(0) == '/') {
 				if (!name.substring(1).equals(openElems.peek()))
 					throw new KNXMLException("element end tag does not match start tag",
@@ -308,7 +310,7 @@ public class DefaultXMLReader implements XMLReader
 		buf.delete(buf.length() - 2, buf.length());
 		return true;
 	}
-	
+
 	// checks if '<' marks begin of a comment, and if so skips over it
 	private boolean skipComment(final String s) throws KNXMLException
 	{
