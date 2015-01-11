@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ import tuwien.auto.calimero.xml.XMLWriter;
  * <p>
  * A KNX datapoint is either state based {@link StateDP} or command based
  * {@link CommandDP}.
- * 
+ *
  * @author B. Malinowsky
  */
 public abstract class Datapoint
@@ -89,7 +89,7 @@ public abstract class Datapoint
 	/**
 	 * Creates a new datapoint with a name and specifies state/command based semantics.
 	 * <p>
-	 * 
+	 *
 	 * @param main the group address used to identify this datapoint
 	 * @param name user defined datapoint name
 	 * @param stateBased <code>true</code> for state based datapoint, <code>false</code>
@@ -109,7 +109,7 @@ public abstract class Datapoint
 	 * The datapoint element is then expected to be the current element in the reader. It
 	 * reads the start tag and attributes of a datapoint element, and sets the reader to
 	 * the next position.
-	 * 
+	 *
 	 * @param r a XML reader
 	 * @throws KNXMLException if the XML element is no datapoint or could not be read
 	 *         correctly
@@ -121,13 +121,12 @@ public abstract class Datapoint
 		final Element e = r.getCurrent();
 		final int line = r.getLineNumber();
 		if (r.getPosition() != XMLReader.START_TAG || !e.getName().equals(TAG_DATAPOINT))
-			throw new KNXMLException("no KNX datapoint element", e != null ? e.getName() : null,
-					line);
+			throw new KNXMLException("no KNX datapoint element", r);
 		stateBased = readDPType(r);
 		if ((name = e.getAttribute(ATTR_NAME)) == null)
-			throw new KNXMLException("missing attribute " + ATTR_NAME, null, line);
+			throw new KNXMLException("missing attribute " + ATTR_NAME, r);
 		if ((dptId = e.getAttribute(ATTR_DPTID)) == null)
-			throw new KNXMLException("missing attribute " + ATTR_DPTID, null, line);
+			throw new KNXMLException("missing attribute " + ATTR_DPTID, r);
 		if (dptId.length() == 0)
 			dptId = null;
 		String a = null;
@@ -138,7 +137,7 @@ public abstract class Datapoint
 			priority = Priority.get(a);
 		}
 		catch (final RuntimeException rte) {
-			throw new KNXMLException("malformed attribute, " + rte.getMessage(), a, line);
+			throw new KNXMLException("malformed attribute, " + rte.getMessage(), r);
 		}
 		r.read();
 	}
@@ -148,7 +147,7 @@ public abstract class Datapoint
 	 * <p>
 	 * If the current XML element position is no start tag, the next element tag is read.
 	 * The datapoint element is then expected to be the current element in the reader.
-	 * 
+	 *
 	 * @param r a XML reader
 	 * @return the created datapoint, either of type {@link StateDP} or {@link CommandDP}
 	 * @throws KNXMLException if the XML element is no datapoint or could not be read
@@ -163,13 +162,13 @@ public abstract class Datapoint
 				return new StateDP(r);
 			return new CommandDP(r);
 		}
-		throw new KNXMLException("no KNX datapoint", null, r.getLineNumber());
+		throw new KNXMLException("no KNX datapoint", r);
 	}
 
 	/**
 	 * Returns the datapoint main address, a KNX group address identifying this datapoint.
 	 * <p>
-	 * 
+	 *
 	 * @return KNX group address
 	 */
 	public final GroupAddress getMainAddress()
@@ -182,7 +181,7 @@ public abstract class Datapoint
 	 * <p>
 	 * The datapoint name might be any user defined name, it is only used for interaction
 	 * with the user.
-	 * 
+	 *
 	 * @param friendlyName user friendly name of the datapoint
 	 */
 	public final void setName(final String friendlyName)
@@ -193,7 +192,7 @@ public abstract class Datapoint
 	/**
 	 * Returns the datapoint name.
 	 * <p>
-	 * 
+	 *
 	 * @return datapoint name as string
 	 */
 	public final String getName()
@@ -204,7 +203,7 @@ public abstract class Datapoint
 	/**
 	 * Returns whether this datapoint is state or command based.
 	 * <p>
-	 * 
+	 *
 	 * @return <code>true</code> if datapoint is state based, <code>false</code> for
 	 *         command based
 	 */
@@ -216,7 +215,7 @@ public abstract class Datapoint
 	/**
 	 * Sets the priority used for KNX messages of this datapoint.
 	 * <p>
-	 * 
+	 *
 	 * @param p the new priority to assign
 	 */
 	public final void setPriority(final Priority p)
@@ -227,7 +226,7 @@ public abstract class Datapoint
 	/**
 	 * Returns the KNX message priority assigned to this datapoint.
 	 * <p>
-	 * 
+	 *
 	 * @return priority value
 	 */
 	public final Priority getPriority()
@@ -239,7 +238,7 @@ public abstract class Datapoint
 	 * Sets the datapoint type to use for translation of datapoint values.
 	 * <p>
 	 * A datapoint type is used with <code>DPTXlator</code>s for value translation.
-	 * 
+	 *
 	 * @param mainNumber main number of the data type used for translation of a datapoint
 	 *        value; if the used <code>dptID</code> argument unambiguously identifies a
 	 *        DPT translator, main number might be left 0
@@ -257,7 +256,7 @@ public abstract class Datapoint
 	 * If the DPT (see {@link #getDPT()}) assigned to this datapoint unambiguously
 	 * identifies the DPT translator, the returned main number might be left 0 by the user
 	 * of this datapoint.
-	 * 
+	 *
 	 * @return main number as int or 0
 	 */
 	public final int getMainNumber()
@@ -269,7 +268,7 @@ public abstract class Datapoint
 	 * Returns the datapoint type ID of a DPT translator to use for datapoint value
 	 * translation.
 	 * <p>
-	 * 
+	 *
 	 * @return the datapoint type ID as string
 	 */
 	public final String getDPT()
@@ -280,7 +279,7 @@ public abstract class Datapoint
 	/**
 	 * Saves this datapoint in XML format to the supplied XML writer.
 	 * <p>
-	 * 
+	 *
 	 * @param w a XML writer
 	 * @throws KNXMLException on error saving this datapoint
 	 */
@@ -317,7 +316,7 @@ public abstract class Datapoint
 	void doLoad(final XMLReader r) throws KNXMLException
 	{
 		if (main != null)
-			throw new KNXMLException("main address already set", null, r.getLineNumber());
+			throw new KNXMLException("main address already set", r);
 		if (r.getPosition() != XMLReader.START_TAG)
 			r.read();
 		main = new GroupAddress(r);
@@ -333,6 +332,6 @@ public abstract class Datapoint
 			return false;
 		if ("true".equalsIgnoreCase(a))
 			return true;
-		throw new KNXMLException("malformed attribute " + ATTR_STATEBASED, a, r.getLineNumber());
+		throw new KNXMLException("malformed attribute " + ATTR_STATEBASED, r);
 	}
 }

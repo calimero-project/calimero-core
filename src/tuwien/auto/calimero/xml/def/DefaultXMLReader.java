@@ -154,7 +154,7 @@ public class DefaultXMLReader implements XMLReader
 			return;
 		final int index = openElems.lastIndexOf(e.getName());
 		if (index == -1)
-			throw new KNXMLException("element tag not read before", e.getName(), line);
+			throw new KNXMLException("no matching element open tag: " + e.getName(), this);
 		String end = null;
 		final StringBuffer content = new StringBuffer(50);
 		while (canRead()) {

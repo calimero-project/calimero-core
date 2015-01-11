@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ public abstract class KNXAddress
 	/**
 	 * Creates a KNX address from a 16 Bit address value.
 	 * <p>
-	 * 
+	 *
 	 * @param address the address value in the range [0..0xffff]
 	 */
 	KNXAddress(final int address)
@@ -79,7 +79,7 @@ public abstract class KNXAddress
 	 * <p>
 	 * The address is read out of the first 2 byte fields, while the address array itself
 	 * might be longer. The content of <code>address</code> is not modified.
-	 * 
+	 *
 	 * @param address the address byte array in big-endian format, with address.length >=
 	 *        2
 	 */
@@ -95,7 +95,7 @@ public abstract class KNXAddress
 	 * <p>
 	 * If the current XML element position is no start tag, the next element tag is read.
 	 * The KNX address element is then expected to be the current element in the reader.
-	 * 
+	 *
 	 * @param r a XML reader
 	 * @throws KNXMLException if the XML element represents no KNX address or the address
 	 *         couldn't be read correctly
@@ -107,8 +107,7 @@ public abstract class KNXAddress
 		final Element e = r.getCurrent();
 		if (r.getPosition() != XMLReader.START_TAG || !e.getName().equals(TAG_ADDRESS)
 				|| !getType().equals(e.getAttribute(ATTR_TYPE)))
-			throw new KNXMLException("XML element represents no KNX " + getType() + " address",
-					e != null ? e.getName() : null, r.getLineNumber());
+			throw new KNXMLException("XML element represents no KNX " + getType() + " address", r);
 		r.complete(e);
 		try {
 			address = Integer.parseInt(e.getCharacterData());
@@ -116,8 +115,7 @@ public abstract class KNXAddress
 				return;
 		}
 		catch (final NumberFormatException nfe) {}
-		throw new KNXMLException("malformed KNX address value", e.getCharacterData(),
-				r.getLineNumber());
+		throw new KNXMLException("malformed KNX address value", r);
 	}
 
 	/**
@@ -132,7 +130,7 @@ public abstract class KNXAddress
 	 * <p>
 	 * The KNX address element is expected to be the current or next element from the
 	 * parser.
-	 * 
+	 *
 	 * @param r a XML reader
 	 * @return the created KNXAddress, either of subtype {@link GroupAddress} or
 	 *         {@link IndividualAddress}
@@ -150,7 +148,7 @@ public abstract class KNXAddress
 			else if (IndividualAddress.ATTR_IND.equals(type))
 				return new IndividualAddress(r);
 		}
-		throw new KNXMLException("not a KNX address", null, r.getLineNumber());
+		throw new KNXMLException("not a KNX address", r);
 	}
 
 	/**
@@ -160,7 +158,7 @@ public abstract class KNXAddress
 	 * individual address, i.e., an {@link IndividualAddress} is created, otherwise a
 	 * {@link GroupAddress} is created.<br>
 	 * Allowed separators are '.' or '/', mutually exclusive.
-	 * 
+	 *
 	 * @param address string containing the KNX address
 	 * @return the created KNX address, either of subtype {@link GroupAddress} or
 	 *         {@link IndividualAddress}
@@ -179,7 +177,7 @@ public abstract class KNXAddress
 	/**
 	 * Returns the KNX address type, identifying a group or individual address.
 	 * <p>
-	 * 
+	 *
 	 * @return address type as string
 	 */
 	public abstract String getType();
@@ -187,7 +185,7 @@ public abstract class KNXAddress
 	/**
 	 * Returns the KNX address in 16 Bit value representation.
 	 * <p>
-	 * 
+	 *
 	 * @return the 16 Bit address value
 	 */
 	public final int getRawAddress()
@@ -198,7 +196,7 @@ public abstract class KNXAddress
 	/**
 	 * Writes the KNX address in XML format to the supplied writer.
 	 * <p>
-	 * 
+	 *
 	 * @param w a XML writer
 	 * @throws KNXMLException on output error
 	 */
@@ -213,7 +211,7 @@ public abstract class KNXAddress
 
 	/**
 	 * Returns the raw address value in a new byte array.
-	 * 
+	 *
 	 * @return The address value. The high byte of the address is placed at index 0.
 	 */
 	public final byte[] toByteArray()

@@ -179,15 +179,13 @@ public class DatapointMap implements DatapointModel, ChangeNotifier
 			r.read();
 		final Element e = r.getCurrent();
 		if (r.getPosition() != XMLReader.START_TAG || !e.getName().equals(TAG_DATAPOINTS))
-			throw new KNXMLException(TAG_DATAPOINTS + " element not found", e != null ? e.getName()
-					: null, r.getLineNumber());
+			throw new KNXMLException(TAG_DATAPOINTS + " element not found", r);
 		synchronized (points) {
 			while (r.read() == XMLReader.START_TAG) {
 				final Datapoint dp = Datapoint.create(r);
 				if (points.containsKey(dp.getMainAddress()))
-					throw new KNXMLException("list contains "
-							+ "duplicate KNX address in datapoint " + dp.getName(), dp
-							.getMainAddress().toString(), r.getLineNumber());
+					throw new KNXMLException("KNX address " + dp.getMainAddress().toString()
+							+ " in datapoint \"" + dp.getName() + "\" already used", r);
 				points.put(dp.getMainAddress(), dp);
 			}
 		}
