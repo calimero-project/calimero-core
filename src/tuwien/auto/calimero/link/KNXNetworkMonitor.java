@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ package tuwien.auto.calimero.link;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.link.medium.RawFrame;
-import tuwien.auto.calimero.log.LogManager;
+import tuwien.auto.calimero.log.LogService;
 
 /**
  * KNX network monitor link.
@@ -56,7 +56,7 @@ import tuwien.auto.calimero.log.LogManager;
  * necessary access options are specified at creation of a dedicated monitor.
  * <p>
  * The name returned by {@link #getName()} is used by a link as name of its log service.
- * 
+ *
  * @author B. Malinowsky
  */
 public interface KNXNetworkMonitor
@@ -70,7 +70,7 @@ public interface KNXNetworkMonitor
 	 * the link in the first place.<br>
 	 * The <code>settings</code> object is not copied internally to allow subsequent
 	 * changes to medium settings by the user which should take effect immediately.
-	 * 
+	 *
 	 * @param settings medium settings to use, the expected subtype is according to the
 	 *        KNX network medium
 	 */
@@ -80,7 +80,7 @@ public interface KNXNetworkMonitor
 	 * Returns the KNX medium settings used by this monitor link.
 	 * <p>
 	 * The returned object is a reference to the one used by this link (not a copy).
-	 * 
+	 *
 	 * @return medium settings for KNX network
 	 */
 	KNXMediumSettings getKNXMedium();
@@ -90,7 +90,7 @@ public interface KNXNetworkMonitor
 	 * network monitor.
 	 * <p>
 	 * If <code>l</code> was already added as listener, no action is performed.
-	 * 
+	 *
 	 * @param l the listener to add
 	 */
 	void addMonitorListener(LinkListener l);
@@ -100,7 +100,7 @@ public interface KNXNetworkMonitor
 	 * receive events from this network monitor.
 	 * <p>
 	 * If <code>l</code> was not added in the first place, no action is performed.
-	 * 
+	 *
 	 * @param l the listener to remove
 	 */
 	void removeMonitorListener(LinkListener l);
@@ -112,7 +112,7 @@ public interface KNXNetworkMonitor
 	 * A decoded raw frame is of type {@link RawFrame} and can be retrieved using
 	 * {@link MonitorFrameEvent#getRawFrame()} within a link listener registered for this
 	 * monitor.
-	 * 
+	 *
 	 * @param decode <code>true</code> to enable decoding, <code>false</code> to skip
 	 *        decoding
 	 */
@@ -124,11 +124,11 @@ public interface KNXNetworkMonitor
 	 * <p>
 	 * The name is unique for monitors with different remote endpoints.<br>
 	 * The returned name is used by the monitor for the name of its log service. Supply
-	 * {@link #getName()} for {@link LogManager#getLogService(String)} for example to get
+	 * {@link #getName()} for {@link LogService#getLogger(String)} for example to get
 	 * the associated log service.
 	 * <p>
 	 * By default, "monitor " + address/ID of the remote endpoint is returned.<br>
-	 * 
+	 *
 	 * @return monitor name as string
 	 */
 	String getName();
@@ -138,7 +138,7 @@ public interface KNXNetworkMonitor
 	 * <p>
 	 * After a call to {@link #close()} or after the underlying protocol initiated the end
 	 * of the communication, this method always returns <code>false</code>.
-	 * 
+	 *
 	 * @return <code>true</code> if this network monitor is open, <code>false</code>
 	 *         on closed
 	 */

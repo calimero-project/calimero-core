@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,27 +46,14 @@ import org.slf4j.Marker;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 
 /**
- * A LogService is used to categorize logging information with regard to logging level and topic,
- * and offer it to its {@link LogWriter}s.
+ * LogService provides access to slf4j logging.
  * <p>
- * The default log level by the LogService is {@link LogLevel#ALL}. This means all log information
- * levels (except {@link LogLevel#OFF}) will be offered.
- * <p>
- * A LogWriter can register at a log service to receive information the log service is offering to
- * its writers.
- * <p>
- * Use {@link LogManager} to create new or get existing log services.<br>
- * Usage:<br>
- * - A log service may be created for different parts of the Calimero library, therefore, it
- * distinguishes log information by source.<br>
- * - A log service may be created for a particular subject, i.e., to divide information into topics.
- * <br>
- * A log service may restrict offered information through its own log level.<br>
- * - ...
+ * In addition to the common {@link #getLogger(String)} returning a standard slf4j logger,
+ * {@link #getAsyncLogger(String)} provides a logger which dispatches the logged information
+ * asynchronously. This minimizes the overhead on the calling thread, independent of the used
+ * underlying logging framework implementation.
  *
  * @author B. Malinowsky
- * @see LogLevel
- * @see LogWriter
  */
 public final class LogService
 {
@@ -75,23 +62,39 @@ public final class LogService
 		ERROR, WARN, INFO, TRACE, DEBUG
 	}
 
-
 	private static final ExecutorService dispatcher = Executors.newFixedThreadPool(1);
 
-	private LogService() {}
+	private LogService()
+	{}
 
+	/**
+	 * Returns an slf4j logger identified by <code>name</code>.
+	 *
+	 * @param name logger name
+	 * @return logger
+	 * @see LoggerFactory#getLogger(Class)
+	 */
 	public static Logger getLogger(final String name)
 	{
 		return LoggerFactory.getLogger(name);
 	}
 
-	// Note that with async loggers stack traces won't show the original location
+	/**
+	 * Returns an slf4j logger identified by <code>name</code> with asynchronous processing of
+	 * logged information. Note that with asynchronous loggers the stack traces will not show the
+	 * original location.
+	 *
+	 * @param name logger name
+	 * @return logger
+	 * @see LoggerFactory#getLogger(Class)
+	 */
 	public static Logger getAsyncLogger(final String name)
 	{
 		return new AsyncLogger(LogService.getLogger(name));
 	}
 
-	public static void removeLogger(final Logger l) {}
+	public static void removeLogger(final Logger l)
+	{}
 
 	static void async(final Logger l, final LogLevel level, final String msg, final Throwable t)
 	{
@@ -105,8 +108,8 @@ public final class LogService
 		dispatcher.execute(() -> {
 			Thread.currentThread().setName(thread.getName());
 			// TODO add marker
-			log(l, level, msg, t);
-		});
+				log(l, level, msg, t);
+			});
 	}
 
 	static void async(final Logger l, final LogLevel level, final String format, final Object... o)
@@ -121,8 +124,8 @@ public final class LogService
 		dispatcher.execute(() -> {
 			Thread.currentThread().setName(thread.getName());
 			// TODO add marker
-			log(l, level, format, o);
-		});
+				log(l, level, format, o);
+			});
 	}
 
 	/**

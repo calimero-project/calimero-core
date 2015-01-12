@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -56,7 +56,6 @@ import tuwien.auto.calimero.exception.KNXAckTimeoutException;
 import tuwien.auto.calimero.exception.KNXException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.internal.EventListeners;
-import tuwien.auto.calimero.log.LogManager;
 import tuwien.auto.calimero.log.LogService;
 
 /**
@@ -160,7 +159,7 @@ public class FT12Connection
 	 * is named "FT1.2 <code>portNumber</code>", with <code>portNumber</code> being the
 	 * supplied port parameter value. If a log writer wants to receive all log events
 	 * created during establishment of this FT1.2 connection, use
-	 * {@link LogManager#getLogService(String)} before invoking this constructor and add
+	 * {@link LogService#getLogger(String)} before invoking this constructor and add
 	 * the writer.
 	 *
 	 * @param portNumber port number of the serial communication port to use; mapped to
@@ -181,7 +180,7 @@ public class FT12Connection
 	 * is named "FT1.2 <code>portId</code>", with <code>portId</code> being the supplied
 	 * port identifier. If a log writer wants to receive all log events created during
 	 * establishment of this FT1.2 connection, use
-	 * {@link LogManager#getLogService(String)} before invoking this constructor and add
+	 * {@link LogService#getLogger(String)} before invoking this constructor and add
 	 * the writer.
 	 *
 	 * @param portId port identifier of the serial communication port to use
