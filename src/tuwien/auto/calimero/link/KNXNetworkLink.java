@@ -66,7 +66,7 @@ import tuwien.auto.calimero.log.LogService;
  *
  * @author B. Malinowsky
  */
-public interface KNXNetworkLink
+public interface KNXNetworkLink extends AutoCloseable
 {
 	/**
 	 * Supplies medium information necessary for KNX communication.

@@ -36,6 +36,7 @@
 
 package tuwien.auto.calimero.serial;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -59,7 +60,7 @@ import org.slf4j.Logger;
  *
  * @author B. Malinowsky
  */
-public abstract class LibraryAdapter
+public abstract class LibraryAdapter implements Closeable
 {
 	/**
 	 * The log service to use, supplied in the constructor; if a sub-class of

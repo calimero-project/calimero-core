@@ -58,7 +58,7 @@ import tuwien.auto.calimero.exception.KNXTimeoutException;
  * <p>
  * Log information by this connection is provided using the log service with the name
  * obtained from {@link KNXnetIPConnection#getName()}.
- * 
+ *
  * @author B. Malinowsky
  * @see KNXnetIPTunnel
  * @see KNXnetIPDevMgmt
@@ -66,7 +66,7 @@ import tuwien.auto.calimero.exception.KNXTimeoutException;
  * @see KNXListener
  * @see CEMI
  */
-public interface KNXnetIPConnection
+public interface KNXnetIPConnection extends AutoCloseable
 {
 	/**
 	 * Identifier for KNXnet/IP protocol version 1.0.
@@ -142,7 +142,7 @@ public interface KNXnetIPConnection
 	 * during the notification, and should be moved to dedicated own worker thread.
 	 * Otherwise subsequent listener invocations will suffer from time delays since the
 	 * receiver can not move on.
-	 * 
+	 *
 	 * @param l the listener to add
 	 */
 	void addConnectionListener(KNXListener l);
@@ -152,7 +152,7 @@ public interface KNXnetIPConnection
 	 * events from this connection.
 	 * <p>
 	 * If <code>l</code> was not added in the first place, no action is performed.
-	 * 
+	 *
 	 * @param l the listener to remove
 	 */
 	void removeConnectionListener(KNXListener l);
@@ -170,7 +170,7 @@ public interface KNXnetIPConnection
 	 * guaranteed to get notified before this method returns, with the communication state
 	 * (see {@link #getState()}) reset to {@link #OK} after the notifying is done, so to
 	 * prevent another send call from a listener.
-	 * 
+	 *
 	 * @param frame cEMI message to send
 	 * @param mode specifies the behavior in regard to response messages, this parameter
 	 *        will be ignored by protocols in case no response is expected at all;<br>
@@ -194,14 +194,14 @@ public interface KNXnetIPConnection
 	 * used.<br>
 	 * If no communication is established, the unspecified (wildcard) address with port
 	 * number 0 is returned.
-	 * 
+	 *
 	 * @return IP address/host and port as {@link InetSocketAddress}
 	 */
 	InetSocketAddress getRemoteAddress();
 
 	/**
 	 * Returns information about the current KNXnet/IP communication state.
-	 * 
+	 *
 	 * @return state enumeration
 	 */
 	int getState();
@@ -213,7 +213,7 @@ public interface KNXnetIPConnection
 	 * The name has to be unique at least for connections with different IP addresses for
 	 * the remote control endpoint.<br>
 	 * The returned name is used by this connection for the name of its log service.
-	 * 
+	 *
 	 * @return name for this connection as string
 	 */
 	String getName();

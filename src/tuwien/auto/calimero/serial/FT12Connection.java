@@ -70,7 +70,7 @@ import tuwien.auto.calimero.log.LogService;
  *
  * @author B. Malinowsky
  */
-public class FT12Connection
+public class FT12Connection implements AutoCloseable
 {
 	/**
 	 * State of communication: in idle state, no error, ready to send.

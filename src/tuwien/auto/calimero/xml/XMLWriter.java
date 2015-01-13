@@ -46,7 +46,7 @@ import java.util.List;
  *
  * @author B. Malinowsky
  */
-public interface XMLWriter
+public interface XMLWriter extends AutoCloseable
 {
 	/**
 	 * Sets the output destination for this XML writer.

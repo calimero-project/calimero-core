@@ -52,10 +52,10 @@ import java.io.Reader;
  * would).
  * <p>
  * XML reader implementations don't need to be thread safe.
- * 
+ *
  * @author B. Malinowsky
  */
-public interface XMLReader
+public interface XMLReader extends AutoCloseable
 {
 	// The XML reader was using the
 	// Extensible Markup Language (XML) 1.0 (Fourth Edition)
@@ -93,7 +93,7 @@ public interface XMLReader
 	 * Sets the input source for this XML reader.
 	 * <p>
 	 * If this XML reader was already closed, setting a new input has no effect.
-	 * 
+	 *
 	 * @param input a reader with input, like obtained from
 	 *        {@link EntityResolver#getInputReader(java.io.InputStream)}
 	 * @param close <code>true</code> if the specified input reader should be closed on
@@ -107,7 +107,7 @@ public interface XMLReader
 	 * The logical position returned by this method can also be obtained with
 	 * {@link #getPosition()}.<br>
 	 * Comments and processing instructions can be ignored, i.e., skipped on reading.
-	 * 
+	 *
 	 * @return the current logical position after reading
 	 * @throws KNXMLException on read error or a not well-formed XML document
 	 */
@@ -117,7 +117,7 @@ public interface XMLReader
 	 * Reads until end of element <code>e</code>.
 	 * <p>
 	 * All gathered relevant information is stored into <code>e</code>.
-	 * 
+	 *
 	 * @param e the element to be completed
 	 * @throws KNXMLException if document is not well-formed, e.g. end of input or end-tag
 	 *         of parent element was reached before end of specified element
@@ -127,7 +127,7 @@ public interface XMLReader
 	/**
 	 * Returns the current element read with the last invocation of {@link #read()}.
 	 * <p>
-	 * 
+	 *
 	 * @return current element or <code>null</code> if no element is available
 	 */
 	Element getCurrent();
@@ -137,7 +137,7 @@ public interface XMLReader
 	 * <p>
 	 * The position is given with constants like {@link #START_DOC} or similar. If no
 	 * input was set or the reader is closed, {@link #NO_INPUT} is returned.
-	 * 
+	 *
 	 * @return the logical position in the document
 	 */
 	int getPosition();
@@ -147,7 +147,7 @@ public interface XMLReader
 	 * this XML reader.
 	 * <p>
 	 * On no input source, or before an input source is first read, 0 is returned.
-	 * 
+	 *
 	 * @return line number, or 0 if no line number is available
 	 */
 	int getLineNumber();
@@ -158,7 +158,7 @@ public interface XMLReader
 	 * If this XML reader is already closed, no action is performed. If for an input
 	 * source was specified to get closed on invocation of this method, it is closed first
 	 * (calling {@link Reader#close()}.
-	 * 
+	 *
 	 * @throws KNXMLException
 	 */
 	void close() throws KNXMLException;

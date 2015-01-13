@@ -146,7 +146,7 @@ import tuwien.auto.calimero.xml.XMLWriter;
  * @see PropertyAdapter
  * @see PropertyTypes
  */
-public class PropertyClient implements PropertyAccess
+public class PropertyClient implements PropertyAccess, AutoCloseable
 {
 	/**
 	 * Provides an interface to load property definitions from a resource, and store

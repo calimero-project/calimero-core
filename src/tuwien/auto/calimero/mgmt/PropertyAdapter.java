@@ -48,15 +48,15 @@ import tuwien.auto.calimero.exception.KNXIllegalStateException;
  * If {@link #close()} is called by a user on an open adapter, all methods which do
  * interface object property access are allowed to throw {@link KNXIllegalStateException}
  * if invoked on that closed adapter.<br>
- * 
+ *
  * @author B. Malinowsky
  */
-public interface PropertyAdapter
+public interface PropertyAdapter extends AutoCloseable
 {
 	/**
 	 * Sets property value elements in an interface object property.
 	 * <p>
-	 * 
+	 *
 	 * @param objIndex interface object index
 	 * @param pid property identifier
 	 * @param start start index in the property value to start writing to
@@ -72,7 +72,7 @@ public interface PropertyAdapter
 	/**
 	 * Gets property value elements in an interface object property.
 	 * <p>
-	 * 
+	 *
 	 * @param objIndex interface object index
 	 * @param pid property identifier
 	 * @param start start index in the property value to start reading from
@@ -90,7 +90,7 @@ public interface PropertyAdapter
 	 * <p>
 	 * The property description layout is according the application layer property
 	 * description service.
-	 * 
+	 *
 	 * @param objIndex interface object index
 	 * @param pid property identifier, specify 0 to use the property index
 	 * @param propIndex property index, starts with index 0 for the first property
@@ -106,14 +106,14 @@ public interface PropertyAdapter
 	/**
 	 * Returns the name for identifying this adapter and its destination.
 	 * <p>
-	 * 
+	 *
 	 * @return adapter name as string
 	 */
 	String getName();
 
 	/**
 	 * Returns whether this adapter can be used for property access and is not closed.
-	 * 
+	 *
 	 * @return <code>true</code> if adapter open, <code>false</code> if closed
 	 */
 	boolean isOpen();
