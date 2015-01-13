@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,6 +46,8 @@ import java.util.EventListener;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.FrameEvent;
@@ -54,8 +56,6 @@ import tuwien.auto.calimero.exception.KNXAckTimeoutException;
 import tuwien.auto.calimero.exception.KNXException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.internal.EventListeners;
-import tuwien.auto.calimero.log.LogLevel;
-import tuwien.auto.calimero.log.LogManager;
 import tuwien.auto.calimero.log.LogService;
 
 /**
@@ -123,7 +123,7 @@ public class FT12Connection
 	private static final int START_FIXED = 0x10;
 	private static final int END = 0x16;
 
-	private final LogService logger;
+	private final Logger logger;
 
 	// adapter for the used serial I/O connection:
 	// - on ME CDC platforms with CommConnection available, CommConnectionAdapter is used
@@ -156,7 +156,7 @@ public class FT12Connection
 	 * is named "FT1.2 <code>portNumber</code>", with <code>portNumber</code> being the
 	 * supplied port parameter value. If a log writer wants to receive all log events
 	 * created during establishment of this FT1.2 connection, use
-	 * {@link LogManager#getLogService(String)} before invoking this constructor and add
+	 * {@link LogService#getLogger(String)} before invoking this constructor and add
 	 * the writer.
 	 *
 	 * @param portNumber port number of the serial communication port to use; mapped to
@@ -177,7 +177,7 @@ public class FT12Connection
 	 * is named "FT1.2 <code>portId</code>", with <code>portId</code> being the supplied
 	 * port identifier. If a log writer wants to receive all log events created during
 	 * establishment of this FT1.2 connection, use
-	 * {@link LogManager#getLogService(String)} before invoking this constructor and add
+	 * {@link LogService#getLogger(String)} before invoking this constructor and add
 	 * the writer.
 	 *
 	 * @param portId port identifier of the serial communication port to use
@@ -210,7 +210,7 @@ public class FT12Connection
 	private FT12Connection(final String originalPortId, final String portId,
 		final int baudrate) throws KNXException
 	{
-		logger = LogManager.getManager().getLogService("FT1.2 " + originalPortId);
+		logger = LogService.getLogger("FT1.2 " + originalPortId);
 		open(portId, baudrate);
 		try {
 			sendReset();
@@ -359,7 +359,7 @@ public class FT12Connection
 		boolean ack = false;
 		try {
 			for (int i = 0; i <= REPEAT_LIMIT; ++i) {
-				if (logger.isLoggable(LogLevel.TRACE))
+				if (logger.isTraceEnabled())
 					logger.trace("sending FT1.2 frame, " + (blocking ? "" : "non-")
 							+ "blocking, attempt " + (i + 1));
 				sendData(frame);
@@ -413,7 +413,7 @@ public class FT12Connection
 			logger.warn("failed to close all serial I/O resources", e);
 		}
 		fireConnectionClosed(user, reason);
-		LogManager.getManager().removeLogService(logger.getName());
+		LogService.removeLogger(logger);
 	}
 
 	private void open(final String portId, final int baudrate) throws KNXException

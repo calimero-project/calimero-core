@@ -56,7 +56,6 @@ import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
 import tuwien.auto.calimero.link.medium.PLSettings;
 import tuwien.auto.calimero.link.medium.TPSettings;
-import tuwien.auto.calimero.log.LogManager;
 
 /**
  * @author B. Malinowsky
@@ -127,7 +126,7 @@ public class KNXNetworkLinkIPTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		LogManager.getManager().addWriter(null, Util.getLogWriter());
+		Util.setupLogging();
 
 		tnl = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, Util.getLocalHost(),
 				Util.getServer(), false, TPSettings.TP1);
@@ -164,7 +163,7 @@ public class KNXNetworkLinkIPTest extends TestCase
 		if (rtr != null)
 			rtr.close();
 
-		LogManager.getManager().removeWriter(null, Util.getLogWriter());
+		Util.tearDownLogging();
 		super.tearDown();
 	}
 

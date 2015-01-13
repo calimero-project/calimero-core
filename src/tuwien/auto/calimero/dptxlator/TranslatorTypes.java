@@ -269,13 +269,13 @@ public final class TranslatorTypes
 				throw new KNXFormatException("failed to init translator", dptID);
 			}
 			catch (final NoSuchMethodException e) {
-				DPTXlator.logger.fatal("DPT translator is required to "
+				DPTXlator.logger.error("DPT translator is required to "
 					+ "have a public constructor(String dptID)");
-				throw new KNXException("interface specification error at translator");
+				throw new KNXException("interface specification error at translator", e);
 			}
 			catch (final Exception e) {
 				// for SecurityException, InstantiationException, IllegalAccessException
-				throw new KNXException("failed to create translator, " + e.getMessage());
+				throw new KNXException("failed to create translator", e);
 			}
 		}
 

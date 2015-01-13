@@ -52,8 +52,6 @@ import tuwien.auto.calimero.exception.KNXTimeoutException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.KNXNetworkLinkIP;
 import tuwien.auto.calimero.link.medium.TPSettings;
-import tuwien.auto.calimero.log.LogLevel;
-import tuwien.auto.calimero.log.LogManager;
 import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
 import tuwien.auto.calimero.mgmt.PropertyClient.Property;
 
@@ -107,7 +105,7 @@ public class PropertyClientTest extends TestCase
 		super.setUp();
 		remote = Util.getKnxDeviceCO();
 		try {
-			LogManager.getManager().addWriter(null, Util.getLogWriter());
+			Util.setupLogging();
 
 			lnk = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, null, Util.getServer(),
 				false, TPSettings.TP1);
@@ -139,8 +137,7 @@ public class PropertyClientTest extends TestCase
 		if (lnk != null)
 			lnk.close();
 
-		Util.getLogWriter().setLogLevel(LogLevel.ALL);
-		LogManager.getManager().removeWriter(null, Util.getLogWriter());
+		Util.tearDownLogging();
 		super.tearDown();
 	}
 

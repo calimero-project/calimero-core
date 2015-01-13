@@ -43,9 +43,6 @@ import java.net.UnknownHostException;
 import tuwien.auto.calimero.exception.KNXException;
 import tuwien.auto.calimero.knxnetip.Discoverer;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
-import tuwien.auto.calimero.log.LogLevel;
-import tuwien.auto.calimero.log.LogStreamWriter;
-import tuwien.auto.calimero.log.LogWriter;
 import tuwien.auto.calimero.serial.FT12Connection;
 
 /**
@@ -69,9 +66,6 @@ public final class Util
 
 	// make sure its the same subnet as the test device (for tests that set the address)
 	private static IndividualAddress nonExisting = new IndividualAddress(1, 1, 200);
-
-	private static final LogWriter w = new LogStreamWriter(LogLevel.ALL, System.out, true, false);
-
 
 	private Util()
 	{}
@@ -119,16 +113,11 @@ public final class Util
 		return buf.toString();
 	}
 
-	/**
-	 * Returns a log writer for standard out.
-	 * <p>
-	 *
-	 * @return LogWriter
-	 */
-	public static LogWriter getLogWriter()
-	{
-		return w;
-	}
+	// marker method where previously a logging was initialized
+	public static void setupLogging() {}
+	public static void setupLogging(final String name) {}
+	// marker method where previously logging was torn down
+	public static void tearDownLogging() {}
 
 	/**
 	 * Returns KNXnet/IP router address used for testing.

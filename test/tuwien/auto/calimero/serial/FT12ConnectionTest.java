@@ -41,7 +41,6 @@ import java.util.Arrays;
 import junit.framework.TestCase;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.exception.KNXException;
-import tuwien.auto.calimero.log.LogManager;
 
 /**
  * Test case for FT12Connection.
@@ -69,7 +68,7 @@ public class FT12ConnectionTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		LogManager.getManager().addWriter(null, Util.getLogWriter());
+		Util.setupLogging();
 	}
 
 	/* (non-Javadoc)
@@ -80,7 +79,7 @@ public class FT12ConnectionTest extends TestCase
 	{
 		if (c != null)
 			c.close();
-		LogManager.getManager().removeWriter(null, Util.getLogWriter());
+		Util.tearDownLogging();
 		super.tearDown();
 	}
 

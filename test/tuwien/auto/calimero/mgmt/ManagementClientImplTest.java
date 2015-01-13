@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,7 +52,6 @@ import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.KNXNetworkLinkIP;
 import tuwien.auto.calimero.link.medium.TPSettings;
-import tuwien.auto.calimero.log.LogManager;
 
 /**
  * @author B. Malinowsky
@@ -79,11 +78,10 @@ public class ManagementClientImplTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		LogManager.getManager().addWriter(null, Util.getLogWriter());
+		Util.setupLogging();
 
 		lnk = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, null, Util.getServer(), false,
 				TPSettings.TP1);
-		// LogManager.getManager().removeWriter(lnk.getName(), Util.getLogWriter());
 		mc = new ManagementClientImpl(lnk);
 		// dco = mc.createDestination(new IndividualAddress(3, 0, 0), true);
 		dco2 = mc.createDestination(Util.getKnxDeviceCO(), true);
@@ -102,7 +100,7 @@ public class ManagementClientImplTest extends TestCase
 		if (lnk != null)
 			lnk.close();
 
-		LogManager.getManager().removeWriter(null, Util.getLogWriter());
+		Util.tearDownLogging();
 		super.tearDown();
 	}
 

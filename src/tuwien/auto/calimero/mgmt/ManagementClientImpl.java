@@ -41,6 +41,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.DetachEvent;
@@ -56,7 +58,6 @@ import tuwien.auto.calimero.exception.KNXRemoteException;
 import tuwien.auto.calimero.exception.KNXTimeoutException;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
-import tuwien.auto.calimero.log.LogManager;
 import tuwien.auto.calimero.log.LogService;
 
 /**
@@ -171,7 +172,7 @@ public class ManagementClientImpl implements ManagementClient
 	private final List<FrameEvent> indications = new LinkedList<>();
 	private volatile int svcResponse;
 	private volatile boolean detached;
-	private final LogService logger;
+	private final Logger logger;
 
 	/**
 	 * Creates a new management client attached to the supplied KNX network link.
@@ -191,7 +192,7 @@ public class ManagementClientImpl implements ManagementClient
 	{
 		tl = transportLayer;
 		tl.addTransportListener(tlListener);
-		logger = LogManager.getManager().getLogService("MC " + link.getName());
+		logger = LogService.getLogger("MC " + link.getName());
 	}
 
 	/* (non-Javadoc)
@@ -296,7 +297,7 @@ public class ManagementClientImpl implements ManagementClient
 		finally {
 			svcResponse = 0;
 		}
-		return l.toArray(new IndividualAddress[l.size()]);
+		return (IndividualAddress[]) l.toArray(new IndividualAddress[l.size()]);
 	}
 
 	/* (non-Javadoc)
@@ -757,7 +758,7 @@ public class ManagementClientImpl implements ManagementClient
 		final KNXNetworkLink lnk = tl.detach();
 		if (lnk != null) {
 			logger.info("detached from " + lnk.getName());
-			LogManager.getManager().removeLogService(logger.getName());
+			LogService.removeLogger(logger);
 		}
 		detached = true;
 		return lnk;

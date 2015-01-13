@@ -40,12 +40,13 @@ import java.util.AbstractCollection;
 import java.util.Arrays;
 import java.util.Map;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.exception.KNXIllegalStateException;
-import tuwien.auto.calimero.log.LogLevel;
-import tuwien.auto.calimero.log.LogManager;
 import tuwien.auto.calimero.log.LogService;
+import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * DPT translator interface for data conversion between KNX DPTs and java types.
@@ -82,7 +83,7 @@ public abstract class DPTXlator
 	/**
 	 * Logger object for all translators.
 	 */
-	protected static final LogService logger = LogManager.getManager().getLogService(LOG_SERVICE);
+	protected static final Logger logger = LogService.getLogger(LOG_SERVICE);
 
 	/**
 	 * Array containing KNX data type values.
@@ -479,7 +480,7 @@ public abstract class DPTXlator
 		final String item) throws KNXFormatException
 	{
 		final KNXFormatException e = new KNXFormatException(excMsg != null ? excMsg : msg, item);
-		logger.log(level, dpt.getID() + " - " + msg, excMsg != null ? e : null);
+		LogService.log(logger, level, dpt.getID() + " - " + msg, excMsg != null ? e : null);
 		throw e;
 	}
 }

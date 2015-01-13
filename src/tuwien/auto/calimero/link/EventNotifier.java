@@ -40,11 +40,12 @@ import java.util.EventListener;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.internal.EventListeners;
-import tuwien.auto.calimero.log.LogService;
 
 /**
  * Threaded event notifier for network link and monitor.
@@ -113,7 +114,7 @@ abstract class EventNotifier extends Thread implements KNXListener
 		}
 	}
 
-	final LogService logger;
+	final Logger logger;
 	final Object source;
 
 	private final EventListeners<LinkListener> listeners;
@@ -121,7 +122,7 @@ abstract class EventNotifier extends Thread implements KNXListener
 	private final List<EventCallback> events = new LinkedList<>();
 	private volatile boolean stop;
 
-	EventNotifier(final Object source, final LogService logger)
+	EventNotifier(final Object source, final Logger logger)
 	{
 		super("Link notifier");
 		this.logger = logger;

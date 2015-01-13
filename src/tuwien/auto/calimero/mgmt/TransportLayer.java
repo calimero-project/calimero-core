@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.exception.KNXTimeoutException;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
-import tuwien.auto.calimero.log.LogManager;
+import tuwien.auto.calimero.log.LogService;
 
 /**
  * Transport layer providing OSI layer 4 (connection oriented) communication.
@@ -53,7 +53,7 @@ import tuwien.auto.calimero.log.LogManager;
  * communication with the KNX network. This attached link is not owned by the TL and will
  * never get closed by it. If the TL object is not needed anymore, this is indicated by
  * detaching the link from the TL.
- * 
+ *
  * @author B. Malinowsky
  */
 public interface TransportLayer
@@ -67,7 +67,7 @@ public interface TransportLayer
 	 * destination connection state for a new destination is disconnected.<br>
 	 * If a destination with the remote address is already available, behavior is
 	 * implementation dependent.
-	 * 
+	 *
 	 * @param remote destination KNX individual address
 	 * @param connectionOriented <code>true</code> for connection oriented mode,
 	 *        <code>false</code> for connectionless mode
@@ -85,7 +85,7 @@ public interface TransportLayer
 	 * destination connection state for a new destination is disconnected.<br>
 	 * If a destination with the remote address is already available, behavior is
 	 * implementation dependent.
-	 * 
+	 *
 	 * @param remote destination KNX individual address
 	 * @param connectionOriented <code>true</code> for connection oriented mode,
 	 *        <code>false</code> for connectionless mode
@@ -108,7 +108,7 @@ public interface TransportLayer
 	 * protocol before destroying the destination.<br>
 	 * The transport layer does not own the destination any longer.<br>
 	 * If the destination is not owned by this transport layer, no action is performed.
-	 * 
+	 *
 	 * @param d destination to destroy
 	 */
 	void destroyDestination(Destination d);
@@ -118,7 +118,7 @@ public interface TransportLayer
 	 * transport layer.
 	 * <p>
 	 * If <code>l</code> was already added as listener, no action is performed.
-	 * 
+	 *
 	 * @param l the listener to add
 	 */
 	void addTransportListener(TransportListener l);
@@ -128,7 +128,7 @@ public interface TransportLayer
 	 * receive events from this transport layer.
 	 * <p>
 	 * If <code>l</code> was not added in the first place, no action is performed.
-	 * 
+	 *
 	 * @param l the listener to remove
 	 */
 	void removeTransportListener(TransportListener l);
@@ -139,7 +139,7 @@ public interface TransportLayer
 	 * If the supplied destination is not configured in connection oriented mode or is not
 	 * in disconnected state, no action is performed.<br>
 	 * On return of this method, the destination is in connected state.
-	 * 
+	 *
 	 * @param d destination to connect
 	 * @throws KNXTimeoutException on timeout during connect
 	 * @throws KNXLinkClosedException if sending on a closed KNX network link
@@ -153,7 +153,7 @@ public interface TransportLayer
 	 * on return of this method.<br>
 	 * If the destination is already in disconnected state or destroyed, no action is
 	 * performed.
-	 * 
+	 *
 	 * @param d destination to disconnect from
 	 * @throws KNXLinkClosedException if sending on a closed KNX network link
 	 */
@@ -166,7 +166,7 @@ public interface TransportLayer
 	 * timeouts are observed and send repetition are done according to the transport layer
 	 * protocol. The method blocks for the corresponding layer 4 acknowledge before
 	 * returning. If no acknowledgment is received, the destination is disconnected.
-	 * 
+	 *
 	 * @param d send destination in the KNX network
 	 * @param p KNX message priority
 	 * @param tsdu transport layer service data unit to send
@@ -182,7 +182,7 @@ public interface TransportLayer
 	 * <p>
 	 * Depending on the supplied type of KNX address, sending on the KNX network is
 	 * unicast or multicast.
-	 * 
+	 *
 	 * @param addr send destination in the KNX network, address of type
 	 *        {@link IndividualAddress} for unicast, {@link GroupAddress} for multicast
 	 * @param p KNX message priority
@@ -198,7 +198,7 @@ public interface TransportLayer
 	 * <p>
 	 * The broadcast mode for KNX messages also depends on the used KNX medium, and might
 	 * differ from the mode specified here.
-	 * 
+	 *
 	 * @param system <code>true</code> for system broadcast, <code>false</code> for
 	 *        default (domain) broadcast
 	 * @param p KNX message priority
@@ -216,12 +216,12 @@ public interface TransportLayer
 	 * The name should at least be unique for transport layers attached to different
 	 * links.<br>
 	 * The returned name is used by this layer as the name of its log service. Supply
-	 * {@link #getName()} for {@link LogManager#getLogService(String)} for example to get
+	 * {@link #getName()} for {@link LogService#getLogger(String)} for example to get
 	 * the associated log service.
 	 * <p>
 	 * By default, the name starts with "TL " + the name of the attached network link.
 	 * After detach of the transport layer the name might get reset to some default name.
-	 * 
+	 *
 	 * @return transport layer name as string
 	 */
 	String getName();
@@ -237,7 +237,7 @@ public interface TransportLayer
 	 * If no network link is attached, no action is performed.
 	 * <p>
 	 * Note that a detach does not trigger a close of the used network link.
-	 * 
+	 *
 	 * @return the formerly attached KNX network link, or <code>null</code> if already
 	 *         detached
 	 */

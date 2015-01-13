@@ -42,7 +42,7 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import tuwien.auto.calimero.log.LogService;
+import org.slf4j.Logger;
 
 /**
  * Adapter to access a serial communication port using some serial I/O library.
@@ -65,14 +65,14 @@ public abstract class LibraryAdapter
 	 * The log service to use, supplied in the constructor; if a sub-class of
 	 * LibraryAdapter does not use logger, it might be set to null.
 	 */
-	protected final LogService logger;
+	protected final Logger logger;
 
 	/**
 	 * Creates a new library adapter.
 	 *
 	 * @param logService the log service to use for this adapter
 	 */
-	protected LibraryAdapter(final LogService logService)
+	protected LibraryAdapter(final Logger logService)
 	{
 		logger = logService;
 	}

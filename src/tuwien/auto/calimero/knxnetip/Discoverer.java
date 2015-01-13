@@ -52,6 +52,8 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.exception.KNXException;
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
@@ -64,7 +66,6 @@ import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchRequest;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
-import tuwien.auto.calimero.log.LogManager;
 import tuwien.auto.calimero.log.LogService;
 
 /**
@@ -116,7 +117,7 @@ public class Discoverer
 
 	static final InetAddress SYSTEM_SETUP_MULTICAST;
 
-	private static final LogService logger = LogManager.getManager().getLogService(LOG_SERVICE);
+	private static final Logger logger = LogService.getLogger(LOG_SERVICE);
 
 	// local host/port
 	private final InetAddress host;
@@ -137,7 +138,7 @@ public class Discoverer
 			a = InetAddress.getByName(SEARCH_MULTICAST);
 		}
 		catch (final UnknownHostException e) {
-			logger.fatal("on resolving system setup multicast " + SEARCH_MULTICAST, e);
+			logger.error("on resolving system setup multicast " + SEARCH_MULTICAST, e);
 		}
 		SYSTEM_SETUP_MULTICAST = a;
 	}

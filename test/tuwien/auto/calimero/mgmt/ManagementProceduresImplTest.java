@@ -45,7 +45,6 @@ import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.KNXNetworkLinkIP;
 import tuwien.auto.calimero.link.medium.TPSettings;
-import tuwien.auto.calimero.log.LogManager;
 
 /**
  * @author B. Malinowsky
@@ -73,7 +72,7 @@ public class ManagementProceduresImplTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		LogManager.getManager().addWriter("", Util.getLogWriter());
+		Util.setupLogging();
 		link = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, Util.getLocalHost(),
 			Util.getServer(), false, TPSettings.TP1);
 		mp = new ManagementProceduresImpl(link);
@@ -88,7 +87,7 @@ public class ManagementProceduresImplTest extends TestCase
 	protected void tearDown() throws Exception
 	{
 		link.close();
-		LogManager.getManager().removeWriter("", Util.getLogWriter());
+		Util.tearDownLogging();
 		super.tearDown();
 	}
 

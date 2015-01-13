@@ -43,7 +43,7 @@ import java.util.EventListener;
 import java.util.Iterator;
 import java.util.List;
 
-import tuwien.auto.calimero.log.LogService;
+import org.slf4j.Logger;
 
 /**
  * Container for keeping event listeners.
@@ -58,7 +58,7 @@ public class EventListeners<T extends EventListener>
 	private final List<T> listeners = new ArrayList<>();
 	private T[] listenersCopy;
 	private final Class<T> type;
-	private final LogService logger;
+	private final Logger logger;
 
 	/**
 	 * Creates a new event listeners container object.
@@ -73,7 +73,7 @@ public class EventListeners<T extends EventListener>
 	 *
 	 * @param logger optional logger for log output
 	 */
-	public EventListeners(final Class<T> listenerType, final LogService logger)
+	public EventListeners(final Class<T> listenerType, final Logger logger)
 	{
 		type = listenerType;
 		this.logger = logger;

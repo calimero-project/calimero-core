@@ -42,6 +42,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DetachEvent;
 import tuwien.auto.calimero.FrameEvent;
@@ -58,8 +60,6 @@ import tuwien.auto.calimero.internal.EventListeners;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.NetworkLinkListener;
-import tuwien.auto.calimero.log.LogLevel;
-import tuwien.auto.calimero.log.LogManager;
 import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.mgmt.Destination.AggregatorProxy;
 
@@ -116,7 +116,7 @@ public class TransportLayerImpl implements TransportLayer
 				try {
 					AggregatorProxy ap = null;
 					synchronized (proxies) {
-						ap = proxies.get(f.getSource());
+						ap = (AggregatorProxy) proxies.get(f.getSource());
 					}
 					handleConnected(f, ap);
 				}
@@ -153,9 +153,9 @@ public class TransportLayerImpl implements TransportLayer
 	private static final GroupAddress broadcast = new GroupAddress(0);
 	// used as default on incoming conn.oriented messages from unknown remote devices
 	private final Destination unknownPartner = new Destination(new AggregatorProxy(this),
-			new IndividualAddress(0), true);
+		new IndividualAddress(0), true);
 
-	private final LogService logger;
+	private final Logger logger;
 
 	// are we representing server side of this transport layer connection
 	private final boolean serverSide;
@@ -201,7 +201,7 @@ public class TransportLayerImpl implements TransportLayer
 			throw new KNXLinkClosedException();
 		lnk = link;
 		lnk.addLinkListener(lnkListener);
-		logger = LogManager.getManager().getLogService(getName());
+		logger = LogService.getLogger(getName());
 		listeners = new EventListeners<>(TransportListener.class, logger);
 		serverSide = serverEndpoint;
 	}
@@ -240,7 +240,7 @@ public class TransportLayerImpl implements TransportLayer
 			final Destination d = new Destination(p, remote, connectionOriented, keepAlive,
 					verifyMode);
 			proxies.put(remote, p);
-			if (logger.isLoggable(LogLevel.TRACE))
+			if (logger.isTraceEnabled())
 				logger.trace("destination " + remote + " ready for use");
 			return d;
 		}
@@ -255,7 +255,7 @@ public class TransportLayerImpl implements TransportLayer
 	 */
 	public Destination getDestination(final IndividualAddress remote)
 	{
-		final AggregatorProxy proxy = proxies.get(remote);
+		final AggregatorProxy proxy = (AggregatorProxy) proxies.get(remote);
 		return proxy != null ? proxy.getDestination() : null;
 	}
 
@@ -268,7 +268,7 @@ public class TransportLayerImpl implements TransportLayer
 	{
 		// method invocation is idempotent
 		synchronized (proxies) {
-			final AggregatorProxy p = proxies.get(d.getAddress());
+			final AggregatorProxy p = (AggregatorProxy) proxies.get(d.getAddress());
 			if (p == null)
 				return;
 			if (p.getDestination() == d) {
@@ -318,7 +318,7 @@ public class TransportLayerImpl implements TransportLayer
 		final byte[] tpdu = new byte[] { (byte) CONNECT };
 		lnk.sendRequestWait(d.getAddress(), Priority.SYSTEM, tpdu);
 		p.setState(Destination.OPEN_IDLE);
-		if (logger.isLoggable(LogLevel.TRACE))
+		if (logger.isTraceEnabled())
 			logger.trace("connected with " + d.getAddress());
 	}
 
@@ -359,7 +359,7 @@ public class TransportLayerImpl implements TransportLayer
 					active = ap;
 					for (repeated = 0; repeated < MAX_REPEAT + 1; ++repeated) {
 						try {
-							if (logger.isLoggable(LogLevel.TRACE))
+							if (logger.isTraceEnabled())
 								logger.trace("sending data connected to " + d.getAddress()
 										+ ", attempt " + (repeated + 1));
 							// set state and timer
@@ -432,7 +432,7 @@ public class TransportLayerImpl implements TransportLayer
 		detached = true;
 		fireDetached();
 		logger.info("detached from " + lnk.getName());
-		LogManager.getManager().removeLogService(logger.getName());
+		LogService.removeLogger(logger);
 		return lnk;
 	}
 
@@ -441,7 +441,7 @@ public class TransportLayerImpl implements TransportLayer
 		if (detached)
 			throw new KNXIllegalStateException("TL detached");
 		synchronized (proxies) {
-			final AggregatorProxy p = proxies.get(d.getAddress());
+			final AggregatorProxy p = (AggregatorProxy) proxies.get(d.getAddress());
 			// TODO at this point, proxy might also be null because destination just got destroyed
 			// check identity, too, to prevent destination with only same address
 			if (p == null || p.getDestination() != d)
@@ -498,7 +498,7 @@ public class TransportLayerImpl implements TransportLayer
 		}
 		else if ((ctrl & 0xC0) == DATA_CONNECTED) {
 			if (d.getState() == Destination.DISCONNECTED || !sender.equals(d.getAddress())) {
-				if (logger.isLoggable(LogLevel.TRACE))
+				if (logger.isTraceEnabled())
 					logger.trace("send disconnect to " + sender);
 				sendDisconnect(sender);
 			} else {
@@ -522,7 +522,7 @@ public class TransportLayerImpl implements TransportLayer
 			else if (d.getState() == Destination.OPEN_WAIT && seq == p.getSeqSend()) {
 				p.incSeqSend();
 				p.setState(Destination.OPEN_IDLE);
-				if (logger.isLoggable(LogLevel.TRACE))
+				if (logger.isTraceEnabled())
 					logger.trace("positive ack by " + d.getAddress());
 			}
 			else
@@ -572,7 +572,7 @@ public class TransportLayerImpl implements TransportLayer
 		// destroyDestination(), called by d.destroy()
 		AggregatorProxy[] allProxies = new AggregatorProxy[proxies.size()];
 		synchronized (proxies) {
-			allProxies = proxies.values().toArray(allProxies);
+			allProxies = (AggregatorProxy[]) proxies.values().toArray(allProxies);
 		}
 		for (int i = 0; i < allProxies.length; i++) {
 			final AggregatorProxy p = allProxies[i];
@@ -598,7 +598,7 @@ public class TransportLayerImpl implements TransportLayer
 		}
 		finally {
 			fireDisconnected(p.getDestination());
-			if (logger.isLoggable(LogLevel.TRACE))
+			if (logger.isTraceEnabled())
 				logger.trace("disconnected from " + p.getDestination().getAddress());
 		}
 	}

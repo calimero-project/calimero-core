@@ -41,8 +41,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.exception.KNXException;
-import tuwien.auto.calimero.log.LogService;
 
 /**
  * Adapter for Java ME CDC javax.microedition.io.CommConnection.
@@ -67,7 +68,7 @@ class CommConnectionAdapter extends LibraryAdapter
 		connector = clazz;
 	}
 
-	CommConnectionAdapter(final LogService logger, final String portId, final int baudrate)
+	CommConnectionAdapter(final Logger logger, final String portId, final int baudrate)
 		throws KNXException
 	{
 		super(logger);

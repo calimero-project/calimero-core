@@ -43,7 +43,6 @@ import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled.DPT3BitControlled;
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
-import tuwien.auto.calimero.log.LogManager;
 
 /**
  * @author B. Malinowsky
@@ -94,7 +93,7 @@ public class DPTXlator3BitControlledTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		LogManager.getManager().addWriter("DPTXlator", Util.getLogWriter());
+		Util.setupLogging("DPTXlator");
 		t7 = new DPTXlator3BitControlled(dim);
 		t8 = new DPTXlator3BitControlled(blind);
 	}
@@ -106,7 +105,7 @@ public class DPTXlator3BitControlledTest extends TestCase
 	protected void tearDown() throws Exception
 	{
 		Thread.sleep(100);
-		LogManager.getManager().removeWriter("DPTXlator", Util.getLogWriter());
+		Util.tearDownLogging();
 		super.tearDown();
 	}
 

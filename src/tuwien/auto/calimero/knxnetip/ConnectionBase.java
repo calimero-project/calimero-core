@@ -43,6 +43,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.EventListener;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.FrameEvent;
@@ -59,9 +61,8 @@ import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingIndication;
 import tuwien.auto.calimero.knxnetip.servicetype.ServiceRequest;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
-import tuwien.auto.calimero.log.LogLevel;
-import tuwien.auto.calimero.log.LogManager;
 import tuwien.auto.calimero.log.LogService;
+import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * Generic implementation of a KNXnet/IP connection, used for tunneling, device management
@@ -109,7 +110,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	/** container for event listeners */
 	protected final EventListeners<KNXListener> listeners = new EventListeners<>(KNXListener.class);
 	/** logger for this connection */
-	protected LogService logger;
+	protected Logger logger;
 
 	// current state visible to the user
 	// a state < 0 indicates severe error state
@@ -237,7 +238,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 						dataEndpt.getAddress(), dataEndpt.getPort());
 				int attempt = 0;
 				for (; attempt < maxSendAttempts; ++attempt) {
-					if (logger.isLoggable(LogLevel.TRACE))
+					if (logger.isTraceEnabled())
 						logger.trace("sending cEMI frame, " + mode + ", attempt " + (attempt + 1));
 
 					socket.send(p);
@@ -497,7 +498,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		setState(CLOSED);
 		fireConnectionClosed(initiator, reason);
 		listeners.removeAll();
-		LogManager.getManager().removeLogService(logger.getName());
+		LogService.removeLogger(logger);
 	}
 
 	/**

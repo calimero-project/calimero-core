@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,8 @@
 
 package tuwien.auto.calimero.link;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.cemi.CEMIBusMon;
@@ -46,7 +48,6 @@ import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.link.medium.RawFrameFactory;
-import tuwien.auto.calimero.log.LogManager;
 import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.serial.FT12Connection;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
@@ -57,7 +58,7 @@ import tuwien.auto.calimero.serial.KNXPortClosedException;
  * <p>
  * Once a monitor has been closed, it is not available for further link communication,
  * i.e., it can't be reopened.
- * 
+ *
  * @author B. Malinowsky
  */
 public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
@@ -66,7 +67,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 	{
 		volatile boolean decode;
 
-		MonitorNotifier(final Object source, final LogService logger)
+		MonitorNotifier(final Object source, final Logger logger)
 		{
 			super(source, logger);
 		}
@@ -106,7 +107,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 			((KNXNetworkMonitorFT12) source).closed = true;
 			super.connectionClosed(e);
 			logger.info("monitor closed");
-			LogManager.getManager().removeLogService(logger.getName());
+			LogService.removeLogger(logger);
 		}
 	}
 
@@ -117,7 +118,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 	private KNXMediumSettings medium;
 
 	private final String name;
-	private final LogService logger;
+	private final Logger logger;
 	// our link connection event notifier
 	private final MonitorNotifier notifier;
 
@@ -127,7 +128,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 	 * <p>
 	 * The port identifier is used to choose the serial port for communication. These
 	 * identifiers are usually device and platform specific.
-	 * 
+	 *
 	 * @param portID identifier of the serial communication port to use
 	 * @param settings medium settings defining the specific KNX medium needed for
 	 *        decoding raw frames received from the KNX network
@@ -139,7 +140,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 		conn = new FT12Connection(portID);
 		enterBusmonitor();
 		name = "monitor " + conn.getPortID();
-		logger = LogManager.getManager().getLogService(getName());
+		logger = LogService.getLogger(getName());
 		logger.info("in busmonitor mode - ready to receive");
 		notifier = new MonitorNotifier(this, logger);
 		conn.addConnectionListener(notifier);
@@ -153,7 +154,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 	 * <p>
 	 * The port number is used to choose the serial port for communication. It is mapped
 	 * to the default port identifier using that number on the platform.
-	 * 
+	 *
 	 * @param portNumber port number of the serial communication port to use
 	 * @param settings medium settings defining the specific KNX medium needed for
 	 *        decoding raw frames received from the KNX network
@@ -165,7 +166,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 		conn = new FT12Connection(portNumber);
 		enterBusmonitor();
 		name = "monitor " + conn.getPortID();
-		logger = LogManager.getManager().getLogService(getName());
+		logger = LogService.getLogger(getName());
 		logger.info("in busmonitor mode - ready to receive");
 		notifier = new MonitorNotifier(this, logger);
 		conn.addConnectionListener(notifier);

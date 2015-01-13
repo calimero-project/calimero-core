@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,8 @@
 
 package tuwien.auto.calimero.link;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.FrameEvent;
@@ -50,8 +52,6 @@ import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.exception.KNXTimeoutException;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
-import tuwien.auto.calimero.log.LogLevel;
-import tuwien.auto.calimero.log.LogManager;
 import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.serial.FT12Connection;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
@@ -62,14 +62,14 @@ import tuwien.auto.calimero.serial.KNXPortClosedException;
  * <p>
  * Once a link has been closed, it is not available for further link communication, i.e.
  * it can not be reopened.
- * 
+ *
  * @author B. Malinowsky
  */
 public class KNXNetworkLinkFT12 implements KNXNetworkLink
 {
 	private static final class LinkNotifier extends EventNotifier
 	{
-		LinkNotifier(final Object source, final LogService logger)
+		LinkNotifier(final Object source, final Logger logger)
 		{
 			super(source, logger);
 		}
@@ -101,7 +101,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 			((KNXNetworkLinkFT12) source).closed = true;
 			super.connectionClosed(e);
 			logger.info("link closed");
-			LogManager.getManager().removeLogService(logger.getName());
+			LogService.removeLogger(logger);
 		}
 	};
 
@@ -113,7 +113,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 	private KNXMediumSettings medium;
 
 	private final String name;
-	private final LogService logger;
+	private final Logger logger;
 	// our link connection event notifier
 	private final EventNotifier notifier;
 
@@ -123,7 +123,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 	 * <p>
 	 * The port identifier is used to choose the serial port for communication. These
 	 * identifiers are usually device and platform specific.
-	 * 
+	 *
 	 * @param portID identifier of the serial communication port to use
 	 * @param settings medium settings defining device and medium specifics needed for
 	 *        communication
@@ -135,7 +135,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 		conn = new FT12Connection(portID);
 		linkLayerMode();
 		name = "link " + conn.getPortID();
-		logger = LogManager.getManager().getLogService(getName());
+		logger = LogService.getLogger(getName());
 		notifier = new LinkNotifier(this, logger);
 		conn.addConnectionListener(notifier);
 		// configure KNX medium stuff
@@ -148,7 +148,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 	 * <p>
 	 * The port number is used to choose the serial port for communication. It is mapped
 	 * to the default port identifier using that number on the platform.
-	 * 
+	 *
 	 * @param portNumber port number of the serial communication port to use
 	 * @param settings medium settings defining device and medium specifics needed for
 	 *        communication
@@ -160,7 +160,7 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 		conn = new FT12Connection(portNumber);
 		linkLayerMode();
 		name = "link " + conn.getPortID();
-		logger = LogManager.getManager().getLogService(getName());
+		logger = LogService.getLogger(getName());
 		notifier = new LinkNotifier(this, logger);
 		conn.addConnectionListener(notifier);
 		// configure KNX medium stuff
@@ -380,8 +380,8 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 		if (closed)
 			throw new KNXLinkClosedException("link closed");
 		try {
-			final boolean trace = logger.isLoggable(LogLevel.TRACE);
-			if (trace || logger.isLoggable(LogLevel.INFO))
+			final boolean trace = logger.isTraceEnabled();
+			if (trace || logger.isInfoEnabled())
 				logger.info("send message to " + dst + (wait ? ", wait for ack" : ""));
 			if (trace)
 				logger.trace("EMI " + DataUnitBuilder.toHex(msg, " "));

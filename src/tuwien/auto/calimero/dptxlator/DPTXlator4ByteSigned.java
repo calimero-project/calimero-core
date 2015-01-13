@@ -41,7 +41,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.log.LogLevel;
+import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 13, type <b>4 byte signed value</b>.

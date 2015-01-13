@@ -47,10 +47,6 @@ import tuwien.auto.calimero.exception.KNXException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.knxnetip.servicetype.DescriptionResponse;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
-import tuwien.auto.calimero.log.LogLevel;
-import tuwien.auto.calimero.log.LogManager;
-import tuwien.auto.calimero.log.LogStreamWriter;
-import tuwien.auto.calimero.log.LogWriter;
 
 /**
  * @author B. Malinowsky
@@ -62,8 +58,6 @@ public class DiscovererTest extends TestCase
 	private Discoverer dmcast;
 	// search/description timeout in seconds
 	private final int timeout = 3;
-
-	private final LogWriter w = new LogStreamWriter(LogLevel.ALL, System.out, true, false);
 
 	/**
 	 * @param name name for test case
@@ -83,7 +77,7 @@ public class DiscovererTest extends TestCase
 		ddef = new Discoverer(0, false);
 		dnat = new Discoverer(0, true);
 		dmcast = new Discoverer(null, 0, false, true);
-		LogManager.getManager().addWriter(null, w);
+		Util.setupLogging();
 	}
 
 	/* (non-Javadoc)
@@ -99,7 +93,6 @@ public class DiscovererTest extends TestCase
 		if (dmcast != null)
 			dmcast.stopSearch();
 		super.tearDown();
-		LogManager.getManager().removeWriter(null, w);
 	}
 
 	/**

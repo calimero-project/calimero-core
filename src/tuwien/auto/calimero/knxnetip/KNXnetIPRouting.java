@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,8 +54,8 @@ import tuwien.auto.calimero.exception.KNXTimeoutException;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingIndication;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingLostMessage;
-import tuwien.auto.calimero.log.LogLevel;
-import tuwien.auto.calimero.log.LogManager;
+import tuwien.auto.calimero.log.LogService.LogLevel;
+import tuwien.auto.calimero.log.LogService;
 
 /**
  * KNXnet/IP connection using the KNXnet/IP routing protocol.
@@ -262,7 +262,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	{
 		ctrlEndpt = new InetSocketAddress(multicast, DEFAULT_PORT);
 		dataEndpt = ctrlEndpt;
-		logger = LogManager.getManager().getLogService(getName());
+		logger = LogService.getLogger(getName());
 
 		MulticastSocket s = null;
 		try {
@@ -335,7 +335,7 @@ public class KNXnetIPRouting extends ConnectionBase
 			closing = 1;
 		}
 
-		logger.log(level, "close connection - " + reason, t);
+		LogService.log(logger, level, "close connection - " + reason, t);
 		try {
 			((MulticastSocket) socket).leaveGroup(multicast);
 		}

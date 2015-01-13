@@ -40,6 +40,8 @@ import java.util.EventListener;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.DetachEvent;
@@ -67,8 +69,6 @@ import tuwien.auto.calimero.internal.EventListeners;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.NetworkLinkListener;
-import tuwien.auto.calimero.log.LogLevel;
-import tuwien.auto.calimero.log.LogManager;
 import tuwien.auto.calimero.log.LogService;
 
 /**
@@ -159,7 +159,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	private volatile int responseTimeout = 10;
 	private volatile boolean wait;
 	private volatile boolean detached;
-	private final LogService logger;
+	private final Logger logger;
 
 	/**
 	 * Creates a new process communicator attached to the supplied KNX network link.
@@ -176,7 +176,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 			throw new KNXLinkClosedException();
 		lnk = link;
 		lnk.addLinkListener(lnkListener);
-		logger = LogManager.getManager().getLogService("process " + link.getName());
+		logger = LogService.getLogger("process " + link.getName());
 		listeners = new EventListeners<>(ProcessListener.class, logger);
 	}
 
@@ -440,7 +440,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		lnk.removeLinkListener(lnkListener);
 		fireDetached();
 		logger.info("detached from " + lnk.getName());
-		LogManager.getManager().removeLogService(logger.getName());
+		LogService.removeLogger(logger);
 		return lnk;
 	}
 
@@ -450,7 +450,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		if (detached)
 			throw new KNXIllegalStateException("process communicator detached");
 		lnk.sendRequestWait(dst, p, createGroupAPDU(GROUP_WRITE, t));
-		if (logger.isLoggable(LogLevel.TRACE))
+		if (logger.isTraceEnabled())
 			logger.trace("group write to " + dst + " succeeded");
 	}
 
@@ -470,7 +470,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 				indications.clear();
 			}
 			lnk.sendRequestWait(dst, p, DataUnitBuilder.createCompactAPDU(GROUP_READ, null));
-			if (logger.isLoggable(LogLevel.TRACE))
+			if (logger.isTraceEnabled())
 				logger.trace("sent group read request to " + dst);
 			return waitForResponse(dst, minASDULen + 2, maxASDULen + 2);
 		}
@@ -493,7 +493,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 				// - a shared KNX network link among several process communicators,
 				//   and therefore several group responses forwarded to each
 				while (indications.size() > 0) {
-					final FrameEvent e = indications.remove(0);
+					final FrameEvent e = (FrameEvent) indications.remove(0);
 					if (((CEMILData) e.getFrame()).getDestination().equals(from)) {
 						final byte[] d = e.getFrame().getPayload();
 						indications.clear();

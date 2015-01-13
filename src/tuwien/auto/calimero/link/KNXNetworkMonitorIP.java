@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,6 +40,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
+import org.slf4j.Logger;
+
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.cemi.CEMIBusMon;
@@ -50,7 +52,6 @@ import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.link.medium.RawFrameFactory;
-import tuwien.auto.calimero.log.LogManager;
 import tuwien.auto.calimero.log.LogService;
 
 /**
@@ -62,7 +63,7 @@ import tuwien.auto.calimero.log.LogService;
  * <p>
  * Pay attention to the IP address consideration stated in the documentation comments of
  * class {@link KNXNetworkLinkIP}.
- * 
+ *
  * @author B. Malinowsky
  */
 public class KNXNetworkMonitorIP implements KNXNetworkMonitor
@@ -71,7 +72,7 @@ public class KNXNetworkMonitorIP implements KNXNetworkMonitor
 	{
 		volatile boolean decode;
 
-		MonitorNotifier(final Object source, final LogService logger)
+		MonitorNotifier(final Object source, final Logger logger)
 		{
 			super(source, logger);
 		}
@@ -108,7 +109,7 @@ public class KNXNetworkMonitorIP implements KNXNetworkMonitor
 			((KNXNetworkMonitorIP) source).closed = true;
 			super.connectionClosed(e);
 			logger.info("monitor closed");
-			LogManager.getManager().removeLogService(logger.getName());
+			LogService.removeLogger(logger);
 		}
 	};
 
@@ -117,15 +118,15 @@ public class KNXNetworkMonitorIP implements KNXNetworkMonitor
 	private KNXMediumSettings medium;
 
 	private final String name;
-	private final LogService logger;
+	private final Logger logger;
 	// our link connection event notifier
 	private final MonitorNotifier notifier;
-	
+
 	/**
 	 * Creates a new network monitor based on the KNXnet/IP protocol for accessing the KNX
 	 * network.
 	 * <p>
-	 * 
+	 *
 	 * @param localEP the local endpoint to use for the link, this is the client control
 	 *        endpoint, use <code>null</code> for the default local host and an
 	 *        ephemeral port number
@@ -151,12 +152,12 @@ public class KNXNetworkMonitorIP implements KNXNetworkMonitor
 				throw new KNXException("no local host available");
 			}
 		conn = new KNXnetIPTunnel(KNXnetIPTunnel.BUSMONITOR_LAYER, ep, remoteEP, useNAT);
-		
+
 		// do our own IP:port string, since InetAddress.toString() always prepends a '/'
 		final InetSocketAddress a = conn.getRemoteAddress();
 		name = "monitor " + a.getAddress().getHostAddress() + ":" + a.getPort();
 
-		logger = LogManager.getManager().getLogService(getName());
+		logger = LogService.getLogger(getName());
 		logger.info("in busmonitor mode - ready to receive");
 		notifier = new MonitorNotifier(this, logger);
 		conn.addConnectionListener(notifier);

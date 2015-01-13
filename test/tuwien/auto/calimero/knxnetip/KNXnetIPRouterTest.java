@@ -56,7 +56,6 @@ import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.exception.KNXException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
-import tuwien.auto.calimero.log.LogManager;
 
 /**
  * @author B. Malinowsky
@@ -124,7 +123,7 @@ public class KNXnetIPRouterTest extends TestCase
 		super.setUp();
 		l = new RouterListenerImpl();
 
-		LogManager.getManager().addWriter(null, Util.getLogWriter());
+		Util.setupLogging();
 
 		frame =
 			new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0),
@@ -149,7 +148,7 @@ public class KNXnetIPRouterTest extends TestCase
 		if (r != null) {
 			r.close();
 		}
-		LogManager.getManager().removeWriter(null, Util.getLogWriter());
+		Util.tearDownLogging();
 		super.tearDown();
 	}
 

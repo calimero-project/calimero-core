@@ -48,7 +48,6 @@ import tuwien.auto.calimero.knxnetip.Debug;
 import tuwien.auto.calimero.link.medium.PLSettings;
 import tuwien.auto.calimero.link.medium.RawFrame;
 import tuwien.auto.calimero.link.medium.TPSettings;
-import tuwien.auto.calimero.log.LogManager;
 
 /**
  * Test for KNXNetworkMonitorFT12.
@@ -118,14 +117,14 @@ public class KNXNetworkMonitorFT12Test extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		LogManager.getManager().addWriter(null, Util.getLogWriter());
+		Util.setupLogging();
 		try {
 			// prevents access problems with a just previously closed port
 			Thread.sleep(50);
 			mon = new KNXNetworkMonitorFT12(Util.getSerialPort(), TPSettings.TP1);
 		}
 		catch (final Exception e) {
-			LogManager.getManager().removeWriter(null, Util.getLogWriter());
+			Util.tearDownLogging();
 			throw e;
 		}
 		lmon = new MonListener();
@@ -140,7 +139,7 @@ public class KNXNetworkMonitorFT12Test extends TestCase
 	{
 		if (mon != null)
 			mon.close();
-		LogManager.getManager().removeWriter(null, Util.getLogWriter());
+		Util.tearDownLogging();
 		super.tearDown();
 	}
 

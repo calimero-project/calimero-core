@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2011 B. Malinowsky
+    Copyright (c) 2010, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -62,15 +62,15 @@ import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.servicetype.ServiceAck;
 import tuwien.auto.calimero.knxnetip.util.CRI;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
-import tuwien.auto.calimero.log.LogLevel;
-import tuwien.auto.calimero.log.LogManager;
+import tuwien.auto.calimero.log.LogService.LogLevel;
+import tuwien.auto.calimero.log.LogService;
 
 /**
  * Base implementation for client tunneling, device management, and routing.
  * <p>
  * The communication on OSI layer 4 is done with UDP.<br>
  * Implements a communication heartbeat monitor.
- * 
+ *
  * @author B. Malinowsky
  */
 abstract class ClientConnection extends ConnectionBase
@@ -114,7 +114,7 @@ abstract class ClientConnection extends ConnectionBase
 	 * <p>
 	 * The communication state of this object is assumed to be closed state. This method
 	 * is designed to be called only once during the objects lifetime!
-	 * 
+	 *
 	 * @param localEP the local endpoint to use for communication channel
 	 * @param serverCtrlEP the remote server control endpoint used for connect request
 	 * @param cri connect request information used to configure the communication
@@ -138,7 +138,7 @@ abstract class ClientConnection extends ConnectionBase
 		if (ctrlEndpt.isUnresolved())
 			throw new KNXException("server control endpoint is unresolved: " + serverCtrlEP);
 		useNat = useNAT;
-		logger = LogManager.getManager().getLogService(getName());
+		logger = LogService.getLogger(getName());
 		Exception thrown = null;
 		try {
 			// if we allow localEP to be null, we would create an unbound socket
@@ -169,7 +169,7 @@ abstract class ClientConnection extends ConnectionBase
 			logger.error("communication failure on connect", thrown);
 			if (localEP.getAddress().isLoopbackAddress())
 				logger.warn("try to specify the actual IP address of the local host");
-			LogManager.getManager().removeLogService(logger.getName());
+			LogService.removeLogger(logger);
 			throw new KNXException("on connect to " + serverCtrlEP + ": " + thrown.getMessage());
 		}
 
@@ -211,7 +211,7 @@ abstract class ClientConnection extends ConnectionBase
 			cleanup = true;
 		}
 
-		logger.log(level, "close connection - " + reason, t);
+		LogService.log(logger, level, "close connection - " + reason, t);
 		// heartbeat was not necessarily used at all
 		if (heartbeat != null)
 			heartbeat.quit();
@@ -235,7 +235,7 @@ abstract class ClientConnection extends ConnectionBase
 		// throw on no answer
 		if (internalState == ClientConnection.CEMI_CON_PENDING) {
 			final KNXTimeoutException e = new KNXTimeoutException("no confirmation reply received");
-			logger.log(LogLevel.INFO, "response timeout waiting for confirmation", e);
+			logger.info("response timeout waiting for confirmation", e);
 			internalState = OK;
 			throw e;
 		}
@@ -352,7 +352,7 @@ abstract class ClientConnection extends ConnectionBase
 	 * <p>
 	 * On unsupported version,
 	 * {@link ClientConnection#close(int, String, LogLevel, Throwable)} is invoked.
-	 * 
+	 *
 	 * @param h KNX header to check
 	 * @return <code>true</code> on supported version, <code>false</code> otherwise
 	 */
@@ -372,7 +372,7 @@ abstract class ClientConnection extends ConnectionBase
 		socket.close();
 		setState(CLOSED);
 		logger.error("establishing connection failed", thrown);
-		LogManager.getManager().removeLogService(logger.getName());
+		LogService.removeLogger(logger);
 	}
 
 	private final class HeartbeatMonitor extends Thread

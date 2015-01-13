@@ -42,7 +42,6 @@ import junit.framework.TestCase;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
-import tuwien.auto.calimero.log.LogManager;
 
 /**
  * @author B. Malinowsky
@@ -91,7 +90,7 @@ public class DPTXlator8BitUnsignedTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		LogManager.getManager().addWriter("DPTXlator", Util.getLogWriter());
+		Util.setupLogging("DPTXlator");
 		t = new DPTXlator8BitUnsigned(dpts[5]);
 	}
 
@@ -102,7 +101,7 @@ public class DPTXlator8BitUnsignedTest extends TestCase
 	protected void tearDown() throws Exception
 	{
 		Thread.sleep(100);
-		LogManager.getManager().removeWriter("DPTXlator", Util.getLogWriter());
+		Util.tearDownLogging();
 		super.tearDown();
 	}
 
