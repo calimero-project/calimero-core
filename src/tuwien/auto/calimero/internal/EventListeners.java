@@ -62,6 +62,8 @@ public class EventListeners<T extends EventListener>
 
 	/**
 	 * Creates a new event listeners container object.
+	 *
+	 * @param listenerType common class type of listeners EventListeners is parameterized for
 	 */
 	public EventListeners(final Class<T> listenerType)
 	{
@@ -71,6 +73,7 @@ public class EventListeners<T extends EventListener>
 	/**
 	 * Creates a new event listeners container object.
 	 *
+	 * @param listenerType common class type of listeners EventListeners is parameterized for
 	 * @param logger optional logger for log output
 	 */
 	public EventListeners(final Class<T> listenerType, final Logger logger)

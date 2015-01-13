@@ -93,6 +93,9 @@ public final class LogService
 		return new AsyncLogger(LogService.getLogger(name));
 	}
 
+	/**
+	 * @param l
+	 */
 	public static void removeLogger(final Logger l)
 	{}
 
@@ -172,8 +175,8 @@ public final class LogService
 	 *
 	 * @param logger the logger
 	 * @param level log level to use for the message
-	 * @param msg the message to be logged
-	 * @param t the exception (throwable) to log, can be <code>null</code>
+	 * @param format the format string
+	 * @param o the arguments
 	 * @deprecated Used for transition to slf4j.
 	 */
 	public static void log(final Logger logger, final LogLevel level, final String format,
