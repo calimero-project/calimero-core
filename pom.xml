@@ -66,6 +66,7 @@
 				<configuration>
 					<overview>src/overview.html</overview>
 					<additionalparam>-Xdoclint:none</additionalparam>
+					<author>false</author>
 					<archive>
 						<manifestEntries>
 							<Built-By>calimero-project</Built-By>
