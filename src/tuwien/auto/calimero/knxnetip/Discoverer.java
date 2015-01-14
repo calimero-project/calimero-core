@@ -577,6 +577,14 @@ public class Discoverer
 		return s;
 	}
 
+	private static String nameOf(final NetworkInterface nif) {
+		final String friendly = nif.getDisplayName();
+		final String name = nif.getName();
+		if (friendly != null & !name.equals(friendly))
+			return friendly + "(" + name + ")";
+		return name;
+	}
+
 	private void join(final ReceiverLoop l) throws InterruptedException
 	{
 		while (l.t.isAlive())
