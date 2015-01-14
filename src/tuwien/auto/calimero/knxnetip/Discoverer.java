@@ -360,7 +360,10 @@ public class Discoverer
 						else
 							break;
 					}
-					catch (final KNXException ignore) {}
+					catch (final KNXException e) {
+						// we ignore exceptions here, but print an error for user information
+						logger.error(e.getMessage());
+					}
 			}
 		}
 		if (rcv.size() == 0)
@@ -524,8 +527,9 @@ public class Discoverer
 				}
 				catch (final IOException ignore) {}
 			s.close();
-			logger.warn("failure sending search request on " + localAddr + ":" + localPort, e);
-			throw new KNXException("search request failed, " + e.getMessage());
+			// logger.warn("failure sending search request on " + localAddr + ":" + localPort, e);
+			throw new KNXException("search request to " + SYSTEM_SETUP_MULTICAST + " failed on "
+					+ localAddr + ":" + localPort + ", " + e.getMessage());
 		}
 	}
 
@@ -569,8 +573,9 @@ public class Discoverer
 			}
 			catch (final IOException e) {
 				s.close();
-				final String msg = "joining group " + SYSTEM_SETUP_MULTICAST + " failed";
-				logger.error(msg, e);
+				final String msg = nameOf(ni) + ": joining group " + SYSTEM_SETUP_MULTICAST
+						+ " failed";
+				// logger.error(msg, e);
 				throw new KNXException(msg + ", " + e.getMessage());
 			}
 		}
