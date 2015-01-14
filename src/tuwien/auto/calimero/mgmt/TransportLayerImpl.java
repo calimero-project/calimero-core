@@ -116,7 +116,7 @@ public class TransportLayerImpl implements TransportLayer
 				try {
 					AggregatorProxy ap = null;
 					synchronized (proxies) {
-						ap = (AggregatorProxy) proxies.get(f.getSource());
+						ap = proxies.get(f.getSource());
 					}
 					handleConnected(f, ap);
 				}
@@ -255,7 +255,7 @@ public class TransportLayerImpl implements TransportLayer
 	 */
 	public Destination getDestination(final IndividualAddress remote)
 	{
-		final AggregatorProxy proxy = (AggregatorProxy) proxies.get(remote);
+		final AggregatorProxy proxy = proxies.get(remote);
 		return proxy != null ? proxy.getDestination() : null;
 	}
 
@@ -268,7 +268,7 @@ public class TransportLayerImpl implements TransportLayer
 	{
 		// method invocation is idempotent
 		synchronized (proxies) {
-			final AggregatorProxy p = (AggregatorProxy) proxies.get(d.getAddress());
+			final AggregatorProxy p = proxies.get(d.getAddress());
 			if (p == null)
 				return;
 			if (p.getDestination() == d) {
@@ -441,7 +441,7 @@ public class TransportLayerImpl implements TransportLayer
 		if (detached)
 			throw new KNXIllegalStateException("TL detached");
 		synchronized (proxies) {
-			final AggregatorProxy p = (AggregatorProxy) proxies.get(d.getAddress());
+			final AggregatorProxy p = proxies.get(d.getAddress());
 			// TODO at this point, proxy might also be null because destination just got destroyed
 			// check identity, too, to prevent destination with only same address
 			if (p == null || p.getDestination() != d)
@@ -572,7 +572,7 @@ public class TransportLayerImpl implements TransportLayer
 		// destroyDestination(), called by d.destroy()
 		AggregatorProxy[] allProxies = new AggregatorProxy[proxies.size()];
 		synchronized (proxies) {
-			allProxies = (AggregatorProxy[]) proxies.values().toArray(allProxies);
+			allProxies = proxies.values().toArray(allProxies);
 		}
 		for (int i = 0; i < allProxies.length; i++) {
 			final AggregatorProxy p = allProxies[i];

@@ -493,7 +493,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 				// - a shared KNX network link among several process communicators,
 				//   and therefore several group responses forwarded to each
 				while (indications.size() > 0) {
-					final FrameEvent e = (FrameEvent) indications.remove(0);
+					final FrameEvent e = indications.remove(0);
 					if (((CEMILData) e.getFrame()).getDestination().equals(from)) {
 						final byte[] d = e.getFrame().getPayload();
 						indications.clear();

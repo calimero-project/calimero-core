@@ -297,7 +297,7 @@ public class ManagementClientImpl implements ManagementClient
 		finally {
 			svcResponse = 0;
 		}
-		return (IndividualAddress[]) l.toArray(new IndividualAddress[l.size()]);
+		return l.toArray(new IndividualAddress[l.size()]);
 	}
 
 	/* (non-Javadoc)
