@@ -72,6 +72,7 @@
 				<version>2.9.1</version>
 				<configuration>
 					<overview>src/overview.html</overview>
+					<author>false</author>
 					<archive>
 						<manifestEntries>
 							<Built-By>calimero-project</Built-By>
