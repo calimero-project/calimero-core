@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,58 +37,72 @@
 package tuwien.auto.calimero.xml;
 
 /**
- * XML element attribute.
- * <p>
- * Objects of this type are immutable.
- * 
+ * XML writer interface to be used with {@link javax.xml.stream.XMLStreamWriter}. This interface was
+ * created by extending the XMLStreamWriter class, without adding any new methods. It does not
+ * provide methods which are not supported on Java ME Embedded.
+ *
  * @author B. Malinowsky
  */
-public class Attribute
+public interface XmlWriter extends AutoCloseable //, XMLStreamWriter
 {
-	private final String name;
-	private final String value;
+	void writeStartElement(String localName);
 
-	/**
-	 * Creates an attribute with its name and value.
-	 * <p>
-	 * 
-	 * @param name name of the attribute
-	 * @param value value of the attribute
-	 */
-	public Attribute(final String name, final String value)
-	{
-		this.name = name;
-		this.value = value;
-	}
+	void writeStartElement(String namespaceURI, String localName);
 
-	/**
-	 * Returns the attribute name.
-	 * <p>
-	 * 
-	 * @return attribute name
-	 */
-	public final String getName()
-	{
-		return name;
-	}
+	void writeStartElement(String prefix, String localName, String namespaceURI);
 
-	/**
-	 * Returns the value of this attribute.
-	 * <p>
-	 * 
-	 * @return value as String
-	 */
-	public final String getValue()
-	{
-		return value;
-	}
+	void writeEmptyElement(String namespaceURI, String localName);
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+	void writeEmptyElement(String prefix, String localName, String namespaceURI);
+
+	void writeEmptyElement(String localName);
+
+	void writeEndElement();
+
+	void writeEndDocument();
+
+	void writeAttribute(String localName, String value);
+
+	void writeAttribute(String prefix, String namespaceURI, String localName, String value);
+
+	void writeAttribute(String namespaceURI, String localName, String value);
+
+	void writeNamespace(String prefix, String namespaceURI);
+
+	void writeDefaultNamespace(String namespaceURI);
+
+	void writeComment(String data);
+
+	void writeProcessingInstruction(String target);
+
+	void writeProcessingInstruction(String target, String data);
+
+	void writeCData(String data);
+
+	void writeDTD(String dtd);
+
+	void writeEntityRef(String name);
+
+	void writeStartDocument();
+
+	void writeStartDocument(String version);
+
+	void writeStartDocument(String encoding, String version);
+
+	void writeCharacters(String text);
+
+	void writeCharacters(char[] text, int start, int len);
+
+	String getPrefix(String uri);
+
+	void setPrefix(String prefix, String uri);
+
+	void setDefaultNamespace(String uri);
+
+	Object getProperty(java.lang.String name);
+
+	void flush();
+
 	@Override
-	public String toString()
-	{
-		return name + "=" + value;
-	}
+	void close();
 }

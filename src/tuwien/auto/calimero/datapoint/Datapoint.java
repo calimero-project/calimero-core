@@ -36,16 +36,11 @@
 
 package tuwien.auto.calimero.datapoint;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.Priority;
-import tuwien.auto.calimero.xml.Attribute;
-import tuwien.auto.calimero.xml.Element;
 import tuwien.auto.calimero.xml.KNXMLException;
-import tuwien.auto.calimero.xml.XMLReader;
-import tuwien.auto.calimero.xml.XMLWriter;
+import tuwien.auto.calimero.xml.XmlReader;
+import tuwien.auto.calimero.xml.XmlWriter;
 
 /**
  * Represents a KNX datapoint configuration.
@@ -68,7 +63,7 @@ import tuwien.auto.calimero.xml.XMLWriter;
  */
 public abstract class Datapoint
 {
-	private static final String TAG_DATAPOINT = "datapoint";
+	static final String TAG_DATAPOINT = "datapoint";
 	private static final String ATTR_NAME = "name";
 	private static final String ATTR_STATEBASED = "stateBased";
 	private static final String ATTR_MAINNUMBER = "mainNumber";
@@ -113,31 +108,30 @@ public abstract class Datapoint
 	 * @throws KNXMLException if the XML element is no datapoint or could not be read
 	 *         correctly
 	 */
-	Datapoint(final XMLReader r) throws KNXMLException
+	Datapoint(final XmlReader r) throws KNXMLException
 	{
-		if (r.getPosition() != XMLReader.START_TAG)
-			r.read();
-		final Element e = r.getCurrent();
-		if (r.getPosition() != XMLReader.START_TAG || !e.getName().equals(TAG_DATAPOINT))
+		if (r.getEventType() != XmlReader.START_ELEMENT)
+			r.nextTag();
+		if (r.getEventType() != XmlReader.START_ELEMENT || !r.getLocalName().equals(TAG_DATAPOINT))
 			throw new KNXMLException("no KNX datapoint element", r);
 		stateBased = readDPType(r);
-		if ((name = e.getAttribute(ATTR_NAME)) == null)
+		if ((name = r.getAttributeValue(null, ATTR_NAME)) == null)
 			throw new KNXMLException("missing attribute " + ATTR_NAME, r);
-		if ((dptId = e.getAttribute(ATTR_DPTID)) == null)
+		if ((dptId = r.getAttributeValue(null, ATTR_DPTID)) == null)
 			throw new KNXMLException("missing attribute " + ATTR_DPTID, r);
 		if (dptId.length() == 0)
 			dptId = null;
 		String a = null;
 		try {
-			a = e.getAttribute(ATTR_MAINNUMBER);
+			a = r.getAttributeValue(null, ATTR_MAINNUMBER);
 			mainNo = Integer.decode(a).intValue();
-			a = e.getAttribute(ATTR_PRIORITY);
+			a = r.getAttributeValue(null, ATTR_PRIORITY);
 			priority = Priority.get(a);
 		}
 		catch (final RuntimeException rte) {
 			throw new KNXMLException("malformed attribute, " + rte.getMessage(), r);
 		}
-		r.read();
+		r.nextTag();
 	}
 
 	/**
@@ -151,11 +145,11 @@ public abstract class Datapoint
 	 * @throws KNXMLException if the XML element is no datapoint or could not be read
 	 *         correctly
 	 */
-	public static Datapoint create(final XMLReader r) throws KNXMLException
+	public static Datapoint create(final XmlReader r) throws KNXMLException
 	{
-		if (r.getPosition() != XMLReader.START_TAG)
-			r.read();
-		if (r.getPosition() == XMLReader.START_TAG) {
+		if (r.getEventType() != XmlReader.START_ELEMENT)
+			r.nextTag();
+		if (r.getEventType() == XmlReader.START_ELEMENT) {
 			if (readDPType(r))
 				return new StateDP(r);
 			return new CommandDP(r);
@@ -279,7 +273,7 @@ public abstract class Datapoint
 	 * @param w a XML writer
 	 * @throws KNXMLException on error saving this datapoint
 	 */
-	public void save(final XMLWriter w) throws KNXMLException
+	public void save(final XmlWriter w) throws KNXMLException
 	{
 		/* XML layout:
 		 <datapoint stateBased=[true|false] name=string mainNumber=int dptID=string
@@ -288,16 +282,15 @@ public abstract class Datapoint
 		 ...
 		 </datapoint>
 		*/
-		final List<Attribute> att = new ArrayList<>();
-		att.add(new Attribute(ATTR_STATEBASED, Boolean.toString(stateBased)));
-		att.add(new Attribute(ATTR_NAME, name));
-		att.add(new Attribute(ATTR_MAINNUMBER, Integer.toString(mainNo)));
-		att.add(new Attribute(ATTR_DPTID, dptId == null ? "" : dptId));
-		att.add(new Attribute(ATTR_PRIORITY, priority.toString()));
-		w.writeElement(TAG_DATAPOINT, att, null);
+		w.writeStartElement(TAG_DATAPOINT);
+		w.writeAttribute(ATTR_STATEBASED, Boolean.toString(stateBased));
+		w.writeAttribute(ATTR_NAME, name);
+		w.writeAttribute(ATTR_MAINNUMBER, Integer.toString(mainNo));
+		w.writeAttribute(ATTR_DPTID, dptId == null ? "" : dptId);
+		w.writeAttribute(ATTR_PRIORITY, priority.toString());
 		main.save(w);
 		doSave(w);
-		w.endElement();
+		w.writeEndElement();
 	}
 
 	/* (non-Javadoc)
@@ -310,21 +303,21 @@ public abstract class Datapoint
 				+ (dptId == null ? "-" : dptId) + ", " + priority.toString() + " priority";
 	}
 
-	void doLoad(final XMLReader r) throws KNXMLException
+	void doLoad(final XmlReader r) throws KNXMLException
 	{
 		if (main != null)
 			throw new KNXMLException("main address already set", r);
-		if (r.getPosition() != XMLReader.START_TAG)
-			r.read();
+		if (r.getEventType() != XmlReader.START_ELEMENT)
+			r.nextTag();
 		main = new GroupAddress(r);
 	}
 
-	abstract void doSave(XMLWriter w) throws KNXMLException;
+	abstract void doSave(XmlWriter w) throws KNXMLException;
 
 	/* returns true for state based DP, false for command based DP */
-	private static boolean readDPType(final XMLReader r) throws KNXMLException
+	private static boolean readDPType(final XmlReader r) throws KNXMLException
 	{
-		final String a = r.getCurrent().getAttribute(ATTR_STATEBASED);
+		final String a = r.getAttributeValue(null, ATTR_STATEBASED);
 		if ("false".equalsIgnoreCase(a))
 			return false;
 		if ("true".equalsIgnoreCase(a))

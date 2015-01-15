@@ -37,7 +37,7 @@
 package tuwien.auto.calimero;
 
 import tuwien.auto.calimero.xml.KNXMLException;
-import tuwien.auto.calimero.xml.XMLReader;
+import tuwien.auto.calimero.xml.XmlReader;
 
 /**
  * Represents an immutable KNX individual address.
@@ -122,7 +122,7 @@ public class IndividualAddress extends KNXAddress
 	 * @throws KNXMLException if the XML element is no KNXAddress or the address couldn't
 	 *         be read in correctly
 	 */
-	public IndividualAddress(final XMLReader r) throws KNXMLException
+	public IndividualAddress(final XmlReader r) throws KNXMLException
 	{
 		super(r);
 	}

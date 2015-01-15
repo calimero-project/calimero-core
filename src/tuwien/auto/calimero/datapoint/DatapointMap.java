@@ -45,10 +45,9 @@ import java.util.Map;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.internal.EventListeners;
-import tuwien.auto.calimero.xml.Element;
 import tuwien.auto.calimero.xml.KNXMLException;
-import tuwien.auto.calimero.xml.XMLReader;
-import tuwien.auto.calimero.xml.XMLWriter;
+import tuwien.auto.calimero.xml.XmlReader;
+import tuwien.auto.calimero.xml.XmlWriter;
 
 /**
  * A datapoint model storing datapoints with no defined order or hierarchy using a map
@@ -99,10 +98,6 @@ public class DatapointMap<T extends Datapoint> implements DatapointModel<T>, Cha
 		points = Collections.synchronizedMap(m);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.datapoint.DatapointModel#add
-	 * (tuwien.auto.calimero.datapoint.Datapoint)
-	 */
 	@Override
 	public void add(final T dp)
 	{
@@ -115,10 +110,6 @@ public class DatapointMap<T extends Datapoint> implements DatapointModel<T>, Cha
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.datapoint.DatapointModel#remove
-	 * (tuwien.auto.calimero.datapoint.Datapoint)
-	 */
 	@Override
 	public void remove(final T dp)
 	{
@@ -126,19 +117,12 @@ public class DatapointMap<T extends Datapoint> implements DatapointModel<T>, Cha
 			fireChangeNotification(dp, false);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.datapoint.DatapointModel#removeAll()
-	 */
 	@Override
 	public void removeAll()
 	{
 		points.clear();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.datapoint.DatapointModel#get
-	 * (tuwien.auto.calimero.GroupAddress)
-	 */
 	@Override
 	public T get(final GroupAddress main)
 	{
@@ -157,40 +141,27 @@ public class DatapointMap<T extends Datapoint> implements DatapointModel<T>, Cha
 		return Collections.unmodifiableCollection(points.values());
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.datapoint.DatapointModel#contains
-	 * (tuwien.auto.calimero.GroupAddress)
-	 */
 	@Override
 	public boolean contains(final GroupAddress main)
 	{
 		return points.containsKey(main);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.datapoint.DatapointModel#contains
-	 * (tuwien.auto.calimero.datapoint.Datapoint)
-	 */
 	@Override
 	public boolean contains(final T dp)
 	{
 		return points.containsKey(dp.getMainAddress());
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.datapoint.DatapointModel#load
-	 * (tuwien.auto.calimero.xml.XMLReader)
-	 */
 	@Override
-	public void load(final XMLReader r) throws KNXMLException
+	public void load(final XmlReader r) throws KNXMLException
 	{
-		if (r.getPosition() != XMLReader.START_TAG)
-			r.read();
-		final Element e = r.getCurrent();
-		if (r.getPosition() != XMLReader.START_TAG || !e.getName().equals(TAG_DATAPOINTS))
+		if (r.getEventType() != XmlReader.START_ELEMENT)
+			r.nextTag();
+		if (r.getEventType() != XmlReader.START_ELEMENT || !r.getLocalName().equals(TAG_DATAPOINTS))
 			throw new KNXMLException(TAG_DATAPOINTS + " element not found", r);
 		synchronized (points) {
-			while (r.read() == XMLReader.START_TAG) {
+			while (r.nextTag() == XmlReader.START_ELEMENT) {
 				final Datapoint dp = Datapoint.create(r);
 				if (points.containsKey(dp.getMainAddress()))
 					throw new KNXMLException("KNX address " + dp.getMainAddress().toString()
@@ -204,35 +175,23 @@ public class DatapointMap<T extends Datapoint> implements DatapointModel<T>, Cha
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.datapoint.DatapointModel#save
-	 * (tuwien.auto.calimero.xml.XMLWriter)
-	 */
 	@Override
-	public void save(final XMLWriter w) throws KNXMLException
+	public void save(final XmlWriter w) throws KNXMLException
 	{
-		w.writeElement(TAG_DATAPOINTS, Collections.emptyList(), null);
+		w.writeStartElement(TAG_DATAPOINTS);
 		synchronized (points) {
 			for (final Iterator<T> i = points.values().iterator(); i.hasNext();)
 				i.next().save(w);
 		}
-		w.endElement();
+		w.writeEndElement();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.datapoint.ChangeNotifier#
-	 * addChangeListener(tuwien.auto.calimero.datapoint.ChangeListener)
-	 */
 	@Override
 	public void addChangeListener(final ChangeListener l)
 	{
 		listeners.add(l);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.datapoint.ChangeNotifier#
-	 * removeChangeListener(tuwien.auto.calimero.datapoint.ChangeListener)
-	 */
 	@Override
 	public void removeChangeListener(final ChangeListener l)
 	{

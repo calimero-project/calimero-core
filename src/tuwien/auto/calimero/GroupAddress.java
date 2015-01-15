@@ -37,7 +37,7 @@
 package tuwien.auto.calimero;
 
 import tuwien.auto.calimero.xml.KNXMLException;
-import tuwien.auto.calimero.xml.XMLReader;
+import tuwien.auto.calimero.xml.XmlReader;
 
 /**
  * Represents an immutable KNX group address.
@@ -135,7 +135,7 @@ public class GroupAddress extends KNXAddress
 	 * @throws KNXMLException if the xml element is no KNX address or the
 	 *         address couldn't be read in correctly
 	 */
-	public GroupAddress(final XMLReader r) throws KNXMLException
+	public GroupAddress(final XmlReader r) throws KNXMLException
 	{
 		super(r);
 	}

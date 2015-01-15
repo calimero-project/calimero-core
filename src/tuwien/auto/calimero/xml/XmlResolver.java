@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@
     version.
 */
 
-package tuwien.auto.calimero.xml.def;
+package tuwien.auto.calimero.xml;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -51,16 +51,12 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import tuwien.auto.calimero.xml.EntityResolver;
-import tuwien.auto.calimero.xml.KNXMLException;
-
 /**
- * Default entity resolver.
- * <p>
+ * Resolves resources during parsing XML.
  *
  * @author B. Malinowsky
  */
-public class DefaultEntityResolver implements EntityResolver
+public final class XmlResolver
 {
 	// IANA to Java encoding names map, used to specify existing charset decoders,
 	// only IANA names which are different from the java encoding names are listed
@@ -80,34 +76,27 @@ public class DefaultEntityResolver implements EntityResolver
 	/**
 	 * Creates a new entity resolver.
 	 */
-	public DefaultEntityResolver()
+	public XmlResolver()
 	{}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.xml.EntityResolver#resolveInput(java.lang.String)
-	 */
-	@Override
-	public InputStream resolveInput(final String systemID) throws KNXMLException
+	public Object resolveEntity(final String publicID, final String systemID, final String baseURI,
+		final String namespace) throws KNXMLException
 	{
 		try {
 			try {
-				final URL loc = new URL(systemID);
+				final URL loc = new URL(baseURI);
 				return loc.openConnection().getInputStream();
 			}
 			catch (final MalformedURLException e) {
-				return new FileInputStream(systemID);
+				return new FileInputStream(baseURI);
 			}
 		}
 		catch (final IOException e) {
-			throw new KNXMLException("error opening " + systemID + ", " + e.getMessage());
+			throw new KNXMLException("error opening " + baseURI + ", " + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.xml.EntityResolver#resolveOutput(java.lang.String)
-	 */
-	@Override
-	public OutputStream resolveOutput(final String systemID) throws KNXMLException
+	OutputStream resolveOutput(final String systemID) throws KNXMLException
 	{
 		try {
 			try {
@@ -123,11 +112,7 @@ public class DefaultEntityResolver implements EntityResolver
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.xml.EntityResolver#getInputReader(java.io.InputStream)
-	 */
-	@Override
-	public Reader getInputReader(final InputStream is) throws KNXMLException
+	Reader getInputReader(final InputStream is) throws KNXMLException
 	{
 		InputStream in = null;
 		try {

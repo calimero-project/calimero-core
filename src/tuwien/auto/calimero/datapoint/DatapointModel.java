@@ -39,8 +39,8 @@ package tuwien.auto.calimero.datapoint;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.xml.KNXMLException;
-import tuwien.auto.calimero.xml.XMLReader;
-import tuwien.auto.calimero.xml.XMLWriter;
+import tuwien.auto.calimero.xml.XmlWriter;
+import tuwien.auto.calimero.xml.XmlReader;
 
 /**
  * A container for keeping {@link Datapoint}s, using some particular hierarchical
@@ -123,7 +123,7 @@ public interface DatapointModel<T extends Datapoint>
 	 * @throws KNXMLException on error loading the datapoint model, or on duplicate loaded
 	 *         datapoint
 	 */
-	void load(XMLReader r) throws KNXMLException;
+	void load(XmlReader r) throws KNXMLException;
 
 	/**
 	 * Saves the datapoint model to XML using the supplied writer.
@@ -132,5 +132,5 @@ public interface DatapointModel<T extends Datapoint>
 	 * @param w a XML writer
 	 * @throws KNXMLException on error saving the datapoint model
 	 */
-	void save(XMLWriter w) throws KNXMLException;
+	void save(XmlWriter w) throws KNXMLException;
 }

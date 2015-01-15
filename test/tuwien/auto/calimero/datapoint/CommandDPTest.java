@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,9 +40,10 @@ import junit.framework.TestCase;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.xml.KNXMLException;
-import tuwien.auto.calimero.xml.XMLFactory;
-import tuwien.auto.calimero.xml.XMLReader;
-import tuwien.auto.calimero.xml.XMLWriter;
+import tuwien.auto.calimero.xml.XmlInputFactory;
+import tuwien.auto.calimero.xml.XmlOutputFactory;
+import tuwien.auto.calimero.xml.XmlReader;
+import tuwien.auto.calimero.xml.XmlWriter;
 
 /**
  * @author B. Malinowsky
@@ -118,18 +119,18 @@ public class CommandDPTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.datapoint.CommandDP#CommandDP(
-	 * tuwien.auto.calimero.xml.XMLReader)}.
-	 * 
+	 * tuwien.auto.calimero.xml.XmlReader)}.
+	 *
 	 * @throws KNXMLException
 	 */
-	public final void testCommandDPXMLReader() throws KNXMLException
+	public final void testCommandDPXmlReader() throws KNXMLException
 	{
 		Datapoint dp = new CommandDP(ga, "testSave", 4, "4.001");
-		final XMLWriter w = XMLFactory.getInstance().createXMLWriter(dpFile);
+		final XmlWriter w = XmlOutputFactory.newInstance().createXMLWriter(dpFile);
 		dp.save(w);
 		w.close();
 
-		final XMLReader r = XMLFactory.getInstance().createXMLReader(dpFile);
+		final XmlReader r = XmlInputFactory.newInstance().createXMLReader(dpFile);
 		dp = new CommandDP(r);
 		r.close();
 		assertEquals(ga, dp.getMainAddress());
@@ -140,13 +141,13 @@ public class CommandDPTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link Datapoint#create(XMLReader)}.
-	 * 
+	 * Test method for {@link Datapoint#create(XmlReader)}.
+	 *
 	 * @throws KNXMLException
 	 */
 	public final void testCreate() throws KNXMLException
 	{
-		final XMLReader r = XMLFactory.getInstance().createXMLReader(dpFile);
+		final XmlReader r = XmlInputFactory.newInstance().createXMLReader(dpFile);
 		assertTrue(Datapoint.create(r) instanceof CommandDP);
 		r.close();
 	}

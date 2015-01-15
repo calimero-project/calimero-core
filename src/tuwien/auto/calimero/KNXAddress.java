@@ -36,15 +36,11 @@
 
 package tuwien.auto.calimero;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.StringTokenizer;
 
-import tuwien.auto.calimero.xml.Attribute;
-import tuwien.auto.calimero.xml.Element;
 import tuwien.auto.calimero.xml.KNXMLException;
-import tuwien.auto.calimero.xml.XMLReader;
-import tuwien.auto.calimero.xml.XMLWriter;
+import tuwien.auto.calimero.xml.XmlReader;
+import tuwien.auto.calimero.xml.XmlWriter;
 
 /**
  * Represents a KNX address.
@@ -96,17 +92,15 @@ public abstract class KNXAddress
 	 * @throws KNXMLException if the XML element represents no KNX address or the address
 	 *         couldn't be read correctly
 	 */
-	KNXAddress(final XMLReader r) throws KNXMLException
+	KNXAddress(final XmlReader r) throws KNXMLException
 	{
-		if (r.getPosition() != XMLReader.START_TAG)
-			r.read();
-		final Element e = r.getCurrent();
-		if (r.getPosition() != XMLReader.START_TAG || !e.getName().equals(TAG_ADDRESS)
-				|| !getType().equals(e.getAttribute(ATTR_TYPE)))
+		if (r.getEventType() != XmlReader.START_ELEMENT)
+			r.nextTag();
+		if (r.getEventType() != XmlReader.START_ELEMENT || !r.getLocalName().equals(TAG_ADDRESS)
+				|| !getType().equals(r.getAttributeValue(null, ATTR_TYPE)))
 			throw new KNXMLException("XML element represents no KNX " + getType() + " address", r);
-		r.complete(e);
 		try {
-			init(e.getCharacterData());
+			init(r.getElementText());
 		}
 		catch (final KNXFormatException kfe) {
 			throw new KNXMLException("malformed KNX address value, " + kfe.getMessage(), r);
@@ -130,12 +124,12 @@ public abstract class KNXAddress
 	 * @throws KNXMLException if the XML element is no KNX address, on unknown address type or wrong
 	 *         address syntax
 	 */
-	public static KNXAddress create(final XMLReader r) throws KNXMLException
+	public static KNXAddress create(final XmlReader r) throws KNXMLException
 	{
-		if (r.getPosition() != XMLReader.START_TAG)
-			r.read();
-		if (r.getPosition() == XMLReader.START_TAG) {
-			final String type = r.getCurrent().getAttribute(ATTR_TYPE);
+		if (r.getEventType() != XmlReader.START_ELEMENT)
+			r.nextTag();
+		if (r.getEventType() == XmlReader.START_ELEMENT) {
+			final String type = r.getAttributeValue(null, ATTR_TYPE);
 			if (GroupAddress.ATTR_GROUP.equals(type))
 				return new GroupAddress(r);
 			else if (IndividualAddress.ATTR_IND.equals(type))
@@ -192,13 +186,13 @@ public abstract class KNXAddress
 	 * @param w a XML writer
 	 * @throws KNXMLException on output error
 	 */
-	public void save(final XMLWriter w) throws KNXMLException
+	public void save(final XmlWriter w) throws KNXMLException
 	{
-		final List<Attribute> att = new ArrayList<>();
-		att.add(new Attribute(ATTR_TYPE, getType()));
 		w.writeComment(" " + toString() + " ");
-		w.writeElement(TAG_ADDRESS, att, Integer.toString(address));
-		w.endElement();
+		w.writeStartElement(TAG_ADDRESS);
+		w.writeAttribute(ATTR_TYPE, getType());
+		w.writeCharacters(Integer.toString(address));
+		w.writeEndElement();
 	}
 
 	/**

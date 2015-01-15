@@ -58,12 +58,11 @@ import tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned;
 import tuwien.auto.calimero.dptxlator.PropertyTypes;
 import tuwien.auto.calimero.dptxlator.TranslatorTypes;
 import tuwien.auto.calimero.log.LogService;
-import tuwien.auto.calimero.xml.Attribute;
-import tuwien.auto.calimero.xml.Element;
 import tuwien.auto.calimero.xml.KNXMLException;
-import tuwien.auto.calimero.xml.XMLFactory;
-import tuwien.auto.calimero.xml.XMLReader;
-import tuwien.auto.calimero.xml.XMLWriter;
+import tuwien.auto.calimero.xml.XmlInputFactory;
+import tuwien.auto.calimero.xml.XmlOutputFactory;
+import tuwien.auto.calimero.xml.XmlReader;
+import tuwien.auto.calimero.xml.XmlWriter;
 
 /**
  * A client to access properties in interface objects of a device.
@@ -172,9 +171,21 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		 * @param resource the identifier of the resource used for loading the properties
 		 * @return a collection containing the property definitions of type
 		 *         {@link PropertyClient.Property}
-		 * @throws KNXException on error reading from the resource
+		 * @throws KNXMLException on error reading from the resource
 		 */
-		Collection<Property> load(String resource) throws KNXException;
+		Collection<Property> load(String resource) throws KNXMLException;
+
+		/**
+		 * Loads the properties using the XML reader.
+		 *
+		 * @param reader the XML reader parsing the resource containing the properties, the current
+		 *        reader state has to be at, or exactly one event before, the property definition
+		 *        start element
+		 * @return a collection containing the property definitions of type
+		 *         {@link PropertyClient.Property}
+		 * @throws KNXMLException on error reading from the resource
+		 */
+		Collection<Property> load(XmlReader reader) throws KNXMLException;
 
 		/**
 		 * Saves the properties to the resource.
@@ -182,9 +193,19 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		 * @param resource the identifier of the resource used for saving the properties
 		 * @param definitions the property definitions in a collection holding
 		 *        {@link PropertyClient.Property}-type values
-		 * @throws KNXException on error writing to the resource
+		 * @throws KNXMLException on error writing to the resource
 		 */
-		void save(String resource, Collection<Property> definitions) throws KNXException;
+		void save(String resource, Collection<Property> definitions) throws KNXMLException;
+
+		/**
+		 * Saves the properties to the resource.
+		 *
+		 * @param writer the XML writer writing the resource containing the properties
+		 * @param definitions the property definitions in a collection holding
+		 *        {@link PropertyClient.Property}-type values
+		 * @throws KNXMLException on error writing to the resource
+		 */
+		void save(XmlWriter writer, Collection<Property> definitions) throws KNXMLException;
 	}
 
 	/**
@@ -496,10 +517,10 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 *        of type {@link Property}
 	 * @param handler the resource handler used for saving the property definitions, if
 	 *        <code>null</code>, a default handler is used
-	 * @throws KNXException on errors in the property resource handler
+	 * @throws KNXMLException on errors in the property resource handler
 	 */
 	public static void saveDefinitions(final String resource,
-		final Collection<Property> definitions, final ResourceHandler handler) throws KNXException
+		final Collection<Property> definitions, final ResourceHandler handler) throws KNXMLException
 	{
 		// for saving an ordered collection based on property key order,
 		// the saving procedure has to be called with the Collection argument
@@ -778,48 +799,48 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		XmlPropertyHandler()
 		{}
 
-		/* (non-Javadoc)
-		 * @see tuwien.auto.calimero.mgmt.PropertyClient.ResourceHandler#load
-		 * (java.lang.String)
-		 */
 		@Override
-		public Collection<Property> load(final String resource) throws KNXException
+		public Collection<Property> load(final String resource) throws KNXMLException
 		{
-			final XMLReader r = XMLFactory.getInstance().createXMLReader(resource);
-			final List<Property> list = new ArrayList<>(30);
+			try (final XmlReader r = XmlInputFactory.newInstance().createXMLReader(resource)) {
+				return load(r);
+			}
+		}
+
+		@Override
+		public Collection<Property> load(final XmlReader reader) throws KNXMLException
+		{
+			final List<Property> list = new ArrayList<>();
 			int objType = -1;
 			try {
-				if (r.read() != XMLReader.START_TAG
-					|| !r.getCurrent().getName().equals(PROPDEFS_TAG))
+				if (reader.nextTag() != XmlReader.START_ELEMENT
+						|| !reader.getLocalName().equals(PROPDEFS_TAG))
 					throw new KNXMLException("no property defintions");
-				while (r.read() != XMLReader.END_DOC) {
-					final Element e = r.getCurrent();
-					if (r.getPosition() == XMLReader.START_TAG) {
-						if (e.getName().equals(OBJECT_TAG)) {
+				while (reader.hasNext()) {
+					final int event = reader.next();
+					if (event == XmlReader.START_ELEMENT) {
+						if (reader.getLocalName().equals(OBJECT_TAG)) {
 							// on no type attribute, toInt() throws, that's ok
-							final String type = e.getAttribute(OBJECTTYPE_ATTR);
+							final String type = reader.getAttributeValue("", OBJECTTYPE_ATTR);
 							objType = "global".equals(type) ? -1 : toInt(type);
 						}
-						else if (e.getName().equals(PROPERTY_TAG)) {
-							r.complete(e);
-							parseRW(e.getAttribute(RW_ATTR));
-							list.add(new Property(toInt(e.getAttribute(PID_ATTR)),
-									e.getAttribute(PIDNAME_ATTR), e.getAttribute(NAME_ATTR),
-									objType, toInt(e.getAttribute(PDT_ATTR)),
-									e.getAttribute(DPT_ATTR)));
+						else if (reader.getLocalName().equals(PROPERTY_TAG)) {
+							parseRW(reader.getAttributeValue("", RW_ATTR));
+							list.add(new Property(toInt(reader.getAttributeValue("", PID_ATTR)),
+									reader.getAttributeValue("", PIDNAME_ATTR), reader
+											.getAttributeValue("", NAME_ATTR), objType,
+									toInt(reader.getAttributeValue("", PDT_ATTR)), reader
+											.getAttributeValue("", DPT_ATTR)));
 						}
 					}
-					else if (r.getPosition() == XMLReader.END_TAG
-							&& e.getName().equals(PROPDEFS_TAG))
+					else if (event == XmlReader.END_ELEMENT
+							&& reader.getLocalName().equals(PROPDEFS_TAG))
 						break;
 				}
 				return list;
 			}
 			catch (final KNXFormatException e) {
-				throw new KNXException("loading property definitions, " + e.getMessage());
-			}
-			finally {
-				r.close();
+				throw new KNXMLException("loading property definitions, " + e.getMessage());
 			}
 		}
 
@@ -828,48 +849,47 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		 * (java.lang.String, java.util.Collection)
 		 */
 		@Override
-		public void save(final String resource, final Collection<Property> properties)
-			throws KNXException
+		public void save(final String resource, final Collection<Property> definitions)
 		{
-			final XMLWriter w = XMLFactory.getInstance().createXMLWriter(resource);
-			try {
-				w.writeDeclaration(true, "UTF-8");
-				w.writeComment("Calimero 2 " + Settings.getLibraryVersion()
-					+ " KNX property definitions, saved on " + new Date().toString());
-				w.writeElement(PROPDEFS_TAG, null, null);
-				final int noType = -2;
-				int objType = noType;
-				for (final Iterator<Property> i = properties.iterator(); i.hasNext();) {
-					final Property p = i.next();
-					if (p.objType != objType) {
-						if (objType != noType)
-							w.endElement();
-						objType = p.objType;
-						final List<Attribute> att = new ArrayList<>();
-						att.add(new Attribute(OBJECTTYPE_ATTR, objType == -1 ? "global"
-							: Integer.toString(objType)));
-						w.writeElement(OBJECT_TAG, att, null);
-					}
-					// property attributes
-					final List<Attribute> att = new ArrayList<>();
-					att.add(new Attribute(PID_ATTR, Integer.toString(p.id)));
-					att.add(new Attribute(PIDNAME_ATTR, p.name));
-					att.add(new Attribute(NAME_ATTR, p.propName));
-					att.add(new Attribute(PDT_ATTR, p.pdt == -1 ? "<tbd>" : Integer.toString(p.pdt)));
-					if (p.dpt != null && p.dpt.length() > 0)
-						att.add(new Attribute(DPT_ATTR, p.dpt));
-					// TOOD why don't we add r/w attribute values?
-					att.add(new Attribute(RW_ATTR, ""));
-					att.add(new Attribute(WRITE_ATTR, ""));
-					// write property
-					w.writeElement(PROPERTY_TAG, att, null);
-					w.writeElement(USAGE_TAG, null, null);
-					w.endElement();
-					w.endElement();
-				}
+			try (final XmlWriter w = XmlOutputFactory.newInstance().createXMLWriter(resource)) {
+				w.writeStartDocument("UTF-8", "1.0");
+				save(w, definitions);
 			}
-			finally {
-				w.close();
+		}
+
+		@Override
+		public void save(final XmlWriter writer, final Collection<Property> definitions)
+		{
+			writer.writeComment("Calimero v" + Settings.getLibraryVersion()
+					+ " KNX property definitions, saved on " + new Date().toString());
+			writer.writeStartElement(PROPDEFS_TAG);
+			final int noType = -2;
+			int objType = noType;
+			for (final Iterator<Property> i = definitions.iterator(); i.hasNext();) {
+				final Property p = i.next();
+				if (p.objType != objType) {
+					if (objType != noType)
+						writer.writeEndElement();
+					objType = p.objType;
+					writer.writeStartElement(OBJECT_TAG);
+					writer.writeAttribute(OBJECTTYPE_ATTR, objType == -1 ? "global"
+							: Integer.toString(objType));
+				}
+				// property attributes
+				writer.writeStartElement(PROPERTY_TAG);
+				writer.writeAttribute(PID_ATTR, Integer.toString(p.id));
+				writer.writeAttribute(PIDNAME_ATTR, p.name);
+				writer.writeAttribute(NAME_ATTR, p.propName);
+				writer.writeAttribute(PDT_ATTR, p.pdt == -1 ? "<tbd>" : Integer.toString(p.pdt));
+				if (p.dpt != null && p.dpt.length() > 0)
+					writer.writeAttribute(DPT_ATTR, p.dpt);
+				// TOOD why don't we add r/w attribute values?
+				writer.writeAttribute(RW_ATTR, "");
+				writer.writeAttribute(WRITE_ATTR, "");
+				// write property
+				writer.writeStartElement(USAGE_TAG);
+				writer.writeEndElement();
+				writer.writeEndElement();
 			}
 		}
 

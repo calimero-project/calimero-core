@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,9 +44,10 @@ import junit.framework.TestCase;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.xml.KNXMLException;
-import tuwien.auto.calimero.xml.XMLFactory;
-import tuwien.auto.calimero.xml.XMLReader;
-import tuwien.auto.calimero.xml.XMLWriter;
+import tuwien.auto.calimero.xml.XmlInputFactory;
+import tuwien.auto.calimero.xml.XmlOutputFactory;
+import tuwien.auto.calimero.xml.XmlReader;
+import tuwien.auto.calimero.xml.XmlWriter;
 
 /**
  * @author B. Malinowsky
@@ -189,19 +190,19 @@ public class DatapointMapTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.datapoint.DatapointMap#load(
-	 * tuwien.auto.calimero.xml.XMLReader)}.
+	 * tuwien.auto.calimero.xml.XmlReader)}.
 	 *
 	 * @throws KNXMLException
 	 */
 	public final void testLoad() throws KNXMLException
 	{
-		final XMLWriter w = XMLFactory.getInstance().createXMLWriter(dpFile);
+		final XmlWriter w = XmlOutputFactory.newInstance().createXMLWriter(dpFile);
 		m.add(dp1);
 		m.add(dp2);
 		m.add(dp3);
 		m.save(w);
 		w.close();
-		final XMLReader r = XMLFactory.getInstance().createXMLReader(dpFile);
+		final XmlReader r = XmlInputFactory.newInstance().createXMLReader(dpFile);
 		try {
 			m.load(r);
 			fail("datapoints already in map");
@@ -211,7 +212,7 @@ public class DatapointMapTest extends TestCase
 
 		m.removeAll();
 		assertEquals(0, ((DatapointMap<Datapoint>) m).getDatapoints().size());
-		final XMLReader r2 = XMLFactory.getInstance().createXMLReader(dpFile);
+		final XmlReader r2 = XmlInputFactory.newInstance().createXMLReader(dpFile);
 		m.load(r2);
 		r2.close();
 		assertEquals(3, ((DatapointMap<Datapoint>) m).getDatapoints().size());
@@ -220,31 +221,31 @@ public class DatapointMapTest extends TestCase
 		assertTrue(m.contains(dp3));
 
 		// save empty file
-		final XMLWriter w2 = XMLFactory.getInstance().createXMLWriter(dpFile);
+		final XmlWriter w2 = XmlOutputFactory.newInstance().createXMLWriter(dpFile);
 		new DatapointMap<StateDP>().save(w2);
 		w2.close();
 		// load empty file
-		final XMLReader r3 = XMLFactory.getInstance().createXMLReader(dpFile);
+		final XmlReader r3 = XmlInputFactory.newInstance().createXMLReader(dpFile);
 		final DatapointMap<StateDP> dpm = new DatapointMap<>();
 		dpm.load(r3);
 		r3.close();
 		assertEquals(0, dpm.getDatapoints().size());
 
 		// load empty file into nonempty map
-		final XMLReader r4 = XMLFactory.getInstance().createXMLReader(dpFile);
+		final XmlReader r4 = XmlInputFactory.newInstance().createXMLReader(dpFile);
 		m.load(r4);
 		r4.close();
 		assertEquals(3, ((DatapointMap<Datapoint>) m).getDatapoints().size());
 
 		// ensure state-based DPs only
-		final XMLWriter w5 = XMLFactory.getInstance().createXMLWriter(dpFile);
+		final XmlWriter w5 = XmlOutputFactory.newInstance().createXMLWriter(dpFile);
 		m.removeAll();
 		m.add(dp1);
 		m.add(dp2); // command-based!
 		m.add(dp3);
 		m.save(w5);
 		w5.close();
-		final XMLReader r5 = XMLFactory.getInstance().createXMLReader(dpFile);
+		final XmlReader r5 = XmlInputFactory.newInstance().createXMLReader(dpFile);
 		try {
 			new DatapointMap<StateDP>().load(r5);
 			fail("loaded command DP into state-based DP map");
@@ -255,16 +256,16 @@ public class DatapointMapTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.datapoint.DatapointMap#save(
-	 * tuwien.auto.calimero.xml.XMLWriter)}.
+	 * tuwien.auto.calimero.xml.XmlWriter)}.
 	 *
 	 * @throws KNXMLException
 	 */
 	public final void testSave() throws KNXMLException
 	{
-		final XMLWriter w = XMLFactory.getInstance().createXMLWriter(dpFile);
+		final XmlWriter w = XmlOutputFactory.newInstance().createXMLWriter(dpFile);
 		m.save(w);
 		w.close();
-		final XMLWriter w2 = XMLFactory.getInstance().createXMLWriter(dpFile);
+		final XmlWriter w2 = XmlOutputFactory.newInstance().createXMLWriter(dpFile);
 		m.add(dp1);
 		m.add(dp2);
 		m.add(dp3);

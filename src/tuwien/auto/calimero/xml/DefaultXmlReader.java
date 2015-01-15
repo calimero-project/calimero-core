@@ -34,74 +34,83 @@
     version.
 */
 
-package tuwien.auto.calimero.xml.def;
+package tuwien.auto.calimero.xml;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
-import tuwien.auto.calimero.xml.Attribute;
-import tuwien.auto.calimero.xml.Element;
-import tuwien.auto.calimero.xml.KNXMLException;
-import tuwien.auto.calimero.xml.XMLReader;
-
 /**
- * Default XML reader implementation of the XMLReader interface.
+ * Default XML reader implementation of the XmlReader interface.
  * <p>
  * Does not add any feature not already documented in the implemented interface.<br>
  * This reader is not thread safe.
  *
  * @author B. Malinowsky
  */
-public class DefaultXMLReader implements XMLReader
+class DefaultXmlReader implements XmlReader
 {
+	private final Map<String, Object> config = new HashMap<>();
+
 	private Reader r;
-	private boolean closeReader;
-	private Element elem;
+
+	private String elemName;
+	private List<String> attributeName;
+	private List<String> attributeValue;
+	private String elemText;
+	private boolean emptyTag;
+
+
 	private final Stack<String> openElems = new Stack<>();
-	private int pos;
+	private int event;
 	private int line;
 
-	/**
-	 * Creates a new XML reader.
-	 */
-	public DefaultXMLReader()
-	{}
+	// variables introduced for StaX API
+	private boolean standalone;
+	private String version;
+	private String encoding;
+
+	// TODO set variables
+	private int textStart;
+	private int textLength;
+
 
 	/**
 	 * Creates a new XML reader with input <code>r</code>.
 	 * <p>
-	 * The {@link Reader} should already be buffered or wrapped with a buffered reader, if
-	 * necessary (e.g. when reading from a file).
+	 * The {@link Reader} should already be buffered or wrapped with a buffered reader, if necessary
+	 * (e.g. when reading from a file).
 	 *
 	 * @param r a {@link Reader} for input
-	 * @param close <code>true</code> to close <code>r</code> if XML reader is closed,
-	 *        <code>false</code> otherwise
-	 * @see XMLReader#setInput(Reader, boolean)
 	 */
-	public DefaultXMLReader(final Reader r, final boolean close)
+	public DefaultXmlReader(final Reader r)
 	{
 		reset();
-		setInput(r, close);
+		setInput(r);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.xml.XMLReader#setInput(java.io.Reader, boolean)
-	 */
-	@Override
-	public void setInput(final Reader input, final boolean close)
+	private void setInput(final Reader input)
 	{
 		if (r != null)
 			reset();
 		r = input;
-		closeReader = close;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.xml.XMLReader#read()
-	 */
-	@Override
-	public int read() throws KNXMLException
+	private void setElement(final String name)
+	{
+		elemName = name;
+		attributeName = new ArrayList<>();
+		attributeValue = new ArrayList<>();
+		elemText = null;
+		emptyTag = false;
+	}
+
+	private int read() throws KNXMLException
 	{
 		while (canRead()) {
 			// init line counter on first read
@@ -115,10 +124,10 @@ public class DefaultXMLReader implements XMLReader
 				continue;
 			final StringBuffer buf = new StringBuffer();
 			if (readCDATASection(str, buf)) {
-				elem = new DefaultElement(openElems.peek());
-				elem.setCharacterData(buf.toString());
-				pos = CHAR_DATA;
-				return pos;
+				setElement(openElems.peek());
+				elemText = buf.toString();
+				event = XmlReader.CHARACTERS;
+				return event;
 			}
 			str = str.trim();
 			// extract element name
@@ -128,41 +137,42 @@ public class DefaultXMLReader implements XMLReader
 			if (name.charAt(0) == '/') {
 				if (!name.substring(1).equals(openElems.peek()))
 					throw new KNXMLException("element end tag does not match start tag",
-						name.substring(1), line);
-				elem = new DefaultElement(openElems.pop());
-				pos = END_TAG;
-				return pos;
+							name.substring(1), line);
+				setElement(openElems.pop());
+				event = XmlReader.END_ELEMENT;
+				return event;
 			}
-			elem = new DefaultElement(name);
+			setElement(name);
 			extractAttributes(str.substring(name.length()));
-			if (!elem.isEmptyElementTag())
+			if (!emptyTag)
 				openElems.push(name);
-			pos = START_TAG;
-			return pos;
+			event = XmlReader.START_ELEMENT;
+			return event;
 		}
 		if (!openElems.empty())
 			throw new KNXMLException("end of XML input with elements left open");
-		pos = END_DOC;
-		return pos;
+		event = XmlReader.END_DOCUMENT;
+		return event;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.xml.XMLReader#complete(tuwien.auto.calimero.xml.Element)
-	 */
-	@Override
-	public void complete(final Element e) throws KNXMLException
+	private int w_read()
 	{
-		if (e.isEmptyElementTag())
+		return read();
+	}
+
+	private void complete(final String name) throws KNXMLException
+	{
+		if (emptyTag)
 			return;
-		final int index = openElems.lastIndexOf(e.getName());
+		final int index = openElems.lastIndexOf(name);
 		if (index == -1)
-			throw new KNXMLException("no matching element open tag: " + e.getName(), this);
+			throw new KNXMLException("no matching element open tag: " + name, this);
 		String end = null;
 		final StringBuffer content = new StringBuffer(50);
 		while (canRead()) {
 			// read text content
 			final String s = read('<');
-			final boolean current = openElems.peek().equals(e.getName());
+			final boolean current = openElems.peek().equals(name);
 			// if character data is for current element, append it
 			if (current && s.length() > 0)
 				content.append(References.replace(s, false));
@@ -180,9 +190,9 @@ public class DefaultXMLReader implements XMLReader
 				if (!tag.equals(openElems.peek()))
 					throw new KNXMLException("element end tag does not match start tag", tag, line);
 				openElems.pop();
-				if (tag.equals(e.getName())) {
-					e.setCharacterData(content.toString());
-					pos = END_TAG;
+				if (tag.equals(name)) {
+					elemText = content.toString();
+					event = XmlReader.END_ELEMENT;
 					return;
 				}
 			}
@@ -197,46 +207,14 @@ public class DefaultXMLReader implements XMLReader
 		throw new KNXMLException("end of XML input with elements left open", end, line);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.xml.XMLReader#getCurrent()
-	 */
-	@Override
-	public final Element getCurrent()
+	private void w_complete(final String name)
 	{
-		return elem;
+		complete(name);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.xml.XMLReader#getPosition()
-	 */
 	@Override
-	public final int getPosition()
+	public void close()
 	{
-		return pos;
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.xml.XMLReader#getLineNumber()
-	 */
-	@Override
-	public final int getLineNumber()
-	{
-		return line;
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.xml.XMLReader#close()
-	 */
-	@Override
-	public void close() throws KNXMLException
-	{
-		if (closeReader)
-			try {
-				r.close();
-			}
-			catch (final IOException e) {
-				throw new KNXMLException(e.getMessage());
-			}
 	}
 
 	private boolean canRead()
@@ -277,7 +255,7 @@ public class DefaultXMLReader implements XMLReader
 	{
 		String s = attributes.trim();
 		if (s.length() > 0 && s.charAt(s.length() - 1) == '/')
-			elem.setEmptyElementTag(true);
+			emptyTag = true;
 
 		while (s.length() != 0) {
 			final int equal = s.indexOf('=');
@@ -294,7 +272,8 @@ public class DefaultXMLReader implements XMLReader
 				final int end = value.indexOf(s.charAt(0));
 				if (end >= 0)
 					value = value.substring(0, end);
-				elem.addAttribute(new Attribute(att, References.replace(value, false)));
+				attributeName.add(att);
+				attributeValue.add(References.replace(value, false));
 			}
 			final int i = s.indexOf(quote ? s.charAt(0) : ' ', 1);
 			s = i == -1 ? "" : s.substring(i + 1);
@@ -332,8 +311,22 @@ public class DefaultXMLReader implements XMLReader
 	private boolean skipInstruction(final String tag)
 	{
 		// is this a processing instruction
-		if (tag.charAt(0) == '?' && tag.charAt(tag.length() - 1) == '?')
+		if (tag.charAt(0) == '?' && tag.charAt(tag.length() - 1) == '?') {
+			// check for decl section
+			// TODO detection is already implemented in entity resolver, use that
+			int idx = tag.indexOf("version");
+			if (idx != -1) {
+				idx = tag.indexOf("=", idx);
+				version = tag.substring(idx + 2, tag.indexOf("\"", idx + 2));
+			}
+			idx = tag.indexOf("encoding");
+			if (idx != -1) {
+				idx = tag.indexOf("=", idx);
+				encoding = tag.substring(idx + 2, tag.indexOf("\"", idx + 2));
+			}
+
 			return true;
+		}
 		return false;
 	}
 
@@ -347,9 +340,255 @@ public class DefaultXMLReader implements XMLReader
 
 	private void reset()
 	{
-		elem = null;
 		openElems.clear();
-		pos = START_DOC;
+		event = XmlReader.START_DOCUMENT;
 		line = 0;
+	}
+
+	@Override
+	public Object getProperty(final String name) throws IllegalArgumentException
+	{
+		return config.get(name);
+	}
+
+	@Override
+	public int next()
+	{
+		return read();
+	}
+
+	@Override
+	public void require(final int type, final String namespaceURI, final String localName)
+	{
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public String getElementText()
+	{
+		w_complete(elemName);
+		return elemText;
+	}
+
+	@Override
+	public int nextTag()
+	{
+		return w_read();
+	}
+
+	@Override
+	public boolean hasNext()
+	{
+		return event != XmlReader.END_DOCUMENT;
+	}
+
+	@Override
+	public String getNamespaceURI(final String prefix)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isWhiteSpace()
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public String getAttributeValue(final String namespaceURI, final String localName)
+	{
+		inStartEvent();
+		final int i = attributeName.indexOf(localName);
+		if (i != -1)
+			return attributeValue.get(i);
+		return null;
+	}
+
+	private void inStartEvent()
+	{
+		if (event != XmlReader.START_ELEMENT)
+			throw new IllegalStateException("not at XML start element");
+	}
+
+	@Override
+	public int getAttributeCount()
+	{
+		inStartEvent();
+		return attributeName.size();
+	}
+
+	@Override
+	public String getAttributeNamespace(final int index)
+	{
+		inStartEvent();
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getAttributeLocalName(final int index)
+	{
+		inStartEvent();
+		return attributeName.get(index);
+	}
+
+	@Override
+	public String getAttributePrefix(final int index)
+	{
+		inStartEvent();
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getAttributeType(final int index)
+	{
+		inStartEvent();
+		return "CDATA";
+	}
+
+	@Override
+	public String getAttributeValue(final int index)
+	{
+		inStartEvent();
+		return attributeValue.get(index);
+	}
+
+	@Override
+	public boolean isAttributeSpecified(final int index)
+	{
+		inStartEvent();
+		return attributeName.size() > index;
+	}
+
+	@Override
+	public int getNamespaceCount()
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public String getNamespacePrefix(final int index)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getNamespaceURI(final int index)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getEventType()
+	{
+		return event;
+	}
+
+	@Override
+	public String getText()
+	{
+		return new String(getTextCharacters());
+	}
+
+	@Override
+	public char[] getTextCharacters()
+	{
+		w_complete(elemName);
+		return elemText.toCharArray();
+	}
+
+	@Override
+	public int getTextStart()
+	{
+		return textStart;
+	}
+
+	@Override
+	public int getTextLength()
+	{
+		return textLength;
+	}
+
+	@Override
+	public String getEncoding()
+	{
+		if (r instanceof InputStreamReader) {
+			final InputStreamReader isr = (InputStreamReader) r;
+			return isr.getEncoding();
+		}
+		return encoding;
+	}
+
+	@Override
+	public StreamLocation getLocation()
+	{
+		return new StreamLocation(line);
+	}
+
+	@Override
+	public String getLocalName()
+	{
+		if (event != XmlReader.START_ELEMENT && event != XmlReader.END_ELEMENT
+				&& event != XmlReader.ENTITY_REFERENCE)
+			throw new IllegalStateException("no XML start/end element or entity reference");
+		return elemName;
+	}
+
+	@Override
+	public String getNamespaceURI()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getPrefix()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getVersion()
+	{
+		return version;
+	}
+
+	@Override
+	public boolean isStandalone()
+	{
+		return standalone;
+	}
+
+	@Override
+	public boolean standaloneSet()
+	{
+		return config.containsKey("standaloneSet");
+	}
+
+	@Override
+	public String getCharacterEncodingScheme()
+	{
+		return encoding;
+	}
+
+	@Override
+	public String getPITarget()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getPIData()
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

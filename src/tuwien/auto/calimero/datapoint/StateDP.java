@@ -37,7 +37,6 @@
 package tuwien.auto.calimero.datapoint;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -45,10 +44,9 @@ import java.util.List;
 
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.xml.Attribute;
 import tuwien.auto.calimero.xml.KNXMLException;
-import tuwien.auto.calimero.xml.XMLReader;
-import tuwien.auto.calimero.xml.XMLWriter;
+import tuwien.auto.calimero.xml.XmlReader;
+import tuwien.auto.calimero.xml.XmlWriter;
 
 /**
  * Represents a state based KNX datapoint.
@@ -133,14 +131,13 @@ public class StateDP extends Datapoint
 	/**
 	 * Creates a new state based datapoint from XML input.
 	 * <p>
-	 * If the current XML element position is no start tag, the next element tag is read.
-	 * The datapoint element is then expected to be the current element in the reader.
+	 * If the current XML element position is no start tag, the next element tag is read. The
+	 * datapoint element is then expected to be the current element in the reader.
 	 *
 	 * @param r a XML reader
-	 * @throws KNXMLException if the XML element is no datapoint or could not be read
-	 *         correctly
+	 * @throws KNXMLException if the XML element is no datapoint or could not be read correctly
 	 */
-	public StateDP(final XMLReader r) throws KNXMLException
+	public StateDP(final XmlReader r) throws KNXMLException
 	{
 		super(r);
 		if (!isStateBased())
@@ -272,67 +269,64 @@ public class StateDP extends Datapoint
 		return "state DP " + super.toString();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.datapoint.Datapoint#doLoad(
-	 * tuwien.auto.calimero.xml.XMLReader)
-	 */
 	@Override
-	void doLoad(final XMLReader r) throws KNXMLException
+	void doLoad(final XmlReader r) throws KNXMLException
 	{
 		boolean main = false;
-		while (r.getPosition() == XMLReader.START_TAG) {
-			final String tag = r.getCurrent().getName();
-			if (tag.equals(TAG_EXPIRATION)) {
-				final String a = r.getCurrent().getAttribute(ATTR_TIMEOUT);
-				if (a != null)
-					try {
-						timeout = Integer.decode(a).intValue();
-					}
-					catch (final NumberFormatException e) {
-						throw new KNXMLException("malformed attribute timeout", r);
-					}
+		for (int event = r.getEventType(); r.hasNext(); event = r.next()) {
+			if (event == XmlReader.START_ELEMENT) {
+				final String tag = r.getLocalName();
+				if (tag.equals(TAG_EXPIRATION)) {
+					final String a = r.getAttributeValue("", ATTR_TIMEOUT);
+					r.getElementText();
+					if (a != null)
+						try {
+							timeout = Integer.decode(a).intValue();
+						}
+						catch (final NumberFormatException e) {
+							throw new KNXMLException("malformed attribute timeout", r);
+						}
+				}
+				// XXX needed?
+//				else if (r.getElementText().isEmpty())
+//					;
+				else if (tag.equals(TAG_UPDATING))
+					while (r.nextTag() == XmlReader.START_ELEMENT)
+						updating.add(new GroupAddress(r));
+				else if (tag.equals(TAG_INVALIDATING))
+					while (r.nextTag() == XmlReader.START_ELEMENT)
+						invalidating.add(new GroupAddress(r));
+				else if (!main) {
+					super.doLoad(r);
+					main = true;
+				}
+				else
+					throw new KNXMLException("invalid element", r);
 			}
-			else if (r.getCurrent().isEmptyElementTag())
-				;
-			else if (tag.equals(TAG_UPDATING))
-				while (r.read() == XMLReader.START_TAG)
-					updating.add(new GroupAddress(r));
-			else if (tag.equals(TAG_INVALIDATING))
-				while (r.read() == XMLReader.START_TAG)
-					invalidating.add(new GroupAddress(r));
-			else if (!main) {
-				super.doLoad(r);
-				main = true;
-			}
-			else
-				throw new KNXMLException("invalid element", r);
-			r.read();
+			else if (event == XmlReader.END_ELEMENT && r.getLocalName().equals(TAG_DATAPOINT))
+				break;
 		}
 		if (!main)
 			throw new KNXMLException("Datapoint is missing its address", r);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.datapoint.Datapoint#doSave(
-	 * tuwien.auto.calimero.xml.XMLWriter)
-	 */
 	@Override
-	void doSave(final XMLWriter w) throws KNXMLException
+	void doSave(final XmlWriter w) throws KNXMLException
 	{
 		// <expiration timeout=int />
-		w.writeEmptyElement(TAG_EXPIRATION, Arrays.asList(new Attribute[] { new Attribute(
-				ATTR_TIMEOUT, Integer.toString(timeout)) }));
-		w.writeElement(TAG_UPDATING, Collections.emptyList(), null);
+		w.writeEmptyElement(TAG_EXPIRATION);
+		w.writeAttribute(ATTR_TIMEOUT, Integer.toString(timeout));
+		w.writeStartElement(TAG_UPDATING);
 		synchronized (updating) {
 			for (final Iterator<GroupAddress> i = updating.iterator(); i.hasNext();)
 				i.next().save(w);
 		}
-		w.endElement();
-		w.writeElement(TAG_INVALIDATING, Collections.emptyList(), null);
+		w.writeEndElement();
+		w.writeStartElement(TAG_INVALIDATING);
 		synchronized (invalidating) {
 			for (final Iterator<GroupAddress> i = invalidating.iterator(); i.hasNext();)
 				i.next().save(w);
 		}
-		w.endElement();
+		w.writeEndElement();
 	}
 }
