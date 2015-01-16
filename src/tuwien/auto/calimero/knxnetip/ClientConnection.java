@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2014 B. Malinowsky
+    Copyright (c) 2010, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -62,8 +62,8 @@ import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.servicetype.ServiceAck;
 import tuwien.auto.calimero.knxnetip.util.CRI;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
-import tuwien.auto.calimero.log.LogService.LogLevel;
 import tuwien.auto.calimero.log.LogService;
+import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * Base implementation for client tunneling, device management, and routing.
@@ -371,7 +371,7 @@ abstract class ClientConnection extends ConnectionBase
 		stopReceiver();
 		socket.close();
 		setState(CLOSED);
-		logger.error("establishing connection failed", thrown);
+		logger.error("establishing connection failed because of " + thrown.getMessage());
 		LogService.removeLogger(logger);
 	}
 
