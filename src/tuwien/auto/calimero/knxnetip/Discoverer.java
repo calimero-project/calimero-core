@@ -51,6 +51,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import tuwien.auto.calimero.exception.KNXException;
 import tuwien.auto.calimero.exception.KNXFormatException;
@@ -118,6 +119,17 @@ public class Discoverer
 	static final InetAddress SYSTEM_SETUP_MULTICAST;
 
 	private static final LogService logger = LogManager.getManager().getLogService(LOG_SERVICE);
+
+	private static boolean win7_OrLater;
+	static {
+		// find out if we're on Windows 7 or later
+		final String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
+		if (os.indexOf("windows") >= 0) {
+			// minor: 0 = vista, 1 = win 7, 2 = win 8, 3 = win 8.1, 4 = win 10,  ...
+			final String ver = System.getProperty("os.version", "generic");
+			win7_OrLater = Double.parseDouble(ver) > 6.1;
+		}
+	}
 
 	// local host/port
 	private final InetAddress host;
@@ -530,8 +542,21 @@ public class Discoverer
 			if (unicast)
 				return new MulticastSocket(new InetSocketAddress(bindAddr, bindPort));
 			s = new MulticastSocket(mcastResponse ? SEARCH_PORT : bindPort);
-			if (ni != null)
-				s.setNetworkInterface(ni);
+			try {
+				// Under Windows >=7 (still the same on Win 8.1), setting the interface might
+				// throw with WSAENOTSOCK. This is due to IPv6 handling, see also bug JDK-6458027.
+				// Solution: set java.net.preferIPv4Stack=true or uncheck
+				// Internet Protocol Version 6 (TCP/IPv6) in Windows network connections
+				if (ni != null)
+					s.setNetworkInterface(ni);
+			}
+			catch (final IOException e) {
+				if (!win7_OrLater)
+					throw e;
+				logger.warn("setting outgoing network interface " + ni.getName()
+						+ " failed, using system default."
+						+ " Either disable IPv6 or set java.net.preferIPv4Stack=true.");
+			}
 		}
 		catch (final IOException e) {
 			final String msg = "failed to create socket on " + bindAddr + ":" + bindPort;
