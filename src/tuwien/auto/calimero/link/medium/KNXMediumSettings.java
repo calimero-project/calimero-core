@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2013 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
  * <p>
  * Used by a KNX link interface to obtain medium/device information necessary to handle
  * communication with the KNX network based on the particular communication medium.
- * 
+ *
  * @author B. Malinowsky
  */
 public abstract class KNXMediumSettings
@@ -87,7 +87,7 @@ public abstract class KNXMediumSettings
 	/**
 	 * Creates the medium settings for the specified KNX medium.
 	 * <p>
-	 * 
+	 *
 	 * @param medium the KNX medium type code, see definitions in {@link KNXMediumSettings}
 	 * @param device individual address to use as source address in KNX messages, supplying
 	 *        <code>null</code> will use the individual address 0.0.0
@@ -110,11 +110,11 @@ public abstract class KNXMediumSettings
 		}
 		throw new KNXIllegalArgumentException("unknown medium type " + medium);
 	}
-	
+
 	/**
 	 * Creates a new container for KNX device/medium settings.
 	 * <p>
-	 * 
+	 *
 	 * @param device individual device address to use as source address in KNX messages,
 	 *        specifying <code>null</code> uses the individual address 0.0.0
 	 */
@@ -126,7 +126,7 @@ public abstract class KNXMediumSettings
 	/**
 	 * Sets the device individual address.
 	 * <p>
-	 * 
+	 *
 	 * @param device individual address to use as new source address in KNX messages
 	 */
 	public final synchronized void setDeviceAddress(final IndividualAddress device)
@@ -137,7 +137,7 @@ public abstract class KNXMediumSettings
 	/**
 	 * Returns the device individual address.
 	 * <p>
-	 * 
+	 *
 	 * @return individual address
 	 */
 	public final synchronized IndividualAddress getDeviceAddress()
@@ -147,13 +147,13 @@ public abstract class KNXMediumSettings
 
 	/**
 	 * Returns the KNX medium type identifier specifying the communication medium this
-	 * setting object is for.
+	 * object represents.
 	 * <p>
-	 * 
+	 *
 	 * @return KNX medium type ID
 	 */
 	public abstract int getMedium();
-	
+
 	/**
 	 * Returns the KNX medium type code for the specified medium type name.
 	 * <p>
@@ -165,7 +165,7 @@ public abstract class KNXMediumSettings
 	 * <li>PL132, P132</li>
 	 * <li>RF</li>
 	 * </ul>
-	 * 
+	 *
 	 * @param mediumName the textual representation of a medium type as returned by
 	 *        {@link #getMediumString()}, case-insensitive
 	 * @return the KNX medium type code
@@ -186,17 +186,30 @@ public abstract class KNXMediumSettings
 		else
 			throw new KNXIllegalArgumentException("unknown medium type " + mediumName);
 	}
-	
+
 	/**
 	 * Returns a textual representation of the KNX medium type.
 	 * <p>
-	 * 
+	 *
 	 * @return KNX medium as string
 	 * @see #getMedium()
 	 */
 	public String getMediumString()
 	{
-		switch (getMedium()) {
+		return getMediumString(getMedium());
+	}
+
+	/**
+	 * Returns a textual representation of the KNX medium type.
+	 * <p>
+	 *
+	 * @param knxMedium the KNX medium type identifier
+	 * @return KNX medium as string, or "unknown" on unknown medium type
+	 * @see #getMedium()
+	 */
+	public static String getMediumString(final int knxMedium)
+	{
+		switch (knxMedium) {
 		case MEDIUM_TP0:
 			return "TP0";
 		case MEDIUM_TP1:
@@ -211,7 +224,7 @@ public abstract class KNXMediumSettings
 			return "unknown";
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
