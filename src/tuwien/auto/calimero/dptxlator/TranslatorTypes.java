@@ -364,7 +364,7 @@ public final class TranslatorTypes
 		map = Collections.synchronizedMap(new HashMap(20));
 		addTranslator(TYPE_BOOLEAN, "DPTXlatorBoolean", "Boolean (main type 1)");
 		addTranslator(TYPE_1BIT_CONTROLLED, "DPTXlator1BitControlled",
-				"Boolean controlled (main type 2");
+				"Boolean controlled (main type 2)");
 		addTranslator(TYPE_3BIT_CONTROLLED, "DPTXlator3BitControlled",
 				"3 Bit controlled (main type 3)");
 		addTranslator(TYPE_8BIT_UNSIGNED, "DPTXlator8BitUnsigned",
