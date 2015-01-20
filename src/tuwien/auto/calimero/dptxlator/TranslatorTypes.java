@@ -422,13 +422,13 @@ public final class TranslatorTypes
 	 *        ASDU
 	 * @return list of all available main types of the requested type size or the empty list
 	 */
-	public static List getMainTypesBySize(final int typeSize)
+	public static List<MainType> getMainTypesBySize(final int typeSize)
 	{
-		final List l = new ArrayList();
-		for (final Iterator i = map.values().iterator(); i.hasNext();) {
-			final MainType type = (MainType) i.next();
+		final List<MainType> l = new ArrayList<>();
+		for (final Iterator<MainType> i = map.values().iterator(); i.hasNext();) {
+			final MainType type = i.next();
 			try {
-				final String dptID = (String) type.getSubTypes().keySet().iterator().next();
+				final String dptID = type.getSubTypes().keySet().iterator().next();
 				final int size = type.createTranslator(dptID).getTypeSize();
 				if (size == typeSize)
 					l.add(type);
