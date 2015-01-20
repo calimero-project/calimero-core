@@ -118,7 +118,6 @@ public abstract class Datapoint
 		if (r.getPosition() != XMLReader.START_TAG)
 			r.read();
 		final Element e = r.getCurrent();
-		final int line = r.getLineNumber();
 		if (r.getPosition() != XMLReader.START_TAG || !e.getName().equals(TAG_DATAPOINT))
 			throw new KNXMLException("no KNX datapoint element", r);
 		stateBased = readDPType(r);

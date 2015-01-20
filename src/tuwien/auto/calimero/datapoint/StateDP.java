@@ -127,9 +127,7 @@ public class StateDP extends Datapoint
 	{
 		super(main, name, true);
 		invalidating = Collections.synchronizedList(new ArrayList<>(invalidatingAddresses));
-		checkGAs(invalidating);
 		updating = Collections.synchronizedList(new ArrayList<>(updatingAddresses));
-		checkGAs(updating);
 	}
 
 	/**
@@ -336,13 +334,5 @@ public class StateDP extends Datapoint
 				i.next().save(w);
 		}
 		w.endElement();
-	}
-
-	// iteration not synchronized
-	private void checkGAs(final List<GroupAddress> l)
-	{
-		for (final Iterator<GroupAddress> i = l.iterator(); i.hasNext();)
-			if (!(i.next() instanceof GroupAddress))
-				throw new KNXIllegalArgumentException("not a group address list");
 	}
 }
