@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -120,13 +120,12 @@ public abstract class Datapoint
 		final Element e = r.getCurrent();
 		final int line = r.getLineNumber();
 		if (r.getPosition() != XMLReader.START_TAG || !e.getName().equals(TAG_DATAPOINT))
-			throw new KNXMLException("no KNX datapoint element", e != null ? e.getName() : null,
-					line);
+			throw new KNXMLException("no KNX datapoint element", r);
 		stateBased = readDPType(r);
 		if ((name = e.getAttribute(ATTR_NAME)) == null)
-			throw new KNXMLException("missing attribute " + ATTR_NAME, null, line);
+			throw new KNXMLException("missing attribute " + ATTR_NAME, r);
 		if ((dptId = e.getAttribute(ATTR_DPTID)) == null)
-			throw new KNXMLException("missing attribute " + ATTR_DPTID, null, line);
+			throw new KNXMLException("missing attribute " + ATTR_DPTID, r);
 		if (dptId.length() == 0)
 			dptId = null;
 		String a = null;
@@ -137,7 +136,7 @@ public abstract class Datapoint
 			priority = Priority.get(a);
 		}
 		catch (final RuntimeException rte) {
-			throw new KNXMLException("malformed attribute, " + rte.getMessage(), a, line);
+			throw new KNXMLException("malformed attribute, " + rte.getMessage(), r);
 		}
 		r.read();
 	}
@@ -162,7 +161,7 @@ public abstract class Datapoint
 				return new StateDP(r);
 			return new CommandDP(r);
 		}
-		throw new KNXMLException("no KNX datapoint", null, r.getLineNumber());
+		throw new KNXMLException("no KNX datapoint", r);
 	}
 
 	/**
@@ -315,7 +314,7 @@ public abstract class Datapoint
 	void doLoad(final XMLReader r) throws KNXMLException
 	{
 		if (main != null)
-			throw new KNXMLException("main address already set", null, r.getLineNumber());
+			throw new KNXMLException("main address already set", r);
 		if (r.getPosition() != XMLReader.START_TAG)
 			r.read();
 		main = new GroupAddress(r);
@@ -331,6 +330,6 @@ public abstract class Datapoint
 			return false;
 		if ("true".equalsIgnoreCase(a))
 			return true;
-		throw new KNXMLException("malformed attribute " + ATTR_STATEBASED, a, r.getLineNumber());
+		throw new KNXMLException("malformed attribute " + ATTR_STATEBASED, r);
 	}
 }

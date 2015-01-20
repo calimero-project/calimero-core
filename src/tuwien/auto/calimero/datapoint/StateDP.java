@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -146,8 +146,7 @@ public class StateDP extends Datapoint
 	{
 		super(r);
 		if (!isStateBased())
-			throw new KNXMLException("no state based KNX datapoint element", null,
-					r.getLineNumber());
+			throw new KNXMLException("no state based KNX datapoint element", r);
 		invalidating = Collections.synchronizedList(new ArrayList<>());
 		updating = Collections.synchronizedList(new ArrayList<>());
 		doLoad(r);
@@ -292,10 +291,11 @@ public class StateDP extends Datapoint
 						timeout = Integer.decode(a).intValue();
 					}
 					catch (final NumberFormatException e) {
-						throw new KNXMLException("malformed attribute timeout, " + a, null,
-								r.getLineNumber());
+						throw new KNXMLException("malformed attribute timeout", r);
 					}
 			}
+			else if (r.getCurrent().isEmptyElementTag())
+				;
 			else if (tag.equals(TAG_UPDATING))
 				while (r.read() == XMLReader.START_TAG)
 					updating.add(new GroupAddress(r));
@@ -307,9 +307,11 @@ public class StateDP extends Datapoint
 				main = true;
 			}
 			else
-				throw new KNXMLException("invalid element", tag, r.getLineNumber());
+				throw new KNXMLException("invalid element", r);
 			r.read();
 		}
+		if (!main)
+			throw new KNXMLException("Datapoint is missing its address", r);
 	}
 
 	/* (non-Javadoc)

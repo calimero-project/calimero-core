@@ -38,6 +38,7 @@ package tuwien.auto.calimero.process;
 
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.datapoint.Datapoint;
+import tuwien.auto.calimero.dptxlator.DPT;
 import tuwien.auto.calimero.exception.KNXException;
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXInvalidResponseException;
@@ -171,17 +172,17 @@ public interface ProcessCommunicator extends ProcessCommunicationBase
 	/**
 	 * Reads a datapoint value from a group destination.
 	 * <p>
-	 * The used KNX message priority is according the supplied datapoint priority.
+	 * The used KNX message priority is according the supplied datapoint priority.<br>
+	 * If no {@link DPT} is set for <code>dp</code>, a non-translated representation of the ASDU is
+	 * returned, e.g., a hexadecimal value string.
 	 *
 	 * @param dp the datapoint for read
-	 * @return the read value in textual representation according the datapoint its type
-	 * @throws KNXTimeoutException on a timeout during send or no read response was
-	 *         received
+	 * @return the read datapoint value in textual representation (translated using the DPT)
+	 * @throws KNXTimeoutException on a timeout during send or no read response was received
 	 * @throws KNXInvalidResponseException on invalid read response message
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
-	 * @throws KNXFormatException on translation problem of the response data
-	 * @throws KNXException if no appropriate DPT translator for the datapoint type is
-	 *         available
+	 * @throws KNXFormatException on translation error of the response data
+	 * @throws KNXException if no appropriate DPT translator for the datapoint type is available
 	 * @throws InterruptedException on interrupt during read
 	 */
 	String read(Datapoint dp) throws KNXException, InterruptedException;

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,9 +37,11 @@
 package tuwien.auto.calimero.dptxlator;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import tuwien.auto.calimero.exception.KNXException;
@@ -182,6 +184,12 @@ public final class TranslatorTypes
 	 * DPT main number for <b>8 Bit enumeration</b>, number = {@value #TYPE_ENUM8}.
 	 */
 	public static final int TYPE_ENUM8 = 20;
+
+	/**
+	 * DPT main number for <b>RGB color</b>, number = {@value #TYPE_RGB}.
+	 * <p>
+	 */
+	public static final int TYPE_RGB = 232;
 
 	/**
 	 * Maps a data type main number to a corresponding translator class doing the DPT
@@ -336,7 +344,7 @@ public final class TranslatorTypes
 		map = Collections.synchronizedMap(new HashMap<>(20));
 		addTranslator(TYPE_BOOLEAN, "DPTXlatorBoolean", "Boolean (main type 1)");
 		addTranslator(TYPE_1BIT_CONTROLLED, "DPTXlator1BitControlled",
-				"Boolean controlled (main type 2");
+				"Boolean controlled (main type 2)");
 		addTranslator(TYPE_3BIT_CONTROLLED, "DPTXlator3BitControlled",
 				"3 Bit controlled (main type 3)");
 		addTranslator(TYPE_8BIT_UNSIGNED, "DPTXlator8BitUnsigned",
@@ -356,6 +364,7 @@ public final class TranslatorTypes
 		addTranslator(TYPE_SCENE_NUMBER, "DPTXlatorSceneNumber", "Scene number (main type 17)");
 		addTranslator(TYPE_SCENE_CONTROL, "DPTXlatorSceneControl", "Scene control (main type 18)");
 		addTranslator(TYPE_DATE_TIME, "DPTXlatorDateTime", "Date with time (main type 19)");
+		addTranslator(TYPE_RGB, "DPTXlatorRGB", "RGB color value (main type 232)");
 	}
 
 	private TranslatorTypes()
@@ -399,6 +408,34 @@ public final class TranslatorTypes
 	public static Map<Integer, MainType> getAllMainTypes()
 	{
 		return map;
+	}
+
+	/**
+	 * Returns all main types of a specific data type size, based on the currently available main
+	 * types as provided by {@link TranslatorTypes#getAllMainTypes()}.
+	 * <p>
+	 * For example, when specifying a type size of <code>2</code>, the returned list will contain
+	 * the main types with number 9 (<b>2-byte float</b>) and number 7 (<b>2 byte unsigned
+	 * value</b>), assuming both are also returned by {@link TranslatorTypes#getAllMainTypes()}.
+	 *
+	 * @param typeSize the data type size in bytes, use <code>0</code> for main types having a 6 bit
+	 *        ASDU
+	 * @return list of all available main types of the requested type size or the empty list
+	 */
+	public static List getMainTypesBySize(final int typeSize)
+	{
+		final List l = new ArrayList();
+		for (final Iterator i = map.values().iterator(); i.hasNext();) {
+			final MainType type = (MainType) i.next();
+			try {
+				final String dptID = (String) type.getSubTypes().keySet().iterator().next();
+				final int size = type.createTranslator(dptID).getTypeSize();
+				if (size == typeSize)
+					l.add(type);
+			}
+			catch (final KNXException e) {}
+		}
+		return l;
 	}
 
 	/**

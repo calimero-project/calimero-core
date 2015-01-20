@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -105,8 +105,7 @@ public abstract class KNXAddress
 		final Element e = r.getCurrent();
 		if (r.getPosition() != XMLReader.START_TAG || !e.getName().equals(TAG_ADDRESS)
 				|| !getType().equals(e.getAttribute(ATTR_TYPE)))
-			throw new KNXMLException("XML element represents no KNX " + getType() + " address",
-					e != null ? e.getName() : null, r.getLineNumber());
+			throw new KNXMLException("XML element represents no KNX " + getType() + " address", r);
 		r.complete(e);
 		try {
 			address = Integer.parseInt(e.getCharacterData());
@@ -114,8 +113,7 @@ public abstract class KNXAddress
 				return;
 		}
 		catch (final NumberFormatException nfe) {}
-		throw new KNXMLException("malformed KNX address value", e.getCharacterData(),
-				r.getLineNumber());
+		throw new KNXMLException("malformed KNX address value", r);
 	}
 
 	/**
@@ -146,7 +144,7 @@ public abstract class KNXAddress
 			else if (IndividualAddress.ATTR_IND.equals(type))
 				return new IndividualAddress(r);
 		}
-		throw new KNXMLException("not a KNX address", null, r.getLineNumber());
+		throw new KNXMLException("not a KNX address", r);
 	}
 
 	/**

@@ -209,7 +209,7 @@ public interface ManagementProcedures
 	 * @throws KNXTimeoutException on communication timeouts during the scanning
 	 * @throws KNXLinkClosedException on a closed KNXNetworkLink to the KNX network
 	 * @throws InterruptedException if this thread was interrupted during scanning the
-	 *         network routers
+	 *         network devices
 	 */
 	IndividualAddress[] scanNetworkDevices(int area, int line) throws KNXTimeoutException,
 			KNXLinkClosedException, InterruptedException;

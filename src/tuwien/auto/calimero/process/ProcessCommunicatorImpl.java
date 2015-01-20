@@ -50,6 +50,7 @@ import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.datapoint.Datapoint;
+import tuwien.auto.calimero.dptxlator.DPT;
 import tuwien.auto.calimero.dptxlator.DPTXlator;
 import tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat;
 import tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled;
@@ -105,18 +106,19 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 			}
 			// notify listeners
 			if (svc == GROUP_READ)
-				fireGroupReadWrite(f, new byte[0], svc);
+				fireGroupReadWrite(f, new byte[0], svc, false);
 			else if (svc == GROUP_RESPONSE || svc == GROUP_WRITE)
-				fireGroupReadWrite(f, DataUnitBuilder.extractASDU(apdu), svc);
+				fireGroupReadWrite(f, DataUnitBuilder.extractASDU(apdu), svc, apdu.length <= 2);
 			else ;
 				//logger.warn("unsupported APDU service - ignored, service code = 0x"
 				//		+ Integer.toHexString(svc));
 		}
 
-		private void fireGroupReadWrite(final CEMILData f, final byte[] asdu, final int svc)
+		private void fireGroupReadWrite(final CEMILData f, final byte[] asdu, final int svc,
+			final boolean optimized)
 		{
 			final ProcessEvent e = new ProcessEvent(ProcessCommunicatorImpl.this, f.getSource(),
-					(GroupAddress) f.getDestination(), svc, asdu);
+					(GroupAddress) f.getDestination(), svc, asdu, optimized);
 			final ProcessListener[] el = listeners.listeners();
 			for (int i = 0; i < el.length; i++) {
 				final ProcessListener l = el[i];
@@ -396,16 +398,18 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		write(dst, priority, t);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#read
-	 * (tuwien.auto.calimero.datapoint.Datapoint)
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * If <code>dp</code> has no {@link DPT} set, this method returns a hexadecimal representation
+	 * of the ASDU.
 	 */
 	@Override
 	public String read(final Datapoint dp) throws KNXException, InterruptedException
 	{
-		if (dp.getDPT() == null)
-			throw new KNXIllegalArgumentException("specify DPT for datapoint");
 		final byte[] apdu = readFromGroup(dp.getMainAddress(), dp.getPriority(), 0, 14);
+		if (dp.getDPT() == null)
+			return DataUnitBuilder.toHex(DataUnitBuilder.extractASDU(apdu), " ");
 		final DPTXlator t = TranslatorTypes.createTranslator(dp.getMainNumber(), dp.getDPT());
 		extractGroupASDU(apdu, t);
 		return t.getValue();

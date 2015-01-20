@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -122,7 +122,9 @@ public class DefaultXMLReader implements XMLReader
 			}
 			str = str.trim();
 			// extract element name
-			final String name = splitOnSpace(str);
+			String name = splitOnSpace(str);
+			if (name.charAt(name.length() - 1) == '/')
+				name = name.substring(0, name.length() - 1);
 			if (name.charAt(0) == '/') {
 				if (!name.substring(1).equals(openElems.peek()))
 					throw new KNXMLException("element end tag does not match start tag",
@@ -154,7 +156,7 @@ public class DefaultXMLReader implements XMLReader
 			return;
 		final int index = openElems.lastIndexOf(e.getName());
 		if (index == -1)
-			throw new KNXMLException("element tag not read before", e.getName(), line);
+			throw new KNXMLException("no matching element open tag: " + e.getName(), this);
 		String end = null;
 		final StringBuffer content = new StringBuffer(50);
 		while (canRead()) {
