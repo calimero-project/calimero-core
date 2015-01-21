@@ -187,7 +187,6 @@ public final class TranslatorTypes
 
 	/**
 	 * DPT main number for <b>RGB color</b>, number = {@value #TYPE_RGB}.
-	 * <p>
 	 */
 	public static final int TYPE_RGB = 232;
 
