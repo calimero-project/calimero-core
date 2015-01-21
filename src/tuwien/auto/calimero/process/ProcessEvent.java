@@ -90,7 +90,7 @@ public class ProcessEvent extends EventObject
 	 * @param svcCode the process communication service code
 	 * @param asdu byte array with the application layer service data unit (ASDU), no copy is
 	 *        created
-	 * @param optimized <code>true</code> iff ASDU is optimized, i.e., length of data &leq; 6 Bits;
+	 * @param optimized <code>true</code> iff ASDU is optimized, i.e., length of data &le; 6 Bits;
 	 *        <code>false</code> otherwise
 	 */
 	public ProcessEvent(final ProcessCommunicator source, final IndividualAddress src,
@@ -149,7 +149,7 @@ public class ProcessEvent extends EventObject
 	}
 
 	/**
-	 * Returns whether the ASDU is optimized, i.e., contains &leq; 6 Bits data.
+	 * Returns whether the ASDU is optimized, i.e., contains &le; 6 Bits data.
 	 * <p>
 	 *
 	 * @return <code>true</code> if optimized, <code>false</code> otherwise

@@ -63,7 +63,6 @@ import tuwien.auto.calimero.log.LogLevel;
 public class DPTXlatorRGB extends DPTXlator {
 	/**
 	 * DPT ID 232.600, RGB Color; values from <b>0 0 0</b> to <b>255 255 255</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_RGB = new DPT("232.600", "RGB", "0 0 0", "255 255 255", "r g b");
 
