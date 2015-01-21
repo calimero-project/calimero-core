@@ -155,6 +155,44 @@ public class Discoverer
 		SYSTEM_SETUP_MULTICAST = a;
 	}
 
+	static class Result<T>
+	{
+		private final T response;
+		private final NetworkInterface ni;
+		private final InetAddress addr;
+
+		public Result(final T r, final NetworkInterface outgoing, final InetAddress bind)
+		{
+			response = r;
+			ni = outgoing;
+			addr = bind;
+		}
+
+		/**
+		 * @return the response
+		 */
+		public T getResponse()
+		{
+			return response;
+		}
+
+		/**
+		 * @return the ni
+		 */
+		public NetworkInterface getNetworkInterface()
+		{
+			return ni;
+		}
+
+		/**
+		 * @return the addr
+		 */
+		public InetAddress getAddress()
+		{
+			return addr;
+		}
+	}
+
 	/**
 	 * Creates a new Discoverer.
 	 * <p>
