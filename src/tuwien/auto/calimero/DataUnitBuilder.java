@@ -142,15 +142,14 @@ public final class DataUnitBuilder
 	}
 
 	/**
-	 * Creates an application layer protocol data unit out of a service code and a service
-	 * data unit.
+	 * Creates an application layer protocol data unit out of a service code and a service data
+	 * unit.
 	 * <p>
-	 * The transport layer bits in the first byte (TL / AL control field) are set 0. For
-	 * creating a compact APDU, refer to {@link #createCompactAPDU(int, byte[])}.
+	 * The transport layer bits in the first byte (TL / AL control field) are set 0. For creating a
+	 * length-optimized (compact) APDU, refer to {@link #createLengthOptimizedAPDU(int, byte[])}.
 	 *
 	 * @param service application layer service code
-	 * @param asdu application layer service data unit, <code>asdu.length</code> &lt;
-	 *        255
+	 * @param asdu application layer service data unit, <code>asdu.length</code> &lt; 255
 	 * @return APDU as byte array
 	 */
 	public static byte[] createAPDU(final int service, final byte[] asdu)
@@ -166,18 +165,17 @@ public final class DataUnitBuilder
 	}
 
 	/**
-	 * Creates a compact application layer protocol data unit out of a service code and a
-	 * service data unit.
-	 * <p>
-	 * The transport layer bits in the first byte (TL / AL control field) are set 0. If
-	 * the compact APDU shall not contain any ASDU information, <code>asdu</code> can be
-	 * left <code>null</code>.
+	 * In the KNX standard, APDUs that use a shorter-length APDU format are referred to as
+	 * <i>optimized</i>, not <i>compact</i>; for naming reasons use
+	 * {@link #createLengthOptimizedAPDU(int, byte[])}.
 	 *
 	 * @param service application layer service code
-	 * @param asdu application layer service data unit, <code>asdu.length</code> &lt;
-	 *        255; or <code>null</code> for no ASDU
+	 * @param asdu application layer service data unit, <code>asdu.length</code> &lt; 255; or
+	 *        <code>null</code> for no ASDU
 	 * @return APDU as byte array
+	 * @deprecated use {@link #createLengthOptimizedAPDU(int, byte[])}
 	 */
+	@Deprecated
 	public static byte[] createCompactAPDU(final int service, final byte[] asdu)
 	{
 		final byte[] apdu =
@@ -193,6 +191,23 @@ public final class DataUnitBuilder
 				apdu[i + 1] = asdu[i];
 		}
 		return apdu;
+	}
+
+	/**
+	 * Creates a length-optimized application layer protocol data unit out of a service
+	 * code and a service data unit.
+	 * <p>
+	 * The transport layer bits in the first byte (TL / AL control field) are set 0. If the compact
+	 * APDU shall not contain any ASDU information, <code>asdu</code> can be left <code>null</code>.
+	 *
+	 * @param service application layer service code
+	 * @param asdu application layer service data unit, <code>asdu.length</code> &lt; 255; or
+	 *        <code>null</code> for no ASDU
+	 * @return APDU as byte array
+	 */
+	public static byte[] createLengthOptimizedAPDU(final int service, final byte[] asdu)
+	{
+		return createCompactAPDU(service, asdu);
 	}
 
 	/**

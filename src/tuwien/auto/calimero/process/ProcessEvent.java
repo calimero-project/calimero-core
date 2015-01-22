@@ -131,12 +131,12 @@ public class ProcessEvent extends EventObject
 	}
 
 	/**
-	 * Returns whether the ASDU is optimized, i.e., contains &le; 6 Bits data.
+	 * Returns whether the APDU is length-optimized, i.e., contains &le; 6 Bits data.
 	 * <p>
 	 *
 	 * @return <code>true</code> if optimized, <code>false</code> otherwise
 	 */
-	public final boolean isOptimizedASDU()
+	public final boolean isLengthOptimizedAPDU()
 	{
 		return optimized;
 	}

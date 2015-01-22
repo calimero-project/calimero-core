@@ -568,13 +568,12 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	}
 
 	/**
-	 * Extracts the service data unit of an application layer protocol data unit into a
-	 * DPT translator.
+	 * Extracts the service data unit of an application layer protocol data unit into a DPT
+	 * translator.
 	 * <p>
-	 * The whole service data unit is taken as data for translation. If the length of the
-	 * supplied <code>apdu</code> is 2, a compact group APDU format layout is assumed.<br>
-	 * On return of this method, the supplied translator contains the DPT items from the
-	 * ASDU.
+	 * The whole service data unit is taken as data for translation. If the length of the supplied
+	 * <code>apdu</code> is 2, a length-optimized (compact) group APDU format layout is assumed.<br>
+	 * On return of this method, the supplied translator contains the DPT items from the ASDU.
 	 *
 	 * @param apdu application layer protocol data unit, 2 &lt;= apdu.length
 	 * @param t the DPT translator to fill with the ASDU
