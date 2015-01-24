@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB;
  * control endpoint.
  * <p>
  * Objects of this type are immutable.
- * 
+ *
  * @author B. Malinowsky
  * @see tuwien.auto.calimero.knxnetip.servicetype.SearchRequest
  */
@@ -65,7 +65,7 @@ public class SearchResponse extends ServiceType
 	/**
 	 * Creates a new search response out of a byte array.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing a search response structure
 	 * @param offset start offset of response in <code>data</code>
 	 * @throws KNXFormatException if no search response was found or invalid structure
@@ -81,7 +81,7 @@ public class SearchResponse extends ServiceType
 	 * Creates a new search response for the given control endpoint together with device
 	 * information.
 	 * <p>
-	 * 
+	 *
 	 * @param ctrlEndpoint discovered control endpoint of the server sending this response
 	 * @param device server device description information
 	 * @param svcFamilies supported service families by the server
@@ -97,7 +97,7 @@ public class SearchResponse extends ServiceType
 	/**
 	 * Returns the server control endpoint.
 	 * <p>
-	 * 
+	 *
 	 * @return discovered control endpoint in a HPAI
 	 */
 	public final HPAI getControlEndpoint()
@@ -109,7 +109,7 @@ public class SearchResponse extends ServiceType
 	 * Returns the device description information block of the server contained in the
 	 * response.
 	 * <p>
-	 * 
+	 *
 	 * @return a device DIB
 	 */
 	public final DeviceDIB getDevice()
@@ -121,12 +121,30 @@ public class SearchResponse extends ServiceType
 	 * Returns the supported service families description information block of the server
 	 * contained in the response.
 	 * <p>
-	 * 
+	 *
 	 * @return a DIB with the supported service families
 	 */
 	public final ServiceFamiliesDIB getServiceFamilies()
 	{
 		return desc.getServiceFamilies();
+	}
+
+	@Override
+	public boolean equals(final Object obj)
+	{
+		if (this == obj)
+			return true;
+		if (!(obj instanceof SearchResponse))
+			return false;
+		final SearchResponse other = (SearchResponse) obj;
+		return endpt.equals(other.endpt) && desc.equals(other.desc);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 17;
+		return prime * endpt.hashCode() + desc.hashCode();
 	}
 
 	/* (non-Javadoc)

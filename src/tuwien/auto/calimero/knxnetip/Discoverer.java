@@ -194,6 +194,27 @@ public class Discoverer
 		{
 			return addr;
 		}
+
+		@Override
+		public boolean equals(final Object obj)
+		{
+			if (this == obj)
+				return true;
+			if (!(obj instanceof Result<?>))
+				return false;
+			final Result<?> other = (Result<?>) obj;
+			return getNetworkInterface().equals(other.getNetworkInterface())
+					&& getAddress().equals(other.getAddress())
+					&& getResponse().equals(other.getResponse());
+		}
+
+		@Override
+		public int hashCode()
+		{
+			final int prime = 17;
+			return prime * (prime * getNetworkInterface().hashCode() + getAddress().hashCode())
+					+ getResponse().hashCode();
+		}
 	}
 
 	/**

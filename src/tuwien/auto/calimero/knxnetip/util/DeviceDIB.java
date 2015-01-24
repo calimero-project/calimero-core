@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -397,6 +397,29 @@ public class DeviceDIB extends DIB
 				+ " (project installation ID " + installationId + ")"
 				+ ", routing multicast address " + mc + ", MAC address " + getMACAddressString()
 				+ ", S/N 0x" + getSerialNumberString();
+	}
+
+	@Override
+	public boolean equals(final Object obj)
+	{
+		if (this == obj)
+			return true;
+		if (!(obj instanceof DeviceDIB))
+			return false;
+		final DeviceDIB other = (DeviceDIB) obj;
+		return address.equals(other.address) && name.equals(other.name) && status == other.status
+				&& knxmedium == other.knxmedium
+				&& Arrays.hashCode(serial) == Arrays.hashCode(other.serial)
+				&& installationId == other.installationId
+				&& Arrays.hashCode(mcast) == Arrays.hashCode(other.mcast)
+				&& Arrays.hashCode(mac) == Arrays.hashCode(other.mac);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return status + knxmedium + installationId + address.hashCode() + name.hashCode()
+				+ Arrays.hashCode(serial) + Arrays.hashCode(mcast) + Arrays.hashCode(mac);
 	}
 
 	/* (non-Javadoc)
