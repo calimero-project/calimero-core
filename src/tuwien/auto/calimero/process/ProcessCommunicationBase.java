@@ -39,6 +39,7 @@ package tuwien.auto.calimero.process;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.datapoint.Datapoint;
+import tuwien.auto.calimero.dptxlator.DPTXlator;
 import tuwien.auto.calimero.exception.KNXException;
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXTimeoutException;
@@ -251,7 +252,7 @@ public interface ProcessCommunicationBase
 	 * <p>
 	 * Writes a 2-byte KNX float datapoint value to a group destination.
 	 * <p>
-	 * 
+	 *
 	 * @param dst group destination to write to
 	 * @param value float value to write
 	 * @throws KNXTimeoutException on a timeout during send
@@ -292,6 +293,18 @@ public interface ProcessCommunicationBase
 	 * @throws KNXException on other write problems
 	 */
 	void write(GroupAddress dst, String value) throws KNXException;
+
+	/**
+	 * Writes the content of the supplied DPTXlator to a group destination.
+	 *
+	 * @param dst group destination to write to
+	 * @param value DPTXlator which's value to write
+	 * @throws KNXTimeoutException on a timeout during send
+	 * @throws KNXFormatException on translation problem of the supplied datapoint value
+	 * @throws KNXLinkClosedException if network link to KNX network is closed
+	 * @throws KNXException on other write problems
+	 */
+	void write(GroupAddress dst, DPTXlator value) throws KNXException;
 
 	/**
 	 * Writes a datapoint value to a group destination.
