@@ -57,7 +57,7 @@ import tuwien.auto.calimero.log.LogLevel;
  * Note, that the floating type structure specified by this data type isn't really
  * precise, especially for bigger floating numbers, so you have to expect certain rounding
  * deviations.
- * 
+ *
  * @author B. Malinowsky
  */
 public class DPTXlator2ByteFloat extends DPTXlator
@@ -164,7 +164,7 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	 * <p>
 	 */
 	public static final DPT DPT_POWER = new DPT("9.024", "Power", "-670760", "+670760", "kW");
-	
+
 	/**
 	 * DPT ID 9.025, Volume flow in liter/hour; value range <b>+/-670760</b> l/h, resolution 0.01.
 	 * <p>
@@ -195,7 +195,7 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	 */
 	public static final DPT DPT_WIND_SPEED_KMH = new DPT("9.028", "Wind speed ", "0", "670760.96",
 			"km/h");
-	
+
 	private static final Map types;
 
 	static {
@@ -227,7 +227,7 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type.
 	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -239,7 +239,7 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	/**
 	 * Creates a translator for <code>dptID</code>.
 	 * <p>
-	 * 
+	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available) DPT
 	 */
@@ -256,7 +256,7 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	 * Sets the translation value from a double.
 	 * <p>
 	 * If succeeded, any other items in the translator are discarded.
-	 * 
+	 *
 	 * @param value the double value
 	 * @throws KNXFormatException if <code>value</code>doesn't fit into KNX data type
 	 */
@@ -270,7 +270,7 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	/**
 	 * Returns the first translation item formatted as float.
 	 * <p>
-	 * 
+	 *
 	 * @return value as float
 	 */
 	public final float getValueFloat()
@@ -281,12 +281,24 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	/**
 	 * Returns the first translation item formatted as double.
 	 * <p>
-	 * 
+	 *
 	 * @return value as double
 	 */
 	public final double getValueDouble()
 	{
 		return fromDPT(0);
+	}
+
+	/**
+	 *  Returns the first translation item formatted as double.
+	 *
+	 *  @return numeric value
+	 *  @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
+	 *  @see getValueDouble()
+	 */
+	public final double getNumericValue()
+	{
+		return getValueDouble();
 	}
 
 	/* (non-Javadoc)
