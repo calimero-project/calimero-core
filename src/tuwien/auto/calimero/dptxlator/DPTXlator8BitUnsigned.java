@@ -94,7 +94,7 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	 * 255: reserved, shall not be transmitted
 	 */
 	public static final DPT DPT_TARIFF = new DPT("5.006", "Tariff information", "0", "254");
-	
+
 	/**
 	 * DPT ID 5.010, Value 1 unsigned count; values from <b>0</b> to <b>255</b> counter
 	 * pulses.
@@ -118,7 +118,7 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type.
 	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -130,7 +130,7 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type ID.
 	 * <p>
-	 * 
+	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
 	 *         <code>dptID</code>
@@ -154,7 +154,7 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	 * items.
 	 * <p>
 	 * The scale of the input value is according to the current DPT.
-	 * 
+	 *
 	 * @param scaled scaled unsigned value, the dimension is determined by the set DPT, 0
 	 *        &lt;= scaled value &lt;= defined maximum of DPT
 	 * @throws KNXFormatException on wrong scaled value, if input doesn't conform to
@@ -170,7 +170,7 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	 * Returns the first translation item, the value scaled conforming to the range of the
 	 * set DPT.
 	 * <p>
-	 * 
+	 *
 	 * @return scaled representation as unsigned 8 Bit using type short
 	 * @see #getType()
 	 */
@@ -180,11 +180,23 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	}
 
 	/**
+	 * Returns the first translation item, the value scaled conforming to the range of the set DPT.
+	 *
+	 * @return scaled numeric value
+	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
+	 * @see #getValueUnsigned()
+	 */
+	public final double getNumericValue()
+	{
+		return getValueUnsigned();
+	}
+
+	/**
 	 * Sets one new translation item from an unsigned unscaled value, replacing any old
 	 * items.
 	 * <p>
 	 * No scaling is performed during translation, the value is equal to the raw KNX data.
-	 * 
+	 *
 	 * @param unscaled unscaled unsigned value, 0 &lt;= <code>unscaled</code> &lt;= 255,
 	 *        the higher bytes are ignored
 	 */
@@ -198,7 +210,7 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	 * <p>
 	 * The returned value is the raw KNX data value (0..255), not adjusted to the value
 	 * range of the set DPT.
-	 * 
+	 *
 	 * @return unscaled representation as unsigned byte
 	 */
 	public final short getValueUnscaled()
@@ -239,7 +251,7 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	 * <p>
 	 * The translator is reset into default state, all currently contained items are
 	 * removed (default value is set).
-	 * 
+	 *
 	 * @param dptID new subtype ID to set
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
 	 *         <code>dptID</code>

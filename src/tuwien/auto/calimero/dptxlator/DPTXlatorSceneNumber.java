@@ -74,7 +74,7 @@ public class DPTXlatorSceneNumber extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type.
 	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -86,7 +86,7 @@ public class DPTXlatorSceneNumber extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type ID.
 	 * <p>
-	 * 
+	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptID</code>
 	 */
@@ -108,7 +108,7 @@ public class DPTXlatorSceneNumber extends DPTXlator
 	/**
 	 * Sets one new translation item, replacing any old items.
 	 * <p>
-	 * 
+	 *
 	 * @param scene number, 0 &lt;= scene number &lt;= 63
 	 */
 	public final void setValue(final int scene)
@@ -119,12 +119,23 @@ public class DPTXlatorSceneNumber extends DPTXlator
 	/**
 	 * Returns the scene number of the first translation item.
 	 * <p>
-	 * 
+	 *
 	 * @return unsigned 6 Bit using type short
 	 */
 	public final short getSceneNumber()
 	{
 		return (short) (data[0] & 0x3F);
+	}
+
+	/**
+	 * Returns the scene number of the first translation item.
+	 *
+	 * @return the scene number
+	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
+	 */
+	public final double getNumericValue()
+	{
+		return getSceneNumber();
 	}
 
 	/* (non-Javadoc)

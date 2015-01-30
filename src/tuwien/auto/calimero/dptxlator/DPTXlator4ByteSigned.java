@@ -127,7 +127,7 @@ public class DPTXlator4ByteSigned extends DPTXlator
 			"-2147483648", "2147483647", "s");
 
 	private static final Map types;
-	
+
 	static {
 		types = new HashMap(15);
 		final Field[] fields = DPTXlator4ByteSigned.class.getFields();
@@ -145,7 +145,7 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type.
 	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -157,7 +157,7 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type ID.
 	 * <p>
-	 * 
+	 *
 	 * @param dptId available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
 	 *         <code>dptID</code>
@@ -172,7 +172,7 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	/**
 	 * Sets the value of the first translation item.
 	 * <p>
-	 * 
+	 *
 	 * @param value signed value
 	 * @throws KNXFormatException on input value out of range for DPT
 	 * @see #getType()
@@ -185,13 +185,25 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	/**
 	 * Returns the first translation item as signed 32 Bit value.
 	 * <p>
-	 * 
+	 *
 	 * @return signed 32 Bit value using type long
 	 * @see #getType()
 	 */
 	public final int getValueSigned()
 	{
 		return fromDPT(0);
+	}
+
+	/**
+	 * Returns the first translation item as signed 32 Bit value.
+	 *
+	 * @return numeric value
+	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
+	 * @see #getValueSigned()
+	 */
+	public final double getNumericValue()
+	{
+		return getValueSigned();
 	}
 
 	/* (non-Javadoc)

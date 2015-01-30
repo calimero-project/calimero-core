@@ -74,7 +74,7 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type.
 	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -86,7 +86,7 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type ID.
 	 * <p>
-	 * 
+	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
 	 *         <code>dptID</code>
@@ -101,7 +101,7 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 	/**
 	 * Sets the value of the first translation item.
 	 * <p>
-	 * 
+	 *
 	 * @param value unsigned value, 0 &lt;= value &lt;= 0xFFFFFFFF
 	 * @throws KNXFormatException on input value out of range for DPT
 	 * @see #getType()
@@ -114,13 +114,25 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 	/**
 	 * Returns the first translation item as unsigned 32 Bit value.
 	 * <p>
-	 * 
+	 *
 	 * @return unsigned 32 Bit value using type long
 	 * @see #getType()
 	 */
 	public final long getValueUnsigned()
 	{
 		return fromDPT(0);
+	}
+
+	/**
+	 * Returns the first translation item as unsigned 32 Bit value.
+	 *
+	 * @return numeric value
+	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
+	 * @see #getValueUnsigned()
+	 */
+	public final double getNumericValue()
+	{
+		return getValueUnsigned();
 	}
 
 	/* (non-Javadoc)

@@ -61,7 +61,7 @@ import tuwien.auto.calimero.log.LogLevel;
  * In value methods expecting a string type, the value is a float type representation.
  * <p>
  * The default return value after creation is <code>0.0</code>.<br>
- * 
+ *
  * @author B. Malinowsky
  */
 public class DPTXlator4ByteFloat extends DPTXlator
@@ -712,7 +712,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type.
 	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -724,7 +724,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	/**
 	 * Creates a translator for <code>dptID</code>.
 	 * <p>
-	 * 
+	 *
 	 * @param dptId available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available) DPT
 	 */
@@ -741,7 +741,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	 * Sets the translation value from a float.
 	 * <p>
 	 * If succeeded, any other items in the translator are discarded.
-	 * 
+	 *
 	 * @param value the float value
 	 * @throws KNXFormatException if <code>value</code> doesn't fit into KNX data type
 	 */
@@ -755,12 +755,24 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	/**
 	 * Returns the first translation item formatted as float.
 	 * <p>
-	 * 
+	 *
 	 * @return value as float
 	 */
 	public final float getValueFloat()
 	{
 		return fromDPT(0);
+	}
+
+	/**
+	 * Returns the first translation item formatted as double.
+	 *
+	 * @return numeric value
+	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
+	 * @see #getValueFloat()
+	 */
+	public final double getNumericValue()
+	{
+		return getValueFloat();
 	}
 
 	/* (non-Javadoc)

@@ -69,7 +69,7 @@ import tuwien.auto.calimero.log.LogService;
  * <p>
  * DPT translator implementations are not required to be thread safe. All translators
  * provided in this package are not thread safe.
- * 
+ *
  * @author B. Malinowsky
  */
 public abstract class DPTXlator
@@ -79,7 +79,7 @@ public abstract class DPTXlator
 	 * <p>
 	 */
 	public static final String LOG_SERVICE = "DPTXlator";
-	
+
 	/**
 	 * Logger object for all translators.
 	 * <p>
@@ -123,7 +123,7 @@ public abstract class DPTXlator
 
 	/**
 	 * Creates the new translator and initializes the data type size.
-	 * 
+	 *
 	 * @param dataTypeSize size in bytes of the KNX data type, use 0 if the type size
 	 *        &lt;= 6 bits
 	 */
@@ -140,7 +140,7 @@ public abstract class DPTXlator
 	 * they get stored by the translator, replacing any old items. On
 	 * <code>values.length == 0</code>, no action is performed.<br>
 	 * Textual commands contained in <code>values</code> are treated case insensitive.
-	 * 
+	 *
 	 * @param values string array holding values for translation
 	 * @throws KNXFormatException if an item in <code>values</code> can't be translated
 	 *         due to a wrong formatted content, or if <code>value</code>doesn't fit
@@ -162,7 +162,7 @@ public abstract class DPTXlator
 	 * <p>
 	 * The items are ordered the same way handed to the translator in the first place
 	 * (FIFO, increasing byte index).
-	 * 
+	 *
 	 * @return an array of strings with values represented as strings
 	 * @see #getValue()
 	 */
@@ -176,7 +176,7 @@ public abstract class DPTXlator
 	 * <code>value</code> are treated case insensitive.<br>
 	 * The <code>value</code> string might have its unit of measure appended (units are
 	 * case sensitive).
-	 * 
+	 *
 	 * @param value value represented as string for translation, case insensitive
 	 * @throws KNXFormatException if <code>value</code> can't be translated due to wrong
 	 *         formatted content, or if <code>value</code>doesn't fit into KNX data type
@@ -194,7 +194,7 @@ public abstract class DPTXlator
 	 * <p>
 	 * If the subtype has a unit of measurement, it is appended after the value according
 	 * to {@link DPTXlator#setAppendUnit(boolean)}.<br>
-	 * 
+	 *
 	 * @return a string representation of the value
 	 * @see #getType()
 	 */
@@ -204,9 +204,21 @@ public abstract class DPTXlator
 	}
 
 	/**
+	 * Returns the numeric representation of the first item stored by this translator, if the DPT
+	 * value can be represented numerically.
+	 *
+	 * @return the numeric representation of the value
+	 * @throws KNXFormatException if the value cannot be represented numerically
+	 */
+	public double getNumericValue() throws KNXFormatException
+	{
+		throw new KNXFormatException("No simple numeric representation possible");
+	}
+
+	/**
 	 * See {@link #setData(byte[], int)}, with offset 0.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing KNX DPT item(s)
 	 */
 	public final void setData(final byte[] data)
@@ -228,7 +240,7 @@ public abstract class DPTXlator
 	 * <code>data.length</code> will satisfy the minimum acceptable length. If this is
 	 * not the case, {@link KNXIllegalArgumentException} has to be caught and handled in
 	 * the caller's context.
-	 * 
+	 *
 	 * @param data byte array containing KNX DPT item(s)
 	 * @param offset offset into <code>data</code> from where to start, 0 &lt;= offset
 	 *        &lt; <code>data.length</code>
@@ -252,7 +264,7 @@ public abstract class DPTXlator
 	/**
 	 * Returns a copy of all items stored by this translator translated into DPTs.
 	 * <p>
-	 * 
+	 *
 	 * @return byte array with KNX DPT value items
 	 */
 	public byte[] getData()
@@ -270,7 +282,7 @@ public abstract class DPTXlator
 	 * modified.<br>
 	 * Datapoint types shorter than 1 bytes only change the affected lower bit positions,
 	 * leaving the upper (high) bits of <code>dst</code> bytes untouched.
-	 * 
+	 *
 	 * @param dst byte array for storing DPT values
 	 * @param offset offset into <code>dst</code> from where to start, 0 &lt;= offset
 	 *        &lt; <code>dst.length</code>
@@ -285,7 +297,7 @@ public abstract class DPTXlator
 		if (min > 0 && end == 0)
 			logger.warn(dpt.getID() + " insufficient space in destination range (" + min + " < "
 					+ typeSize + ")");
-		
+
 		for (int i = 0; i < end; ++i)
 			dst[offset + i] = (byte) data[i];
 		return dst;
@@ -297,7 +309,7 @@ public abstract class DPTXlator
 	 * <p>
 	 * Translator methods capable of appending an available DPT unit will act according
 	 * this setting.
-	 * 
+	 *
 	 * @param append <code>true</code> to append a DPT unit if any available,
 	 *        <code>false</code> to omit any unit
 	 */
@@ -309,7 +321,7 @@ public abstract class DPTXlator
 	/**
 	 * Returns the number of translation items currently in the translator.
 	 * <p>
-	 * 
+	 *
 	 * @return items number
 	 */
 	public int getItems()
@@ -323,7 +335,7 @@ public abstract class DPTXlator
 	 * <p>
 	 * The DPT distinguishes between the different subtypes available for a KNX data type.
 	 * It specifies the dimension, consisting of range and unit attributes.
-	 * 
+	 *
 	 * @return datapoint type in a {@link DPT}
 	 */
 	public final DPT getType()
@@ -346,7 +358,7 @@ public abstract class DPTXlator
 	 * Changes of the DPT currently used by the translator take effect on the next new
 	 * translator created using that DPT.<br>
 	 * The map itself is not synchronized.
-	 * 
+	 *
 	 * @return subtypes as {@link Map}, key is the subtype ID of type string, value of
 	 *         type {@link DPT}
 	 */
@@ -356,7 +368,7 @@ public abstract class DPTXlator
 	 * Returns the KNX data type size in bytes for one value item.
 	 * <p>
 	 * If the data type size is &lt;= 6 bits, 0 is returned.
-	 * 
+	 *
 	 * @return type size in bytes, 0 for types &lt;= 6 bits
 	 */
 	public final int getTypeSize()
@@ -371,7 +383,7 @@ public abstract class DPTXlator
 	 * The string consists of a list of values in the order they are returned by
 	 * {@link #getAllValues()}. Adjacent items are separated as specified by
 	 * {@link AbstractCollection#toString()}.
-	 * 
+	 *
 	 * @return a string representation of the translation values
 	 */
 	public String toString()
@@ -385,7 +397,7 @@ public abstract class DPTXlator
 	 * the item index of the value. The translated KNX data is stored at the corresponding
 	 * array offset in <code>dst</code>. Calculation of offset:
 	 * <code>offset = index * KNX data type size</code>.
-	 * 
+	 *
 	 * @param value value to translate
 	 * @param dst destination array for resulting KNX data
 	 * @param index item index in destination array
@@ -394,12 +406,12 @@ public abstract class DPTXlator
 	 *         type
 	 */
 	protected abstract void toDPT(String value, short[] dst, int index) throws KNXFormatException;
-	
+
 	/**
 	 * Sets the DPT for the translator to use for translation, doing a lookup before in
 	 * the translator's map containing the available, implemented datapoint types.
 	 * <p>
-	 * 
+	 *
 	 * @param availableTypes map of the translator with available, implemented DPTs; the
 	 *        map key is a dptID string, map value is of type {@link DPT}
 	 * @param dptID the ID as string of the datapoint type to set
@@ -427,7 +439,7 @@ public abstract class DPTXlator
 	 * hidden by declarations with the same signature in a sub type. A correct invocation
 	 * is done using the declared type that actually contains the method declaration
 	 * returning the available sub types.
-	 * 
+	 *
 	 * @return subtypes as {@link Map}, key is the subtype ID of type string, value of
 	 *         type {@link DPT}
 	 */
@@ -448,7 +460,7 @@ public abstract class DPTXlator
 	 * specified.
 	 * <p>
 	 * Whitespace are removed from both ends.
-	 * 
+	 *
 	 * @param value value string representation
 	 * @return trimmed value string without unit
 	 */
@@ -470,7 +482,7 @@ public abstract class DPTXlator
 	 * Helper which logs message and creates a format exception.
 	 * <p>
 	 * Adds the current dpt ID as prefix to log output.
-	 * 
+	 *
 	 * @param level log level
 	 * @param msg log output, exception message if <code>excMsg</code> is
 	 *        <code>null</code>

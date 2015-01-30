@@ -49,7 +49,7 @@ import tuwien.auto.calimero.log.LogLevel;
  * The KNX data type width is the lowest bit of 1 byte.<br>
  * The default return value after creation is <code>0</code>, i.e., <code>false</code>
  * for DPT Boolean for example.
- * 
+ *
  * @author B. Malinowsky
  */
 public class DPTXlatorBoolean extends DPTXlator
@@ -199,7 +199,7 @@ public class DPTXlatorBoolean extends DPTXlator
 	 * <p>
 	 */
 	public static final DPT DPT_HEAT_COOL = new DPT("1.100", "Heat/Cool", "cooling", "heating");
-	
+
 	private static final Map types;
 
 	static {
@@ -228,11 +228,11 @@ public class DPTXlatorBoolean extends DPTXlator
 		types.put(DPT_SHUTTER_BLINDS_MODE.getID(), DPT_SHUTTER_BLINDS_MODE);
 		types.put(DPT_HEAT_COOL.getID(), DPT_HEAT_COOL);
 	}
-	
+
 	/**
 	 * Creates a translator for the given datapoint type.
 	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -244,7 +244,7 @@ public class DPTXlatorBoolean extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type ID.
 	 * <p>
-	 * 
+	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
 	 *         <code>dptID</code>
@@ -260,7 +260,7 @@ public class DPTXlatorBoolean extends DPTXlator
 	 * Sets the translation value from a boolean.
 	 * <p>
 	 * Any other items in the translator are discarded.
-	 * 
+	 *
 	 * @param value the boolean value
 	 */
 	public final void setValue(final boolean value)
@@ -271,7 +271,7 @@ public class DPTXlatorBoolean extends DPTXlator
 	/**
 	 * Returns the first translation item formatted as boolean.
 	 * <p>
-	 * 
+	 *
 	 * @return boolean representation
 	 */
 	public final boolean getValueBoolean()
@@ -296,6 +296,18 @@ public class DPTXlatorBoolean extends DPTXlator
 		for (int i = 0; i < data.length; ++i)
 			buf[i] = fromDPT(i);
 		return buf;
+	}
+
+	/**
+	 * Returns the value of the first translation item, using 0 for boolean <code>false</code> and 1
+	 * for boolean <code>true</code>.
+	 *
+	 * @return 0 for boolean false and 1 for boolean true
+	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
+	 */
+	public final double getNumericValue()
+	{
+		return getValueBoolean() ? 1 : 0;
 	}
 
 	/* (non-Javadoc)
