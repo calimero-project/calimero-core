@@ -122,7 +122,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	 * <p>
 	 */
 	public static final DPT DPT_LENGTH = new DPT("7.011", "Length in mm", "0", "65535", "mm");
-	
+
 	/**
 	 * DPT ID 7.012, Electrical current; values from <b>0</b> to <b>65535</b> mA.
 	 * <p>
@@ -164,7 +164,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type.
 	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -176,7 +176,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type ID.
 	 * <p>
-	 * 
+	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
 	 *         <code>dptID</code>
@@ -206,7 +206,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	 * a value of DPT_TIMEPERIOD_100 by 100. The result is rounded to the nearest
 	 * representable value (with 0.5 rounded up). On any other DPT the value is expected
 	 * according to its unit.
-	 * 
+	 *
 	 * @param value unsigned value, 0 &lt;= value &lt;= max, with
 	 *        <ul>
 	 *        <li>max = 655350 on DPT {@link #DPT_TIMEPERIOD_10}</li>
@@ -230,13 +230,31 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	 * returned in unit millisecond, i.e., a KNX DPT_TIMEPERIOD_10 data value is multiplied
 	 * with 10, DPT_TIMEPERIOD_100 with 100.<br>
 	 * On any other DPT the value is returned according to its unit.
-	 * 
+	 *
 	 * @return value as unsigned 16 Bit using type int
 	 * @see #getType()
 	 */
 	public final int getValueUnsigned()
 	{
 		return fromDPT(0);
+	}
+
+	/**
+	 * Returns the first translation item as unsigned value.
+	 * <p>
+	 * A value of DPT {@link #DPT_TIMEPERIOD_10} or {@link #DPT_TIMEPERIOD_100} is
+	 * returned in unit millisecond, i.e., a KNX DPT_TIMEPERIOD_10 data value is multiplied
+	 * with 10, DPT_TIMEPERIOD_100 with 100.<br>
+	 * On any other DPT the value is returned according to its unit.
+	 *
+	 *  @return numeric value
+	 *  @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
+	 *  @see getValueUnsigned()
+	 */
+
+	public double getNumericValue()
+	{
+		return getValueUnsigned();
 	}
 
 	/* (non-Javadoc)
@@ -260,7 +278,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	 * set DPT, with the result rounded to the nearest representable value (with 0.5
 	 * rounded up).<br>
 	 * On any other DPT, the input is treated equal to {@link #setValue(int)}.
-	 * 
+	 *
 	 * @param milliseconds the value in milliseconds, 0 &lt;= <code>milliseconds</code>
 	 * @throws KNXFormatException on milliseconds out of range for DPT
 	 */
