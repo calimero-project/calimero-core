@@ -204,16 +204,6 @@ public abstract class DPTXlator
 	}
 
 	/**
-	 * If the subtype has a unit of measurement, return it.
-	 *
-	 * @return a string denoting the unit of measurement, or "" if no unit is known
-	 */
-	public String getUnit()
-	{
-		return dpt.getUnit();
-	}
-
-	/**
 	 * Get the numeric representation of the value, if the DPT value can be represented
 	 * numerically. Will throw an KNXFormatException if the value can not be represented
 	 * numerically.
