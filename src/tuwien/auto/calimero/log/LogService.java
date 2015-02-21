@@ -141,7 +141,6 @@ public final class LogService
 	 * @param level log level to use for the message
 	 * @param msg the message to be logged
 	 * @param t the exception (throwable) to log, can be <code>null</code>
-	 * @deprecated Used for transition to slf4j.
 	 */
 	public static void log(final Logger logger, final LogLevel level, final String msg,
 		final Throwable t)
