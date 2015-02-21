@@ -38,6 +38,7 @@ package tuwien.auto.calimero.log;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -216,8 +217,10 @@ public final class LogService
 		logger.info(msg);
 	}
 
-	static final void stopDispatcher()
+	static final void stopDispatcher() throws InterruptedException
 	{
 		dispatcher.shutdown();
+		// give any remaining messages a chance to get logged
+		dispatcher.awaitTermination(2, TimeUnit.SECONDS);
 	}
 }
