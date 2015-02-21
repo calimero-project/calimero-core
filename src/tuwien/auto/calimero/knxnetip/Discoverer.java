@@ -158,13 +158,17 @@ public class Discoverer
 		SYSTEM_SETUP_MULTICAST = a;
 	}
 
+	/**
+	 * Discoverer result, either containing a {@link SearchResponse} or {@link DescriptionResponse}.
+	 *
+	 */
 	public static final class Result<T>
 	{
 		private final T response;
 		private final NetworkInterface ni;
 		private final InetAddress addr;
 
-		public Result(final T r, final NetworkInterface outgoing, final InetAddress bind)
+		Result(final T r, final NetworkInterface outgoing, final InetAddress bind)
 		{
 			response = r;
 			ni = outgoing;
@@ -172,7 +176,7 @@ public class Discoverer
 		}
 
 		/**
-		 * @return the response
+		 * @return the received discoverer response
 		 */
 		public T getResponse()
 		{
@@ -180,7 +184,7 @@ public class Discoverer
 		}
 
 		/**
-		 * @return the ni
+		 * @return the local network interface used for the discovery or description request
 		 */
 		public NetworkInterface getNetworkInterface()
 		{
@@ -188,7 +192,7 @@ public class Discoverer
 		}
 
 		/**
-		 * @return the addr
+		 * @return the local IP address used for the discovery or description request
 		 */
 		public InetAddress getAddress()
 		{
@@ -503,7 +507,7 @@ public class Discoverer
 	 * As long as searches are running, new responses might be added to the list of
 	 * responses.
 	 *
-	 * @return array of {@link SearchResponse}s
+	 * @return list of results with {@link SearchResponse}s
 	 * @see #stopSearch()
 	 */
 	public final List<Result<SearchResponse>> getSearchResponses()
@@ -689,20 +693,12 @@ public class Discoverer
 			}
 			catch (final IOException e) {
 				s.close();
-				final String msg = nameOf(ni) + ": joining group " + SYSTEM_SETUP_MULTICAST
+				final String msg = ni.getName() + ": joining group " + SYSTEM_SETUP_MULTICAST
 						+ " failed";
 				throw new KNXException(msg + ", " + e.getMessage());
 			}
 		}
 		return s;
-	}
-
-	private static String nameOf(final NetworkInterface nif) {
-		final String friendly = nif.getDisplayName();
-		final String name = nif.getName();
-		if (friendly != null & !name.equals(friendly))
-			return friendly + "(" + name + ")";
-		return name;
 	}
 
 	private void join(final ReceiverLoop l) throws InterruptedException
