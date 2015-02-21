@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -237,7 +237,7 @@ public class NetworkBufferTest extends TestCase
 		final ProcessCommunicator pc = new ProcessCommunicatorImpl(c.getBufferedLink());
 		final String s1 = pc.read(dp);
 		Thread.sleep(50);
-		final String s2 = pc.read(dp2);
+		/*final String s2 =*/ pc.read(dp2);
 		// read of dp2 should have *not* have invalidated dp
 		assertEquals(s1, pc.read(dp));
 		final String s3 = pc.read(dp3);
@@ -376,7 +376,7 @@ public class NetworkBufferTest extends TestCase
 		}
 		catch (final KNXTimeoutException e) {}
 		final ProcessCommunicator pc2 = new ProcessCommunicatorImpl(lnk);
-		final boolean b2 = pc2.readBool(group1);
+		/*final boolean b2 =*/ pc2.readBool(group1);
 		pc.write(group2, true);
 		Thread.sleep(50);
 		assertTrue(pc.readBool(group2));

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -56,9 +56,9 @@ import tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode;
  */
 public class KNXnetIPDevMgmtTest extends TestCase
 {
-	private static KNXnetIPConnection.BlockingMode noblock =
-		KNXnetIPConnection.NONBLOCKING;
-	private static KNXnetIPConnection.BlockingMode ack = KNXnetIPConnection.WAIT_FOR_ACK;
+//	private static KNXnetIPConnection.BlockingMode noblock =
+//		KNXnetIPConnection.NONBLOCKING;
+//	private static KNXnetIPConnection.BlockingMode ack = KNXnetIPConnection.WAIT_FOR_ACK;
 	private static KNXnetIPConnection.BlockingMode con = KNXnetIPConnection.WAIT_FOR_CON;
 
 	private KNXnetIPDevMgmt m;
@@ -144,7 +144,7 @@ public class KNXnetIPDevMgmtTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPDevMgmt#send
 	 * (tuwien.auto.calimero.cemi.CEMI,
 	 * tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -170,7 +170,7 @@ public class KNXnetIPDevMgmtTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.knxnetip.KNXnetIPDevMgmt#KNXnetIPDevMgmt
 	 * (java.net.InetSocketAddress, java.net.InetSocketAddress, boolean)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -182,7 +182,7 @@ public class KNXnetIPDevMgmtTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPDevMgmt#close()}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -202,7 +202,7 @@ public class KNXnetIPDevMgmtTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.knxnetip.KNXnetIPDevMgmt#getRemoteAddress()}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -217,7 +217,7 @@ public class KNXnetIPDevMgmtTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPDevMgmt#getState()}.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 * @throws KNXException
 	 */

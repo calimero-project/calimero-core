@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2011, 2014 B. Malinowsky
+    Copyright (c) 2011, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -323,7 +323,7 @@ public class ManagementProceduresImplTest extends TestCase
 	 */
 	public final void testReadMemoryShort() throws KNXException, InterruptedException
 	{
-		final byte[] data = mp.readMemory(device, 0x10, 8);
+		/*final byte[] data =*/ mp.readMemory(device, 0x10, 8);
 	}
 
 	/**
@@ -336,6 +336,6 @@ public class ManagementProceduresImplTest extends TestCase
 	 */
 	public final void testReadMemoryLong() throws KNXException, InterruptedException
 	{
-		final byte[] data = mp.readMemory(device, 0x20, 8);
+		/*final byte[] data =*/ mp.readMemory(device, 0x20, 8);
 	}
 }
