@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ import java.io.ByteArrayOutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
@@ -256,6 +257,25 @@ public class HPAI
 	{
 		return "IPv4 " + (hostprot == IPV4_UDP ? "UDP" : "TCP") + " host " + getAddressString()
 				+ " port " + port;
+	}
+
+	@Override
+	public boolean equals(final Object obj)
+	{
+		if (this == obj)
+			return true;
+		if (!(obj instanceof HPAI))
+			return false;
+		final HPAI other = (HPAI) obj;
+		return length == other.length && port == other.port && hostprot == other.hostprot
+				&& Arrays.hashCode(address) == Arrays.hashCode(other.address);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 17;
+		return prime * (prime * (prime * Arrays.hashCode(address) + hostprot) + port) + length;
 	}
 
 	private String getAddressString()

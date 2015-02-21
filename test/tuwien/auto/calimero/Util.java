@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -133,9 +133,9 @@ public final class Util
 				d = new Discoverer(getLocalHost().getAddress(), getLocalHost().getPort(),
 					false, false);
 				d.startSearch(2, true);
-				if (d.getSearchResponses().length == 0)
+				if (d.getSearchResponsesSimple().length == 0)
 					return null;
-				device = d.getSearchResponses()[0].getDevice().getAddress();
+				device = d.getSearchResponsesSimple()[0].getDevice().getAddress();
 			}
 			catch (final KNXException e) {
 				e.printStackTrace();
@@ -220,15 +220,15 @@ public final class Util
 			catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
-			for (int i = 0; i < d.getSearchResponses().length; i++) {
-				final SearchResponse res = d.getSearchResponses()[i];
+			for (int i = 0; i < d.getSearchResponsesSimple().length; i++) {
+				final SearchResponse res = d.getSearchResponsesSimple()[i];
 				System.out.println(""+res.getControlEndpoint());
 			}
-			final InetAddress addr = d.getSearchResponses()[0].getControlEndpoint()
+			final InetAddress addr = d.getSearchResponsesSimple()[0].getControlEndpoint()
 				.getAddress();
 
-			server = new InetSocketAddress(addr, d.getSearchResponses()[0].getControlEndpoint().getPort());
-			device = d.getSearchResponses()[0].getDevice().getAddress();
+			server = new InetSocketAddress(addr, d.getSearchResponsesSimple()[0].getControlEndpoint().getPort());
+			device = d.getSearchResponsesSimple()[0].getDevice().getAddress();
 		}
 		return server;
 	}

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB;
  * DIB, otherwise it is ignored.
  * <p>
  * Objects of this type are immutable.
- * 
+ *
  * @author B. Malinowsky
  * @see tuwien.auto.calimero.knxnetip.servicetype.DescriptionRequest
  */
@@ -68,7 +68,7 @@ public class DescriptionResponse extends ServiceType
 	/**
 	 * Creates a new description response out of a byte array.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing a description response structure
 	 * @param offset start offset of response in <code>data</code>
 	 * @throws KNXFormatException if no description response was found or invalid
@@ -89,7 +89,7 @@ public class DescriptionResponse extends ServiceType
 	 * Creates a new description response containing a device DIB and a supported service
 	 * families DIB.
 	 * <p>
-	 * 
+	 *
 	 * @param device device description
 	 * @param suppSvcFam supported service families
 	 */
@@ -104,7 +104,7 @@ public class DescriptionResponse extends ServiceType
 	 * Creates a new description response containing a device DIB, a supported service
 	 * families DIB and a manufacturer DIB.
 	 * <p>
-	 * 
+	 *
 	 * @param device device description
 	 * @param suppSvcFam supported service families
 	 * @param mfr manufacturer specific data
@@ -119,7 +119,7 @@ public class DescriptionResponse extends ServiceType
 	/**
 	 * Returns the device description information block contained in the response.
 	 * <p>
-	 * 
+	 *
 	 * @return a device DIB
 	 */
 	public final DeviceDIB getDevice()
@@ -130,7 +130,7 @@ public class DescriptionResponse extends ServiceType
 	/**
 	 * Returns the supported service families description information block.
 	 * <p>
-	 * 
+	 *
 	 * @return a DIB with the supported service families
 	 */
 	public final ServiceFamiliesDIB getServiceFamilies()
@@ -144,12 +144,31 @@ public class DescriptionResponse extends ServiceType
 	 * <p>
 	 * The manufacturer data is not a mandatory part of a description response. It is only
 	 * available, if the optional DIB information of a response matches this DIB type.<br>
-	 * 
+	 *
 	 * @return a manufacturer DIB, or <code>null</code> if no such DIB
 	 */
 	public final ManufacturerDIB getManufacturerData()
 	{
 		return mfr;
+	}
+
+	@Override
+	public boolean equals(final Object obj)
+	{
+		if (this == obj)
+			return true;
+		if (!(obj instanceof DescriptionResponse))
+			return false;
+		final DescriptionResponse other = (DescriptionResponse) obj;
+		// device DIB should suffice for equality
+		return device.equals(other.device);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 17;
+		return prime * device.hashCode();
 	}
 
 	/* (non-Javadoc)

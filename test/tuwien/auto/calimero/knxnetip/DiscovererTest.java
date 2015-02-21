@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ import junit.framework.TestCase;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.exception.KNXException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
+import tuwien.auto.calimero.knxnetip.Discoverer.Result;
 import tuwien.auto.calimero.knxnetip.servicetype.DescriptionResponse;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
 
@@ -124,9 +125,9 @@ public class DiscovererTest extends TestCase
 	public final void testClearSearchResponses() throws KNXException, InterruptedException
 	{
 		ddef.startSearch(timeout, true);
-		assertTrue(ddef.getSearchResponses().length > 0);
+		assertTrue(ddef.getSearchResponsesSimple().length > 0);
 		ddef.clearSearchResponses();
-		assertTrue(ddef.getSearchResponses().length == 0);
+		assertTrue(ddef.getSearchResponsesSimple().length == 0);
 	}
 
 	/**
@@ -165,15 +166,15 @@ public class DiscovererTest extends TestCase
 	private void doGetDesc(final Discoverer d) throws KNXException, InterruptedException
 	{
 		d.startSearch(timeout, true);
-		final SearchResponse[] search = d.getSearchResponses();
+		final SearchResponse[] search = d.getSearchResponsesSimple();
 		assertTrue(search.length > 0);
 		for (int i = 0; i < search.length; ++i) {
-			final DescriptionResponse r = d.getDescription(new InetSocketAddress(
+			final Result<DescriptionResponse> r = d.getDescription(new InetSocketAddress(
 				search[i].getControlEndpoint().getAddress(), search[i]
 					.getControlEndpoint().getPort()), timeout);
 			assertNotNull(r);
 			System.out.println("doGetDesc for " + search[i].getControlEndpoint() + " = "
-				+ r.getDevice().getName());
+				+ r.getResponse().getDevice().getName());
 		}
 	}
 
@@ -222,7 +223,7 @@ public class DiscovererTest extends TestCase
 	private void doGetSearchRes(final Discoverer d) throws KNXException, InterruptedException
 	{
 		d.startSearch(timeout, true);
-		final SearchResponse[] search = d.getSearchResponses();
+		final SearchResponse[] search = d.getSearchResponsesSimple();
 		assertTrue(search.length > 0);
 		for (int i = 0; i < search.length; ++i) {
 			assertNotNull(search[i]);
@@ -288,7 +289,7 @@ public class DiscovererTest extends TestCase
 	{
 		d.startSearch(40000, NetworkInterface.getByInetAddress(Util.getLocalHost().getAddress()),
 				timeout, true);
-		final SearchResponse[] search = d.getSearchResponses();
+		final SearchResponse[] search = d.getSearchResponsesSimple();
 		assertTrue(search.length > 0);
 		for (int i = 0; i < search.length; ++i) {
 			assertNotNull(search[i]);
@@ -297,7 +298,7 @@ public class DiscovererTest extends TestCase
 		}
 
 		// start 2 searches concurrently
-		final int responses = d.getSearchResponses().length;
+		final int responses = d.getSearchResponsesSimple().length;
 		d.clearSearchResponses();
 		d.startSearch(30000, NetworkInterface.getByInetAddress(Util.getLocalHost().getAddress()),
 				timeout, false);
@@ -309,7 +310,7 @@ public class DiscovererTest extends TestCase
 		// but 3 * responses is not always true: the number of responses can
 		// vary based on network setup
 		final int expected = usesMulticast ? 3 * responses : 2 * responses;
-		assertEquals(expected, d.getSearchResponses().length);
+		assertEquals(expected, d.getSearchResponsesSimple().length);
 	}
 
 	/**
@@ -370,9 +371,9 @@ public class DiscovererTest extends TestCase
 		d.startSearch(timeout, false);
 		while (d.isSearching())
 			Thread.sleep(100);
-		assertTrue(d.getSearchResponses().length > 0);
+		assertTrue(d.getSearchResponsesSimple().length > 0);
 		assertFalse(d.isSearching());
-		final int responses = d.getSearchResponses().length;
+		final int responses = d.getSearchResponsesSimple().length;
 		d.clearSearchResponses();
 
 		// do two searches same time
@@ -385,7 +386,7 @@ public class DiscovererTest extends TestCase
 		// but 3 * responses is not always true: the number of responses can
 		// vary based on network setup
 		final int expected = usesMulticast ? 3 * responses : 2 * responses;
-		assertEquals(expected, d.getSearchResponses().length);
+		assertEquals(expected, d.getSearchResponsesSimple().length);
 	}
 
 	/**
@@ -400,12 +401,12 @@ public class DiscovererTest extends TestCase
 		ddef.startSearch(timeout, false);
 		ddef.startSearch(timeout, false);
 		Thread.sleep(10);
-		final int responses = ddef.getSearchResponses().length;
+		final int responses = ddef.getSearchResponsesSimple().length;
 		ddef.stopSearch();
 		assertFalse(ddef.isSearching());
 		Thread.sleep(timeout);
 		assertFalse(ddef.isSearching());
-		assertEquals(responses, ddef.getSearchResponses().length);
+		assertEquals(responses, ddef.getSearchResponsesSimple().length);
 
 		final class Stopper extends Thread
 		{
@@ -418,7 +419,7 @@ public class DiscovererTest extends TestCase
 					sleep(500);
 				}
 				catch (final InterruptedException e) {}
-				res = ddef.getSearchResponses().length;
+				res = ddef.getSearchResponsesSimple().length;
 				ddef.stopSearch();
 			}
 		}
@@ -428,7 +429,7 @@ public class DiscovererTest extends TestCase
 		// run blocking, so we're sure stopper stops search
 		ddef.startSearch(0, true);
 		stopper.join();
-		assertEquals(stopper.res, ddef.getSearchResponses().length);
+		assertEquals(stopper.res, ddef.getSearchResponsesSimple().length);
 	}
 
 	/**
