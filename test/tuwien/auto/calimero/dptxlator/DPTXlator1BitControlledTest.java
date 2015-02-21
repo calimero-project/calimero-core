@@ -49,7 +49,6 @@ import tuwien.auto.calimero.log.LogManager;
 
 /**
  * @author B. Malinowsky
- *
  */
 public class DPTXlator1BitControlledTest extends TestCase
 {
