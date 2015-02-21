@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -280,7 +280,7 @@ public class ManagementClientImpl implements ManagementClient
 		try {
 			svcResponse = IND_ADDR_RESPONSE;
 			tl.broadcast(false, Priority.SYSTEM,
-					DataUnitBuilder.createCompactAPDU(IND_ADDR_READ, null));
+					DataUnitBuilder.createLengthOptimizedAPDU(IND_ADDR_READ, null));
 			long wait = responseTimeout;
 			final long end = System.currentTimeMillis() + wait;
 			while (wait > 0) {
@@ -360,8 +360,9 @@ public class ManagementClientImpl implements ManagementClient
 		InterruptedException
 	{
 		// we allow 6 bytes ASDU for RF domains
-		return makeDOAs(readBroadcast(priority, DataUnitBuilder.createCompactAPDU(DOA_READ, null),
-				DOA_RESPONSE, 6, 6, oneDomainOnly));
+		return makeDOAs(readBroadcast(priority,
+				DataUnitBuilder.createLengthOptimizedAPDU(DOA_READ, null), DOA_RESPONSE, 6, 6,
+				oneDomainOnly));
 	}
 
 	/* (non-Javadoc)
@@ -394,7 +395,7 @@ public class ManagementClientImpl implements ManagementClient
 	{
 		if (descType < 0 || descType > 63)
 			throw new KNXIllegalArgumentException("descriptor type out of range [0..63]");
-		final byte[] apdu = sendWait2(dst, priority, DataUnitBuilder.createCompactAPDU(
+		final byte[] apdu = sendWait2(dst, priority, DataUnitBuilder.createLengthOptimizedAPDU(
 				DEVICE_DESC_READ, new byte[] { (byte) descType }), DEVICE_DESC_RESPONSE, 2, 14);
 		final byte[] dd = new byte[apdu.length - 2];
 		for (int i = 0; i < apdu.length - 2; ++i)
@@ -432,11 +433,11 @@ public class ManagementClientImpl implements ManagementClient
 	{
 		int time = 0;
 		if (basic) {
-			send(dst, priority, DataUnitBuilder.createCompactAPDU(RESTART, null), 0);
+			send(dst, priority, DataUnitBuilder.createLengthOptimizedAPDU(RESTART, null), 0);
 		}
 		else {
 			final byte[] sdu = new byte[] { 0x01, (byte) eraseCode, (byte) channel, };
-			final byte[] send = DataUnitBuilder.createCompactAPDU(RESTART, sdu);
+			final byte[] send = DataUnitBuilder.createLengthOptimizedAPDU(RESTART, sdu);
 			final byte[] apdu = sendWait2(dst, priority, send, RESTART, 3, 3);
 			// check we get a restart response
 			if ((apdu[1] & 0x32) == 0)
@@ -621,8 +622,9 @@ public class ManagementClientImpl implements ManagementClient
 			tl.connect(dst);
 		else
 			logger.error("doing read ADC in connectionless mode, " + dst.toString());
-		final byte[] apdu = sendWait(dst, priority, DataUnitBuilder.createCompactAPDU(ADC_READ,
-				new byte[] { (byte) channel, (byte) repeat }), ADC_RESPONSE, 3, 3);
+		final byte[] apdu = sendWait(dst, priority,
+				DataUnitBuilder.createLengthOptimizedAPDU(ADC_READ, new byte[] { (byte) channel,
+					(byte) repeat }), ADC_RESPONSE, 3, 3);
 		if (apdu[2] == 0)
 			throw new KNXRemoteException("error reading value of A/D converter");
 		return ((apdu[3] & 0xff) << 8) | apdu[4] & 0xff;
@@ -644,7 +646,7 @@ public class ManagementClientImpl implements ManagementClient
 		else
 			logger.error("doing read memory in connectionless mode, " + dst.toString());
 		final byte[] apdu = sendWait(dst, priority,
-			DataUnitBuilder.createCompactAPDU(MEMORY_READ, new byte[] { (byte) bytes,
+				DataUnitBuilder.createLengthOptimizedAPDU(MEMORY_READ, new byte[] { (byte) bytes,
 				(byte) (startAddr >>> 8), (byte) startAddr }), MEMORY_RESPONSE, 2, 65);
 		int no = apdu[1] & 0x3F;
 		if (no == 0)
@@ -677,7 +679,7 @@ public class ManagementClientImpl implements ManagementClient
 			tl.connect(dst);
 		else
 			logger.error("doing write memory in connectionless mode, " + dst.toString());
-		final byte[] send = DataUnitBuilder.createCompactAPDU(MEMORY_WRITE, asdu);
+		final byte[] send = DataUnitBuilder.createLengthOptimizedAPDU(MEMORY_WRITE, asdu);
 		if (dst.isVerifyMode()) {
 			// explicitly read back data
 			final byte[] apdu = sendWait(dst, priority, send, MEMORY_RESPONSE, 2, 65);

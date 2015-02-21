@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -473,7 +473,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 			synchronized (indications) {
 				indications.clear();
 			}
-			lnk.sendRequestWait(dst, p, DataUnitBuilder.createCompactAPDU(GROUP_READ, null));
+			lnk.sendRequestWait(dst, p, DataUnitBuilder.createLengthOptimizedAPDU(GROUP_READ, null));
 			if (logger.isTraceEnabled())
 				logger.trace("sent group read request to " + dst);
 			return waitForResponse(dst, minASDULen + 2, maxASDULen + 2);
