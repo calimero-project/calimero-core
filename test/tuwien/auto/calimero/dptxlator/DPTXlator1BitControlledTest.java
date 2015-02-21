@@ -48,7 +48,6 @@ import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 
 /**
  * @author B. Malinowsky
- *
  */
 public class DPTXlator1BitControlledTest extends TestCase
 {
