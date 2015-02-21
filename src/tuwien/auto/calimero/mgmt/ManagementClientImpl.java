@@ -592,7 +592,7 @@ public class ManagementClientImpl implements ManagementClient
 		if (dst.isConnectionOriented())
 			tl.connect(dst);
 		else
-			logger.error("doing read ADC in connectionless mode, " + dst.toString());
+			logger.error("read ADC in connectionless mode, " + dst.toString());
 		final byte[] apdu = sendWait(dst, priority,
 				DataUnitBuilder.createLengthOptimizedAPDU(ADC_READ, new byte[] { (byte) channel,
 					(byte) repeat }), ADC_RESPONSE, 3, 3);
@@ -614,7 +614,7 @@ public class ManagementClientImpl implements ManagementClient
 		if (dst.isConnectionOriented())
 			tl.connect(dst);
 		else
-			logger.error("doing read memory in connectionless mode, " + dst.toString());
+			logger.error("read memory in connectionless mode, " + dst.toString());
 		final byte[] apdu = sendWait(dst, priority,
 				DataUnitBuilder.createLengthOptimizedAPDU(MEMORY_READ, new byte[] { (byte) bytes,
 					(byte) (startAddr >>> 8), (byte) startAddr }), MEMORY_RESPONSE, 2, 65);
@@ -647,7 +647,7 @@ public class ManagementClientImpl implements ManagementClient
 		if (dst.isConnectionOriented())
 			tl.connect(dst);
 		else
-			logger.error("doing write memory in connectionless mode, " + dst.toString());
+			logger.error("write memory in connectionless mode, " + dst.toString());
 		final byte[] send = DataUnitBuilder.createLengthOptimizedAPDU(MEMORY_WRITE, asdu);
 		if (dst.isVerifyMode()) {
 			// explicitly read back data
@@ -677,7 +677,7 @@ public class ManagementClientImpl implements ManagementClient
 		if (dst.isConnectionOriented())
 			tl.connect(dst);
 		else
-			logger.error("doing authorize in connectionless mode, " + dst.toString());
+			logger.error("authorize in connectionless mode, " + dst.toString());
 		final byte[] asdu = new byte[] { 0, key[0], key[1], key[2], key[3] };
 		final byte[] apdu = sendWait(dst, priority,
 			DataUnitBuilder.createAPDU(AUTHORIZE_READ, asdu), AUTHORIZE_RESPONSE, 1, 1);
@@ -701,7 +701,7 @@ public class ManagementClientImpl implements ManagementClient
 		if (dst.isConnectionOriented())
 			tl.connect(dst);
 		else
-			logger.error("doing write key in connectionless mode, " + dst.toString());
+			logger.error("write key in connectionless mode, " + dst.toString());
 		final byte[] apdu = sendWait(dst, priority,
 			DataUnitBuilder.createAPDU(KEY_WRITE, new byte[] { (byte) level, key[0],
 				key[1], key[2], key[3] }), KEY_RESPONSE, 1, 1);
