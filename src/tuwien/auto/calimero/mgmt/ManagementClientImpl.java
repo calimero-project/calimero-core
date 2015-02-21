@@ -647,7 +647,7 @@ public class ManagementClientImpl implements ManagementClient
 			logger.error("doing read memory in connectionless mode, " + dst.toString());
 		final byte[] apdu = sendWait(dst, priority,
 				DataUnitBuilder.createLengthOptimizedAPDU(MEMORY_READ, new byte[] { (byte) bytes,
-				(byte) (startAddr >>> 8), (byte) startAddr }), MEMORY_RESPONSE, 2, 65);
+					(byte) (startAddr >>> 8), (byte) startAddr }), MEMORY_RESPONSE, 2, 65);
 		int no = apdu[1] & 0x3F;
 		if (no == 0)
 			throw new KNXRemoteException("could not read memory from 0x"

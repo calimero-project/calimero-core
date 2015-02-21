@@ -223,7 +223,7 @@ public abstract class KNXAddress
 			t = new StringTokenizer(address, ".");
 		else
 			return new String[] { address };
-			//throw new KNXFormatException("wrong KNX address format, no valid separator", address);
+
 		final int count = t.countTokens();
 		if (count == 2)
 			return new String[] { t.nextToken(), t.nextToken() };
