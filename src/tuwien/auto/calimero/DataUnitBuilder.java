@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -100,10 +100,8 @@ public final class DataUnitBuilder
 		else if (apci4 == 6 || apci4 == 7)
 			return apci4 << 6;
 		// memory codes
-		else if (apci4 == 8 || apci4 == 9 || apci4 == 10) {
-			if ((apci6 & 0x30) == 0)
-				return apci4 << 6;
-		}
+		else if (apci4 == 8 || apci4 == 9 || apci4 == 10)
+			return apci4 << 6;
 		// the rest
 		else
 			return apci4 << 6 | apci6;
