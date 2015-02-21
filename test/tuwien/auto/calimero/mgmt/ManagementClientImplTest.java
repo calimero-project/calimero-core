@@ -165,7 +165,7 @@ public class ManagementClientImplTest extends TestCase
 	public final void testAuthorizeCL() throws KNXException, InterruptedException
 	{
 		try {
-			final int level = mc.authorize(dcl, new byte[] { 0x10, 0x10, 0x10, 0x10 });
+			/*final int level =*/ mc.authorize(dcl, new byte[] { 0x10, 0x10, 0x10, 0x10 });
 			fail("connection less");
 		}
 		catch (final KNXDisconnectException e) {}
@@ -215,7 +215,7 @@ public class ManagementClientImplTest extends TestCase
 	public final void testReadADCCL() throws KNXException, InterruptedException
 	{
 		try {
-			final int adc = mc.readADC(dcl, 1, 1);
+			/*final int adc =*/ mc.readADC(dcl, 1, 1);
 			fail("connection less");
 		}
 		catch (final KNXDisconnectException e) {}
@@ -308,7 +308,7 @@ public class ManagementClientImplTest extends TestCase
 	public final void testReadMemoryCL() throws KNXException, InterruptedException
 	{
 		try {
-			final byte[] mem = mc.readMemory(dcl, 0x105, 2);
+			/*final byte[] mem =*/ mc.readMemory(dcl, 0x105, 2);
 			fail("connection less");
 		}
 		catch (final KNXDisconnectException e) {}
@@ -365,7 +365,7 @@ public class ManagementClientImplTest extends TestCase
 		}
 		catch (final KNXIllegalArgumentException e) {}
 
-		final byte[] prop = mc.readProperty(dco2, 0, 11, 1, 1);
+		/*final byte[] prop =*/ mc.readProperty(dco2, 0, 11, 1, 1);
 	}
 
 	/**
@@ -380,7 +380,7 @@ public class ManagementClientImplTest extends TestCase
 	{
 		dcl.destroy();
 		final Destination connless = mc.createDestination(Util.getKnxDevice(), false);
-		final byte[] prop = mc.readProperty(connless, 0, 14, 1, 1);
+		/*final byte[] prop =*/ mc.readProperty(connless, 0, 14, 1, 1);
 	}
 
 	/**
@@ -425,11 +425,11 @@ public class ManagementClientImplTest extends TestCase
 		}
 		catch (final KNXIllegalArgumentException e) {}
 
-		byte[] desc = mc.readPropertyDesc(dco2, 0, 51, 5);
-		desc = mc.readPropertyDesc(dco2, 0, 0, 1);
+		/*byte[] desc =*/ mc.readPropertyDesc(dco2, 0, 51, 5);
+		/*desc =*/ mc.readPropertyDesc(dco2, 0, 0, 1);
 
-		final byte[] cmp = mc.readPropertyDesc(dco2, 0, 1, 5);
-		desc = mc.readPropertyDesc(dco2, 0, 0, 0);
+		/*final byte[] cmp =*/ mc.readPropertyDesc(dco2, 0, 1, 5);
+		/*desc =*/ mc.readPropertyDesc(dco2, 0, 0, 0);
 		//assertTrue(Arrays.equals(desc, cmp));
 	}
 
@@ -639,8 +639,10 @@ public class ManagementClientImplTest extends TestCase
 		}
 		catch (final KNXIllegalArgumentException e) {}
 
-		final List doas =
-			mc.readDomainAddress(new byte[] { 1, 2, }, Util.getRouterAddress(), 100);
+		/*List<byte[]> doas =*/ mc.readDomainAddress(new byte[] { 1, 2, }, Util.getKnxDeviceCO(), 10);
+		final IndividualAddress start = new IndividualAddress(
+				Util.getKnxDeviceCO().getRawAddress() - 10);
+		/*doas =*/ mc.readDomainAddress(new byte[] { 1, 2, }, start, 10);
 	}
 
 	/**
