@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -179,7 +179,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 	{
 		if (!(dst instanceof GroupAddress))
 			return null;
-		final DatapointModel m = c.getDatapointModel();
+		final DatapointModel<?> m = c.getDatapointModel();
 		final Datapoint dp;
 		if (m != null && ((dp = m.get((GroupAddress) dst)) == null || dp.isStateBased()))
 			return null;
@@ -227,7 +227,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 		final GroupAddress dst = (GroupAddress) f.getDestination();
 		// check if we have a datapoint model, whether it contains the address,
 		// and datapoint is command based
-		final DatapointModel m = c.getDatapointModel();
+		final DatapointModel<?> m = c.getDatapointModel();
 		final Datapoint dp;
 		if (m != null && ((dp = m.get(dst)) == null || dp.isStateBased()))
 			return;

@@ -57,13 +57,17 @@ import tuwien.auto.calimero.xml.XMLWriter;
  *
  * @author B. Malinowsky
  */
-public class DatapointMap implements DatapointModel, ChangeNotifier
+public class DatapointMap<T extends Datapoint> implements DatapointModel<T>, ChangeNotifier
 {
 	private static final String TAG_DATAPOINTS = "datapoints";
 
-	private final Map<GroupAddress, Datapoint> points;
+	private final Map<GroupAddress, T> points;
 	private final EventListeners<ChangeListener> listeners = new EventListeners<>(
 			ChangeListener.class);
+
+	// NYI ensure we only load valid types based on parameterization, assign from constructor
+	// parameter or factory method
+	private final Class<Datapoint> dpTypeRef = Datapoint.class;
 
 	/**
 	 * Creates a new empty datapoint map.
@@ -83,12 +87,12 @@ public class DatapointMap implements DatapointModel, ChangeNotifier
 	 * @param datapoints collection with entries of type {@link Datapoint}
 	 * @throws KNXIllegalArgumentException on duplicate datapoint
 	 */
-	public DatapointMap(final Collection<Datapoint> datapoints)
+	public DatapointMap(final Collection<T> datapoints)
 	{
 		// not all HashSets put additional capacity in HashSet(Collection) ctor
-		final Map<GroupAddress, Datapoint> m = new HashMap<>(Math.max(2 * datapoints.size(), 11));
-		for (final Iterator<Datapoint> i = datapoints.iterator(); i.hasNext();) {
-			final Datapoint dp = i.next();
+		final Map<GroupAddress, T> m = new HashMap<>(Math.max(2 * datapoints.size(), 11));
+		for (final Iterator<T> i = datapoints.iterator(); i.hasNext();) {
+			final T dp = i.next();
 			if (m.containsKey(dp.getMainAddress()))
 				throw new KNXIllegalArgumentException("duplicate datapoint " + dp.getMainAddress());
 			m.put(dp.getMainAddress(), dp);
@@ -101,7 +105,7 @@ public class DatapointMap implements DatapointModel, ChangeNotifier
 	 * (tuwien.auto.calimero.datapoint.Datapoint)
 	 */
 	@Override
-	public void add(final Datapoint dp)
+	public void add(final T dp)
 	{
 		synchronized (points) {
 			if (points.containsKey(dp.getMainAddress()))
@@ -117,7 +121,7 @@ public class DatapointMap implements DatapointModel, ChangeNotifier
 	 * (tuwien.auto.calimero.datapoint.Datapoint)
 	 */
 	@Override
-	public void remove(final Datapoint dp)
+	public void remove(final T dp)
 	{
 		if (points.remove(dp.getMainAddress()) != null)
 			fireChangeNotification(dp, false);
@@ -137,7 +141,7 @@ public class DatapointMap implements DatapointModel, ChangeNotifier
 	 * (tuwien.auto.calimero.GroupAddress)
 	 */
 	@Override
-	public Datapoint get(final GroupAddress main)
+	public T get(final GroupAddress main)
 	{
 		return points.get(main);
 	}
@@ -149,7 +153,7 @@ public class DatapointMap implements DatapointModel, ChangeNotifier
 	 *
 	 * @return unmodifiable collection with entries of type {@link Datapoint}
 	 */
-	public Collection<Datapoint> getDatapoints()
+	public Collection<T> getDatapoints()
 	{
 		return Collections.unmodifiableCollection(points.values());
 	}
@@ -169,7 +173,7 @@ public class DatapointMap implements DatapointModel, ChangeNotifier
 	 * (tuwien.auto.calimero.datapoint.Datapoint)
 	 */
 	@Override
-	public boolean contains(final Datapoint dp)
+	public boolean contains(final T dp)
 	{
 		return points.containsKey(dp.getMainAddress());
 	}
@@ -192,7 +196,11 @@ public class DatapointMap implements DatapointModel, ChangeNotifier
 				if (points.containsKey(dp.getMainAddress()))
 					throw new KNXMLException("KNX address " + dp.getMainAddress().toString()
 							+ " in datapoint \"" + dp.getName() + "\" already used", r);
-				points.put(dp.getMainAddress(), dp);
+				if (!dpTypeRef.isAssignableFrom(dp.getClass()))
+					throw new KNXMLException("datapoint not of type " + dpTypeRef.getTypeName(), r);
+				@SuppressWarnings("unchecked")
+				final T castDp = (T) dp;
+				points.put(dp.getMainAddress(), castDp);
 			}
 		}
 	}
@@ -206,7 +214,7 @@ public class DatapointMap implements DatapointModel, ChangeNotifier
 	{
 		w.writeElement(TAG_DATAPOINTS, Collections.emptyList(), null);
 		synchronized (points) {
-			for (final Iterator<Datapoint> i = points.values().iterator(); i.hasNext();)
+			for (final Iterator<T> i = points.values().iterator(); i.hasNext();)
 				i.next().save(w);
 		}
 		w.endElement();
@@ -232,7 +240,7 @@ public class DatapointMap implements DatapointModel, ChangeNotifier
 		listeners.remove(l);
 	}
 
-	private void fireChangeNotification(final Datapoint dp, final boolean added)
+	private void fireChangeNotification(final T dp, final boolean added)
 	{
 		for (final Iterator<ChangeListener> i = listeners.iterator(); i.hasNext();) {
 			final ChangeListener l = i.next();

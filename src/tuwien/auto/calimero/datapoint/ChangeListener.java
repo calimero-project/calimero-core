@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2011, 2012 B. Malinowsky
+    Copyright (c) 2011, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ import java.util.EventListener;
 
 /**
  * A listener interface to receive notifications about datapoint model events.
- * 
+ *
  * @see DatapointModel
  * @author B. Malinowsky
  */
@@ -51,11 +51,11 @@ public interface ChangeListener extends EventListener
 	 * <p>
 	 * On receiving this notification, {@link DatapointModel#contains(Datapoint)} returns
 	 * true.
-	 * 
+	 *
 	 * @param m the datapoint model emitting the notification
 	 * @param dp the datapoint added
 	 */
-	void onDatapointAdded(DatapointModel m, Datapoint dp);
+	void onDatapointAdded(DatapointModel<? extends Datapoint> m, Datapoint dp);
 
 	/**
 	 * A datapoint was removed from the datapoint model.
@@ -63,9 +63,9 @@ public interface ChangeListener extends EventListener
 	 * Prior this notification, the datapoint was contained in the datapoint model; on
 	 * receiving this notification, {@link DatapointModel#contains(Datapoint)} returns
 	 * false.
-	 * 
+	 *
 	 * @param m the datapoint model emitting the notification
 	 * @param dp the datapoint removed
 	 */
-	void onDatapointRemoved(DatapointModel m, Datapoint dp);
+	void onDatapointRemoved(DatapointModel<? extends Datapoint> m, Datapoint dp);
 }

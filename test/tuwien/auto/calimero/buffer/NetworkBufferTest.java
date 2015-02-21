@@ -183,7 +183,7 @@ public class NetworkBufferTest extends TestCase
 		assertEquals(pc.readBool(group1), pc2.readBool(group1));
 
 		// test with datapoint model and timeout
-		final DatapointMap map = new DatapointMap();
+		final DatapointMap<StateDP> map = new DatapointMap<>();
 		final StateDP dp = new StateDP(group1, "group1", 0, "1.001");
 		dp.setExpirationTimeout(2);
 		map.add(dp);
@@ -209,7 +209,7 @@ public class NetworkBufferTest extends TestCase
 		final GroupAddress group2 = new GroupAddress(0, 0, 2);
 		final GroupAddress group3 = new GroupAddress(0, 0, 3);
 		final Configuration c = buffer.addConfiguration(lnk);
-		final DatapointMap map = new DatapointMap();
+		final DatapointMap<StateDP> map = new DatapointMap<>();
 		final StateDP dp = new StateDP(group1, "group1", 0, "1.001");
 		dp.add(group2, false);
 		dp.add(group3, true);
@@ -390,7 +390,7 @@ public class NetworkBufferTest extends TestCase
 		assertEquals(pc.readBool(group1), pc2.readBool(group1));
 
 		// test with datapoint model and timeout
-		final DatapointMap map = new DatapointMap();
+		final DatapointMap<StateDP> map = new DatapointMap<>();
 		final StateDP dp = new StateDP(group1, "group1", 0, "1.001");
 		dp.setExpirationTimeout(2);
 		map.add(dp);

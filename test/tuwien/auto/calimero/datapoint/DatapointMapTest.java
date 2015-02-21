@@ -55,7 +55,7 @@ public class DatapointMapTest extends TestCase
 {
 	private static final String dpFile = Util.getPath() + "datapointMap.xml";
 
-	private DatapointModel m;
+	private DatapointModel<Datapoint> m;
 	private final GroupAddress ga1 = new GroupAddress(1, 1, 1);
 	private final GroupAddress ga2 = new GroupAddress(2, 2, 2);
 	private final GroupAddress ga3 = new GroupAddress(3, 3, 3);
@@ -78,7 +78,7 @@ public class DatapointMapTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		m = new DatapointMap();
+		m = new DatapointMap<>();
 
 	}
 
@@ -101,7 +101,7 @@ public class DatapointMapTest extends TestCase
 		l.add(dp1);
 		l.add(dp2);
 		l.add(dp3);
-		final DatapointModel dpm = new DatapointMap(l);
+		final DatapointModel<Datapoint> dpm = new DatapointMap<>(l);
 		assertTrue(dpm.contains(ga1));
 		assertTrue(dpm.contains(ga2));
 		assertTrue(dpm.contains(ga3));
@@ -158,7 +158,7 @@ public class DatapointMapTest extends TestCase
 		l.add(dp1);
 		l.add(dp2);
 		l.add(dp3);
-		final DatapointModel dpm = new DatapointMap(l);
+		final DatapointModel<Datapoint> dpm = new DatapointMap<>(l);
 		dpm.removeAll();
 		assertFalse(dpm.contains(ga1));
 		assertFalse(dpm.contains(ga2));
@@ -170,10 +170,10 @@ public class DatapointMapTest extends TestCase
 	 */
 	public final void testGetDatapoints()
 	{
-		Collection<Datapoint> c = ((DatapointMap) m).getDatapoints();
+		Collection<Datapoint> c = ((DatapointMap<Datapoint>) m).getDatapoints();
 		assertEquals(0, c.size());
 		m.add(dp2);
-		c = ((DatapointMap) m).getDatapoints();
+		c = ((DatapointMap<Datapoint>) m).getDatapoints();
 		assertEquals(1, c.size());
 		assertTrue(c.contains(dp2));
 
@@ -210,22 +210,22 @@ public class DatapointMapTest extends TestCase
 		r.close();
 
 		m.removeAll();
-		assertEquals(0, ((DatapointMap) m).getDatapoints().size());
+		assertEquals(0, ((DatapointMap<Datapoint>) m).getDatapoints().size());
 		final XMLReader r2 = XMLFactory.getInstance().createXMLReader(dpFile);
 		m.load(r2);
 		r2.close();
-		assertEquals(3, ((DatapointMap) m).getDatapoints().size());
+		assertEquals(3, ((DatapointMap<Datapoint>) m).getDatapoints().size());
 		assertTrue(m.contains(dp1));
 		assertTrue(m.contains(dp2));
 		assertTrue(m.contains(dp3));
 
 		// save empty file
 		final XMLWriter w2 = XMLFactory.getInstance().createXMLWriter(dpFile);
-		new DatapointMap().save(w2);
+		new DatapointMap<StateDP>().save(w2);
 		w2.close();
 		// load empty file
 		final XMLReader r3 = XMLFactory.getInstance().createXMLReader(dpFile);
-		final DatapointMap dpm = new DatapointMap();
+		final DatapointMap<StateDP> dpm = new DatapointMap<>();
 		dpm.load(r3);
 		r3.close();
 		assertEquals(0, dpm.getDatapoints().size());
@@ -234,8 +234,23 @@ public class DatapointMapTest extends TestCase
 		final XMLReader r4 = XMLFactory.getInstance().createXMLReader(dpFile);
 		m.load(r4);
 		r4.close();
-		assertEquals(3, ((DatapointMap) m).getDatapoints().size());
+		assertEquals(3, ((DatapointMap<Datapoint>) m).getDatapoints().size());
 
+		// ensure state-based DPs only
+		final XMLWriter w5 = XMLFactory.getInstance().createXMLWriter(dpFile);
+		m.removeAll();
+		m.add(dp1);
+		m.add(dp2); // command-based!
+		m.add(dp3);
+		m.save(w5);
+		w5.close();
+		final XMLReader r5 = XMLFactory.getInstance().createXMLReader(dpFile);
+		try {
+			new DatapointMap<StateDP>().load(r5);
+			fail("loaded command DP into state-based DP map");
+		}
+		catch (final KNXMLException expected) {}
+		r5.close();
 	}
 
 	/**

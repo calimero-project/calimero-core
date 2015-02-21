@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -95,7 +95,7 @@ public class StateFilter implements NetworkFilter, RequestFilter
 	private Map<KNXAddress, List<GroupAddress>> update;
 
 	// keep a reference to a notifying model used by the change listener
-	private DatapointModel model;
+	private DatapointModel<? extends Datapoint> model;
 	private final ChangeListener cl = new ChangeListener()
 	{
 		/**
@@ -103,7 +103,8 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		 * @param dp
 		 */
 		@Override
-		public void onDatapointRemoved(final DatapointModel m, final Datapoint dp)
+		public void onDatapointRemoved(final DatapointModel<? extends Datapoint> m,
+			final Datapoint dp)
 		{
 			if (dp instanceof StateDP)
 				destroyReferences((StateDP) dp);
@@ -114,7 +115,7 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		 * @param dp
 		 */
 		@Override
-		public void onDatapointAdded(final DatapointModel m, final Datapoint dp)
+		public void onDatapointAdded(final DatapointModel<? extends Datapoint> m, final Datapoint dp)
 		{
 			if (dp instanceof StateDP)
 				createReferences((StateDP) dp);
@@ -139,7 +140,7 @@ public class StateFilter implements NetworkFilter, RequestFilter
 			final ChangeNotifier notifier = (ChangeNotifier) model;
 			notifier.removeChangeListener(cl);
 		}
-		final DatapointModel m = c.getDatapointModel();
+		final DatapointModel<?> m = c.getDatapointModel();
 		if (m instanceof ChangeNotifier) {
 			model = m;
 			final ChangeNotifier notifier = (ChangeNotifier) m;
@@ -182,7 +183,7 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		if (!(f.getDestination() instanceof GroupAddress))
 			return;
 		final GroupAddress dst = (GroupAddress) f.getDestination();
-		final DatapointModel m = c.getDatapointModel();
+		final DatapointModel<?> m = c.getDatapointModel();
 		Datapoint dp = null;
 		if (m != null && ((dp = m.get(dst)) == null || !dp.isStateBased()))
 			return;
@@ -252,7 +253,7 @@ public class StateFilter implements NetworkFilter, RequestFilter
 			return null;
 		// check if there is an expiration timeout for a state based value
 		final Datapoint dp;
-		final DatapointModel m = c.getDatapointModel();
+		final DatapointModel<?> m = c.getDatapointModel();
 		if (m != null && (dp = m.get((GroupAddress) dst)) != null && dp.isStateBased()) {
 			final int t = ((StateDP) dp).getExpirationTimeout() * 1000;
 			if (t != 0 && System.currentTimeMillis() > o.getTimestamp() + t)
@@ -285,17 +286,17 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		}
 	}
 
-	private void createReferences(final DatapointModel m)
+	private void createReferences(final DatapointModel<? extends Datapoint> m)
 	{
 		invalidate = new HashMap<>();
 		update = new HashMap<>();
-		final Collection<Datapoint> c = ((DatapointMap) m).getDatapoints();
+		final Collection<? extends Datapoint> c = ((DatapointMap<? extends Datapoint>) m)
+				.getDatapoints();
 		synchronized (c) {
-			for (final Iterator<Datapoint> i = c.iterator(); i.hasNext();) {
-				try {
-					createReferences((StateDP) i.next());
-				}
-				catch (final ClassCastException ignore) {}
+			for (final Iterator<? extends Datapoint> i = c.iterator(); i.hasNext();) {
+				final Datapoint dp = i.next();
+				if (dp instanceof StateDP)
+					createReferences((StateDP) dp);
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -102,7 +102,7 @@ public final class NetworkBuffer
 		private Configuration.RequestFilter reqFilter;
 		private volatile boolean active;
 		private volatile boolean queryBufferOnly;
-		private DatapointModel model;
+		private DatapointModel<?> model;
 
 		// listen on the link and update our buffers
 		private final class SquirrelListener implements NetworkLinkListener
@@ -347,7 +347,7 @@ public final class NetworkBuffer
 		}
 
 		@Override
-		public synchronized void setDatapointModel(final DatapointModel m)
+		public synchronized void setDatapointModel(final DatapointModel<?> m)
 		{
 			model = m;
 			if (nwFilter != null)
@@ -355,7 +355,7 @@ public final class NetworkBuffer
 		}
 
 		@Override
-		public synchronized DatapointModel getDatapointModel()
+		public synchronized DatapointModel<?> getDatapointModel()
 		{
 			return model;
 		}
