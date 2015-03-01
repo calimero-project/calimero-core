@@ -631,7 +631,7 @@ public class FT12Connection
 
 		Receiver()
 		{
-			super("FT1.2 receiver");
+			super("Calimero FT1.2 receiver");
 			setDaemon(true);
 		}
 
@@ -734,8 +734,7 @@ public class FT12Connection
 				if ((c & FRAMECOUNT_BIT) != rcvFrameCount) {
 					// ignore repeated frame
 					if (chk == lastChecksum) {
-						logger.trace("framecount and checksum indicate a repeated "
-								+ "frame - ignored");
+						logger.trace("framecount and checksum indicate a repeated frame - ignored");
 						return false;
 					}
 					// protocol discrepancy (Merten Instabus coupler)
