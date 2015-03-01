@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,13 +41,13 @@ import tuwien.auto.calimero.exception.KNXFormatException;
 /**
  * Description Information Block (DIB).
  * <p>
- * A DIB is used to return device specific information.<br>
+ * A DIB is used to return device-specific information.<br>
  * This DIB is a common base for more detailed description formats contained in DIBs. For
  * usage of the different description information available, refer to the DIB subtypes.
  * <p>
  * The currently known valid descriptor type codes (KNXnet/IP core specification v1.2) are
  * defined as available DIB constants.
- * 
+ *
  * @author B. Malinowsky
  */
 public abstract class DIB
@@ -70,13 +70,31 @@ public abstract class DIB
 	 */
 	public static final int SUPP_SVC_FAMILIES = 0x02;
 
+	/**
+	 * Description type code for the IP configuration device information.
+	 * <p>
+	 */
+	public static final int IP_CONFIG = 0x03;
+
+	/**
+	 * Description type code for the current IP configuration device information.
+	 * <p>
+	 */
+	public static final int IP_CURRENT_CONFIG = 0x04;
+
+	/**
+	 * Description type code for the KNX addresses device information.
+	 * <p>
+	 */
+	public static final int KNX_ADDRESSES = 0x05;
+
 	final int size;
 	final int type;
 
 	/**
 	 * Creates a new DIB out of a byte array.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing DIB structure
 	 * @param offset start offset of DIB in <code>data</code>
 	 * @throws KNXFormatException if no DIB found or invalid structure
@@ -94,7 +112,7 @@ public abstract class DIB
 	/**
 	 * Creates a new DIB and initializes basic fields.
 	 * <p>
-	 * 
+	 *
 	 * @param dibSize total size of DIB in bytes, <code>dibSize > 0</code>
 	 * @param descriptionType one of the description type code constants of this class
 	 */
@@ -103,13 +121,13 @@ public abstract class DIB
 		size = dibSize;
 		type = descriptionType;
 	}
-	
+
 	/**
 	 * Returns the description type code of this DIB.
 	 * <p>
 	 * The type code specifies which kind of description information is contained in the
 	 * DIB.
-	 * 
+	 *
 	 * @return description type code as unsigned byte
 	 */
 	public final int getDescTypeCode()
@@ -120,7 +138,7 @@ public abstract class DIB
 	/**
 	 * Returns the structure length of this DIB in bytes.
 	 * <p>
-	 * 
+	 *
 	 * @return structure length as unsigned byte
 	 */
 	public final int getStructLength()
@@ -131,7 +149,7 @@ public abstract class DIB
 	/**
 	 * Returns the byte representation of the whole DIB structure.
 	 * <p>
-	 * 
+	 *
 	 * @return byte array containing structure
 	 */
 	public byte[] toByteArray()
