@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,10 +37,16 @@
 package tuwien.auto.calimero.knxnetip.servicetype;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.knxnetip.util.DIB;
 import tuwien.auto.calimero.knxnetip.util.DeviceDIB;
+import tuwien.auto.calimero.knxnetip.util.IPConfigDIB;
+import tuwien.auto.calimero.knxnetip.util.IPCurrentConfigDIB;
+import tuwien.auto.calimero.knxnetip.util.KnxAddressesDIB;
 import tuwien.auto.calimero.knxnetip.util.ManufacturerDIB;
 import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB;
 
@@ -48,13 +54,20 @@ import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB;
  * Represents a description response.
  * <p>
  * Such response is sent by a server in reply to a description request from a client.<br>
- * A response contains a device description information block (DIB) and a supported
- * service families DIB. Optionally, it might contain an additional DIB with other
- * information. Such optional DIB is only paid attention in case of type manufacturer data
- * DIB, otherwise it is ignored.
+ * A response contains various description information blocks (DIBs), mandatory being a Device DIB
+ * and a Supported Service Families DIB. Optionally, the response might contain additional DIBs with
+ * other information. Each DIB can at most occur once, the following DIBs are recognized:
+ * <ul>
+ * <li>{@link DeviceDIB}</li>
+ * <li>{@link ServiceFamiliesDIB}</li>
+ * <li>{@link IPConfigDIB}</li>
+ * <li>{@link IPCurrentConfigDIB}</li>
+ * <li>{@link KnxAddressesDIB}</li>
+ * <li>{@link ManufacturerDIB}</li>
+ * </ul>
  * <p>
  * Objects of this type are immutable.
- * 
+ *
  * @author B. Malinowsky
  * @see tuwien.auto.calimero.knxnetip.servicetype.DescriptionRequest
  */
@@ -62,13 +75,17 @@ public class DescriptionResponse extends ServiceType
 {
 	private final DeviceDIB device;
 	private final ServiceFamiliesDIB suppfam;
-	// manufacturer data is optional in the specification
-	private ManufacturerDIB mfr;
+
+	// the following DIBs are optional in the specification
+	private final IPConfigDIB config;
+	private final IPCurrentConfigDIB currentConfig;
+	private final KnxAddressesDIB addresses;
+	private final ManufacturerDIB mfr;
 
 	/**
 	 * Creates a new description response out of a byte array.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing a description response structure
 	 * @param offset start offset of response in <code>data</code>
 	 * @throws KNXFormatException if no description response was found or invalid
@@ -79,32 +96,60 @@ public class DescriptionResponse extends ServiceType
 		super(KNXnetIPHeader.DESCRIPTION_RES);
 		device = new DeviceDIB(data, offset);
 		suppfam = new ServiceFamiliesDIB(data, offset + device.getStructLength());
-		// check out if we have an optional DIB part
-		final int len = device.getStructLength() + suppfam.getStructLength();
-		if (len + 1 < data.length - offset && (data[offset + len + 1] & 0xFF) == DIB.MFR_DATA)
-			mfr = new ManufacturerDIB(data, offset + len);
+
+		// parse optional DIBs
+		IPConfigDIB c = null;
+		IPCurrentConfigDIB cc = null;
+		KnxAddressesDIB a = null;
+		ManufacturerDIB m = null;
+		int i = offset + device.getStructLength() + suppfam.getStructLength();
+		while (i + 1 < data.length) {
+			final int size = data[i] & 0xff;
+			final int type = data[i + 1] & 0xff;
+			boolean unique = true;
+			if (type == DIB.IP_CONFIG && (unique = c == null))
+				c = new IPConfigDIB(data, i);
+			else if (type == DIB.IP_CURRENT_CONFIG  && (unique = cc == null))
+				cc = new IPCurrentConfigDIB(data, i);
+			else if (type == DIB.KNX_ADDRESSES  && (unique = a == null))
+				a = new KnxAddressesDIB(data, i);
+			else if (type == DIB.MFR_DATA  && (unique = m == null))
+				m = new ManufacturerDIB(data, i);
+			else if (!unique)
+				throw new KNXFormatException("description response contains duplicate DIB type "
+						+ type);
+			else if (type == 0 || size == 0) // break on invalid field, ensure we always progress i
+				break;
+			else
+				logger.warn("description response contains unknown DIB with type code "
+						+ type + " and size " + size + ", ignore");
+			i += size;
+		}
+
+		config = c;
+		currentConfig = cc;
+		addresses = a;
+		mfr = m;
 	}
 
 	/**
 	 * Creates a new description response containing a device DIB and a supported service
 	 * families DIB.
 	 * <p>
-	 * 
+	 *
 	 * @param device device description
 	 * @param suppSvcFam supported service families
 	 */
 	public DescriptionResponse(final DeviceDIB device, final ServiceFamiliesDIB suppSvcFam)
 	{
-		super(KNXnetIPHeader.DESCRIPTION_RES);
-		this.device = device;
-		suppfam = suppSvcFam;
+		this(device, suppSvcFam, null, null, null, null);
 	}
 
 	/**
 	 * Creates a new description response containing a device DIB, a supported service
 	 * families DIB and a manufacturer DIB.
 	 * <p>
-	 * 
+	 *
 	 * @param device device description
 	 * @param suppSvcFam supported service families
 	 * @param mfr manufacturer specific data
@@ -112,14 +157,58 @@ public class DescriptionResponse extends ServiceType
 	public DescriptionResponse(final DeviceDIB device, final ServiceFamiliesDIB suppSvcFam,
 		final ManufacturerDIB mfr)
 	{
-		this(device, suppSvcFam);
+		this(device, suppSvcFam, null, null, null, mfr);
+	}
+
+	/**
+	 * Creates a new description response containing a device DIB, a supported service
+	 * families DIB and a manufacturer DIB.
+	 * <p>
+	 *
+	 * @param device device description
+	 * @param suppSvcFamilies supported service families
+	 * @param config IP configuration
+	 * @param currentConfig IP current configuration
+	 * @param addresses KNX individual addresses information
+	 * @param mfr manufacturer specific data
+	 */
+	public DescriptionResponse(final DeviceDIB device, final ServiceFamiliesDIB suppSvcFamilies,
+		final IPConfigDIB config, final IPCurrentConfigDIB currentConfig,
+		final KnxAddressesDIB addresses, final ManufacturerDIB mfr)
+	{
+		super(KNXnetIPHeader.DESCRIPTION_RES);
+		this.device = device;
+		suppfam = suppSvcFamilies;
+		this.config = config;
+		this.currentConfig = currentConfig;
+		this.addresses = addresses;
 		this.mfr = mfr;
+	}
+
+	/**
+	 * @return the complete description information contained in this response, as list of
+	 *         description information blocks (DIBs)
+	 */
+	public final List getDescription()
+	{
+		final List l = new ArrayList();
+		l.add(device);
+		l.add(suppfam);
+		if (config != null)
+			l.add(config);
+		if (currentConfig != null)
+			l.add(currentConfig);
+		if (addresses != null)
+			l.add(addresses);
+		if (mfr != null)
+			l.add(mfr);
+		return l;
 	}
 
 	/**
 	 * Returns the device description information block contained in the response.
 	 * <p>
-	 * 
+	 *
 	 * @return a device DIB
 	 */
 	public final DeviceDIB getDevice()
@@ -130,7 +219,7 @@ public class DescriptionResponse extends ServiceType
 	/**
 	 * Returns the supported service families description information block.
 	 * <p>
-	 * 
+	 *
 	 * @return a DIB with the supported service families
 	 */
 	public final ServiceFamiliesDIB getServiceFamilies()
@@ -144,7 +233,7 @@ public class DescriptionResponse extends ServiceType
 	 * <p>
 	 * The manufacturer data is not a mandatory part of a description response. It is only
 	 * available, if the optional DIB information of a response matches this DIB type.<br>
-	 * 
+	 *
 	 * @return a manufacturer DIB, or <code>null</code> if no such DIB
 	 */
 	public final ManufacturerDIB getManufacturerData()
@@ -157,9 +246,9 @@ public class DescriptionResponse extends ServiceType
 	 */
 	int getStructLength()
 	{
-		int len = device.getStructLength() + suppfam.getStructLength();
-		if (mfr != null)
-			len += mfr.getStructLength();
+		int len = 0;
+		for (final Iterator i = getDescription().iterator(); i.hasNext();)
+			len += ((DIB) i.next()).getStructLength();
 		return len;
 	}
 
@@ -169,13 +258,9 @@ public class DescriptionResponse extends ServiceType
 	 */
 	byte[] toByteArray(final ByteArrayOutputStream os)
 	{
-		byte[] buf = device.toByteArray();
-		os.write(buf, 0, buf.length);
-		buf = suppfam.toByteArray();
-		os.write(buf, 0, buf.length);
-		if (mfr != null) {
-			buf = mfr.toByteArray();
-			os.write(buf, 0, buf.length);
+		for (final Iterator i = getDescription().iterator(); i.hasNext();) {
+			final byte[] bytes = ((DIB) i.next()).toByteArray();
+			os.write(bytes, 0, bytes.length);
 		}
 		return os.toByteArray();
 	}
