@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2014 B. Malinowsky
+    Copyright (c) 2010, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -583,6 +583,14 @@ public interface PropertyAccess
 		// PDT,DPT: PDT_UNSIGNED_CHAR[30]
 		public static final int FRIENDLY_NAME = 76;
 
+		/**
+		 * Object type 11 property "Routing Busy Wait Time".
+		 * <p>
+		 * The time wait value sent with a routing busy indication, with default value 100 ms.<br>
+		 * PDT: PDT_UNSIGNED_INT<br>
+		 * Implementations of masks 0x091A and 0x5705 may not have this property.
+		 */
+		public static final int ROUTING_BUSY_WAIT_TIME = 78;
 
 
 		// enfore non-instantiability
