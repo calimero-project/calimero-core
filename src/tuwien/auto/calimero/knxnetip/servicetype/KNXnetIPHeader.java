@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -144,6 +144,11 @@ public class KNXnetIPHeader
 	 * Service type identifier to indicate the loss of routing messages with multicast.
 	 */
 	public static final int ROUTING_LOST_MSG = 0x0531;
+
+	/**
+	 * Service type identifier for a buffer overflow warning indication with multicast.
+	 */
+	public static final int ROUTING_BUSY = 0x0532;
 
 	/**
 	 * Version identifier for KNXnet/IP protocol version 1.0.
@@ -321,6 +326,8 @@ public class KNXnetIPHeader
 			return "routing.ind";
 		case ROUTING_LOST_MSG:
 			return "routing-lost.msg";
+		case ROUTING_BUSY:
+			return "routing-busy.ind";
 		default:
 			return "unknown service";
 		}
