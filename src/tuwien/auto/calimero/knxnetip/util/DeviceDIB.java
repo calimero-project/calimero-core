@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,47 +48,41 @@ import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 
 /**
- * Represents a device description information block.
- * <p>
- * <p>
- * Objects of this type are immutable.
- * 
+ * Represents a device description information block. Objects of this type are immutable.
+ *
  * @author B. Malinowsky
  * @see tuwien.auto.calimero.knxnetip.servicetype.DescriptionResponse
  */
 public class DeviceDIB extends DIB
 {
 	/**
-	 * KNX medium code for twisted pair 0 (2400 bit/s), inherited from BatiBUS.
-	 * <p>
+	 * @deprecated Phased out in the KNX specification, not used any longer. (KNX medium code for
+	 *             twisted pair 0 (2400 bit/s), inherited from BatiBUS.)
 	 */
 	public static final int MEDIUM_TP0 = 0x01;
 
 	/**
 	 * KNX medium code for twisted pair 1 (9600 bit/s).
-	 * <p>
 	 */
 	public static final int MEDIUM_TP1 = 0x02;
 
 	/**
 	 * KNX medium code for power line 110 kHz (1200 bit/s).
-	 * <p>
 	 */
 	public static final int MEDIUM_PL110 = 0x04;
 
 	/**
-	 * KNX medium code for power line 132 kHz (2400 bit/s), inherited from EHS.
-	 * <p>
+	 * @deprecated Phased out in the KNX specification, not used any longer. (KNX medium code for
+	 *             power line 132 kHz (2400 bit/s), inherited from EHS.)
 	 */
 	public static final int MEDIUM_PL132 = 0x08;
 
 	/**
 	 * KNX medium code for radio frequency (868 MHz).
-	 * <p>
 	 */
 	public static final int MEDIUM_RF = 0x10;
 
-	
+
 	private static final int DIB_SIZE = 54;
 
 	private final int status;
@@ -103,7 +97,7 @@ public class DeviceDIB extends DIB
 	/**
 	 * Creates a device DIB out of a byte array.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing device DIB structure
 	 * @param offset start offset of DIB in <code>data</code>
 	 * @throws KNXFormatException if no DIB found or invalid structure
@@ -137,10 +131,10 @@ public class DeviceDIB extends DIB
 	/**
 	 * Creates a device information DIB using the supplied device information.
 	 * <p>
-	 * 
+	 *
 	 * @param friendlyName user friendly name to identify the device; a ISO 8859-1 string
 	 *        with a maximum length of 29 characters
-	 * @param deviceStatus current device status, <code>0 <= deviceStatus <= 0xff</code>
+	 * @param deviceStatus current device status, <code>0 &le; deviceStatus &le; 0xff</code>
 	 *        <ul>
 	 *        <li>bit 0 is the programming mode:<br>
 	 *        1 = device is in programming mode<br>
@@ -219,7 +213,7 @@ public class DeviceDIB extends DIB
 	/**
 	 * Returns the device individual address.
 	 * <p>
-	 * 
+	 *
 	 * @return individual address as {@link IndividualAddress}
 	 */
 	public final IndividualAddress getAddress()
@@ -232,7 +226,7 @@ public class DeviceDIB extends DIB
 	 * <p>
 	 * Bit 0 is programming mode flag: 1 = device is in programming mode, 0 = device is
 	 * not in programming mode.
-	 * 
+	 *
 	 * @return status as unsigned byte
 	 */
 	public final int getDeviceStatus()
@@ -243,7 +237,7 @@ public class DeviceDIB extends DIB
 	/**
 	 * Returns the KNX medium code.
 	 * <p>
-	 * 
+	 *
 	 * @return KNX medium as unsigned byte
 	 */
 	public final int getKNXMedium()
@@ -254,7 +248,7 @@ public class DeviceDIB extends DIB
 	/**
 	 * Returns a textual representation of the KNX medium code.
 	 * <p>
-	 * 
+	 *
 	 * @return KNX medium as string format
 	 * @see #getKNXMedium()
 	 */
@@ -279,7 +273,7 @@ public class DeviceDIB extends DIB
 	/**
 	 * Returns the device Ethernet MAC address.
 	 * <p>
-	 * 
+	 *
 	 * @return byte array containing MAC address
 	 */
 	public final byte[] getMACAddress()
@@ -290,7 +284,7 @@ public class DeviceDIB extends DIB
 	/**
 	 * Returns a textual representation of the device Ethernet MAC address.
 	 * <p>
-	 * 
+	 *
 	 * @return MAC address as string format
 	 */
 	public final String getMACAddressString()
@@ -302,7 +296,7 @@ public class DeviceDIB extends DIB
 	 * Returns the device routing multicast address.
 	 * <p>
 	 * For devices which don't implement routing, the multicast address is 0.
-	 * 
+	 *
 	 * @return multicast address as byte array
 	 */
 	public final byte[] getMulticastAddress()
@@ -316,7 +310,7 @@ public class DeviceDIB extends DIB
 	 * This ID uniquely identifies a device in a project with more than one installation.
 	 * The lowest 4 bits specify the installation number, bit 4 to 15 (MSB) contain the
 	 * project number.
-	 * 
+	 *
 	 * @return project installation identifier as unsigned 16 bit value
 	 */
 	public final int getProjectInstallID()
@@ -328,7 +322,7 @@ public class DeviceDIB extends DIB
 	 * Returns the project number for the device.
 	 * <p>
 	 * The project number is the upper 12 bits of the project-installation identifier.
-	 * 
+	 *
 	 * @return project number as 12 bit unsigned value
 	 * @see #getProjectInstallID()
 	 */
@@ -341,7 +335,7 @@ public class DeviceDIB extends DIB
 	 * Returns the installation number for the device.
 	 * <p>
 	 * The installation number is the lower 4 bits of the project-installation identifier.
-	 * 
+	 *
 	 * @return installation number as 4 bit unsigned value
 	 * @see #getProjectInstallID()
 	 */
@@ -354,7 +348,7 @@ public class DeviceDIB extends DIB
 	 * Returns the KNX serial number of the device.
 	 * <p>
 	 * The serial number uniquely identifies a device.
-	 * 
+	 *
 	 * @return byte array with serial number
 	 */
 	public final byte[] getSerialNumber()
@@ -365,7 +359,7 @@ public class DeviceDIB extends DIB
 	/**
 	 * Returns a textual representation of the device KNX serial number.
 	 * <p>
-	 * 
+	 *
 	 * @return serial number as string
 	 */
 	public final String getSerialNumberString()
@@ -378,7 +372,7 @@ public class DeviceDIB extends DIB
 	 * <p>
 	 * This name is used to display a device in textual format. The maximum name length is
 	 * 30 characters.
-	 * 
+	 *
 	 * @return device name as string
 	 */
 	public final String getName()
@@ -389,7 +383,7 @@ public class DeviceDIB extends DIB
 	/**
 	 * Returns a textual representation of this device DIB.
 	 * <p>
-	 * 
+	 *
 	 * @return a string representation of the object
 	 */
 	public String toString()
