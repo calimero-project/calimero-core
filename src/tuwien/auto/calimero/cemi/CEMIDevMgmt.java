@@ -263,10 +263,12 @@ public class CEMIDevMgmt implements CEMI
 	 * <p>
 	 * Used for reset messages.
 	 *
-	 * @param msgCode a message code value specified by this class
+	 * @param msgCode a reset message code value specified by this class
 	 */
 	public CEMIDevMgmt(final int msgCode)
 	{
+		if (msgCode != MC_RESET_REQ && msgCode != MC_RESET_IND)
+			throw new KNXIllegalArgumentException("not a reset message code");
 		checkSetMC(msgCode);
 	}
 
