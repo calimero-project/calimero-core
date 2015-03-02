@@ -52,32 +52,29 @@ public abstract class KNXMediumSettings
 	// medium codes are equal to the ones specified in KNXnet/IP
 
 	/**
-	 * KNX medium code for twisted pair 0 (2400 bit/s), inherited from BatiBUS.
-	 * <p>
+	 * @deprecated Phased out in the KNX specification, not used any longer. (KNX medium code for
+	 *             twisted pair 0 (2400 bit/s), inherited from BatiBUS.)
 	 */
 	public static final int MEDIUM_TP0 = 0x01;
 
 	/**
 	 * KNX medium code for twisted pair 1 (9600 bit/s).
-	 * <p>
 	 */
 	public static final int MEDIUM_TP1 = 0x02;
 
 	/**
 	 * KNX medium code for power line 110 kHz (1200 bit/s).
-	 * <p>
 	 */
 	public static final int MEDIUM_PL110 = 0x04;
 
 	/**
-	 * KNX medium code for power line 132 kHz (2400 bit/s), inherited from EHS.
-	 * <p>
+	 * @deprecated Phased out in the KNX specification, not used any longer. (KNX medium code for
+	 *             power line 132 kHz (2400 bit/s), inherited from EHS.)
 	 */
 	public static final int MEDIUM_PL132 = 0x08;
 
 	/**
 	 * KNX medium code for radio frequency (868 MHz).
-	 * <p>
 	 */
 	public static final int MEDIUM_RF = 0x10;
 
