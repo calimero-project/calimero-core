@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -116,6 +116,12 @@ public class CEMIDevMgmt implements CEMI
 		 * in negative read/write message confirmations
 		 */
 		public static final int PROP_INDEX_RANGE_ERROR = 0x09;
+
+		/**
+		 * Error code: the property exists but can at this moment not be written with a new value,
+		 * used in negative write message confirmations
+		 */
+		public static final int VALUE_NOT_WRITEABLE_NOW = 0x0A;
 
 		// enforce non-instantiability
 		private ErrorCodes() {}
