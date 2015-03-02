@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -116,9 +116,19 @@ public class Discoverer
 	 */
 	public static final int SEARCH_PORT = KNXnetIPConnection.DEFAULT_PORT;
 
-	static final InetAddress SYSTEM_SETUP_MULTICAST;
-
 	private static final LogService logger = LogManager.getManager().getLogService(LOG_SERVICE);
+
+	static final InetAddress SYSTEM_SETUP_MULTICAST;
+	static {
+		InetAddress a = null;
+		try {
+			a = InetAddress.getByName(SEARCH_MULTICAST);
+		}
+		catch (final UnknownHostException e) {
+			logger.fatal("on resolving system setup multicast " + SEARCH_MULTICAST, e);
+		}
+		SYSTEM_SETUP_MULTICAST = a;
+	}
 
 	private static boolean win7_OrLater;
 	static {
@@ -143,17 +153,6 @@ public class Discoverer
 
 	private final List receivers = Collections.synchronizedList(new ArrayList());
 	private final List responses = Collections.synchronizedList(new ArrayList());
-
-	static {
-		InetAddress a = null;
-		try {
-			a = InetAddress.getByName(SEARCH_MULTICAST);
-		}
-		catch (final UnknownHostException e) {
-			logger.fatal("on resolving system setup multicast " + SEARCH_MULTICAST, e);
-		}
-		SYSTEM_SETUP_MULTICAST = a;
-	}
 
 	/**
 	 * Creates a new Discoverer.
