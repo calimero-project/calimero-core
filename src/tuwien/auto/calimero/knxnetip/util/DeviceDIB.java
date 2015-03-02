@@ -56,8 +56,10 @@ import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 public class DeviceDIB extends DIB
 {
 	/**
-	 * KNX medium code for twisted pair 0 (2400 bit/s), inherited from BatiBUS.
+	 * @deprecated Phased out in the KNX specification, not used any longer. (KNX medium code for
+	 *             twisted pair 0 (2400 bit/s), inherited from BatiBUS.)
 	 */
+	@Deprecated
 	public static final int MEDIUM_TP0 = 0x01;
 
 	/**
@@ -71,8 +73,10 @@ public class DeviceDIB extends DIB
 	public static final int MEDIUM_PL110 = 0x04;
 
 	/**
-	 * KNX medium code for power line 132 kHz (2400 bit/s), inherited from EHS.
+	 * @deprecated Phased out in the KNX specification, not used any longer. (KNX medium code for
+	 *             power line 132 kHz (2400 bit/s), inherited from EHS.)
 	 */
+	@Deprecated
 	public static final int MEDIUM_PL132 = 0x08;
 
 	/**
