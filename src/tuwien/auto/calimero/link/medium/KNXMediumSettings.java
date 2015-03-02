@@ -78,6 +78,12 @@ public abstract class KNXMediumSettings
 	 */
 	public static final int MEDIUM_RF = 0x10;
 
+	/**
+	 * KNX medium code for KNX IP.
+	 */
+	public static final int MEDIUM_KNXIP = 0x20;
+
+
 	// local device address if in transparent server mode
 	private IndividualAddress dev;
 
@@ -104,6 +110,8 @@ public abstract class KNXMediumSettings
 			return new PLSettings(device, null, true);
 		case MEDIUM_RF:
 			return new RFSettings(device);
+		case MEDIUM_KNXIP:
+			return null; // XXX
 		}
 		throw new KNXIllegalArgumentException("unknown medium type " + medium);
 	}
@@ -161,6 +169,7 @@ public abstract class KNXMediumSettings
 	 * <li>PL110, P110</li>
 	 * <li>PL132, P132</li>
 	 * <li>RF</li>
+	 * <li>KNXIP, KNX IP</li>
 	 * </ul>
 	 *
 	 * @param mediumName the textual representation of a medium type as returned by
@@ -180,6 +189,8 @@ public abstract class KNXMediumSettings
 			return MEDIUM_PL132;
 		else if ("rf".equalsIgnoreCase(mediumName))
 			return MEDIUM_RF;
+		else if ("knxip".equalsIgnoreCase(mediumName) || "knx ip".equalsIgnoreCase(mediumName))
+			return MEDIUM_KNXIP;
 		else
 			throw new KNXIllegalArgumentException("unknown medium type " + mediumName);
 	}
@@ -217,6 +228,8 @@ public abstract class KNXMediumSettings
 			return "PL132";
 		case MEDIUM_RF:
 			return "RF";
+		case MEDIUM_KNXIP:
+			return "KNX IP";
 		default:
 			return "unknown";
 		}
