@@ -84,6 +84,11 @@ public class DeviceDIB extends DIB
 	 */
 	public static final int MEDIUM_RF = 0x10;
 
+	/**
+	 * KNX medium code for KNX IP.
+	 */
+	public static final int MEDIUM_KNXIP = 0x20;
+
 
 	private static final int DIB_SIZE = 54;
 
@@ -181,7 +186,7 @@ public class DeviceDIB extends DIB
 					+ ") uses reserved bits");
 
 		if (knxMedium != MEDIUM_TP0 && knxMedium != MEDIUM_TP1 && knxMedium != MEDIUM_PL110
-				&& knxMedium != MEDIUM_PL132 && knxMedium != MEDIUM_RF)
+				&& knxMedium != MEDIUM_PL132 && knxMedium != MEDIUM_RF && knxMedium != MEDIUM_KNXIP)
 			throw new KNXIllegalArgumentException("KNX medium not supported");
 		knxmedium = knxMedium;
 
@@ -267,6 +272,8 @@ public class DeviceDIB extends DIB
 			return "PL132";
 		case MEDIUM_RF:
 			return "RF";
+		case MEDIUM_KNXIP:
+			return "KNX IP";
 		default:
 			return "unknown";
 		}
