@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ import tuwien.auto.calimero.log.LogLevel;
  * network connection between two KNXnet/IP devices - client and server.<br>
  * Up to now, only the client side is implemented.<br>
  * The communication on OSI layer 4 is done using UDP.<br>
- * 
+ *
  * @author B. Malinowsky
  */
 public class KNXnetIPTunnel extends ClientConnection
@@ -106,7 +106,7 @@ public class KNXnetIPTunnel extends ClientConnection
 	 * Creates a new KNXnet/IP tunneling connection to a remote server.
 	 * <p>
 	 * Establishing a raw tunneling layer ({@link #RAW_LAYER}) is not supported yet.<br>
-	 * 
+	 *
 	 * @param knxLayer KNX tunneling layer (e.g. {@link #LINK_LAYER})
 	 * @param localEP specifies the local endpoint with the socket address to be used by
 	 *        the tunnel
@@ -138,7 +138,7 @@ public class KNXnetIPTunnel extends ClientConnection
 	 * Sends a cEMI frame to the remote server communicating with this endpoint.
 	 * <p>
 	 * Sending in busmonitor mode is not permitted.<br>
-	 * 
+	 *
 	 * @param frame cEMI message to send, the expected cEMI type is according to the used
 	 *        tunneling layer
 	 */
@@ -179,7 +179,7 @@ public class KNXnetIPTunnel extends ClientConnection
 			return true;
 
 		final int seq = req.getSequenceNumber();
-		if (seq == getSeqRcv() || seq + 1 == getSeqRcv()) {
+		if (seq == getSeqRcv() || ((seq + 1) & 0xFF) == getSeqRcv()) {
 			final int status = h.getVersion() == KNXNETIP_VERSION_10 ? ErrorCodes.NO_ERROR
 					: ErrorCodes.VERSION_NOT_SUPPORTED;
 			final byte[] buf = PacketHelper.toPacket(new ServiceAck(serviceAck, channelId, seq,
