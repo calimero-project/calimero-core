@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/**
 	 * Holds an additional info type with corresponding information data.
 	 */
-	public static final class AddInfo
+	public static class AddInfo
 	{
 		private final int type;
 		private final byte[] data;
@@ -86,7 +86,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		 *
 		 * @return the data as byte array
 		 */
-		public byte[] getInfo()
+		public final byte[] getInfo()
 		{
 			return data;
 		}
@@ -98,7 +98,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		 *
 		 * @return type ID
 		 */
-		public int getType()
+		public final int getType()
 		{
 			return type;
 		}
