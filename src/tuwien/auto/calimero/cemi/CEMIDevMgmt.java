@@ -205,7 +205,7 @@ public class CEMIDevMgmt implements CEMI
 		"type conflict (write access with a wrong data type (datapoint length))",
 		"property index/range error (read/write access to nonexisting property index)", };
 
-	private int mc;
+	private final int mc;
 	private int iot;
 	private int oi;
 	private int pid;
@@ -240,12 +240,9 @@ public class CEMIDevMgmt implements CEMI
 	{
 		final ByteArrayInputStream is = new ByteArrayInputStream(data, offset, length);
 		checkLength(is, 1);
-		try {
-			checkSetMC(is.read());
-		}
-		catch (final KNXIllegalArgumentException e) {
-			throw new KNXFormatException(e.getMessage());
-		}
+		mc = is.read();
+		if (mc < MC_OFFSET || !msgCodes.get(mc - MC_OFFSET))
+			throw new KNXFormatException("unknown message code");
 		if (mc == MC_RESET_REQ || mc == MC_RESET_IND)
 			initReset(is);
 		else {
@@ -269,7 +266,7 @@ public class CEMIDevMgmt implements CEMI
 	{
 		if (msgCode != MC_RESET_REQ && msgCode != MC_RESET_IND)
 			throw new KNXIllegalArgumentException("not a reset message code");
-		checkSetMC(msgCode);
+		mc = msgCode;
 	}
 
 	/**
@@ -291,7 +288,9 @@ public class CEMIDevMgmt implements CEMI
 	public CEMIDevMgmt(final int msgCode, final int objType, final int objInstance,
 		final int propID, final int startIndex, final int elements)
 	{
-		this(msgCode);
+		if (msgCode < MC_OFFSET || !msgCodes.get(msgCode - MC_OFFSET))
+			throw new KNXIllegalArgumentException("unknown message code");
+		mc = msgCode;
 		header = 7;
 		checkSetHeaderInfo(objType, objInstance, propID, startIndex, elements);
 	}
@@ -556,13 +555,6 @@ public class CEMIDevMgmt implements CEMI
 	{
 		if (is.available() < len)
 			throw new KNXFormatException("invalid frame length of " + len + " bytes", len);
-	}
-
-	private void checkSetMC(final int msgCode)
-	{
-		if (msgCode < MC_OFFSET || !msgCodes.get(msgCode - MC_OFFSET))
-			throw new KNXIllegalArgumentException("unknown message code");
-		mc = msgCode;
 	}
 
 	private void initReset(final ByteArrayInputStream is) throws KNXFormatException
