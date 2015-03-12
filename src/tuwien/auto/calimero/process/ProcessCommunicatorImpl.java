@@ -398,6 +398,16 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		write(dst, priority, t);
 	}
 
+	/* (non-Javadoc)
+	 * @see tuwien.auto.calimero.process.ProcessCommunicator#write
+	 * (tuwien.auto.calimero.GroupAddress, tuwien.auto.calimero.dptxlator.DPTXlator)
+	 */
+	public void write(final GroupAddress dst, final DPTXlator value) throws KNXTimeoutException,
+		KNXFormatException, KNXLinkClosedException
+	{
+		write(dst, priority, value);
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * <p>

@@ -233,6 +233,23 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 		return fromDPT(0);
 	}
 
+	/**
+	 * Returns the first translation item as unsigned value.
+	 * <p>
+	 * A value of DPT {@link #DPT_TIMEPERIOD_10} or {@link #DPT_TIMEPERIOD_100} is returned in unit
+	 * millisecond, i.e., a KNX DPT_TIMEPERIOD_10 data value is multiplied with 10,
+	 * DPT_TIMEPERIOD_100 with 100.<br>
+	 * On any other DPT the value is returned according to its unit.
+	 *
+	 * @return numeric value
+	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
+	 * @see #getValueUnsigned()
+	 */
+	public final double getNumericValue()
+	{
+		return getValueUnsigned();
+	}
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getAllValues()
 	 */

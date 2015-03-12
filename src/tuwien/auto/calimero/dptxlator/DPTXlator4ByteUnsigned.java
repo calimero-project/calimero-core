@@ -124,6 +124,18 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 		return fromDPT(0);
 	}
 
+	/**
+	 * Returns the first translation item as unsigned 32 Bit value.
+	 *
+	 * @return numeric value
+	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
+	 * @see #getValueUnsigned()
+	 */
+	public final double getNumericValue()
+	{
+		return getValueUnsigned();
+	}
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getValue()
 	 */

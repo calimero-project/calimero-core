@@ -129,6 +129,17 @@ public class DPTXlatorSceneNumber extends DPTXlator
 		return (short) (data[0] & 0x3F);
 	}
 
+	/**
+	 * Returns the scene number of the first translation item.
+	 *
+	 * @return the scene number
+	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
+	 */
+	public final double getNumericValue()
+	{
+		return getSceneNumber();
+	}
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getAllValues()
 	 */

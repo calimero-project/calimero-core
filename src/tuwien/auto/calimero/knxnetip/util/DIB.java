@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ import tuwien.auto.calimero.exception.KNXFormatException;
 /**
  * Description Information Block (DIB).
  * <p>
- * A DIB is used to return device specific information.<br>
+ * A DIB is used to return device-specific information.<br>
  * This DIB is a common base for more detailed description formats contained in DIBs. For
  * usage of the different description information available, refer to the DIB subtypes.
  * <p>
@@ -66,6 +66,24 @@ public abstract class DIB
 	 * Description type code for service families supported by the device.
 	 */
 	public static final int SUPP_SVC_FAMILIES = 0x02;
+
+	/**
+	 * Description type code for the IP configuration device information.
+	 * <p>
+	 */
+	public static final int IP_CONFIG = 0x03;
+
+	/**
+	 * Description type code for the current IP configuration device information.
+	 * <p>
+	 */
+	public static final int IP_CURRENT_CONFIG = 0x04;
+
+	/**
+	 * Description type code for the KNX addresses device information.
+	 * <p>
+	 */
+	public static final int KNX_ADDRESSES = 0x05;
 
 	final int size;
 	final int type;

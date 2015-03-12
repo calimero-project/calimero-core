@@ -118,9 +118,18 @@ public class Discoverer
 	 */
 	public static final int SEARCH_PORT = KNXnetIPConnection.DEFAULT_PORT;
 
-	static final InetAddress SYSTEM_SETUP_MULTICAST;
-
 	private static final Logger logger = LogService.getLogger(LOG_SERVICE);
+	static final InetAddress SYSTEM_SETUP_MULTICAST;
+	static {
+		InetAddress a = null;
+		try {
+			a = InetAddress.getByName(SEARCH_MULTICAST);
+		}
+		catch (final UnknownHostException e) {
+			logger.error("on resolving system setup multicast " + SEARCH_MULTICAST, e);
+		}
+		SYSTEM_SETUP_MULTICAST = a;
+	}
 
 	private static boolean win7_OrLater;
 	static {
@@ -147,16 +156,6 @@ public class Discoverer
 	private final List<Result<SearchResponse>> responses = Collections
 			.synchronizedList(new ArrayList<>());
 
-	static {
-		InetAddress a = null;
-		try {
-			a = InetAddress.getByName(SEARCH_MULTICAST);
-		}
-		catch (final UnknownHostException e) {
-			logger.error("on resolving system setup multicast " + SEARCH_MULTICAST, e);
-		}
-		SYSTEM_SETUP_MULTICAST = a;
-	}
 
 	/**
 	 * Discoverer result, either containing a {@link SearchResponse} or {@link DescriptionResponse}.

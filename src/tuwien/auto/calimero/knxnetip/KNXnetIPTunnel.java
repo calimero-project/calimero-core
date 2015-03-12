@@ -178,7 +178,7 @@ public class KNXnetIPTunnel extends ClientConnection
 			return true;
 
 		final int seq = req.getSequenceNumber();
-		if (seq == getSeqRcv() || seq + 1 == getSeqRcv()) {
+		if (seq == getSeqRcv() || ((seq + 1) & 0xFF) == getSeqRcv()) {
 			final int status = h.getVersion() == KNXNETIP_VERSION_10 ? ErrorCodes.NO_ERROR
 					: ErrorCodes.VERSION_NOT_SUPPORTED;
 			final byte[] buf = PacketHelper.toPacket(new ServiceAck(serviceAck, channelId, seq,

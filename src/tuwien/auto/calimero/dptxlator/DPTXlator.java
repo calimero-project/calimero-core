@@ -202,6 +202,18 @@ public abstract class DPTXlator
 	}
 
 	/**
+	 * Returns the numeric representation of the first item stored by this translator, if the DPT
+	 * value can be represented numerically.
+	 *
+	 * @return the numeric representation of the value
+	 * @throws KNXFormatException if the value cannot be represented numerically
+	 */
+	public double getNumericValue() throws KNXFormatException
+	{
+		throw new KNXFormatException("No simple numeric representation possible");
+	}
+
+	/**
 	 * See {@link #setData(byte[], int)}, with offset 0.
 	 *
 	 * @param data byte array containing KNX DPT item(s)

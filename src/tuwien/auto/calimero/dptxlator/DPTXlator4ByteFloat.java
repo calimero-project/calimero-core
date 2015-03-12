@@ -682,6 +682,18 @@ public class DPTXlator4ByteFloat extends DPTXlator
 		return fromDPT(0);
 	}
 
+	/**
+	 * Returns the first translation item formatted as double.
+	 *
+	 * @return numeric value
+	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
+	 * @see #getValueFloat()
+	 */
+	public final double getNumericValue()
+	{
+		return getValueFloat();
+	}
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getAllValues()
 	 */

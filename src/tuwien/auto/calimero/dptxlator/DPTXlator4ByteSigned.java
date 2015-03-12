@@ -185,6 +185,18 @@ public class DPTXlator4ByteSigned extends DPTXlator
 		return fromDPT(0);
 	}
 
+	/**
+	 * Returns the first translation item as signed 32 Bit value.
+	 *
+	 * @return numeric value
+	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
+	 * @see #getValueSigned()
+	 */
+	public final double getNumericValue()
+	{
+		return getValueSigned();
+	}
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getValue()
 	 */

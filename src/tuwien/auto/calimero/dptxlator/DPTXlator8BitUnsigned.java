@@ -179,6 +179,18 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	}
 
 	/**
+	 * Returns the first translation item, the value scaled conforming to the range of the set DPT.
+	 *
+	 * @return scaled numeric value
+	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
+	 * @see #getValueUnsigned()
+	 */
+	public final double getNumericValue()
+	{
+		return getValueUnsigned();
+	}
+
+	/**
 	 * Sets one new translation item from an unsigned unscaled value, replacing any old
 	 * items.
 	 * <p>
