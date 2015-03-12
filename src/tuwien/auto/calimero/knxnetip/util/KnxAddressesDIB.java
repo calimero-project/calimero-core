@@ -43,7 +43,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import tuwien.auto.calimero.IndividualAddress;
-import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 
@@ -59,7 +58,7 @@ public final class KnxAddressesDIB extends DIB
 {
 	private static final int DIB_MIN_SIZE = 4;
 
-	private final List addresses = new ArrayList();
+	private final List<IndividualAddress> addresses = new ArrayList<>();
 
 	/**
 	 * Creates a KNX addresses DIB out of a byte array.
@@ -87,29 +86,23 @@ public final class KnxAddressesDIB extends DIB
 
 	/**
 	 * Creates a KNX addresses DIB using the supplied KNX individual addresses.
-	 * <p>
 	 *
 	 * @param knxAddresses the KNX {@link IndividualAddress}es to add to the description
 	 *        information, containing at least one KNX individual address
 	 */
-	public KnxAddressesDIB(final Collection knxAddresses)
+	public KnxAddressesDIB(final Collection<? extends IndividualAddress> knxAddresses)
 	{
 		super(2 + 2 * knxAddresses.size(), KNX_ADDRESSES);
 		if (knxAddresses.isEmpty())
 			throw new KNXIllegalArgumentException("at least one KNX address is required");
-		for (final Iterator i = knxAddresses.iterator(); i.hasNext();) {
-			final KNXAddress a = (KNXAddress) i.next();
-			if (!(a instanceof IndividualAddress))
-				throw new KNXIllegalArgumentException("not a KNX individual address: " + a);
-			addresses.add(a);
-		}
+		addresses.addAll(knxAddresses);
 	}
 
 	/**
 	 * @return an unmodifiable list with the {@link IndividualAddress}es contained in this DIB, list
 	 *         size &ge; 1
 	 */
-	public List getAddresses()
+	public List<IndividualAddress> getAddresses()
 	{
 		return Collections.unmodifiableList(addresses);
 	}
@@ -129,8 +122,8 @@ public final class KnxAddressesDIB extends DIB
 	{
 		final byte[] buf = super.toByteArray();
 		int i = 2;
-		for (final Iterator it = addresses.iterator(); it.hasNext();) {
-			final IndividualAddress ia = (IndividualAddress) it.next();
+		for (final Iterator<IndividualAddress> it = addresses.iterator(); it.hasNext();) {
+			final IndividualAddress ia = it.next();
 			final byte[] raw = ia.toByteArray();
 			buf[i++] = raw[0];
 			buf[i++] = raw[1];

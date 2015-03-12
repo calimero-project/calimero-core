@@ -189,9 +189,9 @@ public class DescriptionResponse extends ServiceType
 	 * @return the complete description information contained in this response, as list of
 	 *         description information blocks (DIBs)
 	 */
-	public final List getDescription()
+	public final List<DIB> getDescription()
 	{
-		final List l = new ArrayList();
+		final List<DIB> l = new ArrayList<>();
 		l.add(device);
 		l.add(suppfam);
 		if (config != null)
@@ -267,8 +267,8 @@ public class DescriptionResponse extends ServiceType
 	int getStructLength()
 	{
 		int len = 0;
-		for (final Iterator i = getDescription().iterator(); i.hasNext();)
-			len += ((DIB) i.next()).getStructLength();
+		for (final Iterator<DIB> i = getDescription().iterator(); i.hasNext();)
+			len += i.next().getStructLength();
 		return len;
 	}
 
@@ -279,8 +279,8 @@ public class DescriptionResponse extends ServiceType
 	@Override
 	byte[] toByteArray(final ByteArrayOutputStream os)
 	{
-		for (final Iterator i = getDescription().iterator(); i.hasNext();) {
-			final byte[] bytes = ((DIB) i.next()).toByteArray();
+		for (final Iterator<DIB> i = getDescription().iterator(); i.hasNext();) {
+			final byte[] bytes = i.next().toByteArray();
 			os.write(bytes, 0, bytes.length);
 		}
 		return os.toByteArray();
