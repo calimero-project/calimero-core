@@ -178,7 +178,6 @@ public final class DataUnitBuilder
 	 * @return APDU as byte array
 	 * @deprecated use {@link #createLengthOptimizedAPDU(int, byte[])}
 	 */
-	@Deprecated
 	public static byte[] createCompactAPDU(final int service, final byte[] asdu)
 	{
 		final byte[] apdu =
