@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -105,7 +105,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDateTime#setValues
 	 * (java.lang.String[])}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValues() throws KNXFormatException
@@ -124,7 +124,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDateTime#getAllValues()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testGetAllValues() throws KNXFormatException
@@ -143,7 +143,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDateTime#setValue(java.lang.String)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValue() throws KNXFormatException
@@ -167,7 +167,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertTrue(t.getDateTimeFlag(DPTXlatorDateTime.DAYLIGHT));
 		assertTrue(t.getDateTimeFlag(DPTXlatorDateTime.CLOCK_SYNC));
 		assertTrue(t.getDateTimeFlag(DPTXlatorDateTime.WORKDAY));
-		
+
 		t.setData(new byte[] { 107, 8, 31, (byte) ((5 << 5) | 22), 45, 33, 0x41, (byte) 0x80 });
 		dataHelperThrow(new byte[] { 107, 8, 0, (byte) ((5 << 5) | 22), 45, 33, 0x41, (byte) 0x80 });
 		dataHelperThrow(new byte[] { 107, 0, 30, (byte) ((5 << 5) | 22), 45, 33, 0x41, (byte) 0x80 });
@@ -189,11 +189,11 @@ public class DPTXlatorDateTimeTest extends TestCase
 			System.out.println(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDateTime#getData(byte[], int)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testGetDataByteArrayInt() throws KNXFormatException
@@ -239,8 +239,9 @@ public class DPTXlatorDateTimeTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorDateTime#isValid()}.
-	 * 
+	 * Test method for {@link DPTXlatorDateTime#setValue(String)},
+	 * {@link DPTXlatorDateTime#setData(byte[])}.
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValueAndData() throws KNXFormatException
@@ -253,7 +254,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 			fail("should throw");
 		}
 		catch (final KNXFormatException e) {}
-		
+
 		try {
 			t.setValue("24:00:10");
 			fail("should throw");
@@ -278,7 +279,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDateTime#useValueFormat(boolean)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testUseValueFormat() throws KNXFormatException
@@ -300,7 +301,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDateTime#getValueMilliseconds()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testGetValueMilliseconds() throws KNXFormatException
@@ -657,7 +658,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 
 	/**
 	 * Test method for inDaylightTime.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testInDaylightTime() throws KNXFormatException
@@ -672,7 +673,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 
 	/**
 	 * Test method for hasExternalSyncSignal.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testHasExternalSyncSignal() throws KNXFormatException
@@ -703,7 +704,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorDateTime#validate()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testValidate() throws KNXFormatException
@@ -725,7 +726,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 
 		t.setValue("23:00:00");
 		assertTrue(t.validate());
-		
+
 		t.setValues(new String[] { "2002/12/31 23:59:59",
 			"Sat, 2007/5/12 24:00:00 DST ", "2007/2/28 in sync" });
 		assertTrue(t.validate());
