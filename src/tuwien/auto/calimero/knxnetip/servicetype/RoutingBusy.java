@@ -183,7 +183,6 @@ public class RoutingBusy extends ServiceType
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceType#getStructLength()
 	 */
-	@Override
 	int getStructLength()
 	{
 		return typeSize;
@@ -193,7 +192,6 @@ public class RoutingBusy extends ServiceType
 	 * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceType#toByteArray
 	 * (java.io.ByteArrayOutputStream)
 	 */
-	@Override
 	byte[] toByteArray(final ByteArrayOutputStream os)
 	{
 		os.write(typeSize);
