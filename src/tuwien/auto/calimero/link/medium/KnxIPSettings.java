@@ -50,7 +50,6 @@ public final class KnxIPSettings extends KNXMediumSettings
 		super(device);
 	}
 
-	@Override
 	public int getMedium()
 	{
 		return KNXMediumSettings.MEDIUM_KNXIP;
