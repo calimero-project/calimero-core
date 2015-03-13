@@ -45,6 +45,13 @@ import tuwien.auto.calimero.IndividualAddress;
  */
 public final class KnxIPSettings extends KNXMediumSettings
 {
+	/**
+	 * Creates a new settings container with KNX IP medium specific information.
+	 * <p>
+	 *
+	 * @param device individual device address to use as source address in KNX messages,
+	 *        specifying <code>null</code> uses the individual address 0.0.0
+	 */
 	public KnxIPSettings(final IndividualAddress device)
 	{
 		super(device);
