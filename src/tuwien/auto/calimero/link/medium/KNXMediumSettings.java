@@ -97,7 +97,7 @@ public abstract class KNXMediumSettings
 	 * @return the initialized medium-specific settings
 	 * @throws KNXIllegalArgumentException on unknown medium code
 	 */
-	/*public*/static KNXMediumSettings create(final int medium, final IndividualAddress device)
+	public static KNXMediumSettings create(final int medium, final IndividualAddress device)
 	{
 		switch (medium) {
 		case MEDIUM_TP0:
