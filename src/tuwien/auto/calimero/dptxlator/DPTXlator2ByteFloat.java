@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -117,6 +117,13 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	 * <p>
 	 */
 	public static final DPT DPT_AIRQUALITY = new DPT("9.008", "Air quality", "0", "+670760", "ppm");
+
+	/**
+	 * DPT ID 9.009, Air flow; value range <b>+/-670760</b> m&sup3/h; resolution 0.01 m&sup3/h.
+	 * <p>
+	 */
+	public static final DPT DPT_AIR_FLOW = new DPT("9.009", "Air flow", "-670760", "+670760",
+			"m\u00b3/h");
 
 	/**
 	 * DPT ID 9.010, Time difference in seconds; value range <b>+/-670760</b> s.
