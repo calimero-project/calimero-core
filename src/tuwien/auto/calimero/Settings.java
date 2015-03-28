@@ -44,13 +44,13 @@ package tuwien.auto.calimero;
  */
 public final class Settings
 {
-	private static final String version = "2.2-beta";
+	private static final String version = "2.2";
 	private static final String library = "Calimero 2";
 	private static final String desc = "A library for KNX network access";
 
 	private static final String tuwien = "Vienna University of Technology";
 	private static final String group = "Automation Systems Group";
-	private static final String copyright = "(c) 2007-2014";
+	private static final String copyright = "(c) 2007-2015";
 
 	// aligns the bundle package name following the friendly name,
 	// works for friendly name with max length of 20 chars
@@ -94,7 +94,7 @@ public final class Settings
 			return library + " version " + version;
 		final StringBuffer buf = new StringBuffer();
 		buf.append(library).append(" - ").append(desc).append(sep);
-		buf.append("version ").append(version).append(sep);
+		buf.append("Version ").append(version).append(sep);
 		buf.append(group).append(", ");
 		buf.append(tuwien).append(sep);
 		buf.append(copyright);

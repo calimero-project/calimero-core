@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.calimero</groupId>
 	<artifactId>calimero-core</artifactId>
-	<version>2.2-beta</version>
+	<version>2.2</version>
 	<name>Calimero-core Library</name>
 	<description>Calimero, a free KNX network library</description>
 	<scm>
@@ -41,17 +41,37 @@
 				</includes>
 			</resource>
 		</resources>
+		<testResources>
+			<testResource>
+				<directory>${basedir}</directory>
+				<targetPath>META-INF</targetPath>
+				<includes>
+					<include>LICENSE.txt</include>
+				</includes>
+			</testResource>
+		</testResources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
 					<archive>
+						<manifest>
+							<mainClass>tuwien.auto.calimero.Settings</mainClass>
+						</manifest>
 						<manifestEntries>
 							<Built-By>calimero-project</Built-By>
+							<Url>${project.url}</Url>
 						</manifestEntries>
 					</archive>
 				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -60,6 +80,7 @@
 				<configuration>
 					<overview>src/overview.html</overview>
 					<additionalparam>-Xdoclint:none</additionalparam>
+					<author>false</author>
 					<archive>
 						<manifestEntries>
 							<Built-By>calimero-project</Built-By>
@@ -71,6 +92,7 @@
 						<id>attach-javadocs</id>
 						<goals>
 							<goal>jar</goal>
+							<goal>test-jar</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -89,11 +111,34 @@
 					<execution>
 						<id>attach-sources</id>
 						<goals>
-							<goal>jar</goal>
+							<goal>jar-no-fork</goal>
+							<goal>test-jar-no-fork</goal>
 						</goals>
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<useFile>false</useFile>
+				</configuration>
+			</plugin>			
 		</plugins>
 	</build>
 	<dependencies>
