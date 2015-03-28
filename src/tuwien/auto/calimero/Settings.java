@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2013 B. Malinowsky
+    Copyright (c) 2006, 2014 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ package tuwien.auto.calimero;
  */
 public final class Settings
 {
-	private static final String version = "2.2-dev";
+	private static final String version = "2.2-beta";
 	private static final String library = "Calimero 2";
 	private static final String desc = "A library for KNX network access";
 
