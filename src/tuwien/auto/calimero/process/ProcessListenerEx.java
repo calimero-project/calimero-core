@@ -156,18 +156,11 @@ public abstract class ProcessListenerEx implements ProcessListener
 	}
 
 	/**
-	 * Returns the ASDU of the received process event as 2-byte KNX float datapoint value.
-	 * <p>
-	 * This method has to be invoked manually by the user (either in
-	 * {@link #groupReadResponse(ProcessEvent)} or
-	 * {@link ProcessListener#groupWrite(ProcessEvent)}), depending on the received
-	 * datapoint type.
-	 *
+	 * @deprecated Use {@link #asFloat(ProcessEvent, boolean)}.
 	 * @param e the process event with the ASDU to translate
 	 * @return the received value of type float
 	 * @throws KNXFormatException on not supported or not available float DPT
 	 */
-	// TODO prob. should get rid of in favor of the more versatile version
 	public float asFloat(final ProcessEvent e) throws KNXFormatException
 	{
 		final DPTXlator2ByteFloat t = new DPTXlator2ByteFloat(

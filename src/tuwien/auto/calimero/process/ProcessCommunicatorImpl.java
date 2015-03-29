@@ -312,9 +312,8 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		write(dst, priority, t);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#readFloat
-	 * (tuwien.auto.calimero.GroupAddress)
+	/**
+	 * @deprecated Use {@link #readFloat(GroupAddress, boolean)}.
 	 */
 	public float readFloat(final GroupAddress dst) throws KNXTimeoutException,
 		KNXRemoteException, KNXLinkClosedException, KNXFormatException, InterruptedException
@@ -324,9 +323,8 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		return readFloat(dst, false);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#write
-	 * (tuwien.auto.calimero.GroupAddress, float)
+	/**
+	 * @deprecated Use {@link #write(GroupAddress, float, boolean)}.
 	 */
 	public void write(final GroupAddress dst, final float value) throws KNXTimeoutException,
 		KNXFormatException, KNXLinkClosedException

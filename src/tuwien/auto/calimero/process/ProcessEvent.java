@@ -63,16 +63,15 @@ public class ProcessEvent extends EventObject
 	private final boolean optimized;
 
 	/**
-	 * Use {@link #ProcessEvent(ProcessCommunicator, IndividualAddress, GroupAddress,
-	 * int, byte[], boolean)}.
-	 *
+	 * @deprecated Use
+	 * {@link #ProcessEvent(ProcessCommunicator, IndividualAddress, GroupAddress, int, byte[], boolean)}.
+	 *             .
 	 * @param source the process communicator object on which the event initially occurred
 	 * @param src KNX source individual address of the corresponding KNX message
 	 * @param dst KNX destination address of the corresponding KNX message
 	 * @param asdu byte array with the application layer service data unit (ASDU), no copy is
 	 *        created
 	 */
-	// TODO remove, not correct anymore
 	public ProcessEvent(final ProcessCommunicator source, final IndividualAddress src,
 		final GroupAddress dst, final byte[] asdu)
 	{
