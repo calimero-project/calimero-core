@@ -250,6 +250,7 @@ public class DPTXlator64BitSignedTest extends TestCase
 		try {
 			// usable range too short
 			t.getData(new byte[8], 1);
+			fail("usable range too short");
 		}
 		catch (final KNXIllegalArgumentException expected) {}
 
