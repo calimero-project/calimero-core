@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2011 B. Malinowsky
+    Copyright (c) 2009, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -186,7 +186,7 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	 * Returns the first translation item as signed 32 Bit value.
 	 * <p>
 	 *
-	 * @return signed 32 Bit value using type long
+	 * @return signed 32 Bit value
 	 * @see #getType()
 	 */
 	public final int getValueSigned()
