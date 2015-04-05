@@ -206,6 +206,12 @@ public final class TranslatorTypes
 	public static final int TYPE_ENUM8 = 20;
 
 	/**
+	 * DPT main number for <b>UTF-8</b>, number = {@value #TYPE_UTF8}.
+	 * <p>
+	 */
+	public static final int TYPE_UTF8 = 28;
+
+	/**
 	 * DPT main number for <b>RGB color</b>, number = {@value #TYPE_RGB}.
 	 */
 	public static final int TYPE_RGB = 232;
@@ -360,7 +366,7 @@ public final class TranslatorTypes
 	private static final Map map;
 
 	static {
-		map = Collections.synchronizedMap(new HashMap(20));
+		map = Collections.synchronizedMap(new HashMap());
 		addTranslator(TYPE_BOOLEAN, "DPTXlatorBoolean", "Boolean (main type 1)");
 		addTranslator(TYPE_1BIT_CONTROLLED, "DPTXlator1BitControlled",
 				"Boolean controlled (main type 2)");
@@ -383,6 +389,7 @@ public final class TranslatorTypes
 		addTranslator(TYPE_SCENE_NUMBER, "DPTXlatorSceneNumber", "Scene number (main type 17)");
 		addTranslator(TYPE_SCENE_CONTROL, "DPTXlatorSceneControl", "Scene control (main type 18)");
 		addTranslator(TYPE_DATE_TIME, "DPTXlatorDateTime", "Date with time (main type 19)");
+		addTranslator(TYPE_UTF8, "DPTXlatorUtf8", "UTF-8 string (main type 28)");
 		addTranslator(TYPE_RGB, "DPTXlatorRGB", "RGB color value (main type 232)");
 	}
 
