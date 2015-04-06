@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -154,18 +154,11 @@ public interface ProcessListener extends EventListener
 	static double asFloat(final ProcessEvent e, final boolean from4ByteFloat)
 		throws KNXFormatException
 	{
-		if (from4ByteFloat) {
-			final DPTXlator4ByteFloat t = new DPTXlator4ByteFloat(
-					DPTXlator4ByteFloat.DPT_TEMPERATURE_DIFFERENCE);
-			t.setData(e.getASDU());
-			return t.getValueFloat();
-		}
-		else {
-			final DPTXlator2ByteFloat t = new DPTXlator2ByteFloat(
-					DPTXlator2ByteFloat.DPT_RAIN_AMOUNT);
-			t.setData(e.getASDU());
-			return t.getValueDouble();
-		}
+		final DPTXlator t = from4ByteFloat ? new DPTXlator4ByteFloat(
+				DPTXlator4ByteFloat.DPT_TEMPERATURE_DIFFERENCE) : new DPTXlator2ByteFloat(
+				DPTXlator2ByteFloat.DPT_RAIN_AMOUNT);
+		t.setData(e.getASDU());
+		return t.getNumericValue();
 	}
 
 	/**
