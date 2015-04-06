@@ -364,18 +364,13 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException, KNXFormatException,
 		InterruptedException
 	{
-		if (is4ByteFloat) {
-			final byte[] apdu = readFromGroup(dst, priority, 4, 4);
-			final DPTXlator4ByteFloat t = new DPTXlator4ByteFloat(
-					DPTXlator4ByteFloat.DPT_TEMPERATURE_DIFFERENCE);
-			extractGroupASDU(apdu, t);
-			return t.getValueFloat();
-		}
-		final byte[] apdu = readFromGroup(dst, priority, 2, 2);
-		final DPTXlator2ByteFloat t = new DPTXlator2ByteFloat(
+		final DPTXlator t = is4ByteFloat ? new DPTXlator4ByteFloat(
+				DPTXlator4ByteFloat.DPT_TEMPERATURE_DIFFERENCE) : new DPTXlator2ByteFloat(
 				DPTXlator2ByteFloat.DPT_RAIN_AMOUNT);
+		final int size = is4ByteFloat ? 4 : 2;
+		final byte[] apdu = readFromGroup(dst, priority, size, size);
 		extractGroupASDU(apdu, t);
-		return (float) t.getValueDouble();
+		return (float) t.getNumericValue();
 	}
 
 	/* (non-Javadoc)
