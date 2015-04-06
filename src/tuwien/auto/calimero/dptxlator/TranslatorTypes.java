@@ -181,9 +181,9 @@ public final class TranslatorTypes
 	public static final int TYPE_DATE_TIME = 19;
 
 	/**
-	 * DPT main number for <b>8 Bit enumeration</b>, number = {@value #TYPE_ENUM8}.
+	 * DPT main number for <b>8 Bit enumeration</b>, number = {@value #TYPE_8BIT_ENUM}.
 	 */
-	public static final int TYPE_ENUM8 = 20;
+	public static final int TYPE_8BIT_ENUM = 20;
 
 	/**
 	 * DPT main number for <b>RGB color</b>, number = {@value #TYPE_RGB}.
@@ -363,6 +363,7 @@ public final class TranslatorTypes
 		addTranslator(TYPE_SCENE_NUMBER, "DPTXlatorSceneNumber", "Scene number (main type 17)");
 		addTranslator(TYPE_SCENE_CONTROL, "DPTXlatorSceneControl", "Scene control (main type 18)");
 		addTranslator(TYPE_DATE_TIME, "DPTXlatorDateTime", "Date with time (main type 19)");
+		addTranslator(TYPE_8BIT_ENUM, "DPTXlator8BitEnum", "8 Bit enumeration (main type 20)");
 		addTranslator(TYPE_RGB, "DPTXlatorRGB", "RGB color value (main type 232)");
 	}
 
