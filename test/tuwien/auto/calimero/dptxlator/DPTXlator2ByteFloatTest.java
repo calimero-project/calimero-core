@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -116,17 +116,17 @@ public class DPTXlator2ByteFloatTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#setValues
 	 * (java.lang.String[])}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValues() throws KNXFormatException
 	{
 		t.setValues(new String[] {});
 		assertEquals(1, t.getItems());
-		assertEquals(0.0, t.getValueDouble(), 0);
+		assertEquals(0.0, t.getNumericValue(), 0);
 		t.setValues(new String[] { min, max, zero, value1, value2, });
 		assertEquals(5, t.getItems());
-		assertEquals(-671088.64, t.getValueDouble(), 1.0);
+		assertEquals(-671088.64, t.getNumericValue(), 1.0);
 		t.setValue(100);
 		t.setValues(new String[] { t.getValue(), t.getValue() });
 	}
@@ -134,13 +134,13 @@ public class DPTXlator2ByteFloatTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#getAllValues()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testGetAllValues() throws KNXFormatException
 	{
 		assertEquals(t.getItems(), t.getItems());
-		assertEquals(0.0, t.getValueDouble(), 0);
+		assertEquals(0.0, t.getNumericValue(), 0);
 		t.setValues(strings);
 		final String[] returned = t.getAllValues();
 		assertEquals(strings.length, returned.length);
@@ -153,14 +153,14 @@ public class DPTXlator2ByteFloatTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#setValue
 	 * (java.lang.String)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValueString() throws KNXFormatException
 	{
 		t.setValue(value1);
 		assertEquals(1, t.getItems());
-		assertEquals(floats[3], t.getValueDouble(), 1);
+		assertEquals(floats[3], t.getNumericValue(), 1);
 		assertTrue(t.getValue().startsWith(value1Enc));
 
 		t.setValue(t.getValue());
@@ -199,7 +199,7 @@ public class DPTXlator2ByteFloatTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#getData(byte[], int)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testGetDataByteArrayInt() throws KNXFormatException
@@ -239,7 +239,7 @@ public class DPTXlator2ByteFloatTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#DPTXlator2ByteFloat
 	 * (tuwien.auto.calimero.dptxlator.DPT)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testDPTXlator2ByteFloatDPT() throws KNXFormatException
@@ -276,49 +276,49 @@ public class DPTXlator2ByteFloatTest extends TestCase
 
 	/**
 	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#getValueDouble()}.
-	 * 
+	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#getNumericValue()}.
+	 *
 	 * @throws KNXFormatException
 	 */
-	public final void testGetValueDouble() throws KNXFormatException
+	public final void testGetNumericValue() throws KNXFormatException
 	{
-		assertEquals(0.0, t.getValueDouble(), 0);
+		assertEquals(0.0, t.getNumericValue(), 0);
 
 		t.setData(dataMin);
-		assertEquals(floats[0], t.getValueDouble(), 1.0);
+		assertEquals(floats[0], t.getNumericValue(), 1.0);
 		t.setData(dataMax);
-		assertEquals(floats[1], t.getValueDouble(), 1.0);
+		assertEquals(floats[1], t.getNumericValue(), 1.0);
 		t.setData(dataZero);
-		assertEquals(floats[2], t.getValueDouble(), 0);
+		assertEquals(floats[2], t.getNumericValue(), 0);
 		t.setData(dataValue1);
-		assertEquals(floats[3], t.getValueDouble(), 1.0);
+		assertEquals(floats[3], t.getNumericValue(), 1.0);
 		t.setData(dataValue2, 2);
-		assertEquals(floats[4], t.getValueDouble(), 1.0);
+		assertEquals(floats[4], t.getNumericValue(), 1.0);
 
 		for (int i = 0; i < strings.length; i++) {
 			t.setValue(strings[i]);
-			assertEquals(floats[i], t.getValueDouble(), 1.0);
+			assertEquals(floats[i], t.getNumericValue(), 1.0);
 		}
 	}
 
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#setValue(double)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValueDouble() throws KNXFormatException
 	{
 		for (int i = 0; i < floats.length; i++) {
 			t.setValue(floats[i]);
-			assertEquals(floats[i], t.getValueDouble(), 1.0);
+			assertEquals(floats[i], t.getNumericValue(), 1.0);
 			assertTrue(t.getValue().startsWith(strings[i]));
 		}
 	}
-	
+
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#toString()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testToString() throws KNXFormatException
@@ -333,7 +333,7 @@ public class DPTXlator2ByteFloatTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#getValue()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testGetValue() throws KNXFormatException
@@ -342,7 +342,7 @@ public class DPTXlator2ByteFloatTest extends TestCase
 		assertTrue(t.getValue().indexOf(t.getType().getUnit()) >= 0);
 
 		t.setValue(265);
-		final double d = t.getValueDouble();
+		final double d = t.getNumericValue();
 		assertEquals(265, d, 1.0);
 		final String s = String.valueOf(d);
 		assertTrue(t.getValue().indexOf(s) >= 0);

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -248,37 +248,14 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	}
 
 	/**
-	 * Returns the first translation item formatted as float.
-	 * <p>
-	 * 
-	 * @return value as float
-	 */
-	public final float getValueFloat()
-	{
-		return (float) fromDPT(0);
-	}
-
-	/**
-	 * Returns the first translation item formatted as double.
-	 * <p>
-	 *
-	 * @return value as double
-	 */
-	public final double getValueDouble()
-	{
-		return fromDPT(0);
-	}
-
-	/**
 	 * Returns the first translation item formatted as double.
 	 *
-	 * @return numeric value
+	 * @return numeric value as double
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
-	 * @see #getValueDouble()
 	 */
 	public final double getNumericValue()
 	{
-		return getValueDouble();
+		return fromDPT(0);
 	}
 
 	/* (non-Javadoc)
