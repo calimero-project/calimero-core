@@ -51,8 +51,7 @@ import tuwien.auto.calimero.serial.FT12Connection;
 public final class Util
 {
 	/**
-	 * Sets whether NAT functionality should be tested (false for devices without NAT
-	 * support).
+	 * Sets whether NAT functionality should be tested (false for devices without NAT support).
 	 */
 	public static final boolean TEST_NAT = true;
 
@@ -130,12 +129,12 @@ public final class Util
 		if (device == null) {
 			Discoverer d;
 			try {
-				d = new Discoverer(getLocalHost().getAddress(), getLocalHost().getPort(),
-					false, false);
+				d = new Discoverer(getLocalHost().getAddress(), getLocalHost().getPort(), false,
+						false);
 				d.startSearch(2, true);
-				if (d.getSearchResponsesSimple().length == 0)
+				if (d.getSearchResponses().size() == 0)
 					return null;
-				device = d.getSearchResponsesSimple()[0].getDevice().getAddress();
+				device = d.getSearchResponses().get(0).getResponse().getDevice().getAddress();
 			}
 			catch (final KNXException e) {
 				e.printStackTrace();
@@ -156,8 +155,8 @@ public final class Util
 	}
 
 	/**
-	 * @return the individual address of the remote KNX device used for tests, device supports
-	 *         Layer 4 connection-oriented mode
+	 * @return the individual address of the remote KNX device used for tests, device supports Layer
+	 *         4 connection-oriented mode
 	 */
 	public static IndividualAddress getKnxDeviceCO()
 	{
@@ -186,7 +185,7 @@ public final class Util
 			//if (local.isLoopbackAddress())
 			//	addr = new InetSocketAddress(InetAddress.getByName("192.168.1.102"), 0);
 			//else
-				addr = new InetSocketAddress(local, 0);
+			addr = new InetSocketAddress(local, 0);
 			if (printLocalHost) {
 				printLocalHost = false;
 				System.out.println();
@@ -211,24 +210,23 @@ public final class Util
 	public static InetSocketAddress getServer() throws KNXException
 	{
 		if (server == null) {
-			Discoverer d;
-			d = new Discoverer(getLocalHost().getAddress(), getLocalHost().getPort(),
-				false, false);
+			final Discoverer d = new Discoverer(getLocalHost().getAddress(), getLocalHost()
+					.getPort(), false, false);
 			try {
 				d.startSearch(2, true);
 			}
 			catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
-			for (int i = 0; i < d.getSearchResponsesSimple().length; i++) {
-				final SearchResponse res = d.getSearchResponsesSimple()[i];
-				System.out.println(""+res.getControlEndpoint());
+			final SearchResponse response = d.getSearchResponses().get(0).getResponse();
+			for (int i = 0; i < d.getSearchResponses().size(); i++) {
+				final SearchResponse res = response;
+				System.out.println("" + res.getControlEndpoint());
 			}
-			final InetAddress addr = d.getSearchResponsesSimple()[0].getControlEndpoint()
-				.getAddress();
+			final InetAddress addr = response.getControlEndpoint().getAddress();
 
-			server = new InetSocketAddress(addr, d.getSearchResponsesSimple()[0].getControlEndpoint().getPort());
-			device = d.getSearchResponsesSimple()[0].getDevice().getAddress();
+			server = new InetSocketAddress(addr, response.getControlEndpoint().getPort());
+			device = response.getDevice().getAddress();
 		}
 		return server;
 	}

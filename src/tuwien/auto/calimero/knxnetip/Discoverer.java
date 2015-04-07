@@ -488,24 +488,6 @@ public class Discoverer
 	 * As long as searches are running, new responses might be added to the list of
 	 * responses.
 	 *
-	 * @return array of {@link SearchResponse}s
-	 * @see #stopSearch()
-	 * @deprecated
-	 */
-	@Deprecated
-	public final SearchResponse[] getSearchResponsesSimple()
-	{
-		final List<SearchResponse> all = new ArrayList<>();
-		responses.forEach(r -> all.add(r.getResponse()));
-		return all.toArray(new SearchResponse[all.size()]);
-	}
-
-	/**
-	 * Returns all collected search responses received by searches so far.
-	 * <p>
-	 * As long as searches are running, new responses might be added to the list of
-	 * responses.
-	 *
 	 * @return list of results with {@link SearchResponse}s
 	 * @see #stopSearch()
 	 */
