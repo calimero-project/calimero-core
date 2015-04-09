@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -233,7 +233,7 @@ public abstract class DPTXlator
 	 * <code>items = (data.length - offset) / (length of KNX data type)</code>
 	 * <p>
 	 * In general, the KNX data type width is implicitly known in the context where a
-	 * translator is invoked (e.g., by appropriate DP configuration), therefore,
+	 * translator is invoked (e.g., by appropriate DP configuration). Therefore,
 	 * <code>data.length</code> will satisfy the minimum acceptable length. If this is
 	 * not the case, {@link KNXIllegalArgumentException} has to be caught and handled in
 	 * the caller's context.
@@ -491,8 +491,9 @@ public abstract class DPTXlator
 	final void logThrow(final LogLevel level, final String msg, final String excMsg,
 		final String item) throws KNXFormatException
 	{
-		final KNXFormatException e = new KNXFormatException(excMsg != null ? excMsg : msg, item);
-		LogService.log(logger, level, dpt.getID() + " - " + msg, excMsg != null ? e : null);
+		final String s = dpt.getID() + ": " + msg;
+		final KNXFormatException e = new KNXFormatException(excMsg != null ? excMsg : s, item);
+		LogService.log(logger, level, s, excMsg != null ? e : null);
 		throw e;
 	}
 }
