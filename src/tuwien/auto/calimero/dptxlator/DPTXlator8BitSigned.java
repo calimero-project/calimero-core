@@ -47,7 +47,7 @@ import tuwien.auto.calimero.log.LogLevel;
  * <p>
  * The KNX data type width is 1 byte.<br>
  * The default return value after creation is 0.<br>
- * 
+ *
  * @author A. Christian, info@root1.de
  *
  */
@@ -68,7 +68,7 @@ public class DPTXlator8BitSigned extends DPTXlator {
             "counter pulses");
 
 //    /**
-//     * DPT ID 6.020, Status with Mode; 
+//     * DPT ID 6.020, Status with Mode;
 //     * <p>
 //     */
 //    public static final DPT DPT_STATUS_MODE3 = new DPT("6.020", "signed count", "-128", "127",
@@ -109,13 +109,11 @@ public class DPTXlator8BitSigned extends DPTXlator {
     /* (non-Javadoc)
      * @see tuwien.auto.calimero.dptxlator.DPTXlator#getValue()
      */
-    @Override
     public String getValue() {
         return makeString(0);
     }
 
     // overwritten to avoid conversion from signed to unsigned
-    @Override
     public void setData(final byte[] data, final int offset) {
         if (offset < 0 || offset > data.length) {
             throw new KNXIllegalArgumentException("illegal offset " + offset);
@@ -144,7 +142,6 @@ public class DPTXlator8BitSigned extends DPTXlator {
         data = new short[]{(short) value};
     }
 
-    @Override
     public double getNumericValue() throws KNXFormatException {
         return data[0];
     }
@@ -152,7 +149,6 @@ public class DPTXlator8BitSigned extends DPTXlator {
     /* (non-Javadoc)
      * @see tuwien.auto.calimero.dptxlator.DPTXlator#getAllValues()
      */
-    @Override
     public String[] getAllValues() {
         final String[] s = new String[data.length];
         for (int i = 0; i < data.length; ++i) {
@@ -164,7 +160,6 @@ public class DPTXlator8BitSigned extends DPTXlator {
     /* (non-Javadoc)
      * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
      */
-    @Override
     public final Map getSubTypes() {
         return types;
     }
@@ -193,7 +188,7 @@ public class DPTXlator8BitSigned extends DPTXlator {
     }
 
     private short fromDPT(final short data) {
-        short value = data;
+        final short value = data;
         return value;
     }
 
@@ -201,11 +196,10 @@ public class DPTXlator8BitSigned extends DPTXlator {
         return appendUnit(Short.toString(fromDPT(data[index])));
     }
 
-    @Override
     protected void toDPT(final String value, final short[] dst, final int index)
             throws KNXFormatException {
         try {
-            dst[index] = toDPT(Short.decode(removeUnit(value)));
+            dst[index] = toDPT(Short.decode(removeUnit(value)).shortValue());
         } catch (final NumberFormatException e) {
             logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
         }
@@ -213,7 +207,7 @@ public class DPTXlator8BitSigned extends DPTXlator {
 
     private short toDPT(final int value) throws KNXFormatException {
 
-        int convert = value;
+        final int convert = value;
         return (short) convert;
     }
 
