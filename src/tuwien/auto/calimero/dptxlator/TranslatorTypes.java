@@ -368,6 +368,8 @@ public final class TranslatorTypes
 				"3 Bit controlled (main type 3)");
 		addTranslator(TYPE_8BIT_UNSIGNED, "DPTXlator8BitUnsigned",
 				"8 Bit unsigned value (main type 5)");
+		addTranslator(TYPE_8BIT_SIGNED, "DPTXlator8BitSigned",
+				"8 Bit signed value (main type 6)");
 		addTranslator(TYPE_2OCTET_UNSIGNED, "DPTXlator2ByteUnsigned",
 				"2 octet unsigned value (main type 7)");
 		addTranslator(TYPE_2OCTET_FLOAT, "DPTXlator2ByteFloat", "2 octet float value (main type 9)");
