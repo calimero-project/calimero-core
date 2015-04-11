@@ -42,6 +42,7 @@ import junit.framework.TestCase;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
+import tuwien.auto.calimero.exception.KNXIllegalStateException;
 import tuwien.auto.calimero.log.LogManager;
 
 /**
@@ -160,6 +161,36 @@ public class DPTXlator8BitSignedTest extends TestCase
 		t.setValue(s);
 		Helper.assertSimilar(value1, t.getValue());
 		assertEquals(s, t.getValue());
+
+		final DPTXlator8BitSigned t2 = new DPTXlator8BitSigned(sm);
+		// we basically don't care about the status mode separators
+		t2.setValue("0:0:0:0:0-1");
+
+		try {
+			t2.setValue("0/0/0/0 0");
+			fail("wrong status mode");
+		}
+		catch (final KNXFormatException expected) {}
+		try {
+			t2.setValue("0/0/0/0/0/0 0");
+			fail("wrong status mode");
+		}
+		catch (final KNXFormatException expected) {}
+		try {
+			t2.setValue("0/0/0/0/2 0");
+			fail("wrong status mode");
+		}
+		catch (final KNXFormatException expected) {}
+		try {
+			t2.setValue("0/0/0/0/0 3");
+			fail("wrong status mode");
+		}
+		catch (final KNXFormatException expected) {}
+		try {
+			t2.setValue("0/2/0/0/0 1");
+			fail("wrong status mode");
+		}
+		catch (final KNXFormatException expected) {}
 	}
 
 	/**
@@ -179,6 +210,16 @@ public class DPTXlator8BitSignedTest extends TestCase
 		Helper.assertSimilar(stringsRaw[3], t.getValue());
 		t.setData(data);
 		Helper.assertSimilar(max, t.getValue());
+
+		final DPTXlator8BitSigned t2 = new DPTXlator8BitSigned(sm);
+		assertEquals("0/0/0/0/0 0", t2.getValue());
+
+		t2.setValue(DPTXlator8BitSigned.DPT_STATUS_MODE3.getUpperValue());
+		assertEquals(DPTXlator8BitSigned.DPT_STATUS_MODE3.getUpperValue(), t2.getValue());
+		t2.setValue(DPTXlator8BitSigned.DPT_STATUS_MODE3.getLowerValue());
+		assertEquals(DPTXlator8BitSigned.DPT_STATUS_MODE3.getLowerValue(), t2.getValue());
+		t2.setStatusMode(false, true, true, false, true, 1);
+		assertEquals("0/1/1/0/1 1", t2.getValue());
 	}
 
 	/**
@@ -315,6 +356,58 @@ public class DPTXlator8BitSignedTest extends TestCase
 			setValueIntFail(new DPTXlator8BitSigned(dpts[i]),
 					Integer.parseInt(dpts[i].getUpperValue()) + 1);
 		}
+	}
+
+	/**
+	 * Test method for
+	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator8BitSigned#setStatusMode
+	 * (boolean, boolean, boolean, boolean, boolean, int))}.
+	 *
+	 * @throws KNXFormatException
+	 */
+	public final void testSetStatusModeBooleanBooleanBooleanBooleanBooleanInt()
+		throws KNXFormatException
+	{
+		try {
+			t.setStatusMode(true, true, true, true, true, 2);
+			fail("wrong xlator");
+		}
+		catch (final KNXIllegalStateException expected) {}
+
+		final DPTXlator8BitSigned t2 = new DPTXlator8BitSigned(sm);
+		assertEquals(0, t2.getMode());
+		t2.setStatusMode(true, true, true, true, true, 2);
+		assertEquals(2, t2.getMode());
+		assertEquals((byte) 0xfc, t2.getValueSigned());
+
+		t2.setStatusMode(false, false, false, false, false, 0);
+		assertEquals(0, t2.getMode());
+		assertEquals(1, t2.getValueSigned());
+
+		try {
+			t2.setStatusMode(true, true, true, true, true, -1);
+			fail("out of range");
+		}
+		catch (final KNXIllegalArgumentException expected) {}
+		try {
+			t2.setStatusMode(true, true, true, true, true, 3);
+			fail("out of range");
+		}
+		catch (final KNXIllegalArgumentException expected) {}
+	}
+
+	/**
+	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator8BitSigned#getMode()}.
+	 *
+	 * @throws KNXFormatException
+	 */
+	public final void testGetMode() throws KNXFormatException
+	{
+		try {
+			t.getMode();
+			fail("wrong xlator");
+		}
+		catch (final KNXIllegalStateException expected) {}
 	}
 
 	private void setValueIntFail(final DPTXlator8BitSigned tr, final int v)

@@ -40,12 +40,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.exception.KNXFormatException;
+import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
+import tuwien.auto.calimero.exception.KNXIllegalStateException;
 import tuwien.auto.calimero.log.LogLevel;
 
 /**
- * Translator for KNX DPTs with main number 6, type <b>8 Bit signed value</b>.
- * The KNX data type width is 1 byte.<br>
- * The default return value after creation is 0.<br>
+ * Translator for KNX DPTs with main number 6, type <b>8 Bit signed value</b>. The KNX data type
+ * width is 1 byte.<br>
+ * The default return value after creation is 0, except for DPT 6.020. For DPT 6.020, the default
+ * value is all status bits set (i.e., 0) and mode 0 is active.<br>
  *
  * @author A. Christian, info@root1.de
  */
@@ -101,6 +104,8 @@ public class DPTXlator8BitSigned extends DPTXlator
 	{
 		super(1);
 		setTypeID(types, dptID);
+		if (dpt == DPT_STATUS_MODE3)
+			data[0] = 1;
 	}
 
 	/* (non-Javadoc)
@@ -165,6 +170,59 @@ public class DPTXlator8BitSigned extends DPTXlator
 		return s;
 	}
 
+	/**
+	 * Sets the status and mode of the first translation item for DPT 6.020, Status with Mode, if
+	 * the translator is set to that particular datapoint type. This method is only applicable for
+	 * DPT 6.020, other DPTs will cause a {@link KNXIllegalStateException}.
+	 *
+	 * @param a status bit 0 (corresponding to the MSB, bit 7, in the encoding)
+	 * @param b status bit 1
+	 * @param c status bit 2
+	 * @param d status bit 3
+	 * @param e status bit 4
+	 * @param mode the active mode, <code>0</code> $le; mode $le; <code>2</code>
+	 */
+	public final void setStatusMode(final boolean a, final boolean b, final boolean c,
+		final boolean d, final boolean e, final int mode)
+	{
+		if (dpt != DPT_STATUS_MODE3)
+			throw new KNXIllegalStateException("translator not set to DPT 6.020 (Status with Mode)");
+		if (mode < 0 || mode > 2)
+			throw new KNXIllegalArgumentException("mode out of range [0..2]");
+		int status = a ? 1 << 7 : 0;
+		status |= b ? (1 << 6) : 0;
+		status |= c ? (1 << 5) : 0;
+		status |= d ? (1 << 4) : 0;
+		status |= e ? (1 << 3) : 0;
+		final int enc = mode == 0 ? 1 : mode == 1 ? 2 : 4;
+		data = new short[] { (short) (status | enc) };
+	}
+
+	// TODO status would be better be done as enum set?
+	// 0 = set, 1 = clear
+	boolean isStatusBitSet()
+	{
+		// NYI
+		return false;
+	}
+
+	/**
+	 * Returns the mode of the first translation item for DPT 6.020, Status with Mode, if the
+	 * translator is set to that particular datapoint type. This method is only applicable for DPT
+	 * 6.020, other DPTs will cause a {@link KNXIllegalStateException}.
+	 *
+	 * @return the active mode, with a value of either 0, 1, or 2
+	 */
+	public final int getMode()
+	{
+		if (dpt != DPT_STATUS_MODE3)
+			throw new KNXIllegalStateException("translator not set to DPT 6.020 (Status with Mode)");
+		final int enc = data[0] & 0x07;
+		if (enc != 1 && enc != 2 && enc != 4)
+			; //throw new KNXFormatException("invalid mode encoding " + enc + " out of {1, 2, 4}");
+		return enc == 1 ? 0 : enc == 2 ? 1 : 2;
+	}
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
 	 */
@@ -189,12 +247,44 @@ public class DPTXlator8BitSigned extends DPTXlator
 
 	private String makeString(final int index)
 	{
+		if (dpt == DPT_STATUS_MODE3) {
+			final short d = data[index];
+			final StringBuffer sb = new StringBuffer();
+			for (int i = 0; i < 4; i++)
+				sb.append((d >> (7 - i)) & 0x01).append("/");
+			sb.append((d >> 3) & 0x01);
+			sb.append(' ').append(getMode());
+			return sb.toString();
+		}
 		return appendUnit(Short.toString(fromDPT(data[index])));
 	}
 
 	protected void toDPT(final String value, final short[] dst, final int index)
 		throws KNXFormatException
 	{
+		if (dpt == DPT_STATUS_MODE3) {
+			if (value.length() != 11)
+				throw new KNXFormatException("status mode requires 11 characters: " + value);
+			short d = 0;
+			for (int i = 0; i < 5; i++) {
+				final char c = value.charAt(2 * i);
+				if (c == '1')
+					d |=  1 << (7 - i);
+				else if (c != '0')
+					throw new KNXFormatException("invalid status " + c);
+			}
+			final char c = value.charAt(10);
+			if  (c == '0')
+				d += 1;
+			else if  (c == '1')
+				d += 2;
+			else if (c == '2')
+				d += 4;
+			else
+				throw new KNXFormatException("invalid mode " + c);
+			dst[index] = d;
+			return;
+		}
 		try {
 			dst[index] = toDPT(Short.decode(removeUnit(value)).shortValue());
 		}
