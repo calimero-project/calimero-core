@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2012 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,182 +33,180 @@
     you do not wish to do so, delete this exception statement from your
     version.
 */
+
 package tuwien.auto.calimero.dptxlator;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.log.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 6, type <b>8 Bit signed value</b>.
- * <p>
  * The KNX data type width is 1 byte.<br>
  * The default return value after creation is 0.<br>
  *
  * @author A. Christian, info@root1.de
- *
  */
-public class DPTXlator8BitSigned extends DPTXlator {
+public class DPTXlator8BitSigned extends DPTXlator
+{
+	/**
+	 * DPT ID 6.001, Percent 8 Bit; values from <b>-128</b> to <b>127</b> %, resolution 1 %.
+	 */
+	public static final DPT DPT_PERCENT_V8 = new DPT("6.001", "Percent (8 Bit)", "-128", "127", "%");
 
-    /**
-     * DPT ID 6.001, Percent 8 Bit; values from <b>-128</b> to <b>127</b> %.
-     * <p>
-     */
-    public static final DPT DPT_PERCENT_V8 = new DPT("6.001", "Percent (8 Bit)", "-128", "127", "%");
+	/**
+	 * DPT ID 6.010, Value 1 signed count; values from <b>-128</b> to <b>127</b> counter pulses,
+	 * resolution 1 counter pulse.
+	 */
+	public static final DPT DPT_VALUE_1_UCOUNT = new DPT("6.010", "signed count", "-128", "127",
+			"counter pulses");
 
-    /**
-     * DPT ID 6.010, Value 1 signed count; values from <b>-128</b> to <b>127</b>
-     * counter pulses.
-     * <p>
-     */
-    public static final DPT DPT_VALUE_1_UCOUNT = new DPT("6.010", "signed count", "-128", "127",
-            "counter pulses");
+	/**
+	 * DPT ID 6.020, Status with Mode; status values <b>0/1</b>, mode <b>0</b> to <b>2</b>.
+	 */
+	public static final DPT DPT_STATUS_MODE3 = new DPT("6.020", "status with mode", "0/0/0/0/0 0",
+			"1/1/1/1/1 2");
 
-//    /**
-//     * DPT ID 6.020, Status with Mode;
-//     * <p>
-//     */
-//    public static final DPT DPT_STATUS_MODE3 = new DPT("6.020", "signed count", "-128", "127",
-//            "counter pulses");
-    private static final Map types;
+	private static final Map types;
 
-    static {
-        types = new HashMap();
-        types.put(DPT_PERCENT_V8.getID(), DPT_PERCENT_V8);
-        types.put(DPT_VALUE_1_UCOUNT.getID(), DPT_VALUE_1_UCOUNT);
-//        types.put(DPT_STATUS_MODE3.getID(), DPT_STATUS_MODE3);
-    }
+	static {
+		types = new HashMap();
+		types.put(DPT_PERCENT_V8.getID(), DPT_PERCENT_V8);
+		types.put(DPT_VALUE_1_UCOUNT.getID(), DPT_VALUE_1_UCOUNT);
+		types.put(DPT_STATUS_MODE3.getID(), DPT_STATUS_MODE3);
+	}
 
-    /**
-     * Creates a translator for the given datapoint type.
-     * <p>
-     *
-     * @param dpt the requested datapoint type
-     * @throws KNXFormatException on not supported or not available DPT
-     */
-    public DPTXlator8BitSigned(final DPT dpt) throws KNXFormatException {
-        this(dpt.getID());
-    }
+	/**
+	 * Creates a translator for the given datapoint type.
+	 * <p>
+	 *
+	 * @param dpt the requested datapoint type
+	 * @throws KNXFormatException on not supported or not available DPT
+	 */
+	public DPTXlator8BitSigned(final DPT dpt) throws KNXFormatException
+	{
+		this(dpt.getID());
+	}
 
-    /**
-     * Creates a translator for the given datapoint type ID.
-     * <p>
-     *
-     * @param dptID available implemented datapoint type ID
-     * @throws KNXFormatException on wrong formatted or not expected (available)
-     * <code>dptID</code>
-     */
-    public DPTXlator8BitSigned(final String dptID) throws KNXFormatException {
-        super(1);
-        setSubType(dptID);
-    }
+	/**
+	 * Creates a translator for the given datapoint type ID.
+	 * <p>
+	 *
+	 * @param dptID available implemented datapoint type ID
+	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptID</code>
+	 */
+	public DPTXlator8BitSigned(final String dptID) throws KNXFormatException
+	{
+		super(1);
+		setTypeID(types, dptID);
+	}
 
-    /* (non-Javadoc)
-     * @see tuwien.auto.calimero.dptxlator.DPTXlator#getValue()
-     */
-    public String getValue() {
-        return makeString(0);
-    }
+	/* (non-Javadoc)
+	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getValue()
+	 */
+	public String getValue()
+	{
+		return makeString(0);
+	}
 
-    // overwritten to avoid conversion from signed to unsigned
-    public void setData(final byte[] data, final int offset) {
-        if (offset < 0 || offset > data.length) {
-            throw new KNXIllegalArgumentException("illegal offset " + offset);
-        }
-        final int size = Math.max(1, getTypeSize());
-        final int length = (data.length - offset) / size * size;
-        if (length == 0) {
-            throw new KNXIllegalArgumentException("data length " + (data.length - offset)
-                    + " < required KNX data type width " + size);
-        }
-        this.data = new short[length];
-        for (int i = 0; i < length; ++i) {
-            this.data[i] = data[offset + i];
-        }
-    }
+//    // overwritten to avoid conversion from signed to unsigned
+//    public void setData(final byte[] data, final int offset) {
+//        if (offset < 0 || offset > data.length) {
+//            throw new KNXIllegalArgumentException("illegal offset " + offset);
+//        }
+//        final int size = Math.max(1, getTypeSize());
+//        final int length = (data.length - offset) / size * size;
+//        if (length == 0) {
+//            throw new KNXIllegalArgumentException("data length " + (data.length - offset)
+//                    + " < required KNX data type width " + size);
+//        }
+//        this.data = new short[length];
+//        for (int i = 0; i < length; ++i) {
+//            this.data[i] = data[offset + i];
+//        }
+//    }
 
-    /**
-     * Sets one new translation item from an signed value, replacing any old
-     * items.
-     * <p>
-     *
-     * @param value signed value, 0 &lt;= <code>value</code> &lt;= 255, the
-     * higher bytes are ignored
-     */
-    public final void setValue(final int value) {
-        data = new short[]{(short) value};
-    }
+	/**
+	 * Sets one new translation item from a signed value, replacing any old items.
+	 *
+	 * @param value signed value, -128 &le; <code>value</code> &le; 127
+	 * @throws KNXFormatException
+	 */
+	public final void setValue(final int value) throws KNXFormatException
+	{
+		data = new short[] { toDPT(value) };
+	}
 
-    public double getNumericValue() throws KNXFormatException {
-        return data[0];
-    }
+	/* (non-Javadoc)
+	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
+	 */
+	public double getNumericValue() throws KNXFormatException
+	{
+		return getValueSigned();
+	}
 
-    /* (non-Javadoc)
-     * @see tuwien.auto.calimero.dptxlator.DPTXlator#getAllValues()
-     */
-    public String[] getAllValues() {
-        final String[] s = new String[data.length];
-        for (int i = 0; i < data.length; ++i) {
-            s[i] = makeString(i);
-        }
-        return s;
-    }
+	// ??? public for consistency
+	byte getValueSigned()
+	{
+		return fromDPT(data[0]);
+	}
 
-    /* (non-Javadoc)
-     * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
-     */
-    public final Map getSubTypes() {
-        return types;
-    }
+	/* (non-Javadoc)
+	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getAllValues()
+	 */
+	public String[] getAllValues()
+	{
+		final String[] s = new String[data.length];
+		for (int i = 0; i < data.length; ++i) {
+			s[i] = makeString(i);
+		}
+		return s;
+	}
 
-    /**
-     * @return the subtypes of the 8 Bit signed translator type
-     * @see DPTXlator#getSubTypesStatic()
-     */
-    protected static Map getSubTypesStatic() {
-        return types;
-    }
+	/* (non-Javadoc)
+	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
+	 */
+	public final Map getSubTypes()
+	{
+		return types;
+	}
 
-    /**
-     * Sets a new subtype to use for translating items.
-     * <p>
-     * The translator is reset into default state, all currently contained items
-     * are removed (default value is set).
-     *
-     * @param dptID new subtype ID to set
-     * @throws KNXFormatException on wrong formatted or not expected (available)
-     * <code>dptID</code>
-     */
-    private void setSubType(final String dptID) throws KNXFormatException {
-        setTypeID(types, dptID);
-        data = new short[1];
-    }
+	/**
+	 * @return the subtypes of the 8 Bit signed translator type
+	 * @see DPTXlator#getSubTypesStatic()
+	 */
+	protected static Map getSubTypesStatic()
+	{
+		return types;
+	}
 
-    private short fromDPT(final short data) {
-        final short value = data;
-        return value;
-    }
+	private byte fromDPT(final short data)
+	{
+		return (byte) data;
+	}
 
-    private String makeString(final int index) {
-        return appendUnit(Short.toString(fromDPT(data[index])));
-    }
+	private String makeString(final int index)
+	{
+		return appendUnit(Short.toString(fromDPT(data[index])));
+	}
 
-    protected void toDPT(final String value, final short[] dst, final int index)
-            throws KNXFormatException {
-        try {
-            dst[index] = toDPT(Short.decode(removeUnit(value)).shortValue());
-        } catch (final NumberFormatException e) {
-            logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
-        }
-    }
+	protected void toDPT(final String value, final short[] dst, final int index)
+		throws KNXFormatException
+	{
+		try {
+			dst[index] = toDPT(Short.decode(removeUnit(value)).shortValue());
+		}
+		catch (final NumberFormatException e) {
+			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+		}
+	}
 
-    private short toDPT(final int value) throws KNXFormatException {
-
-        final int convert = value;
-        return (short) convert;
-    }
-
+	private short toDPT(final int value) throws KNXFormatException
+	{
+		if (value < -128 || value > 127)
+			throw new KNXFormatException("value " + value + " out of range [-128 .. 127]");
+		return (short) (value & 0xff);
+	}
 }
