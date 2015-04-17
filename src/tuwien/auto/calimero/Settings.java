@@ -38,7 +38,6 @@ package tuwien.auto.calimero;
 
 /**
  * General settings used in Calimero 2 as well as library user information.
- * <p>
  *
  * @author B. Malinowsky
  */
@@ -58,7 +57,6 @@ public final class Settings
 	// just use newline, it's easier to deal with
 	private static final String sep = "\n";
 
-	private static final ClassLoader cl = ClassLoader.getSystemClassLoader();
 
 	private Settings()
 	{}
@@ -197,6 +195,7 @@ public final class Settings
 			final int truncate)
 	{
 		try {
+			final ClassLoader cl = Settings.class.getClassLoader();
 			cl.loadClass(className);
 			int start = className.length();
 			for (int i = 0; i < truncate; ++i)
