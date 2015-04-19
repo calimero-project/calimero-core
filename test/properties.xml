@@ -54,7 +54,7 @@
             <usage>PortAddr, Direction bits for Port A</usage>
         </property>
         <property pid="18" pidName="PID_POLL_GROUP_SETTINGS" name="Pollgroup Settings" pdt="13" rw="R/W" writeEnabled="1">
-            <usage>Pollgroup settings, 2 octet Polling Group 1Byte Slot number</usage>
+            <usage>Pollgroup settings, 2 octet Polling Group 1 Byte Slot number</usage>
         </property>
         <property pid="19" pidName="PID_MANUFACTURER_DATA" name="Manufacturer Data" pdt="20" rw="R(/W)" writeEnabled="0/1">
             <usage>Manufacturer Data</usage>
@@ -161,7 +161,7 @@
             <usage>Frequency setting, Indication of whether a repeater is present, Indication of whether the device is a repeater or not</usage>
         </property>
         <property pid="74" pidName="PID_RF_REPEAT_COUNTER" name="RF Repeat Counter" pdt="2" rw="R/W" writeEnabled="W">
-            <usage>To be  completed.</usage>
+            <usage>To be completed.</usage>
         </property>
         <property pid="75" pidName="PID_RECEIVE_BLOCK_TABLE" name="BiBat Receive Block Table" pdt="2" rw="R/W" writeEnabled="&lt;tbd&gt;">
             <usage>Settings for a RF BiBat Slave in which synchronous blocks it shall receive.</usage>
@@ -188,7 +188,7 @@
             <usage>RF Domain Address for cEMI server filtering and sending</usage>
         </property>
         <property pid="83" pidName="PID_DEVICE_DESCRIPTOR" name="Device Descriptor" pdt="18" rw="R" writeEnabled="0">
-            <usage>Device Descriptor for EIBnet/IP devices.</usage>
+            <usage>Device Descriptor for KNXnet/IP devices.</usage>
         </property>
         <property pid="84" pidName="PID_METERING_FILTER_TABLE" name="Metering Filter Table" pdt="24" rw="R/W" writeEnabled="1">
             <usage>Metering Filter Table for RF M-Bus Repeater and for the M-Bus Data Collector.</usage>
@@ -413,13 +413,13 @@
     </object>
     <object type="11">
         <property pid="51" pidName="PID_PROJECT_INSTALLATION_ID" name="Project Installation Identification" pdt="4" rw="R/W" writeEnabled="1">
-            <usage>Identification of the project and the installation within in which this EIBnet/IP device resides.</usage>
+            <usage>Identification of the project and the installation within in which this KNXnet/IP device resides.</usage>
         </property>
         <property pid="52" pidName="PID_KNX_INDIVIDUAL_ADDRESS" name="KNX Individual Address" pdt="4" rw="R/W" writeEnabled="1">
-            <usage>Indvidual Address of the EIBnet/IP server.</usage>
+            <usage>Indvidual Address of the KNXnet/IP server.</usage>
         </property>
         <property pid="53" pidName="PID_ADDITIONAL_INDIVIDUAL_ADDRESSES" name="Additional Individual Addresses" pdt="4" rw="R/W" writeEnabled="1">
-            <usage>Sorted list of additional KNX Individual Addresses for EIBnet/IP Routers and Tunnelling Servers.</usage>
+            <usage>Sorted list of additional KNX Individual Addresses for KNXnet/IP Routers and Tunnelling Servers.</usage>
         </property>
         <property pid="54" pidName="PID_CURRENT_IP_ASSIGNMENT_METHOD" name="Current IP Assignment Method" pdt="2" rw="R" writeEnabled="0">
             <usage>Used IP address assignment method.</usage>
@@ -428,7 +428,7 @@
             <usage>Enabled IP assignment methods that can be used.</usage>
         </property>
         <property pid="56" pidName="PID_IP_CAPABILITIES" name="IP Capabilities" pdt="51" rw="R" writeEnabled="0">
-            <usage>Capabilities of the EIBnet/IP device for obtaining an IP address.</usage>
+            <usage>Capabilities of the KNXnet/IP device for obtaining an IP address.</usage>
         </property>
         <property pid="57" pidName="PID_CURRENT_IP_ADDRESS" name="Current IP Address" pdt="9" rw="R" writeEnabled="0">
             <usage>Currently used IP address</usage>
@@ -437,7 +437,7 @@
             <usage>Currently used IP subnet mask</usage>
         </property>
         <property pid="59" pidName="PID_CURRENT_DEFAULT_GATEWAY" name="Current Default Gateway" pdt="9" rw="R" writeEnabled="0">
-            <usage>IP Address of the EIBnet/IP device's default gateway.</usage>
+            <usage>IP Address of the KNXnet/IP device's default gateway.</usage>
         </property>
         <property pid="60" pidName="PID_IP_ADDRESS" name="IP Address" pdt="9" rw="R/W" writeEnabled="1">
             <usage>Configured fixed IP Address.</usage>
@@ -449,28 +449,28 @@
             <usage>Configured IP address of the default gateway.</usage>
         </property>
         <property pid="63" pidName="PID_DHCP_BOOTP_SERVER" name="DHCP/BootP Server" pdt="9" rw="R" writeEnabled="0">
-            <usage>IP address of the DHCP or BootP server from which the EIBnet/IP device received its IP address</usage>
+            <usage>IP address of the DHCP or BootP server from which the KNXnet/IP device received its IP address</usage>
         </property>
         <property pid="64" pidName="PID_MAC_ADDRESS" name="MAC Address" pdt="22" rw="R" writeEnabled="0">
-            <usage>MAC address of the EIBnet/IP device</usage>
+            <usage>MAC address of the KNXnet/IP device</usage>
         </property>
         <property pid="65" pidName="PID_SYSTEM_SETUP_MULTICAST_ADDRESS" name="System Setup Multicast Address" pdt="9" rw="R" writeEnabled="0">
-            <usage>EIBnet/IP system set-up multicast address. Value is fixed to 224.0.23.12.</usage>
+            <usage>KNXnet/IP system set-up multicast address. Value is fixed to 224.0.23.12.</usage>
         </property>
         <property pid="66" pidName="PID_ROUTING_MULTICAST_ADDRESS" name="Routing Multicast Address" pdt="9" rw="R/W" writeEnabled="0">
             <usage>Routing multicast address</usage>
         </property>
         <property pid="67" pidName="PID_TTL" name="Time To Live" pdt="2" rw="R/W" writeEnabled="0">
-            <usage>TTL value to be used by EIBnet/IP devices.</usage>
+            <usage>TTL value to be used by KNXnet/IP devices.</usage>
         </property>
-        <property pid="68" pidName="PID_EIBNETIP_DEVICE_CAPABILITIES" name="EIBnet/IP Device Capabilities" pdt="52" rw="R" writeEnabled="0">
-            <usage>EIBnet/IP protocols supported by the EIBnet/IP device</usage>
+        <property pid="68" pidName="PID_KNXNETIP_DEVICE_CAPABILITIES" name="KNXnet/IP Device Capabilities" pdt="52" rw="R" writeEnabled="0">
+            <usage>KNXnet/IP protocols supported by the KNXnet/IP device</usage>
         </property>
-        <property pid="69" pidName="PID_EIBNETIP_DEVICE_STATE" name="EIBnet/IP Device State" pdt="2" rw="R" writeEnabled="0">
-            <usage>Various EIBnet/IP device status info, like KNX or IP network connection failure</usage>
+        <property pid="69" pidName="PID_KNXNETIP_DEVICE_STATE" name="KNXnet/IP Device State" pdt="2" rw="R" writeEnabled="0">
+            <usage>Various KNXnet/IP device status info, like KNX or IP network connection failure</usage>
         </property>
-        <property pid="70" pidName="PID_EIBNETIP_ROUTING_CAPABILITIES" name="EIBnet/IP Routing Capabilities" pdt="2" rw="R" writeEnabled="0">
-            <usage>Supported features by the EIBnet/IP Router.</usage>
+        <property pid="70" pidName="PID_KNXNETIP_ROUTING_CAPABILITIES" name="KNXnet/IP Routing Capabilities" pdt="2" rw="R" writeEnabled="0">
+            <usage>Supported features by the KNXnet/IP Router.</usage>
         </property>
         <property pid="71" pidName="PID_PRIORITY_FIFO_ENABLED" name="Priority FIFO Enabled" pdt="2" rw="R/W" writeEnabled="0">
             <usage>Indication of whether the priority FIFO is enabled of disabled.</usage>
