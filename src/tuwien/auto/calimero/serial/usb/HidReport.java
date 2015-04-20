@@ -117,9 +117,9 @@ public final class HidReport
 	/**
 	 * Creates a new report for use with the Bus Access Server feature service.
 	 *
-	 * @param service
-	 * @param feature
-	 * @param frame
+	 * @param service Bus Access Server service
+	 * @param feature feature ID
+	 * @param frame feature protocol data
 	 * @return the created HID report
 	 */
 	public static HidReport createFeatureService(final BusAccessServerService service,
@@ -130,77 +130,91 @@ public final class HidReport
 
 	/**
 	 * Creates a new report containing an EMI frame.
-	 * @param emi
-	 * @param emiMsgCode
-	 * @param data
+	 *
+	 * @param emi EMI type
+	 * @param frame the EMI message as byte array
 	 * @return the created HID report
 	 */
-	public static List<HidReport> create(final KnxTunnelEmi emi, final int emiMsgCode,
-		final byte[] data)
+	public static List<HidReport> create(final KnxTunnelEmi emi, final byte[] frame)
 	{
 		final List<HidReport> l = new ArrayList<>();
-		int offset = 0;
-		int maxData = maxDataStartPacket;
 		final EnumSet<PacketType> packetType = EnumSet.of(PacketType.Start);
-		if (data.length > maxData)
+		int maxData = maxDataStartPacket;
+		if (frame.length > maxData)
 			packetType.add(PacketType.Partial);
-		int msgCode = emiMsgCode;
+		int offset = 0;
 		for (int i = 1; i < 6; i++) {
-			final byte[] range = Arrays.copyOfRange(data, offset, offset + maxData);
-			offset += maxData;
-			if (range.length <= maxData)
+			final int to = Math.min(offset + frame.length, offset + maxData);
+			final byte[] range = Arrays.copyOfRange(frame, offset, to);
+			offset = to;
+			if (offset >= frame.length)
 				packetType.add(PacketType.End);
-			l.add(new HidReport(i, packetType, Protocol.KnxTunnel, emi, msgCode, range));
+			l.add(new HidReport(i, packetType, Protocol.KnxTunnel, emi, noEmiMsgCode, range));
 			if (range.length <= maxData)
 				break;
 			packetType.remove(PacketType.Start);
-			msgCode = noEmiMsgCode;
 			maxData = maxDataPartialPacket;
 		}
 		return l;
 	}
 
-	// XXX sequence number should always be used and > 0, but oldest spec uses 0
-	// Anyway, distinction should not be necessary, always use new
-	private static final boolean useNoSequence = false;
-
 	private HidReport(final ServiceId serviceId, final BusAccessServerFeature feature,
 		final byte[] frame)
 	{
-		this(useNoSequence ? 0 : 1, EnumSet.of(PacketType.Start, PacketType.End),
+		this(1, EnumSet.of(PacketType.Start, PacketType.End),
 				TransferProtocolHeader.Protocol.BusAccessServerFeature, serviceId, feature.id(),
 				frame);
 	}
 
+	/**
+	 * Creates a new KNX USB HID report.
+	 *
+	 * @param sequence HID report header sequence number
+	 * @param packetType HID report header packet type
+	 * @param protocol protocol ID of transfer protocol header
+	 * @param serviceId service ID of transfer protocol header
+	 * @param featureId feature ID of transfer protocol body
+	 * @param data data of transfer protocol body
+	 */
 	public HidReport(final int sequence, final EnumSet<PacketType> packetType,
-		final Protocol protocol, final ServiceId serviceId, final int emiMsgCode, final byte[] frame)
+		final Protocol protocol, final ServiceId serviceId, final int featureId, final byte[] data)
 	{
-		int packetLength = 1 + frame.length;
-		// only start packets have a transfer protocol header and a feature ID / EMI msg code
+		int packetLength = data.length;
+		if (protocol == Protocol.BusAccessServerFeature) {
+			if (featureId < 1 || featureId > 5)
+				throw new KNXIllegalArgumentException("unsupported device service feature ID "
+						+ featureId);
+			this.featureId = featureId;
+			// add feature ID field (for EMI frames, this is already accounted for by frame[0])
+			++packetLength;
+		}
+		else
+			this.featureId = noEmiMsgCode;
+
+		final int maxData;
 		if (packetType.contains(PacketType.Start)) {
-			if (frame.length > maxDataStartPacket)
-				throw new KNXIllegalArgumentException("frame too large: " + frame.length + " > "
-						+ maxDataStartPacket);
-			tph = new TransferProtocolHeader(1 + frame.length, protocol, serviceId);
+			// only start packets have a transfer protocol header
+			tph = new TransferProtocolHeader(packetLength, protocol, serviceId);
 			packetLength += tph.getStructLength();
-			featureId = emiMsgCode;
-			// validate feature ID range if we represent a device feature service
-			if (protocol == Protocol.BusAccessServerFeature)
-				if (featureId < 1 || featureId > 5)
-					throw new KNXIllegalArgumentException("unsupported device service feature ID "
-							+ featureId);
+			maxData = maxDataStartPacket;
 		}
 		else {
 			tph = null;
-			featureId = noEmiMsgCode;
-			if (frame.length > maxDataPartialPacket)
-				throw new KNXIllegalArgumentException("frame too large: " + frame.length + " > "
-						+ maxDataPartialPacket);
+			maxData = maxDataPartialPacket;
 		}
+		if (data.length > maxData)
+			throw new KNXIllegalArgumentException("frame too large: " + data.length + " > "
+					+ maxData);
 		rh = new HidReportHeader(sequence, packetType, packetLength);
-		data = frame.clone();
+		this.data = data.clone();
 	}
 
+	/**
+	 * Creates a HID report from the supplied frame.
+	 *
+	 * @param frame HID report data frame
+	 * @throws KNXFormatException on invalid HID report data
+	 */
 	public HidReport(final byte[] frame) throws KNXFormatException
 	{
 		if (frame.length > maxReportSize)
@@ -212,11 +226,12 @@ public final class HidReport
 			tph = new TransferProtocolHeader(frame, offset);
 			offset += tph.getStructLength();
 			featureId = frame[offset] & 0xff;
-			++offset;
-			if (tph.getProtocol() == Protocol.BusAccessServerFeature)
+			if (tph.getProtocol() == Protocol.BusAccessServerFeature) {
 				if (featureId < 1 || featureId > 5)
 					throw new KNXFormatException("unsupported device service feature ID "
 							+ featureId);
+				++offset;
+			}
 		}
 		else {
 			tph = null;
@@ -229,26 +244,39 @@ public final class HidReport
 		if (datalength > frame.length)
 			throw new KNXFormatException("HID class report data length " + datalength
 					+ " exceeds frame length " + frame.length);
+
 		// if body contains complete EMI frame (i.e., no partial packets), validate body length
+		// this is always true for feature protocol frames (those are single packets only)
 		final EnumSet<PacketType> type = EnumSet.of(PacketType.Start, PacketType.End);
 		if (rh.getPacketType().equals(type)) {
 			final int bodylength = tph.getBodyLength();
-			if (bodylength != 1 + data.length)
+			// distinguish offset in body
+			final int idOffset = tph.getProtocol() == Protocol.BusAccessServerFeature ? 1 : 0;
+			if (bodylength != idOffset + data.length)
 				throw new KNXFormatException("unexpected KNX USB protocol body length "
 						+ data.length + ", expected " + bodylength);
 		}
 	}
 
+	/**
+	 * @return the KNX USB HID report header
+	 */
 	public HidReportHeader getReportHeader()
 	{
 		return rh;
 	}
 
+	/**
+	 * @return the KNX USB transfer protocol header
+	 */
 	public TransferProtocolHeader getTransferProtocolHeader()
 	{
 		return tph;
 	}
 
+	/**
+	 * @return the KNX USB transfer protocol body data, empty array for no data
+	 */
 	public byte[] getData()
 	{
 		return data;
@@ -260,7 +288,8 @@ public final class HidReport
 		rh.toByteArray(os);
 		if (tph != null) {
 			tph.toByteArray(os);
-			os.write(featureId);
+			if (tph.getProtocol() == Protocol.BusAccessServerFeature)
+				os.write(featureId);
 		}
 		os.write(data, 0, data.length);
 		while (os.size() < maxReportSize)

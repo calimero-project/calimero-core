@@ -47,7 +47,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  *
  * @author B. Malinowsky
  */
-final class TransferProtocolHeader
+public final class TransferProtocolHeader
 {
 	/*
 	  Transfer protocol header structure
@@ -70,10 +70,6 @@ final class TransferProtocolHeader
 		private Protocol(final int id) { this.id = id; }
 		int id() { return id; }
 	}
-
-	// TODO remove, leftover from old constants
-//	private static final int MBUS_TUNNEL = 0x02; // not supported
-//	private static final int BATIBUS_TUNNEL = 0x03; // not supported
 
 	//
 	// EMI/Service identifiers
