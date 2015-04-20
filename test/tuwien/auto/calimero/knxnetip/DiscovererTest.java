@@ -44,9 +44,9 @@ import java.util.List;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
+import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Util;
-import tuwien.auto.calimero.exception.KNXException;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.knxnetip.Discoverer.Result;
 import tuwien.auto.calimero.knxnetip.servicetype.DescriptionResponse;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;

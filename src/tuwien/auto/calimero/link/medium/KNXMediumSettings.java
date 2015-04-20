@@ -37,7 +37,7 @@
 package tuwien.auto.calimero.link.medium;
 
 import tuwien.auto.calimero.IndividualAddress;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 /**
  * Container for device and medium specific settings for the KNX network.

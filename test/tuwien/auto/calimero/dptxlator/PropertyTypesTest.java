@@ -41,8 +41,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import junit.framework.TestCase;
+import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.dptxlator.PropertyTypes.DPTID;
-import tuwien.auto.calimero.exception.KNXException;
 
 /**
  * @author B. Malinowsky

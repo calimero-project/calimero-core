@@ -57,11 +57,11 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 
-import tuwien.auto.calimero.exception.KNXException;
-import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
-import tuwien.auto.calimero.exception.KNXInvalidResponseException;
-import tuwien.auto.calimero.exception.KNXTimeoutException;
+import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXInvalidResponseException;
+import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.internal.UdpSocketLooper;
 import tuwien.auto.calimero.knxnetip.servicetype.DescriptionRequest;
 import tuwien.auto.calimero.knxnetip.servicetype.DescriptionResponse;

@@ -38,8 +38,8 @@ package tuwien.auto.calimero.knxnetip.servicetype;
 
 import java.io.ByteArrayOutputStream;
 
-import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 /**
  * The common KNXnet/IP header used at the first position in every KNXnet/IP frame.

@@ -7,5 +7,17 @@
 		related information, mainly of interest for a user of the library 
 		and/or developer. 
 		<p>
+		This package contains common types of (checked) exceptions 
+		thrown throughout the library by <code>public</code> or 
+		<code>protected</code> visible methods.
+		<br>
+		In general, checked exceptions used in Calimero should extend the base exception 
+		<code>KNXException</code>.
+		<p>
+		<b>Unchecked exceptions only:</b><br>
+		Since a method might throw any type of runtime exception, even those not 
+		specified here, there is no Calimero specific base exception for this.<br>
+		Nevertheless, internal error states and failures originating from Calimero itself
+		should be signaled through Calimero specific exceptions if possible.				
 	</body>
 </html>

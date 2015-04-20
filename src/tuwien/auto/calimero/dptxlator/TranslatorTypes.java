@@ -44,9 +44,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import tuwien.auto.calimero.exception.KNXException;
-import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 /**
  * Maintains available KNX datapoint main numbers and its associated DPT translators.

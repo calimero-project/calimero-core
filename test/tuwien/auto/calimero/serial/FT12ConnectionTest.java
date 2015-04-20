@@ -39,8 +39,8 @@ package tuwien.auto.calimero.serial;
 import java.util.Arrays;
 
 import junit.framework.TestCase;
+import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.Util;
-import tuwien.auto.calimero.exception.KNXException;
 
 /**
  * Test case for FT12Connection.

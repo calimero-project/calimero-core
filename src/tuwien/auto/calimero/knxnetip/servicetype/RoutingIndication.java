@@ -38,9 +38,9 @@ package tuwien.auto.calimero.knxnetip.servicetype;
 
 import java.io.ByteArrayOutputStream;
 
+import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIFactory;
-import tuwien.auto.calimero.exception.KNXFormatException;
 
 /**
  * Represents a routing indication for routing services.

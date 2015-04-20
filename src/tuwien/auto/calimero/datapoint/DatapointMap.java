@@ -43,7 +43,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import tuwien.auto.calimero.GroupAddress;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.internal.EventListeners;
 import tuwien.auto.calimero.xml.Element;
 import tuwien.auto.calimero.xml.KNXMLException;

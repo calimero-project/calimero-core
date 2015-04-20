@@ -42,9 +42,9 @@ import java.util.Calendar;
 import java.util.Date;
 
 import junit.framework.TestCase;
+import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Util;
-import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 
 /**
  * Test for DPTXlatorDate.

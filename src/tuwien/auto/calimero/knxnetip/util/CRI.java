@@ -37,7 +37,7 @@
 package tuwien.auto.calimero.knxnetip.util;
 
 
-import tuwien.auto.calimero.exception.KNXFormatException;
+import tuwien.auto.calimero.KNXFormatException;
 
 /**
  * Immutable container for a connection request information (CRI).

@@ -38,7 +38,7 @@ package tuwien.auto.calimero.knxnetip.servicetype;
 
 import java.io.ByteArrayOutputStream;
 
-import tuwien.auto.calimero.exception.KNXFormatException;
+import tuwien.auto.calimero.KNXFormatException;
 
 /**
  * Little helpers to handle KNXnet/IP packets and service types.

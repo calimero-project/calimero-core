@@ -37,13 +37,13 @@
 package tuwien.auto.calimero.buffer;
 
 import tuwien.auto.calimero.KNXAddress;
+import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.buffer.cache.Cache;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.datapoint.Datapoint;
 import tuwien.auto.calimero.datapoint.DatapointModel;
 import tuwien.auto.calimero.datapoint.StateDP;
-import tuwien.auto.calimero.exception.KNXTimeoutException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 
 /**

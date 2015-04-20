@@ -41,8 +41,8 @@ import java.io.ByteArrayOutputStream;
 import org.slf4j.Logger;
 
 import tuwien.auto.calimero.DataUnitBuilder;
-import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.knxnetip.KNXnetIPDevMgmt;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
 import tuwien.auto.calimero.log.LogService;

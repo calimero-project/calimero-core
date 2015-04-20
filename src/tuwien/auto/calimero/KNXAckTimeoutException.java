@@ -34,64 +34,35 @@
     version.
 */
 
-package tuwien.auto.calimero.exception;
+package tuwien.auto.calimero;
+
 
 /**
- * Thrown to indicate that a method has been passed an illegal or inappropriate argument.
+ * Thrown to indicate that a timeout occurred while waiting for an service acknowledgment
+ * response.
  * <p>
  * 
  * @author B. Malinowsky
  */
-public class KNXIllegalArgumentException extends RuntimeException
+public class KNXAckTimeoutException extends KNXTimeoutException
 {
 	private static final long serialVersionUID = 1L;
 
-	private final String arg;
-
 	/**
-	 * Constructs a new <code>KNXIllegalArgumentException</code> without a detail message.
+	 * Constructs a new <code>KNXAckTimeoutException</code> without a detail message.
 	 */
-	public KNXIllegalArgumentException()
-	{
-		arg = null;
-	}
+	public KNXAckTimeoutException()
+	{}
 
 	/**
-	 * Constructs a new <code>KNXIllegalArgumentException</code> with the specified detail
+	 * Constructs a new <code>KNXAckTimeoutException</code> with the specified detail
 	 * message.
 	 * <p>
 	 * 
 	 * @param s the detail message
 	 */
-	public KNXIllegalArgumentException(final String s)
+	public KNXAckTimeoutException(final String s)
 	{
 		super(s);
-		arg = null;
-	}
-
-	/**
-	 * Constructs a new <code>KNXIllegalArgumentException</code> with the specified detail
-	 * message and cause.
-	 * <p>
-	 * 
-	 * @param s the detail message
-	 * @param cause the cause (which is saved for later retrieval by the
-	 *        {@link #getCause()} method).
-	 */
-	public KNXIllegalArgumentException(final String s, final Throwable cause)
-	{
-		super(s, cause);
-		arg = null;
-	}
-
-	/**
-	 * Returns the argument which caused the exception.
-	 * <p>
-	 * 
-	 * @return argument as string, or <code>null</code> if no argument was set
-	 */
-	public final String getArgument()
-	{
-		return arg;
 	}
 }

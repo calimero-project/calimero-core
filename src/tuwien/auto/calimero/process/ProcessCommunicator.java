@@ -37,12 +37,12 @@
 package tuwien.auto.calimero.process;
 
 import tuwien.auto.calimero.GroupAddress;
+import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXInvalidResponseException;
+import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.datapoint.Datapoint;
 import tuwien.auto.calimero.dptxlator.DPT;
-import tuwien.auto.calimero.exception.KNXException;
-import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.exception.KNXInvalidResponseException;
-import tuwien.auto.calimero.exception.KNXTimeoutException;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 

@@ -34,45 +34,64 @@
     version.
 */
 
-package tuwien.auto.calimero.exception;
+package tuwien.auto.calimero;
 
 /**
- * The root checked exception type used in the Calimero 2 library.
+ * Thrown to indicate that a method has been passed an illegal or inappropriate argument.
  * <p>
  * 
  * @author B. Malinowsky
  */
-public class KNXException extends Exception
+public class KNXIllegalArgumentException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * Constructs a new <code>KNXException</code> without a detail message.
-	 */
-	public KNXException()
-	{}
+	private final String arg;
 
 	/**
-	 * Constructs a new <code>KNXException</code> with the specified detail message.
+	 * Constructs a new <code>KNXIllegalArgumentException</code> without a detail message.
+	 */
+	public KNXIllegalArgumentException()
+	{
+		arg = null;
+	}
+
+	/**
+	 * Constructs a new <code>KNXIllegalArgumentException</code> with the specified detail
+	 * message.
 	 * <p>
 	 * 
 	 * @param s the detail message
 	 */
-	public KNXException(final String s)
+	public KNXIllegalArgumentException(final String s)
 	{
 		super(s);
+		arg = null;
 	}
-	
+
 	/**
-	 * Constructs a new <code>KNXException</code> with the specified detail message and
-	 * cause.
+	 * Constructs a new <code>KNXIllegalArgumentException</code> with the specified detail
+	 * message and cause.
 	 * <p>
 	 * 
 	 * @param s the detail message
-	 * @param cause the cause in form of a throwable object, can be <code>null</code>
+	 * @param cause the cause (which is saved for later retrieval by the
+	 *        {@link #getCause()} method).
 	 */
-	public KNXException(final String s, final Throwable cause)
+	public KNXIllegalArgumentException(final String s, final Throwable cause)
 	{
 		super(s, cause);
+		arg = null;
+	}
+
+	/**
+	 * Returns the argument which caused the exception.
+	 * <p>
+	 * 
+	 * @return argument as string, or <code>null</code> if no argument was set
+	 */
+	public final String getArgument()
+	{
+		return arg;
 	}
 }

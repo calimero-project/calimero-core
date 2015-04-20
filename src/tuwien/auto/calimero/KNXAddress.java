@@ -40,8 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.xml.Attribute;
 import tuwien.auto.calimero.xml.Element;
 import tuwien.auto.calimero.xml.KNXMLException;

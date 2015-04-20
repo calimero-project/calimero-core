@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Vector;
 
 import junit.framework.TestCase;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 /**
  * @author B. Malinowsky

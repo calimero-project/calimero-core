@@ -34,33 +34,35 @@
     version.
 */
 
-package tuwien.auto.calimero.exception;
+package tuwien.auto.calimero;
 
 /**
- * Thrown to indicate that a timeout occurred while waiting for an service acknowledgment
- * response.
+ * Thrown to indicate a message format mismatch of a response sent by a remote endpoint.
  * <p>
+ * Particularly, if received data from the network is parsed and the structure read does
+ * not match.
  * 
  * @author B. Malinowsky
  */
-public class KNXAckTimeoutException extends KNXTimeoutException
+public class KNXInvalidResponseException extends KNXRemoteException
 {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Constructs a new <code>KNXAckTimeoutException</code> without a detail message.
+	 * Constructs a new <code>KNXInvalidResponseException</code> without a detail
+	 * message.
 	 */
-	public KNXAckTimeoutException()
+	public KNXInvalidResponseException()
 	{}
 
 	/**
-	 * Constructs a new <code>KNXAckTimeoutException</code> with the specified detail
-	 * message.
+	 * Constructs a new <code>KNXInvalidResponseException</code> with the specified
+	 * detail message.
 	 * <p>
 	 * 
 	 * @param s the detail message
 	 */
-	public KNXAckTimeoutException(final String s)
+	public KNXInvalidResponseException(final String s)
 	{
 		super(s);
 	}

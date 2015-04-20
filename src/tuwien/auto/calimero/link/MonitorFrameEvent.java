@@ -37,8 +37,8 @@
 package tuwien.auto.calimero.link;
 
 import tuwien.auto.calimero.FrameEvent;
+import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.cemi.CEMI;
-import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.link.medium.RawFrame;
 
 /**

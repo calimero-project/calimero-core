@@ -43,7 +43,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import tuwien.auto.calimero.exception.KNXFormatException;
+import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**

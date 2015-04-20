@@ -43,9 +43,9 @@ import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAddress;
+import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.cemi.CEMILDataEx.AddInfo;
-import tuwien.auto.calimero.exception.KNXFormatException;
 
 /**
  * Factory helper for creating and copying cEMI messages.

@@ -39,9 +39,6 @@ package tuwien.auto.calimero;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
-import tuwien.auto.calimero.exception.KNXIllegalStateException;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.link.medium.KnxIPSettings;
 import tuwien.auto.calimero.link.medium.PLSettings;

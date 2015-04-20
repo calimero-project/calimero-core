@@ -38,10 +38,10 @@ package tuwien.auto.calimero.knxnetip;
 
 import java.net.InetSocketAddress;
 
+import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXListener;
+import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMI;
-import tuwien.auto.calimero.exception.KNXIllegalStateException;
-import tuwien.auto.calimero.exception.KNXTimeoutException;
 
 /**
  * Interface for working with KNX networks over an IP network connection.

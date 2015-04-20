@@ -36,7 +36,7 @@
 
 package tuwien.auto.calimero.knxnetip.util;
 
-import tuwien.auto.calimero.exception.KNXFormatException;
+import tuwien.auto.calimero.KNXFormatException;
 
 /**
  * Description Information Block (DIB).

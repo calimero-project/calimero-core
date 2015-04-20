@@ -37,9 +37,9 @@
 package tuwien.auto.calimero.link;
 
 import tuwien.auto.calimero.KNXAddress;
+import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.cemi.CEMILData;
-import tuwien.auto.calimero.exception.KNXTimeoutException;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.log.LogService;

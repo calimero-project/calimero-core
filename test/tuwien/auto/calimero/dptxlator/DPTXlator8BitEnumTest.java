@@ -41,10 +41,10 @@ import java.util.Map;
 import java.util.Set;
 
 import junit.framework.TestCase;
+import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.dptxlator.DPTXlator8BitEnum.ApplicationArea;
 import tuwien.auto.calimero.dptxlator.DPTXlator8BitEnum.OccupancyMode;
-import tuwien.auto.calimero.exception.KNXFormatException;
 
 /**
  * @author B. Malinowsky

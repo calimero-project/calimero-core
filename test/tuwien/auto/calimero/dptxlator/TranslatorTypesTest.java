@@ -40,9 +40,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.TestCase;
+import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.dptxlator.TranslatorTypes.MainType;
-import tuwien.auto.calimero.exception.KNXException;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 
 /**
  * @author B. Malinowsky

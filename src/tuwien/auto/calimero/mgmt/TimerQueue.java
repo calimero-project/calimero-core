@@ -39,7 +39,7 @@ package tuwien.auto.calimero.mgmt;
 import java.util.ArrayList;
 import java.util.List;
 
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 
 /**

@@ -40,7 +40,7 @@ import java.io.ByteArrayOutputStream;
 
 import org.slf4j.Logger;
 
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.log.LogService;
 
 /**

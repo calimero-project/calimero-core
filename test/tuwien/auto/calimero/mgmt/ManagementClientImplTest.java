@@ -41,13 +41,13 @@ import java.util.List;
 
 import junit.framework.TestCase;
 import tuwien.auto.calimero.IndividualAddress;
+import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXIllegalStateException;
+import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.Util;
-import tuwien.auto.calimero.exception.KNXException;
-import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
-import tuwien.auto.calimero.exception.KNXIllegalStateException;
-import tuwien.auto.calimero.exception.KNXTimeoutException;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.KNXNetworkLinkIP;

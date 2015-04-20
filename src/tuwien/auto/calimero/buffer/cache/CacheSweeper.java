@@ -36,7 +36,7 @@
 
 package tuwien.auto.calimero.buffer.cache;
 
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 /**
  * Used to remove expired entries from a cache.

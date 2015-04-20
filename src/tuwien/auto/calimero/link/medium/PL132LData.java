@@ -40,8 +40,8 @@ import java.io.ByteArrayInputStream;
 
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.IndividualAddress;
+import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.Priority;
-import tuwien.auto.calimero.exception.KNXFormatException;
 
 /**
  * L-data frame format on PL132 communication medium.

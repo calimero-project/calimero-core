@@ -36,8 +36,8 @@
 
 package tuwien.auto.calimero.mgmt;
 
-import tuwien.auto.calimero.exception.KNXException;
-import tuwien.auto.calimero.exception.KNXIllegalStateException;
+import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.KNXIllegalStateException;
 
 /**
  * Adapter hiding protocol specifics and internals of accessing interface object

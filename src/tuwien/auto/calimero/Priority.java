@@ -36,7 +36,6 @@
 
 package tuwien.auto.calimero;
 
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 
 /**
  * Priority of KNX messages for access on a KNX medium.

@@ -37,7 +37,7 @@
 package tuwien.auto.calimero.buffer.cache;
 
 import junit.framework.TestCase;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 /**
  * @author B. Malinowsky

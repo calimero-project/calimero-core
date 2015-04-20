@@ -37,7 +37,6 @@
 package tuwien.auto.calimero;
 
 import junit.framework.TestCase;
-import tuwien.auto.calimero.exception.KNXFormatException;
 
 /**
  * @author B. Malinowsky

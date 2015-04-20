@@ -34,34 +34,45 @@
     version.
 */
 
-package tuwien.auto.calimero.exception;
+package tuwien.auto.calimero;
 
 /**
- * Thrown to indicate that a method was invoked at an inappropriate time.
+ * The root checked exception type used in the Calimero 2 library.
  * <p>
- * The object which was operated on, is not in the correct state for that operation.
  * 
  * @author B. Malinowsky
  */
-public class KNXIllegalStateException extends RuntimeException
+public class KNXException extends Exception
 {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Constructs a new <code>KNXIllegalStateException</code> without a detail message.
+	 * Constructs a new <code>KNXException</code> without a detail message.
 	 */
-	public KNXIllegalStateException()
+	public KNXException()
 	{}
 
 	/**
-	 * Constructs a new <code>KNXIllegalStateException</code> with the specified detail
-	 * message.
+	 * Constructs a new <code>KNXException</code> with the specified detail message.
 	 * <p>
 	 * 
 	 * @param s the detail message
 	 */
-	public KNXIllegalStateException(final String s)
+	public KNXException(final String s)
 	{
 		super(s);
+	}
+	
+	/**
+	 * Constructs a new <code>KNXException</code> with the specified detail message and
+	 * cause.
+	 * <p>
+	 * 
+	 * @param s the detail message
+	 * @param cause the cause in form of a throwable object, can be <code>null</code>
+	 */
+	public KNXException(final String s, final Throwable cause)
+	{
+		super(s, cause);
 	}
 }

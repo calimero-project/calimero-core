@@ -34,46 +34,82 @@
     version.
 */
 
-package tuwien.auto.calimero.exception;
+package tuwien.auto.calimero;
+
 
 /**
- * Thrown to indicate that a timeout occurred.
+ * Thrown when some value or content is not in accordance with the expected or requested
+ * format or result.
  * <p>
  * 
  * @author B. Malinowsky
  */
-public class KNXTimeoutException extends KNXException
+public class KNXFormatException extends KNXException
 {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * Constructs a new <code>KNXTimeoutException</code> without a detail message.
-	 */
-	public KNXTimeoutException()
-	{}
+	private final String item;
 
 	/**
-	 * Constructs a new <code>KNXTimeoutException</code> with the specified detail
+	 * Constructs a new <code>KNXFormatException</code> without a detail message.
+	 */
+	public KNXFormatException()
+	{
+		item = null;
+	}
+
+	/**
+	 * Constructs a new <code>KNXFormatException</code> with the specified detail
 	 * message.
 	 * <p>
 	 * 
 	 * @param s the detail message
 	 */
-	public KNXTimeoutException(final String s)
+	public KNXFormatException(final String s)
 	{
 		super(s);
+		item = null;
 	}
 
 	/**
-	 * Constructs a new <code>KNXTimeoutException</code> with the specified detail message
-	 * and cause.
+	 * Constructs a new <code>KNXFormatException</code> with the specified detail
+	 * message and the invalid item.
 	 * <p>
 	 * 
 	 * @param s the detail message
-	 * @param cause the cause
+	 * @param item value, content or piece of information causing this exception (allowed
+	 *        to be <code>null</code>)
 	 */
-	public KNXTimeoutException(final String s, final Throwable cause)
+	public KNXFormatException(final String s, final String item)
 	{
-		super(s, cause);
+		super(s);
+		this.item = item;
+	}
+
+	/**
+	 * Constructs a new <code>KNXFormatException</code> with the specified detail
+	 * message and the invalid item value of type int.
+	 * <p>
+	 * The <code>item</code> value is formatted into a hexadecimal string representation
+	 * using the format "0x" prefix + value (e.g. "0x23" for an item value of 23).
+	 * 
+	 * @param s the detail message
+	 * @param item the value causing this exception
+	 */
+	public KNXFormatException(final String s, final int item)
+	{
+		super(s);
+		this.item = "0x" + Integer.toHexString(item);
+	}
+
+	/**
+	 * Returns the value, content, or piece of information which caused the exception.
+	 * <p>
+	 * 
+	 * @return item representation as string, or <code>null</code> if no item was set
+	 */
+	public final String getItem()
+	{
+		return item;
 	}
 }

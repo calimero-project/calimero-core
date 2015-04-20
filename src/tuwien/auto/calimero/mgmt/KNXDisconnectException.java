@@ -36,7 +36,7 @@
 
 package tuwien.auto.calimero.mgmt;
 
-import tuwien.auto.calimero.exception.KNXException;
+import tuwien.auto.calimero.KNXException;
 
 /**
  * Thrown to indicate that a layer 4 disconnect event happened.

@@ -36,7 +36,7 @@
 
 package tuwien.auto.calimero.knxnetip;
 
-import tuwien.auto.calimero.exception.KNXException;
+import tuwien.auto.calimero.KNXException;
 
 /**
  * Thrown to indicate an illegal operation due to a closed KNXnet/IP communication

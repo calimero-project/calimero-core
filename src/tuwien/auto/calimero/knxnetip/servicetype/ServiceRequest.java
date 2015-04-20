@@ -39,11 +39,11 @@ package tuwien.auto.calimero.knxnetip.servicetype;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
+import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.cemi.CEMIFactory;
-import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 
 /**
  * Common service request structure, used to send requests over established KNXnet/IP

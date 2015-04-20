@@ -39,6 +39,8 @@ package tuwien.auto.calimero.process;
 import java.util.EventListener;
 
 import tuwien.auto.calimero.DetachEvent;
+import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.dptxlator.DPTXlator;
 import tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat;
 import tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled;
@@ -47,8 +49,6 @@ import tuwien.auto.calimero.dptxlator.DPTXlator8BitUnsigned;
 import tuwien.auto.calimero.dptxlator.DPTXlatorBoolean;
 import tuwien.auto.calimero.dptxlator.DPTXlatorString;
 import tuwien.auto.calimero.dptxlator.TranslatorTypes;
-import tuwien.auto.calimero.exception.KNXException;
-import tuwien.auto.calimero.exception.KNXFormatException;
 
 /**
  * Listener interface for getting process communication events, with basic ASDU type translation

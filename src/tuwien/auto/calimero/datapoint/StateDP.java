@@ -44,7 +44,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import tuwien.auto.calimero.GroupAddress;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.xml.Attribute;
 import tuwien.auto.calimero.xml.KNXMLException;
 import tuwien.auto.calimero.xml.XMLReader;

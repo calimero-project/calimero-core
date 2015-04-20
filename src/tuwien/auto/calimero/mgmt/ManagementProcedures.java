@@ -39,10 +39,10 @@ package tuwien.auto.calimero.mgmt;
 import java.util.List;
 
 import tuwien.auto.calimero.IndividualAddress;
-import tuwien.auto.calimero.exception.KNXException;
-import tuwien.auto.calimero.exception.KNXInvalidResponseException;
-import tuwien.auto.calimero.exception.KNXRemoteException;
-import tuwien.auto.calimero.exception.KNXTimeoutException;
+import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.KNXInvalidResponseException;
+import tuwien.auto.calimero.KNXRemoteException;
+import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 
 /**

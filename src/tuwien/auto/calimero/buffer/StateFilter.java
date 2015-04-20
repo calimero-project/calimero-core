@@ -45,6 +45,7 @@ import java.util.Map;
 
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.KNXAddress;
+import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.buffer.Configuration.NetworkFilter;
 import tuwien.auto.calimero.buffer.Configuration.RequestFilter;
 import tuwien.auto.calimero.buffer.cache.Cache;
@@ -59,7 +60,6 @@ import tuwien.auto.calimero.datapoint.Datapoint;
 import tuwien.auto.calimero.datapoint.DatapointMap;
 import tuwien.auto.calimero.datapoint.DatapointModel;
 import tuwien.auto.calimero.datapoint.StateDP;
-import tuwien.auto.calimero.exception.KNXFormatException;
 
 /**
  * Predefined filter for filtering KNX messages of datapoints with state semantic into the

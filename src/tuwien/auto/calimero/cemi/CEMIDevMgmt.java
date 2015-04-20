@@ -40,8 +40,8 @@ import java.io.ByteArrayInputStream;
 import java.util.BitSet;
 
 import tuwien.auto.calimero.DataUnitBuilder;
-import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 /**
  * A cEMI device management message.

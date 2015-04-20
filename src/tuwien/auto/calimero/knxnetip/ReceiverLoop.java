@@ -43,7 +43,7 @@ import java.net.InetSocketAddress;
 import org.slf4j.Logger;
 
 import tuwien.auto.calimero.CloseEvent;
-import tuwien.auto.calimero.exception.KNXFormatException;
+import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.internal.UdpSocketLooper;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.log.LogService.LogLevel;

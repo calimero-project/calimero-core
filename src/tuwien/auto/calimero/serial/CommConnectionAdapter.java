@@ -43,7 +43,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.slf4j.Logger;
 
-import tuwien.auto.calimero.exception.KNXException;
+import tuwien.auto.calimero.KNXException;
 
 /**
  * Adapter for Java ME CDC javax.microedition.io.CommConnection.

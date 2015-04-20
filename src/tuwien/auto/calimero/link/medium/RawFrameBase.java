@@ -41,8 +41,8 @@ import java.io.ByteArrayInputStream;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAddress;
+import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.Priority;
-import tuwien.auto.calimero.exception.KNXFormatException;
 
 /**
  * Implementation for raw frames with common used functionality in L-data and L-polldata

@@ -34,81 +34,36 @@
     version.
 */
 
-package tuwien.auto.calimero.exception;
+package tuwien.auto.calimero;
+
 
 /**
- * Thrown when some value or content is not in accordance with the expected or requested
- * format or result.
+ * Thrown when a message received from a remote endpoint indicates problems or signals
+ * error conditions at the remote server, for example due to a invalid formatted request
+ * or processing result.
  * <p>
  * 
  * @author B. Malinowsky
  */
-public class KNXFormatException extends KNXException
+public class KNXRemoteException extends KNXException
 {
 	private static final long serialVersionUID = 1L;
 
-	private final String item;
-
 	/**
-	 * Constructs a new <code>KNXFormatException</code> without a detail message.
+	 * Constructs a new <code>KNXRemoteException</code> without a detail message.
 	 */
-	public KNXFormatException()
-	{
-		item = null;
-	}
+	public KNXRemoteException()
+	{}
 
 	/**
-	 * Constructs a new <code>KNXFormatException</code> with the specified detail
+	 * Constructs a new <code>KNXRemoteException</code> with the specified detail
 	 * message.
 	 * <p>
 	 * 
 	 * @param s the detail message
 	 */
-	public KNXFormatException(final String s)
+	public KNXRemoteException(final String s)
 	{
 		super(s);
-		item = null;
-	}
-
-	/**
-	 * Constructs a new <code>KNXFormatException</code> with the specified detail
-	 * message and the invalid item.
-	 * <p>
-	 * 
-	 * @param s the detail message
-	 * @param item value, content or piece of information causing this exception (allowed
-	 *        to be <code>null</code>)
-	 */
-	public KNXFormatException(final String s, final String item)
-	{
-		super(s);
-		this.item = item;
-	}
-
-	/**
-	 * Constructs a new <code>KNXFormatException</code> with the specified detail
-	 * message and the invalid item value of type int.
-	 * <p>
-	 * The <code>item</code> value is formatted into a hexadecimal string representation
-	 * using the format "0x" prefix + value (e.g. "0x23" for an item value of 23).
-	 * 
-	 * @param s the detail message
-	 * @param item the value causing this exception
-	 */
-	public KNXFormatException(final String s, final int item)
-	{
-		super(s);
-		this.item = "0x" + Integer.toHexString(item);
-	}
-
-	/**
-	 * Returns the value, content, or piece of information which caused the exception.
-	 * <p>
-	 * 
-	 * @return item representation as string, or <code>null</code> if no item was set
-	 */
-	public final String getItem()
-	{
-		return item;
 	}
 }

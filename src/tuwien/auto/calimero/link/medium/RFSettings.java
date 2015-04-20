@@ -38,7 +38,7 @@ package tuwien.auto.calimero.link.medium;
 
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.IndividualAddress;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 /**
  * Provides settings necessary for communication on RF medium.

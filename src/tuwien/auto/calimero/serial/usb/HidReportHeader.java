@@ -40,8 +40,8 @@ import java.io.ByteArrayOutputStream;
 import java.util.EnumSet;
 import java.util.Iterator;
 
-import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 final class HidReportHeader
 {

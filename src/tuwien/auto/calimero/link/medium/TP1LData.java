@@ -39,7 +39,7 @@ package tuwien.auto.calimero.link.medium;
 import java.io.ByteArrayInputStream;
 
 import tuwien.auto.calimero.DataUnitBuilder;
-import tuwien.auto.calimero.exception.KNXFormatException;
+import tuwien.auto.calimero.KNXFormatException;
 
 /**
  * L-data frame format on TP1 communication medium.

@@ -39,7 +39,7 @@ package tuwien.auto.calimero.knxnetip.servicetype;
 import java.io.ByteArrayOutputStream;
 import java.net.InetAddress;
 
-import tuwien.auto.calimero.exception.KNXFormatException;
+import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.knxnetip.util.CRI;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
 

@@ -36,7 +36,7 @@
 
 package tuwien.auto.calimero.xml;
 
-import tuwien.auto.calimero.exception.KNXException;
+import tuwien.auto.calimero.KNXException;
 
 /**
  * Indicates a problem with XML processing.

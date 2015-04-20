@@ -36,7 +36,7 @@
 
 package tuwien.auto.calimero.serial;
 
-import tuwien.auto.calimero.exception.KNXException;
+import tuwien.auto.calimero.KNXException;
 
 /**
  * Thrown to indicate illegal access to a closed serial port.

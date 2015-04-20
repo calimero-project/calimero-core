@@ -39,8 +39,8 @@ package tuwien.auto.calimero.cemi;
 import java.io.ByteArrayInputStream;
 
 import tuwien.auto.calimero.DataUnitBuilder;
-import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 /**
  * A cEMI busmonitor indication message.

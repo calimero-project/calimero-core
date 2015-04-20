@@ -34,35 +34,33 @@
     version.
 */
 
-package tuwien.auto.calimero.exception;
+package tuwien.auto.calimero;
 
 /**
- * Thrown to indicate a message format mismatch of a response sent by a remote endpoint.
+ * Thrown to indicate that a method was invoked at an inappropriate time.
  * <p>
- * Particularly, if received data from the network is parsed and the structure read does
- * not match.
+ * The object which was operated on, is not in the correct state for that operation.
  * 
  * @author B. Malinowsky
  */
-public class KNXInvalidResponseException extends KNXRemoteException
+public class KNXIllegalStateException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Constructs a new <code>KNXInvalidResponseException</code> without a detail
-	 * message.
+	 * Constructs a new <code>KNXIllegalStateException</code> without a detail message.
 	 */
-	public KNXInvalidResponseException()
+	public KNXIllegalStateException()
 	{}
 
 	/**
-	 * Constructs a new <code>KNXInvalidResponseException</code> with the specified
-	 * detail message.
+	 * Constructs a new <code>KNXIllegalStateException</code> with the specified detail
+	 * message.
 	 * <p>
 	 * 
 	 * @param s the detail message
 	 */
-	public KNXInvalidResponseException(final String s)
+	public KNXIllegalStateException(final String s)
 	{
 		super(s);
 	}

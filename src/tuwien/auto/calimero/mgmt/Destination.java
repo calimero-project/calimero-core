@@ -37,7 +37,7 @@
 package tuwien.auto.calimero.mgmt;
 
 import tuwien.auto.calimero.IndividualAddress;
-import tuwien.auto.calimero.exception.KNXIllegalStateException;
+import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 
 /**

@@ -42,8 +42,8 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
-import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.serial.usb.HidReportHeader.PacketType;
 import tuwien.auto.calimero.serial.usb.TransferProtocolHeader.BusAccessServerService;
 import tuwien.auto.calimero.serial.usb.TransferProtocolHeader.KnxTunnelEmi;

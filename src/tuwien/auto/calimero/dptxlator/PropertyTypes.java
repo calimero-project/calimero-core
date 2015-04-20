@@ -40,8 +40,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.dptxlator.TranslatorTypes.MainType;
-import tuwien.auto.calimero.exception.KNXException;
 
 /**
  * Maintains all available KNX property data types (PDT).

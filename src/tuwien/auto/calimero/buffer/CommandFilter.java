@@ -42,6 +42,8 @@ import java.util.List;
 
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.KNXAddress;
+import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.buffer.Configuration.NetworkFilter;
 import tuwien.auto.calimero.buffer.Configuration.RequestFilter;
 import tuwien.auto.calimero.buffer.LDataObjectQueue.QueueItem;
@@ -53,8 +55,6 @@ import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.datapoint.Datapoint;
 import tuwien.auto.calimero.datapoint.DatapointModel;
-import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.exception.KNXIllegalStateException;
 
 /**
  * Predefined filter for filtering KNX messages of command based datapoints into the

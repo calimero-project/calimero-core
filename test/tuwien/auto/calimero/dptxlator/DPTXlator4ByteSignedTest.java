@@ -42,9 +42,9 @@ import java.util.Iterator;
 import java.util.Map;
 
 import junit.framework.TestCase;
+import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Util;
-import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 
 /**
  * @author B. Malinowsky

@@ -38,9 +38,9 @@ package tuwien.auto.calimero.mgmt;
 
 import junit.framework.TestCase;
 import tuwien.auto.calimero.IndividualAddress;
+import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Util;
-import tuwien.auto.calimero.exception.KNXException;
-import tuwien.auto.calimero.exception.KNXTimeoutException;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.KNXNetworkLinkIP;

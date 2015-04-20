@@ -39,8 +39,8 @@ package tuwien.auto.calimero.cemi;
 import java.util.Arrays;
 
 import tuwien.auto.calimero.DataUnitBuilder;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.cemi.CEMILDataEx.AddInfo;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 
 /**
  * RF medium information, with additional data link layer information mandatory for communication

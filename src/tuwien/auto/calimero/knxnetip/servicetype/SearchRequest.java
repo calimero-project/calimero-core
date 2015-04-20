@@ -41,7 +41,7 @@ import java.io.ByteArrayOutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
-import tuwien.auto.calimero.exception.KNXFormatException;
+import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
 
 /**

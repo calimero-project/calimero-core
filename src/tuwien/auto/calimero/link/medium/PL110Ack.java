@@ -36,7 +36,7 @@
 
 package tuwien.auto.calimero.link.medium;
 
-import tuwien.auto.calimero.exception.KNXFormatException;
+import tuwien.auto.calimero.KNXFormatException;
 
 /**
  * Raw acknowledgment frame on PL110 communication medium.

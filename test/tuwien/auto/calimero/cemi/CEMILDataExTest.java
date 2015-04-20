@@ -42,9 +42,9 @@ import java.util.List;
 import junit.framework.TestCase;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.cemi.CEMILDataEx.AddInfo;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 
 /**
  * @author B. Malinowsky

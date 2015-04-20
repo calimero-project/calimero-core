@@ -36,7 +36,7 @@
 
 package tuwien.auto.calimero.link;
 
-import tuwien.auto.calimero.exception.KNXException;
+import tuwien.auto.calimero.KNXException;
 
 /**
  * Thrown to indicate an illegal operation invoked on an already closed network link.

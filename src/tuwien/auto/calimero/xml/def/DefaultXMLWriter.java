@@ -43,7 +43,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
-import tuwien.auto.calimero.exception.KNXIllegalStateException;
+import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.xml.Attribute;
 import tuwien.auto.calimero.xml.KNXMLException;
 import tuwien.auto.calimero.xml.XMLWriter;

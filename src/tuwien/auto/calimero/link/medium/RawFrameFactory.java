@@ -36,7 +36,7 @@
 
 package tuwien.auto.calimero.link.medium;
 
-import tuwien.auto.calimero.exception.KNXFormatException;
+import tuwien.auto.calimero.KNXFormatException;
 
 /**
  * Factory for raw frames on medium.

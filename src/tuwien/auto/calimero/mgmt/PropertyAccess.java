@@ -36,8 +36,8 @@
 
 package tuwien.auto.calimero.mgmt;
 
+import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.dptxlator.DPTXlator;
-import tuwien.auto.calimero.exception.KNXException;
 
 /**
  * Common property services for accessing KNX properties and property descriptions.

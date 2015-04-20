@@ -49,8 +49,8 @@ import java.util.List;
 import java.util.Vector;
 
 import junit.framework.TestCase;
+import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.Util;
-import tuwien.auto.calimero.exception.KNXIllegalStateException;
 import tuwien.auto.calimero.xml.def.DefaultXMLWriter;
 
 /**

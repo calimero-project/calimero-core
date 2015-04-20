@@ -37,9 +37,9 @@
 package tuwien.auto.calimero.buffer;
 
 import tuwien.auto.calimero.KNXAddress;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.buffer.cache.CacheObject;
 import tuwien.auto.calimero.cemi.CEMILData;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 
 /**
  * Used for holding {@link CEMILData} frames.

@@ -39,10 +39,10 @@ package tuwien.auto.calimero.dptxlator;
 import java.util.Arrays;
 
 import junit.framework.TestCase;
+import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled.DPT3BitControlled;
-import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 
 /**
  * @author B. Malinowsky

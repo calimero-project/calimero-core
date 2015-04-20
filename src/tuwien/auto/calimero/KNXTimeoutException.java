@@ -34,35 +34,47 @@
     version.
 */
 
-package tuwien.auto.calimero.exception;
+package tuwien.auto.calimero;
+
 
 /**
- * Thrown when a message received from a remote endpoint indicates problems or signals
- * error conditions at the remote server, for example due to a invalid formatted request
- * or processing result.
+ * Thrown to indicate that a timeout occurred.
  * <p>
  * 
  * @author B. Malinowsky
  */
-public class KNXRemoteException extends KNXException
+public class KNXTimeoutException extends KNXException
 {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Constructs a new <code>KNXRemoteException</code> without a detail message.
+	 * Constructs a new <code>KNXTimeoutException</code> without a detail message.
 	 */
-	public KNXRemoteException()
+	public KNXTimeoutException()
 	{}
 
 	/**
-	 * Constructs a new <code>KNXRemoteException</code> with the specified detail
+	 * Constructs a new <code>KNXTimeoutException</code> with the specified detail
 	 * message.
 	 * <p>
 	 * 
 	 * @param s the detail message
 	 */
-	public KNXRemoteException(final String s)
+	public KNXTimeoutException(final String s)
 	{
 		super(s);
+	}
+
+	/**
+	 * Constructs a new <code>KNXTimeoutException</code> with the specified detail message
+	 * and cause.
+	 * <p>
+	 * 
+	 * @param s the detail message
+	 * @param cause the cause
+	 */
+	public KNXTimeoutException(final String s, final Throwable cause)
+	{
+		super(s, cause);
 	}
 }

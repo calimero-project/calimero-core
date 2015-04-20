@@ -50,12 +50,12 @@ import org.slf4j.LoggerFactory;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXAddress;
+import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXRemoteException;
+import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.cemi.CEMILData;
-import tuwien.auto.calimero.exception.KNXException;
-import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
-import tuwien.auto.calimero.exception.KNXRemoteException;
-import tuwien.auto.calimero.exception.KNXTimeoutException;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 
 /**
