@@ -341,6 +341,13 @@ public interface PropertyAccess
 		// PDT,DPT: PDT_UNSIGNED_INT
 		public static final int IO_LIST = 71;
 
+		/**
+		 * Device object property "Device Descriptor Type 0".
+		 */
+		// PDT,DPT: PDT_GENERIC_02
+		public static final int DEVICE_DESCRIPTOR = 83;
+
+
 		//
 		// properties of object type 6, Router object
 		//
