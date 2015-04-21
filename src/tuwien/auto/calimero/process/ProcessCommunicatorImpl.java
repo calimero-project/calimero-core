@@ -364,7 +364,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException, KNXFormatException,
 		InterruptedException
 	{
-		final DPTXlator t = is4ByteFloat ? new DPTXlator4ByteFloat(
+		final DPTXlator t = is4ByteFloat ? (DPTXlator) new DPTXlator4ByteFloat(
 				DPTXlator4ByteFloat.DPT_TEMPERATURE_DIFFERENCE) : new DPTXlator2ByteFloat(
 				DPTXlator2ByteFloat.DPT_RAIN_AMOUNT);
 		final int size = is4ByteFloat ? 4 : 2;
