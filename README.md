@@ -1,10 +1,35 @@
-calimero
-========
+Calimero-core Library
+=====================
 
-Core library
+Calimero for Java ME Embedded. 
 
-This feature branch adapts the Calimero library to take advantage of Java SE Embedded 8. 
-The target compact profile is compact1.
+Provided under the terms of GPL, version 2, with the Classpath Exception.
 
-Java SE Embedded 8 with the compact1 profile is similar to Java ME CDC and Foundation Profile, 
-providing an environment for headless applications on embedded devices that require a small footprint.
+__As a side-effect of porting the source code, current snapshots might not compile!__
+
+Overview
+--------
+
+Java ME Embedded is usually referred to with the Internet of Things (IoT). For an overview of Java ME Embedded, see [the Oracle Java ME Embedded Overview](http://www.oracle.com/technetwork/java/embedded/javame/embed-me/overview/index.html).
+
+The Calimero ME library is based on the Calimero-core library for Java SE 8 with the compact1 profile.
+Due to the restricted Java API and the resource-constrained execution environment of Java ME target platforms, 
+the Calimero API also requires minor adaptations. 
+
+
+Dependencies
+------------
+* Java ME configuration: CLDC 1.8
+* Java ME extensions:
+* Security configuration
+
+	- Required permissions:
+	- Optional permissions:
+
+* Development: Oracle Java ME Embedded 8.0, or later
+* Logging framework (the initial port uses a cut-down slf4j, similar to the Java 8 compact1 version)
+
+
+Development
+-----------
+ ...
