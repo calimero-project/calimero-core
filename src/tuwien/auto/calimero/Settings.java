@@ -43,8 +43,8 @@ package tuwien.auto.calimero;
  */
 public final class Settings
 {
-	private static final String version = "2.2.1-dev";
-	private static final String library = "Calimero 2";
+	private static final String version = "2.3-dev";
+	private static final String library = "Calimero 2 (ME)";
 	private static final String desc = "A library for KNX network access";
 
 	private static final String tuwien = "Vienna University of Technology";
@@ -57,15 +57,14 @@ public final class Settings
 	// just use newline, it's easier to deal with
 	private static final String sep = "\n";
 
-
 	private Settings()
 	{}
 
 	/**
 	 * Returns the core library version as string representation.
 	 * <p>
-	 * The returned version is formatted something similar to
-	 * "main.minor[.milli][-phase]", for example, "2.0" or "2.0.0-alpha".
+	 * The returned version is formatted something similar to "main.minor[.milli][-phase]", for
+	 * example, "2.0" or "2.0.0-alpha".
 	 *
 	 * @return version as string
 	 */
@@ -77,13 +76,13 @@ public final class Settings
 	/**
 	 * Returns a default library header representation with general/usage information.
 	 * <p>
-	 * It includes stuff like the library name, library version, name and institute of the
-	 * Vienna University of Technology where the library was developed, and copyright.
-	 * The returned information parts are divided using the newline ('\n') character.
+	 * It includes stuff like the library name, library version, name and institute of the Vienna
+	 * University of Technology where the library was developed, and copyright. The returned
+	 * information parts are divided using the newline ('\n') character.
 	 *
 	 * @param verbose <code>true</code> to return all header information just mentioned,
-	 *        <code>false</code> to only return library name and version comprised of
-	 *        one line (no line separators)
+	 *        <code>false</code> to only return library name and version comprised of one line (no
+	 *        line separators)
 	 * @return header as string
 	 */
 	public static String getLibraryHeader(final boolean verbose)
@@ -92,7 +91,7 @@ public final class Settings
 			return library + " version " + version;
 		final StringBuffer buf = new StringBuffer();
 		buf.append(library).append(" - ").append(desc).append(sep);
-		buf.append("version ").append(version).append(sep);
+		buf.append("Version ").append(version).append(sep);
 		buf.append(group).append(", ");
 		buf.append(tuwien).append(sep);
 		buf.append(copyright);
@@ -100,49 +99,46 @@ public final class Settings
 	}
 
 	/**
-	 * Returns a listing containing all library bundles, stating each bundle's presence for
-	 * use.
+	 * Returns a listing containing all library bundles, stating each bundle's presence for use.
 	 * <p>
-	 * For loading a bundle, the default system class loader is used. A bundle is present
-	 * if it can be loaded using the class loader, otherwise it is considered not
-	 * available for use.<br>
-	 * An available bundle entry starts with a '+' and consists of a short bundle name and
-	 * the base package identifier string, a bundle not present starts with '-' and
-	 * consists of a short name and is marked with the suffix "- not available".<br>
-	 * The bundle entries in the returned string are separated using the newline ('\n')
-	 * character.
+	 * For loading a bundle, the default system class loader is used. A bundle is present if it can
+	 * be loaded using the class loader, otherwise it is considered not available for use.<br>
+	 * An available bundle entry starts with a '+' and consists of a short bundle name and the base
+	 * package identifier string, a bundle not present starts with '-' and consists of a short name
+	 * and is marked with the suffix "- not available".<br>
+	 * The bundle entries in the returned string are separated using the newline ('\n') character.
 	 *
 	 * @return the bundle listing as string
 	 */
 	public static String getBundleListing()
 	{
 		final StringBuffer buf = new StringBuffer();
-		buf.append(getBundle("log service", "tuwien.auto.calimero.log.LogService", 1)
-			+ sep);
 		buf.append(getBundle("cEMI", "tuwien.auto.calimero.cemi.CEMI", 1)).append(sep);
-		buf.append(getBundle("KNXnet/IP",
-			"tuwien.auto.calimero.knxnetip.KNXnetIPConnection", 1)).append(sep);
+		buf.append(getBundle("KNXnet/IP", "tuwien.auto.calimero.knxnetip.KNXnetIPConnection", 1))
+				.append(sep);
 		buf.append(getBundle("serial", "tuwien.auto.calimero.serial.FT12Connection", 1))
-			.append(sep);
-		buf.append(getBundle("KNX network link",
-			"tuwien.auto.calimero.link.KNXNetworkLink", 1)).append(sep);
-		buf.append(getBundle("DPT translators",
-			"tuwien.auto.calimero.dptxlator.DPTXlator", 1)).append(sep);
-		buf.append(getBundle("datapoints", "tuwien.auto.calimero.datapoint.Datapoint",
-			1)).append(sep);
-		buf.append(getBundle("network buffer",
-			"tuwien.auto.calimero.buffer.NetworkBuffer", 1)).append(sep);
-		buf.append(getBundle("process", "tuwien.auto.calimero.process."
-			+ "ProcessCommunicator", 1)	+ sep);
-		buf.append(getBundle("management", "tuwien.auto.calimero.mgmt.ManagementClient",
-			1)).append(sep);
-		buf.append(getBundle("XML", "tuwien.auto.calimero.xml.def.DefaultXMLReader", 2));
+				.append(sep);
+		buf.append(getBundle("USB", "tuwien.auto.calimero.serial.usb.UsbConnection", 1))
+				.append(sep);
+		buf.append(getBundle("KNX network link", "tuwien.auto.calimero.link.KNXNetworkLink", 1))
+				.append(sep);
+		buf.append(getBundle("DPT translators", "tuwien.auto.calimero.dptxlator.DPTXlator", 1))
+				.append(sep);
+		buf.append(getBundle("datapoints", "tuwien.auto.calimero.datapoint.Datapoint", 1)).append(
+				sep);
+		buf.append(getBundle("network buffer", "tuwien.auto.calimero.buffer.NetworkBuffer", 1))
+				.append(sep);
+		buf.append(getBundle("process", "tuwien.auto.calimero.process.ProcessCommunicator", 1))
+				.append(sep);
+		buf.append(getBundle("management", "tuwien.auto.calimero.mgmt.ManagementClient", 1))
+				.append(sep);
+		buf.append(getBundle("XML", "tuwien.auto.calimero.xml.DefaultXmlReader", 2));
 		return buf.toString();
 	}
 
 	/**
-	 * This entry routine of the library prints information to the standard
-	 * output stream (System.out), mainly for user information.
+	 * This entry routine of the library prints information to the standard output stream
+	 * (System.out), mainly for user information.
 	 * <p>
 	 * Recognized options for output:
 	 * <ul>
@@ -176,11 +172,11 @@ public final class Settings
 	/**
 	 * Library internal use only.
 	 * <p>
-	 * Used for development and debugging purposes, users of the library should not depend
-	 * on this function.
+	 * Used for development and debugging purposes, users of the library should not depend on this
+	 * function.
 	 * <p>
-	 * Querying library mode allows library functions to adapt its behavior, e.g.,
-	 * provide additional logging output.
+	 * Querying library mode allows library functions to adapt its behavior, e.g., provide
+	 * additional logging output.
 	 *
 	 * @return the current library mode
 	 */
@@ -192,19 +188,17 @@ public final class Settings
 	// for now, this works by loading one class as representative from a bundle
 	// to check availability, then class name is truncated to bundle id
 	private static String getBundle(final String friendlyName, final String className,
-			final int truncate)
+		final int truncate)
 	{
 		try {
-			final ClassLoader cl = Settings.class.getClassLoader();
-			cl.loadClass(className);
+			Class.forName(className);
 			int start = className.length();
 			for (int i = 0; i < truncate; ++i)
 				start = className.lastIndexOf('.', start - 1);
 			final String bundle = className.substring(0, start);
 			return "+ " + friendlyName + align(friendlyName) + "- " + bundle;
 		}
-		catch (final ClassNotFoundException e) {}
-		catch (final NoClassDefFoundError e) {}
+		catch (final ClassNotFoundException | Error e) {}
 		return "- " + friendlyName + align(friendlyName) + "- not available";
 	}
 

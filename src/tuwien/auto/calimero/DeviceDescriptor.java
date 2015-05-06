@@ -36,9 +36,6 @@
 
 package tuwien.auto.calimero;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.link.medium.KnxIPSettings;
 import tuwien.auto.calimero.link.medium.PLSettings;
@@ -55,10 +52,10 @@ import tuwien.auto.calimero.link.medium.TPSettings;
  *
  * @author B. Malinowsky
  */
-public interface DeviceDescriptor
+public abstract class DeviceDescriptor
 {
-	static final int TYPE_SIZE = 2;
-	static final int TYPE2_SIZE = 14;
+	public static final int TYPE_SIZE = 2;
+	public static final int TYPE2_SIZE = 14;
 
 	/**
 	 * Construct a device descriptor by parsing raw data.
@@ -76,13 +73,13 @@ public interface DeviceDescriptor
 		throw new KNXFormatException("unknown device descriptor type of size " + data.length);
 	}
 
-	byte[] toByteArray();
+	public abstract byte[] toByteArray();
 
 	/**
 	 * The Device Descriptor Type 0 (DD0) format, providing the available mask versions for type 0.
 	 * The terminology 'mask version' is equivalent with DD0.
 	 */
-	public static final class DD0 implements DeviceDescriptor
+	public static final class DD0 extends DeviceDescriptor
 	{
 		/** */
 		public static final DD0 TYPE_0010 = new DD0(0x0010, "System 1 (BCU 1)");
@@ -155,14 +152,14 @@ public interface DeviceDescriptor
 
 		static {
 			// ensure our DD0 array is up-to-date with the declared mask versions
-			int i = 0;
-			for (final Field f : DD0.class.getDeclaredFields()) {
-				final int mod = f.getModifiers();
-				if (Modifier.isStatic(mod) && f.getName().startsWith("TYPE_"))
-					++i;
-			}
-			if (i != types.length)
-				throw new KNXIllegalStateException("mask versions missing");
+//			int i = 0;
+//			for (final Field f : DD0.class.getDeclaredFields()) {
+//				final int mod = f.getModifiers();
+//				if (Modifier.isStatic(mod) && f.getName().startsWith("TYPE_"))
+//					++i;
+//			}
+//			if (i != types.length)
+//				throw new KNXIllegalStateException("mask versions missing");
 		}
 
 		private final int mv;
@@ -301,7 +298,7 @@ public interface DeviceDescriptor
 		}
 	}
 
-	public static final class DD2 implements DeviceDescriptor
+	public static final class DD2 extends DeviceDescriptor
 	{
 		private final byte[] d;
 
@@ -396,7 +393,10 @@ public interface DeviceDescriptor
 		}
 
 		public enum Channel {
-			Channel1, Channel2, Channel3, Channel4
+			Channel1,
+			Channel2,
+			Channel3,
+			Channel4
 		};
 
 		/**

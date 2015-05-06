@@ -80,7 +80,7 @@ import tuwien.auto.calimero.dptxlator.TranslatorTypes;
  * @author B. Malinowsky
  * @see ProcessCommunicator
  */
-public interface ProcessListener extends EventListener
+public abstract class ProcessListener implements EventListener
 {
 	/**
 	 * Returns the ASDU of the received process event as boolean datapoint value.
@@ -93,7 +93,7 @@ public interface ProcessListener extends EventListener
 	 * @return the received value of type boolean
 	 * @throws KNXFormatException on not supported or not available boolean DPT
 	 */
-	static boolean asBool(final ProcessEvent e) throws KNXFormatException
+	public static boolean asBool(final ProcessEvent e) throws KNXFormatException
 	{
 		final DPTXlatorBoolean t = new DPTXlatorBoolean(DPTXlatorBoolean.DPT_BOOL);
 		t.setData(e.getASDU());
@@ -113,7 +113,8 @@ public interface ProcessListener extends EventListener
 	 * @return the received value of type 8 Bit unsigned
 	 * @throws KNXFormatException on not supported or not available 8 Bit unsigned DPT
 	 */
-	static int asUnsigned(final ProcessEvent e, final String scale) throws KNXFormatException
+	public static int asUnsigned(final ProcessEvent e, final String scale)
+		throws KNXFormatException
 	{
 		final DPTXlator8BitUnsigned t = new DPTXlator8BitUnsigned(scale);
 		t.setData(e.getASDU());
@@ -131,7 +132,7 @@ public interface ProcessListener extends EventListener
 	 * @return the received value of type 3 Bit controlled
 	 * @throws KNXFormatException on not supported or not available 3 Bit controlled DPT
 	 */
-	static int asControl(final ProcessEvent e) throws KNXFormatException
+	public static int asControl(final ProcessEvent e) throws KNXFormatException
 	{
 		final DPTXlator3BitControlled t = new DPTXlator3BitControlled(
 				DPTXlator3BitControlled.DPT_CONTROL_DIMMING);
@@ -151,7 +152,7 @@ public interface ProcessListener extends EventListener
 	 * @return the received value of type double
 	 * @throws KNXFormatException on not supported or not available float DPT
 	 */
-	static double asFloat(final ProcessEvent e, final boolean from4ByteFloat)
+	public static double asFloat(final ProcessEvent e, final boolean from4ByteFloat)
 		throws KNXFormatException
 	{
 		final DPTXlator t = from4ByteFloat ? new DPTXlator4ByteFloat(
@@ -175,7 +176,7 @@ public interface ProcessListener extends EventListener
 	 * @return the received value of type String
 	 * @throws KNXFormatException on not supported or not available ISO-8859-1 DPT
 	 */
-	static String asString(final ProcessEvent e) throws KNXFormatException
+	public static String asString(final ProcessEvent e) throws KNXFormatException
 	{
 		final DPTXlatorString t = new DPTXlatorString(DPTXlatorString.DPT_STRING_8859_1);
 		t.setData(e.getASDU());
@@ -191,14 +192,14 @@ public interface ProcessListener extends EventListener
 	 * the received datapoint type.
 	 *
 	 * @param e the process event with the ASDU to translate
-	 * @param dptMainNumber datapoint type main number, number &ge; 0; use 0 to infer translator type
-	 *        from <code>dptID</code> argument only
+	 * @param dptMainNumber datapoint type main number, number &ge; 0; use 0 to infer translator
+	 *        type from <code>dptID</code> argument only
 	 * @param dptID datapoint type ID for selecting a particular kind of value translation
 	 * @return the received value of the requested type as String representation
 	 * @throws KNXException on not supported or not available DPT
 	 * @see TranslatorTypes#createTranslator(int, String)
 	 */
-	static String asString(final ProcessEvent e, final int dptMainNumber, final String dptID)
+	public static String asString(final ProcessEvent e, final int dptMainNumber, final String dptID)
 		throws KNXException
 	{
 		final DPTXlator t = TranslatorTypes.createTranslator(dptMainNumber, dptID);
@@ -211,26 +212,26 @@ public interface ProcessListener extends EventListener
 	 *
 	 * @param e process event object
 	 */
-	void groupReadRequest(ProcessEvent e);
+	public abstract void groupReadRequest(ProcessEvent e);
 
 	/**
 	 * Indicates that a KNX group read response message was received from the KNX network.
 	 *
 	 * @param e process event object
 	 */
-	void groupReadResponse(ProcessEvent e);
+	public abstract void groupReadResponse(ProcessEvent e);
 
 	/**
 	 * Indicates that a KNX group write message indication was received from the KNX network.
 	 *
 	 * @param e process event object
 	 */
-	void groupWrite(ProcessEvent e);
+	public abstract void groupWrite(ProcessEvent e);
 
 	/**
 	 * The KNX network link was detached from the process communicator.
 	 *
 	 * @param e detach event object
 	 */
-	void detached(DetachEvent e);
+	public abstract void detached(DetachEvent e);
 }

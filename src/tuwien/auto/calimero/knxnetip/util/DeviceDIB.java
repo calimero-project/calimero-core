@@ -38,14 +38,14 @@ package tuwien.auto.calimero.knxnetip.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Arrays;
 
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.internal.EndpointAddress;
+import tuwien.auto.calimero.internal.JavaME;
 
 /**
  * Represents a device description information block. Objects of this type are immutable.
@@ -89,7 +89,6 @@ public class DeviceDIB extends DIB
 	 */
 	public static final int MEDIUM_KNXIP = 0x20;
 
-
 	private static final int DIB_SIZE = 54;
 
 	private final int status;
@@ -120,8 +119,7 @@ public class DeviceDIB extends DIB
 				- offset - 2);
 		knxmedium = is.read();
 		status = is.read();
-		address = new IndividualAddress(
-			new byte[] { (byte) is.read(), (byte) is.read(), });
+		address = new IndividualAddress(new byte[] { (byte) is.read(), (byte) is.read(), });
 		installationId = (is.read() << 8) | is.read();
 		is.read(serial, 0, serial.length);
 		is.read(mcast, 0, mcast.length);
@@ -139,21 +137,18 @@ public class DeviceDIB extends DIB
 	 * Creates a device information DIB using the supplied device information.
 	 * <p>
 	 *
-	 * @param friendlyName user friendly name to identify the device; a ISO 8859-1 string
-	 *        with a maximum length of 29 characters
+	 * @param friendlyName user friendly name to identify the device; a ISO 8859-1 string with a
+	 *        maximum length of 29 characters
 	 * @param deviceStatus current device status, <code>0 &le; deviceStatus &le; 0xff</code>
 	 *        <ul>
 	 *        <li>bit 0 is the programming mode:<br>
 	 *        1 = device is in programming mode<br>
-	 *        0 = device is not in programming mode</li>
-	 *        <li>all other bits are reserved</li>
+	 *        0 = device is not in programming mode</li> <li>all other bits are reserved</li>
 	 *        </ul>
-	 * @param projectInstallationId project-installation identifier of this device;
-	 *        uniquely identifies a device in a project with more than one installation.
-	 *        The lower 4 bits specify the installation number, bits 4 to 15 (MSB) contain
-	 *        the project number.
-	 * @param knxMedium KNX medium, one of the predefined KNX medium code constants of
-	 *        this class
+	 * @param projectInstallationId project-installation identifier of this device; uniquely
+	 *        identifies a device in a project with more than one installation. The lower 4 bits
+	 *        specify the installation number, bits 4 to 15 (MSB) contain the project number.
+	 * @param knxMedium KNX medium, one of the predefined KNX medium code constants of this class
 	 * @param knxAddress KNX individual address
 	 * @param serialNumber KNX serial number of the device, used to identify the device,
 	 *        <code>serialNumber.length == 6</code>
@@ -163,7 +158,7 @@ public class DeviceDIB extends DIB
 	 */
 	public DeviceDIB(final String friendlyName, final int deviceStatus,
 		final int projectInstallationId, final int knxMedium, final IndividualAddress knxAddress,
-		final byte[] serialNumber, final InetAddress routingMulticast, final byte[] macAddress)
+		final byte[] serialNumber, final EndpointAddress routingMulticast, final byte[] macAddress)
 	{
 		super(DIB_SIZE, DEVICE_INFO);
 
@@ -204,9 +199,8 @@ public class DeviceDIB extends DIB
 
 		final byte[] empty = new byte[] { 0, 0, 0, 0 };
 		final byte[] rmc = routingMulticast == null ? empty : routingMulticast.getAddress();
-		if (!Arrays.equals(rmc, empty) && !routingMulticast.isMulticastAddress())
-			throw new KNXIllegalArgumentException(routingMulticast.toString()
-					+ " is not a multicast address");
+		if (!Arrays.equals(rmc, empty) && !routingMulticast.isMulticast())
+			throw new KNXIllegalArgumentException(routingMulticast + " is not a multicast address");
 		for (int i = 0; i < mcast.length; i++)
 			mcast[i] = rmc[i];
 
@@ -231,8 +225,8 @@ public class DeviceDIB extends DIB
 	/**
 	 * Returns the device status byte.
 	 * <p>
-	 * Bit 0 is programming mode flag: 1 = device is in programming mode, 0 = device is
-	 * not in programming mode.
+	 * Bit 0 is programming mode flag: 1 = device is in programming mode, 0 = device is not in
+	 * programming mode.
 	 *
 	 * @return status as unsigned byte
 	 */
@@ -316,9 +310,8 @@ public class DeviceDIB extends DIB
 	/**
 	 * Returns the project-installation identifier of this device.
 	 * <p>
-	 * This ID uniquely identifies a device in a project with more than one installation.
-	 * The lowest 4 bits specify the installation number, bit 4 to 15 (MSB) contain the
-	 * project number.
+	 * This ID uniquely identifies a device in a project with more than one installation. The lowest
+	 * 4 bits specify the installation number, bit 4 to 15 (MSB) contain the project number.
 	 *
 	 * @return project installation identifier as unsigned 16 bit value
 	 */
@@ -379,8 +372,8 @@ public class DeviceDIB extends DIB
 	/**
 	 * Returns the device friendly name.
 	 * <p>
-	 * This name is used to display a device in textual format. The maximum name length is
-	 * 30 characters.
+	 * This name is used to display a device in textual format. The maximum name length is 30
+	 * characters.
 	 *
 	 * @return device name as string
 	 */
@@ -398,11 +391,7 @@ public class DeviceDIB extends DIB
 	@Override
 	public String toString()
 	{
-		InetAddress mc = null;
-		try {
-			mc = InetAddress.getByAddress(getMulticastAddress());
-		}
-		catch (final UnknownHostException ignore) {}
+		final EndpointAddress mc = EndpointAddress.of(getMulticastAddress());
 		return "device " + address + " \"" + name + "\", KNX medium " + getKNXMediumString()
 				+ ", installation " + getInstallation() + " project " + getProject()
 				+ " (project installation ID " + installationId + ")"
@@ -420,17 +409,17 @@ public class DeviceDIB extends DIB
 		final DeviceDIB other = (DeviceDIB) obj;
 		return address.equals(other.address) && name.equals(other.name) && status == other.status
 				&& knxmedium == other.knxmedium
-				&& Arrays.hashCode(serial) == Arrays.hashCode(other.serial)
+				&& JavaME.hashCode(serial) == JavaME.hashCode(other.serial)
 				&& installationId == other.installationId
-				&& Arrays.hashCode(mcast) == Arrays.hashCode(other.mcast)
-				&& Arrays.hashCode(mac) == Arrays.hashCode(other.mac);
+				&& JavaME.hashCode(mcast) == JavaME.hashCode(other.mcast)
+				&& JavaME.hashCode(mac) == JavaME.hashCode(other.mac);
 	}
 
 	@Override
 	public int hashCode()
 	{
 		return status + knxmedium + installationId + address.hashCode() + name.hashCode()
-				+ Arrays.hashCode(serial) + Arrays.hashCode(mcast) + Arrays.hashCode(mac);
+				+ JavaME.hashCode(serial) + JavaME.hashCode(mcast) + JavaME.hashCode(mac);
 	}
 
 	/* (non-Javadoc)

@@ -38,7 +38,6 @@ package tuwien.auto.calimero.mgmt;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -145,8 +144,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	 * @param link the KNX network link, with link in open state
 	 * @throws KNXLinkClosedException on closed {@link KNXNetworkLink}
 	 */
-	public ManagementProceduresImpl(final KNXNetworkLink link)
-		throws KNXLinkClosedException
+	public ManagementProceduresImpl(final KNXNetworkLink link) throws KNXLinkClosedException
 	{
 		tl = new TransportLayerImpl(link);
 		mc = new ManagementClientImpl(link, tl);
@@ -154,11 +152,10 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	}
 
 	/**
-	 * Creates a new management procedures instance, using the supplied management client
-	 * for application layer services.
+	 * Creates a new management procedures instance, using the supplied management client for
+	 * application layer services.
 	 *
-	 * @param mgmtClient the management client, with a network link attached and in open
-	 *        state
+	 * @param mgmtClient the management client, with a network link attached and in open state
 	 * @param transportLayer
 	 */
 	protected ManagementProceduresImpl(final ManagementClient mgmtClient,
@@ -238,8 +235,8 @@ public class ManagementProceduresImpl implements ManagementProcedures
 						// a device with newAddress exists but is not in programming mode,
 						// bail out
 						if (exists) {
-							logger.warn("device exists but is not in programming mode, " +
-									"cancel writing address");
+							logger.warn("device exists but is not in programming mode, "
+									+ "cancel writing address");
 							return false;
 						}
 					}
@@ -292,8 +289,8 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	 * #isAddressOccupied(tuwien.auto.calimero.IndividualAddress)
 	 */
 	@Override
-	public boolean isAddressOccupied(final IndividualAddress devAddr)
-		throws KNXException, InterruptedException
+	public boolean isAddressOccupied(final IndividualAddress devAddr) throws KNXException,
+		InterruptedException
 	{
 		final Destination dst = mc.createDestination(devAddr, true);
 		try {
@@ -384,7 +381,8 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	 * @see tuwien.auto.calimero.mgmt.ManagementProcedures#scanSerialNumbers(int)
 	 */
 	@Override
-	public List<byte[]> scanSerialNumbers(final int medium) throws KNXException, InterruptedException
+	public List<byte[]> scanSerialNumbers(final int medium) throws KNXException,
+		InterruptedException
 	{
 		final Destination dst = mc.createDestination(new IndividualAddress(0, medium, 0xff), true);
 		synchronized (mc) {
@@ -402,7 +400,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 				dst.destroy();
 			}
 		}
-		return Collections.emptyList();
+		return new ArrayList<>();
 	}
 
 	/*
@@ -454,21 +452,20 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		// either verifyWrite or verifyByServer, not both applicable
 		if (verifyWrite && verifyByServer)
 			throw new KNXIllegalArgumentException(
-				"verify write and verify by server not both applicable");
+					"verify write and verify by server not both applicable");
 
 		final Destination d = getOrCreateDestination(device, false, verifyByServer);
 		// if automatic server verification is requested, turn verify flag on
 		if (verifyByServer) {
 			// reading description checks whether property exists
 			/* final byte[] desc = */mc.readPropertyDesc(d, DEVICE_OBJECT_INDEX,
-				PropertyAccess.PID.DEVICE_CONTROL, 0);
+					PropertyAccess.PID.DEVICE_CONTROL, 0);
 			final byte[] ctrl = mc.readProperty(d, DEVICE_OBJECT_INDEX,
-				PropertyAccess.PID.DEVICE_CONTROL, 1, 1);
+					PropertyAccess.PID.DEVICE_CONTROL, 1, 1);
 			// bit 2 is set for automatic management server verification (responds on
 			// memory write with a response containing the written data)
 			ctrl[0] |= 0x04;
-			mc.writeProperty(d, DEVICE_OBJECT_INDEX, PropertyAccess.PID.DEVICE_CONTROL,
-				1, 1, ctrl);
+			mc.writeProperty(d, DEVICE_OBJECT_INDEX, PropertyAccess.PID.DEVICE_CONTROL, 1, 1, ctrl);
 		}
 
 		// create structure to write
@@ -592,8 +589,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 				tl.destroyDestination(d);
 			}
 		}
-		final IndividualAddress[] array = devices
-				.toArray(new IndividualAddress[devices.size()]);
+		final IndividualAddress[] array = devices.toArray(new IndividualAddress[devices.size()]);
 		return array;
 	}
 
@@ -602,7 +598,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		// asdu is 3 bytes shorter than apdu
 		try {
 			final byte[] data = mc.readProperty(d, DEVICE_OBJECT_INDEX,
-				PropertyAccess.PID.MAX_APDULENGTH, 1, 1);
+					PropertyAccess.PID.MAX_APDULENGTH, 1, 1);
 			return toUnsigned(data) - 3;
 		}
 		catch (final KNXException e) {

@@ -37,7 +37,8 @@
 package tuwien.auto.calimero.cemi;
 
 import java.io.ByteArrayInputStream;
-import java.util.BitSet;
+import java.util.HashSet;
+import java.util.Set;
 
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.KNXFormatException;
@@ -82,14 +83,14 @@ public class CEMIDevMgmt implements CEMI
 		public static final int OUT_OF_MINRANGE = 0x03;
 
 		/**
-		 * Error code: memory can not be written or only with fault(s), used in negative
-		 * write messages confirmations
+		 * Error code: memory can not be written or only with fault(s), used in negative write
+		 * messages confirmations
 		 */
 		public static final int MEMORY_ERROR = 0x04;
 
 		/**
-		 * Error code: write access to a 'read only' or a write protected property, used
-		 * in negative write request message confirmations
+		 * Error code: write access to a 'read only' or a write protected property, used in negative
+		 * write request message confirmations
 		 */
 		public static final int READ_ONLY = 0x05;
 
@@ -100,20 +101,20 @@ public class CEMIDevMgmt implements CEMI
 		public static final int ILLEGAL_COMMAND = 0x06;
 
 		/**
-		 * Error code: read or write access to an non existing property, used in negative
-		 * read/write message confirmations
+		 * Error code: read or write access to an non existing property, used in negative read/write
+		 * message confirmations
 		 */
 		public static final int VOID_DP = 0x07;
 
 		/**
-		 * Error code: write access with a wrong data type (datapoint length), used in
-		 * negative write message confirmations
+		 * Error code: write access with a wrong data type (datapoint length), used in negative
+		 * write message confirmations
 		 */
 		public static final int TYPE_CONFLICT = 0x08;
 
 		/**
-		 * Error code: read or write access to a non existing property array index, used
-		 * in negative read/write message confirmations
+		 * Error code: read or write access to a non existing property array index, used in negative
+		 * read/write message confirmations
 		 */
 		public static final int PROP_INDEX_RANGE_ERROR = 0x09;
 
@@ -189,14 +190,11 @@ public class CEMIDevMgmt implements CEMI
 //	 */
 //	public static final short PID_TRANSP_ENABLE = 56;
 
-	private static BitSet msgCodes;
-	private static final int MC_OFFSET = 0xF0;
-
+	private static final Set<Integer> msgCodes = new HashSet<>();
 	private static final byte[] empty = new byte[0];
 
-	private static final String[] errors = new String[] {
-		"unspecified Error (unknown error)", "out of range (write value not allowed)",
-		"out of max. range (write value too high)",
+	private static final String[] errors = new String[] { "unspecified Error (unknown error)",
+		"out of range (write value not allowed)", "out of max. range (write value too high)",
 		"out of min. range (write value too low)",
 		"memory error (memory can not be written or only with faults)",
 		"read only (write access to a read-only or write-protected property)",
@@ -215,14 +213,13 @@ public class CEMIDevMgmt implements CEMI
 	private int header = 1;
 
 	static {
-		msgCodes = new BitSet(20);
-		msgCodes.set(MC_PROPREAD_REQ - MC_OFFSET);
-		msgCodes.set(MC_PROPREAD_CON - MC_OFFSET);
-		msgCodes.set(MC_PROPWRITE_REQ - MC_OFFSET);
-		msgCodes.set(MC_PROPWRITE_CON - MC_OFFSET);
-		msgCodes.set(MC_PROPINFO_IND - MC_OFFSET);
-		msgCodes.set(MC_RESET_REQ - MC_OFFSET);
-		msgCodes.set(MC_RESET_IND - MC_OFFSET);
+		msgCodes.add(Integer.valueOf(MC_PROPREAD_REQ));
+		msgCodes.add(Integer.valueOf(MC_PROPREAD_CON));
+		msgCodes.add(Integer.valueOf(MC_PROPWRITE_REQ));
+		msgCodes.add(Integer.valueOf(MC_PROPWRITE_CON));
+		msgCodes.add(Integer.valueOf(MC_PROPINFO_IND));
+		msgCodes.add(Integer.valueOf(MC_RESET_REQ));
+		msgCodes.add(Integer.valueOf(MC_RESET_IND));
 	}
 
 	/**
@@ -232,8 +229,7 @@ public class CEMIDevMgmt implements CEMI
 	 * @param data byte stream containing a cEMI device management message
 	 * @param offset start offset of cEMI frame in <code>data</code>
 	 * @param length length in bytes of the whole device management message
-	 * @throws KNXFormatException if no device management frame found or invalid frame
-	 *         structure
+	 * @throws KNXFormatException if no device management frame found or invalid frame structure
 	 */
 	public CEMIDevMgmt(final byte[] data, final int offset, final int length)
 		throws KNXFormatException
@@ -241,7 +237,7 @@ public class CEMIDevMgmt implements CEMI
 		final ByteArrayInputStream is = new ByteArrayInputStream(data, offset, length);
 		checkLength(is, 1);
 		mc = is.read();
-		if (mc < MC_OFFSET || !msgCodes.get(mc - MC_OFFSET))
+		if (!msgCodes.contains(mc))
 			throw new KNXFormatException("unknown message code");
 		if (mc == MC_RESET_REQ || mc == MC_RESET_IND)
 			initReset(is);
@@ -254,9 +250,9 @@ public class CEMIDevMgmt implements CEMI
 	/**
 	 * Creates a new device management message with the given message code.
 	 * <p>
-	 * The message structure (and resulting frame) will only consist of the message code
-	 * field. All other device management methods are not used (and will consequently
-	 * return 0 or empty fields by default).
+	 * The message structure (and resulting frame) will only consist of the message code field. All
+	 * other device management methods are not used (and will consequently return 0 or empty fields
+	 * by default).
 	 * <p>
 	 * Used for reset messages.
 	 *
@@ -272,23 +268,22 @@ public class CEMIDevMgmt implements CEMI
 	/**
 	 * Creates a new device management message.
 	 * <p>
-	 * Used for messages without a data (or error information) part in the message
-	 * structure (like read request).
+	 * Used for messages without a data (or error information) part in the message structure (like
+	 * read request).
 	 *
 	 * @param msgCode a message code constant declared by this class
 	 * @param objType interface object type, value in the range 0 &lt;= value &lt;= 0xFFFF
 	 * @param objInstance object instance, value in the range 1 &lt;= value &lt;= 0xFF
 	 * @param propID property identifier (PID), in the range 0 &lt;= PID &lt;= 0xFF
-	 * @param startIndex start index into the property array, first element value has
-	 *        index 1, index 0 in the property contains the current number of valid
-	 *        elements (read only)
-	 * @param elements number of elements in the array of the property, in the range 1
-	 *        &lt;= elements &lt;= 0xFF;
+	 * @param startIndex start index into the property array, first element value has index 1, index
+	 *        0 in the property contains the current number of valid elements (read only)
+	 * @param elements number of elements in the array of the property, in the range 1 &lt;=
+	 *        elements &lt;= 0xFF;
 	 */
 	public CEMIDevMgmt(final int msgCode, final int objType, final int objInstance,
 		final int propID, final int startIndex, final int elements)
 	{
-		if (msgCode < MC_OFFSET || !msgCodes.get(msgCode - MC_OFFSET))
+		if (!msgCodes.contains(msgCode))
 			throw new KNXIllegalArgumentException("unknown message code");
 		mc = msgCode;
 		header = 7;
@@ -298,20 +293,18 @@ public class CEMIDevMgmt implements CEMI
 	/**
 	 * Creates a new device management message.
 	 * <p>
-	 * Used for messages containing a data (or error information) part in the message
-	 * structure (like read confirmation).
+	 * Used for messages containing a data (or error information) part in the message structure
+	 * (like read confirmation).
 	 *
 	 * @param msgCode a message code constant declared by this class
 	 * @param objType interface object type, value in the range 0 &lt;= value &lt;= 0xFFFF
 	 * @param objInstance object instance, value in the range 1 &lt;= value &lt;= 0xFF
 	 * @param propID property identifier (PID), in the range 0 &lt;= PID &lt;= 0xFF
-	 * @param startIndex start index in the property, first element has index 1, index 0
-	 *        in the property contains the current number of valid elements (read only)
-	 * @param elements number of elements in the array of the property, in the range 0
-	 *        &lt;= elements &lt;= 0xFF; the number 0 is used to indicate a negative
-	 *        response
-	 * @param data contains the data (or the error information, if numElems = 0) as byte
-	 *        array
+	 * @param startIndex start index in the property, first element has index 1, index 0 in the
+	 *        property contains the current number of valid elements (read only)
+	 * @param elements number of elements in the array of the property, in the range 0 &lt;=
+	 *        elements &lt;= 0xFF; the number 0 is used to indicate a negative response
+	 * @param data contains the data (or the error information, if numElems = 0) as byte array
 	 */
 	public CEMIDevMgmt(final int msgCode, final int objType, final int objInstance,
 		final int propID, final int startIndex, final int elements, final byte[] data)
@@ -347,17 +340,17 @@ public class CEMIDevMgmt implements CEMI
 	}
 
 	/**
-	 * Returns the data part, i.e., the property data or error information following the
-	 * start index in the message structure.
+	 * Returns the data part, i.e., the property data or error information following the start index
+	 * in the message structure.
 	 * <p>
-	 * The property content depends on the property data type, and in case of an array
-	 * structured property value also on the accessed number of array elements.
+	 * The property content depends on the property data type, and in case of an array structured
+	 * property value also on the accessed number of array elements.
 	 * <p>
-	 * In case of a message carrying a negative response, the payload holds error
-	 * information. To determine whether the returned array contains error information,
-	 * use {@link #isNegativeResponse()}.<br>
-	 * If the message does not contain any data (or error information), a byte array with
-	 * length 0 is returned.
+	 * In case of a message carrying a negative response, the payload holds error information. To
+	 * determine whether the returned array contains error information, use
+	 * {@link #isNegativeResponse()}.<br>
+	 * If the message does not contain any data (or error information), a byte array with length 0
+	 * is returned.
 	 *
 	 * @return a copy of the data part in the message structure as byte array
 	 */
@@ -419,8 +412,8 @@ public class CEMIDevMgmt implements CEMI
 	/**
 	 * Returns the number of elements field from the message.
 	 * <p>
-	 * An element count in the range 1 to 15 indicates the presence of element data. A
-	 * value of 0 indicates a negative response.<br>
+	 * An element count in the range 1 to 15 indicates the presence of element data. A value of 0
+	 * indicates a negative response.<br>
 	 * If the message structure does not contain this field, 0 is returned.
 	 *
 	 * @return number of elements as unsigned 4 bit value
@@ -457,8 +450,8 @@ public class CEMIDevMgmt implements CEMI
 	/**
 	 * Returns if the message contains a negative response.
 	 * <p>
-	 * A message contains a negative response, iff the message code equals
-	 * {@link #MC_PROPREAD_CON} or {@link #MC_PROPWRITE_CON} and number of elements is 0.
+	 * A message contains a negative response, iff the message code equals {@link #MC_PROPREAD_CON}
+	 * or {@link #MC_PROPWRITE_CON} and number of elements is 0.
 	 *
 	 * @return response state as boolean
 	 */
@@ -471,8 +464,8 @@ public class CEMIDevMgmt implements CEMI
 	 * Returns a descriptive error message on a negative response, as determined by
 	 * {@link #isNegativeResponse()}.
 	 * <p>
-	 * A negative response contains an error information code, which is used to find the
-	 * associated message.<br>
+	 * A negative response contains an error information code, which is used to find the associated
+	 * message.<br>
 	 * If invoked on positive response, "no error" will be returned.
 	 *
 	 * @return error status message as string

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@
     version.
 */
 
-package tuwien.auto.calimero.xml.def;
+package tuwien.auto.calimero.xml;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,8 +50,6 @@ import java.util.Map;
  */
 final class References
 {
-	// TODO allow to add/remove user defined entities
-
 	// entities predefined in XML:
 	// char | entity ref | num ref | hex ref
 	// &      &amp;        &#38;     &#x26;
@@ -61,18 +59,13 @@ final class References
 	// '      &apos;       &#39;     &#x27;
 
 	// substitution table
-	private static final String[][] entityTable = {
-		{ "&amp;", "&#38;", "&#x26;", "&" },
-		{ "&lt;", "&#60;", "&#x3C;", "<" },
-		{ "&gt;", "&#62;", "&#x3E;", ">" },
-		{ "&quot;", "&#34;", "&#x22;", "\"" },
-		{ "&apos;", "&#39;", "&#x27;", "'" },
-	};
+	private static final String[][] entityTable = { { "&amp;", "&#38;", "&#x26;", "&" },
+		{ "&lt;", "&#60;", "&#x3C;", "<" }, { "&gt;", "&#62;", "&#x3E;", ">" },
+		{ "&quot;", "&#34;", "&#x22;", "\"" }, { "&apos;", "&#39;", "&#x27;", "'" }, };
 	// references to entity mapping
 	private static final Map<String, String> map;
 
-	static
-	{
+	static {
 		map = new HashMap<>(25);
 		for (int i = 0; i < 5; ++i)
 			for (int k = 0; k < 3; ++k)
@@ -107,7 +100,7 @@ final class References
 
 	static String replaceWithRef(final String text)
 	{
-		final StringBuffer mod = new StringBuffer((int)(1.5f * text.length()));
+		final StringBuffer mod = new StringBuffer((int) (1.5f * text.length()));
 		for (int i = 0; i < text.length(); ++i) {
 			final char c = text.charAt(i);
 			if (c == '&')

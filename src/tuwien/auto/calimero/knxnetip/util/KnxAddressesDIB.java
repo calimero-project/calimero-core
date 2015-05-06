@@ -38,13 +38,13 @@ package tuwien.auto.calimero.knxnetip.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.internal.JavaME;
 
 /**
  * Represents a KNX addresses description information block. DIBs of this type are used for
@@ -104,7 +104,7 @@ public final class KnxAddressesDIB extends DIB
 	 */
 	public List<IndividualAddress> getAddresses()
 	{
-		return Collections.unmodifiableList(addresses);
+		return JavaME.unmodifiableList(addresses);
 	}
 
 	/* (non-Javadoc)

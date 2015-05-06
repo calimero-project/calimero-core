@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2014 B. Malinowsky
+    Copyright (c) 2009, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,11 +36,7 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import java.lang.reflect.Field;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
@@ -611,20 +607,95 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	public static final DPT DPT_WORK = new DPT("14.079", "Work", "-3.40282347e+38f",
 			"3.40282347e+38f", "J");
 
+
+	private static final DPT[] dpts = new DPT[] {
+		DPT_ACCELERATION,
+		DPT_ACCELERATION_ANGULAR,
+		DPT_ACTIVATION_ENERGY,
+		DPT_ACTIVITY,
+		DPT_MOL,
+		DPT_AMPLITUDE,
+		DPT_ANGLE_RAD,
+		DPT_ANGLE_DEG,
+		DPT_ANGULAR_MOMENTUM,
+		DPT_ANGULAR_VELOCITY,
+		DPT_AREA,
+		DPT_CAPACITANCE,
+		DPT_CHARGE_DENSITY_SURFACE,
+		DPT_CHARGE_DENSITY_VOLUME,
+		DPT_COMPRESSIBILITY,
+		DPT_CONDUCTANCE,
+		DPT_ELECTRICAL_CONDUCTIVITY,
+		DPT_DENSITY,
+		DPT_ELECTRIC_CHARGE,
+		DPT_ELECTRIC_CURRENT,
+		DPT_ELECTRIC_CURRENTDENSITY,
+		DPT_ELECTRIC_DIPOLEMOMENT,
+		DPT_ELECTRIC_DISPLACEMENT,
+		DPT_ELECTRIC_FIELDSTRENGTH,
+		DPT_ELECTRIC_FLUX,
+		DPT_ELECTRIC_FLUX_DENSITY,
+		DPT_ELECTRIC_POLARIZATION,
+		DPT_ELECTRIC_POTENTIAL,
+		DPT_ELECTRIC_POTENTIAL_DIFFERENCE,
+		DPT_ELECTROMAGNETIC_MOMENT,
+		DPT_ELECTROMOTIVE_FORCE,
+		DPT_ENERGY,
+		DPT_FORCE,
+		DPT_FREQUENCY,
+		DPT_ANGULAR_FREQUENCY,
+		DPT_HEAT_CAPACITY,
+		DPT_HEAT_FLOWRATE,
+		DPT_HEAT_QUANTITY,
+		DPT_IMPEDANCE,
+		DPT_LENGTH,
+		DPT_LIGHT_QUANTITY,
+		DPT_LUMINANCE,
+		DPT_LUMINOUS_FLUX,
+		DPT_LUMINOUS_INTENSITY,
+		DPT_MAGNETIC_FIELDSTRENGTH,
+		DPT_MAGNETIC_FLUX,
+		DPT_MAGNETIC_FLUX_DENSITY,
+		DPT_MAGNETIC_MOMENT,
+		DPT_MAGNETIC_POLARIZATION,
+		DPT_MAGNETIZATION,
+		DPT_MAGNETOMOTIVE_FORCE,
+		DPT_MASS,
+		DPT_MASS_FLUX,
+		DPT_MOMENTUM,
+		DPT_PHASE_ANGLE_RAD,
+		DPT_PHASE_ANGLE_DEG,
+		DPT_POWER,
+		DPT_POWER_FACTOR,
+		DPT_PRESSURE,
+		DPT_REACTANCE,
+		DPT_RESISTANCE,
+		DPT_RESISTIVITY,
+		DPT_SELF_INDUCTANCE,
+		DPT_SOLID_ANGLE,
+		DPT_SOUND_INTENSITY,
+		DPT_SPEED,
+		DPT_STRESS,
+		DPT_SURFACE_TENSION,
+		DPT_COMMON_TEMPERATURE,
+		DPT_ABSOLUTE_TEMPERATURE,
+		DPT_TEMPERATURE_DIFFERENCE,
+		DPT_THERMAL_CAPACITY,
+		DPT_THERMAL_CONDUCTIVITY,
+		DPT_THERMOELECTRIC_POWER,
+		DPT_TIME,
+		DPT_TORQUE,
+		DPT_VOLUME,
+		DPT_VOLUME_FLUX,
+		DPT_WEIGHT,
+		DPT_WORK,
+	};
+
 	private static final Map<String, DPT> types = new HashMap<>(100);
 
 	static {
-		final Field[] fields = DPTXlator4ByteFloat.class.getFields();
-		for (int i = 0; i < fields.length; i++) {
-			try {
-				final Object o = fields[i].get(null);
-				if (o instanceof DPT) {
-					final DPT dpt = (DPT) o;
-					types.put(dpt.getID(), dpt);
-				}
-			}
-			catch (final IllegalAccessException e) {}
-		}
+		for (final DPT dpt : dpts)
+			types.put(dpt.getID(), dpt);
 	}
 
 	private final float min;
@@ -689,6 +760,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
 	 * @see #getValueFloat()
 	 */
+	@Override
 	public final double getNumericValue()
 	{
 		return getValueFloat();
@@ -732,11 +804,8 @@ public class DPTXlator4ByteFloat extends DPTXlator
 			s = String.valueOf(f);
 		}
 		else {
-			final NumberFormat dcf = NumberFormat.getInstance(Locale.US);
-			if (dcf instanceof DecimalFormat) {
-				((DecimalFormat) dcf).applyPattern("0.#####E0");
-			}
-			s = dcf.format(f);
+			// XXX Java8ME with workaround for some default locales using ','  as decimal mark
+			s = String.format("%6.5E", f).replace(',', '.');
 		}
 		return appendUnit(s);
 	}

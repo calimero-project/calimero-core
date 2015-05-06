@@ -177,7 +177,7 @@ public class DPTXlatorBoolean extends DPTXlator
 	 * DPT ID 1.100, HVAC Heat/Cool; values <b>cooling</b>, <b>heating</b>.
 	 */
 	public static final DPT DPT_HEAT_COOL = new DPT("1.100", "Heat/Cool", "cooling", "heating");
-	
+
 	private static final Map<String, DPT> types;
 
 	static {
@@ -205,6 +205,11 @@ public class DPTXlatorBoolean extends DPTXlator
 		types.put(DPT_SCENE_AB.getID(), DPT_SCENE_AB);
 		types.put(DPT_SHUTTER_BLINDS_MODE.getID(), DPT_SHUTTER_BLINDS_MODE);
 		types.put(DPT_HEAT_COOL.getID(), DPT_HEAT_COOL);
+	}
+
+	DPTXlatorBoolean()
+	{
+		super(0);
 	}
 
 	/**
@@ -285,6 +290,7 @@ public class DPTXlatorBoolean extends DPTXlator
 	 * @return 0 for boolean false and 1 for boolean true
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
 	 */
+	@Override
 	public final double getNumericValue()
 	{
 		return getValueBoolean() ? 1 : 0;

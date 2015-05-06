@@ -37,7 +37,6 @@
 package tuwien.auto.calimero.datapoint;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -45,10 +44,10 @@ import java.util.Map;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.internal.EventListeners;
-import tuwien.auto.calimero.xml.Element;
+import tuwien.auto.calimero.internal.JavaME;
 import tuwien.auto.calimero.xml.KNXMLException;
-import tuwien.auto.calimero.xml.XMLReader;
-import tuwien.auto.calimero.xml.XMLWriter;
+import tuwien.auto.calimero.xml.XmlReader;
+import tuwien.auto.calimero.xml.XmlWriter;
 
 /**
  * A datapoint model storing datapoints with no defined order or hierarchy using a map
@@ -63,7 +62,7 @@ public class DatapointMap<T extends Datapoint> implements DatapointModel<T>, Cha
 
 	private final Map<GroupAddress, T> points;
 	private final EventListeners<ChangeListener> listeners = new EventListeners<>(
-			ChangeListener.class);
+			new ChangeListener[0]);
 
 	// NYI ensure we only load valid types based on parameterization, assign from constructor
 	// parameter or factory method
@@ -74,15 +73,14 @@ public class DatapointMap<T extends Datapoint> implements DatapointModel<T>, Cha
 	 */
 	public DatapointMap()
 	{
-		points = Collections.synchronizedMap(new HashMap<>(20));
+		points = JavaME.synchronizedMap();
 	}
 
 	/**
 	 * Creates a new datapoint map and adds all <code>datapoints</code> to the map.
 	 * <p>
-	 * A datapoint to be added has to be unique according its main address, the attempt to
-	 * add two datapoints using the same main address results in a
-	 * KNXIllegalArgumentException.
+	 * A datapoint to be added has to be unique according its main address, the attempt to add two
+	 * datapoints using the same main address results in a KNXIllegalArgumentException.
 	 *
 	 * @param datapoints collection with entries of type {@link Datapoint}
 	 * @throws KNXIllegalArgumentException on duplicate datapoint
@@ -97,7 +95,7 @@ public class DatapointMap<T extends Datapoint> implements DatapointModel<T>, Cha
 				throw new KNXIllegalArgumentException("duplicate datapoint " + dp.getMainAddress());
 			m.put(dp.getMainAddress(), dp);
 		}
-		points = Collections.synchronizedMap(m);
+		points = JavaME.synchronizedMap(m);
 	}
 
 	/* (non-Javadoc)
@@ -109,8 +107,7 @@ public class DatapointMap<T extends Datapoint> implements DatapointModel<T>, Cha
 	{
 		synchronized (points) {
 			if (points.containsKey(dp.getMainAddress()))
-				throw new KNXIllegalArgumentException("duplicate datapoint "
-					+ dp.getMainAddress());
+				throw new KNXIllegalArgumentException("duplicate datapoint " + dp.getMainAddress());
 			points.put(dp.getMainAddress(), dp);
 			fireChangeNotification(dp, true);
 		}
@@ -155,7 +152,7 @@ public class DatapointMap<T extends Datapoint> implements DatapointModel<T>, Cha
 	 */
 	public Collection<T> getDatapoints()
 	{
-		return Collections.unmodifiableCollection(points.values());
+		return JavaME.unmodifiableCollection(points.values());
 	}
 
 	/* (non-Javadoc)
@@ -178,26 +175,21 @@ public class DatapointMap<T extends Datapoint> implements DatapointModel<T>, Cha
 		return points.containsKey(dp.getMainAddress());
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.datapoint.DatapointModel#load
-	 * (tuwien.auto.calimero.xml.XMLReader)
-	 */
 	@Override
-	public void load(final XMLReader r) throws KNXMLException
+	public void load(final XmlReader r) throws KNXMLException
 	{
-		if (r.getPosition() != XMLReader.START_TAG)
-			r.read();
-		final Element e = r.getCurrent();
-		if (r.getPosition() != XMLReader.START_TAG || !e.getName().equals(TAG_DATAPOINTS))
+		if (r.getEventType() != XmlReader.START_ELEMENT)
+			r.nextTag();
+		if (r.getEventType() != XmlReader.START_ELEMENT || !r.getLocalName().equals(TAG_DATAPOINTS))
 			throw new KNXMLException(TAG_DATAPOINTS + " element not found", r);
 		synchronized (points) {
-			while (r.read() == XMLReader.START_TAG) {
+			while (r.nextTag() == XmlReader.START_ELEMENT) {
 				final Datapoint dp = Datapoint.create(r);
 				if (points.containsKey(dp.getMainAddress()))
 					throw new KNXMLException("KNX address " + dp.getMainAddress().toString()
 							+ " in datapoint \"" + dp.getName() + "\" already used", r);
 				if (!dpTypeRef.isAssignableFrom(dp.getClass()))
-					throw new KNXMLException("datapoint not of type " + dpTypeRef.getTypeName(), r);
+					throw new KNXMLException("datapoint not of type " + dpTypeRef.getName(), r);
 				@SuppressWarnings("unchecked")
 				final T castDp = (T) dp;
 				points.put(dp.getMainAddress(), castDp);
@@ -205,19 +197,15 @@ public class DatapointMap<T extends Datapoint> implements DatapointModel<T>, Cha
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.datapoint.DatapointModel#save
-	 * (tuwien.auto.calimero.xml.XMLWriter)
-	 */
 	@Override
-	public void save(final XMLWriter w) throws KNXMLException
+	public void save(final XmlWriter w) throws KNXMLException
 	{
-		w.writeElement(TAG_DATAPOINTS, Collections.emptyList(), null);
+		w.writeStartElement(TAG_DATAPOINTS);
 		synchronized (points) {
 			for (final Iterator<T> i = points.values().iterator(); i.hasNext();)
 				i.next().save(w);
 		}
-		w.endElement();
+		w.writeEndElement();
 	}
 
 	/* (non-Javadoc)

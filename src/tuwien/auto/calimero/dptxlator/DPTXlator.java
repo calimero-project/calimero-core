@@ -75,6 +75,8 @@ import tuwien.auto.calimero.log.LogService.LogLevel;
  */
 public abstract class DPTXlator
 {
+	// XXX Java8ME add default constructor to all translators
+
 	/**
 	 * Name of the log service used in DPT translators.
 	 */

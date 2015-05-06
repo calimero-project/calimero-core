@@ -37,11 +37,10 @@
 package tuwien.auto.calimero.knxnetip;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.util.EventListener;
+
+import javax.microedition.io.Datagram;
+import javax.microedition.io.UDPDatagramConnection;
 
 import org.slf4j.Logger;
 
@@ -54,6 +53,7 @@ import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMI;
+import tuwien.auto.calimero.internal.EndpointAddress;
 import tuwien.auto.calimero.internal.EventListeners;
 import tuwien.auto.calimero.knxnetip.servicetype.DisconnectRequest;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
@@ -65,8 +65,8 @@ import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
- * Generic implementation of a KNXnet/IP connection, used for tunneling, device management
- * and routing.
+ * Generic implementation of a KNXnet/IP connection, used for tunneling, device management and
+ * routing.
  * <p>
  *
  * @author B. Malinowsky
@@ -74,14 +74,14 @@ import tuwien.auto.calimero.log.LogService.LogLevel;
 public abstract class ConnectionBase implements KNXnetIPConnection
 {
 	/**
-	 * Status code of communication: waiting for service acknowledgment after send, no
-	 * error, not ready to send.
+	 * Status code of communication: waiting for service acknowledgment after send, no error, not
+	 * ready to send.
 	 */
 	public static final int ACK_PENDING = 2;
 
 	/**
-	 * Status code of communication: in idle state, received a service acknowledgment
-	 * error as response, ready to send.
+	 * Status code of communication: in idle state, received a service acknowledgment error as
+	 * response, ready to send.
 	 */
 	public static final int ACK_ERROR = 3;
 
@@ -89,14 +89,14 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	static final int CONNECT_REQ_TIMEOUT = 10;
 
 	/** local control endpoint socket */
-	protected DatagramSocket ctrlSocket;
+	protected UDPDatagramConnection ctrlSocket;
 	/** local data endpoint socket */
-	protected DatagramSocket socket;
+	protected UDPDatagramConnection socket;
 
 	/** remote control endpoint */
-	protected InetSocketAddress ctrlEndpt;
+	protected EndpointAddress ctrlEndpt;
 	/** remote data endpoint */
-	protected InetSocketAddress dataEndpt;
+	protected EndpointAddress dataEndpt;
 
 	/** connection KNX channel identifier */
 	protected int channelId;
@@ -108,7 +108,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	/** acknowledgment service type used for this connection type */
 	protected final int serviceAck;
 	/** container for event listeners */
-	protected final EventListeners<KNXListener> listeners = new EventListeners<>(KNXListener.class);
+	protected final EventListeners<KNXListener> listeners = new EventListeners<>(new KNXListener[0]);
 	/** logger for this connection */
 	protected Logger logger;
 
@@ -180,23 +180,21 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	 * <p>
 	 * If <code>mode</code> is {@link KNXnetIPConnection#WAIT_FOR_CON} or
 	 * {@link KNXnetIPConnection#WAIT_FOR_ACK}, the sequence order of more
-	 * {@link #send(CEMI, tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}
-	 * calls from different threads is being maintained according to invocation order
-	 * (FIFO).<br>
-	 * A call of this method blocks until (possible) previous invocations are done, then
-	 * does communication according to the protocol and waits for response (either ACK or
-	 * cEMI confirmation), timeout or an error condition.<br>
-	 * Note that, for now, when using blocking mode any ongoing nonblocking invocation is
-	 * not detected or considered for waiting until completion.
+	 * {@link #send(CEMI, tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)} calls from
+	 * different threads is being maintained according to invocation order (FIFO).<br>
+	 * A call of this method blocks until (possible) previous invocations are done, then does
+	 * communication according to the protocol and waits for response (either ACK or cEMI
+	 * confirmation), timeout or an error condition.<br>
+	 * Note that, for now, when using blocking mode any ongoing nonblocking invocation is not
+	 * detected or considered for waiting until completion.
 	 * <p>
-	 * If mode is {@link KNXnetIPConnection#NONBLOCKING}, sending is only permitted if no
-	 * other send is currently being done, otherwise throws a
-	 * {@link KNXIllegalStateException}. In this mode, a user has to check the state (
-	 * {@link #getState()} on its own.
+	 * If mode is {@link KNXnetIPConnection#NONBLOCKING}, sending is only permitted if no other send
+	 * is currently being done, otherwise throws a {@link KNXIllegalStateException}. In this mode, a
+	 * user has to check the state ( {@link #getState()} on its own.
 	 */
 	@Override
-	public void send(final CEMI frame, final BlockingMode mode)
-		throws KNXTimeoutException, KNXConnectionClosedException
+	public void send(final CEMI frame, final BlockingMode mode) throws KNXTimeoutException,
+		KNXConnectionClosedException
 	{
 		// send state | blocking | nonblocking
 		// -----------------------------------
@@ -234,14 +232,13 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 				else
 					buf = PacketHelper.toPacket(new ServiceRequest(serviceRequest, channelId,
 							getSeqSend(), frame));
-				final DatagramPacket p = new DatagramPacket(buf, buf.length,
-						dataEndpt.getAddress(), dataEndpt.getPort());
+				final Datagram p = socket.newDatagram(buf, buf.length,
+						"datagram://" + dataEndpt.toString());
 				int attempt = 0;
 				for (; attempt < maxSendAttempts; ++attempt) {
 					if (logger.isTraceEnabled())
 						logger.trace("sending cEMI frame seq {}, {}, attempt {} (channel {})",
 								getSeqSend(), mode, (attempt + 1), channelId);
-
 					socket.send(p);
 					// shortcut for routing, don't switch into 'ack-pending'
 					if (serviceRequest == KNXnetIPHeader.ROUTING_IND)
@@ -258,7 +255,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 				// close connection on no service ack from server
 				if (attempt == maxSendAttempts) {
 					final KNXAckTimeoutException e = new KNXAckTimeoutException(
-						"maximum send attempts, no service acknowledgment received");
+							"maximum send attempts, no service acknowledgment received");
 					close(CloseEvent.INTERNAL, "maximum send attempts", LogLevel.ERROR, e);
 					throw e;
 				}
@@ -289,10 +286,10 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	 * @see tuwien.auto.calimero.knxnetip.KNXnetIPConnection#getRemoteAddress()
 	 */
 	@Override
-	public final InetSocketAddress getRemoteAddress()
+	public final EndpointAddress getRemoteAddress()
 	{
 		if (state == CLOSED)
-			return new InetSocketAddress(0);
+			return EndpointAddress.anyLocal();
 		return ctrlEndpt;
 	}
 
@@ -307,8 +304,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	{
 		// only the control endpoint is set when our logger is initialized (the data
 		// endpoint gets assigned later in connect)
-		// to keep the name short, avoid a prepended host name as done by InetAddress
-		return ctrlEndpt.getAddress().getHostAddress() + ":" + ctrlEndpt.getPort();
+		return ctrlEndpt.toString();
 	}
 
 	/* (non-Javadoc)
@@ -332,8 +328,8 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	}
 
 	/**
-	 * Increments the protocol's receive sequence number, with increment on sequence
-	 * number 255 resulting in 0.
+	 * Increments the protocol's receive sequence number, with increment on sequence number 255
+	 * resulting in 0.
 	 */
 	protected synchronized void incSeqRcv()
 	{
@@ -352,8 +348,8 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	}
 
 	/**
-	 * Increments the protocol's send sequence number, with increment on sequence number
-	 * 255 resulting in 0.
+	 * Increments the protocol's send sequence number, with increment on sequence number 255
+	 * resulting in 0.
 	 */
 	protected synchronized void incSeqSend()
 	{
@@ -361,8 +357,8 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	}
 
 	/**
-	 * Fires a frame received event ({@link KNXListener#frameReceived(FrameEvent)}) for
-	 * the supplied cEMI <code>frame</code>.
+	 * Fires a frame received event ({@link KNXListener#frameReceived(FrameEvent)}) for the supplied
+	 * cEMI <code>frame</code>.
 	 *
 	 * @param frame the cEMI to generate the event for
 	 */
@@ -388,16 +384,14 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	 * @param h received KNXnet/IP header
 	 * @param data received datagram data
 	 * @param offset datagram data start offset
-	 * @param src sender IP address
-	 * @param port sender UDP port
-	 * @return <code>true</code> if service type was known and handled (successfully or
-	 *         not), <code>false</code> otherwise
+	 * @param sender sender IP address
+	 * @return <code>true</code> if service type was known and handled (successfully or not),
+	 *         <code>false</code> otherwise
 	 * @throws KNXFormatException on service type parsing or data format errors
 	 * @throws IOException on socket problems
 	 */
 	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data,
-		final int offset, final InetAddress src, final int port) throws KNXFormatException,
-		IOException
+		final int offset, final EndpointAddress sender) throws KNXFormatException, IOException
 	{
 		// at this subtype level, we don't care about any service type
 		return false;
@@ -439,15 +433,15 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	/**
 	 * Handler method forwarded to on calling {@link #close()}.
 	 * <p>
-	 * It contains all protocol specific actions to close a connection. Before this method
-	 * returns, {@link #cleanup(int, String, LogLevel, Throwable)} is called.
+	 * It contains all protocol specific actions to close a connection. Before this method returns,
+	 * {@link #cleanup(int, String, LogLevel, Throwable)} is called.
 	 *
 	 * @param initiator one of the constants of {@link CloseEvent}
 	 * @param reason short text statement why close was called on this connection
-	 * @param level log level to use for logging, adjust this to the reason of closing
-	 *        this connection
-	 * @param t a throwable, to pass to the logger if the close event was caused by some
-	 *        error, can be <code>null</code>
+	 * @param level log level to use for logging, adjust this to the reason of closing this
+	 *        connection
+	 * @param t a throwable, to pass to the logger if the close event was caused by some error, can
+	 *        be <code>null</code>
 	 */
 	protected void close(final int initiator, final String reason, final LogLevel level,
 		final Throwable t)
@@ -459,10 +453,10 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		}
 		try {
 			synchronized (lock) {
-				final byte[] buf = PacketHelper.toPacket(new DisconnectRequest(channelId,
-						new HPAI(HPAI.IPV4_UDP, useNat ? null : (InetSocketAddress) ctrlSocket
-								.getLocalSocketAddress())));
-				final DatagramPacket p = new DatagramPacket(buf, buf.length, ctrlEndpt);
+				final byte[] buf = PacketHelper.toPacket(new DisconnectRequest(channelId, new HPAI(
+						HPAI.IPV4_UDP, useNat ? null : EndpointAddress.of(ctrlSocket
+								.getLocalAddress()))));
+				final Datagram p = ctrlSocket.newDatagram(buf, buf.length, ctrlEndpt.toAddress());
 				ctrlSocket.send(p);
 				long remaining = CONNECT_REQ_TIMEOUT * 1000;
 				final long end = System.currentTimeMillis() + remaining;
@@ -493,8 +487,8 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	 * @param level
 	 * @param t
 	 */
-	protected void cleanup(final int initiator, final String reason,
-		final LogLevel level, final Throwable t)
+	protected void cleanup(final int initiator, final String reason, final LogLevel level,
+		final Throwable t)
 	{
 		setState(CLOSED);
 		fireConnectionClosed(initiator, reason);
@@ -503,8 +497,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	}
 
 	/**
-	 * Validates channel id received in a packet against the one assigned to this
-	 * connection.
+	 * Validates channel id received in a packet against the one assigned to this connection.
 	 *
 	 * @param id received id to check
 	 * @param svcType packet service type
@@ -524,8 +517,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	 *
 	 * @param h packet KNXnet/IP header
 	 * @param data contains the data following the KNXnet/IP header
-	 * @param offset offset into <code>data</code> to message structure past KNXnet/IP
-	 *        header
+	 * @param offset offset into <code>data</code> to message structure past KNXnet/IP header
 	 * @return the service request
 	 * @throws KNXFormatException on failure to extract (even an empty) service request
 	 */
@@ -541,7 +533,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 			final ServiceRequest req = PacketHelper.getEmptyServiceRequest(h, data, offset);
 			logger.warn("received request with unknown cEMI data "
 					+ DataUnitBuilder.toHex(DataUnitBuilder.copyOfRange(data, offset + 4,
-					offset + h.getTotalLength() - h.getStructLength()), " "), e);
+							offset + h.getTotalLength() - h.getStructLength()), " "), e);
 			return req;
 		}
 	}
@@ -551,7 +543,8 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		if (receiver == null) {
 			final ReceiverLoop looper = new ReceiverLoop(this, socket, 0x200);
 			final Thread t = new Thread(looper, "KNXnet/IP receiver");
-			t.setDaemon(true);
+			// XXX Java8ME
+//			t.setDaemon(true);
 			t.start();
 			receiver = looper;
 		}
@@ -580,15 +573,25 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	}
 
 	/**
-	 * Give chance to perform additional blocking modes called if mode is set to a
-	 * blocking mode not equal to NON_BLOCKING and WAIT_FOR_ACK. This method is called
-	 * from send() after WAIT_FOR_ACK was completed.
+	 * Give chance to perform additional blocking modes called if mode is set to a blocking mode not
+	 * equal to NON_BLOCKING and WAIT_FOR_ACK. This method is called from send() after WAIT_FOR_ACK
+	 * was completed.
 	 *
 	 * @throws KNXTimeoutException
 	 * @throws InterruptedException
 	 */
 	void doExtraBlockingModes() throws KNXTimeoutException, InterruptedException
 	{}
+
+	void closeNoThrow()
+	{
+		try {
+			socket.close();
+		}
+		catch (final IOException e) {
+			logger.error("close", e);
+		}
+	}
 
 	private void fireConnectionClosed(final int initiator, final String reason)
 	{

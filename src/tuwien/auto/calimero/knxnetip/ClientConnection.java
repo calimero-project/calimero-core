@@ -37,10 +37,8 @@
 package tuwien.auto.calimero.knxnetip;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
+
+import javax.microedition.io.Datagram;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.KNXException;
@@ -50,6 +48,8 @@ import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.internal.Connection;
+import tuwien.auto.calimero.internal.EndpointAddress;
 import tuwien.auto.calimero.knxnetip.servicetype.ConnectRequest;
 import tuwien.auto.calimero.knxnetip.servicetype.ConnectResponse;
 import tuwien.auto.calimero.knxnetip.servicetype.ConnectionstateRequest;
@@ -103,8 +103,8 @@ abstract class ClientConnection extends ConnectionBase
 	private volatile boolean cleanup;
 
 	// logger is initialized in connect, when name of connection is available
-	ClientConnection(final int serviceRequest, final int serviceAck,
-		final int maxSendAttempts, final int responseTimeout)
+	ClientConnection(final int serviceRequest, final int serviceAck, final int maxSendAttempts,
+		final int responseTimeout)
 	{
 		super(serviceRequest, serviceAck, maxSendAttempts, responseTimeout);
 	}
@@ -112,83 +112,82 @@ abstract class ClientConnection extends ConnectionBase
 	/**
 	 * Opens a new IP communication channel to a remote server.
 	 * <p>
-	 * The communication state of this object is assumed to be closed state. This method
-	 * is designed to be called only once during the objects lifetime!
+	 * The communication state of this object is assumed to be closed state. This method is designed
+	 * to be called only once during the objects lifetime!
 	 *
 	 * @param localEP the local endpoint to use for communication channel
 	 * @param serverCtrlEP the remote server control endpoint used for connect request
-	 * @param cri connect request information used to configure the communication
-	 *        attributes
+	 * @param cri connect request information used to configure the communication attributes
 	 * @param useNAT <code>true</code> to use a NAT (network address translation) aware
 	 *        communication mechanism, <code>false</code> to use the default way
 	 * @throws KNXException on socket communication error
 	 * @throws KNXTimeoutException on no connect response before connect timeout
-	 * @throws KNXRemoteException if response indicates an error condition at the server
-	 *         concerning the request
+	 * @throws KNXRemoteException if response indicates an error condition at the server concerning
+	 *         the request
 	 * @throws KNXInvalidResponseException if connect response is in wrong format
-	 * @throws InterruptedException on interrupted thread during connect, all resources
-	 *         are cleaned up before passing on this exception
+	 * @throws InterruptedException on interrupted thread during connect, all resources are cleaned
+	 *         up before passing on this exception
 	 */
-	protected void connect(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP,
+	protected void connect(final EndpointAddress localEP, final EndpointAddress serverCtrlEP,
 		final CRI cri, final boolean useNAT) throws KNXException, InterruptedException
 	{
 		if (state != CLOSED)
 			throw new KNXIllegalStateException("open connection");
-		ctrlEndpt = serverCtrlEP;
+		ctrlEndpt = serverCtrlEP.getPort() != 0 ? serverCtrlEP
+				: EndpointAddress.of(serverCtrlEP.getHost(), DEFAULT_PORT);
 		if (ctrlEndpt.isUnresolved())
 			throw new KNXException("server control endpoint is unresolved: " + serverCtrlEP);
 		useNat = useNAT;
 		logger = LogService.getLogger(getName());
-		Exception thrown = null;
 		try {
 			// if we allow localEP to be null, we would create an unbound socket
 			if (localEP == null)
 				throw new KNXIllegalArgumentException("no local endpoint specified");
-			socket = new DatagramSocket(localEP);
-			ctrlSocket = socket;
+			ctrlSocket = Connection.open(localEP, EndpointAddress.anyLocal());
+			socket = ctrlSocket;
 
-			logger.info("establish connection from " + socket.getLocalSocketAddress()
-				+ " to " + ctrlEndpt);
+			logger.info("establish connection from " + ctrlSocket.getLocalAddress() + " to "
+					+ ctrlEndpt);
 			// HPAI throws if wildcard local address (0.0.0.0) is supplied
-			final HPAI hpai = new HPAI(HPAI.IPV4_UDP, useNat ? null
-				: (InetSocketAddress) socket.getLocalSocketAddress());
+			final HPAI hpai = new HPAI(HPAI.IPV4_UDP, useNat ? null : EndpointAddress.of(ctrlSocket
+					.getLocalAddress()));
 			final byte[] buf = PacketHelper.toPacket(new ConnectRequest(cri, hpai, hpai));
-			final DatagramPacket p = new DatagramPacket(buf, buf.length, ctrlEndpt.getAddress(),
-					ctrlEndpt.getPort());
+			final Datagram p = ctrlSocket.newDatagram(buf, buf.length, ctrlEndpt.toAddress());
 			ctrlSocket.send(p);
 		}
-		catch (final IOException e) {
-			thrown = e;
-		}
-		catch (final SecurityException e) {
-			thrown = e;
-		}
-		if (thrown != null) {
-			if (socket != null)
-				socket.close();
-			logger.error("communication failure on connect", thrown);
-			if (localEP.getAddress().isLoopbackAddress())
+		catch (final IOException | SecurityException e) {
+			if (ctrlSocket != null)
+				closeNoThrow();
+			logger.error("communication failure on connect", e);
+			if (localEP.isLoopback())
 				logger.warn("try to specify the actual IP address of the local host");
 			LogService.removeLogger(logger);
-			throw new KNXException("on connect to " + serverCtrlEP + ": " + thrown.getMessage());
+			throw new KNXException("on connect to " + serverCtrlEP + ": " + e.getMessage());
 		}
 
 		logger.info("wait for connect response from " + ctrlEndpt + " ...");
 		startReceiver();
 		try {
 			final boolean changed = waitForStateChange(CLOSED, CONNECT_REQ_TIMEOUT);
+			KNXException e = null;
 			if (state == OK) {
-				(heartbeat = new HeartbeatMonitor()).start();
-				logger.info("connection established");
-				return;
+				try {
+					// TODO Java8ME if ctrl socket is opened in server mode, we don't need this
+					socket = Connection.open(localEP, dataEndpt);
+					(heartbeat = new HeartbeatMonitor()).start();
+					logger.info("connection established");
+					return;
+				} catch (final IOException ioe) {
+					e = new KNXException("opening server data endpoint " + dataEndpt, ioe);
+				}
 			}
-			final KNXException e;
+
 			if (!changed)
 				e = new KNXTimeoutException("timeout connecting to control endpoint " + ctrlEndpt);
 			else if (state == ACK_ERROR)
 				e = new KNXRemoteException("error response from control endpoint " + ctrlEndpt
 						+ ", " + status);
-			else
+			else if (e == null)
 				e = new KNXInvalidResponseException("invalid connect response from " + ctrlEndpt);
 			// quit, cleanup and notify user
 			connectCleanup(e);
@@ -216,7 +215,7 @@ abstract class ClientConnection extends ConnectionBase
 		if (heartbeat != null)
 			heartbeat.quit();
 		stopReceiver();
-		socket.close();
+		closeNoThrow();
 		// ensure user sees final state CLOSED
 		updateState = true;
 		super.cleanup(initiator, reason, level, t);
@@ -230,8 +229,7 @@ abstract class ClientConnection extends ConnectionBase
 	{
 		// blocking mode is wait for .con
 		// wait for incoming request with confirmation
-		waitForStateChange(ClientConnection.CEMI_CON_PENDING,
-			ClientConnection.CONFIRMATION_TIMEOUT);
+		waitForStateChange(ClientConnection.CEMI_CON_PENDING, ClientConnection.CONFIRMATION_TIMEOUT);
 		// throw on no answer
 		if (internalState == ClientConnection.CEMI_CON_PENDING) {
 			final KNXTimeoutException e = new KNXTimeoutException("no confirmation reply received");
@@ -241,16 +239,9 @@ abstract class ClientConnection extends ConnectionBase
 		}
 	}
 
-	/**
-	 * @see tuwien.auto.calimero.knxnetip.ConnectionBase#handleServiceType
-	 *      (tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader, byte[], int,
-	 *      java.net.InetAddress, int)
-	 * @throws IOException
-	 */
 	@Override
 	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data,
-		final int offset, final InetAddress src, final int port) throws KNXFormatException,
-		IOException
+		final int offset, final EndpointAddress sender) throws KNXFormatException, IOException
 	{
 		final int svc = h.getServiceType();
 		if (svc == KNXnetIPHeader.CONNECT_REQ)
@@ -260,18 +251,17 @@ abstract class ClientConnection extends ConnectionBase
 			// we do an additional check for UDP to be on the safe side
 			// endpoint is only != null on no error
 			final HPAI ep = res.getDataEndpoint();
-			if (res.getStatus() == ErrorCodes.NO_ERROR
-				&& ep.getHostProtocol() == HPAI.IPV4_UDP) {
+			if (res.getStatus() == ErrorCodes.NO_ERROR && ep.getHostProtocol() == HPAI.IPV4_UDP) {
 				channelId = res.getChannelID();
-				final InetAddress ip = ep.getAddress();
+				final EndpointAddress addr = ep.getAddress();
 				// in NAT aware mode, if the data EP is incomplete or left
 				// empty, we fall back to the IP address and port of the sender
-				if (useNat && (ip == null || ip.isAnyLocalAddress() || ep.getPort() == 0)) {
-					dataEndpt = new InetSocketAddress(src, port);
+				if (useNat && (addr == null || addr.isAnyLocal() || ep.getPort() == 0)) {
+					dataEndpt = sender;
 					logger.info("NAT aware mode: using server data endpoint " + dataEndpt);
 				}
 				else {
-					dataEndpt = new InetSocketAddress(ip, ep.getPort());
+					dataEndpt = addr;
 					logger.info("using server-assigned data endpoint " + dataEndpt);
 				}
 				checkVersion(h);
@@ -291,7 +281,7 @@ abstract class ClientConnection extends ConnectionBase
 				heartbeat.setResponse(new ConnectionstateResponse(data, offset));
 		}
 		else if (svc == KNXnetIPHeader.DISCONNECT_REQ) {
-			if (ctrlEndpt.getAddress().equals(src) && ctrlEndpt.getPort() == port)
+			if (ctrlEndpt.equals(sender))
 				disconnectRequested(new DisconnectRequest(data, offset));
 		}
 		else if (svc == KNXnetIPHeader.DISCONNECT_RES) {
@@ -336,9 +326,8 @@ abstract class ClientConnection extends ConnectionBase
 		if (req.getChannelID() == channelId) {
 			final byte[] buf = PacketHelper.toPacket(new DisconnectResponse(channelId,
 					ErrorCodes.NO_ERROR));
-			final DatagramPacket p = new DatagramPacket(buf, buf.length, ctrlEndpt.getAddress(),
-					ctrlEndpt.getPort());
 			try {
+				final Datagram p = ctrlSocket.newDatagram(buf, buf.length, ctrlEndpt.toAddress());
 				ctrlSocket.send(p);
 			}
 			catch (final IOException e) {
@@ -353,8 +342,8 @@ abstract class ClientConnection extends ConnectionBase
 	/**
 	 * Checks for supported protocol version in KNX header.
 	 * <p>
-	 * On unsupported version,
-	 * {@link ClientConnection#close(int, String, LogLevel, Throwable)} is invoked.
+	 * On unsupported version, {@link ClientConnection#close(int, String, LogLevel, Throwable)} is
+	 * invoked.
 	 *
 	 * @param h KNX header to check
 	 * @return <code>true</code> on supported version, <code>false</code> otherwise
@@ -372,7 +361,7 @@ abstract class ClientConnection extends ConnectionBase
 	private void connectCleanup(final Exception thrown)
 	{
 		stopReceiver();
-		socket.close();
+		closeNoThrow();
 		setState(CLOSED);
 		logger.error("establishing connection failed because of " + thrown.getMessage());
 		LogService.removeLogger(logger);
@@ -389,18 +378,19 @@ abstract class ClientConnection extends ConnectionBase
 		HeartbeatMonitor()
 		{
 			super("KNXnet/IP heartbeat monitor");
-			setDaemon(true);
+			// XXX Java8ME
+//			setDaemon(true);
 		}
 
 		@Override
 		public void run()
 		{
-			final byte[] buf = PacketHelper.toPacket(new ConnectionstateRequest(channelId,
-					new HPAI(HPAI.IPV4_UDP, useNat ? null : (InetSocketAddress) socket
-							.getLocalSocketAddress())));
-			final DatagramPacket p = new DatagramPacket(buf, buf.length, ctrlEndpt.getAddress(),
-					ctrlEndpt.getPort());
 			try {
+				final byte[] buf = PacketHelper.toPacket(new ConnectionstateRequest(channelId,
+						new HPAI(HPAI.IPV4_UDP, useNat ? null : EndpointAddress.of(socket
+								.getLocalAddress()))));
+				final Datagram p = socket.newDatagram(buf, buf.length, ctrlEndpt.toAddress());
+
 				while (true) {
 					Thread.sleep(HEARTBEAT_INTERVAL * 1000);
 					int i = 0;

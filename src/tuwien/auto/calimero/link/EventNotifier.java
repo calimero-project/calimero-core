@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -127,8 +127,9 @@ abstract class EventNotifier extends Thread implements KNXListener
 		super("Link notifier");
 		this.logger = logger;
 		this.source = source;
-		listeners = new EventListeners<>(LinkListener.class, logger);
-		setDaemon(true);
+		listeners = new EventListeners<>(new LinkListener[0], logger);
+		// XXX Java8ME
+//		setDaemon(true);
 		start();
 	}
 

@@ -37,12 +37,9 @@
 package tuwien.auto.calimero.knxnetip.util;
 
 import java.io.ByteArrayInputStream;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.internal.EndpointAddress;
 
 /**
  * Represents an IP current configuration description information block. DIBs of this type are used
@@ -111,8 +108,8 @@ public final class IPCurrentConfigDIB extends DIB
 	 *        IP address, a bitset with at most one set bit: Bit 0 = manually, 1 = BootP, 2 = DHCP,
 	 *        3 = AutoIP
 	 */
-	public IPCurrentConfigDIB(final Inet4Address ip, final Inet4Address subnetMask,
-		final Inet4Address gateway, final Inet4Address dhcp, final int ipAssignmentMethod)
+	public IPCurrentConfigDIB(final EndpointAddress ip, final EndpointAddress subnetMask,
+		final EndpointAddress gateway, final EndpointAddress dhcp, final int ipAssignmentMethod)
 	{
 		super(DIB_SIZE, IP_CURRENT_CONFIG);
 		this.ip = ip != null ? ip.getAddress() : new byte[4];
@@ -130,7 +127,7 @@ public final class IPCurrentConfigDIB extends DIB
 	/**
 	 * @return the current IPv4 address
 	 */
-	public Inet4Address getIPAddress()
+	public EndpointAddress getIPAddress()
 	{
 		return asInet4Address(ip);
 	}
@@ -138,7 +135,7 @@ public final class IPCurrentConfigDIB extends DIB
 	/**
 	 * @return the current IPv4 subnet mask
 	 */
-	public Inet4Address getSubnetMask()
+	public EndpointAddress getSubnetMask()
 	{
 		return asInet4Address(subnet);
 	}
@@ -146,7 +143,7 @@ public final class IPCurrentConfigDIB extends DIB
 	/**
 	 * @return the current default gateway IPv4 address
 	 */
-	public Inet4Address getDefaultGateway()
+	public EndpointAddress getDefaultGateway()
 	{
 		return asInet4Address(gw);
 	}
@@ -154,7 +151,7 @@ public final class IPCurrentConfigDIB extends DIB
 	/**
 	 * @return the current DHCP server IPv4 address
 	 */
-	public Inet4Address getDhcpServer()
+	public EndpointAddress getDhcpServer()
 	{
 		return asInet4Address(dhcp);
 	}
@@ -170,21 +167,19 @@ public final class IPCurrentConfigDIB extends DIB
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString()
 	{
-		try {
-			return "current IP " + InetAddress.getByAddress(ip) + ", subnet mask "
-					+ InetAddress.getByAddress(subnet) + ", default gateway "
-					+ InetAddress.getByAddress(gw) + ", DHCP server "
-					+ InetAddress.getByAddress(dhcp) + ", IP assignment method " + assignment;
-		}
-		catch (final UnknownHostException ignore) {}
-		return "IP current config DIB";
+		return "current IP " + EndpointAddress.of(ip) + ", subnet mask "
+				+ EndpointAddress.of(subnet) + ", default gateway " + EndpointAddress.of(gw)
+				+ ", DHCP server " + EndpointAddress.of(dhcp) + ", IP assignment method "
+				+ assignment;
 	}
 
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.knxnetip.util.DIB#toByteArray()
 	 */
+	@Override
 	public byte[] toByteArray()
 	{
 		final byte[] buf = super.toByteArray();
@@ -203,12 +198,8 @@ public final class IPCurrentConfigDIB extends DIB
 		return buf;
 	}
 
-	private static Inet4Address asInet4Address(final byte[] addr)
+	private static EndpointAddress asInet4Address(final byte[] addr)
 	{
-		try {
-			return (Inet4Address) InetAddress.getByAddress(addr);
-		}
-		catch (final UnknownHostException ignore) {}
-		return null;
+		return EndpointAddress.of(addr);
 	}
 }

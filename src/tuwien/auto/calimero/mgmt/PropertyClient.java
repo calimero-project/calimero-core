@@ -38,9 +38,7 @@ package tuwien.auto.calimero.mgmt;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -58,45 +56,43 @@ import tuwien.auto.calimero.dptxlator.DPTXlator;
 import tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned;
 import tuwien.auto.calimero.dptxlator.PropertyTypes;
 import tuwien.auto.calimero.dptxlator.TranslatorTypes;
+import tuwien.auto.calimero.internal.JavaME;
 import tuwien.auto.calimero.log.LogService;
-import tuwien.auto.calimero.xml.Attribute;
-import tuwien.auto.calimero.xml.Element;
 import tuwien.auto.calimero.xml.KNXMLException;
-import tuwien.auto.calimero.xml.XMLFactory;
-import tuwien.auto.calimero.xml.XMLReader;
-import tuwien.auto.calimero.xml.XMLWriter;
+import tuwien.auto.calimero.xml.XmlInputFactory;
+import tuwien.auto.calimero.xml.XmlOutputFactory;
+import tuwien.auto.calimero.xml.XmlReader;
+import tuwien.auto.calimero.xml.XmlWriter;
 
 /**
  * A client to access properties in interface objects of a device.
  * <p>
- * This can be done in different ways, to specify the kind of access a property adapter is
- * supplied on creation of the property client. The implementation of the
- * {@link PropertyAdapter} interface methods don't need to be synchronized for use by this
- * property client.
+ * This can be done in different ways, to specify the kind of access a property adapter is supplied
+ * on creation of the property client. The implementation of the {@link PropertyAdapter} interface
+ * methods don't need to be synchronized for use by this property client.
  * <p>
- * Properties can be retrieved or set in the device, property descriptions can be read and
- * scans of properties can be done.<br>
- * If desired, the property data type of a property element is used to return an
- * appropriate DPT translator or the ready formatted string representation.<br>
- * The DPT translators used are requested from {@link PropertyTypes} by default, or, if
- * property definitions were loaded, there will be a lookup in these data at first (i.e.
- * loaded property definitions take priority over the default PDT to DPT mapping).
+ * Properties can be retrieved or set in the device, property descriptions can be read and scans of
+ * properties can be done.<br>
+ * If desired, the property data type of a property element is used to return an appropriate DPT
+ * translator or the ready formatted string representation.<br>
+ * The DPT translators used are requested from {@link PropertyTypes} by default, or, if property
+ * definitions were loaded, there will be a lookup in these data at first (i.e. loaded property
+ * definitions take priority over the default PDT to DPT mapping).
  * <p>
- * It is possible to load property definitions with information about KNX properties from
- * a resource to be used by the property client for lookup requests and property type
- * translation. Also, definitions can be saved to a resource. A global resource handler
- * takes care of working with the resources where those definitions are stored. Loaded
- * definitions can added to a property client for subsequent lookup.<br>
- * Nevertheless, adding any definitions is not required for a client to work properly,
- * i.e., this functionality is optional.
+ * It is possible to load property definitions with information about KNX properties from a resource
+ * to be used by the property client for lookup requests and property type translation. Also,
+ * definitions can be saved to a resource. A global resource handler takes care of working with the
+ * resources where those definitions are stored. Loaded definitions can added to a property client
+ * for subsequent lookup.<br>
+ * Nevertheless, adding any definitions is not required for a client to work properly, i.e., this
+ * functionality is optional.
  * <p>
  * By default, the resource handler uses a xml property file structure.<br>
  * XML file layout: <br>
  * &lt;propertyDefinitions&gt;<br>
  * &lt;object type=(object-type:number | "global")&gt;<br>
- * &lt;property pid=PID:number pidName=PID-name:string name=friendly-name:string
- * pdt=PDT:number [dpt=DPT-ID:string] rw=("R"|"W"|"R/W"|"R(/W"):string
- * writeEnabled=("0"|"1"|"0/1"):string&gt;<br>
+ * &lt;property pid=PID:number pidName=PID-name:string name=friendly-name:string pdt=PDT:number
+ * [dpt=DPT-ID:string] rw=("R"|"W"|"R/W"|"R(/W"):string writeEnabled=("0"|"1"|"0/1"):string&gt;<br>
  * &lt;usage&gt;<br>
  * usage description and additional information<br>
  * &lt;/usage&gt;<br>
@@ -106,41 +102,40 @@ import tuwien.auto.calimero.xml.XMLWriter;
  * ...next object<br>
  * &lt;/propertyDefinitions&gt;<br>
  * <br>
- * Attribute values of type number might be written in hexadecimal form by prepending
- * "0x". The optional attribute "dpt" is to specify a DPT to use for the property, it will
- * be used in preference before the default DPT assigned to the PDT.<br>
- * The attribute "pdt" might have a value of "&lt;tbd&gt;", standing for "to be defined",
- * in this case the PDT value used by the property client is -1.
+ * Attribute values of type number might be written in hexadecimal form by prepending "0x". The
+ * optional attribute "dpt" is to specify a DPT to use for the property, it will be used in
+ * preference before the default DPT assigned to the PDT.<br>
+ * The attribute "pdt" might have a value of "&lt;tbd&gt;", standing for "to be defined", in this
+ * case the PDT value used by the property client is -1.
  * <p>
  * Reduced Property Interfaces:<br>
- * When working with reduced property interfaces, the user has to be aware of the
- * limitations and act accordingly.
+ * When working with reduced property interfaces, the user has to be aware of the limitations and
+ * act accordingly.
  * <p>
- * Some KNX devices only support a 5 Bit field for storing the Property Data Type (PDT),
- * i.e., they only use a PDT identifier up to value 0x1F. When accessing property
- * descriptions in the interface object (for example, using
- * {@link PropertyClient#getDescription(int, int)}), not all existing PDTs can be
- * transmitted. Consequently, for properties that are formatted according any of the
- * higher PDTs, "alternative PDTs" get used. Following implementations are known to
- * support only a 5 Bit PDT in the description:
+ * Some KNX devices only support a 5 Bit field for storing the Property Data Type (PDT), i.e., they
+ * only use a PDT identifier up to value 0x1F. When accessing property descriptions in the interface
+ * object (for example, using {@link PropertyClient#getDescription(int, int)}), not all existing
+ * PDTs can be transmitted. Consequently, for properties that are formatted according any of the
+ * higher PDTs, "alternative PDTs" get used. Following implementations are known to support only a 5
+ * Bit PDT in the description:
  * <ul>
  * <li>mask 0x0020</li>
  * <li>mask 0x0021</li>
  * <li>mask 0x0701</li>
  * </ul>
- * In general, it is not possible for the property client to deduce the actual type to use
- * for encoding/decoding values from such an "alternative PDT". For these cases, the
- * property client has to rely on property definitions supplied by the user through
+ * In general, it is not possible for the property client to deduce the actual type to use for
+ * encoding/decoding values from such an "alternative PDT". For these cases, the property client has
+ * to rely on property definitions supplied by the user through
  * {@link PropertyClient#loadDefinitions(String, PropertyClient.ResourceHandler)}.
  * <p>
  * A note on property descriptions:<br>
  * With a local device management adapter, not all information is supported when reading a
- * description, or is not supported by the protocol at all. In particular, no access
- * levels for read/write (i.e., access is always done with maximum rights) and no property
- * data type (PDT) are available. Also, the maximum number of elements allowed in the
- * property is not available (only the current number of elements).<br>
- * All methods for property access invoked after a close of the property client will throw
- * a {@link KNXIllegalStateException}.
+ * description, or is not supported by the protocol at all. In particular, no access levels for
+ * read/write (i.e., access is always done with maximum rights) and no property data type (PDT) are
+ * available. Also, the maximum number of elements allowed in the property is not available (only
+ * the current number of elements).<br>
+ * All methods for property access invoked after a close of the property client will throw a
+ * {@link KNXIllegalStateException}.
  *
  * @author B. Malinowsky
  * @see PropertyAdapter
@@ -149,19 +144,18 @@ import tuwien.auto.calimero.xml.XMLWriter;
 public class PropertyClient implements PropertyAccess, AutoCloseable
 {
 	/**
-	 * Provides an interface to load property definitions from a resource, and store
-	 * property definitions into a resource.
+	 * Provides an interface to load property definitions from a resource, and store property
+	 * definitions into a resource.
 	 * <p>
 	 * It is used by the property client when loading or saving of property definitions is
 	 * requested.
 	 * <p>
-	 * To allow the property client handling a user defined property resource, create a
-	 * new property resource implementing this interface and supply it to the load/save
-	 * definition methods.<br>
-	 * It is not necessary for subtypes implementing this interface to synchronize the
-	 * methods for concurrent access. All library access to a resource handler instance
-	 * will occur within the execution thread of the invoking method, or the library will
-	 * ensure its own appropriate synchronization on the handler.
+	 * To allow the property client handling a user defined property resource, create a new property
+	 * resource implementing this interface and supply it to the load/save definition methods.<br>
+	 * It is not necessary for subtypes implementing this interface to synchronize the methods for
+	 * concurrent access. All library access to a resource handler instance will occur within the
+	 * execution thread of the invoking method, or the library will ensure its own appropriate
+	 * synchronization on the handler.
 	 *
 	 * @author B. Malinowsky
 	 */
@@ -178,6 +172,18 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		Collection<Property> load(String resource) throws KNXException;
 
 		/**
+		 * Loads the properties using the XML reader.
+		 *
+		 * @param reader the XML reader parsing the resource containing the properties, the current
+		 *        reader state has to be at, or exactly one event before, the property definition
+		 *        start element
+		 * @return a collection containing the property definitions of type
+		 *         {@link PropertyClient.Property}
+		 * @throws KNXException on error reading from the resource
+		 */
+		Collection<Property> load(XmlReader reader) throws KNXException;
+
+		/**
 		 * Saves the properties to the resource.
 		 *
 		 * @param resource the identifier of the resource used for saving the properties
@@ -186,13 +192,23 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		 * @throws KNXException on error writing to the resource
 		 */
 		void save(String resource, Collection<Property> definitions) throws KNXException;
+
+		/**
+		 * Saves the properties to the resource.
+		 *
+		 * @param resource the identifier of the resource used for saving the properties
+		 * @param definitions the property definitions in a collection holding
+		 *        {@link PropertyClient.Property}-type values
+		 * @throws KNXException on error writing to the resource
+		 */
+		void save(XmlWriter writer, Collection<Property> definitions) throws KNXException;
 	}
 
 	/**
 	 * Key value in the map returned by {@link PropertyClient#getDefinitions()}.
 	 * <p>
-	 * A key consists of the interface object type and the property identifier of the
-	 * associated property. If the property is defined globally, the global object type
+	 * A key consists of the interface object type and the property identifier of the associated
+	 * property. If the property is defined globally, the global object type
 	 * {@link PropertyClient.PropertyKey#GLOBAL_OBJTYPE} is used.
 	 *
 	 * @author B. Malinowsky
@@ -243,8 +259,8 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		 * Returns whether the property is defined with global object type.
 		 * <p>
 		 *
-		 * @return <code>true</code> if property has global object type,
-		 *         <code>false</code> if property has a specific object type
+		 * @return <code>true</code> if property has global object type, <code>false</code> if
+		 *         property has a specific object type
 		 */
 		public boolean isGlobal()
 		{
@@ -285,8 +301,8 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	}
 
 	/**
-	 * Stores property definition information of one property, used for type translation
-	 * and property lookup by a property client.
+	 * Stores property definition information of one property, used for type translation and
+	 * property lookup by a property client.
 	 * <p>
 	 *
 	 * @author B. Malinowsky
@@ -310,8 +326,8 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		 * @param propertyName property name, a friendly readable name for the property
 		 * @param objectType object type the property belongs to
 		 * @param pdt property data type
-		 * @param dpt datapoint type, use <code>null</code> if no DPT specified or to
-		 *        indicate default DPT usage
+		 * @param dpt datapoint type, use <code>null</code> if no DPT specified or to indicate
+		 *        default DPT usage
 		 */
 		public Property(final int pid, final String pidName, final String propertyName,
 			final int objectType, final int pdt, final String dpt)
@@ -408,16 +424,13 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 
 	// mapping of object type numbers to the associated object type names
 	// the offset of a name in the array corresponds to the object type number
-	private static final String[] OBJECT_TYPE_NAMES = { "Device Object",
-		"Addresstable Object", "Associationtable Object", "Applicationprogram Object",
-		"Interfaceprogram Object", "EIB-Object Associationtable Object", "Router Object",
-		"LTE Address Filter Table Object", "cEMI Server Object",
-		"Group Object Table Object", "Polling Master", "KNXnet/IP Parameter Object",
-		"Application Controller", "File Server Object", };
+	private static final String[] OBJECT_TYPE_NAMES = { "Device Object", "Addresstable Object",
+		"Associationtable Object", "Applicationprogram Object", "Interfaceprogram Object",
+		"EIB-Object Associationtable Object", "Router Object", "LTE Address Filter Table Object",
+		"cEMI Server Object", "Group Object Table Object", "Polling Master",
+		"KNXnet/IP Parameter Object", "Application Controller", "File Server Object", };
 
-
-	private final Map<PropertyKey, Property> properties = Collections
-			.synchronizedMap(new HashMap<>());
+	private final Map<PropertyKey, Property> properties = JavaME.synchronizedMap();
 
 	private final PropertyAdapter pa;
 	// helper flag to determine local DM mode, mainly for detecting absence of PDT
@@ -430,8 +443,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	private final DPTXlator2ByteUnsigned tObjType;
 
 	/**
-	 * Creates a new property client using the specified adapter for accessing device
-	 * properties.
+	 * Creates a new property client using the specified adapter for accessing device properties.
 	 * <p>
 	 * The property client obtains ownership of the adapter.<br>
 	 * The log service used by this property client is named "PC " + adapter.getName().
@@ -468,8 +480,8 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	}
 
 	/**
-	 * Loads property definitions from a resource using the supplied
-	 * {@link ResourceHandler} or a default handler.
+	 * Loads property definitions from a resource using the supplied {@link ResourceHandler} or a
+	 * default handler.
 	 *
 	 * @param resource the resource location identifier of a resource to load
 	 * @param handler the resource handler used for loading the property definitions, if
@@ -485,16 +497,14 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	}
 
 	/**
-	 * Saves the supplied property definitions to a resource using the supplied resource
-	 * handler.
+	 * Saves the supplied property definitions to a resource using the supplied resource handler.
 	 * <p>
-	 * To save definitions of a property client <code>client</code>, invoke the method
-	 * with the argument <code>client.getDefinitions().values()</code>.
+	 * To save definitions of a property client <code>client</code>, invoke the method with the
+	 * argument <code>client.getDefinitions().values()</code>.
 	 *
-	 * @param resource the resource location identifier to a resource for saving the
-	 *        definitions
-	 * @param definitions the property definitions to save, the collection holds entries
-	 *        of type {@link Property}
+	 * @param resource the resource location identifier to a resource for saving the definitions
+	 * @param definitions the property definitions to save, the collection holds entries of type
+	 *        {@link Property}
 	 * @param handler the resource handler used for saving the property definitions, if
 	 *        <code>null</code>, a default handler is used
 	 * @throws KNXException on errors in the property resource handler
@@ -515,11 +525,10 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 * Adds the property definitions contained in the collection argument to the property
 	 * definitions of the property client.
 	 * <p>
-	 * Any definitions already existing in the client are not removed before adding new
-	 * ones. To remove definitions, use {@link #getDefinitions()} and remove entries
-	 * manually.<br>
-	 * An added property definition will replace an existing definition with its property
-	 * key being equal to the one of the added definition.
+	 * Any definitions already existing in the client are not removed before adding new ones. To
+	 * remove definitions, use {@link #getDefinitions()} and remove entries manually.<br>
+	 * An added property definition will replace an existing definition with its property key being
+	 * equal to the one of the added definition.
 	 *
 	 * @param definitions collection of property definitions, containing entries of type
 	 *        {@link Property}
@@ -533,12 +542,11 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	}
 
 	/**
-	 * Returns the property definitions used by property clients, if definitions were
-	 * loaded.
+	 * Returns the property definitions used by property clients, if definitions were loaded.
 	 * <p>
-	 * The returned map is synchronized and references the one used by the property
-	 * client. Property definitions might be added or removed as required. Modifications
-	 * will influence subsequent lookup behavior of the property client.<br>
+	 * The returned map is synchronized and references the one used by the property client. Property
+	 * definitions might be added or removed as required. Modifications will influence subsequent
+	 * lookup behavior of the property client.<br>
 	 * A map key is of type {@link PropertyKey}, a map value is of type {@link Property}.
 	 *
 	 * @return property map, or <code>null</code> if no definitions loaded
@@ -567,14 +575,14 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	}
 
 	/**
-	 * Gets the first property element using the associated property data type of the
-	 * requested property.
+	 * Gets the first property element using the associated property data type of the requested
+	 * property.
 	 *
 	 * @param objIndex interface object index in the device
 	 * @param pid property identifier
 	 * @return property element value represented as string
-	 * @throws KNXException on adapter errors while querying the property element or data
-	 *         type translation problems
+	 * @throws KNXException on adapter errors while querying the property element or data type
+	 *         translation problems
 	 */
 	public String getProperty(final int objIndex, final int pid) throws KNXException
 	{
@@ -586,8 +594,8 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 * #setProperty(int, int, int, int, byte[])
 	 */
 	@Override
-	public void setProperty(final int objIndex, final int pid, final int start,
-		final int elements, final byte[] data) throws KNXException
+	public void setProperty(final int objIndex, final int pid, final int start, final int elements,
+		final byte[] data) throws KNXException
 	{
 		try {
 			pa.setProperty(objIndex, pid, start, elements, data);
@@ -605,8 +613,8 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 * @see tuwien.auto.calimero.mgmt.PropertyAccess#getProperty(int, int, int, int)
 	 */
 	@Override
-	public byte[] getProperty(final int objIndex, final int pid, final int start,
-		final int elements) throws KNXException
+	public byte[] getProperty(final int objIndex, final int pid, final int start, final int elements)
+		throws KNXException
 	{
 		try {
 			return pa.getProperty(objIndex, pid, start, elements);
@@ -625,8 +633,8 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 * #getPropertyTranslated(int, int, int, int)
 	 */
 	@Override
-	public DPTXlator getPropertyTranslated(final int objIndex, final int pid,
-		final int start, final int elements) throws KNXException
+	public DPTXlator getPropertyTranslated(final int objIndex, final int pid, final int start,
+		final int elements) throws KNXException
 	{
 		try {
 			final DPTXlator t = createTranslator(objIndex, pid);
@@ -642,8 +650,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 * @see tuwien.auto.calimero.mgmt.PropertyAccess#getDescription(int, int)
 	 */
 	@Override
-	public Description getDescription(final int objIndex, final int pid)
-		throws KNXException
+	public Description getDescription(final int objIndex, final int pid) throws KNXException
 	{
 		if (pid == 0)
 			throw new KNXIllegalArgumentException("pid has to be > 0");
@@ -685,9 +692,9 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	/**
 	 * Does a property description scan of the properties in all interface objects.
 	 *
-	 * @param allProperties <code>true</code> to scan all property descriptions in the
-	 *        interface objects, <code>false</code> to only scan the object type
-	 *        descriptions, i.e., ({@link PropertyAccess.PID#OBJECT_TYPE})
+	 * @param allProperties <code>true</code> to scan all property descriptions in the interface
+	 *        objects, <code>false</code> to only scan the object type descriptions, i.e., (
+	 *        {@link PropertyAccess.PID#OBJECT_TYPE})
 	 * @return a list containing the property descriptions of type {@link Description}
 	 * @throws KNXException on adapter errors while querying the descriptions
 	 */
@@ -707,10 +714,10 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 * Does a property description scan of the properties of one interface object.
 	 *
 	 * @param objIndex interface object index in the device
-	 * @param allProperties <code>true</code> to scan all property descriptions in that
-	 *        interface object, <code>false</code> to only scan the object type
-	 *        description of the interface object specified by <code>objIndex</code>,
-	 *        i.e., ({@link PropertyAccess.PID#OBJECT_TYPE})
+	 * @param allProperties <code>true</code> to scan all property descriptions in that interface
+	 *        object, <code>false</code> to only scan the object type description of the interface
+	 *        object specified by <code>objIndex</code>, i.e., (
+	 *        {@link PropertyAccess.PID#OBJECT_TYPE})
 	 * @return a list containing the property descriptions of type {@link Description}
 	 * @throws KNXException on adapter errors while querying the descriptions
 	 */
@@ -752,6 +759,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	/**
 	 * Closes the property client and the used adapter.
 	 */
+	@Override
 	public void close()
 	{
 		if (pa.isOpen()) {
@@ -792,8 +800,8 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		return tObjType.getValueUnsigned();
 	}
 
-	private DPTXlator createTranslator(final int objIndex, final int pid)
-		throws KNXException, InterruptedException
+	private DPTXlator createTranslator(final int objIndex, final int pid) throws KNXException,
+		InterruptedException
 	{
 		final int ot = getObjectType(objIndex, true);
 		int pdt = -1;
@@ -818,7 +826,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		if (PropertyTypes.hasTranslator(pdt))
 			return PropertyTypes.createTranslator(pdt);
 		final KNXException e = new KNXException("no translator available for PID 0x"
-			+ Integer.toHexString(pid) + ", " + getObjectTypeName(ot));
+				+ Integer.toHexString(pid) + ", " + getObjectTypeName(ot));
 		logger.warn("translator missing", e);
 		throw e;
 	}
@@ -848,41 +856,45 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		@Override
 		public Collection<Property> load(final String resource) throws KNXException
 		{
-			final XMLReader r = XMLFactory.getInstance().createXMLReader(resource);
-			final List<Property> list = new ArrayList<>(30);
+			try (final XmlReader r = XmlInputFactory.getInstance().createXMLReader(resource)) {
+				return load(r);
+			}
+		}
+
+		@Override
+		public Collection<Property> load(final XmlReader reader) throws KNXException
+		{
+			final List<Property> list = new ArrayList<>();
 			int objType = -1;
 			try {
-				if (r.read() != XMLReader.START_TAG
-					|| !r.getCurrent().getName().equals(PROPDEFS_TAG))
+				if (reader.nextTag() != XmlReader.START_ELEMENT
+						|| !reader.getLocalName().equals(PROPDEFS_TAG))
 					throw new KNXMLException("no property defintions");
-				while (r.read() != XMLReader.END_DOC) {
-					final Element e = r.getCurrent();
-					if (r.getPosition() == XMLReader.START_TAG) {
-						if (e.getName().equals(OBJECT_TAG)) {
+				while (reader.hasNext()) {
+					final int event = reader.next();
+					if (event == XmlReader.START_ELEMENT) {
+						if (reader.getLocalName().equals(OBJECT_TAG)) {
 							// on no type attribute, toInt() throws, that's ok
-							final String type = e.getAttribute(OBJECTTYPE_ATTR);
+							final String type = reader.getAttributeValue("", OBJECTTYPE_ATTR);
 							objType = "global".equals(type) ? -1 : toInt(type);
 						}
-						else if (e.getName().equals(PROPERTY_TAG)) {
-							r.complete(e);
-							parseRW(e.getAttribute(RW_ATTR));
-							list.add(new Property(toInt(e.getAttribute(PID_ATTR)),
-									e.getAttribute(PIDNAME_ATTR), e.getAttribute(NAME_ATTR),
-									objType, toInt(e.getAttribute(PDT_ATTR)),
-									e.getAttribute(DPT_ATTR)));
+						else if (reader.getLocalName().equals(PROPERTY_TAG)) {
+							parseRW(reader.getAttributeValue("", RW_ATTR));
+							list.add(new Property(toInt(reader.getAttributeValue("", PID_ATTR)),
+									reader.getAttributeValue("", PIDNAME_ATTR), reader
+											.getAttributeValue("", NAME_ATTR), objType,
+									toInt(reader.getAttributeValue("", PDT_ATTR)), reader
+											.getAttributeValue("", DPT_ATTR)));
 						}
 					}
-					else if (r.getPosition() == XMLReader.END_TAG
-							&& e.getName().equals(PROPDEFS_TAG))
+					else if (event == XmlReader.END_ELEMENT
+							&& reader.getLocalName().equals(PROPDEFS_TAG))
 						break;
 				}
 				return list;
 			}
 			catch (final KNXFormatException e) {
 				throw new KNXException("loading property definitions, " + e.getMessage());
-			}
-			finally {
-				r.close();
 			}
 		}
 
@@ -891,48 +903,50 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		 * (java.lang.String, java.util.Collection)
 		 */
 		@Override
-		public void save(final String resource, final Collection<Property> properties)
+		public void save(final String resource, final Collection<Property> definitions)
 			throws KNXException
 		{
-			final XMLWriter w = XMLFactory.getInstance().createXMLWriter(resource);
-			try {
-				w.writeDeclaration(true, "UTF-8");
-				w.writeComment("Calimero 2 " + Settings.getLibraryVersion()
-					+ " KNX property definitions, saved on " + new Date().toString());
-				w.writeElement(PROPDEFS_TAG, null, null);
-				final int noType = -2;
-				int objType = noType;
-				for (final Iterator<Property> i = properties.iterator(); i.hasNext();) {
-					final Property p = i.next();
-					if (p.objType != objType) {
-						if (objType != noType)
-							w.endElement();
-						objType = p.objType;
-						final List<Attribute> att = new ArrayList<>();
-						att.add(new Attribute(OBJECTTYPE_ATTR, objType == -1 ? "global"
-							: Integer.toString(objType)));
-						w.writeElement(OBJECT_TAG, att, null);
-					}
-					// property attributes
-					final List<Attribute> att = new ArrayList<>();
-					att.add(new Attribute(PID_ATTR, Integer.toString(p.id)));
-					att.add(new Attribute(PIDNAME_ATTR, p.name));
-					att.add(new Attribute(NAME_ATTR, p.propName));
-					att.add(new Attribute(PDT_ATTR, p.pdt == -1 ? "<tbd>" : Integer.toString(p.pdt)));
-					if (p.dpt != null && p.dpt.length() > 0)
-						att.add(new Attribute(DPT_ATTR, p.dpt));
-					// TOOD why don't we add r/w attribute values?
-					att.add(new Attribute(RW_ATTR, ""));
-					att.add(new Attribute(WRITE_ATTR, ""));
-					// write property
-					w.writeElement(PROPERTY_TAG, att, null);
-					w.writeElement(USAGE_TAG, null, null);
-					w.endElement();
-					w.endElement();
-				}
+			try (final XmlWriter w = XmlOutputFactory.getInstance().createXMLWriter(resource)) {
+				w.writeStartDocument();
+				save(w, definitions);
 			}
-			finally {
-				w.close();
+		}
+
+		@Override
+		public void save(final XmlWriter writer, final Collection<Property> definitions)
+			throws KNXException
+		{
+			writer.writeStartDocument();
+			writer.writeComment("Calimero 2 " + Settings.getLibraryVersion()
+					+ " KNX property definitions, saved on " + new Date().toString());
+			writer.writeStartElement(PROPDEFS_TAG, null, null);
+			final int noType = -2;
+			int objType = noType;
+			for (final Iterator<Property> i = definitions.iterator(); i.hasNext();) {
+				final Property p = i.next();
+				if (p.objType != objType) {
+					if (objType != noType)
+						writer.writeEndElement();
+					objType = p.objType;
+					writer.writeStartElement(OBJECT_TAG);
+					writer.writeAttribute(OBJECTTYPE_ATTR,
+							objType == -1 ? "global" : Integer.toString(objType));
+				}
+				// property attributes
+				writer.writeStartElement(PROPERTY_TAG);
+				writer.writeAttribute(PID_ATTR, Integer.toString(p.id));
+				writer.writeAttribute(PIDNAME_ATTR, p.name);
+				writer.writeAttribute(NAME_ATTR, p.propName);
+				writer.writeAttribute(PDT_ATTR, p.pdt == -1 ? "<tbd>" : Integer.toString(p.pdt));
+				if (p.dpt != null && p.dpt.length() > 0)
+					writer.writeAttribute(DPT_ATTR, p.dpt);
+				// TOOD why don't we add r/w attribute values?
+				writer.writeAttribute(RW_ATTR, "");
+				writer.writeAttribute(WRITE_ATTR, "");
+				// write property
+				writer.writeStartElement(USAGE_TAG, null, null);
+				writer.writeEndElement();
+				writer.writeEndElement();
 			}
 		}
 

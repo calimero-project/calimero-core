@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,56 +39,55 @@ package tuwien.auto.calimero.serial;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
+
+import javax.microedition.io.CommConnection;
+import javax.microedition.io.Connector;
 
 import org.slf4j.Logger;
 
 import tuwien.auto.calimero.KNXException;
 
 /**
- * Adapter for Java ME CDC javax.microedition.io.CommConnection.
+ * Adapter for Java 8 ME javax.microedition.io.CommConnection.
  * <p>
  *
  * @author B. Malinowsky
  */
 class CommConnectionAdapter extends LibraryAdapter
 {
-	private static final Class<?> connector;
-
-	private Object conn;
+	private final CommConnection conn;
 	private InputStream is;
 	private OutputStream os;
-
-	static {
-		Class<?> clazz = null;
-		try {
-			clazz = Class.forName("javax.microedition.io.Connector");
-		}
-		catch (final ClassNotFoundException e) {}
-		connector = clazz;
-	}
 
 	CommConnectionAdapter(final Logger logger, final String portId, final int baudrate)
 		throws KNXException
 	{
 		super(logger);
-		if (!isAvailable())
-			throw new KNXException("no ME CDC environment, Connector factory missing");
-		open(portId, baudrate);
+		Throwable t;
+		try {
+			final CommConnection c = (CommConnection) Connector.open("comm:" + portId
+					+ ";baudrate=" + baudrate
+					+ ";bitsperchar=8;stopbits=1;parity=even;autocts=off;autorts=off");
+			is = c.openInputStream();
+			os = c.openOutputStream();
+			conn = c;
+			return;
+		}
+		catch (final SecurityException e) {
+			logger.error("CommConnection access denied", e);
+			t = e;
+		}
+		catch (final IOException e) {
+			logger.error("open", e);
+			t = e;
+		}
+		throw new KNXException("failed to open CommConnection", t);
 	}
 
-	/**
-	 * Returns whether the ME CDC Connector class is available or not, and therefore,
-	 * checks if CommConnectionAdapter functionality can be used.
-	 * <p>
-	 * This method does not check if the actual serial protocol connection is supported.
-	 *
-	 * @return <code>true</code>, if running in a ME CDC environment, and CommConnection
-	 *         can be queried, <code>false</code> otherwise
-	 */
-	static boolean isAvailable()
+	@Override
+	public void init(final Object[] settings)
 	{
-		return connector != null;
+		// XXX Java8ME nothing to do here
 	}
 
 	/* (non-Javadoc)
@@ -97,14 +96,7 @@ class CommConnectionAdapter extends LibraryAdapter
 	@Override
 	public void close() throws IOException
 	{
-		try {
-			invoke(conn, "close", null);
-		}
-		catch (final InvocationTargetException e) {
-			if (e.getCause() instanceof IOException)
-				throw (IOException) e.getCause();
-		}
-		catch (final Exception ignore) {}
+		conn.close();
 	}
 
 	/* (non-Javadoc)
@@ -125,33 +117,15 @@ class CommConnectionAdapter extends LibraryAdapter
 		return os;
 	}
 
-	private void open(final String portID, final int baudrate) throws KNXException
+	@Override
+	public int getBaudRate()
 	{
-		Object cc = null;
-		try {
-			// query a CommConnection instance
-			cc = invoke(connector, "open", new String[] { "comm:" + portID + ";baudrate="
-					+ baudrate + ";bitsperchar=8;stopbits=1;parity=even;autocts=off;autorts=off" });
-			is = (InputStream) invoke(cc, "openInputStream", null);
-			os = (OutputStream) invoke(cc, "openOutputStream", null);
-			conn = cc;
-			return;
-		}
-		catch (final SecurityException e) {
-			logger.error("CommConnection access denied", e);
-		}
-		catch (final InvocationTargetException e) {
-			// usually, the cause will hold a ConnectionNotFoundException
-			logger.error("CommConnection: " + e.getCause().getMessage());
-		}
-		// NoSuchMethodException, IllegalAccessException, IllegalArgumentException
-		catch (final Exception e) {}
-		try {
-			invoke(cc, "close", null);
-			is.close();
-			os.close();
-		}
-		catch (final Exception mainlyNPE) {}
-		throw new KNXException("failed to open CommConnection");
+		return conn.getBaudRate();
+	}
+
+	@Override
+	public void setBaudRate(final int baudrate)
+	{
+		conn.setBaudRate(baudrate);
 	}
 }

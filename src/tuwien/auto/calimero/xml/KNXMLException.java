@@ -36,15 +36,12 @@
 
 package tuwien.auto.calimero.xml;
 
-import tuwien.auto.calimero.KNXException;
-
 /**
  * Indicates a problem with XML processing.
- * <p>
  *
  * @author B. Malinowsky
  */
-public class KNXMLException extends KNXException
+public class KNXMLException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;
 
@@ -73,6 +70,13 @@ public class KNXMLException extends KNXException
 		line = 0;
 	}
 
+	public KNXMLException(final String s, final Throwable cause)
+	{
+		super(s, cause);
+		item = null;
+		line = 0;
+	}
+
 	/**
 	 * Constructs a new <code>KNXMLException</code> with the specified detail message, the
 	 * problematic/erroneous processed XML item together with the line number it occurred on.
@@ -97,21 +101,27 @@ public class KNXMLException extends KNXException
 	 * @param s the detail message
 	 * @param r the used XML reader
 	 */
-	public KNXMLException(final String s, final XMLReader r)
+	public KNXMLException(final String s, final XmlReader r)
 	{
 		super(createMsg(s, r));
-		item = r.getCurrent() != null ? r.getCurrent().getName() : "n/a";
-		line = r.getLineNumber();
+		item = r != null ? r.getLocalName() : "n/a";
+		line = r.getLocation().getLineNumber();
 	}
 
-	private static String createMsg(final String s, final XMLReader r)
+	private static String createMsg(final String s, final XmlReader r)
 	{
 		final StringBuffer sb = new StringBuffer();
-		sb.append(s).append(" (line ").append(r.getLineNumber());
+		sb.append(s).append(" (line ").append(r.getLocation().getLineNumber());
 		sb.append(", element ");
-		sb.append((r.getCurrent() != null ? r.getCurrent().toString() : "n/a"));
-		if (r.getCurrent() != null && r.getCurrent().getCharacterData() != null)
-			sb.append(": ").append(r.getCurrent().getCharacterData());
+		sb.append(r.getLocalName());
+		if (r.getEventType() == XmlReader.START_ELEMENT) {
+			for (int i = 0; i < r.getAttributeCount(); i++)
+				sb.append(" ").append(r.getAttributeLocalName(i)).append("=")
+						.append(r.getAttributeValue(i));
+		}
+		final String t = r.getElementText();
+		if (t != null)
+			sb.append(": ").append(t);
 		sb.append(")");
 		return sb.toString();
 	}

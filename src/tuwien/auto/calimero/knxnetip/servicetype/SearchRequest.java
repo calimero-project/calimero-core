@@ -1,7 +1,7 @@
 /*
     Calimero 2 - A library for KNX network access
     Copyright (c) 2005 B. Erb
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,22 +38,20 @@
 package tuwien.auto.calimero.knxnetip.servicetype;
 
 import java.io.ByteArrayOutputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 
 import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.internal.EndpointAddress;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
 
 /**
  * Represents a KNXnet/IP search request.
  * <p>
- * Such request is sent during KNXnet/IP device discovery destined to the discovery
- * endpoint of listening servers. The communication is done multicast, i.e., using the UDP
- * transport protocol.<br>
+ * Such request is sent during KNXnet/IP device discovery destined to the discovery endpoint of
+ * listening servers. The communication is done multicast, i.e., using the UDP transport protocol.<br>
  * The counterpart sent in reply to the request are search responses.
  * <p>
  * Objects of this type are immutable.
- * 
+ *
  * @author Bernhard Erb
  * @author B. Malinowsky
  * @see tuwien.auto.calimero.knxnetip.servicetype.SearchResponse
@@ -66,7 +64,7 @@ public class SearchRequest extends ServiceType
 	/**
 	 * Creates a search request out of a byte array.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing a search request structure
 	 * @param offset start offset of request in <code>data</code>
 	 * @throws KNXFormatException if no valid host protocol address information was found
@@ -80,34 +78,34 @@ public class SearchRequest extends ServiceType
 	/**
 	 * Creates a new search request with the given client response address.
 	 * <p>
-	 * 
-	 * @param responseAddr address of the client discovery endpoint used for the response,
-	 *        use <code>null</code> to create a NAT aware search request
+	 *
+	 * @param responseAddr address of the client discovery endpoint used for the response, use
+	 *        <code>null</code> to create a NAT aware search request
 	 */
-	public SearchRequest(final InetSocketAddress responseAddr)
+	public SearchRequest(final EndpointAddress responseAddr)
 	{
 		super(KNXnetIPHeader.SEARCH_REQ);
 		endpoint = new HPAI(HPAI.IPV4_UDP, responseAddr);
 	}
 
 	/**
-	 * Convenience constructor to create a new search request using the system default
-	 * local host with the given client port.
+	 * Convenience constructor to create a new search request using the system default local host
+	 * with the given client port.
 	 * <p>
-	 * 
-	 * @param responsePort port number of the client control endpoint used for the
-	 *        response, 0 &lt;= port &lt;= 0xFFFF
+	 *
+	 * @param responsePort port number of the client control endpoint used for the response, 0 &lt;=
+	 *        port &lt;= 0xFFFF
 	 */
 	public SearchRequest(final int responsePort)
 	{
 		super(KNXnetIPHeader.SEARCH_REQ);
-		endpoint = new HPAI((InetAddress) null, responsePort);
+		endpoint = new HPAI((EndpointAddress) null, responsePort);
 	}
 
 	/**
 	 * Returns the client discovery endpoint.
 	 * <p>
-	 * 
+	 *
 	 * @return discovery endpoint in a HPAI
 	 */
 	public final HPAI getEndpoint()

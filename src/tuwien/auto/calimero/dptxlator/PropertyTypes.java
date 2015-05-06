@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,20 +36,20 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.dptxlator.TranslatorTypes.MainType;
+import tuwien.auto.calimero.internal.JavaME;
 
 /**
  * Maintains all available KNX property data types (PDT).
  * <p>
- * It stores all available, registered PDTs and the associated datapoint type (DPT) for
- * such a property type.<br>
- * It offers methods to work with and alter these PDT to DPT mappings, to look up DPT
- * translators or to do complete translation of data.<br>
+ * It stores all available, registered PDTs and the associated datapoint type (DPT) for such a
+ * property type.<br>
+ * It offers methods to work with and alter these PDT to DPT mappings, to look up DPT translators or
+ * to do complete translation of data.<br>
  *
  * @author B. Malinowsky
  */
@@ -60,8 +60,7 @@ public final class PropertyTypes
 	 * {@link PropertyTypes#getAllPropertyTypes()}.
 	 * <p>
 	 * Objects of this type are immutable.<br>
-	 * For a more detailed description of main numbers and DPTs, see
-	 * {@link TranslatorTypes}.
+	 * For a more detailed description of main numbers and DPTs, see {@link TranslatorTypes}.
 	 */
 	public static class DPTID
 	{
@@ -71,8 +70,7 @@ public final class PropertyTypes
 		/**
 		 * Creates a new DPTID used to identify a DPT translator.
 		 *
-		 * @param mainNumber DPT main number identifying a data type matching the property
-		 *        data type
+		 * @param mainNumber DPT main number identifying a data type matching the property data type
 		 * @param dpt appropriate datapoint type for the property type
 		 */
 		public DPTID(final int mainNumber, final String dpt)
@@ -84,8 +82,8 @@ public final class PropertyTypes
 		/**
 		 * Returns the main number of the translator data type.
 		 * <p>
-		 * If the datapoint type returned by {@link #getDPT()} is formatted the preferred
-		 * way as described in {@link TranslatorTypes}, the main number might be 0.
+		 * If the datapoint type returned by {@link #getDPT()} is formatted the preferred way as
+		 * described in {@link TranslatorTypes}, the main number might be 0.
 		 *
 		 * @return main number (or 0) as int
 		 */
@@ -337,7 +335,7 @@ public final class PropertyTypes
 		m.put(new Integer(PDT_BITSET16), new DPTID(22, "22.100"));
 		m.put(new Integer(PDT_ENUM8), new DPTID(20, "20.1000"));
 		m.put(new Integer(PDT_SCALING), new DPTID(TranslatorTypes.TYPE_8BIT_UNSIGNED, "5.001"));
-		pt = Collections.synchronizedMap(m);
+		pt = JavaME.synchronizedMap(m);
 	}
 
 	private PropertyTypes()
@@ -357,15 +355,14 @@ public final class PropertyTypes
 	}
 
 	/**
-	 * Does a lookup if the given property data type has an associated translator
-	 * available.
+	 * Does a lookup if the given property data type has an associated translator available.
 	 * <p>
-	 * The translator looked for is specified in the property map. An available translator
-	 * is implemented and can be used for translation.
+	 * The translator looked for is specified in the property map. An available translator is
+	 * implemented and can be used for translation.
 	 *
 	 * @param dataType property data type to lookup
-	 * @return <code>true</code> iff translator and its subtype was found,
-	 *         <code>false</code> otherwise
+	 * @return <code>true</code> iff translator and its subtype was found, <code>false</code>
+	 *         otherwise
 	 */
 	public static boolean hasTranslator(final int dataType)
 	{
@@ -384,8 +381,8 @@ public final class PropertyTypes
 	/**
 	 * Creates a new DPT translator for the specified property type.
 	 * <p>
-	 * The translator is initialized with a subtype as specified by the property map.
-	 * Also, appending of units is disabled in the returned translator.
+	 * The translator is initialized with a subtype as specified by the property map. Also,
+	 * appending of units is disabled in the returned translator.
 	 *
 	 * @param dataType property data type to get the associated translator for
 	 * @return the created DPT translator
@@ -397,19 +394,18 @@ public final class PropertyTypes
 		final DPTID dpt = pt.get(new Integer(dataType));
 		if (dpt == null)
 			throw new KNXException("PDT not found");
-		final DPTXlator t = TranslatorTypes.createTranslator(dpt.getMainNumber(),
-			dpt.getDPT());
+		final DPTXlator t = TranslatorTypes.createTranslator(dpt.getMainNumber(), dpt.getDPT());
 		t.setAppendUnit(false);
 		return t;
 	}
 
 	/**
-	 * Utility method, like {@link #createTranslator(int)}, with the additional capability
-	 * to set the data to be used by the DPT translator.
+	 * Utility method, like {@link #createTranslator(int)}, with the additional capability to set
+	 * the data to be used by the DPT translator.
 	 *
 	 * @param dataType property data type to get the associated translator for
-	 * @param data array with KNX DPT formatted data, the number of contained items is
-	 *        determined by the used DPT
+	 * @param data array with KNX DPT formatted data, the number of contained items is determined by
+	 *        the used DPT
 	 * @return the created DPT translator with the set data
 	 * @throws KNXException on PDT not found or translator could not be created
 	 * @see #createTranslator(int)
@@ -423,15 +419,15 @@ public final class PropertyTypes
 	}
 
 	/**
-	 * Utility method for retrieving the string representations of the KNX DPT data of the
-	 * specified property data type.
+	 * Utility method for retrieving the string representations of the KNX DPT data of the specified
+	 * property data type.
 	 *
 	 * @param dataType property data type of the <code>data</code> items
-	 * @param data array with KNX DPT formatted data, the number of contained items is
-	 *        determined by the used DPT
-	 * @return string array with representation of the data items according to the used
-	 *         DPT translator as returned by {@link DPTXlator#getAllValues()}, length of
-	 *         array equals translated items in <code>data</code>
+	 * @param data array with KNX DPT formatted data, the number of contained items is determined by
+	 *        the used DPT
+	 * @return string array with representation of the data items according to the used DPT
+	 *         translator as returned by {@link DPTXlator#getAllValues()}, length of array equals
+	 *         translated items in <code>data</code>
 	 * @throws KNXException if translator could not be created
 	 */
 	public static String[] getValues(final int dataType, final byte[] data) throws KNXException

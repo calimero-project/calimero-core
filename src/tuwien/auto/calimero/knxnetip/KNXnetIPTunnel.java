@@ -37,9 +37,8 @@
 package tuwien.auto.calimero.knxnetip;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
+
+import javax.microedition.io.Datagram;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.KNXException;
@@ -52,6 +51,7 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIBusMon;
 import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.internal.EndpointAddress;
 import tuwien.auto.calimero.knxnetip.servicetype.ErrorCodes;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
@@ -63,8 +63,8 @@ import tuwien.auto.calimero.log.LogService.LogLevel;
 /**
  * KNXnet/IP connection for KNX tunneling.
  * <p>
- * The tunneling protocol specifies a point-to-point exchange of KNX frames over an IP
- * network connection between two KNXnet/IP devices - client and server.<br>
+ * The tunneling protocol specifies a point-to-point exchange of KNX frames over an IP network
+ * connection between two KNXnet/IP devices - client and server.<br>
  * Up to now, only the client side is implemented.<br>
  * The communication on OSI layer 4 is done using UDP.<br>
  *
@@ -104,21 +104,19 @@ public class KNXnetIPTunnel extends ClientConnection
 	 * Establishing a raw tunneling layer ({@link #RAW_LAYER}) is not supported yet.<br>
 	 *
 	 * @param knxLayer KNX tunneling layer (e.g. {@link #LINK_LAYER})
-	 * @param localEP specifies the local endpoint with the socket address to be used by
-	 *        the tunnel
+	 * @param localEP specifies the local endpoint with the socket address to be used by the tunnel
 	 * @param serverCtrlEP control endpoint of the server to establish connection to
 	 * @param useNAT <code>true</code> to use a NAT (network address translation) aware
 	 *        communication mechanism, <code>false</code> to use the default way
 	 * @throws KNXException on socket communication error
 	 * @throws KNXTimeoutException on no connect response before connect timeout
-	 * @throws KNXRemoteException if response indicates an error condition at the server
-	 *         concerning the request
+	 * @throws KNXRemoteException if response indicates an error condition at the server concerning
+	 *         the request
 	 * @throws KNXInvalidResponseException if connect response is in wrong format
-	 * @throws InterruptedException on interrupted thread while creating tunneling
-	 *         connection
+	 * @throws InterruptedException on interrupted thread while creating tunneling connection
 	 */
-	public KNXnetIPTunnel(final int knxLayer, final InetSocketAddress localEP,
-		final InetSocketAddress serverCtrlEP, final boolean useNAT) throws KNXException,
+	public KNXnetIPTunnel(final int knxLayer, final EndpointAddress localEP,
+		final EndpointAddress serverCtrlEP, final boolean useNAT) throws KNXException,
 		InterruptedException
 	{
 		super(KNXnetIPHeader.TUNNELING_REQ, KNXnetIPHeader.TUNNELING_ACK, 2, TUNNELING_REQ_TIMEOUT);
@@ -135,8 +133,8 @@ public class KNXnetIPTunnel extends ClientConnection
 	 * <p>
 	 * Sending in busmonitor mode is not permitted.<br>
 	 *
-	 * @param frame cEMI message to send, the expected cEMI type is according to the used
-	 *        tunneling layer
+	 * @param frame cEMI message to send, the expected cEMI type is according to the used tunneling
+	 *        layer
 	 */
 	@Override
 	public void send(final CEMI frame, final BlockingMode mode) throws KNXTimeoutException,
@@ -158,16 +156,12 @@ public class KNXnetIPTunnel extends ClientConnection
 		return "KNXnet/IP Tunneling " + super.getName();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.ClientConnection#handleServiceType
-	 * (tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader, byte[], int,
-	 * java.net.InetAddress, int)
-	 */
 	@Override
-	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset,
-		final InetAddress src, final int port) throws KNXFormatException, IOException
+	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data,
+			final int offset, final EndpointAddress sender) throws KNXFormatException,
+			IOException
 	{
-		if (super.handleServiceType(h, data, offset, src, port))
+		if (super.handleServiceType(h, data, offset, sender))
 			return true;
 		final int svc = h.getServiceType();
 		if (svc != serviceRequest)
@@ -183,8 +177,7 @@ public class KNXnetIPTunnel extends ClientConnection
 					: ErrorCodes.VERSION_NOT_SUPPORTED;
 			final byte[] buf = PacketHelper.toPacket(new ServiceAck(serviceAck, channelId, seq,
 					status));
-			final DatagramPacket p = new DatagramPacket(buf, buf.length, dataEndpt.getAddress(),
-					dataEndpt.getPort());
+			final Datagram p = socket.newDatagram(buf, buf.length, dataEndpt.toAddress());
 			socket.send(p);
 			if (status == ErrorCodes.VERSION_NOT_SUPPORTED) {
 				close(CloseEvent.INTERNAL, "protocol version changed", LogLevel.ERROR, null);

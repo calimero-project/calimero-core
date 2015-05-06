@@ -36,11 +36,10 @@
 
 package tuwien.auto.calimero.cemi;
 
-import java.util.Arrays;
-
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.cemi.CEMILDataEx.AddInfo;
+import tuwien.auto.calimero.internal.JavaME;
 
 /**
  * RF medium information, with additional data link layer information mandatory for communication
@@ -146,7 +145,7 @@ final class RFMediumInfo extends AddInfo
 	// ??? maybe make two methods with dedicated names
 	public byte[] getDoAorSN()
 	{
-		return Arrays.copyOfRange(getInfo(), 1, 1 + 6);
+		return DataUnitBuilder.copyOfRange(getInfo(), 1, 1 + 6);
 	}
 
 	// Link layer Frame Number (LFN)

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2014 B. Malinowsky
+    Copyright (c) 2010, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,6 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -170,21 +169,27 @@ public class DPTXlator1BitControlled extends DPTXlator
 	public static final DPT DPT_INVERT_CONTROL = new DPT1BitControlled("2.012",
 			"Invert Controlled", DPTXlatorBoolean.DPT_INVERT);
 
-	private static final Map<String, DPT> types;
+
+	private static DPT[] dpts = new DPT[]{
+		DPT_SWITCH_CONTROL,
+		DPT_BOOL_CONTROL,
+		DPT_ENABLE_CONTROL,
+		DPT_RAMP_CONTROL,
+		DPT_ALARM_CONTROL,
+		DPT_BINARY_CONTROL,
+		DPT_STEP_CONTROL,
+		DPT_UPDOWN_CONTROL,
+		DPT_OPENCLOSE_CONTROL,
+		DPT_START_CONTROL,
+		DPT_STATE_CONTROL,
+		DPT_INVERT_CONTROL,
+	};
+
+	private static final Map<String, DPT> types = new HashMap<>();
 
 	static {
-		types = new HashMap<>(15);
-		final Field[] fields = DPTXlator1BitControlled.class.getFields();
-		for (int i = 0; i < fields.length; i++) {
-			try {
-				final Object o = fields[i].get(null);
-				if (o instanceof DPT) {
-					final DPT dpt = (DPT) o;
-					types.put(dpt.getID(), dpt);
-				}
-			}
-			catch (final IllegalAccessException e) {}
-		}
+		for (final DPT dpt : dpts)
+			types.put(dpt.getID(), dpt);
 	}
 
 	/**

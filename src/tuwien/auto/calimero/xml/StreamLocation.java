@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,59 +36,47 @@
 
 package tuwien.auto.calimero.xml;
 
+import javax.xml.stream.Location;
+
 /**
- * XML element attribute.
- * <p>
- * Objects of this type are immutable.
- * 
  * @author B. Malinowsky
  */
-public class Attribute
+final class StreamLocation implements Location
 {
-	private final String name;
-	private final String value;
+	private final int line;
 
-	/**
-	 * Creates an attribute with its name and value.
-	 * <p>
-	 * 
-	 * @param name name of the attribute
-	 * @param value value of the attribute
-	 */
-	public Attribute(final String name, final String value)
+	public StreamLocation(final int line)
 	{
-		this.name = name;
-		this.value = value;
+		this.line = line;
 	}
 
-	/**
-	 * Returns the attribute name.
-	 * <p>
-	 * 
-	 * @return attribute name
-	 */
-	public final String getName()
-	{
-		return name;
-	}
-
-	/**
-	 * Returns the value of this attribute.
-	 * <p>
-	 * 
-	 * @return value as String
-	 */
-	public final String getValue()
-	{
-		return value;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
-	public String toString()
+	public int getLineNumber()
 	{
-		return name + "=" + value;
+		return line;
+	}
+
+	@Override
+	public int getColumnNumber()
+	{
+		return -1;
+	}
+
+	@Override
+	public int getCharacterOffset()
+	{
+		return -1;
+	}
+
+	@Override
+	public String getPublicId()
+	{
+		return null;
+	}
+
+	@Override
+	public String getSystemId()
+	{
+		return null;
 	}
 }

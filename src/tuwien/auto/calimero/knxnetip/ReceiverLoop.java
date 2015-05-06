@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2014 B. Malinowsky
+    Copyright (c) 2010, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,13 +37,14 @@
 package tuwien.auto.calimero.knxnetip;
 
 import java.io.IOException;
-import java.net.DatagramSocket;
-import java.net.InetSocketAddress;
+
+import javax.microedition.io.UDPDatagramConnection;
 
 import org.slf4j.Logger;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.internal.EndpointAddress;
 import tuwien.auto.calimero.internal.UdpSocketLooper;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.log.LogService.LogLevel;
@@ -54,10 +55,10 @@ final class ReceiverLoop extends UdpSocketLooper implements Runnable
 	private final Logger logger;
 
 	// precondition: an initialized logger instance in ConnectionBase
-	ReceiverLoop(final ConnectionBase connection, final DatagramSocket socket,
+	ReceiverLoop(final ConnectionBase connection, final UDPDatagramConnection socket,
 		final int receiveBufferSize)
 	{
-		super(socket, true, receiveBufferSize, 0, 0);
+		super(socket, true, receiveBufferSize, 0);
 		conn = connection;
 		logger = connection.logger;
 	}
@@ -74,8 +75,8 @@ final class ReceiverLoop extends UdpSocketLooper implements Runnable
 	}
 
 	@Override
-	protected void onReceive(final InetSocketAddress source, final byte[] data,
-		final int offset, final int length) throws IOException
+	protected void onReceive(final EndpointAddress sender, final byte[] data, final int offset,
+		final int length) throws IOException
 	{
 		try {
 			final KNXnetIPHeader h = new KNXnetIPHeader(data, offset);
@@ -85,8 +86,7 @@ final class ReceiverLoop extends UdpSocketLooper implements Runnable
 				// check service type for 0 (invalid type),
 				// so unused service types of us can stay 0 by default
 				logger.warn("received frame with service type 0 - ignored");
-			else if (!conn.handleServiceType(h, data, offset + h.getStructLength(),
-					source.getAddress(), source.getPort()))
+			else if (!conn.handleServiceType(h, data, offset + h.getStructLength(), sender))
 				logger.warn("received unknown frame, service type 0x"
 						+ Integer.toHexString(h.getServiceType()) + " - ignored");
 		}

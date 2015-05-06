@@ -40,10 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.EventListener;
-import java.util.List;
 import java.util.StringTokenizer;
 
 import org.slf4j.Logger;
@@ -61,12 +58,11 @@ import tuwien.auto.calimero.log.LogService;
 /**
  * Provides a connection based on the FT1.2 protocol for communication with a BCU2 device.
  * <p>
- * It supports establishing a connection over serial port identifiers recognized and
- * supported by the underlying operating system.
+ * It supports establishing a connection over serial port identifiers recognized and supported by
+ * the underlying operating system.
  * <p>
  * Access to log event information:<br>
- * See the corresponding constructors of this class for how to get the associated log
- * service.
+ * See the corresponding constructors of this class for how to get the associated log service.
  *
  * @author B. Malinowsky
  */
@@ -83,8 +79,8 @@ public class FT12Connection implements AutoCloseable
 	public static final int CLOSED = 1;
 
 	/**
-	 * Status code of communication: waiting for acknowledge after send, no error, not
-	 * ready to send.
+	 * Status code of communication: waiting for acknowledge after send, no error, not ready to
+	 * send.
 	 */
 	public static final int ACK_PENDING = 2;
 
@@ -144,7 +140,7 @@ public class FT12Connection implements AutoCloseable
 	private int exchangeTimeout;
 	private int idleTimeout;
 
-	private final EventListeners<KNXListener> listeners = new EventListeners<>(KNXListener.class);
+	private final EventListeners<KNXListener> listeners = new EventListeners<>(new KNXListener[0]);
 
 	/**
 	 * Creates a new connection to a BCU2 using the FT1.2 protocol.
@@ -152,17 +148,16 @@ public class FT12Connection implements AutoCloseable
 	 * If the port to use can not be told just by the number, use
 	 * {@link FT12Connection#FT12Connection(String)}.<br>
 	 * The baud rate is set to 19200.<br>
-	 * The associated log service to which the created instance will output logging events
-	 * is named "FT1.2 <code>portNumber</code>", with <code>portNumber</code> being the
-	 * supplied port parameter value. If a log writer wants to receive all log events
-	 * created during establishment of this FT1.2 connection, use
-	 * {@link LogService#getLogger(String)} before invoking this constructor and add
-	 * the writer.
+	 * The associated log service to which the created instance will output logging events is named
+	 * "FT1.2 <code>portNumber</code>", with <code>portNumber</code> being the supplied port
+	 * parameter value. If a log writer wants to receive all log events created during establishment
+	 * of this FT1.2 connection, use {@link LogService#getLogger(String)} before invoking this
+	 * constructor and add the writer.
 	 *
-	 * @param portNumber port number of the serial communication port to use; mapped to
-	 *        the default port identifier using this number (device and platform specific)
-	 * @throws KNXException on port not found or access error, initializing port settings
-	 *         failed, if reset of BCU2 failed
+	 * @param portNumber port number of the serial communication port to use; mapped to the default
+	 *        port identifier using this number (device and platform specific)
+	 * @throws KNXException on port not found or access error, initializing port settings failed, if
+	 *         reset of BCU2 failed
 	 */
 	public FT12Connection(final int portNumber) throws KNXException
 	{
@@ -173,16 +168,15 @@ public class FT12Connection implements AutoCloseable
 	 * Creates a new connection to a BCU2 using the FT1.2 protocol.
 	 * <p>
 	 * The baud rate is set to 19200.<br>
-	 * The associated log service to which the created instance will output logging events
-	 * is named "FT1.2 <code>portId</code>", with <code>portId</code> being the supplied
-	 * port identifier. If a log writer wants to receive all log events created during
-	 * establishment of this FT1.2 connection, use
-	 * {@link LogService#getLogger(String)} before invoking this constructor and add
+	 * The associated log service to which the created instance will output logging events is named
+	 * "FT1.2 <code>portId</code>", with <code>portId</code> being the supplied port identifier. If
+	 * a log writer wants to receive all log events created during establishment of this FT1.2
+	 * connection, use {@link LogService#getLogger(String)} before invoking this constructor and add
 	 * the writer.
 	 *
 	 * @param portId port identifier of the serial communication port to use
-	 * @throws KNXException on port not found or access error, initializing port settings
-	 *         failed, if reset of BCU2 failed
+	 * @throws KNXException on port not found or access error, initializing port settings failed, if
+	 *         reset of BCU2 failed
 	 */
 	public FT12Connection(final String portId) throws KNXException
 	{
@@ -190,25 +184,25 @@ public class FT12Connection implements AutoCloseable
 	}
 
 	/**
-	 * Creates a new connection to a BCU2 using the FT1.2 protocol, and set the baud rate
-	 * for communication.
+	 * Creates a new connection to a BCU2 using the FT1.2 protocol, and set the baud rate for
+	 * communication.
 	 * <p>
-	 * If the requested baud rate is not supported, it may get substituted with a valid
-	 * baud rate by default.<br>
+	 * If the requested baud rate is not supported, it may get substituted with a valid baud rate by
+	 * default.<br>
 	 * For access to the log service, see {@link #FT12Connection(String)}.
 	 *
 	 * @param portId port identifier of the serial communication port to use
 	 * @param baudrate baud rate to use for communication, 0 &lt; baud rate
-	 * @throws KNXException on port not found or access error, initializing port settings
-	 *         failed, if reset of BCU2 failed
+	 * @throws KNXException on port not found or access error, initializing port settings failed, if
+	 *         reset of BCU2 failed
 	 */
 	public FT12Connection(final String portId, final int baudrate) throws KNXException
 	{
 		this(portId, portId, baudrate);
 	}
 
-	private FT12Connection(final String originalPortId, final String portId,
-		final int baudrate) throws KNXException
+	private FT12Connection(final String originalPortId, final String portId, final int baudrate)
+		throws KNXException
 	{
 		logger = LogService.getLogger("FT1.2 " + originalPortId);
 		open(portId, baudrate);
@@ -245,24 +239,12 @@ public class FT12Connection implements AutoCloseable
 				portIds[i] = st.nextToken();
 			return portIds;
 		}
-		if (SerialComAdapter.isAvailable()) {
-			final String[] prefixes = defaultPortPrefixes();
-			final List<String> l = new ArrayList<>(10);
-			for (int k = 0; k < prefixes.length; k++) {
-				final String prefix = prefixes[k];
-				for (int i = 0; i < 10; ++i)
-					if (SerialComAdapter.portExists(prefix + i))
-						l.add(prefix + i);
-			}
-			return l.toArray(new String[l.size()]);
-		}
 		// skip other possible adapters for now, and return empty list...
 		return new String[0];
 	}
 
 	/**
-	 * Adds the specified event listener <code>l</code> to receive events from this
-	 * connection.
+	 * Adds the specified event listener <code>l</code> to receive events from this connection.
 	 * <p>
 	 * If <code>l</code> was already added as listener, no action is performed.
 	 *
@@ -274,8 +256,8 @@ public class FT12Connection implements AutoCloseable
 	}
 
 	/**
-	 * Removes the specified event listener <code>l</code>, so it does no longer receive
-	 * events from this connection.
+	 * Removes the specified event listener <code>l</code>, so it does no longer receive events from
+	 * this connection.
 	 * <p>
 	 * If <code>l</code> was not added in the first place, no action is performed.
 	 *
@@ -289,8 +271,7 @@ public class FT12Connection implements AutoCloseable
 	/**
 	 * Returns the port identifier in use for this connection.
 	 * <p>
-	 * After the connection is closed, the returned identifier will always be the empty
-	 * string.
+	 * After the connection is closed, the returned identifier will always be the empty string.
 	 *
 	 * @return port identifier as string, or empty string
 	 */
@@ -334,27 +315,27 @@ public class FT12Connection implements AutoCloseable
 	/**
 	 * Sends an EMI frame to the BCU2 connected with this endpoint.
 	 * <p>
-	 * In blocking mode, all necessary retransmissions of the sent frame will be done
-	 * automatically according to the protocol specification (i.e., in case of timeout).<br>
-	 * If a communication failure occurs on the port, {@link #close()} is called. A send
-	 * timeout does not lead to closing of this connection.<br>
-	 * In blocking send mode, on successfully receiving a confirmation, all listeners are
-	 * guaranteed to get notified before this method returns. The communication state (see
-	 * {@link #getState()}) is reset to {@link #OK} when the notification completed, so to
-	 * prevent another send call from a listener.
+	 * In blocking mode, all necessary retransmissions of the sent frame will be done automatically
+	 * according to the protocol specification (i.e., in case of timeout).<br>
+	 * If a communication failure occurs on the port, {@link #close()} is called. A send timeout
+	 * does not lead to closing of this connection.<br>
+	 * In blocking send mode, on successfully receiving a confirmation, all listeners are guaranteed
+	 * to get notified before this method returns. The communication state (see {@link #getState()})
+	 * is reset to {@link #OK} when the notification completed, so to prevent another send call from
+	 * a listener.
 	 *
 	 * @param frame EMI message to send, length of frame &lt; 256 bytes
-	 * @param blocking <code>true</code> to block for confirmation (ACK),
-	 *        <code>false</code> to immediately return after send
-	 * @throws KNXAckTimeoutException in <code>blocking</code> mode, if a timeout
-	 *         regarding the frame acknowledgment message was encountered
-	 * @throws KNXPortClosedException if no communication was established in the first
-	 *         place or communication was closed
-	 * @throws InterruptedException on thread interruption during sending the frame; the
-	 *         connection is not closed because of the interruption
+	 * @param blocking <code>true</code> to block for confirmation (ACK), <code>false</code> to
+	 *        immediately return after send
+	 * @throws KNXAckTimeoutException in <code>blocking</code> mode, if a timeout regarding the
+	 *         frame acknowledgment message was encountered
+	 * @throws KNXPortClosedException if no communication was established in the first place or
+	 *         communication was closed
+	 * @throws InterruptedException on thread interruption during sending the frame; the connection
+	 *         is not closed because of the interruption
 	 */
-	public void send(final byte[] frame, final boolean blocking)
-		throws KNXAckTimeoutException, KNXPortClosedException, InterruptedException
+	public void send(final byte[] frame, final boolean blocking) throws KNXAckTimeoutException,
+		KNXPortClosedException, InterruptedException
 	{
 		boolean ack = false;
 		try {
@@ -387,10 +368,11 @@ public class FT12Connection implements AutoCloseable
 	 * Ends communication with the BCU2 as specified by the FT1.2 protocol.
 	 * <p>
 	 * The BCU is always switched back into normal mode.<br>
-	 * All registered event listeners get notified. The close event is the last event the
-	 * listeners receive. <br>
+	 * All registered event listeners get notified. The close event is the last event the listeners
+	 * receive. <br>
 	 * If this connection endpoint is already closed, no action is performed.
 	 */
+	@Override
 	public void close()
 	{
 		close(true, "client request");
@@ -428,71 +410,39 @@ public class FT12Connection implements AutoCloseable
 		logger.info("access supported, opened serial port " + portId);
 	}
 
+	// TODO Java8ME add a lookup for the Java ME Device I/O adapter
 	private LibraryAdapter createAdapter(final String portId, final int baudrate)
 		throws KNXException
 	{
 		boolean available = false;
-		// check for ME CDC platform and available serial communication port
-		// protocol support for communication ports is optional in CDC
-		if (CommConnectionAdapter.isAvailable()) {
-			available = true;
-			logger.info("open ME CDC serial port connection (CommConnection)");
-			try {
-				return new CommConnectionAdapter(logger, portId, baudrate);
-			}
-			catch (final KNXException e) {
-				logger.warn("ME CDC serial port access failed", e);
-			}
+		// check for Java 8 ME platform and available serial communication port
+		// protocol support for communication ports is optional
+		available = true;
+		logger.info("open ME Embedded serial port connection (CommConnection)");
+		try {
+			return new CommConnectionAdapter(logger, portId, baudrate);
 		}
-		// check internal support for serial port access
-		// protocol support available for Win 32/64 platforms
-		// (so we provide serial port access at least on platforms with ETS)
-		if (SerialComAdapter.isAvailable()) {
-			available = true;
-			logger.info("open Calimero 2 native serial port connection (serialcom)");
-			SerialComAdapter conn = null;
-			try {
-				conn = new SerialComAdapter(logger, portId);
-				conn.setBaudRate(baudrate);
-				calcTimeouts(conn.getBaudRate());
-				// In Windows Embedded CE, the read interval timeout starts immediately
-				conn.setTimeouts(new SerialComAdapter.Timeouts(idleTimeout, 0, 0, 0, 0));
-				conn.setParity(SerialComAdapter.PARITY_EVEN);
-				conn.setControl(SerialComAdapter.STOPBITS, SerialComAdapter.ONE_STOPBIT);
-				conn.setControl(SerialComAdapter.DATABITS, 8);
-				conn.setControl(SerialComAdapter.FLOWCTRL, SerialComAdapter.FLOWCTRL_NONE);
-				logger.info("setup serial port: baudrate " + conn.getBaudRate()
-					+ ", even parity, " + conn.getControl(SerialComAdapter.DATABITS)
-					+ " databits, " + conn.getControl(SerialComAdapter.STOPBITS)
-					+ " stopbits, timeouts: " + conn.getTimeouts());
-				return conn;
-			}
-			catch (final IOException e) {
-				if (conn != null)
-					try {
-						conn.close();
-					}
-					catch (final IOException ignore) {}
-				logger.warn("native serial port access failed", e);
-			}
+		catch (final KNXException e) {
+			logger.warn("ME Embedded serial port access failed", e);
 		}
 		try {
+			// XXX Java8ME there exist rxtx compiles for low-end ARM etc. so check it for now
 			final Class<?> c = Class.forName("tuwien.auto.calimero.serial.RxtxAdapter");
 			available = true;
 			// check whether a rxtx library is hanging around somewhere
 			logger.info("open rxtx library serial port connection");
 			final Class<? extends LibraryAdapter> adapter = LibraryAdapter.class;
-			return adapter.cast(c.getConstructors()[0].newInstance(new Object[] {
-				logger, portId, new Integer(baudrate) }));
+			final LibraryAdapter a = adapter.cast(c.newInstance());
+			// XXX Java8ME missing in rxtx adapter
+			a.init(new Object[] { logger, portId });
+			a.setBaudRate(baudrate);
+			return a;
 		}
 		catch (final ClassNotFoundException e) {
 			logger.warn("rxtx library adapter not found");
 		}
 		catch (final SecurityException e) {
 			logger.error("rxtx library adapter access denied", e);
-		}
-		catch (final InvocationTargetException e) {
-			logger.error("initalizing rxtx serial port", e.getCause());
 		}
 		catch (final Exception e) {
 			// InstantiationException, NoSuchMethodException,
@@ -618,7 +568,7 @@ public class FT12Connection implements AutoCloseable
 	private static String[] defaultPortPrefixes()
 	{
 		return System.getProperty("os.name").toLowerCase().indexOf("windows") > -1
-				? new String[]{ "\\\\.\\COM" } : new String[]{ "/dev/ttyS", "/dev/ttyUSB" };
+				? new String[] { "\\\\.\\COM" } : new String[] { "/dev/ttyS", "/dev/ttyUSB" };
 	}
 
 	private final class Receiver extends Thread
@@ -629,7 +579,8 @@ public class FT12Connection implements AutoCloseable
 		Receiver()
 		{
 			super("Calimero FT1.2 receiver");
-			setDaemon(true);
+			// XXX Java8ME
+//			setDaemon(true);
 		}
 
 		@Override
@@ -682,8 +633,9 @@ public class FT12Connection implements AutoCloseable
 				if ((buf[0] & 0x30) == 0) {
 					sendAck();
 					final int fc = buf[0] & 0x0f;
-					logger.trace("received " + (fc == RESET ? "reset" : fc == REQ_STATUS
-							? "status" : "unknown function code "));
+					logger.trace("received "
+							+ (fc == RESET ? "reset" : fc == REQ_STATUS ? "status"
+									: "unknown function code "));
 					return true;
 				}
 			}
@@ -746,8 +698,8 @@ public class FT12Connection implements AutoCloseable
 		}
 
 		/**
-		 * Fires a frame received event ({@link KNXListener#frameReceived(FrameEvent)})
-		 * for the supplied EMI2 <code>frame</code>.
+		 * Fires a frame received event ({@link KNXListener#frameReceived(FrameEvent)}) for the
+		 * supplied EMI2 <code>frame</code>.
 		 *
 		 * @param frame the EMI2 L-data frame to generate the event for
 		 */

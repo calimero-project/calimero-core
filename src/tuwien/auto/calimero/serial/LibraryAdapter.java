@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,20 +40,17 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import org.slf4j.Logger;
 
 /**
  * Adapter to access a serial communication port using some serial I/O library.
  * <p>
- * Subtypes of this class implementing the access to a specific library have to declare a
- * public constructor expecting a String and an <code>int</code> argument, i.e.,<br>
- * <code>public MyAdapter(String portID, int baudrate)</code> for a class named
- * "MyAdapter". The <code>portID</code> argument identifies the communication port on
- * which to open the connection, the <code>baudrate</code> argument specifies the
- * requested baud rate for communication.<br>
+ * Subtypes of this class implementing the access to a specific library have to declare a public
+ * constructor expecting a String and an <code>int</code> argument, i.e.,<br>
+ * <code>public MyAdapter(String portID, int baudrate)</code> for a class named "MyAdapter". The
+ * <code>portID</code> argument identifies the communication port on which to open the connection,
+ * the <code>baudrate</code> argument specifies the requested baud rate for communication.<br>
  * Invoking that constructor will open the serial port according the supplied arguments.
  * <p>
  * After closing a library adapter, method behavior is undefined.
@@ -63,8 +60,8 @@ import org.slf4j.Logger;
 public abstract class LibraryAdapter implements Closeable
 {
 	/**
-	 * The log service to use, supplied in the constructor; if a sub-class of
-	 * LibraryAdapter does not use logger, it might be set to null.
+	 * The log service to use, supplied in the constructor; if a sub-class of LibraryAdapter does
+	 * not use logger, it might be set to null.
 	 */
 	protected final Logger logger;
 
@@ -77,6 +74,8 @@ public abstract class LibraryAdapter implements Closeable
 	{
 		logger = logService;
 	}
+
+	public abstract void init(Object[] settings);
 
 	/**
 	 * Returns the output stream for the opened serial communication port.
@@ -101,13 +100,7 @@ public abstract class LibraryAdapter implements Closeable
 	 *
 	 * @param baudrate requested baud rate [Bit/s], 0 &lt; baud rate
 	 */
-	public void setBaudRate(final int baudrate)
-	{
-		try {
-			invoke(this, "setBaudRate", new Object[] { new Integer(baudrate) });
-		}
-		catch (final Exception e) {}
-	}
+	public abstract void setBaudRate(final int baudrate);
 
 	/**
 	 * Returns the currently used baud rate.
@@ -115,14 +108,7 @@ public abstract class LibraryAdapter implements Closeable
 	 *
 	 * @return baud rate in bit/s
 	 */
-	public int getBaudRate()
-	{
-		try {
-			return ((Integer) invoke(this, "getBaudRate", null)).intValue();
-		}
-		catch (final Exception e) {}
-		return 0;
-	}
+	public abstract int getBaudRate();
 
 	/**
 	 * Closes an open serial port.
@@ -130,42 +116,6 @@ public abstract class LibraryAdapter implements Closeable
 	 *
 	 * @throws IOException on error during close
 	 */
+	@Override
 	public abstract void close() throws IOException;
-
-	/**
-	 * Invokes <code>method</code> name on object <code>obj</code> with arguments
-	 * <code>args</code>.
-	 * <p>
-	 * Arguments wrapped in an object of type Integer are replaced with the primitive int
-	 * type when looking up the method name.
-	 *
-	 * @param obj object on which to invoke the method
-	 * @param method method name
-	 * @param args list of arguments
-	 * @return the result of the invoked method
-	 * @throws NoSuchMethodException
-	 * @throws IllegalAccessException
-	 * @throws InvocationTargetException
-	 * @see Class#getMethod(String, Class[])
-	 * @see Method#invoke(Object, Object[])
-	 */
-	protected Object invoke(final Object obj, final String method, final Object[] args)
-		throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
-	{
-		final Class<?>[] c = new Class[args == null ? 0 : args.length];
-		for (int i = 0; i < c.length; ++i) {
-			c[i] = args[i].getClass();
-			if (c[i] == Integer.class)
-				c[i] = int.class;
-		}
-		try {
-			if (obj instanceof Class)
-				return ((Class<?>) obj).getMethod(method, c).invoke(null, args);
-			return obj.getClass().getMethod(method, c).invoke(obj, args);
-		}
-		catch (final IllegalArgumentException e) {
-			throw new IllegalArgumentException("illegal argument on invoking "
-				+ obj.getClass().getName() + "." + method + ": " + e.getMessage());
-		}
-	}
 }

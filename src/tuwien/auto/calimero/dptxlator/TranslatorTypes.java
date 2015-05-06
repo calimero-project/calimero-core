@@ -36,10 +36,7 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -47,28 +44,26 @@ import java.util.Map;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.internal.JavaME;
 
 /**
  * Maintains available KNX datapoint main numbers and its associated DPT translators.
  * <p>
- * It stores all available, registered DP main numbers with the corresponding translator
- * and an optional description of the type.<br>
- * For more common used data types, the main types are declared as constants, although
- * this doesn't necessarily indicate a translator is actually available.<br>
- * All DPT translator implementations in this package are registered here and available by
- * default. Translators might be added or removed by the user.
+ * It stores all available, registered DP main numbers with the corresponding translator and an
+ * optional description of the type.<br>
+ * For more common used data types, the main types are declared as constants, although this doesn't
+ * necessarily indicate a translator is actually available.<br>
+ * All DPT translator implementations in this package are registered here and available by default.
+ * Translators might be added or removed by the user.
  * <p>
- * A datapoint type consists of a data type and a dimension. The data type is referred to
- * through a main number, the existing dimensions of a data type are listed through sub
- * numbers. The data type specifies format and encoding, while dimension specifies the
- * range and unit.<br>
- * A datapoint type identifier (dptID for short), stands for one particular datapoint
- * type. The preferred - but not enforced - way of naming a dptID is using the expression
+ * A datapoint type consists of a data type and a dimension. The data type is referred to through a
+ * main number, the existing dimensions of a data type are listed through sub numbers. The data type
+ * specifies format and encoding, while dimension specifies the range and unit.<br>
+ * A datapoint type identifier (dptID for short), stands for one particular datapoint type. The
+ * preferred - but not enforced - way of naming a dptID is using the expression
  * "<i>main number</i>.<i>sub number</i>".<br>
- * In short, a datapoint type has a dptID and standardizes one combination of format,
- * encoding, range and unit.
- * <p>
- * Note: main and sub refer to the former used terms major / minor.
+ * In short, a datapoint type has a dptID and standardizes one combination of format, encoding,
+ * range and unit.
  *
  * @author B. Malinowsky
  * @see DPTXlator
@@ -81,14 +76,12 @@ public final class TranslatorTypes
 	public static final int TYPE_BOOLEAN = 1;
 
 	/**
-	 * DPT main number for <b>B2 (1 Bit controlled)</b>, number =
-	 * {@value #TYPE_1BIT_CONTROLLED}.
+	 * DPT main number for <b>B2 (1 Bit controlled)</b>, number = {@value #TYPE_1BIT_CONTROLLED}.
 	 */
 	public static final int TYPE_1BIT_CONTROLLED = 2;
 
 	/**
-	 * DPT main number for <b>B1U3 (3 Bit controlled)</b>, number =
-	 * {@value #TYPE_3BIT_CONTROLLED}.
+	 * DPT main number for <b>B1U3 (3 Bit controlled)</b>, number = {@value #TYPE_3BIT_CONTROLLED}.
 	 */
 	public static final int TYPE_3BIT_CONTROLLED = 3;
 
@@ -98,8 +91,7 @@ public final class TranslatorTypes
 	public static final int TYPE_CHARACTER_SET = 4;
 
 	/**
-	 * DPT main number for <b>8 Bit unsigned value</b>, number =
-	 * {@value #TYPE_8BIT_UNSIGNED}.
+	 * DPT main number for <b>8 Bit unsigned value</b>, number = {@value #TYPE_8BIT_UNSIGNED}.
 	 */
 	public static final int TYPE_8BIT_UNSIGNED = 5;
 
@@ -110,20 +102,17 @@ public final class TranslatorTypes
 	public static final int TYPE_8BIT_SIGNED = 6;
 
 	/**
-	 * DPT main number for <b>2-octet unsigned value</b>, number =
-	 * {@value #TYPE_2OCTET_UNSIGNED}.
+	 * DPT main number for <b>2-octet unsigned value</b>, number = {@value #TYPE_2OCTET_UNSIGNED}.
 	 */
 	public static final int TYPE_2OCTET_UNSIGNED = 7;
 
 	/**
-	 * DPT main number for <b>2-octet signed value</b>, number =
-	 * {@value #TYPE_2OCTET_SIGNED}.
+	 * DPT main number for <b>2-octet signed value</b>, number = {@value #TYPE_2OCTET_SIGNED}.
 	 */
 	public static final int TYPE_2OCTET_SIGNED = 8;
 
 	/**
-	 * DPT main number for <b>2-octet float value</b>, number =
-	 * {@value #TYPE_2OCTET_FLOAT}.
+	 * DPT main number for <b>2-octet float value</b>, number = {@value #TYPE_2OCTET_FLOAT}.
 	 */
 	public static final int TYPE_2OCTET_FLOAT = 9;
 
@@ -138,20 +127,17 @@ public final class TranslatorTypes
 	public static final int TYPE_DATE = 11;
 
 	/**
-	 * DPT main number for <b>4-octet unsigned value</b>, number =
-	 * {@value #TYPE_4OCTET_UNSIGNED}.
+	 * DPT main number for <b>4-octet unsigned value</b>, number = {@value #TYPE_4OCTET_UNSIGNED}.
 	 */
 	public static final int TYPE_4OCTET_UNSIGNED = 12;
 
 	/**
-	 * DPT main number for <b>4-octet signed value</b>, number =
-	 * {@value #TYPE_4OCTET_SIGNED}.
+	 * DPT main number for <b>4-octet signed value</b>, number = {@value #TYPE_4OCTET_SIGNED}.
 	 */
 	public static final int TYPE_4OCTET_SIGNED = 13;
 
 	/**
-	 * DPT main number for <b>4-octet float value</b>, number =
-	 * {@value #TYPE_4OCTET_FLOAT}.
+	 * DPT main number for <b>4-octet float value</b>, number = {@value #TYPE_4OCTET_FLOAT}.
 	 */
 	public static final int TYPE_4OCTET_FLOAT = 14;
 
@@ -191,8 +177,7 @@ public final class TranslatorTypes
 	public static final int TYPE_RGB = 232;
 
 	/**
-	 * Maps a data type main number to a corresponding translator class doing the DPT
-	 * translations.
+	 * Maps a data type main number to a corresponding translator class doing the DPT translations.
 	 * <p>
 	 * Objects of this type are immutable.<br>
 	 */
@@ -237,14 +222,14 @@ public final class TranslatorTypes
 		/**
 		 * Creates a new translator for the given datapoint type.
 		 *
-		 * @param dpt datapoint type specifying the particular translation behavior; if
-		 *        the datapoint type is not part of the translator of this main type, a
+		 * @param dpt datapoint type specifying the particular translation behavior; if the
+		 *        datapoint type is not part of the translator of this main type, a
 		 *        {@link KNXFormatException} is thrown
 		 * @return the new {@link DPTXlator} instance
-		 * @throws KNXFormatException to forward all target exceptions thrown in the
-		 *         constructor of the translator
-		 * @throws KNXException thrown on translator class creation errors (e.g. security /
-		 *         access problems)
+		 * @throws KNXFormatException to forward all target exceptions thrown in the constructor of
+		 *         the translator
+		 * @throws KNXException thrown on translator class creation errors (e.g. security/access
+		 *         problems)
 		 */
 		public final DPTXlator createTranslator(final DPT dpt) throws KNXException
 		{
@@ -254,33 +239,25 @@ public final class TranslatorTypes
 		/**
 		 * Creates a new instance of the translator for the given datapoint type ID.
 		 *
-		 * @param dptID datapoint type ID for selecting a particular kind of value
-		 *        translation; if the datapoint type ID is not part of the translator of
-		 *        this main type, a {@link KNXFormatException} is thrown
+		 * @param dptID datapoint type ID for selecting a particular kind of value translation; if
+		 *        the datapoint type ID is not part of the translator of this main type, a
+		 *        {@link KNXFormatException} is thrown
 		 * @return the new {@link DPTXlator} instance
-		 * @throws KNXFormatException to forward all target exceptions thrown in the
-		 *         constructor of the translator
-		 * @throws KNXException thrown on translator class creation errors (e.g. security /
-		 *         access problems)
+		 * @throws KNXFormatException to forward all target exceptions thrown in the constructor of
+		 *         the translator
+		 * @throws KNXException thrown on translator class creation errors (e.g. security/access
+		 *         problems)
 		 */
 		public DPTXlator createTranslator(final String dptID) throws KNXException
 		{
 			try {
-				return xlator.getConstructor(String.class).newInstance(dptID);
+				// XXX Java8ME no reflection
+//				return xlator.getConstructor(String.class).newInstance(dptID);
+				final DPTXlator t = xlator.newInstance();
+				t.setTypeID(t.getSubTypes(), dptID);
+				return t;
 			}
-			catch (final InvocationTargetException e) {
-				// try to forward encapsulated target exception
-				if (e.getTargetException() instanceof KNXFormatException)
-					throw (KNXFormatException) e.getTargetException();
-				// throw generic message
-				throw new KNXFormatException("failed to init translator", dptID);
-			}
-			catch (final NoSuchMethodException e) {
-				DPTXlator.logger.error("DPT translator is required to "
-					+ "have a public constructor(String dptID)");
-				throw new KNXException("interface specification error at translator", e);
-			}
-			catch (final Exception e) {
+			catch (final SecurityException | InstantiationException | IllegalAccessException e) {
 				// for SecurityException, InstantiationException, IllegalAccessException
 				throw new KNXException("failed to create translator", e);
 			}
@@ -313,26 +290,22 @@ public final class TranslatorTypes
 		 * <p>
 		 *
 		 * @return available subtypes as {@link Map}
-		 * @throws KNXException thrown on problems accessing the translator while
-		 *         retrieving sub types (e.g. security / access problem) for external,
-		 *         user supplied translators
+		 * @throws KNXException thrown on problems accessing the translator while retrieving sub
+		 *         types (e.g. security/access problem) for external, user supplied translators
 		 * @see DPTXlator#getSubTypes()
 		 */
 		public Map<String, DPT> getSubTypes() throws KNXException
 		{
 			try {
-				@SuppressWarnings("unchecked")
-				final Map<String, DPT> m = (Map<String, DPT>) xlator.getDeclaredMethod(
-						"getSubTypesStatic", (Class<?>[]) null).invoke(null, (Object[]) null);
+				// XXX Java8ME
+//				@SuppressWarnings("unchecked")
+//				final Map<String, DPT> m = (Map<String, DPT>) xlator.getDeclaredMethod(
+//						"getSubTypesStatic", (Class<?>[]) null).invoke(null, (Object[]) null);
+				final Map<String, DPT> m = xlator.newInstance().getSubTypes();
 				return m;
 			}
-			catch (final NoSuchMethodException e) {
-				throw new KNXException("no method to get subtypes, " + e.getMessage());
-			}
-			catch (final Exception e) {
-				// for SecurityException and IllegalAccessException
-				// no reason for InvocationTargetException
-				throw new KNXException("security / access problem, " + e.getMessage());
+			catch (final SecurityException | InstantiationException | IllegalAccessException e) {
+				throw new KNXException("security/access problem, " + e.getMessage());
 			}
 		}
 	}
@@ -340,7 +313,7 @@ public final class TranslatorTypes
 	private static final Map<Integer, MainType> map;
 
 	static {
-		map = Collections.synchronizedMap(new HashMap<>(20));
+		map = JavaME.synchronizedMap();
 		addTranslator(TYPE_BOOLEAN, "DPTXlatorBoolean", "Boolean (main type 1)");
 		addTranslator(TYPE_1BIT_CONTROLLED, "DPTXlator1BitControlled",
 				"Boolean controlled (main type 2)");
@@ -388,8 +361,7 @@ public final class TranslatorTypes
 	 * Returns the {@link MainType} object assigned the given data type main number.
 	 *
 	 * @param mainNumber main type to lookup
-	 * @return the main type information found, or <code>null</code> if main number not
-	 *         listed
+	 * @return the main type information found, or <code>null</code> if main number not listed
 	 */
 	public static MainType getMainType(final int mainNumber)
 	{
@@ -397,11 +369,10 @@ public final class TranslatorTypes
 	}
 
 	/**
-	 * Returns all available data types which have a DPT translator implementation
-	 * assigned.
+	 * Returns all available data types which have a DPT translator implementation assigned.
 	 * <p>
-	 * The map returned is the same used by this class for type lookup. Map entries can be
-	 * added, likewise entries might be removed to change future lookup results.
+	 * The map returned is the same used by this class for type lookup. Map entries can be added,
+	 * likewise entries might be removed to change future lookup results.
 	 *
 	 * @return a {@link Map} containing all data types as {@link MainType} objects
 	 */
@@ -441,11 +412,10 @@ public final class TranslatorTypes
 	/**
 	 * Does a lookup if the specified DPT is supported by a DPT translator.
 	 *
-	 * @param mainNumber data type main number, number &ge; 0; use 0 to infer translator
-	 *        type from <code>dptID</code> argument only
+	 * @param mainNumber data type main number, number &ge; 0; use 0 to infer translator type from
+	 *        <code>dptID</code> argument only
 	 * @param dptID datapoint type ID to lookup this particular kind of value translation
-	 * @return <code>true</code> iff translator was found, <code>false</code>
-	 *         otherwise
+	 * @return <code>true</code> iff translator was found, <code>false</code> otherwise
 	 */
 	public static boolean hasTranslator(final int mainNumber, final String dptID)
 	{
@@ -462,18 +432,18 @@ public final class TranslatorTypes
 	/**
 	 * Creates a DPT translator for the given datapoint type ID.
 	 * <p>
-	 * The translation behavior of a DPT translator instance is uniquely defined by the
-	 * supplied datapoint type ID.
+	 * The translation behavior of a DPT translator instance is uniquely defined by the supplied
+	 * datapoint type ID.
 	 * <p>
 	 * If the <code>dptID</code> argument is built up the recommended way, that is "<i>main
-	 * number</i>.<i>sub number</i>", the <code>mainNumber</code> argument might be
-	 * left 0 to use the datapoint type ID only.<br>
-	 * Note, that we don't enforce any particular or standardized format on the dptID
-	 * structure, so using a different formatted dptID solely without main number argument
-	 * results in undefined behavior.
+	 * number</i>.<i>sub number</i>", the <code>mainNumber</code> argument might be left 0 to use
+	 * the datapoint type ID only.<br>
+	 * Note, that we don't enforce any particular or standardized format on the dptID structure, so
+	 * using a different formatted dptID solely without main number argument results in undefined
+	 * behavior.
 	 *
-	 * @param mainNumber data type main number, number &ge; 0; use 0 to infer translator
-	 *        type from <code>dptID</code> argument only
+	 * @param mainNumber data type main number, number &ge; 0; use 0 to infer translator type from
+	 *        <code>dptID</code> argument only
 	 * @param dptID datapoint type ID for selecting a particular kind of value translation
 	 * @return the new {@link DPTXlator} object
 	 * @throws KNXException on main type not found or creation failed (refer to
@@ -495,11 +465,11 @@ public final class TranslatorTypes
 	/**
 	 * Creates a DPT translator for the given datapoint type.
 	 * <p>
-	 * The translation behavior of a DPT translator instance is uniquely defined by the
-	 * supplied datapoint type.
+	 * The translation behavior of a DPT translator instance is uniquely defined by the supplied
+	 * datapoint type.
 	 * <p>
-	 * If translator creation according {@link #createTranslator(int, String)} fails, all
-	 * available main types are enumerated to find an appropriate translator.
+	 * If translator creation according {@link #createTranslator(int, String)} fails, all available
+	 * main types are enumerated to find an appropriate translator.
 	 *
 	 * @param dpt datapoint type selecting a particular kind of value translation
 	 * @return the new {@link DPTXlator} object
@@ -511,7 +481,7 @@ public final class TranslatorTypes
 			return createTranslator(0, dpt.getID());
 		}
 		catch (final KNXException e) {
-			for (final Iterator<MainType> i = map.values().iterator(); i.hasNext(); )
+			for (final Iterator<MainType> i = map.values().iterator(); i.hasNext();)
 				try {
 					return i.next().createTranslator(dpt);
 				}

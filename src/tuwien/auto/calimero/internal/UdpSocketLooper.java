@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2011 B. Malinowsky
+    Copyright (c) 2010, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,10 +38,9 @@ package tuwien.auto.calimero.internal;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetSocketAddress;
-import java.net.SocketTimeoutException;
+
+import javax.microedition.io.Datagram;
+import javax.microedition.io.UDPDatagramConnection;
 
 /**
  * @author B. Malinowsky
@@ -49,16 +48,11 @@ import java.net.SocketTimeoutException;
 public abstract class UdpSocketLooper
 {
 	/**
-	 * The socket on which to loop. It must be initialized during construction, either by
-	 * supplying an already initialized socket using a constructor of this class, or
-	 * directly assigning it in a constructor of a derived class
+	 * The socket on which to loop. It must be initialized during construction, either by supplying
+	 * an already initialized socket using a constructor of this class, or directly assigning it in
+	 * a constructor of a derived class
 	 */
-	protected DatagramSocket s;
-
-	/**
-	 * The socket timeout, set 0 for no timeout.
-	 */
-	private final int timeout;
+	protected UDPDatagramConnection s;
 
 	private final int maxRcvBuf;
 	private final int total;
@@ -68,34 +62,31 @@ public abstract class UdpSocketLooper
 	/**
 	 * Creates a socket looper for the supplied UDP socket.
 	 * <p>
-	 * 
+	 *
 	 * @param socket the UDP socket to loop on
 	 * @param closeSocket <code>true</code> to close the socket on {@link #quit()},
 	 *        <code>false</code> otherwise
 	 */
-	public UdpSocketLooper(final DatagramSocket socket, final boolean closeSocket)
+	public UdpSocketLooper(final UDPDatagramConnection socket, final boolean closeSocket)
 	{
-		this(socket, closeSocket, 512, 0, 0);
+		this(socket, closeSocket, 512, 0);
 	}
 
 	/**
 	 * Creates a socket looper for the supplied UDP socket and timeout parameters.
 	 * <p>
-	 * 
+	 *
 	 * @param socket the UDP socket to loop on
 	 * @param closeSocket <code>true</code> to close the socket on {@link #quit()},
 	 *        <code>false</code> otherwise
 	 * @param receiveBufferSize sets the maximum size of the socket receive buffer
-	 * @param socketTimeout the socket's receive method shall time out after a maximum of
-	 *        <code>socketTimeout</code> milliseconds
 	 * @param loopTimeout this looper shall quit after <code>loopTimeout</code> milliseconds
 	 */
-	public UdpSocketLooper(final DatagramSocket socket, final boolean closeSocket,
-		final int receiveBufferSize, final int socketTimeout, final int loopTimeout)
+	public UdpSocketLooper(final UDPDatagramConnection socket, final boolean closeSocket,
+		final int receiveBufferSize, final int loopTimeout)
 	{
 		s = socket;
 		maxRcvBuf = receiveBufferSize;
-		timeout = socketTimeout;
 		total = loopTimeout;
 		this.closeSocket = closeSocket;
 	}
@@ -103,38 +94,36 @@ public abstract class UdpSocketLooper
 	/**
 	 * Runs the looper.
 	 * <p>
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public void loop() throws IOException
 	{
 		final long start = System.currentTimeMillis();
-
 		final byte[] buf = new byte[maxRcvBuf];
 		try {
-			if (timeout > 0)
-				s.setSoTimeout(timeout);
 			while (!quit) {
 				if (total > 0) {
 					final long now = System.currentTimeMillis();
-					int to = (int) (start + total - now);
+					final int to = (int) (start + total - now);
 					if (to <= 0)
 						break;
 					// query socket timeout directly from socket since subtypes might
 					// have modified the timeout during looping
-					final int sto = s.getSoTimeout();
-					if (sto > 0)
-						to = Math.min(to, sto);
-					s.setSoTimeout(to);
+					// XXX Java8ME socket timeout is set once during socket creation
+//					final int sto = s.getSoTimeout();
+//					if (sto > 0)
+//						to = Math.min(to, sto);
+//					s.setSoTimeout(to);
 				}
 				try {
-					final DatagramPacket p = new DatagramPacket(buf, buf.length);
+					final Datagram p = s.newDatagram(buf, buf.length);
 					s.receive(p);
 					final byte[] data = p.getData();
-					onReceive((InetSocketAddress) p.getSocketAddress(), data, p.getOffset(),
+					onReceive(EndpointAddress.of(p.getAddress()), data, p.getOffset(), 
 							p.getLength());
 				}
-				catch (final SocketTimeoutException e) {
+				catch (final InterruptedIOException e) {
 					if (total == 0 || start + total > System.currentTimeMillis())
 						onTimeout();
 				}
@@ -161,21 +150,20 @@ public abstract class UdpSocketLooper
 	/**
 	 * Invoked on receiving a datagram over the socket.
 	 * <p>
-	 * 
-	 * @param source the sender's address, where the data is coming from
+	 *
+	 * @param sender the sender's address, where the data is coming from
 	 * @param data the received data
-	 * @param offset offset of the data (see {@link DatagramPacket#getOffset()})
-	 * @param length length of the data (see {@link DatagramPacket#getLength()})
+	 * @param offset offset of the data (see {@link Datagram#getOffset()})
+	 * @param length length of the data (see {@link Datagram#getLength()})
 	 * @throws IOException on communication errors while processing the received data
 	 */
-	protected abstract void onReceive(InetSocketAddress source, byte[] data, int offset, int length)
+	protected abstract void onReceive(EndpointAddress sender, byte[] data, int offset, int length)
 		throws IOException;
 
 	/**
 	 * Quits the looper.
 	 * <p>
-	 * If closing the socket was requested during construction of this looper, the socket
-	 * is closed.
+	 * If closing the socket was requested during construction of this looper, the socket is closed.
 	 */
 	public void quit()
 	{
@@ -183,7 +171,11 @@ public abstract class UdpSocketLooper
 		// might not handle the interrupt flag for a longer period of time.
 		// That's why the closeSocket option can be set during construction.
 		quit = true;
-		if (closeSocket)
-			s.close();
+		if (closeSocket) {
+			try {
+				s.close();
+			}
+			catch (final IOException ignore) {}
+		}
 	}
 }

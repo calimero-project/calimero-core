@@ -36,8 +36,6 @@
 
 package tuwien.auto.calimero.buffer;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EventListener;
 import java.util.Iterator;
 import java.util.List;
@@ -52,11 +50,12 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.buffer.cache.Cache;
 import tuwien.auto.calimero.buffer.cache.CacheObject;
-import tuwien.auto.calimero.buffer.cache.LFUCache;
+import tuwien.auto.calimero.buffer.cache.PositiveListCache;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.datapoint.DatapointModel;
 import tuwien.auto.calimero.internal.EventListeners;
+import tuwien.auto.calimero.internal.JavaME;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.NetworkLinkListener;
@@ -141,7 +140,7 @@ public final class NetworkBuffer
 		{
 			private final KNXNetworkLink base;
 			private final EventListeners<NetworkLinkListener> listeners = new EventListeners<>(
-					NetworkLinkListener.class);
+					new NetworkLinkListener[0]);
 
 			SquirrelLink(final KNXNetworkLink baseLink)
 			{
@@ -276,7 +275,7 @@ public final class NetworkBuffer
 		{
 			active = activate;
 			if (active && getCache() == null)
-				setCache(new LFUCache(0, 0));
+				setCache(new PositiveListCache(0));
 			// supply a really simple "all you can buffer"-filter
 			if (active && nwFilter == null) {
 				nwFilter = new NetworkFilter()
@@ -397,7 +396,7 @@ public final class NetworkBuffer
 	// private static final List buffers = new ArrayList();
 	private static int uniqueInstID;
 
-	private final List<ConfigImpl> configs = Collections.synchronizedList(new ArrayList<>());
+	private final List<ConfigImpl> configs = JavaME.synchronizedList();
 	private final String name;
 
 	private NetworkBuffer(final String installation)

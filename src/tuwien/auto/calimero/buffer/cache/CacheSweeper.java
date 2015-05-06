@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * interval set by the user. Then {@link Cache#removeExpired()} is invoked on the
  * specified cache.<br>
  * Interruption policy: complete any ongoing sweeping, then cleanup and exit.
- * 
+ *
  * @author B. Malinowsky
  * @see Cache
  */
@@ -60,7 +60,7 @@ public final class CacheSweeper extends Thread
 	 * Creates a {@link CacheSweeper} for <code>cache</code> with the given
 	 * <code>sweepInterval</code>.
 	 * <p>
-	 * 
+	 *
 	 * @param cache the cache for which {@link Cache#removeExpired()} should be invoked
 	 * @param sweepInterval lapse of time between sweeping in seconds
 	 */
@@ -71,7 +71,8 @@ public final class CacheSweeper extends Thread
 		setSweepInterval(sweepInterval);
 		// priority below normal
 		setPriority(3);
-		setDaemon(true);
+        // XXX Java8ME
+//		setDaemon(true);
 	}
 
 	/**
@@ -79,7 +80,7 @@ public final class CacheSweeper extends Thread
 	 * <p>
 	 * If the cache sweeper is in waiting state for next sweep, the new interval is
 	 * immediately applied and checked against elapsed time.
-	 * 
+	 *
 	 * @param interval new time interval between sweeping in seconds
 	 */
 	public void setSweepInterval(final int interval)
@@ -96,7 +97,7 @@ public final class CacheSweeper extends Thread
 	 * Returns the time interval between {@link Cache#removeExpired()} calls used by this
 	 * cache sweeper.
 	 * <p>
-	 * 
+	 *
 	 * @return the time in seconds
 	 */
 	public int getSweepInterval()

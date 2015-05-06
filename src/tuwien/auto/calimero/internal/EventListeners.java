@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,6 @@
 
 package tuwien.auto.calimero.internal;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EventListener;
@@ -48,8 +47,8 @@ import org.slf4j.Logger;
 /**
  * Container for keeping event listeners.
  * <p>
- * The assumption for implementation of this class is that iterating over event listeners
- * is the predominant operation, adding and removing listeners not.
+ * The assumption for implementation of this class is that iterating over event listeners is the
+ * predominant operation, adding and removing listeners not.
  *
  * @author B. Malinowsky
  */
@@ -57,28 +56,30 @@ public class EventListeners<T extends EventListener>
 {
 	private final List<T> listeners = new ArrayList<>();
 	private T[] listenersCopy;
-	private final Class<T> type;
+	private final T[] type;
 	private final Logger logger;
 
 	/**
 	 * Creates a new event listeners container object.
 	 *
-	 * @param listenerType common class type of listeners EventListeners is parameterized for
+	 * @param emptyArray common class type of listeners EventListeners is parameterized for
 	 */
-	public EventListeners(final Class<T> listenerType)
+	public EventListeners(final T[] emptyArray)
 	{
-		this(listenerType, null);
+		this(emptyArray, null);
 	}
 
 	/**
 	 * Creates a new event listeners container object.
 	 *
-	 * @param listenerType common class type of listeners EventListeners is parameterized for
+	 * @param emptyArray common class type of listeners EventListeners is parameterized for
 	 * @param logger optional logger for log output
 	 */
-	public EventListeners(final Class<T> listenerType, final Logger logger)
+	public EventListeners(final T[] emptyArray, final Logger logger)
 	{
-		type = listenerType;
+		type = emptyArray;
+		if (type.length > 0)
+			throw new IllegalArgumentException("array not empty");
 		this.logger = logger;
 		createCopy();
 	}
@@ -86,8 +87,8 @@ public class EventListeners<T extends EventListener>
 	/**
 	 * Adds the specified event listener <code>l</code> to this container.
 	 * <p>
-	 * If <code>l</code> is
-	 * <code>null</code> or was already added as listener, no action is performed.
+	 * If <code>l</code> is <code>null</code> or was already added as listener, no action is
+	 * performed.
 	 *
 	 * @param l the listener to add
 	 */
@@ -134,12 +135,11 @@ public class EventListeners<T extends EventListener>
 	/**
 	 * Returns an array with all event listeners.
 	 * <p>
-	 * While modifying the returned array will have no impact on the event listeners kept
-	 * by this class, the array might be reused for subsequent callers, who will be
-	 * affected.
+	 * While modifying the returned array will have no impact on the event listeners kept by this
+	 * class, the array might be reused for subsequent callers, who will be affected.
 	 *
-	 * @return array with all event listeners in this container, with array size equal to
-	 *         the number of contained listeners
+	 * @return array with all event listeners in this container, with array size equal to the number
+	 *         of contained listeners
 	 */
 	public T[] listeners()
 	{
@@ -159,32 +159,6 @@ public class EventListeners<T extends EventListener>
 
 	private void createCopy()
 	{
-		@SuppressWarnings("unchecked")
-		final T[] t = (T[]) Array.newInstance(type, listeners.size());
-		listenersCopy = listeners.toArray(t);
+		listenersCopy = Arrays.copyOf(listeners.toArray(type), listeners.size());
 	}
-
-	// not for general use, quite slow due to reflection mechanism
-	/*
-	void fire(final Object event, final Method method)
-	{
-		final Object[] objs = new Object[] { event };
-		for (final Iterator i = iterator(); i.hasNext();) {
-			final EventListener l = (EventListener) i.next();
-			try {
-				method.invoke(l, objs);
-			}
-			catch (final RuntimeException rte) {
-				remove(l);
-				logger.error("removed event listener", rte);
-			}
-			catch (final IllegalAccessException e) {
-				e.printStackTrace();
-			}
-			catch (final InvocationTargetException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	*/
 }

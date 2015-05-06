@@ -39,18 +39,18 @@ package tuwien.auto.calimero.datapoint;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.xml.KNXMLException;
-import tuwien.auto.calimero.xml.XMLReader;
-import tuwien.auto.calimero.xml.XMLWriter;
+import tuwien.auto.calimero.xml.XmlReader;
+import tuwien.auto.calimero.xml.XmlWriter;
 
 /**
- * A container for keeping {@link Datapoint}s, using some particular hierarchical
- * structure or order between those datapoints.
+ * A container for keeping {@link Datapoint}s, using some particular hierarchical structure or order
+ * between those datapoints.
  * <p>
- * Its purpose is to imitate a real world datapoint layout, to build and maintain some
- * kind of model for it, allowing a user to create and work with an arrangement of
- * datapoints being adequate for the application requirements.<br>
- * This interface aims to act as the base for building more complex layouts, for example
- * to model part of a KNX network.
+ * Its purpose is to imitate a real world datapoint layout, to build and maintain some kind of model
+ * for it, allowing a user to create and work with an arrangement of datapoints being adequate for
+ * the application requirements.<br>
+ * This interface aims to act as the base for building more complex layouts, for example to model
+ * part of a KNX network.
  *
  * @author B. Malinowsky
  * @see DatapointMap
@@ -60,8 +60,8 @@ public interface DatapointModel<T extends Datapoint>
 	/**
 	 * Adds a datapoint to this model.
 	 * <p>
-	 * An implementation might throw KNXIllegalArgumentException if tried to add a
-	 * duplicate datapoint.
+	 * An implementation might throw KNXIllegalArgumentException if tried to add a duplicate
+	 * datapoint.
 	 *
 	 * @param dp datapoint to add
 	 * @throws KNXIllegalArgumentException on duplicate datapoint
@@ -82,8 +82,8 @@ public interface DatapointModel<T extends Datapoint>
 	void removeAll();
 
 	/**
-	 * Returns the datapoint identified using the specified <code>main</code> address,
-	 * if found in this model.
+	 * Returns the datapoint identified using the specified <code>main</code> address, if found in
+	 * this model.
 	 * <p>
 	 * If no datapoint is found with that address, <code>null</code> is returned.
 	 *
@@ -98,8 +98,7 @@ public interface DatapointModel<T extends Datapoint>
 	 * <p>
 	 *
 	 * @param main KNX group address to look up
-	 * @return <code>true</code> iff such datapoint is found, <code>false</code>
-	 *         otherwise
+	 * @return <code>true</code> iff such datapoint is found, <code>false</code> otherwise
 	 */
 	boolean contains(GroupAddress main);
 
@@ -108,22 +107,20 @@ public interface DatapointModel<T extends Datapoint>
 	 * <p>
 	 *
 	 * @param dp datapoint to look up
-	 * @return <code>true</code> iff such datapoint is found, <code>false</code>
-	 *         otherwise
+	 * @return <code>true</code> iff such datapoint is found, <code>false</code> otherwise
 	 */
 	boolean contains(T dp);
 
 	/**
 	 * Loads a datapoint model from XML input into this model.
 	 * <p>
-	 * Datapoints already contained in this model are not required to be removed before
-	 * loading, the loaded model will be added to the already existing datapoints.
+	 * Datapoints already contained in this model are not required to be removed before loading, the
+	 * loaded model will be added to the already existing datapoints.
 	 *
 	 * @param r a XML reader
-	 * @throws KNXMLException on error loading the datapoint model, or on duplicate loaded
-	 *         datapoint
+	 * @throws KNXMLException on error loading the datapoint model, or on duplicate loaded datapoint
 	 */
-	void load(XMLReader r) throws KNXMLException;
+	void load(XmlReader r) throws KNXMLException;
 
 	/**
 	 * Saves the datapoint model to XML using the supplied writer.
@@ -132,5 +129,5 @@ public interface DatapointModel<T extends Datapoint>
 	 * @param w a XML writer
 	 * @throws KNXMLException on error saving the datapoint model
 	 */
-	void save(XMLWriter w) throws KNXMLException;
+	void save(XmlWriter w) throws KNXMLException;
 }

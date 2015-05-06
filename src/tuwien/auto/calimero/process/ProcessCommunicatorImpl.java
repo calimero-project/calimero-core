@@ -109,9 +109,9 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 				fireGroupReadWrite(f, new byte[0], svc, false);
 			else if (svc == GROUP_RESPONSE || svc == GROUP_WRITE)
 				fireGroupReadWrite(f, DataUnitBuilder.extractASDU(apdu), svc, apdu.length <= 2);
-			else ;
-				//logger.warn("unsupported APDU service - ignored, service code = 0x"
-				//		+ Integer.toHexString(svc));
+			else {
+				; // just ignore, don't even log
+			}
 		}
 
 		private void fireGroupReadWrite(final CEMILData f, final byte[] asdu, final int svc,
@@ -179,7 +179,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		lnk = link;
 		lnk.addLinkListener(lnkListener);
 		logger = LogService.getLogger("process " + link.getName());
-		listeners = new EventListeners<>(ProcessListener.class, logger);
+		listeners = new EventListeners<>(new ProcessListener[0], logger);
 	}
 
 	/* (non-Javadoc)
@@ -246,8 +246,8 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	 * (tuwien.auto.calimero.GroupAddress)
 	 */
 	@Override
-	public boolean readBool(final GroupAddress dst) throws KNXTimeoutException,
-		KNXRemoteException, KNXLinkClosedException, KNXFormatException, InterruptedException
+	public boolean readBool(final GroupAddress dst) throws KNXTimeoutException, KNXRemoteException,
+		KNXLinkClosedException, KNXFormatException, InterruptedException
 	{
 		final byte[] apdu = readFromGroup(dst, priority, 0, 0);
 		final DPTXlatorBoolean t = new DPTXlatorBoolean(DPTXlatorBoolean.DPT_BOOL);
@@ -303,8 +303,8 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	 * (tuwien.auto.calimero.GroupAddress)
 	 */
 	@Override
-	public int readControl(final GroupAddress dst) throws KNXTimeoutException,
-		KNXRemoteException, KNXLinkClosedException, KNXFormatException, InterruptedException
+	public int readControl(final GroupAddress dst) throws KNXTimeoutException, KNXRemoteException,
+		KNXLinkClosedException, KNXFormatException, InterruptedException
 	{
 		final byte[] apdu = readFromGroup(dst, priority, 0, 0);
 		final DPTXlator3BitControlled t = new DPTXlator3BitControlled(
@@ -398,6 +398,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	 * @see tuwien.auto.calimero.process.ProcessCommunicator#write
 	 * (tuwien.auto.calimero.GroupAddress, tuwien.auto.calimero.dptxlator.DPTXlator)
 	 */
+	@Override
 	public void write(final GroupAddress dst, final DPTXlator value) throws KNXTimeoutException,
 		KNXFormatException, KNXLinkClosedException
 	{
@@ -511,8 +512,8 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 						if (d.length >= minAPDU && d.length <= maxAPDU)
 							return d;
 
-						final String s = "APDU response length " + d.length
-								+ " bytes, expected " + minAPDU + " to " + maxAPDU;
+						final String s = "APDU response length " + d.length + " bytes, expected "
+								+ minAPDU + " to " + maxAPDU;
 						logger.error("received group read response with " + s);
 						throw new KNXInvalidResponseException(s);
 					}
@@ -545,13 +546,13 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	// into to DataUnitBuilder, but moved here to avoid DPT dependencies
 
 	/**
-	 * Creates a group service application layer protocol data unit containing all items
-	 * of a DPT translator.
+	 * Creates a group service application layer protocol data unit containing all items of a DPT
+	 * translator.
 	 * <p>
-	 * The transport layer bits in the first byte (TL / AL control field) are set 0. The
-	 * maximum length used for the ASDU is not checked.<br>
-	 * For DPTs occupying &lt;= 6 bits in length the optimized (compact) group write /
-	 * response format layout is used.
+	 * The transport layer bits in the first byte (TL / AL control field) are set 0. The maximum
+	 * length used for the ASDU is not checked.<br>
+	 * For DPTs occupying &lt;= 6 bits in length the optimized (compact) group write / response
+	 * format layout is used.
 	 *
 	 * @param service application layer group service code
 	 * @param t DPT translator with items to put into ASDU

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,9 +37,8 @@
 package tuwien.auto.calimero.knxnetip;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
+
+import javax.microedition.io.Datagram;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.KNXException;
@@ -50,6 +49,7 @@ import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
+import tuwien.auto.calimero.internal.EndpointAddress;
 import tuwien.auto.calimero.knxnetip.servicetype.ErrorCodes;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
@@ -62,7 +62,7 @@ import tuwien.auto.calimero.log.LogService.LogLevel;
  * KNXnet/IP connection for KNX local device management.
  * <p>
  * The communication on OSI layer 4 is done using UDP.<br>
- * 
+ *
  * @author B. Malinowsky
  */
 public class KNXnetIPDevMgmt extends ClientConnection
@@ -78,33 +78,31 @@ public class KNXnetIPDevMgmt extends ClientConnection
 	/**
 	 * Creates a new KNXnet/IP device management connection to a remote device.
 	 * <p>
-	 * 
+	 *
 	 * @param localEP the local endpoint to use for communication channel
 	 * @param serverCtrlEP the remote server control endpoint used for connect request
 	 * @param useNAT <code>true</code> to use a NAT (Network Address Translation) aware
 	 *        communication mechanism, <code>false</code> to use the default way
 	 * @throws KNXException on socket communication error
 	 * @throws KNXTimeoutException on no connect response before connect timeout
-	 * @throws KNXRemoteException if response indicates an error condition at the server
-	 *         concerning the request
+	 * @throws KNXRemoteException if response indicates an error condition at the server concerning
+	 *         the request
 	 * @throws KNXInvalidResponseException if connect response is in wrong format
-	 * @throws InterruptedException on interrupted thread while creating management
-	 *         connection
+	 * @throws InterruptedException on interrupted thread while creating management connection
 	 */
-	public KNXnetIPDevMgmt(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP,
+	public KNXnetIPDevMgmt(final EndpointAddress localEP, final EndpointAddress serverCtrlEP,
 		final boolean useNAT) throws KNXException, InterruptedException
 	{
-		super(KNXnetIPHeader.DEVICE_CONFIGURATION_REQ,
-			KNXnetIPHeader.DEVICE_CONFIGURATION_ACK, 4, CONFIGURATION_REQ_TIMEOUT);
+		super(KNXnetIPHeader.DEVICE_CONFIGURATION_REQ, KNXnetIPHeader.DEVICE_CONFIGURATION_ACK, 4,
+				CONFIGURATION_REQ_TIMEOUT);
 		final CRI cri = CRI.createRequest(DEVICE_MGMT_CONNECTION, null);
 		connect(localEP, serverCtrlEP, cri, useNAT);
 	}
 
 	/**
-	 * Sends a cEMI device management frame to the remote server communicating with this
-	 * endpoint.
+	 * Sends a cEMI device management frame to the remote server communicating with this endpoint.
 	 * <p>
-	 * 
+	 *
 	 * @param frame cEMI device management message of type {@link CEMIDevMgmt} to send
 	 */
 	@Override
@@ -125,16 +123,12 @@ public class KNXnetIPDevMgmt extends ClientConnection
 		return "KNXnet/IP DevMgmt " + super.getName();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.ClientConnection#handleServiceType
-	 * (tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader, byte[], int,
-	 * java.net.InetAddress, int)
-	 */
 	@Override
-	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset,
-		final InetAddress src, final int port) throws KNXFormatException, IOException
+	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data,
+			final int offset, final EndpointAddress sender) throws KNXFormatException,
+			IOException
 	{
-		if (super.handleServiceType(h, data, offset, src, port))
+		if (super.handleServiceType(h, data, offset, sender))
 			return true;
 		final int svc = h.getServiceType();
 		if (svc != serviceRequest)
@@ -143,15 +137,14 @@ public class KNXnetIPDevMgmt extends ClientConnection
 		final ServiceRequest req = getServiceRequest(h, data, offset);
 		if (!checkChannelId(req.getChannelID(), "request"))
 			return true;
-		
+
 		final int seq = req.getSequenceNumber();
 		if (seq == getSeqRcv()) {
 			final int status = h.getVersion() == KNXNETIP_VERSION_10 ? ErrorCodes.NO_ERROR
 					: ErrorCodes.VERSION_NOT_SUPPORTED;
 			final byte[] buf = PacketHelper.toPacket(new ServiceAck(serviceAck, channelId, seq,
 					status));
-			final DatagramPacket p = new DatagramPacket(buf, buf.length, dataEndpt.getAddress(),
-					dataEndpt.getPort());
+			final Datagram p = socket.newDatagram(buf, buf.length, dataEndpt.toAddress());
 			socket.send(p);
 			incSeqRcv();
 			if (status == ErrorCodes.VERSION_NOT_SUPPORTED) {
@@ -172,8 +165,8 @@ public class KNXnetIPDevMgmt extends ClientConnection
 			}
 		}
 		else
-			logger.warn("received dev.mgmt request with rcv-seq " + seq
-				+ ", expected " + getSeqRcv() + " - ignored");
+			logger.warn("received dev.mgmt request with rcv-seq " + seq + ", expected "
+					+ getSeqRcv() + " - ignored");
 		return true;
 	}
 }

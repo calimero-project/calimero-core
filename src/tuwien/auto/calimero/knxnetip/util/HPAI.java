@@ -37,21 +37,19 @@
 package tuwien.auto.calimero.knxnetip.util;
 
 import java.io.ByteArrayOutputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.internal.EndpointAddress;
+import tuwien.auto.calimero.internal.JavaME;
 
 /**
  * KNXnet/IP Host Protocol Address Information (HPAI).
  * <p>
- * The address information is used to describe a communication channel. Its structure
- * varies according to the used underlying protocol. This class is implemented for IPv4.
- * <br>
- * For IP networks with NAT, consider use of {@link #HPAI(int, InetSocketAddress)}.<br>
+ * The address information is used to describe a communication channel. Its structure varies
+ * according to the used underlying protocol. This class is implemented for IPv4. <br>
+ * For IP networks with NAT, consider use of {@link #HPAI(int, EndpointAddress)}.<br>
  * UDP is the default communication mode with mandatory support used in KNXnet/IP.
  * <p>
  * Objects of this type are immutable.
@@ -83,8 +81,7 @@ public class HPAI
 	 *
 	 * @param data byte array containing the HPAI structure
 	 * @param offset start offset of HPAI in <code>data</code>
-	 * @throws KNXFormatException if no HPAI found, invalid structure or unknown host
-	 *         protocol
+	 * @throws KNXFormatException if no HPAI found, invalid structure or unknown host protocol
 	 */
 	public HPAI(final byte[] data, final int offset) throws KNXFormatException
 	{
@@ -113,19 +110,19 @@ public class HPAI
 	 * <p>
 	 * The constructor uses UDP as communication mode (default in KNXnet/IP).<br>
 	 * The following first matching rule is used for the <code>addr</code> argument:<br>
-	 * 1) <code>addr</code> holds an {@link InetAddress}, use that address<br>
-	 * 2) <code>addr</code> is <code>null</code>, the local host is retrieved by
-	 * {@link InetAddress#getLocalHost()}<br>
-	 * 3) if no local host could be found, fall back to safe state and initialize IP
-	 * <b>and</b> port to 0 (NAT aware mode)<br>
+	 * 1) <code>addr</code> holds an IP address, use that address<br>
+	 * 2) <code>addr</code> is <code>null</code>, the local host is used
+	 * {@link EndpointAddress#localHost()}<br>
+	 * 3) if no local host could be found, fall back to safe state and initialize IP <b>and</b> port
+	 * to 0 (NAT aware mode)
 	 *
 	 * @param addr local IP address, use <code>null</code> for setting local host
 	 * @param port local port number to set, 0 &lt;= <code>port</code> &lt;= 0xFFFF
 	 */
-	public HPAI(final InetAddress addr, final int port)
+	public HPAI(final EndpointAddress addr, final int port)
 	{
 		try {
-			final InetAddress ia = addr != null ? addr : InetAddress.getLocalHost();
+			final EndpointAddress ia = addr != null ? addr : EndpointAddress.localHost();
 			init(IPV4_UDP, ia.getAddress(), port);
 		}
 		catch (final UnknownHostException e) {
@@ -141,7 +138,7 @@ public class HPAI
 	 * @param addr local IP address
 	 * @param port local port number to set, 0 &lt;= <code>port</code> &lt;= 0xFFFF
 	 */
-	public HPAI(final int hostProtocol, final InetAddress addr, final int port)
+	public HPAI(final int hostProtocol, final EndpointAddress addr, final int port)
 	{
 		init(hostProtocol, addr.getAddress(), port);
 	}
@@ -153,20 +150,20 @@ public class HPAI
 	 * <code>addr</code> <code>null</code>.
 	 *
 	 * @param hostProtocol host protocol code (UDP or TCP, see class constants)
-	 * @param addr socket with IP address and port number, if <code>addr</code> =
-	 *        <code>null</code> address and port are initialized to 0
+	 * @param addr socket with IP address and port number, if <code>addr</code> = <code>null</code>
+	 *        address and port are initialized to 0
 	 */
-	public HPAI(final int hostProtocol, final InetSocketAddress addr)
+	public HPAI(final int hostProtocol, final EndpointAddress addr)
 	{
 		if (addr == null)
 			init(hostProtocol, new byte[4], 0);
 		else {
-			final InetAddress a = addr.getAddress();
+			final byte[] a = addr.getAddress();
 			if (a == null)
 				throw new KNXIllegalArgumentException("unresolved IP address");
-			if (a.isAnyLocalAddress())
+			if (addr.isAnyLocal())
 				throw new KNXIllegalArgumentException("wildcard IP address");
-			init(hostProtocol, a.getAddress(), addr.getPort());
+			init(hostProtocol, a, addr.getPort());
 		}
 	}
 
@@ -193,18 +190,14 @@ public class HPAI
 	}
 
 	/**
-	 * Returns the IP network address as {@link InetAddress} representation.
+	 * Returns the IP network address and port number as {@link EndpointAddress} representation.
 	 * <p>
 	 *
-	 * @return IP address as InetAddress object
+	 * @return IP address and port as EndpointAddress object
 	 */
-	public final InetAddress getAddress()
+	public final EndpointAddress getAddress()
 	{
-		try {
-			return InetAddress.getByAddress(address);
-		}
-		catch (final UnknownHostException ignore) {}
-		return null;
+		return EndpointAddress.newUdp(getAddressString(), port);
 	}
 
 	/**
@@ -268,14 +261,14 @@ public class HPAI
 			return false;
 		final HPAI other = (HPAI) obj;
 		return length == other.length && port == other.port && hostprot == other.hostprot
-				&& Arrays.hashCode(address) == Arrays.hashCode(other.address);
+				&& JavaME.hashCode(address) == JavaME.hashCode(other.address);
 	}
 
 	@Override
 	public int hashCode()
 	{
 		final int prime = 17;
-		return prime * (prime * (prime * Arrays.hashCode(address) + hostprot) + port) + length;
+		return prime * (prime * (prime * JavaME.hashCode(address) + hostprot) + port) + length;
 	}
 
 	private String getAddressString()

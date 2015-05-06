@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,13 +36,9 @@
 
 package tuwien.auto.calimero.mgmt;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import tuwien.auto.calimero.CloseEvent;
@@ -55,6 +51,8 @@ import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
+import tuwien.auto.calimero.internal.EndpointAddress;
+import tuwien.auto.calimero.internal.JavaME;
 import tuwien.auto.calimero.knxnetip.KNXConnectionClosedException;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.knxnetip.KNXnetIPDevMgmt;
@@ -107,7 +105,8 @@ public class LocalDeviceMgmtAdapter implements PropertyAdapter
 
 	private final KNXnetIPConnection conn;
 	private final PropertyAdapterListener listener;
-	private final List<CEMI> frames = Collections.synchronizedList(new LinkedList<>());
+	// XXX Java8ME was linked list
+	private final List<CEMI> frames = JavaME.synchronizedList();
 
 	private final List<Pair> interfaceObjects = new ArrayList<>();
 	private final boolean checkRW;
@@ -126,35 +125,34 @@ public class LocalDeviceMgmtAdapter implements PropertyAdapter
 	 * The server to do management for is specified with the server control endpoint.
 	 * <p>
 	 * A note on write enabled / read only properties:<br>
-	 * The check whether a property is read only or write enabled, is done by issuing a
-	 * write request for that property. Due to the memory layout, write cycles of a memory
-	 * location and similar, this might not always be desired. To enable or skip this
-	 * check, the <code>queryWriteEnable</code> option has to be set appropriately.
-	 * Currently, the write enabled check is only of interest when getting a property
-	 * description {@link #getDescription(int, int, int)}.
+	 * The check whether a property is read only or write enabled, is done by issuing a write
+	 * request for that property. Due to the memory layout, write cycles of a memory location and
+	 * similar, this might not always be desired. To enable or skip this check, the
+	 * <code>queryWriteEnable</code> option has to be set appropriately. Currently, the write
+	 * enabled check is only of interest when getting a property description
+	 * {@link #getDescription(int, int, int)}.
 	 *
-	 * @param localEP the local endpoint of the connection, use <code>null</code> for
-	 *        assigning the default local host and an unused (ephemeral) port
+	 * @param localEP the local endpoint of the connection, use <code>null</code> for assigning the
+	 *        default local host and an unused (ephemeral) port
 	 * @param serverCtrlEP the remote server control endpoint used for connect request
-	 * @param useNAT <code>true</code> to use a network address translation aware
-	 *        communication mechanism, <code>false</code> to use the default way
+	 * @param useNAT <code>true</code> to use a network address translation aware communication
+	 *        mechanism, <code>false</code> to use the default way
 	 * @param l property adapter listener to get notified about adapter events, use
 	 *        <code>null</code> for no listener
-	 * @param queryWriteEnable <code>true</code> to check whether a property is write
-	 *        enabled or read only, <code>false</code> to skip the check
-	 * @throws KNXException on failure establishing local device management connection or
-	 *         failure while initializing the property adapter
+	 * @param queryWriteEnable <code>true</code> to check whether a property is write enabled or
+	 *        read only, <code>false</code> to skip the check
+	 * @throws KNXException on failure establishing local device management connection or failure
+	 *         while initializing the property adapter
 	 * @throws InterruptedException on interrupted thread while initializing the adapter
 	 */
-	public LocalDeviceMgmtAdapter(final InetSocketAddress localEP,
-		final InetSocketAddress serverCtrlEP, final boolean useNAT,
-		final PropertyAdapterListener l, final boolean queryWriteEnable)
-		throws KNXException, InterruptedException
+	public LocalDeviceMgmtAdapter(final EndpointAddress localEP,
+		final EndpointAddress serverCtrlEP, final boolean useNAT, final PropertyAdapterListener l,
+		final boolean queryWriteEnable) throws KNXException, InterruptedException
 	{
-		InetSocketAddress local = localEP;
+		EndpointAddress local = localEP;
 		if (local == null)
 			try {
-				local = new InetSocketAddress(InetAddress.getLocalHost(), 0);
+				local = EndpointAddress.localHost();
 			}
 			catch (final UnknownHostException e) {
 				throw new KNXException("no local host available");
@@ -198,8 +196,8 @@ public class LocalDeviceMgmtAdapter implements PropertyAdapter
 	{
 		if (closed)
 			throw new KNXIllegalStateException("adapter closed");
-		conn.send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, getObjectType(objIndex),
-			1, pid, start, elements), KNXnetIPConnection.WAIT_FOR_CON);
+		conn.send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, getObjectType(objIndex), 1, pid,
+				start, elements), KNXnetIPConnection.WAIT_FOR_CON);
 		return findFrame(CEMIDevMgmt.MC_PROPREAD_CON);
 	}
 
@@ -262,8 +260,8 @@ public class LocalDeviceMgmtAdapter implements PropertyAdapter
 	}
 
 	/**
-	 * {@inheritDoc} The name for this adapter starts with "local DM " + KNXnet/IP server
-	 * control endpoint, allowing easier distinction of adapter types.
+	 * {@inheritDoc} The name for this adapter starts with "local DM " + KNXnet/IP server control
+	 * endpoint, allowing easier distinction of adapter types.
 	 */
 	@Override
 	public String getName()
@@ -326,7 +324,7 @@ public class LocalDeviceMgmtAdapter implements PropertyAdapter
 	private void initInterfaceObjects() throws KNXException
 	{
 		conn.send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, DEVICE_OBJECT, 1,
-			PropertyAccess.PID.IO_LIST, 0, 1), KNXnetIPConnection.WAIT_FOR_CON);
+				PropertyAccess.PID.IO_LIST, 0, 1), KNXnetIPConnection.WAIT_FOR_CON);
 		int objects = 0;
 		try {
 			final byte[] ret = findFrame(CEMIDevMgmt.MC_PROPREAD_CON);
@@ -339,7 +337,7 @@ public class LocalDeviceMgmtAdapter implements PropertyAdapter
 			return;
 		}
 		conn.send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, DEVICE_OBJECT, 1,
-			PropertyAccess.PID.IO_LIST, 1, objects), KNXnetIPConnection.WAIT_FOR_CON);
+				PropertyAccess.PID.IO_LIST, 1, objects), KNXnetIPConnection.WAIT_FOR_CON);
 		final byte[] ret = findFrame(CEMIDevMgmt.MC_PROPREAD_CON);
 		int lastObjType = -1;
 		for (int i = 0; i < objects; ++i) {

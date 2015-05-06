@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,21 +36,20 @@
 
 package tuwien.auto.calimero.knxnetip;
 
-import java.net.InetSocketAddress;
 import java.util.EventObject;
 
+import tuwien.auto.calimero.internal.EndpointAddress;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingLostMessage;
 
 /**
  * Event informing about an overflow with loss of messages in KNXnet/IP routing mode.
  * <p>
- * It contains lost message and device state information on overflow of the LAN-to-KNX
- * queue in the KNXnet/IP router, which leads to loss of received KNXnet/IP messages. This
- * event is multicasted by the KNXnet/IP router every time an increment in lost messages
- * occurs. In the router, the number of lost messages is maintained in the
- * PID.QUEUE_OVERFLOW_TO_KNX property value.<br>
+ * It contains lost message and device state information on overflow of the LAN-to-KNX queue in the
+ * KNXnet/IP router, which leads to loss of received KNXnet/IP messages. This event is multicasted
+ * by the KNXnet/IP router every time an increment in lost messages occurs. In the router, the
+ * number of lost messages is maintained in the PID.QUEUE_OVERFLOW_TO_KNX property value.<br>
  * The lost message value states the total of lost messages in the router.
- * 
+ *
  * @author B. Malinowsky
  * @see KNXnetIPRouting
  */
@@ -58,22 +57,22 @@ public class LostMessageEvent extends EventObject
 {
 	private static final long serialVersionUID = 1L;
 
-	private final InetSocketAddress from;
+	private final EndpointAddress from;
 	private final int state;
 	private final int lost;
 
 	/**
 	 * Creates a new routing lost message event.
 	 * <p>
-	 * 
+	 *
 	 * @param source the {@link KNXnetIPRouting} which received a routing lost message
 	 *        {@link RoutingLostMessage} notification and created this event
-	 * @param sender address of the KNXnet/IP router which lost a message and sent a lost
-	 *        message notification
+	 * @param sender address of the KNXnet/IP router which lost a message and sent a lost message
+	 *        notification
 	 * @param deviceState KNXnet/IP router device state, 0 &lt;= state &lt;= 255
 	 * @param lostMessages number of lost messages, 0 &lt;= number &lt;= 0xFFFF
 	 */
-	public LostMessageEvent(final KNXnetIPRouting source, final InetSocketAddress sender,
+	public LostMessageEvent(final KNXnetIPRouting source, final EndpointAddress sender,
 		final int deviceState, final int lostMessages)
 	{
 		super(source);
@@ -83,20 +82,20 @@ public class LostMessageEvent extends EventObject
 	}
 
 	/**
-	 * Returns the sender address of the KNXnet/IP router which sent the routing lost
-	 * message notification.
-	 * 
+	 * Returns the sender address of the KNXnet/IP router which sent the routing lost message
+	 * notification.
+	 *
 	 * @return socket address of sender
 	 */
-	public final InetSocketAddress getSender()
+	public final EndpointAddress getSender()
 	{
 		return from;
 	}
-	
+
 	/**
 	 * Returns the total of lost messages maintained by the KNXnet/IP routing device.
 	 * <p>
-	 * 
+	 *
 	 * @return number of lost messages as unsigned 16 bit value
 	 */
 	public final int getLostMessages()
@@ -107,9 +106,9 @@ public class LostMessageEvent extends EventObject
 	/**
 	 * Returns the router device state.
 	 * <p>
-	 * The device state is a bit field with 8 Bits and conforms to the
-	 * PID.KNXNETIP_DEVICE_STATE property value.
-	 * 
+	 * The device state is a bit field with 8 Bits and conforms to the PID.KNXNETIP_DEVICE_STATE
+	 * property value.
+	 *
 	 * @return device state as unsigned byte
 	 */
 	public final int getDeviceState()
@@ -121,7 +120,7 @@ public class LostMessageEvent extends EventObject
 	 * Returns whether the KNX network cannot be accessed, causing the message loss.
 	 * <p>
 	 * The KNX fault mode is part of the device state.
-	 * 
+	 *
 	 * @return <code>true</code> on KNX access fault, <code>false</code> otherwise
 	 * @see #getDeviceState()
 	 */

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -66,15 +66,13 @@ import tuwien.auto.calimero.mgmt.Destination.AggregatorProxy;
 /**
  * Implementation of the transport layer protocol.
  * <p>
- * All sending is done blocking on the attached network link, so an eventual confirmation
- * response is implicit by return of a send method, there are no explicit confirmation
- * notifications.
+ * All sending is done blocking on the attached network link, so an eventual confirmation response
+ * is implicit by return of a send method, there are no explicit confirmation notifications.
  * <p>
- * Once this transport layer has been {@link TransportLayer#detach()}ed, it can't be used
- * for any further layer 4 communication, and it can't be attached to a new network link.
- * <br>
- * All methods invoked after a detach of the network link used for communication are
- * allowed to throw {@link KNXIllegalStateException}.
+ * Once this transport layer has been {@link TransportLayer#detach()}ed, it can't be used for any
+ * further layer 4 communication, and it can't be attached to a new network link. <br>
+ * All methods invoked after a detach of the network link used for communication are allowed to
+ * throw {@link KNXIllegalStateException}.
  *
  * @author B. Malinowsky
  */
@@ -153,7 +151,7 @@ public class TransportLayerImpl implements TransportLayer
 	private static final GroupAddress broadcast = new GroupAddress(0);
 	// used as default on incoming conn.oriented messages from unknown remote devices
 	private final Destination unknownPartner = new Destination(new AggregatorProxy(this),
-		new IndividualAddress(0), true);
+			new IndividualAddress(0), true);
 
 	private final Logger logger;
 
@@ -190,8 +188,8 @@ public class TransportLayerImpl implements TransportLayer
 	 * Creates a new transport layer end-point attached to the supplied KNX network link.
 	 *
 	 * @param link network link used for communication with a KNX network
-	 * @param serverEndpoint does this instance represent the client-side (<code>false</code>),
-	 *        or server-side (<code>true</code>) end-point
+	 * @param serverEndpoint does this instance represent the client-side (<code>false</code>), or
+	 *        server-side (<code>true</code>) end-point
 	 * @throws KNXLinkClosedException if the network link is closed
 	 */
 	public TransportLayerImpl(final KNXNetworkLink link, final boolean serverEndpoint)
@@ -202,14 +200,14 @@ public class TransportLayerImpl implements TransportLayer
 		lnk = link;
 		lnk.addLinkListener(lnkListener);
 		logger = LogService.getLogger(getName());
-		listeners = new EventListeners<>(TransportListener.class, logger);
+		listeners = new EventListeners<>(new TransportListener[0], logger);
 		serverSide = serverEndpoint;
 	}
 
 	/**
-	 * {@inheritDoc} Only one destination can be created per remote address. If a
-	 * destination with the supplied remote address already exists for this transport
-	 * layer, a {@link KNXIllegalArgumentException} is thrown.<br>
+	 * {@inheritDoc} Only one destination can be created per remote address. If a destination with
+	 * the supplied remote address already exists for this transport layer, a
+	 * {@link KNXIllegalArgumentException} is thrown.<br>
 	 * A transport layer can only handle one connection per destination, because it can't
 	 * distinguish incoming messages between more than one connection.
 	 */
@@ -221,9 +219,9 @@ public class TransportLayerImpl implements TransportLayer
 	}
 
 	/**
-	 * {@inheritDoc} Only one destination can be created per remote address. If a
-	 * destination with the supplied remote address already exists for this transport
-	 * layer, a {@link KNXIllegalArgumentException} is thrown.<br>
+	 * {@inheritDoc} Only one destination can be created per remote address. If a destination with
+	 * the supplied remote address already exists for this transport layer, a
+	 * {@link KNXIllegalArgumentException} is thrown.<br>
 	 * A transport layer can only handle one connection per destination, because it can't
 	 * distinguish incoming messages between more than one connection.
 	 */
@@ -250,8 +248,8 @@ public class TransportLayerImpl implements TransportLayer
 	 * Returns the destination object for the remote individual address, if such exists.
 	 *
 	 * @param remote the remote address to look up
-	 * @return the destination for that address, or <code>null</code> if no destination
-	 *         is currently maintained by the transport layer
+	 * @return the destination for that address, or <code>null</code> if no destination is currently
+	 *         maintained by the transport layer
 	 */
 	public Destination getDestination(final IndividualAddress remote)
 	{
@@ -410,8 +408,7 @@ public class TransportLayerImpl implements TransportLayer
 	}
 
 	/**
-	 * {@inheritDoc} If {@link #detach()} was invoked for this layer, "TL (detached)" is
-	 * returned.
+	 * {@inheritDoc} If {@link #detach()} was invoked for this layer, "TL (detached)" is returned.
 	 */
 	@Override
 	public String getName()
@@ -501,7 +498,8 @@ public class TransportLayerImpl implements TransportLayer
 				if (logger.isTraceEnabled())
 					logger.trace("send disconnect to " + sender);
 				sendDisconnect(sender);
-			} else {
+			}
+			else {
 				p.restartTimeout();
 				if (seq == p.getSeqReceive()) {
 					lnk.sendRequest(sender, Priority.SYSTEM,
@@ -548,8 +546,7 @@ public class TransportLayerImpl implements TransportLayer
 		while (remaining > 0) {
 			try {
 				while (indications.size() > 0)
-					handleConnected((CEMILData) indications.remove(0).getFrame(),
-							active);
+					handleConnected((CEMILData) indications.remove(0).getFrame(), active);
 				if (d.getState() == Destination.DISCONNECTED)
 					throw new KNXDisconnectException(d.getAddress()
 							+ " disconnected while awaiting ACK", d);
@@ -585,13 +582,13 @@ public class TransportLayerImpl implements TransportLayer
 		}
 	}
 
-	private void disconnectIndicate(final AggregatorProxy p,
-		final boolean sendDisconnectReq) throws KNXLinkClosedException
+	private void disconnectIndicate(final AggregatorProxy p, final boolean sendDisconnectReq)
+		throws KNXLinkClosedException
 	{
 		p.setState(Destination.DISCONNECTED);
 		// TODO add initiated by user and refactor into a method
-		p.getDestination().disconnectedBy = sendDisconnectReq ?
-				Destination.LOCAL_ENDPOINT : Destination.REMOTE_ENDPOINT;
+		p.getDestination().disconnectedBy = sendDisconnectReq ? Destination.LOCAL_ENDPOINT
+				: Destination.REMOTE_ENDPOINT;
 		try {
 			if (sendDisconnectReq)
 				sendDisconnect(p.getDestination().getAddress());

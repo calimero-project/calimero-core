@@ -36,11 +36,9 @@
 
 package tuwien.auto.calimero.link;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.net.UnknownHostException;
+
+import javax.microedition.io.NetworkInterface;
 
 import org.slf4j.Logger;
 
@@ -56,6 +54,8 @@ import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.cemi.CEMILDataEx;
+import tuwien.auto.calimero.internal.Connection;
+import tuwien.auto.calimero.internal.EndpointAddress;
 import tuwien.auto.calimero.knxnetip.KNXConnectionClosedException;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
@@ -70,23 +70,22 @@ import tuwien.auto.calimero.log.LogService;
  * Implementation of the KNX network link based on the KNXnet/IP protocol, using a
  * {@link KNXnetIPConnection}.
  * <p>
- * Once a link has been closed, it is not available for further link communication, i.e.
- * it can't be reopened.
+ * Once a link has been closed, it is not available for further link communication, i.e. it can't be
+ * reopened.
  * <p>
- * If KNXnet/IP routing is used as base protocol, the send methods with wait for
- * confirmation behave equally like without wait specified, since routing is an
- * unconfirmed protocol. This implies that no confirmation frames are generated, thus
- * {@link NetworkLinkListener#confirmation(FrameEvent)} is not used.
+ * If KNXnet/IP routing is used as base protocol, the send methods with wait for confirmation behave
+ * equally like without wait specified, since routing is an unconfirmed protocol. This implies that
+ * no confirmation frames are generated, thus {@link NetworkLinkListener#confirmation(FrameEvent)}
+ * is not used.
  * <p>
  * IP address considerations:<br>
- * On more IP addresses assigned to the local host (on possibly several local network
- * interfaces), the default chosen local host address can differ from the expected. In
- * this situation, the local endpoint has to be specified manually during instantiation.
- * <br>
- * Network Address Translation (NAT) aware communication can only be used, if the
- * KNXnet/IP server of the remote endpoint supports it. Otherwise, connection timeouts
- * will occur. With NAT enabled, KNXnet/IP accepts IPv6 addresses. By default, the
- * KNXnet/IP protocol only works with IPv4 addresses.<br>
+ * On more IP addresses assigned to the local host (on possibly several local network interfaces),
+ * the default chosen local host address can differ from the expected. In this situation, the local
+ * endpoint has to be specified manually during instantiation. <br>
+ * Network Address Translation (NAT) aware communication can only be used, if the KNXnet/IP server
+ * of the remote endpoint supports it. Otherwise, connection timeouts will occur. With NAT enabled,
+ * KNXnet/IP accepts IPv6 addresses. By default, the KNXnet/IP protocol only works with IPv4
+ * addresses.<br>
  *
  * @author B. Malinowsky
  */
@@ -119,7 +118,7 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 			}
 			else if (mc == CEMILData.MC_LDATA_CON) {
 				addEvent(new Confirmation(new FrameEvent(source, e.getFrame())));
-				logger.info("confirmation of "	+ ((CEMILData) e.getFrame()).getDestination());
+				logger.info("confirmation of " + ((CEMILData) e.getFrame()).getDestination());
 			}
 			else
 				logger.warn("unspecified frame event - ignored, msg code = 0x"
@@ -151,45 +150,42 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 	 * Creates a new network link based on the KNXnet/IP protocol, using a
 	 * {@link KNXnetIPConnection}.
 	 * <p>
-	 * For more details on KNXnet/IP connections, refer to the various KNXnet/IP
-	 * implementations.<br>
+	 * For more details on KNXnet/IP connections, refer to the various KNXnet/IP implementations.
+	 * <br>
 	 *
-	 * @param serviceMode mode of communication to open, <code>serviceMode</code> is one
-	 *        of the service mode constants (e.g. {@link #TUNNELING}); depending on the mode
-	 *        set, the expected local/remote endpoints might differ
-	 * @param localEP the local endpoint of the link to use;<br> - in tunneling mode
-	 *        (point-to-point), this is the client control endpoint, use <code>null</code>
-	 *        for the default local host and an ephemeral port number<br> - in
-	 *        {@link #ROUTING} mode, specifies the multicast interface, i.e., the local
-	 *        network interface is taken that has the IP address bound to it (if IP
-	 *        address is bound more than once, it's undefined which interface is
-	 *        returned), the port is not used; use <code>null</code> for
-	 *        <code>localEP</code> or an unresolved IP address to take the host's
-	 *        default multicast interface
-	 * @param remoteEP the remote endpoint of the link to communicate with;<br> - in
-	 *        tunneling mode (point-to-point), this is the server control endpoint <br> -
-	 *        in {@link #ROUTING} mode, the IP address specifies the multicast group to
-	 *        join, the port is not used; use <code>null</code> for
-	 *        <code>remoteEP</code> or an unresolved IP address to take the default
-	 *        multicast group
-	 * @param useNAT <code>true</code> to use network address translation in tunneling
-	 *        service mode, <code>false</code> to use the default (non aware) mode;
-	 *        parameter is ignored for routing
-	 * @param settings medium settings defining device and medium specifics needed for
-	 *        communication
+	 * @param serviceMode mode of communication to open, <code>serviceMode</code> is one of the
+	 *        service mode constants (e.g. {@link #TUNNELING}); depending on the mode set, the
+	 *        expected local/remote endpoints might differ
+	 * @param localEP the local endpoint of the link to use;<br>
+	 *        - in tunneling mode (point-to-point), this is the client control endpoint, use
+	 *        <code>null</code> for the default local host and an ephemeral port number<br>
+	 *        - in {@link #ROUTING} mode, specifies the multicast interface, i.e., the local network
+	 *        interface is taken that has the IP address bound to it (if IP address is bound more
+	 *        than once, it's undefined which interface is returned), the port is not used; use
+	 *        <code>null</code> for <code>localEP</code> or an unresolved IP address to take the
+	 *        host's default multicast interface
+	 * @param remoteEP the remote endpoint of the link to communicate with;<br>
+	 *        - in tunneling mode (point-to-point), this is the server control endpoint <br>
+	 *        - in {@link #ROUTING} mode, the IP address specifies the multicast group to join, the
+	 *        port is not used; use <code>null</code> for <code>remoteEP</code> or an unresolved IP
+	 *        address to take the default multicast group
+	 * @param useNAT <code>true</code> to use network address translation in tunneling service mode,
+	 *        <code>false</code> to use the default (non aware) mode; parameter is ignored for
+	 *        routing
+	 * @param settings medium settings defining device and medium specifics needed for communication
 	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
 	 * @throws InterruptedException on interrupted thread while establishing link
 	 */
-	public KNXNetworkLinkIP(final int serviceMode, final InetSocketAddress localEP,
-		final InetSocketAddress remoteEP, final boolean useNAT, final KNXMediumSettings settings)
+	public KNXNetworkLinkIP(final int serviceMode, final EndpointAddress localEP,
+		final EndpointAddress remoteEP, final boolean useNAT, final KNXMediumSettings settings)
 		throws KNXException, InterruptedException
 	{
 		switch (serviceMode) {
 		case TUNNELING:
-			InetSocketAddress local = localEP;
+			EndpointAddress local = localEP;
 			if (local == null)
 				try {
-					local = new InetSocketAddress(InetAddress.getLocalHost(), 0);
+					local = EndpointAddress.localHost();
 				}
 				catch (final UnknownHostException e) {
 					throw new KNXException("no local host available");
@@ -199,13 +195,9 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 		case ROUTING:
 			NetworkInterface netIf = null;
 			if (localEP != null && !localEP.isUnresolved())
-				try {
-					netIf = NetworkInterface.getByInetAddress(localEP.getAddress());
-				}
-				catch (final SocketException e) {
-					throw new KNXException("error getting network interface: " + e.getMessage());
-				}
-			final InetAddress mcast = remoteEP != null ? remoteEP.getAddress() : null;
+				netIf = localEP.getInterface();
+
+			final EndpointAddress mcast = remoteEP != null ? remoteEP : null;
 			conn = new KNXnetIPRouting(netIf, mcast);
 			break;
 		default:
@@ -213,9 +205,8 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 		}
 		// initialize our link with opened connection
 		mode = serviceMode;
-		// do our own IP:port string, since InetAddress.toString() always prepends a '/'
-		final InetSocketAddress a = conn.getRemoteAddress();
-		name = "link " + a.getAddress().getHostAddress() + ":" + a.getPort();
+		final EndpointAddress a = conn.getRemoteAddress();
+		name = "link " + a;
 
 		logger = LogService.getLogger(getName());
 		notifier = new LinkNotifier(this, logger);
@@ -228,21 +219,20 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 	 * Creates a new network link based on the KNXnet/IP tunneling protocol, using a
 	 * {@link KNXnetIPTunnel} with default communication settings.
 	 * <p>
-	 * The link is established using a KNXnet/IP tunnel, the local endpoint is the default
-	 * local host, the remote endpoint uses the default KNXnet/IP port number, network
-	 * address translation (NAT) is disabled.
+	 * The link is established using a KNXnet/IP tunnel, the local endpoint is the default local
+	 * host, the remote endpoint uses the default KNXnet/IP port number, network address translation
+	 * (NAT) is disabled.
 	 *
 	 * @param remoteHost remote host name
-	 * @param settings medium settings defining device and medium specifics needed for
-	 *        communication
+	 * @param settings medium settings defining device and medium specifics needed for communication
 	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
 	 * @throws InterruptedException on interrupted thread while establishing link
 	 */
 	public KNXNetworkLinkIP(final String remoteHost, final KNXMediumSettings settings)
 		throws KNXException, InterruptedException
 	{
-		this(TUNNELING, null, new InetSocketAddress(remoteHost, KNXnetIPConnection.DEFAULT_PORT),
-			false, settings);
+		this(TUNNELING, null, EndpointAddress.newUdp(remoteHost, KNXnetIPConnection.DEFAULT_PORT),
+				false, settings);
 	}
 
 	/**
@@ -250,15 +240,14 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 	 * {@link KNXnetIPRouting}.
 	 * <p>
 	 *
-	 * @param netIf local network interface used to join the multicast group and for
-	 *        sending, use <code>null</code> for the host's default multicast interface
-	 * @param mcGroup address of the multicast group to join, use <code>null</code> for
-	 *        the default KNXnet/IP multicast address
-	 * @param settings medium settings defining device and medium specifics needed for
-	 *        communication
+	 * @param netIf local network interface used to join the multicast group and for sending, use
+	 *        <code>null</code> for the host's default multicast interface
+	 * @param mcGroup address of the multicast group to join, use <code>null</code> for the default
+	 *        KNXnet/IP multicast address
+	 * @param settings medium settings defining device and medium specifics needed for communication
 	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
 	 */
-	public KNXNetworkLinkIP(final NetworkInterface netIf, final InetAddress mcGroup,
+	public KNXNetworkLinkIP(final NetworkInterface netIf, final EndpointAddress mcGroup,
 		final KNXMediumSettings settings) throws KNXException
 	{
 		conn = new KNXnetIPRouting(netIf, mcGroup);
@@ -266,9 +255,8 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 		// initialize our link with the opened connection
 		mode = ROUTING;
 
-		// do our own IP:port string, since InetAddress.toString() always prepends a '/'
-		final InetSocketAddress a = conn.getRemoteAddress();
-		name = "link " + a.getAddress().getHostAddress() + ":" + a.getPort();
+		final EndpointAddress a = conn.getRemoteAddress();
+		name = "link " + a;
 
 		logger = LogService.getLogger(getName());
 		notifier = new LinkNotifier(this, logger);
@@ -287,7 +275,7 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 		if (settings == null)
 			throw new KNXIllegalArgumentException("medium settings are mandatory");
 		if (medium != null && !settings.getClass().isAssignableFrom(medium.getClass())
-			&& !medium.getClass().isAssignableFrom(settings.getClass()))
+				&& !medium.getClass().isAssignableFrom(settings.getClass()))
 			throw new KNXIllegalArgumentException("medium differs");
 		medium = settings;
 	}
@@ -343,9 +331,9 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 	}
 
 	/**
-	 * {@inheritDoc} When communicating with a KNX network which uses open medium,
-	 * messages are broadcasted within domain (as opposite to system broadcast) by
-	 * default. Specify <code>dst null</code> for system broadcast.
+	 * {@inheritDoc} When communicating with a KNX network which uses open medium, messages are
+	 * broadcasted within domain (as opposite to system broadcast) by default. Specify
+	 * <code>dst null</code> for system broadcast.
 	 */
 	@Override
 	public void sendRequest(final KNXAddress dst, final Priority p, final byte[] nsdu)
@@ -355,9 +343,9 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 	}
 
 	/**
-	 * {@inheritDoc} When communicating with a KNX network which uses open medium,
-	 * messages are broadcasted within domain (as opposite to system broadcast) by
-	 * default. Specify <code>dst null</code> for system broadcast.
+	 * {@inheritDoc} When communicating with a KNX network which uses open medium, messages are
+	 * broadcasted within domain (as opposite to system broadcast) by default. Specify
+	 * <code>dst null</code> for system broadcast.
 	 */
 	@Override
 	public void sendRequestWait(final KNXAddress dst, final Priority p, final byte[] nsdu)
@@ -426,10 +414,9 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 		final boolean srcOk = msg.getSource().getRawAddress() != 0;
 		// just return if we don't need to adjust source address and don't need LDataEx
 		if ((srcOk || medium.getDeviceAddress().getRawAddress() == 0)
-			&& (medium instanceof TPSettings || msg instanceof CEMILDataEx))
+				&& (medium instanceof TPSettings || msg instanceof CEMILDataEx))
 			return msg;
-		return CEMIFactory.create(srcOk ? null : medium.getDeviceAddress(), null, msg,
-			true);
+		return CEMIFactory.create(srcOk ? null : medium.getDeviceAddress(), null, msg, true);
 	}
 
 	private void send(final KNXAddress dst, final Priority p, final byte[] nsdu,
@@ -441,7 +428,7 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 		// use default address 0 in system broadcast
 		final KNXAddress d = dst == null ? new GroupAddress(0) : dst;
 		final boolean tp = medium.getMedium() == KNXMediumSettings.MEDIUM_TP0
-			|| medium.getMedium() == KNXMediumSettings.MEDIUM_TP1;
+				|| medium.getMedium() == KNXMediumSettings.MEDIUM_TP1;
 		if (nsdu.length <= 16 && tp)
 			f = new CEMILData(mc, src, d, nsdu, p, true, hopCount);
 		else

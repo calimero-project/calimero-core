@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2014 B. Malinowsky
+    Copyright (c) 2009, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,6 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -119,21 +118,24 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	public static final DPT DPT_DELTA_TIME = new DPT("13.100", "Delta time in seconds",
 			"-2147483648", "2147483647", "s");
 
-	private static final Map<String, DPT> types;
+
+	private static DPT[] dpts = new DPT[]{
+		DPT_COUNT,
+		DPT_FLOWRATE,
+		DPT_ACTIVE_ENERGY,
+		DPT_APPARENT_ENERGY,
+		DPT_REACTIVE_ENERGY,
+		DPT_ACTIVE_ENERGY_KWH,
+		DPT_APPARENT_ENERGY_KVAH,
+		DPT_REACTIVE_ENERGY_KVARH,
+		DPT_DELTA_TIME,
+	};
+
+	private static final Map<String, DPT> types = new HashMap<>();
 
 	static {
-		types = new HashMap<>(15);
-		final Field[] fields = DPTXlator4ByteSigned.class.getFields();
-		for (int i = 0; i < fields.length; i++) {
-			try {
-				final Object o = fields[i].get(null);
-				if (o instanceof DPT) {
-					final DPT dpt = (DPT) o;
-					types.put(dpt.getID(), dpt);
-				}
-			}
-			catch (final IllegalAccessException e) {}
-		}
+		for (final DPT dpt : dpts)
+			types.put(dpt.getID(), dpt);
 	}
 
 	/**
@@ -192,6 +194,7 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
 	 * @see #getValueSigned()
 	 */
+	@Override
 	public final double getNumericValue()
 	{
 		return getValueSigned();

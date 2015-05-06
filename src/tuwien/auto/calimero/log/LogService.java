@@ -36,9 +36,8 @@
 
 package tuwien.auto.calimero.log;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,10 +62,43 @@ public final class LogService
 		ERROR, WARN, INFO, TRACE, DEBUG
 	}
 
-	private static final ExecutorService dispatcher = Executors.newFixedThreadPool(1);
+	// XXX Java8ME
+	private static final class Dispatcher extends Thread {
+		private boolean quit;
+		private final List<Object[]> q = new LinkedList<>();
 
-	private LogService()
-	{}
+		@Override
+		public void run() {
+			try {
+				synchronized (this) {
+					while (!quit) {
+						wait();
+						if (!q.isEmpty()) {
+							final Object[] item = q.remove(0);
+							final String thread = (String) item[0];
+							Thread.currentThread().setName(thread);
+							log((Logger) item[1], (LogLevel) item[2], (String) item[3], item[4]);
+						}
+					}
+				}
+			} catch (final InterruptedException e) {}
+		}
+
+		synchronized void add(final Object[] item) {
+			q.add(item);
+			notify();
+		}
+
+		synchronized void quit() {
+			quit = true;
+			interrupt();
+		}
+	};
+
+	private static final Dispatcher dispatcher = new Dispatcher();
+	static {
+		dispatcher.start();
+	}
 
 	/**
 	 * Returns an slf4j logger identified by <code>name</code>.
@@ -109,11 +141,7 @@ public final class LogService
 		final Throwable t)
 	{
 		final Thread thread = Thread.currentThread();
-		dispatcher.execute(() -> {
-			Thread.currentThread().setName(thread.getName());
-			// TODO add marker
-				log(l, level, msg, t);
-			});
+		dispatcher.add(new Object[] { thread.getName(), l, level, msg, t });
 	}
 
 	static void async(final Logger l, final LogLevel level, final String format, final Object... o)
@@ -125,11 +153,7 @@ public final class LogService
 		final Object... o)
 	{
 		final Thread thread = Thread.currentThread();
-		dispatcher.execute(() -> {
-			Thread.currentThread().setName(thread.getName());
-			// TODO add marker
-				log(l, level, format, o);
-			});
+		dispatcher.add(new Object[] { thread.getName(), l, level, format, o });
 	}
 
 	/**
@@ -179,6 +203,7 @@ public final class LogService
 	 * @param o the arguments
 	 * @deprecated Used for transition to slf4j.
 	 */
+	@Deprecated
 	public static void log(final Logger logger, final LogLevel level, final String format,
 		final Object... o)
 	{
@@ -212,6 +237,7 @@ public final class LogService
 	 * @param msg the message to be logged
 	 * @deprecated Used for transition to slf4j.
 	 */
+	@Deprecated
 	public static void logAlways(final Logger logger, final String msg)
 	{
 		logger.info(msg);
@@ -219,8 +245,6 @@ public final class LogService
 
 	static final void stopDispatcher() throws InterruptedException
 	{
-		dispatcher.shutdown();
-		// give any remaining messages a chance to get logged
-		dispatcher.awaitTermination(2, TimeUnit.SECONDS);
+		dispatcher.quit();
 	}
 }
