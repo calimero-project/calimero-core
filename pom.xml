@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.calimero</groupId>
 	<artifactId>calimero-core</artifactId>
-	<version>2.2.1-SNAPSHOT</version>
+	<version>2.3-SNAPSHOT</version>
 	<name>Calimero-core Library</name>
 	<description>Calimero, a free KNX network library</description>
 	<scm>
@@ -26,6 +26,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<j8me.sdk>C:\Java_ME_platform_SDK_8.1\</j8me.sdk>
 	</properties>
 
 	<build>
@@ -52,10 +53,11 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>1.7</source>
+					<target>1.7</target>
 					<compilerArguments>
-						<profile>compact1</profile>
+                        <bootclasspath>${j8me.sdk}/lib/cldc_1.8.jar${path.separator}${j8me.sdk}/lib/jsr280_1.0.jar${path.separator}${j8me.sdk}/lib/gcf_1.8.jar
+                        </bootclasspath>
 					</compilerArguments>
 				</configuration>
 			</plugin>
@@ -125,12 +127,6 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.7</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>1.7.7</version>
-			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
 	<distributionManagement>
