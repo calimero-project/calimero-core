@@ -11,5 +11,9 @@
 /doc
 /target/
 
+# Java ME Embedded
+/.mtj.tmp/
+/dist/
+
 # OS X
 .DS_Store
