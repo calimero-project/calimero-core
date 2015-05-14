@@ -5,7 +5,7 @@ Calimero for Java ME Embedded.
 
 Provided under the terms of GPL, version 2, with the Classpath Exception.
 
-__As a side-effect of porting the source code, current snapshots might not compile!__
+__In the current snapshot, the unit tests do not compile! It is best to just exclude them from builds.__
 
 Overview
 --------
@@ -24,7 +24,18 @@ Dependencies
 * Security configuration
 
 	- Required permissions:
-	- Optional permissions:
+
+		* java.util.PropertyPermission "*" "read"
+		* java.lang.RuntimePermission "*"
+		* javax.microedition.io.DatagramProtocolPermission "datagram://:*"
+		* javax.microedition.io.DatagramProtocolPermission "datagram://*:*"
+		* javax.microedition.io.MulticastProtocolPermission "multicast://*:*"
+		* javax.microedition.io.SocketProtocolPermission "socket://localhost:*"
+		* javax.microedition.io.AccessPointPermission "property"
+		* javax.microedition.io.AccessPointPermission "manage"
+		* javax.microedition.io.CommProtocolPermission "comm:*"
+
+	- Optional permissions: you might make any permission optional if the corresponding functionality is not used
 
 * Development: Oracle Java ME Embedded 8.0, or later
 * Logging framework (the initial port uses a cut-down slf4j, similar to the Java 8 compact1 version)
@@ -32,4 +43,9 @@ Dependencies
 
 Development
 -----------
- ...
+
+Currently, the Java ME Embedded 8 SDK is only available for Microsoft Windows from the Oracle site. Hence, for development, an installation of Windows 7 or newer is required.
+
+`Maven` supports compiling Calimero against the Java ME Embedded libraries, assuming the default SDK installation directory. For packaging and distribution, an IDE or the terminal is required. Both the Eclipse and Netbeans IDE provide the necessary plugins. (In my opinion, the current integration of the user dialogs and the device emulator is realized better in Netbeans.)
+
+For compilation only, the logging dependency for slf4j is sufficient. However, the pre-compiled slf4j versions will not load on embedded systems using Java ME Embedded.
