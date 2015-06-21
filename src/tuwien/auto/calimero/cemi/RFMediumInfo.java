@@ -43,7 +43,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.cemi.CEMILDataEx.AddInfo;
 
 /**
- * RF medium information, with additional data link layer information mandatory for communication
+ * RF medium information, with data link layer additional information mandatory for communication
  * over RF medium.
  *
  * @author B. Malinowsky
@@ -55,9 +55,9 @@ final class RFMediumInfo extends AddInfo
 	// for .req: if dst is group address != 0x0000, use KNX serial number (AET is set to 0)
 
 	/**
-	 * Defined values of Received Signal Strength (RSS).
+	 * Defined values of Received Signal Strength (RSS): RSS = 0x00: no measurement, 0x01: weak,
+	 * 0x02: medium, 0x03: strong
 	 */
-	// RSS = 0x00: no measurement, 0x01: weak, 0x02: medium, 0x03: strong
 	public enum RSS {
 		Void("void (no measurement)"),
 		Weak("weak"),
@@ -79,27 +79,64 @@ final class RFMediumInfo extends AddInfo
 		this(info, false);
 	}
 
+	/**
+	 * Constructs RF medium info from a byte array containing the additional RF medium information.
+	 *
+	 * @param info RF medium info data
+	 * @param systemBroadcast indicate whether <code>info</code> contains a RF domain address or
+	 *        device S/N, the interpretation depends on the cEMI message control information
+	 */
 	public RFMediumInfo(final byte[] info, final boolean systemBroadcast)
 	{
 		super(CEMILDataEx.ADDINFO_RFMEDIUM, info);
 		sysBcast = systemBroadcast;
 	}
 
-	// use for .req, .con
+	/**
+	 * Constructs RF medium info for use in a cEMI .req or .con message, with domain address and S/N
+	 * set 0.
+	 *
+	 * @param batteryOk battery of sender device is OK (<code>true</code>), or weak (
+	 *        <code>false</code>)
+	 * @param transmitOnlyDevice is sender a transmit-only device (unidirectional), or not
+	 *        (bidirectional)
+	 */
 	public RFMediumInfo(final boolean batteryOk, final boolean transmitOnlyDevice)
 	{
-		this(0, 0, batteryOk, transmitOnlyDevice, new byte[6], 0);
+		this(RSS.Void, 0, batteryOk, transmitOnlyDevice, new byte[6], 0xff);
 	}
 
-	// use for .req, .con
+	/**
+	 * Constructs RF medium info for use in a cEMI .req or .con message.
+	 *
+	 * @param batteryOk battery of sender device is OK (<code>true</code>), or weak (
+	 *        <code>false</code>)
+	 * @param transmitOnlyDevice is sender a transmit-only (unidirectional) or not (bidirectional)
+	 *        device
+	 * @param doA RF domain address, <code>doA.length = 6</code>
+	 * @param lfn link-layer frame number, 0 &le; lfn &le; 7, or 0xff (the cEMI server shall insert
+	 *        the value for LFN)
+	 */
 	public RFMediumInfo(final boolean batteryOk, final boolean transmitOnlyDevice,
 		final byte[] doA, final int lfn)
 	{
-		this(0, 0, batteryOk, transmitOnlyDevice, doA, lfn);
+		this(RSS.Void, 0, batteryOk, transmitOnlyDevice, doA, lfn);
 	}
 
-	// use for .ind
-	public RFMediumInfo(final int rss, final int retransmitterRss, final boolean batteryOk,
+	/**
+	 * Constructs RF medium info for use in a cEMI indication.
+	 *
+	 * @param rss sender RSS
+	 * @param retransmitterRss RSS of lowest retransmitter, use {@link RSS#Void} for no
+	 *        retransmitter
+	 * @param batteryOk battery of sender device is OK (<code>true</code>), or weak (
+	 *        <code>false</code>)
+	 * @param transmitOnlyDevice is sender a transmit-only (unidirectional) or not (bidirectional)
+	 *        device
+	 * @param doA RF domain address, <code>doA.length = 6</code>
+	 * @param lfn link-layer frame number, 0 &le; lfn &le; 7
+	 */
+	public RFMediumInfo(final RSS rss, final int retransmitterRss, final boolean batteryOk,
 		final boolean transmitOnlyDevice, final byte[] doA, final int lfn)
 	{
 		super(CEMILDataEx.ADDINFO_RFMEDIUM, toByteArray(rss, retransmitterRss, batteryOk,
@@ -120,6 +157,10 @@ final class RFMediumInfo extends AddInfo
 		return RSS.values()[rss];
 	}
 
+	/**
+	 * @return the lowest retransmitter RSS, {@link RSS#Void} indicates no retransmitter
+	 *         measurements
+	 */
 	public RSS getRetransmitterRSS()
 	{
 		final int rfInfo = getInfo()[0] & 0xff;
@@ -158,18 +199,29 @@ final class RFMediumInfo extends AddInfo
 		return lfn;
 	}
 
-	private static byte[] toByteArray(final int rss, final int retransmitterRss,
+	@Override
+	public String toString()
+	{
+		final String domain = isSystemBroadcast() ? "SN " : "DoA ";
+		final RSS retxRss = getRetransmitterRSS();
+		final String rtx = retxRss == RSS.Void ? "" : " , ReTX lowest RSS=" + retxRss;
+		final String battery = isBatteryOk() ? "OK" : "weak";
+
+		return "RF " + domain + DataUnitBuilder.toHex(getDoAorSN(), "") + ", LFN "
+				+ getFrameNumber() + ", RSS=" + getRSS() + rtx + ", Battery " + battery;
+	}
+
+	private static byte[] toByteArray(final RSS rss, final int retransmitterRss,
 		final boolean batteryOK, final boolean transmitOnlyDevice, final byte[] doA, final int lfn)
 	{
-		if (rss < 0 || rss > 3)
-			throw new KNXIllegalArgumentException("RSS out of range [0..3]: " + rss);
 		if (retransmitterRss < 0 || retransmitterRss > 3)
 			throw new KNXIllegalArgumentException("retransmitter RSS out of range [0..3]: "
 					+ retransmitterRss);
 
 		final byte[] info = new byte[8];
 		final int unidir = transmitOnlyDevice ? 0x01 : 0x00;
-		info[0] = (byte) ((rss << 4) | (retransmitterRss << 2) | (batteryOK ? 0x02 : 0x0) | unidir);
+		info[0] = (byte) ((rss.ordinal() << 4) | (retransmitterRss << 2)
+				| (batteryOK ? 0x02 : 0x0) | unidir);
 		if (doA.length != 6)
 			throw new KNXIllegalArgumentException("DoA/SN invalid length: 0x"
 					+ DataUnitBuilder.toHex(doA, ""));
