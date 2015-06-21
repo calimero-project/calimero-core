@@ -49,7 +49,6 @@ import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 
 /**
  * Factory helper for creating and copying cEMI messages.
- * <p>
  *
  * @author B. Malinowsky
  */
@@ -60,14 +59,13 @@ public final class CEMIFactory
 
 	/**
 	 * Creates a new cEMI message out of the given <code>data</code> byte stream.
-	 * <p>
 	 *
 	 * @param data byte stream containing a cEMI message frame structure
 	 * @param offset start offset of cEMI message in <code>data</code>
 	 * @param length length in bytes of the whole cEMI message in <code>data</code>
 	 * @return the new created cEMI message
-	 * @throws KNXFormatException if no (valid) cEMI structure was found or unsupported
-	 *         cEMI message code
+	 * @throws KNXFormatException if no (valid) cEMI structure was found or unsupported cEMI message
+	 *         code
 	 */
 	public static CEMI create(final byte[] data, final int offset, final int length)
 		throws KNXFormatException
@@ -99,28 +97,27 @@ public final class CEMIFactory
 		case CEMIBusMon.MC_BUSMON_IND:
 			return new CEMIBusMon(data, offset, length);
 		default:
-			throw new KNXFormatException("cEMI msg code not supported", mc);
+			throw new KNXFormatException("Unsupported cEMI msg code 0x" + Integer.toHexString(mc),
+					mc);
 		}
 	}
 
 	/**
-	 * Creates a new cEMI message with information provided by <code>original</code>,
-	 * and adjusts it to match the supplied <code>msgCode</code> and <code>data</code>.
+	 * Creates a new cEMI message with information provided by <code>original</code>, and adjusts it
+	 * to match the supplied <code>msgCode</code> and <code>data</code>.
 	 * <p>
 	 * The message code has to correspond to the type of cEMI frame supplied with
-	 * <code>original</code>. The byte length of data has to fit the cEMI frame type
-	 * supplied with <code>original</code>.<br>
-	 * The <code>data</code> argument varies according to the supplied message code. For
-	 * L-Data frames, this is the tpdu, for busmonitor frames, this is the raw frame, for
-	 * device management frames, this is the data part or error information.
+	 * <code>original</code>. The byte length of data has to fit the cEMI frame type supplied with
+	 * <code>original</code>.<br>
+	 * The <code>data</code> argument varies according to the supplied message code. For L-Data
+	 * frames, this is the tpdu, for busmonitor frames, this is the raw frame, for device management
+	 * frames, this is the data part or error information.
 	 *
 	 * @param msgCode the message code for the new cEMI frame
 	 * @param data the data for the frame
-	 * @param original the original frame providing all necessary information for the new
-	 *        frame
+	 * @param original the original frame providing all necessary information for the new frame
 	 * @return the new cEMI frame adjusted with message code and data
-	 * @throws KNXFormatException if cEMI message code is unsupported or frame creation
-	 *         failed
+	 * @throws KNXFormatException if cEMI message code is unsupported or frame creation failed
 	 */
 	public static CEMI create(final int msgCode, final byte[] data, final CEMI original)
 		throws KNXFormatException
@@ -130,7 +127,7 @@ public final class CEMIFactory
 		case CEMILData.MC_LDATA_CON:
 		case CEMILData.MC_LDATA_IND:
 			return create(msgCode, null, null, data, (CEMILData) original, false,
-				((CEMILData) original).isRepetition());
+					((CEMILData) original).isRepetition());
 		case CEMIDevMgmt.MC_PROPREAD_REQ:
 		case CEMIDevMgmt.MC_PROPREAD_CON:
 		case CEMIDevMgmt.MC_PROPWRITE_REQ:
@@ -139,56 +136,52 @@ public final class CEMIFactory
 		case CEMIDevMgmt.MC_RESET_REQ:
 		case CEMIDevMgmt.MC_RESET_IND: {
 			final CEMIDevMgmt f = (CEMIDevMgmt) original;
-			return new CEMIDevMgmt(msgCode, f.getObjectType(), f.getObjectInstance(), f
-				.getPID(), f.getStartIndex(), f.getElementCount(), data);
+			return new CEMIDevMgmt(msgCode, f.getObjectType(), f.getObjectInstance(), f.getPID(),
+					f.getStartIndex(), f.getElementCount(), data);
 		}
 		case CEMIBusMon.MC_BUSMON_IND:
 			final CEMIBusMon f = (CEMIBusMon) original;
 			return CEMIBusMon.newWithStatus(f.getStatus(), f.getTimestamp(),
-				f.getTimestampType() == CEMIBusMon.TYPEID_TIMESTAMP_EXT, data);
+					f.getTimestampType() == CEMIBusMon.TYPEID_TIMESTAMP_EXT, data);
 		default:
-			throw new KNXFormatException("not supported cEMI msg code", msgCode);
+			throw new KNXFormatException("not supported cEMI msg code 0x"
+					+ Integer.toHexString(msgCode), msgCode);
 		}
 	}
 
 	/**
-	 * Creates a new cEMI L-Data message with information provided by
-	 * <code>original</code>, and adjusts source and destination address to match the
-	 * supplied addresses.
-	 * <p>
+	 * Creates a new cEMI L-Data message with information provided by <code>original</code>, and
+	 * adjusts source and destination address to match the supplied addresses.
 	 *
-	 * @param src the new KNX source address for the message, use <code>null</code> to
-	 *        use original address
-	 * @param dst the new KNX destination address for the message, use <code>null</code>
-	 *        to use original address
-	 * @param original the original frame providing all missing information for the
-	 *        adjusted message
-	 * @param extended <code>true</code> to always created an extended frame,
-	 *        <code>false</code> to create type according to <code>original</code>
+	 * @param src the new KNX source address for the message, use <code>null</code> to use original
+	 *        address
+	 * @param dst the new KNX destination address for the message, use <code>null</code> to use
+	 *        original address
+	 * @param original the original frame providing all missing information for the adjusted message
+	 * @param extended <code>true</code> to always created an extended frame, <code>false</code> to
+	 *        create type according to <code>original</code>
 	 * @return the new cEMI L-Data message adjusted with KNX addresses
 	 */
 	public static CEMILData create(final IndividualAddress src, final KNXAddress dst,
 		final CEMILData original, final boolean extended)
 	{
-		return (CEMILData) create(0, src, dst, null, original, extended,
-			original.isRepetition());
+		return (CEMILData) create(0, src, dst, null, original, extended, original.isRepetition());
 	}
 
 	/**
-	 * Creates a new cEMI L-Data message with information provided by
-	 * <code>original</code>, and adjusts source and destination address to match the
-	 * supplied addresses, and sets the repeat/is repeated frame indication.
-	 * <p>
+	 * Creates a new cEMI L-Data message with information provided by <code>original</code>, and
+	 * adjusts source and destination address to match the supplied addresses, and sets the
+	 * repeat/is repeated frame indication.
 	 *
-	 * @param src the new KNX source address for the message, use <code>null</code> to
-	 *        use original address
-	 * @param dst the new KNX destination address for the message, use <code>null</code>
-	 *        to use original address
-	 * @param original the original frame providing all missing information for the
-	 *        adjusted message
-	 * @param extended <code>true</code> to always created an extended frame,
-	 *        <code>false</code> to create type according to <code>original</code>
-	 * @param repeat @see {@link CEMILData#isRepetition()}
+	 * @param src the new KNX source address for the message, use <code>null</code> to use original
+	 *        address
+	 * @param dst the new KNX destination address for the message, use <code>null</code> to use
+	 *        original address
+	 * @param original the original frame providing all missing information for the adjusted message
+	 * @param extended <code>true</code> to always created an extended frame, <code>false</code> to
+	 *        create type according to <code>original</code>
+	 * @param repeat request frame repetition, or indicate a repeated frame; see
+	 *        {@link CEMILData#isRepetition()}
 	 * @return the new cEMI L-Data message adjusted with KNX addresses
 	 */
 	public static CEMILData create(final IndividualAddress src, final KNXAddress dst,
@@ -199,12 +192,11 @@ public final class CEMIFactory
 
 	/**
 	 * Creates a new cEMI message out of the supplied EMI frame.
-	 * <p>
 	 *
 	 * @param frame EMI frame
 	 * @return the new cEMI message
-	 * @throws KNXFormatException if no (valid) EMI structure was found or unsupported EMI
-	 *         message code
+	 * @throws KNXFormatException if no (valid) EMI structure was found or unsupported EMI message
+	 *         code
 	 */
 	public static CEMI createFromEMI(final byte[] frame) throws KNXFormatException
 	{
@@ -213,16 +205,15 @@ public final class CEMIFactory
 			throw new KNXFormatException("EMI frame too short");
 		final int mc = frame[0] & 0xff;
 		if (mc == CEMIBusMon.MC_BUSMON_IND) {
-			return CEMIBusMon.newWithStatus(frame[1] & 0xff, (frame[2] & 0xff) << 8
-				| frame[3] & 0xff, false,
-				DataUnitBuilder.copyOfRange(frame, 4, frame.length));
+			return CEMIBusMon.newWithStatus(frame[1] & 0xff, (frame[2] & 0xff) << 8 | frame[3]
+					& 0xff, false, DataUnitBuilder.copyOfRange(frame, 4, frame.length));
 		}
 		final Priority p = Priority.get(frame[1] >> 2 & 0x3);
 		final boolean ack = (frame[1] & 0x02) != 0;
 		final boolean c = (frame[1] & 0x01) != 0;
 		final int dst = (frame[4] & 0xff) << 8 | frame[5] & 0xff;
-		final KNXAddress a = (frame[6] & 0x80) != 0 ?
-			(KNXAddress) new GroupAddress(dst) : new IndividualAddress(dst);
+		final KNXAddress a = (frame[6] & 0x80) != 0 ? (KNXAddress) new GroupAddress(dst)
+				: new IndividualAddress(dst);
 		final int hops = frame[6] >> 4 & 0x07;
 		final int len = (frame[6] & 0x0f) + 1;
 		final byte[] tpdu = DataUnitBuilder.copyOfRange(frame, 7, len + 7);
@@ -271,8 +262,8 @@ public final class CEMIFactory
 	/**
 	 * Does a lazy copy of the supplied cEMI frame.
 	 * <p>
-	 * Only for cEMI frames which are <b>not</b> immutable a copy is created, for all
-	 * other frames <code>original</code> is returned.
+	 * Only for cEMI frames which are <b>not</b> immutable a copy is created, for all other frames
+	 * <code>original</code> is returned.
 	 *
 	 * @param original the frame to copy
 	 * @return the <code>original</code> frame if immutable, a copy of it otherwise
@@ -297,9 +288,8 @@ public final class CEMIFactory
 		final byte[] content = data != null ? data : original.getPayload();
 		if (original instanceof CEMILDataEx) {
 			final CEMILDataEx f = (CEMILDataEx) original;
-			final CEMILDataEx copy =
-				new CEMILDataEx(mc, s, d, content, f.getPriority(), repeat, f
-					.isDomainBroadcast(), f.isAckRequested(), f.getHopCount());
+			final CEMILDataEx copy = new CEMILDataEx(mc, s, d, content, f.getPriority(), repeat,
+					f.isDomainBroadcast(), f.isAckRequested(), f.getHopCount());
 			// copy additional info
 			final List l = f.getAdditionalInfo();
 			for (final Iterator i = l.iterator(); i.hasNext();) {
@@ -310,8 +300,8 @@ public final class CEMIFactory
 		}
 		if (ext)
 			return new CEMILDataEx(mc, s, d, content, original.getPriority(), repeat,
-				original.getHopCount());
+					original.getHopCount());
 		return new CEMILData(mc, s, d, content, original.getPriority(), repeat,
-			original.getHopCount());
+				original.getHopCount());
 	}
 }
