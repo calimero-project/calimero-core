@@ -85,7 +85,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 				if (decode) {
 					try {
 						mfe = new MonitorFrameEvent(netmon, mon, RawFrameFactory.create(
-								netmon.medium.getMedium(), mon.getPayload(), 0));
+								netmon.medium.getMedium(), mon.getPayload(), 0, false));
 					}
 					catch (final KNXFormatException ex) {
 						logger.error("decoding raw frame", ex);

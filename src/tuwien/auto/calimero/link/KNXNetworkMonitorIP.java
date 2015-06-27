@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ import tuwien.auto.calimero.log.LogService;
  * <p>
  * Pay attention to the IP address consideration stated in the documentation comments of
  * class {@link KNXNetworkLinkIP}.
- * 
+ *
  * @author B. Malinowsky
  */
 public class KNXNetworkMonitorIP implements KNXNetworkMonitor
@@ -87,7 +87,7 @@ public class KNXNetworkMonitorIP implements KNXNetworkMonitor
 					try {
 						final int m = netmon.medium.getMedium();
 						mfe = new MonitorFrameEvent(netmon, e.getFrame(), RawFrameFactory.create(m,
-								e.getFrame().getPayload(), 0));
+								e.getFrame().getPayload(), 0, false));
 					}
 					catch (final KNXFormatException ex) {
 						logger.error("decoding raw frame", ex);
@@ -118,12 +118,12 @@ public class KNXNetworkMonitorIP implements KNXNetworkMonitor
 	private final LogService logger;
 	// our link connection event notifier
 	private final MonitorNotifier notifier;
-	
+
 	/**
 	 * Creates a new network monitor based on the KNXnet/IP protocol for accessing the KNX
 	 * network.
 	 * <p>
-	 * 
+	 *
 	 * @param localEP the local endpoint to use for the link, this is the client control
 	 *        endpoint, use <code>null</code> for the default local host and an
 	 *        ephemeral port number
@@ -149,7 +149,7 @@ public class KNXNetworkMonitorIP implements KNXNetworkMonitor
 				throw new KNXException("no local host available");
 			}
 		conn = new KNXnetIPTunnel(KNXnetIPTunnel.BUSMONITOR_LAYER, ep, remoteEP, useNAT);
-		
+
 		// do our own IP:port string, since InetAddress.toString() always prepends a '/'
 		final InetSocketAddress a = conn.getRemoteAddress();
 		name = "monitor " + a.getAddress().getHostAddress() + ":" + a.getPort();

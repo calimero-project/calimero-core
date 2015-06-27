@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ import tuwien.auto.calimero.exception.KNXFormatException;
  * a new raw frame.
  * <p>
  * Objects of this type are considered immutable.
- * 
+ *
  * @author B. Malinowsky
  */
 public abstract class RawFrameBase implements RawFrame
@@ -63,6 +63,9 @@ public abstract class RawFrameBase implements RawFrame
 	 * <p>
 	 */
 	protected int type;
+
+	/** Domain address for PL */
+	protected byte[] doa;
 
 	/**
 	 * Source address.
@@ -123,7 +126,7 @@ public abstract class RawFrameBase implements RawFrame
 	/**
 	 * Returns the KNX individual source address.
 	 * <p>
-	 * 
+	 *
 	 * @return address of type IndividualAddress
 	 */
 	public final IndividualAddress getSource()
@@ -134,7 +137,7 @@ public abstract class RawFrameBase implements RawFrame
 	/**
 	 * Returns the KNX destination address.
 	 * <p>
-	 * 
+	 *
 	 * @return destination address of type KNXAddress
 	 */
 	public final KNXAddress getDestination()
@@ -145,7 +148,7 @@ public abstract class RawFrameBase implements RawFrame
 	/**
 	 * Returns the message priority used for this frame.
 	 * <p>
-	 * 
+	 *
 	 * @return the used Priority
 	 */
 	public final Priority getPriority()
@@ -156,7 +159,7 @@ public abstract class RawFrameBase implements RawFrame
 	/**
 	 * Returns the hop count of this frame.
 	 * <p>
-	 * 
+	 *
 	 * @return hop count in the range 0 &lt;= count &lt;= 7
 	 */
 	public final int getHopcount()
@@ -169,7 +172,7 @@ public abstract class RawFrameBase implements RawFrame
 	 * <p>
 	 * A request for repetition or repeated frame is indicated with <code>true</code>,
 	 * otherwise <code>false</code> is returned.
-	 * 
+	 *
 	 * @return repeat state as boolean
 	 */
 	public final boolean isRepetition()
@@ -180,7 +183,7 @@ public abstract class RawFrameBase implements RawFrame
 	/**
 	 * Returns a copy of the TPDU, if available.
 	 * <p>
-	 * 
+	 *
 	 * @return tpdu as byte array or <code>null</code> for L-polldata frames
 	 */
 	public final byte[] getTPDU()
@@ -195,7 +198,7 @@ public abstract class RawFrameBase implements RawFrame
 	 * validation nor checked for correctness.<br>
 	 * The length and structure of the returned checksum depends on the communication
 	 * medium.
-	 * 
+	 *
 	 * @return frame checksum
 	 */
 	public final int getChecksum()
@@ -210,12 +213,13 @@ public abstract class RawFrameBase implements RawFrame
 	{
 		final StringBuffer sb = new StringBuffer();
 		sb.append(type == LDATA_FRAME ? "L-Data" : "L-Polldata").append(".req ");
-		sb.append(ext ? "(ext)" : "(std)");
-		sb.append(" from ").append(src).append(" to ").append(dst);
+		if (ext)
+			sb.append("(ext) ");
+		sb.append(src).append("->").append(dst);
 		sb.append(", ").append(p).append(" priority");
 		if (repetition)
 			sb.append(" repeat");
-		sb.append(" fcs 0x").append(Integer.toHexString(fcs));
+		sb.append(" FCS 0x").append(Integer.toHexString(fcs));
 		return sb.toString();
 	}
 
@@ -228,14 +232,17 @@ public abstract class RawFrameBase implements RawFrame
 			throw new KNXFormatException("data too short for " + type + " frame", avail);
 		return is;
 	}
-	
+
 	/**
-	 * Inits the basic fields for TP1 and PL110 L-Data format reading the input stream.
-	 * <p>
-	 * 
+	 * Inits the basic fields for TP1 and PL110 L-Data format reading the input
+	 * stream.
+	 *
+	 * @param is
+	 * @param parseDoA parse domain address after control field
+	 * @return length field value of the raw frame
 	 * @throws KNXFormatException
 	 */
-	int init(final ByteArrayInputStream is) throws KNXFormatException
+	int init(final ByteArrayInputStream is, final boolean parseDoA) throws KNXFormatException
 	{
 		final int ctrl = is.read();
 		// parse control field and check if valid
@@ -247,6 +254,12 @@ public abstract class RawFrameBase implements RawFrame
 		repetition = (ctrl & 0x20) == 0;
 		p = Priority.get((ctrl >> 2) & 0x3);
 		final int ctrle = ext ? readCtrlEx(is) : 0;
+
+		if (parseDoA) {
+			doa = new byte[2];
+			is.read(doa, 0, 2);
+		}
+
 		src = new IndividualAddress((is.read() << 8) | is.read());
 		final int addr = (is.read() << 8) | is.read();
 		final int npci = is.read();
@@ -263,7 +276,7 @@ public abstract class RawFrameBase implements RawFrame
 		}
 		return len;
 	}
-	
+
 	void setDestination(final int addr, final boolean group)
 	{
 		dst = group ? (KNXAddress) new GroupAddress(addr) : new IndividualAddress(addr);
