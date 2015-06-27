@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,12 +37,14 @@
 package tuwien.auto.calimero.link.medium;
 
 import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.cemi.CEMIFactory;
 
 /**
- * Factory for raw frames on medium.
- * <p>
- * Supports creation of raw frames out of byte arrays for now.
- * 
+ * Factory for raw frames on medium. Supports creation of raw frames out of byte arrays. The main
+ * purpose is to create frames for the communication media TP1, PL110, and PL132. For the
+ * communication medium KNX IP, which uses cEMI frames, the {@link CEMIFactory} can be used
+ * directly.
+ *
  * @author B. Malinowsky
  */
 public final class RawFrameFactory
@@ -55,7 +57,7 @@ public final class RawFrameFactory
 	 * <p>
 	 * This method just invokes one of the other medium type specific creation methods
 	 * according the given medium type.
-	 * 
+	 *
 	 * @param mediumType KNX communication medium, one of the media types declared in
 	 *        {@link KNXMediumSettings}
 	 * @param data byte array containing the raw frame structure
@@ -66,7 +68,7 @@ public final class RawFrameFactory
 	 *         structure
 	 */
 	public static RawFrame create(final int mediumType, final byte[] data,
-		final int offset) throws KNXFormatException
+		final int offset, final boolean extBusmon) throws KNXFormatException
 	{
 		switch (mediumType) {
 		case KNXMediumSettings.MEDIUM_TP0:
@@ -74,7 +76,7 @@ public final class RawFrameFactory
 		case KNXMediumSettings.MEDIUM_TP1:
 			return createTP1(data, offset);
 		case KNXMediumSettings.MEDIUM_PL110:
-			return createPL110(data, offset);
+			return createPL110(data, offset, extBusmon);
 		case KNXMediumSettings.MEDIUM_PL132:
 			return createPL132(data, offset);
 		case KNXMediumSettings.MEDIUM_RF:
@@ -87,7 +89,7 @@ public final class RawFrameFactory
 	/**
 	 * Creates a raw frame out of a byte array for the TP1 communication medium.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing the TP1 raw frame structure
 	 * @param offset start offset of frame structure in <code>data</code>, 0 &lt;=
 	 *        offset &lt; <code>data.length</code>
@@ -112,25 +114,25 @@ public final class RawFrameFactory
 	/**
 	 * Creates a raw frame out of a byte array for the PL110 communication medium.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing the PL110 raw frame structure
 	 * @param offset start offset of frame structure in <code>data</code>, 0 &lt;=
 	 *        offset &lt; <code>data.length</code>
 	 * @return the created PL110 raw frame
 	 * @throws KNXFormatException on no valid frame structure
 	 */
-	public static RawFrame createPL110(final byte[] data, final int offset)
+	public static RawFrame createPL110(final byte[] data, final int offset, final boolean extBusmon)
 		throws KNXFormatException
 	{
 		if ((data[0] & 0x10) == 0x10)
-			return new PL110LData(data, offset);
+			return new PL110LData(data, offset, extBusmon);
 		return new PL110Ack(data, offset);
 	}
 
 	/**
 	 * Creates a raw frame out of a byte array for the PL132 communication medium.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing the PL132 raw frame structure
 	 * @param offset start offset of frame structure in <code>data</code>, 0 &lt;=
 	 *        offset &lt; <code>data.length</code>

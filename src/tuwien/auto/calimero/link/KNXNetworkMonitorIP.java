@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ public class KNXNetworkMonitorIP implements KNXNetworkMonitor
 					try {
 						final int m = netmon.medium.getMedium();
 						mfe = new MonitorFrameEvent(netmon, e.getFrame(), RawFrameFactory.create(m,
-								e.getFrame().getPayload(), 0));
+								e.getFrame().getPayload(), 0, false));
 					}
 					catch (final KNXFormatException ex) {
 						logger.error("decoding raw frame", ex);

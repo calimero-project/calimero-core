@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,49 +42,49 @@ import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.KNXFormatException;
 
 /**
- * L-data frame format on PL110 communication medium.
- * <p>
- * Supports standard and extended frame format.
- * 
+ * L-data frame format on PL110 communication medium. Supports standard and extended frame format.
+ *
  * @author B. Malinowsky
  */
 public class PL110LData extends RawFrameBase
 {
 	private static final int MIN_LENGTH = 7;
-	
-	private final byte[] doa;
+
+	private final boolean skipDoA;
 
 	/**
 	 * Creates a new L-data frame out of a byte array.
-	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing the L-data frame
-	 * @param offset start offset of frame structure in <code>data</code>, offset &gt;=
-	 *        0
-	 * @throws KNXFormatException if length of data too short for frame, on no valid frame
-	 *         structure
+	 * @param offset start offset of frame structure in <code>data</code>, offset &gt;= 0
+	 * @param extBusmon is <code>data</code> a PL110 extended busmonitor frame, i.e., contains the
+	 *        domain address
+	 * @throws KNXFormatException if length of data too short for frame, on no valid frame structure
 	 */
-	public PL110LData(final byte[] data, final int offset) throws KNXFormatException
+	public PL110LData(final byte[] data, final int offset, final boolean extBusmon)
+		throws KNXFormatException
 	{
 		final ByteArrayInputStream is = asStream(data, offset, MIN_LENGTH, "L-data");
-		final int len = init(is);
+		final int len = init(is, extBusmon);
 
 		if (ext && len > 64)
-			throw new KNXFormatException("APDU length exceeds maximum of 64 bytes",	len);
-		
+			throw new KNXFormatException("APDU length exceeds maximum of 64 bytes", len);
+
 		tpdu = new byte[len + 1];
 		if (is.read(tpdu, 0, tpdu.length) != tpdu.length)
 			throw new KNXFormatException("data too short for L-data TPDU");
 		fcs = is.read();
-		doa = new byte[2];
-		is.read(doa, 1, 1);
+		if (extBusmon)
+			skipDoA = false;
+		else {
+			doa = new byte[2];
+			skipDoA = is.read(doa, 1, 1) == -1;
+		}
 	}
 
 	/**
-	 * Returns the domain address of this frame.
-	 * <p>
-	 * The address is returned in network byte order.
-	 * 
+	 * Returns the domain address of this frame. The address is returned in network byte order.
+	 *
 	 * @return domain address as byte array of length 2
 	 */
 	public final byte[] getDomainAddress()
@@ -92,13 +92,11 @@ public class PL110LData extends RawFrameBase
 		return doa.clone();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.medium.RawFrameBase#toString()
-	 */
 	@Override
 	public String toString()
 	{
-		return super.toString() + " domain " + (doa[1] & 0xff) + ", tpdu "
+		return super.toString()
+				+ (skipDoA ? "" : " domain 0x" + Integer.toHexString(doa[1] & 0xff)) + ", tpdu "
 				+ DataUnitBuilder.toHex(tpdu, " ");
 	}
 }

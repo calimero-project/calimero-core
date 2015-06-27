@@ -52,6 +52,7 @@ import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.knxnetip.KNXConnectionClosedException;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
+import tuwien.auto.calimero.link.medium.PLSettings;
 import tuwien.auto.calimero.link.medium.RawFrameFactory;
 import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
@@ -73,10 +74,12 @@ public class KNXNetworkMonitorUsb implements KNXNetworkMonitor
 	private static final class MonitorNotifier extends EventNotifier
 	{
 		volatile boolean decode;
+		private final boolean extBusmon;
 
-		MonitorNotifier(final Object source, final Logger logger)
+		MonitorNotifier(final Object source, final Logger logger, final boolean extBusmon)
 		{
 			super(source, logger);
+			this.extBusmon = extBusmon;
 		}
 
 		/* (non-Javadoc)
@@ -105,7 +108,7 @@ public class KNXNetworkMonitorUsb implements KNXNetworkMonitor
 				if (decode) {
 					try {
 						mfe = new MonitorFrameEvent(netmon, mon, RawFrameFactory.create(
-								netmon.medium.getMedium(), mon.getPayload(), 0));
+								netmon.medium.getMedium(), mon.getPayload(), 0, extBusmon));
 					}
 					catch (final KNXFormatException ex) {
 						logger.error("decoding raw frame", ex);
@@ -183,12 +186,13 @@ public class KNXNetworkMonitorUsb implements KNXNetworkMonitor
 			close();
 			throw new KNXConnectionClosedException("failed to set active any supported EMI type");
 		}
-		enterBusmonitor();
 		name = conn.getName();
 		logger = LogService.getLogger("calimero.monitor." + getName());
 		logger.info("in busmonitor mode - ready to receive");
 
-		notifier = new MonitorNotifier(this, logger);
+		final boolean extBusmon = settings instanceof PLSettings;
+		enterBusmonitor(extBusmon);
+		notifier = new MonitorNotifier(this, logger, extBusmon);
 		conn.addConnectionListener(notifier);
 		// configure KNX medium stuff
 		setKNXMedium(settings);
@@ -309,7 +313,8 @@ public class KNXNetworkMonitorUsb implements KNXNetworkMonitor
 		return false;
 	}
 
-	private void enterBusmonitor() throws KNXPortClosedException, KNXTimeoutException
+	private void enterBusmonitor(final boolean extBusmon) throws KNXPortClosedException, KNXTimeoutException,
+		KNXFormatException, InterruptedException
 	{
 		if (activeEmi == EmiType.CEmi) {
 			final int CEMI_SERVER_OBJECT = 8;
