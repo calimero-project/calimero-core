@@ -190,6 +190,33 @@ public final class CEMIFactory
 		return (CEMILData) create(0, src, dst, null, original, extended, repeat);
 	}
 
+	private static final int Emi1_LData_ind = 0x49;
+	private static final int Emi1_LBusmon_ind = 0x49;
+	private static final int Emi1_LData_con = 0x4e;
+
+	/**
+	 * Creates a new cEMI message out of the supplied EMI 1/2 busmonitor frame. This specialization
+	 * for busmonitor frames only is necessary, because EMI 1 has assigned the same message code for
+	 * L-Data.ind and L-Busmon.ind.
+	 *
+	 * @param frame EMI 1/2 frame
+	 * @return the cEMI message
+	 * @throws KNXFormatException if no (valid) EMI structure was found or unsupported EMI message
+	 *         code
+	 */
+	public static CEMI fromEmiBusmon(final byte[] frame) throws KNXFormatException
+	{
+		// check for minimum busmon frame length
+		if (frame.length < 4)
+			throw new KNXFormatException("EMI frame too short");
+		final int mc = frame[0] & 0xff;
+		if (mc != CEMIBusMon.MC_BUSMON_IND && mc != Emi1_LBusmon_ind)
+			throw new KNXFormatException("not a busmonitor frame with msg code 0x"
+					+ Integer.toHexString(mc));
+		return CEMIBusMon.newWithStatus(frame[1] & 0xff, (frame[2] & 0xff) << 8 | frame[3] & 0xff,
+				false, DataUnitBuilder.copyOfRange(frame, 4, frame.length));
+	}
+
 	/**
 	 * Creates a new cEMI message out of the supplied EMI frame.
 	 *
@@ -203,7 +230,13 @@ public final class CEMIFactory
 		// check for minimum frame length (i.e., a busmonitor frame)
 		if (frame.length < 4)
 			throw new KNXFormatException("EMI frame too short");
-		final int mc = frame[0] & 0xff;
+		int mc = frame[0] & 0xff;
+		// For EMI 1, L-Data.ind is given preference over L-Busmon.ind
+		if (mc == Emi1_LData_ind)
+			mc = CEMILData.MC_LDATA_IND;
+		if (mc == Emi1_LData_con)
+			mc = CEMILData.MC_LDATA_CON;
+
 		if (mc == CEMIBusMon.MC_BUSMON_IND) {
 			return CEMIBusMon.newWithStatus(frame[1] & 0xff, (frame[2] & 0xff) << 8 | frame[3]
 					& 0xff, false, DataUnitBuilder.copyOfRange(frame, 4, frame.length));

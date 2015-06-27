@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ import tuwien.auto.calimero.serial.KNXPortClosedException;
  * <p>
  * Once a monitor has been closed, it is not available for further link communication,
  * i.e., it can't be reopened.
- * 
+ *
  * @author B. Malinowsky
  */
 public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
@@ -78,7 +78,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 		public void frameReceived(final FrameEvent e)
 		{
 			try {
-				final CEMIBusMon mon = (CEMIBusMon) CEMIFactory.createFromEMI(e.getFrameBytes());
+				final CEMIBusMon mon = (CEMIBusMon) CEMIFactory.fromEmiBusmon(e.getFrameBytes());
 				logger.trace("received monitor indication");
 				final KNXNetworkMonitorFT12 netmon = (KNXNetworkMonitorFT12) source;
 				MonitorFrameEvent mfe = new MonitorFrameEvent(netmon, mon);
@@ -125,7 +125,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 	 * <p>
 	 * The port identifier is used to choose the serial port for communication. These
 	 * identifiers are usually device and platform specific.
-	 * 
+	 *
 	 * @param portID identifier of the serial communication port to use
 	 * @param settings medium settings defining the specific KNX medium needed for
 	 *        decoding raw frames received from the KNX network
@@ -151,7 +151,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 	 * <p>
 	 * The port number is used to choose the serial port for communication. It is mapped
 	 * to the default port identifier using that number on the platform.
-	 * 
+	 *
 	 * @param portNumber port number of the serial communication port to use
 	 * @param settings medium settings defining the specific KNX medium needed for
 	 *        decoding raw frames received from the KNX network
