@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 		public void frameReceived(final FrameEvent e)
 		{
 			try {
-				final CEMIBusMon mon = (CEMIBusMon) CEMIFactory.createFromEMI(e.getFrameBytes());
+				final CEMIBusMon mon = (CEMIBusMon) CEMIFactory.fromEmiBusmon(e.getFrameBytes());
 				logger.trace("received monitor indication");
 				final KNXNetworkMonitorFT12 netmon = (KNXNetworkMonitorFT12) source;
 				MonitorFrameEvent mfe = new MonitorFrameEvent(netmon, mon);

@@ -91,7 +91,7 @@ public class KNXNetworkMonitorUsb implements KNXNetworkMonitor
 
 				final CEMIBusMon mon;
 				if (frame == null)
-					mon = (CEMIBusMon) CEMIFactory.createFromEMI(e.getFrameBytes());
+					mon = (CEMIBusMon) CEMIFactory.fromEmiBusmon(e.getFrameBytes());
 				else if (frame instanceof CEMIBusMon)
 					mon = (CEMIBusMon) frame;
 				else {
