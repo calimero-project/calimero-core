@@ -36,6 +36,7 @@
 
 package tuwien.auto.calimero.mgmt;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import tuwien.auto.calimero.KNXException;
@@ -47,6 +48,7 @@ import tuwien.auto.calimero.serial.KNXPortClosedException;
 import tuwien.auto.calimero.serial.usb.HidReport;
 import tuwien.auto.calimero.serial.usb.TransferProtocolHeader.KnxTunnelEmi;
 import tuwien.auto.calimero.serial.usb.UsbConnection;
+import tuwien.auto.calimero.serial.usb.UsbConnection.EmiType;
 
 /**
  * USB adapter for local device management. This adapter is based on a {@link UsbConnection}.
@@ -80,17 +82,21 @@ public class LocalDeviceManagementUsb extends LocalDeviceManagement
 	 *        read only, <code>false</code> to skip the check
 	 * @throws KNXException on failure establishing local device management connection or failure
 	 *         while initializing the property adapter
+	 * @throws InterruptedException on interrupt during initialization
 	 */
 	public LocalDeviceManagementUsb(final UsbConnection c, final PropertyAdapterListener l,
-		final boolean queryWriteEnable) throws KNXException
+		final boolean queryWriteEnable) throws KNXException, InterruptedException
 	{
 		super(c, l, queryWriteEnable);
 
 		conn = c;
+		final EnumSet<EmiType> emiTypes = conn.getSupportedEmiTypes();
 		conn.addConnectionListener(new KNXListenerImpl());
-
-		final int objectInstance = 1;
-		setProperty(cEmiServerObject, objectInstance, pidCommMode, 1, 1, new byte[] { 0x00 });
+		if (emiTypes.contains(EmiType.CEmi)) {
+			conn.setActiveEmiType(EmiType.CEmi);
+			final int objectInstance = 1;
+			setProperty(cEmiServerObject, objectInstance, pidCommMode, 1, 1, new byte[] { 0x00 });
+		}
 		init();
 	}
 
