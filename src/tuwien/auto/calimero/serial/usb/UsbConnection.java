@@ -78,6 +78,7 @@ import org.usb4java.DeviceHandle;
 import org.usb4java.DeviceList;
 import org.usb4java.LibUsb;
 
+import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXException;
@@ -112,7 +113,7 @@ public class UsbConnection implements AutoCloseable
 		Emi2(1 << 1, KnxTunnelEmi.Emi2),
 		CEmi(1 << 2, KnxTunnelEmi.CEmi);
 
-		public static EnumSet<EmiType> fromBits(final int bitfield)
+		static EnumSet<EmiType> fromBits(final int bitfield)
 		{
 			final EnumSet<EmiType> types = EnumSet.noneOf(EmiType.class);
 			for (final EmiType t : EmiType.values())
@@ -121,7 +122,7 @@ public class UsbConnection implements AutoCloseable
 			return types;
 		}
 
-		public final int bit;
+		final int bit;
 		// the KNX tunneling EMI enumeration values are different!
 		public final KnxTunnelEmi emi;
 
@@ -145,8 +146,9 @@ public class UsbConnection implements AutoCloseable
 	private static final byte knxEndpointOut = (byte) 0x02;
 	private static final byte knxEndpointIn = (byte) 0x81;
 
-	// maximum reply time for a response service
-	private static final int tunnelingTimeout = 1000; // ms
+	// maximum reply time for a response service is 1000 ms
+	// the additional milliseconds allow for delay of slow interfaces and OS crap
+	private static final int tunnelingTimeout = 1000 + 500; // ms
 
 	private static final String logPrefix = "calimero.usb";
 	private static final Logger slogger = LoggerFactory.getLogger(logPrefix);
@@ -185,6 +187,11 @@ public class UsbConnection implements AutoCloseable
 	{
 		private volatile boolean close;
 
+		{
+			setDaemon(true);
+			setName("Calimero USB callback");
+		}
+
 		@Override
 		public void run()
 		{
@@ -193,10 +200,10 @@ public class UsbConnection implements AutoCloseable
 					in.syncSubmit(new byte[64]);
 
 			}
-			catch (UsbNotActiveException | UsbNotOpenException | IllegalArgumentException
+			catch (final UsbNotActiveException | UsbNotOpenException | IllegalArgumentException
 					| UsbDisconnectedException | UsbException e) {
 				if (!close)
-					logger.error("receiver", e);
+					close(CloseEvent.INTERNAL, e.getMessage());
 			}
 		}
 
@@ -317,11 +324,12 @@ public class UsbConnection implements AutoCloseable
 			do {
 				irp = in.asyncSubmit(new byte[64]);
 				irp.waitUntilComplete(10);
-			} while (irp.isComplete());
+			}
+			while (irp.isComplete());
 
 			callback.start();
 		}
-		catch (UsbNotActiveException | UsbDisconnectedException | UsbNotClaimedException
+		catch (final UsbNotActiveException | UsbDisconnectedException | UsbNotClaimedException
 				| UsbException e) {
 			throw new KNXException("open USB connection", e);
 		}
@@ -365,8 +373,9 @@ public class UsbConnection implements AutoCloseable
 	}
 
 	/**
-	 * The returned descriptor information format for device descriptor type 0 is as follows (MSB to
-	 * LSB):<br>
+	 * Returns the KNX device descriptor type 0 (mask version), use {@link DeviceDescriptor} for
+	 * decoding. The returned descriptor information format for device descriptor type 0 is as
+	 * follows (MSB to LSB):<br>
 	 * <code>| Mask Type (8 bit) | Firmware Version (8 bit) |</code><br>
 	 * with the mask type split up into<br>
 	 * <code>| Medium Type (4 bit) | Firmware Type (4 bit)|</code><br>
@@ -471,30 +480,7 @@ public class UsbConnection implements AutoCloseable
 	@Override
 	public void close()
 	{
-		try {
-			callback.quit();
-			out.abortAllSubmissions();
-			out.close();
-			in.removeUsbPipeListener(callback);
-			// TODO this causes our callback thread to quit with exception
-			in.abortAllSubmissions();
-			in.close();
-
-			String name = "" + knxUsbIf.getUsbInterfaceDescriptor().bInterfaceNumber();
-			try {
-				final String s = knxUsbIf.getInterfaceString();
-				if (s != null)
-					name = s;
-			}
-			catch (final UnsupportedEncodingException e) {}
-			logger.trace("release USB interface {}, active={}, claimed={}", name,
-					knxUsbIf.isActive(), knxUsbIf.isClaimed());
-			knxUsbIf.release();
-		}
-		catch (UsbNotActiveException | UsbNotOpenException | UsbDisconnectedException
-				| UsbException e) {
-			logger.warn("close connection", e);
-		}
+		close(CloseEvent.CLIENT_REQUEST, "user request");
 	}
 
 	private UsbInterface open(final UsbDevice device) throws UsbClaimException,
@@ -528,18 +514,17 @@ public class UsbConnection implements AutoCloseable
 						final String inout = DescriptorUtils.getDirectionName(addr);
 						logger.trace("EP {} {}", index, inout);
 
-						final boolean in = (addr & LibUsb.ENDPOINT_IN) == 0 ? false : true;
-						if (in && epAddressIn == 0)
+						final boolean epIn = (addr & LibUsb.ENDPOINT_IN) == 0 ? false : true;
+						if (epIn && epAddressIn == 0)
 							epAddressIn = addr;
-						if (!in && epAddressOut == 0)
+						if (!epIn && epAddressOut == 0)
 							epAddressOut = addr;
 					}
 				}
 			}
 		}
-		logger.info("Found USB device endpoint addresses OUT 0x{}, IN 0x{}",
-				Integer.toHexString(epAddressOut & 0xff),
-				Integer.toHexString(epAddressIn & 0xff));
+		logger.debug("Found USB device endpoint addresses OUT 0x{}, IN 0x{}",
+				Integer.toHexString(epAddressOut & 0xff), Integer.toHexString(epAddressIn & 0xff));
 		// ??? all devices I know use 0, so just stick to it for now
 		final UsbInterface usbIf = configuration.getUsbInterface((byte) 0);
 		try {
@@ -554,18 +539,49 @@ public class UsbConnection implements AutoCloseable
 		return usbIf;
 	}
 
-	private UsbPipe open(final UsbInterface knxUsbIf, final byte endpointAddress)
-		throws KNXException, UsbNotActiveException, UsbNotClaimedException,
-		UsbDisconnectedException, UsbException
+	private UsbPipe open(final UsbInterface usbIf, final byte endpointAddress) throws KNXException,
+		UsbNotActiveException, UsbNotClaimedException, UsbDisconnectedException, UsbException
 	{
-		final UsbEndpoint epout = knxUsbIf.getUsbEndpoint(endpointAddress);
+		final UsbEndpoint epout = usbIf.getUsbEndpoint(endpointAddress);
 		if (epout == null)
-			throw new KNXException(knxUsbIf.getUsbConfiguration().getUsbDevice()
+			throw new KNXException(usbIf.getUsbConfiguration().getUsbDevice()
 					+ " contains no KNX USB data endpoint 0x"
 					+ Integer.toUnsignedString(endpointAddress, 16));
 		final UsbPipe pipe = epout.getUsbPipe();
 		pipe.open();
 		return pipe;
+	}
+
+	private void close(final int initiator, final String reason)
+	{
+		try {
+			in.removeUsbPipeListener(callback);
+			callback.quit();
+
+			out.abortAllSubmissions();
+			out.close();
+			// TODO this causes our callback thread to quit with exception
+			in.abortAllSubmissions();
+			in.close();
+
+			String ifname = "" + knxUsbIf.getUsbInterfaceDescriptor().bInterfaceNumber();
+			try {
+				final String s = knxUsbIf.getInterfaceString();
+				if (s != null)
+					ifname = s;
+			}
+			catch (final UnsupportedEncodingException e) {}
+			logger.trace("release USB interface {}, active={}, claimed={}", ifname,
+					knxUsbIf.isActive(), knxUsbIf.isClaimed());
+			knxUsbIf.release();
+		}
+		catch (final UsbNotActiveException | UsbNotOpenException | UsbDisconnectedException
+				| UsbException e) {
+			logger.warn("close connection", e);
+		}
+		for (final KNXListener l : listeners.listeners()) {
+			l.connectionClosed(new CloseEvent(this, initiator, reason));
+		}
 	}
 
 	private byte[] getFeature(final BusAccessServerFeature feature) throws InterruptedException,
@@ -676,7 +692,7 @@ public class UsbConnection implements AutoCloseable
 		try {
 			return findDevice(getRootHub(), vendorId, productId);
 		}
-		catch (SecurityException | UsbException e) {
+		catch (final SecurityException | UsbException e) {
 			throw new KNXException("Accessing USB root hub", e);
 		}
 	}
@@ -762,7 +778,8 @@ public class UsbConnection implements AutoCloseable
 		if (device.isUsbHub())
 			for (final Iterator<UsbDevice> i = getAttachedDevices((UsbHub) device).iterator(); i
 					.hasNext();)
-				traverse(i.next(), indent + (i.hasNext() ? new String(" |   ") : new String("     ")));
+				traverse(i.next(),
+						indent + (i.hasNext() ? new String(" |   ") : new String("     ")));
 	}
 
 	private static void printInfo(final UsbDevice device, final Logger l, final String indent)
@@ -819,7 +836,7 @@ public class UsbConnection implements AutoCloseable
 		try {
 			final DeviceList list = new DeviceList();
 			final int res = LibUsb.getDeviceList(ctx, list);
-			if (err < 0) {
+			if (res < 0) {
 				slogger.error("LibUsb device list error {}: {}", -res, LibUsb.strError(res));
 				return;
 			}
