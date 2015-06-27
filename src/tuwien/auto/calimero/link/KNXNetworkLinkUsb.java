@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
+import tuwien.auto.calimero.DeviceDescriptor;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
@@ -58,6 +59,7 @@ import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.cemi.CEMILDataEx;
 import tuwien.auto.calimero.knxnetip.KNXConnectionClosedException;
+import tuwien.auto.calimero.link.BcuSwitcher.BcuMode;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.link.medium.RFSettings;
 import tuwien.auto.calimero.log.LogService;
@@ -177,6 +179,9 @@ public class KNXNetworkLinkUsb implements KNXNetworkLink
 	{
 		conn = c;
 		try {
+			if (!conn.isKnxConnectionActive())
+				throw new KNXConnectionClosedException("interface is not connected to KNX network");
+
 			emiTypes = conn.getSupportedEmiTypes();
 			// Responding to active EMI type is optional (and might fail) if only one EMI type is
 			// supported. Or, we get a positive response, but with no emi type set (void)
@@ -186,21 +191,26 @@ public class KNXNetworkLinkUsb implements KNXNetworkLink
 //			else
 			if (!trySetActiveEmi(EmiType.CEmi) && !trySetActiveEmi(EmiType.Emi2)
 					&& !trySetActiveEmi(EmiType.Emi1)) {
-				activeEmi = EmiType.CEmi;
-				close();
 				throw new KNXConnectionClosedException(
 						"failed to set active any supported EMI type");
 			}
 		}
-		catch (final KNXTimeoutException e) {
+		catch (final KNXException e) {
 			conn.close();
 			throw e;
 		}
 		name = conn.getName();
 		logger = LogService.getLogger("calimero.link." + getName());
+
+		try {
+			final int dd0 = conn.getDeviceDescriptorType0();
+			logger.info("Device Mask Version {}", DeviceDescriptor.DD0.fromType0(dd0));
+		} catch (final KNXTimeoutException e) {
+			// device does not provide a device descriptor 0
+		}
+		linkLayerMode();
 		notifier = new LinkNotifier(this, logger);
 		conn.addConnectionListener(notifier);
-		linkLayerMode();
 		// configure KNX medium stuff
 		setKNXMedium(settings);
 	}
@@ -364,7 +374,7 @@ public class KNXNetworkLinkUsb implements KNXNetworkLink
 	}
 
 	// TODO should close and cleanup on error switching to link layer mode
-	private void linkLayerMode() throws KNXException
+	private void linkLayerMode() throws KNXException, InterruptedException
 	{
 		if (activeEmi == EmiType.CEmi) {
 			final int CEMI_SERVER_OBJECT = 8;
@@ -375,22 +385,30 @@ public class KNXNetworkLinkUsb implements KNXNetworkLink
 			conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame.toByteArray()).get(0), true);
 			// check for .con
 			//findFrame(CEMIDevMgmt.MC_PROPWRITE_CON);
+		}
+		else if (activeEmi == EmiType.Emi1) {
+			new BcuSwitcher(conn, logger).enter(BcuMode.LinkLayer);
 			return;
 		}
-		// EMI1/2 link layer mode
-		final byte[] switchLinkLayer = { (byte) PEI_SWITCH, 0x00, 0x18, 0x34, 0x56, 0x78, 0x0A, };
-		conn.send(HidReport.create(activeEmi.emi, switchLinkLayer).get(0), true);
+		else {
+			final byte[] switchLinkLayer = { (byte) PEI_SWITCH, 0x00, 0x18, 0x34, 0x56, 0x78, 0x0A, };
+			conn.send(HidReport.create(activeEmi.emi, switchLinkLayer).get(0), true);
+		}
 	}
 
-	private void normalMode() throws KNXPortClosedException, KNXTimeoutException
+	private void normalMode() throws KNXPortClosedException, KNXTimeoutException, InterruptedException
 	{
 		if (activeEmi == EmiType.CEmi) {
 			final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_RESET_REQ);
 			conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame.toByteArray()).get(0), true);
-			return;
 		}
-		final byte[] switchNormal = { (byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
-		conn.send(HidReport.create(activeEmi.emi, switchNormal).get(0), true);
+		else if (activeEmi == EmiType.Emi1) {
+			new BcuSwitcher(conn, logger).reset();
+		}
+		else {
+			final byte[] switchNormal = { (byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
+			conn.send(HidReport.create(activeEmi.emi, switchNormal).get(0), true);
+		}
 	}
 
 	private byte[] createEMI(final CEMILData f)

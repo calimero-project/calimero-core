@@ -41,6 +41,7 @@ import java.util.EnumSet;
 import org.slf4j.Logger;
 
 import tuwien.auto.calimero.CloseEvent;
+import tuwien.auto.calimero.DeviceDescriptor;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
@@ -51,6 +52,7 @@ import tuwien.auto.calimero.cemi.CEMIBusMon;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.knxnetip.KNXConnectionClosedException;
+import tuwien.auto.calimero.link.BcuSwitcher.BcuMode;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.link.medium.PLSettings;
 import tuwien.auto.calimero.link.medium.RawFrameFactory;
@@ -177,21 +179,32 @@ public class KNXNetworkMonitorUsb implements KNXNetworkMonitor
 		throws KNXException, InterruptedException
 	{
 		conn = c;
-		emiTypes = conn.getSupportedEmiTypes();
-//		if (emiTypes.size() == 1)
-//			activeEmi = emiTypes.iterator().next();
-//		else
-		if (!trySetActiveEmi(EmiType.CEmi) && !trySetActiveEmi(EmiType.Emi2)
+		try {
+			if (!conn.isKnxConnectionActive())
+				throw new KNXConnectionClosedException("interface is not connected to KNX network");
+			emiTypes = conn.getSupportedEmiTypes();
+			if (!trySetActiveEmi(EmiType.CEmi) && !trySetActiveEmi(EmiType.Emi2)
 				&& !trySetActiveEmi(EmiType.Emi1)) {
-			close();
-			throw new KNXConnectionClosedException("failed to set active any supported EMI type");
+				throw new KNXConnectionClosedException("failed to set active any supported EMI type");
+			}
+		}
+		catch (final KNXException e) {
+			conn.close();
+			throw e;
 		}
 		name = conn.getName();
 		logger = LogService.getLogger("calimero.monitor." + getName());
-		logger.info("in busmonitor mode - ready to receive");
 
 		final boolean extBusmon = settings instanceof PLSettings;
 		enterBusmonitor(extBusmon);
+		try {
+			final int dd0 = conn.getDeviceDescriptorType0();
+			logger.info("Device Descriptor {}", DeviceDescriptor.DD0.fromType0(dd0));
+		} catch (final KNXTimeoutException e) {
+			// device does not provide a device descriptor 0
+		}
+
+		logger.info("in busmonitor mode - ready to receive");
 		notifier = new MonitorNotifier(this, logger, extBusmon);
 		conn.addConnectionListener(notifier);
 		// configure KNX medium stuff
@@ -313,8 +326,8 @@ public class KNXNetworkMonitorUsb implements KNXNetworkMonitor
 		return false;
 	}
 
-	private void enterBusmonitor(final boolean extBusmon) throws KNXPortClosedException, KNXTimeoutException,
-		KNXFormatException, InterruptedException
+	private void enterBusmonitor(final boolean extBusmon) throws KNXPortClosedException,
+		KNXTimeoutException, KNXFormatException, InterruptedException
 	{
 		if (activeEmi == EmiType.CEmi) {
 			final int CEMI_SERVER_OBJECT = 8;
@@ -326,26 +339,38 @@ public class KNXNetworkMonitorUsb implements KNXNetworkMonitor
 			// TODO close monitor if we cannot switch to busmonitor
 			// check for .con
 			//findFrame(CEMIDevMgmt.MC_PROPWRITE_CON);
-			return;
 		}
-
-		final byte[] switchBusmon = { (byte) PEI_SWITCH, (byte) 0x90, 0x18, 0x34, 0x56, 0x78, 0x0A, };
-		conn.send(HidReport.create(activeEmi.emi, switchBusmon).get(0), true);
+		else if (activeEmi == EmiType.Emi1) {
+			new BcuSwitcher(conn, logger).enter(extBusmon ? BcuMode.ExtBusmonitor
+					: BcuMode.Busmonitor);
+		}
+		else {
+			final byte[] switchBusmon = { (byte) PEI_SWITCH, (byte) 0x90, 0x18, 0x34, 0x56, 0x78,
+				0x0A, };
+			conn.send(HidReport.create(activeEmi.emi, switchBusmon).get(0), true);
+		}
 	}
 
-	private void leaveBusmonitor() throws KNXPortClosedException, KNXTimeoutException
+	private void leaveBusmonitor() throws KNXPortClosedException, KNXTimeoutException,
+		InterruptedException
 	{
 		normalMode();
 	}
 
-	private void normalMode() throws KNXPortClosedException, KNXTimeoutException
+	private void normalMode() throws KNXPortClosedException, KNXTimeoutException,
+		InterruptedException
 	{
 		if (activeEmi == EmiType.CEmi) {
 			final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_RESET_REQ);
 			conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame.toByteArray()).get(0), true);
-			return;
 		}
-		final byte[] switchNormal = { (byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
-		conn.send(HidReport.create(activeEmi.emi, switchNormal).get(0), true);
+		else if (activeEmi == EmiType.Emi1) {
+			new BcuSwitcher(conn, logger).reset();
+		}
+		else {
+			final byte[] switchNormal = { (byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78,
+				(byte) 0x9A, };
+			conn.send(HidReport.create(activeEmi.emi, switchNormal).get(0), true);
+		}
 	}
 }
