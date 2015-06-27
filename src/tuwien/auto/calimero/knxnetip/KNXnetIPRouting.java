@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ import tuwien.auto.calimero.log.LogManager;
  * Multicast considerations:<br>
  * The multicast loopback behavior defines whether multicast datagrams are looped back to
  * the local socket, see {@link MulticastSocket#setLoopbackMode(boolean)}. By default, the
- * loopback mode of the multicast socket used for sending multicast datagrams is enabled.
+ * loopback mode of the multicast socket used for sending multicast datagrams is disabled.
  * This behavior can be changed by using a KNXnetIPRouting sub type and initializing it by
  * calling {@link #init(NetworkInterface, boolean, boolean)}.
  * <p>
@@ -84,7 +84,7 @@ import tuwien.auto.calimero.log.LogManager;
  * sending host on a different interface (than the sending one), if the host is a member
  * of the multicast group on that interface. The loopback mode setting of the sender's
  * socket has no effect on this behavior.
- * 
+ *
  * @author B. Malinowsky
  */
 public class KNXnetIPRouting extends ConnectionBase
@@ -106,7 +106,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	 * In general, routers are assigned a multicast address by adding an offset to the
 	 * system setup multicast address ({@value #DEFAULT_MULTICAST}) for each KNX
 	 * installation, by default this offset is 0 (i.e., only one used installation).
-	 * 
+	 *
 	 * @param netIf specifies the local network interface used to join the multicast group
 	 *        and send outgoing multicast data, use <code>null</code> to use the default
 	 *        interface; useful for multi-homed hosts
@@ -119,14 +119,14 @@ public class KNXnetIPRouting extends ConnectionBase
 		throws KNXException
 	{
 		this(mcGroup);
-		init(netIf, true, true);
+		init(netIf, false, true);
 	}
 
 	/**
 	 * Use this constructor in case initialization is called separately at a later point
 	 * (using {@link #init(NetworkInterface, boolean, boolean)}).
 	 * <p>
-	 * 
+	 *
 	 * @param mcGroup see {@link #KNXnetIPRouting(NetworkInterface, InetAddress)}
 	 */
 	protected KNXnetIPRouting(final InetAddress mcGroup)
@@ -143,7 +143,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	/**
 	 * Sends a cEMI frame to the joined multicast group.
 	 * <p>
-	 * 
+	 *
 	 * @param frame cEMI message to send
 	 * @param mode arbitrary value, does not influence behavior, since routing is always a
 	 *        unconfirmed, nonblocking service
@@ -174,7 +174,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	 * This value is used to limit the multicast geographically, although this is just a
 	 * rough estimation. The hop count value is forwarded to the underlying multicast
 	 * socket used for communication.
-	 * 
+	 *
 	 * @param hopCount hop count value, 0 &lt;= value &lt;= 255
 	 */
 	public final void setHopCount(final int hopCount)
@@ -194,7 +194,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	 * messages.
 	 * <p>
 	 * The hop count value is queried from the used multicast socket.
-	 * 
+	 *
 	 * @return hop count in the range 0 to 255
 	 */
 	public final int getHopCount()
@@ -211,7 +211,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	/**
 	 * Returns whether this KNXnet/IP routing instance has local loopback of KNXnet/IP
 	 * routing multicast datagrams enabled or not.
-	 * 
+	 *
 	 * @return <code>true</code> if loopback is used, <code>false</code> otherwise
 	 */
 	public final boolean usesMulticastLoopback()
@@ -229,7 +229,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	/**
 	 * Checks whether the supplied IP address is a valid KNX routing multicast address.
 	 * <p>
-	 * 
+	 *
 	 * @param address the IP address to check
 	 * @return <code>true</code> if address qualifies as KNX multicast, <code>false</code>
 	 *         otherwise
@@ -245,7 +245,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	 * and receiver loop.
 	 * <p>
 	 * Call this method only once during initialization.
-	 * 
+	 *
 	 * @param netIf see {@link #KNXnetIPRouting(NetworkInterface, InetAddress)}
 	 * @param useMulticastLoopback <code>true</code> to loopback multicast packets to the
 	 *        local socket, <code>false</code> otherwise; this parameter is only
@@ -294,7 +294,7 @@ public class KNXnetIPRouting extends ConnectionBase
 			startReceiver();
 		setState(OK);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.knxnetip.ConnectionBase#handleServiceType
 	 * (tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader, byte[], int,
