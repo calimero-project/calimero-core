@@ -72,7 +72,8 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 		@Override
 		public void frameReceived(final FrameEvent e)
 		{
-			frames.add(e.getFrame());
+			if (e.getFrame() instanceof CEMIDevMgmt)
+				frames.add(e.getFrame());
 		}
 
 		@Override
