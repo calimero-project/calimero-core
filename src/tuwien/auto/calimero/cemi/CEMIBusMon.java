@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
  * So the raw frame consists of 22 byte LPDU + 1 byte FCS.
  * <p>
  * Objects of this type are immutable.
- * 
+ *
  * @author B. Malinowsky
  */
 public class CEMIBusMon implements CEMI
@@ -95,7 +95,7 @@ public class CEMIBusMon implements CEMI
 	/**
 	 * Creates a new busmonitor message.
 	 * <p>
-	 * 
+	 *
 	 * @param status the status information field (busmonitor error flags) as specified by
 	 *        cEMI, located in the additional information type {@link #TYPEID_STATUSINFO},
 	 *        <code>0 &lt;= status &lt;= 0xFF</code>
@@ -119,7 +119,7 @@ public class CEMIBusMon implements CEMI
 	 * Creates a new busmonitor message.
 	 * <p>
 	 * Allows to specify every status flag in detail.
-	 * 
+	 *
 	 * @param frameError <code>true</code> if a frame error was detected in the message,
 	 *        <code>false</code> otherwise
 	 * @param bitError <code>true</code> if an invalid bit was detected in one or several
@@ -160,7 +160,7 @@ public class CEMIBusMon implements CEMI
 	/**
 	 * Creates a new busmonitor message from a byte stream.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte stream containing a cEMI busmonitor message
 	 * @param offset start offset of cEMI frame in <code>data</code>
 	 * @param length length in bytes of the whole bus monitor message
@@ -179,7 +179,7 @@ public class CEMIBusMon implements CEMI
 		final int ail = is.read();
 		if (ail < MIN_ADDINFO_LENGTH)
 			throw new KNXFormatException("bus monitor add.info length too short", ail);
-	
+
 		boolean statusRead = false;
 		boolean timeRead = false;
 		final int body = is.available() - ail;
@@ -197,7 +197,7 @@ public class CEMIBusMon implements CEMI
 			throw new KNXFormatException("no additional info for timestamp");
 		if (!statusRead)
 			throw new KNXFormatException("no additional info for status info");
-	
+
 		raw = new byte[is.available()];
 		is.read(raw, 0, raw.length);
 	}
@@ -206,7 +206,7 @@ public class CEMIBusMon implements CEMI
 	 * Creates a new busmonitor message using the supplied overall status and timestamp
 	 * information, and the raw frame data.
 	 * <p>
-	 * 
+	 *
 	 * @param status the status information field (busmonitor error flags) as specified by
 	 *        cEMI, located in the additional information type {@link #TYPEID_STATUSINFO},
 	 *        0 &lt;= status &lt;= 0xFF
@@ -235,7 +235,7 @@ public class CEMIBusMon implements CEMI
 	 * In the status field of the additional information block, only the sequence number
 	 * can be chosen, all other status flags remain 0 (i.e., indicating no error, no frame
 	 * loss)
-	 * 
+	 *
 	 * @param seqNumber sequence number in the status field (bits 2..0), 0 &lt;=
 	 *        <code>seqNumber</code> &lt;= 7
 	 * @param timestamp relative timestamp as specified by cEMI, it might either be a
@@ -268,7 +268,7 @@ public class CEMIBusMon implements CEMI
 	 * Returns the raw frame on medium (the data link PDU and FCS) contained in this
 	 * busmonitor indication message.
 	 * <p>
-	 * 
+	 *
 	 * @return a copy of the raw frame on medium as byte array
 	 */
 	public final byte[] getPayload()
@@ -293,7 +293,7 @@ public class CEMIBusMon implements CEMI
 	 * <p>
 	 * If <code>true</code>, an invalid bit was detected in one or several of the frame
 	 * characters.
-	 * 
+	 *
 	 * @return bit error flag as boolean
 	 */
 	public final boolean getBitError()
@@ -305,7 +305,7 @@ public class CEMIBusMon implements CEMI
 	 * Returns the frame error flag state set in the status information.
 	 * <p>
 	 * If <code>true</code>, a frame error was detected in the message.
-	 * 
+	 *
 	 * @return frame error flag as boolean
 	 */
 	public final boolean getFrameError()
@@ -317,7 +317,7 @@ public class CEMIBusMon implements CEMI
 	 * Returns the lost flag state set in the status information.
 	 * <p>
 	 * If <code>true</code>, at least one frame (piece) was lost by the Data Link Layer.
-	 * 
+	 *
 	 * @return lost flag as boolean
 	 */
 	public final boolean getLost()
@@ -329,7 +329,7 @@ public class CEMIBusMon implements CEMI
 	 * Returns the parity error flag state set in the status information.
 	 * <p>
 	 * If <code>true</code>, an invalid parity bit was detected in the frame bits.
-	 * 
+	 *
 	 * @return parity error flag as boolean
 	 */
 	public final boolean getParityError()
@@ -340,7 +340,7 @@ public class CEMIBusMon implements CEMI
 	/**
 	 * Returns the sequence number set in the status information.
 	 * <p>
-	 * 
+	 *
 	 * @return sequence in the range [0..7]
 	 */
 	public final int getSequenceNumber()
@@ -353,7 +353,7 @@ public class CEMIBusMon implements CEMI
 	 * information.
 	 * <p>
 	 * The type of timestamp returned is according to {@link #getTimestampType()}.
-	 * 
+	 *
 	 * @return the timestamp value as long
 	 */
 	public final long getTimestamp()
@@ -364,7 +364,7 @@ public class CEMIBusMon implements CEMI
 	/**
 	 * Returns the type of timestamp contained in the additional information.
 	 * <p>
-	 * 
+	 *
 	 * @return timestamp type ID
 	 */
 	public final int getTimestampType()
@@ -430,7 +430,8 @@ public class CEMIBusMon implements CEMI
 			buf.append("ext.");
 		buf.append("timestamp ");
 		buf.append(tstamp);
-		buf.append(" status 0x").append(Integer.toHexString(status));
+		buf.append(" seq ").append(getSequenceNumber());
+//		buf.append(" status 0x").append(Integer.toHexString(status));
 		if ((status & ~0x07) == 0)
 			buf.append(" (no error)");
 		else {
@@ -447,8 +448,7 @@ public class CEMIBusMon implements CEMI
 				buf.deleteCharAt(buf.length() - 1);
 			buf.append(")");
 		}
-		buf.append(" seq ").append(getSequenceNumber());
-		buf.append(" raw frame ").append(DataUnitBuilder.toHex(raw, " "));
+		buf.append(": ").append(DataUnitBuilder.toHex(raw, " "));
 		return buf.toString();
 	}
 
