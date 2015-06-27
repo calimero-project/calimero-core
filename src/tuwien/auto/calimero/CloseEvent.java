@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ import tuwien.auto.calimero.link.LinkListener;
  * <p>
  * In general, the source of the event is the connection object or network link to be
  * closed.
- * 
+ *
  * @author B. Malinowsky
  * @see LinkListener
  * @see KNXListener
@@ -71,14 +71,14 @@ public class CloseEvent extends EventObject
 	 * <p>
 	 */
 	public static final int CLIENT_REQUEST = 2;
-	
+
 	/**
 	 * Identifies the close event to originate from an internal communication event, for
 	 * example, initiated by an unsupported protocol version.
 	 * <p>
 	 */
 	public static final int INTERNAL = 3;
-	
+
 	private static final long serialVersionUID = 1L;
 
 	private final int initiator;
@@ -88,24 +88,7 @@ public class CloseEvent extends EventObject
 	/**
 	 * Creates a new close event object.
 	 * <p>
-	 * 
-	 * @param source the communication object to be closed
-	 * @param userRequest <code>true</code> if the closing was requested by the user of
-	 *        the object, <code>false</code> otherwise (for example, a close initiated by
-	 *        a remote server)
-	 * @param reason brief description of the reason leading to the close event
-	 */
-	//public CloseEvent(final Object source, final boolean userRequest, final String reason)
-	//	{
-	//		super(source);
-	//		initiator = USER_REQUEST;
-	//		msg = reason;
-	//	}
-
-	/**
-	 * Creates a new close event object.
-	 * <p>
-	 * 
+	 *
 	 * @param source the communication object to be closed
 	 * @param initiator the initiator of this close event, one of {@link #USER_REQUEST},
 	 *        {@link #SERVER_REQUEST}, and {@link #INTERNAL}
@@ -119,24 +102,12 @@ public class CloseEvent extends EventObject
 	}
 
 	/**
-	 * Returns whether the close event was initiated by the user of the communication
-	 * object.
-	 * <p>
-	 * 
-	 * @return <code>true</code> if close is user requested, <code>false</code> otherwise
-	 */
-	//public final boolean isUserRequest()
-	//{
-	//	return initiator == USER_REQUEST;
-	//}
-
-	/**
 	 * Returns the initiator of the close event, see the declared initiator constants of
 	 * this class or its sub-types.
 	 * <p>
 	 * For the base class {@link CloseEvent}, defined are {@link #USER_REQUEST},
 	 * {@link #SERVER_REQUEST}, and {@link #INTERNAL}.
-	 * 
+	 *
 	 * @return identifier stating the initiator of this close event
 	 */
 	public final int getInitiator()
@@ -147,7 +118,7 @@ public class CloseEvent extends EventObject
 	/**
 	 * Returns a brief textual description why the close event was initiated.
 	 * <p>
-	 * 
+	 *
 	 * @return close reason as string
 	 */
 	public final String getReason()
