@@ -142,6 +142,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		public void linkClosed(final CloseEvent e)
 		{
 			logger.info("attached link was closed");
+			detach();
 		}
 	}
 
