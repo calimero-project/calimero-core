@@ -133,14 +133,22 @@ public class UsbConnection implements AutoCloseable
 		}
 	};
 
-	// TODO Provide a lookup for convenience based on known vendor / product IDs. Most platforms
-	// only connect to one KNX USB interface anyway, finding that provides 95 % use-case coverage.
 	private static final int[] vendorIds = {
-		0x135e, // HAGER, JUNG, Merten, and probably some more ...
-		0x0e77, // Siemens, Weinzierl, and probably some more ...
+		0x135e, // Insta: also used in Hager, Jung, Merten, Berker, Gira
+		0x0e77, // Siemens: also used in Weinzierl, Merlin, Hensel
+		0x145c, // Busch-Jaeger
+		0x147b, // ABB stotz-kontakt
 	};
 
-	private static final int[] productIds = {};
+	private static final int[] productIds = {
+		// uses Insta
+		0x0020, 0x0021, 0x0022, 0x0023, 0x0024, 0x0025, 0x0026,
+		// uses Siemens
+		0x0102, 0x0104, 0x0111, 0x0112, 0x0121, 0x0141, 0x2001,
+		// uses BJ
+		0x1330, // BJ flush-mounted
+		// uses ABB
+		0x5120 };
 
 	// EP in/out: USB endpoint for asynchronous KNX data transfer over interrupt pipe
 	private static final byte knxEndpointOut = (byte) 0x02;
@@ -274,6 +282,13 @@ public class UsbConnection implements AutoCloseable
 		catch (final SecurityException | UsbException e) {
 			slogger.error("Enumerate USB devices, " + e);
 		}
+		slogger.info("Found KNX devices:");
+		try {
+			getKnxDevices().forEach(d -> {
+				try { printInfo(d, slogger, ""); } catch (final UsbException ignore) {}
+			});
+		}
+		catch (final SecurityException | UsbException e) {}
 	}
 
 	public static void updateDeviceList() throws SecurityException, UsbException
@@ -284,6 +299,26 @@ public class UsbConnection implements AutoCloseable
 	public static List<UsbDevice> getDevices() throws SecurityException, UsbException
 	{
 		return collect(getRootHub());
+	}
+
+	/**
+	 * Returns the list of KNX devices currently attached to the host, based on known KNX vendor
+	 * IDs.
+	 *
+	 * @return the list of found KNX devices
+	 * @throws SecurityException on error accessing javax.usb
+	 * @throws UsbException on error accessing javax.usb
+	 */
+	public static List<UsbDevice> getKnxDevices() throws SecurityException, UsbException
+	{
+		final List<UsbDevice> knx = new ArrayList<>();
+		for (final UsbDevice d : getDevices()) {
+			final int vendor = d.getUsbDeviceDescriptor().idVendor() & 0xffff;
+			for (final int v : vendorIds)
+				if (v == vendor)
+					knx.add(d);
+		}
+		return knx;
 	}
 
 	public static void printDevices() throws SecurityException, UsbException
@@ -841,7 +876,7 @@ public class UsbConnection implements AutoCloseable
 				return;
 			}
 			try {
-				list.forEach(d -> { printInfo(d, slogger); } );
+				list.forEach(d -> { printInfo(d, slogger); });
 			}
 			finally {
 				LibUsb.freeDeviceList(list, true);
