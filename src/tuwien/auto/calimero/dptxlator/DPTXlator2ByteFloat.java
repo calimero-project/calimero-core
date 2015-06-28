@@ -175,7 +175,7 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	 * DPT ID 9.028, Wind speed in km/h; values from <b>0</b> to <b>670760.96</b> km/h, resolution
 	 * 0.01.
 	 */
-	public static final DPT DPT_WIND_SPEED_KMH = new DPT("9.028", "Wind speed ", "0", "670760.96",
+	public static final DPT DPT_WIND_SPEED_KMH = new DPT("9.028", "Wind speed", "0", "670760.96",
 			"km/h");
 
 	private static final Map<String, DPT> types;
