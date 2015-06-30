@@ -59,9 +59,8 @@ public class DPTXlator2ByteFloatTest extends TestCase
 	private final String value2 = "100.0";
 
 	private final String[] strings = { min, max, zero, "736.0", value2 };
-	private final double[] floats =
-		{ Double.parseDouble(min), Double.parseDouble(max), Double.parseDouble(zero),
-			Double.parseDouble(value1), Double.parseDouble(value2), };
+	private final double[] floats = { Double.parseDouble(min), Double.parseDouble(max),
+		Double.parseDouble(zero), Double.parseDouble(value1), Double.parseDouble(value2), };
 
 	private final byte[] dataMin = { (byte) 0xf8, 0, };
 	private final byte[] dataMax = { 0x7f, -1 };
@@ -114,8 +113,7 @@ public class DPTXlator2ByteFloatTest extends TestCase
 
 	/**
 	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#setValues
-	 * (java.lang.String[])}.
+	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#setValues (java.lang.String[])}.
 	 *
 	 * @throws KNXFormatException
 	 */
@@ -132,8 +130,7 @@ public class DPTXlator2ByteFloatTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#getAllValues()}.
+	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#getAllValues()}.
 	 *
 	 * @throws KNXFormatException
 	 */
@@ -151,8 +148,7 @@ public class DPTXlator2ByteFloatTest extends TestCase
 
 	/**
 	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#setValue
-	 * (java.lang.String)}.
+	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#setValue (java.lang.String)}.
 	 *
 	 * @throws KNXFormatException
 	 */
@@ -186,8 +182,7 @@ public class DPTXlator2ByteFloatTest extends TestCase
 		assertEquals(data[0], dataValue2[2]);
 		assertEquals(data[1], dataValue2[3]);
 
-		final byte[] array =
-			{ 0, dataMax[0], dataMax[1], dataValue1[0], dataValue1[1], 0 };
+		final byte[] array = { 0, dataMax[0], dataMax[1], dataValue1[0], dataValue1[1], 0 };
 		t.setData(array, 1);
 		data = t.getData();
 		assertEquals(4, data.length);
@@ -209,11 +204,16 @@ public class DPTXlator2ByteFloatTest extends TestCase
 		assertEquals(5, data.length);
 		assertTrue(Arrays.equals(dataValue2, data));
 
-		assertEquals(0, t.getData(new byte[1], 0)[0]);
+		try {
+			// usable range too short
+			t.getData(new byte[2], 1);
+			fail("usable range too short");
+		}
+		catch (final KNXIllegalArgumentException expected) {}
+		assertTrue(Arrays.equals(dataValue2, t.getData(new byte[5], 2)));
 		assertNotNull(t.getData(new byte[0], 0));
 
-		final byte[] array =
-			{ 0, dataValue1[0], dataValue1[1], dataMin[0], dataMin[1], 0 };
+		final byte[] array = { 0, dataValue1[0], dataValue1[1], dataMin[0], dataMin[1], 0 };
 		t.setData(array, 1);
 		assertTrue(Arrays.equals(array, t.getData(new byte[6], 1)));
 
@@ -222,8 +222,7 @@ public class DPTXlator2ByteFloatTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#getSubTypes()}.
+	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#getSubTypes()}.
 	 */
 	public final void testGetSubTypes()
 	{
@@ -236,8 +235,7 @@ public class DPTXlator2ByteFloatTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#DPTXlator2ByteFloat
+	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#DPTXlator2ByteFloat
 	 * (tuwien.auto.calimero.dptxlator.DPT)}.
 	 *
 	 * @throws KNXFormatException
@@ -248,10 +246,10 @@ public class DPTXlator2ByteFloatTest extends TestCase
 		Helper.checkDPTs(dpts, false);
 
 		for (int i = 0; i < dpts.length; i++) {
-			setValueFloatFail(new DPTXlator2ByteFloat(dpts[i]), Double.parseDouble(dpts[i]
-				.getLowerValue()) - 0.1d);
-			setValueFloatFail(new DPTXlator2ByteFloat(dpts[i]), Double.parseDouble(dpts[i]
-				.getUpperValue()) + 0.1d);
+			setValueFloatFail(new DPTXlator2ByteFloat(dpts[i]),
+					Double.parseDouble(dpts[i].getLowerValue()) - 0.1d);
+			setValueFloatFail(new DPTXlator2ByteFloat(dpts[i]),
+					Double.parseDouble(dpts[i].getUpperValue()) + 0.1d);
 		}
 
 		final DPT dpt = new DPT("0.00", "invalid", "invalid", "invalid", "invalid");
@@ -275,8 +273,7 @@ public class DPTXlator2ByteFloatTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#getNumericValue()}.
+	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#getNumericValue()}.
 	 *
 	 * @throws KNXFormatException
 	 */
@@ -302,8 +299,7 @@ public class DPTXlator2ByteFloatTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#setValue(double)}.
+	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#setValue(double)}.
 	 *
 	 * @throws KNXFormatException
 	 */

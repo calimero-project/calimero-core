@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,39 +43,37 @@ package tuwien.auto.calimero.link.medium;
  * medium, built up and consisting of medium specific parts within the frame.
  * <p>
  * Subtypes should offer decoding of message parts up to OSI Layer 4 (TPDU) if possible.
- * 
+ *
  * @author B. Malinowsky
  */
 public interface RawFrame
 {
-	// NYI TP0 communication medium frame format
 	// NYI RF communication medium frame format
 
 	/**
 	 * Indicates a L-data frame type.
-	 * 
+	 *
 	 * @see #getFrameType()
 	 */
 	int LDATA_FRAME = 0;
 
 	/**
 	 * Indicates a L-poll-data frame type.
-	 * 
+	 *
 	 * @see #getFrameType()
 	 */
 	int LPOLLDATA_FRAME = 1;
 
 	/**
 	 * Indicates an L-ack frame type.
-	 * 
+	 *
 	 * @see #getFrameType()
 	 */
 	int ACK_FRAME = 2;
 
 	/**
 	 * Returns the type of this frame.
-	 * <p>
-	 * 
+	 *
 	 * @return unsigned frame type identifier
 	 */
 	int getFrameType();

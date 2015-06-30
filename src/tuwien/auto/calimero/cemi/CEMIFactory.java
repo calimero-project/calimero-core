@@ -44,6 +44,7 @@ import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.cemi.CEMILDataEx.AddInfo;
 
@@ -252,6 +253,42 @@ public final class CEMIFactory
 		final byte[] tpdu = DataUnitBuilder.copyOfRange(frame, 7, len + 7);
 		return c ? new CEMILData(mc, new IndividualAddress(0), a, tpdu, p, c) : new CEMILData(mc,
 				new IndividualAddress(0), a, tpdu, p, true, true, ack, hops);
+	}
+
+	/**
+	 * Returns an EMI-formatted message of the supplied cEMI L-Data message.
+	 *
+	 * @param msg a cEMI L-Data message
+	 * @return byte array containing the link layer message in EMI format
+	 * @throws KNXIllegalArgumentException on unsupported ASDU length
+	 */
+	public static byte[] toEmi(final CEMILData msg)
+	{
+		// TP1, standard frames only
+		final byte[] nsdu = msg.getPayload();
+		if (nsdu.length > 16)
+			throw new KNXIllegalArgumentException("maximum TPDU length is 16 in standard frame");
+		final byte[] buf = new byte[nsdu.length + 7];
+		buf[0] = (byte) msg.getMessageCode();
+
+		buf[1] = (byte) (msg.getPriority().value << 2);
+		final int ctrl = (msg.isRepetition() ? 0x20 : 0) | (msg.isAckRequested() ? 0x02 : 0)
+				| (msg.isPositiveConfirmation() ? 0 : 0x01);
+		buf[1] |= (byte) ctrl;
+
+		// on dst null, default address 0 is used (null indicates system broadcast in link API)
+		final KNXAddress dst = msg.getDestination();
+		final int d = dst != null ? dst.getRawAddress() : 0;
+		buf[4] = (byte) (d >> 8);
+		buf[5] = (byte) d;
+
+		final int hopCount = msg.getHopCount();
+		buf[6] = (byte) (hopCount << 4 | (nsdu.length - 1));
+		if (dst instanceof GroupAddress)
+			buf[6] |= 0x80;
+		for (int i = 0; i < nsdu.length; ++i)
+			buf[7 + i] = nsdu[i];
+		return buf;
 	}
 
 	/**

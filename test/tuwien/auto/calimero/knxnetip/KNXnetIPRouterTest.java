@@ -153,8 +153,9 @@ public class KNXnetIPRouterTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.knxnetip.KNXnetIPRouting#send(tuwien.auto.calimero.cemi.CEMI, tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
+	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPRouting#send
+	 * (tuwien.auto.calimero.cemi.CEMI,
+	 * tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
 	 *
 	 * @throws KNXException
 	 */
@@ -198,7 +199,7 @@ public class KNXnetIPRouterTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPRouting#KNXnetIPRouter
+	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPRouting#KNXnetIPRouting
 	 * (java.net.NetworkInterface, java.net.InetAddress)}.
 	 *
 	 * @throws KNXException

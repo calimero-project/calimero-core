@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2015 B. Malinowsky
+    Copyright (c) 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,32 +49,34 @@ import tuwien.auto.calimero.Util;
 /**
  * @author B. Malinowsky
  */
-public class DPTXlator4ByteSignedTest extends TestCase
+public class DPTXlator64BitSignedTest extends TestCase
 {
-	private DPTXlator4ByteSigned t;
+	private DPTXlator64BitSigned t;
 
-	private final String min = "-2147483648";
-	private final String max = "2147483647";
+	private final String min = "-9223372036854775808";
+	private final String max = "9223372036854775807";
 	private final String value1 = "412";
 	private final String value2 = "1294961111";
 
-	private final byte[] dataMin = { 0, 0, 0, 0 };
-	private final byte[] dataMax = { (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff };
-	private final byte[] dataValue1 = { 0, 0, 1, (byte) 0x9c };
+	private final byte[] dataMin = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	private final byte[] dataMax = { (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff,
+		(byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff };
+	private final byte[] dataValue1 = { 0, 0, 0, 0, 0, 0, 1, (byte) 0x9c };
 	// offset = 2, 3 empty bytes at end
-	private final byte[] dataValue2 = { 0, 0, (byte) 0x4D, (byte) 0x2F, (byte) 0x89, (byte) 0xD7,
-		0, 0, 0 };
+	private final byte[] dataValue2 = { 0, 0, 0, 0, 0, 0, (byte) 0x4D, (byte) 0x2F, (byte) 0x89,
+		(byte) 0xD7, 0, 0, 0 };
 
 	private final String[] strings = { max, min, value1, value2, };
-	private final int[] ints = { 2147483647, -2147483648, 412, 1294961111, };
-	private final byte[] data = { (byte) 0x7F, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0x80,
-		(byte) 0x00, (byte) 0x00, (byte) 0x00, 0, 0, 1, (byte) 0x9c, (byte) 0x4D, (byte) 0x2F,
-		(byte) 0x89, (byte) 0xD7 };
+	private final long[] longs = { 9223372036854775807L, -9223372036854775808L, 412, 1294961111, };
+	private final byte[] data = { (byte) 0x7F, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+		(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0x80, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+		(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, 0, 0, 0, 0, 0, 0, 1, (byte) 0x9c, 0, 0,
+		0, 0, (byte) 0x4D, (byte) 0x2F, (byte) 0x89, (byte) 0xD7 };
 
 	/**
 	 * @param name
 	 */
-	public DPTXlator4ByteSignedTest(final String name)
+	public DPTXlator64BitSignedTest(final String name)
 	{
 		super(name);
 	}
@@ -82,21 +84,19 @@ public class DPTXlator4ByteSignedTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
 		Util.setupLogging("DPTXlator");
-		t = new DPTXlator4ByteSigned(DPTXlator4ByteSigned.DPT_COUNT);
+		TranslatorTypes.createTranslator(0, "29.011");
+		t = new DPTXlator64BitSigned(DPTXlator64BitSigned.DPT_ACTIVE_ENERGY);
 	}
 
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@Override
 	protected void tearDown() throws Exception
 	{
-		Thread.sleep(100);
 		Util.tearDownLogging();
 		super.tearDown();
 	}
@@ -112,7 +112,7 @@ public class DPTXlator4ByteSignedTest extends TestCase
 		Helper.assertSimilar("0", t.getAllValues()[0]);
 
 		t.setData(data);
-		assertEquals(data.length / 4, t.getItems());
+		assertEquals(data.length / 8, t.getItems());
 		assertEquals(t.getItems(), t.getItems());
 		Helper.assertSimilar(strings, t.getAllValues());
 		// value = 0xCCCCCCCC
@@ -169,6 +169,21 @@ public class DPTXlator4ByteSignedTest extends TestCase
 		t.setValue(s);
 		Helper.assertSimilar(value1, t.getValue());
 		assertEquals(s, t.getValue());
+
+		final long l = 0x1234567890L;
+		t.setValue(l);
+		Helper.assertSimilar(Long.toString(l), t.getValue());
+		s = t.getValue();
+		t.setValue(s);
+		Helper.assertSimilar(Long.toString(l), t.getValue());
+		assertEquals(s, t.getValue());
+
+		t.setValue(-1);
+		Helper.assertSimilar("-1", t.getValue());
+		s = t.getValue();
+		t.setValue(s);
+		Helper.assertSimilar("-1", t.getValue());
+		assertEquals(s, t.getValue());
 	}
 
 	/**
@@ -181,7 +196,7 @@ public class DPTXlator4ByteSignedTest extends TestCase
 		Helper.assertSimilar("0", t.getValue());
 		t.setValues(new String[0]);
 		Helper.assertSimilar("0", t.getValue());
-		t.setValue(ints[0]);
+		t.setValue(longs[0]);
 		Helper.assertSimilar(strings[0], t.getValue());
 		t.setData(dataValue2, 2);
 		Helper.assertSimilar(value2, t.getValue());
@@ -207,7 +222,7 @@ public class DPTXlator4ByteSignedTest extends TestCase
 
 		t.setData(dataValue2, 2);
 		byte[] d = t.getData();
-		assertEquals(4, d.length);
+		assertEquals(8, d.length);
 		for (int i = 0; i < d.length; i++) {
 			assertEquals(d[i], dataValue2[i + 2]);
 		}
@@ -228,17 +243,18 @@ public class DPTXlator4ByteSignedTest extends TestCase
 	 */
 	public void testGetDataByteArrayInt() throws KNXFormatException
 	{
-		byte[] d = new byte[5];
+		byte[] d = new byte[9];
 		Arrays.fill(d, (byte) 0xAA);
-		assertEquals(5, t.getData(d, 1).length);
+		assertEquals(9, t.getData(d, 1).length);
 		try {
-			// usable range is too short
-			t.getData(new byte[4], 1);
+			// usable range too short
+			t.getData(new byte[8], 1);
 			fail("usable range too short");
 		}
 		catch (final KNXIllegalArgumentException expected) {}
-		final byte[] empty = new byte[5];
-		assertTrue(Arrays.equals(empty, t.getData(new byte[5], 1)));
+
+		final byte[] empty = new byte[9];
+		assertTrue(Arrays.equals(empty, t.getData(new byte[9], 1)));
 
 		t.setData(data);
 		d = t.getData(new byte[25], 6);
@@ -249,11 +265,11 @@ public class DPTXlator4ByteSignedTest extends TestCase
 		for (int i = 22; i < 25; i++)
 			assertEquals(0, d[i]);
 
-		for (int i = 0; i < ints.length; i++) {
-			t.setValue(ints[i]);
-			d = t.getData(new byte[4 + i], i);
+		for (int i = 0; i < longs.length; i++) {
+			t.setValue(longs[i]);
+			d = t.getData(new byte[8 + i], i);
 			for (int j = 0; j < 4; j++) {
-				assertEquals(data[4 * i + j], d[i + j]);
+				assertEquals(data[8 * i + j], d[i + j]);
 			}
 		}
 	}
@@ -263,9 +279,9 @@ public class DPTXlator4ByteSignedTest extends TestCase
 	 */
 	public void testGetSubTypes()
 	{
-		assertEquals(9, t.getSubTypes().size());
+		assertEquals(3, t.getSubTypes().size());
 		final Map<String, DPT> types = t.getSubTypes();
-		System.out.println("\n4 Byte Signed DPTs:");
+		System.out.println("\n64 Bit Signed DPTs:");
 		final Collection<DPT> c = types.values();
 		for (final Iterator<DPT> i = c.iterator(); i.hasNext();) {
 			final DPT dpt = i.next();
@@ -282,16 +298,16 @@ public class DPTXlator4ByteSignedTest extends TestCase
 	{
 		assertEquals(0, t.getValueSigned());
 
-		for (int i = 0; i < ints.length - 1; i++) {
-			t.setData(data, 4 * i);
-			assertEquals(ints[i], t.getValueSigned());
+		for (int i = 0; i < longs.length - 1; i++) {
+			t.setData(data, 8 * i);
+			assertEquals(longs[i], t.getValueSigned());
 		}
 		t.setData(dataValue2, 2);
-		assertEquals(ints[3], t.getValueSigned());
+		assertEquals(longs[3], t.getValueSigned());
 
 		for (int i = 0; i < strings.length; i++) {
 			t.setValue(strings[i]);
-			assertEquals(ints[i], t.getValueSigned());
+			assertEquals(longs[i], t.getValueSigned());
 		}
 	}
 
@@ -302,9 +318,9 @@ public class DPTXlator4ByteSignedTest extends TestCase
 	 */
 	public void testSetValueInt() throws KNXFormatException
 	{
-		for (int i = 0; i < ints.length; i++) {
-			t.setValue(ints[i]);
-			assertEquals(ints[i], t.getValueSigned());
+		for (int i = 0; i < longs.length; i++) {
+			t.setValue(longs[i]);
+			assertEquals(longs[i], t.getValueSigned());
 			Helper.assertSimilar(strings[i], t.getValue());
 		}
 	}

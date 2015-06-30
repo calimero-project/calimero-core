@@ -270,31 +270,32 @@ public abstract class DPTXlator
 	}
 
 	/**
-	 * Copies KNX DPT value items stored by this translator into <code>dst</code>,
-	 * starting at <code>offset</code>.
+	 * Copies KNX DPT value items stored by this translator into <code>dst</code>, starting at
+	 * <code>offset</code>.
 	 * <p>
-	 * The number of items copied depends on the usable <code>dst</code> range, i.e., how
-	 * much items completely fit into <code>dst.length - offset</code>. If the usable
-	 * range is too short, no item is copied at all, and <code>dst</code> is not
-	 * modified.<br>
-	 * Datapoint types shorter than 1 bytes only change the affected lower bit positions,
-	 * leaving the upper (high) bits of <code>dst</code> bytes untouched.
+	 * The number of items copied depends on the usable <code>dst</code> range, i.e., how many items
+	 * completely fit into <code>dst.length - offset</code>. If the usable range is too short, no
+	 * item is copied at all, and <code>dst</code> is not modified.<br>
+	 * Datapoint types shorter than 1 bytes only change the affected lower bit positions, leaving
+	 * the upper (high) bits of <code>dst</code> bytes untouched.
 	 *
 	 * @param dst byte array for storing DPT values
-	 * @param offset offset into <code>dst</code> from where to start, 0 &lt;= offset
-	 *        &lt; <code>dst.length</code>
+	 * @param offset offset into <code>dst</code> from where to start, 0 &lt;= offset &lt;
+	 *        <code>dst.length</code>
 	 * @return <code>dst</code>
+	 * @throws KNXIllegalArgumentException if the usable destination range of <code>dst</code> is
+	 *         not sufficient to hold at least 1 item
 	 */
 	public byte[] getData(final byte[] dst, final int offset)
 	{
 		final int min = Math.min(data.length, dst.length - offset);
 		// align to multiples of typeSize
 		final int end = typeSize > 0 ? min / typeSize * typeSize : min;
-		// log a warning if the destination range turned 0 due to type alignment
-		if (min > 0 && end == 0)
-			logger.warn(dpt.getID() + " insufficient space in destination range (" + min + " < "
-					+ typeSize + ")");
-
+		if (min > 0 && end == 0) {
+			throw new KNXIllegalArgumentException("insufficient space in destination range "
+					+ "for DPT " + dpt.getID() + " (data length " + min + " < "
+					+ Math.max(1, getTypeSize()) + ")");
+		}
 		for (int i = 0; i < end; ++i)
 			dst[offset + i] = (byte) data[i];
 		return dst;

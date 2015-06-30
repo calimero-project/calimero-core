@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2013 B. Malinowsky
+    Copyright (c) 2013, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -76,11 +76,10 @@ public class KNXMediumSettingsTest extends TestCase
 	 */
 	public void testCreate()
 	{
-		testCreate(KNXMediumSettings.MEDIUM_TP0, TPSettings.class);
 		testCreate(KNXMediumSettings.MEDIUM_TP1, TPSettings.class);
 		testCreate(KNXMediumSettings.MEDIUM_PL110, PLSettings.class);
-		testCreate(KNXMediumSettings.MEDIUM_PL132, PLSettings.class);
 		testCreate(KNXMediumSettings.MEDIUM_RF, RFSettings.class);
+		testCreate(KNXMediumSettings.MEDIUM_KNXIP, KnxIPSettings.class);
 
 		try {
 			testCreate(0, RFSettings.class);
@@ -111,15 +110,19 @@ public class KNXMediumSettingsTest extends TestCase
 	 */
 	public void testGetMediumString()
 	{
-		assertEquals(KNXMediumSettings.MEDIUM_TP0, KNXMediumSettings.getMedium("tp0"));
 		assertEquals(KNXMediumSettings.MEDIUM_TP1, KNXMediumSettings.getMedium("TP1"));
-		assertEquals(KNXMediumSettings.MEDIUM_PL132, KNXMediumSettings.getMedium("p132"));
 		assertEquals(KNXMediumSettings.MEDIUM_PL110, KNXMediumSettings.getMedium("p110"));
-		assertEquals(KNXMediumSettings.MEDIUM_PL132, KNXMediumSettings.getMedium("pL132"));
 		assertEquals(KNXMediumSettings.MEDIUM_PL110, KNXMediumSettings.getMedium("PL110"));
 		assertEquals(KNXMediumSettings.MEDIUM_RF, KNXMediumSettings.getMedium("Rf"));
+		assertEquals(KNXMediumSettings.MEDIUM_KNXIP, KNXMediumSettings.getMedium("knxip"));
+		assertEquals(KNXMediumSettings.MEDIUM_KNXIP, KNXMediumSettings.getMedium("knx ip"));
 		try {
 			KNXMediumSettings.getMedium("Re");
+			fail("unknown medium type name");
+		}
+		catch (final KNXIllegalArgumentException e) {}
+		try {
+			KNXMediumSettings.getMedium("KNX  IP");
 			fail("unknown medium type name");
 		}
 		catch (final KNXIllegalArgumentException e) {}

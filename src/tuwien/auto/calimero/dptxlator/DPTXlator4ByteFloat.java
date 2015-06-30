@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2014 B. Malinowsky
+    Copyright (c) 2009, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -461,11 +461,10 @@ public class DPTXlator4ByteFloat extends DPTXlator
 			"3.40282347e+38f", "W");
 
 	/**
-	 * DPT ID 14.057, Power factor; values from <b>-3.40282347e+38f</b> to <b>3.40282347e+38f</b> cos
-	 * Φ.
+	 * DPT ID 14.057, Power factor; values from <b>-3.40282347e+38f</b> to <b>3.40282347e+38f</b>.
 	 */
 	public static final DPT DPT_POWER_FACTOR = new DPT("14.057", "Power factor", "-3.40282347e+38f",
-			"3.40282347e+38f", "cos Φ");
+			"3.40282347e+38f");
 
 	/**
 	 * DPT ID 14.058, Pressure; values from <b>-3.40282347e+38f</b> to <b>3.40282347e+38f</b> Pa = N

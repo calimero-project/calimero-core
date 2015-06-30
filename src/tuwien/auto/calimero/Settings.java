@@ -92,7 +92,7 @@ public final class Settings
 			return library + " version " + version;
 		final StringBuffer buf = new StringBuffer();
 		buf.append(library).append(" - ").append(desc).append(sep);
-		buf.append("version ").append(version).append(sep);
+		buf.append("Version ").append(version).append(sep);
 		buf.append(group).append(", ");
 		buf.append(tuwien).append(sep);
 		buf.append(copyright);

@@ -335,6 +335,13 @@ public interface PropertyAccess
 		// PDT,DPT: PDT_UNSIGNED_INT
 		public static final int IO_LIST = 71;
 
+		/**
+		 * Device object property "Device Descriptor Type 0".
+		 */
+		// PDT,DPT: PDT_GENERIC_02
+		public static final int DEVICE_DESCRIPTOR = 83;
+
+
 		//
 		// properties of object type 6, Router object
 		//
@@ -501,9 +508,7 @@ public interface PropertyAccess
 		/**
 		 * Object type 11 property "KNXnet/IP Device Capabilities".
 		 * <p>
-		 * KNXnet/IP protocols supported by the KNXnet/IP device.<br>
-		 * Compatibility note: the identifier is synonymous to "EIBnet/IP Device
-		 * Capabilities" in the KNX specification.
+		 * KNXnet/IP protocols supported by the KNXnet/IP device.
 		 */
 		// PDT,DPT: PDT_BITSET_16
 		public static final int KNXNETIP_DEVICE_CAPABILITIES = 68;
@@ -511,10 +516,7 @@ public interface PropertyAccess
 		/**
 		 * Object type 11 property "KNXnet/IP Device State".
 		 * <p>
-		 * Various KNXnet/IP device status info, like KNX or IP network connection
-		 * failure.<br>
-		 * Compatibility note: the identifier is synonymous to "EIBnet/IP Device State" in
-		 * the KNX specification.
+		 * Various KNXnet/IP device status info, like KNX or IP network connection failure.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_CHAR
 		public static final int KNXNETIP_DEVICE_STATE = 69;
@@ -522,9 +524,7 @@ public interface PropertyAccess
 		/**
 		 * Object type 11 property "KNXnet/IP Routing Capabilities".
 		 * <p>
-		 * Supported features by the KNXnet/IP Router.<br>
-		 * Compatibility note: the identifier is synonymous to "EIBnet/IP Routing
-		 * Capabilities" in the KNX specification.
+		 * Supported features by the KNXnet/IP Router.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_CHAR
 		public static final int KNXNETIP_ROUTING_CAPABILITIES = 70;

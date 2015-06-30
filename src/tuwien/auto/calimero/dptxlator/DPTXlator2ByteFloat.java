@@ -81,11 +81,8 @@ public class DPTXlator2ByteFloat extends DPTXlator
 		new DPT("9.003", "Temperature gradient", "-670760", "+670760", "K/h");
 
 	/**
-	 * DPT ID 9.004, Intensity of light (Lux); values from <b>0</b> to <b>+670760</b>
-	 * lx.
-	 * <p>
-	 * Note: the unit of measure symbol used here is "lx", and not "Lux" as originally
-	 * proposed for this DPT.
+	 * DPT ID 9.004, Intensity of light (Lux); values from <b>0</b> to <b>+670760</b> lx. Note, the
+	 * unit of measure symbol used here is "lx", and not "Lux" as originally proposed for this DPT.
 	 */
 	public static final DPT DPT_INTENSITY_OF_LIGHT =
 		new DPT("9.004", "Light intensity", "0", "+670760", "lx");
@@ -98,8 +95,8 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	/**
 	 * DPT ID 9.006, Air pressure; values from <b>0</b> to <b>+670760</b> Pa.
 	 */
-	public static final DPT DPT_AIR_PRESSURE =
-		new DPT("9.006", "Air pressure", "0", "+670760", "Pa");
+	public static final DPT DPT_AIR_PRESSURE = new DPT("9.006", "Air pressure", "0", "+670760",
+			"Pa");
 
 	/**
 	 * DPT ID 9.007, Humidity; values from <b>0</b> to <b>+670760</b> %.
@@ -110,6 +107,12 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	 * DPT ID 9.008, Air quality; values from <b>0</b> to <b>+670760</b> ppm.
 	 */
 	public static final DPT DPT_AIRQUALITY = new DPT("9.008", "Air quality", "0", "+670760", "ppm");
+
+	/**
+	 * DPT ID 9.009, Air flow; value range <b>+/-670760</b> m&sup3;/h; resolution 0.01 m&sup3;/h.
+	 */
+	public static final DPT DPT_AIR_FLOW = new DPT("9.009", "Air flow", "-670760", "+670760",
+			"m\u00b3/h");
 
 	/**
 	 * DPT ID 9.010, Time difference in seconds; value range <b>+/-670760</b> s.

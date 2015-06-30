@@ -137,6 +137,15 @@ public class DPTXlatorRGB extends DPTXlator {
 		return types;
 	}
 
+	/**
+	 * @return the subtypes of the RGB translator type
+	 * @see DPTXlator#getSubTypesStatic()
+	 */
+	protected static Map<String, DPT> getSubTypesStatic()
+	{
+		return types;
+	}
+
 	private String fromDPT(final int index)
 	{
 		final int i = index * 3;

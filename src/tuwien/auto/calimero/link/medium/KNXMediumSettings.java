@@ -99,7 +99,7 @@ public abstract class KNXMediumSettings
 	 * @return the initialized medium-specific settings
 	 * @throws KNXIllegalArgumentException on unknown medium code
 	 */
-	/*public*/static KNXMediumSettings create(final int medium, final IndividualAddress device)
+	public static KNXMediumSettings create(final int medium, final IndividualAddress device)
 	{
 		switch (medium) {
 		case MEDIUM_TP0:
@@ -113,7 +113,7 @@ public abstract class KNXMediumSettings
 		case MEDIUM_RF:
 			return new RFSettings(device);
 		case MEDIUM_KNXIP:
-			return null; // XXX
+			return new KnxIPSettings(device);
 		}
 		throw new KNXIllegalArgumentException("unknown medium type " + medium);
 	}
