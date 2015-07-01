@@ -122,22 +122,7 @@ public class GroupAddress extends KNXAddress
 	 */
 	public GroupAddress(final String address) throws KNXFormatException
 	{
-		final String[] tokens = parse(address);
-		try {
-			if (tokens.length == 1)
-				init(Integer.decode(tokens[0]));
-			else if (tokens.length == 2)
-				init(Byte.parseByte(tokens[0]), Short.parseShort(tokens[1]));
-			else if (tokens.length == 3)
-				init(Byte.parseByte(tokens[0]), Byte.parseByte(tokens[1]),
-						Short.parseShort(tokens[2]));
-		}
-		catch (final NumberFormatException e) {
-			throw new KNXFormatException("invalid group address", address);
-		}
-		catch (final KNXIllegalArgumentException e) {
-			throw new KNXFormatException(e.getMessage());
-		}
+		init(address);
 	}
 
 	/**
@@ -279,6 +264,27 @@ public class GroupAddress extends KNXAddress
 	public int hashCode()
 	{
 		return address;
+	}
+
+	@Override
+	void init(final String address) throws KNXFormatException
+	{
+		final String[] tokens = parse(address);
+		try {
+			if (tokens.length == 1)
+				init(Integer.decode(tokens[0]));
+			else if (tokens.length == 2)
+				init(Byte.parseByte(tokens[0]), Short.parseShort(tokens[1]));
+			else if (tokens.length == 3)
+				init(Byte.parseByte(tokens[0]), Byte.parseByte(tokens[1]),
+						Short.parseShort(tokens[2]));
+		}
+		catch (final NumberFormatException e) {
+			throw new KNXFormatException("invalid group address", address);
+		}
+		catch (final KNXIllegalArgumentException e) {
+			throw new KNXFormatException(e.getMessage());
+		}
 	}
 
 	private void init(final int main, final int middle, final int sub)

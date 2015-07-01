@@ -106,12 +106,11 @@ public abstract class KNXAddress
 			throw new KNXMLException("XML element represents no KNX " + getType() + " address", r);
 		r.complete(e);
 		try {
-			address = Integer.parseInt(e.getCharacterData());
-			if (address >= 0 && address <= 0xffff)
-				return;
+			init(e.getCharacterData());
 		}
-		catch (final NumberFormatException nfe) {}
-		throw new KNXMLException("malformed KNX address value", r);
+		catch (final KNXFormatException kfe) {
+			throw new KNXMLException("malformed KNX address value, " + kfe.getMessage(), r);
+		}
 	}
 
 	/**
@@ -231,6 +230,8 @@ public abstract class KNXAddress
 			throw new KNXFormatException("wrong KNX address syntax with " + count + " levels",
 					address);
 	}
+
+	abstract void init(final String address) throws KNXFormatException;
 
 	void init(final int address)
 	{
