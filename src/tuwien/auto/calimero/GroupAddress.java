@@ -66,7 +66,7 @@ public class GroupAddress extends KNXAddress
 	 * Creates a KNX group address from a 16 Bit address value.
 	 * <p>
 	 *
-	 * @param address the address value in the range 0 <= value <= 0xFFFF
+	 * @param address the address value in the range 0 &le; value &le; 0xFFFF
 	 */
 	public GroupAddress(final int address)
 	{
@@ -77,9 +77,9 @@ public class GroupAddress extends KNXAddress
 	 * Creates a KNX group address from the 3-level notation main-, middle- and sub-group.
 	 * <p>
 	 *
-	 * @param mainGroup main group value, in the range 0 <= value <= 0x1F
-	 * @param middleGroup middle group value, in the range 0 <= value <= 0x7
-	 * @param subGroup sub group value, in the range 0 <= value <= 0xFF
+	 * @param mainGroup main group value, in the range 0 &le; value &le; 0x1F
+	 * @param middleGroup middle group value, in the range 0 &le; value &le; 0x7
+	 * @param subGroup sub group value, in the range 0 &le; value &le; 0xFF
 	 */
 	public GroupAddress(final int mainGroup, final int middleGroup, final int subGroup)
 	{
@@ -90,8 +90,8 @@ public class GroupAddress extends KNXAddress
 	 * Creates a KNX group address from the 2-level notation main- and sub-group.
 	 * <p>
 	 *
-	 * @param mainGroup main group value, in the range 0 <= value <= 0x1F
-	 * @param subGroup sub group value, in the range 0 <= value <= 0x7FF
+	 * @param mainGroup main group value, in the range 0 &le; value &le; 0x1F
+	 * @param subGroup sub group value, in the range 0 &le; value &le; 0x7FF
 	 */
 	public GroupAddress(final int mainGroup, final int subGroup)
 	{
@@ -104,7 +104,7 @@ public class GroupAddress extends KNXAddress
 	 * The address is read out of the first 2 byte fields, while the address array itself
 	 * might be longer. The content of <code>address</code> is not modified.
 	 *
-	 * @param address the address byte array in big-endian format, with address.length > 1
+	 * @param address the address byte array in big-endian format, with address.length &gt; 1
 	 */
 	public GroupAddress(final byte[] address)
 	{
@@ -124,22 +124,7 @@ public class GroupAddress extends KNXAddress
 	 */
 	public GroupAddress(final String address) throws KNXFormatException
 	{
-		final String[] tokens = parse(address);
-		try {
-			if (tokens.length == 1)
-				init(Integer.decode(tokens[0]).intValue());
-			else if (tokens.length == 2)
-				init(Byte.parseByte(tokens[0]), Short.parseShort(tokens[1]));
-			else if (tokens.length == 3)
-				init(Byte.parseByte(tokens[0]), Byte.parseByte(tokens[1]),
-						Short.parseShort(tokens[2]));
-		}
-		catch (final NumberFormatException e) {
-			throw new KNXFormatException("invalid group address", address);
-		}
-		catch (final KNXIllegalArgumentException e) {
-			throw new KNXFormatException(e.getMessage());
-		}
+		init(address);
 	}
 
 	/**
@@ -277,6 +262,26 @@ public class GroupAddress extends KNXAddress
 	public int hashCode()
 	{
 		return address;
+	}
+
+	void init(final String address) throws KNXFormatException
+	{
+		final String[] tokens = parse(address);
+		try {
+			if (tokens.length == 1)
+				init(Integer.decode(tokens[0]).intValue());
+			else if (tokens.length == 2)
+				init(Byte.parseByte(tokens[0]), Short.parseShort(tokens[1]));
+			else if (tokens.length == 3)
+				init(Byte.parseByte(tokens[0]), Byte.parseByte(tokens[1]),
+						Short.parseShort(tokens[2]));
+		}
+		catch (final NumberFormatException e) {
+			throw new KNXFormatException("invalid group address", address);
+		}
+		catch (final KNXIllegalArgumentException e) {
+			throw new KNXFormatException(e.getMessage());
+		}
 	}
 
 	private void init(final int main, final int middle, final int sub)

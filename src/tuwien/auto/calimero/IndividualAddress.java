@@ -64,7 +64,7 @@ public class IndividualAddress extends KNXAddress
 	 * Creates a KNX individual address from a 16 Bit address value.
 	 * <p>
 	 *
-	 * @param address the address value in the range 0 <= value <= 0xFFFF
+	 * @param address the address value in the range 0 &le; value &le; 0xFFFF
 	 */
 	public IndividualAddress(final int address)
 	{
@@ -76,9 +76,9 @@ public class IndividualAddress extends KNXAddress
 	 * device-address.
 	 * <p>
 	 *
-	 * @param area area address value, in the range 0 <= value <= 0xF
-	 * @param line line address value, in the range 0 <= value <= 0xF
-	 * @param device device address value, in the range 0 <= value <= 0xFF
+	 * @param area area address value, in the range 0 &le; value &le; 0xF
+	 * @param line line address value, in the range 0 &le; value &le; 0xF
+	 * @param device device address value, in the range 0 &le; value &le; 0xFF
 	 */
 	public IndividualAddress(final int area, final int line, final int device)
 	{
@@ -91,7 +91,7 @@ public class IndividualAddress extends KNXAddress
 	 * The address is read out of the first 2 byte fields, while the address array itself
 	 * might be longer. The content of <code>address</code> is not modified.
 	 *
-	 * @param address the address byte array in big-endian format, with address.length > 1
+	 * @param address the address byte array in big-endian format, with address.length &gt; 1
 	 */
 	public IndividualAddress(final byte[] address)
 	{
@@ -111,23 +111,7 @@ public class IndividualAddress extends KNXAddress
 	 */
 	public IndividualAddress(final String address) throws KNXFormatException
 	{
-		final String[] tokens = parse(address);
-		try {
-			if (tokens.length == 1) {
-				init(Integer.decode(tokens[0]).intValue());
-				return;
-			}
-			if (tokens.length != 3)
-				throw new KNXFormatException("wrong individual address syntax with "
-					+ tokens.length + " levels", address);
-			init(Byte.parseByte(tokens[0]), Byte.parseByte(tokens[1]), Short.parseShort(tokens[2]));
-		}
-		catch (final NumberFormatException e) {
-			throw new KNXFormatException("invalid individual address", address);
-		}
-		catch (final KNXIllegalArgumentException e) {
-			throw new KNXFormatException(e.getMessage());
-		}
+		init(address);
 	}
 
 	/**
@@ -224,6 +208,27 @@ public class IndividualAddress extends KNXAddress
 		// offset to distinguish between group address
 		final int offset = 0x10000;
 		return offset ^ address;
+	}
+
+	void init(final String address) throws KNXFormatException
+	{
+		final String[] tokens = parse(address);
+		try {
+			if (tokens.length == 1) {
+				init(Integer.decode(tokens[0]).intValue());
+				return;
+			}
+			if (tokens.length != 3)
+				throw new KNXFormatException("wrong individual address syntax with "
+						+ tokens.length + " levels", address);
+			init(Byte.parseByte(tokens[0]), Byte.parseByte(tokens[1]), Short.parseShort(tokens[2]));
+		}
+		catch (final NumberFormatException e) {
+			throw new KNXFormatException("invalid individual address", address);
+		}
+		catch (final KNXIllegalArgumentException e) {
+			throw new KNXFormatException(e.getMessage());
+		}
 	}
 
 	private void init(final int area, final int line, final int device)
