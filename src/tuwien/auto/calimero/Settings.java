@@ -53,7 +53,7 @@ public final class Settings
 
 	// aligns the bundle package name following the friendly name,
 	// works for friendly name with max length of 20 chars
-	private static final String bundleAlignment = "                    ";
+	private static final String bundleAlignment = "                      ";
 	// just use newline, it's easier to deal with
 	private static final String sep = "\n";
 
@@ -117,25 +117,25 @@ public final class Settings
 	public static String getBundleListing()
 	{
 		final StringBuffer buf = new StringBuffer();
-		buf.append(getBundle("log service", "tuwien.auto.calimero.log.LogService", 1)
-			+ sep);
 		buf.append(getBundle("cEMI", "tuwien.auto.calimero.cemi.CEMI", 1)).append(sep);
-		buf.append(getBundle("KNXnet/IP",
-			"tuwien.auto.calimero.knxnetip.KNXnetIPConnection", 1)).append(sep);
-		buf.append(getBundle("serial", "tuwien.auto.calimero.serial.FT12Connection", 1))
-			.append(sep);
-		buf.append(getBundle("KNX network link",
-			"tuwien.auto.calimero.link.KNXNetworkLink", 1)).append(sep);
-		buf.append(getBundle("DPT translators",
-			"tuwien.auto.calimero.dptxlator.DPTXlator", 1)).append(sep);
-		buf.append(getBundle("datapoints", "tuwien.auto.calimero.datapoint.Datapoint",
-			1)).append(sep);
-		buf.append(getBundle("network buffer",
-			"tuwien.auto.calimero.buffer.NetworkBuffer", 1)).append(sep);
-		buf.append(getBundle("process", "tuwien.auto.calimero.process."
-			+ "ProcessCommunicator", 1)	+ sep);
-		buf.append(getBundle("management", "tuwien.auto.calimero.mgmt.ManagementClient",
-			1)).append(sep);
+		buf.append(getBundle("KNXnet/IP", "tuwien.auto.calimero.knxnetip.KNXnetIPConnection", 1))
+				.append(sep);
+		buf.append(getBundle("Serial", "tuwien.auto.calimero.serial.FT12Connection", 1))
+				.append(sep);
+		buf.append(getBundle("USB", "tuwien.auto.calimero.serial.usb.UsbConnection", 1))
+				.append(sep);
+		buf.append(getBundle("KNX network link", "tuwien.auto.calimero.link.KNXNetworkLink", 1))
+				.append(sep);
+		buf.append(getBundle("DPT translators", "tuwien.auto.calimero.dptxlator.DPTXlator", 1))
+				.append(sep);
+		buf.append(getBundle("Datapoints", "tuwien.auto.calimero.datapoint.Datapoint", 1)).append(
+				sep);
+		buf.append(getBundle("Network buffer", "tuwien.auto.calimero.buffer.NetworkBuffer", 1))
+				.append(sep);
+		buf.append(getBundle("Process communication", "tuwien.auto.calimero.process."
+				+ "ProcessCommunicator", 1) + sep);
+		buf.append(getBundle("Management", "tuwien.auto.calimero.mgmt.ManagementClient", 1))
+				.append(sep);
 		buf.append(getBundle("XML", "tuwien.auto.calimero.xml.def.DefaultXMLReader", 2));
 		return buf.toString();
 	}
