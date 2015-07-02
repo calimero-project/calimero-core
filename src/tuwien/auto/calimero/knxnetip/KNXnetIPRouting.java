@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,7 +42,11 @@ import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EventListener;
+import java.util.Iterator;
+import java.util.List;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.KNXException;
@@ -51,11 +55,12 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMI;
+import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingIndication;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingLostMessage;
-import tuwien.auto.calimero.log.LogService.LogLevel;
 import tuwien.auto.calimero.log.LogService;
+import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * KNXnet/IP connection using the KNXnet/IP routing protocol.
@@ -98,6 +103,15 @@ public class KNXnetIPRouting extends ConnectionBase
 	public static final String DEFAULT_MULTICAST = Discoverer.SEARCH_MULTICAST;
 
 	private final InetAddress multicast;
+
+	private volatile boolean loopbackEnabled;
+	// This list is used for multicast packets that are looped back in loopback mode. If loopback
+	// mode is enabled, sent packets are buffered, and subsequently discarded when received again
+	// shortly after (and also removed from this buffer again).
+	// This list holds cEMI frames, but basically only the byte array representations are required.
+	private final List<CEMILData> loopbackFrames = new ArrayList<>();
+	private static final int maxLoopbackQueueSize = 20;
+
 
 	/**
 	 * Creates a new KNXnet/IP routing service.
@@ -152,6 +166,12 @@ public class KNXnetIPRouting extends ConnectionBase
 		throws KNXConnectionClosedException
 	{
 		try {
+			if (loopbackEnabled) {
+				synchronized (loopbackFrames) {
+					loopbackFrames.add((CEMILData) frame);
+				}
+				logger.trace("add to multicast loopback frame buffer: {}", frame);
+			}
 			super.send(frame, NONBLOCKING);
 			// we always succeed...
 			setState(OK);
@@ -271,6 +291,7 @@ public class KNXnetIPRouting extends ConnectionBase
 				s.setNetworkInterface(netIf);
 				// port number is not used in join group
 				s.joinGroup(new InetSocketAddress(multicast, 0), netIf);
+				logger.info("using network interface {}", netIf.getName());
 			}
 			else
 				s.joinGroup(multicast);
@@ -283,8 +304,8 @@ public class KNXnetIPRouting extends ConnectionBase
 		try {
 			if (!useMulticastLoopback)
 				s.setLoopbackMode(true);
-			// NB: getLoopbackMode returns true(!) if disabled
-			logger.info("multicast loopback mode " + (s.getLoopbackMode() ? "disabled" : "enabled"));
+			loopbackEnabled = !s.getLoopbackMode();
+			logger.info("multicast loopback mode " + (loopbackEnabled ? "enabled" : "disabled"));
 		}
 		catch (final SocketException e) {
 			logger.warn("failed to access multicast loopback mode, " + e.getMessage());
@@ -312,7 +333,10 @@ public class KNXnetIPRouting extends ConnectionBase
 		else if (svc == KNXnetIPHeader.ROUTING_IND) {
 			final RoutingIndication ind = new RoutingIndication(data, offset, h.getTotalLength()
 					- h.getStructLength());
-			fireFrameReceived(ind.getCEMI());
+			final CEMI frame = ind.getCEMI();
+			if (discardLoopbackFrame(frame))
+				return true;
+			fireFrameReceived(frame);
 		}
 		else if (svc == KNXnetIPHeader.ROUTING_LOST_MSG) {
 			final RoutingLostMessage lost = new RoutingLostMessage(data, offset);
@@ -365,6 +389,26 @@ public class KNXnetIPRouting extends ConnectionBase
 					logger.error("removed event listener", rte);
 				}
 		}
+	}
+
+	private boolean discardLoopbackFrame(final CEMI frame)
+	{
+		if (!loopbackEnabled)
+			return false;
+		final byte[] a = frame.toByteArray();
+		synchronized (loopbackFrames) {
+			for (final Iterator<CEMILData> i = loopbackFrames.iterator(); i.hasNext();) {
+				if (Arrays.equals(a, i.next().toByteArray())) {
+					i.remove();
+					logger.trace("discard multicast loopback cEMI frame: {}", frame);
+					return true;
+				}
+				// remove oldest entry if exceeding max. loopback queue size
+				if (loopbackFrames.size() > maxLoopbackQueueSize)
+					i.remove();
+			}
+		}
+		return false;
 	}
 
 	private static long toLong(final InetAddress addr)
