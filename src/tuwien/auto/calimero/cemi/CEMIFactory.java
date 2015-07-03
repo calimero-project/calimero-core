@@ -250,10 +250,9 @@ public final class CEMIFactory
 		final int hops = frame[6] >> 4 & 0x07;
 		final int len = (frame[6] & 0x0f) + 1;
 		final byte[] tpdu = DataUnitBuilder.copyOfRange(frame, 7, len + 7);
-		// no long frames in EMI2
-		return c ? new CEMILData(mc, new IndividualAddress(0), a, tpdu, p, c)
-			: new CEMILData(mc, new IndividualAddress(0), a, tpdu, p, true, true, ack,
-				hops);
+		final int src = ((frame[2] & 0xff) << 8) | (frame[3] & 0xff);
+		return c ? new CEMILData(mc, new IndividualAddress(src), a, tpdu, p, c) : new CEMILData(mc,
+				new IndividualAddress(src), a, tpdu, p, true, true, ack, hops);
 	}
 
 	/**
