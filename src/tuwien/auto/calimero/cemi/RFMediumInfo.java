@@ -48,7 +48,7 @@ import tuwien.auto.calimero.cemi.CEMILDataEx.AddInfo;
  *
  * @author B. Malinowsky
  */
-final class RFMediumInfo extends AddInfo
+public final class RFMediumInfo extends AddInfo
 {
 	// for .req: if dst is individual address, use RF domain address (AET is set to 1)
 	// for .req: if dst is group address == 0x0000, use RF domain address (AET is set to 1)
