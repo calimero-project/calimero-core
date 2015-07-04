@@ -239,7 +239,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 *        default repeat behavior;<br>
 	 *        meaning of default behavior on media:<br>
 	 *        <ul>
-	 *        <li>TP0, PL132, RF: no repetitions</li>
+	 *        <li>PL132, RF: no repetitions</li>
 	 *        <li>TP1, PL110: repetitions allowed</li>
 	 *        </ul>
 	 *        for indication message - <code>true</code> if is repeated frame,
@@ -251,7 +251,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 *        <code>false</code> for default behavior;<br>
 	 *        meaning of default behavior on media:<br>
 	 *        <ul>
-	 *        <li>TP0, PL132: no acknowledge requested</li>
+	 *        <li>PL132: no acknowledge requested</li>
 	 *        <li>TP1, PL110: acknowledge requested</li>
 	 *        </ul>
 	 * @param hopCount hop count starting value set in control field, in the range 0 &lt;=
@@ -283,7 +283,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 *        default repeat behavior;<br>
 	 *        meaning of default behavior on media:<br>
 	 *        <ul>
-	 *        <li>TP0, PL132, RF: no repetitions</li>
+	 *        <li>PL132, RF: no repetitions</li>
 	 *        <li>TP1, PL110: repetitions allowed</li>
 	 *        </ul>
 	 *        for indication message - <code>true</code> if is repeated frame,

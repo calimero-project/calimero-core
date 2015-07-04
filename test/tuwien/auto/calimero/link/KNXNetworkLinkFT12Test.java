@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ import tuwien.auto.calimero.log.LogManager;
 /**
  * Test for KNXNetworkLinkFT12.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public class KNXNetworkLinkFT12Test extends TestCase
@@ -159,7 +159,7 @@ public class KNXNetworkLinkFT12Test extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.link.KNXNetworkLinkFT12#KNXNetworkLinkFT12
 	 * (java.lang.String, tuwien.auto.calimero.link.medium.KNXMediumSettings)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testKNXNetworkLinkFT12StringKNXMediumSettings() throws KNXException
@@ -200,15 +200,15 @@ public class KNXNetworkLinkFT12Test extends TestCase
 		{
 			TPSettingsSubClass()
 			{
-				super(false);
+				super();
 			}
 		}
 		// replace basetype with subtype
 		lnk.setKNXMedium(new TPSettingsSubClass());
 		// replace subtype with its supertype
-		lnk.setKNXMedium(new TPSettings(true));
+		lnk.setKNXMedium(new TPSettings());
 
-		lnk.setKNXMedium(new TPSettings(new IndividualAddress(200), true));
+		lnk.setKNXMedium(new TPSettings(new IndividualAddress(200)));
 		assertEquals(200, lnk.getKNXMedium().getDeviceAddress().getRawAddress());
 	}
 
@@ -267,7 +267,7 @@ public class KNXNetworkLinkFT12Test extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.link.KNXNetworkLinkFT12#sendRequest
 	 * (tuwien.auto.calimero.KNXAddress, tuwien.auto.calimero.Priority, byte[])}.
-	 * 
+	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 * @throws InterruptedException
@@ -300,7 +300,7 @@ public class KNXNetworkLinkFT12Test extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.link.KNXNetworkLinkFT12#sendRequestWait
 	 * (tuwien.auto.calimero.KNXAddress, tuwien.auto.calimero.Priority, byte[])}.
-	 * 
+	 *
 	 * @throws KNXTimeoutException
 	 * @throws KNXLinkClosedException
 	 */
@@ -329,7 +329,7 @@ public class KNXNetworkLinkFT12Test extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.link.KNXNetworkLinkFT12#send
 	 * (tuwien.auto.calimero.cemi.CEMILData, boolean)}.
-	 * 
+	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 */
@@ -381,7 +381,7 @@ public class KNXNetworkLinkFT12Test extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.link.KNXNetworkLinkFT12#close()}.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 * @throws KNXTimeoutException
 	 */

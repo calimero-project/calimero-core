@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,57 +37,61 @@
 package tuwien.auto.calimero.link.medium;
 
 import tuwien.auto.calimero.IndividualAddress;
+import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 
 /**
- * Provides settings necessary for communication on TP (twisted pair) medium.
- * <p>
- * This settings type is used for twisted pair medium TP0 and TP1.
- * 
+ * Provides settings necessary for communication on TP1 (twisted pair 1) medium.
+ *
  * @author B. Malinowsky
  */
 public class TPSettings extends KNXMediumSettings
 {
 	/**
-	 * Default setting for TP0, device address is 0.0.0.
-	 * <p>
-	 */
-	public static final TPSettings TP0 = new TPSettings(false);
-
-	/**
 	 * Default setting for TP1, device address is 0.0.0.
-	 * <p>
 	 */
-	public static final TPSettings TP1 = new TPSettings(true);
-
-	private final boolean tp1;
+	public static final TPSettings TP1 = new TPSettings();
 
 	/**
-	 * Creates a new settings container with TP medium specific information.
-	 * <p>
-	 * 
-	 * @param device individual device address to use as source address in KNX messages,
+	 * Creates a new settings container with TP1 medium specific information.
+	 *
+	 * @param device KNX individual device address to use as source address in KNX messages,
 	 *        specifying <code>null</code> uses the individual address 0.0.0
-	 * @param mediumTP1 <code>true</code> if communicating on TP1, <code>false</code>
-	 *        if communicating on TP0
+	 */
+	public TPSettings(final IndividualAddress device)
+	{
+		super(device);
+	}
+
+	/**
+	 * Creates a new default container with settings for TP1 medium. The KNX device individual
+	 * address is initialized to 0.0.0.
+	 */
+	public TPSettings()
+	{
+		super(null);
+	}
+
+	/**
+	 * @deprecated Use {@link TPSettings#TPSettings(IndividualAddress)}
+	 * @param device -
+	 * @param mediumTP1 -
 	 */
 	public TPSettings(final IndividualAddress device, final boolean mediumTP1)
 	{
 		super(device);
-		tp1 = mediumTP1;
+		if (!mediumTP1)
+			throw new KNXIllegalArgumentException("TP0 no longer supported");
 	}
 
 	/**
-	 * Creates a new default container with settings for TP medium.
-	 * <p>
-	 * The device address is initialized to 0.0.0.
-	 * 
-	 * @param mediumTP1 <code>true</code> if communicating on TP1, <code>false</code>
-	 *        if communicating on TP0
+	 * @deprecated Use {@link TPSettings#TPSettings()}
+	 * @param mediumTP1 -
 	 */
 	public TPSettings(final boolean mediumTP1)
 	{
 		super(null);
-		tp1 = mediumTP1;
+		if (!mediumTP1)
+			throw new KNXIllegalArgumentException("TP0 no longer supported");
 	}
 
 	/* (non-Javadoc)
@@ -95,17 +99,15 @@ public class TPSettings extends KNXMediumSettings
 	 */
 	public int getMedium()
 	{
-		return tp1 ? MEDIUM_TP1 : MEDIUM_TP0;
+		return MEDIUM_TP1;
 	}
 
 	/**
-	 * Returns whether this setting is for communication on TP1 medium or TP0.
-	 * <p>
-	 * 
-	 * @return <code>true</code> for TP1, <code>false</code> for TP0
+	 * @deprecated No longer necessary
+	 * @return <code>true</code> for TP1
 	 */
 	public final boolean isTP1()
 	{
-		return tp1;
+		return true;
 	}
 }

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -137,7 +137,7 @@ public class KNXNetworkMonitorIPTest extends TestCase
 	 * {@link tuwien.auto.calimero.link.KNXNetworkMonitorIP#KNXNetworkMonitorIP
 	 * (java.net.InetSocketAddress, java.net.InetSocketAddress, boolean,
 	 * tuwien.auto.calimero.link.medium.KNXMediumSettings)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -169,21 +169,21 @@ public class KNXNetworkMonitorIPTest extends TestCase
 		{
 			TPSettingsSubClass()
 			{
-				super(false);
+				super();
 			}
 		}
 		// replace basetype with subtype
 		mon.setKNXMedium(new TPSettingsSubClass());
 		// replace subtype with its supertype
-		mon.setKNXMedium(new TPSettings(true));
+		mon.setKNXMedium(new TPSettings());
 
-		mon.setKNXMedium(new TPSettings(new IndividualAddress(200), true));
+		mon.setKNXMedium(new TPSettings(new IndividualAddress(200)));
 		assertEquals(200, mon.getKNXMedium().getDeviceAddress().getRawAddress());
 	}
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.link.KNXNetworkMonitorIP#close()}.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 */
 	public final void testClose() throws InterruptedException
@@ -200,7 +200,7 @@ public class KNXNetworkMonitorIPTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.link.KNXNetworkMonitorIP#setDecodeRawFrames (boolean)}.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 */
 	public final void testSetDecodeRawFrames() throws InterruptedException
@@ -218,7 +218,7 @@ public class KNXNetworkMonitorIPTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.link.KNXNetworkMonitorIP#getName ()}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testGetName() throws KNXException

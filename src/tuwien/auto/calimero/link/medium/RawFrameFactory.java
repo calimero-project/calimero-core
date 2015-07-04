@@ -71,8 +71,6 @@ public final class RawFrameFactory
 		final int offset, final boolean extBusmon) throws KNXFormatException
 	{
 		switch (mediumType) {
-		case KNXMediumSettings.MEDIUM_TP0:
-			throw new KNXFormatException("TP0 raw frame not supported yet");
 		case KNXMediumSettings.MEDIUM_TP1:
 			return createTP1(data, offset);
 		case KNXMediumSettings.MEDIUM_PL110:
