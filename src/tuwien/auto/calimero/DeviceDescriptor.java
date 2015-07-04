@@ -246,7 +246,7 @@ public interface DeviceDescriptor
 			case 2:
 				return new RFSettings(new IndividualAddress(0));
 			case 3:
-				return TPSettings.TP0;
+				throw new KNXIllegalArgumentException("TP0 medium not supported any longer");
 			case 4:
 				return new PLSettings(true);
 			case 5:

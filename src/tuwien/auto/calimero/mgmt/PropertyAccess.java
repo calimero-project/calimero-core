@@ -354,7 +354,7 @@ public interface PropertyAccess
 		 * Object type 8 property "Medium Type".
 		 * <p>
 		 * KNX media types supported by server.
-		 * Bit 0 (LSB): TP0<br>
+		 * Bit 0 (LSB): reserved (formerly TP0)<br>
 		 * Bit 1: TP1<br>
 		 * Bit 2: PL110<br>
 		 * Bit 3: RF

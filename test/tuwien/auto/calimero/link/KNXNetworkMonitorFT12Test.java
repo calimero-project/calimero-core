@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ import tuwien.auto.calimero.link.medium.TPSettings;
 /**
  * Test for KNXNetworkMonitorFT12.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public class KNXNetworkMonitorFT12Test extends TestCase
@@ -101,7 +101,7 @@ public class KNXNetworkMonitorFT12Test extends TestCase
 			closed = true;
 		}
 	}
-	
+
 	/**
 	 * @param name
 	 */
@@ -147,7 +147,7 @@ public class KNXNetworkMonitorFT12Test extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.link.KNXNetworkMonitorFT12#KNXNetworkMonitorFT12
 	 * (java.lang.String, tuwien.auto.calimero.link.medium.KNXMediumSettings)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testKNXNetworkMonitorFT12StringKNXMediumSettings()
@@ -189,15 +189,15 @@ public class KNXNetworkMonitorFT12Test extends TestCase
 		{
 			TPSettingsSubClass()
 			{
-				super(false);
+				super();
 			}
 		}
 		// replace basetype with subtype
 		mon.setKNXMedium(new TPSettingsSubClass());
 		// replace subtype with its supertype
-		mon.setKNXMedium(new TPSettings(true));
+		mon.setKNXMedium(new TPSettings());
 
-		mon.setKNXMedium(new TPSettings(new IndividualAddress(200), true));
+		mon.setKNXMedium(new TPSettings(new IndividualAddress(200)));
 		assertEquals(200, mon.getKNXMedium().getDeviceAddress().getRawAddress());
 	}
 

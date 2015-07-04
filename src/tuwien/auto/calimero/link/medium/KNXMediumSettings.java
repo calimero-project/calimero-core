@@ -52,13 +52,6 @@ public abstract class KNXMediumSettings
 	// medium codes are equal to the ones specified in KNXnet/IP
 
 	/**
-	 * @deprecated Phased out in the KNX specification, not used any longer. (KNX medium code for
-	 *             twisted pair 0 (2400 bit/s), inherited from BatiBUS.)
-	 */
-	@Deprecated
-	public static final int MEDIUM_TP0 = 0x01;
-
-	/**
 	 * KNX medium code for twisted pair 1 (9600 bit/s).
 	 */
 	public static final int MEDIUM_TP1 = 0x02;
@@ -102,10 +95,8 @@ public abstract class KNXMediumSettings
 	public static KNXMediumSettings create(final int medium, final IndividualAddress device)
 	{
 		switch (medium) {
-		case MEDIUM_TP0:
-			return new TPSettings(device, false);
 		case MEDIUM_TP1:
-			return new TPSettings(device, true);
+			return new TPSettings(device);
 		case MEDIUM_PL110:
 			return new PLSettings(device, null, false);
 		case MEDIUM_PL132:
@@ -166,7 +157,6 @@ public abstract class KNXMediumSettings
 	 * <p>
 	 * Allowed type names are, case is ignored:
 	 * <ul>
-	 * <li>TP0</li>
 	 * <li>TP1</li>
 	 * <li>PL110, P110</li>
 	 * <li>PL132, P132</li>
@@ -181,9 +171,7 @@ public abstract class KNXMediumSettings
 	 */
 	/*public*/static int getMedium(final String mediumName)
 	{
-		if ("tp0".equalsIgnoreCase(mediumName))
-			return MEDIUM_TP0;
-		else if ("tp1".equalsIgnoreCase(mediumName))
+		if ("tp1".equalsIgnoreCase(mediumName))
 			return MEDIUM_TP1;
 		else if ("p110".equalsIgnoreCase(mediumName) || "pl110".equalsIgnoreCase(mediumName))
 			return MEDIUM_PL110;
@@ -220,8 +208,6 @@ public abstract class KNXMediumSettings
 	public static String getMediumString(final int knxMedium)
 	{
 		switch (knxMedium) {
-		case MEDIUM_TP0:
-			return "TP0";
 		case MEDIUM_TP1:
 			return "TP1";
 		case MEDIUM_PL110:

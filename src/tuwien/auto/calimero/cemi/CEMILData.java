@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -190,7 +190,7 @@ public class CEMILData implements CEMI
 	 *        default repeat behavior;<br>
 	 *        meaning of default behavior on media:<br>
 	 *        <ul>
-	 *        <li>TP0, PL132, RF: no repetitions</li>
+	 *        <li>PL132, RF: no repetitions</li>
 	 *        <li>TP1, PL110: repetitions allowed</li>
 	 *        </ul>
 	 *        for indication message - <code>true</code> if is repeated frame,
@@ -202,7 +202,7 @@ public class CEMILData implements CEMI
 	 *        <code>false</code> for default behavior;<br>
 	 *        meaning of default behavior on media:<br>
 	 *        <ul>
-	 *        <li>TP0, PL132: no acknowledge requested</li>
+	 *        <li>PL132: no acknowledge requested</li>
 	 *        <li>TP1, PL110: acknowledge requested</li>
 	 *        </ul>
 	 * @param hopCount hop count starting value set in control field, in the range 0 &lt;=
@@ -213,10 +213,8 @@ public class CEMILData implements CEMI
 		final boolean ack, final int hopCount)
 	{
 		// ctor used for these kinds with relevant ctrl flags:
-		// .ind on TP0: repeat priority ack hop count
 		// .ind on PL110: repeat broadcast priority hop count
 		// .ind on PL132: repeat broadcast priority ack hop count
-		// .req TP0: priority ack hop count
 		// .req PL132: broadcast priority ack hop count
 		// .req on PL110: repeat broadcast priority hop count
 
@@ -256,7 +254,7 @@ public class CEMILData implements CEMI
 	 *        default repeat behavior;<br>
 	 *        meaning of default behavior on media:<br>
 	 *        <ul>
-	 *        <li>TP0, PL132, RF: no repetitions</li>
+	 *        <li>PL132, RF: no repetitions</li>
 	 *        <li>TP1, PL110: repetitions allowed</li>
 	 *        </ul>
 	 *        for indication message - <code>true</code> if is repeated frame,
@@ -357,13 +355,13 @@ public class CEMILData implements CEMI
 	 * for "don't care" (default medium behavior).<br>
 	 * Default behavior on media for L2 ack:
 	 * <ul>
-	 * <li>TP0, PL132: no acknowledge requested</li>
+	 * <li>PL132: no acknowledge requested</li>
 	 * <li>TP1, PL110: acknowledge requested</li>
 	 * </ul>
 	 * <p>
 	 * For indication messages following media behavior applies:
 	 * <ul>
-	 * <li>TP0, PL132: value of ack is relayed from the bus</li>
+	 * <li>PL132: value of ack is relayed from the bus</li>
 	 * <li>TP1, PL110: unused, undefined value behavior</li>
 	 * </ul>
 	 *
@@ -381,7 +379,7 @@ public class CEMILData implements CEMI
 	 * <code>true</code> for default repeat behavior.<br>
 	 * Meaning of default behavior on media:
 	 * <ul>
-	 * <li>TP0, PL132: no repetitions</li>
+	 * <li>PL132: no repetitions</li>
 	 * <li>TP1, PL110: repetitions allowed</li>
 	 * </ul>
 	 * <p>

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -171,7 +171,7 @@ public class KNXNetworkLinkIPTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.link.KNXNetworkLinkIP#KNXNetworkLinkIP
 	 * (int, java.net.InetSocketAddress, java.net.InetSocketAddress, boolean,
 	 * tuwien.auto.calimero.link.medium.KNXMediumSettings)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
@@ -195,7 +195,7 @@ public class KNXNetworkLinkIPTest extends TestCase
 				Util.getServer(), false, TPSettings.TP1);
 		lnk.close();
 		// try easy to use ctor
-		
+
 		try {
 			lnk = new KNXNetworkLinkIP(Util.getServer().getHostName(), TPSettings.TP1);
 			lnk.close();
@@ -207,14 +207,14 @@ public class KNXNetworkLinkIPTest extends TestCase
 			else
 				throw e;
 		}
-		
+
 	}
 
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.link.KNXNetworkLinkIP#KNXNetworkLinkIP(java.net.NetworkInterface,
 	 * java.net.InetAddress, tuwien.auto.calimero.link.medium.KNXMediumSettings)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws UnknownHostException
 	 */
@@ -252,15 +252,15 @@ public class KNXNetworkLinkIPTest extends TestCase
 		{
 			TPSettingsSubClass()
 			{
-				super(false);
+				super();
 			}
 		}
 		// replace basetype with subtype
 		tnl.setKNXMedium(new TPSettingsSubClass());
 		// replace subtype with its supertype
-		tnl.setKNXMedium(new TPSettings(true));
+		tnl.setKNXMedium(new TPSettings());
 
-		tnl.setKNXMedium(new TPSettings(new IndividualAddress(200), true));
+		tnl.setKNXMedium(new TPSettings(new IndividualAddress(200)));
 		assertEquals(200, tnl.getKNXMedium().getDeviceAddress().getRawAddress());
 	}
 
@@ -275,7 +275,7 @@ public class KNXNetworkLinkIPTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.link.KNXNetworkLinkIP#close()}.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 * @throws KNXTimeoutException
 	 */
@@ -331,7 +331,7 @@ public class KNXNetworkLinkIPTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.link.KNXNetworkLinkIP#sendRequest
 	 * (tuwien.auto.calimero.KNXAddress, tuwien.auto.calimero.Priority, byte[])}.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 * @throws KNXException
 	 * @throws UnknownHostException
@@ -369,7 +369,7 @@ public class KNXNetworkLinkIPTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.link.KNXNetworkLinkIP#send(CEMILData, boolean)}.
-	 * 
+	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 */
@@ -395,7 +395,7 @@ public class KNXNetworkLinkIPTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.link.KNXNetworkLinkIP#sendRequestWait(
 	 * tuwien.auto.calimero.KNXAddress, tuwien.auto.calimero.Priority, byte[])}.
-	 * 
+	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 */
@@ -429,7 +429,7 @@ public class KNXNetworkLinkIPTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.link.KNXNetworkLinkIP#send(tuwien.auto.calimero.cemi.CEMILData,
 	 * boolean)}.
-	 * 
+	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 */
@@ -458,7 +458,7 @@ public class KNXNetworkLinkIPTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.link.KNXNetworkLinkIP#getName()}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testGetName() throws KNXException

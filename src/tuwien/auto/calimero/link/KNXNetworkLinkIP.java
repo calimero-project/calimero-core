@@ -440,8 +440,7 @@ public class KNXNetworkLinkIP implements KNXNetworkLink
 		final IndividualAddress src = medium.getDeviceAddress();
 		// use default address 0 in system broadcast
 		final KNXAddress d = dst == null ? new GroupAddress(0) : dst;
-		final boolean tp = medium.getMedium() == KNXMediumSettings.MEDIUM_TP0
-			|| medium.getMedium() == KNXMediumSettings.MEDIUM_TP1;
+		final boolean tp = medium.getMedium() == KNXMediumSettings.MEDIUM_TP1;
 		if (nsdu.length <= 16 && tp)
 			f = new CEMILData(mc, src, d, nsdu, p, true, hopCount);
 		else

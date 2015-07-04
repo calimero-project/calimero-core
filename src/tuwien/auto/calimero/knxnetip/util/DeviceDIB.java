@@ -56,13 +56,6 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 public class DeviceDIB extends DIB
 {
 	/**
-	 * @deprecated Phased out in the KNX specification, not used any longer. (KNX medium code for
-	 *             twisted pair 0 (2400 bit/s), inherited from BatiBUS.)
-	 */
-	@Deprecated
-	public static final int MEDIUM_TP0 = 0x01;
-
-	/**
 	 * KNX medium code for twisted pair 1 (9600 bit/s).
 	 */
 	public static final int MEDIUM_TP1 = 0x02;
@@ -185,8 +178,8 @@ public class DeviceDIB extends DIB
 			CRBase.logger.warn("device DIB \"" + friendlyName + "\": device status (" + status
 					+ ") uses reserved bits");
 
-		if (knxMedium != MEDIUM_TP0 && knxMedium != MEDIUM_TP1 && knxMedium != MEDIUM_PL110
-				&& knxMedium != MEDIUM_PL132 && knxMedium != MEDIUM_RF && knxMedium != MEDIUM_KNXIP)
+		if (knxMedium != MEDIUM_TP1 && knxMedium != MEDIUM_PL110 && knxMedium != MEDIUM_PL132
+				&& knxMedium != MEDIUM_RF && knxMedium != MEDIUM_KNXIP)
 			throw new KNXIllegalArgumentException("KNX medium not supported");
 		knxmedium = knxMedium;
 
@@ -262,8 +255,6 @@ public class DeviceDIB extends DIB
 	public String getKNXMediumString()
 	{
 		switch (knxmedium) {
-		case MEDIUM_TP0:
-			return "TP0";
 		case MEDIUM_TP1:
 			return "TP1";
 		case MEDIUM_PL110:
