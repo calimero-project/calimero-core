@@ -80,7 +80,7 @@ public final class RawFrameFactory
 		case KNXMediumSettings.MEDIUM_PL132:
 			return createPL132(data, offset);
 		case KNXMediumSettings.MEDIUM_RF:
-			throw new KNXFormatException("RF raw frame not supported yet");
+			return new RFLData(data, offset);
 		default:
 			throw new KNXFormatException("unknown KNX medium for raw frame", mediumType);
 		}
