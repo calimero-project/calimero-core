@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ package tuwien.auto.calimero.exception;
  * Thrown when some value or content is not in accordance with the expected or requested
  * format or result.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public class KNXFormatException extends KNXException
@@ -62,7 +62,7 @@ public class KNXFormatException extends KNXException
 	 * Constructs a new <code>KNXFormatException</code> with the specified detail
 	 * message.
 	 * <p>
-	 * 
+	 *
 	 * @param s the detail message
 	 */
 	public KNXFormatException(final String s)
@@ -75,14 +75,14 @@ public class KNXFormatException extends KNXException
 	 * Constructs a new <code>KNXFormatException</code> with the specified detail
 	 * message and the invalid item.
 	 * <p>
-	 * 
+	 *
 	 * @param s the detail message
 	 * @param item value, content or piece of information causing this exception (allowed
 	 *        to be <code>null</code>)
 	 */
 	public KNXFormatException(final String s, final String item)
 	{
-		super(s);
+		super(s + ": " + item);
 		this.item = item;
 	}
 
@@ -91,21 +91,21 @@ public class KNXFormatException extends KNXException
 	 * message and the invalid item value of type int.
 	 * <p>
 	 * The <code>item</code> value is formatted into a hexadecimal string representation
-	 * using the format "0x" prefix + value (e.g. "0x23" for an item value of 23).
-	 * 
+	 * using the format "0x" prefix + value (e.g. "0x23" for an item value of hexadecimal 23).
+	 *
 	 * @param s the detail message
 	 * @param item the value causing this exception
 	 */
 	public KNXFormatException(final String s, final int item)
 	{
-		super(s);
+		super(s + ": 0x" + Integer.toHexString(item));
 		this.item = "0x" + Integer.toHexString(item);
 	}
 
 	/**
 	 * Returns the value, content, or piece of information which caused the exception.
 	 * <p>
-	 * 
+	 *
 	 * @return item representation as string, or <code>null</code> if no item was set
 	 */
 	public final String getItem()

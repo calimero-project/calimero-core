@@ -116,8 +116,8 @@ public class DescriptionResponse extends ServiceType
 			else if (type == DIB.MFR_DATA  && (unique = m == null))
 				m = new ManufacturerDIB(data, i);
 			else if (!unique)
-				throw new KNXFormatException("description response contains duplicate DIB type "
-						+ type);
+				throw new KNXFormatException("description response contains duplicate DIB type",
+						type);
 			else if (type == 0 || size == 0) // break on invalid field, ensure we always progress i
 				break;
 			else

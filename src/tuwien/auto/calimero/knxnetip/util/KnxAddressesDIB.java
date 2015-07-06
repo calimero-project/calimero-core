@@ -73,10 +73,9 @@ public final class KnxAddressesDIB extends DIB
 	{
 		super(data, offset);
 		if (type != KNX_ADDRESSES)
-			throw new KNXFormatException("no KNX addresses DIB, wrong type ID " + type);
+			throw new KNXFormatException("no KNX addresses DIB, wrong type ID", type);
 		if (size < DIB_MIN_SIZE)
-			throw new KNXFormatException("KNX addresses DIB too short, " + size + " < "
-					+ DIB_MIN_SIZE);
+			throw new KNXFormatException("KNX addresses DIB too short, < " + DIB_MIN_SIZE, size);
 		if (size % 2 != 0)
 			throw new KNXFormatException("KNX address DIB requires even size");
 		for (int i = 2; i < size; i += 2) {

@@ -264,14 +264,14 @@ public class DPTXlator8BitSigned extends DPTXlator
 	{
 		if (dpt == DPT_STATUS_MODE3) {
 			if (value.length() != 11)
-				throw new KNXFormatException("status mode requires 11 characters: " + value);
+				throw new KNXFormatException("status mode requires 11 characters", value);
 			short d = 0;
 			for (int i = 0; i < 5; i++) {
 				final char c = value.charAt(2 * i);
 				if (c == '1')
 					d |=  1 << (7 - i);
 				else if (c != '0')
-					throw new KNXFormatException("invalid status " + c);
+					throw new KNXFormatException("invalid status", c);
 			}
 			final char c = value.charAt(10);
 			if  (c == '0')
@@ -281,7 +281,7 @@ public class DPTXlator8BitSigned extends DPTXlator
 			else if (c == '2')
 				d += 4;
 			else
-				throw new KNXFormatException("invalid mode " + c);
+				throw new KNXFormatException("invalid mode", c);
 			dst[index] = d;
 			return;
 		}
@@ -296,7 +296,7 @@ public class DPTXlator8BitSigned extends DPTXlator
 	private short toDPT(final int value) throws KNXFormatException
 	{
 		if (value < -128 || value > 127)
-			throw new KNXFormatException("value " + value + " out of range [-128 .. 127]");
+			throw new KNXFormatException("value out of range [-128 .. 127]", value);
 		return (short) (value & 0xff);
 	}
 }

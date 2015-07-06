@@ -964,7 +964,7 @@ public class PropertyClient implements PropertyAccess
 				}
 			}
 			catch (final NumberFormatException e) {}
-			throw new KNXFormatException("can not convert to number: " + s, s);
+			throw new KNXFormatException("cannot convert to number", s);
 		}
 	}
 
