@@ -44,6 +44,8 @@ import java.util.EnumSet;
 import java.util.EventListener;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.usb.UsbClaimException;
 import javax.usb.UsbConfiguration;
@@ -329,15 +331,12 @@ public class UsbConnection implements AutoCloseable
 	{
 		traverse(getRootHub(), "");
 
-		// Use the low level API, because on Windows the string descriptors cause problems
-		slogger.debug("Enumerate devices again, using the low-level API\n");
-		try {
-			printDevicesLowLevel();
-		}
-		catch (final Exception e) {}
+		// Use the low-level API, because on Windows the string descriptors cause problems
+		if (slogger.isDebugEnabled())
+			slogger.debug("Enumerate devices again, using the low-level API\n{}",
+					getDeviceDescriptionsLowLevel().stream().collect(Collectors.joining("\n")));
 	}
 
-	// TODO more ways for a convenient, human readable, unique device identification
 	public UsbConnection(final String device) throws KNXException
 	{
 		this(findDevice(device), device);
@@ -767,34 +766,37 @@ public class UsbConnection implements AutoCloseable
 				catch (final NumberFormatException expected) {}
 			}
 			// check if device name is a substring in one of the USB device strings
-			return findDeviceByName(getRootHub(), device.toLowerCase());
+			return findDeviceByNameLowLevel(device);
+//			return findDeviceByName(getRootHub(), device.toLowerCase());
 		}
 		catch (final SecurityException | UsbException | UsbDisconnectedException e) {
 			throw new KNXException("find USB device by name " + device, e);
 		}
 	}
 
-	private static UsbDevice findDeviceByName(final UsbHub hub, final String device)
-		throws UsbDisconnectedException, UsbException, KNXException
-	{
-		for (final UsbDevice d : getAttachedDevices(hub)) {
-			try {
-				final String mf = d.getManufacturerString();
-				if (mf != null && mf.toLowerCase().contains(device))
-					return d;
-				final String prod = d.getProductString();
-				if (prod != null && prod.toLowerCase().contains(device))
-					return d;
-			}
-			catch (final UnsupportedEncodingException | UsbException e) {}
-			try {
-				if (d.isUsbHub())
-					return findDeviceByName((UsbHub) d, device);
-			}
-			catch (final KNXException e) {}
-		}
-		throw new KNXException("no USB device found by name " + device);
-	}
+	// find device by name using high-level API
+	// won't work on Windows, because of libusb overflow error on getting the language descriptor
+//	private static UsbDevice findDeviceByName(final UsbHub hub, final String device)
+//		throws UsbDisconnectedException, UsbException, KNXException
+//	{
+//		for (final UsbDevice d : getAttachedDevices(hub)) {
+//			try {
+//				final String mf = d.getManufacturerString();
+//				if (mf != null && mf.toLowerCase().contains(device))
+//					return d;
+//				final String prod = d.getProductString();
+//				if (prod != null && prod.toLowerCase().contains(device))
+//					return d;
+//			}
+//			catch (final UnsupportedEncodingException | UsbException e) {}
+//			try {
+//				if (d.isUsbHub())
+//					return findDeviceByName((UsbHub) d, device);
+//			}
+//			catch (final KNXException e) {}
+//		}
+//		throw new KNXException("no USB device found by name " + device);
+//	}
 
 	private static List<UsbDevice> collect(final UsbDevice device)
 	{
@@ -855,32 +857,48 @@ public class UsbConnection implements AutoCloseable
 			e.printStackTrace();
 		}
 		catch (final UsbPlatformException e) {
-			// Thrown on Win 7/8 (USB error 8) on calling device.getString most USB interfaces.
+			// Thrown on Win 7/8 (USB error 8) on calling device.getString on most USB interfaces.
 			// Therefore, catch it here, but don't issue any error/warning
 			l.debug("extracting USB device strings, {}", e.toString());
 		}
 	}
 
+	// Cross-platform way to do name lookup for USB devices, using the low-level API.
+	// Parse the USB device string descriptions for name, extract the vendor:product ID
+	// string. Pass that ID to findDevice. which will do the lookup by ID.
+	private static UsbDevice findDeviceByNameLowLevel(final String name) throws KNXException
+	{
+		final List<String> list = getDeviceDescriptionsLowLevel();
+		list.removeIf(i -> i.toLowerCase().indexOf(name.toLowerCase()) == -1);
+		if (list.isEmpty())
+			throw new KNXException("no USB device found by name " + name);
+
+		final String desc = list.get(0);
+		final String id = desc.substring(desc.indexOf("ID") + 3, desc.indexOf("\n"));
+		return findDevice(id);
+	}
+
 	// On Win 7/8/8.1, libusb has a problem with overflows on getting the language descriptor,
 	// so we can't read out the device string descriptors.
 	// This method avoids any further issues down the road by using the ASCII descriptors.
-	private static void printDevicesLowLevel()
+	private static List<String> getDeviceDescriptionsLowLevel()
 	{
 		final Context ctx = new Context();
 		final int err = LibUsb.init(ctx);
 		if (err != 0) {
 			slogger.error("LibUsb initialization error {}: {}", -err, LibUsb.strError(err));
-			return;
+			return Collections.emptyList();
 		}
 		try {
 			final DeviceList list = new DeviceList();
 			final int res = LibUsb.getDeviceList(ctx, list);
 			if (res < 0) {
 				slogger.error("LibUsb device list error {}: {}", -res, LibUsb.strError(res));
-				return;
+				return Collections.emptyList();
 			}
 			try {
-				list.forEach(d -> { printInfo(d, slogger); });
+				return StreamSupport.stream(list.spliterator(), false)
+						.map(UsbConnection::printInfo).collect(Collectors.toList());
 			}
 			finally {
 				LibUsb.freeDeviceList(list, true);
@@ -892,7 +910,7 @@ public class UsbConnection implements AutoCloseable
 	}
 
 	// libusb low level
-	private static void printInfo(final Device device, final Logger l)
+	private static String printInfo(final Device device)
 	{
 		final int bus = LibUsb.getBusNumber(device);
 		final int address = LibUsb.getDeviceAddress(device);
@@ -902,12 +920,14 @@ public class UsbConnection implements AutoCloseable
 		final DeviceDescriptor d = new DeviceDescriptor();
 		int err = LibUsb.getDeviceDescriptor(device, d);
 		if (err == 0) {
-			vendor = d.idVendor();
-			product = d.idProduct();
+			vendor = d.idVendor() & 0xffff;
+			product = d.idProduct() & 0xffff;
 		}
 
+		final StringBuilder sb = new StringBuilder();
 		final String item = vendor != 0 ? toDeviceId(vendor, product) : "";
-		l.debug("Bus {} Device {}: ID {}", bus, address, item);
+		sb.append("Bus ").append(bus).append(" Device ").append(address).append(": ID ")
+				.append(item);
 
 		final String ind = "    ";
 		final DeviceHandle dh = new DeviceHandle();
@@ -922,29 +942,33 @@ public class UsbConnection implements AutoCloseable
 				if (man != null)
 					desc += " (" + man + ")";
 				if (desc != ind)
-					l.debug(desc);
+					sb.append("\n").append(desc);
 			}
 			finally {
 				LibUsb.close(dh);
 			}
 		}
 
+		String attach = "";
 		final Device parent = LibUsb.getParent(device);
 		if (parent != null) {
 			// ??? not necessary in my understanding of the USB tree structure, the bus
 			// has to be the same as the child one's
 			final int parentBus = LibUsb.getBusNumber(parent);
 			final int parentAddress = LibUsb.getDeviceAddress(parent);
-			l.debug("{}Parent Hub {}:{}", ind, parentBus, parentAddress);
+			attach += "Parent Hub " + parentBus + ":" + parentAddress;
 		}
-
 		final int port = LibUsb.getPortNumber(device);
 		if (port != 0)
-			l.debug("{}Attached at port {}", ind, port);
+			attach += ", attached at port " + port;
+		if (!attach.isEmpty())
+			sb.append("\n").append(ind).append(attach);
 
 		final int speed = LibUsb.getDeviceSpeed(device);
 		if (speed != LibUsb.SPEED_UNKNOWN)
-			l.debug("{}{} Speed USB", ind, DescriptorUtils.getSpeedName(speed));
+			sb.append("\n").append(ind).append(DescriptorUtils.getSpeedName(speed))
+					.append(" Speed USB");
+		return sb.toString();
 	}
 
 	private static String toDeviceId(final int vendorId, final int productId)
