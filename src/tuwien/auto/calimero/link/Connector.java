@@ -198,6 +198,7 @@ public final class Connector
 			catch (final KNXException e) {
 				if (!connector.initialError)
 					throw e;
+				logger().error("initial connection attempt: {}", e.toString());
 				scheduleConnect(connector.maxAttempts - 1);
 				// TODO should we wait here until scheduled connects are done?
 				// wait ... then check link:
@@ -338,9 +339,9 @@ public final class Connector
 			if (closed || remainingAttempts <= 0)
 				return;
 			final Runnable s = () -> {
+				final long max = connector.maxAttempts;
+				final long attempt = max - remainingAttempts + 1;
 				try {
-					final long max = connector.maxAttempts;
-					final long attempt = max - remainingAttempts + 1;
 					if (connector.maxAttempts == NoMaxAttempts)
 						logger().info("execute scheduled connect {} (no max)", attempt);
 					else
@@ -356,7 +357,7 @@ public final class Connector
 					System.out.println("interrupted: closed flag = " + closed);
 				}
 				catch (final KNXException | RuntimeException e) {
-					logger().error(e.getMessage());
+					logger().error("connection attempt {}: {}", attempt, e.getMessage());
 					scheduleConnect(remainingAttempts - 1);
 				}
 			};
