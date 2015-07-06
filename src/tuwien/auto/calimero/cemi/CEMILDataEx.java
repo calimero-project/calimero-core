@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,18 +51,17 @@ import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 /**
  * A cEMI link layer data message (L-Data).
  * <p>
- * Extended frame formats are supported, with a transport layer protocol data unit of 255
- * bytes maximum. Additional information might be specified.
+ * Extended frame formats are supported, with a transport layer protocol data unit of 255 bytes
+ * maximum. Additional information might be specified.
  * <p>
  * Objects of this L-Data type are <b>not</b> immutable.
- * 
+ *
  * @author B. Malinowsky
  */
 public class CEMILDataEx extends CEMILData implements Cloneable
 {
 	/**
 	 * Holds an additional info type with corresponding information data.
-	 * <p>
 	 */
 	public static final class AddInfo
 	{
@@ -71,8 +70,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 
 		/**
 		 * Creates new wrapper for additional information.
-		 * <p>
-		 * 
+		 *
 		 * @param infoType additional information type ID
 		 * @param info information data
 		 */
@@ -85,10 +83,10 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		/**
 		 * Returns the additional information data wrapped by this type.
 		 * <p>
-		 * 
+		 *
 		 * @return the data as byte array
 		 */
-		public byte[] getInfo()
+		public final byte[] getInfo()
 		{
 			return data;
 		}
@@ -97,10 +95,10 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		 * Returns the type of additional information (see ADDINFO_* constants in class
 		 * CEMILDataEx).
 		 * <p>
-		 * 
+		 *
 		 * @return type ID
 		 */
-		public int getType()
+		public final int getType()
 		{
 			return type;
 		}
@@ -110,38 +108,32 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 
 	/**
 	 * Additional information type for PL medium information.
-	 * <p>
 	 */
 	public static final int ADDINFO_PLMEDIUM = 0x01;
 
 	/**
 	 * Additional information type for RF medium information.
-	 * <p>
 	 */
 	public static final int ADDINFO_RFMEDIUM = 0x02;
 	// public static final int ADDINFO_BUSMON = 0x03;
 
 	/**
 	 * Additional information type for relative timestamp information.
-	 * <p>
 	 */
 	public static final int ADDINFO_TIMESTAMP = 0x04;
 
 	/**
 	 * Additional information type for time delay until sending information.
-	 * <p>
 	 */
 	public static final int ADDINFO_TIMEDELAY = 0x05;
 
 	/**
 	 * Additional information type for extended relative timestamp information.
-	 * <p>
 	 */
 	public static final int ADDINFO_TIMESTAMP_EXT = 0x06;
 
 	/**
 	 * Additional information type for BiBat information.
-	 * <p>
 	 */
 	public static final int ADDINFO_BIBAT = 0x07;
 
@@ -153,18 +145,18 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 
 	/**
 	 * Creates a new L-Data message from a byte stream.
-	 * <p>
-	 * 
+	 *
 	 * @param data byte stream containing a cEMI L-Data message
 	 * @param offset start offset of cEMI frame in <code>data</code>
+	 * @param length length in bytes of the whole cEMI message in <code>data</code>
 	 * @throws KNXFormatException if no (valid) frame was found
 	 */
-	public CEMILDataEx(final byte[] data, final int offset) throws KNXFormatException
+	public CEMILDataEx(final byte[] data, final int offset, final int length)
+		throws KNXFormatException
 	{
-		if (data.length - offset < BASIC_LENGTH + 1)
+		if (data.length - offset < length || length < BASIC_LENGTH + 1)
 			throw new KNXFormatException("buffer too short for frame");
-		final ByteArrayInputStream is =
-			new ByteArrayInputStream(data, offset, data.length - offset);
+		final ByteArrayInputStream is = new ByteArrayInputStream(data, offset, length);
 		readMC(is);
 		readAddInfo(is);
 		readCtrlAndAddr(is);
@@ -174,17 +166,16 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/**
 	 * Creates a L-Data message with most control information set to default values.
 	 * <p>
-	 * The initialized message has send repetitions according to default medium behavior
-	 * (for indication message this equals "not repeated frame"), broadcast is "don't
-	 * care", acknowledge of request is default medium behavior, hop count is 6 and
-	 * confirmation request is "don't care" in the control field.<br>
-	 * 
+	 * The initialized message has send repetitions according to default medium behavior (for
+	 * indication message this equals "not repeated frame"), broadcast is "don't care", acknowledge
+	 * of request is default medium behavior, hop count is 6 and confirmation request is
+	 * "don't care" in the control field.<br>
+	 *
 	 * @param msgCode a message code value specified in the L-Data type
 	 * @param src individual address of source
 	 * @param dst destination address
-	 * @param tpdu data array, starting with the TPCI / APCI (transport / application
-	 *        layer protocol control information), i.e., the NPDU without the length field,
-	 *        tpdu.length &lt;= 255
+	 * @param tpdu data array, starting with the TPCI / APCI (transport / application layer protocol
+	 *        control information), i.e., the NPDU without the length field, tpdu.length &le; 255
 	 * @param p message priority, priority set in the control field
 	 */
 	public CEMILDataEx(final int msgCode, final IndividualAddress src, final KNXAddress dst,
@@ -196,16 +187,14 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/**
 	 * Creates a L-Data message, mainly for confirmation.
 	 * <p>
-	 * The message hop count is set to 6, send repetitions according to default medium
-	 * behavior, broadcast and acknowledge request are set to "don't care" in the control
-	 * field.<br>
-	 * 
+	 * The message hop count is set to 6, send repetitions according to default medium behavior,
+	 * broadcast and acknowledge request are set to "don't care" in the control field.<br>
+	 *
 	 * @param msgCode a message code value specified in the L-Data type
 	 * @param src individual address of source
 	 * @param dst destination address
-	 * @param tpdu data array, starting with the TPCI / APCI (transport / application
-	 *        layer protocol control information); i.e., the NPDU without the length field,
-	 *        tpdu.length &lt;= 255
+	 * @param tpdu data array, starting with the TPCI / APCI (transport / application layer protocol
+	 *        control information); i.e., the NPDU without the length field, tpdu.length &le; 255
 	 * @param p message priority, priority set in the control field
 	 * @param confirm confirm flag in the control field, <code>true</code> to set error,
 	 *        <code>false</code> for no error
@@ -222,40 +211,36 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/**
 	 * Creates a L-Data message with full customization for control information.
 	 * <p>
-	 * The confirmation flag of the control field is left out, since it is mutual
-	 * exclusive with the rest of the control information and set to "don't care" (refer
-	 * to {@link #CEMILDataEx(int, IndividualAddress, KNXAddress, byte[], Priority,
-	 * boolean)}).
-	 * 
+	 * The confirmation flag of the control field is left out, since it is mutual exclusive with the
+	 * rest of the control information and set to "don't care" (refer to
+	 * {@link #CEMILDataEx(int, IndividualAddress, KNXAddress, byte[], Priority, boolean)}).
+	 *
 	 * @param msgCode a message code value specified in the L-Data type
 	 * @param src individual address of source
 	 * @param dst destination address
-	 * @param tpdu data array, starting with the TPCI / APCI (transport / application
-	 *        layer protocol control information), i.e., the NPDU without the length field,
-	 *        tpdu.length &lt;= 255
+	 * @param tpdu data array, starting with the TPCI / APCI (transport / application layer protocol
+	 *        control information), i.e., the NPDU without the length field, tpdu.length &le; 255
 	 * @param p message priority, priority set in the control field
-	 * @param repeat for request messages send repetitions on the medium -
-	 *        <code>false</code> for do not repeat if error, <code>true</code> for
-	 *        default repeat behavior;<br>
-	 *        meaning of default behavior on media:<br>
+	 * @param repeat for request messages send repetitions on the medium - <code>false</code> for do
+	 *        not repeat if error, <code>true</code> for default repeat behavior; meaning of default
+	 *        behavior on media:
 	 *        <ul>
 	 *        <li>PL132, RF: no repetitions</li>
 	 *        <li>TP1, PL110: repetitions allowed</li>
 	 *        </ul>
-	 *        for indication message - <code>true</code> if is repeated frame,
-	 *        <code>false</code> otherwise
+	 *        for indication message - <code>true</code> if is repeated frame, <code>false</code>
+	 *        otherwise
 	 * @param broadcast system / domain broadcast behavior, applicable on open media only:
-	 *        <code>false</code> for system broadcast, <code>true</code> for
-	 *        broadcast; on closed media set <code>true</code> for "don't care"
+	 *        <code>false</code> for system broadcast, <code>true</code> for broadcast; on closed
+	 *        media set <code>true</code> for "don't care"
 	 * @param ack acknowledge request, <code>true</code> if acknowledge is requested,
-	 *        <code>false</code> for default behavior;<br>
-	 *        meaning of default behavior on media:<br>
+	 *        <code>false</code> for default behavior; meaning of default behavior on media:
 	 *        <ul>
 	 *        <li>PL132: no acknowledge requested</li>
 	 *        <li>TP1, PL110: acknowledge requested</li>
 	 *        </ul>
-	 * @param hopCount hop count starting value set in control field, in the range 0 &lt;=
-	 *        value &lt;= 7
+	 * @param hopCount hop count starting value set in control field, in the range 0 &le; value &le;
+	 *        7
 	 */
 	public CEMILDataEx(final int msgCode, final IndividualAddress src, final KNXAddress dst,
 		final byte[] tpdu, final Priority p, final boolean repeat, final boolean broadcast,
@@ -269,27 +254,24 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 
 	/**
 	 * Creates a L-Data message, mainly for TP1 media.
-	 * <p>
-	 * 
+	 *
 	 * @param msgCode a message code value specified in the L-Data type
 	 * @param src individual address of source
 	 * @param dst destination address
-	 * @param tpdu data array, starting with the TPCI / APCI (transport / application
-	 *        layer protocol control information), i.e., the NPDU without the length field,
-	 *        tpdu.length &lt;= 255
+	 * @param tpdu data array, starting with the TPCI / APCI (transport / application layer protocol
+	 *        control information), i.e., the NPDU without the length field, tpdu.length &le; 255
 	 * @param p message priority, priority set in the control field
-	 * @param repeat for request message, send repetitions on the medium -
-	 *        <code>false</code> for do not repeat if error, <code>true</code> for
-	 *        default repeat behavior;<br>
-	 *        meaning of default behavior on media:<br>
+	 * @param repeat for request message, send repetitions on the medium - <code>false</code> for do
+	 *        not repeat if error, <code>true</code> for default repeat behavior; meaning of default
+	 *        behavior on media:
 	 *        <ul>
 	 *        <li>PL132, RF: no repetitions</li>
 	 *        <li>TP1, PL110: repetitions allowed</li>
 	 *        </ul>
-	 *        for indication message - <code>true</code> if is repeated frame,
-	 *        <code>false</code> otherwise
-	 * @param hopCount hop count starting value set in control field, in the range 0 &lt;=
-	 *        value &lt;= 7
+	 *        for indication message - <code>true</code> if is repeated frame, <code>false</code>
+	 *        otherwise
+	 * @param hopCount hop count starting value set in control field, in the range 0 &le; value
+	 *        &le; 7
 	 */
 	public CEMILDataEx(final int msgCode, final IndividualAddress src, final KNXAddress dst,
 		final byte[] tpdu, final Priority p, final boolean repeat, final int hopCount)
@@ -301,7 +283,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 * Adds additional information to the message.
 	 * <p>
 	 * It replaces additional information of the same type, if any was previously added.
-	 * 
+	 *
 	 * @param infoType type ID of additional information
 	 * @param info additional information data
 	 */
@@ -311,14 +293,14 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 			throw new KNXIllegalArgumentException("info type out of range [0..254]");
 		if (!checkAddInfoLength(infoType, info.length))
 			throw new KNXIllegalArgumentException("wrong info data length, expected "
-				+ ADDINFO_LENGTHS[infoType] + " bytes");
+					+ ADDINFO_LENGTHS[infoType] + " bytes");
 		putAddInfo(infoType, info);
 	}
 
 	/**
 	 * Returns all additional information currently set.
 	 * <p>
-	 * 
+	 *
 	 * @return a List with {@link AddInfo} objects
 	 */
 	public synchronized List getAdditionalInfo()
@@ -331,13 +313,11 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	}
 
 	/**
-	 * Returns additional information data corresponding to the supplied type ID, if it is
-	 * contained in the message.
-	 * <p>
-	 * 
+	 * Returns additional information data corresponding to the supplied type ID, if it is contained
+	 * in the message.
+	 *
 	 * @param infoType type ID of the request additional information
-	 * @return additional information data or <code>null</code> if no such information
-	 *         is available
+	 * @return additional information data or <code>null</code> if no such information is available
 	 */
 	public synchronized byte[] getAdditionalInfo(final int infoType)
 	{
@@ -357,9 +337,8 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/**
 	 * Returns whether the message assembles an extended frame format.
 	 * <p>
-	 * 
-	 * @return <code>true</code> if this is an extended frame, <code>false</code>
-	 *         otherwise
+	 *
+	 * @return <code>true</code> if this is an extended frame, <code>false</code> otherwise
 	 */
 	public synchronized boolean isExtendedFrame()
 	{
@@ -368,8 +347,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 
 	/**
 	 * Specifies the kind of broadcast to use for sending.
-	 * <p>
-	 * 
+	 *
 	 * @param domainOnly <code>true</code> for doing a broadcast only within the domain,
 	 *        <code>false</code> for a system broadcast
 	 */
@@ -381,9 +359,9 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/**
 	 * Returns the kind of broadcast set for this message.
 	 * <p>
-	 * By default, <code>true</code> is returned, indicating "domain-only" broadcast on
-	 * open media or "don't care" on closed media.
-	 * 
+	 * By default, <code>true</code> is returned, indicating "domain-only" broadcast on open media
+	 * or "don't care" on closed media.
+	 *
 	 * @return <code>true</code> if broadcast only within domain or "don't care" mode,
 	 *         <code>false</code> for system broadcast
 	 */
@@ -394,8 +372,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 
 	/**
 	 * Removes the additional information with the supplied type ID.
-	 * <p>
-	 * 
+	 *
 	 * @param infoType type ID of additional information to remove
 	 */
 	public synchronized void removeAdditionalInfo(final int infoType)
@@ -496,7 +473,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 			final int len = is.read();
 			if (len > remaining || !checkAddInfoLength(type, len))
 				throw new KNXFormatException("invalid length " + len
-					+ " for additional info type 0x" + Integer.toHexString(type), len);
+						+ " for additional info type 0x" + Integer.toHexString(type), len);
 			final byte[] info = new byte[len];
 			is.read(info, 0, len);
 			putAddInfo(type, info);
@@ -524,8 +501,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 
 	/**
 	 * Writes all additional information to <code>os</code>.
-	 * <p>
-	 * 
+	 *
 	 * @param os the output stream
 	 */
 	synchronized void writeAddInfo(final ByteArrayOutputStream os)
@@ -586,7 +562,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		}
 		addInfo[infoType] = (byte[]) info.clone();
 	}
-	
+
 	private long toLong(final byte[] data)
 	{
 		final long l = (data[0] & 0xff) << 8 | data[1] & 0xff;
