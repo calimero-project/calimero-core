@@ -246,6 +246,10 @@ public class UsbConnection implements AutoCloseable
 					// check whether we are waiting for a device feature response service
 					if (tph.getService() == BusAccessServerService.Response)
 						setResponse(r);
+					else if (tph.getService() == BusAccessServerService.Info) {
+						final BusAccessServerFeature feature = r.getFeatureId();
+						logger.info("{} {}", feature, DataUnitBuilder.toHex(r.getData(), ""));
+					}
 				}
 				else
 					logger.warn("unexpected service {}: {}", tph.getService(),

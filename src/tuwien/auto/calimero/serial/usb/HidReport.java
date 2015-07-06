@@ -282,6 +282,12 @@ public final class HidReport
 		return data;
 	}
 
+	// only applicable for the Bus Access Server Feature protocol
+	BusAccessServerFeature getFeatureId()
+	{
+		return BusAccessServerFeature.values()[featureId - 1];
+	}
+
 	byte[] toByteArray()
 	{
 		final ByteArrayOutputStream os = new ByteArrayOutputStream(maxReportSize);
