@@ -236,7 +236,7 @@ public class UsbConnection implements AutoCloseable
 			final String dir = DescriptorUtils.getDirectionName(epaddr);
 
 			final byte[] data = event.getData();
-			logger.debug("EP {} {} I/O request {}", idx, dir, DataUnitBuilder.toHex(data, ""));
+			logger.trace("EP {} {} I/O request {}", idx, dir, DataUnitBuilder.toHex(data, ""));
 			try {
 				final HidReport r = new HidReport(data);
 				final TransferProtocolHeader tph = r.getTransferProtocolHeader();
@@ -400,7 +400,7 @@ public class UsbConnection implements AutoCloseable
 	{
 		try {
 			final byte[] data = report.toByteArray();
-			logger.debug("sending I/O request {}", DataUnitBuilder.toHex(data, ""));
+			logger.trace("sending I/O request {}", DataUnitBuilder.toHex(data, ""));
 			out.syncSubmit(data);
 		}
 		catch (final UsbException | UsbNotActiveException | UsbNotClaimedException
