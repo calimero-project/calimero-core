@@ -148,13 +148,15 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 *
 	 * @param data byte stream containing a cEMI L-Data message
 	 * @param offset start offset of cEMI frame in <code>data</code>
+	 * @param length length in bytes of the whole cEMI message in <code>data</code>
 	 * @throws KNXFormatException if no (valid) frame was found
 	 */
-	public CEMILDataEx(final byte[] data, final int offset) throws KNXFormatException
+	public CEMILDataEx(final byte[] data, final int offset, final int length)
+		throws KNXFormatException
 	{
-		if (data.length - offset < BASIC_LENGTH + 1)
+		if (data.length - offset < length || length < BASIC_LENGTH + 1)
 			throw new KNXFormatException("buffer too short for frame");
-		final ByteArrayInputStream is = new ByteArrayInputStream(data, offset, data.length - offset);
+		final ByteArrayInputStream is = new ByteArrayInputStream(data, offset, length);
 		readMC(is);
 		readAddInfo(is);
 		readCtrlAndAddr(is);

@@ -80,13 +80,13 @@ public final class CEMIFactory
 		case CEMILData.MC_LDATA_IND:
 			if (length < 26) {
 				try {
-					return new CEMILData(data, offset);
+					return new CEMILData(data, offset, length);
 				}
 				catch (final KNXFormatException e) {
 					// fall-through and try if the extended cEMI works
 				}
 			}
-			return new CEMILDataEx(data, offset);
+			return new CEMILDataEx(data, offset, length);
 		case CEMIDevMgmt.MC_PROPREAD_REQ:
 		case CEMIDevMgmt.MC_PROPREAD_CON:
 		case CEMIDevMgmt.MC_PROPWRITE_REQ:
