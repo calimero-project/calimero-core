@@ -189,7 +189,7 @@ public class KNXnetIPHeader
 			throw new KNXFormatException("unsupported header size, expected " + HEADER_SIZE_10,
 					headersize);
 		if (version != KNXNETIP_VERSION_10)
-			throw new KNXFormatException("unsupported KNXnet/IP protocol " + "version, expected "
+			throw new KNXFormatException("unsupported KNXnet/IP protocol version, expected "
 					+ KNXNETIP_VERSION_10, version);
 	}
 

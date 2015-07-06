@@ -154,7 +154,7 @@ public class RFLData implements RawFrame
 		final ByteArrayInputStream is = new ByteArrayInputStream(frame, offset, frame.length
 				- offset);
 		if (is.available() < MinLength)
-			throw new KNXFormatException("data length " + is.available() + " < " + MinLength);
+			throw new KNXFormatException("minimum data length < " + MinLength, is.available());
 
 		//
 		// 1st block, 10 octets
@@ -163,7 +163,7 @@ public class RFLData implements RawFrame
 		// frame _data_ length
 		length = is.read();
 		if (length == ReservedLength)
-			throw new KNXFormatException("unsupported RF frame of length " + ReservedLength);
+			throw new KNXFormatException("unsupported RF frame length", ReservedLength);
 
 		final int c = is.read();
 		if (c != Send_NoReply)
@@ -171,13 +171,13 @@ public class RFLData implements RawFrame
 
 		final int esc = is.read();
 		if (esc != Escape)
-			throw new KNXFormatException("invalid Escape field 0x" + Integer.toHexString(esc));
+			throw new KNXFormatException("invalid Escape field", esc);
 
 		// RF info
 		final int info = is.read();
 		final int hi = info & 0xf0;
 		if (hi != 0)
-			throw new KNXFormatException("invalid RF info field " + info);
+			throw new KNXFormatException("invalid RF info field", info);
 		final int rssvalue = (info >>> 2) & 0x03;
 		rss = RSS.values()[rssvalue];
 		batteryOk = (info & 0x02) == 0x02;
@@ -208,8 +208,7 @@ public class RFLData implements RawFrame
 		final boolean std = extFormat == 0;
 		final boolean lteExt = (extFormat & 0x0c) == 0x04;
 		if (!std && !lteExt)
-			throw new KNXFormatException("unsupported frame format 0x"
-					+ Integer.toHexString(extFormat));
+			throw new KNXFormatException("unsupported frame format", extFormat);
 
 		// Check HVAC Easy Extension bits
 		if (lteExt) {
@@ -241,7 +240,7 @@ public class RFLData implements RawFrame
 		// allocate array for complete TPDU
 		final int tpduSize = length - TpduOffset;
 		if (tpduSize < 0)
-			throw new KNXFormatException("invalid RF L-Data length " + length + ", TPDU size < 0");
+			throw new KNXFormatException("invalid RF L-Data length, TPDU size < 0", length);
 		tpdu = new byte[tpduSize];
 		// read TPDU contained in 2nd block
 		is.read(tpdu, 0, Math.min(Block2TpduSize, tpduSize));

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -739,7 +739,7 @@ public class DPTXlatorDateTime extends DPTXlator
 				return ms;
 			}
 			catch (final IllegalArgumentException e) {
-				throw new KNXFormatException("invalid calendar value " + e.getMessage());
+				throw new KNXFormatException("invalid calendar value", e.getMessage());
 			}
 		}
 	}

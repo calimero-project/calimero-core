@@ -98,8 +98,7 @@ public final class CEMIFactory
 		case CEMIBusMon.MC_BUSMON_IND:
 			return new CEMIBusMon(data, offset, length);
 		default:
-			throw new KNXFormatException("Unsupported cEMI msg code 0x" + Integer.toHexString(mc),
-					mc);
+			throw new KNXFormatException("unsupported cEMI msg code", mc);
 		}
 	}
 
@@ -145,8 +144,7 @@ public final class CEMIFactory
 			return CEMIBusMon.newWithStatus(f.getStatus(), f.getTimestamp(),
 					f.getTimestampType() == CEMIBusMon.TYPEID_TIMESTAMP_EXT, data);
 		default:
-			throw new KNXFormatException("not supported cEMI msg code 0x"
-					+ Integer.toHexString(msgCode), msgCode);
+			throw new KNXFormatException("unsupported cEMI msg code", msgCode);
 		}
 	}
 

@@ -77,8 +77,7 @@ public final class IPCurrentConfigDIB extends DIB
 		if (type != IP_CURRENT_CONFIG)
 			throw new KNXFormatException("no IP current config DIB, wrong type ID " + type);
 		if (size < DIB_SIZE)
-			throw new KNXFormatException("IP current config DIB too short, " + size + " < "
-					+ DIB_SIZE);
+			throw new KNXFormatException("IP current config DIB too short, < " + DIB_SIZE, size);
 		final ByteArrayInputStream is = new ByteArrayInputStream(data, offset + 2, data.length
 				- offset - 2);
 		ip = new byte[4];
@@ -92,7 +91,7 @@ public final class IPCurrentConfigDIB extends DIB
 		assignment = is.read();
 		final int reserved = is.read();
 		if (reserved != 0)
-			throw new KNXFormatException("reserved field shall be set 0, but is " + reserved);
+			throw new KNXFormatException("reserved field shall be set 0", reserved);
 	}
 
 	/**

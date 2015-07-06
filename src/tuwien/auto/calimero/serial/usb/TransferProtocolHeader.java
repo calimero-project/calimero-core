@@ -148,10 +148,10 @@ public final class TransferProtocolHeader
 			set = EnumSet.allOf(BusAccessServerService.class);
 		}
 		else
-			throw new KNXFormatException("unsupported protocol ID " + p);
+			throw new KNXFormatException("unsupported protocol ID", p);
 		set.removeIf((s) -> s.id() != id);
 		if (set.isEmpty())
-			throw new KNXFormatException("unsupported service/EMI ID " + id);
+			throw new KNXFormatException("unsupported service/EMI ID", id);
 		svc = set.iterator().next();
 
 		final int mhi = (frame[i++] & 0xff) << 8;

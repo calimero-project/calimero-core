@@ -236,13 +236,13 @@ final class BcuSwitcher
 	private static byte[] dataOfGetValueCon(final byte[] frame) throws KNXFormatException
 	{
 		if (frame.length < frameOffsetData)
-			throw new KNXFormatException("frame too short for Get-Value.con");
-		if ((frame[0] & 0xff) != getValue_con)
-			throw new KNXFormatException("no Get-Value.con message");
+			throw new KNXFormatException("frame too short for Get-Value.con", frame.length);
+		final int mc = frame[0] & 0xff;
+		if (mc != getValue_con)
+			throw new KNXFormatException("no Get-Value.con message", mc);
 		final int length = frame[1] & 0xff;
 		if (length + frameOffsetData != frame.length)
-			throw new KNXFormatException("invalid length " + length + " for frame size "
-					+ frame.length);
+			throw new KNXFormatException("invalid length for frame size " + frame.length, length);
 		final byte[] data = new byte[length];
 		for (int i = 0; i < length; i++) {
 			data[i] = frame[frameOffsetData + i];

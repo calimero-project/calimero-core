@@ -481,8 +481,8 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 			final int type = is.read();
 			final int len = is.read();
 			if (len > remaining || !checkAddInfoLength(type, len))
-				throw new KNXFormatException("invalid length " + len
-						+ " for additional info type 0x" + Integer.toHexString(type), len);
+				throw new KNXFormatException("additional info type 0x" + Integer.toHexString(type)
+						+ " with invalid length", len);
 			final byte[] info = new byte[len];
 			is.read(info, 0, len);
 			putAddInfo(type, info);
