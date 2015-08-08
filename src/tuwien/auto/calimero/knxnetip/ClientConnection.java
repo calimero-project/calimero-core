@@ -173,12 +173,13 @@ abstract class ClientConnection extends ConnectionBase
 			throw new KNXException("on connect to " + serverCtrlEP + ": " + thrown.getMessage());
 		}
 
-		logger.info("wait for connect response from " + ctrlEndpt + " ...");
+		logger.debug("wait for connect response from " + ctrlEndpt + " ...");
 		startReceiver();
 		try {
 			final boolean changed = waitForStateChange(CLOSED, CONNECT_REQ_TIMEOUT);
 			if (state == OK) {
-				(heartbeat = new HeartbeatMonitor()).start();
+				heartbeat = new HeartbeatMonitor();
+				heartbeat.start();
 				logger.info("connection established");
 				return;
 			}
@@ -235,7 +236,7 @@ abstract class ClientConnection extends ConnectionBase
 		// throw on no answer
 		if (internalState == ClientConnection.CEMI_CON_PENDING) {
 			final KNXTimeoutException e = new KNXTimeoutException("no confirmation reply received");
-			logger.info("response timeout waiting for confirmation", e);
+			logger.warn("response timeout waiting for confirmation", e);
 			internalState = OK;
 			throw e;
 		}
@@ -245,8 +246,10 @@ abstract class ClientConnection extends ConnectionBase
 	 * @see tuwien.auto.calimero.knxnetip.ConnectionBase#handleServiceType
 	 *      (tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader, byte[], int,
 	 *      java.net.InetAddress, int)
+	 * @throws KNXFormatException
 	 * @throws IOException
 	 */
+	@SuppressWarnings("unused")
 	@Override
 	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data,
 		final int offset, final InetAddress src, final int port) throws KNXFormatException,
@@ -268,20 +271,22 @@ abstract class ClientConnection extends ConnectionBase
 				// empty, we fall back to the IP address and port of the sender
 				if (useNat && (ip == null || ip.isAnyLocalAddress() || ep.getPort() == 0)) {
 					dataEndpt = new InetSocketAddress(src, port);
-					logger.info("NAT aware mode: using server data endpoint " + dataEndpt);
+					logger.debug("NAT aware mode: using server data endpoint " + dataEndpt);
 				}
 				else {
 					dataEndpt = new InetSocketAddress(ip, ep.getPort());
-					logger.info("using server-assigned data endpoint " + dataEndpt);
+					logger.debug("using server-assigned data endpoint " + dataEndpt);
 				}
 				checkVersion(h);
 				setStateNotify(OK);
 				return true;
 			}
 			if (ep != null && ep.getHostProtocol() != HPAI.IPV4_UDP)
-				logger.error(status = "server does not agree with UDP/IP");
+				status = "server does not agree with UDP/IP";
 			else
-				logger.error(status = res.getStatusString());
+				status = res.getStatusString();
+
+			logger.error(status);
 			setStateNotify(ACK_ERROR);
 		}
 		else if (svc == KNXnetIPHeader.CONNECTIONSTATE_REQ)
