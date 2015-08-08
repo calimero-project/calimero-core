@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2011 B. Malinowsky
+    Copyright (c) 2010, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ import tuwien.auto.calimero.log.LogManager;
  * <p>
  * The communication on OSI layer 4 is done with UDP.<br>
  * Implements a communication heartbeat monitor.
- * 
+ *
  * @author B. Malinowsky
  */
 abstract class ClientConnection extends ConnectionBase
@@ -83,13 +83,11 @@ abstract class ClientConnection extends ConnectionBase
 	/**
 	 * Status code of communication: waiting for cEMI confirmation after receive service
 	 * acknowledgment, no error, not ready to send.
-	 * <p>
 	 */
 	public static final int CEMI_CON_PENDING = 4;
 
 	/**
 	 * Status code of communication: unknown error, no send possible.
-	 * <p>
 	 */
 	public static final int UNKNOWN_ERROR = -1;
 
@@ -116,7 +114,7 @@ abstract class ClientConnection extends ConnectionBase
 	 * <p>
 	 * The communication state of this object is assumed to be closed state. This method
 	 * is designed to be called only once during the objects lifetime!
-	 * 
+	 *
 	 * @param localEP the local endpoint to use for communication channel
 	 * @param serverCtrlEP the remote server control endpoint used for connect request
 	 * @param cri connect request information used to configure the communication
@@ -175,12 +173,13 @@ abstract class ClientConnection extends ConnectionBase
 			throw new KNXException("on connect to " + serverCtrlEP + ": " + thrown.getMessage());
 		}
 
-		logger.info("wait for connect response from " + ctrlEndpt + " ...");
+		logger.trace("wait for connect response from " + ctrlEndpt + " ...");
 		startReceiver();
 		try {
 			final boolean changed = waitForStateChange(CLOSED, CONNECT_REQ_TIMEOUT);
 			if (state == OK) {
-				(heartbeat = new HeartbeatMonitor()).start();
+				heartbeat = new HeartbeatMonitor();
+				heartbeat.start();
 				logger.info("connection established");
 				return;
 			}
@@ -235,7 +234,7 @@ abstract class ClientConnection extends ConnectionBase
 		// throw on no answer
 		if (internalState == ClientConnection.CEMI_CON_PENDING) {
 			final KNXTimeoutException e = new KNXTimeoutException("no confirmation reply received");
-			logger.log(LogLevel.INFO, "response timeout waiting for confirmation", e);
+			logger.log(LogLevel.WARN, "response timeout waiting for confirmation", e);
 			internalState = OK;
 			throw e;
 		}
@@ -245,6 +244,7 @@ abstract class ClientConnection extends ConnectionBase
 	 * @see tuwien.auto.calimero.knxnetip.ConnectionBase#handleServiceType
 	 *      (tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader, byte[], int,
 	 *      java.net.InetAddress, int)
+	 * @throws KNXFormatException
 	 * @throws IOException
 	 */
 	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data,
@@ -267,20 +267,22 @@ abstract class ClientConnection extends ConnectionBase
 				// empty, we fall back to the IP address and port of the sender
 				if (useNat && (ip == null || ip.isAnyLocalAddress() || ep.getPort() == 0)) {
 					dataEndpt = new InetSocketAddress(src, port);
-					logger.info("NAT aware mode: using server data endpoint " + dataEndpt);
+					logger.trace("NAT aware mode: using server data endpoint " + dataEndpt);
 				}
 				else {
 					dataEndpt = new InetSocketAddress(ip, ep.getPort());
-					logger.info("using server-assigned data endpoint " + dataEndpt);
+					logger.trace("using server-assigned data endpoint " + dataEndpt);
 				}
 				checkVersion(h);
 				setStateNotify(OK);
 				return true;
 			}
 			if (ep != null && ep.getHostProtocol() != HPAI.IPV4_UDP)
-				logger.error(status = "server does not agree with UDP/IP");
+				status = "server does not agree with UDP/IP";
 			else
-				logger.error(status = res.getStatusString());
+				status = res.getStatusString();
+
+			logger.error(status);
 			setStateNotify(ACK_ERROR);
 		}
 		else if (svc == KNXnetIPHeader.CONNECTIONSTATE_REQ)
@@ -351,7 +353,7 @@ abstract class ClientConnection extends ConnectionBase
 	 * <p>
 	 * On unsupported version,
 	 * {@link ClientConnection#close(int, String, LogLevel, Throwable)} is invoked.
-	 * 
+	 *
 	 * @param h KNX header to check
 	 * @return <code>true</code> on supported version, <code>false</code> otherwise
 	 */
@@ -370,7 +372,7 @@ abstract class ClientConnection extends ConnectionBase
 		stopReceiver();
 		socket.close();
 		setState(CLOSED);
-		logger.error("establishing connection failed", thrown);
+		logger.error("establishing connection failed because of " + thrown.getMessage());
 		LogManager.getManager().removeLogService(logger.getName());
 	}
 
