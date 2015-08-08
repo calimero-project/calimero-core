@@ -114,11 +114,11 @@ public class ManagementProceduresImplTest extends TestCase
 	public final void testReadAddress() throws KNXException, InterruptedException
 	{
 		IndividualAddress[] read = mp.readAddress();
-		assertEquals(read.length, 0);
-		mp.setProgrammingMode(device, true);
+		assertEquals(1, read.length);
+		mp.setProgrammingMode(Util.getKnxDevice(), false);
 		read = mp.readAddress();
-		assertEquals(read.length, 1);
-		mp.setProgrammingMode(device, false);
+		assertEquals(0, read.length);
+		mp.setProgrammingMode(Util.getKnxDevice(), true);
 	}
 
 	/**
@@ -130,16 +130,19 @@ public class ManagementProceduresImplTest extends TestCase
 	 */
 	public final void testWriteAddress() throws KNXException, InterruptedException
 	{
+		final IndividualAddress programDevice = Util.getKnxDevice();
 		final IndividualAddress nonexist2 = Util.getNonExistingKnxDevice();
 		boolean write = mp.writeAddress(nonexist2);
+		assertTrue(write);
+
+		mp.setProgrammingMode(nonexist2, false);
+		write = mp.writeAddress(programDevice);
 		assertFalse(write);
 
-		mp.setProgrammingMode(device, true);
-		write = mp.writeAddress(nonexist2);
-		assertTrue(write);
 		// undo address change
 		mp.setProgrammingMode(nonexist2, true);
-		mp.writeAddress(device);
+		write = mp.writeAddress(programDevice);
+		assertTrue(write);
 	}
 
 	/**
@@ -183,7 +186,7 @@ public class ManagementProceduresImplTest extends TestCase
 	 */
 	public final void testReadAddressByte() throws KNXException, InterruptedException
 	{
-		final byte[] serialNo = new byte[] {0x10, 0x10, 0x10, 0x10, 0x10, 0x10 };
+		final byte[] serialNo = new byte[] {0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
 		mp.readAddress(serialNo);
 	}
 
@@ -197,8 +200,8 @@ public class ManagementProceduresImplTest extends TestCase
 	public final void testWriteAddressByteArrayIndividualAddress() throws KNXException,
 		InterruptedException
 	{
-		final byte[] serialNo = new byte[] { 0x10, 0x10, 0x10, 0x10, 0x10, 0x10 };
-		mp.writeAddress(serialNo, new IndividualAddress(1, 1, 10));
+		final byte[] serialNo = new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
+		mp.writeAddress(serialNo, new IndividualAddress(1, 1, 5));
 	}
 
 	/**
@@ -336,6 +339,6 @@ public class ManagementProceduresImplTest extends TestCase
 	 */
 	public final void testReadMemoryLong() throws KNXException, InterruptedException
 	{
-		/*final byte[] data =*/ mp.readMemory(device, 0x20, 8);
+		/*final byte[] data =*/ mp.readMemory(device, 0x20, 17);
 	}
 }
