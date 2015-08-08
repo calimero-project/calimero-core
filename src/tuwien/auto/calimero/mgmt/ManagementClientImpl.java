@@ -361,7 +361,7 @@ public class ManagementClientImpl implements ManagementClient
 	{
 		// we allow 6 bytes ASDU for RF domains
 		return makeDOAs(readBroadcast(priority,
-				DataUnitBuilder.createLengthOptimizedAPDU(DOA_READ, null), DOA_RESPONSE, 6, 6,
+				DataUnitBuilder.createLengthOptimizedAPDU(DOA_READ, null), DOA_RESPONSE, 2, 6,
 				oneDomainOnly));
 	}
 
