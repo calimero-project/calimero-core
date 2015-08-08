@@ -254,7 +254,7 @@ public final class CEMIFactory
 	}
 
 	/**
-	 * Returns an EMI-formatted message of the supplied cEMI L-Data message.
+	 * Returns an EMI1/EMI2-formatted message of the supplied cEMI L-Data message.
 	 *
 	 * @param msg a cEMI L-Data message
 	 * @return byte array containing the link layer message in EMI format
@@ -262,25 +262,56 @@ public final class CEMIFactory
 	 */
 	public static byte[] toEmi(final CEMILData msg)
 	{
-		// TP1, standard frames only
+		final int mc = msg.getMessageCode();
+		final KNXAddress dst = msg.getDestination();
+		final Priority p = msg.getPriority();
+		final boolean repeat = msg.isRepetition();
+		final boolean ackRequest = msg.isAckRequested();
+		final boolean posCon = msg.isPositiveConfirmation();
+		final int hopCount = msg.getHopCount();
 		final byte[] nsdu = msg.getPayload();
+		return toEmi(mc, dst, p, repeat, ackRequest, posCon, hopCount, nsdu);
+	}
+
+	/**
+	 * Returns an EMI1/EMI2-formatted message using the specified L-Data message parameters. This
+	 * method performs the same formatting as {@link #toEmi(CEMILData)}, with the flexibility of
+	 * individual message parameters from an already dissected cEMI L-Data message.
+	 *
+	 * @param mc message code
+	 * @param p message priority
+	 * @param repeat see
+	 *        {@link CEMILData#CEMILData(int, IndividualAddress, KNXAddress, byte[], Priority, boolean, boolean, boolean, int)}
+	 * @param ackRequest see
+	 *        {@link CEMILData#CEMILData(int, IndividualAddress, KNXAddress, byte[], Priority, boolean, boolean, boolean, int)}
+	 * @param positiveCon positive confirmation, <code>true</code> if not applicable
+	 * @param hopCount the hop count starting value set in control field, in the range 0 &lt;= value
+	 *        &lt;= 7
+	 * @param nsdu the NSDU
+	 * @return byte array containing the link layer message in EMI1/EMI2 format
+	 * @throws KNXIllegalArgumentException on unsupported ASDU length
+	 */
+	public static byte[] toEmi(final int mc, final KNXAddress dst, final Priority p,
+		final boolean repeat, final boolean ackRequest, final boolean positiveCon,
+		final int hopCount, final byte[] nsdu)
+	{
+		// TP1, standard frames only
 		if (nsdu.length > 16)
 			throw new KNXIllegalArgumentException("maximum TPDU length is 16 in standard frame");
 		final byte[] buf = new byte[nsdu.length + 7];
-		buf[0] = (byte) msg.getMessageCode();
+		buf[0] = (byte) mc;
 
-		buf[1] = (byte) (msg.getPriority().value << 2);
-		final int ctrl = (msg.isRepetition() ? 0x20 : 0) | (msg.isAckRequested() ? 0x02 : 0)
-				| (msg.isPositiveConfirmation() ? 0 : 0x01);
+		buf[1] = (byte) (p.value << 2);
+		// repeat flag is only relevant for .con
+		boolean rep = mc == Emi1_LData_con ? repeat : false;
+		final int ctrl = (rep ? 0x20 : 0) | (ackRequest ? 0x02 : 0) | (positiveCon ? 0 : 0x01);
 		buf[1] |= (byte) ctrl;
 
 		// on dst null, default address 0 is used (null indicates system broadcast in link API)
-		final KNXAddress dst = msg.getDestination();
 		final int d = dst != null ? dst.getRawAddress() : 0;
 		buf[4] = (byte) (d >> 8);
 		buf[5] = (byte) d;
 
-		final int hopCount = msg.getHopCount();
 		buf[6] = (byte) (hopCount << 4 | (nsdu.length - 1));
 		if (dst instanceof GroupAddress)
 			buf[6] |= 0x80;
