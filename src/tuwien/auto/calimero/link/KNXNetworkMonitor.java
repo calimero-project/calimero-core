@@ -59,7 +59,7 @@ import tuwien.auto.calimero.log.LogService;
  *
  * @author B. Malinowsky
  */
-public interface KNXNetworkMonitor
+public interface KNXNetworkMonitor extends AutoCloseable
 {
 	/**
 	 * Supplies medium information necessary for KNX communication.
