@@ -169,7 +169,7 @@ public abstract class KNXMediumSettings
 	 * @return the KNX medium type code
 	 * @throws KNXIllegalArgumentException on unknown medium code
 	 */
-	/*public*/static int getMedium(final String mediumName)
+	public static int getMedium(final String mediumName)
 	{
 		if ("tp1".equalsIgnoreCase(mediumName))
 			return MEDIUM_TP1;
@@ -229,6 +229,6 @@ public abstract class KNXMediumSettings
 	@Override
 	public String toString()
 	{
-		return getMediumString() + " medium device " + dev;
+		return getMediumString() + " medium, device " + dev;
 	}
 }
