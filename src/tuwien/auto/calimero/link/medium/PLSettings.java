@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
  * Provides settings necessary for communication on PL (powerline) medium.
  * <p>
  * This settings type is used for powerline medium PL132 and PL110.
- * 
+ *
  * @author B. Malinowsky
  */
 public class PLSettings extends KNXMediumSettings
@@ -56,7 +56,7 @@ public class PLSettings extends KNXMediumSettings
 	/**
 	 * Creates a new settings container with PL medium specific information.
 	 * <p>
-	 * 
+	 *
 	 * @param device individual device address to use as source address in KNX messages,
 	 *        specifying <code>null</code> uses the individual address 0.0.0
 	 * @param domain byte array containing the domain address to use in KNX messages,
@@ -77,7 +77,7 @@ public class PLSettings extends KNXMediumSettings
 	 * <p>
 	 * The device address is initialized to 0.0.0 and domain address is set to broadcast
 	 * domain.
-	 * 
+	 *
 	 * @param mediumPL132 <code>true</code> if communicating on PL132,
 	 *        <code>false</code> if communicating on PL110
 	 */
@@ -91,7 +91,7 @@ public class PLSettings extends KNXMediumSettings
 	/**
 	 * Sets a new domain address.
 	 * <p>
-	 * 
+	 *
 	 * @param domain byte array containing the domain address to use in KNX messages,
 	 *        address is given in network byte order, <code>domain.length</code> = 2,
 	 *        supplying <code>null</code> defaults to the broadcast domain
@@ -110,7 +110,7 @@ public class PLSettings extends KNXMediumSettings
 	 * Returns the domain address.
 	 * <p>
 	 * The address is returned in network byte order.
-	 * 
+	 *
 	 * @return domain address as byte array of length = 2
 	 */
 	public final synchronized byte[] getDomainAddress()
@@ -125,11 +125,11 @@ public class PLSettings extends KNXMediumSettings
 	{
 		return pl132 ? MEDIUM_PL132 : MEDIUM_PL110;
 	}
-	
+
 	/**
 	 * Returns whether settings are for communication on PL132 medium or PL110 medium.
 	 * <p>
-	 * 
+	 *
 	 * @return <code>true</code> for PL132, <code>false</code> for PL110
 	 */
 	public final boolean isPL132()
@@ -142,6 +142,7 @@ public class PLSettings extends KNXMediumSettings
 	 */
 	public String toString()
 	{
-		return super.toString() + " domain " + ((doa[0] & 0xff) << 8 | doa[1] & 0xff);
+		return super.toString() + " in domain 0x"
+				+ Integer.toHexString((doa[0] & 0xff) << 8 | doa[1] & 0xff);
 	}
 }
