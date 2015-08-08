@@ -42,8 +42,6 @@ import java.util.EventListener;
 import java.util.Iterator;
 import java.util.List;
 
-import org.slf4j.Logger;
-
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.FrameEvent;
@@ -61,32 +59,36 @@ import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.NetworkLinkListener;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
-import tuwien.auto.calimero.log.LogService;
 
 /**
- * A network buffer temporarily stores KNX network messages.
+ * A network buffer temporarily stores KNX network messages for better response and/or KNX network
+ * performance. Reasons to use a network buffer might be to lower the response time when answering
+ * frequently occurring application queries, leading to a better runtime performance. Another use
+ * would be to enable user-polled applications. Interfaces for KNX access as well as the KNX
+ * transmission medium differ in processing delays and maximum message rates. This can have adverse
+ * effects, caused by queue overflows or dropped messages, for client applications that do not take
+ * those limitations into account. Overall, a network buffer helps in keeping the KNX network
+ * message load lower for client usage patterns that are not optimal for a KNX network.
  * <p>
- * Reasons to do this might be to lower the response time when answering frequently
- * occurring application queries, leading to a better runtime performance. Another use
- * would be to enable user polled applications.
+ * The purpose of the network buffer is to locally reflect the most up-to-date state (or command
+ * sequence) of KNX datapoints. It is not designed as general-purpose message store. KNX messages
+ * are buffered at link layer (L_Data).
  * <p>
- * A network buffer contains one or more {@link Configuration}s, each of it maintains a
- * setting how to handle, i.e., filter and buffer, certain messages. In other words, a
- * network buffer's knowledge for how to buffer messages by adding configurations.<br>
- * A configuration works with filters set by the user for that configuration. There are
- * two situations a filter can be inserted in the buffer message flow: when messages
- * arrive from the KNX network to the buffer, and when the buffer answers a message request.
- * Two types of filters exist for this, a {@link Configuration.NetworkFilter} applies
- * its filter rules on incoming messages, a {@link Configuration.RequestFilter} filters
- * message requests from users and answers them using the network buffer.<br>
- * If a created configuration is activated and no network filter is set, a default filter
- * is used, which simply accepts all cEMI L-Data.<br>
- * If no request filter is set, no buffer lookup is done on requests, instead the request
- * is forwarded directly to the KNX network.
+ * A network buffer contains one or more {@link Configuration}s, each maintaining rules to filter
+ * and buffer messages. A configuration works with filters set by the user for that particular
+ * configuration. At two points in the messages flow a filter can be specified: when messages arrive
+ * from the KNX network at the buffer, and when the buffer shall answers a message request. Two
+ * types of filters exist for this, a {@link Configuration.NetworkFilter} applies its filter rules
+ * on incoming messages, a {@link Configuration.RequestFilter} filters message requests from users
+ * and answers them using the network buffer.<br>
+ * If a configuration is active and no network filter is set, a default filter is used, which simply
+ * accepts all cEMI L-Data.<br>
+ * If no request filter is set, no buffer lookup is done on requests, instead the request is
+ * forwarded directly to the KNX network.
  * <p>
- * In general, one network buffer is created for one KNX installation, to easier
- * distinguish between different installations. Nevertheless, this is not enforced in any
- * way; a new configuration also might just always use a new network buffer.
+ * In general, one network buffer is created for one KNX installation, to easier distinguish between
+ * different installations. Nevertheless, this is not enforced in any way; a new configuration also
+ * might just always use a new network buffer.
  *
  * @author B. Malinowsky
  */
@@ -388,11 +390,6 @@ public final class NetworkBuffer
 		}
 	}
 
-	/** Name of the log service used for network buffer logging. */
-	public static final String LOG_SERVICE = "network buffer";
-
-	static final Logger logger = LogService.getLogger(LOG_SERVICE);
-
 	// all network buffers currently in use
 	// private static final List buffers = new ArrayList();
 	private static int uniqueInstID;
@@ -419,12 +416,7 @@ public final class NetworkBuffer
 	 */
 	public static synchronized NetworkBuffer createBuffer(final String installationId)
 	{
-		//if (getBuffer(installationId) != null)
-		//	throw new KNXIllegalArgumentException("buffer \"" + installationId
-		//		+ "\" already exists");
 		final NetworkBuffer b = new NetworkBuffer(validateInstID(installationId));
-		//buffers.add(b);
-		logger.info("created network buffer \"" + installationId + "\"");
 		return b;
 	}
 
@@ -446,7 +438,6 @@ public final class NetworkBuffer
 	{
 		final ConfigImpl c = new ConfigImpl(link);
 		configs.add(c);
-		logger.info("created configuration for " + link.getName());
 		return c;
 	}
 
@@ -463,7 +454,6 @@ public final class NetworkBuffer
 	{
 		if (configs.remove(c)) {
 			((ConfigImpl) c).unregister();
-			logger.info("removed configuration of " + c.getBaseLink().getName());
 		}
 	}
 

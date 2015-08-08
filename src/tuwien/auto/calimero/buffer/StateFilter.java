@@ -60,6 +60,7 @@ import tuwien.auto.calimero.datapoint.Datapoint;
 import tuwien.auto.calimero.datapoint.DatapointMap;
 import tuwien.auto.calimero.datapoint.DatapointModel;
 import tuwien.auto.calimero.datapoint.StateDP;
+import tuwien.auto.calimero.log.LogService;
 
 /**
  * Predefined filter for filtering KNX messages of datapoints with state semantic into the
@@ -201,7 +202,8 @@ public class StateFilter implements NetworkFilter, RequestFilter
 				copy = (CEMILData) CEMIFactory.create(CEMILData.MC_LDATA_IND, d, f);
 			}
 			catch (final KNXFormatException e) {
-				NetworkBuffer.logger.error("preparing message for buffer failed", e);
+				LogService.getLogger("calimero").error("create L_Data.ind for network buffer: {}",
+						f, e);
 				return;
 			}
 		}
