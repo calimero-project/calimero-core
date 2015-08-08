@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -82,7 +82,6 @@ public class ManagementClientImplTest extends TestCase
 
 		lnk = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, null, Util.getServer(), false,
 				TPSettings.TP1);
-		// LogManager.getManager().removeWriter(lnk.getName(), Util.getLogWriter());
 		mc = new ManagementClientImpl(lnk);
 		// dco = mc.createDestination(new IndividualAddress(3, 0, 0), true);
 		dco2 = mc.createDestination(Util.getKnxDeviceCO(), true);
@@ -231,7 +230,6 @@ public class ManagementClientImplTest extends TestCase
 	public final void testReadAddressBoolean() throws InterruptedException, KNXException
 	{
 		System.out.println("put device into prog mode for read address...");
-		Thread.sleep(5000);
 		IndividualAddress[] ias = mc.readAddress(true);
 		assertTrue(ias.length <= 1);
 		System.out.println(ias[0]);
@@ -474,7 +472,7 @@ public class ManagementClientImplTest extends TestCase
 	public final void testWriteAddressByteArrayIndividualAddress() throws KNXException,
 		InterruptedException
 	{
-		final byte[] sno = new byte[] { 0x00, 0x01, 0x00, 0x11, (byte) 0xcb, 0x08 };
+		final byte[] sno = new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
 		final IndividualAddress write = mc.readAddress(sno);
 		mc.writeAddress(sno, write);
 		final IndividualAddress read = mc.readAddress(sno);
@@ -624,25 +622,25 @@ public class ManagementClientImplTest extends TestCase
 		InterruptedException
 	{
 	try {
-			mc.readDomainAddress(new byte[] { 1, }, Util.getRouterAddress(), -1);
+			mc.readDomainAddress(new byte[] { 1, }, Util.getKnxDeviceCO(), -1);
 			fail("invalid arg");
 		}
 		catch (final KNXIllegalArgumentException e) {}
 		try {
-			mc.readDomainAddress(new byte[] { 1, 2 }, Util.getRouterAddress(), -1);
+			mc.readDomainAddress(new byte[] { 1, 2 }, Util.getKnxDeviceCO(), -1);
 			fail("invalid arg");
 		}
 		catch (final KNXIllegalArgumentException e) {}
 		try {
-			mc.readDomainAddress(new byte[] { 1, 2, }, Util.getRouterAddress(), 256);
+			mc.readDomainAddress(new byte[] { 1, 2, }, Util.getKnxDeviceCO(), 256);
 			fail("invalid arg");
 		}
 		catch (final KNXIllegalArgumentException e) {}
 
 		/*List<byte[]> doas =*/ mc.readDomainAddress(new byte[] { 1, 2, }, Util.getKnxDeviceCO(), 10);
 		final IndividualAddress start = new IndividualAddress(
-				Util.getKnxDeviceCO().getRawAddress() - 10);
-		/*doas =*/ mc.readDomainAddress(new byte[] { 1, 2, }, start, 10);
+				Util.getKnxDeviceCO().getRawAddress() - 3);
+		/*doas =*/ mc.readDomainAddress(new byte[] { 1, 2, }, start, 3);
 	}
 
 	/**

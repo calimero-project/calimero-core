@@ -461,7 +461,6 @@ public class KNXNetworkLinkIPTest extends TestCase
 	{
 		String n = tnl.getName();
 		assertTrue(n.indexOf(Util.getServer().getAddress().getHostAddress()) > -1);
-		assertTrue(n.indexOf("link") > -1);
 		tnl.close();
 		n = tnl.getName();
 		assertNotNull(n);
