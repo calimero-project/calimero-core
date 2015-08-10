@@ -105,8 +105,6 @@ public abstract class AbstractLink implements KNXNetworkLink
 	private volatile int hopCount = 6;
 	private KNXMediumSettings medium;
 
-	private final AutoCloseable conn;
-
 	private final class LinkNotifier extends EventNotifier
 	{
 		LinkNotifier()
@@ -169,10 +167,8 @@ public abstract class AbstractLink implements KNXNetworkLink
 	 * @param name the link name
 	 * @param settings medium settings of the accessed KNX network
 	 */
-	public AbstractLink(final AutoCloseable connection, final String name,
-		final KNXMediumSettings settings)
+	public AbstractLink(final String name, final KNXMediumSettings settings)
 	{
-		conn = connection;
 		this.name = name;
 		logger = LogManager.getManager().getLogService("calimero.link." + getName());
 		notifier = new LinkNotifier();
@@ -262,11 +258,6 @@ public abstract class AbstractLink implements KNXNetworkLink
 		}
 		onClose();
 		notifier.quit();
-		try {
-			if (conn != null)
-				conn.close();
-		}
-		catch (final Exception ignore) {}
 	}
 
 	public String toString()
