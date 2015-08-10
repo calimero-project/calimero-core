@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,289 +36,119 @@
 
 package tuwien.auto.calimero.link;
 
-import org.slf4j.Logger;
-
-import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
-import tuwien.auto.calimero.FrameEvent;
-import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.KNXAckTimeoutException;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
-import tuwien.auto.calimero.KNXFormatException;
-import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXTimeoutException;
-import tuwien.auto.calimero.Priority;
-import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
-import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.serial.FT12Connection;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
 
 /**
  * Implementation of the KNX network network link based on the FT1.2 protocol, using a
  * {@link FT12Connection}.
- * <p>
- * Once a link has been closed, it is not available for further link communication, i.e.
- * it can not be reopened.
  *
  * @author B. Malinowsky
  */
-public class KNXNetworkLinkFT12 implements KNXNetworkLink
+public class KNXNetworkLinkFT12 extends AbstractLink
 {
-	private static final class LinkNotifier extends EventNotifier
-	{
-		LinkNotifier(final Object source, final Logger logger)
-		{
-			super(source, logger);
-		}
-
-		@Override
-		public void frameReceived(final FrameEvent e)
-		{
-			try {
-				final CEMILData f =
-					(CEMILData) CEMIFactory.createFromEMI(e.getFrameBytes());
-				final int mc = f.getMessageCode();
-				if (mc == CEMILData.MC_LDATA_IND) {
-					addEvent(new Indication(new FrameEvent(source, f)));
-					logger.info("indication from " + f.getSource());
-				}
-				else if (mc == CEMILData.MC_LDATA_CON) {
-					addEvent(new Confirmation(new FrameEvent(source, f)));
-					logger.info("confirmation of " + f.getDestination());
-				}
-			}
-			catch (final KNXFormatException ex) {
-				logger.warn("unspecified frame event - ignored", ex);
-			}
-		}
-
-		@Override
-		public void connectionClosed(final CloseEvent e)
-		{
-			((KNXNetworkLinkFT12) source).closed = true;
-			super.connectionClosed(e);
-			logger.info("link closed");
-			LogService.removeLogger(logger);
-		}
-	};
-
 	private static final int PEI_SWITCH = 0xA9;
 
-	private volatile boolean closed;
 	private final FT12Connection conn;
-	private volatile int hopCount = 6;
-	private KNXMediumSettings medium;
-
-	private final String name;
-	private final Logger logger;
-	// our link connection event notifier
-	private final EventNotifier notifier;
 
 	/**
-	 * Creates a new network link based on the FT1.2 protocol for accessing the KNX
-	 * network.
+	 * Creates a new network link based on the FT1.2 protocol for accessing the KNX network.
 	 * <p>
-	 * The port identifier is used to choose the serial port for communication. These
-	 * identifiers are usually device and platform specific.
+	 * The port identifier is used to choose the serial port for communication. These identifiers
+	 * are usually device and platform specific.
 	 *
 	 * @param portID identifier of the serial communication port to use
-	 * @param settings medium settings defining device and medium specifics needed for
-	 *        communication
+	 * @param settings medium settings defining device and medium specifics needed for communication
 	 * @throws KNXException
 	 */
 	public KNXNetworkLinkFT12(final String portID, final KNXMediumSettings settings)
 		throws KNXException
 	{
-		conn = new FT12Connection(portID);
-		linkLayerMode();
-		name = "link " + conn.getPortID();
-		logger = LogService.getLogger(getName());
-		notifier = new LinkNotifier(this, logger);
-		conn.addConnectionListener(notifier);
-		// configure KNX medium stuff
-		setKNXMedium(settings);
+		this(new FT12Connection(portID), settings);
 	}
 
 	/**
-	 * Creates a new network link based on the FT1.2 protocol for accessing the KNX
-	 * network.
+	 * Creates a new network link based on the FT1.2 protocol for accessing the KNX network.
 	 * <p>
-	 * The port number is used to choose the serial port for communication. It is mapped
-	 * to the default port identifier using that number on the platform.
+	 * The port number is used to choose the serial port for communication. It is mapped to the
+	 * default port identifier using that number on the platform.
 	 *
 	 * @param portNumber port number of the serial communication port to use
-	 * @param settings medium settings defining device and medium specifics needed for
-	 *        communication
+	 * @param settings medium settings defining device and medium specifics needed for communication
 	 * @throws KNXException
 	 */
 	public KNXNetworkLinkFT12(final int portNumber, final KNXMediumSettings settings)
 		throws KNXException
 	{
-		conn = new FT12Connection(portNumber);
+		this(new FT12Connection(portNumber), settings);
+	}
+
+	/**
+	 * Creates a new network link to a KNX network based on the supplied FT1.2 protocol connection.
+	 *
+	 * @param c a FT1.2 protocol connection in open state
+	 * @param settings medium settings defining device and medium specifics needed for communication
+	 * @throws KNXException on error, timeout, or interrupt while switching to link layer mode
+	 */
+	protected KNXNetworkLinkFT12(final FT12Connection c, final KNXMediumSettings settings)
+		throws KNXException
+	{
+		super(c, c.getPortID(), settings);
+		cEMI = false;
+		sendCEmiAsByteArray = true;
+		conn = c;
 		linkLayerMode();
-		name = "link " + conn.getPortID();
-		logger = LogService.getLogger(getName());
-		notifier = new LinkNotifier(this, logger);
 		conn.addConnectionListener(notifier);
-		// configure KNX medium stuff
-		setKNXMedium(settings);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#setKNXMedium
-	 * (tuwien.auto.calimero.link.medium.KNXMediumSettings)
-	 */
 	@Override
-	public void setKNXMedium(final KNXMediumSettings settings)
-	{
-		if (settings == null)
-			throw new KNXIllegalArgumentException("medium settings are mandatory");
-		if (medium != null && !settings.getClass().isAssignableFrom(medium.getClass())
-			&& !medium.getClass().isAssignableFrom(settings.getClass()))
-			throw new KNXIllegalArgumentException("medium differs");
-		medium = settings;
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#getKNXMedium()
-	 */
-	@Override
-	public KNXMediumSettings getKNXMedium()
-	{
-		return medium;
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#addLinkListener
-	 * (tuwien.auto.calimero.link.event.NetworkLinkListener)
-	 */
-	@Override
-	public void addLinkListener(final NetworkLinkListener l)
-	{
-		notifier.addListener(l);
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#removeLinkListener
-	 * (tuwien.auto.calimero.link.event.NetworkLinkListener)
-	 */
-	@Override
-	public void removeLinkListener(final NetworkLinkListener l)
-	{
-		notifier.removeListener(l);
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#setHopCount(int)
-	 */
-	@Override
-	public void setHopCount(final int count)
-	{
-		if (count < 0 || count > 7)
-			throw new KNXIllegalArgumentException("hop count out of range [0..7]");
-		hopCount = count;
-		logger.info("hop count set to " + count);
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#getHopCount()
-	 */
-	@Override
-	public int getHopCount()
-	{
-		return hopCount;
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#sendRequest
-	 * (tuwien.auto.calimero.KNXAddress, tuwien.auto.calimero.Priority, byte[])
-	 */
-	@Override
-	public void sendRequest(final KNXAddress dst, final Priority p, final byte[] nsdu)
+	protected void onSend(final KNXAddress dst, final byte[] msg, final boolean waitForCon)
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
-		doSend(createEMI(CEMILData.MC_LDATA_REQ, dst, p, nsdu), false, dst);
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#sendRequestWait
-	 * (tuwien.auto.calimero.KNXAddress, tuwien.auto.calimero.Priority, byte[])
-	 */
-	@Override
-	public void sendRequestWait(final KNXAddress dst, final Priority p, final byte[] nsdu)
-		throws KNXTimeoutException, KNXLinkClosedException
-	{
-		doSend(createEMI(CEMILData.MC_LDATA_REQ, dst, p, nsdu), true, dst);
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#send
-	 * (tuwien.auto.calimero.cemi.CEMILData, boolean)
-	 */
-	@Override
-	public void send(final CEMILData msg, final boolean waitForCon) throws KNXTimeoutException,
-		KNXLinkClosedException
-	{
-		doSend(createEMI(msg), waitForCon, msg.getDestination());
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#getName()
-	 */
-	@Override
-	public String getName()
-	{
-		return name;
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#isOpen()
-	 */
-	@Override
-	public boolean isOpen()
-	{
-		return !closed;
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#close()
-	 */
-	@Override
-	public void close()
-	{
-		synchronized (this) {
-			if (closed)
-				return;
-			closed = true;
+		try {
+			final boolean trace = logger.isTraceEnabled();
+			if (trace || logger.isInfoEnabled())
+				logger.info("send message to " + dst + (waitForCon ? ", wait for ack" : ""));
+			if (trace)
+				logger.trace("EMI {}", DataUnitBuilder.toHex(msg, " "));
+			conn.send(msg, waitForCon);
+			logger.trace("send to {} succeeded", dst);
 		}
+		catch (final KNXPortClosedException | InterruptedException e) {
+			logger.error("send error, closing link", e);
+			close();
+			if (e instanceof InterruptedException)
+				Thread.currentThread().interrupt();
+			throw new KNXLinkClosedException("link closed, " + e.getMessage());
+		}
+	}
+
+	@Override
+	protected void onSend(final CEMILData msg, final boolean waitForCon)
+	{}
+
+	@Override
+	protected void onClose()
+	{
 		try {
 			normalMode();
 		}
 		catch (final Exception e) {
 			logger.error("could not switch BCU back to normal mode", e);
 		}
-		conn.close();
-		notifier.quit();
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		return getName() + (closed ? "(closed), " : ", ") + medium.getMediumString()
-			+ " hopcount " + hopCount;
 	}
 
 	private void linkLayerMode() throws KNXException
 	{
 		// link layer mode
-		final byte[] switchLinkLayer = { (byte) PEI_SWITCH, 0x00, 0x18, 0x34, 0x56, 0x78,
-			0x0A, };
+		final byte[] switchLinkLayer = { (byte) PEI_SWITCH, 0x00, 0x18, 0x34, 0x56, 0x78, 0x0A, };
 		try {
 			conn.send(switchLinkLayer, true);
 		}
@@ -337,67 +167,5 @@ public class KNXNetworkLinkFT12 implements KNXNetworkLink
 	{
 		final byte[] switchNormal = { (byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
 		conn.send(switchNormal, true);
-	}
-
-	private byte[] createEMI(final CEMILData f)
-	{
-		final byte[] buf = createEMI(f.getMessageCode(), f.getDestination(), f.getPriority(),
-				f.getPayload());
-		final int ctrl = (f.isRepetition() ? 0x20 : 0) | (f.isAckRequested() ? 0x02 : 0)
-				| (f.isPositiveConfirmation() ? 0 : 0x01);
-		buf[1] |= (byte) ctrl;
-		if (f.getHopCount() != hopCount)
-			buf[6] = (byte) (buf[6] & ~0x70 | f.getHopCount() << 4);
-		return buf;
-	}
-
-	private byte[] createEMI(final int mc, final KNXAddress dst, final Priority p, final byte[] nsdu)
-	{
-		if (nsdu.length > 16)
-			throw new KNXIllegalArgumentException("maximum TPDU length is 16 in standard frame");
-		// TP1, standard frames only
-		final byte[] buf = new byte[nsdu.length + 7];
-		buf[0] = (byte) mc;
-		// ack don't care
-		buf[1] = (byte) (p.value << 2);
-		// on dst null, default address 0 is used
-		// (null indicates system broadcast in link API)
-		final int d = dst != null ? dst.getRawAddress() : 0;
-		buf[4] = (byte) (d >> 8);
-		buf[5] = (byte) d;
-		buf[6] = (byte) (hopCount << 4 | (nsdu.length - 1));
-		if (dst instanceof GroupAddress)
-			buf[6] |= 0x80;
-		for (int i = 0; i < nsdu.length; ++i)
-			buf[7 + i] = nsdu[i];
-		return buf;
-	}
-
-	// dst is just for log information
-	private void doSend(final byte[] msg, final boolean wait, final KNXAddress dst)
-		throws KNXAckTimeoutException, KNXLinkClosedException
-	{
-		if (closed)
-			throw new KNXLinkClosedException("link closed");
-		try {
-			final boolean trace = logger.isTraceEnabled();
-			if (trace || logger.isInfoEnabled())
-				logger.info("send message to " + dst + (wait ? ", wait for ack" : ""));
-			if (trace)
-				logger.trace("EMI " + DataUnitBuilder.toHex(msg, " "));
-			conn.send(msg, wait);
-			if (trace)
-				logger.trace("send to " + dst + " succeeded");
-		}
-		catch (final KNXPortClosedException e) {
-			logger.error("send error, closing link", e);
-			close();
-			throw new KNXLinkClosedException("link closed, " + e.getMessage());
-		}
-		catch (final InterruptedException e) {
-			logger.error("interrupted, closing link", e);
-			close();
-			throw new KNXLinkClosedException("link closed, " + e.getMessage());
-		}
 	}
 }

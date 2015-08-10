@@ -39,30 +39,17 @@ package tuwien.auto.calimero.link;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.slf4j.Logger;
-
-import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.DeviceDescriptor;
-import tuwien.auto.calimero.FrameEvent;
-import tuwien.auto.calimero.GroupAddress;
-import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
-import tuwien.auto.calimero.KNXFormatException;
-import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXTimeoutException;
-import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
-import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.cemi.CEMILData;
-import tuwien.auto.calimero.cemi.CEMILDataEx;
 import tuwien.auto.calimero.knxnetip.KNXConnectionClosedException;
 import tuwien.auto.calimero.link.BcuSwitcher.BcuMode;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
-import tuwien.auto.calimero.link.medium.RFSettings;
-import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
 import tuwien.auto.calimero.serial.usb.HidReport;
 import tuwien.auto.calimero.serial.usb.TransferProtocolHeader.KnxTunnelEmi;
@@ -76,77 +63,18 @@ import tuwien.auto.calimero.serial.usb.UsbConnection.EmiType;
  *
  * @author B. Malinowsky
  */
-public class KNXNetworkLinkUsb implements KNXNetworkLink
+public class KNXNetworkLinkUsb extends AbstractLink
 {
-	private static final class LinkNotifier extends EventNotifier
-	{
-		LinkNotifier(final Object source, final Logger logger)
-		{
-			super(source, logger);
-		}
-
-		@Override
-		public void frameReceived(final FrameEvent e)
-		{
-			try {
-				final CEMI frame = e.getFrame();
-				if (frame instanceof CEMIDevMgmt) {
-					// XXX check .con correctly (required for setting cEMI link layer mode)
-					final int mc = frame.getMessageCode();
-					if (mc == CEMIDevMgmt.MC_PROPWRITE_CON) {
-						final CEMIDevMgmt f = (CEMIDevMgmt) frame;
-						if (f.isNegativeResponse())
-							logger.error("L-DM negative response, " + f.getErrorMessage());
-					}
-				}
-				if (frame != null && !(frame instanceof CEMILData))
-					return;
-				final CEMILData f = frame != null ? (CEMILData) frame : (CEMILData) CEMIFactory
-						.createFromEMI(e.getFrameBytes());
-				final int mc = f.getMessageCode();
-				if (mc == CEMILData.MC_LDATA_IND) {
-					addEvent(new Indication(new FrameEvent(source, f)));
-					logger.debug("indication from " + f.getSource());
-				}
-				else if (mc == CEMILData.MC_LDATA_CON) {
-					addEvent(new Confirmation(new FrameEvent(source, f)));
-					logger.debug("confirmation of " + f.getDestination());
-				}
-			}
-			catch (final KNXFormatException ex) {
-				logger.warn("unspecified frame event - ignored", ex);
-			}
-		}
-
-		@Override
-		public void connectionClosed(final CloseEvent e)
-		{
-			((KNXNetworkLinkUsb) source).closed = true;
-			super.connectionClosed(e);
-			logger.info("link closed");
-			LogService.removeLogger(logger);
-		}
-	};
-
 	// EMI1/2 switch command
 	private static final int PEI_SWITCH = 0xA9;
 
-	private volatile boolean closed;
 	private final UsbConnection conn;
 	private final EnumSet<EmiType> emiTypes;
 	private EmiType activeEmi;
-	private volatile int hopCount = 6;
-	private KNXMediumSettings medium;
-
-	private final String name;
-	private final Logger logger;
-	private final EventNotifier notifier;
 
 	/**
-	 * Creates a new network link for accessing the KNX network over a USB connection.
-	 * <p>
-	 * The port identifier is used to choose the serial port for communication. These identifiers
-	 * are usually device and platform specific.
+	 * Creates a new network link for accessing the KNX network over a USB connection, using a USB
+	 * vendor and product ID for USB interface identification.
 	 *
 	 * @param vendorId the USB vendor ID of the KNX USB device interface
 	 * @param productId the USB product ID of the KNX USB device interface
@@ -161,10 +89,14 @@ public class KNXNetworkLinkUsb implements KNXNetworkLink
 	}
 
 	/**
-	 * Creates a new network link for accessing the KNX network over a USB connection.
-	 * <p>
+	 * Creates a new network link for accessing the KNX network over a USB connection. Because
+	 * arguments for parameter <code>device</code> are not necessarily unique identifiers, the first
+	 * matching USB interface is selected.
 	 *
-	 * @param settings medium settings defining device and medium specifics needed for communication
+	 * @param device an identifier to lookup the USB device, e.g., based on (part of) a device
+	 *        string like the product or manufacturer name, or USB vendor and product ID in the
+	 *        format <code>vendorId:productId</code>
+	 * @param settings KNX medium settings, with device and medium-specific communication settings
 	 * @throws KNXException on error creating USB link
 	 * @throws InterruptedException on interrupt
 	 */
@@ -174,9 +106,10 @@ public class KNXNetworkLinkUsb implements KNXNetworkLink
 		this(new UsbConnection(device), settings);
 	}
 
-	private KNXNetworkLinkUsb(final UsbConnection c, final KNXMediumSettings settings)
+	protected KNXNetworkLinkUsb(final UsbConnection c, final KNXMediumSettings settings)
 		throws KNXException, InterruptedException
 	{
+		super(c, c.getName(), settings);
 		conn = c;
 		try {
 			if (!conn.isKnxConnectionActive())
@@ -199,167 +132,52 @@ public class KNXNetworkLinkUsb implements KNXNetworkLink
 			conn.close();
 			throw e;
 		}
-		name = conn.getName();
-		logger = LogService.getLogger("calimero.link." + getName());
-
 		try {
+			// not all devices provide a device descriptor 0
 			final int dd0 = conn.getDeviceDescriptorType0();
 			logger.info("Device Mask Version {}", DeviceDescriptor.DD0.fromType0(dd0));
-		} catch (final KNXTimeoutException e) {
-			// device does not provide a device descriptor 0
 		}
+		catch (final KNXTimeoutException expected) {}
 		linkLayerMode();
-		notifier = new LinkNotifier(this, logger);
+		cEMI = emiTypes.contains(EmiType.CEmi);
+		sendCEmiAsByteArray = true;
 		conn.addConnectionListener(notifier);
-		// configure KNX medium stuff
-		setKNXMedium(settings);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#setKNXMedium
-	 * (tuwien.auto.calimero.link.medium.KNXMediumSettings)
-	 */
 	@Override
-	public void setKNXMedium(final KNXMediumSettings settings)
-	{
-		if (settings == null)
-			throw new KNXIllegalArgumentException("medium settings are mandatory");
-		if (medium != null && !settings.getClass().isAssignableFrom(medium.getClass())
-				&& !medium.getClass().isAssignableFrom(settings.getClass()))
-			throw new KNXIllegalArgumentException("medium differs");
-		medium = settings;
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#getKNXMedium()
-	 */
-	@Override
-	public KNXMediumSettings getKNXMedium()
-	{
-		return medium;
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#addLinkListener
-	 * (tuwien.auto.calimero.link.event.NetworkLinkListener)
-	 */
-	@Override
-	public void addLinkListener(final NetworkLinkListener l)
-	{
-		notifier.addListener(l);
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#removeLinkListener
-	 * (tuwien.auto.calimero.link.event.NetworkLinkListener)
-	 */
-	@Override
-	public void removeLinkListener(final NetworkLinkListener l)
-	{
-		notifier.removeListener(l);
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#setHopCount(int)
-	 */
-	@Override
-	public void setHopCount(final int count)
-	{
-		if (count < 0 || count > 7)
-			throw new KNXIllegalArgumentException("hop count out of range [0..7]");
-		hopCount = count;
-		logger.info("hop count set to " + count);
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#getHopCount()
-	 */
-	@Override
-	public int getHopCount()
-	{
-		return hopCount;
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#sendRequest
-	 * (tuwien.auto.calimero.KNXAddress, tuwien.auto.calimero.Priority, byte[])
-	 */
-	@Override
-	public void sendRequest(final KNXAddress dst, final Priority p, final byte[] nsdu)
+	protected void onSend(final KNXAddress dst, final byte[] msg, final boolean waitForCon)
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
-		doSend(createEMI(CEMILData.MC_LDATA_REQ, dst, p, nsdu), false, dst);
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#sendRequestWait
-	 * (tuwien.auto.calimero.KNXAddress, tuwien.auto.calimero.Priority, byte[])
-	 */
-	@Override
-	public void sendRequestWait(final KNXAddress dst, final Priority p, final byte[] nsdu)
-		throws KNXTimeoutException, KNXLinkClosedException
-	{
-		doSend(createEMI(CEMILData.MC_LDATA_REQ, dst, p, nsdu), true, dst);
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#send
-	 * (tuwien.auto.calimero.cemi.CEMILData, boolean)
-	 */
-	@Override
-	public void send(final CEMILData msg, final boolean waitForCon) throws KNXTimeoutException,
-		KNXLinkClosedException
-	{
-		doSend(createEMI(msg), waitForCon, msg.getDestination());
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#getName()
-	 */
-	@Override
-	public String getName()
-	{
-		return name;
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#isOpen()
-	 */
-	@Override
-	public boolean isOpen()
-	{
-		return !closed;
-	}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.KNXNetworkLink#close()
-	 */
-	@Override
-	public void close()
-	{
-		synchronized (this) {
-			if (closed)
-				return;
-			closed = true;
+		try {
+			final boolean trace = logger.isTraceEnabled();
+			logger.debug("send message to {}, {}blocking", dst, (waitForCon ? "" : "non-"));
+			if (trace)
+				logger.trace("EMI {}", DataUnitBuilder.toHex(msg, " "));
+			final List<HidReport> reports = HidReport.create(activeEmi.emi, msg);
+			for (final HidReport r : reports)
+				conn.send(r, waitForCon);
+			logger.trace("send to {} succeeded", dst);
 		}
+		catch (final KNXPortClosedException e) {
+			logger.error("send error, closing link", e);
+			close();
+			throw new KNXLinkClosedException("link closed, " + e.getMessage());
+		}
+	}
+
+	@Override
+	protected void onSend(final CEMILData msg, final boolean waitForCon)
+	{}
+
+	@Override
+	protected void onClose()
+	{
 		try {
 			normalMode();
 		}
 		catch (final Exception e) {
 			logger.error("could not switch BCU back to normal mode", e);
 		}
-		conn.close();
-		notifier.quit();
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		return getName() + (closed ? "(closed), " : ", ") + medium.getMediumString() + " hopcount "
-				+ hopCount;
 	}
 
 	private boolean trySetActiveEmi(final EmiType active) throws KNXPortClosedException,
@@ -396,7 +214,8 @@ public class KNXNetworkLinkUsb implements KNXNetworkLink
 		}
 	}
 
-	private void normalMode() throws KNXPortClosedException, KNXTimeoutException, InterruptedException
+	private void normalMode() throws KNXPortClosedException, KNXTimeoutException,
+		InterruptedException
 	{
 		if (activeEmi == EmiType.CEmi) {
 			final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_RESET_REQ);
@@ -406,98 +225,9 @@ public class KNXNetworkLinkUsb implements KNXNetworkLink
 			new BcuSwitcher(conn, logger).reset();
 		}
 		else {
-			final byte[] switchNormal = { (byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
+			final byte[] switchNormal = { (byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78,
+				(byte) 0x9A, };
 			conn.send(HidReport.create(activeEmi.emi, switchNormal).get(0), true);
-		}
-	}
-
-	private byte[] createEMI(final CEMILData f)
-	{
-		if (emiTypes.contains(EmiType.CEmi))
-			return f.toByteArray();
-		final byte[] buf = createEMI(f.getMessageCode(), f.getDestination(), f.getPriority(),
-				f.getPayload());
-		final int ctrl = (f.isRepetition() ? 0x20 : 0) | (f.isAckRequested() ? 0x02 : 0)
-				| (f.isPositiveConfirmation() ? 0 : 0x01);
-		buf[1] |= (byte) ctrl;
-		if (f.getHopCount() != hopCount)
-			buf[6] = (byte) (buf[6] & ~0x70 | f.getHopCount() << 4);
-		return buf;
-	}
-
-	private byte[] createEMI(final int mc, final KNXAddress dst, final Priority p, final byte[] nsdu)
-	{
-		if (emiTypes.contains(EmiType.CEmi))
-			return cEMI(mc, dst, p, nsdu).toByteArray();
-
-		if (nsdu.length > 16)
-			throw new KNXIllegalArgumentException("maximum TPDU length is 16 in standard frame");
-		// TP1, standard frames only
-		final byte[] buf = new byte[nsdu.length + 7];
-		buf[0] = (byte) mc;
-		// ack don't care
-		buf[1] = (byte) (p.value << 2);
-		// on dst null, default address 0 is used
-		// (null indicates system broadcast in link API)
-		final int d = dst != null ? dst.getRawAddress() : 0;
-		buf[4] = (byte) (d >> 8);
-		buf[5] = (byte) d;
-		buf[6] = (byte) (hopCount << 4 | (nsdu.length - 1));
-		if (dst instanceof GroupAddress)
-			buf[6] |= 0x80;
-		for (int i = 0; i < nsdu.length; ++i)
-			buf[7 + i] = nsdu[i];
-		return buf;
-	}
-
-	private CEMI cEMI(final int mc, final KNXAddress dst, final Priority p, final byte[] nsdu)
-	{
-		final IndividualAddress src = medium.getDeviceAddress();
-		// use default address 0 in system broadcast
-		final KNXAddress d = dst == null ? new GroupAddress(0) : dst;
-		final boolean tp = medium.getMedium() == KNXMediumSettings.MEDIUM_TP1;
-		if (nsdu.length <= 16 && tp)
-			return new CEMILData(mc, src, d, nsdu, p, true, hopCount);
-//		CEMILDataEx f = new CEMILDataEx(mc, src, d, nsdu, p, true, dst != null, false, hopCount);
-		// TODO allow domain bcast, currently we send everything as system broadcast
-		final CEMILDataEx f = new CEMILDataEx(mc, src, d, nsdu, p, true, false, false, hopCount);
-		if (medium.getMedium() == KNXMediumSettings.MEDIUM_RF) {
-			final RFSettings rf = (RFSettings) medium;
-			if (f.getAdditionalInfo(CEMILDataEx.ADDINFO_RFMEDIUM) == null) {
-				final byte[] sn = f.isDomainBroadcast() ? rf.getDomainAddress() : rf
-						.getSerialNumber();
-				// add-info: rf-info (0 ignores a lot), sn (6 bytes), lfn (=255:void)
-				f.addAdditionalInfo(CEMILDataEx.ADDINFO_RFMEDIUM, new byte[] { 0, sn[0], sn[1],
-					sn[2], sn[3], sn[4], sn[5], (byte) 0xff });
-				logger.trace("send - added RF additional info to message "
-						+ (f.isDomainBroadcast() ? "(domain address)" : "(S/N)"));
-			}
-		}
-		return f;
-	}
-
-	// dst is just for log information
-	private void doSend(final byte[] msg, final boolean blocking, final KNXAddress dst)
-		throws KNXLinkClosedException, KNXTimeoutException
-	{
-		if (closed)
-			throw new KNXLinkClosedException("link closed");
-		try {
-			final boolean trace = logger.isTraceEnabled();
-			if (trace || logger.isInfoEnabled())
-				logger.info("send message to " + dst + (blocking ? ", blocking" : ""));
-			if (trace)
-				logger.trace("EMI " + DataUnitBuilder.toHex(msg, " "));
-			final List<HidReport> reports = HidReport.create(activeEmi.emi, msg);
-			for (final HidReport r : reports)
-				conn.send(r, blocking);
-			if (trace)
-				logger.trace("send to " + dst + " succeeded");
-		}
-		catch (final KNXPortClosedException e) {
-			logger.error("send error, closing link", e);
-			close();
-			throw new KNXLinkClosedException("link closed, " + e.getMessage());
 		}
 	}
 }
