@@ -60,7 +60,7 @@ public final class LogService
 {
 	// Enumeration of the supported slf4j log levels
 	public static enum LogLevel {
-		ERROR, WARN, INFO, TRACE, DEBUG
+		ERROR, WARN, INFO, DEBUG, TRACE 
 	}
 
 	private static final ExecutorService dispatcher = Executors.newFixedThreadPool(1);
