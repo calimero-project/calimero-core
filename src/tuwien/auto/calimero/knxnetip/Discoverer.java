@@ -106,7 +106,7 @@ public class Discoverer
 	/**
 	 * Name of the log service used by a discoverer.
 	 */
-	public static final String LOG_SERVICE = "Discoverer";
+	public static final String LOG_SERVICE = "calimero.knxnetip.Discoverer";
 
 	/**
 	 * Multicast IP address used for discovery, multicast group is {@value}.
