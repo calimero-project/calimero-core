@@ -602,9 +602,10 @@ public interface PropertyAccess
 	 * @param value string representation of the element value
 	 * @throws KNXException on adapter errors while setting the property elements or
 	 *         translation problems
+	 * @throws InterruptedException on thread interrupt
 	 */
 	void setProperty(int objIndex, int pid, int position, String value)
-		throws KNXException;
+		throws KNXException, InterruptedException;
 
 	/**
 	 * Sets one or more elements of a property.
@@ -615,9 +616,10 @@ public interface PropertyAccess
 	 * @param elements number of elements to set in the property
 	 * @param data byte array holding the element data
 	 * @throws KNXException on adapter errors while setting the property elements
+	 * @throws InterruptedException on thread interrupt
 	 */
 	void setProperty(int objIndex, int pid, int start, int elements, byte[] data)
-		throws KNXException;
+		throws KNXException, InterruptedException;
 
 	/**
 	 * Gets one or more elements of a property.
@@ -628,9 +630,10 @@ public interface PropertyAccess
 	 * @param elements number of elements to get in the property
 	 * @return byte array holding the retrieved element data
 	 * @throws KNXException on adapter errors while querying the property element
+	 * @throws InterruptedException on thread interrupt
 	 */
 	byte[] getProperty(int objIndex, int pid, int start, int elements)
-		throws KNXException;
+		throws KNXException, InterruptedException;
 
 	/**
 	 * Gets one or more elements of a property with the returned data set in a DPT
@@ -643,9 +646,10 @@ public interface PropertyAccess
 	 * @return a DPT translator containing the returned the element data
 	 * @throws KNXException on adapter errors while querying the property element or data
 	 *         type translation problems
+	 * @throws InterruptedException on thread interrupt
 	 */
 	DPTXlator getPropertyTranslated(int objIndex, int pid, int start, int elements)
-		throws KNXException;
+		throws KNXException, InterruptedException;
 
 	/**
 	 * Gets the property description based on the property ID.
@@ -660,8 +664,9 @@ public interface PropertyAccess
 	 * @param pid property identifier, pid &gt; 0
 	 * @return the property description
 	 * @throws KNXException on adapter errors while querying the description
+	 * @throws InterruptedException on thread interrupt
 	 */
-	Description getDescription(int objIndex, int pid) throws KNXException;
+	Description getDescription(int objIndex, int pid) throws KNXException, InterruptedException;
 
 	/**
 	 * Gets the property description based on the property index.
@@ -670,6 +675,8 @@ public interface PropertyAccess
 	 * @param propIndex property index in the object, propIndex &ge; 0
 	 * @return a property description object
 	 * @throws KNXException on adapter errors while querying the description
+	 * @throws InterruptedException on thread interrupt
 	 */
-	Description getDescriptionByIndex(int objIndex, int propIndex) throws KNXException;
+	Description getDescriptionByIndex(int objIndex, int propIndex) throws KNXException,
+		InterruptedException;
 }

@@ -52,7 +52,6 @@ import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXRemoteException;
-import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Settings;
 import tuwien.auto.calimero.dptxlator.DPTXlator;
 import tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned;
@@ -548,22 +547,13 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		return properties;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.PropertyAccess
-	 * #setProperty(int, int, int, java.lang.String)
-	 */
 	@Override
 	public void setProperty(final int objIndex, final int pid, final int position,
-		final String value) throws KNXException
+		final String value) throws KNXException, InterruptedException
 	{
-		try {
-			final DPTXlator t = createTranslator(objIndex, pid);
-			t.setValue(value);
-			setProperty(objIndex, pid, position, t.getItems(), t.getData());
-		}
-		catch (final InterruptedException e) {
-			throw new KNXTimeoutException("interrupted", e);
-		}
+		final DPTXlator t = createTranslator(objIndex, pid);
+		t.setValue(value);
+		setProperty(objIndex, pid, position, t.getItems(), t.getData());
 	}
 
 	/**
@@ -575,87 +565,44 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 * @return property element value represented as string
 	 * @throws KNXException on adapter errors while querying the property element or data
 	 *         type translation problems
+	 * @throws InterruptedException on thread interrupt
 	 */
-	public String getProperty(final int objIndex, final int pid) throws KNXException
+	public String getProperty(final int objIndex, final int pid) throws KNXException,
+		InterruptedException
 	{
 		return getPropertyTranslated(objIndex, pid, 1, 1).getValue();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.PropertyAccess
-	 * #setProperty(int, int, int, int, byte[])
-	 */
 	@Override
 	public void setProperty(final int objIndex, final int pid, final int start,
-		final int elements, final byte[] data) throws KNXException
+		final int elements, final byte[] data) throws KNXException, InterruptedException
 	{
-		try {
-			pa.setProperty(objIndex, pid, start, elements, data);
-		}
-		catch (final KNXException e) {
-			logger.error("set property failed", e);
-			throw e;
-		}
-		catch (final InterruptedException e) {
-			throw new KNXTimeoutException("interrupted", e);
-		}
+		pa.setProperty(objIndex, pid, start, elements, data);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.PropertyAccess#getProperty(int, int, int, int)
-	 */
 	@Override
 	public byte[] getProperty(final int objIndex, final int pid, final int start,
-		final int elements) throws KNXException
+		final int elements) throws KNXException, InterruptedException
 	{
-		try {
-			return pa.getProperty(objIndex, pid, start, elements);
-		}
-		catch (final KNXException e) {
-			logger.error("get property failed", e);
-			throw e;
-		}
-		catch (final InterruptedException e) {
-			throw new KNXTimeoutException("interrupted", e);
-		}
+		return pa.getProperty(objIndex, pid, start, elements);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.PropertyAccess
-	 * #getPropertyTranslated(int, int, int, int)
-	 */
 	@Override
 	public DPTXlator getPropertyTranslated(final int objIndex, final int pid,
-		final int start, final int elements) throws KNXException
+		final int start, final int elements) throws KNXException, InterruptedException
 	{
-		try {
-			final DPTXlator t = createTranslator(objIndex, pid);
-			t.setData(getProperty(objIndex, pid, start, elements));
-			return t;
-		}
-		catch (final InterruptedException e) {
-			throw new KNXTimeoutException("interrupted", e);
-		}
+		final DPTXlator t = createTranslator(objIndex, pid);
+		t.setData(getProperty(objIndex, pid, start, elements));
+		return t;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.PropertyAccess#getDescription(int, int)
-	 */
 	@Override
 	public Description getDescription(final int objIndex, final int pid)
-		throws KNXException
+		throws KNXException, InterruptedException
 	{
 		if (pid == 0)
 			throw new KNXIllegalArgumentException("pid has to be > 0");
-		try {
-			return createDesc(objIndex, pa.getDescription(objIndex, pid, 0));
-		}
-		catch (final KNXException e) {
-			throw e;
-		}
-		catch (final InterruptedException e) {
-			throw new KNXTimeoutException("interrupted", e);
-		}
+		return createDesc(objIndex, pa.getDescription(objIndex, pid, 0));
 	}
 
 	/**
@@ -668,18 +615,9 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 */
 	@Override
 	public Description getDescriptionByIndex(final int objIndex, final int propIndex)
-		throws KNXException
+		throws KNXException, InterruptedException
 	{
-		try {
-			return createDesc(objIndex, pa.getDescription(objIndex, 0, propIndex));
-		}
-		catch (final KNXException e) {
-			logger.error("get description failed", e);
-			throw e;
-		}
-		catch (final InterruptedException e) {
-			throw new KNXTimeoutException("interrupted", e);
-		}
+		return createDesc(objIndex, pa.getDescription(objIndex, 0, propIndex));
 	}
 
 	/**
@@ -690,8 +628,10 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 *        descriptions, i.e., ({@link PropertyAccess.PID#OBJECT_TYPE})
 	 * @return a list containing the property descriptions of type {@link Description}
 	 * @throws KNXException on adapter errors while querying the descriptions
+	 * @throws InterruptedException on thread interrupt
 	 */
-	public List<Description> scanProperties(final boolean allProperties) throws KNXException
+	public List<Description> scanProperties(final boolean allProperties) throws KNXException,
+		InterruptedException
 	{
 		final List<Description> scan = new ArrayList<>();
 		for (int index = 0;; ++index) {
@@ -713,9 +653,10 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 *        i.e., ({@link PropertyAccess.PID#OBJECT_TYPE})
 	 * @return a list containing the property descriptions of type {@link Description}
 	 * @throws KNXException on adapter errors while querying the descriptions
+	 * @throws InterruptedException on thread interrupt
 	 */
 	public List<Description> scanProperties(final int objIndex, final boolean allProperties)
-		throws KNXException
+		throws KNXException, InterruptedException
 	{
 		final List<Description> scan = new ArrayList<>();
 		// property with index 0 is description of object type
@@ -731,9 +672,6 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 				logger.error("scan properties failed", e);
 				throw e;
 			}
-		}
-		catch (final InterruptedException e) {
-			throw new KNXTimeoutException("interrupted", e);
 		}
 		return scan;
 	}
@@ -757,7 +695,6 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		if (pa.isOpen()) {
 			pa.close();
 			logger.info("closed property client");
-			LogService.removeLogger(logger);
 		}
 	}
 
