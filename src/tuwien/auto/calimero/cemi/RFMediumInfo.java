@@ -103,7 +103,7 @@ public final class RFMediumInfo extends AddInfo
 	 */
 	public RFMediumInfo(final boolean batteryOk, final boolean transmitOnlyDevice)
 	{
-		this(RSS.Void, 0, batteryOk, transmitOnlyDevice, new byte[6], 0xff);
+		this(RSS.Void, RSS.Void, batteryOk, transmitOnlyDevice, new byte[6], 0xff);
 	}
 
 	/**
@@ -120,14 +120,14 @@ public final class RFMediumInfo extends AddInfo
 	public RFMediumInfo(final boolean batteryOk, final boolean transmitOnlyDevice,
 		final byte[] doA, final int lfn)
 	{
-		this(RSS.Void, 0, batteryOk, transmitOnlyDevice, doA, lfn);
+		this(RSS.Void, RSS.Void, batteryOk, transmitOnlyDevice, doA, lfn);
 	}
 
 	/**
 	 * Constructs RF medium info for use in a cEMI indication.
 	 *
-	 * @param rss sender RSS
-	 * @param retransmitterRss RSS of lowest retransmitter, use {@link RSS#Void} for no
+	 * @param sender sender RSS
+	 * @param retransmitter RSS of lowest retransmitter, use {@link RSS#Void} for no
 	 *        retransmitter
 	 * @param batteryOk battery of sender device is OK (<code>true</code>), or weak (
 	 *        <code>false</code>)
@@ -136,10 +136,10 @@ public final class RFMediumInfo extends AddInfo
 	 * @param doA RF domain address, <code>doA.length = 6</code>
 	 * @param lfn link-layer frame number, 0 &le; lfn &le; 7
 	 */
-	public RFMediumInfo(final RSS rss, final int retransmitterRss, final boolean batteryOk,
+	public RFMediumInfo(final RSS sender, final RSS retransmitter, final boolean batteryOk,
 		final boolean transmitOnlyDevice, final byte[] doA, final int lfn)
 	{
-		super(CEMILDataEx.ADDINFO_RFMEDIUM, toByteArray(rss, retransmitterRss, batteryOk,
+		super(CEMILDataEx.ADDINFO_RFMEDIUM, toByteArray(sender, retransmitter, batteryOk,
 				transmitOnlyDevice, doA, lfn));
 		sysBcast = false;
 	}
@@ -211,20 +211,16 @@ public final class RFMediumInfo extends AddInfo
 				+ getFrameNumber() + ", RSS=" + getRSS() + rtx + ", Battery " + battery;
 	}
 
-	private static byte[] toByteArray(final RSS rss, final int retransmitterRss,
+	private static byte[] toByteArray(final RSS sender, final RSS retransmitter,
 		final boolean batteryOK, final boolean transmitOnlyDevice, final byte[] doA, final int lfn)
 	{
-		if (retransmitterRss < 0 || retransmitterRss > 3)
-			throw new KNXIllegalArgumentException("retransmitter RSS out of range [0..3]: "
-					+ retransmitterRss);
-
 		final byte[] info = new byte[8];
 		final int unidir = transmitOnlyDevice ? 0x01 : 0x00;
-		info[0] = (byte) ((rss.ordinal() << 4) | (retransmitterRss << 2)
+		info[0] = (byte) ((sender.ordinal() << 4) | (retransmitter.ordinal() << 2)
 				| (batteryOK ? 0x02 : 0x0) | unidir);
 		if (doA.length != 6)
-			throw new KNXIllegalArgumentException("DoA/SN invalid length: 0x"
-					+ DataUnitBuilder.toHex(doA, ""));
+			throw new KNXIllegalArgumentException(
+					"DoA/SN invalid length: 0x" + DataUnitBuilder.toHex(doA, ""));
 		for (int i = 0; i < doA.length; i++) {
 			final byte b = doA[i];
 			info[1 + i] = b;
