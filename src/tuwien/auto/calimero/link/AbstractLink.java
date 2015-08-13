@@ -173,6 +173,7 @@ public abstract class AbstractLink implements KNXNetworkLink
 		logger = LogManager.getManager().getLogService("calimero.link." + getName());
 		notifier = new LinkNotifier();
 		setKNXMedium(settings);
+		notifier.start();
 	}
 
 	public final synchronized void setKNXMedium(final KNXMediumSettings settings)

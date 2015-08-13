@@ -143,6 +143,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 		conn.addConnectionListener(notifier);
 		// configure KNX medium stuff
 		setKNXMedium(settings);
+		notifier.start();
 	}
 
 	/**
@@ -169,6 +170,7 @@ public class KNXNetworkMonitorFT12 implements KNXNetworkMonitor
 		conn.addConnectionListener(notifier);
 		// configure KNX medium stuff
 		setKNXMedium(settings);
+		notifier.start();
 	}
 
 	/* (non-Javadoc)
