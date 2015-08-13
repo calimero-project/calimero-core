@@ -129,7 +129,6 @@ abstract class EventNotifier extends Thread implements KNXListener
 		this.source = source;
 		listeners = new EventListeners<>(LinkListener.class, logger);
 		setDaemon(true);
-		start();
 	}
 
 	@Override

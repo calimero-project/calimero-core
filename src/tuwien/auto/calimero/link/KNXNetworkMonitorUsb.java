@@ -209,6 +209,7 @@ public class KNXNetworkMonitorUsb implements KNXNetworkMonitor
 		conn.addConnectionListener(notifier);
 		// configure KNX medium stuff
 		setKNXMedium(settings);
+		notifier.start();
 	}
 
 	/* (non-Javadoc)
