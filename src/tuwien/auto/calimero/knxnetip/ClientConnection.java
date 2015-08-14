@@ -188,7 +188,7 @@ abstract class ClientConnection extends ConnectionBase
 				e = new KNXTimeoutException("timeout connecting to control endpoint " + ctrlEndpt);
 			else if (state == ACK_ERROR)
 				e = new KNXRemoteException("error response from control endpoint " + ctrlEndpt
-						+ ", " + status);
+						+ ": " + status);
 			else
 				e = new KNXInvalidResponseException("invalid connect response from " + ctrlEndpt);
 			// quit, cleanup and notify user
@@ -372,7 +372,7 @@ abstract class ClientConnection extends ConnectionBase
 		stopReceiver();
 		socket.close();
 		setState(CLOSED);
-		logger.error("establishing connection failed because of " + thrown.getMessage());
+		logger.error("establishing connection failed, " + thrown.getMessage());
 		LogManager.getManager().removeLogService(logger.getName());
 	}
 

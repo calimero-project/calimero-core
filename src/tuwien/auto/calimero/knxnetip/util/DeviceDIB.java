@@ -288,7 +288,7 @@ public class DeviceDIB extends DIB
 	 */
 	public final String getMACAddressString()
 	{
-		return DataUnitBuilder.toHex(mac, "-");
+		return DataUnitBuilder.toHex(mac, ":");
 	}
 
 	/**

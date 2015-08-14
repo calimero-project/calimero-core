@@ -162,18 +162,32 @@ public abstract class AbstractLink implements KNXNetworkLink
 	};
 
 	/**
-	 * @param connection if not <code>null</code>, the link object will close this resource as last
-	 *        action before returning from {@link #close()}, relinquishing any underlying resources
+	 * @param connection the connection object
 	 * @param name the link name
 	 * @param settings medium settings of the accessed KNX network
 	 */
-	public AbstractLink(final String name, final KNXMediumSettings settings)
+	protected AbstractLink(final Object connection, final String name,
+		final KNXMediumSettings settings)
 	{
 		this.name = name;
 		logger = LogManager.getManager().getLogService("calimero.link." + getName());
 		notifier = new LinkNotifier();
 		setKNXMedium(settings);
 		notifier.start();
+	}
+
+	/**
+	 * This constructor does not start the event notifier.
+	 *
+	 * @param name the link name
+	 * @param settings medium settings of the accessed KNX network
+	 */
+	protected AbstractLink(final String name, final KNXMediumSettings settings)
+	{
+		this.name = name;
+		logger = LogManager.getManager().getLogService("calimero.link." + getName());
+		notifier = new LinkNotifier();
+		setKNXMedium(settings);
 	}
 
 	public final synchronized void setKNXMedium(final KNXMediumSettings settings)
@@ -263,8 +277,8 @@ public abstract class AbstractLink implements KNXNetworkLink
 
 	public String toString()
 	{
-		return getName() + (closed ? " (closed), " : ", ") + medium.getMediumString()
-				+ " hopcount " + hopCount;
+		return getName() + (closed ? " (closed), " : ", ") + medium.getMediumString() + " hopcount "
+				+ hopCount;
 	}
 
 	/**
@@ -320,8 +334,8 @@ public abstract class AbstractLink implements KNXNetworkLink
 	 * @throws KNXTimeoutException on a timeout during send or while waiting for the confirmation
 	 * @throws KNXLinkClosedException if the link is closed
 	 */
-	protected abstract void onSend(CEMILData msg, boolean waitForCon) throws KNXTimeoutException,
-		KNXLinkClosedException;
+	protected abstract void onSend(CEMILData msg, boolean waitForCon)
+		throws KNXTimeoutException, KNXLinkClosedException;
 
 	/**
 	 * Returns a cEMI representation, e.g., cEMI L-Data, using the received frame event for EMI and
@@ -383,7 +397,8 @@ public abstract class AbstractLink implements KNXNetworkLink
 	}
 
 	// Creates the target EMI format using L-Data message parameters
-	private byte[] createEmi(final int mc, final KNXAddress dst, final Priority p, final byte[] nsdu)
+	private byte[] createEmi(final int mc, final KNXAddress dst, final Priority p,
+		final byte[] nsdu)
 	{
 		if (cEMI)
 			return cEMI(mc, dst, p, nsdu).toByteArray();
