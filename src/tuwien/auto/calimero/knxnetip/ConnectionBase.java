@@ -41,7 +41,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.util.EventListener;
 
 import org.slf4j.Logger;
 
@@ -108,7 +107,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	/** acknowledgment service type used for this connection type */
 	protected final int serviceAck;
 	/** container for event listeners */
-	protected final EventListeners<KNXListener> listeners = new EventListeners<>(KNXListener.class);
+	protected final EventListeners<KNXListener> listeners = new EventListeners<>();
 	/** logger for this connection */
 	protected Logger logger;
 
@@ -369,17 +368,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	protected void fireFrameReceived(final CEMI frame)
 	{
 		final FrameEvent fe = new FrameEvent(this, frame);
-		final EventListener[] el = listeners.listeners();
-		for (int i = 0; i < el.length; i++) {
-			final KNXListener l = (KNXListener) el[i];
-			try {
-				l.frameReceived(fe);
-			}
-			catch (final RuntimeException e) {
-				removeConnectionListener(l);
-				logger.error("removed event listener", e);
-			}
-		}
+		listeners.fire(l -> l.frameReceived(fe));
 	}
 
 	/**
@@ -593,17 +582,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	private void fireConnectionClosed(final int initiator, final String reason)
 	{
 		final CloseEvent ce = new CloseEvent(this, initiator, reason);
-		final EventListener[] el = listeners.listeners();
-		for (int i = 0; i < el.length; i++) {
-			final KNXListener l = (KNXListener) el[i];
-			try {
-				l.connectionClosed(ce);
-			}
-			catch (final RuntimeException e) {
-				removeConnectionListener(l);
-				logger.error("removed event listener", e);
-			}
-		}
+		listeners.fire(l -> l.connectionClosed(ce));
 	}
 
 	// a semaphore with fair use behavior (FIFO)

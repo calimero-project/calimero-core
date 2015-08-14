@@ -36,11 +36,11 @@
 
 package tuwien.auto.calimero.mgmt;
 
-import java.util.EventListener;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 
@@ -202,7 +202,7 @@ public class TransportLayerImpl implements TransportLayer
 		lnk = link;
 		lnk.addLinkListener(lnkListener);
 		logger = LogService.getLogger(getName());
-		listeners = new EventListeners<>(TransportListener.class, logger);
+		listeners = new EventListeners<>(logger);
 		serverSide = serverEndpoint;
 	}
 
@@ -617,71 +617,35 @@ public class TransportLayerImpl implements TransportLayer
 
 	private void fireDisconnected(final Destination d)
 	{
-		final EventListener[] el = listeners.listeners();
-		for (int i = 0; i < el.length; i++) {
-			final TransportListener l = (TransportListener) el[i];
-			try {
-				l.disconnected(d);
-			}
-			catch (final RuntimeException rte) {
-				removeTransportListener(l);
-				logger.error("removed event listener", rte);
-			}
-		}
+		listeners.fire(l -> l.disconnected(d));
 	}
 
 	// type 0 = broadcast, 1 = group, 2 = individual, 3 = connected
 	private void fireFrameType(final CEMI frame, final int type)
 	{
 		final FrameEvent e = new FrameEvent(this, frame);
-		final EventListener[] el = listeners.listeners();
-		for (int i = 0; i < el.length; i++) {
-			final TransportListener l = (TransportListener) el[i];
-			try {
-				if (type == 0)
-					l.broadcast(e);
-				else if (type == 1)
-					l.group(e);
-				else if (type == 2)
-					l.dataIndividual(e);
-				else if (type == 3)
-					l.dataConnected(e);
-			}
-			catch (final RuntimeException rte) {
-				removeTransportListener(l);
-				logger.error("removed event listener", rte);
-			}
-		}
+		final Consumer<? super TransportListener> c;
+		if (type == 0)
+			c = l -> l.broadcast(e);
+		else if (type == 1)
+			c = l -> l.group(e);
+		else if (type == 2)
+			c = l -> l.dataIndividual(e);
+		else if (type == 3)
+			c = l -> l.dataConnected(e);
+		else
+			return;
+		listeners.fire(c);
 	}
 
 	private void fireDetached()
 	{
 		final DetachEvent e = new DetachEvent(this);
-		final EventListener[] el = listeners.listeners();
-		for (int i = 0; i < el.length; i++) {
-			final TransportListener l = (TransportListener) el[i];
-			try {
-				l.detached(e);
-			}
-			catch (final RuntimeException rte) {
-				removeTransportListener(l);
-				logger.error("removed event listener", rte);
-			}
-		}
+		listeners.fire(l -> l.detached(e));
 	}
 
 	private void fireLinkClosed(final CloseEvent e)
 	{
-		final EventListener[] el = listeners.listeners();
-		for (int i = 0; i < el.length; i++) {
-			final TransportListener l = (TransportListener) el[i];
-			try {
-				l.linkClosed(e);
-			}
-			catch (final RuntimeException rte) {
-				removeTransportListener(l);
-				logger.error("removed event listener", rte);
-			}
-		}
+		listeners.fire(l -> l.linkClosed(e));
 	}
 }

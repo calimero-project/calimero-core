@@ -42,7 +42,6 @@ import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.EventListener;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -144,7 +143,7 @@ public class FT12Connection implements AutoCloseable
 	private int exchangeTimeout;
 	private int idleTimeout;
 
-	private final EventListeners<KNXListener> listeners = new EventListeners<>(KNXListener.class);
+	private final EventListeners<KNXListener> listeners = new EventListeners<>();
 
 	/**
 	 * Creates a new connection to a BCU2 using the FT1.2 protocol.
@@ -583,17 +582,7 @@ public class FT12Connection implements AutoCloseable
 	{
 		final int initiator = user ? CloseEvent.USER_REQUEST : CloseEvent.INTERNAL;
 		final CloseEvent ce = new CloseEvent(this, initiator, reason);
-		final EventListener[] el = listeners.listeners();
-		for (int i = 0; i < el.length; i++) {
-			final KNXListener l = (KNXListener) el[i];
-			try {
-				l.connectionClosed(ce);
-			}
-			catch (final RuntimeException e) {
-				removeConnectionListener(l);
-				logger.error("removed event listener", e);
-			}
-		}
+		listeners.fire(l -> l.connectionClosed(ce));
 	}
 
 	private void calcTimeouts(final int baudrate)
@@ -754,17 +743,7 @@ public class FT12Connection implements AutoCloseable
 		private void fireFrameReceived(final byte[] frame)
 		{
 			final FrameEvent fe = new FrameEvent(this, frame);
-			final EventListener[] el = listeners.listeners();
-			for (int i = 0; i < el.length; i++) {
-				final KNXListener l = (KNXListener) el[i];
-				try {
-					l.frameReceived(fe);
-				}
-				catch (final RuntimeException e) {
-					removeConnectionListener(l);
-					logger.error("removed event listener", e);
-				}
-			}
+			listeners.fire(l -> l.frameReceived(fe));
 		}
 	}
 }

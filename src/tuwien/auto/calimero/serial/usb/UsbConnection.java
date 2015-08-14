@@ -41,7 +41,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.EventListener;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -165,7 +164,7 @@ public class UsbConnection implements AutoCloseable
 	private final Logger logger;
 	private final String name;
 
-	private final EventListeners<KNXListener> listeners = new EventListeners<>(KNXListener.class);
+	private final EventListeners<KNXListener> listeners = new EventListeners<>();
 
 	private final UsbInterface knxUsbIf;
 	private final UsbPipe out;
@@ -617,9 +616,7 @@ public class UsbConnection implements AutoCloseable
 				| UsbException e) {
 			logger.warn("close connection", e);
 		}
-		for (final KNXListener l : listeners.listeners()) {
-			l.connectionClosed(new CloseEvent(this, initiator, reason));
-		}
+		listeners.fire(l -> l.connectionClosed(new CloseEvent(this, initiator, reason)));
 	}
 
 	private byte[] getFeature(final BusAccessServerFeature feature) throws InterruptedException,
@@ -700,17 +697,7 @@ public class UsbConnection implements AutoCloseable
 		logger.debug("received {} frame {}", emiType, DataUnitBuilder.toHex(frame, ""));
 		final FrameEvent fe = emiType == KnxTunnelEmi.CEmi ? new FrameEvent(this,
 				CEMIFactory.create(frame, 0, frame.length)) : new FrameEvent(this, frame);
-		final EventListener[] el = listeners.listeners();
-		for (int i = 0; i < el.length; i++) {
-			final KNXListener l = (KNXListener) el[i];
-			try {
-				l.frameReceived(fe);
-			}
-			catch (final RuntimeException e) {
-				removeConnectionListener(l);
-				logger.error("removed event listener", e);
-			}
-		}
+		listeners.fire(l -> l.frameReceived(fe));
 	}
 
 	private static UsbHub getRootHub() throws SecurityException, UsbException

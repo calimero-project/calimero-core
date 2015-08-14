@@ -38,7 +38,6 @@ package tuwien.auto.calimero.buffer;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EventListener;
 import java.util.Iterator;
 import java.util.List;
 
@@ -142,8 +141,7 @@ public final class NetworkBuffer
 		private final class SquirrelLink implements KNXNetworkLink
 		{
 			private final KNXNetworkLink base;
-			private final EventListeners<NetworkLinkListener> listeners = new EventListeners<>(
-					NetworkLinkListener.class);
+			private final EventListeners<NetworkLinkListener> listeners = new EventListeners<>();
 
 			SquirrelLink(final KNXNetworkLink baseLink)
 			{
@@ -253,16 +251,7 @@ public final class NetworkBuffer
 			private void fireIndication(final CEMILData frame)
 			{
 				final FrameEvent e = new FrameEvent(this, frame);
-				final EventListener[] el = listeners.listeners();
-				for (int i = 0; i < el.length; ++i) {
-					final NetworkLinkListener l = (NetworkLinkListener) el[i];
-					try {
-						l.indication(e);
-					}
-					catch (final RuntimeException rte) {
-						removeLinkListener(l);
-					}
-				}
+				listeners.fire(l -> l.indication(e));
 			}
 		}
 

@@ -62,8 +62,7 @@ public class DatapointMap<T extends Datapoint> implements DatapointModel<T>, Cha
 	private static final String TAG_DATAPOINTS = "datapoints";
 
 	private final Map<GroupAddress, T> points;
-	private final EventListeners<ChangeListener> listeners = new EventListeners<>(
-			ChangeListener.class);
+	private final EventListeners<ChangeListener> listeners = new EventListeners<>();
 
 	// NYI ensure we only load valid types based on parameterization, assign from constructor
 	// parameter or factory method
@@ -242,12 +241,9 @@ public class DatapointMap<T extends Datapoint> implements DatapointModel<T>, Cha
 
 	private void fireChangeNotification(final T dp, final boolean added)
 	{
-		for (final Iterator<ChangeListener> i = listeners.iterator(); i.hasNext();) {
-			final ChangeListener l = i.next();
-			if (added)
-				l.onDatapointAdded(this, dp);
-			else
-				l.onDatapointRemoved(this, dp);
-		}
+		if (added)
+			listeners.fire(l -> l.onDatapointAdded(this, dp));
+		else
+			listeners.fire(l -> l.onDatapointRemoved(this, dp));
 	}
 }

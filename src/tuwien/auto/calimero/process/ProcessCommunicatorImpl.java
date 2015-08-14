@@ -36,9 +36,9 @@
 
 package tuwien.auto.calimero.process;
 
-import java.util.EventListener;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 
@@ -119,22 +119,14 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		{
 			final ProcessEvent e = new ProcessEvent(ProcessCommunicatorImpl.this, f.getSource(),
 					(GroupAddress) f.getDestination(), svc, asdu, optimized);
-			final ProcessListener[] el = listeners.listeners();
-			for (int i = 0; i < el.length; i++) {
-				final ProcessListener l = el[i];
-				try {
-					if (svc == GROUP_READ)
-						l.groupReadRequest(e);
-					else if (svc == GROUP_RESPONSE)
-						l.groupReadResponse(e);
-					else
-						l.groupWrite(e);
-				}
-				catch (final RuntimeException rte) {
-					removeProcessListener(l);
-					logger.error("removed event listener", rte);
-				}
-			}
+			final Consumer<? super ProcessListener> c;
+			if (svc == GROUP_READ)
+				c = l -> l.groupReadRequest(e);
+			else if (svc == GROUP_RESPONSE)
+				c = l -> l.groupReadResponse(e);
+			else
+				c = l -> l.groupWrite(e);
+			listeners.fire(c);
 		}
 
 		@Override
@@ -180,7 +172,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		lnk = link;
 		lnk.addLinkListener(lnkListener);
 		logger = LogService.getLogger("process " + link.getName());
-		listeners = new EventListeners<>(ProcessListener.class, logger);
+		listeners = new EventListeners<>(logger);
 	}
 
 	/* (non-Javadoc)
@@ -529,17 +521,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	private void fireDetached()
 	{
 		final DetachEvent e = new DetachEvent(this);
-		final EventListener[] el = listeners.listeners();
-		for (int i = 0; i < el.length; i++) {
-			final ProcessListener l = (ProcessListener) el[i];
-			try {
-				l.detached(e);
-			}
-			catch (final RuntimeException rte) {
-				removeProcessListener(l);
-				logger.error("removed event listener", rte);
-			}
-		}
+		listeners.fire(l -> l.detached(e));
 	}
 
 	// createGroupAPDU and extractGroupASDU helper would actually better fit

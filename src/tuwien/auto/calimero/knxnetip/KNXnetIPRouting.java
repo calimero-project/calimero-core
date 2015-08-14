@@ -44,7 +44,6 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EventListener;
 import java.util.Iterator;
 import java.util.List;
 
@@ -377,18 +376,10 @@ public class KNXnetIPRouting extends ConnectionBase
 	{
 		final LostMessageEvent e = new LostMessageEvent(this, sender,
 			lost.getDeviceState(), lost.getLostMessages());
-		final EventListener[] el = listeners.listeners();
-		for (int i = 0; i < el.length; i++) {
-			final EventListener l = el[i];
+		listeners.fire(l -> {
 			if (l instanceof RoutingListener)
-				try {
 					((RoutingListener) l).lostMessage(e);
-				}
-				catch (final RuntimeException rte) {
-					removeConnectionListener((KNXListener) l);
-					logger.error("removed event listener", rte);
-				}
-		}
+		});
 	}
 
 	private boolean discardLoopbackFrame(final CEMI frame)

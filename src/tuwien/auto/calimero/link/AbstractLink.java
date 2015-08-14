@@ -90,7 +90,7 @@ public abstract class AbstractLink implements KNXNetworkLink
 	 * Listener and notifier of KNX link events, add as connection listener to the underlying
 	 * protocol during initialization.
 	 */
-	protected final EventNotifier notifier;
+	protected final EventNotifier<NetworkLinkListener> notifier;
 
 	/** The message format to generate: cEMI or EMI1/EMI2. */
 	protected boolean cEMI = true;
@@ -108,7 +108,7 @@ public abstract class AbstractLink implements KNXNetworkLink
 
 	private final AutoCloseable conn;
 
-	private final class LinkNotifier extends EventNotifier
+	private final class LinkNotifier extends EventNotifier<NetworkLinkListener>
 	{
 		LinkNotifier()
 		{
@@ -135,11 +135,11 @@ public abstract class AbstractLink implements KNXNetworkLink
 				final CEMILData f = (CEMILData) cemi;
 				final int mc = f.getMessageCode();
 				if (mc == CEMILData.MC_LDATA_IND) {
-					addEvent(new Indication(new FrameEvent(source, f)));
+					addEvent(l -> l.indication(new FrameEvent(source, f)));
 					logger.debug("indication from {}", f.getSource());
 				}
 				else if (mc == CEMILData.MC_LDATA_CON) {
-					addEvent(new Confirmation(new FrameEvent(source, f)));
+					addEvent(l -> l.confirmation(new FrameEvent(source, f)));
 					logger.debug("confirmation of {}", f.getDestination());
 				}
 				else
