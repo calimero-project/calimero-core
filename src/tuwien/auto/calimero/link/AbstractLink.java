@@ -167,7 +167,7 @@ public abstract class AbstractLink implements KNXNetworkLink
 	 * @param name the link name
 	 * @param settings medium settings of the accessed KNX network
 	 */
-	public AbstractLink(final AutoCloseable connection, final String name,
+	protected AbstractLink(final AutoCloseable connection, final String name,
 		final KNXMediumSettings settings)
 	{
 		conn = connection;
@@ -252,8 +252,8 @@ public abstract class AbstractLink implements KNXNetworkLink
 	}
 
 	@Override
-	public void send(final CEMILData msg, final boolean waitForCon) throws KNXTimeoutException,
-		KNXLinkClosedException
+	public void send(final CEMILData msg, final boolean waitForCon)
+		throws KNXTimeoutException, KNXLinkClosedException
 	{
 		if (closed)
 			throw new KNXLinkClosedException("link closed");
@@ -298,8 +298,8 @@ public abstract class AbstractLink implements KNXNetworkLink
 	@Override
 	public String toString()
 	{
-		return getName() + (closed ? " (closed), " : ", ") + medium.getMediumString()
-				+ " hopcount " + hopCount;
+		return getName() + (closed ? " (closed), " : ", ") + medium.getMediumString() + " hopcount "
+				+ hopCount;
 	}
 
 	/**
@@ -355,8 +355,8 @@ public abstract class AbstractLink implements KNXNetworkLink
 	 * @throws KNXTimeoutException on a timeout during send or while waiting for the confirmation
 	 * @throws KNXLinkClosedException if the link is closed
 	 */
-	protected abstract void onSend(CEMILData msg, boolean waitForCon) throws KNXTimeoutException,
-		KNXLinkClosedException;
+	protected abstract void onSend(CEMILData msg, boolean waitForCon)
+		throws KNXTimeoutException, KNXLinkClosedException;
 
 	/**
 	 * Returns a cEMI representation, e.g., cEMI L-Data, using the received frame event for EMI and
@@ -402,8 +402,8 @@ public abstract class AbstractLink implements KNXNetworkLink
 			final CEMILDataEx f = (CEMILDataEx) msg;
 			if (f.getAdditionalInfo(CEMILDataEx.ADDINFO_RFMEDIUM) == null) {
 				final RFSettings rf = (RFSettings) medium;
-				final byte[] sn = f.isDomainBroadcast() ? rf.getDomainAddress() : rf
-						.getSerialNumber();
+				final byte[] sn = f.isDomainBroadcast() ? rf.getDomainAddress()
+						: rf.getSerialNumber();
 				final byte[] ai = new RFMediumInfo(true, rf.isUnidirectional(), sn, 255).getInfo();
 				f.addAdditionalInfo(CEMILDataEx.ADDINFO_RFMEDIUM, ai);
 				s = f.isDomainBroadcast() ? "(using domain address)" : "(using device SN)";
@@ -415,7 +415,8 @@ public abstract class AbstractLink implements KNXNetworkLink
 	}
 
 	// Creates the target EMI format using L-Data message parameters
-	private byte[] createEmi(final int mc, final KNXAddress dst, final Priority p, final byte[] nsdu)
+	private byte[] createEmi(final int mc, final KNXAddress dst, final Priority p,
+		final byte[] nsdu)
 	{
 		if (cEMI)
 			return cEMI(mc, dst, p, nsdu).toByteArray();
