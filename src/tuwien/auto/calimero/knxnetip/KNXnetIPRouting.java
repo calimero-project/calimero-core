@@ -292,13 +292,23 @@ public class KNXnetIPRouting extends ConnectionBase
 				s.joinGroup(new InetSocketAddress(multicast, 0), netIf);
 				logger.info("using network interface {}", netIf.getName());
 			}
-			else
-				s.joinGroup(multicast);
+			else {
+				try {
+					// On OSX, joinGroup(multicast) is likely to fail if no network interface was
+					// set. With the following being the first join call, it will not fail, even
+					// if no network interface was set
+					s.joinGroup(new InetSocketAddress(multicast, 0), null);
+				}
+				catch (final IOException e) {
+					// Try the simple call as backup, as it works without problem on Linux/Windows
+					s.joinGroup(multicast);
+				}
+			}
 		}
 		catch (final IOException e) {
 			if (s != null)
 				s.close();
-			throw new KNXException(e.getMessage());
+			throw new KNXException(e.getMessage(), e);
 		}
 		try {
 			if (!useMulticastLoopback)
@@ -378,7 +388,7 @@ public class KNXnetIPRouting extends ConnectionBase
 			lost.getDeviceState(), lost.getLostMessages());
 		listeners.fire(l -> {
 			if (l instanceof RoutingListener)
-					((RoutingListener) l).lostMessage(e);
+				((RoutingListener) l).lostMessage(e);
 		});
 	}
 
