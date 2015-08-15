@@ -1,9 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.github.calimero</groupId>
+	<parent>
+		<groupId>com.github.calimero</groupId>
+		<artifactId>calimero-parent</artifactId>
+		<version>2.3-SNAPSHOT</version>
+	</parent>
 	<artifactId>calimero-core</artifactId>
-	<version>2.3-SNAPSHOT</version>
 	<name>Calimero-core Library</name>
 	<description>Calimero, a free KNX network library</description>
 	<scm>
@@ -24,37 +27,7 @@
 		</developer>
 	</developers>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
-
 	<build>
-		<sourceDirectory>src</sourceDirectory>
-		<testSourceDirectory>test</testSourceDirectory>
-		<resources>
-			<resource>
-				<directory>${basedir}</directory>
-				<targetPath>META-INF</targetPath>
-				<includes>
-					<include>LICENSE.txt</include>
-				</includes>
-			</resource>
-			<resource>
-				<directory>resources</directory>
-				<includes>
-					<include>properties.xml</include>
-				</includes>
-			</resource>
-		</resources>
-		<testResources>
-			<testResource>
-				<directory>${basedir}</directory>
-				<targetPath>META-INF</targetPath>
-				<includes>
-					<include>LICENSE.txt</include>
-				</includes>
-			</testResource>
-		</testResources>		
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -71,83 +44,20 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.5</version>
 				<configuration>
 					<archive>
 						<manifest>
 							<mainClass>tuwien.auto.calimero.Settings</mainClass>
 						</manifest>
-						<manifestEntries>
-							<Url>${project.url}</Url>
-							<Built-By>calimero-project</Built-By>
-						</manifestEntries>
 					</archive>
 				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>test-jar</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.9.1</version>
 				<configuration>
-					<overview>src/overview.html</overview>
-					<author>false</author>
-					<quiet>true</quiet>
-					<archive>
-						<manifestEntries>
-							<Built-By>calimero-project</Built-By>
-						</manifestEntries>
-					</archive>
+					<additionalparam>-Xdoclint</additionalparam>
 				</configuration>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-							<goal>test-jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>2.3</version>
-				<configuration>
-					<archive>
-						<manifestEntries>
-							<Built-By>calimero-project</Built-By>
-						</manifestEntries>
-					</archive>
-				</configuration>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar-no-fork</goal>
-							<goal>test-jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-gpg-plugin</artifactId>
-				<version>1.5</version>
-				<executions>
-					<execution>
-						<id>sign-artifacts</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -160,12 +70,6 @@
 		</plugins>
 	</build>
 	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.11</version>
-			<scope>test</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
@@ -183,14 +87,4 @@
 			<version>1.2.0</version>
 		</dependency>
 	</dependencies>
-	<distributionManagement>
-		<snapshotRepository>
-			<id>sonatype</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>sonatype</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-		</repository>
-	</distributionManagement>
 </project>
