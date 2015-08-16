@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,8 +54,7 @@ import tuwien.auto.calimero.serial.FT12Connection;
 public final class Util
 {
 	/**
-	 * Sets whether NAT functionality should be tested (false for devices without NAT
-	 * support).
+	 * Sets whether NAT functionality should be tested (false for devices without NAT support).
 	 */
 	public static final boolean TEST_NAT = true;
 
@@ -78,7 +77,6 @@ public final class Util
 
 	/**
 	 * Standard out desc and toHexDec(bytes).
-	 * <p>
 	 *
 	 * @param desc description
 	 * @param bytes bytes to print hex and decimal
@@ -90,7 +88,6 @@ public final class Util
 
 	/**
 	 * Format first 200 bytes into hex, followed by decimal presentation.
-	 * <p>
 	 *
 	 * @param bytes bytes to format
 	 * @return formatted bytes as string
@@ -143,8 +140,8 @@ public final class Util
 		if (device == null) {
 			Discoverer d;
 			try {
-				d = new Discoverer(getLocalHost().getAddress(), getLocalHost().getPort(),
-					false, false);
+				d = new Discoverer(getLocalHost().getAddress(), getLocalHost().getPort(), false,
+						false);
 				d.startSearch(2, true);
 				if (d.getSearchResponses().length == 0)
 					return null;
@@ -169,8 +166,8 @@ public final class Util
 	}
 
 	/**
-	 * @return the individual address of the remote KNX device used for tests, device supports
-	 *         Layer 4 connection-oriented mode
+	 * @return the individual address of the remote KNX device used for tests, device supports Layer
+	 *         4 connection-oriented mode
 	 */
 	public static IndividualAddress getKnxDeviceCO()
 	{
@@ -199,7 +196,7 @@ public final class Util
 			//if (local.isLoopbackAddress())
 			//	addr = new InetSocketAddress(InetAddress.getByName("192.168.1.102"), 0);
 			//else
-				addr = new InetSocketAddress(local, 0);
+			addr = new InetSocketAddress(local, 0);
 			if (printLocalHost) {
 				printLocalHost = false;
 				System.out.println();
@@ -214,6 +211,8 @@ public final class Util
 		return null;
 	}
 
+	private static boolean noServer;
+
 	/**
 	 * Returns the socket address of the KNXnet/IP router to use for testing.
 	 * <p>
@@ -223,19 +222,22 @@ public final class Util
 	 */
 	public static InetSocketAddress getServer() throws KNXException
 	{
+		if (noServer)
+			return null;
 		if (server == null) {
-			Discoverer d;
-			d = new Discoverer(getLocalHost().getAddress(), getLocalHost().getPort(),
-				false, false);
+			final Discoverer d = new Discoverer(getLocalHost().getAddress(), getLocalHost()
+					.getPort(), false, false);
 			try {
 				d.startSearch(2, true);
 			}
 			catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
+			if (d.getSearchResponses().length == 0)
+				noServer = true;
 			for (int i = 0; i < d.getSearchResponses().length; i++) {
 				final SearchResponse res = d.getSearchResponses()[i];
-				System.out.println(""+res.getControlEndpoint());
+				System.out.println("" + res.getControlEndpoint());
 			}
 			final InetAddress addr = d.getSearchResponses()[0].getControlEndpoint()
 				.getAddress();
