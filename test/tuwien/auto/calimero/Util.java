@@ -199,6 +199,8 @@ public final class Util
 		return null;
 	}
 
+	private static boolean noServer;
+
 	/**
 	 * Returns the socket address of the KNXnet/IP router to use for testing.
 	 * <p>
@@ -208,6 +210,8 @@ public final class Util
 	 */
 	public static InetSocketAddress getServer() throws KNXException
 	{
+		if (noServer)
+			return null;
 		if (server == null) {
 			final Discoverer d = new Discoverer(getLocalHost().getAddress(), getLocalHost()
 					.getPort(), false, false);
@@ -217,6 +221,8 @@ public final class Util
 			catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
+			if (d.getSearchResponses().isEmpty())
+				noServer = true;
 			final SearchResponse response = d.getSearchResponses().get(0).getResponse();
 			for (int i = 0; i < d.getSearchResponses().size(); i++) {
 				final SearchResponse res = response;
