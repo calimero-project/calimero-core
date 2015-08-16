@@ -38,7 +38,6 @@ package tuwien.auto.calimero.log;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,10 +59,16 @@ public final class LogService
 {
 	// Enumeration of the supported slf4j log levels
 	public static enum LogLevel {
-		ERROR, WARN, INFO, DEBUG, TRACE 
+		ERROR, WARN, INFO, DEBUG, TRACE
 	}
 
-	private static final ExecutorService dispatcher = Executors.newFixedThreadPool(1);
+	private static final String loggerThreadName = "Calimero Async Logging";
+	private static final ExecutorService dispatcher = Executors.newFixedThreadPool(1, (r) -> {
+		final Thread t = Executors.defaultThreadFactory().newThread(r);
+		t.setName(loggerThreadName);
+		t.setDaemon(true);
+		return t;
+	});
 
 	private LogService()
 	{}
@@ -102,18 +107,13 @@ public final class LogService
 
 	static void async(final Logger l, final LogLevel level, final String msg, final Throwable t)
 	{
-		async(l, level, null, msg, t);
+		async(l, level, (Marker) null, "{}", msg, t);
 	}
 
 	static void async(final Logger l, final LogLevel level, final Marker m, final String msg,
 		final Throwable t)
 	{
-		final Thread thread = Thread.currentThread();
-		dispatcher.execute(() -> {
-			Thread.currentThread().setName(thread.getName());
-			// TODO add marker
-				log(l, level, msg, t);
-			});
+		async(l, level, (Marker) null, "{}", msg, t);
 	}
 
 	static void async(final Logger l, final LogLevel level, final String format, final Object... o)
@@ -126,10 +126,11 @@ public final class LogService
 	{
 		final Thread thread = Thread.currentThread();
 		dispatcher.execute(() -> {
-			Thread.currentThread().setName(thread.getName());
-			// TODO add marker
-				log(l, level, format, o);
-			});
+			final Thread logger = Thread.currentThread();
+			logger.setName(thread.getName());
+			log(l, level, m, format, o);
+			logger.setName(loggerThreadName);
+		});
 	}
 
 	/**
@@ -146,57 +147,27 @@ public final class LogService
 	public static void log(final Logger logger, final LogLevel level, final String msg,
 		final Throwable t)
 	{
-		switch (level) {
-		case DEBUG:
-			logger.debug(msg, t);
-			break;
-		case TRACE:
-			logger.trace(msg, t);
-			break;
-		case INFO:
-			logger.info(msg, t);
-			break;
-		case WARN:
-			logger.warn(msg, t);
-			break;
-		case ERROR:
-			logger.error(msg, t);
-			break;
-		default:
-			throw new KNXIllegalArgumentException("unknown log level");
-		}
+		log(logger, level, (Marker) null, "{}", msg, t);
 	}
 
-	/**
-	 * Logs a message and an exception with the specified log level using the supplied logger.
-	 * <p>
-	 * This method works around the limitation that slf4j loggers don't have a generic
-	 * <code>log</code> method.
-	 *
-	 * @param logger the logger
-	 * @param level log level to use for the message
-	 * @param format the format string
-	 * @param o the arguments
-	 * @deprecated Used for transition to slf4j.
-	 */
-	public static void log(final Logger logger, final LogLevel level, final String format,
-		final Object... o)
+	private static void log(final Logger logger, final LogLevel level, final Marker marker,
+		final String format, final Object... o)
 	{
 		switch (level) {
 		case DEBUG:
-			logger.debug(format, o);
+			logger.debug(marker, format, o);
 			break;
 		case TRACE:
-			logger.trace(format, o);
+			logger.trace(marker, format, o);
 			break;
 		case INFO:
-			logger.info(format, o);
+			logger.info(marker, format, o);
 			break;
 		case WARN:
-			logger.warn(format, o);
+			logger.warn(marker, format, o);
 			break;
 		case ERROR:
-			logger.error(format, o);
+			logger.error(marker, format, o);
 			break;
 		default:
 			throw new KNXIllegalArgumentException("unknown log level");
@@ -215,12 +186,5 @@ public final class LogService
 	public static void logAlways(final Logger logger, final String msg)
 	{
 		logger.info(msg);
-	}
-
-	static final void stopDispatcher() throws InterruptedException
-	{
-		dispatcher.shutdown();
-		// give any remaining messages a chance to get logged
-		dispatcher.awaitTermination(2, TimeUnit.SECONDS);
 	}
 }
