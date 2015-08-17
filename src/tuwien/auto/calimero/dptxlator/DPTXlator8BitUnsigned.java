@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2012 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.log.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 5, type <b>8 Bit unsigned value</b>.
@@ -54,27 +53,26 @@ import tuwien.auto.calimero.log.LogLevel;
  * <p>
  * In value methods expecting string items, the item might be formatted using decimal,
  * hexadecimal, and octal numbers, distinguished by using these prefixes:
- * <dd>no prefix for decimal numeral
- * <dd><code>0x</code>, <code>0X</code> or <code>#</code> for hexadecimal
- * <dd><code>0</code> for octal numeral
+ * <dl>
+ * <dt>no prefix</dt><dd>for decimal numeral</dd>
+ * <dt><code>0x</code>, <code>0X</code>, <code>#</code><dd>for hexadecimal numeral</dd>
+ * <dt><code>0</code><dd>for octal numeral</dd>
+ * </dl>
  */
 public class DPTXlator8BitUnsigned extends DPTXlator
 {
 	/**
 	 * DPT ID 5.001, Scaling; values from <b>0</b> to <b>100</b> %.
-	 * <p>
 	 */
 	public static final DPT DPT_SCALING = new DPT("5.001", "Scaling", "0", "100", "%");
 
 	/**
 	 * DPT ID 5.003, Angle; values from <b>0</b> to <b>360</b> \u00b0 (degree).
-	 * <p>
 	 */
 	public static final DPT DPT_ANGLE = new DPT("5.003", "Angle", "0", "360", "\u00b0");
 
 	/**
 	 * DPT ID 5.004, Percent 8 Bit; values from <b>0</b> to <b>255</b> %.
-	 * <p>
 	 */
 	public static final DPT DPT_PERCENT_U8 = new DPT("5.004", "Percent (8 Bit)", "0", "255", "%");
 
@@ -98,7 +96,6 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	/**
 	 * DPT ID 5.010, Value 1 unsigned count; values from <b>0</b> to <b>255</b> counter
 	 * pulses.
-	 * <p>
 	 */
 	public static final DPT DPT_VALUE_1_UCOUNT = new DPT("5.010", "Unsigned count", "0", "255",
 			"counter pulses");
@@ -284,7 +281,7 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 			dst[index] = toDPT(Short.decode(removeUnit(value)).shortValue());
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			throw newException("wrong value format", value);
 		}
 	}
 
@@ -292,12 +289,11 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	{
 		try {
 			if (value < 0 || value > Integer.parseInt(dpt.getUpperValue()))
-				logThrow(LogLevel.WARN, "translation error for " + value,
-					"input value out of range [" + dpt.getLowerValue() + ".."
-						+ dpt.getUpperValue() + "]", Integer.toString(value));
+				throw newException("translation error, input value out of range ["
+						+ dpt.getLowerValue() + ".." + dpt.getUpperValue() + "]", Integer.toString(value));
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.ERROR, "parsing " + dpt, null, dpt.getUpperValue());
+			throw newException("parsing upper limit of " + dpt, dpt.getUpperValue());
 		}
 		int convert = value;
 		if (dpt.equals(DPT_SCALING))

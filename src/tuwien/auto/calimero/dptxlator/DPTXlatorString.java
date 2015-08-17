@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,6 @@ import java.util.Map;
 
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
-import tuwien.auto.calimero.log.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 16, type <b>string</b>.
@@ -59,13 +58,11 @@ public class DPTXlatorString extends DPTXlator
 {
 	/**
 	 * DPT ID 16.000, ASCII string; 7 Bit character set encoding.
-	 * <p>
 	 */
 	public static final DPT DPT_STRING_ASCII = new DPT("16.000", "ASCII string", "", "");
 
 	/**
 	 * DPT ID 16.001, ISO-8859-1 string (Latin 1); 8 Bit character set encoding.
-	 * <p>
 	 */
 	public static final DPT DPT_STRING_8859_1 =
 		new DPT("16.001", "ISO-8859-1 string (Latin 1)", "", "");
@@ -87,7 +84,7 @@ public class DPTXlatorString extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type.
 	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -99,7 +96,7 @@ public class DPTXlatorString extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type ID.
 	 * <p>
-	 * 
+	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
 	 *         <code>dptID</code>
@@ -185,7 +182,7 @@ public class DPTXlatorString extends DPTXlator
 		throws KNXFormatException
 	{
 		if (value.length() > stringLength)
-			logThrow(LogLevel.WARN, "maximum KNX string length is 14 characters", null, value);
+			throw newException("maximum KNX string length is 14 characters", value);
 		// check character set, default to ASCII 7 bit encoding
 		char rangeMax = '\u007f';
 		if (dpt.equals(DPT_STRING_8859_1))

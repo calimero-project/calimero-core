@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,7 +46,6 @@ import java.util.StringTokenizer;
 
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
-import tuwien.auto.calimero.log.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 10, type <b>time</b>.
@@ -64,7 +63,7 @@ import tuwien.auto.calimero.log.LogLevel;
  * adjusted using the next, larger field.<br>
  * <p>
  * The default return value after creation is <code>no-day, 00:00:00</code>.
- * 
+ *
  * @author B. Malinowsky
  */
 public class DPTXlatorTime extends DPTXlator
@@ -72,7 +71,6 @@ public class DPTXlatorTime extends DPTXlator
 	/**
 	 * DPT ID 10.001, Time of day; values from <b>no-day, 00:00:00</b> to <b>Sun,
 	 * 23:59:59</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_TIMEOFDAY =
 		new DPT("10.001", "Time of day", "no-day, 00:00:00", "Sun, 23:59:59",
@@ -98,8 +96,7 @@ public class DPTXlatorTime extends DPTXlator
 
 	/**
 	 * Creates a translator for the given datapoint type.
-	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -110,8 +107,7 @@ public class DPTXlatorTime extends DPTXlator
 
 	/**
 	 * Creates a translator for the given datapoint type ID.
-	 * <p>
-	 * 
+	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
 	 *         <code>dptID</code>
@@ -132,7 +128,7 @@ public class DPTXlatorTime extends DPTXlator
 	 * Note, the format will rely on calendar default time symbols (i.e., language for
 	 * example), and does not support the KNX DPT identifier "no-day" for day of week.
 	 * This identifier can not be used therefore.
-	 * 
+	 *
 	 * @param pattern the new pattern specifying the value time format, <code>null</code>
 	 *        to reset to default value format
 	 */
@@ -166,7 +162,7 @@ public class DPTXlatorTime extends DPTXlator
 	 * A day of week value of 0 corresponds to "no-day", indicating the day of week is not
 	 * used. The first day of week is Monday with a value of 1, the last day is Sunday
 	 * with a value of 7. <br>
-	 * 
+	 *
 	 * @param dayOfWeek day of week, 0 &lt;= day &lt;= 7
 	 * @param hour hour value, 0 &lt;= hour &lt;= 23
 	 * @param minute minute value, 0 &lt;= minute &lt;= 59
@@ -183,7 +179,7 @@ public class DPTXlatorTime extends DPTXlator
 	 * <p>
 	 * The return of 0 corresponds to "no-day", indicating the day of week is not used.
 	 * The first day of week is Monday with a value of 1, Sunday has a value of 7.
-	 * 
+	 *
 	 * @return day of week value, 0 &lt;= day of week &lt;= 7
 	 */
 	public final int getDayOfWeek()
@@ -194,7 +190,7 @@ public class DPTXlatorTime extends DPTXlator
 	/**
 	 * Returns the hour information.
 	 * <p>
-	 * 
+	 *
 	 * @return hour value, 0 &lt;= hour &lt;= 23
 	 */
 	public final int getHour()
@@ -205,7 +201,7 @@ public class DPTXlatorTime extends DPTXlator
 	/**
 	 * Returns the minute information.
 	 * <p>
-	 * 
+	 *
 	 * @return minute value, 0 &lt;= minute &lt;= 59
 	 */
 	public final int getMinute()
@@ -216,7 +212,7 @@ public class DPTXlatorTime extends DPTXlator
 	/**
 	 * Returns the second information.
 	 * <p>
-	 * 
+	 *
 	 * @return second value, 0 &lt;= second &lt;= 59
 	 */
 	public final int getSecond()
@@ -229,7 +225,7 @@ public class DPTXlatorTime extends DPTXlator
 	 * <p>
 	 * The <code>milliseconds</code> is interpreted with the translator default
 	 * calendar.
-	 * 
+	 *
 	 * @param milliseconds time value in milliseconds, as used in {@link Calendar}
 	 */
 	public final void setValue(final long milliseconds)
@@ -246,7 +242,7 @@ public class DPTXlatorTime extends DPTXlator
 	 * Note, since this is UTC time information, the initially returned local time
 	 * 00:00:00 does therefore not corresponding to 0 milliseconds, except in the case
 	 * when the local time zone is GMT.
-	 * 
+	 *
 	 * @return the time in milliseconds as long, as used in {@link Calendar}
 	 */
 	public final long getValueMilliseconds()
@@ -348,7 +344,7 @@ public class DPTXlatorTime extends DPTXlator
 			tokens[count] = t.nextToken();
 		// we allow day of week to be omitted in value
 		if (count < 3)
-			logThrow(LogLevel.WARN, "invalid time " + value, null, value);
+			throw newException("invalid time", value);
 		// on 4 tokens, day of week is included
 		final int dow = count == 4 ? getDOW(tokens[0]) : 0;
 		try {
@@ -358,10 +354,10 @@ public class DPTXlatorTime extends DPTXlator
 			set(dow, h, m, s, dst, index);
 		}
 		catch (final KNXIllegalArgumentException e) {
-			logThrow(LogLevel.WARN, "invalid time " + value, e.getMessage(), value);
+			throw newException("invalid time", value, e);
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.WARN, "invalid number in " + value, null, value);
+			throw newException("invalid number", value, e);
 		}
 	}
 
@@ -400,8 +396,7 @@ public class DPTXlatorTime extends DPTXlator
 		for (int i = 0; i < DAYS.length; ++i)
 			if (DAYS[i].equalsIgnoreCase(dow))
 				return i;
-		logThrow(LogLevel.WARN, "invalid day of week " + dow, null, dow);
-		return 0;
+		throw newException("invalid day of week", dow);
 	}
 
 	private long parse(final String value) throws KNXFormatException
@@ -410,8 +405,7 @@ public class DPTXlatorTime extends DPTXlator
 			return sdf.parse(value).getTime();
 		}
 		catch (final ParseException e) {
-			logThrow(LogLevel.WARN, "invalid time format", e.getMessage(), value);
-			return 0;
+			throw newException("invalid time format", value, e);
 		}
 	}
 

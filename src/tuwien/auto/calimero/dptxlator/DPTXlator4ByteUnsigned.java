@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.log.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 12, type <b>4 byte unsigned value</b>.
@@ -50,16 +49,17 @@ import tuwien.auto.calimero.log.LogLevel;
  * <p>
  * In value methods expecting string items, the item might be formatted using decimal,
  * hexadecimal, and octal numbers, distinguished by using these prefixes:
- * <dd>no prefix for decimal numeral
- * <dd><code>0x</code>, <code>0X</code> or <code>#</code> for hexadecimal
- * <dd><code>0</code> for octal numeral
+ * <dl>
+ * <dt>no prefix</dt><dd>for decimal numeral</dd>
+ * <dt><code>0x</code>, <code>0X</code>, <code>#</code><dd>for hexadecimal numeral</dd>
+ * <dt><code>0</code><dd>for octal numeral</dd>
+ * </dl>
  */
 public class DPTXlator4ByteUnsigned extends DPTXlator
 {
 	/**
 	 * DPT ID 12.001, Unsigned count; values from <b>0</b> to <b>4294967295</b> counter
 	 * pulses.
-	 * <p>
 	 */
 	public static final DPT DPT_VALUE_4_UCOUNT = new DPT("12.001", "Unsigned count", "0",
 			"4294967295", "counter pulses");
@@ -189,7 +189,7 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 			toDPT(Long.decode(removeUnit(value)).longValue(), dst, index);
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			throw newException("wrong value format", value);
 		}
 	}
 
@@ -197,8 +197,7 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 		throws KNXFormatException
 	{
 		if (value < 0 || value > 0xFFFFFFFFL)
-			logThrow(LogLevel.WARN, "translation error for " + value,
-					"input value out of range", Long.toString(value));
+			throw newException("translation error, input value out of range", Long.toString(value));
 		final int i = 4 * index;
 		dst[i] = (short) ((value >> 24) & 0xFF);
 		dst[i + 1] = (short) ((value >> 16) & 0xFF);

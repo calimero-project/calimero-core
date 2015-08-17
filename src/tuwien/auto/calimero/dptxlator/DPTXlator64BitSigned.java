@@ -41,7 +41,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.log.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 29, type <b>8 Byte signed (V64)</b>, used for electrical
@@ -52,16 +51,17 @@ import tuwien.auto.calimero.log.LogLevel;
  * <p>
  * In value methods expecting string items, the item might be formatted using decimal, hexadecimal,
  * and octal numbers, distinguished by using these prefixes:
- * <dd>no prefix for decimal numeral
- * <dd><code>0x</code>, <code>0X</code> or <code>#</code> for hexadecimal
- * <dd><code>0</code> for octal numeral
+ * <dl>
+ * <dt>no prefix</dt><dd>for decimal numeral</dd>
+ * <dt><code>0x</code>, <code>0X</code>, <code>#</code><dd>for hexadecimal numeral</dd>
+ * <dt><code>0</code><dd>for octal numeral</dd>
+ * </dl>
  */
 public class DPTXlator64BitSigned extends DPTXlator
 {
 	/**
 	 * DPT ID 29.010, Active energy in watthours; values from <b>-9223372036854775808</b> to
 	 * <b>9223372036854775807</b> Wh, resolution 1 Wh.
-	 * <p>
 	 */
 	public static final DPT DPT_ACTIVE_ENERGY = new DPT("29.010", "Active Energy",
 			"-9223372036854775808", "9223372036854775807", "Wh");
@@ -69,7 +69,6 @@ public class DPTXlator64BitSigned extends DPTXlator
 	/**
 	 * DPT ID 29.011, Apparent energy; values from <b>-9223372036854775808</b> to <b>2147483647</b>
 	 * VAh, resolution 1 VAh.
-	 * <p>
 	 */
 	public static final DPT DPT_APPARENT_ENERGY = new DPT("29.011", "Apparent energy",
 			"-9223372036854775808", "9223372036854775807", "VAh");
@@ -77,7 +76,6 @@ public class DPTXlator64BitSigned extends DPTXlator
 	/**
 	 * DPT ID 29.012, Reactive energy; values from <b>-9223372036854775808</b> to <b>2147483647</b>
 	 * VARh, resolution 1 VARh.
-	 * <p>
 	 */
 	public static final DPT DPT_REACTIVE_ENERGY = new DPT("29.012", "Reactive energy",
 			"-9223372036854775808", "9223372036854775807", "VARh");
@@ -91,7 +89,8 @@ public class DPTXlator64BitSigned extends DPTXlator
 			try {
 				final Object o = fields[i].get(null);
 				if (o instanceof DPT) {
-					types.put(((DPT) o).getID(), o);
+					final DPT dpt = (DPT) o;
+					types.put(dpt.getID(), dpt);
 				}
 			}
 			catch (final IllegalAccessException e) {}
@@ -220,7 +219,7 @@ public class DPTXlator64BitSigned extends DPTXlator
 			toDPT(Long.decode(removeUnit(value)).longValue(), dst, index);
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			throw newException("wrong value format", value);
 		}
 	}
 

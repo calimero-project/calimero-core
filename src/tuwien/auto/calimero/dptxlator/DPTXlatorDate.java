@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,7 +46,6 @@ import java.util.StringTokenizer;
 
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
-import tuwien.auto.calimero.log.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 11, type <b>date</b>.
@@ -59,14 +58,13 @@ import tuwien.auto.calimero.log.LogLevel;
  * adjusted using the next, larger field.<br>
  * <p>
  * The default return value after creation is <code>2000-01-01</code>.
- * 
+ *
  * @author B. Malinowsky
  */
 public class DPTXlatorDate extends DPTXlator
 {
 	/**
 	 * DPT ID 11.001, Date; values from <b>1990-01-01</b> to <b>2089-12-31</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_DATE =
 		new DPT("11.001", "Date", "1990-01-01", "2089-12-31", "yyyy-mm-dd");
@@ -86,8 +84,7 @@ public class DPTXlatorDate extends DPTXlator
 
 	/**
 	 * Creates a translator for the given datapoint type.
-	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -98,8 +95,7 @@ public class DPTXlatorDate extends DPTXlator
 
 	/**
 	 * Creates a translator for the given datapoint type ID.
-	 * <p>
-	 * 
+	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
 	 *         <code>dptID</code>
@@ -122,7 +118,7 @@ public class DPTXlatorDate extends DPTXlator
 	 * If requesting a textual date representation, and using this value format leads to
 	 * errors due to an invalid calendar date, a short error message string will be
 	 * returned.
-	 * 
+	 *
 	 * @param pattern the new pattern specifying the value date format, <code>null</code>
 	 *        to reset to default value format
 	 */
@@ -153,7 +149,7 @@ public class DPTXlatorDate extends DPTXlator
 	 * Sets the year, month, and day of month for the first date item.
 	 * <p>
 	 * Any other items in the translator are discarded on successful set.<br>
-	 * 
+	 *
 	 * @param year year value, 1990 &lt;= year &lt;= 2089
 	 * @param month month value, 1 &lt;= month &lt;= 12
 	 * @param day day value, 1 &lt;= day &lt;= 31
@@ -166,7 +162,7 @@ public class DPTXlatorDate extends DPTXlator
 	/**
 	 * Returns the day information.
 	 * <p>
-	 * 
+	 *
 	 * @return day of month value, 1 &lt;= day &lt;= 31
 	 */
 	public final int getDay()
@@ -177,7 +173,7 @@ public class DPTXlatorDate extends DPTXlator
 	/**
 	 * Returns the month information.
 	 * <p>
-	 * 
+	 *
 	 * @return month value, 1 &lt;= month &lt;= 12
 	 */
 	public final int getMonth()
@@ -188,7 +184,7 @@ public class DPTXlatorDate extends DPTXlator
 	/**
 	 * Returns the year information.
 	 * <p>
-	 * 
+	 *
 	 * @return year value, 1990 &lt;= year &lt;= 2089
 	 */
 	public final short getYear()
@@ -201,7 +197,7 @@ public class DPTXlatorDate extends DPTXlator
 	 * <p>
 	 * The <code>milliseconds</code> is interpreted with the translator default
 	 * calendar.
-	 * 
+	 *
 	 * @param milliseconds time value in milliseconds, as used in {@link Calendar}
 	 */
 	public final void setValue(final long milliseconds)
@@ -215,7 +211,7 @@ public class DPTXlatorDate extends DPTXlator
 	 * <p>
 	 * The method uses year, month and day information for calculation. Any finer time
 	 * granularity defaults to 0.<br>
-	 * 
+	 *
 	 * @return the date as time in milliseconds as long, as used in {@link Calendar}
 	 * @throws KNXFormatException on invalid calendar date
 	 */
@@ -316,14 +312,14 @@ public class DPTXlatorDate extends DPTXlator
 			for (; count < maxTokens && t.hasMoreTokens(); ++count)
 				tokens[count] = Short.parseShort(t.nextToken());
 			if (count < 3)
-				logThrow(LogLevel.WARN, "invalid date " + value, null, value);
+				throw newException("invalid date", value);
 			set(tokens[0], tokens[1], tokens[2], dst, index);
 		}
 		catch (final KNXIllegalArgumentException e) {
-			logThrow(LogLevel.WARN, "invalid date " + value, e.getMessage(), value);
+			throw newException("invalid date", value, e);
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.WARN, "invalid number in " + value, null, value);
+			throw newException("invalid number", value, e);
 		}
 	}
 
@@ -367,8 +363,7 @@ public class DPTXlatorDate extends DPTXlator
 			return sdf.parse(value).getTime();
 		}
 		catch (final ParseException e) {
-			logThrow(LogLevel.WARN, "invalid date format", e.getMessage(), value);
-			return 0;
+			throw newException("invalid date format", value, e);
 		}
 	}
 

@@ -42,7 +42,6 @@ import java.util.StringTokenizer;
 
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
-import tuwien.auto.calimero.log.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 232, type <b>rgb</b>.
@@ -183,8 +182,8 @@ public class DPTXlatorRGB extends DPTXlator {
 							b = Short.parseShort(componentValue);
 						}
 						else {
-							logThrow(LogLevel.WARN, "invalid color component " + componentID
-									+ " in " + value, null, value);
+							throw newException("invalid color component " + componentID
+									+ " in", value);
 						}
 					}
 					else
@@ -196,18 +195,16 @@ public class DPTXlatorRGB extends DPTXlator {
 							+ "e.g. 'r:', 'g:', 'b:' in " + colorComponent);
 			}
 			if ((r == -1) || (g == -1) || (b == -1)) {
-				logThrow(LogLevel.WARN, "invalid color " + value, null, value);
-
-				return;
+				throw newException("invalid color", value);
 			} else {
 				set(r, g, b, dst, index);
 			}
 		}
 		catch (final KNXIllegalArgumentException e) {
-			logThrow(LogLevel.WARN, "invalid color " + value, e.getMessage(), value);
+			throw newException("invalid color", value, e);
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.WARN, "invalid number in " + value, null, value);
+			throw newException("invalid number", value);
 		}
 	}
 

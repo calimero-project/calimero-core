@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2013 B. Malinowsky
+    Copyright (c) 2013, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,6 @@ import java.util.Map;
 
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
-import tuwien.auto.calimero.log.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 17, representing <b>Scene Number</b>.
@@ -51,15 +50,16 @@ import tuwien.auto.calimero.log.LogLevel;
  * <p>
  * In value methods expecting string items, the item might be formatted using decimal, hexadecimal,
  * and octal numbers, distinguished by using these prefixes:
+ * <ul>
  * <li>no prefix for decimal numeral</li>
  * <li><code>0x</code>, <code>0X</code> or <code>#</code> for hexadecimal</li>
  * <li><code>0</code> for octal numeral</li>
+ * </ul>
  */
 public class DPTXlatorSceneNumber extends DPTXlator
 {
 	/**
 	 * DPT ID 17.001, Scene Number; scenes are numbered with values from <b>0</b> to <b>63</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_SCENE_NUMBER = new DPT("17.001", "Scene Number", "0",
 			 "63");
@@ -179,7 +179,7 @@ public class DPTXlatorSceneNumber extends DPTXlator
 			dst[index] = toDPT(Short.decode(value.trim()).shortValue());
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			throw newException("wrong value format", value);
 		}
 	}
 

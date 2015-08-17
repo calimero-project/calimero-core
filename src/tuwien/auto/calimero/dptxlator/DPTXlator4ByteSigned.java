@@ -41,7 +41,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.log.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 13, type <b>4 byte signed value</b>.
@@ -51,16 +50,17 @@ import tuwien.auto.calimero.log.LogLevel;
  * <p>
  * In value methods expecting string items, the item might be formatted using decimal,
  * hexadecimal, and octal numbers, distinguished by using these prefixes:
- * <dd>no prefix for decimal numeral
- * <dd><code>0x</code>, <code>0X</code> or <code>#</code> for hexadecimal
- * <dd><code>0</code> for octal numeral
+ * <dl>
+ * <dt>no prefix</dt><dd>for decimal numeral</dd>
+ * <dt><code>0x</code>, <code>0X</code>, <code>#</code><dd>for hexadecimal numeral</dd>
+ * <dt><code>0</code><dd>for octal numeral</dd>
+ * </dl>
  */
 public class DPTXlator4ByteSigned extends DPTXlator
 {
 	/**
 	 * DPT ID 13.001, Counter pulses; values from <b>-2147483648</b> to <b>2147483647</b> counter
 	 * pulses.
-	 * <p>
 	 */
 	public static final DPT DPT_COUNT = new DPT("13.001", "Counter pulses", "-2147483648",
 			"2147483647", "counter pulses");
@@ -68,7 +68,6 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	/**
 	 * DPT ID 13.002, Flow rate in m3/h with high resolution; values from <b>-2147483648</b> to
 	 * <b>2147483647</b>, resolution 0.0001 m3/h.
-	 * <p>
 	 */
 	public static final DPT DPT_FLOWRATE = new DPT("13.002", "Flow rate", "-2147483648",
 			"2147483647", "m3/h");
@@ -76,21 +75,18 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	/**
 	 * DPT ID 13.010, Active energy in watthours; values from <b>-2147483648</b> to
 	 * <b>2147483647</b> Wh.
-	 * <p>
 	 */
 	public static final DPT DPT_ACTIVE_ENERGY = new DPT("13.010", "Active Energy", "-2147483648",
 			"2147483647", "Wh");
 
 	/**
 	 * DPT ID 13.011, Apparent energy; values from <b>-2147483648</b> to <b>2147483647</b> VAh.
-	 * <p>
 	 */
 	public static final DPT DPT_APPARENT_ENERGY = new DPT("13.011", "Apparent energy",
 			"-2147483648", "2147483647", "VAh");
 
 	/**
 	 * DPT ID 13.012, Reactive energy; values from <b>-2147483648</b> to <b>2147483647</b> VARh.
-	 * <p>
 	 */
 	public static final DPT DPT_REACTIVE_ENERGY = new DPT("13.012", "Reactive energy",
 			"-2147483648", "2147483647", "VARh");
@@ -98,7 +94,6 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	/**
 	 * DPT ID 13.013, Active energy in kilowatthours; values from <b>-2147483648</b> to
 	 * <b>2147483647</b> kWh.
-	 * <p>
 	 */
 	public static final DPT DPT_ACTIVE_ENERGY_KWH = new DPT("13.013", "Active energy in kWh",
 			"-2147483648", "2147483647", "kWh");
@@ -106,7 +101,6 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	/**
 	 * DPT ID 13.014, Apparent energy in kilovolt-ampere-hours; values from <b>-2147483648</b> to
 	 * <b>2147483647</b> kVAh.
-	 * <p>
 	 */
 	public static final DPT DPT_APPARENT_ENERGY_KVAH = new DPT("13.014", "Apparent energy in kVAh",
 			"-2147483648", "2147483647", "kVAh");
@@ -114,14 +108,12 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	/**
 	 * DPT ID 13.015, Reactive energy in kVARh; values from <b>-2147483648</b> to <b>2147483647</b>
 	 * kVARh.
-	 * <p>
 	 */
 	public static final DPT DPT_REACTIVE_ENERGY_KVARH = new DPT("13.015",
 			"Reactive energy in kVARh", "-2147483648", "2147483647", "kVARh");
 
 	/**
 	 * DPT ID 13.100, Delta time in seconds; values from <b>-2147483648</b> to <b>2147483647</b> s.
-	 * <p>
 	 */
 	public static final DPT DPT_DELTA_TIME = new DPT("13.100", "Delta time in seconds",
 			"-2147483648", "2147483647", "s");
@@ -135,7 +127,8 @@ public class DPTXlator4ByteSigned extends DPTXlator
 			try {
 				final Object o = fields[i].get(null);
 				if (o instanceof DPT) {
-					types.put(((DPT) o).getID(), o);
+					final DPT dpt = (DPT) o;
+					types.put(dpt.getID(), dpt);
 				}
 			}
 			catch (final IllegalAccessException e) {}
@@ -144,7 +137,6 @@ public class DPTXlator4ByteSigned extends DPTXlator
 
 	/**
 	 * Creates a translator for the given datapoint type.
-	 * <p>
 	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
@@ -156,7 +148,6 @@ public class DPTXlator4ByteSigned extends DPTXlator
 
 	/**
 	 * Creates a translator for the given datapoint type ID.
-	 * <p>
 	 *
 	 * @param dptId available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
@@ -171,7 +162,6 @@ public class DPTXlator4ByteSigned extends DPTXlator
 
 	/**
 	 * Sets the value of the first translation item.
-	 * <p>
 	 *
 	 * @param value signed value
 	 * @throws KNXFormatException on input value out of range for DPT
@@ -260,7 +250,7 @@ public class DPTXlator4ByteSigned extends DPTXlator
 			toDPT(Integer.decode(removeUnit(value)).intValue(), dst, index);
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			throw newException("wrong value format", value);
 		}
 	}
 

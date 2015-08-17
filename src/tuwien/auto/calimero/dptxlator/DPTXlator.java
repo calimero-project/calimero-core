@@ -43,7 +43,6 @@ import java.util.Map;
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 import tuwien.auto.calimero.exception.KNXIllegalStateException;
-import tuwien.auto.calimero.log.LogLevel;
 import tuwien.auto.calimero.log.LogManager;
 import tuwien.auto.calimero.log.LogService;
 
@@ -76,13 +75,11 @@ public abstract class DPTXlator
 {
 	/**
 	 * Name of the log service used in DPT translators.
-	 * <p>
 	 */
 	public static final String LOG_SERVICE = "DPTXlator";
 
 	/**
 	 * Logger object for all translators.
-	 * <p>
 	 */
 	protected static final LogService logger = LogManager.getManager().getLogService(LOG_SERVICE);
 
@@ -98,7 +95,6 @@ public abstract class DPTXlator
 
 	/**
 	 * The datapoint type set for the translator.
-	 * <p>
 	 */
 	protected DPT dpt;
 
@@ -217,7 +213,6 @@ public abstract class DPTXlator
 
 	/**
 	 * See {@link #setData(byte[], int)}, with offset 0.
-	 * <p>
 	 *
 	 * @param data byte array containing KNX DPT item(s)
 	 */
@@ -236,7 +231,7 @@ public abstract class DPTXlator
 	 * <code>items = (data.length - offset) / (length of KNX data type)</code>
 	 * <p>
 	 * In general, the KNX data type width is implicitly known in the context where a
-	 * translator is invoked (e.g., by appropriate DP configuration), therefore,
+	 * translator is invoked (e.g., by appropriate DP configuration). Therefore,
 	 * <code>data.length</code> will satisfy the minimum acceptable length. If this is
 	 * not the case, {@link KNXIllegalArgumentException} has to be caught and handled in
 	 * the caller's context.
@@ -411,7 +406,6 @@ public abstract class DPTXlator
 	/**
 	 * Sets the DPT for the translator to use for translation, doing a lookup before in
 	 * the translator's map containing the available, implemented datapoint types.
-	 * <p>
 	 *
 	 * @param availableTypes map of the translator with available, implemented DPTs; the
 	 *        map key is a dptID string, map value is of type {@link DPT}
@@ -479,23 +473,16 @@ public abstract class DPTXlator
 		return (short) (value & 0xff);
 	}
 
-	/**
-	 * Helper which logs message and creates a format exception.
-	 * <p>
-	 * Adds the current dpt ID as prefix to log output.
-	 *
-	 * @param level log level
-	 * @param msg log output, exception message if <code>excMsg</code> is
-	 *        <code>null</code>
-	 * @param excMsg exception message, if <code>null</code> <code>msg</code> is used
-	 * @param item item in KNXFormatException, might be <code>null</code>
-	 * @throws KNXFormatException the created format exception
-	 */
-	final void logThrow(final LogLevel level, final String msg, final String excMsg,
-		final String item) throws KNXFormatException
+	final KNXFormatException newException(final String msg, final String item,
+		final Exception cause)
 	{
-		final KNXFormatException e = new KNXFormatException(excMsg != null ? excMsg : msg, item);
-		logger.log(level, dpt.getID() + " - " + msg, excMsg != null ? e : null);
-		throw e;
+		final String s = dpt.getID() + " " + dpt.getDescription() + ": " + msg;
+		// TODO add cause
+		return new KNXFormatException(s, item);
+	}
+
+	final KNXFormatException newException(final String msg, final String item)
+	{
+		return newException(msg, item, null);
 	}
 }

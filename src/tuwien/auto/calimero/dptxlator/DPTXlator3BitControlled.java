@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,7 +42,6 @@ import java.util.StringTokenizer;
 
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
-import tuwien.auto.calimero.log.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 3, type <b>3 Bit controlled</b>.
@@ -56,9 +55,11 @@ import tuwien.auto.calimero.log.LogLevel;
  * subtype control field representation, followed by whitespace and the stepcode.<br>
  * It might be formatted using decimal, hexadecimal, and octal numbers, distinguished by
  * using these prefixes:
- * <dd>no prefix for decimal numeral
- * <dd><code>0x</code>, <code>0X</code> or <code>#</code> for hexadecimal
- * <dd><code>0</code> for octal numeral
+ * <dl>
+ * <dt>no prefix</dt><dd>for decimal numeral</dd>
+ * <dt><code>0x</code>, <code>0X</code>, <code>#</code><dd>for hexadecimal numeral</dd>
+ * <dt><code>0</code><dd>for octal numeral</dd>
+ * </dl>
  */
 public class DPTXlator3BitControlled extends DPTXlator
 {
@@ -66,7 +67,7 @@ public class DPTXlator3BitControlled extends DPTXlator
 	 * A DPT for the 3 Bit controlled, with additional access to the control information
 	 * DPT.
 	 * <p>
-	 * 
+	 *
 	 * @author B. Malinowsky
 	 */
 	public static class DPT3BitControlled extends DPT
@@ -80,7 +81,7 @@ public class DPTXlator3BitControlled extends DPTXlator
 		 * Such a DPT has a value range from the lower value information like returned
 		 * from the control DPT information and stepcode 7, to the upper value control DPT
 		 * and stepcode 7.
-		 * 
+		 *
 		 * @param typeID {@inheritDoc}
 		 * @param description {@inheritDoc}
 		 * @param control the DPT of the control information
@@ -95,7 +96,7 @@ public class DPTXlator3BitControlled extends DPTXlator
 		/**
 		 * Returns the DPT used to represent the control information of this DPT.
 		 * <p>
-		 * 
+		 *
 		 * @return the DPT for the control information
 		 */
 		public final DPT getControlDPT()
@@ -107,7 +108,6 @@ public class DPTXlator3BitControlled extends DPTXlator
 	/**
 	 * DPT ID 3.007, Dimming control; values are {@link DPTXlatorBoolean#DPT_STEP} for
 	 * control and 3 Bit stepcode.
-	 * <p>
 	 */
 	public static final DPT DPT_CONTROL_DIMMING =
 		new DPT3BitControlled("3.007", "Dimming", DPTXlatorBoolean.DPT_STEP);
@@ -115,7 +115,6 @@ public class DPTXlator3BitControlled extends DPTXlator
 	/**
 	 * DPT ID 3.008, Blinds control; values are {@link DPTXlatorBoolean#DPT_UPDOWN} for
 	 * control and 3 Bit stepcode.
-	 * <p>
 	 */
 	public static final DPT DPT_CONTROL_BLINDS =
 		new DPT3BitControlled("3.008", "Blinds", DPTXlatorBoolean.DPT_UPDOWN);
@@ -131,7 +130,7 @@ public class DPTXlator3BitControlled extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type.
 	 * <p>
-	 * 
+	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
@@ -143,7 +142,7 @@ public class DPTXlator3BitControlled extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type ID.
 	 * <p>
-	 * 
+	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
 	 *         <code>dptID</code>
@@ -162,7 +161,7 @@ public class DPTXlator3BitControlled extends DPTXlator
 	 * represents the control flag, a positive control flag is shown by a positive sign,
 	 * control flag 0 by a negative sign. A <code>value</code> of 0 is interpreted as
 	 * stepcode 0 with positive control flag.
-	 * 
+	 *
 	 * @param value 3 Bit controlled value in signed representation
 	 * @see #getValueSigned()
 	 */
@@ -179,7 +178,7 @@ public class DPTXlator3BitControlled extends DPTXlator
 	 * (false) by a negative sign in the returned value.<br>
 	 * In state "break" (stepcode 0), no distinction is made between a set or not set
 	 * control flag, both have value 0.
-	 * 
+	 *
 	 * @return 3 Bit controlled signed value
 	 */
 	public final int getValueSigned()
@@ -190,7 +189,7 @@ public class DPTXlator3BitControlled extends DPTXlator
 	/**
 	 * Sets one new translation item, replacing any old items.
 	 * <p>
-	 * 
+	 *
 	 * @param control control direction
 	 * @param stepcode the stepcode, 0 &lt;= value &lt;= 7
 	 * @see #setControlBit(boolean)
@@ -220,7 +219,7 @@ public class DPTXlator3BitControlled extends DPTXlator
 	 * A value of <code>false</code> stands for decrease/up, <code>true</code> for
 	 * increase/down.<br>
 	 * This method does not reset other item data or discard other translation items.
-	 * 
+	 *
 	 * @param value control direction
 	 */
 	public final void setControlBit(final boolean value)
@@ -236,7 +235,7 @@ public class DPTXlator3BitControlled extends DPTXlator
 	 * <p>
 	 * A value of <code>false</code> stands for decrease / up, <code>true</code> for
 	 * increase / down.
-	 * 
+	 *
 	 * @return control bit as boolean
 	 */
 	public final boolean getControlBit()
@@ -250,7 +249,7 @@ public class DPTXlator3BitControlled extends DPTXlator
 	 * The stepcode is the encoded representation of the number of intervals. A stepcode
 	 * of 0 is used for step break indication.<br>
 	 * This method does not reset other item data or discard other translation items.
-	 * 
+	 *
 	 * @param value the stepcode, 0 &lt;= value &lt;= 7
 	 * @see #setIntervals(int)
 	 */
@@ -264,7 +263,7 @@ public class DPTXlator3BitControlled extends DPTXlator
 	/**
 	 * Returns the stepcode of the first translation item.
 	 * <p>
-	 * 
+	 *
 	 * @return stepcode value, 0 &lt;= value &lt;= 7
 	 * @see #getIntervals()
 	 */
@@ -284,7 +283,7 @@ public class DPTXlator3BitControlled extends DPTXlator
 	 * representable intervals is rounded off (e.g 48 rounded of to 32, 3 rounded of to
 	 * 2).<br>
 	 * This method does not reset other item data or discard other translation items.
-	 * 
+	 *
 	 * @param numberOfIntervals desired intervals, 1 &lt;= intervals &lt;= 64
 	 */
 	public final void setIntervals(final int numberOfIntervals)
@@ -302,7 +301,7 @@ public class DPTXlator3BitControlled extends DPTXlator
 	 * item.
 	 * <p>
 	 * If a step break indication is set, the return value is 0.
-	 * 
+	 *
 	 * @return number of intervals in the range 1 &lt;= intervals &lt;= 64, or 0
 	 */
 	public final int getIntervals()
@@ -382,15 +381,14 @@ public class DPTXlator3BitControlled extends DPTXlator
 	{
 		final StringTokenizer token = new StringTokenizer(value);
 		if (token.countTokens() < 2)
-			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			throw newException("wrong value format", value);
 		int ctrl = 0;
 		String s = token.nextToken();
 		final DPT dptCtrl = ((DPT3BitControlled) dpt).getControlDPT();
 		if (s.equalsIgnoreCase(dptCtrl.getUpperValue()))
 			ctrl = 0x08;
 		else if (!s.equalsIgnoreCase(dptCtrl.getLowerValue()))
-			logThrow(LogLevel.WARN, "translation error for " + s,
-					"unknown control value string", s);
+			throw newException("translation error, unknown control value string", s);
 		try {
 			s = token.nextToken();
 			if (s.equalsIgnoreCase("break"))
@@ -402,6 +400,6 @@ public class DPTXlator3BitControlled extends DPTXlator
 			}
 		}
 		catch (final NumberFormatException e) {}
-		logThrow(LogLevel.WARN, "invalid stepcode " + s, null, s);
+		throw newException("invalid stepcode", s);
 	}
 }

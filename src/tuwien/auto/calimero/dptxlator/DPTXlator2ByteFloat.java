@@ -40,7 +40,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.log.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 9, type <b>2-byte float</b>.
@@ -64,117 +63,98 @@ public class DPTXlator2ByteFloat extends DPTXlator
 {
 	/**
 	 * DPT ID 9.001, Temperature; values from <b>-273</b> to <b>+670760</b> \u00b0C.
-	 * <p>
 	 */
 	public static final DPT DPT_TEMPERATURE =
 		new DPT("9.001", "Temperature", "-273", "+670760", "\u00b0C");
 
 	/**
 	 * DPT ID 9.002, Temperature difference; value range <b>+/-670760</b> K.
-	 * <p>
 	 */
 	public static final DPT DPT_TEMPERATURE_DIFFERENCE =
 		new DPT("9.002", "Temperature difference", "-670760", "+670760", "K");
 
 	/**
 	 * DPT ID 9.003, Temperature gradient; value range <b>+/-670760</b> K/h.
-	 * <p>
 	 */
 	public static final DPT DPT_TEMPERATURE_GRADIENT =
 		new DPT("9.003", "Temperature gradient", "-670760", "+670760", "K/h");
 
 	/**
-	 * DPT ID 9.004, Intensity of light (Lux); values from <b>0</b> to <b>+670760</b>
-	 * lx.
-	 * <p>
-	 * Note: the unit of measure symbol used here is "lx", and not "Lux" as originally
-	 * proposed for this DPT.
+	 * DPT ID 9.004, Intensity of light (Lux); values from <b>0</b> to <b>+670760</b> lx. Note, the
+	 * unit of measure symbol used here is "lx", and not "Lux" as originally proposed for this DPT.
 	 */
 	public static final DPT DPT_INTENSITY_OF_LIGHT =
 		new DPT("9.004", "Light intensity", "0", "+670760", "lx");
 
 	/**
 	 * DPT ID 9.005, Wind speed; values from <b>0</b> to <b>+670760</b> m/s.
-	 * <p>
 	 */
 	public static final DPT DPT_WIND_SPEED = new DPT("9.005", "Wind speed", "0", "+670760", "m/s");
 
 	/**
 	 * DPT ID 9.006, Air pressure; values from <b>0</b> to <b>+670760</b> Pa.
-	 * <p>
 	 */
-	public static final DPT DPT_AIR_PRESSURE =
-		new DPT("9.006", "Air pressure", "0", "+670760", "Pa");
+	public static final DPT DPT_AIR_PRESSURE = new DPT("9.006", "Air pressure", "0", "+670760",
+			"Pa");
 
 	/**
 	 * DPT ID 9.007, Humidity; values from <b>0</b> to <b>+670760</b> %.
-	 * <p>
 	 */
 	public static final DPT DPT_HUMIDITY = new DPT("9.007", "Humidity", "0", "+670760", "%");
 
 	/**
 	 * DPT ID 9.008, Air quality; values from <b>0</b> to <b>+670760</b> ppm.
-	 * <p>
 	 */
 	public static final DPT DPT_AIRQUALITY = new DPT("9.008", "Air quality", "0", "+670760", "ppm");
 
 	/**
-	 * DPT ID 9.009, Air flow; value range <b>+/-670760</b> m&sup3/h; resolution 0.01 m&sup3/h.
-	 * <p>
+	 * DPT ID 9.009, Air flow; value range <b>+/-670760</b> m&sup3;/h; resolution 0.01 m&sup3;/h.
 	 */
 	public static final DPT DPT_AIR_FLOW = new DPT("9.009", "Air flow", "-670760", "+670760",
 			"m\u00b3/h");
 
 	/**
 	 * DPT ID 9.010, Time difference in seconds; value range <b>+/-670760</b> s.
-	 * <p>
 	 */
 	public static final DPT DPT_TIME_DIFFERENCE1 =
 		new DPT("9.010", "Time difference 1", "-670760", "+670760", "s");
 
 	/**
 	 * DPT ID 9.011, Time difference in milliseconds; value range <b>+/-670760</b> ms.
-	 * <p>
 	 */
 	public static final DPT DPT_TIME_DIFFERENCE2 =
 		new DPT("9.011", "Time difference 2", "-670760", "+670760", "ms");
 
 	/**
 	 * DPT ID 9.020, Voltage; value range <b>+/-670760</b> mV.
-	 * <p>
 	 */
 	public static final DPT DPT_VOLTAGE = new DPT("9.020", "Voltage", "-670760", "+670760", "mV");
 
 	/**
 	 * DPT ID 9.021, Electrical current; value range <b>+/-670760</b> mA.
-	 * <p>
 	 */
 	public static final DPT DPT_ELECTRICAL_CURRENT =
 		new DPT("9.021", "Electrical current", "-670760", "+670760", "mA");
 
 	/**
 	 * DPT ID 9.022, Power density; value range <b>+/-670760</b> W/m<sup>2</sup>.
-	 * <p>
 	 */
 	public static final DPT DPT_POWERDENSITY =
 		new DPT("9.022", "Power density", "-670760", "+670760", "W/m\u00b2");
 
 	/**
 	 * DPT ID 9.023, Kelvin/percent; value range <b>+/-670760</b> K/%.
-	 * <p>
 	 */
 	public static final DPT DPT_KELVIN_PER_PERCENT =
 		new DPT("9.023", "Kelvin/percent", "-670760", "+670760", "K/%");
 
 	/**
 	 * DPT ID 9.024, Power; value range <b>+/-670760</b> kW.
-	 * <p>
 	 */
 	public static final DPT DPT_POWER = new DPT("9.024", "Power", "-670760", "+670760", "kW");
 
 	/**
 	 * DPT ID 9.025, Volume flow in liter/hour; value range <b>+/-670760</b> l/h, resolution 0.01.
-	 * <p>
 	 */
 	public static final DPT DPT_VOLUME_FLOW = new DPT("9.025", "Volume flow", "-670760", "+670760",
 			"l/h");
@@ -182,7 +162,6 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	/**
 	 * DPT ID 9.026, Rain amount in liters per square meter; values from <b>-671088.64</b> to
 	 * <b>670760.96</b> l/m<sup>2</sup>, resolution 0.01.
-	 * <p>
 	 */
 	public static final DPT DPT_RAIN_AMOUNT = new DPT("9.026", "Rain amount", "-671088.64",
 			"670760.96", "l/m\u00b2");
@@ -190,7 +169,6 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	/**
 	 * DPT ID 9.027, Temperature in Degree Fahrenheit; values from <b>+/-459.6</b> to
 	 * <b>670760.96</b> \u00b0F, resolution 0.01.
-	 * <p>
 	 */
 	public static final DPT DPT_TEMP_F = new DPT("9.027", "Temperature", "-459.6", "670760.96",
 			"\u00b0F");
@@ -198,7 +176,6 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	/**
 	 * DPT ID 9.028, Wind speed in km/h; values from <b>0</b> to <b>670760.96</b> km/h, resolution
 	 * 0.01.
-	 * <p>
 	 */
 	public static final DPT DPT_WIND_SPEED_KMH = new DPT("9.028", "Wind speed", "0", "670760.96",
 			"km/h");
@@ -233,7 +210,6 @@ public class DPTXlator2ByteFloat extends DPTXlator
 
 	/**
 	 * Creates a translator for the given datapoint type.
-	 * <p>
 	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
@@ -245,7 +221,6 @@ public class DPTXlator2ByteFloat extends DPTXlator
 
 	/**
 	 * Creates a translator for <code>dptID</code>.
-	 * <p>
 	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available) DPT
@@ -287,7 +262,6 @@ public class DPTXlator2ByteFloat extends DPTXlator
 
 	/**
 	 * Returns the first translation item formatted as double.
-	 * <p>
 	 *
 	 * @return value as double
 	 */
@@ -301,7 +275,6 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	 *
 	 * @return numeric value
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
-	 * @see #getValueDouble()
 	 */
 	public final double getNumericValue()
 	{
@@ -357,9 +330,8 @@ public class DPTXlator2ByteFloat extends DPTXlator
 		throws KNXFormatException
 	{
 		if (value < min || value > max)
-			logThrow(LogLevel.WARN, "translation error for " + value, "value out of range [" +
-					dpt.getLowerValue() + ".." + dpt.getUpperValue() + "]",
-					Double.toString(value));
+			throw newException("translation error, value out of range [" + dpt.getLowerValue()
+					+ ".." + dpt.getUpperValue() + "]", Double.toString(value));
 		// encoding: value = (0.01*M)*2^E
 		double v = value * 100.0f;
 		int e = 0;
@@ -381,7 +353,7 @@ public class DPTXlator2ByteFloat extends DPTXlator
 			toDPT(Double.parseDouble(removeUnit(value)), dst, index);
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			throw newException("wrong value format", value, e);
 		}
 	}
 
@@ -393,7 +365,6 @@ public class DPTXlator2ByteFloat extends DPTXlator
 				return d;
 		}
 		catch (final NumberFormatException e) {}
-		logThrow(LogLevel.ERROR, "limit " + limit, "invalid DPT range", limit);
-		return 0;
+		throw newException("limit in valid DPT range", limit);
 	}
 }

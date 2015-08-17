@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.exception.KNXFormatException;
-import tuwien.auto.calimero.log.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 7, type <b>2 byte unsigned value</b>.
@@ -50,22 +49,22 @@ import tuwien.auto.calimero.log.LogLevel;
  * <p>
  * Supplied string value items might be formatted using decimal, hexadecimal, and octal
  * numbers, distinguished by using these prefixes:
- * <dd>no prefix for decimal numeral
- * <dd><code>0x</code>, <code>0X</code> or <code>#</code> for hexadecimal
- * <dd><code>0</code> for octal numeral
+ * <dl>
+ * <dt>no prefix</dt><dd>for decimal numeral</dd>
+ * <dt><code>0x</code>, <code>0X</code>, <code>#</code><dd>for hexadecimal numeral</dd>
+ * <dt><code>0</code><dd>for octal numeral</dd>
+ * </dl>
  */
 public class DPTXlator2ByteUnsigned extends DPTXlator
 {
 	/**
 	 * DPT ID 7.001, Unsigned count; values from <b>0</b> to <b>65535</b> pulses.
-	 * <p>
 	 */
 	public static final DPT DPT_VALUE_2_UCOUNT =
 		new DPT("7.001", "Unsigned count", "0", "65535", "pulses");
 
 	/**
 	 * DPT ID 7.002, Time period in ms; values from <b>0</b> to <b>65535</b> ms.
-	 * <p>
 	 */
 	public static final DPT DPT_TIMEPERIOD =
 		new DPT("7.002", "Time period in ms", "0", "65535", "ms");
@@ -73,7 +72,6 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	/**
 	 * DPT ID 7.003, Time period (resolution 10 ms); values from <b>0</b> to <b>655350</b>
 	 * ms.
-	 * <p>
 	 */
 	public static final DPT DPT_TIMEPERIOD_10 =
 		new DPT("7.003", "Time period (resolution 10 ms)", "0", "655350", "ms");
@@ -81,7 +79,6 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	/**
 	 * DPT ID 7.004, Time period (resolution 100 ms); values from <b>0</b> to <b>6553500</b>
 	 * ms.
-	 * <p>
 	 */
 	public static final DPT DPT_TIMEPERIOD_100 =
 		new DPT("7.004", "Time period (resolution 100 ms)", "0", "6553500", "ms");
@@ -89,7 +86,6 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	/**
 	 * DPT ID 7.005, Time period in seconds; values from <b>0</b> to <b>65535</b> s
 	 * (~18,2 hours).
-	 * <p>
 	 */
 	public static final DPT DPT_TIMEPERIOD_SEC =
 		new DPT("7.005", "Time period in seconds", "0", "65535", "s");
@@ -97,7 +93,6 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	/**
 	 * DPT ID 7.006, Time period in minutes; values from <b>0</b> to <b>65535</b> min
 	 * (~45,5 days).
-	 * <p>
 	 */
 	public static final DPT DPT_TIMEPERIOD_MIN =
 		new DPT("7.006", "Time period in minutes", "0", "65535", "min");
@@ -105,21 +100,18 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	/**
 	 * DPT ID 7.007, Time period in hours; values from <b>0</b> to <b>65535</b> h (~7,4
 	 * years).
-	 * <p>
 	 */
 	public static final DPT DPT_TIMEPERIOD_HOURS =
 		new DPT("7.007", "Time period in hours", "0", "65535", "h");
 
 	/**
 	 * DPT ID 7.010, Interface object property ID; values from <b>0</b> to <b>65535</b>.
-	 * <p>
 	 */
 	public static final DPT DPT_PROP_DATATYPE =
 		new DPT("7.010", "Interface object property ID", "0", "65535", "");
 
 	/**
 	 * DPT ID 7.011, Length in millimeters; values from <b>0</b> to <b>65535</b>, resolution 1.
-	 * <p>
 	 */
 	public static final DPT DPT_LENGTH = new DPT("7.011", "Length in mm", "0", "65535", "mm");
 
@@ -325,7 +317,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 			toDPT(Integer.decode(removeUnit(value)).intValue(), dst, index);
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			throw newException("wrong value format", value);
 		}
 	}
 
@@ -333,8 +325,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	{
 		// prevent round up to 0 from negative milliseconds
 		if (ms < 0)
-			logThrow(LogLevel.WARN, "negative input value " + Long.toString(ms), null,
-					Long.toString(ms));
+			throw newException("negative input value", Long.toString(ms));
 		long v = ms;
 		if (dpt.equals(DPT_TIMEPERIOD_SEC))
 			v = Math.round(ms / 1000.0);
@@ -350,9 +341,8 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	private void toDPT(final int value, final short[] dst, final int index) throws KNXFormatException
 	{
 		if (value < min || value > max)
-			logThrow(LogLevel.WARN, "translation error for " + value,
-					"input value out of range [" + dpt.getLowerValue() + ".." + dpt.getUpperValue()
-							+ "]", Integer.toString(value));
+			throw newException("translation error, input value out of range ["
+							+ dpt.getLowerValue() + ".." + dpt.getUpperValue() + "]", Integer.toString(value));
 		int v = value;
 		if (dpt.equals(DPT_TIMEPERIOD_10))
 			v = Math.round(value / 10.0f);
@@ -372,7 +362,6 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 				return i;
 		}
 		catch (final NumberFormatException e) {}
-		logThrow(LogLevel.ERROR, "limit " + limit, "invalid DPT range", limit);
-		return 0;
+		throw newException("limit not in valid DPT range", limit);
 	}
 }
