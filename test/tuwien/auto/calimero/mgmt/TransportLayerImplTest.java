@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -95,7 +95,7 @@ public class TransportLayerImplTest extends TestCase
 			broad.add(e.getFrame());
 			final CEMILData f = (CEMILData) e.getFrame();
 			assertEquals(new GroupAddress(0), f.getDestination());
-			System.out.println("broadcast:");
+			System.out.print("broadcast: ");
 			Debug.printLData(f);
 		}
 
@@ -105,7 +105,7 @@ public class TransportLayerImplTest extends TestCase
 			assertNotNull(e);
 			conn.add(e.getFrame());
 			final CEMILData f = (CEMILData) e.getFrame();
-			System.out.println("connecteddata:");
+			System.out.print("data connected: ");
 			Debug.printLData(f);
 		}
 
@@ -116,7 +116,7 @@ public class TransportLayerImplTest extends TestCase
 			ind.add(e.getFrame());
 			final CEMILData f = (CEMILData) e.getFrame();
 			assertTrue(f.getDestination() instanceof IndividualAddress);
-			System.out.println("individual:");
+			System.out.print("data individual: ");
 			Debug.printLData(f);
 		}
 
@@ -231,10 +231,10 @@ public class TransportLayerImplTest extends TestCase
 	{
 		final int indAddrRead = 0x0100;
 		final byte[] tsdu = new byte[] { (byte) (indAddrRead >> 8), (byte) indAddrRead };
-		System.out.println("\nensure at least one programming button is pressed\n");
-		Thread.sleep(5000);
+//		System.out.println("\nensure at least one programming button is pressed\n");
+//		Thread.sleep(5000);
 		tl.broadcast(false, Priority.SYSTEM, tsdu);
-		Thread.sleep(100);
+		Thread.sleep(500);
 		assertFalse(ltl.broad.isEmpty());
 	}
 
@@ -504,7 +504,7 @@ public class TransportLayerImplTest extends TestCase
 						notify();
 					}
 					try {
-						sleep(2);
+						sleep(0);
 					}
 					catch (final InterruptedException e) {}
 					tl.detach();
@@ -514,8 +514,11 @@ public class TransportLayerImplTest extends TestCase
 				detacher.start();
 				detacher.wait();
 			}
-			tl.sendData(dco, p, tsduDescRead);
-			fail("we got detached");
+			try {
+				tl.sendData(dco, p, tsduDescRead);
+				fail("we got detached");
+			}
+			catch (final KNXIllegalStateException expected) {}
 		}
 		catch (final KNXDisconnectException e) {}
 		// for TL listener to process remaining indications
@@ -552,8 +555,8 @@ public class TransportLayerImplTest extends TestCase
 		final int propRead = 0x03D5;
 		// read pid max_apdu_length
 		final byte[] tsdu = new byte[] { (byte) (propRead >> 8), (byte) propRead, 0, 56, 0x10, 1, };
-		tl.sendData(Util.getRouterAddress(), p, tsdu);
-		Thread.sleep(1500);
+		tl.sendData(Util.getKnxDevice(), p, tsdu);
+		Thread.sleep(500);
 		assertFalse(ltl.ind.isEmpty());
 	}
 }
