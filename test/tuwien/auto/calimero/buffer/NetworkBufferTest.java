@@ -148,8 +148,8 @@ public class NetworkBufferTest extends TestCase
 	 */
 	public final void testStateBasedBuffering() throws InterruptedException, KNXException
 	{
-		final GroupAddress group1 = new GroupAddress(0, 0, 1);
-		final GroupAddress group2 = new GroupAddress(0, 0, 2);
+		final GroupAddress group1 = new GroupAddress(1, 0, 1);
+		final GroupAddress group2 = new GroupAddress(1, 0, 11);
 		final Configuration c = buffer.addConfiguration(lnk);
 		assertEquals(c.getBufferedLink().getName(), "buffered " + lnk.getName());
 		final StateFilter f = new StateFilter();
@@ -205,9 +205,9 @@ public class NetworkBufferTest extends TestCase
 	public final void testInvalidationUpdating() throws KNXException,
 		InterruptedException
 	{
-		final GroupAddress group1 = new GroupAddress(0, 0, 1);
-		final GroupAddress group2 = new GroupAddress(0, 0, 2);
-		final GroupAddress group3 = new GroupAddress(0, 0, 3);
+		final GroupAddress group1 = new GroupAddress(1, 0, 1);
+		final GroupAddress group2 = new GroupAddress(1, 0, 11);
+		final GroupAddress group3 = new GroupAddress(1, 0, 111);
 		final Configuration c = buffer.addConfiguration(lnk);
 		final DatapointMap<StateDP> map = new DatapointMap<>();
 		final StateDP dp = new StateDP(group1, "group1", 0, "1.001");
@@ -275,8 +275,8 @@ public class NetworkBufferTest extends TestCase
 	public final void testCommandBasedBuffering() throws InterruptedException,
 		KNXException
 	{
-		final GroupAddress group1 = new GroupAddress(0, 0, 1);
-		final GroupAddress group2 = new GroupAddress(0, 0, 2);
+		final GroupAddress group1 = new GroupAddress(1, 0, 1);
+		final GroupAddress group2 = new GroupAddress(1, 0, 11);
 		final Configuration c = buffer.addConfiguration(lnk);
 		final CommandFilter f = new CommandFilter();
 		c.setFilter(f, f);
@@ -352,8 +352,8 @@ public class NetworkBufferTest extends TestCase
 	 */
 	public final void testQueryBufferOnly() throws InterruptedException, KNXException
 	{
-		final GroupAddress group1 = new GroupAddress(0, 0, 1);
-		final GroupAddress group2 = new GroupAddress(0, 0, 2);
+		final GroupAddress group1 = new GroupAddress(1, 0, 1);
+		final GroupAddress group2 = new GroupAddress(1, 0, 11);
 		final Configuration c = buffer.addConfiguration(lnk);
 		final StateFilter f = new StateFilter();
 		c.setFilter(f, f);

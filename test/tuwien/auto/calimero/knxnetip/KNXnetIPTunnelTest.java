@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -178,6 +178,9 @@ public class KNXnetIPTunnelTest extends TestCase
 		newTunnel();
 		doSend(frame, con, true);
 		doSend(frame2, con, true);
+		// the test expects a negative confirmation with the received L_Data.con
+		// the Calimero server always sends positive .con any frame, even if the group
+		// address is non-existing
 		doSend(frameNoDest, noblock, false);
 		doSend(frame, ack, true);
 		doSend(frame2, con, true);

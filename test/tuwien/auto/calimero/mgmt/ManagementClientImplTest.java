@@ -229,7 +229,7 @@ public class ManagementClientImplTest extends TestCase
 	 */
 	public final void testReadAddressBoolean() throws InterruptedException, KNXException
 	{
-		System.out.println("put device into prog mode for read address...");
+//		System.out.println("put device into prog mode for read address...");
 		IndividualAddress[] ias = mc.readAddress(true);
 		assertTrue(ias.length <= 1);
 		System.out.println(ias[0]);
@@ -441,8 +441,8 @@ public class ManagementClientImplTest extends TestCase
 	public final void testWriteAddressIndividualAddress() throws InterruptedException,
 		KNXException
 	{
-		System.out.println("put device into prog mode for write address...");
-		Thread.sleep(5000);
+//		System.out.println("put device into prog mode for write address...");
+//		Thread.sleep(5000);
 		final IndividualAddress[] orig = mc.readAddress(true);
 
 		assertEquals(1, orig.length);
@@ -458,8 +458,8 @@ public class ManagementClientImplTest extends TestCase
 		Thread.sleep(50);
 		// test for original address
 		assertEquals(orig[0], mc.readAddress(true)[0]);
-		System.out.println("turn prog mode off...");
-		Thread.sleep(5000);
+//		System.out.println("turn prog mode off...");
+//		Thread.sleep(5000);
 	}
 
 	/**
@@ -637,10 +637,11 @@ public class ManagementClientImplTest extends TestCase
 		}
 		catch (final KNXIllegalArgumentException e) {}
 
-		/*List<byte[]> doas =*/ mc.readDomainAddress(new byte[] { 1, 2, }, Util.getKnxDeviceCO(), 10);
+		final byte[] domain = new byte[] { 0, (byte) 0x6c };
+		/*List<byte[]> doas =*/ mc.readDomainAddress(domain, Util.getKnxDeviceCO(), 10);
 		final IndividualAddress start = new IndividualAddress(
 				Util.getKnxDeviceCO().getRawAddress() - 3);
-		/*doas =*/ mc.readDomainAddress(new byte[] { 1, 2, }, start, 3);
+		/*doas =*/ mc.readDomainAddress(domain, start, 5);
 	}
 
 	/**
