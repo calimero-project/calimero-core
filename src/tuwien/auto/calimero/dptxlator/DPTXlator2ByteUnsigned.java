@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
-import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 7, type <b>2 byte unsigned value</b>.
@@ -322,7 +321,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 			toDPT(Integer.decode(removeUnit(value)).intValue(), dst, index);
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			throw newException("wrong value format", value);
 		}
 	}
 
@@ -330,8 +329,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	{
 		// prevent round up to 0 from negative milliseconds
 		if (ms < 0)
-			logThrow(LogLevel.WARN, "negative input value " + Long.toString(ms), null,
-					Long.toString(ms));
+			throw newException("negative input value", Long.toString(ms));
 		long v = ms;
 		if (dpt.equals(DPT_TIMEPERIOD_SEC))
 			v = Math.round(ms / 1000.0);
@@ -347,9 +345,8 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	private void toDPT(final int value, final short[] dst, final int index) throws KNXFormatException
 	{
 		if (value < min || value > max)
-			logThrow(LogLevel.WARN, "translation error for " + value,
-					"input value out of range [" + dpt.getLowerValue() + ".." + dpt.getUpperValue()
-							+ "]", Integer.toString(value));
+			throw newException("translation error, input value out of range ["
+							+ dpt.getLowerValue() + ".." + dpt.getUpperValue() + "]", Integer.toString(value));
 		int v = value;
 		if (dpt.equals(DPT_TIMEPERIOD_10))
 			v = Math.round(value / 10.0f);
@@ -369,7 +366,6 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 				return i;
 		}
 		catch (final NumberFormatException e) {}
-		logThrow(LogLevel.ERROR, "limit " + limit, "invalid DPT range", limit);
-		return 0;
+		throw newException("limit not in valid DPT range", limit);
 	}
 }

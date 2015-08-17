@@ -43,7 +43,6 @@ import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 20, type <b>8 Bit Enumeration (N8)</b>. It provides the
@@ -1043,8 +1042,8 @@ public class DPTXlator8BitEnum extends DPTXlator
 			// try name of enum constant or element description
 			final EnumBase<?> e = ((EnumDpt<?>) dpt).find(value);
 			if (e == null)
-				logThrow(LogLevel.WARN, "value '" + value + "' is no element of "
-						+ ((EnumDpt<?>) dpt).elements.getSimpleName() + " enumeration", null, value);
+				throw newException("value is no element of "
+						+ ((EnumDpt<?>) dpt).elements.getSimpleName() + " enumeration", value);
 			dst[index] = (short) e.value();
 		}
 	}
@@ -1067,8 +1066,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 	{
 		final EnumDpt<?> enumDpt = (EnumDpt<?>) dpt;
 		if (!enumDpt.contains(value))
-			logThrow(LogLevel.WARN,
-					"value " + value + " is no element of " + enumDpt.elements.getSimpleName()
-							+ " enumeration", null, Integer.toString(value));
+			throw newException("value is no element of " + enumDpt.elements.getSimpleName()
+					+ " enumeration", Integer.toString(value));
 	}
 }

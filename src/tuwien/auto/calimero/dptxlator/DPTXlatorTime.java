@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,7 +46,6 @@ import java.util.StringTokenizer;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 10, type <b>time</b>.
@@ -349,7 +348,7 @@ public class DPTXlatorTime extends DPTXlator
 			tokens[count] = t.nextToken();
 		// we allow day of week to be omitted in value
 		if (count < 3)
-			logThrow(LogLevel.WARN, "invalid time " + value, null, value);
+			throw newException("invalid time", value);
 		// on 4 tokens, day of week is included
 		final int dow = count == 4 ? getDOW(tokens[0]) : 0;
 		try {
@@ -359,10 +358,10 @@ public class DPTXlatorTime extends DPTXlator
 			set(dow, h, m, s, dst, index);
 		}
 		catch (final KNXIllegalArgumentException e) {
-			logThrow(LogLevel.WARN, "invalid time " + value, e.getMessage(), value);
+			throw newException("invalid time", value, e);
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.WARN, "invalid number in " + value, null, value);
+			throw newException("invalid number", value, e);
 		}
 	}
 
@@ -401,8 +400,7 @@ public class DPTXlatorTime extends DPTXlator
 		for (int i = 0; i < DAYS.length; ++i)
 			if (DAYS[i].equalsIgnoreCase(dow))
 				return i;
-		logThrow(LogLevel.WARN, "invalid day of week " + dow, null, dow);
-		return 0;
+		throw newException("invalid day of week", dow);
 	}
 
 	private long parse(final String value) throws KNXFormatException
@@ -411,8 +409,7 @@ public class DPTXlatorTime extends DPTXlator
 			return sdf.parse(value).getTime();
 		}
 		catch (final ParseException e) {
-			logThrow(LogLevel.WARN, "invalid time format", e.getMessage(), value);
-			return 0;
+			throw newException("invalid time format", value, e);
 		}
 	}
 

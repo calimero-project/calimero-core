@@ -43,7 +43,6 @@ import java.util.StringTokenizer;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 19, type <b>date with time</b>.
@@ -832,7 +831,7 @@ public class DPTXlatorDateTime extends DPTXlator
 			try {
 				final short no = Short.parseShort(s);
 				if (no < 0)
-					logThrow(LogLevel.WARN, "negative date/time " + s, null, s);
+					throw newException("negative date/time " + s, s);
 				if (no >= MIN_YEAR && no <= MAX_YEAR) {
 					set(dst, index, YEAR, no);
 					setBit(dst, index, NO_YEAR, false);
@@ -851,8 +850,7 @@ public class DPTXlatorDateTime extends DPTXlator
 				else if (s.equalsIgnoreCase("no") || s.equalsIgnoreCase("in")) {
 					if (++sync > 1 || !t.hasMoreTokens()
 						|| !t.nextToken().equalsIgnoreCase(SYNC_SIGN))
-						logThrow(LogLevel.WARN, s + ": '" + SYNC_SIGN
-							+ "' expected", null, s);
+						throw newException(s + ": '" + SYNC_SIGN + "' expected", s);
 					// check sync'd or not sync'd
 					if (s.charAt(0) == 'i' || s.charAt(0) == 'I')
 						setBitEx(dst, index, QUALITY, true);
@@ -865,19 +863,19 @@ public class DPTXlatorDateTime extends DPTXlator
 					final boolean anyday = dow == 0 && t.hasMoreTokens()
 						&& t.nextToken().equalsIgnoreCase("day");
 					if (dow <= 0 && !anyday)
-						logThrow(LogLevel.WARN, s + ": wrong weekday", null, s);
+						newException(s + ": wrong weekday", s, null);
 					set(dst, index, DOW, dow);
 					setBit(dst, index, NO_DOW, false);
 				}
 				else
-					logThrow(LogLevel.WARN, "wrong date/time " + s, null, s);
+					newException("wrong date/time " + s, s, null);
 			}
 		}
 		// find out date/time combination, and store numbers into fields
 		if (count == 0)
 			return;
 		if (count == 1 || count == 4)
-			logThrow(LogLevel.WARN, "ambiguous date/time " + value, null, value);
+			throw newException("ambiguous date/time", value);
 		int field = count == 3 ? HOUR : MONTH;
 		if (field == HOUR || count == 5)
 			setBit(dst, index, NO_TIME, false);
@@ -888,7 +886,7 @@ public class DPTXlatorDateTime extends DPTXlator
 		// check time field, if set
 		if (field == SECOND + 1
 			&& !check24Hours(numbers[count - 3], numbers[count - 2], numbers[count - 1]))
-			logThrow(LogLevel.WARN, "incorrect time " + value, null, value);
+			throw newException("incorrect time", value);
 	}
 
 	private static synchronized void initCalendar()

@@ -44,7 +44,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
-import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 14, type <b>4-byte float</b>.
@@ -751,7 +750,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 		throws KNXFormatException
 	{
 		if (value < min || value > max)
-			logThrow(LogLevel.WARN, "translation error for " + value, "value out of range ["
+			throw newException("translation error, value out of range ["
 					+ dpt.getLowerValue() + ".." + dpt.getUpperValue() + "]", Float.toString(value));
 		final int raw = Float.floatToRawIntBits(value);
 		final int i = 4 * index;
@@ -769,7 +768,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 			toDPT(Float.parseFloat(removeUnit(value)), dst, index);
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			throw newException("wrong value format", value);
 		}
 	}
 
@@ -779,7 +778,6 @@ public class DPTXlator4ByteFloat extends DPTXlator
 			return Float.parseFloat(limit);
 		}
 		catch (final NumberFormatException e) {}
-		logThrow(LogLevel.ERROR, "limit " + limit, "invalid DPT range", limit);
-		return 0;
+		throw newException("limit not in valid DPT range", limit);
 	}
 }

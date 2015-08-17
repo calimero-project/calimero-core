@@ -40,7 +40,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
-import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 9, type <b>2-byte float</b>.
@@ -312,9 +311,8 @@ public class DPTXlator2ByteFloat extends DPTXlator
 		throws KNXFormatException
 	{
 		if (value < min || value > max)
-			logThrow(LogLevel.WARN, "translation error for " + value, "value out of range [" +
-					dpt.getLowerValue() + ".." + dpt.getUpperValue() + "]",
-					Double.toString(value));
+			throw newException("translation error, value out of range [" + dpt.getLowerValue()
+					+ ".." + dpt.getUpperValue() + "]", Double.toString(value));
 		// encoding: value = (0.01*M)*2^E
 		double v = value * 100.0f;
 		int e = 0;
@@ -337,7 +335,7 @@ public class DPTXlator2ByteFloat extends DPTXlator
 			toDPT(Double.parseDouble(removeUnit(value)), dst, index);
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			throw newException("wrong value format", value, e);
 		}
 	}
 
@@ -349,7 +347,6 @@ public class DPTXlator2ByteFloat extends DPTXlator
 				return d;
 		}
 		catch (final NumberFormatException e) {}
-		logThrow(LogLevel.ERROR, "limit " + limit, "invalid DPT range", limit);
-		return 0;
+		throw newException("limit in valid DPT range", limit);
 	}
 }

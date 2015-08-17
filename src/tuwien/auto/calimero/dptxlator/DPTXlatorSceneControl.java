@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2013, 2014 B. Malinowsky
+    Copyright (c) 2013, 2015 B. Malinowsky
     Copyright (c) 2013 Juan Ruzafa Millán
 
     This program is free software; you can redistribute it and/or modify
@@ -43,7 +43,6 @@ import java.util.StringTokenizer;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 18, representing <b>Scene Control</b>.
@@ -181,19 +180,19 @@ public class DPTXlatorSceneControl extends DPTXlator
 	{
 		final StringTokenizer token = new StringTokenizer(value, " \t");
 		if (token.countTokens() < 2)
-			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			throw newException("wrong value format", value);
 		boolean learn = false;
 		String s = token.nextToken();
 		if (s.equals("learn"))
 			learn = true;
 		else if (!s.equals("activate"))
-			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			throw newException("wrong value format", value);
 		try {
 			s = token.nextToken();
 			dst[index] = toDPT(learn, Integer.decode(s).intValue());
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.WARN, "parsing " + value, null, value);
+			throw newException("parsing", value);
 		}
 	}
 

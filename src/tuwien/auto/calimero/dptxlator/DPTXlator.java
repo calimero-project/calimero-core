@@ -46,7 +46,6 @@ import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.log.LogService;
-import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * DPT translator interface for data conversion between KNX DPTs and java types.
@@ -477,24 +476,16 @@ public abstract class DPTXlator
 		return (short) (value & 0xff);
 	}
 
-	/**
-	 * Helper which logs message and creates a format exception.
-	 * <p>
-	 * Adds the current dpt ID as prefix to log output.
-	 *
-	 * @param level log level
-	 * @param msg log output, exception message if <code>excMsg</code> is
-	 *        <code>null</code>
-	 * @param excMsg exception message, if <code>null</code> <code>msg</code> is used
-	 * @param item item in KNXFormatException, might be <code>null</code>
-	 * @throws KNXFormatException the created format exception
-	 */
-	final void logThrow(final LogLevel level, final String msg, final String excMsg,
-		final String item) throws KNXFormatException
+	final KNXFormatException newException(final String msg, final String item,
+		final Exception cause)
 	{
-		final String s = dpt.getID() + ": " + msg;
-		final KNXFormatException e = new KNXFormatException(excMsg != null ? excMsg : s, item);
-		LogService.log(logger, level, s, excMsg != null ? e : null);
-		throw e;
+		final String s = dpt.getID() + " " + dpt.getDescription() + ": " + msg;
+		// TODO add cause
+		return new KNXFormatException(s, item);
+	}
+
+	final KNXFormatException newException(final String msg, final String item)
+	{
+		return newException(msg, item, null);
 	}
 }

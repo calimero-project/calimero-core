@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
-import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 12, type <b>4 byte unsigned value</b>.
@@ -194,7 +193,7 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 			toDPT(Long.decode(removeUnit(value)).longValue(), dst, index);
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			throw newException("wrong value format", value);
 		}
 	}
 
@@ -202,8 +201,7 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 		throws KNXFormatException
 	{
 		if (value < 0 || value > 0xFFFFFFFFL)
-			logThrow(LogLevel.WARN, "translation error for " + value,
-					"input value out of range", Long.toString(value));
+			throw newException("translation error, input value out of range", Long.toString(value));
 		final int i = 4 * index;
 		dst[i] = (short) ((value >> 24) & 0xFF);
 		dst[i + 1] = (short) ((value >> 16) & 0xFF);

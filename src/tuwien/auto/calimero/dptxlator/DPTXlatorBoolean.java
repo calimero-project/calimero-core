@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,6 @@ import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 1, type <b>Boolean</b>.
@@ -177,7 +176,7 @@ public class DPTXlatorBoolean extends DPTXlator
 	 * DPT ID 1.100, HVAC Heat/Cool; values <b>cooling</b>, <b>heating</b>.
 	 */
 	public static final DPT DPT_HEAT_COOL = new DPT("1.100", "Heat/Cool", "cooling", "heating");
-	
+
 	private static final Map<String, DPT> types;
 
 	static {
@@ -349,8 +348,7 @@ public class DPTXlatorBoolean extends DPTXlator
 		else if (dpt.getUpperValue().equalsIgnoreCase(value))
 			dst[index] = 1;
 		else
-			logThrow(LogLevel.WARN, "translation error for " + value,
-				"value not recognized", value);
+			throw newException("translation error, value not recognized", value);
 	}
 
 	private String fromDPT(final int index)

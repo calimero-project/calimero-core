@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,7 +46,6 @@ import java.util.StringTokenizer;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 11, type <b>date</b>.
@@ -317,14 +316,14 @@ public class DPTXlatorDate extends DPTXlator
 			for (; count < maxTokens && t.hasMoreTokens(); ++count)
 				tokens[count] = Short.parseShort(t.nextToken());
 			if (count < 3)
-				logThrow(LogLevel.WARN, "invalid date " + value, null, value);
+				throw newException("invalid date", value);
 			set(tokens[0], tokens[1], tokens[2], dst, index);
 		}
 		catch (final KNXIllegalArgumentException e) {
-			logThrow(LogLevel.WARN, "invalid date " + value, e.getMessage(), value);
+			throw newException("invalid date", value, e);
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.WARN, "invalid number in " + value, null, value);
+			throw newException("invalid number", value, e);
 		}
 	}
 
@@ -368,8 +367,7 @@ public class DPTXlatorDate extends DPTXlator
 			return sdf.parse(value).getTime();
 		}
 		catch (final ParseException e) {
-			logThrow(LogLevel.WARN, "invalid date format", e.getMessage(), value);
-			return 0;
+			throw newException("invalid date format", value, e);
 		}
 	}
 

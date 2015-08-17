@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,7 +42,6 @@ import java.util.StringTokenizer;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 3, type <b>3 Bit controlled</b>.
@@ -387,15 +386,14 @@ public class DPTXlator3BitControlled extends DPTXlator
 	{
 		final StringTokenizer token = new StringTokenizer(value);
 		if (token.countTokens() < 2)
-			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			throw newException("wrong value format", value);
 		int ctrl = 0;
 		String s = token.nextToken();
 		final DPT dptCtrl = ((DPT3BitControlled) dpt).getControlDPT();
 		if (s.equalsIgnoreCase(dptCtrl.getUpperValue()))
 			ctrl = 0x08;
 		else if (!s.equalsIgnoreCase(dptCtrl.getLowerValue()))
-			logThrow(LogLevel.WARN, "translation error for " + s,
-					"unknown control value string", s);
+			throw newException("translation error, unknown control value string", s);
 		try {
 			s = token.nextToken();
 			if (s.equalsIgnoreCase("break"))
@@ -407,6 +405,6 @@ public class DPTXlator3BitControlled extends DPTXlator
 			}
 		}
 		catch (final NumberFormatException e) {}
-		logThrow(LogLevel.WARN, "invalid stepcode " + s, null, s);
+		throw newException("invalid stepcode", s);
 	}
 }

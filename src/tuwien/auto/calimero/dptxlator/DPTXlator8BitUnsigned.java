@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
-import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 5, type <b>8 Bit unsigned value</b>.
@@ -286,7 +285,7 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 			dst[index] = toDPT(Short.decode(removeUnit(value)).shortValue());
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			throw newException("wrong value format", value);
 		}
 	}
 
@@ -294,12 +293,11 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	{
 		try {
 			if (value < 0 || value > Integer.parseInt(dpt.getUpperValue()))
-				logThrow(LogLevel.WARN, "translation error for " + value,
-					"input value out of range [" + dpt.getLowerValue() + ".."
-						+ dpt.getUpperValue() + "]", Integer.toString(value));
+				throw newException("translation error, input value out of range ["
+						+ dpt.getLowerValue() + ".." + dpt.getUpperValue() + "]", Integer.toString(value));
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.ERROR, "parsing " + dpt, null, dpt.getUpperValue());
+			throw newException("parsing upper limit of " + dpt, dpt.getUpperValue());
 		}
 		int convert = value;
 		if (dpt.equals(DPT_SCALING))

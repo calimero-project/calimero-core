@@ -42,7 +42,6 @@ import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 28, type <b>Unicode UTF-8 string</b>.
@@ -242,8 +241,8 @@ public class DPTXlatorUtf8 extends DPTXlator
 		try {
 			final byte[] utfdata = value.getBytes("utf-8");
 			if (utfdata.length > maxLength - 1)
-				logThrow(LogLevel.WARN, "UTF-8 string exceeds translator limit of " + maxLength
-						+ " bytes", null, value);
+				throw newException("UTF-8 string exceeds translator limit of " + maxLength
+						+ " bytes", value);
 			return utfdata;
 		}
 		catch (final UnsupportedEncodingException e) {

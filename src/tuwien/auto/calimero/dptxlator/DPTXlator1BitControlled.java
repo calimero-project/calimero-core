@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2014 B. Malinowsky
+    Copyright (c) 2010, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
-import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 2, type <b>1 Bit controlled</b>.
@@ -359,7 +358,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 		throws KNXFormatException
 	{
 		if (value.length() < 3)
-			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			throw newException("wrong value format", value);
 		final DPT val = ((DPT1BitControlled) dpt).getValueDPT();
 		final DPTXlatorBoolean x = new DPTXlatorBoolean(val);
 		x.setValue(value.substring(2));
@@ -367,7 +366,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 		if (value.startsWith("1 "))
 			c = 0x2;
 		else if (!value.startsWith("0 "))
-			logThrow(LogLevel.WARN, "invalid control bit " + value, null, value);
+			throw newException("invalid control bit", value);
 		dst[index] = (short) (c + (x.getValueBoolean() ? 1 : 0));
 	}
 }

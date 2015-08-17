@@ -42,7 +42,6 @@ import java.util.Map;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXIllegalStateException;
-import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 6, type <b>8 Bit signed value</b>. The KNX data type
@@ -290,7 +289,7 @@ public class DPTXlator8BitSigned extends DPTXlator
 			dst[index] = toDPT(Short.decode(removeUnit(value)).shortValue());
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			throw newException("wrong value format", value);
 		}
 	}
 

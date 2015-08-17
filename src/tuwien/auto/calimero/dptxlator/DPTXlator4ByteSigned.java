@@ -41,7 +41,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
-import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 13, type <b>4 byte signed value</b>.
@@ -255,7 +254,7 @@ public class DPTXlator4ByteSigned extends DPTXlator
 			toDPT(Integer.decode(removeUnit(value)).intValue(), dst, index);
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			throw newException("wrong value format", value);
 		}
 	}
 

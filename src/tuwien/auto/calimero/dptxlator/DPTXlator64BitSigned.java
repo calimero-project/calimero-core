@@ -41,7 +41,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
-import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 29, type <b>8 Byte signed (V64)</b>, used for electrical
@@ -220,7 +219,7 @@ public class DPTXlator64BitSigned extends DPTXlator
 			toDPT(Long.decode(removeUnit(value)).longValue(), dst, index);
 		}
 		catch (final NumberFormatException e) {
-			logThrow(LogLevel.WARN, "wrong value format " + value, null, value);
+			throw newException("wrong value format", value);
 		}
 	}
 
