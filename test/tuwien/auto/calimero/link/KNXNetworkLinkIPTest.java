@@ -464,14 +464,14 @@ public class KNXNetworkLinkIPTest extends TestCase
 		tnl.close();
 		n = tnl.getName();
 		assertNotNull(n);
-		assertTrue(n.indexOf("link") > -1);
+		assertTrue(n.indexOf(Util.getServer().getAddress().getHostAddress()) > -1);
 
 		n = rtr.getName();
 		assertTrue(n.indexOf(KNXnetIPRouting.DEFAULT_MULTICAST) > -1);
-		assertTrue(n.indexOf("link") > -1);
+//		assertTrue(n.indexOf("link") > -1);
 		rtr.close();
 		n = rtr.getName();
 		assertNotNull(n);
-		assertTrue(n.indexOf("link") > -1);
+		assertTrue(n.indexOf(KNXnetIPRouting.DEFAULT_MULTICAST) > -1);
 	}
 }
