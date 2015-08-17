@@ -471,6 +471,9 @@ public class TransportLayerImpl implements TransportLayer
 					proxy.setState(Destination.OPEN_IDLE);
 				}
 				else {
+					// reset the sequence counters
+					p.setState(Destination.CONNECTING);
+					// restart disconnect timer
 					p.setState(Destination.OPEN_IDLE);
 				}
 			}
