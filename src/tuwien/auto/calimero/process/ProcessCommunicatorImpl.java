@@ -110,8 +110,8 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 			else if (svc == GROUP_RESPONSE || svc == GROUP_WRITE)
 				fireGroupReadWrite(f, DataUnitBuilder.extractASDU(apdu), svc, apdu.length <= 2);
 			else ;
-				//logger.warn("unsupported APDU service - ignored, service code = 0x"
-				//		+ Integer.toHexString(svc));
+			//logger.warn("unsupported APDU service - ignored, service code = 0x"
+			//		+ Integer.toHexString(svc));
 		}
 
 		private void fireGroupReadWrite(final CEMILData f, final byte[] asdu, final int svc,
@@ -240,8 +240,8 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	 * (tuwien.auto.calimero.GroupAddress)
 	 */
 	@Override
-	public boolean readBool(final GroupAddress dst) throws KNXTimeoutException,
-		KNXRemoteException, KNXLinkClosedException, KNXFormatException, InterruptedException
+	public boolean readBool(final GroupAddress dst) throws KNXTimeoutException, KNXRemoteException,
+		KNXLinkClosedException, KNXFormatException, InterruptedException
 	{
 		final byte[] apdu = readFromGroup(dst, priority, 0, 0);
 		final DPTXlatorBoolean t = new DPTXlatorBoolean(DPTXlatorBoolean.DPT_BOOL);
@@ -254,8 +254,8 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	 * (tuwien.auto.calimero.GroupAddress, boolean)
 	 */
 	@Override
-	public void write(final GroupAddress dst, final boolean value) throws KNXTimeoutException,
-		KNXLinkClosedException
+	public void write(final GroupAddress dst, final boolean value)
+		throws KNXTimeoutException, KNXLinkClosedException
 	{
 		try {
 			final DPTXlatorBoolean t = new DPTXlatorBoolean(DPTXlatorBoolean.DPT_BOOL);
@@ -297,8 +297,8 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	 * (tuwien.auto.calimero.GroupAddress)
 	 */
 	@Override
-	public int readControl(final GroupAddress dst) throws KNXTimeoutException,
-		KNXRemoteException, KNXLinkClosedException, KNXFormatException, InterruptedException
+	public int readControl(final GroupAddress dst) throws KNXTimeoutException, KNXRemoteException,
+		KNXLinkClosedException, KNXFormatException, InterruptedException
 	{
 		final byte[] apdu = readFromGroup(dst, priority, 0, 0);
 		final DPTXlator3BitControlled t = new DPTXlator3BitControlled(
@@ -352,9 +352,9 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException, KNXFormatException,
 		InterruptedException
 	{
-		final DPTXlator t = is4ByteFloat ? new DPTXlator4ByteFloat(
-				DPTXlator4ByteFloat.DPT_TEMPERATURE_DIFFERENCE) : new DPTXlator2ByteFloat(
-				DPTXlator2ByteFloat.DPT_RAIN_AMOUNT);
+		final DPTXlator t = is4ByteFloat
+				? new DPTXlator4ByteFloat(DPTXlator4ByteFloat.DPT_TEMPERATURE_DIFFERENCE)
+				: new DPTXlator2ByteFloat(DPTXlator2ByteFloat.DPT_RAIN_AMOUNT);
 		final int size = is4ByteFloat ? 4 : 2;
 		final byte[] apdu = readFromGroup(dst, priority, size, size);
 		extractGroupASDU(apdu, t);
@@ -366,8 +366,8 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	 * (tuwien.auto.calimero.GroupAddress)
 	 */
 	@Override
-	public String readString(final GroupAddress dst) throws KNXTimeoutException,
-		KNXRemoteException, KNXLinkClosedException, KNXFormatException, InterruptedException
+	public String readString(final GroupAddress dst) throws KNXTimeoutException, KNXRemoteException,
+		KNXLinkClosedException, KNXFormatException, InterruptedException
 	{
 		final byte[] apdu = readFromGroup(dst, priority, 0, 14);
 		final DPTXlatorString t = new DPTXlatorString(DPTXlatorString.DPT_STRING_8859_1);
@@ -380,8 +380,8 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	 * (tuwien.auto.calimero.GroupAddress, java.lang.String)
 	 */
 	@Override
-	public void write(final GroupAddress dst, final String value) throws KNXTimeoutException,
-		KNXFormatException, KNXLinkClosedException
+	public void write(final GroupAddress dst, final String value)
+		throws KNXTimeoutException, KNXFormatException, KNXLinkClosedException
 	{
 		final DPTXlatorString t = new DPTXlatorString(DPTXlatorString.DPT_STRING_8859_1);
 		t.setValue(value);
@@ -392,8 +392,8 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	 * @see tuwien.auto.calimero.process.ProcessCommunicator#write
 	 * (tuwien.auto.calimero.GroupAddress, tuwien.auto.calimero.dptxlator.DPTXlator)
 	 */
-	public void write(final GroupAddress dst, final DPTXlator value) throws KNXTimeoutException,
-		KNXFormatException, KNXLinkClosedException
+	public void write(final GroupAddress dst, final DPTXlator value)
+		throws KNXTimeoutException, KNXFormatException, KNXLinkClosedException
 	{
 		write(dst, priority, value);
 	}
@@ -460,7 +460,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 
 	private synchronized byte[] readFromGroup(final GroupAddress dst, final Priority p,
 		final int minASDULen, final int maxASDULen) throws KNXTimeoutException,
-		KNXInvalidResponseException, KNXLinkClosedException, InterruptedException
+			KNXInvalidResponseException, KNXLinkClosedException, InterruptedException
 	{
 		if (detached)
 			throw new KNXIllegalStateException("process communicator detached");
@@ -473,7 +473,8 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 			synchronized (indications) {
 				indications.clear();
 			}
-			lnk.sendRequestWait(dst, p, DataUnitBuilder.createLengthOptimizedAPDU(GROUP_READ, null));
+			lnk.sendRequestWait(dst, p,
+					DataUnitBuilder.createLengthOptimizedAPDU(GROUP_READ, null));
 			if (logger.isTraceEnabled())
 				logger.trace("sent group read request to " + dst);
 			return waitForResponse(dst, minASDULen + 2, maxASDULen + 2);
@@ -505,8 +506,8 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 						if (d.length >= minAPDU && d.length <= maxAPDU)
 							return d;
 
-						final String s = "APDU response length " + d.length
-								+ " bytes, expected " + minAPDU + " to " + maxAPDU;
+						final String s = "APDU response length " + d.length + " bytes, expected "
+								+ minAPDU + " to " + maxAPDU;
 						logger.error("received group read response with " + s);
 						throw new KNXInvalidResponseException(s);
 					}
@@ -529,13 +530,13 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	// into to DataUnitBuilder, but moved here to avoid DPT dependencies
 
 	/**
-	 * Creates a group service application layer protocol data unit containing all items
-	 * of a DPT translator.
+	 * Creates a group service application layer protocol data unit containing all items of a DPT
+	 * translator.
 	 * <p>
-	 * The transport layer bits in the first byte (TL / AL control field) are set 0. The
-	 * maximum length used for the ASDU is not checked.<br>
-	 * For DPTs occupying &lt;= 6 bits in length the optimized (compact) group write /
-	 * response format layout is used.
+	 * The transport layer bits in the first byte (TL / AL control field) are set 0. The maximum
+	 * length used for the ASDU is not checked.<br>
+	 * For DPTs occupying &lt;= 6 bits in length the optimized (compact) group write / response
+	 * format layout is used.
 	 *
 	 * @param service application layer group service code
 	 * @param t DPT translator with items to put into ASDU
