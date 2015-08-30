@@ -106,7 +106,7 @@ public abstract class AbstractLink implements KNXNetworkLink
 	private volatile int hopCount = 6;
 	private KNXMediumSettings medium;
 
-	private final AutoCloseable conn;
+	final AutoCloseable conn;
 
 	private final class LinkNotifier extends EventNotifier<NetworkLinkListener>
 	{
@@ -377,7 +377,7 @@ public abstract class AbstractLink implements KNXNetworkLink
 	 * Invoked on {@link #close()} to execute additional close sequences of the communication
 	 * protocol, or releasing link-specific resources.
 	 */
-	protected abstract void onClose();
+	protected void onClose() {}
 
 	private CEMILData adjustMsgType(final CEMILData msg)
 	{
