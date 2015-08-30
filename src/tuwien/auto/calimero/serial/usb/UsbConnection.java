@@ -405,7 +405,7 @@ public class UsbConnection implements AutoCloseable
 		catch (final UsbException | UsbNotActiveException | UsbNotClaimedException
 				| UsbDisconnectedException e) {
 			close();
-			throw new KNXPortClosedException("error sending report over USB, " + e);
+			throw new KNXPortClosedException("error sending report over USB", name, e);
 		}
 	}
 

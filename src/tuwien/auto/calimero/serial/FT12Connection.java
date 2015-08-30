@@ -378,7 +378,7 @@ public class FT12Connection implements AutoCloseable
 		}
 		catch (final IOException e) {
 			close(false, e.getMessage());
-			throw new KNXPortClosedException(e.getMessage());
+			throw new KNXPortClosedException(e.getMessage(), port, e);
 		}
 	}
 
@@ -523,11 +523,12 @@ public class FT12Connection implements AutoCloseable
 		}
 		catch (final InterruptedException e) {
 			close(true, "send reset interruption, " + e.getMessage());
-			throw new KNXPortClosedException("interrupted during send reset");
+			Thread.currentThread().interrupt();
+			throw new KNXPortClosedException("interrupted during send reset", port);
 		}
 		catch (final IOException e) {
 			close(false, e.getMessage());
-			throw new KNXPortClosedException(e.getMessage());
+			throw new KNXPortClosedException("I/O error", port, e);
 		}
 		finally {
 			sendFrameCount = FRAMECOUNT_BIT;
@@ -540,7 +541,7 @@ public class FT12Connection implements AutoCloseable
 		if (data.length > 255)
 			throw new KNXIllegalArgumentException("data length > 255 bytes");
 		if (state == CLOSED)
-			throw new KNXPortClosedException("connection closed");
+			throw new KNXPortClosedException("connection closed", port);
 		final byte[] buf = new byte[data.length + 7];
 		int i = 0;
 		buf[i++] = START;

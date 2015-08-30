@@ -198,7 +198,8 @@ public class TransportLayerImpl implements TransportLayer
 		throws KNXLinkClosedException
 	{
 		if (!link.isOpen())
-			throw new KNXLinkClosedException();
+			throw new KNXLinkClosedException(
+					"cannot initialize transport layer using closed link " + link.getName());
 		lnk = link;
 		lnk.addLinkListener(lnkListener);
 		logger = LogService.getLogger(getName());
