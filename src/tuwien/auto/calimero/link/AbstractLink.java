@@ -356,7 +356,7 @@ public abstract class AbstractLink implements KNXNetworkLink
 	 * Invoked on {@link #close()} to execute additional close sequences of the communication
 	 * protocol, or releasing link-specific resources.
 	 */
-	protected abstract void onClose();
+	protected void onClose() {}
 
 	private CEMILData adjustMsgType(final CEMILData msg)
 	{
