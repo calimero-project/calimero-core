@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ import tuwien.auto.calimero.log.LogService;
  * Invoking that constructor will open the serial port according the supplied arguments.
  * <p>
  * After closing a library adapter, method behavior is undefined.
- * 
+ *
  * @author B. Malinowsky
  */
 public abstract class LibraryAdapter
@@ -69,7 +69,7 @@ public abstract class LibraryAdapter
 
 	/**
 	 * Creates a new library adapter.
-	 * 
+	 *
 	 * @param logService the log service to use for this adapter
 	 */
 	protected LibraryAdapter(final LogService logService)
@@ -81,7 +81,7 @@ public abstract class LibraryAdapter
 	 * Returns the output stream for the opened serial communication port.
 	 * <p>
 	 * Subsequent invocations might return the same or a new stream object.
-	 * 
+	 *
 	 * @return the OutputStream object
 	 */
 	public abstract OutputStream getOutputStream();
@@ -90,15 +90,14 @@ public abstract class LibraryAdapter
 	 * Returns the input stream for the opened serial communication port.
 	 * <p>
 	 * Subsequent invocations might return the same or a new stream object.
-	 * 
+	 *
 	 * @return the InputStream object
 	 */
 	public abstract InputStream getInputStream();
 
 	/**
 	 * Sets a new baud rate for this connection.
-	 * <p>
-	 * 
+	 *
 	 * @param baudrate requested baud rate [Bit/s], 0 &lt; baud rate
 	 */
 	public void setBaudRate(final int baudrate)
@@ -112,7 +111,7 @@ public abstract class LibraryAdapter
 	/**
 	 * Returns the currently used baud rate.
 	 * <p>
-	 * 
+	 *
 	 * @return baud rate in bit/s
 	 */
 	public int getBaudRate()
@@ -126,8 +125,7 @@ public abstract class LibraryAdapter
 
 	/**
 	 * Closes an open serial port.
-	 * <p>
-	 * 
+	 *
 	 * @throws IOException on error during close
 	 */
 	public abstract void close() throws IOException;
@@ -138,7 +136,7 @@ public abstract class LibraryAdapter
 	 * <p>
 	 * Arguments wrapped in an object of type Integer are replaced with the primitive int
 	 * type when looking up the method name.
-	 * 
+	 *
 	 * @param obj object on which to invoke the method
 	 * @param method method name
 	 * @param args list of arguments

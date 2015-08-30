@@ -72,19 +72,16 @@ public abstract class DIB
 
 	/**
 	 * Description type code for the IP configuration device information.
-	 * <p>
 	 */
 	public static final int IP_CONFIG = 0x03;
 
 	/**
 	 * Description type code for the current IP configuration device information.
-	 * <p>
 	 */
 	public static final int IP_CURRENT_CONFIG = 0x04;
 
 	/**
 	 * Description type code for the KNX addresses device information.
-	 * <p>
 	 */
 	public static final int KNX_ADDRESSES = 0x05;
 
