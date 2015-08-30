@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ import tuwien.auto.calimero.exception.KNXException;
 /**
  * Thrown to indicate illegal access to a closed serial port.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public class KNXPortClosedException extends KNXException
@@ -51,46 +51,36 @@ public class KNXPortClosedException extends KNXException
 	private final String id;
 
 	/**
-	 * Constructs a new <code>KNXPortClosedException</code> without a detail
-	 * message.
-	 * <p>
+	 * Constructs a new <code>KNXPortClosedException</code> with the specified detail message,
+	 * cause, and port identifier.
+	 *
+	 * @param s the detail message
+	 * @param portId port identifier, can be <code>null</code>
+	 * @param cause the cause in form of a throwable object, can be <code>null</code>
 	 */
-	public KNXPortClosedException()
+	public KNXPortClosedException(final String s, final String portId, final Throwable cause)
 	{
-		id = null;
+		super(s, cause);
+		id = portId;
 	}
 
 	/**
-	 * Constructs a new <code>KNXPortClosedException</code> with the specified
-	 * detail message.
-	 * <p>
-	 * 
+	 * Constructs a new <code>KNXPortClosedException</code> with the specified detail message and
+	 * the serial port identifier.
+	 *
 	 * @param s the detail message
+	 * @param portId serial port identifier of the closed port, can be <code>null</code>
 	 */
-	public KNXPortClosedException(final String s)
+	public KNXPortClosedException(final String s, final String portId)
 	{
 		super(s);
-		id = null;
-	}
-
-	/**
-	 * Constructs a new <code>KNXPortClosedException</code> with the specified
-	 * detail message and the serial port identifier.
-	 * <p>
-	 * 
-	 * @param s the detail message
-	 * @param portID serial port identifier of the closed port
-	 */
-	public KNXPortClosedException(final String s, final String portID)
-	{
-		super(s);
-		id = portID;
+		id = portId;
 	}
 
 	/**
 	 * Returns the serial port identifier supplied with this exception.
 	 * <p>
-	 * 
+	 *
 	 * @return port ID as string, or <code>null</code> if no port ID specified
 	 */
 	public final String getPortID()

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ import tuwien.auto.calimero.exception.KNXException;
 
 /**
  * Thrown to indicate an illegal operation invoked on an already closed network link.
- * 
+ *
  * @author B. Malinowsky
  */
 public class KNXLinkClosedException extends KNXException
@@ -48,21 +48,23 @@ public class KNXLinkClosedException extends KNXException
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Constructs a new <code>KNXLinkClosedException</code> without a detail message.
-	 * <p>
-	 */
-	public KNXLinkClosedException()
-	{}
-
-	/**
-	 * Constructs a new <code>KNXLinkClosedException</code> with the specified detail
-	 * message.
-	 * <p>
-	 * 
+	 * Constructs a new <code>KNXLinkClosedException</code> with the specified detail message.
+	 *
 	 * @param s the detail message
 	 */
 	public KNXLinkClosedException(final String s)
 	{
 		super(s);
+	}
+
+	/**
+	 * Constructs a new <code>KNXLinkClosedException</code> with the specified detail message and
+	 * cause.
+	 *
+	 * @param s the detail message
+	 */
+	public KNXLinkClosedException(final String s, final Throwable cause)
+	{
+		super(s, cause);
 	}
 }
