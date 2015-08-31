@@ -92,7 +92,7 @@ public class LocalDeviceMgmtAdapter extends LocalDeviceManagement
 		InterruptedException
 	{
 		super(create(localEP, serverCtrlEP, useNat), l, queryWriteEnable);
-		conn = (KNXnetIPConnection) c;
+		conn = c;
 		conn.addConnectionListener(new KNXListenerImpl());
 		init();
 	}

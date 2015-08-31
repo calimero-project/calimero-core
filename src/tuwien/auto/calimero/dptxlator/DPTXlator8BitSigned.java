@@ -146,7 +146,7 @@ public class DPTXlator8BitSigned extends DPTXlator
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
 	 */
-	public double getNumericValue() throws KNXFormatException
+	public double getNumericValue()
 	{
 		return getValueSigned();
 	}

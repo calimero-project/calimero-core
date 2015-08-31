@@ -164,10 +164,9 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	 * Sets the value of the first translation item.
 	 *
 	 * @param value signed value
-	 * @throws KNXFormatException on input value out of range for DPT
 	 * @see #getType()
 	 */
-	public final void setValue(final int value) throws KNXFormatException
+	public final void setValue(final int value)
 	{
 		data = toDPT(value, new short[4], 0);
 	}
@@ -255,7 +254,6 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	}
 
 	private short[] toDPT(final int value, final short[] dst, final int index)
-		throws KNXFormatException
 	{
 		final int i = 4 * index;
 		dst[i] = (short) ((value >> 24) & 0xFF);

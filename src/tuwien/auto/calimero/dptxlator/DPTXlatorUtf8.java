@@ -42,7 +42,6 @@ import java.util.Map;
 
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
-import tuwien.auto.calimero.log.LogLevel;
 
 /**
  * Translator for KNX DPTs with main number 28, type <b>Unicode UTF-8 string</b>.

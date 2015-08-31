@@ -104,10 +104,8 @@ public class DPTXlator64BitSignedTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator4ByteSigned#getAllValues()}.
-	 *
-	 * @throws KNXFormatException
 	 */
-	public void testGetAllValues() throws KNXFormatException
+	public void testGetAllValues()
 	{
 		assertEquals(1, t.getItems());
 		Helper.assertSimilar("0", t.getAllValues()[0]);
@@ -239,10 +237,8 @@ public class DPTXlator64BitSignedTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#getData(byte[], int)}.
-	 *
-	 * @throws KNXFormatException
 	 */
-	public void testGetDataByteArrayInt() throws KNXFormatException
+	public void testGetDataByteArrayInt()
 	{
 		byte[] d = new byte[9];
 		Arrays.fill(d, (byte) 0xAA);
@@ -314,10 +310,8 @@ public class DPTXlator64BitSignedTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator4ByteSigned#setValue(int)}.
-	 *
-	 * @throws KNXFormatException
 	 */
-	public void testSetValueInt() throws KNXFormatException
+	public void testSetValueInt()
 	{
 		for (int i = 0; i < longs.length; i++) {
 			t.setValue(longs[i]);

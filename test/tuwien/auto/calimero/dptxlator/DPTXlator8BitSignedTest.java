@@ -333,10 +333,8 @@ public class DPTXlator8BitSignedTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator8BitSigned#getNumericValue()}.
-	 *
-	 * @throws KNXFormatException
 	 */
-	public final void testGetNumericValue() throws KNXFormatException
+	public final void testGetNumericValue()
 	{
 		t.setData(new byte[] { (byte) 0xff}, 0);
 		assertEquals(-1, (int) t.getNumericValue());
@@ -398,10 +396,8 @@ public class DPTXlator8BitSignedTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator8BitSigned#getMode()}.
-	 *
-	 * @throws KNXFormatException
 	 */
-	public final void testGetMode() throws KNXFormatException
+	public final void testGetMode()
 	{
 		try {
 			t.getMode();
