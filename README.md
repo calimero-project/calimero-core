@@ -31,6 +31,7 @@ Supported Features
 * KNX RF USB
 * KNX USB
 * KNX FT1.2 Protocol (serial connections)
+* TP-UART [__NEW__: Access TP1 networks via TP-UART]
 
 #### KNXnet/IP
 * Discovery and Self-description
