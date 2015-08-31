@@ -30,6 +30,7 @@ Supported Features
 * KNX RF USB (Java 8 branch only)
 * KNX USB (Java 8 branch only)
 * KNX FT1.2 Protocol (serial connections)
+* TP-UART [__NEW__: Access TP1 networks via TP-UART]
 
 #### KNXnet/IP
 * Discovery and Self-description
