@@ -848,7 +848,7 @@ public class ManagementClientImpl implements ManagementClient
 
 	private List<byte[]> waitForResponses(final IndividualAddress from, final Priority p,
 		final int minAsduLen, final int maxAsduLen, final boolean oneOnly)
-		throws KNXLinkClosedException, KNXInvalidResponseException, InterruptedException
+		throws KNXInvalidResponseException, InterruptedException
 	{
 		final List<byte[]> l = new ArrayList<>();
 		try {

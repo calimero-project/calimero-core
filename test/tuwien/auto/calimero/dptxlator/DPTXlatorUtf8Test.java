@@ -39,10 +39,9 @@ package tuwien.auto.calimero.dptxlator;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
-import junit.framework.TestCase;
-
 import org.junit.Assert;
 
+import junit.framework.TestCase;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Util;
@@ -229,9 +228,8 @@ public class DPTXlatorUtf8Test extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#getData(byte[], int)}.
-	 * @throws KNXFormatException
 	 */
-	public final void testGetDataByteArrayInt() throws KNXFormatException
+	public final void testGetDataByteArrayInt()
 	{
 		assertEquals(25, t.getData(new byte[25], 4).length);
 		final byte[] buf = new byte[20];
@@ -267,9 +265,8 @@ public class DPTXlatorUtf8Test extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#getTypeSize()}.
 	 *
 	 * @throws KNXFormatException
-	 * @throws UnsupportedEncodingException
 	 */
-	public final void testGetTypeSize() throws KNXFormatException, UnsupportedEncodingException
+	public final void testGetTypeSize() throws KNXFormatException
 	{
 		assertEquals(1, t.getTypeSize());
 		t.setValue(string1);

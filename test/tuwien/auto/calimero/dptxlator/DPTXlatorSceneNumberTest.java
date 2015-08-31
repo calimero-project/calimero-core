@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2013 B. Malinowsky
+    Copyright (c) 2013, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -103,7 +103,7 @@ public class DPTXlatorSceneNumberTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorSceneNumber#setValues(java.lang.String[])}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValues() throws KNXFormatException
@@ -126,7 +126,7 @@ public class DPTXlatorSceneNumberTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorSceneNumber#getAllValues()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public void testGetAllValues() throws KNXFormatException
@@ -147,7 +147,7 @@ public class DPTXlatorSceneNumberTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorSceneNumber#setValue(java.lang.String)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public void testSetValueString() throws KNXFormatException
@@ -173,7 +173,7 @@ public class DPTXlatorSceneNumberTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorSceneNumber#getValue()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public void testGetValue() throws KNXFormatException
@@ -219,7 +219,7 @@ public class DPTXlatorSceneNumberTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorSceneNumber#getData(byte[], int)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public void testGetDataByteArrayInt() throws KNXFormatException
@@ -273,10 +273,8 @@ public class DPTXlatorSceneNumberTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorSceneNumber#setValue(int)}.
-	 * 
-	 * @throws KNXFormatException
 	 */
-	public void testSetValueInt() throws KNXFormatException
+	public void testSetValueInt()
 	{
 		t.setValue(13);
 		Helper.assertSimilar(value1, t.getValue());

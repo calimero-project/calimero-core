@@ -128,10 +128,9 @@ public class DPTXlator64BitSigned extends DPTXlator
 	 * <p>
 	 *
 	 * @param value signed value
-	 * @throws KNXFormatException on input value out of range for DPT
 	 * @see #getType()
 	 */
-	public final void setValue(final long value) throws KNXFormatException
+	public final void setValue(final long value)
 	{
 		data = toDPT(value, new short[8], 0);
 	}
@@ -224,7 +223,6 @@ public class DPTXlator64BitSigned extends DPTXlator
 	}
 
 	private short[] toDPT(final long value, final short[] dst, final int index)
-		throws KNXFormatException
 	{
 		final int i = 8 * index;
 		dst[i] = (short) ((value >> 56) & 0xFF);

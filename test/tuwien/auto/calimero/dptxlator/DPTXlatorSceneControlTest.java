@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2013 B. Malinowsky
+    Copyright (c) 2013, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -103,7 +103,7 @@ public class DPTXlatorSceneControlTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorSceneControl#setValues(java.lang.String[])}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValues() throws KNXFormatException
@@ -126,7 +126,7 @@ public class DPTXlatorSceneControlTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorSceneControl#getAllValues()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public void testGetAllValues() throws KNXFormatException
@@ -147,7 +147,7 @@ public class DPTXlatorSceneControlTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorSceneControl#setValue(java.lang.String)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public void testSetValueString() throws KNXFormatException
@@ -172,7 +172,7 @@ public class DPTXlatorSceneControlTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorSceneControl#getValue()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public void testGetValue() throws KNXFormatException
@@ -218,7 +218,7 @@ public class DPTXlatorSceneControlTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorSceneControl#getData(byte[], int)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public void testGetDataByteArrayInt() throws KNXFormatException
@@ -272,9 +272,8 @@ public class DPTXlatorSceneControlTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorSceneControl#setValue(boolean, int)}.
-	 * @throws KNXFormatException
 	 */
-	public void testSetValueBooleanInt() throws KNXFormatException
+	public void testSetValueBooleanInt()
 	{
 		t.setValue(true, 13);
 		Helper.assertSimilar(value1, t.getValue());
@@ -285,12 +284,12 @@ public class DPTXlatorSceneControlTest extends TestCase
 		Helper.assertSimilar(strings[2], t.getValue());
 		scene = t.getSceneNumber();
 		assertEquals(0, scene);
-		
+
 		t.setValue(false, 34);
 		Helper.assertSimilar(strings[1], t.getValue());
 		scene = t.getSceneNumber();
 		assertEquals(34, scene);
-		
+
 		try {
 			t.setValue(false, 64);
 			fail("scene number too big");
@@ -298,7 +297,7 @@ public class DPTXlatorSceneControlTest extends TestCase
 		catch (final Exception e) {
 			// fine
 		}
-		
+
 		try {
 			t.setValue(false, -1);
 			fail("scene number negative");
