@@ -281,7 +281,7 @@ public abstract class AbstractLink implements KNXNetworkLink
 
 	public String toString()
 	{
-		return getName() + (closed ? " (closed), " : ", ") + medium.getMediumString() + " hopcount "
+		return "link" + (closed ? " (closed) " : " ") + getName() + " " + medium + ", hopcount "
 				+ hopCount;
 	}
 
