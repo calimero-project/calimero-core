@@ -196,7 +196,7 @@ public class KNXNetworkLinkFT12Test extends TestCase
 	public final void testSetKNXMedium()
 	{
 		try {
-			lnk.setKNXMedium(new PLSettings(true));
+			lnk.setKNXMedium(new PLSettings());
 			fail("different medium");
 		}
 		catch (final KNXIllegalArgumentException e) {}

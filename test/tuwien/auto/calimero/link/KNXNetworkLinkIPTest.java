@@ -244,7 +244,7 @@ public class KNXNetworkLinkIPTest extends TestCase
 	public final void testSetKNXMedium()
 	{
 		try {
-			tnl.setKNXMedium(new PLSettings(true));
+			tnl.setKNXMedium(new PLSettings());
 			fail("different medium");
 		}
 		catch (final KNXIllegalArgumentException e) {}
@@ -348,7 +348,7 @@ public class KNXNetworkLinkIPTest extends TestCase
 		final KNXNetworkLink plrtr = new KNXNetworkLinkIP(KNXNetworkLinkIP.ROUTING,
 				Util.getLocalHost(), new InetSocketAddress(
 						InetAddress.getByName(KNXnetIPRouting.DEFAULT_MULTICAST), 0), false,
-				new PLSettings(true));
+				new PLSettings());
 		plrtr.sendRequest(new GroupAddress(0, 0, 1), Priority.LOW, new byte[] { 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (byte) (0x80 | 0) });
 	}

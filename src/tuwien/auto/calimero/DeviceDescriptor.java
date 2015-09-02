@@ -242,7 +242,7 @@ public interface DeviceDescriptor
 			case 0:
 				return TPSettings.TP1;
 			case 1:
-				return new PLSettings(false);
+				return new PLSettings();
 			case 2:
 				return new RFSettings(new IndividualAddress(0));
 			case 3:
