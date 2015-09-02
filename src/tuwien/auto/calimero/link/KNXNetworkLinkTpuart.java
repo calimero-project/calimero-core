@@ -77,7 +77,7 @@ public class KNXNetworkLinkTpuart extends AbstractLink
 	 * @throws KNXException on error establishing the TP-UART connection
 	 */
 	public KNXNetworkLinkTpuart(final String portId, final KNXMediumSettings settings,
-		final Collection<KNXAddress> acknowledge) throws KNXException
+		final Collection<? extends KNXAddress> acknowledge) throws KNXException
 	{
 		super(new TpuartConnection(portId, ensureDeviceAck(settings, acknowledge)),
 				"tpuart:" + portId, settings);
@@ -128,8 +128,8 @@ public class KNXNetworkLinkTpuart extends AbstractLink
 	{}
 
 	// if possible, add this link to the list of addresses to acknowledge
-	private static Collection<KNXAddress> ensureDeviceAck(final KNXMediumSettings settings,
-		final Collection<KNXAddress> acknowledge)
+	private static Collection<? extends KNXAddress> ensureDeviceAck(final KNXMediumSettings settings,
+		final Collection<? extends KNXAddress> acknowledge)
 	{
 		if (settings.getMedium() != KNXMediumSettings.MEDIUM_TP1)
 			throw new KNXIllegalArgumentException("TP-UART link supports only TP1 medium");

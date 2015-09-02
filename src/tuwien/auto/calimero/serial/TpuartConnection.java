@@ -148,7 +148,7 @@ public class TpuartConnection implements AutoCloseable
 	 * @throws KNXException on error opening the communication port, or initializing the TP-UART
 	 *         controller
 	 */
-	public TpuartConnection(final String portId, final Collection<KNXAddress> acknowledge)
+	public TpuartConnection(final String portId, final Collection<? extends KNXAddress> acknowledge)
 		throws KNXException
 	{
 		this.portId = portId;
