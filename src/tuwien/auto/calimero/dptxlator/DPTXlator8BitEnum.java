@@ -69,7 +69,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  */
 public class DPTXlator8BitEnum extends DPTXlator
 {
-	// the translator does not include the system domain subtypes (they are not used anyway?)
+	// ??? the translator does not include the system domain subtypes (they are not used anyway?)
 
 	// TODO review and finish subtype enumerations, make enums public
 
@@ -100,12 +100,13 @@ public class DPTXlator8BitEnum extends DPTXlator
 	// The specified enumerations for the DPTs of this translator
 	//
 
-	static enum SCLOMode implements EnumBase<SCLOMode> {
+	/** System Clock Mode. */
+	static enum ScloMode implements EnumBase<ScloMode> {
 		Autonomous(0, "autonomous"),
 		Slave(1, "slave"),
 		Master(2, "master");
 
-		private SCLOMode(final int element, final String description)
+		private ScloMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -162,11 +163,11 @@ public class DPTXlator8BitEnum extends DPTXlator
 	static enum ApplicationArea implements EnumBase<ApplicationArea> {
 		NoFault(0, "no fault"),
 		CommonInterest(1, "system and functions of common interest"),
-		HVACGeneralFBs(10, "HVAC general FBs"),
-		HVACHotWaterHeating(11, "HVAC Hot Water Heating"),
-		HVACDirectElectricalHeating(12, "HVAC Direct Electrical Heating"),
-		HVACTerminalUnits(13, "HVAC Terminal Units"),
-		HVACVAC(14, "HVAC VAC"),
+		HvacGeneralFBs(10, "HVAC general FBs"),
+		HvacHotWaterHeating(11, "HVAC Hot Water Heating"),
+		HvacDirectElectricalHeating(12, "HVAC Direct Electrical Heating"),
+		HvacTerminalUnits(13, "HVAC Terminal Units"),
+		HvacVac(14, "HVAC VAC"), // Ventilation and Air Conditioning
 		Lighting(20, "Lighting"),
 		Security(30, "Security"),
 		LoadManagement(40, "Load Management"),
@@ -190,12 +191,12 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum PSUMode implements EnumBase<PSUMode> {
+	static enum PsuMode implements EnumBase<PsuMode> {
 		Disabled(0, "disabled (PSU/DPSU fixed off)"),
 		Enabled(1, "enabled (PSU/DPSU fixed on)"),
 		Auto(2, "auto (PSU/DPSU automatic on/off)");
 
-		private PSUMode(final int element, final String description)
+		private PsuMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -228,14 +229,14 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum ErrorClassHVAC implements EnumBase<ErrorClassHVAC> {
+	static enum ErrorClassHvac implements EnumBase<ErrorClassHvac> {
 		NoFault(0, "no fault"),
 		SensorFault(1, "sensor fault"),
 		ProcessFault(2, "process fault / controller fault"),
 		ActuatorFault(3, "actuator fault"),
 		OtherFault(4, "other fault");
 
-		private ErrorClassHVAC(final int element, final String description)
+		private ErrorClassHvac(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -342,27 +343,28 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum HVACMode implements EnumBase<HVACMode> {
+	static enum HvacMode implements EnumBase<HvacMode> {
 		Auto(0, "Auto"),
 		Comfort(1, "Comfort"),
 		Standby(2, "Standby"),
 		Economy(3, "Economy"),
 		BuildingProtection(4, "Building Protection");
 
-		private HVACMode(final int element, final String description)
+		private HvacMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
 	}
 
-	static enum DHWMode implements EnumBase<DHWMode> {
+	/** Domestic Hot Water Mode. */
+	static enum DhwMode implements EnumBase<DhwMode> {
 		Auto(0, "Auto"),
 		LegioProtect(1, "Legio Protect"),
 		Normal(2, "Normal"),
 		Reduced(3, "Reduced"),
 		OffOrFrostProtect(4, "Off / Frost Protect");
 
-		private DHWMode(final int element, final String description)
+		private DhwMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -379,7 +381,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum HVACControlMode implements EnumBase<HVACControlMode> {
+	static enum HvacControlMode implements EnumBase<HvacControlMode> {
 		Auto(0, "Auto"),
 		Heat(1, "Heat"),
 		MorningWarmup(2, "Morning Warmup"),
@@ -400,13 +402,13 @@ public class DPTXlator8BitEnum extends DPTXlator
 		EmergencySteamMode(17, "Emergency Steam Mode"),
 		NoDem(20, "NoDem");
 
-		private HVACControlMode(final int element, final String description)
+		private HvacControlMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
 	}
 
-	static enum HVACEmergencyMode implements EnumBase<HVACEmergencyMode> {
+	static enum HvacEmergencyMode implements EnumBase<HvacEmergencyMode> {
 		Normal(0, "Normal"),
 		Pressure(1, "Emergency Pressure"),
 		Depressure(2, "Emergency Depressure"),
@@ -414,7 +416,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Shutdown(4, "Emergency Shutdown"),
 		Fire(5, "Emergency Fire");
 
-		private HVACEmergencyMode(final int element, final String description)
+		private HvacEmergencyMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -526,12 +528,13 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum ADAType implements EnumBase<ADAType> {
+	/** Air Damper Actuator Type. */
+	static enum AdaType implements EnumBase<AdaType> {
 
 		AirDamper(1, "Air Damper"),
-		VAV(2, "VAV");
+		Vav(2, "VAV"); // Variable Air Volume
 
-		private ADAType(final int element, final String description)
+		private AdaType(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -653,13 +656,14 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum LDSBMode implements EnumBase<LDSBMode> {
+	/** Light Dimming Sensor Basic Mode. */
+	static enum LdsbMode implements EnumBase<LdsbMode> {
 		OnePushButton(1, "one push-button/binary input, Switch On/Off inverts on each transmission"),
 		OnePushButtonDimUp(2, "one push-button/binary input, On/Dim-Up message sent"),
 		OnePushButtonDimDown(3, "one push-button/binary input, Off/Dim-Down message sent"),
 		TwoPushButtons(4, "two push-buttons/binary inputs mode");
 
-		private LDSBMode(final int element, final String description)
+		private LdsbMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -699,20 +703,22 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum SABExceptBehaviour implements EnumBase<SABExceptBehaviour> {
+	/** Sunblind Actuator Basic Exception Behaviour. */
+	static enum SabExceptBehaviour implements EnumBase<SabExceptBehaviour> {
 		Up(0, "up"),
 		Down(1, "down"),
 		NoChange(2, "no change"),
 		AdditionalParameter(3, "value according additional parameter"),
 		Stop(4, "stop");
 
-		private SABExceptBehaviour(final int element, final String description)
+		private SabExceptBehaviour(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
 	}
 
-	static enum SABBehaviourLockUnlock implements EnumBase<SABBehaviourLockUnlock> {
+	/** Sunblind Actuator Basic Behaviour. */
+	static enum SabBehaviourLockUnlock implements EnumBase<SabBehaviourLockUnlock> {
 		Up(0, "up"),
 		Down(1, "down"),
 		NoChange(2, "no change"),
@@ -721,19 +727,20 @@ public class DPTXlator8BitEnum extends DPTXlator
 		UpdatedValue(5, "updated value"),
 		ValueBeforeLocking(6, "value before locking");
 
-		private SABBehaviourLockUnlock(final int element, final String description)
+		private SabBehaviourLockUnlock(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
 	}
 
-	static enum SSSBMode implements EnumBase<SSSBMode> {
+	/** Sunblind Sensor Basic Mode. */
+	static enum SssbMode implements EnumBase<SssbMode> {
 		OnePushButton(1, "one push button/binary input: Move-Up/Down inverts on each transmission"),
 		OnePushButtonUp(2, "one push button/binary input: Move-Up/Step-Up message sent"),
 		OnePushButtonDown(3, "one push button/binary input: Move-Down/Step-Down message sent"),
 		TwoPushButtons(4, "two push buttons/binary inputs mode");
 
-		private SSSBMode(final int element, final String description)
+		private SssbMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -812,8 +819,9 @@ public class DPTXlator8BitEnum extends DPTXlator
 		}
 	}
 
-	public static final EnumDpt<SCLOMode> DPT_SCLOMode = new EnumDpt<>("20.001", "SCLO Mode",
-			SCLOMode.class, "0", "2");
+	/** DPT System Clock Mode. */
+	public static final EnumDpt<ScloMode> DPT_ScloMode = new EnumDpt<>("20.001", "SCLO Mode",
+			ScloMode.class, "0", "2");
 	public static final EnumDpt<BuildingMode> DPT_BuildingMode = new EnumDpt<>("20.002",
 			"Building Mode", BuildingMode.class, "0", "2");
 	public static final EnumDpt<OccupancyMode> DPT_OccupancyMode = new EnumDpt<>("20.003",
@@ -826,12 +834,12 @@ public class DPTXlator8BitEnum extends DPTXlator
 			"Application Area", ApplicationArea.class, "0", "14");
 	public static final EnumDpt<AlarmClassType> DPT_AlarmClassType = new EnumDpt<>("20.007",
 			"Alarm Class Type", AlarmClassType.class, "0", "3");
-	public static final EnumDpt<PSUMode> DPT_PSUMode = new EnumDpt<>("20.008", "PSU Mode",
-			PSUMode.class, "0", "2");
+	public static final EnumDpt<PsuMode> DPT_PsuMode = new EnumDpt<>("20.008", "PSU Mode",
+			PsuMode.class, "0", "2");
 	public static final EnumDpt<ErrorClassSystem> DPT_ErrorClassSystem = new EnumDpt<>("20.011",
 			"Error Class System", ErrorClassSystem.class, "0", "18");
-	public static final EnumDpt<ErrorClassHVAC> DPT_ErrorClassHVAC = new EnumDpt<>("20.012",
-			"Error Class HVAC", ErrorClassHVAC.class, "0", "4");
+	public static final EnumDpt<ErrorClassHvac> DPT_ErrorClassHvac = new EnumDpt<>("20.012",
+			"Error Class HVAC", ErrorClassHvac.class, "0", "4");
 	public static final EnumDpt<TimeDelay> DPT_TimeDelay = new EnumDpt<>("20.013", "Time Delay",
 			TimeDelay.class, "0", "25");
 	public static final EnumDpt<BeaufortWindForceScale> DPT_BeaufortWindForceScale = new EnumDpt<>(
@@ -844,16 +852,17 @@ public class DPTXlator8BitEnum extends DPTXlator
 			FuelType.class, "0", "3");
 	public static final EnumDpt<BurnerType> DPT_BurnerType = new EnumDpt<>("20.101", "Burner Type",
 			BurnerType.class, "0", "3");
-	public static final EnumDpt<HVACMode> DPT_HVACMode = new EnumDpt<>("20.102", "HVAC Mode",
-			HVACMode.class, "0", "4");
-	public static final EnumDpt<DHWMode> DPT_DHWMode = new EnumDpt<>("20.103", "DHW Mode",
-			DHWMode.class, "0", "4");
+	public static final EnumDpt<HvacMode> DPT_HvacMode = new EnumDpt<>("20.102", "HVAC Mode",
+			HvacMode.class, "0", "4");
+	/** Domestic Hot Water Mode. */
+	public static final EnumDpt<DhwMode> DPT_DhwMode = new EnumDpt<>("20.103", "DHW Mode",
+			DhwMode.class, "0", "4");
 	public static final EnumDpt<LoadPriority> DPT_LoadPriority = new EnumDpt<>("20.104",
 			"Load Priority", LoadPriority.class, "0", "2");
-	public static final EnumDpt<HVACControlMode> DPT_HVACControlMode = new EnumDpt<>("20.105",
-			"HVAC Control Mode", HVACControlMode.class, "0", "20");
-	public static final EnumDpt<HVACEmergencyMode> DPT_HVACEmergencyMode = new EnumDpt<>("20.106",
-			"HVAC Emergency Mode", HVACEmergencyMode.class, "0", "5");
+	public static final EnumDpt<HvacControlMode> DPT_HvacControlMode = new EnumDpt<>("20.105",
+			"HVAC Control Mode", HvacControlMode.class, "0", "20");
+	public static final EnumDpt<HvacEmergencyMode> DPT_HvacEmergencyMode = new EnumDpt<>("20.106",
+			"HVAC Emergency Mode", HvacEmergencyMode.class, "0", "5");
 	public static final EnumDpt<ChangeoverMode> DPT_ChangeoverMode = new EnumDpt<>("20.107",
 			"Changeover Mode", ChangeoverMode.class, "0", "2");
 	public static final EnumDpt<ValveMode> DPT_ValveMode = new EnumDpt<>("20.108", "Valve Mode",
@@ -870,8 +879,9 @@ public class DPTXlator8BitEnum extends DPTXlator
 			"20.113", "Status Room Setpoint", StatusRoomSetpoint.class, "0", "2");
 	public static final EnumDpt<MeteringDeviceType> DPT_MeteringDeviceType = new EnumDpt<>(
 			"20.114", "Metering Device Type", MeteringDeviceType.class, "0", "41/255");
-	public static final EnumDpt<ADAType> DPT_ADAType = new EnumDpt<>("20.120", "ADA Type",
-			ADAType.class, "1", "2");
+	/** DPT Air Damper Actuator Type. */
+	public static final EnumDpt<AdaType> DPT_AdaType = new EnumDpt<>("20.120", "ADA Type",
+			AdaType.class, "1", "2");
 	public static final EnumDpt<BackupMode> DPT_BackupMode = new EnumDpt<>("20.121", "Backup Mode",
 			BackupMode.class, "0", "1");
 	public static final EnumDpt<StartSynchronization> DPT_StartSynchronization = new EnumDpt<>(
@@ -880,6 +890,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 			"20.600", "Behaviour Lock/Unlock", BehaviourLockUnlock.class, "0", "6");
 	public static final EnumDpt<BehaviourBusPowerUpDown> DPT_BehaviourBusPowerUpDown = new EnumDpt<>(
 			"20.601", "Behaviour Bus Power Up/Down", BehaviourBusPowerUpDown.class, "0", "4");
+	/** DPT Digital Addressable Lighting Interface Fade Time. */
 	public static final EnumDpt<DaliFadeTime> DPT_DaliFadeTime = new EnumDpt<>("20.602",
 			"DALI Fade Time", DaliFadeTime.class, "0", "15");
 	public static final EnumDpt<BlinkingMode> DPT_BlinkingMode = new EnumDpt<>("20.603",
@@ -890,20 +901,23 @@ public class DPTXlator8BitEnum extends DPTXlator
 			"Switch PB Model", SwitchPBModel.class, "1", "2");
 	public static final EnumDpt<SwitchPBAction> DPT_SwitchPBAction = new EnumDpt<>("20.606",
 			"PB Action", SwitchPBAction.class, "0", "3");
-	public static final EnumDpt<LDSBMode> DPT_DimmPBModel = new EnumDpt<>("20.607",
-			"Dimm PB Model", LDSBMode.class, "1", "4");
+	public static final EnumDpt<LdsbMode> DPT_DimmPBModel = new EnumDpt<>("20.607",
+			"Dimm PB Model", LdsbMode.class, "1", "4");
 	public static final EnumDpt<SwitchOnMode> DPT_SwitchOnMode = new EnumDpt<>("20.608",
 			"Switch On Mode", SwitchOnMode.class, "0", "2");
 	public static final EnumDpt<LoadTypeSet> DPT_LoadTypeSet = new EnumDpt<>("20.609",
 			"Load Type Set", LoadTypeSet.class, "0", "2");
 	public static final EnumDpt<LoadTypeDetected> DPT_LoadTypeDetected = new EnumDpt<>("20.610",
 			"Load Type Detected", LoadTypeDetected.class, "0", "3");
-	public static final EnumDpt<SABExceptBehaviour> DPT_SABExceptBehaviour = new EnumDpt<>(
-			"20.801", "SABExcept  Behaviour", SABExceptBehaviour.class, "0", "4");
-	public static final EnumDpt<SABBehaviourLockUnlock> DPT_SABBehaviourLockUnlock = new EnumDpt<>(
-			"20.802", "SABBehaviour Lock/Unlock", SABBehaviourLockUnlock.class, "0", "6");
-	public static final EnumDpt<SSSBMode> DPT_SSSBMode = new EnumDpt<>("20.803", "SSSB Mode",
-			SSSBMode.class, "1", "4");
+	/** DPT Sunblind Actuator Basic Exception Behaviour. */
+	public static final EnumDpt<SabExceptBehaviour> DPT_SabExceptBehaviour = new EnumDpt<>(
+			"20.801", "SAB Except  Behaviour", SabExceptBehaviour.class, "0", "4");
+	/** DPT Sunblind Actuator Basic Behaviour. */
+	public static final EnumDpt<SabBehaviourLockUnlock> DPT_SabBehaviourLockUnlock = new EnumDpt<>(
+			"20.802", "SAB Behaviour Lock/Unlock", SabBehaviourLockUnlock.class, "0", "6");
+	/** DPT Sunblind Sensor Basic Mode. */
+	public static final EnumDpt<SssbMode> DPT_SssbMode = new EnumDpt<>("20.803", "SSSB Mode",
+			SssbMode.class, "1", "4");
 	public static final EnumDpt<BlindsControlMode> DPT_BlindsControlMode = new EnumDpt<>("20.804",
 			"Blinds Control Mode", BlindsControlMode.class, "0", "1");
 
