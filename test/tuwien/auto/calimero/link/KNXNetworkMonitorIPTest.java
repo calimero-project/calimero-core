@@ -161,7 +161,7 @@ public class KNXNetworkMonitorIPTest extends TestCase
 	public final void testSetKNXMedium()
 	{
 		try {
-			mon.setKNXMedium(new PLSettings(true));
+			mon.setKNXMedium(new PLSettings());
 			fail("different medium");
 		}
 		catch (final KNXIllegalArgumentException e) {}

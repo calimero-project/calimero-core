@@ -97,7 +97,7 @@ public abstract class KNXMediumSettings
 		case MEDIUM_TP1:
 			return new TPSettings(device);
 		case MEDIUM_PL110:
-			return new PLSettings(device, null, false);
+			return new PLSettings(device, null);
 		case MEDIUM_PL132:
 			return new PLSettings(device, null, true);
 		case MEDIUM_RF:
