@@ -137,6 +137,7 @@ public final class RawFrameFactory
 	 * @return the created PL132 raw frame
 	 * @throws KNXFormatException on no valid frame structure
 	 */
+	@Deprecated
 	public static RawFrame createPL132(final byte[] data, final int offset)
 		throws KNXFormatException
 	{

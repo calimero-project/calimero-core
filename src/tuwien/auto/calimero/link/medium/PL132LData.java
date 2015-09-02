@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,20 +47,21 @@ import tuwien.auto.calimero.Priority;
  * L-data frame format on PL132 communication medium.
  * <p>
  * Supports standard and extended frame format.
- * 
+ *
  * @author B. Malinowsky
  */
+@Deprecated
 public class PL132LData extends RawFrameBase
 {
 	private static final int MIN_LENGTH = 9;
 
 	private final byte[] doa;
 	private final boolean ack;
-	
+
 	/**
 	 * Creates a new L-data frame out of a byte array.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing the L-data frame
 	 * @param offset start offset of frame structure in <code>data</code>, offset &gt;=
 	 *        0
@@ -109,7 +110,7 @@ public class PL132LData extends RawFrameBase
 	 * Returns the domain address of this frame.
 	 * <p>
 	 * The address is returned in network byte order.
-	 * 
+	 *
 	 * @return domain address as byte array of length 2
 	 */
 	public final byte[] getDomainAddress()
@@ -120,7 +121,7 @@ public class PL132LData extends RawFrameBase
 	/**
 	 * Returns whether a Layer 2 acknowledgment is requested or not.
 	 * <p>
-	 * 
+	 *
 	 * @return <code>true</code> if an L2-ACK requested, <code>false</code> otherwise
 	 */
 	public final boolean isAckRequested()
