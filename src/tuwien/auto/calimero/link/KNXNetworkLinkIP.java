@@ -71,7 +71,7 @@ import tuwien.auto.calimero.link.medium.KNXMediumSettings;
  * IP address considerations:<br>
  * On more IP addresses assigned to the local host (on possibly several local network interfaces),
  * the default chosen local host address can differ from the expected. In this situation, the local
- * endpoint has to be specified manually during instantiation. <br>
+ * endpoint has to be specified manually during instantiation.<br>
  * Network Address Translation (NAT) aware communication can only be used, if the KNXnet/IP server
  * of the remote endpoint supports it. Otherwise, connection timeouts will occur. With NAT enabled,
  * KNXnet/IP accepts IPv6 addresses. By default, the KNXnet/IP protocol only works with IPv4
