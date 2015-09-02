@@ -71,8 +71,6 @@ public class DPTXlator8BitEnum extends DPTXlator
 {
 	// ??? the translator does not include the system domain subtypes (they are not used anyway?)
 
-	// TODO review and finish subtype enumerations, make enums public
-
 	// use a common base to store and access enumeration elements independent of specific type
 	private interface EnumBase<E extends EnumBase<E>>
 	{
@@ -101,7 +99,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 	//
 
 	/** System Clock Mode. */
-	static enum ScloMode implements EnumBase<ScloMode> {
+	public enum ScloMode implements EnumBase<ScloMode> {
 		Autonomous(0, "autonomous"),
 		Slave(1, "slave"),
 		Master(2, "master");
@@ -112,7 +110,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum BuildingMode implements EnumBase<BuildingMode> {
+	public enum BuildingMode implements EnumBase<BuildingMode> {
 		BuildingInUse(0, "Building in use"),
 		BuildingNotUsed(1, "Building not used"),
 		BuildingProtection(2, "Building protection");
@@ -123,7 +121,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum OccupancyMode implements EnumBase<OccupancyMode> {
+	public enum OccupancyMode implements EnumBase<OccupancyMode> {
 		Occupied(0, "occupied"),
 		Standby(1, "standby"),
 		NotOccupied(2, "not occupied");
@@ -135,7 +133,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		//RP1
 	}
 
-	static enum Priority implements EnumBase<Priority> {
+	public enum Priority implements EnumBase<Priority> {
 		High(0, "High"),
 		Medium(1, "Medium"),
 		Low(2, "Low"),
@@ -148,7 +146,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		//RP1
 	}
 
-	static enum LightApplicationMode implements EnumBase<LightApplicationMode> {
+	public enum LightApplicationMode implements EnumBase<LightApplicationMode> {
 		Normal(0, "normal"),
 		PresenceSimulation(1, "presence simulation"),
 		NightRound(2, "night round");
@@ -160,7 +158,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		//RP1
 	}
 
-	static enum ApplicationArea implements EnumBase<ApplicationArea> {
+	public enum ApplicationArea implements EnumBase<ApplicationArea> {
 		NoFault(0, "no fault"),
 		CommonInterest(1, "system and functions of common interest"),
 		HvacGeneralFBs(10, "HVAC general FBs"),
@@ -180,7 +178,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		//RP1
 	}
 
-	static enum AlarmClassType implements EnumBase<AlarmClassType> {
+	public enum AlarmClassType implements EnumBase<AlarmClassType> {
 		SimpleAlarm(1, "simple alarm"),
 		BasicAlarm(2, "basic alarm"),
 		ExtendedAlarm(3, "extended alarm");
@@ -191,7 +189,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum PsuMode implements EnumBase<PsuMode> {
+	public enum PsuMode implements EnumBase<PsuMode> {
 		Disabled(0, "disabled (PSU/DPSU fixed off)"),
 		Enabled(1, "enabled (PSU/DPSU fixed on)"),
 		Auto(2, "auto (PSU/DPSU automatic on/off)");
@@ -202,7 +200,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum ErrorClassSystem implements EnumBase<ErrorClassSystem> {
+	public enum ErrorClassSystem implements EnumBase<ErrorClassSystem> {
 		NoFault(0, "no fault"),
 		GeneralDeviceFault(1, "general device fault (e.g., RAM, EEPROM, UI, watchdog)"),
 		CommunicationFault(2, "communication fault"),
@@ -229,7 +227,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum ErrorClassHvac implements EnumBase<ErrorClassHvac> {
+	public enum ErrorClassHvac implements EnumBase<ErrorClassHvac> {
 		NoFault(0, "no fault"),
 		SensorFault(1, "sensor fault"),
 		ProcessFault(2, "process fault / controller fault"),
@@ -242,7 +240,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum TimeDelay implements EnumBase<TimeDelay> {
+	public enum TimeDelay implements EnumBase<TimeDelay> {
 		NotActive(0, "not active"),
 		Delay1s(1, "1 s"),
 		Delay2s(2, "2 s"),
@@ -276,7 +274,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum BeaufortWindForceScale implements EnumBase<BeaufortWindForceScale> {
+	public enum BeaufortWindForceScale implements EnumBase<BeaufortWindForceScale> {
 		Calm(0, "calm (< 1.1 km/h)"),
 		LightAir(1, "light air (1.1–5.5 km/h)"),
 		LightBreeze(2, "light breeze (5.5–11.9 km/h)"),
@@ -297,7 +295,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum SensorSelect implements EnumBase<SensorSelect> {
+	public enum SensorSelect implements EnumBase<SensorSelect> {
 		Inactive(0, "inactive"),
 		DigitalInput(1, "digital input (not inverted)"),
 		DigitalInputInverted(2, "digital input inverted"),
@@ -310,7 +308,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum ActuatorConnectType implements EnumBase<ActuatorConnectType> {
+	public enum ActuatorConnectType implements EnumBase<ActuatorConnectType> {
 		SensorConnection(1, "Sensor Connection"),
 		ControllerConnection(2, "Controller Connection");
 
@@ -320,7 +318,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum FuelType implements EnumBase<FuelType> {
+	public enum FuelType implements EnumBase<FuelType> {
 		Auto(0, "auto"),
 		Oil(1, "oil"),
 		Gas(2, "gas"),
@@ -332,7 +330,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum BurnerType implements EnumBase<BurnerType> {
+	public enum BurnerType implements EnumBase<BurnerType> {
 		OneStage(1, "1 stage"),
 		TwoStage(2, "2 stage"),
 		Modulating(3, "modulating");
@@ -343,7 +341,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum HvacMode implements EnumBase<HvacMode> {
+	public enum HvacMode implements EnumBase<HvacMode> {
 		Auto(0, "Auto"),
 		Comfort(1, "Comfort"),
 		Standby(2, "Standby"),
@@ -357,7 +355,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 	}
 
 	/** Domestic Hot Water Mode. */
-	static enum DhwMode implements EnumBase<DhwMode> {
+	public enum DhwMode implements EnumBase<DhwMode> {
 		Auto(0, "Auto"),
 		LegioProtect(1, "Legio Protect"),
 		Normal(2, "Normal"),
@@ -370,7 +368,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum LoadPriority implements EnumBase<LoadPriority> {
+	public enum LoadPriority implements EnumBase<LoadPriority> {
 		None(0, "None"),
 		ShiftLoadPriority(1, "Shift load priority"),
 		AbsoluteLoadPriority(2, "Absolute load priority");
@@ -381,7 +379,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum HvacControlMode implements EnumBase<HvacControlMode> {
+	public enum HvacControlMode implements EnumBase<HvacControlMode> {
 		Auto(0, "Auto"),
 		Heat(1, "Heat"),
 		MorningWarmup(2, "Morning Warmup"),
@@ -408,7 +406,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum HvacEmergencyMode implements EnumBase<HvacEmergencyMode> {
+	public enum HvacEmergencyMode implements EnumBase<HvacEmergencyMode> {
 		Normal(0, "Normal"),
 		Pressure(1, "Emergency Pressure"),
 		Depressure(2, "Emergency Depressure"),
@@ -422,7 +420,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum ChangeoverMode implements EnumBase<ChangeoverMode> {
+	public enum ChangeoverMode implements EnumBase<ChangeoverMode> {
 		Auto(0, "Auto"),
 		CoolingOnly(1, "Cooling Only"),
 		HeatingOnly(2, "Heating Only");
@@ -433,7 +431,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum ValveMode implements EnumBase<ValveMode> {
+	public enum ValveMode implements EnumBase<ValveMode> {
 		HeatStageA(1, "Heat stage A for normal heating"),
 		HeatStageB(2, "Heat stage B for heating with two stages (A + B)"),
 		CoolStageA(3, "Cool stage A for normal cooling"),
@@ -446,7 +444,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum DamperMode implements EnumBase<DamperMode> {
+	public enum DamperMode implements EnumBase<DamperMode> {
 		FreshAir(1, "Fresh air, e.g., fancoils"),
 		SupplyAir(2, "Supply Air, e.g. Variable Air Volume (VAV)"),
 		ExtractAir(3, "Extract Air, e.g. Variable Air Volume (VAV)"),
@@ -458,7 +456,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum HeaterMode implements EnumBase<HeaterMode> {
+	public enum HeaterMode implements EnumBase<HeaterMode> {
 		HeatStageA(1, "Heat Stage A On/Off"),
 		HeatStageAProportional(2, "Heat Stage A Proportional"),
 		HeatStageBProportional(3, "Heat Stage B Proportional");
@@ -469,7 +467,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum FanMode implements EnumBase<FanMode> {
+	public enum FanMode implements EnumBase<FanMode> {
 		NotRunning(0, "not running"),
 		PermanentlyRunning(1, "permanently running"),
 		Intervals(2, "running in intervals");
@@ -480,7 +478,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum MasterSlaveMode implements EnumBase<MasterSlaveMode> {
+	public enum MasterSlaveMode implements EnumBase<MasterSlaveMode> {
 		Autonomous(0, "autonomous"),
 		Master(1, "master"),
 		Slave(2, "slave");
@@ -491,7 +489,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum StatusRoomSetpoint implements EnumBase<StatusRoomSetpoint> {
+	public enum StatusRoomSetpoint implements EnumBase<StatusRoomSetpoint> {
 		Normal(0, "normal setpoint"),
 		Alternative(1, "alternative setpoint"),
 		BuildingProtection(2, "building protection setpoint");
@@ -502,7 +500,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum MeteringDeviceType implements EnumBase<MeteringDeviceType> {
+	public enum MeteringDeviceType implements EnumBase<MeteringDeviceType> {
 		OtherDeviceType(0, "Other device type"),
 		OilMeter(1, "Oil meter"),
 		ElectricityMeter(2, "Electricity meter"),
@@ -529,7 +527,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 	}
 
 	/** Air Damper Actuator Type. */
-	static enum AdaType implements EnumBase<AdaType> {
+	public enum AdaType implements EnumBase<AdaType> {
 
 		AirDamper(1, "Air Damper"),
 		Vav(2, "VAV"); // Variable Air Volume
@@ -540,7 +538,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum BackupMode implements EnumBase<BackupMode> {
+	public enum BackupMode implements EnumBase<BackupMode> {
 		BackupValue(0, "Backup Value"),
 		KeepLastState(1, "Keep Last State");
 
@@ -550,7 +548,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum StartSynchronization implements EnumBase<StartSynchronization> {
+	public enum StartSynchronization implements EnumBase<StartSynchronization> {
 		PositionUnchanged(0, "Position unchanged"),
 		SingleClose(1, "Single close"),
 		SingleOpen(2, "Single open");
@@ -561,7 +559,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum BehaviourLockUnlock implements EnumBase<BehaviourLockUnlock> {
+	public enum BehaviourLockUnlock implements EnumBase<BehaviourLockUnlock> {
 		Off(0, "off"),
 		On(1, "on"),
 		NoChange(2, "no change"),
@@ -576,7 +574,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum BehaviourBusPowerUpDown implements EnumBase<BehaviourBusPowerUpDown> {
+	public enum BehaviourBusPowerUpDown implements EnumBase<BehaviourBusPowerUpDown> {
 		Off(0, "off"),
 		On(1, "on"),
 		NoChange(2, "no change"),
@@ -589,7 +587,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum DaliFadeTime implements EnumBase<DaliFadeTime> {
+	public enum DaliFadeTime implements EnumBase<DaliFadeTime> {
 		NoFade(0, "0 s (no fade)"),
 		Fade0_7s(1, "0,7 s"),
 		Fade1s(2, "1,0 s"),
@@ -613,7 +611,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum BlinkingMode implements EnumBase<BlinkingMode> {
+	public enum BlinkingMode implements EnumBase<BlinkingMode> {
 		Disabled(0, "Blinking Disabled"),
 		WithoutAcknowledge(1, "Without Acknowledge"),
 		WithAcknowledge(2, "Blinking With Acknowledge ");
@@ -624,7 +622,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum LightControlMode implements EnumBase<LightControlMode> {
+	public enum LightControlMode implements EnumBase<LightControlMode> {
 		Automatic(0, "automatic light control"),
 		Manual(1, "manual light control");
 
@@ -634,7 +632,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum SwitchPBModel implements EnumBase<SwitchPBModel> {
+	public enum SwitchPBModel implements EnumBase<SwitchPBModel> {
 		OnePB(1, "one PB/binary input mode"),
 		TwoPBs(2, "two PBs/binary inputs mode");
 
@@ -644,7 +642,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum SwitchPBAction implements EnumBase<SwitchPBAction> {
+	public enum SwitchPBAction implements EnumBase<SwitchPBAction> {
 		Inactive(0, "inactive (no message sent)"),
 		SwitchOffSent(1, "Switch-Off message sent"),
 		SwitchOnSent(2, "Switch-On message sent"),
@@ -657,8 +655,9 @@ public class DPTXlator8BitEnum extends DPTXlator
 	}
 
 	/** Light Dimming Sensor Basic Mode. */
-	static enum LdsbMode implements EnumBase<LdsbMode> {
-		OnePushButton(1, "one push-button/binary input, Switch On/Off inverts on each transmission"),
+	public enum LdsbMode implements EnumBase<LdsbMode> {
+		OnePushButton(1,
+				"one push-button/binary input, Switch On/Off inverts on each transmission"),
 		OnePushButtonDimUp(2, "one push-button/binary input, On/Dim-Up message sent"),
 		OnePushButtonDimDown(3, "one push-button/binary input, Off/Dim-Down message sent"),
 		TwoPushButtons(4, "two push-buttons/binary inputs mode");
@@ -669,7 +668,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum SwitchOnMode implements EnumBase<SwitchOnMode> {
+	public enum SwitchOnMode implements EnumBase<SwitchOnMode> {
 		LastActualValue(0, "last actual value"),
 		AdditionalParameter(1, "value according additional parameter"),
 		LastReceivedSetvalue(2, "last received absolute setvalue");
@@ -680,7 +679,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum LoadTypeSet implements EnumBase<LoadTypeSet> {
+	public enum LoadTypeSet implements EnumBase<LoadTypeSet> {
 		Automatic(0, "automatic"),
 		LeadingEdge(1, "leading edge (inductive load)"),
 		TrailingEdge(2, "trailing edge (capacitive load)");
@@ -691,7 +690,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum LoadTypeDetected implements EnumBase<LoadTypeDetected> {
+	public enum LoadTypeDetected implements EnumBase<LoadTypeDetected> {
 		Undefined(0, "undefined"),
 		LeadingEdge(1, "leading edge (inductive load)"),
 		TrailingEdge(2, "trailing edge (capacitive load)"),
@@ -704,7 +703,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 	}
 
 	/** Sunblind Actuator Basic Exception Behaviour. */
-	static enum SabExceptBehaviour implements EnumBase<SabExceptBehaviour> {
+	public enum SabExceptBehaviour implements EnumBase<SabExceptBehaviour> {
 		Up(0, "up"),
 		Down(1, "down"),
 		NoChange(2, "no change"),
@@ -718,7 +717,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 	}
 
 	/** Sunblind Actuator Basic Behaviour. */
-	static enum SabBehaviourLockUnlock implements EnumBase<SabBehaviourLockUnlock> {
+	public enum SabBehaviourLockUnlock implements EnumBase<SabBehaviourLockUnlock> {
 		Up(0, "up"),
 		Down(1, "down"),
 		NoChange(2, "no change"),
@@ -734,7 +733,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 	}
 
 	/** Sunblind Sensor Basic Mode. */
-	static enum SssbMode implements EnumBase<SssbMode> {
+	public enum SssbMode implements EnumBase<SssbMode> {
 		OnePushButton(1, "one push button/binary input: Move-Up/Down inverts on each transmission"),
 		OnePushButtonUp(2, "one push button/binary input: Move-Up/Step-Up message sent"),
 		OnePushButtonDown(3, "one push button/binary input: Move-Down/Step-Down message sent"),
@@ -746,7 +745,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	static enum BlindsControlMode implements EnumBase<BlindsControlMode> {
+	public enum BlindsControlMode implements EnumBase<BlindsControlMode> {
 		AutomaticControl(0, "Automatic Control"),
 		ManualControl(1, "Manual Control");
 
@@ -875,10 +874,10 @@ public class DPTXlator8BitEnum extends DPTXlator
 			FanMode.class, "0", "2");
 	public static final EnumDpt<MasterSlaveMode> DPT_MasterSlaveMode = new EnumDpt<>("20.112",
 			"Master/Slave Mode", MasterSlaveMode.class, "0", "2");
-	public static final EnumDpt<StatusRoomSetpoint> DPT_StatusRoomSetpoint = new EnumDpt<>(
-			"20.113", "Status Room Setpoint", StatusRoomSetpoint.class, "0", "2");
-	public static final EnumDpt<MeteringDeviceType> DPT_MeteringDeviceType = new EnumDpt<>(
-			"20.114", "Metering Device Type", MeteringDeviceType.class, "0", "41/255");
+	public static final EnumDpt<StatusRoomSetpoint> DPT_StatusRoomSetpoint = new EnumDpt<>("20.113",
+			"Status Room Setpoint", StatusRoomSetpoint.class, "0", "2");
+	public static final EnumDpt<MeteringDeviceType> DPT_MeteringDeviceType = new EnumDpt<>("20.114",
+			"Metering Device Type", MeteringDeviceType.class, "0", "41/255");
 	/** DPT Air Damper Actuator Type. */
 	public static final EnumDpt<AdaType> DPT_AdaType = new EnumDpt<>("20.120", "ADA Type",
 			AdaType.class, "1", "2");
@@ -901,8 +900,8 @@ public class DPTXlator8BitEnum extends DPTXlator
 			"Switch PB Model", SwitchPBModel.class, "1", "2");
 	public static final EnumDpt<SwitchPBAction> DPT_SwitchPBAction = new EnumDpt<>("20.606",
 			"PB Action", SwitchPBAction.class, "0", "3");
-	public static final EnumDpt<LdsbMode> DPT_DimmPBModel = new EnumDpt<>("20.607",
-			"Dimm PB Model", LdsbMode.class, "1", "4");
+	public static final EnumDpt<LdsbMode> DPT_DimmPBModel = new EnumDpt<>("20.607", "Dimm PB Model",
+			LdsbMode.class, "1", "4");
 	public static final EnumDpt<SwitchOnMode> DPT_SwitchOnMode = new EnumDpt<>("20.608",
 			"Switch On Mode", SwitchOnMode.class, "0", "2");
 	public static final EnumDpt<LoadTypeSet> DPT_LoadTypeSet = new EnumDpt<>("20.609",
@@ -910,8 +909,8 @@ public class DPTXlator8BitEnum extends DPTXlator
 	public static final EnumDpt<LoadTypeDetected> DPT_LoadTypeDetected = new EnumDpt<>("20.610",
 			"Load Type Detected", LoadTypeDetected.class, "0", "3");
 	/** DPT Sunblind Actuator Basic Exception Behaviour. */
-	public static final EnumDpt<SabExceptBehaviour> DPT_SabExceptBehaviour = new EnumDpt<>(
-			"20.801", "SAB Except  Behaviour", SabExceptBehaviour.class, "0", "4");
+	public static final EnumDpt<SabExceptBehaviour> DPT_SabExceptBehaviour = new EnumDpt<>("20.801",
+			"SAB Except Behaviour", SabExceptBehaviour.class, "0", "4");
 	/** DPT Sunblind Actuator Basic Behaviour. */
 	public static final EnumDpt<SabBehaviourLockUnlock> DPT_SabBehaviourLockUnlock = new EnumDpt<>(
 			"20.802", "SAB Behaviour Lock/Unlock", SabBehaviourLockUnlock.class, "0", "6");
@@ -940,7 +939,6 @@ public class DPTXlator8BitEnum extends DPTXlator
 
 	/**
 	 * Creates a translator for the given datapoint type.
-	 * <p>
 	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
@@ -952,7 +950,6 @@ public class DPTXlator8BitEnum extends DPTXlator
 
 	/**
 	 * Creates a translator for the given datapoint type ID.
-	 * <p>
 	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptID</code>
@@ -965,9 +962,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		data = new short[] { (short) set.iterator().next().value() };
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getValue()
-	 */
+	@Override
 	public String getValue()
 	{
 		return makeString(0);
@@ -975,7 +970,6 @@ public class DPTXlator8BitEnum extends DPTXlator
 
 	/**
 	 * Sets one new translation item from an unsigned value, replacing any old items.
-	 * <p>
 	 *
 	 * @param element the element to set as unsigned value, the dimension is determined by the set
 	 *        DPT, 0 &le; element &le; defined maximum of DPT
@@ -988,14 +982,26 @@ public class DPTXlator8BitEnum extends DPTXlator
 	}
 
 	/**
-	 * Returns the first translation item.
-	 * <p>
+	 * Sets one new translation item from an enumeration element, replacing any old items.
 	 *
-	 * @return element as unsigned 8 Bit using type short
+	 * @param element the element to set, the enumeration has to match the set DPT
+	 * @throws KNXFormatException if element is not in the enumeration specified by the used DPT ID
+	 * @see #getType()
+	 */
+	public final void setValue(final EnumBase<? extends EnumBase<?>> element)
+		throws KNXFormatException
+	{
+		data = new short[] { toDPT(element.value()) };
+	}
+
+	/**
+	 * Returns the first translation item.
+	 *
+	 * @return element as unsigned 8 Bit
 	 * @throws KNXFormatException
 	 * @see #getType()
 	 */
-	public final short getValueUnsigned() throws KNXFormatException
+	public final int getValueUnsigned() throws KNXFormatException
 	{
 		return fromDPT(0);
 	}
@@ -1008,14 +1014,13 @@ public class DPTXlator8BitEnum extends DPTXlator
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
 	 * @see #getValueUnsigned()
 	 */
+	@Override
 	public final double getNumericValue() throws KNXFormatException
 	{
 		return getValueUnsigned();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getAllValues()
-	 */
+	@Override
 	public String[] getAllValues()
 	{
 		final String[] s = new String[data.length];
@@ -1024,9 +1029,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		return s;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
-	 */
+	@Override
 	public final Map<String, DPT> getSubTypes()
 	{
 		return types;
@@ -1046,6 +1049,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		return ((EnumDpt<?>) dpt).textOf(data[index]);
 	}
 
+	@Override
 	protected void toDPT(final String value, final short[] dst, final int index)
 		throws KNXFormatException
 	{

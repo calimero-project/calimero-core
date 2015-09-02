@@ -64,8 +64,8 @@ public class DPTXlator8BitEnumTest extends TestCase
 	private final String[] stringsDesc = { "no fault", "HVAC Hot Water Heating",
 		"HVAC Direct Electrical Heating" };
 	private final String[] stringsName = { ApplicationArea.NoFault.name(),
-		ApplicationArea.HVACHotWaterHeating.name(),
-		ApplicationArea.HVACDirectElectricalHeating.name() };
+		ApplicationArea.HvacHotWaterHeating.name(),
+		ApplicationArea.HvacDirectElectricalHeating.name() };
 
 	private final int[] values = { 0, 11, 12 };
 
@@ -113,7 +113,7 @@ public class DPTXlator8BitEnumTest extends TestCase
 
 		// try a enum with no 0 element
 		final DPTXlator8BitEnum x = new DPTXlator8BitEnum(DPTXlator8BitEnum.DPT_AlarmClassType);
-		final short v = x.getValueUnsigned();
+		final int v = x.getValueUnsigned();
 		assertEquals(1, v);
 		final int element = DPTXlator8BitEnum.AlarmClassType.ExtendedAlarm.value();
 		x.setValue(element);
