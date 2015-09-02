@@ -124,6 +124,8 @@ public final class LogService
 	static void async(final Logger l, final LogLevel level, final Marker m, final String format,
 		final Object... o)
 	{
+		if (!isEnabled(l, level))
+			return;
 		final Thread thread = Thread.currentThread();
 		dispatcher.execute(() -> {
 			final Thread logger = Thread.currentThread();
@@ -169,6 +171,24 @@ public final class LogService
 		case ERROR:
 			logger.error(marker, format, o);
 			break;
+		default:
+			throw new KNXIllegalArgumentException("unknown log level");
+		}
+	}
+
+	private static boolean isEnabled(final Logger logger, final LogLevel level)
+	{
+		switch (level) {
+		case TRACE:
+			return logger.isTraceEnabled();
+		case DEBUG:
+			return logger.isDebugEnabled();
+		case INFO:
+			return logger.isInfoEnabled();
+		case WARN:
+			return logger.isWarnEnabled();
+		case ERROR:
+			return logger.isErrorEnabled();
 		default:
 			throw new KNXIllegalArgumentException("unknown log level");
 		}
