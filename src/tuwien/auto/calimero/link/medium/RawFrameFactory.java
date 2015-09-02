@@ -41,7 +41,7 @@ import tuwien.auto.calimero.exception.KNXFormatException;
 
 /**
  * Factory for raw frames on medium. Supports creation of raw frames out of byte arrays. The main
- * purpose is to create frames for the communication media TP1, PL110, and PL132. For the
+ * purpose is to create frames for the communication media TP1 and PL110. For the
  * communication medium KNX IP, which uses cEMI frames, the {@link CEMIFactory} can be used
  * directly.
  *
@@ -128,12 +128,10 @@ public final class RawFrameFactory
 	}
 
 	/**
-	 * Creates a raw frame out of a byte array for the PL132 communication medium.
-	 * <p>
-	 *
+	 * @deprecated PL132 medium (inherited from EHS) is no longer supported.
 	 * @param data byte array containing the PL132 raw frame structure
-	 * @param offset start offset of frame structure in <code>data</code>, 0 &lt;=
-	 *        offset &lt; <code>data.length</code>
+	 * @param offset start offset of frame structure in <code>data</code>, 0 &lt;= offset &lt;
+	 *        <code>data.length</code>
 	 * @return the created PL132 raw frame
 	 * @throws KNXFormatException on no valid frame structure
 	 */

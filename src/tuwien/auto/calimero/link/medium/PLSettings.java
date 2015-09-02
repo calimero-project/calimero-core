@@ -40,9 +40,7 @@ import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
 
 /**
- * Provides settings necessary for communication on PL (powerline) medium.
- * <p>
- * This settings type is used for powerline medium PL132 and PL110.
+ * Provides settings necessary for communication on power-line 110 (PL110) transmission medium.
  *
  * @author B. Malinowsky
  */
@@ -54,18 +52,44 @@ public class PLSettings extends KNXMediumSettings
 	private final boolean pl132;
 
 	/**
-	 * Creates a new settings container with PL medium specific information.
-	 * <p>
-	 *
-	 * @param device individual device address to use as source address in KNX messages,
-	 *        specifying <code>null</code> uses the individual address 0.0.0
-	 * @param domain byte array containing the domain address to use in KNX messages,
-	 *        address is given in network byte order, <code>domain.length</code> = 2,
-	 *        supplying <code>null</code> defaults to the broadcast domain
-	 * @param mediumPL132 <code>true</code> if communicating on PL132,
-	 *        <code>false</code> if communicating on PL110
+	 * Creates a new default container with settings for PL110 medium, with the device address
+	 * initialized to 0.0.0 and domain address set to broadcast domain.
 	 */
-	public PLSettings(final IndividualAddress device, final byte[] domain, final boolean mediumPL132)
+	public PLSettings()
+	{
+		super(null);
+		pl132 = false;
+		doa = broadcastDomain;
+	}
+
+	/**
+	 * Creates a new settings container with medium information for PL110.
+	 *
+	 * @param device individual device address to use as source address in KNX messages, specifying
+	 *        <code>null</code> uses the individual address 0.0.0
+	 * @param domain byte array containing the domain address to use in KNX messages, address is
+	 *        given in network byte order, <code>domain.length</code> = 2, supplying
+	 *        <code>null</code> defaults to the broadcast domain
+	 */
+	public PLSettings(final IndividualAddress device, final byte[] domain)
+	{
+		super(device);
+		pl132 = false;
+		setDomainAddress(domain);
+	}
+
+	/**
+	 * @deprecated
+	 * @param device individual device address to use as source address in KNX messages, specifying
+	 *        <code>null</code> uses the individual address 0.0.0
+	 * @param domain byte array containing the domain address to use in KNX messages, address is
+	 *        given in network byte order, <code>domain.length</code> = 2, supplying
+	 *        <code>null</code> defaults to the broadcast domain
+	 * @param mediumPL132 <code>true</code> if communicating on PL132, <code>false</code> if
+	 *        communicating on PL110
+	 */
+	public PLSettings(final IndividualAddress device, final byte[] domain,
+		final boolean mediumPL132)
 	{
 		super(device);
 		pl132 = mediumPL132;
@@ -73,13 +97,9 @@ public class PLSettings extends KNXMediumSettings
 	}
 
 	/**
-	 * Creates a new default container with settings for PL medium.
-	 * <p>
-	 * The device address is initialized to 0.0.0 and domain address is set to broadcast
-	 * domain.
-	 *
-	 * @param mediumPL132 <code>true</code> if communicating on PL132,
-	 *        <code>false</code> if communicating on PL110
+	 * @deprecated
+	 * @param mediumPL132 <code>true</code> if communicating on PL132, <code>false</code> if
+	 *        communicating on PL110
 	 */
 	public PLSettings(final boolean mediumPL132)
 	{
@@ -92,9 +112,9 @@ public class PLSettings extends KNXMediumSettings
 	 * Sets a new domain address.
 	 * <p>
 	 *
-	 * @param domain byte array containing the domain address to use in KNX messages,
-	 *        address is given in network byte order, <code>domain.length</code> = 2,
-	 *        supplying <code>null</code> defaults to the broadcast domain
+	 * @param domain byte array containing the domain address to use in KNX messages, address is
+	 *        given in network byte order, <code>domain.length</code> = 2, supplying
+	 *        <code>null</code> defaults to the broadcast domain
 	 */
 	public final synchronized void setDomainAddress(final byte[] domain)
 	{
@@ -137,9 +157,6 @@ public class PLSettings extends KNXMediumSettings
 		return pl132;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.medium.KNXMediumSettings#toString()
-	 */
 	public String toString()
 	{
 		return super.toString() + " in domain 0x"

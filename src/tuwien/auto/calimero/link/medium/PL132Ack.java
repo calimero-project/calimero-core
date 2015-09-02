@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,14 +37,7 @@
 package tuwien.auto.calimero.link.medium;
 
 /**
- * Raw acknowledgment frame on PL132 communication medium.
- * <p>
- * The acknowledgment on PL132 medium is handled using the frame checksum of the
- * corresponding request frame.<br>
- * A positive acknowledgment frame contains the sequence of bits received in the FCS field
- * of the corresponding L-data request. A negative acknowledgment contains the bitwise
- * complement of the checksum received with the L-data request.
- * 
+ * @deprecated PL132 medium (inherited from EHS) is no longer supported.
  * @author B. Malinowsky
  */
 public class PL132Ack extends RawAckBase
@@ -52,7 +45,7 @@ public class PL132Ack extends RawAckBase
 	/**
 	 * Negative acknowledgment type, reception buffer is full.
 	 * <p>
-	 * 
+	 *
 	 * @see #getAckType()
 	 */
 	public static final int FULL = 0x100;
@@ -61,7 +54,7 @@ public class PL132Ack extends RawAckBase
 	 * The kind of acknowledgment is unknown, because no checksum from the request frame
 	 * is available for comparison, or the delivered checksum in the ack-frame is invalid.
 	 * <p>
-	 * 
+	 *
 	 * @see #getAckType()
 	 */
 	public static final int UNKNOWN_ACK = 0x200;
@@ -74,7 +67,7 @@ public class PL132Ack extends RawAckBase
 	 * The acknowledgment type returned for the created frame is always
 	 * {@link PL132Ack#UNKNOWN_ACK}, since no checksum of the corresponding request frame
 	 * is supplied. Use {@link #getChecksum()} to determine the type of acknowledgment.
-	 * 
+	 *
 	 * @param data byte array containing the acknowledgment frame
 	 * @param offset start offset of frame structure in <code>data</code>, offset &gt;= 0
 	 */
@@ -88,7 +81,7 @@ public class PL132Ack extends RawAckBase
 	/**
 	 * Creates a new PL132 acknowledgment frame out of a byte array.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing the acknowledgment frame
 	 * @param offset start offset of frame structure in <code>data</code>, offset &gt;= 0
 	 * @param requestChecksum checksum of the corresponding request frame
@@ -108,7 +101,7 @@ public class PL132Ack extends RawAckBase
 	/**
 	 * Returns the checksum contained in this acknowledgment frame.
 	 * <p>
-	 * 
+	 *
 	 * @return checksum as unsigned 16 bit value
 	 */
 	public final int getChecksum()
