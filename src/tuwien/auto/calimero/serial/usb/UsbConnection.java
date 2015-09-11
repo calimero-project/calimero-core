@@ -280,18 +280,21 @@ public class UsbConnection implements AutoCloseable
 	}
 
 	static {
-		slogger.info("Enumerate USB devices:");
 		try {
 			printDevices();
 		}
 		catch (final SecurityException | UsbException e) {
 			slogger.error("Enumerate USB devices, " + e);
 		}
-		slogger.info("Found KNX devices:");
 		try {
-			getKnxDevices().forEach(d -> {
-				try { printInfo(d, slogger, ""); } catch (final UsbException ignore) {}
-			});
+			final StringBuilder sb = new StringBuilder();
+			for (final UsbDevice d : getKnxDevices()) {
+				try {
+					sb.append("\n").append(printInfo(d, slogger, " |   "));
+				}
+				catch (final UsbException ignore) {}
+			}
+			slogger.info("Found KNX devices:{}", sb);
 		}
 		catch (final SecurityException | UsbException e) {}
 	}
@@ -328,11 +331,13 @@ public class UsbConnection implements AutoCloseable
 
 	public static void printDevices() throws SecurityException, UsbException
 	{
-		traverse(getRootHub(), "");
+		final StringBuilder sb = new StringBuilder();
+		traverse(getRootHub(), sb, "");
+		slogger.info("Enumerate USB devices\n{}", sb);
 
 		// Use the low-level API, because on Windows the string descriptors cause problems
 		if (slogger.isDebugEnabled())
-			slogger.debug("Enumerate devices again, using the low-level API\n{}",
+			slogger.debug("Enumerate USB devices using the low-level API\n{}",
 					getDeviceDescriptionsLowLevel().stream().collect(Collectors.joining("\n")));
 	}
 
@@ -523,7 +528,7 @@ public class UsbConnection implements AutoCloseable
 	private UsbInterface open(final UsbDevice device) throws UsbClaimException,
 		UsbNotActiveException, UsbDisconnectedException, UsbException
 	{
-		printInfo(device, logger, "");
+		logger.info(printInfo(device, logger, ""));
 
 		final UsbConfiguration configuration = device.getActiveUsbConfiguration();
 		@SuppressWarnings("unchecked")
@@ -795,10 +800,11 @@ public class UsbConnection implements AutoCloseable
 		return l;
 	}
 
-	private static void traverse(final UsbDevice device, final String indent)
+	private static void traverse(final UsbDevice device, final StringBuilder sb,
+		final String indent)
 	{
 		try {
-			printInfo(device, slogger, indent);
+			sb.append(printInfo(device, slogger, indent));
 		}
 		catch (final UsbException e) {
 			slogger.warn("Accessing USB device, " + e);
@@ -806,22 +812,22 @@ public class UsbConnection implements AutoCloseable
 		if (device.isUsbHub())
 			for (final Iterator<UsbDevice> i = getAttachedDevices((UsbHub) device).iterator(); i
 					.hasNext();)
-				traverse(i.next(),
-						indent + (i.hasNext() ? new String(" |   ") : new String("     ")));
+				traverse(i.next(), sb.append("\n"), indent + (i.hasNext() ? " |   " : "     "));
 	}
 
-	private static void printInfo(final UsbDevice device, final Logger l, final String indent)
+	private static String printInfo(final UsbDevice device, final Logger l, final String indent)
 		throws UsbException
 	{
+		final StringBuilder sb = new StringBuilder();
 		final UsbDeviceDescriptor dd = device.getUsbDeviceDescriptor();
 		final String s = indent.isEmpty() ? "" : indent.substring(0, indent.length() - 5) + " |--";
 		// vendor ID is mandatory for KNX USB data interface
-		l.info("{}{}", s, device.toString());
+		sb.append(s).append(device.toString());
 
 		// virtual devices don't contain string descriptors
 		final boolean virtual = device instanceof UsbHub && ((UsbHub) device).isRootUsbHub();
 		if (virtual)
-			return;
+			return sb.toString();
 
 		// manufacturer is mandatory for KNX USB data interface
 		final byte manufacturer = dd.iManufacturer();
@@ -835,9 +841,9 @@ public class UsbConnection implements AutoCloseable
 			if (manufacturer != 0)
 				desc += " (" + device.getString(manufacturer) + ")";
 			if (desc != indent)
-				l.info(desc);
+				sb.append("\n").append(desc);
 			if (sno != 0)
-				l.info("{}S/N: {}", indent, device.getString(sno));
+				sb.append("\n").append(indent).append("S/N: ").append(device.getString(sno));
 		}
 		catch (final UnsupportedEncodingException e) {
 			l.error("Java platform lacks support for the required standard charset UTF-16LE");
@@ -848,6 +854,7 @@ public class UsbConnection implements AutoCloseable
 			// Therefore, catch it here, but don't issue any error/warning
 			l.debug("extracting USB device strings, {}", e.toString());
 		}
+		return sb.toString();
 	}
 
 	// Cross-platform way to do name lookup for USB devices, using the low-level API.
