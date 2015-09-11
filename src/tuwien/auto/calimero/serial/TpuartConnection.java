@@ -83,6 +83,16 @@ public class TpuartConnection implements AutoCloseable
 	private static final int Reset_req = 0x01;
 	private static final int Reset_ind = 0x03;
 
+	// we can use this service to distinguish TP-UART 1/2
+	// TP-UART 1 doesn't support this service
+//	private static final int ProductId_req = 0x20;
+
+	// the ProductId_res sucks, as it is specified without msg code
+	// | Bit 7 - 5 | Bit 4 - 0 |
+	// |  Prod. Id |  Rev. no  |
+	// TP-UART 2 Release a
+//	private static final int V2ReleaseA = 0b01000001;
+
 	private static final int State_req = 0x02;
 	private static final int State_ind = 0x07;
 
