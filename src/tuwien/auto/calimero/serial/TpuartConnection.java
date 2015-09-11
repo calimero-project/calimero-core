@@ -43,6 +43,7 @@ import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -133,7 +134,7 @@ public class TpuartConnection implements AutoCloseable
 
 	private final EventListeners<KNXListener> listeners = new EventListeners<>();
 
-	private final Set<KNXAddress> addresses = new HashSet<>();
+	private final Set<KNXAddress> addresses = Collections.synchronizedSet(new HashSet<>());
 
 	private final Logger logger;
 
@@ -203,6 +204,26 @@ public class TpuartConnection implements AutoCloseable
 		os.write(ActivateBusmon);
 		busmonSequence = 0;
 		busmon = true;
+	}
+
+	/**
+	 * Adds an address to the list of addresses acknowledged on the bus.
+	 *
+	 * @param ack the address to acknowledge
+	 */
+	public final void addAddress(final KNXAddress ack)
+	{
+		addresses.add(ack);
+	}
+
+	/**
+	 * Removes an address from the list of addresses acknowledged on the bus.
+	 *
+	 * @param ack the address to no further acknowledge
+	 */
+	public final void removeAddress(final KNXAddress ack)
+	{
+		addresses.remove(ack);
 	}
 
 	/**

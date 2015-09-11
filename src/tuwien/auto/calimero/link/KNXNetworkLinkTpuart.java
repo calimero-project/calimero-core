@@ -103,6 +103,26 @@ public class KNXNetworkLinkTpuart extends AbstractLink
 		c.addConnectionListener(notifier);
 	}
 
+	/**
+	 * Adds an address to the list of addresses acknowledged on the bus.
+	 *
+	 * @param ack the address to acknowledge
+	 */
+	public final void addAddress(final KNXAddress ack)
+	{
+		c.addAddress(ack);
+	}
+
+	/**
+	 * Removes an address from the list of addresses acknowledged on the bus.
+	 *
+	 * @param ack the address to no further acknowledge
+	 */
+	public final void removeAddress(final KNXAddress ack)
+	{
+		c.removeAddress(ack);
+	}
+
 	@Override
 	protected void onSend(final KNXAddress dst, final byte[] msg, final boolean waitForCon)
 		throws KNXTimeoutException, KNXLinkClosedException
