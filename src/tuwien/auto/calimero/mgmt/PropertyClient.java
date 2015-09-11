@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 
@@ -651,17 +652,30 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 * @throws KNXException on adapter errors while querying the descriptions
 	 * @throws InterruptedException on thread interrupt
 	 */
+	@Deprecated
 	public List<Description> scanProperties(final boolean allProperties) throws KNXException,
 		InterruptedException
 	{
 		final List<Description> scan = new ArrayList<>();
-		for (int index = 0;; ++index) {
-			final List<Description> l = scanProperties(index, allProperties);
-			if (l.size() == 0)
-				break;
-			scan.addAll(l);
-		}
+		scanProperties(allProperties, scan::add);
 		return scan;
+	}
+
+	/**
+	 * Does a property description scan of the properties in all interface objects.
+	 *
+	 * @param allProperties <code>true</code> to scan all property descriptions in the interface
+	 *        objects, <code>false</code> to only scan the object type descriptions, i.e.,
+	 *        {@link PropertyAccess.PID#OBJECT_TYPE}
+	 * @param consumer invoked on every property read during the scan, taking a property
+	 *        {@link Description} argument
+	 * @throws KNXException on adapter errors while querying the descriptions
+	 * @throws InterruptedException on thread interrupt
+	 */
+	public void scanProperties(final boolean allProperties, final Consumer<Description> consumer)
+		throws KNXException, InterruptedException
+	{
+		for (int index = 0; scan(index, allProperties, consumer) > 0; ++index);
 	}
 
 	/**
@@ -676,25 +690,32 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 * @throws KNXException on adapter errors while querying the descriptions
 	 * @throws InterruptedException on thread interrupt
 	 */
+	@Deprecated
 	public List<Description> scanProperties(final int objIndex, final boolean allProperties)
 		throws KNXException, InterruptedException
 	{
 		final List<Description> scan = new ArrayList<>();
-		// property with index 0 is description of object type
-		// rest are ordinary properties of the object
-		try {
-			scan.add(createDesc(objIndex, pa.getDescription(objIndex, 0, 0)));
-			if (allProperties)
-				for (int i = 1;; ++i)
-					scan.add(createDesc(objIndex, pa.getDescription(objIndex, 0, i)));
-		}
-		catch (final KNXException e) {
-			if (!KNXRemoteException.class.equals(e.getClass())) {
-				logger.error("scan properties failed", e);
-				throw e;
-			}
-		}
+		scanProperties(objIndex, allProperties, scan::add);
 		return scan;
+	}
+
+	/**
+	 * Does a property description scan of the properties of one interface object.
+	 *
+	 * @param objIndex interface object index in the device
+	 * @param allProperties <code>true</code> to scan all property descriptions in that interface
+	 *        object, <code>false</code> to only scan the object type description of the interface
+	 *        object specified by <code>objIndex</code>, i.e.,
+	 *        {@link PropertyAccess.PID#OBJECT_TYPE}
+	 * @param consumer invoked on every property read during the scan, taking a property
+	 *        {@link Description} argument
+	 * @throws KNXException on adapter errors while querying the descriptions
+	 * @throws InterruptedException on thread interrupt
+	 */
+	public void scanProperties(final int objIndex, final boolean allProperties,
+		final Consumer<Description> consumer) throws KNXException, InterruptedException
+	{
+		scan(objIndex, allProperties, consumer);
 	}
 
 	/**
@@ -717,6 +738,28 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 			pa.close();
 			logger.info("closed property client");
 		}
+	}
+
+	private int scan(final int objIndex, final boolean allProperties,
+		final Consumer<Description> consumer) throws KNXException, InterruptedException
+	{
+		int i = 0;
+		try {
+			// property with index 0 is description of object type
+			// rest are ordinary properties of the object
+			for (;; ++i) {
+				consumer.accept(createDesc(objIndex, pa.getDescription(objIndex, 0, i)));
+				if (!allProperties)
+					return 1;
+			}
+		}
+		catch (final KNXException e) {
+			if (!KNXRemoteException.class.equals(e.getClass())) {
+				logger.error("scan properties failed", e);
+				throw e;
+			}
+		}
+		return i;
 	}
 
 	private Description createDesc(final int oi, final byte[] desc) throws KNXException,
