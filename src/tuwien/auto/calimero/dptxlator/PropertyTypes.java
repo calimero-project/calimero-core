@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -357,13 +357,13 @@ public final class PropertyTypes
 	}
 
 	/**
-	 * Does a lookup if the given property data type has an associated translator
+	 * Does a lookup if the given property data type (PDT) has an associated translator
 	 * available.
 	 * <p>
 	 * The translator looked for is specified in the property map. An available translator
 	 * is implemented and can be used for translation.
 	 *
-	 * @param dataType property data type to lookup
+	 * @param dataType property data type (PDT) to lookup
 	 * @return <code>true</code> iff translator and its subtype was found,
 	 *         <code>false</code> otherwise
 	 */
