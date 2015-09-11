@@ -498,10 +498,11 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 * @return collection with loaded property definitions of type {@link Property}
 	 * @throws KNXException on errors in the property resource handler
 	 */
+	@Deprecated
 	public static Collection<Property> loadDefinitions(final String resource,
 		final ResourceHandler handler) throws KNXException
 	{
-		final ResourceHandler rh = handler == null ? new XmlPropertyHandler() : handler;
+		final ResourceHandler rh = handler == null ? new XmlPropertyDefinitions() : handler;
 		return rh.load(resource);
 	}
 
@@ -520,6 +521,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 *        <code>null</code>, a default handler is used
 	 * @throws KNXMLException on errors in the property resource handler
 	 */
+	@Deprecated
 	public static void saveDefinitions(final String resource,
 		final Collection<Property> definitions, final ResourceHandler handler) throws KNXMLException
 	{
@@ -528,7 +530,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		// <code>new TreeMap(getDefinitions()).values()</code>, since our property map
 		// is not ordered for the time being
 
-		final ResourceHandler rh = handler == null ? new XmlPropertyHandler() : handler;
+		final ResourceHandler rh = handler == null ? new XmlPropertyDefinitions() : handler;
 		rh.save(resource, definitions);
 	}
 
@@ -824,7 +826,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		throw e;
 	}
 
-	private static class XmlPropertyHandler implements ResourceHandler
+	public static class XmlPropertyDefinitions implements ResourceHandler
 	{
 		private static final String PROPDEFS_TAG = "propertyDefinitions";
 		private static final String OBJECT_TAG = "object";
@@ -838,9 +840,6 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		private static final String RW_ATTR = "rw";
 		private static final String WRITE_ATTR = "writeEnabled";
 		private static final String USAGE_TAG = "usage";
-
-		XmlPropertyHandler()
-		{}
 
 		@Override
 		public Collection<Property> load(final String resource) throws KNXMLException
@@ -887,10 +886,6 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 			}
 		}
 
-		/* (non-Javadoc)
-		 * @see tuwien.auto.calimero.mgmt.PropertyClient.ResourceHandler#save
-		 * (java.lang.String, java.util.Collection)
-		 */
 		@Override
 		public void save(final String resource, final Collection<Property> definitions)
 		{
