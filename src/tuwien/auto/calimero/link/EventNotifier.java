@@ -121,7 +121,7 @@ abstract class EventNotifier extends Thread implements KNXListener
 
 	EventNotifier(final Object source, final LogService logger)
 	{
-		super("Link notifier");
+		super("Calimero link notifier");
 		this.logger = logger;
 		this.source = source;
 		listeners = new EventListeners(logger);
