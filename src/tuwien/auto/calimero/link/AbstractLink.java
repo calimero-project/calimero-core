@@ -100,6 +100,8 @@ public abstract class AbstractLink implements KNXNetworkLink
 	 */
 	protected boolean sendCEmiAsByteArray;
 
+	final Object conn;
+
 	private final String name;
 	private volatile boolean closed;
 	private volatile int hopCount = 6;
@@ -169,6 +171,7 @@ public abstract class AbstractLink implements KNXNetworkLink
 	protected AbstractLink(final Object connection, final String name,
 		final KNXMediumSettings settings)
 	{
+		conn = connection;
 		this.name = name;
 		logger = LogManager.getManager().getLogService("calimero.link." + getName());
 		notifier = new LinkNotifier();
@@ -184,6 +187,7 @@ public abstract class AbstractLink implements KNXNetworkLink
 	 */
 	protected AbstractLink(final String name, final KNXMediumSettings settings)
 	{
+		conn = null;
 		this.name = name;
 		logger = LogManager.getManager().getLogService("calimero.link." + getName());
 		notifier = new LinkNotifier();

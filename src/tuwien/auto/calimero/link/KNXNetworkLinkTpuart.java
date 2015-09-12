@@ -42,11 +42,12 @@ import java.util.Collection;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAddress;
-import tuwien.auto.calimero.KNXException;
-import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.exception.KNXException;
+import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
+import tuwien.auto.calimero.exception.KNXTimeoutException;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
+import tuwien.auto.calimero.log.LogLevel;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
 import tuwien.auto.calimero.serial.TpuartConnection;
 
@@ -77,7 +78,7 @@ public class KNXNetworkLinkTpuart extends AbstractLink
 	 * @throws KNXException on error establishing the TP-UART connection
 	 */
 	public KNXNetworkLinkTpuart(final String portId, final KNXMediumSettings settings,
-		final Collection<KNXAddress> acknowledge) throws KNXException
+		final Collection acknowledge) throws KNXException
 	{
 		super(new TpuartConnection(portId, ensureDeviceAck(settings, acknowledge)),
 				"tpuart:" + portId, settings);
@@ -103,33 +104,36 @@ public class KNXNetworkLinkTpuart extends AbstractLink
 		c.addConnectionListener(notifier);
 	}
 
-	@Override
 	protected void onSend(final KNXAddress dst, final byte[] msg, final boolean waitForCon)
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
 		try {
 			final IndividualAddress src = new IndividualAddress(new byte[] { msg[4], msg[5] });
-			logger.debug("send {}->{}, {}", src, dst,
-					(waitForCon ? "blocking for .con" : "non-blocking"));
-			if (logger.isTraceEnabled())
-				logger.trace("cEMI {}", DataUnitBuilder.toHex(msg, " "));
+			final boolean trace = logger.isLoggable(LogLevel.TRACE);
+			if (trace)
+				logger.trace("send " + src + "->" + dst + ", "
+						+ (waitForCon ? "blocking for .con" : "non-blocking"));
+			if (trace)
+				logger.trace("cEMI " + DataUnitBuilder.toHex(msg, " "));
 			c.send(msg, waitForCon);
 		}
-		catch (final InterruptedException | KNXPortClosedException e) {
+		catch (final InterruptedException e) {
 			close();
-			if (e instanceof InterruptedException)
-				Thread.currentThread().interrupt();
+			Thread.currentThread().interrupt();
+			throw new KNXLinkClosedException(getName(), e);
+		}
+		catch (final KNXPortClosedException e) {
+			close();
 			throw new KNXLinkClosedException(getName(), e);
 		}
 	}
 
-	@Override
 	protected void onSend(final CEMILData msg, final boolean waitForCon)
 	{}
 
 	// if possible, add this link to the list of addresses to acknowledge
-	private static Collection<KNXAddress> ensureDeviceAck(final KNXMediumSettings settings,
-		final Collection<KNXAddress> acknowledge)
+	private static Collection ensureDeviceAck(final KNXMediumSettings settings,
+		final Collection acknowledge)
 	{
 		if (settings.getMedium() != KNXMediumSettings.MEDIUM_TP1)
 			throw new KNXIllegalArgumentException("TP-UART link supports only TP1 medium");
@@ -138,7 +142,7 @@ public class KNXNetworkLinkTpuart extends AbstractLink
 		if (device.getDevice() == 0 || device.getDevice() == 0xff)
 			return acknowledge;
 
-		final ArrayList<KNXAddress> l = new ArrayList<>(acknowledge);
+		final ArrayList l = new ArrayList(acknowledge);
 		l.add(device);
 		return l;
 	}
