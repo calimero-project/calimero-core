@@ -75,8 +75,6 @@ public final class RawFrameFactory
 			return createTP1(data, offset);
 		case KNXMediumSettings.MEDIUM_PL110:
 			return createPL110(data, offset, extBusmon);
-		case KNXMediumSettings.MEDIUM_PL132:
-			return createPL132(data, offset);
 		case KNXMediumSettings.MEDIUM_RF:
 			return new RFLData(data, offset);
 		default:

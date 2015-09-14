@@ -248,7 +248,7 @@ public interface DeviceDescriptor
 			case 3:
 				throw new KNXIllegalArgumentException("TP0 medium not supported any longer");
 			case 4:
-				return new PLSettings(true);
+				throw new KNXIllegalArgumentException("PL132 medium not supported any longer");
 			case 5:
 				return new KnxIPSettings(new IndividualAddress(0));
 			default:
