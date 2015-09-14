@@ -99,8 +99,7 @@ public class XmlWriterTest extends TestCase
 	 */
 	public void testXmlWriter()
 	{
-		try {
-			final XmlWriter w = new DefaultXmlWriter(out);
+		try (final XmlWriter w = new DefaultXmlWriter(out)) {
 			w.writeEndDocument();
 		}
 		catch (final KNXMLException e) {

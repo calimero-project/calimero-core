@@ -392,8 +392,8 @@ public class DiscovererTest extends TestCase
 		// multicasts are not only received on sending IF
 		// but 3 * responses is not always true: the number of responses can
 		// vary based on network setup
-		final int expected = usesMulticast ? 3 * responses : 2 * responses;
-		assertEquals(expected, d.getSearchResponses().size());
+		final int expected = usesMulticast ? 2 * responses : 2 * responses;
+		assertTrue(d.getSearchResponses().size() >= expected);
 	}
 
 	/**

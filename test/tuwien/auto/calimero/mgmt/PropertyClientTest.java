@@ -36,10 +36,7 @@
 
 package tuwien.auto.calimero.mgmt;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import junit.framework.TestCase;
 import tuwien.auto.calimero.CloseEvent;
@@ -53,7 +50,6 @@ import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.KNXNetworkLinkIP;
 import tuwien.auto.calimero.link.medium.TPSettings;
 import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
-import tuwien.auto.calimero.mgmt.PropertyClient.Property;
 
 /**
  * @author B. Malinowsky
@@ -61,7 +57,7 @@ import tuwien.auto.calimero.mgmt.PropertyClient.Property;
 public class PropertyClientTest extends TestCase
 {
 	private static final String PIDResource = Util.getPath() + "properties.xml";
-	private static final String PIDResourceSave = Util.getPath() + "propertiesSaved.xml";
+//	private static final String PIDResourceSave = Util.getPath() + "propertiesSaved.xml";
 
 	private KNXNetworkLink lnk;
 	private PropertyClient rem;
@@ -115,8 +111,8 @@ public class PropertyClientTest extends TestCase
 			localAdpt = new LocalDeviceMgmtAdapter(null, Util.getServer(), false, ll, true);
 			local = new PropertyClient(localAdpt);
 
-			rem.addDefinitions(PropertyClient.loadDefinitions(PIDResource, null));
-			local.addDefinitions(PropertyClient.loadDefinitions(PIDResource, null));
+			rem.addDefinitions(new PropertyClient.XmlPropertyDefinitions().load(PIDResource));
+			local.addDefinitions(new PropertyClient.XmlPropertyDefinitions().load(PIDResource));
 		}
 		catch (final RuntimeException e) {
 			tearDown();
@@ -188,31 +184,6 @@ public class PropertyClientTest extends TestCase
 				assertNotNull(s);
 			System.out.println(i + " = " + s);
 		}
-	}
-
-	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#loadDefinitions(String,
-	 * tuwien.auto.calimero.mgmt.PropertyClient.ResourceHandler)}.
-	 *
-	 * @throws KNXException
-	 */
-	public final void testLoadDefinitions() throws KNXException
-	{
-		PropertyClient.loadDefinitions(PIDResource, null);
-	}
-
-	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#saveDefinitions(String,
-	 * Collection, tuwien.auto.calimero.mgmt.PropertyClient.ResourceHandler)}.
-	 *
-	 * @throws KNXException
-	 */
-	public final void testSaveDefinitions() throws KNXException
-	{
-		PropertyClient.saveDefinitions(PIDResourceSave, new ArrayList<>(), null);
-
-		final Collection<Property> c = PropertyClient.loadDefinitions(PIDResource, null);
-		PropertyClient.saveDefinitions(PIDResourceSave, c, null);
 	}
 
 	/**
@@ -336,49 +307,38 @@ public class PropertyClientTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#scanProperties(boolean)}.
+	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#scanProperties(boolean,
+	 * java.util.function.Consumer)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
-	public final void testScanPropertiesBoolean() throws KNXException, InterruptedException
+	public final void testScanPropertiesBooleanConsumer() throws KNXException, InterruptedException
 	{
-		List<Description> l = rem.scanProperties(true);
-		assertTrue(l.size() > 0);
-		for (final Iterator<Description> i = l.iterator(); i.hasNext();) {
-			final Description d = i.next();
-			printDesc(d);
-		}
-		l = local.scanProperties(true);
-		assertTrue(l.size() > 0);
-		for (final Iterator<Description> i = l.iterator(); i.hasNext();) {
-			final Description d = i.next();
-			printDesc(d);
-		}
+		final AtomicBoolean i = new AtomicBoolean();
+		final AtomicBoolean k = new AtomicBoolean();
+		rem.scanProperties(true, (d) -> i.set(true));
+		assertTrue(i.get());
+		local.scanProperties(true, (d) -> k.set(true));
+		assertTrue(k.get());
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#scanProperties(int, boolean)}.
+	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#scanProperties(int, boolean,
+	 * java.util.function.Consumer)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
-	public final void testScanPropertiesIntBoolean() throws KNXException, InterruptedException
+	public final void testScanPropertiesIntegerBooleanConsumer()
+		throws KNXException, InterruptedException
 	{
-		List<Description> l = rem.scanProperties(0, true);
-		assertTrue(l.size() > 0);
-		for (final Iterator<Description> i = l.iterator(); i.hasNext();) {
-			final Description d = i.next();
-			printDesc(d);
-		}
-		l = local.scanProperties(0, true);
-		assertTrue(l.size() > 0);
-		for (final Iterator<Description> i = l.iterator(); i.hasNext();) {
-			final Description d = i.next();
-			printDesc(d);
-		}
+		final AtomicBoolean i = new AtomicBoolean();
+		final AtomicBoolean k = new AtomicBoolean();
+		rem.scanProperties(0, true, (d) -> i.set(true));
+		assertTrue(i.get());
+		local.scanProperties(0, true, (d) -> k.set(true));
+		assertTrue(k.get());
 	}
 
 	/**

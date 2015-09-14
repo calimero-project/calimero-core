@@ -178,15 +178,13 @@ public class KNXNetworkLinkIPTest extends TestCase
 	public final void testKNXNetworkLinkIPConstructor() throws KNXException, InterruptedException
 	{
 		tnl.close();
-		try {
-			new KNXNetworkLinkIP(100, new InetSocketAddress(0), Util.getServer(), false,
-				TPSettings.TP1);
+		try (final KNXNetworkLink l = new KNXNetworkLinkIP(100, new InetSocketAddress(0),
+				Util.getServer(), false, TPSettings.TP1)) {
 			fail("illegal arg");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-		try {
-			new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, new InetSocketAddress(0), Util
-				.getServer(), false, TPSettings.TP1);
+		try (final KNXNetworkLink l = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING,
+				new InetSocketAddress(0), Util.getServer(), false, TPSettings.TP1)) {
 			fail("wildcard no supported");
 		}
 		catch (final KNXIllegalArgumentException e) {}
@@ -221,8 +219,7 @@ public class KNXNetworkLinkIPTest extends TestCase
 	public final void testKNXNetworkLinkIPNetworkInterfaceInetAddressKNXMediumSettings()
 		throws UnknownHostException, KNXException
 	{
-		final KNXNetworkLink lnk =
-			new KNXNetworkLinkIP(null, InetAddress.getByName("224.0.23.14"),
+		final KNXNetworkLink lnk = new KNXNetworkLinkIP(null, InetAddress.getByName("224.0.23.14"),
 				TPSettings.TP1);
 		lnk.close();
 	}
@@ -351,11 +348,13 @@ public class KNXNetworkLinkIPTest extends TestCase
 				new PLSettings());
 		plrtr.sendRequest(new GroupAddress(0, 0, 1), Priority.LOW, new byte[] { 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (byte) (0x80 | 0) });
+		plrtr.close();
 	}
 
 	private void doSend(final boolean tunnel, final byte[] nsdu) throws KNXLinkClosedException,
 		InterruptedException, KNXTimeoutException
 	{
+		@SuppressWarnings("resource")
 		final KNXNetworkLink lnk = tunnel ? tnl : rtr;
 		final NLListenerImpl l = tunnel ? ltnl : lrtr;
 		l.con = null;
@@ -411,6 +410,7 @@ public class KNXNetworkLinkIPTest extends TestCase
 	private void doSendWait(final boolean tunnel, final byte[] nsdu) throws KNXLinkClosedException,
 		KNXTimeoutException
 	{
+		@SuppressWarnings("resource")
 		final KNXNetworkLink lnk = tunnel ? tnl : rtr;
 		final NLListenerImpl l = tunnel ? ltnl : lrtr;
 		l.con = null;

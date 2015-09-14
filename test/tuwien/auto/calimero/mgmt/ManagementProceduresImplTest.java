@@ -156,12 +156,12 @@ public class ManagementProceduresImplTest extends TestCase
 	{
 		// TODO enable test again
 		// reset of test device works fine, but we have to undo it to not fail in subsequent tests
-//		mp.resetAddress();
-//		Thread.sleep(3000);
-//		mp.resetAddress();
-//		final IndividualAddress def = new IndividualAddress(0xffff);
-//		mp.setProgrammingMode(def, true);
-//		mp.writeAddress(device);
+		mp.resetAddress();
+		Thread.sleep(3000);
+		mp.resetAddress();
+		final IndividualAddress def = new IndividualAddress(0xffff);
+		mp.setProgrammingMode(def, true);
+		mp.writeAddress(device);
 	}
 
 	/**

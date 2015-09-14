@@ -181,21 +181,22 @@ public class KNXnetIPTunnelTest extends TestCase
 		// the test expects a negative confirmation with the received L_Data.con
 		// the Calimero server always sends positive .con any frame, even if the group
 		// address is non-existing
-		doSend(frameNoDest, noblock, false);
+		final boolean posCon = true;
+		doSend(frameNoDest, noblock, posCon);
 		doSend(frame, ack, true);
 		doSend(frame2, con, true);
 
 		final long start = System.currentTimeMillis();
-		doSend(frameNoDest, con, false);
-		doSend(frameNoDest, con, false);
-		doSend(frameNoDest, con, false);
-		doSend(frameNoDest, con, false);
-		doSend(frameNoDest, con, false);
-		doSend(frameNoDest, con, false);
-		doSend(frameNoDest, con, false);
-		doSend(frameNoDest, con, false);
-		doSend(frameNoDest, con, false);
-		doSend(frameNoDest, con, false);
+		doSend(frameNoDest, con, posCon);
+		doSend(frameNoDest, con, posCon);
+		doSend(frameNoDest, con, posCon);
+		doSend(frameNoDest, con, posCon);
+		doSend(frameNoDest, con, posCon);
+		doSend(frameNoDest, con, posCon);
+		doSend(frameNoDest, con, posCon);
+		doSend(frameNoDest, con, posCon);
+		doSend(frameNoDest, con, posCon);
+		doSend(frameNoDest, con, posCon);
 		final long end = System.currentTimeMillis();
 		System.out.println("time for 10 send with con: " + (end - start));
 	}
@@ -393,16 +394,15 @@ public class KNXnetIPTunnelTest extends TestCase
 	 */
 	public final void testKNXnetIPTunnel() throws KNXException, InterruptedException
 	{
-		try {
-			new KNXnetIPTunnel(KNXnetIPTunnel.LINK_LAYER, null, new InetSocketAddress(
-				"127.0.0.1", 4000), false);
+		try (final KNXnetIPConnection c = new KNXnetIPTunnel(KNXnetIPTunnel.LINK_LAYER, null,
+				new InetSocketAddress("127.0.0.1", 4000), false)) {
 			fail("local socket is null");
 		}
 		catch (final KNXIllegalArgumentException e) {}
 
-		try {
-			new KNXnetIPTunnel(KNXnetIPTunnel.LINK_LAYER, new InetSocketAddress(
-				"0.0.0.0", 0), new InetSocketAddress("127.0.0.1", 4000), false);
+		try (final KNXnetIPConnection c = new KNXnetIPTunnel(KNXnetIPTunnel.LINK_LAYER,
+				new InetSocketAddress("0.0.0.0", 0), new InetSocketAddress("127.0.0.1", 4000),
+				false)) {
 			fail("wildcard for local socket not null");
 		}
 		catch (final KNXIllegalArgumentException e) {}
