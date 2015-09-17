@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -132,7 +132,7 @@ public class DestinationTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.mgmt.Destination#Destination
 	 * (tuwien.auto.calimero.mgmt.Destination.AggregatorProxy, tuwien.auto.calimero.IndividualAddress, boolean)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testDestinationAggregatorProxyIndividualAddressBoolean()
@@ -156,7 +156,7 @@ public class DestinationTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.Destination#getAddress()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testGetAddress() throws KNXFormatException
@@ -168,7 +168,7 @@ public class DestinationTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.Destination#getState()}.
-	 * 
+	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 * @throws InterruptedException
@@ -208,7 +208,7 @@ public class DestinationTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.mgmt.Destination#isConnectionOriented()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testIsConnectionOriented() throws KNXFormatException
@@ -222,7 +222,7 @@ public class DestinationTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.Destination#isKeepAlive()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testIsKeepAlive() throws KNXFormatException
@@ -236,7 +236,7 @@ public class DestinationTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.mgmt.Destination#isVerifyMode()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testIsVerifyMode() throws KNXFormatException
