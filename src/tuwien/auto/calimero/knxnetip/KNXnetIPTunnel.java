@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.KNXException;
@@ -149,20 +150,12 @@ public class KNXnetIPTunnel extends ClientConnection
 		super.send(frame, mode);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.KNXnetIPConnection#getName()
-	 */
 	@Override
 	public String getName()
 	{
 		return "KNXnet/IP Tunneling " + super.getName();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.ClientConnection#handleServiceType
-	 * (tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader, byte[], int,
-	 * java.net.InetAddress, int)
-	 */
 	@Override
 	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset,
 		final InetAddress src, final int port) throws KNXFormatException, IOException
@@ -192,27 +185,56 @@ public class KNXnetIPTunnel extends ClientConnection
 			}
 		}
 		else
-			logger.warn("tunneling request with invalid rcv-seq " + seq + ", expected "
-					+ getSeqRcv());
+			logger.warn("tunneling request with invalid rcv-seq {}, expected {}", getSeqRcv(), seq);
 		if (seq == getSeqRcv()) {
 			incSeqRcv();
 			final CEMI cemi = req.getCEMI();
 			// leave if we are working with an empty (broken) service request
 			if (cemi == null)
 				return true;
-			if (cemi.getMessageCode() == CEMILData.MC_LDATA_IND
-					|| cemi.getMessageCode() == CEMIBusMon.MC_BUSMON_IND)
+
+			final int mc = cemi.getMessageCode();
+			if (mc == CEMILData.MC_LDATA_IND || mc == CEMIBusMon.MC_BUSMON_IND)
 				fireFrameReceived(cemi);
-			else if (cemi.getMessageCode() == CEMILData.MC_LDATA_CON) {
+			else if (mc == CEMILData.MC_LDATA_CON) {
 				// invariant: notify listener before return from blocking send
+				logger.debug("received cEMI L-Data.con with req " + req.getSequenceNumber());
 				fireFrameReceived(cemi);
-				setStateNotify(OK);
+
+				synchronized (lock) {
+					final CEMILData ldata = (CEMILData) keepForCon;
+					if (ldata != null && getState() == CEMI_CON_PENDING) {
+						// check if address was set by server
+						final boolean emptySrc = ldata.getSource().getRawAddress() == 0;
+						final byte[] sent = unifyLData(ldata, emptySrc);
+						final byte[] recv = unifyLData(cemi, emptySrc);
+						if (Arrays.equals(recv, sent)) {
+							keepForCon = null;
+							setStateNotify(OK);
+						}
+					}
+				}
 			}
-			else if (cemi.getMessageCode() == CEMILData.MC_LDATA_REQ)
+			else if (mc == CEMILData.MC_LDATA_REQ)
 				logger.warn("received L-Data request - ignored");
 		}
 		else
 			logger.info("skip tunneling request with rcv-seq {} (already received)", seq);
 		return true;
+	}
+
+	private byte[] unifyLData(final CEMI ldata, final boolean emptySrc)
+	{
+		final byte[] data = ldata.toByteArray();
+		// set msg code field 0
+		data[0] = 0;
+		// set ctrl1 field 0
+		data[1 + data[1] + 1] = 0;
+		// conditionally set source address 0
+		if (emptySrc) {
+			data[1 + data[1] + 3] = 0;
+			data[1 + data[1] + 4] = 0;
+		}
+		return data;
 	}
 }

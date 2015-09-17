@@ -127,6 +127,8 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	// timeout for response message in seconds
 	final int responseTimeout;
 
+	CEMI keepForCon;
+
 	private ReceiverLoop receiver;
 
 	// lock object to do wait() on for protocol timeouts
@@ -235,6 +237,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 							getSeqSend(), frame));
 				final DatagramPacket p = new DatagramPacket(buf, buf.length,
 						dataEndpt.getAddress(), dataEndpt.getPort());
+				keepForCon = frame;
 				int attempt = 0;
 				for (; attempt < maxSendAttempts; ++attempt) {
 					if (logger.isTraceEnabled())
@@ -253,6 +256,8 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 					waitForStateChange(ACK_PENDING, responseTimeout);
 					if (internalState == ClientConnection.CEMI_CON_PENDING || internalState == OK)
 						break;
+					if (internalState == CLOSED)
+						throw new KNXConnectionClosedException("waiting for service ack");
 				}
 				// close connection on no service ack from server
 				if (attempt == maxSendAttempts) {
@@ -485,7 +490,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	protected void cleanup(final int initiator, final String reason,
 		final LogLevel level, final Throwable t)
 	{
-		setState(CLOSED);
+		setStateNotify(CLOSED);
 		fireConnectionClosed(initiator, reason);
 		listeners.removeAll();
 		LogService.removeLogger(logger);

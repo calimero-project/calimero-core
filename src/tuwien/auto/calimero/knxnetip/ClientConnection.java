@@ -223,9 +223,6 @@ abstract class ClientConnection extends ConnectionBase
 		super.cleanup(initiator, reason, level, t);
 	}
 
-	/* (non-Javadoc)
-	* @see tuwien.auto.calimero.knxnetip.ConnectionBase#doExtraBlockingModes()
-	*/
 	@Override
 	void doExtraBlockingModes() throws KNXTimeoutException, InterruptedException
 	{
@@ -235,7 +232,8 @@ abstract class ClientConnection extends ConnectionBase
 			ClientConnection.CONFIRMATION_TIMEOUT);
 		// throw on no answer
 		if (internalState == ClientConnection.CEMI_CON_PENDING) {
-			final KNXTimeoutException e = new KNXTimeoutException("no confirmation reply received");
+			final KNXTimeoutException e = new KNXTimeoutException(
+					"no confirmation reply received for " + keepForCon);
 			logger.warn("response timeout waiting for confirmation", e);
 			internalState = OK;
 			throw e;
