@@ -362,7 +362,7 @@ public class UsbConnection implements AutoCloseable
 	{
 		final StringBuilder sb = new StringBuilder();
 		traverse(getRootHub(), sb, "");
-		slogger.info("Enumerate USB devices\n{}", sb);
+		slogger.debug("Enumerate USB devices\n{}", sb);
 
 		// Use the low-level API, because on Windows the string descriptors cause problems
 		if (slogger.isDebugEnabled())
