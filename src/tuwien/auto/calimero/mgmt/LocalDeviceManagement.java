@@ -264,12 +264,9 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 		send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, DEVICE_OBJECT, 1,
 				PropertyAccess.PID.IO_LIST, 1, objects), KNXnetIPConnection.WAIT_FOR_CON);
 		final byte[] ret = findFrame(CEMIDevMgmt.MC_PROPREAD_CON);
-		int lastObjType = -1;
 		for (int i = 0; i < objects; ++i) {
 			final int objType = (ret[2 * i] & 0xff) << 8 | ret[2 * i + 1] & 0xff;
-			if (objType != lastObjType)
-				interfaceObjects.add(new Pair(i, objType));
-			lastObjType = objType;
+			interfaceObjects.add(new Pair(i, objType));
 		}
 	}
 
