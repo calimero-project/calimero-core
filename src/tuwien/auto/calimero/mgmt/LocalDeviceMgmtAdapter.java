@@ -103,7 +103,7 @@ public class LocalDeviceMgmtAdapter extends LocalDeviceManagement
 	 */
 	public String getName()
 	{
-		return "local DM " + conn.getRemoteAddress();
+		return "Local-DM " + conn.getRemoteAddress();
 	}
 
 	protected void send(final CEMIDevMgmt frame, final Object mode) throws KNXTimeoutException,
