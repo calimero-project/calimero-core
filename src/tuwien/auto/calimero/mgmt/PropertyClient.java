@@ -807,10 +807,13 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		if (p != null) {
 			if (p.dpt != null)
 				try {
-					return TranslatorTypes.createTranslator(0, p.dpt);
+					final DPTXlator t = TranslatorTypes.createTranslator(0, p.dpt);
+					t.setAppendUnit(false);
+					return t;
 				}
 				catch (final KNXException e) {
-					logger.warn("fallback to default translator", e);
+					logger.warn("fallback to default translator for PID " + pid
+							+ ", no translator for DPT " + p.dpt, e);
 				}
 			pdt = p.pdt;
 		}
@@ -818,11 +821,14 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		// in local dev.mgmt, no pdt description is available
 		if (pdt == -1 && !local)
 			pdt = pa.getDescription(objIndex, pid, 0)[3] & 0x3f;
-		if (PropertyTypes.hasTranslator(pdt))
-			return PropertyTypes.createTranslator(pdt);
-		final KNXException e = new KNXException("no translator available for PID 0x"
-			+ Integer.toHexString(pid) + ", " + getObjectTypeName(ot));
-		logger.warn("translator missing", e);
+		if (PropertyTypes.hasTranslator(pdt)) {
+			final DPTXlator t = PropertyTypes.createTranslator(pdt);
+			t.setAppendUnit(false);
+			return t;
+		}
+		final KNXException e = new KNXException(
+				"no translator available for PID " + pid + ", " + getObjectTypeName(ot));
+		logger.warn("translator missing for PID " + pid + ", PDT " + pdt, e);
 		throw e;
 	}
 
