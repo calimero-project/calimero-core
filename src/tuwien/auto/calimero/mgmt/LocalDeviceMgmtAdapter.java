@@ -104,7 +104,7 @@ public class LocalDeviceMgmtAdapter extends LocalDeviceManagement
 	@Override
 	public String getName()
 	{
-		return "local DM " + conn.getRemoteAddress();
+		return "Local-DM " + conn.getRemoteAddress();
 	}
 
 	@Override

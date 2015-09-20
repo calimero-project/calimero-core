@@ -154,7 +154,7 @@ public class LocalDeviceManagementUsb extends LocalDeviceManagement
 	@Override
 	public String getName()
 	{
-		return "local DM " + conn.getName();
+		return "Local-DM " + conn.getName();
 	}
 
 	@Override
