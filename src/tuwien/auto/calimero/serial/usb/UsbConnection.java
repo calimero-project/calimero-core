@@ -866,9 +866,9 @@ public class UsbConnection implements AutoCloseable
 		try {
 			String desc = indent;
 			if (product != 0)
-				desc += "" + device.getString(product);
+				desc += "" + trimAtNull(device.getString(product));
 			if (manufacturer != 0)
-				desc += " (" + device.getString(manufacturer) + ")";
+				desc += " (" + trimAtNull(device.getString(manufacturer)) + ")";
 			if (desc != indent)
 				sb.append("\n").append(desc);
 			if (sno != 0)
@@ -884,6 +884,13 @@ public class UsbConnection implements AutoCloseable
 			l.debug("extracting USB device strings, {}", e.toString());
 		}
 		return sb.toString();
+	}
+
+	// sometimes the usb4java high-level API returns strings which exceed past the null terminator
+	private static String trimAtNull(final String s)
+	{
+		final int end = s.indexOf((char) 0);
+		return end > -1 ? s.substring(0, end) : s;
 	}
 
 	// Cross-platform way to do name lookup for USB devices, using the low-level API.
