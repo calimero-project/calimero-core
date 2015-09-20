@@ -352,6 +352,36 @@ public interface PropertyAccess
 		// properties of object type 6, Router object
 		//
 
+		/**
+		 * Router object property "Line Status", status of the subnetwork connected to the secondary
+		 * side of the coupler. Bit 0 = PowerDownSubline: 0 = power up, 1 = power down.
+		 */
+		public static final int LINE_STATUS = 51;
+
+		/**
+		 * Router object property "Main Line Coupler Config", for point-to-point and broadcast
+		 * frames on the primary side subnetwork of the coupler.
+		 */
+		public static final int MAIN_LCCONFIG = 52;
+
+		/**
+		 * Router object property "Sub Line Coupler Config", for point-to-point and broadcast
+		 * frames on the secondary side subnetwork of the coupler.
+		 */
+		public static final int SUB_LCCONFIG = 53;
+
+		/**
+		 * Router object property "Main Line Coupler Group Config", for multicast
+		 * frames (group communication) on the primary side subnetwork of the coupler.
+		 */
+		public static final int MAIN_LCGROUPCONFIG = 54;
+
+		/**
+		 * Router object property "Sub Line Coupler Group Config", for multicast
+		 * frames (group communication) on the secondary side subnetwork of the coupler.
+		 */
+		public static final int SUB_LCGROUPCONFIG = 55;
+
 		//
 		// properties of object type 9, CEMI server object
 		//
