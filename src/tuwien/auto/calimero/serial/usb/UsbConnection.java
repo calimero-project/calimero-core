@@ -151,6 +151,18 @@ public class UsbConnection implements AutoCloseable
 		// uses ABB
 		0x5120 };
 
+
+	// KNX interfaces that use a USB to ? adapter (e.g., USB to serial adapter)
+	// this allows us to at least list those devices, although we cannot tell the
+	// actual communication port (e.g., /dev/ttyACM0)
+	private static final int[] virtualSerialVendorIds = {
+		0x03eb // busware TP-UART
+	};
+	private static final int[] virtualSerialProductIds = {
+		0x204b // busware TP-UART
+	};
+
+
 	// EP in/out: USB endpoint for asynchronous KNX data transfer over interrupt pipe
 	private static final byte knxEndpointOut = (byte) 0x02;
 	private static final byte knxEndpointIn = (byte) 0x81;
@@ -325,6 +337,23 @@ public class UsbConnection implements AutoCloseable
 			for (final int v : vendorIds)
 				if (v == vendor)
 					knx.add(d);
+		}
+		return knx;
+	}
+
+	// internal use only
+	public static List<UsbDevice> getVirtualSerialKnxDevices()
+		throws SecurityException, UsbException
+	{
+		final List<UsbDevice> knx = new ArrayList<>();
+		for (final UsbDevice d : getDevices()) {
+			final int vendor = d.getUsbDeviceDescriptor().idVendor() & 0xffff;
+			final int product = d.getUsbDeviceDescriptor().idProduct() & 0xffff;
+			for (int i = 0; i < virtualSerialVendorIds.length; i++) {
+				final int v = virtualSerialVendorIds[i];
+				if (v == vendor && virtualSerialProductIds[i] == product)
+					knx.add(d);
+			}
 		}
 		return knx;
 	}
