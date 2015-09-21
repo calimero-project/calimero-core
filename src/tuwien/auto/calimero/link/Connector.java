@@ -103,11 +103,14 @@ public final class Connector
 		this.maxAttempts = rhs.maxAttempts;
 	}
 
-	public Connector connectOnCreation(final boolean connect)
-	{
-		this.onCreation = connect;
-		return this;
-	}
+	// rare use-case, comment out for now: disabling connect on creation
+	// only makes sense for KNXNetworkLink, and only if a send method is called eventually
+	// Alternatively, make it a setter for "block during first attempt in constructor"
+//	public Connector connectOnCreation(final boolean connect)
+//	{
+//		this.onCreation = connect;
+//		return this;
+//	}
 
 	public Connector maxConnectAttempts(final long maxAttempts)
 	{
