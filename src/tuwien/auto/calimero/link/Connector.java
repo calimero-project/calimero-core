@@ -39,8 +39,10 @@ package tuwien.auto.calimero.link;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -166,16 +168,23 @@ public final class Connector
 		private final List<NetworkLinkListener> listeners = new ArrayList<>();
 		private volatile KNXMediumSettings settings;
 		private volatile int hopCount;
+		private static final ThreadFactory tf = Executors.defaultThreadFactory();
+		// we should replace this with a scheduled _cached_ thread pool executor implementation,
+		// this one is a fixed sized pool, with thread time-out enabled
+		private static ScheduledThreadPoolExecutor reconnect = new ScheduledThreadPoolExecutor(4,
+				(r) -> {
+					final Thread t = tf.newThread(r);
+					t.setName("Calimero Connector (" + t.getName() + ")");
+					t.setDaemon(true);
+					return t;
+				});
 
 		private final TSupplier<? extends KNXNetworkLink> creator;
 
-		// To avoid any kind of resource exhaustion, declare as thread pool executor which
-		// implements ScheduledExecutorService. This way, we can set a reasonable bound
-		// for the maximum thread pool size.
-		// XXX use daemon threads, or shutdown orderly if Calimero exits
-		private static ScheduledThreadPoolExecutor reconnect = new ScheduledThreadPoolExecutor(1);
 		static {
-			reconnect.setMaximumPoolSize(20);
+			// try to remove idle threads after a while
+			reconnect.setKeepAliveTime(61, TimeUnit.SECONDS);
+			reconnect.allowCoreThreadTimeOut(true);
 		}
 
 		// we save a copy of the connector options that won't get modified
