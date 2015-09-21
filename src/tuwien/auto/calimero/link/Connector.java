@@ -112,6 +112,7 @@ public final class Connector
 //		return this;
 //	}
 
+	// on successful connection, the attempts are reset to maxAttempts
 	public Connector maxConnectAttempts(final long maxAttempts)
 	{
 		if (maxAttempts < 1)
@@ -150,27 +151,40 @@ public final class Connector
 	 * @throws KNXException
 	 * @throws InterruptedException
 	 */
-	public <T> KNXNetworkLink newLink(final TSupplier<? extends KNXNetworkLink> creator)
+	public KNXNetworkLink newLink(final TSupplier<? extends KNXNetworkLink> creator)
 		throws KNXException, InterruptedException
 	{
-		return new LinkProxy(creator, this);
+		return new Link<KNXNetworkLink>(creator, this);
 	}
 
-	// ??? add static factory method that directly creates link using supplier only
-//	public static <T, U> KNXNetworkLink newLink(final TSupplier<? extends KNXNetworkLink> creator)
-//		throws KNXException, InterruptedException
-//	{
-//		return creator.get();
-//	}
+	/**
+	 * Returns a new KNXNetworMonitor with the specified behavior for (re-)connection to the KNX
+	 * network.
+	 *
+	 * @param creator supplies the specific KNX network monitor
+	 * @return a new KNX network monitor with the specified (re-)connection behavior configured
+	 * @throws KNXException
+	 * @throws InterruptedException
+	 */
+	public KNXNetworkMonitor newMonitor(final TSupplier<? extends KNXNetworkMonitor> creator)
+		throws KNXException, InterruptedException
+	{
+		return new Link<KNXNetworkMonitor>(creator, this);
+	}
 
 	// interruption policy: close link resource
-	private static final class LinkProxy implements KNXNetworkLink, NetworkLinkListener
+	public static final class Link<T extends AutoCloseable>
+			implements KNXNetworkLink, KNXNetworkMonitor, NetworkLinkListener
 	{
-		private volatile KNXNetworkLink impl;
-		// ??? right now we cannot access link internals, have to duplicate them here
-		private final List<NetworkLinkListener> listeners = new ArrayList<>();
+		private volatile T impl;
+		private final List<LinkListener> listeners = new ArrayList<>();
 		private volatile KNXMediumSettings settings;
 		private volatile int hopCount;
+		// monitor: decode raw frames
+		private volatile boolean decodeRawFrames;
+
+		private final TSupplier<? extends T> creator;
+
 		private static final ThreadFactory tf = Executors.defaultThreadFactory();
 		// we should replace this with a scheduled _cached_ thread pool executor implementation,
 		// this one is a fixed sized pool, with thread time-out enabled
@@ -182,8 +196,6 @@ public final class Connector
 					return t;
 				});
 
-		private final TSupplier<? extends KNXNetworkLink> creator;
-
 		static {
 			// try to remove idle threads after a while
 			reconnect.setKeepAliveTime(61, TimeUnit.SECONDS);
@@ -192,17 +204,16 @@ public final class Connector
 
 		// we save a copy of the connector options that won't get modified
 		private final Connector connector;
+
 		private volatile boolean closed;
 		private volatile Future<?> f = CompletableFuture.completedFuture(null);
 		private final AtomicBoolean connecting = new AtomicBoolean();
 
-		private LinkProxy(final TSupplier<? extends KNXNetworkLink> creator, final Connector options)
+		private Link(final TSupplier<? extends T> creator, final Connector options)
 			throws KNXException, InterruptedException
 		{
 			this.creator = creator;
 			connector = new Connector(options);
-
-			logger().warn("!!! Experimental feature: KNX network link via Connector");
 			try {
 				if (connector.onCreation)
 					connect();
@@ -210,7 +221,7 @@ public final class Connector
 			catch (final KNXException e) {
 				if (!connector.initialError)
 					throw e;
-				logger().error("initial connection attempt: {}", e.toString());
+				logger().error("initial connection attempt", e);
 				scheduleConnect(connector.maxAttempts - 1);
 				// TODO should we wait here until scheduled connects are done?
 				// wait ... then check link:
@@ -219,25 +230,42 @@ public final class Connector
 			}
 		}
 
+		/**
+		 * @return the currently used connection instance of type {@link KNXNetworkLink} or
+		 *         {@link KNXNetworkMonitor}, or null
+		 */
+		public AutoCloseable target()
+		{
+			return impl;
+		}
+
 		@Override
 		public void setKNXMedium(final KNXMediumSettings settings)
 		{
-			if (impl != null)
-				impl.setKNXMedium(settings);
+			final T t = impl;
+			if (t instanceof KNXNetworkLink)
+				((KNXNetworkLink) t).setKNXMedium(settings);
+			else if (t instanceof KNXNetworkMonitor)
+				((KNXNetworkMonitor) t).setKNXMedium(settings);
 			this.settings = settings;
 		}
 
 		@Override
 		public KNXMediumSettings getKNXMedium()
 		{
-			return impl != null ? impl.getKNXMedium() : settings;
+			final T t = impl;
+			if (t instanceof KNXNetworkLink)
+				return ((KNXNetworkLink) t).getKNXMedium();
+			if (t instanceof KNXNetworkMonitor)
+				return ((KNXNetworkMonitor) t).getKNXMedium();
+			return settings;
 		}
 
 		@Override
 		public void addLinkListener(final NetworkLinkListener l)
 		{
-			if (impl != null)
-				impl.addLinkListener(l);
+			if (impl instanceof KNXNetworkLink)
+				((KNXNetworkLink) impl).addLinkListener(l);
 			listeners.add(l);
 		}
 
@@ -245,22 +273,46 @@ public final class Connector
 		public void removeLinkListener(final NetworkLinkListener l)
 		{
 			listeners.remove(l);
-			if (impl != null)
-				impl.removeLinkListener(l);
+			if (impl instanceof KNXNetworkLink)
+				((KNXNetworkLink) impl).removeLinkListener(l);
+		}
+
+		@Override
+		public void addMonitorListener(final LinkListener l)
+		{
+			if (impl instanceof KNXNetworkMonitor)
+				((KNXNetworkMonitor) impl).addMonitorListener(l);
+			listeners.add(l);
+		}
+
+		@Override
+		public void removeMonitorListener(final LinkListener l)
+		{
+			listeners.remove(l);
+			if (impl instanceof KNXNetworkMonitor)
+				((KNXNetworkMonitor) impl).removeMonitorListener(l);
+		}
+
+		@Override
+		public void setDecodeRawFrames(final boolean decode)
+		{
+			decodeRawFrames = decode;
+			if (impl instanceof KNXNetworkMonitor)
+				((KNXNetworkMonitor) impl).setDecodeRawFrames(decode);
 		}
 
 		@Override
 		public void setHopCount(final int count)
 		{
-			if (impl != null)
-				impl.setHopCount(count);
+			if (impl instanceof KNXNetworkLink)
+				((KNXNetworkLink) impl).setHopCount(count);
 			hopCount = count;
 		}
 
 		@Override
 		public int getHopCount()
 		{
-			return impl != null ? impl.getHopCount() : hopCount;
+			return impl != null ? ((KNXNetworkLink) impl).getHopCount() : hopCount;
 		}
 
 		@Override
@@ -287,13 +339,17 @@ public final class Connector
 		@Override
 		public String getName()
 		{
-			return impl != null ? impl.getName() : "calimero.link";
+			final T t = impl;
+			if (t instanceof KNXNetworkLink)
+				return ((KNXNetworkLink) t).getName();
+			if (t instanceof KNXNetworkMonitor)
+				return ((KNXNetworkMonitor) t).getName();
+			return "calimero.link";
 		}
 
 		@Override
 		public boolean isOpen()
 		{
-			// XXX that's basically lying? there should be a way to show the currently known state
 			return !closed;
 		}
 
@@ -301,10 +357,13 @@ public final class Connector
 		public void close()
 		{
 			closed = true;
-			final boolean canceled = f.cancel(true);
-			System.out.println("cancellation of " + f + " returned " + canceled);
-			if (impl != null)
-				impl.close();
+//			final boolean canceled = f.cancel(true);
+//			System.out.println("cancellation of " + f + " returned " + canceled);
+			try {
+				if (impl != null)
+					impl.close();
+			}
+			catch (final Exception ignore) {}
 		}
 
 		@Override
@@ -323,42 +382,42 @@ public final class Connector
 		public void confirmation(final FrameEvent e)
 		{}
 
+		// only called for network link send
 		private KNXNetworkLink link() throws KNXLinkClosedException
 		{
-			final KNXLinkClosedException lce = new KNXLinkClosedException("reconnecting link");
 			try {
-				final KNXNetworkLink l = impl;
+				final KNXNetworkLink l = (KNXNetworkLink) impl;
 				// ??? should immediate connects here also count for scheduled connects, and
 				// increment the attempt counter?
-				return l == null ? connect() : l.isOpen() ? l : connector.onSend
-						? connect() : l;
+				return (KNXNetworkLink) (l == null ? connect()
+						: l.isOpen() ? l : connector.onSend ? connect() : l);
 			}
 			catch (final InterruptedException e) {
 				Thread.currentThread().interrupt();
-				lce.initCause(e);
+				throw new KNXLinkClosedException("interrupt on reconnecting link", e);
 			}
 			catch (final KNXLinkClosedException e) {
 				throw e;
 			}
 			catch (final KNXException e) {
-				lce.initCause(e);
+				throw new KNXLinkClosedException("reconnecting link", e);
 			}
-			throw lce;
 		}
 
 		private void scheduleConnect(final long remainingAttempts)
 		{
 			if (closed || remainingAttempts <= 0)
 				return;
+			final long max = connector.maxAttempts;
+			final long remaining = remainingAttempts - 1;
+			final long attempt = max - remaining;
 			final Runnable s = () -> {
-				final long max = connector.maxAttempts;
-				final long attempt = max - remainingAttempts + 1;
 				try {
 					if (connector.maxAttempts == NoMaxAttempts)
 						logger().info("execute scheduled connect {} (no max)", attempt);
 					else
 						logger().info("execute scheduled connect {}/{} ({} remaining)", attempt,
-								max, (remainingAttempts - 1));
+								max, remaining);
 					connect();
 				}
 				catch (final InterruptedException e) {
@@ -370,32 +429,39 @@ public final class Connector
 				}
 				catch (final KNXException | RuntimeException e) {
 					logger().error("connection attempt {}: {}", attempt, e.getMessage());
-					scheduleConnect(remainingAttempts - 1);
+					scheduleConnect(remaining);
 				}
 			};
 			f = reconnect.schedule(s, connector.reconnectWait, TimeUnit.MILLISECONDS);
-			System.out.println("scheduled future " + f);
 		}
 
-		private KNXNetworkLink connect() throws InterruptedException, KNXException
+		private AutoCloseable connect() throws InterruptedException, KNXException
 		{
-			if (impl != null && impl.isOpen()) {
-				System.out.println("got active connection, cancel connect");
+			if (targetOpen()) {
 				return impl;
 			}
 			// if currently no connection attempt is active, we create one
 			if (connecting.compareAndSet(false, true)) {
 				try {
-					final KNXNetworkLink link = creator.get();
-					if (impl == null) {
-						settings = link.getKNXMedium();
-						hopCount = link.getHopCount();
+					final T t = creator.get();
+					if (t instanceof KNXNetworkLink) {
+						final KNXNetworkLink link = (KNXNetworkLink) t;
+						if (impl == null) {
+							settings = link.getKNXMedium();
+							hopCount = link.getHopCount();
+						}
+						link.setKNXMedium(settings);
+						link.setHopCount(hopCount);
+						link.addLinkListener(this);
+						listeners.forEach((l) -> link.addLinkListener((NetworkLinkListener) l));
 					}
-					link.setKNXMedium(settings);
-					link.setHopCount(hopCount);
-					link.addLinkListener(this);
-					listeners.forEach(link::addLinkListener);
-					impl = link;
+					else if (t instanceof KNXNetworkMonitor) {
+						final KNXNetworkMonitor monitor = (KNXNetworkMonitor) t;
+						monitor.setDecodeRawFrames(decodeRawFrames);
+						monitor.addMonitorListener(this);
+						listeners.forEach(monitor::addMonitorListener);
+					}
+					impl = t;
 				}
 				catch (final KNXRemoteException e) {
 					final KNXLinkClosedException lce = new KNXLinkClosedException(e.getMessage());
@@ -415,10 +481,20 @@ public final class Connector
 					while (connecting.get())
 						connecting.wait();
 				}
-				if (impl == null || !impl.isOpen())
+				if (!targetOpen())
 					throw new KNXLinkClosedException("ongoing connect attempt we waited for failed");
 			}
 			return impl;
+		}
+
+		private boolean targetOpen()
+		{
+			final T t = impl;
+			if (t instanceof KNXNetworkLink)
+				return ((KNXNetworkLink) t).isOpen();
+			if (t instanceof KNXNetworkMonitor)
+				return ((KNXNetworkMonitor) t).isOpen();
+			return false;
 		}
 
 		private Logger logger()
