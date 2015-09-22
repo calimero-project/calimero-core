@@ -72,8 +72,8 @@ public class DPTXlator8BitEnum extends DPTXlator
 	// use a common base to store and access enumeration elements independent of specific type
 	private interface EnumBase<E extends EnumBase<E>>
 	{
-		final Map<EnumBase<?>, Integer> values = new HashMap<>();
-		final Map<EnumBase<?>, String> descriptions = new HashMap<>();
+		Map<EnumBase<?>, Integer> values = new HashMap<>();
+		Map<EnumBase<?>, String> descriptions = new HashMap<>();
 
 		default void init(final int element, final String description)
 		{
@@ -102,7 +102,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Slave(1, "slave"),
 		Master(2, "master");
 
-		private ScloMode(final int element, final String description)
+		ScloMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -113,7 +113,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		BuildingNotUsed(1, "Building not used"),
 		BuildingProtection(2, "Building protection");
 
-		private BuildingMode(final int element, final String description)
+		BuildingMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -124,7 +124,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Standby(1, "standby"),
 		NotOccupied(2, "not occupied");
 
-		private OccupancyMode(final int element, final String description)
+		OccupancyMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		}
@@ -137,7 +137,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Low(2, "Low"),
 		Void(3, "void");
 
-		private Priority(final int element, final String description)
+		Priority(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		}
@@ -149,7 +149,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		PresenceSimulation(1, "presence simulation"),
 		NightRound(2, "night round");
 
-		private LightApplicationMode(final int element, final String description)
+		LightApplicationMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		}
@@ -169,7 +169,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		LoadManagement(40, "Load Management"),
 		ShuttersAndBlinds(50, "Shutters and blinds");
 
-		private ApplicationArea(final int element, final String description)
+		ApplicationArea(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		}
@@ -181,7 +181,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		BasicAlarm(2, "basic alarm"),
 		ExtendedAlarm(3, "extended alarm");
 
-		private AlarmClassType(final int element, final String description)
+		AlarmClassType(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -192,7 +192,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Enabled(1, "enabled (PSU/DPSU fixed on)"),
 		Auto(2, "auto (PSU/DPSU automatic on/off)");
 
-		private PsuMode(final int element, final String description)
+		PsuMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -219,7 +219,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		InvalidGroupObject(17, "invalid Group Object number (ASAP)"),
 		GroupObjectTypeExceedsLength(18, "Group Object Type exceeds (PID_MAX_APDU_LENGTH – 2)");
 
-		private ErrorClassSystem(final int element, final String description)
+		ErrorClassSystem(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -232,7 +232,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		ActuatorFault(3, "actuator fault"),
 		OtherFault(4, "other fault");
 
-		private ErrorClassHvac(final int element, final String description)
+		ErrorClassHvac(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -266,7 +266,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Delay12h(24, "12 h"),
 		Delay24h(25, "24 h");
 
-		private TimeDelay(final int element, final String description)
+		TimeDelay(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -287,7 +287,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		ViolentStorm(11, "violent storm (102.4–117.4 km/h)"),
 		Hurricane(12, "hurricane (≥ 117.4 km/h)");
 
-		private BeaufortWindForceScale(final int element, final String description)
+		BeaufortWindForceScale(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -300,7 +300,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		AnalogInput(3, "analog input, 0 % to 100 %"),
 		TemperatureSensorInput(4, "temperature sensor input");
 
-		private SensorSelect(final int element, final String description)
+		SensorSelect(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -310,7 +310,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		SensorConnection(1, "Sensor Connection"),
 		ControllerConnection(2, "Controller Connection");
 
-		private ActuatorConnectType(final int element, final String description)
+		ActuatorConnectType(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -322,7 +322,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Gas(2, "gas"),
 		SolidStateFuel(3, "solid state fuel");
 
-		private FuelType(final int element, final String description)
+		FuelType(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -333,7 +333,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		TwoStage(2, "2 stage"),
 		Modulating(3, "modulating");
 
-		private BurnerType(final int element, final String description)
+		BurnerType(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -346,7 +346,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Economy(3, "Economy"),
 		BuildingProtection(4, "Building Protection");
 
-		private HvacMode(final int element, final String description)
+		HvacMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -360,7 +360,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Reduced(3, "Reduced"),
 		OffOrFrostProtect(4, "Off / Frost Protect");
 
-		private DhwMode(final int element, final String description)
+		DhwMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -371,7 +371,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		ShiftLoadPriority(1, "Shift load priority"),
 		AbsoluteLoadPriority(2, "Absolute load priority");
 
-		private LoadPriority(final int element, final String description)
+		LoadPriority(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -398,7 +398,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		EmergencySteamMode(17, "Emergency Steam Mode"),
 		NoDem(20, "NoDem");
 
-		private HvacControlMode(final int element, final String description)
+		HvacControlMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -412,7 +412,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Shutdown(4, "Emergency Shutdown"),
 		Fire(5, "Emergency Fire");
 
-		private HvacEmergencyMode(final int element, final String description)
+		HvacEmergencyMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -423,7 +423,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		CoolingOnly(1, "Cooling Only"),
 		HeatingOnly(2, "Heating Only");
 
-		private ChangeoverMode(final int element, final String description)
+		ChangeoverMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -436,7 +436,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		CoolStageB(4, "Cool stage B for cooling with two stages (A + B)"),
 		HeatCool(5, "Heat/Cool for changeover applications");
 
-		private ValveMode(final int element, final String description)
+		ValveMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -448,7 +448,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		ExtractAir(3, "Extract Air, e.g. Variable Air Volume (VAV)"),
 		ExtractAir2(4, "Extract Air, e.g. Variable Air Volume (VAV)");
 
-		private DamperMode(final int element, final String description)
+		DamperMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -459,7 +459,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		HeatStageAProportional(2, "Heat Stage A Proportional"),
 		HeatStageBProportional(3, "Heat Stage B Proportional");
 
-		private HeaterMode(final int element, final String description)
+		HeaterMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -470,7 +470,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		PermanentlyRunning(1, "permanently running"),
 		Intervals(2, "running in intervals");
 
-		private FanMode(final int element, final String description)
+		FanMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -481,7 +481,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Master(1, "master"),
 		Slave(2, "slave");
 
-		private MasterSlaveMode(final int element, final String description)
+		MasterSlaveMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -492,7 +492,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Alternative(1, "alternative setpoint"),
 		BuildingProtection(2, "building protection setpoint");
 
-		private StatusRoomSetpoint(final int element, final String description)
+		StatusRoomSetpoint(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -518,7 +518,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Garbage(41, "garbage"),
 		VoidDeviceType(255, "void device type");
 
-		private MeteringDeviceType(final int element, final String description)
+		MeteringDeviceType(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -530,7 +530,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		AirDamper(1, "Air Damper"),
 		Vav(2, "VAV"); // Variable Air Volume
 
-		private AdaType(final int element, final String description)
+		AdaType(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -540,7 +540,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		BackupValue(0, "Backup Value"),
 		KeepLastState(1, "Keep Last State");
 
-		private BackupMode(final int element, final String description)
+		BackupMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -551,7 +551,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		SingleClose(1, "Single close"),
 		SingleOpen(2, "Single open");
 
-		private StartSynchronization(final int element, final String description)
+		StartSynchronization(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -566,7 +566,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		UpdatedValue(5, "updated value"),
 		ValueBeforeLocking(6, "value before locking");
 
-		private BehaviourLockUnlock(final int element, final String description)
+		BehaviourLockUnlock(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -579,7 +579,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		AdditionalParameter(3, "value according additional parameter"),
 		Last(4, "last (value before bus power down)");
 
-		private BehaviourBusPowerUpDown(final int element, final String description)
+		BehaviourBusPowerUpDown(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -603,7 +603,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Fade64s(14, "64,0 s"),
 		Fade90_5s(15, "90,5 s");
 
-		private DaliFadeTime(final int element, final String description)
+		DaliFadeTime(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -614,7 +614,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		WithoutAcknowledge(1, "Without Acknowledge"),
 		WithAcknowledge(2, "Blinking With Acknowledge ");
 
-		private BlinkingMode(final int element, final String description)
+		BlinkingMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -624,7 +624,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Automatic(0, "automatic light control"),
 		Manual(1, "manual light control");
 
-		private LightControlMode(final int element, final String description)
+		LightControlMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -634,7 +634,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		OnePB(1, "one PB/binary input mode"),
 		TwoPBs(2, "two PBs/binary inputs mode");
 
-		private SwitchPBModel(final int element, final String description)
+		SwitchPBModel(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -646,7 +646,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		SwitchOnSent(2, "Switch-On message sent"),
 		InfoOnOff(3, "inverse value of Info On/Off  is sent");
 
-		private SwitchPBAction(final int element, final String description)
+		SwitchPBAction(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -660,7 +660,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		OnePushButtonDimDown(3, "one push-button/binary input, Off/Dim-Down message sent"),
 		TwoPushButtons(4, "two push-buttons/binary inputs mode");
 
-		private LdsbMode(final int element, final String description)
+		LdsbMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -671,7 +671,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		AdditionalParameter(1, "value according additional parameter"),
 		LastReceivedSetvalue(2, "last received absolute setvalue");
 
-		private SwitchOnMode(final int element, final String description)
+		SwitchOnMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -682,7 +682,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		LeadingEdge(1, "leading edge (inductive load)"),
 		TrailingEdge(2, "trailing edge (capacitive load)");
 
-		private LoadTypeSet(final int element, final String description)
+		LoadTypeSet(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -694,7 +694,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		TrailingEdge(2, "trailing edge (capacitive load)"),
 		DetectionNotPossible(3, "detection not possible or error");
 
-		private LoadTypeDetected(final int element, final String description)
+		LoadTypeDetected(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -708,7 +708,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		AdditionalParameter(3, "value according additional parameter"),
 		Stop(4, "stop");
 
-		private SabExceptBehaviour(final int element, final String description)
+		SabExceptBehaviour(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -724,7 +724,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		UpdatedValue(5, "updated value"),
 		ValueBeforeLocking(6, "value before locking");
 
-		private SabBehaviourLockUnlock(final int element, final String description)
+		SabBehaviourLockUnlock(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -737,7 +737,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		OnePushButtonDown(3, "one push button/binary input: Move-Down/Step-Down message sent"),
 		TwoPushButtons(4, "two push buttons/binary inputs mode");
 
-		private SssbMode(final int element, final String description)
+		SssbMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -747,7 +747,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		AutomaticControl(0, "Automatic Control"),
 		ManualControl(1, "Manual Control");
 
-		private BlindsControlMode(final int element, final String description)
+		BlindsControlMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -761,7 +761,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		cEmiTransportLayer(6, "cEMI transport layer"),
 		NoLayer(0xff, "no layer");
 
-		private CommMode(final int element, final String description)
+		CommMode(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -778,7 +778,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		ExtRelativeTimestamp(6, "Extended relative timestamp"),
 		BiBat(7, "BiBat information");
 
-		private AddInfoType(final int element, final String description)
+		AddInfoType(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -790,7 +790,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		AsyncBiBatMaster(1, "Asynchronous BiBat master"),
 		AsyncBiBatSlave(2, "Asynchronous BiBat slave");
 
-		private RFModeSelect(final int element, final String description)
+		RFModeSelect(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -803,7 +803,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		SN(2, "filtering by KNX serial number table"),
 		DoAAndSN(3, "filtering by DoA and S/N table");
 
-		private RFFilterSelect(final int element, final String description)
+		RFFilterSelect(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -816,7 +816,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Released(2, "Break/Valve is released"),
 		Invalid(255, "invalid");
 
-		private MBusBreakerValveState(final int element, final String description)
+		MBusBreakerValveState(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -829,7 +829,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		BaseCondition(2, "at base condition"),
 		MeasurementCondition(3, "at measurement condition");
 
-		private GasMeasurementCondition(final int element, final String description)
+		GasMeasurementCondition(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
