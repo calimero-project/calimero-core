@@ -69,8 +69,6 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  */
 public class DPTXlator8BitEnum extends DPTXlator
 {
-	// ??? the translator does not include the system domain subtypes (they are not used anyway?)
-
 	// use a common base to store and access enumeration elements independent of specific type
 	private interface EnumBase<E extends EnumBase<E>>
 	{
@@ -755,6 +753,88 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
+	// 20.1000
+	public enum CommMode implements EnumBase<CommMode> {
+		DataLinkLayer(0, "Data link layer"),
+		Busmonitor(1, "Data link layer busmonitor"),
+		RawFrames(2, "Data link layer raw frames"),
+		cEmiTransportLayer(6, "cEMI transport layer"),
+		NoLayer(0xff, "no layer");
+
+		private CommMode(final int element, final String description)
+		{ //RP2
+			init(element, description);
+		} //RP1
+	}
+
+	// 20.1001
+	public enum AddInfoType implements EnumBase<AddInfoType> {
+		Reserved(0, "Reserved"),
+		PL(1, "PL medium DoA"),
+		RF(2, "RF control and S/N or DoA"),
+		Busmonitor(3, "Busmonitor error flags"),
+		RelativeTimestamp(4, "Relative timestamp"),
+		TimeDelay(5, "Time delay"),
+		ExtRelativeTimestamp(6, "Extended relative timestamp"),
+		BiBat(7, "BiBat information");
+
+		private AddInfoType(final int element, final String description)
+		{ //RP2
+			init(element, description);
+		} //RP1
+	}
+
+	// 20.1002
+	public enum RFModeSelect implements EnumBase<RFModeSelect> {
+		Async(0, "Asynchronous"),
+		AsyncBiBatMaster(1, "Asynchronous BiBat master"),
+		AsyncBiBatSlave(2, "Asynchronous BiBat slave");
+
+		private RFModeSelect(final int element, final String description)
+		{ //RP2
+			init(element, description);
+		} //RP1
+	}
+
+	// 20.1003
+	public enum RFFilterSelect implements EnumBase<RFFilterSelect> {
+		None(0, "no filter"),
+		DoA(1, "filtering by DoA"),
+		SN(2, "filtering by KNX serial number table"),
+		DoAAndSN(3, "filtering by DoA and S/N table");
+
+		private RFFilterSelect(final int element, final String description)
+		{ //RP2
+			init(element, description);
+		} //RP1
+	}
+
+	// 20.1200
+	public enum MBusBreakerValveState implements EnumBase<MBusBreakerValveState> {
+		Closed(0, "Breaker/Valve is closed"),
+		Open(1, "Breaker/Valve is open"),
+		Released(2, "Break/Valve is released"),
+		Invalid(255, "invalid");
+
+		private MBusBreakerValveState(final int element, final String description)
+		{ //RP2
+			init(element, description);
+		} //RP1
+	}
+
+	// 20.1202
+	public enum GasMeasurementCondition implements EnumBase<GasMeasurementCondition> {
+		Unknown(0, "unknown"),
+		TemperatureConverted(1, "temperature converted"),
+		BaseCondition(2, "at base condition"),
+		MeasurementCondition(3, "at measurement condition");
+
+		private GasMeasurementCondition(final int element, final String description)
+		{ //RP2
+			init(element, description);
+		} //RP1
+	}
+
 	//
 	// End of enumerations
 	//
@@ -919,6 +999,24 @@ public class DPTXlator8BitEnum extends DPTXlator
 			SssbMode.class, "1", "4");
 	public static final EnumDpt<BlindsControlMode> DPT_BlindsControlMode = new EnumDpt<>("20.804",
 			"Blinds Control Mode", BlindsControlMode.class, "0", "1");
+
+	// System domain
+
+	public static final EnumDpt<CommMode> DPT_CommMode = new EnumDpt<>("20.1000", "Comm Mode",
+			CommMode.class, "0", "255");
+	public static final EnumDpt<AddInfoType> DPT_AddInfoType = new EnumDpt<>("20.1001",
+			"Additional Info Type", AddInfoType.class, "0", "7");
+	public static final EnumDpt<RFModeSelect> DPT_RFModeSelect = new EnumDpt<>("20.1002",
+			"RF Mode Select", RFModeSelect.class, "0", "2");
+	public static final EnumDpt<RFFilterSelect> DPT_RFFilterSelect = new EnumDpt<>("20.1003",
+			"RF Filter Select", RFFilterSelect.class, "0", "3");
+
+	// Metering domain
+
+	public static final EnumDpt<MBusBreakerValveState> DPT_MBusBreakerValveState = new EnumDpt<>(
+			"20.1200", "M-Bus Breaker/Valve State", MBusBreakerValveState.class, "0", "255");
+	public static final EnumDpt<GasMeasurementCondition> DPT_GasMeasurementCondition = new EnumDpt<>(
+			"20.1202", "Gas Measurement Condition", GasMeasurementCondition.class, "0", "3");
 
 	private static final Map<String, DPT> types;
 
