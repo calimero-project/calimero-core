@@ -98,7 +98,7 @@ public class LocalDeviceMgmtAdapter extends LocalDeviceManagement
 	}
 
 	/**
-	 * {@inheritDoc} The name for this adapter starts with "local DM " + KNXnet/IP server control
+	 * {@inheritDoc} The name for this adapter starts with "Local-DM " + KNXnet/IP server control
 	 * endpoint, allowing easier distinction of adapter types.
 	 */
 	@Override

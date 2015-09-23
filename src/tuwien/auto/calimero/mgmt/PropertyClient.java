@@ -464,7 +464,8 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	public PropertyClient(final PropertyAdapter adapter) throws KNXFormatException
 	{
 		pa = adapter;
-		local = pa.getName().startsWith("local");
+		local = adapter instanceof LocalDeviceManagement
+				|| pa.getName().toLowerCase().startsWith("local");
 		try {
 			tObjType = new DPTXlator2ByteUnsigned(DPTXlator2ByteUnsigned.DPT_PROP_DATATYPE);
 		}

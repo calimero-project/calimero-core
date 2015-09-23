@@ -149,7 +149,7 @@ public class LocalDeviceManagementUsb extends LocalDeviceManagement
 	}
 
 	/**
-	 * {@inheritDoc} The name for this adapter starts with "local DM " + USB connection name.
+	 * {@inheritDoc} The name for this adapter starts with "Local-DM " + USB connection name.
 	 */
 	@Override
 	public String getName()
