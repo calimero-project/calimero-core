@@ -279,6 +279,14 @@ public final class Util
 	 */
 	public static String getPath()
 	{
-		return "./test/";
+		return "test/resources/";
+	}
+
+	/**
+	 * @return the base output directory used for unit testing
+	 */
+	public static String getTargetPath()
+	{
+		return "target/";
 	}
 }

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -62,7 +62,6 @@ import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
 public class PropertyClientTest extends TestCase
 {
 	private static final String PIDResource = Util.getPath() + "properties.xml";
-	private static final String PIDResourceSave = Util.getPath() + "propertiesSaved.xml";
 
 	private KNXNetworkLink lnk;
 	private PropertyClient rem;
@@ -187,31 +186,6 @@ public class PropertyClientTest extends TestCase
 				assertNotNull(s);
 			System.out.println(i + " = " + s);
 		}
-	}
-
-	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#loadDefinitions(String,
-	 * tuwien.auto.calimero.mgmt.PropertyClient.ResourceHandler)}.
-	 *
-	 * @throws KNXException
-	 */
-	public final void testLoadDefinitions() throws KNXException
-	{
-		PropertyClient.loadDefinitions(PIDResource, null);
-	}
-
-	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#saveDefinitions(String,
-	 * Collection, tuwien.auto.calimero.mgmt.PropertyClient.ResourceHandler)}.
-	 *
-	 * @throws KNXException
-	 */
-	public final void testSaveDefinitions() throws KNXException
-	{
-		PropertyClient.saveDefinitions(PIDResourceSave, new ArrayList(), null);
-
-		final Collection c = PropertyClient.loadDefinitions(PIDResource, null);
-		PropertyClient.saveDefinitions(PIDResourceSave, c, null);
 	}
 
 	/**
