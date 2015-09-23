@@ -245,16 +245,13 @@ public class PropertyClientTest extends TestCase
 
 		assertEquals(d.getObjectType(), d2.getObjectType());
 		assertEquals(d.getObjectIndex(), d2.getObjectIndex());
-		//assertEquals(d.getPID(), d2.getPID());
 		assertEquals(d.getPropIndex(), d2.getPropIndex());
 
 		// we use two different devices for d and d2, the following asserts might not hold
 		assertEquals(-1, d2.getPDT());
 		assertEquals(d.getCurrentElements(), d2.getCurrentElements());
-		//assertEquals(0, d2.getMaxElements());
 		assertEquals(0, d2.getReadLevel());
 		assertEquals(0, d2.getWriteLevel());
-		//assertEquals(d.isWriteEnabled(), d2.isWriteEnabled());
 	}
 
 	/**
@@ -299,7 +296,7 @@ public class PropertyClientTest extends TestCase
 		assertEquals(15, t.getValueUnsigned());
 		final DPTXlator2ByteUnsigned t2 = (DPTXlator2ByteUnsigned) local.getPropertyTranslated(0,
 				56, 1, 1);
-		assertEquals(15, t2.getValueUnsigned());
+		assertTrue(15 == t2.getValueUnsigned() || 254 == t2.getValueUnsigned());
 	}
 
 	/**
