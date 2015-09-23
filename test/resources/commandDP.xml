@@ -1,0 +1,5 @@
+<datapoint stateBased="false" name="testSave" mainNumber="4"
+	dptID="4.001" priority="low">
+	<!-- 3/2/1 -->
+	<knxAddress type="group">6657</knxAddress>
+</datapoint>

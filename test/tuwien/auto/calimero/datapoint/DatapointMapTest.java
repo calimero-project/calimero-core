@@ -54,7 +54,7 @@ import tuwien.auto.calimero.xml.XmlWriter;
  */
 public class DatapointMapTest extends TestCase
 {
-	private static final String dpFile = Util.getPath() + "datapointMap.xml";
+	private static final String dpFile = Util.getTargetPath() + "datapointMap.xml";
 
 	private DatapointModel<Datapoint> m;
 	private final GroupAddress ga1 = new GroupAddress(1, 1, 1);

@@ -57,7 +57,6 @@ import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
 public class PropertyClientTest extends TestCase
 {
 	private static final String PIDResource = Util.getPath() + "properties.xml";
-//	private static final String PIDResourceSave = Util.getPath() + "propertiesSaved.xml";
 
 	private KNXNetworkLink lnk;
 	private PropertyClient rem;

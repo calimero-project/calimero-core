@@ -56,7 +56,8 @@ import tuwien.auto.calimero.xml.XmlWriter;
 public class StateDPTest extends TestCase
 {
 	private static final GroupAddress ga = new GroupAddress(3, 2, 1);
-	private static final String dpFile = Util.getPath() + "stateDP.xml";
+	private static final String filename = "stateDP.xml";
+	private static final String dpFile = Util.getTargetPath() + filename;
 
 	private List<GroupAddress> inv;
 	private List<GroupAddress> upd;
@@ -197,7 +198,7 @@ public class StateDPTest extends TestCase
 	 */
 	public final void testCreate() throws KNXMLException
 	{
-		final XmlReader r = XmlInputFactory.newInstance().createXMLReader(dpFile);
+		final XmlReader r = XmlInputFactory.newInstance().createXMLReader(Util.getPath() + filename);
 		assertTrue(Datapoint.create(r) instanceof StateDP);
 		r.close();
 	}

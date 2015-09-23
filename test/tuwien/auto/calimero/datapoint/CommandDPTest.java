@@ -51,7 +51,8 @@ import tuwien.auto.calimero.xml.XmlWriter;
 public class CommandDPTest extends TestCase
 {
 	private static final GroupAddress ga = new GroupAddress(3, 2, 1);
-	private static final String dpFile = Util.getPath() + "commandDP.xml";
+	private static final String filename = "commandDP.xml";
+	private static final String dpFile = Util.getTargetPath() + filename;
 
 	/**
 	 * @param name
@@ -147,7 +148,7 @@ public class CommandDPTest extends TestCase
 	 */
 	public final void testCreate() throws KNXMLException
 	{
-		final XmlReader r = XmlInputFactory.newInstance().createXMLReader(dpFile);
+		final XmlReader r = XmlInputFactory.newInstance().createXMLReader(Util.getPath() + filename);
 		assertTrue(Datapoint.create(r) instanceof CommandDP);
 		r.close();
 	}

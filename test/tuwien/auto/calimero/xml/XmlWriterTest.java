@@ -55,7 +55,7 @@ import tuwien.auto.calimero.Util;
  */
 public class XmlWriterTest extends TestCase
 {
-	private static final String file = Util.getPath() + "write.xml";
+	private static final String file = Util.getTargetPath() + "write.xml";
 	private Writer out;
 	private XmlWriter w, w2;
 	private ByteArrayOutputStream stream;

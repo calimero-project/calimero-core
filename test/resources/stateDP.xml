@@ -1,0 +1,20 @@
+<datapoint stateBased="true" name="testSave2" mainNumber="0"
+	dptID="" priority="low">
+	<!-- 3/2/1 -->
+	<knxAddress type="group">6657</knxAddress>
+	<expiration timeout="15" />
+	<updatingAddresses>
+		<!-- 4/4/4 -->
+		<knxAddress type="group">9220</knxAddress>
+		<!-- 5/5/5 -->
+		<knxAddress type="group">11525</knxAddress>
+	</updatingAddresses>
+	<invalidatingAddresses>
+		<!-- 1/1/1 -->
+		<knxAddress type="group">2305</knxAddress>
+		<!-- 2/2/2 -->
+		<knxAddress type="group">4610</knxAddress>
+		<!-- 3/3/3 -->
+		<knxAddress type="group">6915</knxAddress>
+	</invalidatingAddresses>
+</datapoint>
