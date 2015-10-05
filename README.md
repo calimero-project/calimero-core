@@ -15,10 +15,10 @@ Download
 
 ~~~ sh
 # Either using git
-$ git clone https://github.com/calimero-project/calimero.git calimero-core
+$ git clone https://github.com/calimero-project/calimero-core.git
 
 # Or using hub
-$ hub clone calimero-project/calimero calimero-core
+$ hub clone calimero-project/calimero-core
 ~~~
 
 Supported Features
@@ -70,13 +70,13 @@ Supported Features
 * 232.x - RGB color value
 
 ### Busmonitor
-Access via KNXnet/IP, KNX USB, and FT1.2
+Access via KNXnet/IP, KNX USB, TP-UART, and FT1.2
 
 #### Raw Frame Decoding
 * TP1
 * KNX IP
 * PL110
-* PL132
+* PL132 (phased out)
 * RF
 
 ### Management
