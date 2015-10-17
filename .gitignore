@@ -20,5 +20,6 @@ calimero-core.iml
 
 #Maven
 target
-test
+test/commandDP.xml
+test/stateDP.xml
 

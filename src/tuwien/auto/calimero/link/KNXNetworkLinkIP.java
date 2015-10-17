@@ -56,6 +56,8 @@ import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 
+import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TUNNEL_LAYER.LINK_LAYER;
+
 /**
  * Implementation of the KNX network link based on the KNXnet/IP protocol, using a
  * {@link KNXnetIPConnection}.
@@ -138,7 +140,7 @@ public class KNXNetworkLinkIP extends AbstractLink
 				catch (final UnknownHostException e) {
 					throw new KNXException("no local host available");
 				}
-			conn = new KNXnetIPTunnel(KNXnetIPTunnel.LINK_LAYER, local, remoteEP, useNAT);
+			conn = new KNXnetIPTunnel(LINK_LAYER, local, remoteEP, useNAT);
 			break;
 		case ROUTING:
 			NetworkInterface netIf = null;

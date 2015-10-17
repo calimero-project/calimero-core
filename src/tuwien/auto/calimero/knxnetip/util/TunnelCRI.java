@@ -39,6 +39,9 @@ package tuwien.auto.calimero.knxnetip.util;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
+import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TUNNEL_LAYER;
+
+import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TUNNEL_CONNECTION;
 
 /**
  * Connection request information used for KNX tunneling connection.
@@ -61,7 +64,7 @@ public class TunnelCRI extends CRI
 	public TunnelCRI(final byte[] data, final int offset) throws KNXFormatException
 	{
 		super(data, offset);
-		if (getConnectionType() != KNXnetIPTunnel.TUNNEL_CONNECTION)
+		if (getConnectionType() != TUNNEL_CONNECTION)
 			throw new KNXFormatException("not a tunneling CRI", getConnectionType());
 		if (getStructLength() != 4)
 			throw new KNXFormatException("wrong length for tunneling CRI");
@@ -70,14 +73,12 @@ public class TunnelCRI extends CRI
 	/**
 	 * Creates a new CRI for tunnel connection type on the given KNX layer.
 	 * <p>
-	 * 
+	 *
 	 * @param knxLayer KNX layer specifying the kind of tunnel, e.g., link layer tunnel
 	 */
-	public TunnelCRI(final int knxLayer)
+	public TunnelCRI(final TUNNEL_LAYER knxLayer)
 	{
-		super(KNXnetIPTunnel.TUNNEL_CONNECTION, new byte[] { (byte) knxLayer, 0 });
-		if (knxLayer < 0 || knxLayer > 0xff)
-			throw new KNXIllegalArgumentException("KNX layer out of range [0..255]");
+		super(TUNNEL_CONNECTION, new byte[] { knxLayer.getCode(), 0 });
 	}
 
 	/**
@@ -91,7 +92,7 @@ public class TunnelCRI extends CRI
 	 */
 	TunnelCRI(final byte[] optionalData)
 	{
-		super(KNXnetIPTunnel.TUNNEL_CONNECTION, optionalData.clone());
+		super(TUNNEL_CONNECTION, optionalData.clone());
 		if (getStructLength() != 4)
 			throw new KNXIllegalArgumentException("wrong length for tunneling CRI");
 	}

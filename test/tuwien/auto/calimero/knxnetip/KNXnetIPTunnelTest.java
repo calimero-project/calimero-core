@@ -56,6 +56,9 @@ import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIBusMon;
 import tuwien.auto.calimero.cemi.CEMILData;
 
+import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TUNNEL_LAYER.BUS_MONITOR_LAYER;
+import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TUNNEL_LAYER.LINK_LAYER;
+
 /**
  * @author B. Malinowsky
  */
@@ -394,13 +397,13 @@ public class KNXnetIPTunnelTest extends TestCase
 	 */
 	public final void testKNXnetIPTunnel() throws KNXException, InterruptedException
 	{
-		try (final KNXnetIPConnection c = new KNXnetIPTunnel(KNXnetIPTunnel.LINK_LAYER, null,
+		try (final KNXnetIPConnection c = new KNXnetIPTunnel(LINK_LAYER, null,
 				new InetSocketAddress("127.0.0.1", 4000), false)) {
 			fail("local socket is null");
 		}
 		catch (final KNXIllegalArgumentException e) {}
 
-		try (final KNXnetIPConnection c = new KNXnetIPTunnel(KNXnetIPTunnel.LINK_LAYER,
+		try (final KNXnetIPConnection c = new KNXnetIPTunnel(LINK_LAYER,
 				new InetSocketAddress("0.0.0.0", 0), new InetSocketAddress("127.0.0.1", 4000),
 				false)) {
 			fail("wildcard for local socket not null");
@@ -505,21 +508,21 @@ public class KNXnetIPTunnelTest extends TestCase
 
 	private void newTunnel() throws KNXException, InterruptedException
 	{
-		t = new KNXnetIPTunnel(KNXnetIPTunnel.LINK_LAYER, Util.getLocalHost(), Util.getServer(),
+		t = new KNXnetIPTunnel(LINK_LAYER, Util.getLocalHost(), Util.getServer(),
 				false);
 		t.addConnectionListener(l);
 	}
 
 	private void newNATTunnel() throws KNXException, InterruptedException
 	{
-		tnat = new KNXnetIPTunnel(KNXnetIPTunnel.LINK_LAYER, Util.getLocalHost(), Util.getServer(),
+		tnat = new KNXnetIPTunnel(LINK_LAYER, Util.getLocalHost(), Util.getServer(),
 				true);
 		tnat.addConnectionListener(lnat);
 	}
 
 	private void newMonitor() throws KNXException, InterruptedException
 	{
-		mon = new KNXnetIPTunnel(KNXnetIPTunnel.BUSMONITOR_LAYER, Util.getLocalHost(),
+		mon = new KNXnetIPTunnel(BUS_MONITOR_LAYER, Util.getLocalHost(),
 				Util.getServer(), false);
 		mon.addConnectionListener(lmon);
 	}
