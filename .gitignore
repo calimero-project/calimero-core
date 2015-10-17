@@ -13,3 +13,12 @@
 
 # OS X
 .DS_Store
+
+#Intellij
+calimero-core.iml
+.idea
+
+#Maven
+target
+test
+
