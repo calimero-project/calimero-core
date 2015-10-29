@@ -45,7 +45,7 @@ import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 
-import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TUNNEL_LAYER.BUS_MONITOR_LAYER;
+import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.BusMonitorLayer;
 
 /**
  * Implementation of the KNX network monitor link based on the KNXnet/IP protocol, using a
@@ -77,7 +77,7 @@ public class KNXNetworkMonitorIP extends AbstractMonitor
 		final boolean useNAT, final KNXMediumSettings settings)
 			throws KNXException, InterruptedException
 	{
-		this(new KNXnetIPTunnel(BUS_MONITOR_LAYER, localEndpoint(localEP), remoteEP,
+		this(new KNXnetIPTunnel(BusMonitorLayer, localEndpoint(localEP), remoteEP,
 				useNAT), settings);
 		logger.info("in busmonitor mode - ready to receive");
 		((KNXnetIPTunnel) super.conn).addConnectionListener(notifier);
