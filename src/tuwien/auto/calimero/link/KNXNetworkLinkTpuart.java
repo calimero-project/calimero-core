@@ -151,6 +151,11 @@ public class KNXNetworkLinkTpuart extends AbstractLink
 	protected void onSend(final CEMILData msg, final boolean waitForCon)
 	{}
 
+	protected void onClose()
+	{
+		c.close();
+	}
+
 	// if possible, add this link to the list of addresses to acknowledge
 	private static Collection ensureDeviceAck(final KNXMediumSettings settings,
 		final Collection acknowledge)

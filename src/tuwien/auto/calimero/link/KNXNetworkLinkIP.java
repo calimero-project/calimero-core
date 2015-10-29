@@ -128,7 +128,7 @@ public class KNXNetworkLinkIP extends AbstractLink
 		final InetSocketAddress remoteEP, final boolean useNAT, final KNXMediumSettings settings)
 		throws KNXException, InterruptedException
 	{
-		super(createLinkName(remoteEP), settings);
+		super(null, createLinkName(remoteEP), settings);
 		switch (serviceMode) {
 		case TUNNELING:
 			InetSocketAddress local = localEP;
@@ -208,7 +208,7 @@ public class KNXNetworkLinkIP extends AbstractLink
 	protected KNXNetworkLinkIP(final int serviceMode, final KNXnetIPConnection c,
 		final KNXMediumSettings settings)
 	{
-		super(createLinkName(c.getRemoteAddress()), settings);
+		super(null, createLinkName(c.getRemoteAddress()), settings);
 		cEMI = true;
 
 		mode = serviceMode;

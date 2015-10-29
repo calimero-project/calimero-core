@@ -101,7 +101,7 @@ public class KNXNetworkLinkFT12 extends AbstractLink
 	protected KNXNetworkLinkFT12(final FT12Connection c, final KNXMediumSettings settings)
 		throws KNXException
 	{
-		super(c.getPortID(), settings);
+		super(null, c.getPortID(), settings);
 		cEMI = false;
 		sendCEmiAsByteArray = true;
 		conn = c;
