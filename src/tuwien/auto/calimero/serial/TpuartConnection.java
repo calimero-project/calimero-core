@@ -422,11 +422,15 @@ public class TpuartConnection implements AutoCloseable
 		return ~cs;
 	}
 
-	private static boolean isValidChecksum(final byte[] frame)
+	private boolean isValidChecksum(final byte[] frame)
 	{
 		final byte[] copy = Arrays.copyOf(frame, frame.length - 1);
 		final int cs = checksum(copy);
-		final boolean valid = frame[frame.length - 1] == cs;
+		final int expected = frame[frame.length - 1];
+		final boolean valid = expected == cs;
+		if (!valid)
+			logger.warn("invalid L-Data checksum 0x" + Integer.toHexString(cs & 0xff) + ", expected 0x"
+					+ Integer.toHexString(expected & 0xff));
 		return valid;
 	}
 
@@ -679,8 +683,7 @@ public class TpuartConnection implements AutoCloseable
 		private byte[] createLData(final int mc, final byte[] tp1)
 		{
 			// TODO allow return of null, and ignore frames with invalid checksum
-			if (!isValidChecksum(tp1))
-				logger.warn("invalid L-Data checksum");
+			isValidChecksum(tp1);
 
 			final boolean std = (tp1[0] & StdFrameFormat) == StdFrameFormat;
 			final byte[] ind = new byte[tp1.length + (std ? 2 : 1)];
