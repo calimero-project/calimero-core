@@ -57,9 +57,18 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  */
 public final class LogService
 {
-	// Enumeration of the supported slf4j log levels
-	public static enum LogLevel {
-		ERROR, WARN, INFO, DEBUG, TRACE
+	/** Enumeration of the supported slf4j log levels. */
+	public enum LogLevel {
+		/** Error level. */
+		ERROR,
+		/** Warn level. */
+		WARN,
+		/** Info level. */
+		INFO,
+		/** Debug level. */
+		DEBUG,
+		/** Trace level. */
+		TRACE
 	}
 
 	private static final String loggerThreadName = "Calimero Async Logging";
@@ -203,6 +212,7 @@ public final class LogService
 	 * @param msg the message to be logged
 	 * @deprecated Used for transition to slf4j.
 	 */
+	@Deprecated
 	public static void logAlways(final Logger logger, final String msg)
 	{
 		logger.info(msg);
