@@ -14,12 +14,6 @@
 # OS X
 .DS_Store
 
-#Intellij
+# IntelliJ
 calimero-core.iml
 .idea
-
-#Maven
-target
-test/commandDP.xml
-test/stateDP.xml
-
