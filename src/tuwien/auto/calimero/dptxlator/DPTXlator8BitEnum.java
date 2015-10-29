@@ -1096,7 +1096,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 	 * Returns the first translation item.
 	 *
 	 * @return element as unsigned 8 Bit
-	 * @throws KNXFormatException
+	 * @throws KNXFormatException on formatting datapoint value
 	 * @see #getType()
 	 */
 	public final int getValueUnsigned() throws KNXFormatException
