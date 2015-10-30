@@ -38,7 +38,9 @@ package tuwien.auto.calimero.serial;
 
 import java.util.Arrays;
 
+import category.RequireFT12Connection;
 import junit.framework.TestCase;
+import org.junit.experimental.categories.Category;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.Util;
 
@@ -47,6 +49,7 @@ import tuwien.auto.calimero.Util;
  * 
  * @author B. Malinowsky
  */
+@Category(RequireFT12Connection.class)
 public class FT12ConnectionTest extends TestCase
 {
 	private static int usePort = Util.getSerialPort();

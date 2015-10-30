@@ -36,7 +36,9 @@
 
 package tuwien.auto.calimero.process;
 
+import category.RequireKNXNetworkLink;
 import junit.framework.TestCase;
+import org.junit.experimental.categories.Category;
 import tuwien.auto.calimero.DetachEvent;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.KNXException;
@@ -55,6 +57,7 @@ import tuwien.auto.calimero.link.medium.TPSettings;
 /**
  * @author B. Malinowsky
  */
+@Category(RequireKNXNetworkLink.class)
 public class ProcessCommunicatorTest extends TestCase
 {
 	private ProcessCommunicator pc;

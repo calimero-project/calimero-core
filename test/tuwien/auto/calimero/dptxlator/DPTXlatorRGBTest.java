@@ -37,10 +37,12 @@
 package tuwien.auto.calimero.dptxlator;
 
 import junit.framework.TestCase;
+import org.junit.Ignore;
 
 /**
  * @author B. Malinowsky
  */
+@Ignore
 public class DPTXlatorRGBTest extends TestCase
 {
 	/**

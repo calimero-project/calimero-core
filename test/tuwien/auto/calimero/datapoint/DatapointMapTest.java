@@ -41,6 +41,7 @@ import java.util.Collection;
 import java.util.List;
 
 import junit.framework.TestCase;
+import org.junit.Ignore;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.xml.KNXMLException;
@@ -52,6 +53,7 @@ import tuwien.auto.calimero.xml.XmlWriter;
 /**
  * @author B. Malinowsky
  */
+@Ignore
 public class DatapointMapTest extends TestCase
 {
 	private static final String dpFile = Util.getTargetPath() + "datapointMap.xml";

@@ -38,7 +38,9 @@ package tuwien.auto.calimero.buffer;
 
 import java.util.Date;
 
+import category.RequireKNXNetworkLink;
 import junit.framework.TestCase;
+import org.junit.experimental.categories.Category;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalStateException;
@@ -57,6 +59,7 @@ import tuwien.auto.calimero.process.ProcessCommunicatorImpl;
 /**
  * @author B. Malinowsky
  */
+@Category(RequireKNXNetworkLink.class)
 public class NetworkBufferTest extends TestCase
 {
 	private KNXNetworkLink lnk;
