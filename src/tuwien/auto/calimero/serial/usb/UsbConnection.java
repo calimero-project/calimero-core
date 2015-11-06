@@ -40,6 +40,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
@@ -250,9 +251,10 @@ public class UsbConnection implements AutoCloseable
 			final String dir = DescriptorUtils.getDirectionName(epaddr);
 
 			final byte[] data = event.getData();
-			logger.trace("EP {} {} I/O request {}", idx, dir, DataUnitBuilder.toHex(data, ""));
 			try {
 				final HidReport r = new HidReport(data);
+				logger.trace("EP {} {} I/O request {}", idx, dir, DataUnitBuilder.toHex(
+						Arrays.copyOfRange(data, 0, r.getReportHeader().getDataLength() + 3), ""));
 				final TransferProtocolHeader tph = r.getTransferProtocolHeader();
 				if (tph == null)
 					assemblePartialPackets(r);
@@ -272,7 +274,7 @@ public class UsbConnection implements AutoCloseable
 							DataUnitBuilder.toHex(data, ""));
 			}
 			catch (final KNXFormatException | RuntimeException e) {
-				logger.error("creating HID class report", e);
+				logger.error("creating HID class report from {}", DataUnitBuilder.toHex(data, ""), e);
 			}
 		}
 
@@ -437,7 +439,8 @@ public class UsbConnection implements AutoCloseable
 	{
 		try {
 			final byte[] data = report.toByteArray();
-			logger.trace("sending I/O request {}", DataUnitBuilder.toHex(data, ""));
+			logger.trace("sending I/O request {}", DataUnitBuilder.toHex(
+					Arrays.copyOfRange(data, 0, report.getReportHeader().getDataLength() + 3), ""));
 			out.syncSubmit(data);
 		}
 		catch (final UsbException | UsbNotActiveException | UsbNotClaimedException
