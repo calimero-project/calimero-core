@@ -36,11 +36,15 @@
 
 package tuwien.auto.calimero.knxnetip;
 
+import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.BusMonitorLayer;
+import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.RawLayer;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
+import java.util.Objects;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.KNXException;
@@ -78,55 +82,76 @@ public class KNXnetIPTunnel extends ClientConnection
 	 */
 	public static final int TUNNEL_CONNECTION = 0x04;
 
-	/**
-	 * Tunneling on busmonitor layer, establishes a busmonitor tunnel to the KNX network.
-	 */
-	public static final int BUSMONITOR_LAYER = 0x80;
 
-	/**
-	 * Tunneling on link layer, establishes a link layer tunnel to the KNX network.
-	 */
-	public static final int LINK_LAYER = 0x02;
+	public enum TunnelingLayer {
+		/**
+		 * Tunneling on busmonitor layer, establishes a busmonitor tunnel to the KNX network.
+		 */
+		BusMonitorLayer(0x80),
+		/**
+		 * Tunneling on link layer, establishes a link layer tunnel to the KNX network.
+		 */
+		LinkLayer(0x02),
+		/**
+		 * Tunneling on raw layer, establishes a raw tunnel to the KNX network.
+		 */
+		RawLayer(0x04);
 
-	/**
-	 * Tunneling on raw layer, establishes a raw tunnel to the KNX network.
-	 */
-	public static final int RAW_LAYER = 0x04;
+		private final int code;
+
+//		public static TunnelingLayer from(final int layer)
+//		{
+//			for (final TunnelingLayer v : TunnelingLayer.values())
+//				if (layer == v.code)
+//					return v;
+////			return null;
+//			throw new KNXIllegalArgumentException(
+//					"unspecified tunneling layer + 0x" + Integer.toHexString(layer));
+//		}
+
+		TunnelingLayer(final int code) {
+			this.code = code;
+		}
+
+		public final int getCode() {
+			return code;
+		}
+	}
 
 	// client SHALL wait 1 second for acknowledgment response to a
 	// tunneling request from server
 	private static final int TUNNELING_REQ_TIMEOUT = 1;
 
-	private final int layer;
+	private final TunnelingLayer layer;
 
 	/**
 	 * Creates a new KNXnet/IP tunneling connection to a remote server.
 	 * <p>
-	 * Establishing a raw tunneling layer ({@link #RAW_LAYER}) is not supported yet.<br>
+	 * Establishing a raw tunneling layer (
+	 * {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer#RawLayer}) is not
+	 * supported yet.<br>
 	 *
-	 * @param knxLayer KNX tunneling layer (e.g. {@link #LINK_LAYER})
-	 * @param localEP specifies the local endpoint with the socket address to be used by
-	 *        the tunnel
+	 * @param knxLayer KNX tunneling layer (e.g. {@link TunnelingLayer#LinkLayer})
+	 * @param localEP specifies the local endpoint with the socket address to be used by the tunnel
 	 * @param serverCtrlEP control endpoint of the server to establish connection to
 	 * @param useNAT <code>true</code> to use a NAT (network address translation) aware
 	 *        communication mechanism, <code>false</code> to use the default way
 	 * @throws KNXException on socket communication error
 	 * @throws KNXTimeoutException on no connect response before connect timeout
-	 * @throws KNXRemoteException if response indicates an error condition at the server
-	 *         concerning the request
+	 * @throws KNXRemoteException if response indicates an error condition at the server concerning
+	 *         the request
 	 * @throws KNXInvalidResponseException if connect response is in wrong format
-	 * @throws InterruptedException on interrupted thread while creating tunneling
-	 *         connection
+	 * @throws InterruptedException on interrupted thread while creating tunneling connection
 	 */
-	public KNXnetIPTunnel(final int knxLayer, final InetSocketAddress localEP,
+	public KNXnetIPTunnel(final TunnelingLayer knxLayer, final InetSocketAddress localEP,
 		final InetSocketAddress serverCtrlEP, final boolean useNAT) throws KNXException,
 		InterruptedException
 	{
 		super(KNXnetIPHeader.TUNNELING_REQ, KNXnetIPHeader.TUNNELING_ACK, 2, TUNNELING_REQ_TIMEOUT);
-		if (knxLayer == RAW_LAYER)
-			throw new KNXIllegalArgumentException("raw tunnel to KNX network not supported");
-		if (knxLayer != LINK_LAYER && knxLayer != BUSMONITOR_LAYER)
-			throw new KNXIllegalArgumentException("unknown KNX layer");
+		if (Objects.isNull(knxLayer))
+			throw new NullPointerException("Tunneling Layer");
+		if (knxLayer == RawLayer)
+			throw new KNXIllegalArgumentException("Raw tunnel to KNX network not supported: " + knxLayer);
 		layer = knxLayer;
 		connect(localEP, serverCtrlEP, new TunnelCRI(knxLayer), useNAT);
 	}
@@ -143,7 +168,7 @@ public class KNXnetIPTunnel extends ClientConnection
 	public void send(final CEMI frame, final BlockingMode mode) throws KNXTimeoutException,
 		KNXConnectionClosedException
 	{
-		if (layer == BUSMONITOR_LAYER)
+		if (layer == BusMonitorLayer)
 			throw new KNXIllegalStateException("send not permitted in busmonitor mode");
 		if (!(frame instanceof CEMILData))
 			throw new KNXIllegalArgumentException("unsupported cEMI type");

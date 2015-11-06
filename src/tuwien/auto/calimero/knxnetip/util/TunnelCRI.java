@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,14 +36,16 @@
 
 package tuwien.auto.calimero.knxnetip.util;
 
+import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TUNNEL_CONNECTION;
+
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
+import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
 
 /**
  * Connection request information used for KNX tunneling connection.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public class TunnelCRI extends CRI
@@ -52,7 +54,7 @@ public class TunnelCRI extends CRI
 	 * Creates a new CRI for tunnel connection type out of a byte array.
 	 * <p>
 	 * The CRI structure has a length of 4 bytes.<br>
-	 * 
+	 *
 	 * @param data byte array containing a CRI structure,
 	 *        <code>data.length - offset = 4</code>
 	 * @param offset start offset of CRI in <code>data</code>
@@ -61,7 +63,7 @@ public class TunnelCRI extends CRI
 	public TunnelCRI(final byte[] data, final int offset) throws KNXFormatException
 	{
 		super(data, offset);
-		if (getConnectionType() != KNXnetIPTunnel.TUNNEL_CONNECTION)
+		if (getConnectionType() != TUNNEL_CONNECTION)
 			throw new KNXFormatException("not a tunneling CRI", getConnectionType());
 		if (getStructLength() != 4)
 			throw new KNXFormatException("wrong length for tunneling CRI");
@@ -70,28 +72,26 @@ public class TunnelCRI extends CRI
 	/**
 	 * Creates a new CRI for tunnel connection type on the given KNX layer.
 	 * <p>
-	 * 
+	 *
 	 * @param knxLayer KNX layer specifying the kind of tunnel, e.g., link layer tunnel
 	 */
-	public TunnelCRI(final int knxLayer)
+	public TunnelCRI(final TunnelingLayer knxLayer)
 	{
-		super(KNXnetIPTunnel.TUNNEL_CONNECTION, new byte[] { (byte) knxLayer, 0 });
-		if (knxLayer < 0 || knxLayer > 0xff)
-			throw new KNXIllegalArgumentException("KNX layer out of range [0..255]");
+		super(TUNNEL_CONNECTION, new byte[] { (byte) knxLayer.getCode(), 0 });
 	}
 
 	/**
 	 * Creates a CRI for tunnel connection type containing optional data.
 	 * <p>
 	 * Note, the optional data field contains the KNX tunnel layer.<br>
-	 * 
+	 *
 	 * @param optionalData byte array containing tunneling host protocol data, this
 	 *        information is located starting at offset 2 in the CRI structure,
 	 *        <code>optionalData.length</code> = 2
 	 */
 	TunnelCRI(final byte[] optionalData)
 	{
-		super(KNXnetIPTunnel.TUNNEL_CONNECTION, optionalData.clone());
+		super(TUNNEL_CONNECTION, optionalData.clone());
 		if (getStructLength() != 4)
 			throw new KNXIllegalArgumentException("wrong length for tunneling CRI");
 	}
@@ -99,7 +99,7 @@ public class TunnelCRI extends CRI
 	/**
 	 * Returns the KNX tunneling layer.
 	 * <p>
-	 * 
+	 *
 	 * @return layer value as unsigned byte
 	 */
 	public final int getKNXLayer()
@@ -107,10 +107,20 @@ public class TunnelCRI extends CRI
 		return opt[0] & 0xFF;
 	}
 
+//	/**
+//	 * Returns the requested tunneling layer.
+//	 *
+//	 * @return tunneling layer
+//	 */
+//	public final TunnelingLayer getLayer()
+//	{
+//		return TunnelingLayer.from(getKNXLayer());
+//	}
+
 	/**
 	 * Returns a textual representation of this tunnel CRI.
 	 * <p>
-	 * 
+	 *
 	 * @return a string representation of the object
 	 */
 	@Override

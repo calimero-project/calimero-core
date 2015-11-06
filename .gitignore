@@ -13,3 +13,7 @@
 
 # OS X
 .DS_Store
+
+# IntelliJ
+calimero-core.iml
+.idea
