@@ -377,7 +377,7 @@ public class CEMIBusMon implements CEMI
 	 */
 	public final int getStructLength()
 	{
-		return raw.length + 9;
+		return 7 + (tstampType == TYPEID_TIMESTAMP ? 2 : 4) + raw.length;
 	}
 
 	/* (non-Javadoc)
