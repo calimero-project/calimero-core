@@ -192,6 +192,9 @@ public final class CEMIFactory
 	private static final int Emi1_LData_ind = 0x49;
 	private static final int Emi1_LBusmon_ind = 0x49;
 	private static final int Emi1_LData_con = 0x4e;
+	private static final int Emi1_LSysBcast_req = 0x15;
+	private static final int Emi1_LSysBcast_con = 0x4c;
+	private static final int Emi1_LSysBcast_ind = 0x4d;
 
 	/**
 	 * Creates a new cEMI message out of the supplied EMI 1/2 busmonitor frame. This specialization
@@ -230,11 +233,23 @@ public final class CEMIFactory
 		if (frame.length < 4)
 			throw new KNXFormatException("EMI frame too short");
 		int mc = frame[0] & 0xff;
+
+		// check for system broadcast on open media
+		boolean domainBcast = true;
+		if (mc == Emi1_LSysBcast_req || mc == Emi1_LSysBcast_con || mc == Emi1_LSysBcast_ind)
+			domainBcast = false;
+
 		// For EMI 1, L-Data.ind is given preference over L-Busmon.ind
 		if (mc == Emi1_LData_ind)
 			mc = CEMILData.MC_LDATA_IND;
 		if (mc == Emi1_LData_con)
 			mc = CEMILData.MC_LDATA_CON;
+		if (mc == Emi1_LSysBcast_req)
+			mc = CEMILData.MC_LDATA_REQ;
+		if (mc == Emi1_LSysBcast_con)
+			mc = CEMILData.MC_LDATA_CON;
+		if (mc == Emi1_LSysBcast_ind)
+			mc = CEMILData.MC_LDATA_IND;
 
 		if (mc == CEMIBusMon.MC_BUSMON_IND) {
 			return CEMIBusMon.newWithStatus(frame[1] & 0xff, (frame[2] & 0xff) << 8 | frame[3]
@@ -251,7 +266,7 @@ public final class CEMIFactory
 		final byte[] tpdu = DataUnitBuilder.copyOfRange(frame, 7, len + 7);
 		final int src = ((frame[2] & 0xff) << 8) | (frame[3] & 0xff);
 		return c ? new CEMILData(mc, new IndividualAddress(src), a, tpdu, p, c) : new CEMILData(mc,
-				new IndividualAddress(src), a, tpdu, p, true, true, ack, hops);
+				new IndividualAddress(src), a, tpdu, p, true, domainBcast, ack, hops);
 	}
 
 	/**
