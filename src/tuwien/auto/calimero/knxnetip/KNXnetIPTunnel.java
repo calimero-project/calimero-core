@@ -99,15 +99,14 @@ public class KNXnetIPTunnel extends ClientConnection
 
 		private final int code;
 
-//		public static TunnelingLayer from(final int layer)
-//		{
-//			for (final TunnelingLayer v : TunnelingLayer.values())
-//				if (layer == v.code)
-//					return v;
-////			return null;
-//			throw new KNXIllegalArgumentException(
-//					"unspecified tunneling layer + 0x" + Integer.toHexString(layer));
-//		}
+		public static TunnelingLayer from(final int layer)
+		{
+			for (final TunnelingLayer v : TunnelingLayer.values())
+				if (layer == v.code)
+					return v;
+			throw new KNXIllegalArgumentException(
+					"unspecified tunneling layer + 0x" + Integer.toHexString(layer));
+		}
 
 		TunnelingLayer(final int code) {
 			this.code = code;
