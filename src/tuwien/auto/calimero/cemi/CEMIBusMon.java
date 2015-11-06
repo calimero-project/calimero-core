@@ -90,7 +90,6 @@ public class CEMIBusMon implements CEMI
 
 	/**
 	 * Creates a new busmonitor message.
-	 * <p>
 	 *
 	 * @param status the status information field (busmonitor error flags) as specified by
 	 *        cEMI, located in the additional information type {@link #TYPEID_STATUSINFO},
@@ -112,9 +111,7 @@ public class CEMIBusMon implements CEMI
 	}
 
 	/**
-	 * Creates a new busmonitor message.
-	 * <p>
-	 * Allows to specify every status flag in detail.
+	 * Creates a new busmonitor message, allowing to specify every status flag in detail.
 	 *
 	 * @param frameError <code>true</code> if a frame error was detected in the message,
 	 *        <code>false</code> otherwise
@@ -155,7 +152,6 @@ public class CEMIBusMon implements CEMI
 
 	/**
 	 * Creates a new busmonitor message from a byte stream.
-	 * <p>
 	 *
 	 * @param data byte stream containing a cEMI busmonitor message
 	 * @param offset start offset of cEMI frame in <code>data</code>
@@ -201,7 +197,6 @@ public class CEMIBusMon implements CEMI
 	/**
 	 * Creates a new busmonitor message using the supplied overall status and timestamp
 	 * information, and the raw frame data.
-	 * <p>
 	 *
 	 * @param status the status information field (busmonitor error flags) as specified by
 	 *        cEMI, located in the additional information type {@link #TYPEID_STATUSINFO},
@@ -230,7 +225,7 @@ public class CEMIBusMon implements CEMI
 	 * <p>
 	 * In the status field of the additional information block, only the sequence number
 	 * can be chosen, all other status flags remain 0 (i.e., indicating no error, no frame
-	 * loss)
+	 * loss).
 	 *
 	 * @param seqNumber sequence number in the status field (bits 2..0), 0 &lt;=
 	 *        <code>seqNumber</code> &lt;= 7
@@ -252,9 +247,6 @@ public class CEMIBusMon implements CEMI
 		return new CEMIBusMon(seqNumber, timestamp, extTimestamp, rawFrame);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.cemi.CEMI#getMessageCode()
-	 */
 	@Override
 	public final int getMessageCode()
 	{
@@ -337,7 +329,6 @@ public class CEMIBusMon implements CEMI
 
 	/**
 	 * Returns the sequence number set in the status information.
-	 * <p>
 	 *
 	 * @return sequence in the range [0..7]
 	 */
@@ -361,7 +352,6 @@ public class CEMIBusMon implements CEMI
 
 	/**
 	 * Returns the type of timestamp contained in the additional information.
-	 * <p>
 	 *
 	 * @return timestamp type ID
 	 */
@@ -370,18 +360,12 @@ public class CEMIBusMon implements CEMI
 		return tstampType;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.cemi.CEMI#getStructLength()
-	 */
 	@Override
 	public final int getStructLength()
 	{
 		return raw.length + 9;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.cemi.CEMI#toByteArray()
-	 */
 	@Override
 	public byte[] toByteArray()
 	{
@@ -406,22 +390,6 @@ public class CEMIBusMon implements CEMI
 		return buf;
 	}
 
-//	REMOVED FROM INTERFACE
-//	/**
-//	 * Returns the overflow flag state set in the status information.
-//	 * <p>
-//	 * This bit is of type "don't care".
-//	 *
-//	 * @return overflow flag as boolean
-//	 */
-//	 public final boolean getOverflow()
-//	 {
-//	 return (status & 0x10) == 0x10;
-//	 }
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString()
 	{
