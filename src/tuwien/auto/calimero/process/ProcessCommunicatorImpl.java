@@ -103,14 +103,16 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 					indications.notify();
 				}
 			}
-			// notify listeners
-			if (svc == GROUP_READ)
-				fireGroupReadWrite(f, new byte[0], svc, false);
-			else if (svc == GROUP_RESPONSE || svc == GROUP_WRITE)
-				fireGroupReadWrite(f, DataUnitBuilder.extractASDU(apdu), svc, apdu.length <= 2);
-			else ;
-			//logger.warn("unsupported APDU service - ignored, service code = 0x"
-			//		+ Integer.toHexString(svc));
+			try {
+				// notify listeners
+				if (svc == GROUP_READ)
+					fireGroupReadWrite(f, new byte[0], svc, false);
+				else if (svc == GROUP_RESPONSE || svc == GROUP_WRITE)
+					fireGroupReadWrite(f, DataUnitBuilder.extractASDU(apdu), svc, apdu.length <= 2);
+			}
+			catch (final RuntimeException rte) {
+				logger.error("on group indication", rte);
+			}
 		}
 
 		private void fireGroupReadWrite(final CEMILData f, final byte[] asdu, final int svc,
