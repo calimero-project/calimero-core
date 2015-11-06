@@ -38,11 +38,13 @@ package tuwien.auto.calimero.serial.usb;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -178,6 +180,7 @@ public class UsbConnection implements AutoCloseable
 
 	private final EventListeners<KNXListener> listeners = new EventListeners<>();
 
+	private final UsbDevice dev;
 	private final UsbInterface knxUsbIf;
 	private final UsbPipe out;
 	private final UsbPipe in;
@@ -384,6 +387,7 @@ public class UsbConnection implements AutoCloseable
 	private UsbConnection(final UsbDevice device, final String name) throws KNXException
 	{
 		try {
+			dev = device;
 			this.name = name;
 			logger = LoggerFactory.getLogger(logPrefix + "." + getName());
 			knxUsbIf = open(device);
@@ -650,7 +654,36 @@ public class UsbConnection implements AutoCloseable
 				| UsbException e) {
 			logger.warn("close connection", e);
 		}
+		finally {
+			removeClaimedInterfaceNumberOnWindows(knxUsbIf);
+		}
 		listeners.fire(l -> l.connectionClosed(new CloseEvent(this, initiator, reason)));
+	}
+
+	// Workaround for usb4java-javax on Windows platforms to always remove the interface number of our USB interface.
+	// AbstractDevice does not do that in case libusb returns with an error code from releaseInterface().
+	// Subsequent claims of that interface then always fail.
+	private void removeClaimedInterfaceNumberOnWindows(final UsbInterface knxUsbIf)
+	{
+		final String os = System.getProperty("os.name", "unknown").toLowerCase();
+		if (!os.contains("win"))
+			return;
+		try {
+			final Class<? extends UsbDevice> c = dev.getClass();
+			final Class<?> abstractDevice = c.getSuperclass();
+			final Field field = abstractDevice.getDeclaredField("claimedInterfaceNumbers");
+			field.setAccessible(true);
+			final Object set = field.get(dev);
+			if (set instanceof Set<?>) {
+				@SuppressWarnings("unchecked")
+				final Set<Byte> numbers = (Set<Byte>) set;
+				numbers.remove(knxUsbIf.getUsbInterfaceDescriptor().bInterfaceNumber());
+			}
+		}
+		catch (final Exception e) {
+			// specifically NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException
+			logger.error("on removing claimed interface number, subsequent claims might fail!", e);
+		}
 	}
 
 	private byte[] getFeature(final BusAccessServerFeature feature) throws InterruptedException,
