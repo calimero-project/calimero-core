@@ -227,7 +227,7 @@ public class CEMILData implements CEMI
 		// .req on PL110: repeat broadcast priority hop count
 
 		if (msgCode != MC_LDATA_REQ && msgCode != MC_LDATA_CON && msgCode != MC_LDATA_IND)
-			throw new KNXIllegalArgumentException("unknown L-Data message code");
+			throw new KNXIllegalArgumentException("unknown L-Data message code " + Integer.toHexString(msgCode));
 		mc = msgCode;
 		source = src;
 		this.dst = dst;
