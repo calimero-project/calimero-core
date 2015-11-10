@@ -264,8 +264,11 @@ public final class CEMIFactory
 		final int len = (frame[6] & 0x0f) + 1;
 		final byte[] tpdu = DataUnitBuilder.copyOfRange(frame, 7, len + 7);
 		final int src = ((frame[2] & 0xff) << 8) | (frame[3] & 0xff);
-		return c ? new CEMILData(mc, new IndividualAddress(src), a, tpdu, p, c) : new CEMILData(mc,
-				new IndividualAddress(src), a, tpdu, p, true, domainBcast, ack, hops);
+
+		if (c) return new CEMILData(mc, new IndividualAddress(src), a, tpdu, p, c);
+		// for .ind always create a not repeated frame, otherwise default repetition behavior
+		final boolean repeat = mc == CEMILData.MC_LDATA_IND ? false : true;
+		return new CEMILData(mc, new IndividualAddress(src), a, tpdu, p, repeat, domainBcast, ack, hops);
 	}
 
 	/**
