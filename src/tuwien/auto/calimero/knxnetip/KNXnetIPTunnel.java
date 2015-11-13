@@ -201,7 +201,7 @@ public class KNXnetIPTunnel extends ClientConnection
 
 				synchronized (lock) {
 					final CEMILData ldata = (CEMILData) keepForCon;
-					if (ldata != null && getState() == CEMI_CON_PENDING) {
+					if (ldata != null && internalState == CEMI_CON_PENDING) {
 						// check if address was set by server
 						final boolean emptySrc = ldata.getSource().getRawAddress() == 0;
 						final byte[] sent = unifyLData(ldata, emptySrc);
