@@ -56,6 +56,8 @@ import tuwien.auto.calimero.xml.XmlWriter;
 @Ignore
 public class DatapointMapTest extends TestCase
 {
+	// TODO move @Ignore from class to testLoad
+
 	private static final String dpFile = Util.getTargetPath() + "datapointMap.xml";
 
 	private DatapointModel<Datapoint> m;
