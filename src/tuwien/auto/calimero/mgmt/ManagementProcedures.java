@@ -37,6 +37,8 @@
 package tuwien.auto.calimero.mgmt;
 
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
@@ -213,6 +215,25 @@ public interface ManagementProcedures
 	 */
 	IndividualAddress[] scanNetworkDevices(int area, int line) throws KNXTimeoutException,
 			KNXLinkClosedException, InterruptedException;
+
+	/**
+	 * Determines the existing KNX network devices on a specific KNX subnetwork. This method corresponds to the KNX
+	 * network management subnetwork devices scan procedure <i>NM_SubnetworkDevices_Scan</i>. This procedure scans a
+	 * specific KNX subnetwork, identified by the <code>area</code> and <code>line</code> of the KNX network.<br>
+	 * For this procedure to work, the individual address (and the domain address for open media) of the used routers in
+	 * the KNX network have to be configured.
+	 *
+	 * @param area the KNX network area to scan for network devices, <code>0 &le; area &le; 0x0F</code>; devices in the
+	 *        backbone line of areas are assigned area address 0. For a definition of area, see
+	 *        {@link IndividualAddress}.
+	 * @param line the KNX network line to scan for network devices, <code>0 &le; line &le; 0x0F</code>; devices in the
+	 *        main line of an area are assigned line address 0. for a definition of line, see {@link IndividualAddress}
+	 * @throws KNXTimeoutException on communication timeouts during the scan
+	 * @throws KNXLinkClosedException on a closed KNXNetworkLink to the KNX network
+	 * @throws InterruptedException if this thread was interrupted while scanning the network devices
+	 */
+	void scanNetworkDevices(int area, int line, Consumer<IndividualAddress> device)
+		throws KNXTimeoutException, KNXLinkClosedException, InterruptedException;
 
 	/**
 	 * Determines the serial numbers of all KNX devices that have its individual address set to the

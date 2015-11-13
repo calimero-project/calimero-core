@@ -43,6 +43,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 
@@ -94,11 +98,20 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	private static final class TLListener implements TransportListener
 	{
 		private final Set<IndividualAddress> devices;
+		private final Consumer<IndividualAddress> disconnect;
 		private final boolean routers;
 
 		private TLListener(final Set<IndividualAddress> scanResult, final boolean scanRouters)
 		{
 			devices = scanResult;
+			disconnect = null;
+			routers = scanRouters;
+		}
+
+		private TLListener(final Consumer<IndividualAddress> onDisconnect, final boolean scanRouters)
+		{
+			disconnect = onDisconnect;
+			devices = null;
 			routers = scanRouters;
 		}
 
@@ -121,8 +134,16 @@ public class ManagementProceduresImpl implements ManagementProcedures
 				return;
 			final IndividualAddress addr = d.getAddress();
 			if (routers && addr.getDevice() == 0)
-				devices.add(addr);
+				accept(addr);
 			else if (!routers && addr.getDevice() != 0)
+				accept(addr);
+		}
+
+		private void accept(final IndividualAddress addr)
+		{
+			if (disconnect != null)
+				disconnect.accept(addr);
+			else
 				devices.add(addr);
 		}
 
@@ -380,6 +401,19 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		return scanAddresses(addresses, false);
 	}
 
+	@Override
+	public void scanNetworkDevices(final int area, final int line, final Consumer<IndividualAddress> device)
+		throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
+	{
+		if (area < 0 || area > 0xf)
+			throw new KNXIllegalArgumentException("area out of range [0..0xf]");
+		if (line < 0 || line > 0xf)
+			throw new KNXIllegalArgumentException("line out of range [0..0xf]");
+		final List<IndividualAddress> addresses = IntStream.rangeClosed(0, 0xff)
+				.mapToObj((i) -> new IndividualAddress(area, line, i)).collect(Collectors.toList());
+		scanAddresses(addresses, false, device);
+	}
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.ManagementProcedures#scanSerialNumbers(int)
 	 */
@@ -595,6 +629,32 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		final IndividualAddress[] array = devices
 				.toArray(new IndividualAddress[devices.size()]);
 		return array;
+	}
+
+	private void scanAddresses(final List<IndividualAddress> addresses, final boolean routers,
+		final Consumer<IndividualAddress> response)
+			throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
+	{
+		final TransportListener tll = new TLListener(response, routers);
+		tl.addTransportListener(tll);
+
+		List<Destination> dst = new ArrayList<>();
+		try {
+			dst = addresses.stream().map((a) -> getOrCreateDestination(a, true, false)).collect(Collectors.toList());
+			for (final Destination d : dst) {
+				tl.connect(d);
+				// increased from 100 (the default) to minimize chance of overflow over FT1.2
+				Thread.sleep(115);
+			}
+			// we wait in total (115 + 6000 + 1000 + 100) ms for a possible T-disconnect, taking
+			// into account the KNXnet/IP tunneling.req retransmit timeout plus some network delay
+			waitFor(disconnectTimeout + 1100);
+		}
+		finally {
+			tl.removeTransportListener(tll);
+			// TODO this is not sufficient in the case getOrCreateDestination throws
+			dst.forEach(Destination::destroy);
+		}
 	}
 
 	private int readMaxAsduLength(final Destination d) throws InterruptedException
