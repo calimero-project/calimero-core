@@ -281,11 +281,11 @@ public class KNXNetworkLinkIP extends AbstractLink
 	{
 		if (endpt == null)
 			return KNXnetIPRouting.DEFAULT_MULTICAST;
-		final InetAddress a = endpt.getAddress();
 		// do our own IP:port string, since InetAddress.toString() always prepends a '/'
+		final String host = (endpt.isUnresolved() ? endpt.getHostString() : endpt.getAddress().getHostAddress());
 		final int p = endpt.getPort();
 		if (p > 0)
-			return a.getHostAddress() + ":" + p;
-		return a.getHostAddress();
+			return host + ":" + p;
+		return host;
 	}
 }

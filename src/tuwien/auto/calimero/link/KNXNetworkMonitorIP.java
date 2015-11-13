@@ -115,6 +115,7 @@ public class KNXNetworkMonitorIP extends AbstractMonitor
 	private static String monitorName(final InetSocketAddress remote)
 	{
 		// do our own IP:port string, since InetAddress.toString() always prepends a '/'
-		return "monitor " + remote.getAddress().getHostAddress() + ":" + remote.getPort();
+		final String host = (remote.isUnresolved() ? remote.getHostString() : remote.getAddress().getHostAddress());
+		return "monitor " + host + ":" + remote.getPort();
 	}
 }
