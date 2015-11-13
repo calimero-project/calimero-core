@@ -38,7 +38,9 @@ package tuwien.auto.calimero.link;
 
 import java.net.InetSocketAddress;
 
+import category.RequireFT12Connection;
 import junit.framework.TestCase;
+import org.junit.experimental.categories.Category;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.IndividualAddress;
@@ -54,6 +56,7 @@ import tuwien.auto.calimero.link.medium.TPSettings;
 /**
  * @author B. Malinowsky
  */
+@Category(RequireFT12Connection.class)
 public class KNXNetworkMonitorIPTest extends TestCase
 {
 	private KNXNetworkMonitor mon;

@@ -36,7 +36,9 @@
 
 package tuwien.auto.calimero.mgmt;
 
+import category.RequireKNXNetworkLink;
 import junit.framework.TestCase;
+import org.junit.experimental.categories.Category;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DetachEvent;
 import tuwien.auto.calimero.FrameEvent;
@@ -53,6 +55,7 @@ import tuwien.auto.calimero.link.medium.TPSettings;
 /**
  * @author B. Malinowsky
  */
+@Category(RequireKNXNetworkLink.class)
 public class DestinationTest extends TestCase
 {
 	private KNXNetworkLink lnk;

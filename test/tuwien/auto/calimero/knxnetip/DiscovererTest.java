@@ -42,8 +42,10 @@ import java.net.SocketException;
 import java.util.Iterator;
 import java.util.List;
 
+import category.RequireDiscover;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
+import org.junit.experimental.categories.Category;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Util;
@@ -54,6 +56,7 @@ import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
 /**
  * @author B. Malinowsky
  */
+@Category(RequireDiscover.class)
 public class DiscovererTest extends TestCase
 {
 	private Discoverer ddef;

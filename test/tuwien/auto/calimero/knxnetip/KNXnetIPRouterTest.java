@@ -45,7 +45,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import category.RequireFT12Connection;
 import junit.framework.TestCase;
+import org.junit.experimental.categories.Category;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.GroupAddress;
@@ -60,6 +62,7 @@ import tuwien.auto.calimero.cemi.CEMILData;
 /**
  * @author B. Malinowsky
  */
+@Category(RequireFT12Connection.class)
 public class KNXnetIPRouterTest extends TestCase
 {
 	private static KNXnetIPConnection.BlockingMode noblock =

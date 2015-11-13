@@ -39,7 +39,9 @@ package tuwien.auto.calimero.mgmt;
 import java.util.Arrays;
 import java.util.List;
 
+import category.RequireKNXNetworkLink;
 import junit.framework.TestCase;
+import org.junit.experimental.categories.Category;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
@@ -56,6 +58,7 @@ import tuwien.auto.calimero.link.medium.TPSettings;
 /**
  * @author B. Malinowsky
  */
+@Category(RequireKNXNetworkLink.class)
 public class ManagementClientImplTest extends TestCase
 {
 	private KNXNetworkLink lnk;

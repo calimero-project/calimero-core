@@ -38,7 +38,9 @@ package tuwien.auto.calimero.mgmt;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import category.RequireKNXNetworkLink;
 import junit.framework.TestCase;
+import org.junit.experimental.categories.Category;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
@@ -54,6 +56,7 @@ import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
 /**
  * @author B. Malinowsky
  */
+@Category(RequireKNXNetworkLink.class)
 public class PropertyClientTest extends TestCase
 {
 	private static final String PIDResource = Util.getPath() + "properties.xml";
