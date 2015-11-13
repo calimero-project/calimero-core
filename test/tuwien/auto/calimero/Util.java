@@ -41,6 +41,7 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
 import tuwien.auto.calimero.knxnetip.Discoverer;
+import tuwien.auto.calimero.knxnetip.Discoverer.Result;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
 import tuwien.auto.calimero.serial.FT12Connection;
 
@@ -199,39 +200,44 @@ public final class Util
 		return null;
 	}
 
-	private static boolean noServer;
+	// we initially assume that our test server was started
+	private static boolean testServerRunning = true;
+	// identify test sever among other interfaces that might lurk around
+	private static final String testServerId = "calimero-core knx test-server";
 
 	/**
 	 * Returns the socket address of the KNXnet/IP router to use for testing.
-	 * <p>
 	 *
 	 * @return socket address
 	 * @throws KNXException if KNXnet/IP discovery failed
 	 */
 	public static InetSocketAddress getServer() throws KNXException
 	{
-		if (noServer)
+		// we try once to find our running test server, on failure subsequent calls will
+		// immediately return to speed up tests
+		if (!testServerRunning)
 			return null;
 		if (server == null) {
-			final Discoverer d = new Discoverer(getLocalHost().getAddress(), getLocalHost()
-					.getPort(), false, false);
+			testServerRunning = false;
+			final Discoverer d = new Discoverer(getLocalHost().getAddress(), getLocalHost().getPort(), false, false);
 			try {
 				d.startSearch(2, true);
 			}
 			catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
-			if (d.getSearchResponses().isEmpty())
-				noServer = true;
-			final SearchResponse response = d.getSearchResponses().get(0).getResponse();
-			for (int i = 0; i < d.getSearchResponses().size(); i++) {
-				final SearchResponse res = response;
-				System.out.println("" + res.getControlEndpoint());
+			for (final Result<SearchResponse> r : d.getSearchResponses()) {
+				final SearchResponse res = r.getResponse();
+				if (testServerId.equals(res.getDevice().getName())) {
+					final InetAddress addr = res.getControlEndpoint().getAddress();
+					server = new InetSocketAddress(addr, res.getControlEndpoint().getPort());
+					device = res.getDevice().getAddress();
+					testServerRunning = true;
+					return server;
+				}
 			}
-			final InetAddress addr = response.getControlEndpoint().getAddress();
-
-			server = new InetSocketAddress(addr, response.getControlEndpoint().getPort());
-			device = response.getDevice().getAddress();
+			System.err.println("\n\tA unit test case requests the KNX test server, but no running instance was found!\n"
+					+ "\t\t--> Many tests requiring KNXnet/IP will fail.\n");
 		}
 		return server;
 	}
