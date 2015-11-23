@@ -142,6 +142,8 @@ public class UsbConnection implements AutoCloseable
 		0x0e77, // Siemens: also used in Weinzierl, Merlin, Hensel
 		0x145c, // Busch-Jaeger
 		0x147b, // ABB stotz-kontakt
+		0x16D0, // Tapko and others
+		0x0681, // Siemens OCI700 interface (Synco family)
 	};
 
 	private static final int[] productIds = {
@@ -151,8 +153,14 @@ public class UsbConnection implements AutoCloseable
 		0x0102, 0x0104, 0x0111, 0x0112, 0x0121, 0x0141, 0x2001,
 		// uses BJ
 		0x1330, // BJ flush-mounted
+		0x1490, // BJ surface-mounted
 		// uses ABB
-		0x5120 };
+		0x5120,
+		// uses Tapko
+		0x0490, 0x0491, 0x0492,
+		// uses OCI
+		0x0014,
+	};
 
 
 	// KNX interfaces that use a USB to ? adapter (e.g., USB to serial adapter)
