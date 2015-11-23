@@ -963,13 +963,32 @@ public class UsbConnection implements AutoCloseable
 		return end > -1 ? s.substring(0, end) : s;
 	}
 
+	// pre: device = vendorId:productId
+	private static boolean isKNXIntfID(final String device)
+	{
+		boolean knownVendor = false, knownProduct = false;
+		final String[] split = device.split(":");
+		try {
+			final int vend = Integer.parseInt(split[0], 16), prod = Integer.parseInt(split[1], 16);
+			for (final int v : vendorIds)
+				knownVendor |= v == vend;
+			for (final int p : productIds)
+				knownProduct |= p == prod;
+		}
+		catch (final NumberFormatException ignore) {}
+		return knownVendor && knownProduct;
+	}
+
 	// Cross-platform way to do name lookup for USB devices, using the low-level API.
 	// Parse the USB device string descriptions for name, extract the vendor:product ID
 	// string. Pass that ID to findDevice. which will do the lookup by ID.
 	private static UsbDevice findDeviceByNameLowLevel(final String name) throws KNXException
 	{
 		final List<String> list = getDeviceDescriptionsLowLevel();
-		list.removeIf(i -> i.toLowerCase().indexOf(name.toLowerCase()) == -1);
+		if (name.isEmpty())
+			list.removeIf(i -> !isKNXIntfID(i.substring(i.indexOf("ID") + 3, i.indexOf("\n"))));
+		else
+			list.removeIf(i -> i.toLowerCase().indexOf(name.toLowerCase()) == -1);
 		if (list.isEmpty())
 			throw new KNXException("no USB interface found by name " + name);
 
