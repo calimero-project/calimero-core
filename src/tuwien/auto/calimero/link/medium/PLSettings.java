@@ -49,7 +49,6 @@ public class PLSettings extends KNXMediumSettings
 	private static final byte[] broadcastDomain = new byte[2];
 
 	private byte[] doa;
-	private final boolean pl132;
 
 	/**
 	 * Creates a new default container with settings for PL110 medium, with the device address
@@ -58,7 +57,6 @@ public class PLSettings extends KNXMediumSettings
 	public PLSettings()
 	{
 		super(null);
-		pl132 = false;
 		doa = broadcastDomain;
 	}
 
@@ -74,50 +72,11 @@ public class PLSettings extends KNXMediumSettings
 	public PLSettings(final IndividualAddress device, final byte[] domain)
 	{
 		super(device);
-		pl132 = false;
 		setDomainAddress(domain);
-	}
-
-	/**
-	 * Creates a new settings container with PL medium specific information.
-	 * <p>
-	 *
-	 * @param device individual device address to use as source address in KNX messages, specifying
-	 *        <code>null</code> uses the individual address 0.0.0
-	 * @param domain byte array containing the domain address to use in KNX messages, address is
-	 *        given in network byte order, <code>domain.length</code> = 2, supplying
-	 *        <code>null</code> defaults to the broadcast domain
-	 * @param mediumPL132 <code>true</code> if communicating on PL132, <code>false</code> if
-	 *        communicating on PL110
-	 */
-	@Deprecated
-	public PLSettings(final IndividualAddress device, final byte[] domain,
-		final boolean mediumPL132)
-	{
-		super(device);
-		pl132 = mediumPL132;
-		setDomainAddress(domain);
-	}
-
-	/**
-	 * Creates a new default container with settings for PL medium.
-	 * <p>
-	 * The device address is initialized to 0.0.0 and domain address is set to broadcast domain.
-	 *
-	 * @param mediumPL132 <code>true</code> if communicating on PL132, <code>false</code> if
-	 *        communicating on PL110
-	 */
-	@Deprecated
-	public PLSettings(final boolean mediumPL132)
-	{
-		super(null);
-		pl132 = mediumPL132;
-		doa = broadcastDomain;
 	}
 
 	/**
 	 * Sets a new domain address.
-	 * <p>
 	 *
 	 * @param domain byte array containing the domain address to use in KNX messages, address is
 	 *        given in network byte order, <code>domain.length</code> = 2, supplying
@@ -134,36 +93,19 @@ public class PLSettings extends KNXMediumSettings
 	}
 
 	/**
-	 * Returns the domain address.
-	 * <p>
-	 * The address is returned in network byte order.
+	 * Returns the domain address in network byte order.
 	 *
-	 * @return domain address as byte array of length = 2
+	 * @return domain address as byte array of length 2
 	 */
 	public final synchronized byte[] getDomainAddress()
 	{
 		return doa.clone();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.medium.KNXMediumSettings#getMedium()
-	 */
 	@Override
 	public int getMedium()
 	{
-		return pl132 ? MEDIUM_PL132 : MEDIUM_PL110;
-	}
-
-	/**
-	 * Returns whether settings are for communication on PL132 medium or PL110 medium.
-	 * <p>
-	 *
-	 * @return <code>true</code> for PL132, <code>false</code> for PL110
-	 */
-	@Deprecated
-	public final boolean isPL132()
-	{
-		return pl132;
+		return MEDIUM_PL110;
 	}
 
 	@Override
