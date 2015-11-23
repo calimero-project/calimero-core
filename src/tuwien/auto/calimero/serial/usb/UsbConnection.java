@@ -609,12 +609,13 @@ public class UsbConnection implements AutoCloseable
 			final List<UsbInterface> settings = uif.getSettings();
 			// iterate over all alternate settings this interface provides
 			for (final UsbInterface alt : settings) {
-				logger.trace("Interface {}", alt);
+				logger.trace("Interface {}, setting {}", alt,
+						alt.getUsbInterfaceDescriptor().bAlternateSetting() & 0xff);
 				// KNX USB has a HID class interface
 				final int INTERFACE_CLASS_HID = 0x03;
 				final byte ifClass = alt.getUsbInterfaceDescriptor().bInterfaceClass();
 				if (ifClass != INTERFACE_CLASS_HID)
-					logger.warn("Interface doesn't look right, no HID class");
+					logger.warn("{} {} doesn't look right, no HID class", device, alt);
 				else {
 					@SuppressWarnings("unchecked")
 					final List<UsbEndpoint> endpoints = alt.getUsbEndpoints();
@@ -860,7 +861,7 @@ public class UsbConnection implements AutoCloseable
 //			return findDeviceByName(getRootHub(), device.toLowerCase());
 		}
 		catch (final SecurityException | UsbException | UsbDisconnectedException e) {
-			throw new KNXException("find USB device by name " + device, e);
+			throw new KNXException("find USB interface by name " + device, e);
 		}
 	}
 
@@ -970,7 +971,7 @@ public class UsbConnection implements AutoCloseable
 		final List<String> list = getDeviceDescriptionsLowLevel();
 		list.removeIf(i -> i.toLowerCase().indexOf(name.toLowerCase()) == -1);
 		if (list.isEmpty())
-			throw new KNXException("no USB device found by name " + name);
+			throw new KNXException("no USB interface found by name " + name);
 
 		final String desc = list.get(0);
 		final String id = desc.substring(desc.indexOf("ID") + 3, desc.indexOf("\n"));
