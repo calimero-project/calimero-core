@@ -254,7 +254,7 @@ public interface ManagementClient
 	 * range.
 	 * <p>
 	 * This method is used to check existence of a device with the specified domain on a
-	 * powerline medium and paying attention to more installations.<br>
+	 * power-line medium and paying attention to more installations.<br>
 	 * This service uses system broadcast communication mode.<br>
 	 * <p>
 	 * A note on answering behavior when the specified <code>range</code> is &lt; 255:<br>
@@ -262,7 +262,7 @@ public interface ManagementClient
 	 * answering device 'B', 'A' will terminate the transmission of its response.
 	 *
 	 * @param domain byte array with domain address to check for,
-	 *        <code>domain.length</code> = 2 (powerline medium only)
+	 *        <code>domain.length</code> = 2 (power-line medium only)
 	 * @param startAddress start from this individual address, lower bound of checked
 	 *        range
 	 * @param range address range, specifies upper bound address (startAddress + range)
