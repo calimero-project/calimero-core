@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 package tuwien.auto.calimero.mgmt;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
@@ -229,8 +230,24 @@ public interface ManagementClient
 	 * @throws KNXException on other read domain address errors
 	 * @throws InterruptedException
 	 */
-	List<byte[]> readDomainAddress(boolean oneAddressOnly) throws KNXException,
-		InterruptedException;
+	List<byte[]> readDomainAddress(boolean oneAddressOnly) throws KNXException, InterruptedException;
+
+	/**
+	 * Reads the domain address of a communication partner in the KNX network, providing both the individual address of
+	 * the device as well as its domain address for all devices from which a response is received.
+	 * <p>
+	 * This service is designed for open media and uses system broadcast communication mode.<br>
+	 * The communication partner is one or more devices in programming mode.
+	 *
+	 * @param domain consumer called for every response received for this request, with the first argument being the
+	 *        device address, the second argument its domain address
+	 * @throws KNXTimeoutException on any timeout during sending the request
+	 * @throws KNXInvalidResponseException on invalid read response message
+	 * @throws KNXLinkClosedException on closed KNX network link
+	 * @throws InterruptedException on interrupted thread
+	 */
+	void readDomainAddress(BiConsumer<IndividualAddress, byte[]> domain)
+		throws KNXLinkClosedException, KNXInvalidResponseException, KNXTimeoutException, InterruptedException;
 
 	/**
 	 * Reads the domain address of a communication partner identified using an address

@@ -37,9 +37,12 @@
 package tuwien.auto.calimero.mgmt;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.BiConsumer;
 
 import org.slf4j.Logger;
 
@@ -363,6 +366,15 @@ public class ManagementClientImpl implements ManagementClient
 		return makeDOAs(readBroadcast(priority,
 				DataUnitBuilder.createLengthOptimizedAPDU(DOA_READ, null), DOA_RESPONSE, 2, 6,
 				oneDomainOnly));
+	}
+
+	@Override
+	public synchronized void readDomainAddress(final BiConsumer<IndividualAddress, byte[]> response)
+		throws KNXLinkClosedException, KNXInvalidResponseException, KNXTimeoutException, InterruptedException
+	{
+		// we allow 6 bytes ASDU for RF domains
+		readBroadcast(priority, DataUnitBuilder.createLengthOptimizedAPDU(DOA_READ, null), DOA_RESPONSE, 2, 6, false,
+				response);
 	}
 
 	/* (non-Javadoc)
@@ -810,9 +822,17 @@ public class ManagementClientImpl implements ManagementClient
 
 	// timeout in milliseconds
 	// min + max ASDU len are *not* including any field that contains ACPI
-	private byte[] waitForResponse(final IndividualAddress from, final int minAsduLen,
-		final int maxAsduLen, final long timeout) throws KNXInvalidResponseException,
-		KNXTimeoutException, InterruptedException
+	private byte[] waitForResponse(final IndividualAddress from, final int minAsduLen, final int maxAsduLen,
+		final long timeout) throws KNXInvalidResponseException, KNXTimeoutException, InterruptedException
+	{
+		return waitForResponse(from, minAsduLen, maxAsduLen, timeout, Optional.empty());
+	}
+
+	// timeout in milliseconds
+	// min + max ASDU len are *not* including any field that contains ACPI
+	private byte[] waitForResponse(final IndividualAddress from, final int minAsduLen, final int maxAsduLen,
+		final long timeout, final Optional<List<IndividualAddress>> responders)
+			throws KNXInvalidResponseException, KNXTimeoutException, InterruptedException
 	{
 		long remaining = timeout;
 		final long end = System.currentTimeMillis() + remaining;
@@ -837,6 +857,7 @@ public class ManagementClientImpl implements ManagementClient
 					if (svcResponse == IND_ADDR_RESPONSE || svcResponse == IND_ADDR_SN_RESPONSE)
 						return ((CEMILData) frame).getSource().toByteArray();
 					indications.clear();
+					responders.ifPresent((l) -> l.add(((CEMILData) frame).getSource()));
 					return apdu;
 				}
 				indications.wait(remaining);
@@ -865,6 +886,25 @@ public class ManagementClientImpl implements ManagementClient
 		return l;
 	}
 
+	private void waitForResponses(final IndividualAddress from, final Priority p, final int minAsduLen,
+		final int maxAsduLen, final boolean oneOnly, final BiConsumer<IndividualAddress, byte[]> callback)
+			throws KNXInvalidResponseException, InterruptedException
+	{
+		try {
+			long wait = responseTimeout;
+			final long end = System.currentTimeMillis() + wait;
+			while (wait > 0) {
+				final Optional<List<IndividualAddress>> src = Optional.of(new ArrayList<>());
+				final byte[] response = waitForResponse(from, minAsduLen, maxAsduLen, wait, src);
+				callback.accept(src.get().get(0), Arrays.copyOfRange(response, 2, response.length));
+				if (oneOnly)
+					break;
+				wait = end - System.currentTimeMillis();
+			}
+		}
+		catch (final KNXTimeoutException e) {}
+	}
+
 	private synchronized List<byte[]> readBroadcast(final Priority p, final byte[] apdu,
 		final int response, final int minAsduLen, final int maxAsduLen, final boolean oneOnly)
 		throws KNXLinkClosedException, KNXInvalidResponseException, KNXTimeoutException,
@@ -877,6 +917,21 @@ public class ManagementClientImpl implements ManagementClient
 			if (l.isEmpty())
 				throw new KNXTimeoutException("timeout waiting for responses");
 			return l;
+		}
+		finally {
+			svcResponse = 0;
+		}
+	}
+
+	private synchronized void readBroadcast(final Priority p, final byte[] apdu, final int response,
+		final int minAsduLen, final int maxAsduLen, final boolean oneOnly,
+		final BiConsumer<IndividualAddress, byte[]> callback)
+			throws KNXLinkClosedException, KNXInvalidResponseException, KNXTimeoutException, InterruptedException
+	{
+		try {
+			svcResponse = response;
+			tl.broadcast(true, p, apdu);
+			waitForResponses(null, p, minAsduLen, maxAsduLen, oneOnly, callback);
 		}
 		finally {
 			svcResponse = 0;
