@@ -133,7 +133,7 @@ public class KNXNetworkMonitorFT12 extends AbstractMonitor
 		try {
 			normalMode();
 		}
-		catch (KNXAckTimeoutException | KNXPortClosedException e) {}
+		catch (final KNXAckTimeoutException | KNXPortClosedException e) {}
 	}
 
 	private void normalMode()

@@ -101,7 +101,7 @@ public final class XmlInputFactory // extends XMLInputFactory
 				l.debug("using StaX XMLStreamReader " + r.r.getClass().getName());
 				return r;
 			}
-			catch (Exception | Error e) {
+			catch (final Exception | Error e) {
 				e.printStackTrace();
 				// we fall back on our own minimal implementation
 				throw new KNXMLException("no StaX implementation found", e);
@@ -120,7 +120,7 @@ public final class XmlInputFactory // extends XMLInputFactory
 				l.debug("using StaX XMLStreamReader " + r.r.getClass().getName());
 				return r;
 			}
-			catch (Exception | Error e) {
+			catch (final Exception | Error e) {
 				e.printStackTrace();
 				// we fall back on our own minimal implementation
 				throw new KNXMLException("no StaX implementation found", e);

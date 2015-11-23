@@ -172,7 +172,7 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor
 		try {
 			normalMode();
 		}
-		catch (KNXPortClosedException | KNXTimeoutException e) {}
+		catch (final KNXPortClosedException | KNXTimeoutException e) {}
 	}
 
 	private void normalMode()

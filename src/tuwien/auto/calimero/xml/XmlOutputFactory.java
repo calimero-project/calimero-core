@@ -91,7 +91,7 @@ public class XmlOutputFactory // extends XMLOutputFactory
 				l.debug("using StaX XMLStreamWriter " + w.w.getClass().getName());
 				return w;
 			}
-			catch (Exception | Error e) {
+			catch (final Exception | Error e) {
 				e.printStackTrace();
 				// fall-through to minimal writer implementation
 			}
@@ -109,7 +109,7 @@ public class XmlOutputFactory // extends XMLOutputFactory
 				l.debug("using StaX XMLStreamWriter " + w.w.getClass().getName());
 				return w;
 			}
-			catch (Exception | Error e) {
+			catch (final Exception | Error e) {
 				e.printStackTrace();
 				// fall-through to minimal writer implementation
 			}
