@@ -130,7 +130,7 @@ public class UsbConnection implements AutoCloseable
 		// the KNX tunneling EMI enumeration values are different!
 		public final KnxTunnelEmi emi;
 
-		private EmiType(final int bit, final KnxTunnelEmi emi)
+		EmiType(final int bit, final KnxTunnelEmi emi)
 		{
 			this.bit = bit;
 			this.emi = emi;
@@ -194,8 +194,6 @@ public class UsbConnection implements AutoCloseable
 	private final UsbPipe out;
 	private final UsbPipe in;
 
-//	private final boolean useFallback = false;
-//	private VirtualComPort comPort;
 
 	/*
 	 Device Feature Service protocol:
@@ -324,6 +322,13 @@ public class UsbConnection implements AutoCloseable
 		catch (final SecurityException | UsbException e) {}
 	}
 
+	/**
+	 * Scans for USB device connection changes, so subsequent traversals provide an updated view of attached USB
+	 * interfaces.
+	 *
+	 * @throws SecurityException on restricted access to USB services indicated as security violation
+	 * @throws UsbException on error with USB services
+	 */
 	public static void updateDeviceList() throws SecurityException, UsbException
 	{
 		((org.usb4java.javax.Services) UsbHostManager.getUsbServices()).scan();
@@ -383,11 +388,30 @@ public class UsbConnection implements AutoCloseable
 					getDeviceDescriptionsLowLevel().stream().collect(Collectors.joining("\n")));
 	}
 
+	/**
+	 * Creates a new KNX USB connection using a KNX USB <code>device</code> identifier to locate the USB interface,
+	 * being either a <code>vendorId:productId</code>, or a name used for pattern matching with the USB device
+	 * descriptor strings.
+	 *
+	 * @param device a <code>vendorId:productId</code> identifier, or a name (case-insensitive) that is used to match a
+	 *        KNX USB interface by its description strings, e.g, "siemens", "busch-jaeger", "abb". Note, that with more
+	 *        than one USB interfaces matching the criteria of <code>device</code>, the first one found is selected
+	 * @throws KNXException on errors finding or accessing the USB interface, or opening the KNX USB connection
+	 */
 	public UsbConnection(final String device) throws KNXException
 	{
 		this(findDevice(device), device);
 	}
 
+	/**
+	 * Creates a new KNX USB connection using a vendor and product identifier to locate the USB interface. Note, that
+	 * with more than one USB interfaces matching <code>vendorId:productId</code>, the first one found is selected. This
+	 * is only the case if several USB interfaces of the same make and model are attached to the host.
+	 *
+	 * @param vendorId the vendor identifier of the USB <code>vendorId:productId</code>
+	 * @param productId the product identifier of the USB <code>vendorId:productId</code>
+	 * @throws KNXException on errors finding or accessing the USB interface, or opening the KNX USB connection
+	 */
 	// TODO we use the first matching USB device we find, current param list is not sufficient!
 	public UsbConnection(final int vendorId, final int productId) throws KNXException
 	{
@@ -473,6 +497,7 @@ public class UsbConnection implements AutoCloseable
 	 * @throws KNXPortClosedException on closed port
 	 * @throws KNXTimeoutException on response timeout
 	 * @throws InterruptedException on interrupt
+	 * @see tuwien.auto.calimero.DeviceDescriptor
 	 */
 	public final int getDeviceDescriptorType0() throws KNXPortClosedException, KNXTimeoutException,
 		InterruptedException
