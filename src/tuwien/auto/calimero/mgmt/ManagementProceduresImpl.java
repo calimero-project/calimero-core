@@ -180,7 +180,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	 *
 	 * @param mgmtClient the management client, with a network link attached and in open
 	 *        state
-	 * @param transportLayer
+	 * @param transportLayer the transport layer used to initialize <code>mgmtClient</code>
 	 */
 	protected ManagementProceduresImpl(final ManagementClient mgmtClient,
 		final TransportLayer transportLayer)

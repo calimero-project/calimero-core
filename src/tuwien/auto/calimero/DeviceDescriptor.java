@@ -402,6 +402,7 @@ public interface DeviceDescriptor
 		/**
 		 * The number of channels implemented in the device for the specified channel type.
 		 *
+		 * @param channelType the requested channel type
 		 * @return the number of channels, <code>1 &le; channels &le; 8</code>
 		 */
 		public int getChannels(final Channel channelType)
@@ -411,6 +412,7 @@ public interface DeviceDescriptor
 		}
 
 		/**
+		 * @param channelType the requested channel type
 		 * @return the 13 bit channel code of the specified channel type
 		 */
 		public int getChannelCode(final Channel channelType)

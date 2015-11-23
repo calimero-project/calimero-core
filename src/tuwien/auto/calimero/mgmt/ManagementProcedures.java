@@ -228,6 +228,7 @@ public interface ManagementProcedures
 	 *        {@link IndividualAddress}.
 	 * @param line the KNX network line to scan for network devices, <code>0 &le; line &le; 0x0F</code>; devices in the
 	 *        main line of an area are assigned line address 0. for a definition of line, see {@link IndividualAddress}
+	 * @param device consumer called for every device found during the scan
 	 * @throws KNXTimeoutException on communication timeouts during the scan
 	 * @throws KNXLinkClosedException on a closed KNXNetworkLink to the KNX network
 	 * @throws InterruptedException if this thread was interrupted while scanning the network devices
