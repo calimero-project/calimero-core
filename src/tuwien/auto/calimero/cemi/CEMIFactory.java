@@ -282,6 +282,18 @@ public final class CEMIFactory
 	{
 		final int mc = msg.getMessageCode();
 		final KNXAddress dst = msg.getDestination();
+		// TODO find out if we need L-Data system broadcast
+//		if (dst.getRawAddress() == 0) {
+//			// check if system broadcast is indicated in ctrl1 field
+//			byte[] array = msg.toByteArray();
+//			if ((array[2] & 0x10) == 0x0)
+//				mc = Emi1_LSysBcast_req;
+//
+//			// APCI domain address.read
+//			if (DataUnitBuilder.getAPDUService(msg.getPayload()) == 0x03e1)
+//				mc = Emi1_LSysBcast_req;
+//		}
+
 		final Priority p = msg.getPriority();
 		final boolean repeat = msg.isRepetition();
 		final boolean ackRequest = msg.isAckRequested();
