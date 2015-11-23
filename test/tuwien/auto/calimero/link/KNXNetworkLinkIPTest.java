@@ -40,9 +40,10 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
-import category.RequireFT12Connection;
-import junit.framework.TestCase;
 import org.junit.experimental.categories.Category;
+
+import category.RequireKnxnetIP;
+import junit.framework.TestCase;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.GroupAddress;
@@ -62,7 +63,7 @@ import tuwien.auto.calimero.link.medium.TPSettings;
 /**
  * @author B. Malinowsky
  */
-@Category(RequireFT12Connection.class)
+@Category(RequireKnxnetIP.class)
 public class KNXNetworkLinkIPTest extends TestCase
 {
 	private KNXNetworkLink tnl;

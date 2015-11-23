@@ -36,13 +36,17 @@
 
 package tuwien.auto.calimero.knxnetip;
 
+import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.BusMonitorLayer;
+import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.LinkLayer;
+
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Vector;
 
-import category.RequireFT12Connection;
-import junit.framework.TestCase;
 import org.junit.experimental.categories.Category;
+
+import category.RequireKnxnetIP;
+import junit.framework.TestCase;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.GroupAddress;
@@ -58,13 +62,10 @@ import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIBusMon;
 import tuwien.auto.calimero.cemi.CEMILData;
 
-import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.BusMonitorLayer;
-import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.LinkLayer;
-
 /**
  * @author B. Malinowsky
  */
-@Category(RequireFT12Connection.class)
+@Category(RequireKnxnetIP.class)
 public class KNXnetIPTunnelTest extends TestCase
 {
 	private static KNXnetIPConnection.BlockingMode noblock =

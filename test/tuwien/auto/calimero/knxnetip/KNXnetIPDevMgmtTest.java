@@ -39,9 +39,10 @@ package tuwien.auto.calimero.knxnetip;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import category.RequireFT12Connection;
-import junit.framework.TestCase;
 import org.junit.experimental.categories.Category;
+
+import category.RequireKnxnetIP;
+import junit.framework.TestCase;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.IndividualAddress;
@@ -56,7 +57,7 @@ import tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode;
 /**
  * @author B. Malinowsky
  */
-@Category(RequireFT12Connection.class)
+@Category(RequireKnxnetIP.class)
 public class KNXnetIPDevMgmtTest extends TestCase
 {
 //	private static KNXnetIPConnection.BlockingMode noblock =
