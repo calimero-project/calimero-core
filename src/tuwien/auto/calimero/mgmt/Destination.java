@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,14 +51,14 @@ import tuwien.auto.calimero.link.KNXLinkClosedException;
  * <p>
  * A destination object is usually created and maintained by a TransportLayer instance or
  * {@link ManagementClient} instance.<br>
- * After a destination got destroyed, it can't be used for communication to that
- * destination anymore, i.e., it's not possible to change the connection state.
+ * If a destination is closed, it changes to state destroyed. After a destination got destroyed, it can't be used
+ * for communication to that destination anymore, i.e., it's not possible to change the connection state.
  *
  * @author B. Malinowsky
  * @see TransportLayer
  * @see ManagementClient
  */
-public class Destination
+public class Destination implements AutoCloseable
 {
 	/**
 	 * An aggregator proxy is associated with one destination and is supplied at the
@@ -386,6 +386,12 @@ public class Destination
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
+	public void close()
+	{
+		destroy();
+	}
+
 	@Override
 	public String toString()
 	{
