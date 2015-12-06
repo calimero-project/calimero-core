@@ -36,9 +36,10 @@
 
 package tuwien.auto.calimero.mgmt;
 
+import org.junit.experimental.categories.Category;
+
 import category.RequireKNXNetworkLink;
 import junit.framework.TestCase;
-import org.junit.experimental.categories.Category;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DetachEvent;
 import tuwien.auto.calimero.FrameEvent;
@@ -51,6 +52,7 @@ import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.KNXNetworkLinkIP;
 import tuwien.auto.calimero.link.medium.TPSettings;
+import tuwien.auto.calimero.mgmt.Destination.State;
 
 /**
  * @author B. Malinowsky
@@ -162,7 +164,7 @@ public class DestinationTest extends TestCase
 	public final void testDestroy()
 	{
 		dst.destroy();
-		assertEquals(Destination.DESTROYED, dst.getState());
+		assertEquals(State.Destroyed, dst.getState());
 	}
 
 	/**
@@ -187,12 +189,12 @@ public class DestinationTest extends TestCase
 	public final void testGetState() throws KNXLinkClosedException, KNXTimeoutException,
 		InterruptedException
 	{
-		assertEquals(Destination.DISCONNECTED, dst.getState());
+		assertEquals(Destination.State.Disconnected, dst.getState());
 		assertEquals(0, tll.disconnected);
 		tl.connect(dst);
 		assertEquals(0, tll.disconnected);
 		tl.disconnect(dst);
-		assertEquals(Destination.DISCONNECTED, dst.getState());
+		assertEquals(Destination.State.Disconnected, dst.getState());
 		assertEquals(1, tll.disconnected);
 		tl.connect(dst);
 		try {
@@ -202,18 +204,18 @@ public class DestinationTest extends TestCase
 		catch (final KNXDisconnectException e) {
 			assertEquals(dst, e.getDestination());
 		}
-		assertEquals(Destination.DISCONNECTED, dst.getState());
+		assertEquals(Destination.State.Disconnected, dst.getState());
 		assertEquals(2, tll.disconnected);
 
 		tl.connect(dst);
-		assertEquals(Destination.OPEN_IDLE, dst.getState());
+		assertEquals(Destination.State.OpenIdle, dst.getState());
 		Thread.sleep(6100);
-		assertEquals(Destination.DISCONNECTED, dst.getState());
+		assertEquals(Destination.State.Disconnected, dst.getState());
 		assertEquals(3, tll.disconnected);
 
 		dst.destroy();
 		assertEquals(3, tll.disconnected);
-		assertEquals(Destination.DESTROYED, dst.getState());
+		assertEquals(Destination.State.Destroyed, dst.getState());
 	}
 
 	/**

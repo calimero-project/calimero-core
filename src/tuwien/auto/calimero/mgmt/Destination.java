@@ -36,6 +36,12 @@
 
 package tuwien.auto.calimero.mgmt;
 
+import static tuwien.auto.calimero.mgmt.Destination.State.Connecting;
+import static tuwien.auto.calimero.mgmt.Destination.State.Destroyed;
+import static tuwien.auto.calimero.mgmt.Destination.State.Disconnected;
+import static tuwien.auto.calimero.mgmt.Destination.State.OpenIdle;
+import static tuwien.auto.calimero.mgmt.Destination.State.OpenWait;
+
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
@@ -164,7 +170,7 @@ public class Destination implements AutoCloseable
 		 *
 		 * @param newState new destination state
 		 */
-		public void setState(final int newState)
+		public void setState(final State newState)
 		{
 			d.setState(newState, this);
 		}
@@ -185,8 +191,8 @@ public class Destination implements AutoCloseable
 			if (d.alive)
 				return;
 
-			final int state = d.getState();
-			if (state != DISCONNECTED && state != DESTROYED)
+			final State state = d.getState();
+			if (state != Disconnected && state != Destroyed)
 				try {
 					aggr.disconnect(d);
 				}
@@ -199,6 +205,30 @@ public class Destination implements AutoCloseable
 
 	// a disconnect timer for all active destination objects
 	private static TimerQueue disconnectTimer = new TimerQueue();
+
+	/** Destination state. */
+	public enum State {
+		/**
+		 * Destination is destroyed.
+		 */
+		Destroyed,
+		/**
+		 * Connection state is disconnected.
+		 */
+		Disconnected,
+		/**
+		 * Connection state is connecting.
+		 */
+		Connecting,
+		/**
+		 * Connection state is open and communication is in idle state.
+		 */
+		OpenIdle,
+		/**
+		 * Connection state is open and communication is in waiting state for Layer 4 acknowledgment.
+		 */
+		OpenWait
+	};
 
 	/**
 	 * Destination is destroyed.
@@ -245,7 +275,7 @@ public class Destination implements AutoCloseable
 
 	private final TransportLayer tl;
 	private final IndividualAddress addr;
-	private volatile int state = DISCONNECTED;
+	private volatile State state = Disconnected;
 	private int seqRcv;
 	private int seqSend;
 	private final boolean co;
@@ -255,9 +285,7 @@ public class Destination implements AutoCloseable
 	private final boolean verify;
 
 	/**
-	 * Creates a new destination.
-	 * <p>
-	 * Verify mode defaults to false and keep alive is not used.
+	 * Creates a new destination, verify mode defaults to false and keep alive is not used.
 	 *
 	 * @param aggregator aggregator proxy to associate with this destination
 	 * @param remote KNX remote address specifying the connection destination
@@ -308,19 +336,17 @@ public class Destination implements AutoCloseable
 	 *
 	 * @return the destination individual address
 	 */
-	public IndividualAddress getAddress()
+	public final IndividualAddress getAddress()
 	{
 		return addr;
 	}
 
 	/**
 	 * Returns the state of this destination.
-	 * <p>
-	 * The returned value is one of the destination state constants.
 	 *
 	 * @return destination state
 	 */
-	public final int getState()
+	public final State getState()
 	{
 		return state;
 	}
@@ -339,7 +365,6 @@ public class Destination implements AutoCloseable
 
 	/**
 	 * Returns whether keep alive of connection is specified.
-	 * <p>
 	 *
 	 * @return <code>true</code> if keep alive is specified and connection oriented mode
 	 *         is used, <code>false</code> otherwise
@@ -351,7 +376,6 @@ public class Destination implements AutoCloseable
 
 	/**
 	 * Returns whether verify mode is supported by the destination.
-	 * <p>
 	 *
 	 * @return <code>true</code> for verify mode enabled, <code>false</code> otherwise
 	 */
@@ -370,22 +394,19 @@ public class Destination implements AutoCloseable
 	 */
 	public synchronized void destroy()
 	{
-		if (state == DESTROYED)
+		if (state == Destroyed)
 			return;
-		if (state != DISCONNECTED)
+		if (state != Disconnected)
 			try {
 				tl.disconnect(this);
 			}
 			catch (final KNXLinkClosedException e) {
 				// we already should've been destroyed on catching this exception
 			}
-		setState(DESTROYED, null);
+		setState(Destroyed, null);
 		tl.destroyDestination(this);
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public void close()
 	{
@@ -396,11 +417,11 @@ public class Destination implements AutoCloseable
 	public String toString()
 	{
 		String s = "destination " + addr + " (" + tl.getName() + ") ";
-		if (state == DESTROYED)
+		if (state == Destroyed)
 			return s + getStateString();
 		// keep-alive and detailed state only apply in CO mode
 		if (co)
-			s = s + "conn-oriented, " + getStateString() + (alive ? " " : " no") + " keep-alive, ";
+			s = s + getStateString() +  ", conn.-oriented," + (alive ? "w/" : " no") + " keep-alive, ";
 		else
 			s = s + "connectionless, ";
 		return s + (verify ? "" : "no") + " verify mode";
@@ -413,42 +434,43 @@ public class Destination implements AutoCloseable
 
 	private String getStateString()
 	{
-		switch (state) {
-		case DISCONNECTED:
-			return "disconnected";
-		case CONNECTING:
-			return "connecting";
-		case OPEN_IDLE:
-			return "open idle";
-		case OPEN_WAIT:
-			return "open wait";
-		case DESTROYED:
-			return "destroyed";
-		default:
-			return "unknown";
-		}
+		return state.name();
+//		switch (state) {
+//		case DISCONNECTED:
+//			return "disconnected";
+//		case CONNECTING:
+//			return "connecting";
+//		case OPEN_IDLE:
+//			return "open idle";
+//		case OPEN_WAIT:
+//			return "open wait";
+//		case Destroyed:
+//			return "destroyed";
+//		default:
+//			return "unknown";
+//		}
 	}
 
-	private synchronized void setState(final int newState, final Runnable notify)
+	private synchronized void setState(final State newState, final Runnable notify)
 	{
-		if (state == DESTROYED)
+		if (state == Destroyed)
 			return;
 		state = newState;
-		if (state == CONNECTING) {
+		if (state == Connecting) {
 			seqSend = 0;
 			seqRcv = 0;
 		}
-		else if (state == OPEN_IDLE)
+		else if (state == OpenIdle)
 			restartTimer(notify);
-		else if (state == OPEN_WAIT)
+		else if (state == OpenWait)
 			restartTimer(notify);
-		else if (state == DISCONNECTED) {
+		else if (state == Disconnected) {
 			disconnectTimer.cancel(notify);
 			// required for server-side, otherwise server would expect old sequence and return NAK
 			seqSend = 0;
 			seqRcv = 0;
 		}
-		else if (state == DESTROYED)
+		else if (state == Destroyed)
 			disconnectTimer.cancel(notify);
 	}
 
@@ -456,7 +478,7 @@ public class Destination implements AutoCloseable
 	{
 		if (!co)
 			throw new KNXIllegalStateException("no timer if not connection oriented");
-		if (state == DESTROYED)
+		if (state == Destroyed)
 			return;
 
 		if (!disconnectTimer.isAlive())

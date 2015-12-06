@@ -481,7 +481,7 @@ public class ManagementClientImpl implements ManagementClient
 			tl.addTransportListener(l);
 			try {
 				synchronized (lock) {
-					while (dst.getState() != Destination.DISCONNECTED)
+					while (dst.getState() != Destination.State.Disconnected)
 						lock.wait();
 				}
 			}
