@@ -132,6 +132,7 @@ public class Discoverer
 	}
 
 	private static boolean win7_OrLater;
+	private static boolean osx;
 	static {
 		// find out if we're on Windows 7 or later
 		final String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
@@ -140,6 +141,8 @@ public class Discoverer
 			final String ver = System.getProperty("os.version", "generic");
 			win7_OrLater = Double.parseDouble(ver) > 6.1;
 		}
+		if (os.indexOf("mac os x") >= 0)
+			osx = true;
 	}
 
 	// local host/port
@@ -640,10 +643,10 @@ public class Discoverer
 			if (unicast)
 				return new MulticastSocket(new InetSocketAddress(bindAddr, bindPort));
 			s = new MulticastSocket(null);//mcastResponse ? SEARCH_PORT : bindPort);
-			if (!mcastResponse)
-				s.bind(new InetSocketAddress(bindAddr, mcastResponse ? SEARCH_PORT : bindPort));
+			if (mcastResponse)
+				s.bind(new InetSocketAddress(SEARCH_PORT));
 			else
-				s.bind(new InetSocketAddress(mcastResponse ? SEARCH_PORT : bindPort));
+				s.bind(new InetSocketAddress(bindAddr, bindPort));
 			try {
 				// Under Windows >=7 (still the same on Win 8.1), setting the interface might
 				// throw with WSAENOTSOCK. This is due to IPv6 handling, see also bug JDK-6458027.
@@ -671,12 +674,19 @@ public class Discoverer
 					s.joinGroup(new InetSocketAddress(SYSTEM_SETUP_MULTICAST, 0), ni);
 				else
 					s.joinGroup(SYSTEM_SETUP_MULTICAST);
+
+				// For some reasons, OS X sends IGMP membership reports with a delay
+				if (osx)
+					Thread.sleep(500);
 			}
 			catch (final IOException e) {
 				s.close();
 				final String msg = ni.getName() + ": joining group " + SYSTEM_SETUP_MULTICAST
 						+ " failed";
 				throw new KNXException(msg + ", " + e.getMessage());
+			}
+			catch (final InterruptedException e) {
+				Thread.currentThread().interrupt();
 			}
 		}
 		return s;
