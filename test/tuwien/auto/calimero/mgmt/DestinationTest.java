@@ -184,7 +184,7 @@ public class DestinationTest extends TestCase
 	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testGetState() throws KNXLinkClosedException, KNXTimeoutException,
 		InterruptedException

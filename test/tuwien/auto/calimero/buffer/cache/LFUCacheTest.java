@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -131,8 +131,8 @@ public class LFUCacheTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.buffer.cache.LFUCache#get(java.lang.Object)}.
-	 * 
-	 * @throws InterruptedException
+	 *
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public void testGet() throws InterruptedException
 	{
@@ -289,8 +289,8 @@ public class LFUCacheTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.buffer.cache.LFUCache#removeExpired()}.
-	 * 
-	 * @throws InterruptedException
+	 *
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public void testRemoveExpired() throws InterruptedException
 	{

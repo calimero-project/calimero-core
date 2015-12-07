@@ -149,7 +149,7 @@ public final class Connector
 	 * @param creator supplies the specific KNX network link
 	 * @return a new KNX network link with the specified (re-)connection behavior configured
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public KNXNetworkLink newLink(final TSupplier<? extends KNXNetworkLink> creator)
 		throws KNXException, InterruptedException
@@ -164,7 +164,7 @@ public final class Connector
 	 * @param creator supplies the specific KNX network monitor
 	 * @return a new KNX network monitor with the specified (re-)connection behavior configured
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public KNXNetworkMonitor newMonitor(final TSupplier<? extends KNXNetworkMonitor> creator)
 		throws KNXException, InterruptedException

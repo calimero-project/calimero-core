@@ -143,7 +143,7 @@ public class PropertyClientTest extends TestCase
 	 * Test method for property adapter.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testPropertyClient() throws KNXException, InterruptedException
 	{
@@ -192,7 +192,7 @@ public class PropertyClientTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#close()}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testClose() throws KNXException, InterruptedException
 	{
@@ -215,7 +215,7 @@ public class PropertyClientTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#getDescription(int, int)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testLocalGetDescription() throws KNXException, InterruptedException
 	{
@@ -226,7 +226,7 @@ public class PropertyClientTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#getDescription(int, int)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testRemoteGetDescription() throws KNXException, InterruptedException
 	{
@@ -238,7 +238,7 @@ public class PropertyClientTest extends TestCase
 	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#getDescriptionByIndex(int, int)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testGetDescriptionByIndex() throws KNXException, InterruptedException
 	{
@@ -261,7 +261,7 @@ public class PropertyClientTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#getProperty(int, int)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testGetPropertyIntInt() throws KNXException, InterruptedException
 	{
@@ -280,7 +280,7 @@ public class PropertyClientTest extends TestCase
 	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#getProperty(int, int, int, int)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testGetPropertyIntIntIntInt() throws KNXException, InterruptedException
 	{
@@ -293,7 +293,7 @@ public class PropertyClientTest extends TestCase
 	 * (int, int, int, int)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testGetPropertyTranslated() throws KNXException, InterruptedException
 	{
@@ -310,7 +310,7 @@ public class PropertyClientTest extends TestCase
 	 * java.util.function.Consumer)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testScanPropertiesBooleanConsumer() throws KNXException, InterruptedException
 	{
@@ -327,7 +327,7 @@ public class PropertyClientTest extends TestCase
 	 * java.util.function.Consumer)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testScanPropertiesIntegerBooleanConsumer()
 		throws KNXException, InterruptedException
@@ -345,7 +345,7 @@ public class PropertyClientTest extends TestCase
 	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#setProperty(int, int, int, int, byte[])}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testSetPropertyIntIntIntIntByteArray() throws KNXException,
 		InterruptedException
@@ -365,7 +365,7 @@ public class PropertyClientTest extends TestCase
 	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#setProperty(int, int, int, java.lang.String)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testSetPropertyIntIntIntString() throws KNXException, InterruptedException
 	{

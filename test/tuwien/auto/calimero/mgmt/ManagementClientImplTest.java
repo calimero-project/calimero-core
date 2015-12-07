@@ -127,7 +127,7 @@ public class ManagementClientImplTest extends TestCase
 	 * (tuwien.auto.calimero.mgmt.Destination, byte[])}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testAuthorize() throws KNXException, InterruptedException
 	{
@@ -162,7 +162,7 @@ public class ManagementClientImplTest extends TestCase
 	 * (tuwien.auto.calimero.mgmt.Destination, byte[])}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testAuthorizeCL() throws KNXException, InterruptedException
 	{
@@ -178,7 +178,7 @@ public class ManagementClientImplTest extends TestCase
 	 * (tuwien.auto.calimero.mgmt.Destination, int, int)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testReadADC() throws KNXException, InterruptedException
 	{
@@ -212,7 +212,7 @@ public class ManagementClientImplTest extends TestCase
 	 * (tuwien.auto.calimero.mgmt.Destination, int, int)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testReadADCCL() throws KNXException, InterruptedException
 	{
@@ -227,7 +227,7 @@ public class ManagementClientImplTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readAddress(boolean)}.
 	 *
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 * @throws KNXException
 	 */
 	public final void testReadAddressBoolean() throws InterruptedException, KNXException
@@ -248,7 +248,7 @@ public class ManagementClientImplTest extends TestCase
 	 * {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readAddress(byte[])}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testReadAddressByteArray() throws KNXException, InterruptedException
 	{
@@ -270,7 +270,7 @@ public class ManagementClientImplTest extends TestCase
 	 * (tuwien.auto.calimero.mgmt.Destination, int, int)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testReadMemory() throws KNXException, InterruptedException
 	{
@@ -304,7 +304,7 @@ public class ManagementClientImplTest extends TestCase
 	 * (tuwien.auto.calimero.mgmt.Destination, int, int)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testReadMemoryCL() throws KNXException, InterruptedException
 	{
@@ -320,7 +320,7 @@ public class ManagementClientImplTest extends TestCase
 	 * (tuwien.auto.calimero.mgmt.Destination, int, int, int, int)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testReadPropertyDestinationIntIntIntInt() throws KNXException,
 		InterruptedException
@@ -374,7 +374,7 @@ public class ManagementClientImplTest extends TestCase
 	 * (tuwien.auto.calimero.mgmt.Destination, int, int, int, int)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testReadPropertyDestinationIntIntIntIntCL() throws KNXException,
 		InterruptedException
@@ -390,7 +390,7 @@ public class ManagementClientImplTest extends TestCase
 	 * (tuwien.auto.calimero.mgmt.Destination, int, int, int)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testReadPropertyDescDestinationIntIntInt() throws KNXException,
 		InterruptedException
@@ -438,7 +438,7 @@ public class ManagementClientImplTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#writeAddress
 	 * (tuwien.auto.calimero.IndividualAddress)}.
 	 *
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 * @throws KNXException
 	 */
 	public final void testWriteAddressIndividualAddress() throws InterruptedException,
@@ -470,7 +470,7 @@ public class ManagementClientImplTest extends TestCase
 	 * (byte[], tuwien.auto.calimero.IndividualAddress)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testWriteAddressByteArrayIndividualAddress() throws KNXException,
 		InterruptedException
@@ -494,7 +494,7 @@ public class ManagementClientImplTest extends TestCase
 	 * (tuwien.auto.calimero.mgmt.Destination, int, byte[])}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testWriteKey() throws KNXException, InterruptedException
 	{
@@ -522,7 +522,7 @@ public class ManagementClientImplTest extends TestCase
 	 * (tuwien.auto.calimero.mgmt.Destination, int, byte[])}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testWriteMemory() throws KNXException, InterruptedException
 	{
@@ -562,7 +562,7 @@ public class ManagementClientImplTest extends TestCase
 	 * (tuwien.auto.calimero.mgmt.Destination, int, int, int, int, byte[])}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testWritePropertyDestinationIntIntIntIntByteArray()
 		throws KNXException, InterruptedException
@@ -578,7 +578,7 @@ public class ManagementClientImplTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#detach()}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testClose() throws KNXException, InterruptedException
 	{
@@ -619,7 +619,7 @@ public class ManagementClientImplTest extends TestCase
 	 * tuwien.auto.calimero.IndividualAddress, int)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testReadDomainAddressIntIndividualAddressInt() throws KNXException,
 		InterruptedException
@@ -652,7 +652,7 @@ public class ManagementClientImplTest extends TestCase
 	 * {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readDomainAddress(boolean)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testReadDomainAddressBoolean() throws KNXException,
 		InterruptedException
@@ -690,7 +690,7 @@ public class ManagementClientImplTest extends TestCase
 	 * (tuwien.auto.calimero.mgmt.Destination, int)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testReadDeviceDesc() throws KNXException, InterruptedException
 	{

@@ -207,7 +207,7 @@ public class KNXNetworkMonitorFT12Test extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.link.KNXNetworkMonitorFT12#setDecodeRawFrames(boolean)}.
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testSetDecodeRawFrames() throws InterruptedException
 	{
@@ -239,7 +239,7 @@ public class KNXNetworkMonitorFT12Test extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.link.KNXNetworkMonitorFT12#close()}.
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testClose() throws InterruptedException
 	{

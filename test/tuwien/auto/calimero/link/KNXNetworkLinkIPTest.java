@@ -177,7 +177,7 @@ public class KNXNetworkLinkIPTest extends TestCase
 	 * tuwien.auto.calimero.link.medium.KNXMediumSettings)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testKNXNetworkLinkIPConstructor() throws KNXException, InterruptedException
 	{
@@ -277,7 +277,7 @@ public class KNXNetworkLinkIPTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.link.KNXNetworkLinkIP#close()}.
 	 *
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 * @throws KNXTimeoutException
 	 */
 	public final void testClose() throws InterruptedException, KNXTimeoutException
@@ -333,7 +333,7 @@ public class KNXNetworkLinkIPTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.link.KNXNetworkLinkIP#sendRequest
 	 * (tuwien.auto.calimero.KNXAddress, tuwien.auto.calimero.Priority, byte[])}.
 	 *
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 * @throws KNXException
 	 * @throws UnknownHostException
 	 */

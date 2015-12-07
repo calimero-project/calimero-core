@@ -155,7 +155,7 @@ public interface ManagementClient
 	 * @throws KNXInvalidResponseException on invalid read response message
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other read address errors
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	IndividualAddress[] readAddress(boolean oneAddressOnly) throws KNXException,
 		InterruptedException;
@@ -187,7 +187,7 @@ public interface ManagementClient
 	 * @throws KNXInvalidResponseException on invalid read response message
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other read address errors
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	IndividualAddress readAddress(byte[] serialNo) throws KNXException,
 		InterruptedException;
@@ -228,7 +228,7 @@ public interface ManagementClient
 	 * @throws KNXInvalidResponseException on invalid read response message
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other read domain address errors
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	List<byte[]> readDomainAddress(boolean oneAddressOnly) throws KNXException, InterruptedException;
 
@@ -273,7 +273,7 @@ public interface ManagementClient
 	 * @throws KNXInvalidResponseException on invalid response message
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other read domain address errors
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	List<byte[]> readDomainAddress(byte[] domain, IndividualAddress startAddress, int range)
 		throws KNXException, InterruptedException;
@@ -307,7 +307,7 @@ public interface ManagementClient
 	 * @throws KNXDisconnectException on disconnect in connection oriented mode
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other read device descriptor errors
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	byte[] readDeviceDesc(Destination dst, int descType) throws KNXException,
 		InterruptedException;
@@ -365,7 +365,7 @@ public interface ManagementClient
 	 * @throws KNXRemoteException
 	 * @throws KNXDisconnectException
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	int restart(final Destination dst, int eraseCode, int channel) throws KNXTimeoutException,
 		KNXRemoteException, KNXDisconnectException, KNXLinkClosedException, InterruptedException;
@@ -396,7 +396,7 @@ public interface ManagementClient
 	 * @throws KNXDisconnectException on disconnect in connection oriented mode
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other read property error
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	byte[] readProperty(Destination dst, int objIndex, int propertyId, int start, int elements)
 		throws KNXException, InterruptedException;
@@ -425,7 +425,7 @@ public interface ManagementClient
 	 * @throws KNXDisconnectException on disconnect in connection oriented mode
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other read property error
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	void writeProperty(Destination dst, int objIndex, int propertyId, int start, int elements,
 		byte[] data) throws KNXException, InterruptedException;
@@ -454,7 +454,7 @@ public interface ManagementClient
 	 * @throws KNXDisconnectException on disconnect in connection oriented mode
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other read property description error
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	byte[] readPropertyDesc(Destination dst, int objIndex, int propertyId, int propIndex)
 		throws KNXException, InterruptedException;
@@ -474,7 +474,7 @@ public interface ManagementClient
 	 * @throws KNXDisconnectException on disconnect during read
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other read A/D converter error
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	int readADC(Destination dst, int channel, int repeat) throws KNXException, InterruptedException;
 
@@ -497,7 +497,7 @@ public interface ManagementClient
 	 * @throws KNXDisconnectException on disconnect during read
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other read memory problems
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	byte[] readMemory(Destination dst, int startAddr, int bytes) throws KNXException,
 		InterruptedException;
@@ -523,7 +523,7 @@ public interface ManagementClient
 	 * @throws KNXDisconnectException on disconnect during read
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other write memory problems
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	void writeMemory(Destination dst, int startAddr, byte[] data) throws KNXException,
 		InterruptedException;
@@ -548,7 +548,7 @@ public interface ManagementClient
 	 * @throws KNXDisconnectException on disconnect during authorize
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other authorization error
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	int authorize(Destination dst, byte[] key) throws KNXException, InterruptedException;
 
@@ -571,7 +571,7 @@ public interface ManagementClient
 	 * @throws KNXDisconnectException on disconnect during write
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other write key error
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	void writeKey(Destination dst, int level, byte[] key) throws KNXException, InterruptedException;
 

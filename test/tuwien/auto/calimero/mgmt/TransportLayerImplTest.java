@@ -227,7 +227,7 @@ public class TransportLayerImplTest extends TestCase
 	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testBroadcast() throws KNXTimeoutException, KNXLinkClosedException,
 		InterruptedException
@@ -432,7 +432,7 @@ public class TransportLayerImplTest extends TestCase
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 * @throws KNXDisconnectException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testSendDataDestinationPriorityByteArray() throws KNXDisconnectException,
 		KNXTimeoutException, KNXLinkClosedException, InterruptedException
@@ -474,7 +474,7 @@ public class TransportLayerImplTest extends TestCase
 	 * 	(tuwien.auto.calimero.mgmt.Destination, tuwien.auto.calimero.Priority, byte[])}.
 	 * @throws KNXTimeoutException
 	 * @throws KNXLinkClosedException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public void testSendDataNonExistingAddress() throws KNXTimeoutException,
 		KNXLinkClosedException, InterruptedException
@@ -532,7 +532,7 @@ public class TransportLayerImplTest extends TestCase
 	 * @throws KNXTimeoutException
 	 * @throws KNXLinkClosedException
 	 * @throws KNXDisconnectException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public void testSendDataLinkClose() throws KNXTimeoutException,
 		KNXLinkClosedException, KNXDisconnectException, InterruptedException
@@ -550,7 +550,7 @@ public class TransportLayerImplTest extends TestCase
 	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testSendDataKNXAddressPriorityByteArray() throws KNXTimeoutException,
 		KNXLinkClosedException, InterruptedException

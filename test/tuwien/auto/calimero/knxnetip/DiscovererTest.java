@@ -125,7 +125,7 @@ public class DiscovererTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.Discoverer#clearSearchResponses()}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testClearSearchResponses() throws KNXException, InterruptedException
 	{
@@ -140,7 +140,7 @@ public class DiscovererTest extends TestCase
 	 * (java.net.InetSocketAddress, int)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testGetDescription() throws KNXException, InterruptedException
 	{
@@ -152,7 +152,7 @@ public class DiscovererTest extends TestCase
 	 * (java.net.InetSocketAddress, int)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testNATGetDescription() throws KNXException, InterruptedException
 	{
@@ -189,7 +189,7 @@ public class DiscovererTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.Discoverer#getSearchResponses()}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testGetSearchResponses() throws KNXException, InterruptedException
 	{
@@ -200,7 +200,7 @@ public class DiscovererTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.Discoverer#getSearchResponses()}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testNATGetSearchResponses() throws KNXException, InterruptedException
 	{
@@ -220,7 +220,7 @@ public class DiscovererTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.Discoverer#getSearchResponses()}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testMcastGetSearchResponses() throws KNXException, InterruptedException
 	{
@@ -247,7 +247,7 @@ public class DiscovererTest extends TestCase
 	 *
 	 * @throws KNXException
 	 * @throws SocketException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testStartSearchIntNetworkInterfaceIntBoolean() throws SocketException,
 		KNXException, InterruptedException
@@ -261,7 +261,7 @@ public class DiscovererTest extends TestCase
 	 *
 	 * @throws KNXException
 	 * @throws SocketException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testNATStartSearchIntNetworkInterfaceIntBoolean() throws SocketException,
 		KNXException, InterruptedException
@@ -285,7 +285,7 @@ public class DiscovererTest extends TestCase
 	 *
 	 * @throws KNXException
 	 * @throws SocketException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testMcastStartSearchIntNetworkInterfaceIntBoolean() throws SocketException,
 		KNXException, InterruptedException
@@ -328,7 +328,7 @@ public class DiscovererTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.Discoverer#startSearch(int, boolean)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testStartSearchIntBoolean() throws KNXException, InterruptedException
 	{
@@ -339,7 +339,7 @@ public class DiscovererTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.Discoverer#startSearch(int, boolean)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testNATStartSearchIntBoolean() throws KNXException, InterruptedException
 	{
@@ -359,7 +359,7 @@ public class DiscovererTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.Discoverer#startSearch(int, boolean)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testMcastStartSearchIntBoolean() throws KNXException, InterruptedException
 	{
@@ -368,7 +368,7 @@ public class DiscovererTest extends TestCase
 
 	/**
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	private void doStartSeach(final Discoverer d, final boolean usesMulticast) throws KNXException,
 		InterruptedException
@@ -402,7 +402,7 @@ public class DiscovererTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.Discoverer#stopSearch()}.
 	 *
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 * @throws KNXException
 	 */
 	public final void testStopSearch() throws InterruptedException, KNXException
@@ -446,7 +446,7 @@ public class DiscovererTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.Discoverer#isSearching()}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testIsSearching() throws KNXException, InterruptedException
 	{

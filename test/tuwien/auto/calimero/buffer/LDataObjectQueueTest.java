@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -258,7 +258,7 @@ public class LDataObjectQueueTest extends TestCase
 	 * {@link tuwien.auto.calimero.buffer.LDataObjectQueue#LDataObjectQueue(GroupAddress,
 	 * boolean, int, boolean,
 	 * tuwien.auto.calimero.buffer.LDataObjectQueue.QueueListener)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public void testCEMICacheObjectQueueGroupAddressIntBooleanBoolean()
@@ -385,8 +385,8 @@ public class LDataObjectQueueTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.buffer.LDataObjectQueue#getTimestamps()}.
-	 * 
-	 * @throws InterruptedException
+	 *
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public void testGetTimestamps() throws InterruptedException
 	{
@@ -487,7 +487,7 @@ public class LDataObjectQueueTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.buffer.LDataObjectQueue#clear()}.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public void testClear() throws Exception
