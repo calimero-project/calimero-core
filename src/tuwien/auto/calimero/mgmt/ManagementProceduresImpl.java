@@ -214,6 +214,23 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		}
 	}
 
+	@Override
+	public void readDomainAddress(final BiConsumer<IndividualAddress, byte[]> device)
+		throws KNXException, InterruptedException
+	{
+		synchronized (mc) {
+			final int oldTimeout = mc.getResponseTimeout();
+			mc.setResponseTimeout(3);
+			try {
+				mc.readDomainAddress(device);
+			}
+			catch (final KNXTimeoutException e) {}
+			finally {
+				mc.setResponseTimeout(oldTimeout);
+			}
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.ManagementProcedures
 	 * #writeAddress(tuwien.auto.calimero.IndividualAddress)

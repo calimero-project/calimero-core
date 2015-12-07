@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -160,11 +160,25 @@ public interface ManagementProcedures
 	 *         device address
 	 * @throws InterruptedException
 	 */
-	boolean writeAddress(byte[] serialNo, IndividualAddress newAddress) throws KNXException,
-			InterruptedException;
+	boolean writeAddress(byte[] serialNo, IndividualAddress newAddress) throws KNXException, InterruptedException;
 
-	// NYI DOA+Ind.Addr procedures: its unclear how to associate domain to ind.addr of
-	// several responses; it's not that important, power-line isn't common anyway
+	/**
+	 * Reads the domain address of a communication partner in the KNX network, providing both the individual address of
+	 * the device as well as its domain address for all devices from which a response is received.
+	 * <p>
+	 * This service is designed for open media and uses system broadcast communication mode.<br>
+	 * The communication partner is one or more devices in programming mode. The total response timeout granted to any
+	 * device responding is 3 seconds.
+	 *
+	 * @param device consumer called for every responding device, with the first argument being the device address, the
+	 *        second argument its domain address
+	 * @throws KNXTimeoutException on any timeout during sending the request
+	 * @throws KNXInvalidResponseException on invalid read response message
+	 * @throws KNXLinkClosedException on closed KNX network link
+	 * @throws KNXException on other errors during read domain address
+	 * @throws InterruptedException on interrupted thread
+	 */
+	void readDomainAddress(BiConsumer<IndividualAddress, byte[]> device) throws KNXException, InterruptedException;
 
 	// scanning procedures
 
