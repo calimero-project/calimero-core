@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -217,7 +217,7 @@ public class ProcessCommunicatorTest extends TestCase
 	 * .
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testReadBool() throws KNXException, InterruptedException
 	{
@@ -289,7 +289,7 @@ public class ProcessCommunicatorTest extends TestCase
 	 * .
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testWriteGroupAddressBoolean() throws KNXException,
 		InterruptedException
@@ -310,7 +310,7 @@ public class ProcessCommunicatorTest extends TestCase
 	 * .
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testReadUnsigned() throws KNXException, InterruptedException
 	{
@@ -324,7 +324,7 @@ public class ProcessCommunicatorTest extends TestCase
 	 * .
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testWriteGroupAddressIntString() throws KNXException, InterruptedException
 	{
@@ -341,7 +341,7 @@ public class ProcessCommunicatorTest extends TestCase
 	 * .
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testReadControl() throws KNXException, InterruptedException
 	{
@@ -367,7 +367,7 @@ public class ProcessCommunicatorTest extends TestCase
 	 * .
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testReadFloatBoolean() throws KNXException, InterruptedException
 	{
@@ -395,7 +395,7 @@ public class ProcessCommunicatorTest extends TestCase
 	 * .
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testReadString() throws KNXException, InterruptedException
 	{
@@ -410,7 +410,7 @@ public class ProcessCommunicatorTest extends TestCase
 	 * .
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testWriteGroupAddressString() throws KNXException, InterruptedException
 	{
@@ -427,7 +427,7 @@ public class ProcessCommunicatorTest extends TestCase
 	 * .
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testRead() throws KNXException, InterruptedException
 	{

@@ -270,7 +270,7 @@ public class KNXNetworkLinkFT12Test extends TestCase
 	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testSendRequest() throws KNXTimeoutException,
 		KNXLinkClosedException, InterruptedException
@@ -382,7 +382,7 @@ public class KNXNetworkLinkFT12Test extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.link.KNXNetworkLinkFT12#close()}.
 	 *
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 * @throws KNXTimeoutException
 	 */
 	public final void testClose() throws InterruptedException, KNXTimeoutException

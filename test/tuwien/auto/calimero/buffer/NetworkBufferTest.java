@@ -142,7 +142,7 @@ public class NetworkBufferTest extends TestCase
 	/**
 	 * Test method for state based buffering.
 	 *
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 * @throws KNXException
 	 */
 	public final void testStateBasedBuffering() throws InterruptedException, KNXException
@@ -199,7 +199,7 @@ public class NetworkBufferTest extends TestCase
 	 * Test method for state based buffering.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testInvalidationUpdating() throws KNXException,
 		InterruptedException
@@ -268,7 +268,7 @@ public class NetworkBufferTest extends TestCase
 	/**
 	 * Test method for command based buffering.
 	 *
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 * @throws KNXException
 	 */
 	public final void testCommandBasedBuffering() throws InterruptedException,
@@ -345,7 +345,7 @@ public class NetworkBufferTest extends TestCase
 	/**
 	 * Test method for query buffer only mode.
 	 *
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 * @throws KNXException
 	 */
 	public final void testQueryBufferOnly() throws InterruptedException, KNXException

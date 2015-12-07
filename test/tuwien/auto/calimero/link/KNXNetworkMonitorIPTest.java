@@ -139,7 +139,7 @@ public class KNXNetworkMonitorIPTest extends TestCase
 	 * tuwien.auto.calimero.link.medium.KNXMediumSettings)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testKNXNetworkMonitorIP() throws KNXException, InterruptedException
 	{
@@ -184,7 +184,7 @@ public class KNXNetworkMonitorIPTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.link.KNXNetworkMonitorIP#close()}.
 	 *
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testClose() throws InterruptedException
 	{
@@ -201,7 +201,7 @@ public class KNXNetworkMonitorIPTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.link.KNXNetworkMonitorIP#setDecodeRawFrames (boolean)}.
 	 *
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testSetDecodeRawFrames() throws InterruptedException
 	{

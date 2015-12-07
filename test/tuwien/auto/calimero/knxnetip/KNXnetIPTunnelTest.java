@@ -168,7 +168,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	 * tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testSend() throws KNXException, InterruptedException
 	{
@@ -203,7 +203,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	 * tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testFIFOSend() throws KNXException,
 		InterruptedException
@@ -273,7 +273,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	 * tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testNATSend() throws KNXException, InterruptedException
 	{
@@ -294,7 +294,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	 * tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testMonitorSend() throws KNXException, InterruptedException
 	{
@@ -385,7 +385,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	 * (short, java.net.InetSocketAddress, java.net.InetSocketAddress, boolean)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testKNXnetIPTunnel() throws KNXException, InterruptedException
 	{
@@ -412,7 +412,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	 * (short, java.net.InetSocketAddress, java.net.InetSocketAddress, boolean)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testKNXnetIPMonitor() throws KNXException, InterruptedException
 	{
@@ -424,7 +424,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#close()}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testClose() throws KNXException, InterruptedException
 	{
@@ -444,7 +444,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	 * {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#getRemoteAddress()}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testGetRemoteAddress() throws KNXException, InterruptedException
 	{
@@ -459,7 +459,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#getState()}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testGetState() throws KNXException,
 		InterruptedException
@@ -481,7 +481,7 @@ public class KNXnetIPTunnelTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPTunnel#getState()}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testMonitorGetState() throws KNXException,
 		InterruptedException

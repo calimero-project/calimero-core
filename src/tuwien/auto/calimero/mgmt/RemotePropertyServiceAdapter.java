@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2015 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ import tuwien.auto.calimero.link.NetworkLinkListener;
 /**
  * Property adapter for remote property services.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public class RemotePropertyServiceAdapter implements PropertyAdapter
@@ -57,7 +57,7 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 	private byte[] key;
 	private final NetworkLinkListener nll;
 	private final PropertyAdapterListener pal;
-	
+
 	private final class NLListener implements NetworkLinkListener
 	{
 		NLListener()
@@ -75,10 +75,10 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 				.getInitiator(), e.getReason()));
 		}
 	}
-	
+
 	/**
 	 * Creates a new property adapter for remote property access.
-	 * 
+	 *
 	 * @param link KNX network link used for communication with the KNX network
 	 * @param remote KNX individual address to access its interface objects
 	 * @param l property adapter listener to get notified about adapter events, use
@@ -103,7 +103,7 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 	/**
 	 * Creates a new property adapter for remote property access in connection-oriented
 	 * mode with authorization.
-	 * 
+	 *
 	 * @param link KNX network link used for communication with the KNX network
 	 * @param remote KNX individual address to access its interface objects
 	 * @param l property adapter listener to get notified about adapter events, use
@@ -111,7 +111,7 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 	 * @param authorizeKey byte array with authorization key
 	 * @throws KNXLinkClosedException if the network link is closed
 	 * @throws KNXException on failure during authorization
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public RemotePropertyServiceAdapter(final KNXNetworkLink link,
 		final IndividualAddress remote, final PropertyAdapterListener l,

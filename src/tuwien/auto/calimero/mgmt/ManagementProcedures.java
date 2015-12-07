@@ -76,7 +76,7 @@ public interface ManagementProcedures
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXRemoteException on invalid response behavior from a remote endpoint
 	 * @throws KNXException and subtypes on other errors
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	IndividualAddress[] readAddress() throws KNXException, InterruptedException;
 
@@ -93,7 +93,7 @@ public interface ManagementProcedures
 	 * @return <code>true</code> if address was written successfully, <code>false</code>
 	 *         if device with address exists but was not set to programming mode
 	 * @throws KNXException on error attempting to write the new individual device address
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	boolean writeAddress(IndividualAddress newAddress) throws KNXException, InterruptedException;
 
@@ -106,7 +106,7 @@ public interface ManagementProcedures
 	 * devices in programming mode are restarted.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	void resetAddress() throws KNXException, InterruptedException;
 
@@ -120,7 +120,7 @@ public interface ManagementProcedures
 	 * @return <code>true</code> if address is occupied, <code>false</code> if not
 	 *         occupied
 	 * @throws KNXException on network or send errors
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	boolean isAddressOccupied(IndividualAddress devAddr) throws KNXException, InterruptedException;
 
@@ -136,7 +136,7 @@ public interface ManagementProcedures
 	 * @throws KNXInvalidResponseException on invalid read response message
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other read address errors
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	IndividualAddress readAddress(byte[] serialNo) throws KNXException, InterruptedException;
 
@@ -156,7 +156,7 @@ public interface ManagementProcedures
 	 *         verification
 	 * @throws KNXException on any errors attempting to write or verify the written individual
 	 *         device address
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	boolean writeAddress(byte[] serialNo, IndividualAddress newAddress) throws KNXException,
 			InterruptedException;
@@ -238,7 +238,7 @@ public interface ManagementProcedures
 	 * @return a new list with byte arrays of serial numbers, corresponding to KNX devices having
 	 *         the default individual address set
 	 * @throws KNXException on network or reading error obtaining the serial numbers
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	// ??? can we automatically detect the medium in this procedure?
 	List scanSerialNumbers(int medium) throws KNXException, InterruptedException;
@@ -255,7 +255,7 @@ public interface ManagementProcedures
 	 * @param programming <code>true</code> to set the device into programming mode,
 	 *        <code>false</code> to switch off programming mode
 	 * @throws KNXException on communication error or device access problems
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	void setProgrammingMode(IndividualAddress device, boolean programming) throws KNXException,
 			InterruptedException;
@@ -285,7 +285,7 @@ public interface ManagementProcedures
 	 *        any written memory, <code>false</code> otherwise; if <code>true</code>,
 	 *        <code>verifyWrite</code> has to be set to <code>false</code>
 	 * @throws KNXException on communication error or device access problems
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	void writeMemory(IndividualAddress device, long startAddress, byte[] data, boolean verifyWrite,
 			boolean verifyByServer) throws KNXException, InterruptedException;
@@ -305,7 +305,7 @@ public interface ManagementProcedures
 	 * @param bytes number of bytes to read, <code>0 < bytes</code>
 	 * @return an array of bytes, with the length of the array equal to <code>bytes</code>
 	 * @throws KNXException on communication error or device access problems
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	byte[] readMemory(IndividualAddress device, long startAddress, int bytes) throws KNXException,
 			InterruptedException;

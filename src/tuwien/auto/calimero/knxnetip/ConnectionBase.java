@@ -582,7 +582,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	 * from send() after WAIT_FOR_ACK was completed.
 	 *
 	 * @throws KNXTimeoutException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	void doExtraBlockingModes() throws KNXTimeoutException, InterruptedException
 	{}

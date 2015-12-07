@@ -109,7 +109,7 @@ public class ManagementProceduresImplTest extends TestCase
 	 * {@link tuwien.auto.calimero.mgmt.ManagementProceduresImpl#readAddress()}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testReadAddress() throws KNXException, InterruptedException
 	{
@@ -126,7 +126,7 @@ public class ManagementProceduresImplTest extends TestCase
 	 * {@link tuwien.auto.calimero.mgmt.ManagementProceduresImpl#writeAddress(IndividualAddress)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testWriteAddress() throws KNXException, InterruptedException
 	{
@@ -150,7 +150,7 @@ public class ManagementProceduresImplTest extends TestCase
 	 * {@link tuwien.auto.calimero.mgmt.ManagementProceduresImpl#resetAddress()}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testResetAddress() throws KNXException, InterruptedException
 	{
@@ -167,7 +167,7 @@ public class ManagementProceduresImplTest extends TestCase
 	 * {@link tuwien.auto.calimero.mgmt.ManagementProceduresImpl#isAddressOccupied(IndividualAddress)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testIsAddressOccupied() throws KNXException, InterruptedException
 	{
@@ -178,7 +178,7 @@ public class ManagementProceduresImplTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.mgmt.ManagementProceduresImpl#readAddress(byte[])}.
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 * @throws KNXException
 	 *
 	 */
@@ -191,7 +191,7 @@ public class ManagementProceduresImplTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.mgmt.ManagementProceduresImpl#writeAddress(byte[], IndividualAddress)}.
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 * @throws KNXException
 	 *
 	 */
@@ -206,7 +206,7 @@ public class ManagementProceduresImplTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.mgmt.ManagementProceduresImpl#scanNetworkRouters()}.
 	 *
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 */
@@ -223,7 +223,7 @@ public class ManagementProceduresImplTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.mgmt.ManagementProceduresImpl#scanNetworkDevices(int, int)}.
 	 *
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 */
@@ -268,7 +268,7 @@ public class ManagementProceduresImplTest extends TestCase
 	 * IndividualAddress, boolean)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testSetProgrammingMode() throws KNXException, InterruptedException
 	{
@@ -282,7 +282,7 @@ public class ManagementProceduresImplTest extends TestCase
 	 * IndividualAddress, long, byte[], boolean, boolean)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testWriteMemoryShort() throws KNXException, InterruptedException
 	{
@@ -301,7 +301,7 @@ public class ManagementProceduresImplTest extends TestCase
 	 * IndividualAddress, long, byte[], boolean, boolean)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testWriteMemoryLong() throws KNXException, InterruptedException
 	{
@@ -320,7 +320,7 @@ public class ManagementProceduresImplTest extends TestCase
 	 * tuwien.auto.calimero.IndividualAddress, long, int)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testReadMemoryShort() throws KNXException, InterruptedException
 	{
@@ -333,7 +333,7 @@ public class ManagementProceduresImplTest extends TestCase
 	 * IndividualAddress, long, int)}.
 	 *
 	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws InterruptedException on interrupted thread
 	 */
 	public final void testReadMemoryLong() throws KNXException, InterruptedException
 	{
