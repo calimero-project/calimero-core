@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -348,6 +348,17 @@ public class CEMILData implements CEMI
 	public final Priority getPriority()
 	{
 		return p;
+	}
+
+	/**
+	 * Returns the broadcast type of this message, applicable for open transmission media. By default, returns
+	 * <code>false</code>, indicating domain-only broadcast on open media or "don't care" on closed media.
+	 *
+	 * @return <code>true</code> if system broadcast (open media), <code>false</code> for broadcast within domain or
+	 *         "don't care"
+	 */
+	public final boolean isSystemBroadcast() {
+		return (ctrl1 & 0x10) == 0;
 	}
 
 	/**
