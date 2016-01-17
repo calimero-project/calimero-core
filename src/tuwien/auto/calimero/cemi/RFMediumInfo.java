@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015 B. Malinowsky
+    Copyright (c) 2015, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,13 +55,16 @@ public final class RFMediumInfo extends AddInfo
 	// for .req: if dst is group address != 0x0000, use KNX serial number (AET is set to 0)
 
 	/**
-	 * Defined values of Received Signal Strength (RSS): RSS = 0x00: no measurement, 0x01: weak,
-	 * 0x02: medium, 0x03: strong
+	 * Received Signal Strength (RSS): RSS = 0x00: no measurement, 0x01: weak, 0x02: medium, 0x03: strong.
 	 */
 	public enum RSS {
+		/** RSS = void / no measurement. */
 		Void("void (no measurement)"),
+		/** RSS = weak. */
 		Weak("weak"),
+		/** RSS = medium. */
 		Medium("medium"),
+		/** RSS = strong. */
 		Strong("strong");
 
 		private final String v;
@@ -74,6 +77,11 @@ public final class RFMediumInfo extends AddInfo
 
 	private final boolean sysBcast;
 
+	/**
+	 * Constructs a new RF medium info from a byte array containing the additional RF medium information.
+	 *
+	 * @param info RF medium info data
+	 */
 	public RFMediumInfo(final byte[] info)
 	{
 		this(info, false);
