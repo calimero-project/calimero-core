@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2014, 2015 B. Malinowsky
+    Copyright (c) 2014, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -682,8 +682,8 @@ public class TpuartConnection implements AutoCloseable
 		// create a cEMI L-Data from a TP1 frame
 		private byte[] createLData(final int mc, final byte[] tp1)
 		{
-			// TODO allow return of null, and ignore frames with invalid checksum
-			isValidChecksum(tp1);
+			if (!isValidChecksum(tp1))
+				return null;
 
 			final boolean std = (tp1[0] & StdFrameFormat) == StdFrameFormat;
 			final byte[] ind = new byte[tp1.length + (std ? 2 : 1)];
@@ -727,6 +727,8 @@ public class TpuartConnection implements AutoCloseable
 
 		private void fireFrameReceived(final byte[] frame)
 		{
+			if (frame == null)
+				return;
 			logger.trace("cEMI (length " + frame.length + "): " + DataUnitBuilder.toHex(frame, " "));
 			try {
 				final CEMI msg = CEMIFactory.create(frame, 0, frame.length);
