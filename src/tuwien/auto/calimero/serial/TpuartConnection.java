@@ -135,6 +135,9 @@ public class TpuartConnection implements AutoCloseable
 	private final Receiver receiver;
 	private final Object lock = new Object();
 
+	private volatile boolean idle;
+	private final Object enterIdleLock = new Object();
+
 	// NYI compare to received frame for .con, or just remove
 	private volatile byte[] req;
 	private volatile int state;
@@ -262,8 +265,14 @@ public class TpuartConnection implements AutoCloseable
 			logger.trace("UART services {}", DataUnitBuilder.toHex(data, " "));
 			req = frame.clone();
 //			for (int i = 0; i < MaxSendAttempts; i++) {
-			logger.debug("write UART services, {}",
-					(waitForCon ? "waiting for .con" : "non-blocking"));
+			final long start = System.nanoTime();
+			synchronized (enterIdleLock) {
+				if (!idle)
+					enterIdleLock.wait();
+			}
+			logger.trace("UART ready for sending after {} us", (System.nanoTime() - start) / 1000);
+
+			logger.debug("write UART services, {}", (waitForCon ? "waiting for .con" : "non-blocking"));
 			os.write(data);
 			state = ConPending;
 			if (!waitForCon)
@@ -450,17 +459,36 @@ public class TpuartConnection implements AutoCloseable
 			catch (final IOException ignore) {}
 			logger.trace("drain rx queue ({} bytes)", drained);
 
+			long enterIdleTimestamp = 0; // [ns]
 			while (!quit) {
 				try {
 					final long start = System.nanoTime();
-					final int c = is.read();
+					final int c = is.available() > 0 || idle ? is.read() : -1;
+
 					if (c == -1) {
 						if (lastUartState + UartStateReadInterval < System.currentTimeMillis())
 							readUartState();
+
+						// we transition to idle state after some time of inactivity, and notify a waiting sender
+						final long inactivity = 10000; // [us]
+						if (enterIdleTimestamp == 0)
+							enterIdleTimestamp = start;
+						else if ((start - enterIdleTimestamp) / 1000 > inactivity) {
+							synchronized (enterIdleLock) {
+								idle = true;
+								enterIdleLock.notify();
+							}
+						}
 						continue;
 					}
 
 //					logger.trace("read 0x" + Integer.toHexString(c));
+					final long idlePeriod = (start - enterIdleTimestamp) / 1000;
+					if (enterIdleTimestamp != 0 && idlePeriod > 100_000)
+						logger.trace("return from extended idle period of {} us", idlePeriod);
+					idle = false;
+					enterIdleTimestamp = 0;
+
 					if (parseFrame(c) || isLDataCon(c) || isUartStateInd(c))
 						; // nothing to do
 					else if (c == Reset_ind)
