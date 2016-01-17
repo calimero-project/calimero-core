@@ -440,6 +440,16 @@ public class TpuartConnection implements AutoCloseable
 		@Override
 		public void run()
 		{
+			// at first drain rx queue of any old frames
+			// most likely, flushes out the reset.ind corresponding to our init reset, but that's ok
+			int drained = 0;
+			try {
+				while (is.read() != -1)
+					drained++;
+			}
+			catch (final IOException ignore) {}
+			logger.trace("drain rx queue ({} bytes)", drained);
+
 			while (!quit) {
 				try {
 					final long start = System.nanoTime();
