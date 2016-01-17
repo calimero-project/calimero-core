@@ -67,10 +67,10 @@ import tuwien.auto.calimero.internal.EventListeners;
 import tuwien.auto.calimero.log.LogService;
 
 /**
- * Provides a connection with a TP-UART-IC controller for transparent communication with a KNX TP1
- * network. The connection supports cEMI L-Data communication and busmonitor mode.<br>
- * The host establishes a connection over a serial port, using any identifier recognized and
- * supported by the serial adapter and the operating system.
+ * Provides a connection with a TP-UART-IC controller for transparent communication with a KNX TP1 network. The
+ * connection supports cEMI L-Data communication and busmonitor mode.<br>
+ * The host establishes a connection over a serial port, using any identifier recognized and supported by the serial
+ * adapter and the operating system.
  * <p>
  * Interruption policy: any blocking sends are cancelled.
  *
@@ -149,18 +149,16 @@ public class TpuartConnection implements AutoCloseable
 	private final Logger logger;
 
 	/**
-	 * Creates a new TP-UART connection using communication port <code>portId</code>, expecting a
-	 * collection of KNX addresses for which the host shall acknowledge TP1 frame reception.
+	 * Creates a new TP-UART connection using communication port <code>portId</code>, expecting a collection of KNX
+	 * addresses for which the host shall acknowledge TP1 frame reception.
 	 *
 	 * @param portId the identifier of the communication port
-	 * @param acknowledge a (possibly empty) collection of KNX addresses this endpoint shall issue a
-	 *        positive acknowledgement for, on receiving a valid TP1 frame with its destination
-	 *        address being an element in <code>acknowledge</code>
-	 * @throws KNXException on error opening the communication port, or initializing the TP-UART
-	 *         controller
+	 * @param acknowledge a (possibly empty) collection of KNX addresses this endpoint shall issue a positive
+	 *        acknowledgement for, on receiving a valid TP1 frame with its destination address being an element in
+	 *        <code>acknowledge</code>
+	 * @throws KNXException on error opening the communication port, or initializing the TP-UART controller
 	 */
-	public TpuartConnection(final String portId, final Collection<? extends KNXAddress> acknowledge)
-		throws KNXException
+	public TpuartConnection(final String portId, final Collection<? extends KNXAddress> acknowledge) throws KNXException
 	{
 		this.portId = portId;
 		logger = LogService.getAsyncLogger("calimero.serial.tpuart");
@@ -182,8 +180,8 @@ public class TpuartConnection implements AutoCloseable
 	}
 
 	/**
-	 * Adds the specified event listener <code>l</code> to receive events from this connection. If
-	 * <code>l</code> was already added as listener, no action is performed.
+	 * Adds the specified event listener <code>l</code> to receive events from this connection. If <code>l</code> was
+	 * already added as listener, no action is performed.
 	 *
 	 * @param l the listener to add
 	 */
@@ -193,8 +191,8 @@ public class TpuartConnection implements AutoCloseable
 	}
 
 	/**
-	 * Removes the specified event listener <code>l</code>, so it does no longer receive events from
-	 * this connection. If <code>l</code> was not added in the first place, no action is performed.
+	 * Removes the specified event listener <code>l</code>, so it does no longer receive events from this connection. If
+	 * <code>l</code> was not added in the first place, no action is performed.
 	 *
 	 * @param l the listener to remove
 	 */
@@ -237,19 +235,16 @@ public class TpuartConnection implements AutoCloseable
 	}
 
 	/**
-	 * Sends a cEMI L-Data frame, either waiting for confirmation or non-blocking. Sending is
-	 * not-permitted in busmonitor mode. A cEMI frame for TP1 does not require any additional
-	 * information, therefore is assumed to not contain any, i.e., the field with additional
-	 * information length is 0.
+	 * Sends a cEMI L-Data frame, either waiting for confirmation or non-blocking. Sending is not-permitted in
+	 * busmonitor mode. A cEMI frame for TP1 does not require any additional information, therefore is assumed to not
+	 * contain any, i.e., the field with additional information length is 0.
 	 *
-	 * @param frame cEMI L-Data msg as byte array, <code>msg</code> cannot contain additional
-	 *        information types (additional information length field equals 0)
+	 * @param frame cEMI L-Data msg as byte array, <code>msg</code> cannot contain additional information types
+	 *        (additional information length field equals 0)
 	 * @param waitForCon wait for L_Data.con (blocking) or not (non-blocking)
 	 * @throws KNXPortClosedException on closed communication port
-	 * @throws KNXAckTimeoutException on send/receive timeout (or if no ACK from the bus was
-	 *         received)
-	 * @throws InterruptedException on thread interrupt, a send waiting for L-Data confirmation will
-	 *         be cancelled
+	 * @throws KNXAckTimeoutException on send/receive timeout (or if no ACK from the bus was received)
+	 * @throws InterruptedException on thread interrupt, a send waiting for L-Data confirmation will be cancelled
 	 */
 	// TODO sync concurrent sends
 	public void send(final byte[] frame, final boolean waitForCon)
@@ -417,8 +412,8 @@ public class TpuartConnection implements AutoCloseable
 		final int expected = frame[frame.length - 1];
 		final boolean valid = expected == cs;
 		if (!valid)
-			logger.warn("invalid L-Data checksum 0x{}, expected 0x{}",
-					Integer.toHexString(cs & 0xff), Integer.toHexString(expected & 0xff));
+			logger.warn("invalid L-Data checksum 0x{}, expected 0x{}", Integer.toHexString(cs & 0xff),
+					Integer.toHexString(expected & 0xff));
 		return valid;
 	}
 
@@ -460,8 +455,6 @@ public class TpuartConnection implements AutoCloseable
 						; // nothing to do
 					else if (c == Reset_ind)
 						logger.debug("TP-UART reset.ind");
-//					else if (lastUartState + UartStateReadInterval < System.currentTimeMillis())
-//						readUartState();
 
 					final long loop = System.nanoTime() - start;
 					logger.trace("loop time = {} us", loop / 1000);
@@ -535,9 +528,6 @@ public class TpuartConnection implements AutoCloseable
 						}
 					}
 				}
-//				else
-//					logger.trace("L_Data.ind array < {}: {}", minLength,
-//							DataUnitBuilder.toHex(in.toByteArray(), " "));
 			}
 			else if (isLDataStart(c)) {
 				lastRead = System.nanoTime() / 1000;
@@ -576,8 +566,8 @@ public class TpuartConnection implements AutoCloseable
 			final boolean protError = (c & 0x10) == 0x10; // illegal ctrl byte
 			final boolean tempWarning = (c & 0x08) == 0x08; // too hot
 			logger.debug("TP-UART status update: {}Temp. {}, Errors: Rx={} Tx={} Prot={}",
-					slaveCollision ? "Slave collision, " : "", tempWarning ? "warning" : "OK",
-					rxError, txError, protError);
+					slaveCollision ? "Slave collision, " : "", tempWarning ? "warning" : "OK", rxError, txError,
+					protError);
 			// NYI if controller sends warning, we have to pause tx for 1 sec
 			if (tempWarning)
 				logger.warn("TP-UART high temperature warning!");
@@ -603,8 +593,7 @@ public class TpuartConnection implements AutoCloseable
 			final boolean start = (c & 0xd0) == StdFrameFormat || (c & 0xd0) == ExtFrameFormat;
 			if (start) {
 				final boolean repeated = (c & RepeatFlag) == 0;
-				logger.trace("Start of frame 0x{}, repeated = {}", Integer.toHexString(c),
-						repeated);
+				logger.trace("Start of frame 0x{}, repeated = {}", Integer.toHexString(c), repeated);
 				extFrame = (c & 0xd0) == ExtFrameFormat;
 			}
 			return start;
