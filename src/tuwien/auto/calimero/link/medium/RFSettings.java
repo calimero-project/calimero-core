@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,8 +42,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 /**
  * Provides settings necessary for communication on RF medium.
- * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public class RFSettings extends KNXMediumSettings
@@ -59,7 +58,7 @@ public class RFSettings extends KNXMediumSettings
 	 * <p>
 	 * The domain address is initialized to broadcast domain, serial number is 0,
 	 * unidirectional is set <code>false</code>.
-	 * 
+	 *
 	 * @param device device individual device address to use as source address in KNX
 	 *        messages, specifying <code>null</code> uses the individual address 0.0.0
 	 */
@@ -74,7 +73,7 @@ public class RFSettings extends KNXMediumSettings
 	/**
 	 * Creates a new settings container with RF medium specific information.
 	 * <p>
-	 * 
+	 *
 	 * @param device device individual device address to use as source address in KNX
 	 *        messages, specifying <code>null</code> uses the individual address 0.0.0
 	 * @param domain byte array containing the domain address to use in KNX messages,
@@ -96,8 +95,7 @@ public class RFSettings extends KNXMediumSettings
 
 	/**
 	 * Sets a new domain address.
-	 * <p>
-	 * 
+	 *
 	 * @param domain byte array containing the domain address to use in KNX messages,
 	 *        address is given in network byte order, <code>domain.length</code> = 6,
 	 *        supplying <code>null</code> defaults to the broadcast domain
@@ -113,10 +111,8 @@ public class RFSettings extends KNXMediumSettings
 	}
 
 	/**
-	 * Returns the domain address.
-	 * <p>
-	 * The address is returned in network byte order.
-	 * 
+	 * Returns the domain address in network byte order.
+	 *
 	 * @return domain address as byte array of length = 6
 	 */
 	public final synchronized byte[] getDomainAddress()
@@ -126,8 +122,7 @@ public class RFSettings extends KNXMediumSettings
 
 	/**
 	 * Returns the serial number of the device.
-	 * <p>
-	 * 
+	 *
 	 * @return serial number as byte array of length = 6
 	 */
 	public final byte[] getSerialNumber()
@@ -137,8 +132,7 @@ public class RFSettings extends KNXMediumSettings
 
 	/**
 	 * Returns whether unidirectional device is set.
-	 * <p>
-	 * 
+	 *
 	 * @return <code>true</code> if unidirectional, <code>false</code> otherwise
 	 */
 	public final boolean isUnidirectional()
@@ -146,18 +140,12 @@ public class RFSettings extends KNXMediumSettings
 		return unidir;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.medium.KNXMediumSettings#getMedium()
-	 */
 	@Override
 	public int getMedium()
 	{
 		return MEDIUM_RF;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.medium.KNXMediumSettings#toString()
-	 */
 	@Override
 	public String toString()
 	{
@@ -167,8 +155,7 @@ public class RFSettings extends KNXMediumSettings
 
 	/**
 	 * Sets a new serial number.
-	 * <p>
-	 * 
+	 *
 	 * @param serial serial number of the device, <code>serial.length</code> = 6,
 	 */
 	private void setSerial(final byte[] serial)
