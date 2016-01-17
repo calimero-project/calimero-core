@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015 B. Malinowsky
+    Copyright (c) 2015, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -666,16 +666,21 @@ public class UsbConnection implements AutoCloseable
 
 	private void close(final int initiator, final String reason)
 	{
+		if (!knxUsbIf.isClaimed())
+			return;
 		try {
 			in.removeUsbPipeListener(callback);
 			callback.quit();
 
-			out.abortAllSubmissions();
-			out.close();
-			// TODO this causes our callback thread to quit with exception
-			in.abortAllSubmissions();
-			in.close();
-
+			if (out.isOpen()) {
+				out.abortAllSubmissions();
+				out.close();
+			}
+			if (in.isOpen()) {
+				// TODO this causes our callback thread to quit with exception
+				in.abortAllSubmissions();
+				in.close();
+			}
 			String ifname = "" + knxUsbIf.getUsbInterfaceDescriptor().bInterfaceNumber();
 			try {
 				final String s = knxUsbIf.getInterfaceString();
