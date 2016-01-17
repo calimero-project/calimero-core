@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -769,7 +769,12 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		InterruptedException
 	{
 		final Description d = new Description(getObjectType(oi, true), desc);
-		d.setCurrentElements(pa.getProperty(oi, d.getPID(), 0, 1));
+		try {
+			d.setCurrentElements(pa.getProperty(oi, d.getPID(), 0, 1));
+		} catch (final KNXRemoteException e) {
+			logger.warn("failed to get current number of elements for OI {} PID {}: {}", oi, d.getPID(),
+					e.getMessage());
+		}
 		// workaround for PDT on local DM
 		if (local)
 			d.setPDT(-1);
