@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -280,19 +280,16 @@ public final class CEMIFactory
 	 */
 	public static byte[] toEmi(final CEMILData msg)
 	{
-		final int mc = msg.getMessageCode();
+		int mc = msg.getMessageCode();
 		final KNXAddress dst = msg.getDestination();
-		// TODO find out if we need L-Data system broadcast
-//		if (dst.getRawAddress() == 0) {
-//			// check if system broadcast is indicated in ctrl1 field
-//			byte[] array = msg.toByteArray();
-//			if ((array[2] & 0x10) == 0x0)
-//				mc = Emi1_LSysBcast_req;
-//
-//			// APCI domain address.read
-//			if (DataUnitBuilder.getAPDUService(msg.getPayload()) == 0x03e1)
-//				mc = Emi1_LSysBcast_req;
-//		}
+		// find out if we need L-Data system broadcast
+		if (msg.isSystemBroadcast())
+			mc = Emi1_LSysBcast_req;
+		if (dst.getRawAddress() == 0) {
+			// APCI domain address.read is always system broadcast
+			if (DataUnitBuilder.getAPDUService(msg.getPayload()) == 0x03e1)
+				mc = Emi1_LSysBcast_req;
+		}
 
 		final Priority p = msg.getPriority();
 		final boolean repeat = msg.isRepetition();
