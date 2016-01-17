@@ -164,7 +164,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 *
 	 * @author B. Malinowsky
 	 */
-	public static interface ResourceHandler
+	public interface ResourceHandler
 	{
 		/**
 		 * Loads the properties from the resource.
