@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015 B. Malinowsky
+    Copyright (c) 2015, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -105,10 +105,9 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor
 		conn = c;
 		try {
 			if (!conn.isKnxConnectionActive())
-				throw new KNXConnectionClosedException("interface is not connected to KNX network");
+				throw new KNXConnectionClosedException("USB interface is not connected to KNX network");
 			emiTypes = conn.getSupportedEmiTypes();
-			if (!trySetActiveEmi(EmiType.CEmi) && !trySetActiveEmi(EmiType.Emi2)
-					&& !trySetActiveEmi(EmiType.Emi1)) {
+			if (!trySetActiveEmi(EmiType.CEmi) && !trySetActiveEmi(EmiType.Emi2) && !trySetActiveEmi(EmiType.Emi1)) {
 				throw new KNXConnectionClosedException("failed to set active any supported EMI type");
 			}
 		}
@@ -120,12 +119,11 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor
 		final boolean extBusmon = settings instanceof PLSettings;
 		enterBusmonitor(extBusmon);
 		try {
+			// not all devices provide a device descriptor 0
 			final int dd0 = conn.getDeviceDescriptorType0();
-			logger.info("Device Descriptor {}", DeviceDescriptor.DD0.fromType0(dd0));
+			logger.info("Device Descriptor (Mask Version) {}", DeviceDescriptor.DD0.fromType0(dd0));
 		}
-		catch (final KNXTimeoutException e) {
-			// device does not provide a device descriptor 0
-		}
+		catch (final KNXTimeoutException expected) {}
 
 		logger.info("in busmonitor mode - ready to receive");
 		conn.addConnectionListener(notifier);

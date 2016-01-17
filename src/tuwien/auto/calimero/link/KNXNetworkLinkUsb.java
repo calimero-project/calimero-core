@@ -57,9 +57,8 @@ import tuwien.auto.calimero.serial.usb.UsbConnection;
 import tuwien.auto.calimero.serial.usb.UsbConnection.EmiType;
 
 /**
- * Implementation of the KNX network network link over USB, using a {@link UsbConnection}. Once a
- * link has been closed, it is not available for further link communication, i.e. it can not be
- * reopened.
+ * Implementation of the KNX network network link over USB, using a {@link UsbConnection}. Once a link has been closed,
+ * it is not available for further link communication, i.e., it cannot be reopened.
  *
  * @author B. Malinowsky
  */
@@ -106,6 +105,14 @@ public class KNXNetworkLinkUsb extends AbstractLink
 		this(new UsbConnection(device), settings);
 	}
 
+	/**
+	 * Creates a new network link for accessing the KNX network over the supplied USB connection.
+	 *
+	 * @param c USB connection in open state, connected to a KNX network; the link takes ownership
+	 * @param settings KNX medium settings, with device and medium-specific communication settings
+	 * @throws KNXException on error creating USB link
+	 * @throws InterruptedException on interrupt
+	 */
 	protected KNXNetworkLinkUsb(final UsbConnection c, final KNXMediumSettings settings)
 		throws KNXException, InterruptedException
 	{
@@ -113,7 +120,7 @@ public class KNXNetworkLinkUsb extends AbstractLink
 		conn = c;
 		try {
 			if (!conn.isKnxConnectionActive())
-				throw new KNXConnectionClosedException("interface is not connected to KNX network");
+				throw new KNXConnectionClosedException("USB interface is not connected to KNX network");
 
 			emiTypes = conn.getSupportedEmiTypes();
 			// Responding to active EMI type is optional (and might fail) if only one EMI type is
@@ -122,10 +129,8 @@ public class KNXNetworkLinkUsb extends AbstractLink
 //			if (emiTypes.size() == 1)
 //				activeEmi = emiTypes.iterator().next();
 //			else
-			if (!trySetActiveEmi(EmiType.CEmi) && !trySetActiveEmi(EmiType.Emi2)
-					&& !trySetActiveEmi(EmiType.Emi1)) {
-				throw new KNXConnectionClosedException(
-						"failed to set active any supported EMI type");
+			if (!trySetActiveEmi(EmiType.CEmi) && !trySetActiveEmi(EmiType.Emi2) && !trySetActiveEmi(EmiType.Emi1)) {
+				throw new KNXConnectionClosedException("failed to set active any supported EMI type");
 			}
 		}
 		catch (final KNXException e) {
@@ -136,9 +141,10 @@ public class KNXNetworkLinkUsb extends AbstractLink
 		try {
 			// not all devices provide a device descriptor 0
 			final int dd0 = conn.getDeviceDescriptorType0();
-			logger.info("Device Mask Version {}", DeviceDescriptor.DD0.fromType0(dd0));
+			logger.info("Device Descriptor (Mask Version) {}", DeviceDescriptor.DD0.fromType0(dd0));
 		}
 		catch (final KNXTimeoutException expected) {}
+
 		linkLayerMode();
 		cEMI = emiTypes.contains(EmiType.CEmi);
 		sendCEmiAsByteArray = true;
