@@ -264,7 +264,8 @@ public class TpuartConnection implements AutoCloseable
 
 		try {
 			final byte[] data = toUartServices(cEmiToTP1(frame));
-			logger.trace("UART services " + DataUnitBuilder.toHex(data, " "));
+			if (logger.isLoggable(LogLevel.TRACE))
+				logger.trace("UART services " + DataUnitBuilder.toHex(data, " "));
 			req = (byte[]) frame.clone();
 //			for (int i = 0; i < MaxSendAttempts; i++) {
 			final long start = System.nanoTime();
@@ -415,6 +416,7 @@ public class TpuartConnection implements AutoCloseable
 				remaining = end - System.currentTimeMillis();
 			}
 		}
+		logger.trace("ACK received after " + (ExchangeTimeout - remaining) + " ms");
 		return remaining > 0;
 	}
 
@@ -495,7 +497,6 @@ public class TpuartConnection implements AutoCloseable
 						continue;
 					}
 
-//					logger.trace("read 0x" + Integer.toHexString(c));
 					final long idlePeriod = (start - enterIdleTimestamp) / 1000;
 					if (enterIdleTimestamp != 0 && idlePeriod > 100000)
 						logger.trace("return from extended idle period of " + idlePeriod + " us");
@@ -507,8 +508,8 @@ public class TpuartConnection implements AutoCloseable
 					else if (c == Reset_ind)
 						logger.trace("TP-UART reset.ind");
 
-					final long loop = System.nanoTime() - start;
-					logger.trace("loop time = " + loop / 1000 + " us");
+//					final long loop = System.nanoTime() - start;
+//					logger.trace("loop time = " + loop / 1000 + " us");
 				}
 				catch (final RuntimeException e) {
 					e.printStackTrace();
@@ -540,10 +541,13 @@ public class TpuartConnection implements AutoCloseable
 			int size = in.size();
 			// empty buffer if we didn't receive data for some time
 			if (size > 0 && ((lastRead + 4000) < (System.nanoTime() / 1000))) {
+				final byte[] buf = in.toByteArray();
 				in.reset();
-				logger.trace("reset input buffer, discard any partial frame");
 				size = 0;
+				logger.trace("reset input buffer, discard partial frame (length " + size + ") " +
+						DataUnitBuilder.toHex(buf, " "));
 			}
+
 			if (size > 0) {
 				in.write(c);
 				lastRead = System.nanoTime() / 1000;
@@ -673,7 +677,7 @@ public class TpuartConnection implements AutoCloseable
 			if (oneOfUs) {
 				ack |= 0x01;
 				os.write(new byte[] { (byte) ack });
-				logger.trace("ACK 0x" + Integer.toHexString(ack) + " for " + dst);
+				logger.trace("write ACK (0x" + Integer.toHexString(ack) + ") for " + dst);
 			}
 			frameAcked = true;
 		}
