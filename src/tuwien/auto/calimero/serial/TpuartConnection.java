@@ -326,9 +326,9 @@ public class TpuartConnection implements AutoCloseable
 	private void reset() throws IOException
 	{
 		logger.debug("reset TP-UART controller");
-		os.write(Reset_req);
 		busmon = false;
 		busmonSequence = 0;
+		os.write(Reset_req);
 	}
 
 	// returns a TP1 std or ext frame
