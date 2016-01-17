@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,24 +47,22 @@ import tuwien.auto.calimero.log.LogService;
 /**
  * KNX network link interface to communicate with destinations in a KNX network.
  * <p>
- * A network link enables transparency of the type of connection protocol used to access a
- * KNX network, as well as an abstraction of the particular physical KNX medium used for
- * communication in the KNX network (e.g. TP1).
+ * A network link provides transparency of the type of connection protocol used to access a KNX network, as well as an
+ * abstraction of the particular physical KNX transmission medium used for communication in the KNX network, e.g., TP1.
  * <p>
- * The link provides two forms of information exchange for KNX messages, one is to
- * directly supply necessary information like KNX address, message priority and NSDU, the
- * other to use cEMI as container format.<br>
- * On send, message parts not present or supplied which are necessary for communication
- * will be added using the information provided by
- * {@link KNXNetworkLink#setKNXMedium(KNXMediumSettings)}.
+ * The link provides two forms of information exchange for KNX messages: one is to directly supply necessary information
+ * like KNX address, message priority and NSDU, the other is to use cEMI as container format.<br>
+ * Before sending a message, message parts that are not present nor supplied, but which are necessary for communication,
+ * are added using the settings of {@link KNXMediumSettings}.
  * <p>
- * A KNX network link relies on an underlying intermediate connection technology and
- * protocol (e.g., IP and KNXnet/IP, {@link KNXnetIPConnection}) to access KNX networks,
- * the necessary access options are specified at creation of a dedicated network link.
+ * A KNX network link relies on an underlying intermediate connection technology and protocol, e.g., IP and KNXnet/IP
+ * {@link KNXnetIPConnection}, to access KNX networks. The necessary access settings are specified at creation of a
+ * dedicated network link.
  * <p>
  * The name returned by {@link #getName()} is used by a link as name of its log service.
  *
  * @author B. Malinowsky
+ * @see Connector
  */
 public interface KNXNetworkLink extends AutoCloseable
 {
