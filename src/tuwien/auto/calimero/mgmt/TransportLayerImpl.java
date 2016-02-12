@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -247,8 +247,7 @@ public class TransportLayerImpl implements TransportLayer
 			final Destination d = new Destination(p, remote, connectionOriented, keepAlive,
 					verifyMode);
 			proxies.put(remote, p);
-			if (logger.isTraceEnabled())
-				logger.trace("destination " + remote + " ready for use");
+			logger.trace("destination {} ready for use", remote);
 			return d;
 		}
 	}
@@ -325,8 +324,7 @@ public class TransportLayerImpl implements TransportLayer
 		final byte[] tpdu = new byte[] { (byte) CONNECT };
 		lnk.sendRequestWait(d.getAddress(), Priority.SYSTEM, tpdu);
 		p.setState(OpenIdle);
-		if (logger.isTraceEnabled())
-			logger.trace("connected with " + d.getAddress());
+		logger.trace("connected with {}", d.getAddress());
 	}
 
 	/* (non-Javadoc)
@@ -366,9 +364,7 @@ public class TransportLayerImpl implements TransportLayer
 					active = ap;
 					for (repeated = 0; repeated < MAX_REPEAT + 1; ++repeated) {
 						try {
-							if (logger.isTraceEnabled())
-								logger.trace("sending data connected to " + d.getAddress()
-										+ ", attempt " + (repeated + 1));
+							logger.trace("sending data connected to {}, attempt {}", d.getAddress(), (repeated + 1));
 							// set state and timer
 							ap.setState(OpenWait);
 							lnk.sendRequestWait(d.getAddress(), p, tsdu);
@@ -508,10 +504,10 @@ public class TransportLayerImpl implements TransportLayer
 		}
 		else if ((ctrl & 0xC0) == DATA_CONNECTED) {
 			if (d.getState() == Disconnected || !sender.equals(d.getAddress())) {
-				if (logger.isTraceEnabled())
-					logger.trace("send disconnect to " + sender);
+				logger.trace("send disconnect to {}", sender);
 				sendDisconnect(sender);
-			} else {
+			}
+			else {
 				p.restartTimeout();
 				if (seq == p.getSeqReceive()) {
 					lnk.sendRequest(sender, Priority.SYSTEM,
@@ -532,8 +528,7 @@ public class TransportLayerImpl implements TransportLayer
 			else if (d.getState() == OpenWait && seq == p.getSeqSend()) {
 				p.incSeqSend();
 				p.setState(OpenIdle);
-				if (logger.isTraceEnabled())
-					logger.trace("positive ack by " + d.getAddress());
+				logger.trace("positive ack by {}", d.getAddress());
 			}
 			else
 				disconnectIndicate(p, true);
@@ -608,8 +603,7 @@ public class TransportLayerImpl implements TransportLayer
 		}
 		finally {
 			fireDisconnected(p.getDestination());
-			if (logger.isTraceEnabled())
-				logger.trace("disconnected from " + p.getDestination().getAddress());
+			logger.trace("disconnected from {}", p.getDestination().getAddress());
 		}
 	}
 
