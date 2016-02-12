@@ -267,7 +267,6 @@ public class TpuartConnection implements AutoCloseable
 			if (logger.isLoggable(LogLevel.TRACE))
 				logger.trace("UART services " + DataUnitBuilder.toHex(data, " "));
 			req = (byte[]) frame.clone();
-//			for (int i = 0; i < MaxSendAttempts; i++) {
 			final long start = System.nanoTime();
 			synchronized (enterIdleLock) {
 				if (!idle)
@@ -283,7 +282,6 @@ public class TpuartConnection implements AutoCloseable
 				return;
 			if (waitForCon())
 				return;
-//			}
 			throw new KNXAckTimeoutException("no ACK for L-Data.con");
 		}
 		catch (final InterruptedIOException e) {
@@ -544,7 +542,7 @@ public class TpuartConnection implements AutoCloseable
 				final byte[] buf = in.toByteArray();
 				in.reset();
 				size = 0;
-				logger.trace("reset input buffer, discard partial frame (length " + size + ") " +
+				logger.trace("reset input buffer, discard partial frame (length " + buf.length + ") " +
 						DataUnitBuilder.toHex(buf, " "));
 			}
 
@@ -593,10 +591,8 @@ public class TpuartConnection implements AutoCloseable
 			// busmon mode only: short acks
 			else if (c == Ack || c == Nak || c == Busy)
 				fireFrameReceived(createBusmonInd(new byte[] { (byte) c }));
-			else {
-//				logger.warn("received unrecognized character 0x{}", Integer.toHexString(c));
+			else
 				return false;
-			}
 			return true;
 		}
 
@@ -610,10 +606,10 @@ public class TpuartConnection implements AutoCloseable
 		{
 			if (!uartStatePending)
 				return false;
-			uartStatePending = false;
 			final boolean ind = (c & State_ind) == State_ind;
 			if (!ind)
 				return false;
+			uartStatePending = false;
 			lastUartState = System.currentTimeMillis();
 			final boolean slaveCollision = (c & 0x80) == 0x80;
 			final boolean rxError = (c & 0x40) == 0x40; // checksum, parity, bit error
