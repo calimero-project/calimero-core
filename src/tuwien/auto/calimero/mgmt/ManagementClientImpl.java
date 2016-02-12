@@ -457,7 +457,7 @@ public class ManagementClientImpl implements ManagementClient
 			// defined error codes: 0,1,2,3
 			final String[] codes = new String[] { "Success", "Access Denied",
 				"Unsupported Erase Code", "Invalid Channel Number", "Unknown Error" };
-			final int error = Math.min(apdu[2] & 0xff, 4) ;
+			final int error = Math.min(apdu[2] & 0xff, 4);
 			if (error > 0)
 				throw new KNXRemoteException("master reset: " + codes[error]);
 			time = ((apdu[3] & 0xff) << 8) | (apdu[4] & 0xff);
@@ -611,12 +611,25 @@ public class ManagementClientImpl implements ManagementClient
 			throw new KNXIllegalArgumentException("argument value out of range");
 		final byte[] send = DataUnitBuilder.createAPDU(PROPERTY_DESC_READ, new byte[] {
 			(byte) objIndex, (byte) propertyId, (byte) (propertyId == 0 ? propIndex : 0) });
-		final byte[] apdu = sendWait2(dst, priority, send, PROPERTY_DESC_RESPONSE, 7, 7);
-		// max_nr_elem field is a 4bit exponent + 12bit unsigned
-		// on problem this field is 0
-		if (apdu[6] == 0 && apdu[7] == 0)
-			throw new KNXRemoteException("got no property description (object non-existant?)");
-		return new byte[] { apdu[2], apdu[3], apdu[4], apdu[5], apdu[6], apdu[7], apdu[8] };
+
+		for (int i = 0; i < 2; i++) {
+			final byte[] apdu = sendWait2(dst, priority, send, PROPERTY_DESC_RESPONSE, 7, 7);
+			// make sure the response contains the requested description
+			final boolean oiOk = objIndex == (apdu[2] & 0xff);
+			final boolean pidOk = propertyId == 0 || propertyId == (apdu[3] & 0xff);
+			final boolean pidxOk = propertyId != 0 || propIndex == (apdu[4] & 0xff);
+			if (oiOk && pidOk && pidxOk) {
+				// max_nr_elem field is a 4bit exponent + 12bit unsigned
+				// on problem this field is 0
+				if (apdu[6] == 0 && apdu[7] == 0)
+					throw new KNXRemoteException("got no property description (object non-existant?)");
+				return new byte[] { apdu[2], apdu[3], apdu[4], apdu[5], apdu[6], apdu[7], apdu[8] };
+			}
+			else
+				logger.warn("wrong description response: OI {} PID {} prop idx {}", apdu[2] & 0xff, apdu[3] & 0xff,
+						apdu[4] & 0xff);
+		}
+		throw new KNXTimeoutException("timeout occurred while waiting for data response");
 	}
 
 	/* (non-Javadoc)
