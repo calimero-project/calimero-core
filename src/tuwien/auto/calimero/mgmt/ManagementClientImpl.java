@@ -65,7 +65,7 @@ import tuwien.auto.calimero.log.LogService;
  * Uses {@link TransportLayer} internally for communication. <br>
  * All management service methods invoked after a detach of the network link are allowed
  * to throw {@link KNXIllegalStateException}.
- * 
+ *
  * @author B. Malinowsky
  */
 public class ManagementClientImpl implements ManagementClient
@@ -171,7 +171,7 @@ public class ManagementClientImpl implements ManagementClient
 	 * <p>
 	 * The log service used by this management client is named "MC " +
 	 * <code>link.getName()</code>.
-	 * 
+	 *
 	 * @param link network link used for communication with a KNX network
 	 * @throws KNXLinkClosedException if the network link is closed
 	 */
@@ -401,7 +401,7 @@ public class ManagementClientImpl implements ManagementClient
 	{
 		return restart(false, dst, eraseCode, channel);
 	}
-	
+
 	// for erase codes 1,3,4 the channel should be 0
 	private int restart(final boolean basic, final Destination dst, final int eraseCode,
 		final int channel) throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException,
@@ -421,12 +421,12 @@ public class ManagementClientImpl implements ManagementClient
 			// defined error codes: 0,1,2,3
 			final String[] codes = new String[] { "Success", "Access Denied",
 				"Unsupported Erase Code", "Invalid Channel Number", "Unknown Error" };
-			final int error = Math.min(apdu[2] & 0xff, 4) ;
+			final int error = Math.min(apdu[2] & 0xff, 4);
 			if (error > 0)
 				throw new KNXRemoteException("master reset: " + codes[error]);
 			time = ((apdu[3] & 0xff) << 8) | (apdu[4] & 0xff);
 		}
-		
+
 		if (dst.isConnectionOriented()) {
 			// a remote endpoint is allowed to not send a TL disconnect before restart, but
 			// a TL disconnect timeout shall not be treated as protocol error
@@ -456,7 +456,7 @@ public class ManagementClientImpl implements ManagementClient
 		}
 		return time;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.ManagementClient#readProperty
 	 * (tuwien.auto.calimero.mgmt.Destination, int, int, int, int)
@@ -478,7 +478,7 @@ public class ManagementClientImpl implements ManagementClient
 	{
 		return readProperty(dst, objIndex, propertyId, start, elements, false);
 	}
-	
+
 	private List readProperty(final Destination dst, final int objIndex, final int propertyId,
 		final int start, final int elements, final boolean oneResponseOnly)
 		throws KNXTimeoutException, KNXRemoteException, KNXDisconnectException,
@@ -492,7 +492,7 @@ public class ManagementClientImpl implements ManagementClient
 		asdu[1] = (byte) propertyId;
 		asdu[2] = (byte) ((elements << 4) | ((start >>> 8) & 0xF));
 		asdu[3] = (byte) start;
-		
+
 		final List responses;
 		synchronized (this) {
 			try {
@@ -521,7 +521,7 @@ public class ManagementClientImpl implements ManagementClient
 		}
 		return ret;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.ManagementClient#writeProperty
 	 * (tuwien.auto.calimero.mgmt.Destination, int, int, int, int, byte[])
@@ -571,12 +571,25 @@ public class ManagementClientImpl implements ManagementClient
 			throw new KNXIllegalArgumentException("argument value out of range");
 		final byte[] send = DataUnitBuilder.createAPDU(PROPERTY_DESC_READ, new byte[] {
 			(byte) objIndex, (byte) propertyId, (byte) (propertyId == 0 ? propIndex : 0) });
-		final byte[] apdu = sendWait2(dst, priority, send, PROPERTY_DESC_RESPONSE, 7, 7);
-		// max_nr_elem field is a 4bit exponent + 12bit unsigned
-		// on problem this field is 0
-		if (apdu[6] == 0 && apdu[7] == 0)
-			throw new KNXRemoteException("got no property description (object non-existant?)");
-		return new byte[] { apdu[2], apdu[3], apdu[4], apdu[5], apdu[6], apdu[7], apdu[8] };
+
+		for (int i = 0; i < 2; i++) {
+			final byte[] apdu = sendWait2(dst, priority, send, PROPERTY_DESC_RESPONSE, 7, 7);
+			// make sure the response contains the requested description
+			final boolean oiOk = objIndex == (apdu[2] & 0xff);
+			final boolean pidOk = propertyId == 0 || propertyId == (apdu[3] & 0xff);
+			final boolean pidxOk = propertyId != 0 || propIndex == (apdu[4] & 0xff);
+			if (oiOk && pidOk && pidxOk) {
+				// max_nr_elem field is a 4bit exponent + 12bit unsigned
+				// on problem this field is 0
+				if (apdu[6] == 0 && apdu[7] == 0)
+					throw new KNXRemoteException("got no property description (object non-existant?)");
+				return new byte[] { apdu[2], apdu[3], apdu[4], apdu[5], apdu[6], apdu[7], apdu[8] };
+			}
+			else
+				logger.warn("wrong description response: OI " + (apdu[2] & 0xff) + " PID " + (apdu[3] & 0xff)
+						+ " prop idx " + (apdu[4] & 0xff));
+		}
+		throw new KNXTimeoutException("timeout occurred while waiting for data response");
 	}
 
 	/* (non-Javadoc)
@@ -743,7 +756,7 @@ public class ManagementClientImpl implements ManagementClient
 		else
 			tl.sendData(d.getAddress(), p, apdu);
 	}
-	
+
 	private synchronized byte[] sendWait(final Destination d, final Priority p,
 		final byte[] apdu, final int response, final int minAsduLen, final int maxAsduLen)
 		throws KNXDisconnectException, KNXTimeoutException, KNXInvalidResponseException,
@@ -829,7 +842,7 @@ public class ManagementClientImpl implements ManagementClient
 		catch (final KNXTimeoutException e) {}
 		return l;
 	}
-	
+
 	private synchronized List readBroadcast(final Priority p, final byte[] apdu,
 		final int response, final int minAsduLen, final int maxAsduLen, final boolean oneOnly)
 		throws KNXLinkClosedException, KNXInvalidResponseException, KNXTimeoutException,
@@ -857,7 +870,7 @@ public class ManagementClientImpl implements ManagementClient
 		}
 		return l;
 	}
-	
+
 	// returns property read.res element values
 	private static byte[] extractPropertyElements(final byte[] apdu, final int elements)
 		throws KNXRemoteException
