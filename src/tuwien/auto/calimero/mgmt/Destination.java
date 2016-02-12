@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -230,42 +230,6 @@ public class Destination implements AutoCloseable
 		OpenWait
 	};
 
-	/**
-	 * Destination is destroyed.
-	 *
-	 * @see Destination#getState
-	 */
-	public static final int DESTROYED = 0;
-
-	/**
-	 * Connection state is disconnected.
-	 *
-	 * @see Destination#getState
-	 */
-	public static final int DISCONNECTED = 1;
-
-	/**
-	 * Connection state is connecting.
-	 *
-	 * @see Destination#getState
-	 */
-	public static final int CONNECTING = 2;
-
-	/**
-	 * Connection state is open and communication is in idle state.
-	 *
-	 * @see Destination#getState
-	 */
-	public static final int OPEN_IDLE = 3;
-
-	/**
-	 * Connection state is open and communication is in waiting state for Layer 4
-	 * acknowledgment.
-	 *
-	 * @see Destination#getState
-	 */
-	public static final int OPEN_WAIT = 4;
-
 
 	static final int USER_REQUEST = 0;
 	static final int REMOTE_ENDPOINT = 1;
@@ -435,20 +399,6 @@ public class Destination implements AutoCloseable
 	private String getStateString()
 	{
 		return state.name();
-//		switch (state) {
-//		case DISCONNECTED:
-//			return "disconnected";
-//		case CONNECTING:
-//			return "connecting";
-//		case OPEN_IDLE:
-//			return "open idle";
-//		case OPEN_WAIT:
-//			return "open wait";
-//		case Destroyed:
-//			return "destroyed";
-//		default:
-//			return "unknown";
-//		}
 	}
 
 	private synchronized void setState(final State newState, final Runnable notify)
