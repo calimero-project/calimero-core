@@ -607,8 +607,7 @@ public class ManagementClientImpl implements ManagementClient
 		KNXRemoteException, KNXDisconnectException, KNXLinkClosedException,
 		InterruptedException
 	{
-		if (objIndex < 0 || objIndex > 255 || propertyId < 0 || propertyId > 255
-			|| propIndex < 0 || propIndex > 255)
+		if (objIndex < 0 || objIndex > 255 || propertyId < 0 || propertyId > 255 || propIndex < 0 || propIndex > 255)
 			throw new KNXIllegalArgumentException("argument value out of range");
 		final byte[] send = DataUnitBuilder.createAPDU(PROPERTY_DESC_READ, new byte[] {
 			(byte) objIndex, (byte) propertyId, (byte) (propertyId == 0 ? propIndex : 0) });
