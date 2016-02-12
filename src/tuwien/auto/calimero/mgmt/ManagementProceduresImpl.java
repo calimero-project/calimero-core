@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2015 B. Malinowsky
+    Copyright (c) 2010, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -239,9 +239,8 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	public boolean writeAddress(final IndividualAddress newAddress) throws KNXException,
 		InterruptedException
 	{
-		final Destination dst = getOrCreateDestination(newAddress);
 		boolean exists = false;
-		try {
+		try (final Destination dst = getOrCreateDestination(newAddress)) {
 			mc.readDeviceDesc(dst, 0);
 			exists = true;
 		}
@@ -251,15 +250,11 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		catch (final KNXTimeoutException e) {
 			// no remote endpoint answered, we proceed
 		}
-		finally {
-			dst.destroy();
-		}
 
 		boolean setAddr = false;
 		synchronized (mc) {
 			final int oldTimeout = mc.getResponseTimeout();
-			final Destination verify = mc.createDestination(newAddress, true);
-			try {
+			try (final Destination verify = mc.createDestination(newAddress, true)) {
 				mc.setResponseTimeout(1);
 				// ??? this does not conform to spec, where no max. attempts are given
 				// the problem is that we potentially loop forever (which would be correct)
@@ -273,11 +268,9 @@ public class ManagementProceduresImpl implements ManagementProcedures
 							setAddr = true;
 					}
 					catch (final KNXException e) {
-						// a device with newAddress exists but is not in programming mode,
-						// bail out
+						// a device with newAddress exists but is not in programming mode, bail out
 						if (exists) {
-							logger.warn("device exists but is not in programming mode, " +
-									"cancel writing address");
+							logger.warn("device exists but is not in programming mode, cancel writing address");
 							return false;
 						}
 					}
@@ -292,7 +285,6 @@ public class ManagementProceduresImpl implements ManagementProcedures
 				mc.restart(verify);
 			}
 			finally {
-				verify.destroy();
 				mc.setResponseTimeout(oldTimeout);
 			}
 		}
@@ -306,8 +298,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	public void resetAddress() throws KNXException, InterruptedException
 	{
 		final IndividualAddress def = new IndividualAddress(0xffff);
-		final Destination dst = mc.createDestination(def, true);
-		try {
+		try (final Destination dst = mc.createDestination(def, true)) {
 			while (true) {
 				mc.writeAddress(def);
 				mc.restart(dst);
@@ -320,9 +311,6 @@ public class ManagementProceduresImpl implements ManagementProcedures
 				}
 			}
 		}
-		finally {
-			dst.destroy();
-		}
 	}
 
 	/* (non-Javadoc)
@@ -333,8 +321,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	public boolean isAddressOccupied(final IndividualAddress devAddr)
 		throws KNXException, InterruptedException
 	{
-		final Destination dst = mc.createDestination(devAddr, true);
-		try {
+		try (final Destination dst = mc.createDestination(devAddr, true)) {
 			mc.readDeviceDesc(dst, 0);
 		}
 		catch (final KNXTimeoutException e) {
@@ -344,9 +331,6 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			// remote disconnect: device with that address exists but does not support CO mode
 			if (e.getDestination().getDisconnectedBy() != Destination.REMOTE_ENDPOINT)
 				return false;
-		}
-		finally {
-			dst.destroy();
 		}
 		return true;
 	}
@@ -437,10 +421,9 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	@Override
 	public List<byte[]> scanSerialNumbers(final int medium) throws KNXException, InterruptedException
 	{
-		final Destination dst = mc.createDestination(new IndividualAddress(0, medium, 0xff), true);
 		synchronized (mc) {
 			final int oldTimeout = mc.getResponseTimeout();
-			try {
+			try (final Destination dst = mc.createDestination(new IndividualAddress(0, medium, 0xff), true)) {
 				mc.setResponseTimeout(7);
 				return ((ManagementClientImpl) mc).readProperty2(dst, 0,
 						PropertyAccess.PID.SERIAL_NUMBER, 1, 1);
@@ -450,7 +433,6 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			}
 			finally {
 				mc.setResponseTimeout(oldTimeout);
-				dst.destroy();
 			}
 		}
 		return Collections.emptyList();
