@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -209,6 +209,18 @@ public class KNXnetIPTunnel extends ClientConnection
 						if (Arrays.equals(recv, sent)) {
 							keepForCon = null;
 							setStateNotify(OK);
+						}
+						else {
+							// we could get a .con with its hop count already decremented by 1
+							// decrement hop count of sent for comparison
+							final int sendCount = ldata.getHopCount() - 1;
+							sent[3] = (byte) ((sent[3] & (0x8f)) | (sendCount << 4));
+							if (Arrays.equals(recv, sent)) {
+								keepForCon = null;
+								setStateNotify(OK);
+								logger.info("received L-Data.con with hopcount decremented by 1 (sent "
+										+ (sendCount + 1) + ", got " + sendCount + ")");
+							}
 						}
 					}
 				}
