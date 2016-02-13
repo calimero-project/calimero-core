@@ -76,6 +76,11 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		 */
 		public AddInfo(final int infoType, final byte[] info)
 		{
+			if (info.length > 255)
+				throw new KNXIllegalArgumentException("cEMI additional info exceeds maximum length of 255 bytes");
+			if (infoType < ADDINFO_LENGTHS.length && info.length != ADDINFO_LENGTHS[infoType])
+				throw new KNXIllegalArgumentException(
+						"invalid length " + info.length + " for cEMI additional info type " + infoType);
 			type = infoType;
 			data = info;
 		}
