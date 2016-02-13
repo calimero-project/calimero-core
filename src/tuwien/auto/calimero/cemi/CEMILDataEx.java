@@ -49,12 +49,10 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Priority;
 
 /**
- * A cEMI link layer data message (L-Data).
+ * A cEMI link layer data message (L-Data) supporting extended frame formats and cEMI additional information, with a
+ * transport layer protocol data unit maximum of 255 bytes.
  * <p>
- * Extended frame formats are supported, with a transport layer protocol data unit of 255 bytes
- * maximum. Additional information might be specified.
- * <p>
- * Objects of this L-Data type are <b>not</b> immutable.
+ * In contrast to CEMILData, objects of this L-Data type are mutable.
  *
  * @author B. Malinowsky
  */
