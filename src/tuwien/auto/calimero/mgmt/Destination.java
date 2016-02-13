@@ -165,7 +165,7 @@ public class Destination implements AutoCloseable
 		 * <p>
 		 * If necessary, the connection timeout for the destination is started, restarted
 		 * or deactivated according the state transition.<br>
-		 * If the state of destination is {@link Destination#DESTROYED}, setting of a new
+		 * If the state of destination is {@link State#Destroyed}, setting of a new
 		 * state is ignored.
 		 *
 		 * @param newState new destination state
@@ -352,7 +352,7 @@ public class Destination implements AutoCloseable
 	 * Destroys this destination.
 	 * <p>
 	 * If the connection state is connected, it will be disconnected. The connection state
-	 * is set to {@link #DESTROYED}. The associated transport layer is notified through
+	 * is set to {@link State#Destroyed}. The associated transport layer is notified through
 	 * {@link TransportLayer#destroyDestination(Destination)}. <br>
 	 * On an already destroyed destination, no action is performed.
 	 */
