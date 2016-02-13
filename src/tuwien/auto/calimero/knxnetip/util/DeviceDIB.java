@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -64,13 +64,6 @@ public class DeviceDIB extends DIB
 	 * KNX medium code for power line 110 kHz (1200 bit/s).
 	 */
 	public static final int MEDIUM_PL110 = 0x04;
-
-	/**
-	 * @deprecated Phased out in the KNX specification, not used any longer. (KNX medium code for
-	 *             power line 132 kHz (2400 bit/s), inherited from EHS.)
-	 */
-	@Deprecated
-	public static final int MEDIUM_PL132 = 0x08;
 
 	/**
 	 * KNX medium code for radio frequency (868 MHz).
@@ -178,8 +171,7 @@ public class DeviceDIB extends DIB
 			CRBase.logger.warn("device DIB \"" + friendlyName + "\": device status (" + status
 					+ ") uses reserved bits");
 
-		if (knxMedium != MEDIUM_TP1 && knxMedium != MEDIUM_PL110 && knxMedium != MEDIUM_PL132
-				&& knxMedium != MEDIUM_RF && knxMedium != MEDIUM_KNXIP)
+		if (knxMedium != MEDIUM_TP1 && knxMedium != MEDIUM_PL110 && knxMedium != MEDIUM_RF && knxMedium != MEDIUM_KNXIP)
 			throw new KNXIllegalArgumentException("KNX medium not supported");
 		knxmedium = knxMedium;
 
@@ -259,8 +251,6 @@ public class DeviceDIB extends DIB
 			return "TP1";
 		case MEDIUM_PL110:
 			return "PL110";
-		case MEDIUM_PL132:
-			return "PL132";
 		case MEDIUM_RF:
 			return "RF";
 		case MEDIUM_KNXIP:

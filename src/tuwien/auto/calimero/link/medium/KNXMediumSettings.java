@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -60,13 +60,6 @@ public abstract class KNXMediumSettings
 	 * KNX medium code for power line 110 kHz (1200 bit/s).
 	 */
 	public static final int MEDIUM_PL110 = 0x04;
-
-	/**
-	 * @deprecated Phased out in the KNX specification, not used any longer. (KNX medium code for
-	 *             power line 132 kHz (2400 bit/s), inherited from EHS.)
-	 */
-	@Deprecated
-	public static final int MEDIUM_PL132 = 0x08;
 
 	/**
 	 * KNX medium code for radio frequency (868 MHz).
@@ -157,7 +150,6 @@ public abstract class KNXMediumSettings
 	 * <ul>
 	 * <li>TP1</li>
 	 * <li>PL110, P110</li>
-	 * <li>PL132, P132</li>
 	 * <li>RF</li>
 	 * <li>KNXIP, KNX IP</li>
 	 * </ul>
@@ -173,8 +165,6 @@ public abstract class KNXMediumSettings
 			return MEDIUM_TP1;
 		else if ("p110".equalsIgnoreCase(mediumName) || "pl110".equalsIgnoreCase(mediumName))
 			return MEDIUM_PL110;
-		else if ("p132".equalsIgnoreCase(mediumName) || "pl132".equalsIgnoreCase(mediumName))
-			return MEDIUM_PL132;
 		else if ("rf".equalsIgnoreCase(mediumName))
 			return MEDIUM_RF;
 		else if ("knxip".equalsIgnoreCase(mediumName) || "knx ip".equalsIgnoreCase(mediumName))
@@ -210,8 +200,6 @@ public abstract class KNXMediumSettings
 			return "TP1";
 		case MEDIUM_PL110:
 			return "PL110";
-		case MEDIUM_PL132:
-			return "PL132";
 		case MEDIUM_RF:
 			return "RF";
 		case MEDIUM_KNXIP:

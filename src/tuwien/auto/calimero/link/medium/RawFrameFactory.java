@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ import tuwien.auto.calimero.cemi.CEMIFactory;
 
 /**
  * Factory for raw frames on medium. Supports creation of raw frames out of byte arrays. The main
- * purpose is to create frames for the communication media TP1, PL110, and PL132. For the
+ * purpose is to create frames for the communication media TP1, PL110, and RF. For the
  * communication medium KNX IP, which uses cEMI frames, the {@link CEMIFactory} can be used
  * directly.
  *
@@ -53,19 +53,16 @@ public final class RawFrameFactory
 	{}
 
 	/**
-	 * Creates a raw frame out of a byte array for the specified communication medium.
-	 * <p>
-	 * This method just invokes one of the other medium type specific creation methods
-	 * according the given medium type.
+	 * Creates a raw frame out of a byte array for the specified communication medium. This method just invokes one of
+	 * the other medium type specific creation methods according the given medium type.
 	 *
-	 * @param mediumType KNX communication medium, one of the media types declared in
-	 *        {@link KNXMediumSettings}
+	 * @param mediumType KNX communication medium, one of the media types declared in {@link KNXMediumSettings}
 	 * @param data byte array containing the raw frame structure
-	 * @param offset start offset of frame structure in <code>data</code>, 0 &lt;=
-	 *        offset &lt; <code>data.length</code>
+	 * @param offset start offset of frame structure in <code>data</code>, 0 &lt;= offset &lt; <code>data.length</code>
+	 * @param extBusmon parse <code>data</code> as PL110 extended busmonitor frame, i.e., <code>data</code> contains the
+	 *        domain address; ignored if medium type is not PL110
 	 * @return the created raw frame for the specified medium
-	 * @throws KNXFormatException on unknown/not supported KNX medium or no valid frame
-	 *         structure
+	 * @throws KNXFormatException on unknown/not supported KNX medium or no valid frame structure
 	 */
 	public static RawFrame create(final int mediumType, final byte[] data,
 		final int offset, final boolean extBusmon) throws KNXFormatException
@@ -84,7 +81,6 @@ public final class RawFrameFactory
 
 	/**
 	 * Creates a raw frame out of a byte array for the TP1 communication medium.
-	 * <p>
 	 *
 	 * @param data byte array containing the TP1 raw frame structure
 	 * @param offset start offset of frame structure in <code>data</code>, 0 &lt;=
@@ -92,8 +88,7 @@ public final class RawFrameFactory
 	 * @return the created TP1 raw frame
 	 * @throws KNXFormatException on no valid frame structure
 	 */
-	public static RawFrame createTP1(final byte[] data, final int offset)
-		throws KNXFormatException
+	public static RawFrame createTP1(final byte[] data, final int offset) throws KNXFormatException
 	{
 		final int ctrl = data[offset] & 0xff;
 		// parse control field and check if valid
@@ -109,11 +104,11 @@ public final class RawFrameFactory
 
 	/**
 	 * Creates a raw frame out of a byte array for the PL110 communication medium.
-	 * <p>
 	 *
 	 * @param data byte array containing the PL110 raw frame structure
-	 * @param offset start offset of frame structure in <code>data</code>, 0 &lt;=
-	 *        offset &lt; <code>data.length</code>
+	 * @param offset start offset of frame structure in <code>data</code>, 0 &lt;= offset &lt; <code>data.length</code>
+	 * @param extBusmon parse <code>data</code> as PL110 extended busmonitor frame, i.e., <code>data</code> contains the
+	 *        domain address
 	 * @return the created PL110 raw frame
 	 * @throws KNXFormatException on no valid frame structure
 	 */
@@ -123,24 +118,5 @@ public final class RawFrameFactory
 		if ((data[0] & 0x10) == 0x10)
 			return new PL110LData(data, offset, extBusmon);
 		return new PL110Ack(data, offset);
-	}
-
-	/**
-	 * Creates a raw frame out of a byte array for the PL132 communication medium.
-	 * <p>
-	 *
-	 * @param data byte array containing the PL132 raw frame structure
-	 * @param offset start offset of frame structure in <code>data</code>, 0 &lt;=
-	 *        offset &lt; <code>data.length</code>
-	 * @return the created PL132 raw frame
-	 * @throws KNXFormatException on no valid frame structure
-	 */
-	@Deprecated
-	public static RawFrame createPL132(final byte[] data, final int offset)
-		throws KNXFormatException
-	{
-		if (data.length - offset == 2)
-			return new PL132Ack(data, offset);
-		return new PL132LData(data, offset);
 	}
 }

@@ -77,7 +77,6 @@ Access via KNXnet/IP, KNX USB, and FT1.2 (KNX RF USB not tested -- no busmonitor
 * TP1
 * KNX IP
 * PL110
-* PL132
 * RF
 
 ### Management

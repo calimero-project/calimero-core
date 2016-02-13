@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -225,7 +225,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 *        not repeat if error, <code>true</code> for default repeat behavior; meaning of default
 	 *        behavior on media:
 	 *        <ul>
-	 *        <li>PL132, RF: no repetitions</li>
+	 *        <li>RF: no repetitions</li>
 	 *        <li>TP1, PL110: repetitions allowed</li>
 	 *        </ul>
 	 *        for indication message - <code>true</code> if is repeated frame, <code>false</code>
@@ -236,11 +236,9 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 * @param ack acknowledge request, <code>true</code> if acknowledge is requested,
 	 *        <code>false</code> for default behavior; meaning of default behavior on media:
 	 *        <ul>
-	 *        <li>PL132: no acknowledge requested</li>
 	 *        <li>TP1, PL110: acknowledge requested</li>
 	 *        </ul>
-	 * @param hopCount hop count starting value set in control field, in the range 0 &le; value &le;
-	 *        7
+	 * @param hopCount hop count starting value set in control field, in the range 0 &le; value &le; 7
 	 */
 	public CEMILDataEx(final int msgCode, final IndividualAddress src, final KNXAddress dst,
 		final byte[] tpdu, final Priority p, final boolean repeat, final boolean broadcast,
@@ -265,7 +263,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 *        not repeat if error, <code>true</code> for default repeat behavior; meaning of default
 	 *        behavior on media:
 	 *        <ul>
-	 *        <li>PL132, RF: no repetitions</li>
+	 *        <li>RF: no repetitions</li>
 	 *        <li>TP1, PL110: repetitions allowed</li>
 	 *        </ul>
 	 *        for indication message - <code>true</code> if is repeated frame, <code>false</code>
