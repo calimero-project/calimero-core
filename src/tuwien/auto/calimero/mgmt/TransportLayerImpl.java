@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ import tuwien.auto.calimero.mgmt.Destination.AggregatorProxy;
  * <br>
  * All methods invoked after a detach of the network link used for communication are
  * allowed to throw {@link KNXIllegalStateException}.
- * 
+ *
  * @author B. Malinowsky
  */
 public class TransportLayerImpl implements TransportLayer
@@ -156,7 +156,7 @@ public class TransportLayerImpl implements TransportLayer
 
 	// are we representing server side of this transport layer connection
 	private final boolean serverSide;
-	
+
 	private volatile boolean detached;
 	private final KNXNetworkLink lnk;
 	private final NetworkLinkListener lnkListener = new NLListener();
@@ -167,7 +167,7 @@ public class TransportLayerImpl implements TransportLayer
 	private final Map proxies = new HashMap();
 	private final Map incomingProxies = new HashMap();
 	private AggregatorProxy active;
-	
+
 	private volatile int repeated;
 	private final Object lock = new Object();
 
@@ -175,7 +175,7 @@ public class TransportLayerImpl implements TransportLayer
 	 * Creates a new client-side transport layer end-point attached to the supplied KNX network
 	 * link.
 	 * <p>
-	 * 
+	 *
 	 * @param link network link used for communication with a KNX network
 	 * @throws KNXLinkClosedException if the network link is closed
 	 */
@@ -187,7 +187,7 @@ public class TransportLayerImpl implements TransportLayer
 	/**
 	 * Creates a new transport layer end-point attached to the supplied KNX network link.
 	 * <p>
-	 * 
+	 *
 	 * @param link network link used for communication with a KNX network
 	 * @param serverEndpoint does this instance represent the client-side (<code>false</code>),
 	 *        or server-side (<code>true</code>) end-point
@@ -205,7 +205,7 @@ public class TransportLayerImpl implements TransportLayer
 		listeners = new EventListeners(logger);
 		serverSide = serverEndpoint;
 	}
-	
+
 	/**
 	 * {@inheritDoc} Only one destination can be created per remote address. If a
 	 * destination with the supplied remote address already exists for this transport
@@ -247,7 +247,7 @@ public class TransportLayerImpl implements TransportLayer
 	/**
 	 * Returns the destination object for the remote individual address, if such exists.
 	 * <p>
-	 * 
+	 *
 	 * @param remote the remote address to look up
 	 * @return the destination for that address, or <code>null</code> if no destination
 	 *         is currently maintained by the transport layer
@@ -257,7 +257,7 @@ public class TransportLayerImpl implements TransportLayer
 		final AggregatorProxy proxy = (AggregatorProxy) proxies.get(remote);
 		return proxy != null ? proxy.getDestination() : null;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.TransportLayer#destroyDestination
 	 * (tuwien.auto.calimero.mgmt.Destination)
@@ -453,7 +453,7 @@ public class TransportLayerImpl implements TransportLayer
 		if (ctrl == CONNECT) {
 			if (serverSide) {
 				AggregatorProxy proxy = p;
-				// TODO problem: if we receive a new connect, but an old destination is still
+				// if we receive a new connect, but an old destination is still
 				// here configured as connection-less, we get a problem with setting
 				// the connection timeout (connectionless has no support for that)
 				if (proxy != null && !d.isConnectionOriented()) {
@@ -461,7 +461,7 @@ public class TransportLayerImpl implements TransportLayer
 					d.destroy();
 					proxy = null;
 				}
-				
+
 				// allow incoming connect requests (server)
 				if (proxy == null) {
 					proxy = new AggregatorProxy(this);
@@ -581,7 +581,6 @@ public class TransportLayerImpl implements TransportLayer
 		final boolean sendDisconnectReq) throws KNXLinkClosedException
 	{
 		p.setState(Destination.DISCONNECTED);
-		// TODO add initiated by user and refactor into a method
 		p.getDestination().disconnectedBy = sendDisconnectReq ?
 				Destination.LOCAL_ENDPOINT : Destination.REMOTE_ENDPOINT;
 		try {

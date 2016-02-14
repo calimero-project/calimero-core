@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2012 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -160,9 +160,6 @@ public interface ManagementProcedures
 	 */
 	boolean writeAddress(byte[] serialNo, IndividualAddress newAddress) throws KNXException,
 			InterruptedException;
-
-	// NYI DOA+Ind.Addr procedures: its unclear how to associate domain to ind.addr of
-	// several responses; it's not that important, power-line isn't common anyway
 
 	// scanning procedures
 

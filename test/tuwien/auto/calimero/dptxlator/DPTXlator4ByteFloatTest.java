@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2014 B. Malinowsky
+    Copyright (c) 2009, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -59,23 +59,22 @@ public class DPTXlator4ByteFloatTest extends TestCase
 	private DPTXlator4ByteFloat x;
 	private DPTXlator4ByteFloat t;
 
-	
+
 	private final String min = "1.40239846e-45";
 	private final String max = "3.40282347e+38";
 	private final String value1 = "735";
 	private final String value2 = "54732.33334";
-	
+
 	private final String value1Enc = "735";
-	
+
 	private final String zero = "0.0";
 	private final String[] strings = { min, max, zero, value1, value2};
-	// TODO achieving a nice formatting of floats is cumbersome, use Java defaults here
 	private final String[] strCmp = { "1.4E-45", "3.40282E38", "0.0", "735", "54732.332"};
-	
+
 	private final float[] floats =
 		{ Float.parseFloat(min), Float.parseFloat(max), Float.parseFloat(zero),
 			Float.parseFloat(value1), Float.parseFloat(value2), };
-	
+
 	private final byte[] dataMin = toBytes(Float.floatToIntBits(floats[0]));
 	private final byte[] dataMax = toBytes(Float.floatToIntBits(floats[1]));
 	private final byte[] dataZero = toBytes(Float.floatToIntBits(floats[2]));
@@ -92,7 +91,7 @@ public class DPTXlator4ByteFloatTest extends TestCase
 	{
 		return new byte[] {(byte) (i >>> 24), (byte) (i >>> 16), (byte) (i >>> 8), (byte) (i) };
 	}
-	
+
 	/**
 	 * @param name
 	 */
@@ -125,7 +124,7 @@ public class DPTXlator4ByteFloatTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned#setValues(java.lang.String[])}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValues() throws KNXFormatException
@@ -146,7 +145,7 @@ public class DPTXlator4ByteFloatTest extends TestCase
 
 		t.setValues(new String[] { t.getValue(), t.getValue() });
 	}
-	
+
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator4ByteFloat#getAllValues()}.
 	 * @throws KNXFormatException
@@ -250,7 +249,7 @@ public class DPTXlator4ByteFloatTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#getValue()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testGetValue() throws KNXFormatException
@@ -261,8 +260,8 @@ public class DPTXlator4ByteFloatTest extends TestCase
 		final float f = t.getValueFloat();
 		assertEquals(265, f, 1.0);
 		assertTrue(t.getValue().indexOf(String.valueOf(f)) >= 0);
-		
-		// test non-localized formatted output for bigger floating point values 
+
+		// test non-localized formatted output for bigger floating point values
 		// that use scientific notation
 		// the difference is basically the decimal separator '.' vs ',' (depending on locale)
 		// we compare for all available locales
@@ -287,7 +286,7 @@ public class DPTXlator4ByteFloatTest extends TestCase
 			assertEquals(first, second);
 		}
 	}
-	
+
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#setData(byte[], int)}.
 	 */
@@ -318,7 +317,7 @@ public class DPTXlator4ByteFloatTest extends TestCase
 			assertEquals(array[i + 1], data[i]);
 		Helper.assertSimilar(new String[] { strCmp[1], value1Enc }, t.getAllValues());
 	}
-	
+
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#getType()}.
 	 */
@@ -337,7 +336,7 @@ public class DPTXlator4ByteFloatTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#toString()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testToString() throws KNXFormatException
@@ -349,5 +348,5 @@ public class DPTXlator4ByteFloatTest extends TestCase
 			assertTrue(s.indexOf(strCmp[i]) >= 0);
 		}
 	}
-	
+
 }

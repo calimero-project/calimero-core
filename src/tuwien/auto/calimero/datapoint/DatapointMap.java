@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -139,7 +139,6 @@ public class DatapointMap implements DatapointModel, ChangeNotifier
 		return (Datapoint) points.get(main);
 	}
 
-	// ??? make this a super type interface method
 	/**
 	 * Returns all datapoints currently contained in this map.
 	 * <p>

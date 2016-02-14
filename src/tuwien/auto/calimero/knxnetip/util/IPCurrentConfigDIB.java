@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015 B. Malinowsky
+    Copyright (c) 2015, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -119,7 +119,6 @@ public final class IPCurrentConfigDIB extends DIB
 		this.gw = gateway != null ? gateway.getAddress() : new byte[4];
 		this.dhcp = dhcp != null ? dhcp.getAddress() : new byte[4];
 
-		// NYI JRE >= 1.5: should use Integer.bitCount()
 		if (ipAssignmentMethod < 0 || ipAssignmentMethod > 0x15)
 			throw new KNXIllegalArgumentException("IP assignment method out of range [0..b1111]: "
 					+ ipAssignmentMethod);

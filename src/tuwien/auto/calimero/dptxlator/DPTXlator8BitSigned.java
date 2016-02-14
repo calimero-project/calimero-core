@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -115,23 +115,6 @@ public class DPTXlator8BitSigned extends DPTXlator
 		return makeString(0);
 	}
 
-//    // overwritten to avoid conversion from signed to unsigned
-//    public void setData(final byte[] data, final int offset) {
-//        if (offset < 0 || offset > data.length) {
-//            throw new KNXIllegalArgumentException("illegal offset " + offset);
-//        }
-//        final int size = Math.max(1, getTypeSize());
-//        final int length = (data.length - offset) / size * size;
-//        if (length == 0) {
-//            throw new KNXIllegalArgumentException("data length " + (data.length - offset)
-//                    + " < required KNX data type width " + size);
-//        }
-//        this.data = new short[length];
-//        for (int i = 0; i < length; ++i) {
-//            this.data[i] = data[offset + i];
-//        }
-//    }
-
 	/**
 	 * Sets one new translation item from a signed value, replacing any old items.
 	 *
@@ -151,7 +134,6 @@ public class DPTXlator8BitSigned extends DPTXlator
 		return getValueSigned();
 	}
 
-	// ??? public for consistency
 	byte getValueSigned()
 	{
 		return fromDPT(data[0]);
@@ -197,7 +179,6 @@ public class DPTXlator8BitSigned extends DPTXlator
 		data = new short[] { (short) (status | enc) };
 	}
 
-	// TODO status would be better be done as enum set?
 	// 0 = set, 1 = clear
 	boolean isStatusBitSet()
 	{
