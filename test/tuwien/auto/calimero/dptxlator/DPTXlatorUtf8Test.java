@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015 B. Malinowsky
+    Copyright (c) 2015, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,10 +39,9 @@ package tuwien.auto.calimero.dptxlator;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
-import junit.framework.TestCase;
-
 import org.junit.Assert;
 
+import junit.framework.TestCase;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.exception.KNXFormatException;
 import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
@@ -63,7 +62,7 @@ public class DPTXlatorUtf8Test extends TestCase
 	// ab[uppercase weird A]cd[lowercase greek a]
 	private final String nonLatin = "ab\u0100cd\u03b1";
 
-	private final byte[] dataEmpty = new byte[1];
+//	private final byte[] dataEmpty = new byte[1];
 	private final byte[] data1 = new byte[6];
 	private final byte[] data2 = new byte[6];
 

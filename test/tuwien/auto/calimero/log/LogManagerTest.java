@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ public class LogManagerTest extends TestCase
 	private static final String file3 = Util.getPath() + "test-manager-log-writer 3.log";
 
 	private LogManager m;
-	
+
 	/**
 	 * @param name name for test case
 	 */
@@ -140,7 +140,7 @@ public class LogManagerTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.log.LogManager#addWriter
 	 * (java.lang.String, tuwien.auto.calimero.log.LogWriter)}.
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws KNXLogException
 	 */
@@ -177,7 +177,7 @@ public class LogManagerTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.log.LogManager#removeWriter
 	 * (java.lang.String, tuwien.auto.calimero.log.LogWriter)}.
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws KNXLogException
 	 */
@@ -260,37 +260,37 @@ public class LogManagerTest extends TestCase
 		assertTrue(m.hasLogService(logger2));
 		assertTrue(m.hasLogService(logger3));
 	}
-	
+
 	// subclass so we have the writer instance
 	private class TestWriter extends LogFileWriter{
-		Writer w;
-		
+//		Writer w;
+
 		public TestWriter(final LogLevel level, final String file, final boolean append, final int maxSize,
 			final boolean autoFlush) throws KNXLogException
 		{
 			super(level, file, append, maxSize, autoFlush);
 		}
-		
+
 		protected void setOutput(final Writer w)
 		{
 			super.setOutput(w);
-			this.w = w;
+//			this.w = w;
 		}
 	}
-	
+
 	public void testShutdown() throws KNXLogException
 	{
 		// add global writer
 		final TestWriter w1 = new TestWriter(LogLevel.ALL, file, false, 0, true);
 		m.addWriter(null, w1);
-		
+
 		final TestWriter w2 = new TestWriter(LogLevel.ALL, file2, false, 0, true);
 		final LogService s = m.getLogService("test-logger 1");
 		s.addWriter(w2);
 		// remove the global writer from this service
 		s.removeWriter(w1);
-		
-		// XXX comment out this part because otherwise, logging is shutdown for other tests
+
+		// comment out this part because otherwise, logging is shutdown for other tests
 //		m.shutdown(true);
 //		try {
 //			w1.w.write('c');

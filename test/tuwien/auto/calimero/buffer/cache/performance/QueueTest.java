@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -76,31 +76,31 @@ public class QueueTest extends PerfTestCase
 			arr[size++] = value;
 		}
 
-		int capacity()
-		{
-			return arr.length;
-		}
+//		int capacity()
+//		{
+//			return arr.length;
+//		}
 
-		long get(final int index)
-		{
-			return arr[index];
-		}
+//		long get(final int index)
+//		{
+//			return arr[index];
+//		}
 
 		void set(final int index, final long value)
 		{
 			arr[index] = value;
 		}
 
-		int size()
-		{
-			return size;
-		}
+//		int size()
+//		{
+//			return size;
+//		}
 
-		void clear()
-		{
-			while (size > 0)
-				arr[--size] = 0;
-		}
+//		void clear()
+//		{
+//			while (size > 0)
+//				arr[--size] = 0;
+//		}
 
 		long[] toArray()
 		{

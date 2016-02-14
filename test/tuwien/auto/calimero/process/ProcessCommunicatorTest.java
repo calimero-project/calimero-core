@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -371,8 +371,8 @@ public class ProcessCommunicatorTest extends TestCase
 	 */
 	public final void testReadFloatBoolean() throws KNXException, InterruptedException
 	{
-		final float f2 = pc.readFloat(dpFloat2, false);
-		final float f4 = pc.readFloat(dpFloat4, true);
+		/*final float f2 =*/ pc.readFloat(dpFloat2, false);
+		/*final float f4 =*/ pc.readFloat(dpFloat4, true);
 	}
 
 	/**

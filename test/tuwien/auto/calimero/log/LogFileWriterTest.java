@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -53,8 +53,6 @@ public class LogFileWriterTest extends TestCase
 	private static final String test = Util.getPath() + "test.log";
 	private static final String exists = Util.getPath() + "exists.log";
 	private static final String close = Util.getPath() + "close.log";
-	// on MacOS, this is actually not invalid
-	private static final String invalid = Util.getPath() + "{!<\"~?*^',invalid.log";
 	private static final String wrongDir = Util.getPath() + "dirNotExists/invalid.log";
 
 	private LogFileWriter w, w2;
@@ -118,7 +116,7 @@ public class LogFileWriterTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.log.LogFileWriter#close()}.
-	 * 
+	 *
 	 * @throws KNXLogException
 	 * @throws IOException
 	 */
@@ -137,7 +135,7 @@ public class LogFileWriterTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.log.LogFileWriter#LogFileWriter(java.lang.String, boolean)}
 	 * .
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public void testLogFileWriterStringBoolean() throws IOException
@@ -149,14 +147,6 @@ public class LogFileWriterTest extends TestCase
 		}
 		catch (final KNXLogException e) {}
 		assertNotNull(l);
-		l = null;
-		// dont run this, as its a valid name on MacOS
-//		try {
-//			l = new LogFileWriter(invalid, false);
-//			l.close();
-//		}
-//		catch (final KNXLogException e) {}
-		assertNull(l);
 		l = null;
 		try {
 			l = new LogFileWriter(wrongDir, true);
@@ -275,7 +265,7 @@ public class LogFileWriterTest extends TestCase
 
 	/**
 	 * Tests the file size of the file written by the log file writer.
-	 * 
+	 *
 	 * @throws KNXLogException
 	 */
 	public void testSize() throws KNXLogException
