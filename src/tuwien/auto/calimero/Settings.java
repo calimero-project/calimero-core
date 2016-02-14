@@ -43,13 +43,13 @@ package tuwien.auto.calimero;
  */
 public final class Settings
 {
-	private static final String version = "2.3-dev";
+	private static final String version = "2.3-beta";
 	private static final String library = "Calimero 2";
 	private static final String desc = "A library for KNX network access";
 
 	private static final String tuwien = "Vienna University of Technology";
 	private static final String group = "Automation Systems Group";
-	private static final String copyright = "(c) 2007-2015";
+	private static final String copyright = "(c) 2007-2016";
 
 	// aligns the bundle package name following the friendly name,
 	// works for friendly name with max length of 20 chars
