@@ -71,14 +71,11 @@ import tuwien.auto.calimero.log.LogService;
  * a subtype uses the KNXListener {@link AbstractLink#notifier} as connection listener.
  * <p>
  * In general, once a link has been closed, it is not available for further link communication and
- * cannot be reopened. For many use cases, a {@link Connector} is useful for creating KNX network
- * links.
+ * cannot be reopened.
  *
  * @author B. Malinowsky
  * @see KNXNetworkLinkIP
  * @see KNXNetworkLinkFT12
- * @see KNXNetworkLinkUsb
- * @see Connector
  */
 public abstract class AbstractLink implements KNXNetworkLink
 {

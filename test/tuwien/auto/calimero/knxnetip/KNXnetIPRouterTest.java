@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -151,7 +151,7 @@ public class KNXnetIPRouterTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.knxnetip.KNXnetIPRouting#send(tuwien.auto.calimero.cemi.CEMI, tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testSend() throws KNXException
@@ -166,7 +166,7 @@ public class KNXnetIPRouterTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPRouting#send
 	 * (tuwien.auto.calimero.cemi.CEMI,
 	 * tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws UnknownHostException
 	 * @throws SocketException
@@ -194,9 +194,9 @@ public class KNXnetIPRouterTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPRouting#KNXnetIPRouter
+	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPRouting#KNXnetIPRouting
 	 * (java.net.NetworkInterface, java.net.InetAddress)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws UnknownHostException
 	 * @throws SocketException
@@ -235,7 +235,7 @@ public class KNXnetIPRouterTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.knxnetip.KNXnetIPRouting#setHopCount(int)}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testSetHopCount() throws KNXException
@@ -266,7 +266,7 @@ public class KNXnetIPRouterTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.knxnetip.KNXnetIPRouting#close()}.
-	 * 
+	 *
 	 * @throws KNXException
 	 */
 	public final void testClose() throws KNXException
@@ -285,7 +285,7 @@ public class KNXnetIPRouterTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.knxnetip.KNXnetIPRouting#getRemoteAddress()}.
-	 * 
+	 *
 	 * @throws KNXException
 	 * @throws UnknownHostException
 	 * @throws SocketException

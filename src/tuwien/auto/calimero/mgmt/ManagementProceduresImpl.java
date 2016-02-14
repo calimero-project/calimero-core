@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2015 B. Malinowsky
+    Copyright (c) 2010, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -64,9 +64,9 @@ import tuwien.auto.calimero.log.LogService;
  * <p>
  * In general, invoked procedures should not be run concurrently on the same remote endpoint. As
  * precaution, this implementation will guard against such behavior by executing procedures
- * synchronized on the used management client instance if considered necessary ( {@ManagementClient
- * }). Note that this, although, is not sufficient to guarantee non-concurrent
- * execution of procedures on the same remote endpoint in general.
+ * synchronized on the used management client instance if considered necessary ({@link ManagementClient}).
+ * Note that this is not sufficient to guarantee non-concurrent
+ * execution of procedures on the same remote endpoint in general (and not supported by the KNX standard).
  *
  * @author B. Malinowsky
  */

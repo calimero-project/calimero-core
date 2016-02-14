@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2015 B. Malinowsky
+    Copyright (c) 2010, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -75,8 +75,8 @@ public class DPTXlator1BitControlled extends DPTXlator
 		/**
 		 * Creates a new datapoint type information structure for the 1 Bit controlled DPT.
 		 *
-		 * @param typeID {@inheritDoc}
-		 * @param description {@inheritDoc}
+		 * @param typeID datapoint type identifier
+		 * @param description short textual description
 		 * @param value the DPT of the control information
 		 */
 		public DPT1BitControlled(final String typeID, final String description, final DPT value)
