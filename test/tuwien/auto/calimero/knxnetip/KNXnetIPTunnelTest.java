@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -178,21 +178,22 @@ public class KNXnetIPTunnelTest extends TestCase
 		// the test expects a negative confirmation with the received L_Data.con
 		// the Calimero server always sends positive .con any frame, even if the group
 		// address is non-existing
-		doSend(frameNoDest, noblock, false);
+		final boolean posCon = true;
+		doSend(frameNoDest, noblock, posCon);
 		doSend(frame, ack, true);
 		doSend(frame2, con, true);
 
 		final long start = System.currentTimeMillis();
-		doSend(frameNoDest, con, false);
-		doSend(frameNoDest, con, false);
-		doSend(frameNoDest, con, false);
-		doSend(frameNoDest, con, false);
-		doSend(frameNoDest, con, false);
-		doSend(frameNoDest, con, false);
-		doSend(frameNoDest, con, false);
-		doSend(frameNoDest, con, false);
-		doSend(frameNoDest, con, false);
-		doSend(frameNoDest, con, false);
+		doSend(frameNoDest, con, posCon);
+		doSend(frameNoDest, con, posCon);
+		doSend(frameNoDest, con, posCon);
+		doSend(frameNoDest, con, posCon);
+		doSend(frameNoDest, con, posCon);
+		doSend(frameNoDest, con, posCon);
+		doSend(frameNoDest, con, posCon);
+		doSend(frameNoDest, con, posCon);
+		doSend(frameNoDest, con, posCon);
+		doSend(frameNoDest, con, posCon);
 		final long end = System.currentTimeMillis();
 		System.out.println("time for 10 send with con: " + (end - start));
 	}
