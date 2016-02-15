@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -118,7 +118,7 @@ public class CommandDPTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.datapoint.CommandDP#CommandDP(
 	 * tuwien.auto.calimero.xml.XMLReader)}.
-	 * 
+	 *
 	 * @throws KNXMLException
 	 */
 	public final void testCommandDPXMLReader() throws KNXMLException
@@ -140,12 +140,12 @@ public class CommandDPTest extends TestCase
 
 	/**
 	 * Test method for {@link Datapoint#create(XMLReader)}.
-	 * 
+	 *
 	 * @throws KNXMLException
 	 */
 	public final void testCreate() throws KNXMLException
 	{
-		final XMLReader r = XMLFactory.getInstance().createXMLReader(Util.getPath() + dpFile);
+		final XMLReader r = XMLFactory.getInstance().createXMLReader(dpFile);
 		assertTrue(Datapoint.create(r) instanceof CommandDP);
 		r.close();
 	}
