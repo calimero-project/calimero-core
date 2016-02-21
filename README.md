@@ -6,8 +6,8 @@ Library with core functionality for KNX network access.
 * The Java 8 version is [on this branch](https://github.com/calimero-project/calimero/tree/feat/jse-embd8-c1).
 * A port for [Java ME Embedded 8.1](http://www.oracle.com/technetwork/java/embedded/javame/embed-me/overview/index.html) is [on this branch](https://github.com/calimero-project/calimero/tree/jme-embd).
 
-The packages (jars) currently distributed are based on the master branch, and compatible to Java ME CDC (JSR 218) with the Foundation Profile, i.e., "Java 1.4".
-Future versions will use the Java 8 branch, requiring Java SE Embedded 8/compact1. The update will (probably) be with v2.3.
+Version 2.3 is the last version compatible to Java ME CDC (JSR 218) with the Foundation Profile, i.e., "Java 1.4".
+Any later versions require Java SE Embedded 8/compact1.
 
 
 Download
@@ -30,7 +30,7 @@ Supported Features
 * KNX RF USB (Java 8 branch only)
 * KNX USB (Java 8 branch only)
 * KNX FT1.2 Protocol (serial connections)
-* TP-UART [__NEW__: Access TP1 networks via TP-UART]
+* TP-UART
 
 #### KNXnet/IP
 * Discovery and Self-description
@@ -76,7 +76,6 @@ Access via KNXnet/IP, KNX USB, TP-UART, and FT1.2
 * TP1
 * KNX IP
 * PL110
-* PL132 (phased out)
 * RF
 
 ### Management
@@ -92,7 +91,7 @@ Access via KNXnet/IP, KNX USB, TP-UART, and FT1.2
 * EMI1/2 Busmonitor
 
 ### Network Buffer
-* State/command-based datapoint buffer to answer L_Data.reqs, and buffer incoming L_Data.ind updates
+* State/command-based datapoint buffer to answer L-Data.reqs, and buffer incoming L-Data.ind updates
 
 
 More Features, Tools, Examples
