@@ -117,7 +117,8 @@ final class TimerQueue extends Thread
 			}
 		}
 		catch (final InterruptedException e) {
-			System.err.println("TimerQueue stopped, still submitted = " + notifiables.size());
+			if (!notifiables.isEmpty())
+				System.err.println("TimerQueue stopped, still submitted = " + notifiables.size());
 		}
 	}
 
