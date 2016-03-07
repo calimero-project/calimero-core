@@ -1,4 +1,4 @@
-Calimero-core
+Calimero-core [![Build Status](https://travis-ci.org/calimero-project/calimero-core.svg?branch=feat/jse-embd8-c1)](https://travis-ci.org/calimero-project/calimero-core)
 =============
 
 This feature branch provides Calimero for Java SE Embedded 8. The minimum required runtime environment is 
