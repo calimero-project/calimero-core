@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -70,6 +70,9 @@ public class DPTXlatorDateTimeTest extends TestCase
 	private final byte[] data2 = { 107, 6, 5, 0x57, 22, 0, 0x41, 0 };
 	private final byte[] data3 = { 0, 0, 0, 8, 30, 0, 0x58, 0 };
 	private final byte[] data4 = { 0, 0, 0, 0, 0, 0, 0x4a, 0 };
+
+	// if we're in a time zone without DST, date/time values with a set DST field will fail
+	private final boolean useDaylightTime = Calendar.getInstance().getTimeZone().useDaylightTime();
 
 	/**
 	 * @param name name of test case
@@ -316,7 +319,10 @@ public class DPTXlatorDateTimeTest extends TestCase
 		catch (final KNXFormatException e) {}
 		final Calendar c = Calendar.getInstance();
 
-		t.setValue(value2);
+		if (useDaylightTime)
+			t.setValue(value2);
+		else
+			t.setValue(value2.replace("DST", ""));
 		ms = t.getValueMilliseconds();
 		c.setTimeInMillis(ms);
 		assertEquals(c.get(Calendar.YEAR), t.getYear());
@@ -728,8 +734,10 @@ public class DPTXlatorDateTimeTest extends TestCase
 		t.setValue("23:00:00");
 		assertTrue(t.validate());
 
-		t.setValues(new String[] { "2002/12/31 23:59:59",
-			"Sat, 2007/5/12 24:00:00 DST ", "2007/2/28 in sync" });
+		if (useDaylightTime)
+			t.setValues(new String[] { "2002/12/31 23:59:59", "Sat, 2007/5/12 24:00:00 DST ", "2007/2/28 in sync" });
+		else
+			t.setValues(new String[] { "2002/12/31 23:59:59", "Sat, 2007/5/12 24:00:00 ", "2007/2/28 in sync" });
 		assertTrue(t.validate());
 		t.setValues(new String[] { "2002/12/31 23:59:59",
 			"Sat, 2007/5/12 24:00:00 DST ", "2007/2/29" });
