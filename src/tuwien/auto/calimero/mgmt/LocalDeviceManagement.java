@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015 B. Malinowsky
+    Copyright (c) 2015, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -129,7 +129,9 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 	{
 		if (closed)
 			throw new KNXIllegalStateException("adapter closed");
-		send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, getObjectType(objIndex), 1, pid, start,
+		final int objectType = getObjectType(objIndex);
+		final int objectInstance = getObjectInstance(objIndex, objectType);
+		send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, objectType, objectInstance, pid, start,
 				elements, data), KNXnetIPConnection.WAIT_FOR_CON);
 		findFrame(CEMIDevMgmt.MC_PROPWRITE_CON);
 	}
@@ -139,7 +141,9 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 	{
 		if (closed)
 			throw new KNXIllegalStateException("adapter closed");
-		send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, getObjectType(objIndex), 1, pid, start,
+		final int objectType = getObjectType(objIndex);
+		final int objectInstance = getObjectInstance(objIndex, objectType);
+		send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, objectType, objectInstance, pid, start,
 				elements), KNXnetIPConnection.WAIT_FOR_CON);
 		return findFrame(CEMIDevMgmt.MC_PROPREAD_CON);
 	}
@@ -244,6 +248,17 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 				return p.otype;
 		}
 		throw new KNXRemoteException("object not listed");
+	}
+
+	private int getObjectInstance(final int objIndex, final int objectType)
+	{
+		int instance = 0;
+		for (int i = 0; i <= objIndex; i++) {
+			final Pair p = (Pair) interfaceObjects.get(i);
+			if (p.otype == objectType)
+				instance++;
+		}
+		return instance;
 	}
 
 	protected void initInterfaceObjects() throws KNXException
