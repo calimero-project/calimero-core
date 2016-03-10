@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,10 +42,11 @@ import java.net.SocketException;
 import java.util.Iterator;
 import java.util.List;
 
-import category.RequireDiscover;
+import org.junit.experimental.categories.Category;
+
+import category.RequireKnxnetIP;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
-import org.junit.experimental.categories.Category;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Util;
@@ -56,7 +57,7 @@ import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
 /**
  * @author B. Malinowsky
  */
-@Category(RequireDiscover.class)
+@Category(RequireKnxnetIP.class)
 public class DiscovererTest extends TestCase
 {
 	private Discoverer ddef;

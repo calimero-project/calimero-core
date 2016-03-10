@@ -28,7 +28,7 @@
 	</developers>
 
 	<properties>
-		<test.exclude.groups>category.RequireKnxnetIP,category.RequireKNXNetworkLink,category.RequireDiscover,category.RequireFT12Connection,category.RequirePerf</test.exclude.groups>
+		<test.exclude.groups>category.RequireKnxnetIP,category.RequireFT12Connection</test.exclude.groups>
 	</properties>
 
 	<build>

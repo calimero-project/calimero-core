@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,9 +38,10 @@ package tuwien.auto.calimero.buffer;
 
 import java.util.Date;
 
-import category.RequireKNXNetworkLink;
-import junit.framework.TestCase;
 import org.junit.experimental.categories.Category;
+
+import category.RequireKnxnetIP;
+import junit.framework.TestCase;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalStateException;
@@ -59,7 +60,7 @@ import tuwien.auto.calimero.process.ProcessCommunicatorImpl;
 /**
  * @author B. Malinowsky
  */
-@Category(RequireKNXNetworkLink.class)
+@Category(RequireKnxnetIP.class)
 public class NetworkBufferTest extends TestCase
 {
 	private KNXNetworkLink lnk;
