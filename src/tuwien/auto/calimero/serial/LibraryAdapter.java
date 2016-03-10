@@ -108,10 +108,7 @@ public abstract class LibraryAdapter
 			}
 			catch (final IOException e) {
 				if (conn != null)
-					try {
-						conn.close();
-					}
-					catch (final IOException ignore) {}
+					conn.close();
 				t = e;
 			}
 		}
@@ -195,12 +192,7 @@ public abstract class LibraryAdapter
 		return 0;
 	}
 
-	/**
-	 * Closes an open serial port.
-	 *
-	 * @throws IOException on error during close
-	 */
-	public abstract void close() throws IOException;
+	public abstract void close();
 
 	/**
 	 * Invokes <code>method</code> name on object <code>obj</code> with arguments <code>args</code>.

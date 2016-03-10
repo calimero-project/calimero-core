@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -67,27 +67,24 @@ import tuwien.auto.calimero.log.LogService;
  * Access to log event information:<br>
  * See the corresponding constructors of this class for how to get the associated log
  * service.
- * 
+ *
  * @author B. Malinowsky
  */
 public class FT12Connection
 {
 	/**
 	 * State of communication: in idle state, no error, ready to send.
-	 * <p>
 	 */
 	public static final int OK = 0;
 
 	/**
 	 * State of communication: in closed state, no send possible.
-	 * <p>
 	 */
 	public static final int CLOSED = 1;
 
 	/**
 	 * Status code of communication: waiting for acknowledge after send, no error, not
 	 * ready to send.
-	 * <p>
 	 */
 	public static final int ACK_PENDING = 2;
 
@@ -161,7 +158,7 @@ public class FT12Connection
 	 * created during establishment of this FT1.2 connection, use
 	 * {@link LogManager#getLogService(String)} before invoking this constructor and add
 	 * the writer.
-	 * 
+	 *
 	 * @param portNumber port number of the serial communication port to use; mapped to
 	 *        the default port identifier using this number (device and platform specific)
 	 * @throws KNXException on port not found or access error, initializing port settings
@@ -182,7 +179,7 @@ public class FT12Connection
 	 * establishment of this FT1.2 connection, use
 	 * {@link LogManager#getLogService(String)} before invoking this constructor and add
 	 * the writer.
-	 * 
+	 *
 	 * @param portId port identifier of the serial communication port to use
 	 * @throws KNXException on port not found or access error, initializing port settings
 	 *         failed, if reset of BCU2 failed
@@ -199,7 +196,7 @@ public class FT12Connection
 	 * If the requested baud rate is not supported, it may get substituted with a valid
 	 * baud rate by default.<br>
 	 * For access to the log service, see {@link #FT12Connection(String)}.
-	 * 
+	 *
 	 * @param portId port identifier of the serial communication port to use
 	 * @param baudrate baud rate to use for communication, 0 &lt; baud rate
 	 * @throws KNXException on port not found or access error, initializing port settings
@@ -231,7 +228,7 @@ public class FT12Connection
 	 * property with that key, and the Calimero library has access to serial ports, the lowest 10
 	 * port numbers of each of the default system name prefixes are checked if present.<br>
 	 * The empty array is returned if no ports are discovered.
-	 * 
+	 *
 	 * @return array of strings with found port identifiers
 	 */
 	public static String[] getPortIdentifiers()
@@ -268,7 +265,7 @@ public class FT12Connection
 	 * connection.
 	 * <p>
 	 * If <code>l</code> was already added as listener, no action is performed.
-	 * 
+	 *
 	 * @param l the listener to add
 	 */
 	public void addConnectionListener(final KNXListener l)
@@ -281,7 +278,7 @@ public class FT12Connection
 	 * events from this connection.
 	 * <p>
 	 * If <code>l</code> was not added in the first place, no action is performed.
-	 * 
+	 *
 	 * @param l the listener to remove
 	 */
 	public void removeConnectionListener(final KNXListener l)
@@ -294,7 +291,7 @@ public class FT12Connection
 	 * <p>
 	 * After the connection is closed, the returned identifier will always be the empty
 	 * string.
-	 * 
+	 *
 	 * @return port identifier as string, or empty string
 	 */
 	public final String getPortID()
@@ -304,8 +301,7 @@ public class FT12Connection
 
 	/**
 	 * Sets a new baud rate for this connection.
-	 * <p>
-	 * 
+	 *
 	 * @param baud requested baud rate [bit/s], 0 &lt; baud rate
 	 */
 	public void setBaudrate(final int baud)
@@ -317,7 +313,7 @@ public class FT12Connection
 	 * Returns the currently used baud rate.
 	 * <p>
 	 * After closing the connection, the returned baud rate is 0 by default.
-	 * 
+	 *
 	 * @return baud rate in Bit/s
 	 */
 	public final int getBaudRate()
@@ -327,7 +323,7 @@ public class FT12Connection
 
 	/**
 	 * Returns information about the current FT1.2 communication state.
-	 * 
+	 *
 	 * @return state enumeration
 	 */
 	public final int getState()
@@ -346,7 +342,7 @@ public class FT12Connection
 	 * guaranteed to get notified before this method returns. The communication state (see
 	 * {@link #getState()}) is reset to {@link #OK} when the notification completed, so to
 	 * prevent another send call from a listener.
-	 * 
+	 *
 	 * @param frame EMI message to send, length of frame &lt; 256 bytes
 	 * @param blocking <code>true</code> to block for confirmation (ACK),
 	 *        <code>false</code> to immediately return after send
@@ -473,10 +469,7 @@ public class FT12Connection
 			}
 			catch (final IOException e) {
 				if (conn != null)
-					try {
-						conn.close();
-					}
-					catch (final IOException ignore) {}
+					conn.close();
 				logger.warn("native serial port access failed", e);
 			}
 		}
@@ -751,7 +744,7 @@ public class FT12Connection
 		/**
 		 * Fires a frame received event ({@link KNXListener#frameReceived(FrameEvent)})
 		 * for the supplied EMI2 <code>frame</code>.
-		 * 
+		 *
 		 * @param frame the EMI2 L-data frame to generate the event for
 		 */
 		private void fireFrameReceived(final byte[] frame)
