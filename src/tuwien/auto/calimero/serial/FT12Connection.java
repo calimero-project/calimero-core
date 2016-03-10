@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -468,10 +468,7 @@ public class FT12Connection implements AutoCloseable
 			}
 			catch (final IOException e) {
 				if (conn != null)
-					try {
-						conn.close();
-					}
-					catch (final IOException ignore) {}
+					conn.close();
 				logger.warn("native serial port access failed", e);
 			}
 		}

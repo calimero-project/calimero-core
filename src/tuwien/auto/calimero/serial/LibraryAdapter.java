@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -110,10 +110,7 @@ public abstract class LibraryAdapter implements Closeable
 			}
 			catch (final IOException e) {
 				if (conn != null)
-					try {
-						conn.close();
-					}
-					catch (final IOException ignore) {}
+					conn.close();
 				t = e;
 			}
 		}
@@ -194,12 +191,8 @@ public abstract class LibraryAdapter implements Closeable
 		return 0;
 	}
 
-	/**
-	 * Closes an open serial port.
-	 *
-	 * @throws IOException on error during close
-	 */
-	public abstract void close() throws IOException;
+	@Override
+	public abstract void close();
 
 	/**
 	 * Invokes <code>method</code> name on object <code>obj</code> with arguments <code>args</code>.

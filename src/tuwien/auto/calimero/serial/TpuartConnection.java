@@ -302,20 +302,15 @@ public class TpuartConnection implements AutoCloseable
 
 	private void close(final int origin, final String reason)
 	{
+		// best-effort, as we might already have hit an I/O error
 		try {
-			// best-effort, as we might already have hit an I/O error
-			try {
-				reset();
-			}
-			catch (final InterruptedIOException e) {
-				Thread.currentThread().interrupt();
-			}
-			catch (final Exception ignore) {}
-			adapter.close();
+			reset();
 		}
-		catch (final IOException e) {
-			logger.error("on closing {}", portId, e);
+		catch (final InterruptedIOException e) {
+			Thread.currentThread().interrupt();
 		}
+		catch (final IOException ignore) {}
+		adapter.close();
 		receiver.quit();
 		fireConnectionClosed(origin, reason);
 	}

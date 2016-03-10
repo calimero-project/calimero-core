@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,6 @@
 
 package tuwien.auto.calimero.serial;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -91,18 +90,11 @@ class CommConnectionAdapter extends LibraryAdapter
 		return connector != null;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.serial.LibraryAdapter#close()
-	 */
 	@Override
-	public void close() throws IOException
+	public void close()
 	{
 		try {
 			invoke(conn, "close", null);
-		}
-		catch (final InvocationTargetException e) {
-			if (e.getCause() instanceof IOException)
-				throw (IOException) e.getCause();
 		}
 		catch (final Exception ignore) {}
 	}

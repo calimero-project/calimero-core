@@ -288,16 +288,17 @@ class SerialComAdapter extends LibraryAdapter
 		return new PortOutputStream(this);
 	}
 
-	/* (non-Javadoc)
-	 * Like CommConnection in Java ME
-	 * @see javax.microedition.io.Connection#close()
-	 */
 	// any open input/output stream accessing this port becomes unusable
 	@Override
-	public final void close() throws IOException
+	public final void close()
 	{
-		if (fd != INVALID_HANDLE)
-			close0();
+		try {
+			if (fd != INVALID_HANDLE)
+				close0();
+		}
+		catch (final IOException e) {
+			logger.error("closing serial port", e);
+		}
 		fd = INVALID_HANDLE;
 	}
 
