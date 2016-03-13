@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -518,8 +518,8 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 				remaining = end - System.currentTimeMillis();
 			}
 		}
-		logger.info("timeout waiting for group read response");
-		throw new KNXTimeoutException("timeout waiting for group read response");
+		logger.info("timeout waiting for group read response from {}", from);
+		throw new KNXTimeoutException("timeout waiting for group read response " + from);
 	}
 
 	private void fireDetached()
