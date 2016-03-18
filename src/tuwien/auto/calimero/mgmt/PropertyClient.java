@@ -832,10 +832,8 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 			t.setAppendUnit(false);
 			return t;
 		}
-		final KNXException e = new KNXException(
-				"no translator available for PID " + pid + ", " + getObjectTypeName(ot));
-		logger.warn("translator missing for PID " + pid + ", PDT " + pdt, e);
-		throw e;
+		throw new KNXException("no translator available for PID " + pid + " in " + getObjectTypeName(ot) + " (OT " + ot
+				+ "), PDT " + pdt + " ");
 	}
 
 	public static class XmlPropertyDefinitions implements ResourceHandler
