@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,13 +43,13 @@ package tuwien.auto.calimero;
  */
 public final class Settings
 {
-	private static final String version = "2.3-dev";
+	private static final String version = "2.4-dev";
 	private static final String library = "Calimero 2";
 	private static final String desc = "A library for KNX network access";
 
 	private static final String tuwien = "Vienna University of Technology";
 	private static final String group = "Automation Systems Group";
-	private static final String copyright = "(c) 2007-2015";
+	private static final String copyright = "(c) 2007-2016";
 
 	// aligns the bundle package name following the friendly name,
 	// works for friendly name with max length of 20 chars
@@ -118,25 +118,18 @@ public final class Settings
 	{
 		final StringBuffer buf = new StringBuffer();
 		buf.append(getBundle("cEMI", "tuwien.auto.calimero.cemi.CEMI", 1)).append(sep);
-		buf.append(getBundle("KNXnet/IP", "tuwien.auto.calimero.knxnetip.KNXnetIPConnection", 1))
+		buf.append(getBundle("KNXnet/IP", "tuwien.auto.calimero.knxnetip.KNXnetIPConnection", 1)).append(sep);
+		buf.append(getBundle("FT1.2", "tuwien.auto.calimero.serial.FT12Connection", 1)).append(sep);
+		buf.append(getBundle("TP-Uart", "tuwien.auto.calimero.serial.TpuartConnection", 1)).append(sep);
+		buf.append(getBundle("USB", "tuwien.auto.calimero.serial.usb.UsbConnection", 1)).append(sep);
+		buf.append(getBundle("KNX network link", "tuwien.auto.calimero.link.KNXNetworkLink", 1)).append(sep);
+		buf.append(getBundle("DPT translators", "tuwien.auto.calimero.dptxlator.DPTXlator", 1)).append(sep);
+		buf.append(getBundle("Datapoints", "tuwien.auto.calimero.datapoint.Datapoint", 1)).append(sep);
+		buf.append(getBundle("Network buffer", "tuwien.auto.calimero.buffer.NetworkBuffer", 1)).append(sep);
+		buf.append(getBundle("Process communication", "tuwien.auto.calimero.process." + "ProcessCommunicator", 1))
 				.append(sep);
-		buf.append(getBundle("Serial", "tuwien.auto.calimero.serial.FT12Connection", 1))
-				.append(sep);
-		buf.append(getBundle("USB", "tuwien.auto.calimero.serial.usb.UsbConnection", 1))
-				.append(sep);
-		buf.append(getBundle("KNX network link", "tuwien.auto.calimero.link.KNXNetworkLink", 1))
-				.append(sep);
-		buf.append(getBundle("DPT translators", "tuwien.auto.calimero.dptxlator.DPTXlator", 1))
-				.append(sep);
-		buf.append(getBundle("Datapoints", "tuwien.auto.calimero.datapoint.Datapoint", 1)).append(
-				sep);
-		buf.append(getBundle("Network buffer", "tuwien.auto.calimero.buffer.NetworkBuffer", 1))
-				.append(sep);
-		buf.append(getBundle("Process communication", "tuwien.auto.calimero.process."
-				+ "ProcessCommunicator", 1) + sep);
-		buf.append(getBundle("Management", "tuwien.auto.calimero.mgmt.ManagementClient", 1))
-				.append(sep);
-		buf.append(getBundle("XML", "tuwien.auto.calimero.xml.def.DefaultXMLReader", 2));
+		buf.append(getBundle("Management", "tuwien.auto.calimero.mgmt.ManagementClient", 1)).append(sep);
+		buf.append(getBundle("XML", "tuwien.auto.calimero.xml.DefaultXmlReader", 1));
 		return buf.toString();
 	}
 
