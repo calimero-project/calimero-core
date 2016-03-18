@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -201,20 +201,5 @@ public final class LogService
 		default:
 			throw new KNXIllegalArgumentException("unknown log level");
 		}
-	}
-
-	/**
-	 * Workaround for the previously supported log level ALWAYS, logging the message with level
-	 * INFO.
-	 * <p>
-	 *
-	 * @param logger the logger
-	 * @param msg the message to be logged
-	 * @deprecated Used for transition to slf4j.
-	 */
-	@Deprecated
-	public static void logAlways(final Logger logger, final String msg)
-	{
-		logger.info(msg);
 	}
 }
