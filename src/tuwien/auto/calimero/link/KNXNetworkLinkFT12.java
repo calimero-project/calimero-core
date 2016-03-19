@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -113,10 +113,8 @@ public class KNXNetworkLinkFT12 extends AbstractLink
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
 		try {
-			final boolean trace = logger.isTraceEnabled();
-			if (trace || logger.isInfoEnabled())
-				logger.info("send message to " + dst + (waitForCon ? ", wait for ack" : ""));
-			if (trace)
+			logger.debug("send message to {}{}", dst, (waitForCon ? ", wait for ack" : ""));
+			if (logger.isTraceEnabled())
 				logger.trace("EMI {}", DataUnitBuilder.toHex(msg, " "));
 			conn.send(msg, waitForCon);
 			logger.trace("send to {} succeeded", dst);

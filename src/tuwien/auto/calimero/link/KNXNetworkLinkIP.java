@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,8 @@
 
 package tuwien.auto.calimero.link;
 
+import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.LinkLayer;
+
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
@@ -55,8 +57,6 @@ import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
-
-import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.LinkLayer;
 
 /**
  * Implementation of the KNX network link based on the KNXnet/IP protocol, using a
@@ -260,12 +260,9 @@ public class KNXNetworkLinkIP extends AbstractLink
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
 		try {
-			if (logger.isInfoEnabled())
-				logger.info("send message to " + msg.getDestination()
-						+ (waitForCon ? ", wait for confirmation" : ""));
+			logger.debug("send message to {}{}", msg.getDestination(), (waitForCon ? ", wait for confirmation" : ""));
 			logger.trace("cEMI {}", msg);
-			conn.send(msg, waitForCon ? KNXnetIPConnection.WAIT_FOR_CON
-					: KNXnetIPConnection.WAIT_FOR_ACK);
+			conn.send(msg, waitForCon ? KNXnetIPConnection.WAIT_FOR_CON : KNXnetIPConnection.WAIT_FOR_ACK);
 			logger.trace("send to {} succeeded", msg.getDestination());
 		}
 		catch (final KNXConnectionClosedException e) {
