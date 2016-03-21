@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -120,7 +120,7 @@ public class DPTXlatorStringTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorString#setValues(java.lang.String[])}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValues() throws KNXFormatException
@@ -149,7 +149,7 @@ public class DPTXlatorStringTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorString#getAllValues()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testGetAllValues() throws KNXFormatException
@@ -170,7 +170,7 @@ public class DPTXlatorStringTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorString#setValue(java.lang.String)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValue() throws KNXFormatException
@@ -236,14 +236,24 @@ public class DPTXlatorStringTest extends TestCase
 		assertTrue(Arrays.equals(data, t.getData()));
 		final byte[] dataOffset = new byte[28];
 		System.arraycopy(data1, 0, dataOffset, 3, data1.length);
-		t.setData(dataOffset, 3);
+		try {
+			t.setData(dataOffset, 3);
+			fail("length 25 not an exact match");
+		}
+		catch (final KNXIllegalArgumentException expected) {}
+		t.setData(Arrays.copyOf(dataOffset, 17), 3);
 		byte[] d = t.getData();
 		assertEquals(14, d.length);
 		assertTrue(Arrays.equals(data1, d));
 
 		final byte[] array = new byte[data.length + 8];
 		System.arraycopy(data, 0, array, 1, data.length);
-		t.setData(array, 1);
+		try {
+			t.setData(array, 1);
+			fail("length 49 not an exact match");
+		}
+		catch (final KNXIllegalArgumentException expected) {}
+		t.setData(Arrays.copyOf(array, data.length + 1), 1);
 		d = t.getData();
 		assertEquals(data.length, d.length);
 		assertTrue(Arrays.equals(data, d));
@@ -253,7 +263,7 @@ public class DPTXlatorStringTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorString#getData(byte[], int)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testGetDataByteArrayInt() throws KNXFormatException
@@ -296,7 +306,7 @@ public class DPTXlatorStringTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorString#DPTXlatorString
 	 * (tuwien.auto.calimero.dptxlator.DPT)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testDPTXlatorStringDPT() throws KNXFormatException
