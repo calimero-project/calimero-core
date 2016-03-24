@@ -130,7 +130,7 @@ import tuwien.auto.calimero.xml.XmlWriter;
  * In general, it is not possible for the property client to deduce the actual type to use
  * for encoding/decoding values from such an "alternative PDT". For these cases, the
  * property client has to rely on property definitions supplied by the user through
- * {@link PropertyClient#loadDefinitions(String, PropertyClient.ResourceHandler)}.
+ * {@link PropertyClient#addDefinitions(Collection)}.
  * <p>
  * A note on property descriptions:<br>
  * With a local device management adapter, not all information is supported when reading a
@@ -490,52 +490,6 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	}
 
 	/**
-	 * Loads property definitions from a resource using the supplied
-	 * {@link ResourceHandler} or a default handler.
-	 *
-	 * @param resource the resource location identifier of a resource to load
-	 * @param handler the resource handler used for loading the property definitions, if
-	 *        <code>null</code>, a default handler is used
-	 * @return collection with loaded property definitions of type {@link Property}
-	 * @throws KNXException on errors in the property resource handler
-	 */
-	@Deprecated
-	public static Collection<Property> loadDefinitions(final String resource,
-		final ResourceHandler handler) throws KNXException
-	{
-		final ResourceHandler rh = handler == null ? new XmlPropertyDefinitions() : handler;
-		return rh.load(resource);
-	}
-
-	/**
-	 * Saves the supplied property definitions to a resource using the supplied resource
-	 * handler.
-	 * <p>
-	 * To save definitions of a property client <code>client</code>, invoke the method
-	 * with the argument <code>client.getDefinitions().values()</code>.
-	 *
-	 * @param resource the resource location identifier to a resource for saving the
-	 *        definitions
-	 * @param definitions the property definitions to save, the collection holds entries
-	 *        of type {@link Property}
-	 * @param handler the resource handler used for saving the property definitions, if
-	 *        <code>null</code>, a default handler is used
-	 * @throws KNXMLException on errors in the property resource handler
-	 */
-	@Deprecated
-	public static void saveDefinitions(final String resource,
-		final Collection<Property> definitions, final ResourceHandler handler) throws KNXMLException
-	{
-		// for saving an ordered collection based on property key order,
-		// the saving procedure has to be called with the Collection argument
-		// <code>new TreeMap(getDefinitions()).values()</code>, since our property map
-		// is not ordered for the time being
-
-		final ResourceHandler rh = handler == null ? new XmlPropertyDefinitions() : handler;
-		rh.save(resource, definitions);
-	}
-
-	/**
 	 * Adds the property definitions contained in the collection argument to the property
 	 * definitions of the property client.
 	 * <p>
@@ -648,25 +602,6 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	/**
 	 * Does a property description scan of the properties in all interface objects.
 	 *
-	 * @param allProperties <code>true</code> to scan all property descriptions in the
-	 *        interface objects, <code>false</code> to only scan the object type
-	 *        descriptions, i.e., ({@link PropertyAccess.PID#OBJECT_TYPE})
-	 * @return a list containing the property descriptions of type {@link Description}
-	 * @throws KNXException on adapter errors while querying the descriptions
-	 * @throws InterruptedException on thread interrupt
-	 */
-	@Deprecated
-	public List<Description> scanProperties(final boolean allProperties) throws KNXException,
-		InterruptedException
-	{
-		final List<Description> scan = new ArrayList<>();
-		scanProperties(allProperties, scan::add);
-		return scan;
-	}
-
-	/**
-	 * Does a property description scan of the properties in all interface objects.
-	 *
 	 * @param allProperties <code>true</code> to scan all property descriptions in the interface
 	 *        objects, <code>false</code> to only scan the object type descriptions, i.e.,
 	 *        {@link PropertyAccess.PID#OBJECT_TYPE}
@@ -679,27 +614,6 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		throws KNXException, InterruptedException
 	{
 		for (int index = 0; scan(index, allProperties, consumer) > 0; ++index);
-	}
-
-	/**
-	 * Does a property description scan of the properties of one interface object.
-	 *
-	 * @param objIndex interface object index in the device
-	 * @param allProperties <code>true</code> to scan all property descriptions in that
-	 *        interface object, <code>false</code> to only scan the object type
-	 *        description of the interface object specified by <code>objIndex</code>,
-	 *        i.e., ({@link PropertyAccess.PID#OBJECT_TYPE})
-	 * @return a list containing the property descriptions of type {@link Description}
-	 * @throws KNXException on adapter errors while querying the descriptions
-	 * @throws InterruptedException on thread interrupt
-	 */
-	@Deprecated
-	public List<Description> scanProperties(final int objIndex, final boolean allProperties)
-		throws KNXException, InterruptedException
-	{
-		final List<Description> scan = new ArrayList<>();
-		scanProperties(objIndex, allProperties, scan::add);
-		return scan;
 	}
 
 	/**
@@ -865,8 +779,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 			final List<Property> list = new ArrayList<>();
 			int objType = -1;
 			try {
-				if (reader.nextTag() != XmlReader.START_ELEMENT
-						|| !reader.getLocalName().equals(PROPDEFS_TAG))
+				if (reader.nextTag() != XmlReader.START_ELEMENT || !reader.getLocalName().equals(PROPDEFS_TAG))
 					throw new KNXMLException("no property defintions");
 				while (reader.hasNext()) {
 					final int event = reader.next();
@@ -879,14 +792,12 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 						else if (reader.getLocalName().equals(PROPERTY_TAG)) {
 							parseRW(reader.getAttributeValue("", RW_ATTR));
 							list.add(new Property(toInt(reader.getAttributeValue("", PID_ATTR)),
-									reader.getAttributeValue("", PIDNAME_ATTR), reader
-											.getAttributeValue("", NAME_ATTR), objType,
-									toInt(reader.getAttributeValue("", PDT_ATTR)), reader
-											.getAttributeValue("", DPT_ATTR)));
+									reader.getAttributeValue("", PIDNAME_ATTR), reader.getAttributeValue("", NAME_ATTR),
+									objType, toInt(reader.getAttributeValue("", PDT_ATTR)),
+									reader.getAttributeValue("", DPT_ATTR)));
 						}
 					}
-					else if (event == XmlReader.END_ELEMENT
-							&& reader.getLocalName().equals(PROPDEFS_TAG))
+					else if (event == XmlReader.END_ELEMENT && reader.getLocalName().equals(PROPDEFS_TAG))
 						break;
 				}
 				return list;
