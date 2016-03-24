@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -403,6 +403,12 @@ public final class DataUnitBuilder
 			return "A_Property.write";
 		case 0x0380:
 			return "A_Restart";
+		case 0b1111011010:
+			return "A_NetworkParameter.read";
+		case 0b1111011011:
+			return "A_NetworkParameter.response";
+		case 0b1111100100:
+			return "A_NetworkParameter.write";
 		default:
 			return "unknown APCI";
 		}
