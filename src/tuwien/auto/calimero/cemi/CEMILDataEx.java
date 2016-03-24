@@ -411,9 +411,6 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		return super.toByteArray();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.cemi.CEMILData#toString()
-	 */
 	@Override
 	public String toString()
 	{
@@ -426,7 +423,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 			if (info != null)
 				if (i == ADDINFO_PLMEDIUM) {
 					buf.append(" domain ");
-					buf.append((info[0] & 0xff) << 8 | info[1] & 0xff);
+					buf.append(Integer.toHexString((info[0] & 0xff) << 8 | info[1] & 0xff));
 				}
 				else if (i == ADDINFO_RFMEDIUM)
 					buf.append(" ").append(new RFMediumInfo(info, !isDomainBroadcast()))
