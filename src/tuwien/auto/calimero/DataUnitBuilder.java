@@ -36,6 +36,8 @@
 
 package tuwien.auto.calimero;
 
+import java.util.Arrays;
+
 import org.slf4j.Logger;
 
 import tuwien.auto.calimero.log.LogService;
@@ -162,35 +164,6 @@ public final class DataUnitBuilder
 	}
 
 	/**
-	 * In the KNX standard, APDUs that use a shorter-length APDU format are referred to as
-	 * <i>optimized</i>, not <i>compact</i>; for naming reasons use
-	 * {@link #createLengthOptimizedAPDU(int, byte[])}.
-	 *
-	 * @param service application layer service code
-	 * @param asdu application layer service data unit, <code>asdu.length</code> &lt; 255; or
-	 *        <code>null</code> for no ASDU
-	 * @return APDU as byte array
-	 * @deprecated use {@link #createLengthOptimizedAPDU(int, byte[])}
-	 */
-	@Deprecated
-	public static byte[] createCompactAPDU(final int service, final byte[] asdu)
-	{
-		final byte[] apdu =
-			new byte[(asdu != null && asdu.length > 0) ? 1 + asdu.length : 2];
-		if (apdu.length > 255)
-			throw new KNXIllegalArgumentException("APDU length exceeds maximum of 255 bytes");
-		apdu[0] = (byte) ((service >> 8) & 0x03);
-		apdu[1] = (byte) service;
-		if (asdu != null && asdu.length > 0) {
-			// maximum of 6 bits in asdu[0] are valid
-			apdu[1] |= asdu[0] & 0x3F;
-			for (int i = 1; i < asdu.length; ++i)
-				apdu[i + 1] = asdu[i];
-		}
-		return apdu;
-	}
-
-	/**
 	 * Creates a length-optimized application layer protocol data unit out of a service
 	 * code and a service data unit.
 	 * <p>
@@ -204,7 +177,18 @@ public final class DataUnitBuilder
 	 */
 	public static byte[] createLengthOptimizedAPDU(final int service, final byte[] asdu)
 	{
-		return createCompactAPDU(service, asdu);
+		final byte[] apdu = new byte[(asdu != null && asdu.length > 0) ? 1 + asdu.length : 2];
+		if (apdu.length > 255)
+			throw new KNXIllegalArgumentException("APDU length exceeds maximum of 255 bytes");
+		apdu[0] = (byte) ((service >> 8) & 0x03);
+		apdu[1] = (byte) service;
+		if (asdu != null && asdu.length > 0) {
+			// maximum of 6 bits in asdu[0] are valid
+			apdu[1] |= asdu[0] & 0x3F;
+			for (int i = 1; i < asdu.length; ++i)
+				apdu[i + 1] = asdu[i];
+		}
+		return apdu;
 	}
 
 	/**
@@ -450,9 +434,6 @@ public final class DataUnitBuilder
 	 */
 	public static byte[] copyOfRange(final byte[] data, final int from, final int to)
 	{
-		final byte[] range = new byte[Math.min(data.length, to) - from];
-		for (int i = 0; i < range.length; ++i)
-			range[i] = data[from + i];
-		return range;
+		return Arrays.copyOfRange(data, from, to);
 	}
 }
