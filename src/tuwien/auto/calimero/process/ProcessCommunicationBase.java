@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2015 B. Malinowsky
+    Copyright (c) 2010, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ import tuwien.auto.calimero.link.KNXNetworkLink;
  *
  * @author B. Malinowsky
  */
-public interface ProcessCommunicationBase
+public interface ProcessCommunicationBase extends AutoCloseable
 {
 	/**
 	 * Represents "on" of datapoint type <b>Switch</b> (DPT ID 1.001), value =
@@ -304,4 +304,7 @@ public interface ProcessCommunicationBase
 	 *         detached
 	 */
 	KNXNetworkLink detach();
+
+	@Override
+	default void close() { detach(); }
 }

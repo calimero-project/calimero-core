@@ -163,7 +163,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	/**
 	 * Creates a new management procedures instance, using the supplied KNX network link.
 	 *
-	 * @param link the KNX network link, with link in open state
+	 * @param link the KNX network link in open state, the management procedures instance does not take ownership
 	 * @throws KNXLinkClosedException on closed {@link KNXNetworkLink}
 	 */
 	public ManagementProceduresImpl(final KNXNetworkLink link)
@@ -570,10 +570,6 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		return read;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementProcedures#detach()
-	 */
 	@Override
 	public void detach()
 	{

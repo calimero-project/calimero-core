@@ -183,7 +183,7 @@ public class ManagementClientImpl implements ManagementClient
 	 * The log service used by this management client is named "MC " +
 	 * <code>link.getName()</code>.
 	 *
-	 * @param link network link used for communication with a KNX network
+	 * @param link network link used for communication with a KNX network, the client does not take ownership
 	 * @throws KNXLinkClosedException if the network link is closed
 	 */
 	public ManagementClientImpl(final KNXNetworkLink link) throws KNXLinkClosedException

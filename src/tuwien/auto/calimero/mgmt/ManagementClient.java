@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ import tuwien.auto.calimero.link.KNXNetworkLink;
  *
  * @author B. Malinowsky
  */
-public interface ManagementClient
+public interface ManagementClient extends AutoCloseable
 {
 	/**
 	 * Sets the response timeout to wait for a KNX response message to arrive to complete
@@ -596,4 +596,7 @@ public interface ManagementClient
 	 * @see TransportLayer#detach()
 	 */
 	KNXNetworkLink detach();
+
+	@Override
+	default void close() { detach(); }
 }
