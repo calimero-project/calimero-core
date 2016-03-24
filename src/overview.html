@@ -1,18 +1,15 @@
 <html>
 	<body>
-		This document is the API specification for <b>Calimero-Core 2.3-SNAPSHOT</b>.
+		This document is the API specification for <b>Calimero-Core 2.4-SNAPSHOT</b>.
 		<p>
 		
 		Calimero 2 was developed at the 
         <a href="http://www.auto.tuwien.ac.at">		
 		Vienna University of Technology, Automation Systems Group</a>.<br>
 		
-		Development and documentation of the Calimero project is hosted on 
+		Development, documentation, and artifacts of the Calimero project are hosted on 
 		<a href="https://github.com/calimero-project">GitHub</a>.<br>
-		
-		More information about other projects for KNX can be found  
-		<a href="https://www.auto.tuwien.ac.at/a-lab/knx_eib.html">here</a>.
-		<p>
+		All Calimero artifacts are available in Maven repositories.
 		
 		<h3>Licence</h3>
 		Calimero is Open Source.
@@ -25,16 +22,15 @@
 		for more details.
 		<p>
 		
-		<h3>General Rules of Usage for this API</h3>
+		<h3>Rules of usage for the Calimero API</h3>
 		<p>
-		No <code>null</code> arguments are allowed, if not explicitly stated 
+		<b>Null arguments:</b> in general, no <code>null</code> arguments are allowed, if not explicitly stated 
 		otherwise in the documentation of the interface or method declaration.
 		This means, applying a method -- which expects arguments of reference type --
 		to a <code>null</code> argument will lead to undefined behavior.<br>
-		In the absence of other explicit specification in type API comments, 
-		instances of types are thread-safe, that is, concurrent access is allowed.
-		<p>
-		A user application can obtain general information  
+		<b>Thread-safety:</b> in the absence of other explicit specification in type API comments, 
+		instances of types are thread-safe, that is, concurrent access is allowed.<br>
+		<b>Version/Bundles:</b> A user application can obtain general information  
 		like the current library version, available bundles and similar by using  
 		<code>tuwien.auto.calimero.Settings</code>.
 	</body>
