@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -410,9 +410,6 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		return super.toByteArray();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.cemi.CEMILData#toString()
-	 */
 	public String toString()
 	{
 		final String s = super.toString();
@@ -424,7 +421,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 			if (info != null)
 				if (i == ADDINFO_PLMEDIUM) {
 					buf.append(" domain ");
-					buf.append((info[0] & 0xff) << 8 | info[1] & 0xff);
+					buf.append(Integer.toHexString((info[0] & 0xff) << 8 | info[1] & 0xff));
 				}
 				else if (i == ADDINFO_RFMEDIUM)
 					buf.append(" RF-info 0x").append(DataUnitBuilder.toHex(info, " "));
