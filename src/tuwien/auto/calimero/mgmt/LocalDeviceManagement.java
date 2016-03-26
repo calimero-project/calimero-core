@@ -261,7 +261,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 	{
 		int instance = 0;
 		for (int i = 0; i <= objIndex; i++) {
-			final Pair p = (Pair) interfaceObjects.get(i);
+			final Pair p = interfaceObjects.get(i);
 			if (p.otype == objectType)
 				instance++;
 		}
