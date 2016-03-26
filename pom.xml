@@ -27,6 +27,10 @@
 		</developer>
 	</developers>
 
+	<properties>
+		<exec.mainClass>tuwien.auto.calimero.Settings</exec.mainClass>
+	</properties>
+
 	<build>
 		<plugins>
 			<plugin>
