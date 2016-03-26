@@ -1,8 +1,16 @@
 Calimero-core [![Build Status](https://travis-ci.org/calimero-project/calimero-core.svg?branch=feat/jse-embd8-c1)](https://travis-ci.org/calimero-project/calimero-core)
 =============
 
-This feature branch provides Calimero for Java SE Embedded 8. The minimum required runtime environment is 
+Calimero-core library for Java SE, specifically Java SE Embedded 8. The minimum required runtime environment is 
 the profile [compact1](http://www.oracle.com/technetwork/java/embedded/resources/tech/compact-profiles-overview-2157132.html).
+
+**Main breaking changes from earlier versions of Calimero:**
+
+* Some API methods got updated to use `@FunctionalInterface`s
+* Use of `enum`s
+* XML processing defaults to the Streaming API for XML (StAX)
+* Use of the [Simple Logging Facade for Java (slf4j)](http://www.slf4j.org/)
+* Remove or replace `@Deprecated` parts of the library
 
 ### Embedded Profile
 
@@ -31,7 +39,7 @@ Supported Features
 * KNX RF USB
 * KNX USB
 * KNX FT1.2 Protocol (serial connections)
-* TP-UART [__NEW__: Access TP1 networks via TP-UART]
+* TP-UART (access TP1 networks over serial connections)
 
 #### KNXnet/IP
 * Discovery and Self-description
@@ -71,7 +79,7 @@ Supported Features
 * 232.x - RGB color value
 
 ### Busmonitor
-Access via KNXnet/IP, KNX USB, and FT1.2 (KNX RF USB not tested -- no busmonitor hardware)
+Access via KNXnet/IP, KNX USB, KNX RF USB, and FT1.2 (KNX RF USB is not tested -- no busmonitor hardware available)
 
 #### Raw Frame Decoding
 * TP1
@@ -100,3 +108,9 @@ Logging
 
 Calimero uses the [Simple Logging Facade for Java (slf4j)](http://www.slf4j.org/). Bind any desired logging frameworks of your choice. The default maven dependency is the [Simple Logger](http://www.slf4j.org/api/org/slf4j/impl/SimpleLogger.html). It logs everything to standard output. The simple logger can be configured via the file `simplelogger.properties`, JVM system properties, or `java` command line options, e.g., `-Dorg.slf4j.simpleLogger.defaultLogLevel=warn`.
 
+Testing
+-------
+
+For unit tests, Calimero provides a _test network_, consisting of a KNXnet/IP server and a virtual KNX network with two KNX devices. The test network provides the remote endpoint for executing unit test for KNXnet/IP tunneling, busmonitoring, routing, device management, and KNX IP protocols.
+
+Currently, the TP-UART and FT1.2 protocols can only be tested if the corresponding hardware is available. 
