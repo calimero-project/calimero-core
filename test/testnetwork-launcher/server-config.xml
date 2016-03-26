@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Calimero 2 server settings -->
+<knxServer name="server" friendlyName="calimero-core knx test-server">
+	<discovery listenNetIf="all" outgoingNetIf="all"/>
+	<serviceContainer activate="true" routing="true" listenNetIf="any"
+		allowNetworkMonitoring="true" udpPort="3671" reuseCtrlEP="false">
+		<knxAddress type="individual">1.1.1</knxAddress>
+		<knxSubnet type="virtual" medium="pl110" domainAddress="6c">KnxTestNetwork</knxSubnet>
+		<groupAddressFilter>
+			<knxAddress type="group">1/0/1</knxAddress>
+			<knxAddress type="group">1/0/2</knxAddress>
+			<knxAddress type="group">1/0/3</knxAddress>
+			<knxAddress type="group">1/0/4</knxAddress>
+			<knxAddress type="group">1/0/5</knxAddress>
+			<knxAddress type="group">1/0/6</knxAddress>
+			<knxAddress type="group">1/07</knxAddress> <!-- 1/0/7 -->
+			<knxAddress type="group">0x80b</knxAddress> <!-- 1/0/11 -->
+			<knxAddress type="group">1/0/111</knxAddress>
+			<knxAddress type="group">0/0/0</knxAddress>
+		</groupAddressFilter>
+		<additionalAddresses>
+			<knxAddress type="individual">1.1.10</knxAddress>
+			<knxAddress type="individual">1.1.11</knxAddress>
+			<knxAddress type="individual">1.1.12</knxAddress>
+			<knxAddress type="individual">1.1.13</knxAddress>
+			<knxAddress type="individual">1.1.14</knxAddress>
+			<knxAddress type="individual">1.1.15</knxAddress>
+			<knxAddress type="individual">1.1.16</knxAddress>
+			<knxAddress type="individual">1.1.17</knxAddress>
+			<knxAddress type="individual">1.1.18</knxAddress>
+			<knxAddress type="individual">1.1.19</knxAddress>
+			<knxAddress type="individual">1.1.20</knxAddress>
+			<knxAddress type="individual">1.1.21</knxAddress>
+			<knxAddress type="individual">1.1.22</knxAddress>
+			<knxAddress type="individual">1.1.23</knxAddress>
+		</additionalAddresses>
+	</serviceContainer>
+</knxServer>        

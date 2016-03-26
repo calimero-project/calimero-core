@@ -1,0 +1,20 @@
+apply plugin:'application'
+mainClassName = 'tuwien.auto.calimero.TestNetwork'
+
+run {
+    systemProperties System.getProperties()
+    args 'server-config.xml'
+    standardInput = System.in
+}
+
+group = 'com.github.calimero'
+version = '2.4-SNAPSHOT'
+
+repositories {        
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    compile group:group, name:'calimero-testnetwork', version:version
+}
