@@ -29,6 +29,7 @@
 
 	<properties>
 		<test.exclude.groups>category.RequireKnxnetIP,category.RequireFT12Connection</test.exclude.groups>
+		<exec.mainClass>tuwien.auto.calimero.Settings</exec.mainClass>
 	</properties>
 
 	<build>
