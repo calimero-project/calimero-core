@@ -442,15 +442,15 @@ public abstract class AbstractLink implements KNXNetworkLink
 		final IndividualAddress src = medium.getDeviceAddress();
 		// use default address 0 in system broadcast
 		final KNXAddress d = dst == null ? new GroupAddress(0) : dst;
+		final boolean repeat = mc == CEMILData.MC_LDATA_IND ? false : true;
 		final boolean tp = medium.getMedium() == KNXMediumSettings.MEDIUM_TP1;
 		if (nsdu.length <= 16 && tp)
-			return new CEMILData(mc, src, d, nsdu, p, true, hopCount);
+			return new CEMILData(mc, src, d, nsdu, p, repeat, hopCount);
 
 		final boolean pl = medium.getMedium() == KNXMediumSettings.MEDIUM_PL110;
 		// TODO allow domain bcast for RF, currently we send all RF L_Data as system broadcast
 		final boolean domainBcast = tp ? true : pl && dst != null ? true : false;
-		final CEMILDataEx f = new CEMILDataEx(mc, src, d, nsdu, p, true, domainBcast, false,
-				hopCount);
+		final CEMILDataEx f = new CEMILDataEx(mc, src, d, nsdu, p, repeat, domainBcast, false, hopCount);
 		addMediumInfo(f);
 		return f;
 	}
