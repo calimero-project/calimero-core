@@ -732,7 +732,7 @@ public class ManagementClientImpl implements ManagementClient
 	{
 		final KNXNetworkLink lnk = tl.detach();
 		if (lnk != null) {
-			logger.info("detached from " + lnk.getName());
+			logger.debug("detached from " + lnk.getName());
 			LogService.removeLogger(logger);
 		}
 		detached = true;
