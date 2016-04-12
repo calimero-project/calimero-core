@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -381,7 +381,7 @@ public final class TranslatorTypes
 			final Class<? extends DPTXlator> c = (Class<? extends DPTXlator>) Class
 					.forName("tuwien.auto.calimero.dptxlator." + className);
 			map.put(new Integer(main), new MainType(main, c, desc));
-			DPTXlator.logger.trace(desc + " loaded");
+			DPTXlator.logger.trace("loaded {}", desc);
 		}
 		catch (final ClassNotFoundException e) {
 			DPTXlator.logger.warn(className + " not found, " + desc + " not added");

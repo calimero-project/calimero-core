@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2015 B. Malinowsky
+    Copyright (c) 2010, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -389,9 +389,9 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	 * @throws KNXFormatException on service type parsing or data format errors
 	 * @throws IOException on socket problems
 	 */
-	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data,
-		final int offset, final InetAddress src, final int port) throws KNXFormatException,
-		IOException
+	@SuppressWarnings("unused")
+	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset,
+		final InetAddress src, final int port) throws KNXFormatException, IOException
 	{
 		// at this subtype level, we don't care about any service type
 		return false;
@@ -581,6 +581,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	 * @throws KNXTimeoutException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@SuppressWarnings("unused")
 	void doExtraBlockingModes() throws KNXTimeoutException, InterruptedException
 	{}
 

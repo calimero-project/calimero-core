@@ -363,9 +363,8 @@ public class ManagementClientImpl implements ManagementClient
 		InterruptedException
 	{
 		// we allow 6 bytes ASDU for RF domains
-		return makeDOAs(readBroadcast(priority,
-				DataUnitBuilder.createLengthOptimizedAPDU(DOA_READ, null), DOA_RESPONSE, 2, 6,
-				oneDomainOnly));
+		return makeDOAs(readBroadcast(priority, DataUnitBuilder.createLengthOptimizedAPDU(DOA_READ, null), DOA_RESPONSE,
+				2, 6, oneDomainOnly));
 	}
 
 	@Override
@@ -377,10 +376,6 @@ public class ManagementClientImpl implements ManagementClient
 				response);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#readDomainAddress
-	 * (byte[], tuwien.auto.calimero.IndividualAddress, int)
-	 */
 	@Override
 	public List<byte[]> readDomainAddress(final byte[] domain, final IndividualAddress start,
 		final int range) throws KNXInvalidResponseException, KNXLinkClosedException,
@@ -396,10 +391,6 @@ public class ManagementClientImpl implements ManagementClient
 					addr[0], addr[1], (byte) range }), DOA_RESPONSE, 2, 2, false));
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#readDeviceDesc
-	 * (tuwien.auto.calimero.mgmt.Destination, int)
-	 */
 	@Override
 	public byte[] readDeviceDesc(final Destination dst, final int descType)
 		throws KNXInvalidResponseException, KNXDisconnectException, KNXTimeoutException,
@@ -415,10 +406,6 @@ public class ManagementClientImpl implements ManagementClient
 		return dd;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#restart
-	 * (tuwien.auto.calimero.mgmt.Destination)
-	 */
 	@Override
 	public void restart(final Destination dst) throws KNXTimeoutException, KNXLinkClosedException
 	{
@@ -494,10 +481,6 @@ public class ManagementClientImpl implements ManagementClient
 		return time;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#readProperty
-	 * (tuwien.auto.calimero.mgmt.Destination, int, int, int, int)
-	 */
 	@Override
 	public byte[] readProperty(final Destination dst, final int objIndex, final int propertyId,
 		final int start, final int elements) throws KNXTimeoutException, KNXRemoteException,
@@ -534,12 +517,11 @@ public class ManagementClientImpl implements ManagementClient
 		final List<byte[]> responses;
 		synchronized (this) {
 			try {
-				send(dst, priority, DataUnitBuilder.createAPDU(PROPERTY_READ, asdu),
-						PROPERTY_RESPONSE);
+				send(dst, priority, DataUnitBuilder.createAPDU(PROPERTY_READ, asdu), PROPERTY_RESPONSE);
 				// if we are waiting for several responses, we pass no from address to accept
 				// messages from any sender
-				responses = waitForResponses(oneResponseOnly ? dst.getAddress() : null, priority,
-						4, 14, oneResponseOnly);
+				responses = waitForResponses(oneResponseOnly ? dst.getAddress() : null, priority, 4, 14,
+						oneResponseOnly);
 			}
 			finally {
 				svcResponse = 0;
@@ -560,10 +542,6 @@ public class ManagementClientImpl implements ManagementClient
 		return ret;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#writeProperty
-	 * (tuwien.auto.calimero.mgmt.Destination, int, int, int, int, byte[])
-	 */
 	@Override
 	public void writeProperty(final Destination dst, final int objIndex,
 		final int propertyId, final int start, final int elements, final byte[] data)
@@ -597,10 +575,6 @@ public class ManagementClientImpl implements ManagementClient
 				throw new KNXRemoteException("read back failed (erroneous property data)");
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#readPropertyDesc
-	 * (tuwien.auto.calimero.mgmt.Destination, int, int, int)
-	 */
 	@Override
 	public byte[] readPropertyDesc(final Destination dst, final int objIndex,
 		final int propertyId, final int propIndex) throws KNXTimeoutException,
@@ -632,10 +606,6 @@ public class ManagementClientImpl implements ManagementClient
 		throw new KNXTimeoutException("timeout occurred while waiting for data response");
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#readADC
-	 * (tuwien.auto.calimero.mgmt.Destination, int, int)
-	 */
 	@Override
 	public int readADC(final Destination dst, final int channel, final int repeat)
 		throws KNXTimeoutException, KNXDisconnectException, KNXRemoteException,
@@ -655,10 +625,6 @@ public class ManagementClientImpl implements ManagementClient
 		return ((apdu[3] & 0xff) << 8) | apdu[4] & 0xff;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#readMemory
-	 * (tuwien.auto.calimero.mgmt.Destination, int, int)
-	 */
 	@Override
 	public byte[] readMemory(final Destination dst, final int startAddr, final int bytes)
 		throws KNXTimeoutException, KNXDisconnectException, KNXRemoteException,
@@ -683,10 +649,6 @@ public class ManagementClientImpl implements ManagementClient
 		return mem;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#writeMemory
-	 * (tuwien.auto.calimero.mgmt.Destination, int, byte[])
-	 */
 	@Override
 	public void writeMemory(final Destination dst, final int startAddr, final byte[] data)
 		throws KNXDisconnectException, KNXTimeoutException, KNXRemoteException,
@@ -720,10 +682,6 @@ public class ManagementClientImpl implements ManagementClient
 			tl.sendData(dst, priority, send);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#authorize
-	 * (tuwien.auto.calimero.mgmt.Destination, byte[])
-	 */
 	@Override
 	public int authorize(final Destination dst, final byte[] key)
 		throws KNXDisconnectException, KNXTimeoutException, KNXRemoteException,
@@ -744,10 +702,6 @@ public class ManagementClientImpl implements ManagementClient
 		return level;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#writeKey
-	 * (tuwien.auto.calimero.mgmt.Destination, int, byte[])
-	 */
 	@Override
 	public void writeKey(final Destination dst, final int level, final byte[] key)
 		throws KNXTimeoutException, KNXDisconnectException, KNXRemoteException,
@@ -767,18 +721,12 @@ public class ManagementClientImpl implements ManagementClient
 			throw new KNXRemoteException("access denied: current access level > write level");
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#isOpen()
-	 */
 	@Override
 	public boolean isOpen()
 	{
 		return !detached;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#detach()
-	 */
 	@Override
 	public KNXNetworkLink detach()
 	{

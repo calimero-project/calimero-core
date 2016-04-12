@@ -198,10 +198,8 @@ public class KNXnetIPTunnel extends ClientConnection
 		if (seq == getSeqRcv() || ((seq + 1) & 0xFF) == getSeqRcv()) {
 			final int status = h.getVersion() == KNXNETIP_VERSION_10 ? ErrorCodes.NO_ERROR
 					: ErrorCodes.VERSION_NOT_SUPPORTED;
-			final byte[] buf = PacketHelper.toPacket(new ServiceAck(serviceAck, channelId, seq,
-					status));
-			final DatagramPacket p = new DatagramPacket(buf, buf.length, dataEndpt.getAddress(),
-					dataEndpt.getPort());
+			final byte[] buf = PacketHelper.toPacket(new ServiceAck(serviceAck, channelId, seq, status));
+			final DatagramPacket p = new DatagramPacket(buf, buf.length, dataEndpt.getAddress(), dataEndpt.getPort());
 			socket.send(p);
 			if (status == ErrorCodes.VERSION_NOT_SUPPORTED) {
 				close(CloseEvent.INTERNAL, "protocol version changed", LogLevel.ERROR, null);
@@ -222,7 +220,8 @@ public class KNXnetIPTunnel extends ClientConnection
 				fireFrameReceived(cemi);
 			else if (mc == CEMILData.MC_LDATA_CON) {
 				// invariant: notify listener before return from blocking send
-				logger.debug("received cEMI L-Data.con with req " + req.getSequenceNumber());
+				logger.debug("received cEMI L-Data.con with req {} (for {})", req.getSequenceNumber(),
+						((CEMILData) cemi).getSource());
 				fireFrameReceived(cemi);
 
 				synchronized (lock) {

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2015 B. Malinowsky
+    Copyright (c) 2010, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -228,12 +228,10 @@ abstract class ClientConnection extends ConnectionBase
 	{
 		// blocking mode is wait for .con
 		// wait for incoming request with confirmation
-		waitForStateChange(ClientConnection.CEMI_CON_PENDING,
-			ClientConnection.CONFIRMATION_TIMEOUT);
+		waitForStateChange(ClientConnection.CEMI_CON_PENDING, ClientConnection.CONFIRMATION_TIMEOUT);
 		// throw on no answer
 		if (internalState == ClientConnection.CEMI_CON_PENDING) {
-			final KNXTimeoutException e = new KNXTimeoutException(
-					"no confirmation reply received for " + keepForCon);
+			final KNXTimeoutException e = new KNXTimeoutException("no confirmation reply received for " + keepForCon);
 			logger.warn("response timeout waiting for confirmation", e);
 			internalState = OK;
 			throw e;

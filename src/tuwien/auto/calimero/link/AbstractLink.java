@@ -143,12 +143,10 @@ public abstract class AbstractLink implements KNXNetworkLink
 					logger.debug("confirmation of {}", f.getDestination());
 				}
 				else
-					logger.warn("unspecified frame event - ignored, msg code = 0x"
-							+ Integer.toHexString(mc));
+					logger.warn("unspecified frame event - ignored, msg code = 0x" + Integer.toHexString(mc));
 			}
 			catch (final KNXFormatException | RuntimeException ex) {
-				logger.warn("received unspecified frame {}",
-						DataUnitBuilder.toHex(e.getFrameBytes(), ""), ex);
+				logger.warn("received unspecified frame {}", DataUnitBuilder.toHex(e.getFrameBytes(), ""), ex);
 			}
 		}
 
@@ -394,15 +392,13 @@ public abstract class AbstractLink implements KNXNetworkLink
 		if (medium instanceof PLSettings) {
 			final CEMILDataEx f = (CEMILDataEx) msg;
 			if (f.getAdditionalInfo(CEMILDataEx.ADDINFO_PLMEDIUM) == null)
-				f.addAdditionalInfo(CEMILDataEx.ADDINFO_PLMEDIUM,
-						((PLSettings) medium).getDomainAddress());
+				f.addAdditionalInfo(CEMILDataEx.ADDINFO_PLMEDIUM, ((PLSettings) medium).getDomainAddress());
 		}
 		else if (medium.getMedium() == KNXMediumSettings.MEDIUM_RF) {
 			final CEMILDataEx f = (CEMILDataEx) msg;
 			if (f.getAdditionalInfo(CEMILDataEx.ADDINFO_RFMEDIUM) == null) {
 				final RFSettings rf = (RFSettings) medium;
-				final byte[] sn = f.isDomainBroadcast() ? rf.getDomainAddress()
-						: rf.getSerialNumber();
+				final byte[] sn = f.isDomainBroadcast() ? rf.getDomainAddress() : rf.getSerialNumber();
 				final byte[] ai = new RFMediumInfo(true, rf.isUnidirectional(), sn, 255).getInfo();
 				f.addAdditionalInfo(CEMILDataEx.ADDINFO_RFMEDIUM, ai);
 				s = f.isDomainBroadcast() ? "(using domain address)" : "(using device SN)";
@@ -414,8 +410,7 @@ public abstract class AbstractLink implements KNXNetworkLink
 	}
 
 	// Creates the target EMI format using L-Data message parameters
-	private byte[] createEmi(final int mc, final KNXAddress dst, final Priority p,
-		final byte[] nsdu)
+	private byte[] createEmi(final int mc, final KNXAddress dst, final Priority p, final byte[] nsdu)
 	{
 		if (cEMI)
 			return cEMI(mc, dst, p, nsdu).toByteArray();

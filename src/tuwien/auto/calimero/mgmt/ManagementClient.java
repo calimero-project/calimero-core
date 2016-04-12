@@ -131,8 +131,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 */
-	void writeAddress(IndividualAddress newAddress) throws KNXTimeoutException,
-		KNXLinkClosedException;
+	void writeAddress(IndividualAddress newAddress) throws KNXTimeoutException, KNXLinkClosedException;
 
 	/**
 	 * Reads the individual address of a communication partner in the KNX network.
@@ -157,8 +156,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @throws KNXException on other read address errors
 	 * @throws InterruptedException on interrupted thread
 	 */
-	IndividualAddress[] readAddress(boolean oneAddressOnly) throws KNXException,
-		InterruptedException;
+	IndividualAddress[] readAddress(boolean oneAddressOnly) throws KNXException, InterruptedException;
 
 	/**
 	 * Modifies the individual address of a communication partner identified using an
@@ -309,8 +307,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @throws KNXException on other read device descriptor errors
 	 * @throws InterruptedException on interrupted thread
 	 */
-	byte[] readDeviceDesc(Destination dst, int descType) throws KNXException,
-		InterruptedException;
+	byte[] readDeviceDesc(Destination dst, int descType) throws KNXException, InterruptedException;
 
 	/**
 	 * Initiates a basic restart of the controller of a communication partner.
@@ -499,8 +496,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @throws KNXException on other read memory problems
 	 * @throws InterruptedException on interrupted thread
 	 */
-	byte[] readMemory(Destination dst, int startAddr, int bytes) throws KNXException,
-		InterruptedException;
+	byte[] readMemory(Destination dst, int startAddr, int bytes) throws KNXException, InterruptedException;
 
 	/**
 	 * Writes memory data in the address space of a communication partner its controller.
@@ -525,8 +521,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @throws KNXException on other write memory problems
 	 * @throws InterruptedException on interrupted thread
 	 */
-	void writeMemory(Destination dst, int startAddr, byte[] data) throws KNXException,
-		InterruptedException;
+	void writeMemory(Destination dst, int startAddr, byte[] data) throws KNXException, InterruptedException;
 
 	/**
 	 * Authorizes at a communication partner using an authorization key to obtain a

@@ -462,6 +462,7 @@ public class TransportLayerImpl implements TransportLayer
 		final int seq = (tpdu[0] & 0x3C) >>> 2;
 
 		// on proxy null (no destination found for sender) use 'no partner' placeholder
+		@SuppressWarnings("resource")
 		final Destination d = p != null ? p.getDestination() : unknownPartner;
 
 		if (ctrl == CONNECT) {

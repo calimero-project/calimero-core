@@ -227,9 +227,8 @@ public class DestinationTest extends TestCase
 	public final void testIsConnectionOriented() throws KNXFormatException
 	{
 		assertTrue(dst.isConnectionOriented());
-		final Destination d =
-			new Destination(new Destination.AggregatorProxy(tl), new IndividualAddress(
-				"2.2.2"), false);
+		final Destination d = new Destination(new Destination.AggregatorProxy(tl), new IndividualAddress("2.2.2"),
+				false);
 		assertFalse(d.isConnectionOriented());
 	}
 
@@ -241,9 +240,8 @@ public class DestinationTest extends TestCase
 	public final void testIsKeepAlive() throws KNXFormatException
 	{
 		assertFalse(dst.isKeepAlive());
-		final Destination d =
-			new Destination(new Destination.AggregatorProxy(tl), new IndividualAddress(
-				"2.2.2"), true, true, false);
+		final Destination d = new Destination(new Destination.AggregatorProxy(tl), new IndividualAddress("2.2.2"), true,
+				true, false);
 		assertTrue(d.isKeepAlive());
 	}
 
@@ -255,9 +253,8 @@ public class DestinationTest extends TestCase
 	public final void testIsVerifyMode() throws KNXFormatException
 	{
 		assertFalse(dst.isVerifyMode());
-		final Destination d =
-			new Destination(new Destination.AggregatorProxy(tl), new IndividualAddress(
-				"2.2.2"), true, true, true);
+		final Destination d = new Destination(new Destination.AggregatorProxy(tl), new IndividualAddress("2.2.2"), true,
+				true, true);
 		assertTrue(d.isVerifyMode());
 	}
 
