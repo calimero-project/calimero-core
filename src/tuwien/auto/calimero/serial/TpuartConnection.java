@@ -267,7 +267,7 @@ public class TpuartConnection implements AutoCloseable
 			req = frame.clone();
 			final long start = System.nanoTime();
 			synchronized (enterIdleLock) {
-				if (!idle)
+				while (!idle)
 					enterIdleLock.wait();
 			}
 			logger.trace("UART ready for sending after {} us", (System.nanoTime() - start) / 1000);
