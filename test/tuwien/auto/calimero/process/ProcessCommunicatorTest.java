@@ -36,6 +36,11 @@
 
 package tuwien.auto.calimero.process;
 
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.experimental.categories.Category;
 
 import category.RequireKnxnetIP;
@@ -443,6 +448,101 @@ public class ProcessCommunicatorTest extends TestCase
 		final String res = pc2.read(dp);
 		assertTrue(res.length() > 0);
 	}
+
+	/**
+	 * Test method for {@link ProcessCommunicator#read(Datapoint)}.
+	 */
+	public final void testConcurrentRead()
+	{
+		final Datapoint dp = new StateDP(dpString, "test datapoint");
+		dp.setDPT(0, DPTXlatorString.DPT_STRING_8859_1.getID());
+		final List<Thread> threads = new ArrayList<>();
+		final AtomicInteger count = new AtomicInteger();
+		for (int i = 0; i < 10; i++) {
+			final Thread t = new Thread(() -> {
+				try {
+					count.addAndGet(pc2.read(dp).length() > 0 ? 1 : 0);
+				}
+				catch (KNXException | InterruptedException e) {}
+			});
+			threads.add(t);
+		}
+		threads.forEach(Thread::start);
+		threads.forEach((t) -> {
+			try {
+				t.join();
+			}
+			catch (final InterruptedException e) {}
+		});
+		assertEquals(threads.size(), count.get());
+	}
+
+	/**
+	 * Test method for {@link ProcessCommunicator#read(Datapoint)}.
+	 *
+	 * @throws KNXException
+	 * @throws InterruptedException on interrupted thread
+	 */
+	public final void testConcurrentRead2() throws KNXException, InterruptedException
+	{
+		final List<Thread> threads = new ArrayList<>();
+		final AtomicInteger count = new AtomicInteger();
+		final boolean b = pc2.readBool(dpBool);
+		final double d = pc2.readFloat(dpFloat2, false);
+		for (int i = 0; i < 20; i++) {
+			final int index = i;
+			final Thread t = new Thread(() -> {
+				try {
+					if (index % 2 == 0)
+						count.addAndGet(pc2.readBool(dpBool) == b ? 1 : 0);
+					else
+						count.addAndGet(pc2.readFloat(dpFloat2, false) == d ? 1 : 0);
+				}
+				catch (KNXException | InterruptedException e) {}
+			});
+			threads.add(t);
+		}
+		threads.forEach(Thread::start);
+		threads.forEach((t) -> {
+			try {
+				t.join();
+			}
+			catch (final InterruptedException e) {}
+		});
+		assertEquals(threads.size(), count.get());
+	}
+
+	/**
+	 * Test method for {@link ProcessCommunicator#read(Datapoint)}.
+	 */
+	public final void testConcurrentReadNonExistingDestination()
+	{
+		final List<Thread> threads = new ArrayList<>();
+		final AtomicInteger count = new AtomicInteger();
+		final LocalTime start = LocalTime.now();
+		for (int i = 0; i < 5; i++) {
+			final Thread t = new Thread(() -> {
+				try {
+					pc2.readBool(new GroupAddress(7, 7, 7));
+					count.incrementAndGet();
+				}
+				catch (KNXException | InterruptedException e) {}
+			});
+			threads.add(t);
+		}
+		threads.forEach(Thread::start);
+		threads.forEach((t) -> {
+			try {
+				t.join();
+			}
+			catch (final InterruptedException e) {}
+		});
+		assertEquals(0, count.get());
+		final LocalTime now = LocalTime.now();
+		assertTrue(now.isAfter(start.plusSeconds(10)));
+		assertTrue(now.isBefore(start.plusSeconds(12)));
+	}
+
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.process.ProcessCommunicator#write(

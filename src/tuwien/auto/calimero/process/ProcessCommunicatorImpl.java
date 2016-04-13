@@ -36,8 +36,9 @@
 
 package tuwien.auto.calimero.process;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
@@ -55,6 +56,7 @@ import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
+import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.datapoint.Datapoint;
 import tuwien.auto.calimero.dptxlator.DPT;
@@ -84,9 +86,6 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 {
 	private final class NLListener implements NetworkLinkListener
 	{
-		NLListener()
-		{}
-
 		@Override
 		public void indication(final FrameEvent e)
 		{
@@ -98,10 +97,10 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 			final int svc = DataUnitBuilder.getAPDUService(apdu);
 			// Note: even if this is a read response we have waited for,
 			// we nevertheless notify the listeners about it (we do *not* discard it)
-			if (svc == GROUP_RESPONSE && wait) {
+			if (svc == GROUP_RESPONSE) {
 				synchronized (indications) {
-					indications.add(e);
-					indications.notify();
+					if (indications.replace((GroupAddress) f.getDestination(), e) != null)
+						indications.notifyAll();
 				}
 			}
 			try {
@@ -112,12 +111,11 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 					fireGroupReadWrite(f, DataUnitBuilder.extractASDU(apdu), svc, apdu.length <= 2);
 			}
 			catch (final RuntimeException rte) {
-				logger.error("on group indication", rte);
+				logger.error("on group indication from {}", f.getDestination(), rte);
 			}
 		}
 
-		private void fireGroupReadWrite(final CEMILData f, final byte[] asdu, final int svc,
-			final boolean optimized)
+		private void fireGroupReadWrite(final CEMILData f, final byte[] asdu, final int svc, final boolean optimized)
 		{
 			final ProcessEvent e = new ProcessEvent(ProcessCommunicatorImpl.this, f.getSource(),
 					(GroupAddress) f.getDestination(), svc, asdu, optimized);
@@ -150,11 +148,14 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	private final KNXNetworkLink lnk;
 	private final NetworkLinkListener lnkListener = new NLListener();
 	private final EventListeners<ProcessListener> listeners;
-	private final List<FrameEvent> indications = new LinkedList<>();
+
+	private final Map<GroupAddress, FrameEvent> indications = new HashMap<>();
+	private final static FrameEvent NoResponse = new FrameEvent(ProcessCommunicatorImpl.class, (CEMI) null);
+	private final Map<GroupAddress, AtomicInteger> readers = new HashMap<>();
+
 	private volatile Priority priority = Priority.LOW;
 	// maximum wait time in seconds for a response message
 	private volatile int responseTimeout = 10;
-	private volatile boolean wait;
 	private volatile boolean detached;
 	private final Logger logger;
 
@@ -460,29 +461,28 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 			logger.trace("group write to " + dst + " succeeded");
 	}
 
-	private synchronized byte[] readFromGroup(final GroupAddress dst, final Priority p,
+	private byte[] readFromGroup(final GroupAddress dst, final Priority p,
 		final int minASDULen, final int maxASDULen) throws KNXTimeoutException,
 			KNXInvalidResponseException, KNXLinkClosedException, InterruptedException
 	{
 		if (detached)
 			throw new KNXIllegalStateException("process communicator detached");
 		try {
-			wait = true;
-
-			// before sending a request and waiting for response, clear previous indications
-			// that could be sitting there from previous timed-out commands or by another request
-			// for the same group
 			synchronized (indications) {
-				indications.clear();
+				readers.computeIfAbsent(dst, v -> new AtomicInteger()).incrementAndGet();
+				indications.putIfAbsent(dst, NoResponse);
 			}
-			lnk.sendRequestWait(dst, p,
-					DataUnitBuilder.createLengthOptimizedAPDU(GROUP_READ, null));
-			if (logger.isTraceEnabled())
-				logger.trace("sent group read request to " + dst);
+
+			lnk.sendRequestWait(dst, p, DataUnitBuilder.createLengthOptimizedAPDU(GROUP_READ, null));
+			logger.trace("sent group read request to {}", dst);
 			return waitForResponse(dst, minASDULen + 2, maxASDULen + 2);
 		}
 		finally {
-			wait = false;
+			synchronized (indications) {
+				final boolean none = readers.get(dst).decrementAndGet() == 0;
+				readers.compute(dst, (k, v) -> none ? null : v);
+				indications.compute(dst, (k, v) -> none ? null : v);
+			}
 		}
 	}
 
@@ -493,33 +493,26 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		final long end = System.currentTimeMillis() + remaining;
 		synchronized (indications) {
 			while (remaining > 0) {
-				// although we can rely that we process any correctly received
-				// response in indications, there might be
-				// - more than one response for a single read from the
-				//   (mis-)configured network
-				// - a shared KNX network link among several process communicators,
-				//   and therefore several group responses forwarded to each
-				while (indications.size() > 0) {
-					final FrameEvent e = indications.remove(0);
-					if (((CEMILData) e.getFrame()).getDestination().equals(from)) {
-						final byte[] d = e.getFrame().getPayload();
-						indications.clear();
-						// ok, got response we're waiting for
-						if (d.length >= minAPDU && d.length <= maxAPDU)
-							return d;
-
-						final String s = "APDU response length " + d.length + " bytes, expected "
-								+ minAPDU + " to " + maxAPDU;
-						logger.error("received group read response with " + s);
-						throw new KNXInvalidResponseException(s);
-					}
+				final FrameEvent e = indications.get(from);
+				if (e == NoResponse) {
+					indications.wait(remaining);
+					remaining = end - System.currentTimeMillis();
 				}
-				indications.wait(remaining);
-				remaining = end - System.currentTimeMillis();
+				else {
+					final byte[] d = e.getFrame().getPayload();
+					final int len = d.length;
+					// validate length of response we're waiting for
+					if (len >= minAPDU && len <= maxAPDU)
+						return d;
+
+					final String s = "APDU response length " + len + " bytes, expected " + minAPDU + " to " + maxAPDU;
+					logger.error("received group read response from {} with {}", from, s);
+					throw new KNXInvalidResponseException(s);
+				}
 			}
 		}
 		logger.info("timeout waiting for group read response from {}", from);
-		throw new KNXTimeoutException("timeout waiting for group read response " + from);
+		throw new KNXTimeoutException("timeout waiting for group read response from " + from);
 	}
 
 	private void fireDetached()
