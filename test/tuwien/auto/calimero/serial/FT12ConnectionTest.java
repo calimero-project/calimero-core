@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,11 +36,19 @@
 
 package tuwien.auto.calimero.serial;
 
+import static org.junit.gen5.api.Assertions.assertEquals;
+import static org.junit.gen5.api.Assertions.assertFalse;
+import static org.junit.gen5.api.Assertions.assertNotNull;
+import static org.junit.gen5.api.Assertions.fail;
+
 import java.util.Arrays;
 
-import category.RequireFT12Connection;
-import junit.framework.TestCase;
 import org.junit.experimental.categories.Category;
+import org.junit.gen5.api.AfterEach;
+import org.junit.gen5.api.Test;
+
+import category.RequireFT12Connection;
+import tag.FT12;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.Util;
 
@@ -50,48 +58,27 @@ import tuwien.auto.calimero.Util;
  * @author B. Malinowsky
  */
 @Category(RequireFT12Connection.class)
-public class FT12ConnectionTest extends TestCase
+@FT12
+public class FT12ConnectionTest
 {
 	private static int usePort = Util.getSerialPort();
 	private static String portID;
 	private FT12Connection c;
 
-	/**
-	 * @param name
-	 */
-	public FT12ConnectionTest(final String name)
-	{
-		super(name);
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-		Util.setupLogging();
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
+	@AfterEach
+	void tearDown() throws Exception
 	{
 		if (c != null)
 			c.close();
 		Util.tearDownLogging();
-		super.tearDown();
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.serial.FT12Connection#FT12Connection(int)}.
+	 * Test method for {@link tuwien.auto.calimero.serial.FT12Connection#FT12Connection(int)}.
 	 *
 	 * @throws KNXException
 	 */
+	@Test
 	public final void testFT12ConnectionInt() throws KNXException
 	{
 		c = new FT12Connection(usePort);
@@ -111,11 +98,11 @@ public class FT12ConnectionTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.serial.FT12Connection#FT12Connection
-	 * (java.lang.String, int)}.
+	 * Test method for {@link tuwien.auto.calimero.serial.FT12Connection#FT12Connection(java.lang.String, int)}.
 	 *
 	 * @throws KNXException
 	 */
+	@Test
 	public final void testFT12ConnectionStringInt() throws KNXException
 	{
 		c = new FT12Connection(portID, 19200);
@@ -129,9 +116,9 @@ public class FT12ConnectionTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.serial.FT12Connection#getPortIdentifiers()}.
+	 * Test method for {@link tuwien.auto.calimero.serial.FT12Connection#getPortIdentifiers()}.
 	 */
+	@Test
 	public final void testGetPortIdentifiers()
 	{
 		assertNotNull(FT12Connection.getPortIdentifiers());
@@ -144,6 +131,7 @@ public class FT12ConnectionTest extends TestCase
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testClose() throws KNXException, InterruptedException
 	{
 		c = new FT12Connection(usePort);
@@ -165,6 +153,7 @@ public class FT12ConnectionTest extends TestCase
 	 *
 	 * @throws KNXException
 	 */
+	@Test
 	public final void testGetSetBaudRate() throws KNXException
 	{
 		c = new FT12Connection(usePort);
@@ -183,12 +172,12 @@ public class FT12ConnectionTest extends TestCase
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testGetState() throws KNXException, InterruptedException
 	{
 		c = new FT12Connection(usePort);
 		assertEquals(FT12Connection.OK, c.getState());
-		final byte[] switchNormal =
-			{ (byte) 0xA9, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
+		final byte[] switchNormal = { (byte) 0xA9, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
 		c.send(switchNormal, true);
 		assertEquals(FT12Connection.OK, c.getState());
 		c.send(switchNormal, true);
@@ -203,11 +192,12 @@ public class FT12ConnectionTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.serial.FT12Connection#send(byte[], boolean)}.
+	 * Test method for {@link tuwien.auto.calimero.serial.FT12Connection#send(byte[], boolean)}.
+	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testSend() throws KNXException, InterruptedException
 	{
 		c = new FT12Connection(usePort);
@@ -217,5 +207,4 @@ public class FT12ConnectionTest extends TestCase
 		c.send(new byte[] { 1, 2, }, false);
 		c.close();
 	}
-
 }
