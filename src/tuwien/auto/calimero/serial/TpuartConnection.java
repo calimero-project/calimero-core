@@ -269,7 +269,7 @@ public class TpuartConnection implements AutoCloseable
 			req = (byte[]) frame.clone();
 			final long start = System.nanoTime();
 			synchronized (enterIdleLock) {
-				if (!idle)
+				while (!idle)
 					enterIdleLock.wait();
 			}
 			if (logger.isLoggable(LogLevel.TRACE)) {
