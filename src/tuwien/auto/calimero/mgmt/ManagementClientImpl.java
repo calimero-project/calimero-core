@@ -43,6 +43,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 
@@ -169,6 +170,8 @@ public class ManagementClientImpl implements ManagementClient
 						indications.notify();
 					}
 			}
+			if (notify != null)
+				notify.accept(e);
 		}
 	};
 
@@ -180,6 +183,8 @@ public class ManagementClientImpl implements ManagementClient
 	private volatile int svcResponse;
 	private volatile boolean detached;
 	private final Logger logger;
+	// TODO currently exclusively used for push-button mode link procedure
+	private volatile Consumer<FrameEvent> notify;
 
 	/**
 	 * Creates a new management client attached to the supplied KNX network link.
@@ -195,12 +200,14 @@ public class ManagementClientImpl implements ManagementClient
 		this(link, new TransportLayerImpl(link));
 	}
 
-	ManagementClientImpl(final KNXNetworkLink link, final TransportLayer transportLayer)
+	protected ManagementClientImpl(final KNXNetworkLink link, final TransportLayer transportLayer)
 	{
 		tl = transportLayer;
 		tl.addTransportListener(tlListener);
 		logger = LogService.getLogger("MC " + link.getName());
 	}
+
+	void setServiceListener(final Consumer<FrameEvent> onEvent) { notify = onEvent; }
 
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.mgmt.ManagementClient#setResponseTimeout(int)
