@@ -165,7 +165,7 @@ public class TpuartConnection implements AutoCloseable
 	{
 		this.portId = portId;
 		logger = LogService.getAsyncLogger("calimero.serial.tpuart");
-		adapter = LibraryAdapter.open(logger, portId);
+		adapter = LibraryAdapter.open(logger, portId, 19200, 0);
 		os = adapter.getOutputStream();
 		is = adapter.getInputStream();
 

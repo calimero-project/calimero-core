@@ -40,7 +40,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -173,7 +172,7 @@ public class FT12Connection implements AutoCloseable
 	 * <p>
 	 * The baud rate is set to 19200.<br>
 	 * The associated log service to which the created instance will output logging events
-	 * is named "FT1.2 <code>portId</code>", with <code>portId</code> being the supplied
+	 * is named "calimero.serial.ft12.<code>portId</code>", with <code>portId</code> being the supplied
 	 * port identifier. If a log writer wants to receive all log events created during
 	 * establishment of this FT1.2 connection, use
 	 * {@link LogService#getLogger(String)} before invoking this constructor and add
@@ -209,7 +208,7 @@ public class FT12Connection implements AutoCloseable
 	private FT12Connection(final String originalPortId, final String portId,
 		final int baudrate) throws KNXException
 	{
-		logger = LogService.getLogger("FT1.2 " + originalPortId);
+		logger = LogService.getLogger("calimero.serial.ft12." + originalPortId);
 		open(portId, baudrate);
 		try {
 			sendReset();
@@ -417,90 +416,16 @@ public class FT12Connection implements AutoCloseable
 
 	private void open(final String portId, final int baudrate) throws KNXException
 	{
-		adapter = createAdapter(portId, baudrate);
+		calcTimeouts(baudrate);
+		adapter = LibraryAdapter.open(logger, portId, baudrate, idleTimeout);
 		port = portId;
 		is = adapter.getInputStream();
 		os = adapter.getOutputStream();
 		calcTimeouts(adapter.getBaudRate());
-		(receiver = new Receiver()).start();
+		receiver = new Receiver();
+		receiver.start();
 		state = OK;
 		logger.info("access supported, opened serial port " + portId);
-	}
-
-	private LibraryAdapter createAdapter(final String portId, final int baudrate)
-		throws KNXException
-	{
-		boolean available = false;
-		// check for ME CDC platform and available serial communication port
-		// protocol support for communication ports is optional in CDC
-		if (CommConnectionAdapter.isAvailable()) {
-			available = true;
-			logger.info("open ME CDC serial port connection (CommConnection)");
-			try {
-				return new CommConnectionAdapter(logger, portId, baudrate);
-			}
-			catch (final KNXException e) {
-				logger.warn("ME CDC serial port access failed", e);
-			}
-		}
-		// check internal support for serial port access
-		// protocol support available for Win 32/64 platforms
-		// (so we provide serial port access at least on platforms with ETS)
-		if (SerialComAdapter.isAvailable()) {
-			available = true;
-			logger.info("open Calimero 2 native serial port connection (serialcom)");
-			SerialComAdapter conn = null;
-			try {
-				conn = new SerialComAdapter(logger, portId);
-				conn.setBaudRate(baudrate);
-				calcTimeouts(conn.getBaudRate());
-				// In Windows Embedded CE, the read interval timeout starts immediately
-				conn.setTimeouts(new SerialComAdapter.Timeouts(idleTimeout, 0, 0, 0, 0));
-				conn.setParity(SerialComAdapter.PARITY_EVEN);
-				conn.setControl(SerialComAdapter.STOPBITS, SerialComAdapter.ONE_STOPBIT);
-				conn.setControl(SerialComAdapter.DATABITS, 8);
-				conn.setControl(SerialComAdapter.FLOWCTRL, SerialComAdapter.FLOWCTRL_NONE);
-				logger.info("setup serial port: baudrate " + conn.getBaudRate()
-					+ ", even parity, " + conn.getControl(SerialComAdapter.DATABITS)
-					+ " databits, " + conn.getControl(SerialComAdapter.STOPBITS)
-					+ " stopbits, timeouts: " + conn.getTimeouts());
-				return conn;
-			}
-			catch (final IOException e) {
-				if (conn != null)
-					conn.close();
-				logger.warn("native serial port access failed", e);
-			}
-		}
-		try {
-			final Class<?> c = Class.forName("tuwien.auto.calimero.serial.RxtxAdapter");
-			available = true;
-			// check whether a rxtx library is hanging around somewhere
-			logger.info("open rxtx library serial port connection");
-			final Class<? extends LibraryAdapter> adapter = LibraryAdapter.class;
-			return adapter.cast(c.getConstructors()[0].newInstance(new Object[] {
-				logger, portId, new Integer(baudrate) }));
-		}
-		catch (final ClassNotFoundException e) {
-			logger.warn("rxtx library adapter not found");
-		}
-		catch (final SecurityException e) {
-			logger.error("rxtx library adapter access denied", e);
-		}
-		catch (final InvocationTargetException e) {
-			logger.error("initalizing rxtx serial port", e.getCause());
-		}
-		catch (final Exception e) {
-			// InstantiationException, NoSuchMethodException,
-			// IllegalAccessException, IllegalArgumentException
-			logger.warn("rxtx serial port access failed", e);
-		}
-		catch (final NoClassDefFoundError e) {
-			logger.error("no rxtx library classes found", e);
-		}
-		if (available)
-			throw new KNXException("can not open serial port " + portId);
-		throw new KNXException("no serial adapter available");
 	}
 
 	private void sendReset() throws KNXPortClosedException, KNXAckTimeoutException

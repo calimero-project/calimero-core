@@ -69,18 +69,22 @@ public abstract class LibraryAdapter implements Closeable
 	 */
 	protected final Logger logger;
 
-	// FT1.2 and TP-UART both support 19200
-	private static final int baudrate = 19200;
-	// XXX
-	private static final int idleTimeout = 100;
-
-	public static LibraryAdapter open(final Logger logger, final String portId) throws KNXException
+	/**
+	 * Factory method to open a serial connection using one of the available library adapters.
+	 *
+	 * @param logger logger
+	 * @param portId serial port identifier
+	 * @param baudrate baudrate
+	 * @return adapter to access serial communication port, port resource is in open state
+	 * @throws KNXException on failure to open or configure serial port, or no adapter available
+	 */
+	public static LibraryAdapter open(final Logger logger, final String portId, final int baudrate, final int idleTimeout) throws KNXException
 	{
 		Throwable t = null;
-		// check for ME CDC platform and available serial communication port
-		// protocol support for communication ports is optional in CDC
+		// check for Java ME Embedded platform and available serial communication port,
+		// protocol support for communication ports is optional
 		if (CommConnectionAdapter.isAvailable()) {
-			logger.debug("open ME CDC serial port connection (CommConnection) for {}", portId);
+			logger.debug("open Java ME serial port connection (CommConnection) for {}", portId);
 			try {
 				return new CommConnectionAdapter(logger, portId, baudrate);
 			}
@@ -97,7 +101,8 @@ public abstract class LibraryAdapter implements Closeable
 			try {
 				conn = new SerialComAdapter(logger, portId);
 				conn.setBaudRate(baudrate);
-				conn.setTimeouts(new SerialComAdapter.Timeouts(idleTimeout, 0, 0, 0, 0));
+				//final int idleTimeout = idleTimeout(conn.getBaudRate());
+				conn.setTimeouts(new SerialComAdapter.Timeouts(idleTimeout, 0, 250, 0, 0));
 				conn.setParity(SerialComAdapter.PARITY_EVEN);
 				conn.setControl(SerialComAdapter.STOPBITS, SerialComAdapter.ONE_STOPBIT);
 				conn.setControl(SerialComAdapter.DATABITS, 8);
