@@ -205,8 +205,7 @@ public class FT12Connection implements AutoCloseable
 		this(portId, portId, baudrate);
 	}
 
-	private FT12Connection(final String originalPortId, final String portId,
-		final int baudrate) throws KNXException
+	private FT12Connection(final String originalPortId, final String portId, final int baudrate) throws KNXException
 	{
 		logger = LogService.getLogger("calimero.serial.ft12." + originalPortId);
 		open(portId, baudrate);
@@ -357,9 +356,7 @@ public class FT12Connection implements AutoCloseable
 		boolean ack = false;
 		try {
 			for (int i = 0; i <= REPEAT_LIMIT; ++i) {
-				if (logger.isTraceEnabled())
-					logger.trace("sending FT1.2 frame, " + (blocking ? "" : "non-")
-							+ "blocking, attempt " + (i + 1));
+				logger.trace("sending FT1.2 frame, {}blocking, attempt {}", (blocking ? "" : "non-"), (i + 1));
 				sendData(frame);
 				if (!blocking || waitForAck()) {
 					ack = true;
@@ -431,8 +428,7 @@ public class FT12Connection implements AutoCloseable
 	private void sendReset() throws KNXPortClosedException, KNXAckTimeoutException
 	{
 		try {
-			final byte[] reset = new byte[] { START_FIXED, INITIATOR | RESET, INITIATOR | RESET,
-				END };
+			final byte[] reset = new byte[] { START_FIXED, INITIATOR | RESET, INITIATOR | RESET, END };
 			for (int i = 0; i <= REPEAT_LIMIT; ++i) {
 				logger.trace("send reset to BCU");
 				state = ACK_PENDING;
@@ -563,8 +559,7 @@ public class FT12Connection implements AutoCloseable
 						else if (c == START_FIXED)
 							readShortFrame();
 						else
-							logger.trace("received unexpected start byte 0x"
-									+ Integer.toHexString(c) + " - ignored");
+							logger.trace("received unexpected start byte 0x" + Integer.toHexString(c) + " - ignored");
 					}
 				}
 			}
@@ -608,8 +603,7 @@ public class FT12Connection implements AutoCloseable
 			final byte[] buf = new byte[len + 4];
 			// read rest of frame, check header, ctrl, and end tag
 			final int read = is.read(buf);
-			if (read == len + 4 && (buf[0] & 0xff) == len && (buf[1] & 0xff) == START
-					&& (buf[len + 3] & 0xff) == END) {
+			if (read == len + 4 && (buf[0] & 0xff) == len && (buf[1] & 0xff) == START && (buf[len + 3] & 0xff) == END) {
 				final byte chk = buf[buf.length - 2];
 				if (!checkCtrlField(buf[2] & 0xff, chk))
 					return false;
@@ -629,8 +623,7 @@ public class FT12Connection implements AutoCloseable
 				}
 			}
 			else
-				logger.warn("invalid frame, discarded " + read + " bytes: "
-						+ DataUnitBuilder.toHex(buf, " "));
+				logger.warn("invalid frame, discarded " + read + " bytes: " + DataUnitBuilder.toHex(buf, " "));
 			return false;
 		}
 
