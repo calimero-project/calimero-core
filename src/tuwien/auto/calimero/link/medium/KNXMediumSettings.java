@@ -209,6 +209,16 @@ public abstract class KNXMediumSettings
 		}
 	}
 
+	/**
+	 * Returns the medium dependent time factor required for calculating certain protocol timings.
+	 *
+	 * @return medium dependent time factor in milliseconds, might be <code>0</code>
+	 */
+	public int timeFactor()
+	{
+		return 0;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
