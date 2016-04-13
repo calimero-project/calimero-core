@@ -48,6 +48,7 @@ import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXIllegalStateException;
+import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.Util;
@@ -683,6 +684,57 @@ public class ManagementClientImplTest extends TestCase
 		}
 		catch (final KNXIllegalArgumentException e) {}
 		mc.writeDomainAddress(new byte[] { 1, 2, });
+	}
+
+	private static final int NetworkParamObjectType = 0;
+	private static final int NetworkParamPid = 59;
+
+	public final void testWriteNetworkParameter() throws KNXLinkClosedException, KNXTimeoutException
+	{
+		mc.writeNetworkParameter(dcl.getAddress(), NetworkParamObjectType, NetworkParamPid, new byte[] { 0 });
+	}
+
+	public final void testWriteNetworkParameterBroadcast() throws KNXLinkClosedException, KNXTimeoutException
+	{
+		mc.writeNetworkParameter(null, NetworkParamObjectType, NetworkParamPid, new byte[] { 0 });
+	}
+
+	public final void testReadNetworkParameterBroadcast() throws KNXException, InterruptedException
+	{
+		mc.readNetworkParameter(null, NetworkParamObjectType, NetworkParamPid, new byte[] {});
+	}
+
+	public final void testReadNetworkParameter() throws KNXException, InterruptedException
+	{
+		mc.readNetworkParameter(dcl.getAddress(), NetworkParamObjectType, NetworkParamPid, new byte[] { 0 });
+	}
+
+	public final void testReadUnsupportedNetworkParameter() throws InterruptedException, KNXException
+	{
+		try {
+			mc.readNetworkParameter(dcl.getAddress(), 99, 254, new byte[] {});
+			fail("unsupported object type");
+		}
+		catch (final KNXInvalidResponseException expected) {}
+		try {
+			mc.readNetworkParameter(dcl.getAddress(), 0, 254, new byte[] {});
+			fail("unsupported pid");
+		}
+		catch (final KNXInvalidResponseException expected) {}
+	}
+
+	public final void testReadUnsupportedNetworkParameterBroadcast() throws InterruptedException, KNXException
+	{
+		try {
+			mc.readNetworkParameter(null, 99, 254, new byte[] {});
+			fail("unsupported object type, should be timeout");
+		}
+		catch (final KNXTimeoutException expected) {}
+		try {
+			mc.readNetworkParameter(null, 0, 254, new byte[] {});
+			fail("unsupported pid, should be timeout");
+		}
+		catch (final KNXTimeoutException expected) {}
 	}
 
 	/**

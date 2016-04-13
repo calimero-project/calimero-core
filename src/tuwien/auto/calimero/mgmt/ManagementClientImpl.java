@@ -110,6 +110,10 @@ public class ManagementClientImpl implements ManagementClient
 	private static final int PROPERTY_RESPONSE = 0x03D6;
 	private static final int PROPERTY_WRITE = 0x03D7;
 
+	private static final int NetworkParamRead = 0b1111011010;
+	private static final int NetworkParamResponse = 0b1111011011;
+	static final int NetworkParamWrite = 0b1111100100;
+
 	// serves as both req and res
 	private static final int RESTART = 0x0380;
 
@@ -389,6 +393,64 @@ public class ManagementClientImpl implements ManagementClient
 		return makeDOAs(readBroadcast(priority,
 				DataUnitBuilder.createAPDU(DOA_SELECTIVE_READ, new byte[] { domain[0], domain[1],
 					addr[0], addr[1], (byte) range }), DOA_RESPONSE, 2, 2, false));
+	}
+
+	@Override
+	public byte[] readNetworkParameter(final IndividualAddress remote, final int objectType, final int pid,
+		final byte[] testInfo)
+		throws KNXLinkClosedException, KNXTimeoutException, KNXInvalidResponseException, InterruptedException
+	{
+		synchronized (this) {
+			try {
+				svcResponse = NetworkParamResponse;
+				sendNetworkParameter(NetworkParamRead, remote, objectType, pid, testInfo);
+				final byte[] res = waitForResponse(remote, 3, 14, responseTimeout);
+				final int receivedIot = (res[2] & 0xff) << 8 | (res[3] & 0xff);
+				final int receivedPid = res[4] & 0xff;
+				String s = "network parameter read response from " + remote + ": ";
+				if (receivedPid == 0xff) {
+					if (receivedIot == 0xffff)
+						s += "unsupported interface object type " + objectType;
+					else
+						s += "unsupported PID " + pid;
+					throw new KNXInvalidResponseException(s);
+				}
+				if (receivedIot != objectType || receivedPid != pid)
+					throw new KNXInvalidResponseException(s + "mismatch OT " + receivedIot + ", PID " + receivedPid);
+				final int offset = 2 + 3 + testInfo.length;
+				return Arrays.copyOfRange(res, offset, res.length);
+			}
+			finally {
+				svcResponse = 0;
+			}
+		}
+	}
+
+	@Override
+	public void writeNetworkParameter(final IndividualAddress remote, final int objectType, final int pid,
+		final byte[] value) throws KNXLinkClosedException, KNXTimeoutException
+	{
+		sendNetworkParameter(NetworkParamWrite, remote, objectType, pid, value);
+	}
+
+	private void sendNetworkParameter(final int apci, final IndividualAddress remote, final int objectType,
+		final int pid, final byte[] value) throws KNXTimeoutException, KNXLinkClosedException
+	{
+		if (objectType < 0 || objectType > 0xffff || pid < 0 || pid > 0xff)
+			throw new KNXIllegalArgumentException("IOT or PID argument out of range");
+		final byte[] asdu = new byte[3 + value.length];
+		asdu[0] = (byte) (objectType >> 8);
+		asdu[1] = (byte) objectType;
+		asdu[2] = (byte) pid;
+		for (int i = 0; i < value.length; i++)
+			asdu[3 + i] = value[i];
+
+		final Priority p = Priority.SYSTEM;
+		final byte[] tsdu = DataUnitBuilder.createAPDU(apci, asdu);
+		if (remote != null)
+			tl.sendData(remote, p, tsdu);
+		else
+			tl.broadcast(true, p, tsdu);
 	}
 
 	@Override

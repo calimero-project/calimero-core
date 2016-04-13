@@ -277,6 +277,43 @@ public interface ManagementClient extends AutoCloseable
 		throws KNXException, InterruptedException;
 
 	/**
+	 * Reads the current configuration of a network parameter from a {@code remote} endpoint. In broadcast communication
+	 * mode, the remote endpoint will ignore a network parameter read request on 1) reading a network parameter that is
+	 * not supported by the remote endpoint in question, or 2) on a negative check with respect to the supplied
+	 * parameters against the test information {@code testInfo}. In both cases, a timeout exception will occur.<br>
+	 * In point-to-point communication mode, the remote endpoint will answer with a negative response if 1) the
+	 * interface object type is not supported, 2) the PID is not supported, or 3) on a negative check of the
+	 * investigated parameters against the test information. In both cases, <code>KNXInvalidResponseException</code> is
+	 * thrown.
+	 *
+	 * @param remote address of remote endpoint, or <code>null</code> to use broadcast communication mode
+	 * @param objectType interface object type, <code>0 &le; iot &lt; 0xffff</code>
+	 * @param pid KNX property identifier, <code>0 &le; pid &lt; 0xff</code>
+	 * @param testInfo test information, <code>0 &lt; testInfo.length &lt; ???</code>
+	 * @return test result as byte array, <code>result.length &gt; 0</code>
+	 * @throws KNXLinkClosedException if network link to KNX network is closed
+	 * @throws KNXTimeoutException on timeout during send or waiting for a response
+	 * @throws KNXInvalidResponseException on invalid read response message
+	 * @throws InterruptedException on interrupted thread
+	 */
+	byte[] readNetworkParameter(IndividualAddress remote, int objectType, int pid, byte[] testInfo)
+		throws KNXException, InterruptedException;
+
+	/**
+	 * Writes a network parameter to a {@code remote} endpoint. The remote endpoint will neglect unknown parameter types
+	 * without any further action.
+	 *
+	 * @param remote address of remote endpoint, or <code>null</code> to use broadcast communication
+	 * @param objectType interface object type
+	 * @param pid KNX property identifier
+	 * @param value value to write
+	 * @throws KNXLinkClosedException if network link to KNX network is closed
+	 * @throws KNXTimeoutException on timeout during send
+	 */
+	void writeNetworkParameter(final IndividualAddress remote, final int objectType, final int pid, final byte[] value)
+		throws KNXLinkClosedException, KNXTimeoutException;
+
+	/**
 	 * Reads the device descriptor information of a communication partner its controller.
 	 * <p>
 	 * This service uses point-to-point connectionless or connection-oriented
