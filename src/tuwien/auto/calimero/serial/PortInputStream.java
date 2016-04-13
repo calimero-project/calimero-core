@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ import java.io.InputStream;
 /**
  * Input stream for a serial port.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 class PortInputStream extends InputStream
@@ -52,10 +52,10 @@ class PortInputStream extends InputStream
 	/**
 	 * Creates a new input stream for <code>port</code>.
 	 * <p>
-	 * 
+	 *
 	 * @param port open port for input
 	 */
-	public PortInputStream(final SerialComAdapter port)
+	PortInputStream(final SerialComAdapter port)
 	{
 		p = port;
 	}

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015 B. Malinowsky
+    Copyright (c) 2015, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ final class HidReportHeader
 		Start(1), End(2), Partial(4);
 
 		private final int id;
-		private PacketType(final int id) { this.id = id; }
+		PacketType(final int id) { this.id = id; }
 		int id() { return id; }
 	}
 
@@ -77,14 +77,14 @@ final class HidReportHeader
 	private final EnumSet<PacketType> type;
 	private final int length;
 
-	public HidReportHeader(final int sequence, final EnumSet<PacketType> type, final int dataLength)
+	HidReportHeader(final int sequence, final EnumSet<PacketType> type, final int dataLength)
 	{
 		seqNo = validateSequence(sequence);
 		this.type = validatePacketType(type);
 		length = validateDataLength(dataLength);
 	}
 
-	public HidReportHeader(final byte[] frame, final int offset) throws KNXFormatException
+	HidReportHeader(final byte[] frame, final int offset) throws KNXFormatException
 	{
 		if (frame.length - offset < headerSize)
 			throw new KNXFormatException("frame to short to fit HID report header");

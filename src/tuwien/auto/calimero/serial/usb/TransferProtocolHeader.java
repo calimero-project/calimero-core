@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015 B. Malinowsky
+    Copyright (c) 2015, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ public final class TransferProtocolHeader
 
 		final int id;
 
-		private Protocol(final int id) { this.id = id; }
+		Protocol(final int id) { this.id = id; }
 		int id() { return id; }
 	}
 
