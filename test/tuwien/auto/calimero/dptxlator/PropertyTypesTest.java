@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -77,11 +77,11 @@ public class PropertyTypesTest extends TestCase
 		m.remove(new Integer(1000));
 		for (final Iterator<Integer> i = m.keySet().iterator(); i.hasNext();) {
 			final Integer type = i.next();
-			System.out.println(type);
+			System.out.println("PDT " + type);
 		}
 		for (final Iterator<DPTID> i = m.values().iterator(); i.hasNext();) {
 			final DPTID type = i.next();
-			System.out.println(type.getMainNumber() + ", " + type.getDPT());
+			System.out.println("main, dpt: " + type.getMainNumber() + ", " + type.getDPT());
 		}
 	}
 
