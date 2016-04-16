@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ package tuwien.auto.calimero.knxnetip.servicetype;
 /**
  * Contains KNXnet/IP error codes for all supported service types.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public final class ErrorCodes
@@ -115,8 +115,8 @@ public final class ErrorCodes
 	 * Returns a brief description message for an error code.
 	 * <p>
 	 * For now, only common error codes are translated.<br>
-	 * On unknown error code, the string "unknown error code" is returned.
-	 * 
+	 * On unknown error code, the string "error code 0x&lt;code&gt;" is returned.
+	 *
 	 * @param code error code to lookup the description
 	 * @return string representation of error code
 	 */
@@ -133,6 +133,8 @@ public final class ErrorCodes
 			return "sequence number out of order";
 		case CONNECTION_ID:
 			return "no active data connection with that ID";
+		case NO_MORE_CONNECTIONS:
+			return "could not accept new connection (maximum reached)";
 		default:
 			return "error code 0x" + Integer.toHexString(code);
 		}
