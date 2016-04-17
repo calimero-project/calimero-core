@@ -1,0 +1,44 @@
+apply plugin:'java'
+apply plugin:'application'
+apply plugin: 'org.junit.gen5.gradle'
+
+mainClassName = 'tuwien.auto.calimero.Settings'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.junit:junit-gradle:5.0.0-ALPHA'
+    }
+}
+
+sourceSets {
+    main {
+        java.srcDir 'src'
+        resources.srcDir 'resources'
+    }
+    test.java.srcDirs 'test'
+}
+
+junit5 {
+    version '5.0.0-ALPHA'
+    runJunit4 true
+    matchClassName '.*Test'
+    excludeTag 'slow'
+    excludeTag 'ft12'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.slf4j:slf4j-api:1.7.18'
+    compile 'javax.xml.stream:stax-api:1.0-2'
+    compile 'org.usb4java:usb4java-javax:1.2.0'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.junit:junit4-runner:5.0.0-ALPHA'
+    testCompile 'org.slf4j:slf4j-simple:1.7.18'
+}
