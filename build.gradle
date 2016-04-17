@@ -1,6 +1,5 @@
 apply plugin:'java'
 apply plugin:'application'
-apply plugin: 'org.junit.gen5.gradle'
 
 mainClassName = 'tuwien.auto.calimero.Settings'
 
@@ -13,12 +12,14 @@ buildscript {
     }
 }
 
+apply plugin: 'org.junit.gen5.gradle'
+
 sourceSets {
     main {
         java.srcDir 'src'
         resources.srcDir 'resources'
     }
-    test.java.srcDirs 'test'
+    test.java.srcDirs = [ 'test' ]
 }
 
 junit5 {
@@ -40,5 +41,5 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.junit:junit4-runner:5.0.0-ALPHA'
-    testCompile 'org.slf4j:slf4j-simple:1.7.18'
+    testRuntime 'org.slf4j:slf4j-simple:1.7.18'
 }
