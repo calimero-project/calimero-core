@@ -2,7 +2,7 @@ apply plugin:'application'
 mainClassName = 'tuwien.auto.calimero.TestNetwork'
 
 run {
-	// for attaching to debugger, start with -Ddebug=true
+    // for attaching to debugger, start with -Ddebug=true
     if (System.getProperty('debug', 'false') == 'true') {
         jvmArgs '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=8000'
     }
@@ -17,6 +17,9 @@ version = '2.4-SNAPSHOT'
 repositories {        
     mavenCentral()
     mavenLocal()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
 }
 
 dependencies {
