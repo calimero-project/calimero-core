@@ -36,9 +36,12 @@
 
 package tuwien.auto.calimero;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import tuwien.auto.calimero.knxnetip.Discoverer;
 import tuwien.auto.calimero.knxnetip.Discoverer.Result;
@@ -276,11 +279,22 @@ public final class Util
 		return "test/resources/";
 	}
 
+	private static Path temp;
+
 	/**
 	 * @return the base output directory used for unit testing
 	 */
 	public static String getTargetPath()
 	{
-		return "target/";
+		if (temp == null) {
+			try {
+				temp = Files.createTempDirectory("calimero-junit-");
+				temp.toFile().deleteOnExit();
+			}
+			catch (final IOException e) {
+				throw new RuntimeException("could not create temp directory", e);
+			}
+		}
+		return temp.toString() + "/";
 	}
 }
