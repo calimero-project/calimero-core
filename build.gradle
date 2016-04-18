@@ -19,7 +19,11 @@ sourceSets {
         java.srcDir 'src'
         resources.srcDir 'resources'
     }
-    test.java.srcDirs = [ 'test' ]
+    test {
+        java.srcDirs = [ 'test' ]
+        file('build/classes/test').mkdirs()
+        runtimeClasspath = runtimeClasspath + files('build/classes/test')
+    }
 }
 
 junit5 {
