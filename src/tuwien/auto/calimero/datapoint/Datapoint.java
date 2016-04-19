@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -293,13 +293,10 @@ public abstract class Datapoint
 		w.writeEndElement();
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString()
 	{
-		return main.toString() + " " + name + ", DPT main " + mainNo + " id "
+		return main.toString() + " '" + name + "', DPT main " + mainNo + " id "
 				+ (dptId == null ? "-" : dptId) + ", " + priority.toString() + " priority";
 	}
 
