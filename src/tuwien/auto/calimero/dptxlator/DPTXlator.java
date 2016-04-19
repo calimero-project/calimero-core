@@ -250,8 +250,8 @@ public abstract class DPTXlator
 		final int size = Math.max(1, getTypeSize());
 		final int length = (data.length - offset) / size * size;
 		if (length == 0)
-			throw new KNXIllegalArgumentException("data length " + (data.length - offset)
-					+ " < required KNX data type width " + size);
+			throw new KNXIllegalArgumentException(dpt.getID() + " " + dpt.getDescription() + ": data length "
+					+ (data.length - offset) + " < required KNX data type width " + size);
 		this.data = new short[length];
 		for (int i = 0; i < length; ++i)
 			this.data[i] = ubyte(data[offset + i]);
