@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,9 +37,7 @@
 package tuwien.auto.calimero.exception;
 
 /**
- * Thrown when some value or content is not in accordance with the expected or requested
- * format or result.
- * <p>
+ * Thrown when some value or content is not in accordance with the expected or requested format or result.
  *
  * @author B. Malinowsky
  */
@@ -50,18 +48,7 @@ public class KNXFormatException extends KNXException
 	private final String item;
 
 	/**
-	 * Constructs a new <code>KNXFormatException</code> without a detail message.
-	 * <p>
-	 */
-	public KNXFormatException()
-	{
-		item = null;
-	}
-
-	/**
-	 * Constructs a new <code>KNXFormatException</code> with the specified detail
-	 * message.
-	 * <p>
+	 * Constructs a new <code>KNXFormatException</code> with the specified detail message.
 	 *
 	 * @param s the detail message
 	 */
@@ -72,26 +59,45 @@ public class KNXFormatException extends KNXException
 	}
 
 	/**
-	 * Constructs a new <code>KNXFormatException</code> with the specified detail
-	 * message and the invalid item.
-	 * <p>
+	 * Constructs a new <code>KNXFormatException</code> with the specified detail message and cause.
 	 *
 	 * @param s the detail message
-	 * @param item value, content or piece of information causing this exception (allowed
-	 *        to be <code>null</code>)
+	 * @param cause the cause in form of a throwable object, can be <code>null</code>
+	 */
+	public KNXFormatException(final String s, final Throwable cause)
+	{
+		super(s, cause);
+		this.item = null;
+	}
+
+	/**
+	 * Constructs a new <code>KNXFormatException</code> with the specified detail message and the invalid item.
+	 *
+	 * @param s the detail message
+	 * @param item value, content or piece of information causing this exception (allowed to be <code>null</code>)
 	 */
 	public KNXFormatException(final String s, final String item)
+	{
+		this(s, item, null);
+	}
+
+	/**
+	 * Constructs a new <code>KNXFormatException</code> with the specified detail message, invalid item, and cause.
+	 *
+	 * @param s the detail message
+	 * @param item value, content or piece of information causing this exception (allowed to be <code>null</code>)
+	 * @param cause the cause in form of a throwable object, can be <code>null</code>
+	 */
+	public KNXFormatException(final String s, final String item, final Throwable cause)
 	{
 		super(s + ": " + item);
 		this.item = item;
 	}
 
 	/**
-	 * Constructs a new <code>KNXFormatException</code> with the specified detail
-	 * message and the invalid item value of type int.
-	 * <p>
-	 * The <code>item</code> value is formatted into a hexadecimal string representation
-	 * using the format "0x" prefix + value (e.g. "0x23" for an item value of hexadecimal 23).
+	 * Constructs a new <code>KNXFormatException</code> with the specified detail message and the invalid item value of
+	 * type int. The <code>item</code> value is formatted into a hexadecimal string representation using the format "0x"
+	 * prefix + value (e.g. "0x23" for an item value of hexadecimal 23).
 	 *
 	 * @param s the detail message
 	 * @param item the value causing this exception
