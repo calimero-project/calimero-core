@@ -235,8 +235,6 @@ public class TransportLayerImplTest extends TestCase
 	{
 		final int indAddrRead = 0x0100;
 		final byte[] tsdu = new byte[] { (byte) (indAddrRead >> 8), (byte) indAddrRead };
-//		System.out.println("\nensure at least one programming button is pressed\n");
-//		Thread.sleep(5000);
 		tl.broadcast(false, Priority.SYSTEM, tsdu);
 		Thread.sleep(500);
 		assertFalse(ltl.broad.isEmpty());

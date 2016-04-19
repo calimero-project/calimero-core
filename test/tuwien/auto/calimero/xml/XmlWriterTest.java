@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -75,10 +75,10 @@ public class XmlWriterTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		out = new FileWriter(file);
-		w = XmlOutputFactory.newInstance().createXMLStreamWriter(out); //new DefaultXmlWriter(out);
+		w = XmlOutputFactory.newInstance().createXMLStreamWriter(out);
 		stream = new ByteArrayOutputStream();
 		final OutputStreamWriter buf = new OutputStreamWriter(stream);
-		w2 = XmlOutputFactory.newInstance().createXMLStreamWriter(buf); //new DefaultXmlWriter(buf);
+		w2 = XmlOutputFactory.newInstance().createXMLStreamWriter(buf);
 	}
 
 	/* (non-Javadoc)

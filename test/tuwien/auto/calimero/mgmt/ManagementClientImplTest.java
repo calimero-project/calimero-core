@@ -441,8 +441,6 @@ public class ManagementClientImplTest extends TestCase
 	public final void testWriteAddressIndividualAddress() throws InterruptedException,
 		KNXException
 	{
-//		System.out.println("put device into prog mode for write address...");
-//		Thread.sleep(5000);
 		final IndividualAddress[] orig = mc.readAddress(true);
 
 		assertEquals(1, orig.length);
@@ -458,8 +456,6 @@ public class ManagementClientImplTest extends TestCase
 		Thread.sleep(50);
 		// test for original address
 		assertEquals(orig[0], mc.readAddress(true)[0]);
-//		System.out.println("turn prog mode off...");
-//		Thread.sleep(5000);
 	}
 
 	/**
