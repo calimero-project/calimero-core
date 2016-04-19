@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -98,20 +98,9 @@ public class DPTXlator3BitControlledTest extends TestCase
 		t8 = new DPTXlator3BitControlled(blind);
 	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
-	{
-		Thread.sleep(100);
-		Util.tearDownLogging();
-		super.tearDown();
-	}
-
 	/**
 	 * Test method for {@link DPTXlator3BitControlled#DPTXlator3BitControlled(DPT)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testDPTXlator3BitControlled() throws KNXFormatException
@@ -123,7 +112,7 @@ public class DPTXlator3BitControlledTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled#setValues(java.lang.String[])}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValues() throws KNXFormatException
@@ -168,7 +157,7 @@ public class DPTXlator3BitControlledTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled#setValue
 	 * (java.lang.String)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValueString() throws KNXFormatException
@@ -186,7 +175,7 @@ public class DPTXlator3BitControlledTest extends TestCase
 		assertEquals(s, t7.getValue());
 
 		t8.setValue(blindValueBr);
-		
+
 		// check tolerant whitespace behavior
 		t7.setValue(" " + dim.getUpperValue() + "    " + 7);
 		t7.setValue("\t" + dim.getUpperValue() + "\t" + 3 + "\t");
@@ -287,7 +276,7 @@ public class DPTXlator3BitControlledTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled#getControlBit()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testGetControlBit() throws KNXFormatException
@@ -304,7 +293,7 @@ public class DPTXlator3BitControlledTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled#setControlBit(boolean)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetControlBit() throws KNXFormatException
@@ -329,7 +318,7 @@ public class DPTXlator3BitControlledTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled#getStepCode()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testGetStepCode() throws KNXFormatException
@@ -391,7 +380,7 @@ public class DPTXlator3BitControlledTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled#setStepCode(int)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetStepCode() throws KNXFormatException
@@ -422,7 +411,7 @@ public class DPTXlator3BitControlledTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#getValue()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testGetValue() throws KNXFormatException

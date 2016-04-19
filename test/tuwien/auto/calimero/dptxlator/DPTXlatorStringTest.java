@@ -106,17 +106,6 @@ public class DPTXlatorStringTest extends TestCase
 			data[i] = data2[i - 28];
 	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
-	{
-		Thread.sleep(100);
-		Util.tearDownLogging();
-		super.tearDown();
-	}
-
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorString#setValues(java.lang.String[])}.

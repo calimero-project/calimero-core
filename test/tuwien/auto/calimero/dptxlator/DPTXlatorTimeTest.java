@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,10 +40,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import junit.framework.TestCase;
-
 import org.junit.Assert;
 
+import junit.framework.TestCase;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Util;
@@ -82,16 +81,6 @@ public class DPTXlatorTimeTest extends TestCase
 		t = new DPTXlatorTime(DPTXlatorTime.DPT_TIMEOFDAY);
 		// reset to default to not interfere with tests
 		DPTXlatorTime.useValueFormat(null);
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
-	{
-		Util.tearDownLogging();
-		super.tearDown();
 	}
 
 	/**

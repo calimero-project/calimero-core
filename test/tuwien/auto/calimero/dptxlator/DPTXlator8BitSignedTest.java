@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015 B. Malinowsky
+    Copyright (c) 2015, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -89,16 +89,6 @@ public class DPTXlator8BitSignedTest extends TestCase
 		Util.setupLogging("DPTXlator");
 		TranslatorTypes.createTranslator(0, "6.001");
 		t = new DPTXlator8BitSigned(dpts[1]);
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	protected void tearDown() throws Exception
-	{
-		Thread.sleep(100);
-		Util.tearDownLogging();
-		super.tearDown();
 	}
 
 	/**

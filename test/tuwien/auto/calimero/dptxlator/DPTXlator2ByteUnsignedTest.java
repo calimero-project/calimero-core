@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -96,21 +96,10 @@ public class DPTXlator2ByteUnsignedTest extends TestCase
 		t = new DPTXlator2ByteUnsigned(dpts[0]);
 	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
-	{
-		Thread.sleep(100);
-		Util.tearDownLogging();
-		super.tearDown();
-	}
-
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned#setValues(java.lang.String[])}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValues() throws KNXFormatException
@@ -134,7 +123,7 @@ public class DPTXlator2ByteUnsignedTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned#getAllValues()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testGetAllValues() throws KNXFormatException
@@ -156,7 +145,7 @@ public class DPTXlator2ByteUnsignedTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned#setValue(java.lang.String)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValueString() throws KNXFormatException
@@ -172,7 +161,7 @@ public class DPTXlator2ByteUnsignedTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned#getValue()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testGetValue() throws KNXFormatException
@@ -219,7 +208,7 @@ public class DPTXlator2ByteUnsignedTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned#getData(byte[], int)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testGetDataByteArrayInt() throws KNXFormatException
@@ -263,7 +252,7 @@ public class DPTXlator2ByteUnsignedTest extends TestCase
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned#DPTXlator2ByteUnsigned
 	 * (tuwien.auto.calimero.dptxlator.DPT)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testDPTXlator2ByteUnsignedDPT() throws KNXFormatException
@@ -289,7 +278,7 @@ public class DPTXlator2ByteUnsignedTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned#getValueUnsigned()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testGetValueUnsigned() throws KNXFormatException
@@ -314,7 +303,7 @@ public class DPTXlator2ByteUnsignedTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned#setValue(int)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetValueInt() throws KNXFormatException
@@ -355,7 +344,7 @@ public class DPTXlator2ByteUnsignedTest extends TestCase
 	/**
 	 * Test method for
 	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned#setTimePeriod(long)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public final void testSetTimePeriod() throws KNXFormatException
