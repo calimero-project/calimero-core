@@ -477,7 +477,7 @@ public abstract class DPTXlator
 		final Exception cause)
 	{
 		final String s = dpt.getID() + " " + dpt.getDescription() + ": " + msg;
-		return new KNXFormatException(s, item);
+		return new KNXFormatException(s, item, cause);
 	}
 
 	final KNXFormatException newException(final String msg, final String item)
