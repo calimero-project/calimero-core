@@ -209,7 +209,7 @@ public class KNXnetIPRouterTest
 		newRouter();
 		System.out.println("waiting for some incoming frames...");
 		try {
-			Thread.sleep(30000);
+			Thread.sleep(10 * 1000);
 		}
 		catch (final InterruptedException e) {}
 	}

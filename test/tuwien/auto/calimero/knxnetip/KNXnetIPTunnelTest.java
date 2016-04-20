@@ -320,7 +320,7 @@ public class KNXnetIPTunnelTest
 		newTunnel();
 		System.out.println("Tunnel: waiting for some incoming frames...");
 		try {
-			Thread.sleep(30 * 1000);
+			Thread.sleep(10 * 1000);
 		}
 		catch (final InterruptedException e) {}
 	}
@@ -331,7 +331,7 @@ public class KNXnetIPTunnelTest
 		newMonitor();
 		System.out.println("Monitor: waiting for some incoming frames...");
 		try {
-			Thread.sleep(30 * 1000);
+			Thread.sleep(10 * 1000);
 		}
 		catch (final InterruptedException e) {}
 	}
