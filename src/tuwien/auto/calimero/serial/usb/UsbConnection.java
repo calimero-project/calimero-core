@@ -697,7 +697,7 @@ public class UsbConnection implements AutoCloseable
 			logger.warn("close connection", e);
 		}
 		finally {
-			removeClaimedInterfaceNumberOnWindows(knxUsbIf);
+			removeClaimedInterfaceNumberOnWindows();
 		}
 		listeners.fire(l -> l.connectionClosed(new CloseEvent(this, initiator, reason)));
 	}
@@ -705,7 +705,7 @@ public class UsbConnection implements AutoCloseable
 	// Workaround for usb4java-javax on Windows platforms to always remove the interface number of our USB interface.
 	// AbstractDevice does not do that in case libusb returns with an error code from releaseInterface().
 	// Subsequent claims of that interface then always fail.
-	private void removeClaimedInterfaceNumberOnWindows(final UsbInterface knxUsbIf)
+	private void removeClaimedInterfaceNumberOnWindows()
 	{
 		final String os = System.getProperty("os.name", "unknown").toLowerCase();
 		if (!os.contains("win"))
