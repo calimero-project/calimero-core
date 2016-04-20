@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,12 +36,20 @@
 
 package tuwien.auto.calimero.link;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.net.InetSocketAddress;
 
-import org.junit.experimental.categories.Category;
+import org.junit.gen5.api.AfterEach;
+import org.junit.gen5.api.BeforeEach;
+import org.junit.gen5.api.Test;
 
-import category.RequireKnxnetIP;
-import junit.framework.TestCase;
+import tag.KnxnetIP;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.IndividualAddress;
@@ -50,6 +58,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.cemi.CEMIBusMon;
 import tuwien.auto.calimero.knxnetip.Debug;
+import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.link.medium.PLSettings;
 import tuwien.auto.calimero.link.medium.RawFrame;
 import tuwien.auto.calimero.link.medium.TPSettings;
@@ -57,8 +66,8 @@ import tuwien.auto.calimero.link.medium.TPSettings;
 /**
  * @author B. Malinowsky
  */
-@Category(RequireKnxnetIP.class)
-public class KNXNetworkMonitorIPTest extends TestCase
+@KnxnetIP
+public class KNXNetworkMonitorIPTest
 {
 	private KNXNetworkMonitor mon;
 	private MonListener lmon;
@@ -69,10 +78,6 @@ public class KNXNetworkMonitorIPTest extends TestCase
 		volatile boolean closed;
 		volatile RawFrame raw;
 
-		/* (non-Javadoc)
-		 * @see tuwien.auto.calimero.link.event.LinkListener#indication
-		 * (tuwien.auto.calimero.FrameEvent)
-		 */
 		@Override
 		public void indication(final FrameEvent e)
 		{
@@ -88,10 +93,6 @@ public class KNXNetworkMonitorIPTest extends TestCase
 				Debug.printTP1Frame(lmon.raw);
 		}
 
-		/* (non-Javadoc)
-		 * @see tuwien.auto.calimero.link.event.LinkListener#linkClosed
-		 * (tuwien.auto.calimero.CloseEvent)
-		 */
 		@Override
 		public void linkClosed(final CloseEvent e)
 		{
@@ -103,57 +104,36 @@ public class KNXNetworkMonitorIPTest extends TestCase
 		}
 	}
 
-	/**
-	 * @param name name of test case
-	 */
-	public KNXNetworkMonitorIPTest(final String name)
+	@BeforeEach
+	void init() throws Exception
 	{
-		super(name);
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-		Util.setupLogging();
-
-		mon = new KNXNetworkMonitorIP(Util.getLocalHost(), Util.getServer(), false,
-			TPSettings.TP1);
+		mon = new KNXNetworkMonitorIP(Util.getLocalHost(), Util.getServer(), false, TPSettings.TP1);
 		lmon = new MonListener();
 		mon.addMonitorListener(lmon);
 	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
+	@AfterEach
+	void tearDown() throws Exception
 	{
 		if (mon != null)
 			mon.close();
-
-		Util.tearDownLogging();
-		super.tearDown();
 	}
 
 	/**
 	 * Test method for
-	 * {@link tuwien.auto.calimero.link.KNXNetworkMonitorIP#KNXNetworkMonitorIP
-	 * (java.net.InetSocketAddress, java.net.InetSocketAddress, boolean,
-	 * tuwien.auto.calimero.link.medium.KNXMediumSettings)}.
+	 * {@link KNXNetworkMonitorIP#KNXNetworkMonitorIP(InetSocketAddress, InetSocketAddress, boolean, KNXMediumSettings)}
+	 * .
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testKNXNetworkMonitorIP() throws KNXException, InterruptedException
 	{
 		if (mon != null)
 			mon.close();
-		try (final KNXNetworkMonitor m = new KNXNetworkMonitorIP(new InetSocketAddress(0),
-				Util.getServer(), false, TPSettings.TP1)) {
+		try (final KNXNetworkMonitor m = new KNXNetworkMonitorIP(new InetSocketAddress(0), Util.getServer(), false,
+				TPSettings.TP1)) {
 			fail("wildcard no supported");
 		}
 		catch (final KNXIllegalArgumentException e) {}
@@ -161,9 +141,9 @@ public class KNXNetworkMonitorIPTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.link.KNXNetworkMonitorIP#setKNXMedium
-	 * (tuwien.auto.calimero.link.medium.KNXMediumSettings)}.
+	 * Test method for {@link KNXNetworkMonitorIP#setKNXMedium(KNXMediumSettings)}.
 	 */
+	@Test
 	public final void testSetKNXMedium()
 	{
 		try {
@@ -188,10 +168,11 @@ public class KNXNetworkMonitorIPTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.link.KNXNetworkMonitorIP#close()}.
+	 * Test method for {@link KNXNetworkMonitorIP#close()}.
 	 *
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testClose() throws InterruptedException
 	{
 		assertTrue(mon.isOpen());
@@ -204,11 +185,11 @@ public class KNXNetworkMonitorIPTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.link.KNXNetworkMonitorIP#setDecodeRawFrames (boolean)}.
+	 * Test method for {@link KNXNetworkMonitorIP#setDecodeRawFrames(boolean)}.
 	 *
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testSetDecodeRawFrames() throws InterruptedException
 	{
 		mon.setDecodeRawFrames(true);
@@ -223,10 +204,11 @@ public class KNXNetworkMonitorIPTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.link.KNXNetworkMonitorIP#getName ()}.
+	 * Test method for {@link KNXNetworkMonitorIP#getName()}.
 	 *
 	 * @throws KNXException
 	 */
+	@Test
 	public final void testGetName() throws KNXException
 	{
 		String n = mon.getName();

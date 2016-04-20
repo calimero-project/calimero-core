@@ -36,12 +36,18 @@
 
 package tuwien.auto.calimero.mgmt;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.junit.experimental.categories.Category;
+import org.junit.gen5.api.AfterEach;
+import org.junit.gen5.api.BeforeEach;
+import org.junit.gen5.api.Test;
 
-import category.RequireKnxnetIP;
-import junit.framework.TestCase;
+import tag.KnxnetIP;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
@@ -57,8 +63,8 @@ import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
 /**
  * @author B. Malinowsky
  */
-@Category(RequireKnxnetIP.class)
-public class PropertyClientTest extends TestCase
+@KnxnetIP
+public class PropertyClientTest
 {
 	private static final String PIDResource = Util.getPath() + "properties.xml";
 
@@ -87,27 +93,12 @@ public class PropertyClientTest extends TestCase
 
 	}
 
-	/**
-	 * @param name name for test case
-	 */
-	public PropertyClientTest(final String name)
+	@BeforeEach
+	void init() throws Exception
 	{
-		super(name);
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
 		remote = Util.getKnxDeviceCO();
 		try {
-			Util.setupLogging();
-
-			lnk = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, null, Util.getServer(),
-				false, TPSettings.TP1);
+			lnk = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, null, Util.getServer(), false, TPSettings.TP1);
 			remAdpt = new RemotePropertyServiceAdapter(lnk, remote, null, true);
 			rem = new PropertyClient(remAdpt);
 			ll = new PropertyListenerImpl();
@@ -123,11 +114,8 @@ public class PropertyClientTest extends TestCase
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
+	@AfterEach
+	void tearDown() throws Exception
 	{
 		if (rem != null)
 			rem.close();
@@ -135,9 +123,6 @@ public class PropertyClientTest extends TestCase
 			local.close();
 		if (lnk != null)
 			lnk.close();
-
-		Util.tearDownLogging();
-		super.tearDown();
 	}
 
 	/**
@@ -146,6 +131,7 @@ public class PropertyClientTest extends TestCase
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testPropertyClient() throws KNXException, InterruptedException
 	{
 		rem.close();
@@ -154,8 +140,7 @@ public class PropertyClientTest extends TestCase
 		remAdpt.close();
 		remAdpt = null;
 		try {
-			final byte[] key = new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff,
-				(byte) 0xff };
+			final byte[] key = new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff };
 			remAdpt = new RemotePropertyServiceAdapter(lnk, remote, null, key);
 		}
 		catch (final KNXTimeoutException e) {
@@ -175,8 +160,9 @@ public class PropertyClientTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#getObjectTypeName(int)}.
+	 * Test method for {@link PropertyClient#getObjectTypeName(int)}.
 	 */
+	@Test
 	public final void testGetObjectTypeName()
 	{
 		for (int i = 0; i < 20; ++i) {
@@ -190,11 +176,12 @@ public class PropertyClientTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#close()}.
+	 * Test method for {@link PropertyClient#close()}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testClose() throws KNXException, InterruptedException
 	{
 		rem.close();
@@ -213,34 +200,36 @@ public class PropertyClientTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#getDescription(int, int)}.
+	 * Test method for {@link PropertyClient#getDescription(int, int)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testLocalGetDescription() throws KNXException, InterruptedException
 	{
 		printDesc(local.getDescription(0, PID.SERIAL_NUMBER));
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#getDescription(int, int)}.
+	 * Test method for {@link PropertyClient#getDescription(int, int)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testRemoteGetDescription() throws KNXException, InterruptedException
 	{
 		printDesc(rem.getDescription(0, PID.SERIAL_NUMBER));
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#getDescriptionByIndex(int, int)}.
+	 * Test method for {@link PropertyClient#getDescriptionByIndex(int, int)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testGetDescriptionByIndex() throws KNXException, InterruptedException
 	{
 		Description d, d2;
@@ -259,11 +248,12 @@ public class PropertyClientTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#getProperty(int, int)}.
+	 * Test method for {@link PropertyClient#getProperty(int, int)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testGetPropertyIntInt() throws KNXException, InterruptedException
 	{
 		String s = rem.getProperty(0, 56);
@@ -277,12 +267,12 @@ public class PropertyClientTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#getProperty(int, int, int, int)}.
+	 * Test method for {@link PropertyClient#getProperty(int, int, int, int)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testGetPropertyIntIntIntInt() throws KNXException, InterruptedException
 	{
 		Util.out("OT 0 PID 56", rem.getProperty(0, 56, 1, 1));
@@ -290,29 +280,27 @@ public class PropertyClientTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#getPropertyTranslated
-	 * (int, int, int, int)}.
+	 * Test method for {@link PropertyClient#getPropertyTranslated(int, int, int, int)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testGetPropertyTranslated() throws KNXException, InterruptedException
 	{
-		final DPTXlator2ByteUnsigned t = (DPTXlator2ByteUnsigned) rem.getPropertyTranslated(0, 56,
-				1, 1);
+		final DPTXlator2ByteUnsigned t = (DPTXlator2ByteUnsigned) rem.getPropertyTranslated(0, 56, 1, 1);
 		assertEquals(15, t.getValueUnsigned());
-		final DPTXlator2ByteUnsigned t2 = (DPTXlator2ByteUnsigned) local.getPropertyTranslated(0,
-				56, 1, 1);
+		final DPTXlator2ByteUnsigned t2 = (DPTXlator2ByteUnsigned) local.getPropertyTranslated(0, 56, 1, 1);
 		assertTrue(15 == t2.getValueUnsigned() || 254 == t2.getValueUnsigned());
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#scanProperties(boolean,
-	 * java.util.function.Consumer)}.
+	 * Test method for {@link PropertyClient#scanProperties(boolean, java.util.function.Consumer)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testScanPropertiesBooleanConsumer() throws KNXException, InterruptedException
 	{
 		final AtomicBoolean i = new AtomicBoolean();
@@ -324,14 +312,13 @@ public class PropertyClientTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.PropertyClient#scanProperties(int, boolean,
-	 * java.util.function.Consumer)}.
+	 * Test method for {@link PropertyClient#scanProperties(int, boolean, java.util.function.Consumer)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
-	public final void testScanPropertiesIntegerBooleanConsumer()
-		throws KNXException, InterruptedException
+	@Test
+	public final void testScanPropertiesIntegerBooleanConsumer() throws KNXException, InterruptedException
 	{
 		final AtomicBoolean i = new AtomicBoolean();
 		final AtomicBoolean k = new AtomicBoolean();
@@ -342,14 +329,13 @@ public class PropertyClientTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#setProperty(int, int, int, int, byte[])}.
+	 * Test method for {@link PropertyClient#setProperty(int, int, int, int, byte[])}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
-	public final void testSetPropertyIntIntIntIntByteArray() throws KNXException,
-		InterruptedException
+	@Test
+	public final void testSetPropertyIntIntIntIntByteArray() throws KNXException, InterruptedException
 	{
 		// set routing count to
 		final byte[] cnt = rem.getProperty(0, 51, 1, 1);
@@ -362,12 +348,12 @@ public class PropertyClientTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.PropertyClient#setProperty(int, int, int, java.lang.String)}.
+	 * Test method for {@link PropertyClient#setProperty(int, int, int, java.lang.String)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testSetPropertyIntIntIntString() throws KNXException, InterruptedException
 	{
 		// set routing count to

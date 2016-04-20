@@ -36,10 +36,16 @@
 
 package tuwien.auto.calimero.mgmt;
 
-import org.junit.experimental.categories.Category;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import category.RequireKnxnetIP;
-import junit.framework.TestCase;
+import org.junit.gen5.api.AfterEach;
+import org.junit.gen5.api.BeforeEach;
+import org.junit.gen5.api.Test;
+
+import tag.KnxnetIP;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DetachEvent;
 import tuwien.auto.calimero.FrameEvent;
@@ -57,8 +63,8 @@ import tuwien.auto.calimero.mgmt.Destination.State;
 /**
  * @author B. Malinowsky
  */
-@Category(RequireKnxnetIP.class)
-public class DestinationTest extends TestCase
+@KnxnetIP
+public class DestinationTest
 {
 	private KNXNetworkLink lnk;
 	private TransportLayer tl;
@@ -103,64 +109,43 @@ public class DestinationTest extends TestCase
 		{}
 	};
 
-	/**
-	 * @param name name for test case
-	 */
-	public DestinationTest(final String name)
+	@BeforeEach
+	void init() throws Exception
 	{
-		super(name);
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-		Util.setupLogging();
-
-		lnk = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, null, Util.getServer(), false,
-				TPSettings.TP1);
+		lnk = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, null, Util.getServer(), false, TPSettings.TP1);
 		tl = new TransportLayerImpl(lnk);
 		dst = tl.createDestination(new IndividualAddress("2.2.2"), true, false, false);
 		tll = new TLListener();
 		tl.addTransportListener(tll);
 	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
+	@AfterEach
+	void tearDown() throws Exception
 	{
 		if (lnk != null)
 			lnk.close();
-
-		Util.tearDownLogging();
-		super.tearDown();
 	}
 
 	/**
 	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.Destination#Destination
-	 * (tuwien.auto.calimero.mgmt.Destination.AggregatorProxy, tuwien.auto.calimero.IndividualAddress, boolean)}.
+	 * {@link Destination#Destination(Destination.AggregatorProxy, tuwien.auto.calimero.IndividualAddress, boolean)}.
 	 *
 	 * @throws KNXFormatException
 	 */
-	public final void testDestinationAggregatorProxyIndividualAddressBoolean()
-		throws KNXFormatException
+	@Test
+	public final void testDestinationAggregatorProxyIndividualAddressBoolean() throws KNXFormatException
 	{
-		final Destination d =
-			new Destination(new Destination.AggregatorProxy(tl), new IndividualAddress(
-				"2.2.2"), true);
+		@SuppressWarnings("resource")
+		final Destination d = new Destination(new Destination.AggregatorProxy(tl), new IndividualAddress("2.2.2"),
+				true);
 		assertFalse(d.isKeepAlive());
 		assertFalse(d.isVerifyMode());
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.Destination#destroy()}.
+	 * Test method for {@link Destination#destroy()}.
 	 */
+	@Test
 	public final void testDestroy()
 	{
 		dst.destroy();
@@ -168,10 +153,11 @@ public class DestinationTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.Destination#getAddress()}.
+	 * Test method for {@link Destination#getAddress()}.
 	 *
 	 * @throws KNXFormatException
 	 */
+	@Test
 	public final void testGetAddress() throws KNXFormatException
 	{
 		assertEquals(new IndividualAddress("2.2.2"), dst.getAddress());
@@ -180,14 +166,14 @@ public class DestinationTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.Destination#getState()}.
+	 * Test method for {@link Destination#getState()}.
 	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 * @throws InterruptedException on interrupted thread
 	 */
-	public final void testGetState() throws KNXLinkClosedException, KNXTimeoutException,
-		InterruptedException
+	@Test
+	public final void testGetState() throws KNXLinkClosedException, KNXTimeoutException, InterruptedException
 	{
 		assertEquals(Destination.State.Disconnected, dst.getState());
 		assertEquals(0, tll.disconnected);
@@ -219,48 +205,54 @@ public class DestinationTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.Destination#isConnectionOriented()}.
+	 * Test method for {@link Destination#isConnectionOriented()}.
 	 *
 	 * @throws KNXFormatException
 	 */
+	@Test
 	public final void testIsConnectionOriented() throws KNXFormatException
 	{
 		assertTrue(dst.isConnectionOriented());
+		@SuppressWarnings("resource")
 		final Destination d = new Destination(new Destination.AggregatorProxy(tl), new IndividualAddress("2.2.2"),
 				false);
 		assertFalse(d.isConnectionOriented());
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.Destination#isKeepAlive()}.
+	 * Test method for {@link Destination#isKeepAlive()}.
 	 *
 	 * @throws KNXFormatException
 	 */
+	@Test
 	public final void testIsKeepAlive() throws KNXFormatException
 	{
 		assertFalse(dst.isKeepAlive());
+		@SuppressWarnings("resource")
 		final Destination d = new Destination(new Destination.AggregatorProxy(tl), new IndividualAddress("2.2.2"), true,
 				true, false);
 		assertTrue(d.isKeepAlive());
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.Destination#isVerifyMode()}.
+	 * Test method for {@link Destination#isVerifyMode()}.
 	 *
 	 * @throws KNXFormatException
 	 */
+	@Test
 	public final void testIsVerifyMode() throws KNXFormatException
 	{
 		assertFalse(dst.isVerifyMode());
+		@SuppressWarnings("resource")
 		final Destination d = new Destination(new Destination.AggregatorProxy(tl), new IndividualAddress("2.2.2"), true,
 				true, true);
 		assertTrue(d.isVerifyMode());
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.Destination#toString()}.
+	 * Test method for {@link Destination#toString()}.
 	 */
+	@Test
 	public final void testToString()
 	{
 		System.out.println(dst.toString());

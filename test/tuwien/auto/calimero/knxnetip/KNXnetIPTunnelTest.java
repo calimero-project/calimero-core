@@ -131,13 +131,11 @@ public class KNXnetIPTunnelTest
 	}
 
 	@BeforeEach
-	void setUp() throws Exception
+	void init() throws Exception
 	{
 		l = new KNXListenerImpl();
 		lnat = new KNXListenerImpl();
 		lmon = new KNXListenerImpl();
-
-		Util.setupLogging();
 
 		frame = new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0), new GroupAddress(0, 0, 1),
 				new byte[] { 0, (byte) (0x80 | 1) }, Priority.NORMAL);
@@ -158,7 +156,6 @@ public class KNXnetIPTunnelTest
 		}
 		if (mon != null)
 			mon.close();
-		Util.tearDownLogging();
 	}
 
 	/**

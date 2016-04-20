@@ -69,7 +69,7 @@ public class ManagementProceduresImplTest
 	private IndividualAddress nonexist;
 
 	@BeforeEach
-	void setUp() throws Exception
+	void init() throws Exception
 	{
 		link = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, Util.getLocalHost(), Util.getServer(), false,
 				TPSettings.TP1);
@@ -201,6 +201,7 @@ public class ManagementProceduresImplTest
 	 * @throws KNXTimeoutException
 	 */
 	@Test
+	@Slow
 	public final void testScanNetworkRouters() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		System.out.println("start scanNetworkRouters, takes a while ...");

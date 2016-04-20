@@ -36,13 +36,21 @@
 
 package tuwien.auto.calimero.mgmt;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 import java.util.Vector;
 
-import org.junit.experimental.categories.Category;
+import org.junit.gen5.api.AfterEach;
+import org.junit.gen5.api.BeforeEach;
+import org.junit.gen5.api.Test;
 
-import category.RequireKnxnetIP;
-import junit.framework.TestCase;
+import tag.KnxnetIP;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DetachEvent;
 import tuwien.auto.calimero.FrameEvent;
@@ -64,8 +72,8 @@ import tuwien.auto.calimero.link.medium.TPSettings;
 /**
  * @author B. Malinowsky
  */
-@Category(RequireKnxnetIP.class)
-public class TransportLayerImplTest extends TestCase
+@KnxnetIP
+public class TransportLayerImplTest
 {
 	private KNXNetworkLink nl;
 	private TransportLayer tl;
@@ -76,8 +84,7 @@ public class TransportLayerImplTest extends TestCase
 
 	// device descriptor read
 	private final int devDescRead = 0x300;
-	private final byte[] tsduDescRead =
-		new byte[] { (byte) (devDescRead >> 8), (byte) (devDescRead | 0) };
+	private final byte[] tsduDescRead = new byte[] { (byte) (devDescRead >> 8), (byte) (devDescRead | 0) };
 
 	private final class TLListener implements TransportListener
 	{
@@ -159,24 +166,11 @@ public class TransportLayerImplTest extends TestCase
 		}
 	};
 
-	/**
-	 * @param name name of test case
-	 */
-	public TransportLayerImplTest(final String name)
+	@BeforeEach
+	void init() throws Exception
 	{
-		super(name);
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-		Util.setupLogging();
-		nl = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, Util.getLocalHost(), Util
-			.getServer(), false, TPSettings.TP1);
+		nl = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, Util.getLocalHost(), Util.getServer(), false,
+				TPSettings.TP1);
 		tl = new TransportLayerImpl(nl);
 		ltl = new TLListener();
 		tl.addTransportListener(ltl);
@@ -184,11 +178,8 @@ public class TransportLayerImplTest extends TestCase
 		dcl = tl.createDestination(Util.getKnxDevice(), false);
 	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
+	@AfterEach
+	void tearDown() throws Exception
 	{
 		if (tl != null) {
 			tl.detach();
@@ -196,11 +187,9 @@ public class TransportLayerImplTest extends TestCase
 		nl.close();
 		dco.destroy();
 		dcl.destroy();
-
-		Util.tearDownLogging();
-		super.tearDown();
 	}
 
+	@Test
 	public final void testTransportLayerImpl()
 	{
 		nl.close();
@@ -212,10 +201,9 @@ public class TransportLayerImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.TransportLayerImpl#addTransportListener
-	 * (tuwien.auto.calimero.mgmt.TransportListener)}.
+	 * Test method for {@link TransportLayerImpl#addTransportListener(TransportListener)}.
 	 */
+	@Test
 	public final void testAddEventListener()
 	{
 		tl.addTransportListener(new TLListener());
@@ -223,15 +211,14 @@ public class TransportLayerImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.TransportLayerImpl#broadcast
-	 * (boolean, Priority, byte[])}.
+	 * Test method for {@link TransportLayerImpl#broadcast(boolean, Priority, byte[])}.
 	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 * @throws InterruptedException on interrupted thread
 	 */
-	public final void testBroadcast() throws KNXTimeoutException, KNXLinkClosedException,
-		InterruptedException
+	@Test
+	public final void testBroadcast() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		final int indAddrRead = 0x0100;
 		final byte[] tsdu = new byte[] { (byte) (indAddrRead >> 8), (byte) indAddrRead };
@@ -241,12 +228,12 @@ public class TransportLayerImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.TransportLayerImpl#connect
-	 * (tuwien.auto.calimero.mgmt.Destination)}.
+	 * Test method for {@link TransportLayerImpl#connect(Destination)}.
 	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 */
+	@Test
 	public final void testConnect() throws KNXTimeoutException, KNXLinkClosedException
 	{
 		tl.connect(dco);
@@ -255,8 +242,7 @@ public class TransportLayerImplTest extends TestCase
 		tl.connect(dcl);
 
 		final TransportLayer tl2 = new TransportLayerImpl(nl);
-		final Destination d2 =
-			tl2.createDestination(new IndividualAddress(3, 1, 1), true);
+		final Destination d2 = tl2.createDestination(new IndividualAddress(3, 1, 1), true);
 		try {
 			tl.connect(d2);
 			fail("not owning destination");
@@ -265,10 +251,9 @@ public class TransportLayerImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.TransportLayerImpl#createDestination
-	 * (tuwien.auto.calimero.IndividualAddress, boolean)}.
+	 * Test method for {@link TransportLayerImpl#createDestination(tuwien.auto.calimero.IndividualAddress, boolean)}.
 	 */
+	@Test
 	public final void testCreateDestinationIndividualAddressBoolean()
 	{
 		assertTrue(dco.isConnectionOriented());
@@ -281,9 +266,9 @@ public class TransportLayerImplTest extends TestCase
 
 	/**
 	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.TransportLayerImpl#createDestination
-	 * (tuwien.auto.calimero.IndividualAddress, boolean, boolean, boolean)}.
+	 * {@link TransportLayerImpl#createDestination(tuwien.auto.calimero.IndividualAddress, boolean, boolean, boolean)}.
 	 */
+	@Test
 	public final void testCreateDestinationIndividualAddressBooleanBooleanBoolean()
 	{
 		Destination d;
@@ -301,10 +286,11 @@ public class TransportLayerImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.TransportLayerImpl#detach()}.
+	 * Test method for {@link TransportLayerImpl#detach()}.
 	 *
 	 * @throws KNXLinkClosedException
 	 */
+	@Test
 	public final void testDetach() throws KNXLinkClosedException
 	{
 		assertFalse(ltl.detached);
@@ -326,11 +312,12 @@ public class TransportLayerImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.TransportLayerImpl#detach()}.
+	 * Test method for {@link TransportLayerImpl#detach()}.
 	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 */
+	@Test
 	public final void testDetach2() throws KNXTimeoutException, KNXLinkClosedException
 	{
 		tl.detach();
@@ -353,8 +340,9 @@ public class TransportLayerImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.TransportLayerImpl#detach()}.
+	 * Test method for {@link TransportLayerImpl#detach()}.
 	 */
+	@Test
 	public final void testDetach3()
 	{
 		nl.close();
@@ -362,12 +350,12 @@ public class TransportLayerImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.TransportLayerImpl#disconnect
-	 * (tuwien.auto.calimero.mgmt.Destination)}.
+	 * Test method for {@link TransportLayerImpl#disconnect(Destination)}.
 	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 */
+	@Test
 	public final void testDisconnect() throws KNXLinkClosedException, KNXTimeoutException
 	{
 		tl.disconnect(dco);
@@ -386,8 +374,7 @@ public class TransportLayerImplTest extends TestCase
 		tl.disconnect(dcl);
 
 		final TransportLayer tl2 = new TransportLayerImpl(nl);
-		final Destination d2 =
-			tl2.createDestination(new IndividualAddress(3, 1, 1), true);
+		final Destination d2 = tl2.createDestination(new IndividualAddress(3, 1, 1), true);
 		tl2.connect(d2);
 		try {
 			tl.disconnect(d2);
@@ -398,8 +385,9 @@ public class TransportLayerImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.TransportLayerImpl#getName()}.
+	 * Test method for {@link TransportLayerImpl#getName()}.
 	 */
+	@Test
 	public final void testGetName()
 	{
 		String n = tl.getName();
@@ -412,10 +400,9 @@ public class TransportLayerImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.TransportLayerImpl#removeTransportListener
-	 * (tuwien.auto.calimero.mgmt.TransportListener)}.
+	 * Test method for {@link TransportLayerImpl#removeTransportListener(TransportListener)}.
 	 */
+	@Test
 	public final void testRemoveEventListener()
 	{
 		tl.removeTransportListener(ltl);
@@ -425,16 +412,16 @@ public class TransportLayerImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.TransportLayerImpl#sendData
-	 * (tuwien.auto.calimero.mgmt.Destination, tuwien.auto.calimero.Priority, byte[])}.
+	 * Test method for {@link TransportLayerImpl#sendData(Destination, tuwien.auto.calimero.Priority, byte[])}.
 	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 * @throws KNXDisconnectException
 	 * @throws InterruptedException on interrupted thread
 	 */
-	public final void testSendDataDestinationPriorityByteArray() throws KNXDisconnectException,
-		KNXTimeoutException, KNXLinkClosedException, InterruptedException
+	@Test
+	public final void testSendDataDestinationPriorityByteArray()
+		throws KNXDisconnectException, KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		try {
 			tl.sendData(dco, p, tsduDescRead);
@@ -469,14 +456,15 @@ public class TransportLayerImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.TransportLayerImpl#sendData
-	 * 	(tuwien.auto.calimero.mgmt.Destination, tuwien.auto.calimero.Priority, byte[])}.
+	 * Test method for {@link TransportLayerImpl#sendData(Destination, tuwien.auto.calimero.Priority, byte[])}.
+	 *
 	 * @throws KNXTimeoutException
 	 * @throws KNXLinkClosedException
 	 * @throws InterruptedException on interrupted thread
 	 */
-	public void testSendDataNonExistingAddress() throws KNXTimeoutException,
-		KNXLinkClosedException, InterruptedException
+	@Test
+	public void testSendDataNonExistingAddress()
+		throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		// not existing device address
 		final Destination dunknown = tl.createDestination(Util.getNonExistingKnxDevice(), true);
@@ -491,14 +479,13 @@ public class TransportLayerImplTest extends TestCase
 		assertTrue(ltl.conn.size() == 0);
 	}
 
-	public void testSendDataDetach() throws KNXTimeoutException, KNXLinkClosedException,
-		InterruptedException
+	@Test
+	public void testSendDataDetach() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		// do a detach while waiting for L4 ack
 		tl.connect(dco);
 		try {
-			final Thread detacher = new Thread()
-			{
+			final Thread detacher = new Thread() {
 				@Override
 				public void run()
 				{
@@ -533,8 +520,9 @@ public class TransportLayerImplTest extends TestCase
 	 * @throws KNXDisconnectException
 	 * @throws InterruptedException on interrupted thread
 	 */
-	public void testSendDataLinkClose() throws KNXTimeoutException,
-		KNXLinkClosedException, KNXDisconnectException, InterruptedException
+	@Test
+	public void testSendDataLinkClose()
+		throws KNXTimeoutException, KNXLinkClosedException, KNXDisconnectException, InterruptedException
 	{
 		// do a link closed while waiting for L4 response
 		tl.connect(dco);
@@ -544,15 +532,16 @@ public class TransportLayerImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.TransportLayerImpl#sendData
-	 * (tuwien.auto.calimero.KNXAddress, tuwien.auto.calimero.Priority, byte[])}.
+	 * Test method for
+	 * {@link TransportLayerImpl#sendData(tuwien.auto.calimero.KNXAddress, tuwien.auto.calimero.Priority, byte[])}.
 	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 * @throws InterruptedException on interrupted thread
 	 */
-	public final void testSendDataKNXAddressPriorityByteArray() throws KNXTimeoutException,
-		KNXLinkClosedException, InterruptedException
+	@Test
+	public final void testSendDataKNXAddressPriorityByteArray()
+		throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		final int propRead = 0x03D5;
 		// read pid max_apdu_length

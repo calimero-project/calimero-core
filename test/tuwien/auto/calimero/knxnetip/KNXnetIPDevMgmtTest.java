@@ -113,12 +113,9 @@ public class KNXnetIPDevMgmtTest
 	}
 
 	@BeforeEach
-	void setUp() throws Exception
+	void init() throws Exception
 	{
 		l = new KNXListenerImpl();
-
-		Util.setupLogging();
-
 		// pid 52 = individual address
 		frame = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, 11, 1, 52, 1, 1);
 		// pid 57 = current ip address
@@ -131,7 +128,6 @@ public class KNXnetIPDevMgmtTest
 		if (m != null) {
 			m.close();
 		}
-		Util.tearDownLogging();
 	}
 
 	/**

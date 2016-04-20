@@ -36,12 +36,19 @@
 
 package tuwien.auto.calimero.buffer;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Date;
 
-import org.junit.experimental.categories.Category;
+import org.junit.gen5.api.AfterEach;
+import org.junit.gen5.api.BeforeEach;
+import org.junit.gen5.api.Test;
 
-import category.RequireKnxnetIP;
-import junit.framework.TestCase;
+import tag.KnxnetIP;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalStateException;
@@ -60,50 +67,31 @@ import tuwien.auto.calimero.process.ProcessCommunicatorImpl;
 /**
  * @author B. Malinowsky
  */
-@Category(RequireKnxnetIP.class)
-public class NetworkBufferTest extends TestCase
+@KnxnetIP
+public class NetworkBufferTest
 {
 	private KNXNetworkLink lnk;
 	private NetworkBuffer buffer;
 
-	/**
-	 * @param name name of test case
-	 */
-	public NetworkBufferTest(final String name)
+	@BeforeEach
+	void init() throws Exception
 	{
-		super(name);
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-		lnk = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, null, Util.getServer(),
-			false, TPSettings.TP1);
-		Util.setupLogging();
+		lnk = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, null, Util.getServer(), false, TPSettings.TP1);
 		buffer = NetworkBuffer.createBuffer("test");
 	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
+	@AfterEach
+	void tearDown() throws Exception
 	{
 		if (lnk != null)
 			lnk.close();
 		buffer.destroy();
-		Util.tearDownLogging();
-		super.tearDown();
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.NetworkBuffer#createBuffer(java.lang.String)}.
+	 * Test method for {@link NetworkBuffer#createBuffer(java.lang.String)}.
 	 */
+	@Test
 	public final void testCreateBuffer()
 	{
 		final String id = "testInstallation";
@@ -112,9 +100,9 @@ public class NetworkBufferTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.buffer.NetworkBuffer#addConfiguration(
-	 * tuwien.auto.calimero.link.KNXNetworkLink)}.
+	 * Test method for {@link NetworkBuffer#addConfiguration(tuwien.auto.calimero.link.KNXNetworkLink)}.
 	 */
+	@Test
 	public final void testCreateConfigurationKNXNetworkLink()
 	{
 		final NetworkBuffer b = NetworkBuffer.createBuffer(null);
@@ -122,9 +110,9 @@ public class NetworkBufferTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.buffer.NetworkBuffer#getConfiguration(
-	 * tuwien.auto.calimero.link.KNXNetworkLink)}.
+	 * Test method for {@link NetworkBuffer#getConfiguration(tuwien.auto.calimero.link.KNXNetworkLink)}.
 	 */
+	@Test
 	public final void testGetConfiguration()
 	{
 		final Configuration c = buffer.addConfiguration(lnk);
@@ -133,9 +121,9 @@ public class NetworkBufferTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.buffer.NetworkBuffer#removeConfiguration(
-	 * tuwien.auto.calimero.buffer.Configuration)}.
+	 * Test method for {@link NetworkBuffer#removeConfiguration(Configuration)}.
 	 */
+	@Test
 	public final void testRemoveConfigurationConfiguration()
 	{
 		final Configuration c = buffer.addConfiguration(lnk);
@@ -150,6 +138,7 @@ public class NetworkBufferTest extends TestCase
 	 * @throws InterruptedException on interrupted thread
 	 * @throws KNXException
 	 */
+	@Test
 	public final void testStateBasedBuffering() throws InterruptedException, KNXException
 	{
 		final GroupAddress group1 = new GroupAddress(1, 0, 1);
@@ -159,6 +148,7 @@ public class NetworkBufferTest extends TestCase
 		final StateFilter f = new StateFilter();
 		c.setFilter(f, f);
 		c.activate(true);
+		@SuppressWarnings("resource")
 		final ProcessCommunicator pc = new ProcessCommunicatorImpl(c.getBufferedLink());
 
 		// buffered write, check of buffer
@@ -171,6 +161,7 @@ public class NetworkBufferTest extends TestCase
 		assertFalse(pc.readBool(group2));
 
 		final boolean b1 = pc.readBool(group1);
+		@SuppressWarnings("resource")
 		final ProcessCommunicator pc2 = new ProcessCommunicatorImpl(lnk);
 		final boolean b2 = pc2.readBool(group1);
 		assertEquals(b1, b2);
@@ -206,8 +197,8 @@ public class NetworkBufferTest extends TestCase
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
-	public final void testInvalidationUpdating() throws KNXException,
-		InterruptedException
+	@Test
+	public final void testInvalidationUpdating() throws KNXException, InterruptedException
 	{
 		final GroupAddress group1 = new GroupAddress(1, 0, 1);
 		final GroupAddress group2 = new GroupAddress(1, 0, 11);
@@ -231,13 +222,14 @@ public class NetworkBufferTest extends TestCase
 		init.write(dp, "off");
 		init.write(dp2, "on");
 		init.write(dp3, "on");
-		init.detach();
+		init.close();
 
 		c.activate(true);
 
 		// dp gets invalidated by group2, updated by group3
 		// a write updates and invalidates, read.res only updates
 
+		@SuppressWarnings("resource")
 		final ProcessCommunicator pc = new ProcessCommunicatorImpl(c.getBufferedLink());
 		final String s1 = pc.read(dp);
 		Thread.sleep(50);
@@ -276,8 +268,8 @@ public class NetworkBufferTest extends TestCase
 	 * @throws InterruptedException on interrupted thread
 	 * @throws KNXException
 	 */
-	public final void testCommandBasedBuffering() throws InterruptedException,
-		KNXException
+	@Test
+	public final void testCommandBasedBuffering() throws InterruptedException, KNXException
 	{
 		final GroupAddress group1 = new GroupAddress(1, 0, 1);
 		final GroupAddress group2 = new GroupAddress(1, 0, 11);
@@ -285,6 +277,7 @@ public class NetworkBufferTest extends TestCase
 		final CommandFilter f = new CommandFilter();
 		c.setFilter(f, f);
 		c.activate(true);
+		@SuppressWarnings("resource")
 		final ProcessCommunicator pc = new ProcessCommunicatorImpl(c.getBufferedLink());
 
 		// buffered write, check of buffer
@@ -302,7 +295,7 @@ public class NetworkBufferTest extends TestCase
 		final QueueItem qi2 = f.getNextIndication();
 		Debug.printLData(qi2.getFrame());
 		System.out.println(new Date(qi2.getTimestamp()));
-		assertTrue(qi.getTimestamp() < (qi2.getTimestamp() - 700));
+		assertTrue(qi.getTimestamp() + ", " + qi2.getTimestamp(), qi.getTimestamp() < (qi2.getTimestamp() - 700));
 
 		assertFalse(f.hasNewIndication());
 
@@ -321,6 +314,7 @@ public class NetworkBufferTest extends TestCase
 		final ListenerImpl listener = new ListenerImpl();
 		f.setQueueListener(listener);
 
+		@SuppressWarnings("resource")
 		final ProcessCommunicator pc2 = new ProcessCommunicatorImpl(lnk);
 		pc2.readBool(group1);
 		Thread.sleep(50);
@@ -354,6 +348,7 @@ public class NetworkBufferTest extends TestCase
 	 * @throws InterruptedException on interrupted thread
 	 * @throws KNXException
 	 */
+	@Test
 	public final void testQueryBufferOnly() throws InterruptedException, KNXException
 	{
 		final GroupAddress group1 = new GroupAddress(1, 0, 1);
@@ -363,6 +358,7 @@ public class NetworkBufferTest extends TestCase
 		c.setFilter(f, f);
 		c.setQueryBufferOnly(true);
 		c.activate(true);
+		@SuppressWarnings("resource")
 		final ProcessCommunicator pc = new ProcessCommunicatorImpl(c.getBufferedLink());
 
 		// buffered write, check of buffer
@@ -379,6 +375,7 @@ public class NetworkBufferTest extends TestCase
 			fail("there should be no " + group1 + " value in the buffer");
 		}
 		catch (final KNXTimeoutException e) {}
+		@SuppressWarnings("resource")
 		final ProcessCommunicator pc2 = new ProcessCommunicatorImpl(lnk);
 		/*final boolean b2 =*/ pc2.readBool(group1);
 		pc.write(group2, true);

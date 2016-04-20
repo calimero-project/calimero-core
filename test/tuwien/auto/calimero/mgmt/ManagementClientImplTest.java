@@ -36,13 +36,19 @@
 
 package tuwien.auto.calimero.mgmt;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.experimental.categories.Category;
+import org.junit.gen5.api.AfterEach;
+import org.junit.gen5.api.BeforeEach;
+import org.junit.gen5.api.Test;
 
-import category.RequireKnxnetIP;
-import junit.framework.TestCase;
+import tag.KnxnetIP;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
@@ -60,59 +66,37 @@ import tuwien.auto.calimero.link.medium.TPSettings;
 /**
  * @author B. Malinowsky
  */
-@Category(RequireKnxnetIP.class)
-public class ManagementClientImplTest extends TestCase
+@KnxnetIP
+public class ManagementClientImplTest
 {
 	private KNXNetworkLink lnk;
 	private ManagementClient mc;
 	private Destination dco, dco2;
 	private Destination dcl;
 
-	/**
-	 * @param name name of test case
-	 */
-	public ManagementClientImplTest(final String name)
+	@BeforeEach
+	void init() throws Exception
 	{
-		super(name);
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-		Util.setupLogging();
-
-		lnk = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, null, Util.getServer(), false,
-				TPSettings.TP1);
+		lnk = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, null, Util.getServer(), false, TPSettings.TP1);
 		mc = new ManagementClientImpl(lnk);
-		// dco = mc.createDestination(new IndividualAddress(3, 0, 0), true);
 		dco2 = mc.createDestination(Util.getKnxDeviceCO(), true);
 		dco = dco2;
 		dcl = mc.createDestination(Util.getKnxDevice(), false);
 	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
+	@AfterEach
+	void tearDown() throws Exception
 	{
 		if (mc != null)
 			mc.detach();
 		if (lnk != null)
 			lnk.close();
-		Util.tearDownLogging();
-		super.tearDown();
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#ManagementClientImpl(
-	 * tuwien.auto.calimero.link.KNXNetworkLink)}.
+	 * Test method for {@link ManagementClientImpl#ManagementClientImpl(tuwien.auto.calimero.link.KNXNetworkLink)}.
 	 */
+	@Test
 	public final void testManagementClientImpl()
 	{
 		mc.detach();
@@ -125,12 +109,12 @@ public class ManagementClientImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#authorize
-	 * (tuwien.auto.calimero.mgmt.Destination, byte[])}.
+	 * Test method for {@link ManagementClientImpl#authorize(Destination, byte[])}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testAuthorize() throws KNXException, InterruptedException
 	{
 		try {
@@ -155,12 +139,12 @@ public class ManagementClientImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#authorize
-	 * (tuwien.auto.calimero.mgmt.Destination, byte[])}.
+	 * Test method for {@link ManagementClientImpl#authorize(Destination, byte[])}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testAuthorizeCL() throws KNXException, InterruptedException
 	{
 		try {
@@ -171,12 +155,12 @@ public class ManagementClientImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readADC
-	 * (tuwien.auto.calimero.mgmt.Destination, int, int)}.
+	 * Test method for {@link ManagementClientImpl#readADC(Destination, int, int)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testReadADC() throws KNXException, InterruptedException
 	{
 		try {
@@ -205,12 +189,12 @@ public class ManagementClientImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readADC
-	 * (tuwien.auto.calimero.mgmt.Destination, int, int)}.
+	 * Test method for {@link ManagementClientImpl#readADC(Destination, int, int)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testReadADCCL() throws KNXException, InterruptedException
 	{
 		try {
@@ -221,15 +205,14 @@ public class ManagementClientImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readAddress(boolean)}.
+	 * Test method for {@link ManagementClientImpl#readAddress(boolean)}.
 	 *
 	 * @throws InterruptedException on interrupted thread
 	 * @throws KNXException
 	 */
+	@Test
 	public final void testReadAddressBoolean() throws InterruptedException, KNXException
 	{
-//		System.out.println("put device into prog mode for read address...");
 		IndividualAddress[] ias = mc.readAddress(true);
 		assertTrue(ias.length <= 1);
 		System.out.println(ias[0]);
@@ -241,12 +224,12 @@ public class ManagementClientImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readAddress(byte[])}.
+	 * Test method for {@link ManagementClientImpl#readAddress(byte[])}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testReadAddressByteArray() throws KNXException, InterruptedException
 	{
 		try {
@@ -263,12 +246,12 @@ public class ManagementClientImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readMemory
-	 * (tuwien.auto.calimero.mgmt.Destination, int, int)}.
+	 * Test method for {@link ManagementClientImpl#readMemory(Destination, int, int)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testReadMemory() throws KNXException, InterruptedException
 	{
 		try {
@@ -297,12 +280,12 @@ public class ManagementClientImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readMemory
-	 * (tuwien.auto.calimero.mgmt.Destination, int, int)}.
+	 * Test method for {@link ManagementClientImpl#readMemory(Destination, int, int)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testReadMemoryCL() throws KNXException, InterruptedException
 	{
 		try {
@@ -313,14 +296,13 @@ public class ManagementClientImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readProperty
-	 * (tuwien.auto.calimero.mgmt.Destination, int, int, int, int)}.
+	 * Test method for {@link ManagementClientImpl#readProperty(Destination, int, int, int, int)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
-	public final void testReadPropertyDestinationIntIntIntInt() throws KNXException,
-		InterruptedException
+	@Test
+	public final void testReadPropertyDestinationIntIntIntInt() throws KNXException, InterruptedException
 	{
 		try {
 			mc.readProperty(dco, -1, 2, 1, 1);
@@ -367,14 +349,13 @@ public class ManagementClientImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readProperty
-	 * (tuwien.auto.calimero.mgmt.Destination, int, int, int, int)}.
+	 * Test method for {@link ManagementClientImpl#readProperty(Destination, int, int, int, int)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
-	public final void testReadPropertyDestinationIntIntIntIntCL() throws KNXException,
-		InterruptedException
+	@Test
+	public final void testReadPropertyDestinationIntIntIntIntCL() throws KNXException, InterruptedException
 	{
 		dcl.destroy();
 		final Destination connless = mc.createDestination(Util.getKnxDevice(), false);
@@ -382,15 +363,13 @@ public class ManagementClientImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readPropertyDesc
-	 * (tuwien.auto.calimero.mgmt.Destination, int, int, int)}.
+	 * Test method for {@link ManagementClientImpl#readPropertyDesc(Destination, int, int, int)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
-	public final void testReadPropertyDescDestinationIntIntInt() throws KNXException,
-		InterruptedException
+	@Test
+	public final void testReadPropertyDescDestinationIntIntInt() throws KNXException, InterruptedException
 	{
 		try {
 			mc.readPropertyDesc(dco, -1, 2, 1);
@@ -432,14 +411,13 @@ public class ManagementClientImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#writeAddress
-	 * (tuwien.auto.calimero.IndividualAddress)}.
+	 * Test method for {@link ManagementClientImpl#writeAddress(tuwien.auto.calimero.IndividualAddress)}.
 	 *
 	 * @throws InterruptedException on interrupted thread
 	 * @throws KNXException
 	 */
-	public final void testWriteAddressIndividualAddress() throws InterruptedException,
-		KNXException
+	@Test
+	public final void testWriteAddressIndividualAddress() throws InterruptedException, KNXException
 	{
 		final IndividualAddress[] orig = mc.readAddress(true);
 
@@ -459,14 +437,13 @@ public class ManagementClientImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#writeAddress
-	 * (byte[], tuwien.auto.calimero.IndividualAddress)}.
+	 * Test method for {@link ManagementClientImpl#writeAddress(byte[], tuwien.auto.calimero.IndividualAddress)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
-	public final void testWriteAddressByteArrayIndividualAddress() throws KNXException,
-		InterruptedException
+	@Test
+	public final void testWriteAddressByteArrayIndividualAddress() throws KNXException, InterruptedException
 	{
 		final byte[] sno = new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
 		final IndividualAddress write = mc.readAddress(sno);
@@ -483,12 +460,12 @@ public class ManagementClientImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#writeKey
-	 * (tuwien.auto.calimero.mgmt.Destination, int, byte[])}.
+	 * Test method for {@link ManagementClientImpl#writeKey(Destination, int, byte[])}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testWriteKey() throws KNXException, InterruptedException
 	{
 		try {
@@ -511,12 +488,12 @@ public class ManagementClientImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#writeMemory
-	 * (tuwien.auto.calimero.mgmt.Destination, int, byte[])}.
+	 * Test method for {@link ManagementClientImpl#writeMemory(Destination, int, byte[])}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testWriteMemory() throws KNXException, InterruptedException
 	{
 		final byte[] mem = mc.readMemory(dco, 0x105, 2);
@@ -525,11 +502,12 @@ public class ManagementClientImplTest extends TestCase
 
 	/**
 	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#createDestination
-	 * (tuwien.auto.calimero.IndividualAddress, boolean, boolean, boolean)}.
+	 * {@link ManagementClientImpl#createDestination(tuwien.auto.calimero.IndividualAddress, boolean, boolean, boolean)}
+	 * .
 	 *
 	 * @throws KNXFormatException
 	 */
+	@Test
 	public final void testCreateDestination() throws KNXFormatException
 	{
 		mc.createDestination(new IndividualAddress("1.1.1"), false);
@@ -537,28 +515,25 @@ public class ManagementClientImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#restart
-	 * (tuwien.auto.calimero.mgmt.Destination)}.
+	 * Test method for {@link ManagementClientImpl#restart(Destination)}.
 	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 */
+	@Test
 	public final void testRestart() throws KNXTimeoutException, KNXLinkClosedException
 	{
-		// TODO why is the meaning of this destroy here?
-		//dcl.destroy();
 		mc.restart(dcl);
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#writeProperty
-	 * (tuwien.auto.calimero.mgmt.Destination, int, int, int, int, byte[])}.
+	 * Test method for {@link ManagementClientImpl#writeProperty(Destination, int, int, int, int, byte[])}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
-	public final void testWritePropertyDestinationIntIntIntIntByteArray()
-		throws KNXException, InterruptedException
+	@Test
+	public final void testWritePropertyDestinationIntIntIntIntByteArray() throws KNXException, InterruptedException
 	{
 		final byte[] read = mc.readProperty(dco2, 0, 51, 1, 1);
 		mc.writeProperty(dco2, 0, 51, 1, 1, new byte[] { 7 });
@@ -568,11 +543,12 @@ public class ManagementClientImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#detach()}.
+	 * Test method for {@link ManagementClientImpl#detach()}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testClose() throws KNXException, InterruptedException
 	{
 		mc.detach();
@@ -585,9 +561,9 @@ public class ManagementClientImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#getResponseTimeout()}.
+	 * Test method for {@link ManagementClientImpl#getResponseTimeout()}.
 	 */
+	@Test
 	public final void testGetResponseTimeout()
 	{
 		assertEquals(5, mc.getResponseTimeout());
@@ -596,9 +572,9 @@ public class ManagementClientImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#getPriority()}.
+	 * Test method for {@link ManagementClientImpl#getPriority()}.
 	 */
+	@Test
 	public final void testGetPriority()
 	{
 		assertEquals(Priority.LOW, mc.getPriority());
@@ -608,16 +584,15 @@ public class ManagementClientImplTest extends TestCase
 
 	/**
 	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readDomainAddress (byte[],
-	 * tuwien.auto.calimero.IndividualAddress, int)}.
+	 * {@link ManagementClientImpl#readDomainAddress(byte[], tuwien.auto.calimero.IndividualAddress, int)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
-	public final void testReadDomainAddressIntIndividualAddressInt() throws KNXException,
-		InterruptedException
+	@Test
+	public final void testReadDomainAddressIntIndividualAddressInt() throws KNXException, InterruptedException
 	{
-	try {
+		try {
 			mc.readDomainAddress(new byte[] { 1, }, Util.getKnxDeviceCO(), -1);
 			fail("invalid arg");
 		}
@@ -635,34 +610,31 @@ public class ManagementClientImplTest extends TestCase
 
 		final byte[] domain = new byte[] { 0, (byte) 0x6c };
 		/*List<byte[]> doas =*/ mc.readDomainAddress(domain, Util.getKnxDeviceCO(), 10);
-		final IndividualAddress start = new IndividualAddress(
-				Util.getKnxDeviceCO().getRawAddress() - 3);
+		final IndividualAddress start = new IndividualAddress(Util.getKnxDeviceCO().getRawAddress() - 3);
 		/*doas =*/ mc.readDomainAddress(domain, start, 5);
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readDomainAddress(boolean)}.
+	 * Test method for {@link ManagementClientImpl#readDomainAddress(boolean)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
-	public final void testReadDomainAddressBoolean() throws KNXException,
-		InterruptedException
+	@Test
+	public final void testReadDomainAddressBoolean() throws KNXException, InterruptedException
 	{
 		final List<byte[]> domain = mc.readDomainAddress(true);
 		assertTrue(domain.size() <= 1);
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#writeDomainAddress(byte[])}.
+	 * Test method for {@link ManagementClientImpl#writeDomainAddress(byte[])}.
 	 *
 	 * @throws KNXLinkClosedException
 	 * @throws KNXTimeoutException
 	 */
-	public final void testWriteDomainAddress() throws KNXTimeoutException,
-		KNXLinkClosedException
+	@Test
+	public final void testWriteDomainAddress() throws KNXTimeoutException, KNXLinkClosedException
 	{
 		try {
 			mc.writeDomainAddress(new byte[] { 1, 2, 3 });
@@ -680,26 +652,31 @@ public class ManagementClientImplTest extends TestCase
 	private static final int NetworkParamObjectType = 0;
 	private static final int NetworkParamPid = 59;
 
+	@Test
 	public final void testWriteNetworkParameter() throws KNXLinkClosedException, KNXTimeoutException
 	{
 		mc.writeNetworkParameter(dcl.getAddress(), NetworkParamObjectType, NetworkParamPid, new byte[] { 0 });
 	}
 
+	@Test
 	public final void testWriteNetworkParameterBroadcast() throws KNXLinkClosedException, KNXTimeoutException
 	{
 		mc.writeNetworkParameter(null, NetworkParamObjectType, NetworkParamPid, new byte[] { 0 });
 	}
 
+	@Test
 	public final void testReadNetworkParameterBroadcast() throws KNXException, InterruptedException
 	{
 		mc.readNetworkParameter(null, NetworkParamObjectType, NetworkParamPid, new byte[] {});
 	}
 
+	@Test
 	public final void testReadNetworkParameter() throws KNXException, InterruptedException
 	{
 		mc.readNetworkParameter(dcl.getAddress(), NetworkParamObjectType, NetworkParamPid, new byte[] { 0 });
 	}
 
+	@Test
 	public final void testReadUnsupportedNetworkParameter() throws InterruptedException, KNXException
 	{
 		try {
@@ -714,6 +691,7 @@ public class ManagementClientImplTest extends TestCase
 		catch (final KNXInvalidResponseException expected) {}
 	}
 
+	@Test
 	public final void testReadUnsupportedNetworkParameterBroadcast() throws InterruptedException, KNXException
 	{
 		try {
@@ -729,13 +707,12 @@ public class ManagementClientImplTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.mgmt.ManagementClientImpl#readDeviceDesc
-	 * (tuwien.auto.calimero.mgmt.Destination, int)}.
+	 * Test method for {@link ManagementClientImpl#readDeviceDesc(Destination, int)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
+	@Test
 	public final void testReadDeviceDesc() throws KNXException, InterruptedException
 	{
 		try {
