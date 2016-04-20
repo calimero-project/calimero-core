@@ -178,7 +178,7 @@ public class DPTXlator4ByteFloatTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator4ByteFloat#DPTXlator4ByteFloat(tuwien.auto.calimero.dptxlator.DPT)}.
+	 * Test method for {@link DPTXlator4ByteFloat#DPTXlator4ByteFloat(tuwien.auto.calimero.dptxlator.DPT)}.
 	 */
 	public void testDPTXlator4ByteFloatDPT()
 	{

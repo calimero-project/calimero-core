@@ -103,7 +103,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 	private int lastPropIndex;
 	private int lastPid;
 
-	public LocalDeviceManagement(final AutoCloseable connection, final PropertyAdapterListener l,
+	LocalDeviceManagement(final AutoCloseable connection, final PropertyAdapterListener l,
 		final boolean queryWriteEnable)
 	{
 		c = connection;

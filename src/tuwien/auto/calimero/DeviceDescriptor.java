@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015 B. Malinowsky
+    Copyright (c) 2015, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -57,8 +57,8 @@ import tuwien.auto.calimero.link.medium.TPSettings;
  */
 public interface DeviceDescriptor
 {
-	static final int TYPE_SIZE = 2;
-	static final int TYPE2_SIZE = 14;
+	int TYPE_SIZE = 2;
+	int TYPE2_SIZE = 14;
 
 	/**
 	 * Construct a device descriptor by parsing raw data.
@@ -67,7 +67,7 @@ public interface DeviceDescriptor
 	 * @return a {@link DeviceDescriptor}
 	 * @throws KNXFormatException if the data does not contain a valid device descriptor
 	 */
-	public static DeviceDescriptor fromType(final byte[] data) throws KNXFormatException
+	static DeviceDescriptor fromType(final byte[] data) throws KNXFormatException
 	{
 		if (data.length == TYPE_SIZE)
 			return DD0.fromType0(data);
@@ -82,7 +82,7 @@ public interface DeviceDescriptor
 	 * The Device Descriptor Type 0 (DD0) format, providing the available mask versions for type 0.
 	 * The terminology 'mask version' is equivalent with DD0.
 	 */
-	public static final class DD0 implements DeviceDescriptor
+	final class DD0 implements DeviceDescriptor
 	{
 		/** */
 		public static final DD0 TYPE_0010 = new DD0(0x0010, "System 1 (BCU 1)");
@@ -301,7 +301,7 @@ public interface DeviceDescriptor
 		}
 	}
 
-	public static final class DD2 implements DeviceDescriptor
+	final class DD2 implements DeviceDescriptor
 	{
 		private final byte[] d;
 

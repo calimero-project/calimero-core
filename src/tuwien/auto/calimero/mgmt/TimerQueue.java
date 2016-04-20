@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2011, 2014 B. Malinowsky
+    Copyright (c) 2011, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ final class TimerQueue extends Thread
 	private final List<Runnable> notifiables = new ArrayList<>();
 	private final List<Long> endTimes = new ArrayList<>();
 
-	public TimerQueue()
+	TimerQueue()
 	{
 		super("TimerQueue");
 		setDaemon(true);

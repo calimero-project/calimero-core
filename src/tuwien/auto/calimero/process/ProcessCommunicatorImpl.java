@@ -150,7 +150,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	private final EventListeners<ProcessListener> listeners;
 
 	private final Map<GroupAddress, FrameEvent> indications = new HashMap<>();
-	private final static FrameEvent NoResponse = new FrameEvent(ProcessCommunicatorImpl.class, (CEMI) null);
+	private static final FrameEvent NoResponse = new FrameEvent(ProcessCommunicatorImpl.class, (CEMI) null);
 	private final Map<GroupAddress, AtomicInteger> readers = new HashMap<>();
 
 	private volatile Priority priority = Priority.LOW;

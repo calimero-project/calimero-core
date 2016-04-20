@@ -75,10 +75,12 @@ public abstract class LibraryAdapter implements Closeable
 	 * @param logger logger
 	 * @param portId serial port identifier
 	 * @param baudrate baudrate
+	 * @param idleTimeout idle timeout in milliseconds
 	 * @return adapter to access serial communication port, port resource is in open state
 	 * @throws KNXException on failure to open or configure serial port, or no adapter available
 	 */
-	public static LibraryAdapter open(final Logger logger, final String portId, final int baudrate, final int idleTimeout) throws KNXException
+	public static LibraryAdapter open(final Logger logger, final String portId, final int baudrate,
+		final int idleTimeout) throws KNXException
 	{
 		Throwable t = null;
 		// check for Java ME Embedded platform and available serial communication port,

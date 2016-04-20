@@ -59,9 +59,7 @@ public final class TransferProtocolHeader
 	  Size    |     1     |   1   |      2      |     1    |  1       |      2       |
 	*/
 
-	//
-	// Protocol IDs, only KNX Tunnel and Feature Service is supported
-	//
+	/** Protocol IDs, only KNX Tunnel and Feature Service is supported. */
 	public enum Protocol {
 		KnxTunnel(1), BusAccessServerFeature(0x0f);
 
@@ -83,14 +81,14 @@ public final class TransferProtocolHeader
 		int id();
 	}
 
-	// EMI IDs for KNX Tunnel (for other protocol IDs the coding is not defined)
+	/** EMI IDs for KNX Tunnel (for other protocol IDs the coding is not defined). */
 	public enum KnxTunnelEmi implements ServiceId {
 		Emi1, Emi2, CEmi;
 
 		public int id() { return ordinal() + 1; }
 	}
 
-	// Service IDs for Bus Access Server device feature service
+	/** Service IDs for Bus Access Server device feature service. */
 	public enum BusAccessServerService implements ServiceId {
 		Get, Response, Set, Info;
 

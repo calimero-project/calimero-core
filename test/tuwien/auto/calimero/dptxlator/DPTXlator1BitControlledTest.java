@@ -210,7 +210,7 @@ public class DPTXlator1BitControlledTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator1BitControlled#DPTXlator1BitControlled(tuwien.auto.calimero.dptxlator.DPT)}.
+	 * Test method for {@link DPTXlator1BitControlled#DPTXlator1BitControlled(tuwien.auto.calimero.dptxlator.DPT)}.
 	 */
 	public void testDPTXlator1BitControlledDPT()
 	{

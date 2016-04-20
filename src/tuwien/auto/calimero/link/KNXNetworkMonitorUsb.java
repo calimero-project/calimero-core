@@ -55,9 +55,8 @@ import tuwien.auto.calimero.serial.usb.UsbConnection;
 import tuwien.auto.calimero.serial.usb.UsbConnection.EmiType;
 
 /**
- * Implementation of the KNX network monitor link over USB, using a {@link UsbConnection}. Once a
- * monitor has been closed, it is not available for further link communication, i.e., it can't be
- * reopened.
+ * Implementation of the KNX network monitor link over USB, using a {@link UsbConnection}. Once a monitor has been
+ * closed, it is not available for further link communication, i.e., it can't be reopened.
  *
  * @author B. Malinowsky
  */
@@ -72,25 +71,29 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor
 
 	/**
 	 * Creates a new network monitor for accessing the KNX network over a USB connection.
-	 * <p>
 	 *
-	 * @param settings medium settings defining the specific KNX medium needed for decoding raw
-	 *        frames received from the KNX network
-	 * @throws KNXException
+	 * @param vendorId the USB vendor ID of the KNX USB device interface
+	 * @param productId the USB product ID of the KNX USB device interface
+	 * @param settings medium settings defining the specific KNX medium needed for decoding raw frames received from the
+	 *        KNX network
+	 * @throws KNXException on error creating USB link
+	 * @throws InterruptedException on thread interrupted
 	 */
-	public KNXNetworkMonitorUsb(final int vendorId, final int productId,
-		final KNXMediumSettings settings) throws KNXException, InterruptedException
+	public KNXNetworkMonitorUsb(final int vendorId, final int productId, final KNXMediumSettings settings)
+		throws KNXException, InterruptedException
 	{
 		this(new UsbConnection(vendorId, productId), settings);
 	}
 
 	/**
 	 * Creates a new network monitor for accessing the KNX network over a USB connection.
-	 * <p>
 	 *
-	 * @param settings medium settings defining the specific KNX medium needed for decoding raw
-	 *        frames received from the KNX network
-	 * @throws KNXException
+	 * @param device an identifier to lookup the USB device, e.g., based on (part of) a device string like the product
+	 *        or manufacturer name, or USB vendor and product ID in the format <code>vendorId:productId</code>
+	 * @param settings medium settings defining the specific KNX medium needed for decoding raw frames received from the
+	 *        KNX network
+	 * @throws KNXException on error creating USB link
+	 * @throws InterruptedException on thread interrupt
 	 */
 	public KNXNetworkMonitorUsb(final String device, final KNXMediumSettings settings)
 		throws KNXException, InterruptedException
@@ -98,6 +101,14 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor
 		this(new UsbConnection(device), settings);
 	}
 
+	/**
+	 * Creates a new monitor link for accessing the KNX network over the supplied USB connection.
+	 *
+	 * @param c USB connection in open state, connected to a KNX network; the link takes ownership
+	 * @param settings KNX medium settings, with device and medium-specific communication settings
+	 * @throws KNXException on error creating USB link
+	 * @throws InterruptedException on thread interrupt
+	 */
 	protected KNXNetworkMonitorUsb(final UsbConnection c, final KNXMediumSettings settings)
 		throws KNXException, InterruptedException
 	{
@@ -147,24 +158,23 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor
 			final int CEMI_SERVER_OBJECT = 8;
 			final int PID_COMM_MODE = 52;
 			final int objectInstance = 1;
-			final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, CEMI_SERVER_OBJECT,
-					objectInstance, PID_COMM_MODE, 1, 1, new byte[] { 1 });
+			final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, CEMI_SERVER_OBJECT, objectInstance,
+					PID_COMM_MODE, 1, 1, new byte[] { 1 });
 			conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame.toByteArray()).get(0), true);
 			// TODO close monitor if we cannot switch to busmonitor
 			// check for .con
 			//findFrame(CEMIDevMgmt.MC_PROPWRITE_CON);
 		}
 		else if (activeEmi == EmiType.Emi1) {
-			new BcuSwitcher(conn, logger)
-					.enter(extBusmon ? BcuMode.ExtBusmonitor : BcuMode.Busmonitor);
+			new BcuSwitcher(conn, logger).enter(extBusmon ? BcuMode.ExtBusmonitor : BcuMode.Busmonitor);
 		}
 		else {
-			final byte[] switchBusmon = { (byte) PEI_SWITCH, (byte) 0x90, 0x18, 0x34, 0x56, 0x78,
-				0x0A, };
+			final byte[] switchBusmon = { (byte) PEI_SWITCH, (byte) 0x90, 0x18, 0x34, 0x56, 0x78, 0x0A, };
 			conn.send(HidReport.create(activeEmi.emi, switchBusmon).get(0), true);
 		}
 	}
 
+	@Override
 	protected void leaveBusmonitor() throws InterruptedException
 	{
 		try {
@@ -173,8 +183,7 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor
 		catch (final KNXPortClosedException | KNXTimeoutException e) {}
 	}
 
-	private void normalMode()
-		throws KNXPortClosedException, KNXTimeoutException, InterruptedException
+	private void normalMode() throws KNXPortClosedException, KNXTimeoutException, InterruptedException
 	{
 		if (activeEmi == EmiType.CEmi) {
 			final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_RESET_REQ);
@@ -184,8 +193,7 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor
 			new BcuSwitcher(conn, logger).reset();
 		}
 		else {
-			final byte[] switchNormal = { (byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78,
-				(byte) 0x9A, };
+			final byte[] switchNormal = { (byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
 			conn.send(HidReport.create(activeEmi.emi, switchNormal).get(0), true);
 		}
 	}

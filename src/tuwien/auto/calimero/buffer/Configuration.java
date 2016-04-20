@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ public interface Configuration
 	 * exception, since there probably won't be any reasonable error handling in the
 	 * surrounding method invoking the filter.
 	 */
-	public static interface NetworkFilter
+	public interface NetworkFilter
 	{
 		/**
 		 * Allows the filter to get a reference to its owning configuration, and do all

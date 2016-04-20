@@ -480,7 +480,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		timeHelperThrow(0, 0, -55);
 	}
 
-	private void timeHelper(final int hr, final int min, final int sec, final int dataHr, final int dataMin, final int dataSec)
+	private void timeHelper(final int hr, final int min, final int sec, final int dataHr, final int dataMin,
+		final int dataSec)
 	{
 		t.setTime(hr, min, sec);
 		t.setValidField(DPTXlatorDateTime.TIME, true);
