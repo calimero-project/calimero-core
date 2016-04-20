@@ -43,11 +43,9 @@ import static org.junit.gen5.api.Assertions.fail;
 
 import java.util.Arrays;
 
-import org.junit.experimental.categories.Category;
 import org.junit.gen5.api.AfterEach;
 import org.junit.gen5.api.Test;
 
-import category.RequireFT12Connection;
 import tag.FT12;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.Util;
@@ -57,7 +55,6 @@ import tuwien.auto.calimero.Util;
  *
  * @author B. Malinowsky
  */
-@Category(RequireFT12Connection.class)
 @FT12
 public class FT12ConnectionTest
 {
