@@ -32,6 +32,7 @@ junit5 {
     matchClassName '.*Test'
     excludeTag 'slow'
     excludeTag 'ft12'
+//    excludeTag 'knxnetip'
 }
 
 repositories {
@@ -45,5 +46,5 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.junit:junit4-runner:5.0.0-ALPHA'
-    testRuntime 'org.slf4j:slf4j-simple:1.7.18'
+//    testRuntime 'org.slf4j:slf4j-simple:1.7.18'
 }
