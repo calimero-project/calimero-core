@@ -41,7 +41,6 @@ import java.io.OutputStream;
 
 /**
  * Output stream for a serial port.
- * <p>
  *
  * @author B. Malinowsky
  */
@@ -51,7 +50,7 @@ class PortOutputStream extends OutputStream
 
 	/**
 	 * Creates a new output stream for <code>port</code>.
-	 * <p>
+	 *
 	 * @param port open port for output
 	 */
 	PortOutputStream(final SerialComAdapter port)
@@ -59,18 +58,12 @@ class PortOutputStream extends OutputStream
 		p = port;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.io.OutputStream#write(int)
-	 */
 	@Override
 	public void write(final int b) throws IOException
 	{
 		p.write(b);
 	}
 
-	/* (non-Javadoc)
-	 * @see java.io.OutputStream#write(byte[])
-	 */
 	@Override
 	public void write(final byte[] b) throws IOException
 	{
@@ -79,36 +72,13 @@ class PortOutputStream extends OutputStream
 		p.writeBytes(b, 0, b.length);
 	}
 
-	/* (non-Javadoc)
-	 * @see java.io.OutputStream#write(byte[], int, int)
-	 */
 	@Override
 	public void write(final byte[] b, final int off, final int len) throws IOException
 	{
 		if (b == null)
 			throw new NullPointerException();
-		if (off < 0 || off > b.length || len < 0 || off + len > b.length
-			|| off + len < 0)
+		if (off < 0 || off > b.length || len < 0 || off + len > b.length || off + len < 0)
 			throw new IndexOutOfBoundsException();
 		p.writeBytes(b, off, len);
-	}
-
-	/* (non-Javadoc)
-	 * @see java.io.OutputStream#flush()
-	 */
-	@Override
-	public void flush() throws IOException
-	{
-		super.flush();
-	}
-
-	/* (non-Javadoc)
-	 * @see java.io.OutputStream#close()
-	 */
-	@Override
-	public void close() throws IOException
-	{
-		super.flush();
-		super.close();
 	}
 }

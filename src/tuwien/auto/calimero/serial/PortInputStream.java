@@ -41,7 +41,6 @@ import java.io.InputStream;
 
 /**
  * Input stream for a serial port.
- * <p>
  *
  * @author B. Malinowsky
  */
@@ -51,7 +50,6 @@ class PortInputStream extends InputStream
 
 	/**
 	 * Creates a new input stream for <code>port</code>.
-	 * <p>
 	 *
 	 * @param port open port for input
 	 */
@@ -60,18 +58,12 @@ class PortInputStream extends InputStream
 		p = port;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.io.InputStream#read()
-	 */
 	@Override
 	public int read() throws IOException
 	{
 		return p.read();
 	}
 
-	/* (non-Javadoc)
-	 * @see java.io.InputStream#read(byte[])
-	 */
 	@Override
 	public int read(final byte[] b) throws IOException
 	{
@@ -80,9 +72,6 @@ class PortInputStream extends InputStream
 		return p.readBytes(b, 0, b.length);
 	}
 
-	/* (non-Javadoc)
-	 * @see java.io.InputStream#read(byte[], int, int)
-	 */
 	@Override
 	public int read(final byte[] b, final int off, final int len) throws IOException
 	{
@@ -93,21 +82,9 @@ class PortInputStream extends InputStream
 		return p.readBytes(b, off, len);
 	}
 
-	/* (non-Javadoc)
-	 * @see java.io.InputStream#available()
-	 */
 	@Override
 	public int available()
 	{
 		return p.getStatus(SerialComAdapter.AVAILABLE_INPUT_STATUS);
-	}
-
-	/* (non-Javadoc)
-	 * @see java.io.InputStream#close()
-	 */
-	@Override
-	public void close() throws IOException
-	{
-		super.close();
 	}
 }

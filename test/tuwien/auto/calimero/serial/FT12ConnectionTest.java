@@ -67,7 +67,6 @@ public class FT12ConnectionTest
 	{
 		if (c != null)
 			c.close();
-		Util.tearDownLogging();
 	}
 
 	/**
