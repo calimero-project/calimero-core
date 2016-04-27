@@ -469,14 +469,11 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		catch (final InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
-		catch (final IOException e) {
-			logger.error("send disconnect failed", e);
-		}
-		catch (final RuntimeException e) {
-			// we have to do this strange catch here, since if socket already failed
+		catch (IOException | RuntimeException e) {
+			// we have to also catch RTEs here, since if socket already failed
 			// before close(), getLocalSocketAddress() might throw illegal argument
 			// exception or return the wildcard address, indicating a messed up socket
-			logger.error("send disconnect failed, socket problem");
+			logger.error("send disconnect failed", e);
 		}
 		cleanup(initiator, reason, level, t);
 	}
