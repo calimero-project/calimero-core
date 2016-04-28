@@ -170,7 +170,7 @@ public class KNXnetIPTunnel extends ClientConnection
 		if (layer == BusMonitorLayer)
 			throw new KNXIllegalStateException("send not permitted in busmonitor mode");
 		if (!(frame instanceof CEMILData))
-			throw new KNXIllegalArgumentException("unsupported cEMI type");
+			throw new KNXIllegalArgumentException("unsupported cEMI type " + frame.getClass());
 		super.send(frame, mode);
 	}
 
