@@ -60,7 +60,6 @@ import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingIndication;
 import tuwien.auto.calimero.knxnetip.servicetype.ServiceRequest;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
-import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
@@ -490,7 +489,6 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		setStateNotify(CLOSED);
 		fireConnectionClosed(initiator, reason);
 		listeners.removeAll();
-		LogService.removeLogger(logger);
 	}
 
 	/**

@@ -169,7 +169,6 @@ abstract class ClientConnection extends ConnectionBase
 			logger.error("communication failure on connect", thrown);
 			if (localEP.getAddress().isLoopbackAddress())
 				logger.warn("try to specify the actual IP address of the local host");
-			LogService.removeLogger(logger);
 			throw new KNXException("on connect to " + serverCtrlEP + ": " + thrown.getMessage());
 		}
 
@@ -376,7 +375,6 @@ abstract class ClientConnection extends ConnectionBase
 		socket.close();
 		setState(CLOSED);
 		logger.error("establishing connection failed, " + thrown.getMessage());
-		LogService.removeLogger(logger);
 	}
 
 	private final class HeartbeatMonitor extends Thread

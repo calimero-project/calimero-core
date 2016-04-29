@@ -108,12 +108,6 @@ public final class LogService
 		return new AsyncLogger(LogService.getLogger(name));
 	}
 
-	/**
-	 * @param l
-	 */
-	public static void removeLogger(final Logger l)
-	{}
-
 	static void async(final Logger l, final LogLevel level, final String msg, final Throwable t)
 	{
 		async(l, level, (Marker) null, "{}", msg, t);

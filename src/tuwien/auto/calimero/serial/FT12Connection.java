@@ -408,7 +408,6 @@ public class FT12Connection implements AutoCloseable
 			logger.warn("failed to close all serial I/O resources", e);
 		}
 		fireConnectionClosed(user, reason);
-		LogService.removeLogger(logger);
 	}
 
 	private void open(final String portId, final int baudrate) throws KNXException
