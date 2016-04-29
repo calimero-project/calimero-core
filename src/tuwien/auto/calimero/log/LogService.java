@@ -130,8 +130,7 @@ public final class LogService
 		async(l, level, null, format, o);
 	}
 
-	static void async(final Logger l, final LogLevel level, final Marker m, final String format,
-		final Object... o)
+	static void async(final Logger l, final LogLevel level, final Marker m, final String format, final Object... o)
 	{
 		if (!isEnabled(l, level))
 			return;
@@ -145,20 +144,17 @@ public final class LogService
 	}
 
 	/**
-	 * Logs a message and an exception with the specified log level using the supplied logger.
-	 * <p>
-	 * This method works around the limitation that slf4j loggers don't have a generic
-	 * <code>log</code> method.
+	 * Logs a message with the specified log level, format, and arguments using the supplied logger. This method works
+	 * around the limitation that slf4j loggers don't have a generic <code>log</code> method.
 	 *
 	 * @param logger the logger
 	 * @param level log level to use for the message
-	 * @param msg the message to be logged
-	 * @param t the exception (throwable) to log, can be <code>null</code>
+	 * @param format the format of the message to be logged
+	 * @param arguments message arguments
 	 */
-	public static void log(final Logger logger, final LogLevel level, final String msg,
-		final Throwable t)
+	public static void log(final Logger logger, final LogLevel level, final String format, final Object... arguments)
 	{
-		log(logger, level, (Marker) null, "{}", msg, t);
+		log(logger, level, (Marker) null, format, arguments);
 	}
 
 	private static void log(final Logger logger, final LogLevel level, final Marker marker,
