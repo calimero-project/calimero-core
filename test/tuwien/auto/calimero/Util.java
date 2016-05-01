@@ -43,6 +43,8 @@ import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.junit.Assert;
+
 import tuwien.auto.calimero.knxnetip.Discoverer;
 import tuwien.auto.calimero.knxnetip.Discoverer.Result;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
@@ -191,10 +193,10 @@ public final class Util
 			addr = new InetSocketAddress(local, 0);
 			if (printLocalHost) {
 				printLocalHost = false;
+				final String underline = addr.toString().replaceAll(".", "=");
 				System.out.println();
-				System.out.println("\t\tLocal host used in tests:");
-				System.out.println("\t\t=========================");
-				System.out.println("\t\t" + addr);
+				System.out.println("\t\tLocal host used in tests: " + addr);
+				System.out.println("\t\t==========================" + underline);
 				System.out.println();
 			}
 			return addr;
@@ -219,7 +221,7 @@ public final class Util
 		// we try once to find our running test server, on failure subsequent calls will
 		// immediately return to speed up tests
 		if (!testServerRunning)
-			return null;
+			Assert.fail("no KNXnet/IP test-server available!");
 		if (server == null) {
 			testServerRunning = false;
 			final Discoverer d = new Discoverer(getLocalHost().getAddress(), getLocalHost().getPort(), false, false);
@@ -241,6 +243,7 @@ public final class Util
 			}
 			System.err.println("\n\tA unit test case requests the KNX test server, but no running instance was found!\n"
 					+ "\t\t--> Many tests requiring KNXnet/IP will fail.\n");
+			Assert.fail("no KNXnet/IP test-server found!");
 		}
 		return server;
 	}

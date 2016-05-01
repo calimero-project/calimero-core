@@ -36,12 +36,12 @@
 
 package tuwien.auto.calimero.mgmt;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.gen5.api.Assertions.assertEquals;
+import static org.junit.gen5.api.Assertions.assertFalse;
+import static org.junit.gen5.api.Assertions.assertNotNull;
+import static org.junit.gen5.api.Assertions.assertNotSame;
+import static org.junit.gen5.api.Assertions.assertTrue;
+import static org.junit.gen5.api.Assertions.fail;
 
 import java.util.List;
 import java.util.Vector;
@@ -88,11 +88,11 @@ public class TransportLayerImplTest
 
 	private final class TLListener implements TransportListener
 	{
-		List<CEMI> broad = new Vector<>();
-		List<CEMI> conn = new Vector<>();
-		List<CEMI> ind = new Vector<>();
-		List<CEMI> group = new Vector<>();
-		List<Destination> dis = new Vector<>();
+		final List<CEMI> broad = new Vector<>();
+		final List<CEMI> conn = new Vector<>();
+		final List<CEMI> ind = new Vector<>();
+		final List<CEMI> group = new Vector<>();
+		final List<Destination> dis = new Vector<>();
 		volatile boolean closed;
 		volatile boolean detached;
 
@@ -102,39 +102,36 @@ public class TransportLayerImplTest
 		@Override
 		public void broadcast(final FrameEvent e)
 		{
-			assertNotNull(e);
+			assertNotNull(e, "broadcast frame event");
 			broad.add(e.getFrame());
 			final CEMILData f = (CEMILData) e.getFrame();
 			assertEquals(new GroupAddress(0), f.getDestination());
-			System.out.print("broadcast: ");
-			Debug.printLData(f);
+			Debug.printLData("broadcast: ", f);
 		}
 
 		@Override
 		public void dataConnected(final FrameEvent e)
 		{
-			assertNotNull(e);
+			assertNotNull(e, "data-connected frame event");
 			conn.add(e.getFrame());
 			final CEMILData f = (CEMILData) e.getFrame();
-			System.out.print("data connected: ");
-			Debug.printLData(f);
+			Debug.printLData("data connected: ", f);
 		}
 
 		@Override
 		public void dataIndividual(final FrameEvent e)
 		{
-			assertNotNull(e);
+			assertNotNull(e, "data-individual frame event");
 			ind.add(e.getFrame());
 			final CEMILData f = (CEMILData) e.getFrame();
 			assertTrue(f.getDestination() instanceof IndividualAddress);
-			System.out.print("data individual: ");
-			Debug.printLData(f);
+			Debug.printLData("data individual: ", f);
 		}
 
 		@Override
 		public void disconnected(final Destination d)
 		{
-			assertNotNull(d);
+			assertNotNull(d, "disconnected");
 			dis.add(d);
 			System.out.println("disconnected: " + d);
 		}
@@ -142,17 +139,17 @@ public class TransportLayerImplTest
 		@Override
 		public void group(final FrameEvent e)
 		{
-			assertNotNull(e);
+			assertNotNull(e, "group frame event");
 			group.add(e.getFrame());
 			final CEMILData f = (CEMILData) e.getFrame();
 			assertTrue(f.getDestination() instanceof GroupAddress);
-			Debug.printLData(f);
+			Debug.printLData("group data: ", f);
 		}
 
 		@Override
 		public void linkClosed(final CloseEvent e)
 		{
-			assertNotNull(e);
+			assertNotNull(e, "link closed event");
 			assertEquals(nl, e.getSource());
 			if (closed)
 				fail("already closed");
@@ -224,7 +221,7 @@ public class TransportLayerImplTest
 		final byte[] tsdu = new byte[] { (byte) (indAddrRead >> 8), (byte) indAddrRead };
 		tl.broadcast(false, Priority.SYSTEM, tsdu);
 		Thread.sleep(500);
-		assertFalse(ltl.broad.isEmpty());
+		assertFalse(ltl.broad.isEmpty(), "no broadcast received");
 	}
 
 	/**
@@ -431,12 +428,12 @@ public class TransportLayerImplTest
 
 		tl.connect(dco);
 		tl.sendData(dco, p, tsduDescRead);
-		Thread.sleep(100);
-		assertTrue(ltl.conn.size() == 1);
+		Thread.sleep(500);
+		assertEquals(1, ltl.conn.size());
 		// second time
 		tl.sendData(dco, p, tsduDescRead);
-		Thread.sleep(100);
-		assertTrue(ltl.conn.size() == 2);
+		Thread.sleep(500);
+		assertEquals(2, ltl.conn.size());
 		tl.disconnect(dco);
 
 		try {
@@ -444,7 +441,7 @@ public class TransportLayerImplTest
 			fail("disconnected");
 		}
 		catch (final KNXDisconnectException e) {}
-		assertTrue(ltl.conn.size() == 2);
+		assertEquals(2, ltl.conn.size());
 
 		final TransportLayer tl2 = new TransportLayerImpl(nl);
 		final Destination d2 = tl2.createDestination(new IndividualAddress(3, 1, 1), true);

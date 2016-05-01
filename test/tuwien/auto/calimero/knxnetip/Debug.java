@@ -58,9 +58,10 @@ public final class Debug
 	private Debug()
 	{}
 
-	public static void printLData(final CEMILData f)
+	public static void printLData(final String prefix, final CEMILData f)
 	{
 		final StringBuffer buf = new StringBuffer();
+		buf.append(prefix);
 		buf.append("hopcount=" + f.getHopCount());
 		buf.append(", dst=" + f.getDestination());
 		buf.append(", prio=" + f.getPriority());
@@ -75,6 +76,11 @@ public final class Debug
 		buf.append(f.toString());
 		buf.append(": ").append(DataUnitBuilder.decode(f.getPayload(), f.getDestination()));
 		print(buf);
+	}
+
+	public static void printLData(final CEMILData f)
+	{
+		printLData("", f);
 	}
 
 	public static void printMData(final CEMIDevMgmt f)
