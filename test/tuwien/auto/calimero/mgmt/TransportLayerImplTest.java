@@ -182,8 +182,6 @@ public class TransportLayerImplTest
 			tl.detach();
 		}
 		nl.close();
-		dco.destroy();
-		dcl.destroy();
 	}
 
 	@Test
