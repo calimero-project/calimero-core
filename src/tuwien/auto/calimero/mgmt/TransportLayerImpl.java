@@ -280,6 +280,9 @@ public class TransportLayerImpl implements TransportLayer
 			if (p.getDestination() == d) {
 				d.destroy();
 				proxies.remove(d.getAddress());
+				synchronized (indications) {
+					indications.notify();
+				}
 			}
 			else
 				logger.warn("not owner of " + d.getAddress());
@@ -544,8 +547,7 @@ public class TransportLayerImpl implements TransportLayer
 				disconnectIndicate(p, true);
 	}
 
-	private boolean waitForAck() throws KNXTimeoutException, KNXDisconnectException,
-		KNXLinkClosedException
+	private boolean waitForAck() throws KNXTimeoutException, KNXDisconnectException, KNXLinkClosedException
 	{
 		long remaining = ACK_TIMEOUT * 1000;
 		final long end = System.currentTimeMillis() + remaining;
@@ -553,17 +555,14 @@ public class TransportLayerImpl implements TransportLayer
 		while (remaining > 0) {
 			try {
 				while (indications.size() > 0)
-					handleConnected((CEMILData) indications.remove(0).getFrame(),
-							active);
-				if (d.getState() == Disconnected)
-					throw new KNXDisconnectException(d.getAddress()
-							+ " disconnected while awaiting ACK", d);
+					handleConnected((CEMILData) indications.remove(0).getFrame(), active);
+				if (d.getState() == Disconnected || d.getState() == Destroyed)
+					throw new KNXDisconnectException(d.getAddress() + " disconnected while awaiting ACK", d);
 				if (d.getState() == OpenIdle)
 					return true;
 				indications.wait(remaining);
-				if (d.getState() == Disconnected)
-					throw new KNXDisconnectException(d.getAddress()
-							+ " disconnected while awaiting ACK", d);
+				if (d.getState() == Disconnected || d.getState() == Destroyed)
+					throw new KNXDisconnectException(d.getAddress() + " disconnected while awaiting ACK", d);
 			}
 			catch (final InterruptedException e) {}
 			remaining = end - System.currentTimeMillis();
