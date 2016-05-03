@@ -174,7 +174,6 @@ public class TransportLayerImpl implements TransportLayer
 	/**
 	 * Creates a new client-side transport layer end-point attached to the supplied KNX network
 	 * link.
-	 * <p>
 	 *
 	 * @param link network link used for communication with a KNX network
 	 * @throws KNXLinkClosedException if the network link is closed
@@ -186,7 +185,6 @@ public class TransportLayerImpl implements TransportLayer
 
 	/**
 	 * Creates a new transport layer end-point attached to the supplied KNX network link.
-	 * <p>
 	 *
 	 * @param link network link used for communication with a KNX network
 	 * @param serverEndpoint does this instance represent the client-side (<code>false</code>),
@@ -246,7 +244,6 @@ public class TransportLayerImpl implements TransportLayer
 
 	/**
 	 * Returns the destination object for the remote individual address, if such exists.
-	 * <p>
 	 *
 	 * @param remote the remote address to look up
 	 * @return the destination for that address, or <code>null</code> if no destination
@@ -272,6 +269,9 @@ public class TransportLayerImpl implements TransportLayer
 			if (p.getDestination() == d) {
 				d.destroy();
 				proxies.remove(d.getAddress());
+				synchronized (indications) {
+					indications.notify();
+				}
 			}
 			else
 				logger.warn("not owner of " + d.getAddress());
@@ -453,7 +453,7 @@ public class TransportLayerImpl implements TransportLayer
 		if (ctrl == CONNECT) {
 			if (serverSide) {
 				AggregatorProxy proxy = p;
-				// if we receive a new connect, but an old destination is still
+				// TODO problem: if we receive a new connect, but an old destination is still
 				// here configured as connection-less, we get a problem with setting
 				// the connection timeout (connectionless has no support for that)
 				if (proxy != null && !d.isConnectionOriented()) {
@@ -493,7 +493,8 @@ public class TransportLayerImpl implements TransportLayer
 				if (logger.isLoggable(LogLevel.TRACE))
 					logger.trace("send disconnect to " + sender);
 				sendDisconnect(sender);
-			} else {
+			}
+			else {
 				p.restartTimeout();
 				if (seq == p.getSeqReceive()) {
 					lnk.sendRequest(sender, Priority.SYSTEM,
@@ -531,8 +532,7 @@ public class TransportLayerImpl implements TransportLayer
 				disconnectIndicate(p, true);
 	}
 
-	private boolean waitForAck() throws KNXTimeoutException, KNXDisconnectException,
-		KNXLinkClosedException
+	private boolean waitForAck() throws KNXTimeoutException, KNXDisconnectException, KNXLinkClosedException
 	{
 		long remaining = ACK_TIMEOUT * 1000;
 		final long end = System.currentTimeMillis() + remaining;
