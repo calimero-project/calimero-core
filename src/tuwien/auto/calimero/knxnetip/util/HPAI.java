@@ -255,8 +255,7 @@ public class HPAI
 	 */
 	public String toString()
 	{
-		return "IPv4 " + (hostprot == IPV4_UDP ? "UDP" : "TCP") + " host " + getAddressString()
-				+ " port " + port;
+		return getAddressString() + ":" + port + " (IPv4 " + (hostprot == IPV4_UDP ? "UDP" : "TCP") + ")";
 	}
 
 	private String getAddressString()
