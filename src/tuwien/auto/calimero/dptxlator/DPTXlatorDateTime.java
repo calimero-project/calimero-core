@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -70,6 +70,8 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  */
 public class DPTXlatorDateTime extends DPTXlator
 {
+	public static final String Description = "Date with Time";
+
 	/**
 	 * DPT ID 19.001, Date with time; values from <b>1900, 01/01 00:00:00</b> to
 	 * <b>2155, 12/31 24:00:00</b>.

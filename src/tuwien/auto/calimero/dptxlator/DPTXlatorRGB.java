@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -58,8 +58,9 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  *
  * @author T. Wegner
  */
-
 public class DPTXlatorRGB extends DPTXlator {
+	public static final String Description = "RGB Color";
+
 	/**
 	 * DPT ID 232.600, RGB Color; values from <b>0 0 0</b> to <b>255 255 255</b>.
 	 */
