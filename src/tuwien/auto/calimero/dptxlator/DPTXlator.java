@@ -77,7 +77,7 @@ public abstract class DPTXlator
 	/**
 	 * Name of the log service used in DPT translators.
 	 */
-	public static final String LOG_SERVICE = "DPTXlator";
+	public static final String LOG_SERVICE = "calimero.dptxlator.DptXlator";
 
 	/**
 	 * Logger object for all translators.
