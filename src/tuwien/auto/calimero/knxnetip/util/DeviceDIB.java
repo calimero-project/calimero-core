@@ -384,9 +384,9 @@ public class DeviceDIB extends DIB
 			mc = InetAddress.getByAddress(getMulticastAddress());
 		}
 		catch (final UnknownHostException ignore) {}
-		return "device " + address + " \"" + name + "\", KNX medium " + getKNXMediumString()
-				+ ", installation " + getInstallation() + " project " + getProject()
-				+ " (project installation ID " + installationId + ")"
+		return "KNX address " + address + " \"" + name + "\", KNX medium " + getKNXMediumString()
+				+ ", installation " + getInstallation() + " - project " + getProject()
+				+ " (project/installation ID " + installationId + ")"
 				+ ", routing multicast address " + mc + ", MAC address " + getMACAddressString()
 				+ ", S/N 0x" + getSerialNumberString();
 	}

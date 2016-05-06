@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -266,7 +266,7 @@ public class ServiceFamiliesDIB extends DIB
 		final StringBuffer buf = new StringBuffer();
 		for (int i = 0; i < ids.length; i++) {
 			buf.append(getFamilyName(ids[i]));
-			buf.append(" version ").append(versions[i]);
+			buf.append(" (v").append(versions[i]).append(")");
 			if (i + 1 < ids.length)
 				buf.append(", ");
 		}
