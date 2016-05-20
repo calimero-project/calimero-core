@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -138,7 +138,7 @@ public class Discoverer
 		if (os.indexOf("windows") >= 0) {
 			// minor: 0 = vista, 1 = win 7, 2 = win 8, 3 = win 8.1, 4 = win 10,  ...
 			final String ver = System.getProperty("os.version", "generic");
-			win7_OrLater = Double.parseDouble(ver) > 6.1;
+			win7_OrLater = Double.parseDouble(ver) >= 6.1;
 		}
 		if (os.indexOf("mac os x") >= 0)
 			osx = true;
