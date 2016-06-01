@@ -119,7 +119,7 @@ public final class Debug
 	public static void printTP1Frame(final RawFrame tp1)
 	{
 		final StringBuffer buf = new StringBuffer();
-		String type;
+		final String type;
 		switch (tp1.getFrameType()) {
 		case RawFrame.ACK_FRAME:
 			type = "ack";

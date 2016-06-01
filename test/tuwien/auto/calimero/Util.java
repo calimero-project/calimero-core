@@ -132,10 +132,9 @@ public final class Util
 	public static IndividualAddress getRouterAddress()
 	{
 		if (device == null) {
-			Discoverer d;
+			final Discoverer d;
 			try {
-				d = new Discoverer(getLocalHost().getAddress(), getLocalHost().getPort(), false,
-						false);
+				d = new Discoverer(getLocalHost().getAddress(), getLocalHost().getPort(), false, false);
 				d.startSearch(2, true);
 				if (d.getSearchResponses().size() == 0)
 					return null;

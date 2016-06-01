@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -237,7 +237,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 		final int svc = d[0] & 0x03 | d[1] & 0xC0;
 		if (svc != 0x40 && svc != 0x80)
 			return;
-		CEMILData copy;
+		final CEMILData copy;
 		try {
 			copy = (CEMILData) CEMIFactory.create(CEMILData.MC_LDATA_IND, d, f);
 		}

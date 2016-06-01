@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,14 +40,11 @@ import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalStateException;
 
 /**
- * Adapter hiding protocol specifics and internals of accessing interface object
- * properties.
+ * Adapter hiding protocol specifics and internals of accessing interface object properties.
  * <p>
- * A property adapter is created for one communication partner (KNX device, KNXnet/IP
- * router).<br>
- * If {@link #close()} is called by a user on an open adapter, all methods which do
- * interface object property access are allowed to throw {@link KNXIllegalStateException}
- * if invoked on that closed adapter.<br>
+ * A property adapter is created for one communication partner (KNX device, KNXnet/IP router). If {@link #close()} is
+ * called by a user on an open adapter, all methods which do interface object property access are allowed to throw
+ * {@link KNXIllegalStateException} if invoked on that closed adapter.<br>
  *
  * @author B. Malinowsky
  */
@@ -55,7 +52,6 @@ public interface PropertyAdapter extends AutoCloseable
 {
 	/**
 	 * Sets property value elements in an interface object property.
-	 * <p>
 	 *
 	 * @param objIndex interface object index
 	 * @param pid property identifier
@@ -71,7 +67,6 @@ public interface PropertyAdapter extends AutoCloseable
 
 	/**
 	 * Gets property value elements in an interface object property.
-	 * <p>
 	 *
 	 * @param objIndex interface object index
 	 * @param pid property identifier
@@ -82,30 +77,24 @@ public interface PropertyAdapter extends AutoCloseable
 	 * @throws KNXIllegalStateException if adapter was already closed
 	 * @throws InterruptedException on interrupted thread
 	 */
-	byte[] getProperty(int objIndex, int pid, int start, int elements)
-		throws KNXException, InterruptedException;
+	byte[] getProperty(int objIndex, int pid, int start, int elements) throws KNXException, InterruptedException;
 
 	/**
-	 * Reads the description of a property of an interface object.
-	 * <p>
-	 * The property description layout is according the application layer property
-	 * description service.
+	 * Reads the description of a property of an interface object, returning a property description layout according the
+	 * application layer property description service.
 	 *
 	 * @param objIndex interface object index
 	 * @param pid property identifier, specify 0 to use the property index
 	 * @param propIndex property index, starts with index 0 for the first property
-	 * @return byte array containing the property description, starting with the property
-	 *         object index
+	 * @return byte array containing the property description, starting with the property object index
 	 * @throws KNXException on error getting the property description
 	 * @throws KNXIllegalStateException if adapter was already closed
 	 * @throws InterruptedException on interrupted thread
 	 */
-	byte[] getDescription(int objIndex, int pid, int propIndex) throws KNXException,
-		InterruptedException;
+	byte[] getDescription(int objIndex, int pid, int propIndex) throws KNXException, InterruptedException;
 
 	/**
 	 * Returns the name for identifying this adapter and its destination.
-	 * <p>
 	 *
 	 * @return adapter name as string
 	 */
@@ -121,9 +110,8 @@ public interface PropertyAdapter extends AutoCloseable
 	/**
 	 * Closes the adapter.
 	 * <p>
-	 * Depending on the adapter, necessary steps to terminate a connection might be done
-	 * and owned resources will be freed.<br>
-	 * A closed adapter can't be used for property access anymore.<br>
+	 * Depending on the adapter, necessary steps to terminate a connection might be done and owned resources will be
+	 * freed. A closed adapter can't be used for property access anymore.<br>
 	 * Currently, this method does not invoke
 	 * {@link PropertyAdapterListener#adapterClosed(tuwien.auto.calimero.CloseEvent)}.
 	 */

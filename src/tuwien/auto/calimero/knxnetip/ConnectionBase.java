@@ -613,7 +613,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 
 		void acquire()
 		{
-			Node n;
+			final Node n;
 			boolean interrupted = false;
 			synchronized (this) {
 				if (cnt > 0 && tail == null) {

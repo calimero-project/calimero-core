@@ -232,7 +232,7 @@ public class PropertyClientTest
 	@Test
 	public final void testGetDescriptionByIndex() throws KNXException, InterruptedException
 	{
-		Description d, d2;
+		final Description d, d2;
 		printDesc(d = rem.getDescriptionByIndex(0, 1));
 		printDesc(d2 = local.getDescriptionByIndex(0, 1));
 
