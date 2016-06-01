@@ -37,6 +37,7 @@
 package tuwien.auto.calimero.knxnetip;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -196,7 +197,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	 */
 	@Override
 	public void send(final CEMI frame, final BlockingMode mode)
-		throws KNXTimeoutException, KNXConnectionClosedException
+		throws KNXTimeoutException, KNXConnectionClosedException, InterruptedException
 	{
 		// send state | blocking | nonblocking
 		// -----------------------------------
@@ -270,10 +271,8 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 				if (mode != WAIT_FOR_ACK)
 					doExtraBlockingModes();
 			}
-			catch (final InterruptedException e) {
-				close(CloseEvent.USER_REQUEST, "interrupted", LogLevel.WARN, e);
-				Thread.currentThread().interrupt();
-				throw new KNXConnectionClosedException("interrupted connection got closed");
+			catch (final InterruptedIOException e) {
+				throw new InterruptedException("interrupted I/O, " + e);
 			}
 			catch (final IOException e) {
 				close(CloseEvent.INTERNAL, "communication failure", LogLevel.ERROR, e);

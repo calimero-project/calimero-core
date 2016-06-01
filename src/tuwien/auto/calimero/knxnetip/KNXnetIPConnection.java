@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -181,10 +181,11 @@ public interface KNXnetIPConnection extends AutoCloseable
 	 *         a response message was encountered
 	 * @throws KNXConnectionClosedException if no communication was established in the
 	 *         first place or communication was closed
+	 * @throws InterruptedException on thread interrupt
 	 * @throws KNXIllegalStateException if the send is not permitted by the protocol
 	 */
-	void send(CEMI frame, BlockingMode mode) throws KNXTimeoutException,
-		KNXConnectionClosedException;
+	void send(CEMI frame, BlockingMode mode)
+		throws KNXTimeoutException, KNXConnectionClosedException, InterruptedException;
 
 	/**
 	 * Returns the address (endpoint) this connection endpoint is communicating to.

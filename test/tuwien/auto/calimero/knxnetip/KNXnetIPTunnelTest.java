@@ -226,10 +226,7 @@ public class KNXnetIPTunnelTest
 					t.send(f, con);
 					System.out.println(getName() + " returned sending " + f.getSource());
 				}
-				catch (final KNXTimeoutException e) {
-					e.printStackTrace();
-				}
-				catch (final KNXConnectionClosedException e) {
+				catch (KNXTimeoutException | KNXConnectionClosedException | InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
@@ -337,7 +334,7 @@ public class KNXnetIPTunnelTest
 	}
 
 	private void doSend(final CEMILData f, final KNXnetIPConnection.BlockingMode m, final boolean positiveConfirmation)
-		throws KNXTimeoutException, KNXConnectionClosedException
+		throws KNXTimeoutException, KNXConnectionClosedException, InterruptedException
 	{
 		l.received = null;
 		t.send(f, m);
@@ -362,7 +359,8 @@ public class KNXnetIPTunnelTest
 	}
 
 	private void doNATSend(final CEMILData f, final KNXnetIPConnection.BlockingMode m,
-		final boolean positiveConfirmation) throws KNXTimeoutException, KNXConnectionClosedException
+		final boolean positiveConfirmation)
+		throws KNXTimeoutException, KNXConnectionClosedException, InterruptedException
 	{
 		lnat.received = null;
 		tnat.send(f, m);
@@ -494,6 +492,25 @@ public class KNXnetIPTunnelTest
 		assertEquals(KNXnetIPConnection.OK, mon.getState());
 		Thread.sleep(60000);
 		assertEquals(KNXnetIPConnection.OK, mon.getState());
+	}
+
+	@Test
+	void interruptedSend() throws Exception
+	{
+		init();
+		newTunnel();
+		for (int i = 0; i < 20; i++) {
+			try {
+				Thread.currentThread().interrupt();
+				t.send(frame, KNXnetIPConnection.WAIT_FOR_CON);
+				fail("we are interrupted");
+				try {
+					Thread.sleep(100);
+				}
+				catch (final InterruptedException e) {}
+			}
+			catch (final InterruptedException expected) {}
+		}
 	}
 
 	private void newTunnel() throws KNXException, InterruptedException

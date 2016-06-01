@@ -145,7 +145,7 @@ public class KNXnetIPDevMgmtTest
 	}
 
 	private void doSend(final CEMIDevMgmt f, final BlockingMode mode, final boolean positiveResponse)
-		throws KNXTimeoutException, KNXConnectionClosedException
+		throws KNXTimeoutException, KNXConnectionClosedException, InterruptedException
 	{
 		l.received = null;
 		m.send(f, mode);

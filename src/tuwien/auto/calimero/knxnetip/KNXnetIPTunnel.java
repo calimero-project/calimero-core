@@ -164,8 +164,8 @@ public class KNXnetIPTunnel extends ClientConnection
 	 *        tunneling layer
 	 */
 	@Override
-	public void send(final CEMI frame, final BlockingMode mode) throws KNXTimeoutException,
-		KNXConnectionClosedException
+	public void send(final CEMI frame, final BlockingMode mode)
+		throws KNXTimeoutException, KNXConnectionClosedException, InterruptedException
 	{
 		if (layer == BusMonitorLayer)
 			throw new KNXIllegalStateException("send not permitted in busmonitor mode");

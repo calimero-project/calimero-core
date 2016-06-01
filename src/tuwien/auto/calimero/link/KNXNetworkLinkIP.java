@@ -265,7 +265,7 @@ public class KNXNetworkLinkIP extends AbstractLink
 			conn.send(msg, waitForCon ? KNXnetIPConnection.WAIT_FOR_CON : KNXnetIPConnection.WAIT_FOR_ACK);
 			logger.trace("send to {} succeeded", msg.getDestination());
 		}
-		catch (final KNXConnectionClosedException e) {
+		catch (InterruptedException | KNXConnectionClosedException e) {
 			logger.error("send error, closing link", e);
 			close();
 			throw new KNXLinkClosedException("link closed, " + e.getMessage());

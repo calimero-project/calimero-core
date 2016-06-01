@@ -111,7 +111,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 		checkRW = queryWriteEnable;
 	}
 
-	void init() throws KNXException
+	void init() throws KNXException, InterruptedException
 	{
 		resetLastDescription();
 		try {
@@ -128,7 +128,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 
 	@Override
 	public void setProperty(final int objIndex, final int pid, final int start, final int elements,
-		final byte[] data) throws KNXException
+		final byte[] data) throws KNXException, InterruptedException
 	{
 		if (closed)
 			throw new KNXIllegalStateException("adapter closed");
@@ -141,7 +141,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 
 	@Override
 	public byte[] getProperty(final int objIndex, final int pid, final int start, final int elements)
-		throws KNXException
+		throws KNXException, InterruptedException
 	{
 		if (closed)
 			throw new KNXIllegalStateException("adapter closed");
@@ -154,7 +154,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 
 	@Override
 	public byte[] getDescription(final int objIndex, final int pid, final int propIndex)
-		throws KNXException
+		throws KNXException, InterruptedException
 	{
 		// imitate property description:
 		// oindex: PropertyAccess.PID.IO_LIST
@@ -225,7 +225,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 		}
 	}
 
-	protected abstract void send(final CEMIDevMgmt frame, final Object mode) throws KNXException;
+	protected abstract void send(final CEMIDevMgmt frame, final Object mode) throws KNXException, InterruptedException;
 
 	protected byte[] findFrame(final int messageCode) throws KNXRemoteException
 	{
@@ -268,7 +268,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 		return instance;
 	}
 
-	protected void initInterfaceObjects() throws KNXException
+	protected void initInterfaceObjects() throws KNXException, InterruptedException
 	{
 		send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, DEVICE_OBJECT, 1,
 				PropertyAccess.PID.IO_LIST, 0, 1), KNXnetIPConnection.WAIT_FOR_CON);
