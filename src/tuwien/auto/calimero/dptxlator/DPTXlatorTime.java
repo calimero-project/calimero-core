@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -250,17 +250,14 @@ public class DPTXlatorTime extends DPTXlator
 		return fromDPTMillis(0);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#setData(byte[], int)
-	 */
 	public void setData(final byte[] data, final int offset)
 	{
 		if (offset < 0 || offset > data.length)
 			throw new KNXIllegalArgumentException("illegal offset " + offset);
 		final int size = (data.length - offset) / 3 * 3;
 		if (size == 0)
-			throw new KNXIllegalArgumentException("data length " + size + " < KNX data type width "
-					+ Math.max(1, getTypeSize()));
+			throw new KNXIllegalArgumentException("DPT " + dpt.getID() + " " + dpt.getDescription() + ": data length "
+					+ size + " < required datapoint type width " + Math.max(1, getTypeSize()));
 		final short[] buf = new short[size];
 		int item = 0;
 		for (int i = offset; i < size + offset; i += 3) {
@@ -268,14 +265,11 @@ public class DPTXlatorTime extends DPTXlator
 					+ SECOND] & 0x3F, buf, item++);
 			// check reserved bits
 			if ((data[i + MINUTE] & ~0x3F) + (data[i + SECOND] & ~0x3F) != 0)
-				logger.warn(dpt.getID() + " - reserved bit not 0");
+				logger.warn("DPT " + dpt.getID() + " " + dpt.getDescription() + ": reserved bit not 0");
 		}
 		this.data = buf;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
-	 */
 	public Map getSubTypes()
 	{
 		return types;

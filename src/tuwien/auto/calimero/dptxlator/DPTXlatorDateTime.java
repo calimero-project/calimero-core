@@ -594,8 +594,8 @@ public class DPTXlatorDateTime extends DPTXlator
 			throw new KNXIllegalArgumentException("illegal offset " + offset);
 		final int size = (data.length - offset) & ~7;
 		if (size == 0)
-			throw new KNXIllegalArgumentException("data length " + size
-				+ " < KNX data type width " + Math.max(1, getTypeSize()));
+			throw new KNXIllegalArgumentException("DPT " + dpt.getID() + " " + dpt.getDescription() + ": data length "
+					+ (data.length - offset) + " < required datapoint type width " + Math.max(1, getTypeSize()));
 		final short[] buf = new short[size];
 		final int[] mask = { 0xFF, 0x0F, 0x1F, 0xFF, 0x3F, 0x3F, 0xFF, 0x80 };
 		for (int i = 0; i < size; ++i) {
@@ -603,7 +603,7 @@ public class DPTXlatorDateTime extends DPTXlator
 			buf[i] = (short) (data[offset + i] & mask[field]);
 			// check reserved bits
 			if ((ubyte(data[offset + i]) & ~mask[field]) != 0)
-				logger.warn(dpt.getID() + " - reserved bit not 0");
+				logger.warn("DPT " + dpt.getID() + " " + dpt.getDescription() + ": reserved bit not 0");
 			// check range on set fields
 			if (field == 6 && (buf[i] & NO_DATE) == 0) {
 				checkRange(MONTH, buf[i - 5]);

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,10 +52,9 @@ import tuwien.auto.calimero.exception.KNXIllegalArgumentException;
  * <p>
  * The KNX data type width is 3 bytes.<br>
  * The type contains the date information year, month, and day of month. <br>
- * Where required in time calculation, the used calendar is based on the current time in
- * the default time zone with the default locale. All time information behaves in
- * non-lenient mode, i.e., no value overflow is allowed and values are not normalized or
- * adjusted using the next, larger field.<br>
+ * Where required in time calculation, the used calendar is based on the current time in the default time zone with the
+ * default locale. All time information behaves in non-lenient mode, i.e., no value overflow is allowed and values are
+ * not normalized or adjusted using the next, larger field.<br>
  * <p>
  * The default return value after creation is <code>2000-01-01</code>.
  *
@@ -66,8 +65,7 @@ public class DPTXlatorDate extends DPTXlator
 	/**
 	 * DPT ID 11.001, Date; values from <b>1990-01-01</b> to <b>2089-12-31</b>.
 	 */
-	public static final DPT DPT_DATE =
-		new DPT("11.001", "Date", "1990-01-01", "2089-12-31", "yyyy-mm-dd");
+	public static final DPT DPT_DATE = new DPT("11.001", "Date", "1990-01-01", "2089-12-31", "yyyy-mm-dd");
 
 	private static final int DAY = 0;
 	private static final int MONTH = 1;
@@ -97,8 +95,7 @@ public class DPTXlatorDate extends DPTXlator
 	 * Creates a translator for the given datapoint type ID.
 	 *
 	 * @param dptID available implemented datapoint type ID
-	 * @throws KNXFormatException on wrong formatted or not expected (available)
-	 *         <code>dptID</code>
+	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptID</code>
 	 */
 	public DPTXlatorDate(final String dptID) throws KNXFormatException
 	{
@@ -110,17 +107,14 @@ public class DPTXlatorDate extends DPTXlator
 	/**
 	 * Sets a user defined date value format used by all instances of this class.
 	 * <p>
-	 * The pattern is specified according to {@link SimpleDateFormat}. Subsequent date
-	 * information, supplied and returned in textual representation, will use a layout
-	 * formatted according this pattern.<br>
-	 * Note, the format will rely on calendar default time symbols (e.g., language
-	 * specifics).<br>
-	 * If requesting a textual date representation, and using this value format leads to
-	 * errors due to an invalid calendar date, a short error message string will be
-	 * returned.
+	 * The pattern is specified according to {@link SimpleDateFormat}. Subsequent date information, supplied and
+	 * returned in textual representation, will use a layout formatted according this pattern.<br>
+	 * Note, the format will rely on calendar default time symbols (e.g., language specifics).<br>
+	 * If requesting a textual date representation, and using this value format leads to errors due to an invalid
+	 * calendar date, a short error message string will be returned.
 	 *
-	 * @param pattern the new pattern specifying the value date format, <code>null</code>
-	 *        to reset to default value format
+	 * @param pattern the new pattern specifying the value date format, <code>null</code> to reset to default value
+	 *        format
 	 */
 	public static final synchronized void useValueFormat(final String pattern)
 	{
@@ -134,9 +128,6 @@ public class DPTXlatorDate extends DPTXlator
 			sdf.applyPattern(pattern);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getAllValues()
-	 */
 	public String[] getAllValues()
 	{
 		final String[] buf = new String[data.length / 3];
@@ -195,8 +186,7 @@ public class DPTXlatorDate extends DPTXlator
 	/**
 	 * Sets the date for the first item using UTC millisecond information.
 	 * <p>
-	 * The <code>milliseconds</code> is interpreted with the translator default
-	 * calendar.
+	 * The <code>milliseconds</code> is interpreted with the translator default calendar.
 	 *
 	 * @param milliseconds time value in milliseconds, as used in {@link Calendar}
 	 */
@@ -206,11 +196,9 @@ public class DPTXlatorDate extends DPTXlator
 	}
 
 	/**
-	 * Returns the date information in UTC milliseconds, using the translator default
-	 * calendar.
+	 * Returns the date information in UTC milliseconds, using the translator default calendar.
 	 * <p>
-	 * The method uses year, month and day information for calculation. Any finer time
-	 * granularity defaults to 0.<br>
+	 * The method uses year, month and day information for calculation. Any finer time granularity defaults to 0.<br>
 	 *
 	 * @return the date as time in milliseconds as long, as used in {@link Calendar}
 	 * @throws KNXFormatException on invalid calendar date
@@ -220,33 +208,25 @@ public class DPTXlatorDate extends DPTXlator
 		return fromDPTMillis(0);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#setData(byte[], int)
-	 */
 	public void setData(final byte[] data, final int offset)
 	{
 		if (offset < 0 || offset > data.length)
 			throw new KNXIllegalArgumentException("illegal offset " + offset);
 		final int size = (data.length - offset) / 3 * 3;
 		if (size == 0)
-			throw new KNXIllegalArgumentException("data length " + size
-				+ " < KNX data type width " + Math.max(1, getTypeSize()));
+			throw new KNXIllegalArgumentException("DPT " + dpt.getID() + " " + dpt.getDescription() + ": data length "
+					+ size + " < required datapoint type width " + Math.max(1, getTypeSize()));
 		final short[] buf = new short[size];
 		int item = 0;
 		for (int i = offset; i < size + offset; i += 3) {
-			set(absYear(data[i + YEAR] & 0x7F), data[i + MONTH] & 0x0F,
-				data[i + DAY] & 0x1F, buf, item++);
+			set(absYear(data[i + YEAR] & 0x7F), data[i + MONTH] & 0x0F, data[i + DAY] & 0x1F, buf, item++);
 			// check reserved bits
-			if ((data[i + YEAR] & ~0x7F) + (data[i + MONTH] & ~0x0F) +
-				(data[i + DAY] & ~0x1F) != 0)
-				logger.warn(dpt.getID() + " - reserved bit not 0");
+			if ((data[i + YEAR] & ~0x7F) + (data[i + MONTH] & ~0x0F) + (data[i + DAY] & ~0x1F) != 0)
+				logger.warn("DPT " + dpt.getID() + " " + dpt.getDescription() + ": reserved bit not 0");
 		}
 		this.data = buf;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
-	 */
 	public Map getSubTypes()
 	{
 		return types;
@@ -275,8 +255,7 @@ public class DPTXlatorDate extends DPTXlator
 		// return year-month-day
 		final int d = data[i + DAY];
 		final int m = data[i + MONTH];
-		return Short.toString(absYear(data[i + YEAR])) + '-' + align(m) + m + '-'
-			+ align(d) + d;
+		return Short.toString(absYear(data[i + YEAR])) + '-' + align(m) + m + '-' + align(d) + d;
 	}
 
 	private long fromDPTMillis(final int index) throws KNXFormatException
@@ -296,8 +275,7 @@ public class DPTXlatorDate extends DPTXlator
 		}
 	}
 
-	protected void toDPT(final String value, final short[] dst, final int index)
-		throws KNXFormatException
+	protected void toDPT(final String value, final short[] dst, final int index) throws KNXFormatException
 	{
 		if (sdf != null)
 			synchronized (DPTXlatorDate.class) {
@@ -328,14 +306,12 @@ public class DPTXlatorDate extends DPTXlator
 		synchronized (DPTXlatorDate.class) {
 			getCalendar().clear();
 			c.setTimeInMillis(milliseconds);
-			set(c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c
-				.get(Calendar.DAY_OF_MONTH), dst, index);
+			set(c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH), dst, index);
 		}
 		return dst;
 	}
 
-	private short[] set(final int year, final int month, final int day, final short[] dst,
-		final int index)
+	private short[] set(final int year, final int month, final int day, final short[] dst, final int index)
 	{
 		if (year < 1990 || year > 2089)
 			throw new KNXIllegalArgumentException("year out of range [1990..2089]");
