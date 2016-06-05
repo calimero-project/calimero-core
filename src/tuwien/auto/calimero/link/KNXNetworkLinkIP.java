@@ -97,6 +97,27 @@ public class KNXNetworkLinkIP extends AbstractLink
 	private final KNXnetIPConnection conn;
 
 	/**
+	 * Creates a new network link using KNXnet/IP tunneling (internally using a {@link KNXnetIPConnection}) to a remote
+	 * KNXnet/IP server endpoint.
+	 *
+	 * @param localEP the local endpoint of the link to use; this is the client control endpoint, use <code>null</code>
+	 *        for the default local host and an ephemeral port number<br>
+	 * @param remoteEP the remote endpoint of the link to communicate with; this is the KNXnet/IP server control
+	 *        endpoint
+	 * @param useNAT <code>true</code> to use network address translation in tunneling service mode, <code>false</code>
+	 *        to use the default (non aware) mode
+	 * @param settings medium settings defining device and KNX medium specifics for communication
+	 * @return the network link in open state
+	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
+	 * @throws InterruptedException on interrupted thread while establishing link
+	 */
+	public static KNXNetworkLinkIP newTunnelingLink(final InetSocketAddress localEP, final InetSocketAddress remoteEP,
+		final boolean useNAT, final KNXMediumSettings settings) throws KNXException, InterruptedException
+	{
+		return new KNXNetworkLinkIP(TUNNELING, localEP, remoteEP, useNAT, settings);
+	}
+
+	/**
 	 * Creates a new network link based on the KNXnet/IP protocol, using a
 	 * {@link KNXnetIPConnection}.
 	 * <p>

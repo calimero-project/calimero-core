@@ -64,7 +64,6 @@ import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.knxnetip.Debug;
-import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.link.medium.PLSettings;
@@ -177,23 +176,19 @@ public class KNXNetworkLinkIPTest
 		}
 		catch (final KNXIllegalArgumentException e) {}
 		// use default local host
-		KNXNetworkLink lnk = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, null, Util.getServer(), false,
+		final KNXNetworkLink lnk = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, null, Util.getServer(), false,
 				TPSettings.TP1);
 		lnk.close();
-		// try easy to use ctor
+	}
 
-		try {
-			lnk = new KNXNetworkLinkIP(Util.getServer().getHostName(), TPSettings.TP1);
-			lnk.close();
-		}
-		catch (final KNXException e) {
-			if (Util.getServer().getPort() != KNXnetIPConnection.DEFAULT_PORT)
-				System.out.println("could not test KNXNetworkLinkIP simple constructor: "
-						+ "KNX server does not use default port 3671");
-			else
-				throw e;
-		}
+	@Test
+	void tunnelingLinkFactoryMethod() throws KNXException, InterruptedException
+	{
+		// TODO null argument requesting default local endpoint might fail based on system settings
+		try (KNXNetworkLink link = KNXNetworkLinkIP.newTunnelingLink(null, Util.getServer(), false, TPSettings.TP1)) {}
 
+		try (KNXNetworkLink link = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false,
+				TPSettings.TP1)) {}
 	}
 
 	/**
