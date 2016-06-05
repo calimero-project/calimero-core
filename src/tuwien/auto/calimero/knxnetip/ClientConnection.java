@@ -138,7 +138,7 @@ abstract class ClientConnection extends ConnectionBase
 		if (ctrlEndpt.isUnresolved())
 			throw new KNXException("server control endpoint is unresolved: " + serverCtrlEP);
 		useNat = useNAT;
-		logger = LogService.getLogger(getName());
+		logger = LogService.getLogger("calimero.knxnetip." + getName());
 		Exception thrown = null;
 		try {
 			// if we allow localEP to be null, we would create an unbound socket
