@@ -192,7 +192,7 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor
 		else if (activeEmi == EmiType.Emi1) {
 			new BcuSwitcher(conn, logger).reset();
 		}
-		else {
+		else if (activeEmi == EmiType.Emi2) {
 			final byte[] switchNormal = { (byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
 			conn.send(HidReport.create(activeEmi.emi, switchNormal).get(0), true);
 		}
