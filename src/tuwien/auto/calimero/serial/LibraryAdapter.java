@@ -42,6 +42,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 
@@ -68,6 +74,37 @@ public abstract class LibraryAdapter implements Closeable
 	 * not use logger, it might be set to null.
 	 */
 	protected final Logger logger;
+
+	/** Returns all available serial communication port identifiers. */
+	public static List<String> getPortIdentifiers()
+	{
+		try {
+			final String ports = System.getProperty("microedition.commports");
+			if (ports != null)
+				return Arrays.asList(ports.split(",")).stream().collect(Collectors.toList());
+		}
+		catch (final SecurityException e) {}
+		if (SerialComAdapter.isAvailable()) {
+			final List<String> ports = new ArrayList<>();
+			Arrays.asList(defaultPortPrefixes()).forEach(p -> IntStream.range(0, 20)
+					.filter(i -> SerialComAdapter.portExists(p + i)).forEach(i -> ports.add(p + i)));
+			return ports;
+		}
+		try {
+			final Class<?> c = Class.forName("tuwien.auto.calimero.serial.RxtxAdapter");
+			@SuppressWarnings("unchecked")
+			final List<String> ports = (List<String>) c.getMethod("getPortIdentifiers").invoke(null);
+			return ports;
+		}
+		catch (Exception | NoClassDefFoundError e) {}
+		return Collections.emptyList();
+	}
+
+	private static String[] defaultPortPrefixes()
+	{
+		return System.getProperty("os.name").toLowerCase().indexOf("windows") > -1 ? new String[] { "\\\\.\\COM" }
+				: new String[] { "/dev/ttyS", "/dev/ttyACM", "/dev/ttyUSB" };
+	}
 
 	/**
 	 * Factory method to open a serial connection using one of the available library adapters.
