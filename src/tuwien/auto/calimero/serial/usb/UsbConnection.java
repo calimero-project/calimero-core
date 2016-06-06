@@ -45,6 +45,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -969,7 +970,7 @@ public class UsbConnection implements AutoCloseable
 	}
 
 	// pre: device = vendorId:productId
-	private static boolean isKNXIntfID(final String device)
+	private static boolean isKnxInterfaceId(final String device)
 	{
 		boolean knownVendor = false, knownProduct = false;
 		final String[] split = device.split(":");
@@ -991,7 +992,7 @@ public class UsbConnection implements AutoCloseable
 	{
 		final List<String> list = getDeviceDescriptionsLowLevel();
 		if (name.isEmpty())
-			list.removeIf(i -> !isKNXIntfID(i.substring(i.indexOf("ID") + 3, i.indexOf("\n"))));
+			list.removeIf(i -> !isKnxInterfaceId(i.substring(i.indexOf("ID") + 3, i.indexOf("\n"))));
 		else
 			list.removeIf(i -> i.toLowerCase().indexOf(name.toLowerCase()) == -1);
 		if (list.isEmpty())
@@ -1093,6 +1094,76 @@ public class UsbConnection implements AutoCloseable
 			sb.append("\n").append(ind).append(DescriptorUtils.getSpeedName(speed))
 					.append(" Speed USB");
 		return sb.toString();
+	}
+
+	public static Device findDeviceLowLevel(final int vendorId, final int productId)
+	{
+		final Context ctx = new Context();
+		int err = LibUsb.init(ctx);
+		if (err != 0) {
+			slogger.error("LibUsb initialization error {}: {}", -err, LibUsb.strError(err));
+			return null;
+		}
+		try {
+			final DeviceList list = new DeviceList();
+			final int res = LibUsb.getDeviceList(ctx, list);
+			if (res < 0) {
+				slogger.error("LibUsb device list error {}: {}", -res, LibUsb.strError(res));
+				return null;
+			}
+			try {
+				for (final Device device : list) {
+					final DeviceDescriptor d = new DeviceDescriptor();
+					err = LibUsb.getDeviceDescriptor(device, d);
+					if (err == 0) {
+						final int vendor = d.idVendor() & 0xffff;
+						final int product = d.idProduct() & 0xffff;
+						if (vendor == vendorId && product == productId) {
+							LibUsb.refDevice(device);
+							return device;
+						}
+					}
+				}
+			}
+			finally {
+				LibUsb.freeDeviceList(list, true);
+			}
+		}
+		finally {
+			// XXX we can't call exit here, as we return a Device for subsequent usage
+//			LibUsb.exit(ctx);
+		}
+		return null;
+	}
+
+	public static Optional<String> getProductName(final Device device)
+	{
+		final DeviceDescriptor d = new DeviceDescriptor();
+		final DeviceHandle dh = new DeviceHandle();
+		if (LibUsb.getDeviceDescriptor(device, d) == 0 && LibUsb.open(device, dh) == 0) {
+			try {
+				return Optional.ofNullable(LibUsb.getStringDescriptor(dh, d.iProduct()));
+			}
+			finally {
+				LibUsb.close(dh);
+			}
+		}
+		return Optional.empty();
+	}
+
+	public static Optional<String> getManufacturer(final Device device)
+	{
+		final DeviceDescriptor d = new DeviceDescriptor();
+		final DeviceHandle dh = new DeviceHandle();
+		if (LibUsb.getDeviceDescriptor(device, d) == 0 && LibUsb.open(device, dh) == 0) {
+			try {
+				return Optional.ofNullable(LibUsb.getStringDescriptor(dh, d.iManufacturer()));
+			}
+			finally {
+				LibUsb.close(dh);
+			}
+		}
+		return Optional.empty();
 	}
 
 	private static String toDeviceId(final int vendorId, final int productId)
