@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2015 B. Malinowsky
+    Copyright (c) 2009, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -190,6 +190,7 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
 	 * @see #getValueSigned()
 	 */
+	@Override
 	public final double getNumericValue()
 	{
 		return getValueSigned();

@@ -115,5 +115,6 @@ public interface PropertyAdapter extends AutoCloseable
 	 * Currently, this method does not invoke
 	 * {@link PropertyAdapterListener#adapterClosed(tuwien.auto.calimero.CloseEvent)}.
 	 */
+	@Override
 	void close();
 }

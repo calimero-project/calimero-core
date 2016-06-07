@@ -226,5 +226,6 @@ public interface KNXnetIPConnection extends AutoCloseable
 	 * listeners receive. <br>
 	 * If this connection endpoint is already closed, no action is performed.
 	 */
+	@Override
 	void close();
 }

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -151,5 +151,6 @@ public interface KNXNetworkMonitor extends AutoCloseable
 	 * If no communication access was established in the first place, no action is
 	 * performed.
 	 */
+	@Override
 	void close();
 }

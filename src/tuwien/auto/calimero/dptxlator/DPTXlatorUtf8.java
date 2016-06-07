@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015 B. Malinowsky
+    Copyright (c) 2015, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -117,6 +117,7 @@ public class DPTXlatorUtf8 extends DPTXlator
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#setValues(java.lang.String[])
 	 */
+	@Override
 	public void setValues(final String[] values) throws KNXFormatException
 	{
 		if (values.length == 0)
@@ -134,6 +135,7 @@ public class DPTXlatorUtf8 extends DPTXlator
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getAllValues()
 	 */
+	@Override
 	public String[] getAllValues()
 	{
 		final String[] buf = new String[getItems()];
@@ -145,6 +147,7 @@ public class DPTXlatorUtf8 extends DPTXlator
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#setValue(java.lang.String)
 	 */
+	@Override
 	public void setValue(final String value) throws KNXFormatException
 	{
 		setValues(new String[] { value });
@@ -153,6 +156,7 @@ public class DPTXlatorUtf8 extends DPTXlator
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#setData(byte[], int)
 	 */
+	@Override
 	public void setData(final byte[] data, final int offset)
 	{
 		if (offset < 0 || offset > data.length)
@@ -163,6 +167,7 @@ public class DPTXlatorUtf8 extends DPTXlator
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getItems()
 	 */
+	@Override
 	public int getItems()
 	{
 		return items;
@@ -171,6 +176,7 @@ public class DPTXlatorUtf8 extends DPTXlator
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
 	 */
+	@Override
 	public final Map<String, DPT> getSubTypes()
 	{
 		return types;
@@ -224,6 +230,7 @@ public class DPTXlatorUtf8 extends DPTXlator
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#toDPT(java.lang.String, short[], int)
 	 */
+	@Override
 	protected void toDPT(final String value, final short[] dst, final int index)
 		throws KNXFormatException
 	{

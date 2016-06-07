@@ -386,6 +386,7 @@ public class FT12Connection implements AutoCloseable
 	 * listeners receive. <br>
 	 * If this connection endpoint is already closed, no action is performed.
 	 */
+	@Override
 	public void close()
 	{
 		close(true, "client request");

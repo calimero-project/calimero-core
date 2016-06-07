@@ -220,5 +220,6 @@ public interface KNXNetworkLink extends AutoCloseable
 	 * If no communication access was established in the first place, no action is
 	 * performed.
 	 */
+	@Override
 	void close();
 }

@@ -687,6 +687,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
 	 * @see #getValueFloat()
 	 */
+	@Override
 	public final double getNumericValue()
 	{
 		return getValueFloat();

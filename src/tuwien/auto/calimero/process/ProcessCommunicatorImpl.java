@@ -395,6 +395,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	 * @see tuwien.auto.calimero.process.ProcessCommunicator#write
 	 * (tuwien.auto.calimero.GroupAddress, tuwien.auto.calimero.dptxlator.DPTXlator)
 	 */
+	@Override
 	public void write(final GroupAddress dst, final DPTXlator value)
 		throws KNXTimeoutException, KNXLinkClosedException
 	{

@@ -85,6 +85,7 @@ public final class TransferProtocolHeader
 	public enum KnxTunnelEmi implements ServiceId {
 		Emi1, Emi2, CEmi;
 
+		@Override
 		public int id() { return ordinal() + 1; }
 	}
 
@@ -92,6 +93,7 @@ public final class TransferProtocolHeader
 	public enum BusAccessServerService implements ServiceId {
 		Get, Response, Set, Info;
 
+		@Override
 		public int id() { return ordinal() + 1; }
 	}
 

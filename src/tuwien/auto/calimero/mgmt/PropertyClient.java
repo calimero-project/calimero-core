@@ -649,6 +649,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	/**
 	 * Closes the property client and the used adapter.
 	 */
+	@Override
 	public void close()
 	{
 		if (pa.isOpen()) {
