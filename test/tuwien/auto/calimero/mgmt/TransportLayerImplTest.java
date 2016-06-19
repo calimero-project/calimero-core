@@ -485,7 +485,7 @@ public class TransportLayerImplTest
 				public void run()
 				{
 					synchronized (this) {
-						notify();
+						this.notify();
 					}
 					try {
 						sleep(0);

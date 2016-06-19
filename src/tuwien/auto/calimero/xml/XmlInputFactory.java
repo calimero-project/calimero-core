@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class XmlInputFactory // extends XMLInputFactory
 {
-	public static boolean INTERNAL_ONLY = false;
+	public static final boolean INTERNAL_ONLY = false;
 
 	private static final Logger l = LoggerFactory.getLogger("calimero.xml");
 

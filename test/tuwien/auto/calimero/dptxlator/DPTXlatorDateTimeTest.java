@@ -205,7 +205,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 		t.setValue(test);
 		final String std = t.getValue();
 		final byte[] d = t.getData(dst, offset);
-		assertEquals(dst, d);
+		assertTrue(dst == d);
 		assertTrue(dst[0] == 0 && dst[1] == 0 && dst[10] == 0 && dst[11] == 0);
 		for (int i = 0; i < 8; ++i)
 			assertEquals(cmp[i], d[offset + i]);

@@ -419,10 +419,8 @@ public abstract class DPTXlator
 	{
 		final DPT t = availableTypes.get(dptID);
 		if (t == null) {
-			// don't call logThrow since dpt is not set yet
-			final String s = "DPT " + dptID + " is not available";
-			logger.warn(s);
-			throw new KNXFormatException(s, dptID);
+			// don't call newException because dpt is not set
+			throw new KNXFormatException("DPT " + dptID + " is not available", dptID);
 		}
 		dpt = t;
 	}
@@ -476,8 +474,7 @@ public abstract class DPTXlator
 		return (short) (value & 0xff);
 	}
 
-	final KNXFormatException newException(final String msg, final String item,
-		final Exception cause)
+	final KNXFormatException newException(final String msg, final String item, final Exception cause)
 	{
 		final String s = dpt.getID() + " " + dpt.getDescription() + ": " + msg;
 		return new KNXFormatException(s, item, cause);

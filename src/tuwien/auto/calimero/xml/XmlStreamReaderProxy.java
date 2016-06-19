@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015 B. Malinowsky
+    Copyright (c) 2015, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -107,7 +107,7 @@ public final class XmlStreamReaderProxy implements XmlReader
 	}
 
 	@Override
-	public String getNamespaceURI(final String prefix) { return r.getNamespaceURI(prefix);}
+	public String getNamespaceURI(final String prefix) { return r.getNamespaceURI(prefix); }
 
 	@Override
 	public boolean isWhiteSpace() { return r.isWhiteSpace(); }
@@ -121,31 +121,31 @@ public final class XmlStreamReaderProxy implements XmlReader
 	public int getAttributeCount() { return r.getAttributeCount(); }
 
 	@Override
-	public String getAttributeNamespace(final int index) { return r.getAttributeNamespace( index); }
+	public String getAttributeNamespace(final int index) { return r.getAttributeNamespace(index); }
 
 	@Override
-	public String getAttributeLocalName(final int index) { return r.getAttributeLocalName( index); }
+	public String getAttributeLocalName(final int index) { return r.getAttributeLocalName(index); }
 
 	@Override
-	public String getAttributePrefix(final int index) { return r.getAttributePrefix( index); }
+	public String getAttributePrefix(final int index) { return r.getAttributePrefix(index); }
 
 	@Override
-	public String getAttributeType(final int index) { return r.getAttributeType( index); }
+	public String getAttributeType(final int index) { return r.getAttributeType(index); }
 
 	@Override
-	public String getAttributeValue(final int index) { return r.getAttributeValue( index); }
+	public String getAttributeValue(final int index) { return r.getAttributeValue(index); }
 
 	@Override
-	public boolean isAttributeSpecified(final int index) { return r.isAttributeSpecified( index); }
+	public boolean isAttributeSpecified(final int index) { return r.isAttributeSpecified(index); }
 
 	@Override
 	public int getNamespaceCount() { return r.getNamespaceCount(); }
 
 	@Override
-	public String getNamespacePrefix(final int index) { return r.getNamespacePrefix( index); }
+	public String getNamespacePrefix(final int index) { return r.getNamespacePrefix(index); }
 
 	@Override
-	public String getNamespaceURI(final int index) { return r.getNamespaceURI( index); }
+	public String getNamespaceURI(final int index) { return r.getNamespaceURI(index); }
 
 	@Override
 	public int getEventType() { return r.getEventType(); }
