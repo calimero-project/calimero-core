@@ -119,6 +119,12 @@ public abstract class AbstractLink implements KNXNetworkLink
 		public void frameReceived(final FrameEvent e)
 		{
 			try {
+				// with EMI1 frames, there is the possibility we receive some left-over Get-Value responses
+				// from BCU switching during link setup, silently discard them
+				final byte[] emi1 = e.getFrameBytes();
+				if (emi1 != null && BcuSwitcher.isEmi1GetValue(emi1[0] & 0xff))
+					return;
+
 				final CEMI cemi = onReceive(e);
 				if (cemi instanceof CEMIDevMgmt) {
 					// XXX check .con correctly (required for setting cEMI link layer mode)

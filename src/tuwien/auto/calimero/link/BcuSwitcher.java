@@ -114,6 +114,10 @@ final class BcuSwitcher
 	private static final int getValue_con = 0x4b;
 	private static final int setValue_req = 0x46;
 
+	static boolean isEmi1GetValue(final int messageCode) {
+		return messageCode == getValue_con;
+	}
+
 	private static final int frameOffsetData = 4;
 
 	private static final int responseTimeout = 1000;
