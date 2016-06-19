@@ -312,8 +312,8 @@ public class TpuartConnection implements AutoCloseable
 			Thread.currentThread().interrupt();
 		}
 		catch (final IOException ignore) {}
-		adapter.close();
 		receiver.quit();
+		adapter.close();
 		fireConnectionClosed(origin, reason);
 	}
 
