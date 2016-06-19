@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015 B. Malinowsky
+    Copyright (c) 2015, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -127,18 +127,6 @@ final class BcuSwitcher
 		this.c = c;
 		logger = l;
 		conn = null; // XXX
-		c.addConnectionListener(new KNXListener() {
-
-			@Override
-			public void frameReceived(final FrameEvent e)
-			{
-				setResponse(e.getFrameBytes());
-			}
-
-			@Override
-			public void connectionClosed(final CloseEvent e)
-			{}
-		});
 	}
 
 	enum BcuMode {
@@ -150,29 +138,36 @@ final class BcuSwitcher
 	void enter(final BcuMode mode) throws KNXFormatException, KNXPortClosedException,
 		KNXTimeoutException, InterruptedException
 	{
-		byte[] data = read(createGetValue(AddrExpectedPeiType, 1));
-		logger.info("PEI type {}", data[0] & 0xff);
-		data = read(createGetValue(AddrStartAddressTable, 1));
-		logger.debug("Address Table location {}", DataUnitBuilder.toHex(data, ""));
-		data = read(createGetValue(AddrSystemState, 1));
-		logger.debug("Current operation mode {}", OperationMode.of(data[0] & 0xff));
+		final KNXListener l = new KNXListener() {
+			@Override
+			public void frameReceived(final FrameEvent e) { setResponse(e.getFrameBytes()); }
 
-		// set PEI type 1: ensure that the application will not be started
-		writeVerify(AddrExpectedPeiType, new byte[] { 1 });
-
-		// power line: set extended busmonitor to transmit domain address in .ind
-		setExtBusmon(mode == BcuMode.ExtBusmonitor);
-
-		// set active operation mode, link layer or busmonitor
-		final OperationMode set = mode == BcuMode.LinkLayer ? OperationMode.LinkLayer
-				: OperationMode.Busmonitor;
-		writeVerify(AddrSystemState, new byte[] { (byte) set.mode });
-
-		// set address table to 0
-		writeVerify(AddrStartAddressTable, new byte[] { 0 });
-
-		data = read(createGetValue(AddrIndividualAddress, 2));
-		logger.info("KNX individual address " + new IndividualAddress(data));
+			@Override
+			public void connectionClosed(final CloseEvent e) {}
+		};
+		c.addConnectionListener(l);
+		try {
+			byte[] data = read(createGetValue(AddrExpectedPeiType, 1));
+			logger.info("PEI type {}", data[0] & 0xff);
+			data = read(createGetValue(AddrStartAddressTable, 1));
+			logger.debug("Address Table location {}", DataUnitBuilder.toHex(data, ""));
+			data = read(createGetValue(AddrSystemState, 1));
+			logger.debug("Current operation mode {}", OperationMode.of(data[0] & 0xff));
+			// set PEI type 1: ensure that the application will not be started
+			writeVerify(AddrExpectedPeiType, new byte[] { 1 });
+			// power line: set extended busmonitor to transmit domain address in .ind
+			setExtBusmon(mode == BcuMode.ExtBusmonitor);
+			// set active operation mode, link layer or busmonitor
+			final OperationMode set = mode == BcuMode.LinkLayer ? OperationMode.LinkLayer : OperationMode.Busmonitor;
+			writeVerify(AddrSystemState, new byte[] { (byte) set.mode });
+			// set address table to 0
+			writeVerify(AddrStartAddressTable, new byte[] { 0 });
+			data = read(createGetValue(AddrIndividualAddress, 2));
+			logger.info("KNX individual address " + new IndividualAddress(data));
+		}
+		finally {
+			c.removeConnectionListener(l);
+		}
 	}
 
 	// TODO reset actually takes a while, enforce a wait?
