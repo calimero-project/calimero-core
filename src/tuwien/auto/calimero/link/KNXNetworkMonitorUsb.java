@@ -121,21 +121,21 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor
 			if (!trySetActiveEmi(EmiType.CEmi) && !trySetActiveEmi(EmiType.Emi2) && !trySetActiveEmi(EmiType.Emi1)) {
 				throw new KNXConnectionClosedException("failed to set active any supported EMI type");
 			}
+			try {
+				// report device descriptor before switching to busmonitor mode
+				// not all devices provide a device descriptor 0
+				final int dd0 = conn.getDeviceDescriptorType0();
+				logger.info("Device Descriptor (Mask Version) {}", DeviceDescriptor.DD0.fromType0(dd0));
+			}
+			catch (final KNXTimeoutException expected) {}
+
+			final boolean extBusmon = settings instanceof PLSettings;
+			enterBusmonitor(extBusmon);
 		}
 		catch (final KNXException e) {
 			close();
 			throw e;
 		}
-
-		final boolean extBusmon = settings instanceof PLSettings;
-		enterBusmonitor(extBusmon);
-		try {
-			// not all devices provide a device descriptor 0
-			final int dd0 = conn.getDeviceDescriptorType0();
-			logger.info("Device Descriptor (Mask Version) {}", DeviceDescriptor.DD0.fromType0(dd0));
-		}
-		catch (final KNXTimeoutException expected) {}
-
 		logger.info("in busmonitor mode - ready to receive");
 		conn.addConnectionListener(notifier);
 	}

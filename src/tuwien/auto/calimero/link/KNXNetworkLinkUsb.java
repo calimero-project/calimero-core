@@ -132,23 +132,24 @@ public class KNXNetworkLinkUsb extends AbstractLink
 			if (!trySetActiveEmi(EmiType.CEmi) && !trySetActiveEmi(EmiType.Emi2) && !trySetActiveEmi(EmiType.Emi1)) {
 				throw new KNXConnectionClosedException("failed to set active any supported EMI type");
 			}
+			try {
+				// report device descriptor before switching to link layer mode
+				// not all devices provide a device descriptor 0
+				final int dd0 = conn.getDeviceDescriptorType0();
+				logger.info("Device Descriptor (Mask Version) {}", DeviceDescriptor.DD0.fromType0(dd0));
+			}
+			catch (final KNXTimeoutException expected) {}
+
+			linkLayerMode();
 		}
 		catch (final KNXException e) {
 			notifier.quit();
 			conn.close();
 			throw e;
 		}
-		try {
-			// not all devices provide a device descriptor 0
-			final int dd0 = conn.getDeviceDescriptorType0();
-			logger.info("Device Descriptor (Mask Version) {}", DeviceDescriptor.DD0.fromType0(dd0));
-		}
-		catch (final KNXTimeoutException expected) {}
-
-		linkLayerMode();
+		conn.addConnectionListener(notifier);
 		cEMI = emiTypes.contains(EmiType.CEmi);
 		sendCEmiAsByteArray = true;
-		conn.addConnectionListener(notifier);
 	}
 
 	@Override
@@ -198,7 +199,6 @@ public class KNXNetworkLinkUsb extends AbstractLink
 		return false;
 	}
 
-	// TODO should close and cleanup on error switching to link layer mode
 	private void linkLayerMode() throws KNXException, InterruptedException
 	{
 		if (activeEmi == EmiType.CEmi) {
@@ -213,7 +213,6 @@ public class KNXNetworkLinkUsb extends AbstractLink
 		}
 		else if (activeEmi == EmiType.Emi1) {
 			new BcuSwitcher(conn, logger).enter(BcuMode.LinkLayer);
-			return;
 		}
 		else {
 			final byte[] switchLinkLayer = { (byte) PEI_SWITCH, 0x00, 0x18, 0x34, 0x56, 0x78, 0x0A, };
