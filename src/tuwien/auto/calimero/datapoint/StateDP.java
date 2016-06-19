@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -78,6 +78,7 @@ public class StateDP extends Datapoint
 	private final List<GroupAddress> updating;
 	// timeout in seconds, how long a set state value stays valid since reception
 	private volatile int timeout;
+	private final List<String> locations = Collections.synchronizedList(new ArrayList<>());
 
 	/**
 	 * Creates a new state based datapoint with a name.
@@ -260,13 +261,10 @@ public class StateDP extends Datapoint
 		return updating.contains(a);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.datapoint.Datapoint#toString()
-	 */
 	@Override
 	public String toString()
 	{
-		return "state DP " + super.toString();
+		return "state DP " + locations() + " " + super.toString();
 	}
 
 	@Override
@@ -287,9 +285,8 @@ public class StateDP extends Datapoint
 							throw new KNXMLException("malformed attribute timeout", r);
 						}
 				}
-				// XXX needed?
-//				else if (r.getElementText().isEmpty())
-//					;
+				else if (tag.equals("location"))
+					locations.add(r.getElementText());
 				else if (tag.equals(TAG_UPDATING))
 					while (r.nextTag() == XmlReader.START_ELEMENT)
 						updating.add(new GroupAddress(r));
@@ -328,5 +325,10 @@ public class StateDP extends Datapoint
 				i.next().save(w);
 		}
 		w.writeEndElement();
+	}
+
+	private Collection<String> locations()
+	{
+		return locations;
 	}
 }
