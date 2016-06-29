@@ -48,7 +48,7 @@ junitPlatform {
 }
 
 dependencies {
-    compile 'org.slf4j:slf4j-api:1.7.18'
+    compile 'org.slf4j:slf4j-api:1.7.21'
     compile 'javax.xml.stream:stax-api:1.0-2'
     compile 'org.usb4java:usb4java-javax:1.2.0'
 
@@ -58,5 +58,5 @@ dependencies {
     testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
     testRuntime 'org.junit.vintage:junit-vintage-engine:4.12.0-SNAPSHOT'
 
-//    testRuntime 'org.slf4j:slf4j-simple:1.7.18'
+//    testRuntime 'org.slf4j:slf4j-simple:1.7.21'
 }
