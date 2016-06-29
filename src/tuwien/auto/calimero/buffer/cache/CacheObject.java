@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * A timestamp is stored of the most recent assignment of a value object hold by
  * this CacheObject. This timestamp is created with
  * {@link System#currentTimeMillis()}.
- * 
+ *
  * @author B. Malinowsky
  * @see Cache
  * @see System#currentTimeMillis()
@@ -60,7 +60,7 @@ public class CacheObject
 	 * The value object hold by this cache object.
 	 */
 	protected Object value;
-	
+
 	private final Object key;
 	// hit count (increment count) of this object
 	private int count;
@@ -73,7 +73,7 @@ public class CacheObject
 	 * Creates a CacheObject associated with <code>key</code> holding a
 	 * <code>value</code> entry.
 	 * <p>
-	 * 
+	 *
 	 * @param key key of this {@link CacheObject}
 	 * @param value value of this {@link CacheObject}
 	 */
@@ -90,7 +90,7 @@ public class CacheObject
 	/**
 	 * Returns the key associated with this cache object.
 	 * <p>
-	 * 
+	 *
 	 * @return the key object
 	 */
 	public Object getKey()
@@ -103,7 +103,7 @@ public class CacheObject
 	 * <p>
 	 * Note that the value is guaranteed to be always a non <code>null</code>
 	 * reference.
-	 * 
+	 *
 	 * @return the value object
 	 */
 	public synchronized Object getValue()
@@ -116,7 +116,7 @@ public class CacheObject
 	 * object was assigned to this cache object, or the moment this object was
 	 * {@link Cache#put(CacheObject)} into a cache.
 	 * <p>
-	 * 
+	 *
 	 * @return the timestamp in milliseconds of type long
 	 * @see System#currentTimeMillis()
 	 */
@@ -134,11 +134,11 @@ public class CacheObject
 	{
 		timestamp = System.currentTimeMillis();
 	}
-	
+
 	/**
 	 * Returns the access count this cache object was queried from the cache.
 	 * <p>
-	 * 
+	 *
 	 * @return the access count
 	 */
 	public final synchronized int getCount()
@@ -168,7 +168,7 @@ public class CacheObject
 	/**
 	 * Returns the usage value of this cache object as defined by a particular cache.
 	 * <p>
-	 * 
+	 *
 	 * @return the usage value
 	 */
 	public final int getUsage()
@@ -181,7 +181,7 @@ public class CacheObject
 	 * <p>
 	 * The usage value might be used by a caching policy to store a different
 	 * way of access counting.<br>
-	 * 
+	 *
 	 * @param newUsage new usage value
 	 */
 	protected final void setUsage(final int newUsage)
