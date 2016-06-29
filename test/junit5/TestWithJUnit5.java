@@ -36,11 +36,11 @@
 
 package junit5;
 
-import org.junit.gen5.junit4.runner.JUnit5;
-import org.junit.gen5.junit4.runner.Packages;
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.platform.runner.SelectPackages;
 import org.junit.runner.RunWith;
 
 // Required to use JUnit 5 in Eclipse with its JUnit 4 runner
-@RunWith(JUnit5.class)
-@Packages({ "tuwien.auto.calimero" })
+@RunWith(JUnitPlatform.class)
+@SelectPackages({ "tuwien.auto.calimero" })
 public class TestWithJUnit5 {}

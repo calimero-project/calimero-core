@@ -36,10 +36,10 @@
 
 package tuwien.auto.calimero.knxnetip;
 
-import static org.junit.gen5.api.Assertions.assertEquals;
-import static org.junit.gen5.api.Assertions.assertNotNull;
-import static org.junit.gen5.api.Assertions.assertTrue;
-import static org.junit.gen5.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.BusMonitorLayer;
 import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.LinkLayer;
 
@@ -47,9 +47,9 @@ import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Vector;
 
-import org.junit.gen5.api.AfterEach;
-import org.junit.gen5.api.BeforeEach;
-import org.junit.gen5.api.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import tag.KnxnetIP;
 import tag.Slow;

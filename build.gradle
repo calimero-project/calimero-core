@@ -1,18 +1,26 @@
-apply plugin:'java'
-apply plugin:'application'
-
-mainClassName = 'tuwien.auto.calimero.Settings'
-
 buildscript {
     repositories {
         mavenCentral()
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     }
     dependencies {
-        classpath 'org.junit:junit-gradle:5.0.0-ALPHA'
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0-SNAPSHOT'
     }
 }
 
-apply plugin: 'org.junit.gen5.gradle'
+repositories {
+    mavenCentral()
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+}
+
+ext.junitJupiterVersion = '5.0.0-SNAPSHOT'
+ext.junitPlatformVersion = '1.0.0-SNAPSHOT'
+
+apply plugin:'java'
+apply plugin:'application'
+apply plugin: 'org.junit.platform.gradle.plugin'
+
+mainClassName = 'tuwien.auto.calimero.Settings'
 
 sourceSets {
     main {
@@ -26,17 +34,17 @@ sourceSets {
     }
 }
 
-junit5 {
-    version '5.0.0-ALPHA'
-    runJunit4 true
-    matchClassName '.*Test'
-    excludeTag 'slow'
-    excludeTag 'ft12'
-//    excludeTag 'knxnetip'
-}
-
-repositories {
-    mavenCentral()
+junitPlatform {
+//    version '1.0.0-SNAPSHOT'
+    engines {
+//        include 'junit-jupiter', 'junit-vintage'
+    }
+    tags {
+        exclude 'ft12'
+//        exclude 'knxnetip'
+        exclude 'slow'
+    }
+    includeClassNamePattern '.*Test'
 }
 
 dependencies {
@@ -44,7 +52,11 @@ dependencies {
     compile 'javax.xml.stream:stax-api:1.0-2'
     compile 'org.usb4java:usb4java-javax:1.2.0'
 
+    testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
+    testCompile("org.junit.platform:junit-platform-runner:${junitPlatformVersion}")
     testCompile 'junit:junit:4.12'
-    testCompile 'org.junit:junit4-runner:5.0.0-ALPHA'
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
+    testRuntime 'org.junit.vintage:junit-vintage-engine:4.12.0-SNAPSHOT'
+
 //    testRuntime 'org.slf4j:slf4j-simple:1.7.18'
 }

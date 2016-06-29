@@ -36,9 +36,9 @@
 
 package tuwien.auto.calimero.serial;
 
-import static org.junit.gen5.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.gen5.api.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for {@link LibraryAdapter}.
