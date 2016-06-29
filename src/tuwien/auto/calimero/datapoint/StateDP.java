@@ -192,6 +192,7 @@ public class StateDP extends Datapoint
 	 * @param isUpdating <code>true</code> to mark the address as updating this datapoint
 	 *        state, <code>false</code> to mark it as state invalidating
 	 */
+	@Deprecated
 	public final void add(final GroupAddress a, final boolean isUpdating)
 	{
 		if (getMainAddress().equals(a))
@@ -207,14 +208,44 @@ public class StateDP extends Datapoint
 	}
 
 	/**
-	 * Removes a state updating/invalidating group address from this datapoint.
-	 * <p>
-	 * The group address is no longer contained in the corresponding updating/invalidating
-	 * category.
+	 * Adds an updating group address to this datapoint to indicate that KNX messages with that destination address are
+	 * allowed to update the associated datapoint state (i.e., the state value related to this datapoint). An address is
+	 * added at most once.
+	 *
+	 * @param ga the KNX group address to add
+	 */
+	public void addUpdatingAddress(final GroupAddress ga)
+	{
+		if (getMainAddress().equals(ga))
+			throw new KNXIllegalArgumentException(
+					"updating address " + ga + " equals main address of this datapoint '" + getName() + "'");
+		if (!updating.contains(ga))
+			updating.add(ga);
+	}
+
+	/**
+	 * Adds an invalidating group address to this datapoint to indicate that KNX messages with that address are allowed
+	 * to invalidate the associated datapoint state (i.e., the state value related to this datapoint). An address is
+	 * added at most once.
+	 *
+	 * @param ga the KNX group address to add
+	 */
+	public void addInvalidatingAddress(final GroupAddress ga)
+	{
+		if (getMainAddress().equals(ga))
+			throw new KNXIllegalArgumentException(
+					"updating address " + ga + " equals main address of this datapoint '" + getName() + "'");
+		if (!invalidating.contains(ga))
+			invalidating.add(ga);
+	}
+
+	/**
+	 * Removes an updating/invalidating group address from this datapoint, so the group address is no longer contained
+	 * in the corresponding updating/invalidating category.
 	 *
 	 * @param a the KNX group address to remove
-	 * @param fromUpdating <code>true</code> to remove from updating this datapoint state,
-	 *        <code>false</code> to remove from invalidating this datapoint state
+	 * @param fromUpdating <code>true</code> to remove from updating this datapoint state, <code>false</code> to remove
+	 *        from invalidating this datapoint state
 	 */
 	public final void remove(final GroupAddress a, final boolean fromUpdating)
 	{

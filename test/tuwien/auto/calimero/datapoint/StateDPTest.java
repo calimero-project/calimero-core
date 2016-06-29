@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -224,15 +224,15 @@ public class StateDPTest extends TestCase
 		final StateDP dp = new StateDP(ga, "name1", inv, upd);
 		for (final Iterator<GroupAddress> i = upd.iterator(); i.hasNext();) {
 			final GroupAddress a = i.next();
-			dp.add(a, true);
+			dp.addUpdatingAddress(a);
 		}
 		assertEquals(upd.size(), dp.getAddresses(true).size());
 		for (final Iterator<GroupAddress> i = inv.iterator(); i.hasNext();) {
 			final GroupAddress a = i.next();
-			dp.add(a, false);
+			dp.addInvalidatingAddress(a);
 		}
 		assertEquals(inv.size(), dp.getAddresses(false).size());
-		dp.add(new GroupAddress(5, 5, 5), false);
+		dp.addInvalidatingAddress(new GroupAddress(5, 5, 5));
 		assertEquals(inv.size() + 1, dp.getAddresses(false).size());
 		assertTrue(dp.isInvalidating(new GroupAddress(5, 5, 5)));
 	}
@@ -272,9 +272,9 @@ public class StateDPTest extends TestCase
 	public final void testIsInvalidating()
 	{
 		final StateDP dp = new StateDP(ga, "test");
-		dp.add(new GroupAddress(2, 2, 2), true);
+		dp.addUpdatingAddress(new GroupAddress(2, 2, 2));
 		assertFalse(dp.isInvalidating(new GroupAddress(2, 2, 2)));
-		dp.add(new GroupAddress(2, 2, 2), false);
+		dp.addInvalidatingAddress(new GroupAddress(2, 2, 2));
 		assertTrue(dp.isInvalidating(new GroupAddress(2, 2, 2)));
 	}
 
@@ -285,9 +285,9 @@ public class StateDPTest extends TestCase
 	public final void testIsUpdating()
 	{
 		final StateDP dp = new StateDP(ga, "test");
-		dp.add(new GroupAddress(2, 2, 2), true);
+		dp.addUpdatingAddress(new GroupAddress(2, 2, 2));
 		assertTrue(dp.isUpdating(new GroupAddress(2, 2, 2)));
-		dp.add(new GroupAddress(1, 1, 1), false);
+		dp.addInvalidatingAddress(new GroupAddress(1, 1, 1));
 		assertFalse(dp.isUpdating(new GroupAddress(1, 1, 1)));
 	}
 }
