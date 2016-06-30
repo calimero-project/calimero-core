@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,12 +36,20 @@
 
 package tuwien.auto.calimero.datapoint;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import junit.framework.TestCase;
-import org.junit.Ignore;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.xml.KNXMLException;
@@ -53,11 +61,8 @@ import tuwien.auto.calimero.xml.XmlWriter;
 /**
  * @author B. Malinowsky
  */
-@Ignore
-public class DatapointMapTest extends TestCase
+public class DatapointMapTest
 {
-	// TODO move @Ignore from class to testLoad
-
 	private static final String dpFile = Util.getTargetPath() + "datapointMap.xml";
 
 	private DatapointModel<Datapoint> m;
@@ -68,38 +73,17 @@ public class DatapointMapTest extends TestCase
 	private final Datapoint dp2 = new CommandDP(ga2, "test2");
 	private final Datapoint dp3 = new StateDP(ga3, "test3");
 
-	/**
-	 * @param name name of test case
-	 */
-	public DatapointMapTest(final String name)
+	@BeforeEach
+	protected void init() throws Exception
 	{
-		super(name);
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
 		m = new DatapointMap<>();
-
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
-	{
-		super.tearDown();
 	}
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.datapoint.DatapointMap#DatapointMap(
 	 * java.util.Collection)}.
 	 */
+	@Test
 	public final void testDatapointMapCollection()
 	{
 		final List<Datapoint> l = new ArrayList<>();
@@ -116,6 +100,7 @@ public class DatapointMapTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.datapoint.DatapointMap#add(
 	 * tuwien.auto.calimero.datapoint.Datapoint)}.
 	 */
+	@Test
 	public final void testAdd()
 	{
 		assertFalse(m.contains(ga1));
@@ -130,6 +115,7 @@ public class DatapointMapTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.datapoint.DatapointMap#remove(
 	 * tuwien.auto.calimero.datapoint.Datapoint)}.
 	 */
+	@Test
 	public final void testRemove()
 	{
 		m.add(dp1);
@@ -144,6 +130,7 @@ public class DatapointMapTest extends TestCase
 	 * Test method for {@link tuwien.auto.calimero.datapoint.DatapointMap#get(
 	 * tuwien.auto.calimero.GroupAddress)}.
 	 */
+	@Test
 	public final void testGet()
 	{
 		assertNull(m.get(ga3));
@@ -157,6 +144,7 @@ public class DatapointMapTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.datapoint.DatapointMap#removeAll()}.
 	 */
+	@Test
 	public final void testRemoveAll()
 	{
 		final List<Datapoint> l = new ArrayList<>();
@@ -173,6 +161,7 @@ public class DatapointMapTest extends TestCase
 	/**
 	 * Test method for {@link tuwien.auto.calimero.datapoint.DatapointMap#getDatapoints()}.
 	 */
+	@Test
 	public final void testGetDatapoints()
 	{
 		Collection<Datapoint> c = ((DatapointMap<Datapoint>) m).getDatapoints();
@@ -198,6 +187,8 @@ public class DatapointMapTest extends TestCase
 	 *
 	 * @throws KNXMLException
 	 */
+	@Test
+	@Disabled
 	public final void testLoad() throws KNXMLException
 	{
 		final XmlWriter w = XmlOutputFactory.newInstance().createXMLWriter(dpFile);
@@ -264,6 +255,7 @@ public class DatapointMapTest extends TestCase
 	 *
 	 * @throws KNXMLException
 	 */
+	@Test
 	public final void testSave() throws KNXMLException
 	{
 		final XmlWriter w = XmlOutputFactory.newInstance().createXMLWriter(dpFile);
