@@ -89,7 +89,6 @@ public class DeviceDIB extends DIB
 
 	/**
 	 * Creates a device DIB out of a byte array.
-	 * <p>
 	 *
 	 * @param data byte array containing device DIB structure
 	 * @param offset start offset of DIB in <code>data</code>
@@ -102,8 +101,7 @@ public class DeviceDIB extends DIB
 			throw new KNXFormatException("DIB is not of type device info", type);
 		if (size < DIB_SIZE)
 			throw new KNXFormatException("device info DIB too short", size);
-		final ByteArrayInputStream is = new ByteArrayInputStream(data, offset + 2, data.length
-				- offset - 2);
+		final ByteArrayInputStream is = new ByteArrayInputStream(data, offset + 2, data.length - offset - 2);
 		knxmedium = is.read();
 		status = is.read();
 		address = new IndividualAddress(
@@ -123,10 +121,9 @@ public class DeviceDIB extends DIB
 
 	/**
 	 * Creates a device information DIB using the supplied device information.
-	 * <p>
 	 *
-	 * @param friendlyName user friendly name to identify the device; a ISO 8859-1 string
-	 *        with a maximum length of 29 characters
+	 * @param friendlyName user friendly name to identify the device; a ISO 8859-1 string with a maximum length of 29
+	 *        characters
 	 * @param deviceStatus current device status, <code>0 &le; deviceStatus &le; 0xff</code>
 	 *        <ul>
 	 *        <li>bit 0 is the programming mode:<br>
@@ -134,17 +131,15 @@ public class DeviceDIB extends DIB
 	 *        0 = device is not in programming mode</li>
 	 *        <li>all other bits are reserved</li>
 	 *        </ul>
-	 * @param projectInstallationId project-installation identifier of this device;
-	 *        uniquely identifies a device in a project with more than one installation.
-	 *        The lower 4 bits specify the installation number, bits 4 to 15 (MSB) contain
-	 *        the project number.
-	 * @param knxMedium KNX medium, one of the predefined KNX medium code constants of
-	 *        this class
+	 * @param projectInstallationId project-installation identifier of this device; uniquely identifies a device in a
+	 *        project with more than one installation. The lower 4 bits specify the installation number, bits 4 to 15
+	 *        (MSB) contain the project number.
+	 * @param knxMedium KNX medium, one of the predefined KNX medium code constants of this class
 	 * @param knxAddress KNX individual address
 	 * @param serialNumber KNX serial number of the device, used to identify the device,
 	 *        <code>serialNumber.length == 6</code>
-	 * @param routingMulticast KNXnet/IP routing multicast address for a routing device,
-	 *        <code>null</code> 0.0.0.0 if the device does not support routing
+	 * @param routingMulticast KNXnet/IP routing multicast address for a routing device, <code>null</code> 0.0.0.0 if
+	 *        the device does not support routing
 	 * @param macAddress device Ethernet MAC address, <code>macAddress.length == 6</code>
 	 */
 	public DeviceDIB(final String friendlyName, final int deviceStatus,
@@ -176,8 +171,7 @@ public class DeviceDIB extends DIB
 		knxmedium = knxMedium;
 
 		if (serialNumber.length != serial.length)
-			throw new KNXIllegalArgumentException("serial number length not equal to "
-					+ serial.length + " bytes");
+			throw new KNXIllegalArgumentException("serial number length not equal to " + serial.length + " bytes");
 		for (int i = 0; i < serial.length; i++)
 			serial[i] = serialNumber[i];
 
@@ -190,21 +184,18 @@ public class DeviceDIB extends DIB
 		final byte[] empty = new byte[] { 0, 0, 0, 0 };
 		final byte[] rmc = routingMulticast == null ? empty : routingMulticast.getAddress();
 		if (!Arrays.equals(rmc, empty) && !routingMulticast.isMulticastAddress())
-			throw new KNXIllegalArgumentException(routingMulticast.toString()
-					+ " is not a multicast address");
+			throw new KNXIllegalArgumentException(routingMulticast.toString() + " is not a multicast address");
 		for (int i = 0; i < mcast.length; i++)
 			mcast[i] = rmc[i];
 
 		if (macAddress.length != mac.length)
-			throw new KNXIllegalArgumentException("MAC address length not equal to " + mac.length
-					+ " bytes");
+			throw new KNXIllegalArgumentException("MAC address length not equal to " + mac.length + " bytes");
 		for (int i = 0; i < mac.length; i++)
 			mac[i] = macAddress[i];
 	}
 
 	/**
 	 * Returns the device individual address.
-	 * <p>
 	 *
 	 * @return individual address as {@link IndividualAddress}
 	 */
@@ -214,10 +205,8 @@ public class DeviceDIB extends DIB
 	}
 
 	/**
-	 * Returns the device status byte.
-	 * <p>
-	 * Bit 0 is programming mode flag: 1 = device is in programming mode, 0 = device is
-	 * not in programming mode.
+	 * Returns the device status byte. Bit 0 is the programming mode flag: 1 = device is in programming mode, 0 = device
+	 * is not in programming mode.
 	 *
 	 * @return status as unsigned byte
 	 */
@@ -228,7 +217,6 @@ public class DeviceDIB extends DIB
 
 	/**
 	 * Returns the KNX medium code.
-	 * <p>
 	 *
 	 * @return KNX medium as unsigned byte
 	 */
@@ -239,7 +227,6 @@ public class DeviceDIB extends DIB
 
 	/**
 	 * Returns a textual representation of the KNX medium code.
-	 * <p>
 	 *
 	 * @return KNX medium as string format
 	 * @see #getKNXMedium()
@@ -262,7 +249,6 @@ public class DeviceDIB extends DIB
 
 	/**
 	 * Returns the device Ethernet MAC address.
-	 * <p>
 	 *
 	 * @return byte array containing MAC address
 	 */
@@ -273,7 +259,6 @@ public class DeviceDIB extends DIB
 
 	/**
 	 * Returns a textual representation of the device Ethernet MAC address.
-	 * <p>
 	 *
 	 * @return MAC address as string format
 	 */
@@ -283,9 +268,8 @@ public class DeviceDIB extends DIB
 	}
 
 	/**
-	 * Returns the device routing multicast address.
-	 * <p>
-	 * For devices which don't implement routing, the multicast address is 0.
+	 * Returns the device routing multicast address; for devices which don't implement routing, the multicast address is
+	 * 0.
 	 *
 	 * @return multicast address as byte array
 	 */
@@ -335,9 +319,7 @@ public class DeviceDIB extends DIB
 	}
 
 	/**
-	 * Returns the KNX serial number of the device.
-	 * <p>
-	 * The serial number uniquely identifies a device.
+	 * Returns the KNX serial number of the device, which uniquely identifies a device.
 	 *
 	 * @return byte array with serial number
 	 */
@@ -348,7 +330,6 @@ public class DeviceDIB extends DIB
 
 	/**
 	 * Returns a textual representation of the device KNX serial number.
-	 * <p>
 	 *
 	 * @return serial number as string
 	 */
@@ -372,7 +353,6 @@ public class DeviceDIB extends DIB
 
 	/**
 	 * Returns a textual representation of this device DIB.
-	 * <p>
 	 *
 	 * @return a string representation of the object
 	 */
@@ -414,9 +394,6 @@ public class DeviceDIB extends DIB
 				+ Arrays.hashCode(serial) + Arrays.hashCode(mcast) + Arrays.hashCode(mac);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.util.DIB#toByteArray()
-	 */
 	@Override
 	public byte[] toByteArray()
 	{

@@ -92,8 +92,7 @@ public class ManagementProceduresImplTest
 	@Test
 	public final void testManagementProceduresImpl() throws KNXLinkClosedException
 	{
-		final ManagementProcedures test = new ManagementProceduresImpl(link);
-		test.detach();
+		try (final ManagementProcedures test = new ManagementProceduresImpl(link)) {};
 	}
 
 	/**
