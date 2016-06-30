@@ -198,11 +198,10 @@ public class DPTXlatorRGB extends DPTXlator {
 					throw new KNXIllegalArgumentException("expected component identifier "
 							+ "e.g. 'r:', 'g:', 'b:' in " + colorComponent);
 			}
-			if ((r == -1) || (g == -1) || (b == -1)) {
+			if ((r == -1) || (g == -1) || (b == -1))
 				throw newException("invalid color", value);
-			} else {
-				set(r, g, b, dst, index);
-			}
+
+			set(r, g, b, dst, index);
 		}
 		catch (final KNXIllegalArgumentException e) {
 			throw newException("invalid color", value, e);
