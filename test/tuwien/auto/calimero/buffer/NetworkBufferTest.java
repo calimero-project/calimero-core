@@ -42,24 +42,32 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import tag.KnxnetIP;
+import tuwien.auto.calimero.CloseEvent;
+import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.GroupAddress;
+import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.buffer.LDataObjectQueue.QueueItem;
+import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.datapoint.Datapoint;
 import tuwien.auto.calimero.datapoint.DatapointMap;
 import tuwien.auto.calimero.datapoint.StateDP;
 import tuwien.auto.calimero.knxnetip.Debug;
+import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.KNXNetworkLinkIP;
+import tuwien.auto.calimero.link.NetworkLinkListener;
 import tuwien.auto.calimero.link.medium.TPSettings;
 import tuwien.auto.calimero.process.ProcessCommunicator;
 import tuwien.auto.calimero.process.ProcessCommunicatorImpl;
@@ -70,8 +78,39 @@ import tuwien.auto.calimero.process.ProcessCommunicatorImpl;
 @KnxnetIP
 public class NetworkBufferTest
 {
+	private final GroupAddress group1 = new GroupAddress(1, 0, 1);
+	private final GroupAddress invalidatingGroup = new GroupAddress(1, 0, 11);
+	private final GroupAddress updatingGroup = new GroupAddress(1, 0, 111);
+	private StateDP dp;
+	private StateDP invalidatingDp;
+	private StateDP updatingDp;
+
 	private KNXNetworkLink lnk;
 	private NetworkBuffer buffer;
+
+	private final Set<GroupAddress> waitObject = new HashSet<>();
+	private static final long WaitForUpdate = 1000;
+
+	private final NetworkLinkListener linkListener = new NetworkLinkListener() {
+		@Override
+		public void linkClosed(final CloseEvent e)
+		{}
+
+		@Override
+		public void indication(final FrameEvent e)
+		{}
+
+		@Override
+		public void confirmation(final FrameEvent e)
+		{
+			synchronized (waitObject) {
+				final KNXAddress ga = ((CEMILData) e.getFrame()).getDestination();
+				if (waitObject.removeIf(ga::equals)) {
+					waitObject.notifyAll();
+				}
+			}
+		}
+	};
 
 	@BeforeEach
 	void init() throws Exception
@@ -87,6 +126,128 @@ public class NetworkBufferTest
 			lnk.close();
 		buffer.destroy();
 	}
+
+	// some helpers
+
+	private ProcessCommunicator initConfig() throws KNXException, InterruptedException {
+		final Configuration c = buffer.addConfiguration(lnk);
+		final DatapointMap<StateDP> map = new DatapointMap<>();
+		dp = new StateDP(group1, "group1", 0, "1.001");
+		// dp gets invalidated by invalidatingGroup, updated by updatingGroup
+		// a write updates and invalidates, read.res only update
+		dp.addInvalidatingAddress(invalidatingGroup);
+		dp.addUpdatingAddress(updatingGroup);
+		invalidatingDp = new StateDP(invalidatingGroup, "group2", 0, "1.001");
+		updatingDp = new StateDP(updatingGroup, "group3", 0, "1.001");
+		map.add(dp);
+		map.add(invalidatingDp);
+		map.add(updatingDp);
+		c.setDatapointModel(map);
+		final StateFilter f = new StateFilter();
+		c.setFilter(f, f);
+
+		// set datapoint states before activating config
+		final ProcessCommunicator init = new ProcessCommunicatorImpl(lnk);
+		init.write(dp, "off");
+		init.write(invalidatingDp, "on");
+		init.write(updatingDp, "on");
+		init.close();
+
+		c.activate(true);
+		c.getBufferedLink().addLinkListener(linkListener);
+
+		final ProcessCommunicator pc = new ProcessCommunicatorImpl(c.getBufferedLink());
+		pc.readBool(group1);
+		return pc;
+	}
+
+	private void write(final ProcessCommunicator pc, final GroupAddress dst, final boolean value)
+		throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
+	{
+		try {
+			waitObject.add(dst);
+			pc.write(dst, value);
+			final long start = System.nanoTime();
+			synchronized (waitObject) {
+				while (waitObject.contains(dst)) {
+					if (System.nanoTime() - start > (WaitForUpdate * 1000_000))
+						break;
+					waitObject.wait(WaitForUpdate);
+				}
+			}
+		}
+		finally {
+			waitObject.remove(dst);
+		}
+	}
+
+	private void write(final ProcessCommunicator pc, final Datapoint dp, final String value)
+			throws KNXException, InterruptedException
+	{
+		final GroupAddress dst = dp.getMainAddress();
+		try {
+			waitObject.add(dst);
+			pc.write(dp, value);
+			final long start = System.nanoTime();
+			synchronized (waitObject) {
+				while (waitObject.contains(dst)) {
+					if (System.nanoTime() - start > (WaitForUpdate * 1000_000))
+						break;
+					waitObject.wait(WaitForUpdate);
+				}
+			}
+		}
+		finally {
+			waitObject.remove(dst);
+		}
+	}
+
+	private boolean read(final ProcessCommunicator pc, final GroupAddress dst)
+			throws KNXException, InterruptedException
+	{
+		boolean ret;
+		try {
+			waitObject.add(dst);
+			ret = pc.readBool(dst);
+			final long start = System.nanoTime();
+			synchronized (waitObject) {
+				while (waitObject.contains(dst)) {
+					if (System.nanoTime() - start > (WaitForUpdate * 1000_000))
+						break;
+					waitObject.wait(WaitForUpdate);
+				}
+			}
+		}
+		finally {
+			waitObject.remove(dst);
+		}
+		return ret;
+	}
+
+	private String read(final ProcessCommunicator pc, final Datapoint dp)
+			throws KNXException, InterruptedException
+	{
+		final GroupAddress dst = dp.getMainAddress();
+		String ret;
+		try {
+			waitObject.add(dst);
+			ret = pc.read(dp);
+			final long start = System.nanoTime();
+			synchronized (waitObject) {
+				while (waitObject.contains(dst)) {
+					if (System.nanoTime() - start > (WaitForUpdate * 1000_000))
+						break;
+					waitObject.wait(WaitForUpdate);
+				}
+			}
+		}
+		finally {
+			waitObject.remove(dst);
+		}
+		return ret;
+	}
+
+	// tests
 
 	/**
 	 * Test method for {@link NetworkBuffer#createBuffer(java.lang.String)}.
@@ -148,16 +309,14 @@ public class NetworkBufferTest
 		final StateFilter f = new StateFilter();
 		c.setFilter(f, f);
 		c.activate(true);
+		c.getBufferedLink().addLinkListener(linkListener);
 		@SuppressWarnings("resource")
 		final ProcessCommunicator pc = new ProcessCommunicatorImpl(c.getBufferedLink());
 
 		// buffered write, check of buffer
-		pc.write(group2, true);
-		// little time for notifier for confirmation
-		Thread.sleep(50);
+		write(pc, group2, true);
 		assertTrue(pc.readBool(group2));
-		pc.write(group2, false);
-		Thread.sleep(50);
+		write(pc, group2, false);
 		assertFalse(pc.readBool(group2));
 
 		final boolean b1 = pc.readBool(group1);
@@ -165,16 +324,13 @@ public class NetworkBufferTest
 		final ProcessCommunicator pc2 = new ProcessCommunicatorImpl(lnk);
 		final boolean b2 = pc2.readBool(group1);
 		assertEquals(b1, b2);
-		pc.write(group2, true);
-		Thread.sleep(50);
+		write(pc, group2, true);
 		assertTrue(pc.readBool(group2));
 
 		// unbuffered write, check of buffer
-		pc2.write(group1, true);
-		Thread.sleep(50);
+		write(pc2, group1, true);
 		assertEquals(pc.readBool(group1), pc2.readBool(group1));
-		pc2.write(group1, false);
-		Thread.sleep(50);
+		write(pc2, group1, false);
 		assertEquals(pc.readBool(group1), pc2.readBool(group1));
 
 		// test with datapoint model and timeout
@@ -191,74 +347,58 @@ public class NetworkBufferTest
 		pc.read(dp);
 	}
 
-	/**
-	 * Test method for state based buffering.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testInvalidationUpdating() throws KNXException, InterruptedException
+	void readDoesNotInvalidate() throws KNXException, InterruptedException
 	{
-		final GroupAddress group1 = new GroupAddress(1, 0, 1);
-		final GroupAddress group2 = new GroupAddress(1, 0, 11);
-		final GroupAddress group3 = new GroupAddress(1, 0, 111);
-		final Configuration c = buffer.addConfiguration(lnk);
-		final DatapointMap<StateDP> map = new DatapointMap<>();
-		final StateDP dp = new StateDP(group1, "group1", 0, "1.001");
-		dp.add(group2, false);
-		dp.add(group3, true);
-		final StateDP dp2 = new StateDP(group2, "group2", 0, "1.001");
-		final StateDP dp3 = new StateDP(group3, "group3", 0, "1.001");
-		map.add(dp);
-		map.add(dp2);
-		map.add(dp3);
-		c.setDatapointModel(map);
-		final StateFilter f = new StateFilter();
-		c.setFilter(f, f);
+		final ProcessCommunicator pc = initConfig();
 
-		// set datapoint states before activating config
-		final ProcessCommunicator init = new ProcessCommunicatorImpl(lnk);
-		init.write(dp, "off");
-		init.write(dp2, "on");
-		init.write(dp3, "on");
-		init.close();
-
-		c.activate(true);
-
-		// dp gets invalidated by group2, updated by group3
-		// a write updates and invalidates, read.res only updates
-
-		@SuppressWarnings("resource")
-		final ProcessCommunicator pc = new ProcessCommunicatorImpl(c.getBufferedLink());
 		final String s1 = pc.read(dp);
-		Thread.sleep(50);
-		/*final String s2 =*/ pc.read(dp2);
-		// read of dp2 should have *not* have invalidated dp
+		read(pc, invalidatingDp);
+		// read of invalidatingDp should have *not* have invalidated dp
 		assertEquals(s1, pc.read(dp));
-		final String s3 = pc.read(dp3);
-		// allow some time to receive update from dp3
-		Thread.sleep(100);
-		assertEquals(s3, pc.read(dp));
-		final String write = s3.equals("off") ? "on" : "off";
-		pc.write(dp3, write);
-		// allow some time to receive write updates and update map
-		Thread.sleep(100);
-		assertEquals(write, pc.read(dp));
-		assertEquals(write, pc.read(dp3));
-		assertEquals(write, pc.read(dp));
+	}
 
-		pc.write(group3, true);
-		Thread.sleep(50);
+	@Test
+	void readDoesUpdate() throws KNXException, InterruptedException
+	{
+		final ProcessCommunicator pc = initConfig();
+		assertFalse(pc.readBool(dp.getMainAddress()));
+		final String s3 = read(pc, updatingDp);
+		assertEquals(s3, pc.read(dp));
+	}
+
+	@Test
+	void writeDoesUpdate() throws KNXException, InterruptedException
+	{
+		final ProcessCommunicator pc = initConfig();
+
+		final String s3 = pc.read(updatingDp);
+		final String write = s3.equals("off") ? "on" : "off";
+		write(pc, updatingDp, write);
+		assertEquals(write, pc.read(dp));
+		assertEquals(write, pc.read(updatingDp));
+		assertEquals(write, pc.read(dp));
+	}
+
+	@Test
+	void alternateWriteDoesUpdate() throws KNXException, InterruptedException
+	{
+		final ProcessCommunicator pc = initConfig();
+		write(pc, updatingGroup, true);
 		assertTrue(pc.readBool(group1));
-		pc.write(group3, false);
-		Thread.sleep(50);
+		waitObject.add(updatingGroup);
+		write(pc, updatingGroup, false);
 		assertFalse(pc.readBool(group1));
-		pc.write(group2, false);
-		Thread.sleep(50);
+	}
+
+	@Test
+	void repeatedWriteInvalidate() throws KNXException, InterruptedException
+	{
+		final ProcessCommunicator pc = initConfig();
+		write(pc, invalidatingGroup, false);
+		final String s1 = "off";
 		assertEquals(s1, pc.read(dp));
-		pc.write(group2, false);
-		Thread.sleep(50);
+		write(pc, invalidatingGroup, false);
 		assertEquals(s1, pc.read(dp));
 	}
 
@@ -271,31 +411,25 @@ public class NetworkBufferTest
 	@Test
 	public final void testCommandBasedBuffering() throws InterruptedException, KNXException
 	{
-		final GroupAddress group1 = new GroupAddress(1, 0, 1);
-		final GroupAddress group2 = new GroupAddress(1, 0, 11);
 		final Configuration c = buffer.addConfiguration(lnk);
 		final CommandFilter f = new CommandFilter();
 		c.setFilter(f, f);
 		c.activate(true);
+		c.getBufferedLink().addLinkListener(linkListener);
 		@SuppressWarnings("resource")
 		final ProcessCommunicator pc = new ProcessCommunicatorImpl(c.getBufferedLink());
 
 		// buffered write, check of buffer
-		pc.write(group2, true);
-		Thread.sleep(1000);
-		pc.write(group2, false);
-		// little time for notifier for confirmation
-		Thread.sleep(50);
+		write(pc, invalidatingGroup, true);
+		write(pc, invalidatingGroup, false);
 		assertTrue(f.hasNewIndication());
 		final QueueItem qi = f.getNextIndication();
 		Debug.printLData(qi.getFrame());
-		System.out.println(new Date(qi.getTimestamp()));
 		assertTrue(f.hasNewIndication());
 
 		final QueueItem qi2 = f.getNextIndication();
 		Debug.printLData(qi2.getFrame());
-		System.out.println(new Date(qi2.getTimestamp()));
-		assertTrue(qi.getTimestamp() + ", " + qi2.getTimestamp(), qi.getTimestamp() < (qi2.getTimestamp() - 700));
+		assertTrue(qi.getTimestamp() + ", " + qi2.getTimestamp(), qi.getTimestamp() <= (qi2.getTimestamp()));
 
 		assertFalse(f.hasNewIndication());
 
@@ -316,15 +450,13 @@ public class NetworkBufferTest
 
 		@SuppressWarnings("resource")
 		final ProcessCommunicator pc2 = new ProcessCommunicatorImpl(lnk);
-		pc2.readBool(group1);
-		Thread.sleep(50);
+		read(pc2, group1);
 		assertTrue(f.hasNewIndication());
-		pc2.write(group2, true);
-		Thread.sleep(50);
 
+		write(pc2, invalidatingGroup, true);
 		for (int i = 0; i < 9; ++i)
-			pc2.write(group2, i % 2 != 0);
-		Thread.sleep(50);
+			write(pc2, invalidatingGroup, i % 2 != 0);
+		c.activate(false);
 		assertTrue(listener.filled);
 		assertTrue(f.hasNewIndication());
 
@@ -334,8 +466,8 @@ public class NetworkBufferTest
 			assertTrue(f.hasNewIndication());
 			for (int i = 0; i < 10; ++i) {
 				qi3 = f.getNextIndication();
-				assertEquals(0, qi3.getTimestamp());
 				assertNull(qi3.getFrame());
+				assertEquals(0, qi3.getTimestamp());
 			}
 			assertFalse(f.hasNewIndication());
 		}
@@ -351,8 +483,6 @@ public class NetworkBufferTest
 	@Test
 	public final void testQueryBufferOnly() throws InterruptedException, KNXException
 	{
-		final GroupAddress group1 = new GroupAddress(1, 0, 1);
-		final GroupAddress group2 = new GroupAddress(1, 0, 11);
 		final Configuration c = buffer.addConfiguration(lnk);
 		final StateFilter f = new StateFilter();
 		c.setFilter(f, f);
@@ -362,13 +492,10 @@ public class NetworkBufferTest
 		final ProcessCommunicator pc = new ProcessCommunicatorImpl(c.getBufferedLink());
 
 		// buffered write, check of buffer
-		pc.write(group2, true);
-		// little time for notifier for confirmation
-		Thread.sleep(50);
-		assertTrue(pc.readBool(group2));
-		pc.write(group2, false);
-		Thread.sleep(50);
-		assertFalse(pc.readBool(group2));
+		write(pc, invalidatingGroup, true);
+		assertTrue(pc.readBool(invalidatingGroup));
+		write(pc, invalidatingGroup, false);
+		assertFalse(pc.readBool(invalidatingGroup));
 
 		try {
 			pc.readBool(group1);
@@ -378,16 +505,13 @@ public class NetworkBufferTest
 		@SuppressWarnings("resource")
 		final ProcessCommunicator pc2 = new ProcessCommunicatorImpl(lnk);
 		/*final boolean b2 =*/ pc2.readBool(group1);
-		pc.write(group2, true);
-		Thread.sleep(50);
-		assertTrue(pc.readBool(group2));
+		write(pc, invalidatingGroup, true);
+		assertTrue(pc.readBool(invalidatingGroup));
 
 		// unbuffered write, check of buffer
-		pc2.write(group1, true);
-		Thread.sleep(50);
+		write(pc2, group1, true);
 		assertEquals(pc.readBool(group1), pc2.readBool(group1));
-		pc2.write(group1, false);
-		Thread.sleep(50);
+		write(pc2, group1, false);
 		assertEquals(pc.readBool(group1), pc2.readBool(group1));
 
 		// test with datapoint model and timeout
