@@ -36,6 +36,8 @@
 
 package tuwien.auto.calimero.mgmt;
 
+import static tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode.WaitForCon;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -51,7 +53,6 @@ import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
-import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 
 abstract class LocalDeviceManagement implements PropertyAdapter
 {
@@ -135,7 +136,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 		final int objectType = getObjectType(objIndex);
 		final int objectInstance = getObjectInstance(objIndex, objectType);
 		send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, objectType, objectInstance, pid, start,
-				elements, data), KNXnetIPConnection.WAIT_FOR_CON);
+				elements, data), WaitForCon);
 		findFrame(CEMIDevMgmt.MC_PROPWRITE_CON);
 	}
 
@@ -148,7 +149,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 		final int objectType = getObjectType(objIndex);
 		final int objectInstance = getObjectInstance(objIndex, objectType);
 		send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, objectType, objectInstance, pid, start,
-				elements), KNXnetIPConnection.WAIT_FOR_CON);
+				elements), WaitForCon);
 		return findFrame(CEMIDevMgmt.MC_PROPREAD_CON);
 	}
 
@@ -271,7 +272,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 	protected void initInterfaceObjects() throws KNXException, InterruptedException
 	{
 		send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, DEVICE_OBJECT, 1,
-				PropertyAccess.PID.IO_LIST, 0, 1), KNXnetIPConnection.WAIT_FOR_CON);
+				PropertyAccess.PID.IO_LIST, 0, 1), WaitForCon);
 		int objects = 0;
 		try {
 			final byte[] ret = findFrame(CEMIDevMgmt.MC_PROPREAD_CON);
@@ -284,7 +285,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 			return;
 		}
 		send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, DEVICE_OBJECT, 1,
-				PropertyAccess.PID.IO_LIST, 1, objects), KNXnetIPConnection.WAIT_FOR_CON);
+				PropertyAccess.PID.IO_LIST, 1, objects), WaitForCon);
 		final byte[] ret = findFrame(CEMIDevMgmt.MC_PROPREAD_CON);
 		for (int i = 0; i < objects; ++i) {
 			final int objType = (ret[2 * i] & 0xff) << 8 | ret[2 * i + 1] & 0xff;

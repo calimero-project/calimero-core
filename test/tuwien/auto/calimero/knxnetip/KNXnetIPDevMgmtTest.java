@@ -67,9 +67,9 @@ import tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode;
 @KnxnetIP
 public class KNXnetIPDevMgmtTest
 {
-//	private static KNXnetIPConnection.BlockingMode noblock = KNXnetIPConnection.NONBLOCKING;
-//	private static KNXnetIPConnection.BlockingMode ack = KNXnetIPConnection.WAIT_FOR_ACK;
-	private static KNXnetIPConnection.BlockingMode con = KNXnetIPConnection.WAIT_FOR_CON;
+//	private static KNXnetIPConnection.BlockingMode noblock = KNXnetIPConnection.BlockingMode.NonBlocking;
+//	private static KNXnetIPConnection.BlockingMode ack = KNXnetIPConnection.BlockingMode.WaitForAck;
+	private static KNXnetIPConnection.BlockingMode con = KNXnetIPConnection.BlockingMode.WaitForCon;
 
 	private KNXnetIPDevMgmt m;
 	private KNXListenerImpl l;

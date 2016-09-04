@@ -36,6 +36,8 @@
 
 package tuwien.auto.calimero.knxnetip;
 
+import static tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode.NonBlocking;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -170,7 +172,7 @@ public class KNXnetIPRouting extends ConnectionBase
 				}
 				logger.trace("add to multicast loopback frame buffer: {}", frame);
 			}
-			super.send(frame, NONBLOCKING);
+			super.send(frame, NonBlocking);
 			// we always succeed...
 			setState(OK);
 		}

@@ -92,43 +92,25 @@ public interface KNXnetIPConnection extends AutoCloseable
 	int CLOSED = 1;
 
 	/**
-	 * Type for blocking mode used in
-	 * {@link KNXnetIPConnection#send(CEMI,
-	 * tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
+	 * Blocking mode used in {@link KNXnetIPConnection#send(CEMI, KNXnetIPConnection.BlockingMode)}.
 	 */
-	class BlockingMode
-	{
-		private final String mode;
-
-		BlockingMode(final String mode)
-		{
-			this.mode = mode;
-		}
+	enum BlockingMode {
+		/**
+		 * Send mode without any blocking for a response.
+		 */
+		NonBlocking,
 
 		/**
-		 * Returns a textual representation of this blocking mode.
+		 * Send mode with waiting for service acknowledgment response.
 		 */
-		@Override
-		public String toString()
-		{
-			return mode;
-		}
+		WaitForAck,
+
+		/**
+		 * Send mode with waiting for cEMI confirmation response.
+		 */
+		WaitForCon
 	}
 
-	/**
-	 * Send mode without any blocking for a response.
-	 */
-	BlockingMode NONBLOCKING = new BlockingMode("non-blocking");
-
-	/**
-	 * Send mode with waiting for service acknowledgment response.
-	 */
-	BlockingMode WAIT_FOR_ACK = new BlockingMode("wait for ack");
-
-	/**
-	 * Send mode with waiting for cEMI confirmation response.
-	 */
-	BlockingMode WAIT_FOR_CON = new BlockingMode("wait for cEMI.con");
 
 	/**
 	 * Adds the specified event listener <code>l</code> to receive events from this
@@ -175,8 +157,8 @@ public interface KNXnetIPConnection extends AutoCloseable
 	 * @param mode specifies the behavior in regard to response messages, this parameter
 	 *        will be ignored by protocols in case no response is expected at all;<br>
 	 *        supply one of the {@link BlockingMode} constants, with following blocking
-	 *        behavior in increasing order<br> {@link #NONBLOCKING}<br> {@link #WAIT_FOR_ACK}<br>
-	 *        {@link #WAIT_FOR_CON}<br>
+	 *        behavior in increasing order: {@link BlockingMode#NonBlocking}, {@link BlockingMode#WaitForAck},
+	 *        {@link BlockingMode#WaitForCon}
 	 * @throws KNXTimeoutException in a blocking <code>mode</code> if a timeout regarding
 	 *         a response message was encountered
 	 * @throws KNXConnectionClosedException if no communication was established in the

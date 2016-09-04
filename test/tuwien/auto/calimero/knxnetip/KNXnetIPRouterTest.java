@@ -72,7 +72,7 @@ import tuwien.auto.calimero.cemi.CEMILData;
 @KnxnetIP
 public class KNXnetIPRouterTest
 {
-	private static KNXnetIPConnection.BlockingMode noblock = KNXnetIPConnection.NONBLOCKING;
+	private static KNXnetIPConnection.BlockingMode noblock = KNXnetIPConnection.BlockingMode.NonBlocking;
 
 	private KNXnetIPRouting r;
 	private RouterListenerImpl l;

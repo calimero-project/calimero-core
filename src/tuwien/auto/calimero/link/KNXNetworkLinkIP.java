@@ -36,6 +36,8 @@
 
 package tuwien.auto.calimero.link;
 
+import static tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode.WaitForAck;
+import static tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode.WaitForCon;
 import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.LinkLayer;
 
 import java.net.InetAddress;
@@ -258,7 +260,7 @@ public class KNXNetworkLinkIP extends AbstractLink
 		try {
 			logger.debug("send message to {}{}", msg.getDestination(), (waitForCon ? ", wait for confirmation" : ""));
 			logger.trace("cEMI {}", msg);
-			conn.send(msg, waitForCon ? KNXnetIPConnection.WAIT_FOR_CON : KNXnetIPConnection.WAIT_FOR_ACK);
+			conn.send(msg, waitForCon ? WaitForCon : WaitForAck);
 			logger.trace("send to {} succeeded", msg.getDestination());
 		}
 		catch (InterruptedException | KNXConnectionClosedException e) {

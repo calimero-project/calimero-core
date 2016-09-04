@@ -74,9 +74,9 @@ import tuwien.auto.calimero.cemi.CEMILData;
 @KnxnetIP
 public class KNXnetIPTunnelTest
 {
-	private static KNXnetIPConnection.BlockingMode noblock = KNXnetIPConnection.NONBLOCKING;
-	private static KNXnetIPConnection.BlockingMode ack = KNXnetIPConnection.WAIT_FOR_ACK;
-	private static KNXnetIPConnection.BlockingMode con = KNXnetIPConnection.WAIT_FOR_CON;
+	private static KNXnetIPConnection.BlockingMode noblock = KNXnetIPConnection.BlockingMode.NonBlocking;
+	private static KNXnetIPConnection.BlockingMode ack = KNXnetIPConnection.BlockingMode.WaitForAck;
+	private static KNXnetIPConnection.BlockingMode con = KNXnetIPConnection.BlockingMode.WaitForCon;
 
 	private KNXnetIPTunnel t;
 	private KNXnetIPTunnel tnat;
@@ -502,7 +502,7 @@ public class KNXnetIPTunnelTest
 		for (int i = 0; i < 20; i++) {
 			try {
 				Thread.currentThread().interrupt();
-				t.send(frame, KNXnetIPConnection.WAIT_FOR_CON);
+				t.send(frame, con);
 				fail("we are interrupted");
 				try {
 					Thread.sleep(100);

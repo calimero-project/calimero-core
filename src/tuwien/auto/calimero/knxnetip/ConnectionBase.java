@@ -36,6 +36,9 @@
 
 package tuwien.auto.calimero.knxnetip;
 
+import static tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode.NonBlocking;
+import static tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode.WaitForAck;
+
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.DatagramPacket;
@@ -166,22 +169,17 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	}
 
 	/**
+	 * If <code>mode</code> is {@link BlockingMode#WaitForCon} or {@link BlockingMode#WaitForAck}, the sequence
+	 * order of more {@link #send(CEMI, BlockingMode)} calls from different threads is being maintained according to
+	 * invocation order (FIFO).<br>
+	 * Calling send blocks until any previous invocation finished, then communication proceeds according to the protocol
+	 * and waits for response (either ACK or cEMI confirmation), timeout, or an error condition.<br>
+	 * Note that, for now, when using blocking mode any ongoing nonblocking invocation is not detected or considered for
+	 * waiting until completion.
 	 * <p>
-	 * If <code>mode</code> is {@link KNXnetIPConnection#WAIT_FOR_CON} or
-	 * {@link KNXnetIPConnection#WAIT_FOR_ACK}, the sequence order of more
-	 * {@link #send(CEMI, tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}
-	 * calls from different threads is being maintained according to invocation order
-	 * (FIFO).<br>
-	 * A call of this method blocks until (possible) previous invocations are done, then
-	 * does communication according to the protocol and waits for response (either ACK or
-	 * cEMI confirmation), timeout or an error condition.<br>
-	 * Note that, for now, when using blocking mode any ongoing nonblocking invocation is
-	 * not detected or considered for waiting until completion.
-	 * <p>
-	 * If mode is {@link KNXnetIPConnection#NONBLOCKING}, sending is only permitted if no
-	 * other send is currently being done, otherwise throws a
-	 * {@link KNXIllegalStateException}. In this mode, a user has to check the state (
-	 * {@link #getState()} on its own.
+	 * If mode is {@link BlockingMode#NonBlocking}, sending is only permitted if no other send is currently being done,
+	 * otherwise {@link KNXIllegalStateException} is thrown. In this mode, a user has to check communication state on
+	 * its own ({@link #getState()}).
 	 */
 	@Override
 	public void send(final CEMI frame, final BlockingMode mode)
@@ -202,19 +200,19 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 			throw new KNXIllegalStateException("in error state, send aborted");
 		}
 		// arrange into line for blocking mode
-		if (mode != NONBLOCKING)
+		if (mode != NonBlocking)
 			sendWaitQueue.acquire();
 		synchronized (lock) {
-			if (mode == NONBLOCKING && state != OK && state != ACK_ERROR) {
-				logger.warn("nonblocking send invoked while waiting for data response in state "
-						+ state + " - aborted");
+			if (mode == NonBlocking && state != OK && state != ACK_ERROR) {
+				logger.warn(
+						"nonblocking send invoked while waiting for data response in state " + state + " - aborted");
 				throw new KNXIllegalStateException("waiting for data response");
 			}
 			try {
 				if (state == CLOSED) {
 					throw new KNXConnectionClosedException("send attempt on closed connection");
 				}
-				updateState = mode == NONBLOCKING;
+				updateState = mode == NonBlocking;
 				final byte[] buf;
 				if (serviceRequest == KNXnetIPHeader.ROUTING_IND)
 					buf = PacketHelper.toPacket(new RoutingIndication(frame));
@@ -236,7 +234,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 					internalState = ACK_PENDING;
 					// always forward this state to user
 					state = ACK_PENDING;
-					if (mode == NONBLOCKING)
+					if (mode == NonBlocking)
 						return;
 					waitForStateChange(ACK_PENDING, responseTimeout);
 					if (internalState == ClientConnection.CEMI_CON_PENDING || internalState == OK)
@@ -253,7 +251,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 				}
 				// always forward this state to user
 				state = internalState;
-				if (mode != WAIT_FOR_ACK)
+				if (mode != WaitForAck)
 					doExtraBlockingModes();
 			}
 			catch (final InterruptedIOException e) {
@@ -266,7 +264,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 			finally {
 				updateState = true;
 				setState(internalState);
-				if (mode != NONBLOCKING)
+				if (mode != NonBlocking)
 					sendWaitQueue.release();
 			}
 		}
@@ -533,9 +531,8 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	}
 
 	/**
-	 * Give chance to perform additional blocking modes called if mode is set to a
-	 * blocking mode not equal to NON_BLOCKING and WAIT_FOR_ACK. This method is called
-	 * from send() after WAIT_FOR_ACK was completed.
+	 * Give chance to perform additional blocking modes called if mode is set to a blocking mode not equal to
+	 * NonBlocking and WaitForAck. This method is called from send() after WaitForAck was completed.
 	 *
 	 * @throws KNXTimeoutException
 	 * @throws InterruptedException on interrupted thread
