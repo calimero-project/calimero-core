@@ -127,8 +127,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	 *        ); value of <code>mcGroup &ge; </code>{@value #DEFAULT_MULTICAST}
 	 * @throws KNXException on socket error, or if joining to group failed
 	 */
-	public KNXnetIPRouting(final NetworkInterface netIf, final InetAddress mcGroup)
-		throws KNXException
+	public KNXnetIPRouting(final NetworkInterface netIf, final InetAddress mcGroup) throws KNXException
 	{
 		this(mcGroup);
 		init(netIf, true, true);
@@ -178,9 +177,6 @@ public class KNXnetIPRouting extends ConnectionBase
 		catch (KNXTimeoutException | InterruptedException ignore) {}
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.KNXnetIPConnection#getName()
-	 */
 	@Override
 	public String getName()
 	{
@@ -326,11 +322,6 @@ public class KNXnetIPRouting extends ConnectionBase
 		setState(OK);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.ConnectionBase#handleServiceType
-	 * (tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader, byte[], int,
-	 * java.net.InetAddress, int)
-	 */
 	@Override
 	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data,
 		final int offset, final InetAddress src, final int port)

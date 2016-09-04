@@ -236,7 +236,7 @@ public class KNXnetIPTunnel extends ClientConnection
 							setStateNotify(OK);
 						}
 						else {
-							// we could get a .con with its hop count already decremented by 1
+							// we could get a .con with its hop count already decremented by 1 (eibd does that)
 							// decrement hop count of sent for comparison
 							final int sendCount = ldata.getHopCount() - 1;
 							sent[3] = (byte) ((sent[3] & (0x8f)) | (sendCount << 4));

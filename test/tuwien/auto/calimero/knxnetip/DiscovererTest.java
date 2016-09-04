@@ -172,8 +172,8 @@ public class DiscovererTest
 			final Result<DescriptionResponse> r = d.getDescription(new InetSocketAddress(
 					response.getControlEndpoint().getAddress(), response.getControlEndpoint().getPort()), timeout);
 			assertNotNull(r);
-			System.out.println(
-					"doGetDesc for " + response.getControlEndpoint() + " = " + r.getResponse().getDevice().getName());
+//			System.out.println(
+//					"doGetDesc for " + response.getControlEndpoint() + " = " + r.getResponse().getDevice().getName());
 		}
 	}
 
@@ -231,8 +231,8 @@ public class DiscovererTest
 			final Result<SearchResponse> result = i.next();
 			final SearchResponse response = result.getResponse();
 			assertNotNull(response);
-			System.out.println("doGetSearchRes " + i + " = " + response.getControlEndpoint() + ", "
-					+ response.getServiceFamilies());
+//			System.out.println("doGetSearchRes " + i + " = " + response.getControlEndpoint() + ", "
+//					+ response.getServiceFamilies());
 		}
 	}
 
@@ -297,8 +297,8 @@ public class DiscovererTest
 			final Result<SearchResponse> result = i.next();
 			final SearchResponse response = result.getResponse();
 			assertNotNull(response);
-			System.out.println("doStartSearchIF " + i + " = " + response.getControlEndpoint() + ", "
-					+ response.getServiceFamilies());
+//			System.out.println("doStartSearchIF " + i + " = " + response.getControlEndpoint() + ", "
+//					+ response.getServiceFamilies());
 		}
 
 		// start 2 searches concurrently

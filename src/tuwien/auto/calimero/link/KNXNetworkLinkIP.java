@@ -146,9 +146,8 @@ public class KNXNetworkLinkIP extends AbstractLink
 	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
 	 * @throws InterruptedException on interrupted thread while establishing link
 	 */
-	public KNXNetworkLinkIP(final int serviceMode, final InetSocketAddress localEP,
-		final InetSocketAddress remoteEP, final boolean useNAT, final KNXMediumSettings settings)
-		throws KNXException, InterruptedException
+	public KNXNetworkLinkIP(final int serviceMode, final InetSocketAddress localEP, final InetSocketAddress remoteEP,
+		final boolean useNAT, final KNXMediumSettings settings) throws KNXException, InterruptedException
 	{
 		super(null, createLinkName(remoteEP), settings);
 		switch (serviceMode) {
@@ -184,18 +183,17 @@ public class KNXNetworkLinkIP extends AbstractLink
 	}
 
 	/**
-	 * Creates a new network link based on the KNXnet/IP routing protocol, using a
-	 * {@link KNXnetIPRouting}.
+	 * Creates a new network link based on the KNXnet/IP routing protocol, using a {@link KNXnetIPRouting}.
 	 *
-	 * @param netIf local network interface used to join the multicast group and for sending, use
-	 *        <code>null</code> for the host's default multicast interface
-	 * @param mcGroup address of the multicast group to join, use <code>null</code> for the default
-	 *        KNXnet/IP multicast address
+	 * @param netIf local network interface used to join the multicast group and for sending, use <code>null</code> for
+	 *        the host's default multicast interface
+	 * @param mcGroup address of the multicast group to join, use <code>null</code> for the default KNXnet/IP multicast
+	 *        address
 	 * @param settings medium settings defining device and medium specifics needed for communication
 	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
 	 */
-	public KNXNetworkLinkIP(final NetworkInterface netIf, final InetAddress mcGroup,
-		final KNXMediumSettings settings) throws KNXException
+	public KNXNetworkLinkIP(final NetworkInterface netIf, final InetAddress mcGroup, final KNXMediumSettings settings)
+		throws KNXException
 	{
 		this(ROUTING, new KNXnetIPRouting(netIf, mcGroup), settings);
 	}
@@ -207,8 +205,7 @@ public class KNXNetworkLinkIP extends AbstractLink
 	 * @param c a KNXnet/IP tunneling or routing connection in open state
 	 * @param settings medium settings defining device and medium specifics needed for communication
 	 */
-	protected KNXNetworkLinkIP(final int serviceMode, final KNXnetIPConnection c,
-		final KNXMediumSettings settings)
+	protected KNXNetworkLinkIP(final int serviceMode, final KNXnetIPConnection c, final KNXMediumSettings settings)
 	{
 		super(c, createLinkName(c.getRemoteAddress()), settings);
 		cEMI = true;
@@ -219,9 +216,8 @@ public class KNXNetworkLinkIP extends AbstractLink
 	}
 
 	/**
-	 * {@inheritDoc} When communicating with a KNX network which uses open medium, messages are
-	 * broadcasted within domain (as opposite to system broadcast) by default. Specify
-	 * <code>dst = null</code> for system broadcast.
+	 * {@inheritDoc} When communicating with a KNX network which uses open medium, messages are broadcasted within
+	 * domain (as opposite to system broadcast) by default. Specify <code>dst = null</code> for system broadcast.
 	 */
 	@Override
 	public void sendRequest(final KNXAddress dst, final Priority p, final byte[] nsdu)
@@ -232,9 +228,8 @@ public class KNXNetworkLinkIP extends AbstractLink
 	}
 
 	/**
-	 * {@inheritDoc} When communicating with a KNX network which uses open medium, messages are
-	 * broadcasted within domain (as opposite to system broadcast) by default. Specify
-	 * <code>dst null</code> for system broadcast.
+	 * {@inheritDoc} When communicating with a KNX network which uses open medium, messages are broadcasted within
+	 * domain (as opposite to system broadcast) by default. Specify <code>dst null</code> for system broadcast.
 	 */
 	@Override
 	public void sendRequestWait(final KNXAddress dst, final Priority p, final byte[] nsdu)

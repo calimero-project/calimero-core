@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ import tuwien.auto.calimero.cemi.CEMIFactory;
  * Depending on the type of frame supplied on creation of a new frame event, either
  * {@link #getFrame()} or {@link #getFrameBytes()} has to be used to retrieve the
  * associated frame.
- * 
+ *
  * @see KNXListener
  */
 public class FrameEvent extends EventObject
@@ -60,7 +60,7 @@ public class FrameEvent extends EventObject
 	/**
 	 * Creates a new frame event for <code>frame</code>.
 	 * <p>
-	 * 
+	 *
 	 * @param source the creator of this event
 	 * @param frame cEMI frame
 	 */
@@ -74,7 +74,7 @@ public class FrameEvent extends EventObject
 	/**
 	 * Creates a new frame event for <code>frame</code>.
 	 * <p>
-	 * 
+	 *
 	 * @param source the creator of this event
 	 * @param frame EMI2 L-data frame
 	 */
@@ -84,26 +84,26 @@ public class FrameEvent extends EventObject
 		b = frame;
 		c = null;
 	}
-	
+
 	/**
 	 * Returns the cEMI frame, if supplied at event creation.
 	 * <p>
-	 * 
+	 *
 	 * @return cEMI frame object, or <code>null</code>
 	 */
 	public final CEMI getFrame()
 	{
 		return CEMIFactory.copy(c);
 	}
-	
+
 	/**
 	 * Returns the frame as byte array, if supplied at event creation.
 	 * <p>
-	 * 
+	 *
 	 * @return copy of frame as byte array, or <code>null</code>
 	 */
 	public final byte[] getFrameBytes()
 	{
-		return b != null ? (byte[]) b.clone() : null;
+		return b != null ? b.clone() : null;
 	}
 }

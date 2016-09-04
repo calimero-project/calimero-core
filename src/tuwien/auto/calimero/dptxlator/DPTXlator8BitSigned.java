@@ -107,31 +107,11 @@ public class DPTXlator8BitSigned extends DPTXlator
 			data[0] = 1;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getValue()
-	 */
 	@Override
 	public String getValue()
 	{
 		return makeString(0);
 	}
-
-//    // overwritten to avoid conversion from signed to unsigned
-//    public void setData(final byte[] data, final int offset) {
-//        if (offset < 0 || offset > data.length) {
-//            throw new KNXIllegalArgumentException("illegal offset " + offset);
-//        }
-//        final int size = Math.max(1, getTypeSize());
-//        final int length = (data.length - offset) / size * size;
-//        if (length == 0) {
-//            throw new KNXIllegalArgumentException("data length " + (data.length - offset)
-//                    + " < required KNX data type width " + size);
-//        }
-//        this.data = new short[length];
-//        for (int i = 0; i < length; ++i) {
-//            this.data[i] = data[offset + i];
-//        }
-//    }
 
 	/**
 	 * Sets one new translation item from a signed value, replacing any old items.
@@ -144,9 +124,6 @@ public class DPTXlator8BitSigned extends DPTXlator
 		data = new short[] { toDPT(value) };
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()
-	 */
 	@Override
 	public double getNumericValue()
 	{
@@ -221,13 +198,10 @@ public class DPTXlator8BitSigned extends DPTXlator
 			throw new KNXIllegalStateException("translator not set to DPT 6.020 (Status with Mode)");
 		final int enc = data[0] & 0x07;
 		if (enc != 1 && enc != 2 && enc != 4)
-			; //throw new KNXFormatException("invalid mode encoding " + enc + " out of {1, 2, 4}");
+			throw new KNXIllegalStateException("invalid mode encoding " + enc + " out of {1, 2, 4}");
 		return enc == 1 ? 0 : enc == 2 ? 1 : 2;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
-	 */
 	@Override
 	public final Map<String, DPT> getSubTypes()
 	{

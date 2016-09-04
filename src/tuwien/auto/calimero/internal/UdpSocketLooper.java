@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2011 B. Malinowsky
+    Copyright (c) 2010, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ public abstract class UdpSocketLooper
 	/**
 	 * Creates a socket looper for the supplied UDP socket.
 	 * <p>
-	 * 
+	 *
 	 * @param socket the UDP socket to loop on
 	 * @param closeSocket <code>true</code> to close the socket on {@link #quit()},
 	 *        <code>false</code> otherwise
@@ -81,7 +81,7 @@ public abstract class UdpSocketLooper
 	/**
 	 * Creates a socket looper for the supplied UDP socket and timeout parameters.
 	 * <p>
-	 * 
+	 *
 	 * @param socket the UDP socket to loop on
 	 * @param closeSocket <code>true</code> to close the socket on {@link #quit()},
 	 *        <code>false</code> otherwise
@@ -103,7 +103,7 @@ public abstract class UdpSocketLooper
 	/**
 	 * Runs the looper.
 	 * <p>
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public void loop() throws IOException
@@ -131,8 +131,7 @@ public abstract class UdpSocketLooper
 					final DatagramPacket p = new DatagramPacket(buf, buf.length);
 					s.receive(p);
 					final byte[] data = p.getData();
-					onReceive((InetSocketAddress) p.getSocketAddress(), data, p.getOffset(),
-							p.getLength());
+					onReceive((InetSocketAddress) p.getSocketAddress(), data, p.getOffset(), p.getLength());
 				}
 				catch (final SocketTimeoutException e) {
 					if (total == 0 || start + total > System.currentTimeMillis())
@@ -161,7 +160,7 @@ public abstract class UdpSocketLooper
 	/**
 	 * Invoked on receiving a datagram over the socket.
 	 * <p>
-	 * 
+	 *
 	 * @param source the sender's address, where the data is coming from
 	 * @param data the received data
 	 * @param offset offset of the data (see {@link DatagramPacket#getOffset()})

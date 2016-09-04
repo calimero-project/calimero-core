@@ -182,14 +182,9 @@ public final class Util
 	 */
 	public static InetSocketAddress getLocalHost()
 	{
-		// don't trust default local host resolving of Java
 		try {
-			final InetSocketAddress addr;
 			final InetAddress local = InetAddress.getLocalHost();
-			//if (local.isLoopbackAddress())
-			//	addr = new InetSocketAddress(InetAddress.getByName("192.168.1.102"), 0);
-			//else
-			addr = new InetSocketAddress(local, 0);
+			final InetSocketAddress addr = new InetSocketAddress(local, 0);
 			if (printLocalHost) {
 				printLocalHost = false;
 				final String underline = addr.toString().replaceAll(".", "=");
@@ -206,7 +201,7 @@ public final class Util
 
 	// we initially assume that our test server was started
 	private static boolean testServerRunning = true;
-	// identify test sever among other interfaces that might lurk around
+	// identify test server among other interfaces that might lurk around
 	private static final String testServerId = "calimero-core knx test-server";
 
 	/**

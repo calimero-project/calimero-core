@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -108,9 +108,6 @@ public abstract class RawFrameBase implements RawFrame
 	 */
 	protected byte[] tpdu;
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.medium.RawFrame#getFrameType()
-	 */
 	@Override
 	public final int getFrameType()
 	{
@@ -182,7 +179,7 @@ public abstract class RawFrameBase implements RawFrame
 	 */
 	public final byte[] getTPDU()
 	{
-		return tpdu == null ? null : (byte[]) tpdu.clone();
+		return tpdu == null ? null : tpdu.clone();
 	}
 
 	/**
@@ -200,9 +197,6 @@ public abstract class RawFrameBase implements RawFrame
 		return fcs;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString()
 	{

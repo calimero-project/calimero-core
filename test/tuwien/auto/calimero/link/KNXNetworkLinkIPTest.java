@@ -165,12 +165,12 @@ public class KNXNetworkLinkIPTest
 	public final void testKNXNetworkLinkIPConstructor() throws KNXException, InterruptedException
 	{
 		tnl.close();
-		try (final KNXNetworkLink l = new KNXNetworkLinkIP(100, new InetSocketAddress(0), Util.getServer(), false,
+		try (KNXNetworkLink l = new KNXNetworkLinkIP(100, new InetSocketAddress(0), Util.getServer(), false,
 				TPSettings.TP1)) {
 			fail("illegal arg");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-		try (final KNXNetworkLink l = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, new InetSocketAddress(0),
+		try (KNXNetworkLink l = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, new InetSocketAddress(0),
 				Util.getServer(), false, TPSettings.TP1)) {
 			fail("wildcard no supported");
 		}
