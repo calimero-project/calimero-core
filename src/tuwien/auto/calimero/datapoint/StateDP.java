@@ -247,12 +247,25 @@ public class StateDP extends Datapoint
 	 * @param fromUpdating <code>true</code> to remove from updating this datapoint state, <code>false</code> to remove
 	 *        from invalidating this datapoint state
 	 */
+	@Deprecated
 	public final void remove(final GroupAddress a, final boolean fromUpdating)
 	{
 		if (fromUpdating)
 			updating.remove(a);
 		else
 			invalidating.remove(a);
+	}
+
+	/**
+	 * Removes an updating/invalidating group address from this datapoint, so the group address is no longer contained
+	 * in the corresponding updating/invalidating category.
+	 *
+	 * @param ga the KNX group address to remove
+	 */
+	public final void removeAddress(final GroupAddress ga)
+	{
+		updating.remove(ga);
+		invalidating.remove(ga);
 	}
 
 	/**
