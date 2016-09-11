@@ -39,6 +39,8 @@ package tuwien.auto.calimero.knxnetip;
 import static tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode.NonBlocking;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
@@ -53,11 +55,14 @@ import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
+import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
+import tuwien.auto.calimero.knxnetip.servicetype.RoutingBusy;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingIndication;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingLostMessage;
 import tuwien.auto.calimero.log.LogService;
@@ -177,6 +182,11 @@ public class KNXnetIPRouting extends ConnectionBase
 			setState(OK);
 		}
 		catch (KNXTimeoutException | InterruptedException ignore) {}
+	}
+
+	public final void send(final RoutingBusy busy) throws KNXConnectionClosedException
+	{
+		send(PacketHelper.toPacket(busy));
 	}
 
 	@Override
@@ -344,6 +354,10 @@ public class KNXnetIPRouting extends ConnectionBase
 			final RoutingLostMessage lost = new RoutingLostMessage(data, offset);
 			fireLostMessage(new InetSocketAddress(src, port), lost);
 		}
+		else if (svc == KNXnetIPHeader.ROUTING_BUSY) {
+			final RoutingBusy busy = new RoutingBusy(data, offset);
+			fireRoutingBusy(new InetSocketAddress(src, port), busy);
+		}
 		else if (svc != KNXnetIPHeader.SEARCH_REQ && svc != KNXnetIPHeader.SEARCH_RES)
 			// silently ignore multicast packets from searches,
 			// to avoid logged warnings about unknown frames
@@ -375,13 +389,49 @@ public class KNXnetIPRouting extends ConnectionBase
 		}
 	}
 
+	protected void send(final byte[] packet) throws KNXConnectionClosedException
+	{
+		final int state = getState();
+		if (state == CLOSED) {
+			logger.warn("send invoked on closed connection - aborted");
+			throw new KNXConnectionClosedException("connection closed");
+		}
+		if (state < 0) {
+			logger.error("send invoked in error state " + state + " - aborted");
+			throw new KNXIllegalStateException("in error state, send aborted");
+		}
+		try {
+			final DatagramPacket p = new DatagramPacket(packet, packet.length, dataEndpt.getAddress(),
+					dataEndpt.getPort());
+			socket.send(p);
+			setState(OK);
+		}
+		catch (final InterruptedIOException e) {
+			close(CloseEvent.USER_REQUEST, "interrupted", LogLevel.WARN, e);
+			Thread.currentThread().interrupt();
+			throw new KNXConnectionClosedException("interrupted connection got closed");
+		}
+		catch (final IOException e) {
+			close(CloseEvent.INTERNAL, "communication failure", LogLevel.ERROR, e);
+			throw new KNXConnectionClosedException("connection closed");
+		}
+	}
+
 	private void fireLostMessage(final InetSocketAddress sender, final RoutingLostMessage lost)
 	{
-		final LostMessageEvent e = new LostMessageEvent(this, sender,
-			lost.getDeviceState(), lost.getLostMessages());
+		final LostMessageEvent e = new LostMessageEvent(this, sender, lost.getDeviceState(), lost.getLostMessages());
 		listeners.fire(l -> {
 			if (l instanceof RoutingListener)
 				((RoutingListener) l).lostMessage(e);
+		});
+	}
+
+	private void fireRoutingBusy(final InetSocketAddress sender, final RoutingBusy busy)
+	{
+		final RoutingBusyEvent e = new RoutingBusyEvent(this, sender, busy);
+		listeners.fire(l -> {
+			if (l instanceof RoutingListener)
+				((RoutingListener) l).routingBusy(e);
 		});
 	}
 

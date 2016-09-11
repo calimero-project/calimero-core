@@ -46,11 +46,14 @@ import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.time.Duration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -65,6 +68,7 @@ import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.knxnetip.servicetype.RoutingBusy;
 
 /**
  * @author B. Malinowsky
@@ -81,6 +85,8 @@ public class KNXnetIPRouterTest
 	private CEMILData frame2;
 	// should be a frame with unused destination address
 	private CEMILData frameNoDest;
+
+	private final AtomicInteger routingBusy = new AtomicInteger();
 
 	private final class RouterListenerImpl implements RoutingListener
 	{
@@ -113,6 +119,12 @@ public class KNXnetIPRouterTest
 			assertNotNull(e);
 			lost.add(e);
 		}
+
+		@Override
+		public void routingBusy(final RoutingBusyEvent e)
+		{
+			routingBusy.incrementAndGet();
+		}
 	}
 
 	@BeforeEach
@@ -125,6 +137,7 @@ public class KNXnetIPRouterTest
 				new byte[] { 0, (byte) (0x80 | 0) }, Priority.URGENT);
 		frameNoDest = new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0), new GroupAddress(10, 7, 10),
 				new byte[] { 0, (byte) (0x80 | 0) }, Priority.URGENT);
+		routingBusy.set(0);
 	}
 
 	@AfterEach
@@ -312,6 +325,51 @@ public class KNXnetIPRouterTest
 			final LostMessageEvent e = i.next();
 			System.out.println("dev.state:" + e.getDeviceState() + ", lost msgs:" + e.getLostMessages());
 		}
+	}
+
+	private static final Duration timeout = Duration.ofMillis(1000);
+
+	@Test
+	void sendRoutingBusy() throws KNXException
+	{
+		newRouter();
+		r.send(new RoutingBusy(0, 100, 0));
+		Assertions.assertTimeout(timeout, () -> {
+			while (routingBusy.get() == 0)
+				Thread.sleep(50);
+		}, "no routing busy notification");
+		assertEquals(1, routingBusy.get());
+	}
+
+	@Test
+	void incrementRoutingBusyCounter() throws KNXException, InterruptedException
+	{
+		newRouter();
+		final int messages = 5;
+		for (int i = 0; i < messages; i++) {
+			r.send(new RoutingBusy(1, 20, 0));
+			Thread.sleep(12);
+		}
+		Assertions.assertTimeout(timeout, () -> {
+			while (routingBusy.get() != messages)
+				Thread.sleep(50);
+		}, "wrong number of routing busy notification");
+		assertEquals(messages, routingBusy.get());
+	}
+
+	@Test
+	void fastSendManyRoutingBusy() throws KNXException
+	{
+		newRouter();
+		final int messages = 40;
+		for (int i = 0; i < messages; i++) {
+			r.send(new RoutingBusy(1, 20, 0));
+		}
+		Assertions.assertTimeout(timeout, () -> {
+			while (routingBusy.get() != messages)
+				Thread.sleep(50);
+		}, "wrong number of routing busy notification");
+		assertEquals(messages, routingBusy.get());
 	}
 
 	private void newRouter() throws KNXException

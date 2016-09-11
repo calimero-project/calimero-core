@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,30 +36,37 @@
 
 package tuwien.auto.calimero.knxnetip;
 
-import tuwien.auto.calimero.KNXListener;
+import java.net.InetSocketAddress;
+import java.util.EventObject;
 
-/**
- * A listener for use with {@link KNXnetIPRouting} connections.
- * <p>
- * In routing mode, it is possible that indications sent with KNXnet/IP routing might be
- * looped back by the network stack and received again through a registered listener in
- * {@link KNXListener#frameReceived(tuwien.auto.calimero.FrameEvent)}.<br>
- * Background: a platform's network interface has the option to send multicast
- * datagrams back to the local socket of the sender; setting the socket's loopback mode is
- * only considered as request and does not have to be followed rigorously.<br>
- *
- * @author B. Malinowsky
- * @see KNXnetIPRouting
- */
-public interface RoutingListener extends KNXListener
+import tuwien.auto.calimero.knxnetip.servicetype.RoutingBusy;
+
+public class RoutingBusyEvent extends EventObject
 {
-	/**
-	 * Informs about the loss of messages in the KNXnet/IP router.
-	 * <p>
-	 *
-	 * @param e event with lost message information
-	 */
-	void lostMessage(LostMessageEvent e);
+	private static final long serialVersionUID = 1L;
 
-	void routingBusy(RoutingBusyEvent e);
+	private final InetSocketAddress from;
+	private final RoutingBusy busy;
+
+	public RoutingBusyEvent(final KNXnetIPRouting source, final InetSocketAddress sender, final RoutingBusy busy)
+	{
+		super(source);
+		from = sender;
+		this.busy = busy;
+	}
+
+	public final InetSocketAddress sender()
+	{
+		return from;
+	}
+
+	public final int waitTime()
+	{
+		return busy.getWaitTime();
+	}
+
+	public final RoutingBusy get()
+	{
+		return busy;
+	}
 }

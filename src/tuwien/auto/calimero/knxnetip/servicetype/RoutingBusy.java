@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015 B. Malinowsky
+    Copyright (c) 2015, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -67,7 +67,6 @@ public class RoutingBusy extends ServiceType
 
 	/**
 	 * Creates a new routing busy indication out of a byte array.
-	 * <p>
 	 *
 	 * @param data byte array containing a lost message indication structure
 	 * @param offset start offset of indication in <code>data</code>
@@ -89,7 +88,6 @@ public class RoutingBusy extends ServiceType
 
 	/**
 	 * Creates a new routing busy indication.
-	 * <p>
 	 *
 	 * @param deviceState router device state, this router states are defined by the KNX property ID
 	 *        69 in object type 11 of the KNX property definitions (with the state maintained by the
@@ -101,8 +99,8 @@ public class RoutingBusy extends ServiceType
 	public RoutingBusy(final int deviceState, final int waitTime, final int control)
 	{
 		super(KNXnetIPHeader.ROUTING_BUSY);
-		if (waitTime < 0 || waitTime > 100)
-			throw new KNXIllegalArgumentException("wait time out of range [0..100] ms");
+		if (waitTime < 20 || waitTime > 100)
+			throw new KNXIllegalArgumentException("wait time out of range [20..100] ms");
 		if (deviceState < 0 || deviceState > 0xFF)
 			throw new KNXIllegalArgumentException("device state field out of range [0..0xFF]");
 		// bits 2 to 7 are reserved for now...
@@ -133,7 +131,7 @@ public class RoutingBusy extends ServiceType
 	 * @return <code>true</code> on KNX access fault, <code>false</code> otherwise
 	 * @see #getDeviceState()
 	 */
-	public final boolean isKNXFault()
+	public final boolean isKnxFault()
 	{
 		return (state & 0x01) != 0;
 	}
@@ -141,7 +139,7 @@ public class RoutingBusy extends ServiceType
 	/**
 	 * Returns the time required to empty the affected receive queue.
 	 * <p>
-	 * If 1) {@link #getControl()} returns 0x0, or 2) {@link #getControl()} returns not 0x0 but the
+	 * If 1) {@link #getControl()} returns 0x0, or 2) {@link #getControl()} returns not 0x0 and the
 	 * value is not interpreted by the receiving device, the receiving KNXnet/IP router or KNX IP
 	 * device shall stop sending further routing indications for a time of {@link #getWaitTime()}.
 	 * The following flow control mechanism applies:<br>
@@ -180,19 +178,12 @@ public class RoutingBusy extends ServiceType
 		return ctrl;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceType#getStructLength()
-	 */
 	@Override
 	int getStructLength()
 	{
 		return typeSize;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceType#toByteArray
-	 * (java.io.ByteArrayOutputStream)
-	 */
 	@Override
 	byte[] toByteArray(final ByteArrayOutputStream os)
 	{
