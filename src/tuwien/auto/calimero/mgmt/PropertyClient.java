@@ -437,8 +437,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		"Application Controller", "File Server Object", };
 
 
-	private final Map<PropertyKey, Property> properties = Collections
-			.synchronizedMap(new HashMap<>());
+	private final Map<PropertyKey, Property> properties = Collections.synchronizedMap(new HashMap<>());
 
 	private final PropertyAdapter pa;
 	// helper flag to determine local DM mode, mainly for detecting absence of PDT

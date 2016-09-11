@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -307,37 +307,32 @@ public final class PropertyTypes
 	 */
 	// private static final int PDT_ESCAPE = 0x3F;
 
-	private static final Map<Integer, DPTID> pt;
+	private static final Map<Integer, DPTID> pt = Collections.synchronizedMap(new HashMap<>());
 
 	static {
-		final Map<Integer, DPTID> m = new HashMap<>(40);
-		m.put(new Integer(PDT_CHAR), new DPTID(TranslatorTypes.TYPE_8BIT_SIGNED, "6.010"));
-		m.put(new Integer(PDT_UNSIGNED_CHAR),
-				new DPTID(TranslatorTypes.TYPE_8BIT_UNSIGNED, "5.010"));
-		m.put(new Integer(PDT_INT), new DPTID(TranslatorTypes.TYPE_2OCTET_SIGNED, "8.001"));
-		m.put(new Integer(PDT_UNSIGNED_INT), new DPTID(TranslatorTypes.TYPE_2OCTET_UNSIGNED,
-				"7.001"));
-		m.put(new Integer(PDT_KNX_FLOAT), new DPTID(TranslatorTypes.TYPE_2OCTET_FLOAT, "9.002"));
-		m.put(new Integer(PDT_DATE), new DPTID(TranslatorTypes.TYPE_DATE, "11.001"));
-		m.put(new Integer(PDT_TIME), new DPTID(TranslatorTypes.TYPE_TIME, "10.001"));
-		m.put(new Integer(PDT_LONG), new DPTID(TranslatorTypes.TYPE_4OCTET_SIGNED, "13.001"));
-		m.put(new Integer(PDT_UNSIGNED_LONG), new DPTID(TranslatorTypes.TYPE_4OCTET_UNSIGNED,
-				"12.001"));
-		m.put(new Integer(PDT_FLOAT), new DPTID(TranslatorTypes.TYPE_4OCTET_FLOAT, "14.005"));
+		pt.put(new Integer(PDT_CHAR), new DPTID(TranslatorTypes.TYPE_8BIT_SIGNED, "6.010"));
+		pt.put(new Integer(PDT_UNSIGNED_CHAR), new DPTID(TranslatorTypes.TYPE_8BIT_UNSIGNED, "5.010"));
+		pt.put(new Integer(PDT_INT), new DPTID(TranslatorTypes.TYPE_2OCTET_SIGNED, "8.001"));
+		pt.put(new Integer(PDT_UNSIGNED_INT), new DPTID(TranslatorTypes.TYPE_2OCTET_UNSIGNED, "7.001"));
+		pt.put(new Integer(PDT_KNX_FLOAT), new DPTID(TranslatorTypes.TYPE_2OCTET_FLOAT, "9.002"));
+		pt.put(new Integer(PDT_DATE), new DPTID(TranslatorTypes.TYPE_DATE, "11.001"));
+		pt.put(new Integer(PDT_TIME), new DPTID(TranslatorTypes.TYPE_TIME, "10.001"));
+		pt.put(new Integer(PDT_LONG), new DPTID(TranslatorTypes.TYPE_4OCTET_SIGNED, "13.001"));
+		pt.put(new Integer(PDT_UNSIGNED_LONG), new DPTID(TranslatorTypes.TYPE_4OCTET_UNSIGNED, "12.001"));
+		pt.put(new Integer(PDT_FLOAT), new DPTID(TranslatorTypes.TYPE_4OCTET_FLOAT, "14.005"));
 		// p.put(new Integer(PDT_DOUBLE), );
-		m.put(new Integer(PDT_CHAR_BLOCK), new DPTID(24, "24.001"));
+		pt.put(new Integer(PDT_CHAR_BLOCK), new DPTID(24, "24.001"));
 		// p.put(new Integer(PDT_POLL_GROUP_SETTINGS), );
-		m.put(new Integer(PDT_SHORT_CHAR_BLOCK), new DPTID(24, "24.001"));
-		m.put(new Integer(PDT_DATE_TIME), new DPTID(TranslatorTypes.TYPE_DATE_TIME, "19.001"));
-		m.put(new Integer(PDT_VARIABLE_LENGTH), new DPTID(24, "24.001"));
-		m.put(new Integer(PDT_VERSION), new DPTID(217, "217.001"));
-		m.put(new Integer(PDT_ALARM_INFO), new DPTID(219, "219.001"));
-		m.put(new Integer(PDT_BINARY_INFORMATION), new DPTID(TranslatorTypes.TYPE_BOOLEAN, "1.002"));
-		m.put(new Integer(PDT_BITSET8), new DPTID(21, "21.001"));
-		m.put(new Integer(PDT_BITSET16), new DPTID(22, "22.100"));
-		m.put(new Integer(PDT_ENUM8), new DPTID(20, "20.1000"));
-		m.put(new Integer(PDT_SCALING), new DPTID(TranslatorTypes.TYPE_8BIT_UNSIGNED, "5.001"));
-		pt = Collections.synchronizedMap(m);
+		pt.put(new Integer(PDT_SHORT_CHAR_BLOCK), new DPTID(24, "24.001"));
+		pt.put(new Integer(PDT_DATE_TIME), new DPTID(TranslatorTypes.TYPE_DATE_TIME, "19.001"));
+		pt.put(new Integer(PDT_VARIABLE_LENGTH), new DPTID(24, "24.001"));
+		pt.put(new Integer(PDT_VERSION), new DPTID(217, "217.001"));
+		pt.put(new Integer(PDT_ALARM_INFO), new DPTID(219, "219.001"));
+		pt.put(new Integer(PDT_BINARY_INFORMATION), new DPTID(TranslatorTypes.TYPE_BOOLEAN, "1.002"));
+		pt.put(new Integer(PDT_BITSET8), new DPTID(21, "21.001"));
+		pt.put(new Integer(PDT_BITSET16), new DPTID(22, "22.100"));
+		pt.put(new Integer(PDT_ENUM8), new DPTID(20, "20.1000"));
+		pt.put(new Integer(PDT_SCALING), new DPTID(TranslatorTypes.TYPE_8BIT_UNSIGNED, "5.001"));
 	}
 
 	private PropertyTypes()

@@ -43,6 +43,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Container for keeping event listeners.
@@ -72,7 +73,7 @@ public class EventListeners<T extends EventListener>
 	 */
 	public EventListeners()
 	{
-		this.logger = null;
+		this.logger = LoggerFactory.getLogger("calimero");
 	}
 
 	/**
