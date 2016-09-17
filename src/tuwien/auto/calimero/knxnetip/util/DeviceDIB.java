@@ -363,7 +363,7 @@ public class DeviceDIB extends DIB
 	 */
 	public final String getSerialNumberString()
 	{
-		return DataUnitBuilder.toHex(serial, null);
+		return DataUnitBuilder.toHex(serial, "");
 	}
 
 	/**
@@ -392,7 +392,7 @@ public class DeviceDIB extends DIB
 			mc = InetAddress.getByAddress(getMulticastAddress());
 		}
 		catch (final UnknownHostException ignore) {}
-		return "KNX address " + address + " \"" + name + "\", KNX medium " + getKNXMediumString()
+		return "\"" + name + "\", KNX address " + address + ", KNX medium " + getKNXMediumString()
 				+ ", installation " + getInstallation() + " - project " + getProject()
 				+ " (project/installation ID " + installationId + ")"
 				+ ", routing multicast address " + mc + ", MAC address " + getMACAddressString()
