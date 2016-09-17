@@ -449,9 +449,12 @@ public class Discoverer
 //						else
 //							break;
 					}
-					catch (final KNXException e) {
-						// we ignore exceptions here, but print an error for user information
-						logger.error(e.getMessage());
+					catch (KNXException | RuntimeException e) {
+						// we continue on exception, but print a warning for user information
+						String causeMsg = "";
+						for (Throwable t = e.getCause(); t != null && t != t.getCause(); t = t.getCause())
+							causeMsg = " (" + t.getMessage() + ")";
+						logger.warn("using {} at {}: {}{}", a, ni.getName(), e.getMessage(), causeMsg);
 					}
 			}
 		}
@@ -572,7 +575,7 @@ public class Discoverer
 		catch (final IOException e) {
 			final String msg = "network failure on getting description";
 			logger.error(msg, e);
-			throw new KNXException(msg);
+			throw new KNXException(msg, e);
 		}
 		finally {
 			s.close();
@@ -638,7 +641,7 @@ public class Discoverer
 				catch (final IOException ignore) {}
 			s.close();
 			throw new KNXException("search request to " + SYSTEM_SETUP_MULTICAST + " failed on "
-					+ localAddr + ":" + localPort + ", " + e.getMessage());
+					+ localAddr + ":" + localPort, e);
 		}
 	}
 
@@ -675,7 +678,7 @@ public class Discoverer
 		catch (final IOException e) {
 			final String msg = "failed to create socket on " + bindAddr + ":" + bindPort;
 			logger.warn(msg, e);
-			throw new KNXException(msg + ", " + e.getMessage());
+			throw new KNXException(msg, e);
 		}
 		if (mcastResponse) {
 			try {
@@ -690,9 +693,8 @@ public class Discoverer
 			}
 			catch (final IOException e) {
 				s.close();
-				final String msg = ni.getName() + ": joining group " + SYSTEM_SETUP_MULTICAST
-						+ " failed";
-				throw new KNXException(msg + ", " + e.getMessage());
+				throw new KNXException("failed to join multicast group " + SYSTEM_SETUP_MULTICAST
+						+ (ni == null ? "" : " at " + ni.getName()), e);
 			}
 			catch (final InterruptedException e) {
 				Thread.currentThread().interrupt();
@@ -753,7 +755,7 @@ public class Discoverer
 				nif = socket.getNetworkInterface();
 			}
 			catch (final SocketException e) {
-				e.printStackTrace();
+				throw new KNXIllegalArgumentException("getting network interface of socket " + socket, e);
 			}
 			this.addrOnNetif = addrOnNetIf;
 			search = true;
@@ -824,7 +826,7 @@ public class Discoverer
 						}
 						catch (final KNXFormatException e) {
 							logger.error("invalid description response", e);
-							thrown = new KNXInvalidResponseException(e.getMessage());
+							thrown = new KNXInvalidResponseException("description response from " + source, e);
 						}
 						finally {
 							quit();
