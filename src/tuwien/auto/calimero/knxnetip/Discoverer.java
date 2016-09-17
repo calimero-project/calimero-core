@@ -436,18 +436,8 @@ public class Discoverer
 								rcv.add(search(a, port, ni, timeout));
 						}
 						if (a.isLoopbackAddress()) {
-//							System.out.println("loopback " + a);
 							lo = true;
 						}
-						else if (a.isLinkLocalAddress()) {
-//							System.out.println("link local " + a);
-						}
-						else if (a.isSiteLocalAddress()) {
-//							System.out.println("site local " + a);
-							//break;
-						}
-//						else
-//							break;
 					}
 					catch (KNXException | RuntimeException e) {
 						// we continue on exception, but print a warning for user information
@@ -621,14 +611,12 @@ public class Discoverer
 
 			// IP multicast responses MUST be forwarded by NAT without
 			// modifications to IP/port, hence, we can safely state them in our HPAI
-			final InetSocketAddress res = mcast ? new InetSocketAddress(SYSTEM_SETUP_MULTICAST,
-					s.getLocalPort()) : nat ? null : new InetSocketAddress(localAddr,
-					s.getLocalPort());
+			final InetSocketAddress res = mcast ? new InetSocketAddress(SYSTEM_SETUP_MULTICAST, s.getLocalPort())
+					: nat ? null : new InetSocketAddress(localAddr, s.getLocalPort());
 			final byte[] buf = PacketHelper.toPacket(new SearchRequest(res));
 			s.send(new DatagramPacket(buf, buf.length, SYSTEM_SETUP_MULTICAST, SEARCH_PORT));
 			synchronized (receivers) {
-				final ReceiverLoop l = startReceiver(s, localAddr, timeout,
-						nifName + localAddr.getHostAddress());
+				final ReceiverLoop l = startReceiver(s, localAddr, timeout, nifName + localAddr.getHostAddress());
 				receivers.add(l);
 				return l;
 			}
@@ -670,8 +658,7 @@ public class Discoverer
 			catch (final IOException e) {
 				if (!win7_OrLater)
 					throw e;
-				logger.warn("setting outgoing network interface " + ni.getName()
-						+ " failed, using system default."
+				logger.warn("setting outgoing network interface " + ni.getName() + " failed, using system default."
 						+ " Either disable IPv6 or set java.net.preferIPv4Stack=true.");
 			}
 		}
@@ -793,8 +780,7 @@ public class Discoverer
 		{
 			if (search) {
 				try {
-					((MulticastSocket) s).leaveGroup(new InetSocketAddress(SYSTEM_SETUP_MULTICAST,
-							0), null);
+					((MulticastSocket) s).leaveGroup(new InetSocketAddress(SYSTEM_SETUP_MULTICAST, 0), null);
 				}
 				catch (final IOException ignore) {}
 				receivers.remove(this);
@@ -803,8 +789,7 @@ public class Discoverer
 		}
 
 		@Override
-		public void onReceive(final InetSocketAddress source, final byte[] data, final int offset,
-			final int length)
+		public void onReceive(final InetSocketAddress source, final byte[] data, final int offset, final int length)
 		{
 			try {
 				final KNXnetIPHeader h = new KNXnetIPHeader(data, offset);
