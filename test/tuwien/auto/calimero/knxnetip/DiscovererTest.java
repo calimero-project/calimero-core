@@ -309,10 +309,9 @@ public class DiscovererTest
 		d.startSearch(30001, NetworkInterface.getByInetAddress(Util.getLocalHost().getAddress()), timeout, false);
 		while (d.isSearching())
 			Thread.sleep(200);
-		// -> 2 * responses is not always true: the number of responses can vary based on network setup
-		final int expected = usesMulticast ? 2 * responses : 2 * responses;
+		final int expected = responses;
 		final int actual = d.getSearchResponses().size();
-		assertTrue("expected = " + expected + ", actual = " + actual, expected <= actual);
+		assertEquals("expected = " + expected + ", actual = " + actual, expected, actual);
 	}
 
 	/**
