@@ -794,14 +794,16 @@ public class Discoverer
 			try {
 				final KNXnetIPHeader h = new KNXnetIPHeader(data, offset);
 				if (h.getTotalLength() > length)
-					logger.warn("ignore received packet from " + source
-						+ ", frame length does not match");
+					logger.warn("ignore received packet from " + source + ", frame length does not match");
 				else if (search && h.getServiceType() == KNXnetIPHeader.SEARCH_RES) {
-					// if our search is still running, add response
+					// if our search is still running, add response if not already added
 					synchronized (receivers) {
-						if (receivers.contains(this))
-							responses.add(new Result<>(new SearchResponse(data, offset
-									+ h.getStructLength()), nif, addrOnNetif));
+						if (receivers.contains(this)) {
+							final Result<SearchResponse> r = new Result<>(
+									new SearchResponse(data, offset + h.getStructLength()), nif, addrOnNetif);
+							if (!responses.contains(r))
+								responses.add(r);
+						}
 					}
 				}
 				else if (!search && h.getServiceType() == KNXnetIPHeader.DESCRIPTION_RES) {
