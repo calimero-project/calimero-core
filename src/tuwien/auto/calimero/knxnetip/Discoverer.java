@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ package tuwien.auto.calimero.knxnetip;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
@@ -54,6 +55,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 
@@ -358,7 +360,14 @@ public class Discoverer
 			throw new KNXIllegalArgumentException("timeout has to be >= 0");
 		if (localPort < 0 || localPort > 65535)
 			throw new KNXIllegalArgumentException("port out of range [0..0xFFFF]");
-		final ReceiverLoop r = search(host, localPort, ni, timeout);
+
+		// possibly empty list of netif IP addresses
+		final List<InetAddress> l = Optional.ofNullable(ni).map(NetworkInterface::getInetAddresses)
+				.map(Collections::list).orElse(new ArrayList<>());
+		// use any assigned (IPv4) address of netif, otherwise, use host
+		final InetAddress addr = l.stream().filter(ia -> nat || ia instanceof Inet4Address).findFirst().orElse(host);
+
+		final ReceiverLoop r = search(addr, localPort, ni, timeout);
 		if (wait) {
 			try {
 				join(r);
