@@ -253,20 +253,21 @@ public class DiscovererTest
 	/**
 	 * Test method for {@link Discoverer#startSearch(int, java.net.NetworkInterface, int, boolean)}.
 	 *
-	 * @throws KNXException
 	 * @throws SocketException
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testNATStartSearchIntNetworkInterfaceIntBoolean()
-		throws SocketException, KNXException, InterruptedException
+	public final void testNATStartSearchIntNetworkInterfaceIntBoolean() throws SocketException, InterruptedException
 	{
 		if (!Util.TEST_NAT) {
-			System.out.println("\n==== skip " + "testNATStartSearchIntNetworkInterfaceIntBoolean ====\n");
+			System.out.println("\n==== skip testNATStartSearchIntNetworkInterfaceIntBoolean ====\n");
 			return;
 		}
 		try {
 			doStartSearchIF(dnat, false);
+		}
+		catch (final KNXException e) {
+			// don't fail, we might use an IPv6 socket, and on some OS IPv6 sockets can't join IPv4 multicast groups
 		}
 		catch (final AssertionFailedError e) {
 			fail("Probably no NAT support on router, " + e.getMessage());
