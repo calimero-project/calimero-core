@@ -72,14 +72,13 @@ public class HPAI
 
 	private static final int HPAI_SIZE = 8;
 
-	private byte[] address;
-	private int hostprot;
-	private int port;
-	private int length;
+	private final int length;
+	private final int hostprot;
+	private final byte[] address;
+	private final int port;
 
 	/**
 	 * Creates a HPAI out of a byte array.
-	 * <p>
 	 *
 	 * @param data byte array containing the HPAI structure
 	 * @param offset start offset of HPAI in <code>data</code>
@@ -104,38 +103,29 @@ public class HPAI
 		address[2] = data[i++];
 		address[3] = data[i++];
 
-		port = (data[i++] & 0xFF) << 8;
-		port |= data[i++] & 0xFF;
+		int p = (data[i++] & 0xFF) << 8;
+		p |= data[i] & 0xFF;
+		port = p;
 	}
 
 	/**
-	 * Creates a HPAI for UDP communication with the given address information.
-	 * <p>
-	 * The constructor uses UDP as communication mode (default in KNXnet/IP).<br>
-	 * The following first matching rule is used for the <code>addr</code> argument:<br>
+	 * Creates a HPAI for UDP communication with the given address information, using UDP as communication mode (default
+	 * in KNXnet/IP). The following first matching rule is used for the <code>addr</code> argument:<br>
 	 * 1) <code>addr</code> holds an {@link InetAddress}, use that address<br>
-	 * 2) <code>addr</code> is <code>null</code>, the local host is retrieved by
-	 * {@link InetAddress#getLocalHost()}<br>
-	 * 3) if no local host could be found, fall back to safe state and initialize IP
-	 * <b>and</b> port to 0 (NAT aware mode)<br>
+	 * 2) <code>addr</code> is <code>null</code>, the local host is retrieved by {@link InetAddress#getLocalHost()}<br>
+	 * 3) if no local host could be found, fall back to safe state and initialize IP <b>and</b> port to 0 (NAT aware
+	 * mode)
 	 *
 	 * @param addr local IP address, use <code>null</code> for setting local host
 	 * @param port local port number to set, 0 &lt;= <code>port</code> &lt;= 0xFFFF
 	 */
 	public HPAI(final InetAddress addr, final int port)
 	{
-		try {
-			final InetAddress ia = addr != null ? addr : InetAddress.getLocalHost();
-			init(IPV4_UDP, ia.getAddress(), port);
-		}
-		catch (final UnknownHostException e) {
-			init(IPV4_UDP, new byte[4], 0);
-		}
+		this(IPV4_UDP, addrOrDefault(addr), port);
 	}
 
 	/**
 	 * Creates a HPAI with the given address information.
-	 * <p>
 	 *
 	 * @param hostProtocol host protocol code (UDP or TCP on IP)
 	 * @param addr local IP address
@@ -143,7 +133,7 @@ public class HPAI
 	 */
 	public HPAI(final int hostProtocol, final InetAddress addr, final int port)
 	{
-		init(hostProtocol, addr.getAddress(), port);
+		this(hostProtocol, new InetSocketAddress(addr, port));
 	}
 
 	/**
@@ -158,15 +148,25 @@ public class HPAI
 	 */
 	public HPAI(final int hostProtocol, final InetSocketAddress addr)
 	{
-		if (addr == null)
-			init(hostProtocol, new byte[4], 0);
-		else {
+		length = HPAI_SIZE;
+		if (hostProtocol != IPV4_UDP && hostProtocol != IPV4_TCP)
+			throw new KNXIllegalArgumentException("unknown host protocol");
+		hostprot = hostProtocol;
+
+		if (addr != null) {
 			final InetAddress a = addr.getAddress();
 			if (a == null)
 				throw new KNXIllegalArgumentException("unresolved IP address");
 			if (a.isAnyLocalAddress())
 				throw new KNXIllegalArgumentException("wildcard IP address");
-			init(hostProtocol, a.getAddress(), addr.getPort());
+			address = a.getAddress();
+			if (address.length != 4)
+				throw new KNXIllegalArgumentException("not an IPv4 address");
+			port = addr.getPort();
+		}
+		else {
+			address = new byte[4];
+			port = 0;
 		}
 	}
 
@@ -283,17 +283,18 @@ public class HPAI
 				+ (address[3] & 0xFF);
 	}
 
-	private void init(final int prot, final byte[] addr, final int p)
+	private static InetAddress addrOrDefault(final InetAddress addr)
 	{
-		if (addr.length != 4)
-			throw new KNXIllegalArgumentException("not an IPv4 address");
-		if (port < 0 || port > 0xffff)
-			throw new KNXIllegalArgumentException("port number out of range [0..65535]");
-		if (prot != IPV4_UDP && prot != IPV4_TCP)
-			throw new KNXIllegalArgumentException("unknown host protocol");
-		length = HPAI_SIZE;
-		hostprot = prot;
-		port = p;
-		address = addr;
+		try {
+			return addr != null ? addr : InetAddress.getLocalHost();
+		}
+		catch (final UnknownHostException e) {
+			try {
+				return InetAddress.getByAddress(new byte[4]);
+			}
+			catch (final UnknownHostException unreachable) {
+				throw new Error("raw IPv4 addresses should always work", unreachable);
+			}
+		}
 	}
 }
