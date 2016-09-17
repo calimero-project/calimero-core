@@ -323,7 +323,7 @@ public class DiscovererTest
 	@Test
 	public final void testStartSearchIntBoolean() throws KNXException, InterruptedException
 	{
-		doStartSeach(ddef, false);
+		doStartSearch(ddef, false);
 	}
 
 	/**
@@ -340,7 +340,7 @@ public class DiscovererTest
 			return;
 		}
 		try {
-			doStartSeach(dnat, false);
+			doStartSearch(dnat, false);
 		}
 		catch (final AssertionFailedError e) {
 			fail("Probably no NAT support on router, " + e.getMessage());
@@ -356,14 +356,14 @@ public class DiscovererTest
 	@Test
 	public final void testMcastStartSearchIntBoolean() throws KNXException, InterruptedException
 	{
-		doStartSeach(dmcast, true);
+		doStartSearch(dmcast, true);
 	}
 
 	/**
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
 	 */
-	private void doStartSeach(final Discoverer d, final boolean usesMulticast) throws KNXException, InterruptedException
+	private void doStartSearch(final Discoverer d, final boolean usesMulticast) throws KNXException, InterruptedException
 	{
 		try {
 			d.startSearch(-1, true);
@@ -386,9 +386,9 @@ public class DiscovererTest
 
 		// multicasts are not only received on sending IF
 		// the number of responses can vary based on network setup
-		final int expected = usesMulticast ? 2 * responses : 2 * responses;
+		final int expected = responses;
 		final int actual = d.getSearchResponses().size();
-		assertTrue("expected = " + expected + ", actual = " + actual, (actual == 1) || (expected <= actual));
+		assertEquals("expected = " + expected + ", actual = " + actual, expected, actual);
 	}
 
 	/**
