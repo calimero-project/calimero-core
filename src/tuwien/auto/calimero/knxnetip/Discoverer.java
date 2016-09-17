@@ -289,10 +289,10 @@ public class Discoverer
 			}
 		else
 			host = localHost;
-		checkHost();
 		port = localPort;
 		nat = natAware;
 		mcast = mcastResponse;
+		checkHost();
 	}
 
 	/**
