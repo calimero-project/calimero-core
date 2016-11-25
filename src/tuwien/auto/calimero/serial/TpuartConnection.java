@@ -633,8 +633,8 @@ public class TpuartConnection implements AutoCloseable
 		}
 
 		// pre: we have a new .ind frame, length > 5
-		// The ack service has to be sent at the latest 1.7 ms after receiving the address
-		// type bit of the the L-Data.ind
+		// The ack service has to be sent at the latest 1.7 ms after receiving the
+		// address-type bit of the L-Data.ind
 		private void ack(final byte[] frame) throws IOException
 		{
 			if (busmon || frameAcked)

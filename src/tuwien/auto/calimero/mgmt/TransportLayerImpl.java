@@ -244,10 +244,9 @@ public class TransportLayerImpl implements TransportLayer
 			if (proxies.containsKey(remote))
 				throw new KNXIllegalArgumentException("destination already created: " + remote);
 			final AggregatorProxy p = new AggregatorProxy(this);
-			final Destination d = new Destination(p, remote, connectionOriented, keepAlive,
-					verifyMode);
+			final Destination d = new Destination(p, remote, connectionOriented, keepAlive, verifyMode);
 			proxies.put(remote, p);
-			logger.trace("destination {} ready for use", remote);
+			logger.trace("created {} destination for {}", (connectionOriented ? "co" : "cl"), remote);
 			return d;
 		}
 	}

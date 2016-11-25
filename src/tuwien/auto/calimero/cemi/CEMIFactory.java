@@ -213,8 +213,7 @@ public final class CEMIFactory
 			throw new KNXFormatException("EMI frame too short");
 		final int mc = frame[0] & 0xff;
 		if (mc != CEMIBusMon.MC_BUSMON_IND && mc != Emi1_LBusmon_ind)
-			throw new KNXFormatException("not a busmonitor frame with msg code 0x"
-					+ Integer.toHexString(mc));
+			throw new KNXFormatException("not a busmonitor frame with msg code 0x" + Integer.toHexString(mc));
 		return CEMIBusMon.newWithStatus(frame[1] & 0xff, (frame[2] & 0xff) << 8 | frame[3] & 0xff,
 				false, DataUnitBuilder.copyOfRange(frame, 4, frame.length));
 	}
@@ -389,9 +388,7 @@ public final class CEMIFactory
 			return copy;
 		}
 		if (ext)
-			return new CEMILDataEx(mc, s, d, content, original.getPriority(), repeat,
-					original.getHopCount());
-		return new CEMILData(mc, s, d, content, original.getPriority(), repeat,
-				original.getHopCount());
+			return new CEMILDataEx(mc, s, d, content, original.getPriority(), repeat, original.getHopCount());
+		return new CEMILData(mc, s, d, content, original.getPriority(), repeat, original.getHopCount());
 	}
 }

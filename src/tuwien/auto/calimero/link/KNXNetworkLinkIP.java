@@ -201,8 +201,7 @@ public class KNXNetworkLinkIP extends AbstractLink
 	}
 
 	/**
-	 * Creates a new network link with <code>serviceMode</code> based on the supplied KNXnet/IP
-	 * connection.
+	 * Creates a new network link with <code>serviceMode</code> based on the supplied KNXnet/IP connection.
 	 *
 	 * @param c a KNXnet/IP tunneling or routing connection in open state
 	 * @param settings medium settings defining device and medium specifics needed for communication
