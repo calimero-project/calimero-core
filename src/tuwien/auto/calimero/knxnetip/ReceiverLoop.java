@@ -89,12 +89,8 @@ final class ReceiverLoop extends UdpSocketLooper implements Runnable
 				logger.warn("received unknown frame, service type 0x"
 						+ Integer.toHexString(h.getServiceType()) + " - ignored");
 		}
-		catch (final KNXFormatException e) {
-			// if available log bad item, too
-			if (e.getItem() != null)
-				logger.warn("received invalid frame, item " + e.getItem(), e);
-			else
-				logger.warn("received invalid frame", e);
+		catch (KNXFormatException | RuntimeException e) {
+			logger.warn("received invalid frame", e);
 		}
 	}
 }
