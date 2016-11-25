@@ -60,6 +60,7 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.internal.EventListeners;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.log.LogService;
@@ -163,15 +164,13 @@ public class ManagementClientImpl implements ManagementClient
 		{
 			if (svcResponse != 0) {
 				final byte[] tpdu = e.getFrame().getPayload();
-				//logger.trace("check response: " + e.getFrame());
 				if (DataUnitBuilder.getAPDUService(tpdu) == svcResponse)
 					synchronized (indications) {
 						indications.add(e);
 						indications.notify();
 					}
 			}
-			if (notify != null)
-				notify.accept(e);
+			listeners.fire(c -> c.accept(e));
 		}
 	};
 
@@ -183,8 +182,8 @@ public class ManagementClientImpl implements ManagementClient
 	private volatile int svcResponse;
 	private volatile boolean detached;
 	private final Logger logger;
-	// TODO currently exclusively used for push-button mode link procedure
-	private volatile Consumer<FrameEvent> notify;
+
+	private final EventListeners<Consumer<FrameEvent>> listeners;
 
 	/**
 	 * Creates a new management client attached to the supplied KNX network link.
@@ -205,13 +204,21 @@ public class ManagementClientImpl implements ManagementClient
 		tl = transportLayer;
 		tl.addTransportListener(tlListener);
 		logger = LogService.getLogger("MC " + link.getName());
+		listeners = new EventListeners<>(logger);
 	}
 
-	void setServiceListener(final Consumer<FrameEvent> onEvent) { notify = onEvent; }
+	/** Internal API. */
+	public final void addEventListener(final Consumer<FrameEvent> onEvent)
+	{
+		listeners.add(onEvent);
+	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#setResponseTimeout(int)
-	 */
+	/** Internal API. */
+	public final void removeEventListener(final Consumer<FrameEvent> onEvent)
+	{
+		listeners.remove(onEvent);
+	}
+
 	@Override
 	public void setResponseTimeout(final int timeout)
 	{
@@ -220,38 +227,24 @@ public class ManagementClientImpl implements ManagementClient
 		responseTimeout = timeout * 1000;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#getResponseTimeout()
-	 */
 	@Override
 	public int getResponseTimeout()
 	{
 		return responseTimeout / 1000;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#setPriority
-	 * (tuwien.auto.calimero.Priority)
-	 */
 	@Override
 	public void setPriority(final Priority p)
 	{
 		priority = p;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#getPriority()
-	 */
 	@Override
 	public Priority getPriority()
 	{
 		return priority;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#createDestination
-	 * (tuwien.auto.calimero.IndividualAddress, boolean)
-	 */
 	@Override
 	public Destination createDestination(final IndividualAddress remote,
 		final boolean connectionOriented)
@@ -259,10 +252,6 @@ public class ManagementClientImpl implements ManagementClient
 		return tl.createDestination(remote, connectionOriented);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#createDestination
-	 * (tuwien.auto.calimero.IndividualAddress, boolean, boolean, boolean)
-	 */
 	@Override
 	public Destination createDestination(final IndividualAddress remote,
 		final boolean connectionOriented, final boolean keepAlive, final boolean verifyMode)
@@ -270,10 +259,6 @@ public class ManagementClientImpl implements ManagementClient
 		return tl.createDestination(remote, connectionOriented, keepAlive, verifyMode);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#writeAddress
-	 * (tuwien.auto.calimero.IndividualAddress)
-	 */
 	@Override
 	public void writeAddress(final IndividualAddress newAddress) throws KNXTimeoutException,
 		KNXLinkClosedException
@@ -282,9 +267,6 @@ public class ManagementClientImpl implements ManagementClient
 				DataUnitBuilder.createAPDU(IND_ADDR_WRITE, newAddress.toByteArray()));
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#readAddress(boolean)
-	 */
 	@Override
 	public synchronized IndividualAddress[] readAddress(final boolean oneAddressOnly)
 		throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException,
@@ -314,10 +296,6 @@ public class ManagementClientImpl implements ManagementClient
 		return l.toArray(new IndividualAddress[l.size()]);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#writeAddress
-	 * (byte[], tuwien.auto.calimero.IndividualAddress)
-	 */
 	@Override
 	public void writeAddress(final byte[] serialNo, final IndividualAddress newAddress)
 		throws KNXTimeoutException, KNXLinkClosedException
@@ -332,9 +310,6 @@ public class ManagementClientImpl implements ManagementClient
 		tl.broadcast(false, Priority.SYSTEM, DataUnitBuilder.createAPDU(IND_ADDR_SN_WRITE, asdu));
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#readAddress(byte[])
-	 */
 	@Override
 	public synchronized IndividualAddress readAddress(final byte[] serialNo)
 		throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException,
@@ -353,9 +328,6 @@ public class ManagementClientImpl implements ManagementClient
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#writeDomainAddress(byte[])
-	 */
 	@Override
 	public void writeDomainAddress(final byte[] domain) throws KNXTimeoutException,
 		KNXLinkClosedException
@@ -365,9 +337,6 @@ public class ManagementClientImpl implements ManagementClient
 		tl.broadcast(true, priority, DataUnitBuilder.createAPDU(DOA_WRITE, domain));
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementClient#readDomainAddress(boolean)
-	 */
 	@Override
 	public synchronized List<byte[]> readDomainAddress(final boolean oneDomainOnly)
 		throws KNXLinkClosedException, KNXInvalidResponseException, KNXTimeoutException,
@@ -803,6 +772,7 @@ public class ManagementClientImpl implements ManagementClient
 		if (lnk != null) {
 			logger.debug("detached from " + lnk.getName());
 		}
+		listeners.removeAll();
 		detached = true;
 		return lnk;
 	}
