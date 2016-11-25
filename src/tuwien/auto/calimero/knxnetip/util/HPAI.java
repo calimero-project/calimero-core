@@ -194,7 +194,6 @@ public class HPAI
 
 	/**
 	 * Returns the IP network address as {@link InetAddress} representation.
-	 * <p>
 	 *
 	 * @return IP address as InetAddress object
 	 */
@@ -203,8 +202,9 @@ public class HPAI
 		try {
 			return InetAddress.getByAddress(address);
 		}
-		catch (final UnknownHostException ignore) {}
-		return null;
+		catch (final UnknownHostException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 	/**
