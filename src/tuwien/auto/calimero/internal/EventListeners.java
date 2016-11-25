@@ -37,7 +37,6 @@
 package tuwien.auto.calimero.internal;
 
 import java.util.Collections;
-import java.util.EventListener;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -53,7 +52,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author B. Malinowsky
  */
-public class EventListeners<T extends EventListener>
+public class EventListeners<T>
 {
 	private final CopyOnWriteArrayList<T> listeners = new CopyOnWriteArrayList<>();
 	private final Logger logger;
