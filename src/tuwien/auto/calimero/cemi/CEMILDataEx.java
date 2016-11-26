@@ -384,27 +384,18 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 			addInfo[infoType] = null;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.cemi.CEMILData#setHopCount(int)
-	 */
 	@Override
 	public final synchronized void setHopCount(final int hobbes)
 	{
 		super.setHopCount(hobbes);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.cemi.CEMILData#setPriority(tuwien.auto.calimero.Priority)
-	 */
 	@Override
 	public final void setPriority(final Priority p)
 	{
 		super.setPriority(p);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.cemi.CEMILData#toByteArray()
-	 */
 	@Override
 	public synchronized byte[] toByteArray()
 	{
@@ -443,9 +434,6 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		return buf.toString();
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#clone()
-	 */
 	@Override
 	public Object clone()
 	{
@@ -461,9 +449,6 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.cemi.CEMILData#readAddInfo(java.io.ByteArrayInputStream)
-	 */
 	@Override
 	void readAddInfo(final ByteArrayInputStream is) throws KNXFormatException
 	{
@@ -488,9 +473,6 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.cemi.CEMILData#readPayload(java.io.ByteArrayInputStream)
-	 */
 	@Override
 	void readPayload(final ByteArrayInputStream is) throws KNXFormatException
 	{
@@ -524,9 +506,6 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 			}
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.cemi.CEMILData#writePayload(java.io.ByteArrayOutputStream)
-	 */
 	@Override
 	void writePayload(final ByteArrayOutputStream os)
 	{
@@ -535,9 +514,6 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		os.write(data, 0, data.length);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.cemi.CEMILData#isValidTPDULength(byte[])
-	 */
 	@Override
 	boolean isValidTPDULength(final byte[] tpdu)
 	{
