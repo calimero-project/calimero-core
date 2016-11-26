@@ -52,6 +52,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import tuwien.auto.calimero.CloseEvent;
+import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -107,6 +108,12 @@ public class KNXnetIPRouting extends ConnectionBase
 	 * This is the standard system setup multicast address used in KNXnet/IP.
 	 */
 	public static final String DEFAULT_MULTICAST = Discoverer.SEARCH_MULTICAST;
+
+	// newer Gira servers have a "reliable communication" option, which uses the
+	// following unsupported service type; not part of the knx spec
+	private static final int GiraUnsupportedSvcType = 0x538;
+	// we will only warn about it once, to avoid spamming the log
+	private boolean loggedGiraUnsupportedSvcType;
 
 	private final InetAddress multicast;
 
@@ -357,6 +364,12 @@ public class KNXnetIPRouting extends ConnectionBase
 		else if (svc == KNXnetIPHeader.ROUTING_BUSY) {
 			final RoutingBusy busy = new RoutingBusy(data, offset);
 			fireRoutingBusy(new InetSocketAddress(src, port), busy);
+		}
+		else if (svc == GiraUnsupportedSvcType) {
+			if (!loggedGiraUnsupportedSvcType)
+				logger.warn("received unsupported Gira-specific service type 0x538, will be silently ignored: {}",
+						DataUnitBuilder.toHex(data, " "));
+			loggedGiraUnsupportedSvcType = true;
 		}
 		else if (svc != KNXnetIPHeader.SEARCH_REQ && svc != KNXnetIPHeader.SEARCH_RES)
 			// silently ignore multicast packets from searches,
