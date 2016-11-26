@@ -55,6 +55,8 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,8 +74,6 @@ import tuwien.auto.calimero.link.KNXLinkClosedException;
  */
 public final class LinkProcedure implements Runnable
 {
-	// TODO sensor: notification with link response data
-
 	// the command code is Action::ordinal()
 	enum Action {
 		None,
@@ -100,10 +100,10 @@ public final class LinkProcedure implements Runnable
 	private static final int deviceObjectType = 0;
 	private static final int pidConfigLink = 59;
 
-	// TODO for the Features response from sensor to actuator, a timeout should not abort the procedure
+	// NYI for the Features response from sensor to actuator, a timeout should not abort the procedure
 	private static final long timeout = 3000; // [ms]
 
-	private static final Logger logger = LoggerFactory.getLogger(LinkProcedure.class);
+	private static final Logger logger = LoggerFactory.getLogger("calimero.mgmt.LinkProcedure");
 
 	private final boolean isActuator;
 	// execute reset installation procedure
@@ -155,6 +155,11 @@ public final class LinkProcedure implements Runnable
 	// QuitConfigMode
 	private boolean wrongService;
 
+	// the default link change notification does nothing and always succeeds
+	private BiFunction<Integer, Map<Integer, GroupAddress>, Integer> linkFunction = (f, g) -> LinkAdded;
+	// set by the link function, but only relevant for the actuator returning its status used for link response
+	private volatile int linkResponseStatus;
+
 	/**
 	 * Creates the link procedure for an actuator. Running the link procedure ({@link #run()}) should be based on the
 	 * actuator decision to enter configuration mode.
@@ -192,7 +197,7 @@ public final class LinkProcedure implements Runnable
 	}
 
 	/**
-	 * Creates a link procedure to reset all devices of an installation to factory setup. Don't use with RF devices!
+	 * Creates a link procedure to reset all devices of an installation to factory setup; don't use with RF devices!
 	 *
 	 * @param mgmt management client
 	 * @return link procedure to reset an installation
@@ -201,6 +206,25 @@ public final class LinkProcedure implements Runnable
 	{
 		return new LinkProcedure(false, true, mgmt, new IndividualAddress(0), null, false, 0, 0,
 				Collections.emptyMap());
+	}
+
+	/**
+	 * Examines the supplied <code>asdu</code>, to determine whether an actuator (which sent <code>asdu</code>) entered
+	 * configuration mode. This method is useful for a sensor device to decide if its link procedure should be started.
+	 *
+	 * @param asdu the ASDU of a network parameter write service
+	 * @return <code>true</code> if the sender of that ASDU entered configuration mode, <code>false</code> otherwise
+	 */
+	public static boolean isEnterConfigMode(final byte[] asdu)
+	{
+		final int iot = (asdu[0] & 0xff << 8) | asdu[1] & 0xff;
+		final int pid = asdu[2] & 0xff;
+		if (iot == deviceObjectType && pid == pidConfigLink) {
+			final int command = (asdu[3] & 0xff) >> 4;
+			final Action action = Action.values()[command];
+			return action == EnterConfigMode;
+		}
+		return false;
 	}
 
 	private LinkProcedure(final boolean isActuator, final boolean reset, final ManagementClient mgmt,
@@ -219,9 +243,27 @@ public final class LinkProcedure implements Runnable
 		this.groupObjects = Collections.synchronizedMap(groupObjects);
 	}
 
+	/**
+	 * Implementing the link function:<br>
+	 * Actuator link function behavior: if the link status (as sent as part of the link response) corresponds to
+	 * {@link #UseExistingAddress}, then the group objects map has to be updated to contain that existing address. The
+	 * link procedure's link response will send that address back to the sensor, and not the one that was received with
+	 * the command to set/delete the link.
+	 * <p>
+	 * Sensor link function behavior: return code of link function is currently not used
+	 *
+	 * @param linkFunction link function taking the flags received with the command, and a map of connection code (or
+	 *        scene number) to group address
+	 */
+	public void setLinkFunction(final BiFunction<Integer, Map<Integer, GroupAddress>, Integer> linkFunction)
+	{
+		this.linkFunction = linkFunction;
+	}
+
 	@Override
 	public void run()
 	{
+		final Consumer<FrameEvent> onEvent = this::receivedManagementService;
 		try {
 			if (reset) {
 				write(EnterConfigMode);
@@ -231,7 +273,7 @@ public final class LinkProcedure implements Runnable
 			}
 
 			logger.info("starting link procedure for {} {}->{}", isActuator ? "actuator" : "sensor", self, remote);
-			((ManagementClientImpl) mgmt).setServiceListener(this::receivedManagementService);
+			((ManagementClientImpl) mgmt).addEventListener(onEvent);
 			int groupObject = 0;
 			final Iterator<Integer> connectionCodes = groupObjects.keySet().iterator();
 			final Action[] commands = (isActuator ? actuator : sensor).toArray(new Action[0]);
@@ -262,28 +304,9 @@ public final class LinkProcedure implements Runnable
 			Thread.currentThread().interrupt();
 		}
 		finally {
-			((ManagementClientImpl) mgmt).setServiceListener(null);
+			((ManagementClientImpl) mgmt).removeEventListener(onEvent);
 			logger.info("finished link procedure for {} {}->{}", isActuator ? "actuator" : "sensor", self, remote);
 		}
-	}
-
-	/**
-	 * Examines the supplied <code>asdu</code>, to determine whether an actuator (which sent <code>asdu</code>) entered
-	 * configuration mode. This method is useful for a sensor device to decide if its link procedure should be started.
-	 *
-	 * @param asdu the ASDU of a network parameter write service
-	 * @return <code>true</code> if the sender of that ASDU entered configuration mode, <code>false</code> otherwise
-	 */
-	public static boolean isEnterConfigMode(final byte[] asdu)
-	{
-		final int iot = (asdu[0] & 0xff << 8) | asdu[1] & 0xff;
-		final int pid = asdu[2] & 0xff;
-		if (iot == deviceObjectType && pid == pidConfigLink) {
-			final int command = (asdu[3] & 0xff) >> 4;
-			final Action action = Action.values()[command];
-			return action == EnterConfigMode;
-		}
-		return false;
 	}
 
 	/**
@@ -302,11 +325,11 @@ public final class LinkProcedure implements Runnable
 		int flags = 0;
 		switch (action) {
 		// commented actions are all dealt by default
-		//		case EnterConfigMode:
-		//		case BeginConnection:
-		//		case QuitConfigMode:
-		//		case ResetInstallation:
-		//			return value;
+//		case EnterConfigMode:
+//		case BeginConnection:
+//		case QuitConfigMode:
+//		case ResetInstallation:
+//			return value;
 		case StartLink:
 			flags = (unidir ? 0x08 : 0) | (paramIndicator ? 0x04 : 0) | subFunction;
 			value[1] = (byte) (mfId >> 8);
@@ -320,7 +343,7 @@ public final class LinkProcedure implements Runnable
 			break;
 		case SetDeleteLink:
 		case LinkResponse:
-			flags = (action == Action.SetDeleteLink) ? subFunc : linkResponseStatus();
+			flags = (action == Action.SetDeleteLink) ? subFunc : linkResponseStatus;
 			final GroupAddress ga = groupObjects.get(activeConnectionCode);
 			final byte[] addr = ga.toByteArray();
 			value[1] = (byte) activeConnectionCode; // or scene number
@@ -329,7 +352,7 @@ public final class LinkProcedure implements Runnable
 			logger.info("create {}: connection code {} ==> {}", action, activeConnectionCode, ga);
 			break;
 		case StopLink:
-			flags = (abort ? 0x04 : 0) | (noChannel ? 0x02 : 0) | (timerExpired ? 0x01 : 0);
+			flags = (abort ? Error : 0) | (noChannel ? 0x02 : 0) | (timerExpired ? 0x01 : 0);
 			break;
 		case QuitConfigMode:
 			flags = timerExpired ? 1 : noChannel ? 2 : wrongService ? 3 : 0;
@@ -377,15 +400,20 @@ public final class LinkProcedure implements Runnable
 		}
 	}
 
-	// content of current state in link procedure starts at asdu[3] (command & flags)
+	// NYI standard wants us to check reserved/0x00 fields for 0x00, otherwise discard the message
 	private void parseAction(final Action action, final byte[] asdu)
 	{
-		// NYI standard wants us to check reserved/0x00 fields for 0x00, otherwise discard the message
+		// content of current state in link procedure starts at asdu[3] (command & flags)
+		final int flags = asdu[3] & 0x0f;
 		switch (action) {
 		case StartLink:
 			final int code = (asdu[4] & 0xff) << 8 | asdu[5] & 0xff;
 			final int objects = asdu[6] & 0xff;
-			logger.debug("received {}: manufacturer code {}, group objects to link: {}", action, code, objects);
+			final boolean unidirectional = (flags & 0x08) == 0x08;
+			final boolean params = (flags & 0x04) == 0x04;
+			final int subfunc = flags & 0x03;
+			logger.debug("received {}: unidir {}, params {}, subfunc {}, manufacturer code {}, "
+					+ "group objects to link: {}", action, unidirectional, params, subfunc, code, objects);
 			expectedGroupObjects = Math.max(1, objects);
 			break;
 		case ChannelFunctionActuator:
@@ -395,7 +423,6 @@ public final class LinkProcedure implements Runnable
 			break;
 		case SetDeleteLink:
 		case LinkResponse:
-			final int flags = asdu[3] & 0x0f;
 			final int cc = asdu[4] & 0xff;
 			final GroupAddress ga = new GroupAddress((asdu[5] & 0xff) << 8 | asdu[6] & 0xff);
 			groupObjects.put(cc, ga);
@@ -403,8 +430,17 @@ public final class LinkProcedure implements Runnable
 
 			if (action == SetDeleteLink)
 				activeConnectionCode = cc;
-			else if (activeConnectionCode != cc)
-				logger.error("link response connection code {} does not match {}", cc, activeConnectionCode);
+			else {
+				if (activeConnectionCode != cc)
+					logger.error("link response connection code {} does not match {}", cc, activeConnectionCode);
+				if ((flags & Error) == Error) {
+					abort = true;
+					// NYI stop link procedure by notifying run method
+				}
+			}
+//			final Map<Integer, GroupAddress> link = new HashMap<>();
+//			link.put(activeConnectionCode, groupObjects.get(activeConnectionCode));
+			linkResponseStatus = linkFunction.apply(flags, groupObjects);
 			break;
 		case StopLink:
 		case QuitConfigMode:
@@ -417,7 +453,7 @@ public final class LinkProcedure implements Runnable
 
 	private void stopLink(final Exception e)
 	{
-		logger.error("stop link procedure", e);
+		logger.error("stop link procedure with {}", remote, e);
 		try {
 			if (state.ordinal() >= EnterConfigMode.ordinal())
 				write(Action.StopLink);
@@ -440,13 +476,5 @@ public final class LinkProcedure implements Runnable
 		}
 		timerExpired = true;
 		throw new KNXTimeoutException("pairing timeout waiting for " + next);
-	}
-
-	// TODO set status based on user answer
-	private static int linkResponseStatus()
-	{
-		final boolean error = false;
-		final int status = LinkAdded;
-		return (error ? Error : 0) | status;
 	}
 }
