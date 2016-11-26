@@ -566,8 +566,8 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 
 	private void putAddInfo(final int infoType, final byte[] info)
 	{
-		if (addInfo.length < infoType) {
-			final byte[][] newInfo = new byte[Math.max(2 * addInfo.length, infoType)][];
+		if (addInfo.length <= infoType) {
+			final byte[][] newInfo = new byte[Math.max(2 * addInfo.length, infoType + 1)][];
 			System.arraycopy(addInfo, 0, newInfo, 0, addInfo.length);
 			addInfo = newInfo;
 		}
