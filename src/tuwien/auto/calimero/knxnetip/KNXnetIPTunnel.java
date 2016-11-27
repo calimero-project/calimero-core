@@ -44,9 +44,13 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import tuwien.auto.calimero.CloseEvent;
+import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -57,6 +61,8 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIBusMon;
 import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.cemi.CEMILDataEx;
+import tuwien.auto.calimero.cemi.CEMILDataEx.AddInfo;
 import tuwien.auto.calimero.knxnetip.servicetype.ErrorCodes;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
@@ -104,8 +110,7 @@ public class KNXnetIPTunnel extends ClientConnection
 			for (final TunnelingLayer v : TunnelingLayer.values())
 				if (layer == v.code)
 					return v;
-			throw new KNXIllegalArgumentException(
-					"unspecified tunneling layer + 0x" + Integer.toHexString(layer));
+			throw new KNXIllegalArgumentException("unspecified tunneling layer + 0x" + Integer.toHexString(layer));
 		}
 
 		TunnelingLayer(final int code) {
@@ -229,8 +234,9 @@ public class KNXnetIPTunnel extends ClientConnection
 					if (ldata != null && internalState == CEMI_CON_PENDING) {
 						// check if address was set by server
 						final boolean emptySrc = ldata.getSource().getRawAddress() == 0;
-						final byte[] sent = unifyLData(ldata, emptySrc);
-						final byte[] recv = unifyLData(cemi, emptySrc);
+						final List<Integer> types = additionalInfoTypesOf(ldata);
+						final byte[] sent = unifyLData(ldata, emptySrc, types);
+						final byte[] recv = unifyLData(cemi, emptySrc, types);
 						if (Arrays.equals(recv, sent)) {
 							keepForCon = null;
 							setStateNotify(OK);
@@ -258,9 +264,33 @@ public class KNXnetIPTunnel extends ClientConnection
 		return true;
 	}
 
-	private byte[] unifyLData(final CEMI ldata, final boolean emptySrc)
+	private List<Integer> additionalInfoTypesOf(final CEMILData ldata)
 	{
-		final byte[] data = ldata.toByteArray();
+		if (ldata instanceof CEMILDataEx) {
+			final CEMILDataEx ext = (CEMILDataEx) ldata;
+			final List<AddInfo> info = ext.getAdditionalInfo();
+			return info.stream().map(AddInfo::getType).collect(Collectors.toList());
+		}
+		return Collections.emptyList();
+	}
+
+	// types parameter: a workaround introduced for the Gira server, which sometimes adds non-standard
+	// additional info. types provides the list of add.info types we want to keep, everything else is removed
+	private byte[] unifyLData(final CEMI ldata, final boolean emptySrc, final List<Integer> types)
+	{
+		final byte[] data;
+		if (ldata instanceof CEMILDataEx) {
+			final CEMILDataEx ext = ((CEMILDataEx) ldata);
+			// remove all add.infos that are not in the types list
+			ext.getAdditionalInfo().forEach(info -> {
+				if (!types.contains(info.getType())) {
+					logger.warn("remove L-Data additional info type {}: {}", info.getType(),
+							DataUnitBuilder.toHex(info.getInfo(), ""));
+					ext.removeAdditionalInfo(info.getType());
+				}
+			});
+		}
+		data = ldata.toByteArray();
 		// set msg code field 0
 		data[0] = 0;
 		// set ctrl1 field 0
