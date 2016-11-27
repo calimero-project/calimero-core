@@ -148,7 +148,7 @@ public class Discoverer
 	}
 
 	// local host/port
-	private final InetAddress host;
+	private InetAddress host;
 	private final int port;
 	// is our discovery/description aware of network address translation
 	private final boolean nat;
@@ -261,8 +261,8 @@ public class Discoverer
 	 * situations. So it can be overruled specifying a local host address using this
 	 * constructor.
 	 *
-	 * @param localHost local host address used for discovery/description responses, or
-	 *        <code>null</code> for the default local host
+	 * @param localHost local host address used for KNXnet/IP description, or
+	 *        <code>null</code> to use the default local host if required
 	 * @param localPort the port number used to bind a socket, a valid port is in the
 	 *        range of 1 to 65535, or use 0 to pick an arbitrary unused (ephemeral) port.
 	 *        Note that a specified valid port does not ensure a successful bind in
@@ -279,20 +279,13 @@ public class Discoverer
 	{
 		if (localPort < 0 || localPort > 0xFFFF)
 			throw new KNXIllegalArgumentException("port out of range [0..0xFFFF]");
-		if (localHost == null)
-			try {
-				host = InetAddress.getLocalHost();
-			}
-			catch (final UnknownHostException e) {
-				logger.error("can not get local host", e);
-				throw new KNXException("can not get local host");
-			}
-		else
-			host = localHost;
+		host = localHost;
 		port = localPort;
 		nat = natAware;
 		mcast = mcastResponse;
-		checkHost();
+
+		if (host != null && host.getAddress().length != 4 && !nat)
+			throw new KNXException("IPv4 address required if NAT is not used (supplied " + host.getHostAddress() + ")");
 	}
 
 	/**
@@ -365,7 +358,7 @@ public class Discoverer
 		final List<InetAddress> l = Optional.ofNullable(ni).map(NetworkInterface::getInetAddresses)
 				.map(Collections::list).orElse(new ArrayList<>());
 		// use any assigned (IPv4) address of netif, otherwise, use host
-		final InetAddress addr = l.stream().filter(ia -> nat || ia instanceof Inet4Address).findFirst().orElse(host);
+		final InetAddress addr = l.stream().filter(ia -> nat || ia instanceof Inet4Address).findFirst().orElse(host());
 
 		final ReceiverLoop r = search(addr, localPort, ni, timeout);
 		if (wait) {
@@ -550,7 +543,7 @@ public class Discoverer
 	{
 		if (timeout <= 0 || timeout >= Integer.MAX_VALUE / 1000)
 			throw new KNXIllegalArgumentException("timeout out of range");
-		final DatagramSocket s = createSocket(true, host, port, null, false);
+		final DatagramSocket s = createSocket(true, host(), port, null, false);
 		try {
 			final byte[] buf = PacketHelper.toPacket(new DescriptionRequest(nat ? null
 					: (InetSocketAddress) s.getLocalSocketAddress()));
@@ -560,7 +553,7 @@ public class Discoverer
 			if (looper.thrown != null)
 				throw looper.thrown;
 			if (looper.res != null)
-				return new Result<>(looper.res, NetworkInterface.getByInetAddress(host), host);
+				return new Result<>(looper.res, NetworkInterface.getByInetAddress(host()), host());
 		}
 		catch (final IOException e) {
 			final String msg = "network failure on getting description";
@@ -696,13 +689,16 @@ public class Discoverer
 			l.t.join();
 	}
 
-	private void checkHost() throws KNXException
+	private synchronized InetAddress host() throws KNXException
 	{
-		if (nat || host.getAddress().length == 4)
-			return;
-		final KNXException e = new KNXException(host.getHostAddress() + " is not an IPv4 address");
-		logger.error("NAT not used, only IPv4 address support", e);
-		throw e;
+		try {
+			if (host == null)
+				host = InetAddress.getLocalHost();
+			return host;
+		}
+		catch (final UnknownHostException e) {
+			throw new KNXException("on resolving address of local host", e);
+		}
 	}
 
 	private ReceiverLoop startReceiver(final MulticastSocket socket, final InetAddress addrOnNetIf,

@@ -176,6 +176,7 @@ public final class Util
 	}
 
 	private static boolean printLocalHost = true;
+	private static InetAddress localHost;
 
 	/**
 	 * @return the local host used for testing
@@ -183,8 +184,9 @@ public final class Util
 	public static InetSocketAddress getLocalHost()
 	{
 		try {
-			final InetAddress local = InetAddress.getLocalHost();
-			final InetSocketAddress addr = new InetSocketAddress(local, 0);
+			if (localHost == null)
+				localHost = InetAddress.getLocalHost();
+			final InetSocketAddress addr = new InetSocketAddress(localHost, 0);
 			if (printLocalHost) {
 				printLocalHost = false;
 				final String underline = addr.toString().replaceAll(".", "=");
