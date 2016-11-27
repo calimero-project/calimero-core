@@ -75,16 +75,23 @@ class LinkProcedureTest
 	}
 
 	@Test
-	public final void runActuator()
+	void runActuator()
 	{
 		final Destination d = mgmt.createDestination(Util.getKnxDevice(), false);
 		final int CH_PB_Toggle = 2;
 		final LinkProcedure lp = LinkProcedure.forActuator(mgmt, self, d, CH_PB_Toggle);
+		lp.setLinkFunction(this::onSetDeleteLink);
 		lp.run();
 	}
 
+	private int onSetDeleteLink(final int flags, final Map<Integer, GroupAddress> groupObjects)
+	{
+//		System.out.println("set delete link: flags " + flags + ", group objects " + groupObjects);
+		return LinkProcedure.LinkAdded;
+	}
+
 	@Test
-	public final void runSensor()
+	void runSensor()
 	{
 		final Destination d = mgmt.createDestination(Util.getKnxDevice(), false);
 		final Map<Integer, GroupAddress> groupObjects = new HashMap<>();
@@ -93,6 +100,13 @@ class LinkProcedureTest
 		groupObjects.put(CC_Switch_OnOff, new GroupAddress(7, 3, 10));
 		groupObjects.put(CC_Dimming_Ctrl, new GroupAddress(7, 3, 11));
 		final LinkProcedure lp = LinkProcedure.forSensor(mgmt, self, d, false, 0xbeef, groupObjects);
+		lp.setLinkFunction(this::onLinkResponse);
 		lp.run();
+	}
+
+	private int onLinkResponse(final int flags, final Map<Integer, GroupAddress> groupObjects)
+	{
+//		System.out.println("link response: flags " + flags + ", group objects " + groupObjects);
+		return 0;
 	}
 }
