@@ -417,8 +417,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 					buf.append(Integer.toHexString((info[0] & 0xff) << 8 | info[1] & 0xff));
 				}
 				else if (i == ADDINFO_RFMEDIUM)
-					buf.append(" ").append(new RFMediumInfo(info, !isDomainBroadcast()))
-							.append(",");
+					buf.append(" ").append(new RFMediumInfo(info, !isDomainBroadcast())).append(",");
 				else if (i == ADDINFO_TIMESTAMP) {
 					buf.append(" timestamp ");
 					buf.append((info[0] & 0xff) << 8 | info[1] & 0xff);
@@ -429,6 +428,8 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 					buf.append(" ext.timestamp ").append(toLong(info));
 				else if (i == ADDINFO_BIBAT)
 					buf.append(" bibat 0x").append(DataUnitBuilder.toHex(info, " "));
+				else
+					buf.append(" type ").append(i).append(" 0x").append(DataUnitBuilder.toHex(info, ""));
 		}
 		buf.append(s.substring(split + 1));
 		return buf.toString();
