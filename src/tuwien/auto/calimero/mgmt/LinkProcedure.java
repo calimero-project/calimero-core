@@ -139,13 +139,13 @@ public final class LinkProcedure implements Runnable
 	private int activeConnectionCode;
 
 	// LinkResponse Status Flags
-	// Bits 0-1, 2 bit status
-	private static final int LinkAdded = 0;
-	private static final int UseExistingAddress = 1;
-	private static final int LinkDeleted = 2;
-	private static final int LinkNotAdded = 3;
-	// Bit 2, error indication (stop link procedure)
-	private static final int Error = 0x04;
+	// Bits 0-1, 2 bit status - one of:
+	public static final int LinkAdded = 0;
+	public static final int UseExistingAddress = 1;
+	public static final int LinkDeleted = 2;
+	public static final int LinkNotAdded = 3;
+	// Bit 2, error indication (setting error bit will stop link procedure)
+	public static final int Error = 4;
 
 	// StopLink
 	private boolean abort;
