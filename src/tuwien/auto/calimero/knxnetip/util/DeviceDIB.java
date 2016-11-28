@@ -366,7 +366,7 @@ public class DeviceDIB extends DIB
 		catch (final UnknownHostException ignore) {}
 		return "\"" + name + "\", KNX address " + address + ", KNX medium " + getKNXMediumString()
 				+ ", installation " + getInstallation() + " - project " + getProject()
-				+ " (project/installation ID " + installationId + ")"
+				+ " (ID " + installationId + ")"
 				+ ", routing multicast address " + mc + ", MAC address " + getMACAddressString()
 				+ ", S/N 0x" + getSerialNumberString();
 	}

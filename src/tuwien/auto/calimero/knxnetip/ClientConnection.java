@@ -456,7 +456,7 @@ abstract class ClientConnection extends ConnectionBase
 				notify();
 			}
 			if (!ok)
-				logger.warn("connection state response status: " + res.getStatusString());
+				logger.warn("connection state response: " + res.getStatusString());
 		}
 	}
 }
