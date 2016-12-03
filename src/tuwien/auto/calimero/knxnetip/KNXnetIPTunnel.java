@@ -200,7 +200,11 @@ public class KNXnetIPTunnel extends ClientConnection
 			return true;
 
 		final int seq = req.getSequenceNumber();
-		if (seq == getSeqRcv() || ((seq + 1) & 0xFF) == getSeqRcv()) {
+		final boolean expected = seq == getSeqRcv();
+		final boolean repeated = ((seq + 1) & 0xFF) == getSeqRcv();
+
+		// send KNXnet/IP service ack
+		if (expected || repeated) {
 			final int status = h.getVersion() == KNXNETIP_VERSION_10 ? ErrorCodes.NO_ERROR
 					: ErrorCodes.VERSION_NOT_SUPPORTED;
 			final byte[] buf = PacketHelper.toPacket(new ServiceAck(serviceAck, channelId, seq, status));
@@ -211,56 +215,67 @@ public class KNXnetIPTunnel extends ClientConnection
 				return true;
 			}
 		}
-		else
-			logger.warn("tunneling request with invalid rcv-seq {}, expected {}", getSeqRcv(), seq);
-		if (seq == getSeqRcv()) {
-			incSeqRcv();
-			final CEMI cemi = req.getCEMI();
-			// leave if we are working with an empty (broken) service request
-			if (cemi == null)
-				return true;
+		else {
+			logger.warn("tunneling request with invalid rcv-seq {}, expected {}", seq, getSeqRcv());
+			return true;
+		}
 
-			final int mc = cemi.getMessageCode();
-			if (mc == CEMILData.MC_LDATA_IND || mc == CEMIBusMon.MC_BUSMON_IND)
-				fireFrameReceived(cemi);
-			else if (mc == CEMILData.MC_LDATA_CON) {
-				// invariant: notify listener before return from blocking send
-				logger.debug("received cEMI L-Data.con with req {} (for {})", req.getSequenceNumber(),
-						((CEMILData) cemi).getSource());
-				fireFrameReceived(cemi);
+		// ignore repeated tunneling requests
+		if (repeated) {
+			logger.debug("skip tunneling request with rcv-seq {} (already received)", seq);
+			return true;
+		}
 
-				synchronized (lock) {
-					final CEMILData ldata = (CEMILData) keepForCon;
-					if (ldata != null && internalState == CEMI_CON_PENDING) {
-						// check if address was set by server
-						final boolean emptySrc = ldata.getSource().getRawAddress() == 0;
-						final List<Integer> types = additionalInfoTypesOf(ldata);
-						final byte[] sent = unifyLData(ldata, emptySrc, types);
-						final byte[] recv = unifyLData(cemi, emptySrc, types);
+		// further process all expected tunneling requests
+		incSeqRcv();
+		final CEMI cemi = req.getCEMI();
+		// leave if we are working with an empty (broken) service request
+		if (cemi == null)
+			return true;
+
+		final int mc = cemi.getMessageCode();
+		if (mc == CEMILData.MC_LDATA_IND || mc == CEMIBusMon.MC_BUSMON_IND) {
+			logger.trace("received request seq {} (channel {}) cEMI {}", req.getSequenceNumber(), channelId,
+					DataUnitBuilder.toHex(cemi.toByteArray(), " "));
+			fireFrameReceived(cemi);
+		}
+		else if (mc == CEMILData.MC_LDATA_CON) {
+			// invariant: notify listener before return from blocking send
+			logger.debug("received request seq {} (channel {}) cEMI L-Data.con {}->{}", req.getSequenceNumber(),
+					channelId, ((CEMILData) cemi).getSource(), ((CEMILData) cemi).getDestination());
+			// TODO move notification to after we know it's a valid .con (we should keep it out of the lock, though)
+			fireFrameReceived(cemi);
+
+			synchronized (lock) {
+				final CEMILData ldata = (CEMILData) keepForCon;
+				if (ldata != null && internalState == CEMI_CON_PENDING) {
+					// check if address was set by server
+					final boolean emptySrc = ldata.getSource().getRawAddress() == 0;
+					final List<Integer> types = additionalInfoTypesOf(ldata);
+					final byte[] sent = unifyLData(ldata, emptySrc, types);
+					final byte[] recv = unifyLData(cemi, emptySrc, types);
+					if (Arrays.equals(recv, sent)) {
+						keepForCon = null;
+						setStateNotify(OK);
+					}
+					else {
+						// we could get a .con with its hop count already decremented by 1 (eibd does that)
+						// decrement hop count of sent for comparison
+						final int sendCount = ldata.getHopCount() - 1;
+						sent[3] = (byte) ((sent[3] & (0x8f)) | (sendCount << 4));
 						if (Arrays.equals(recv, sent)) {
 							keepForCon = null;
 							setStateNotify(OK);
-						}
-						else {
-							// we could get a .con with its hop count already decremented by 1 (eibd does that)
-							// decrement hop count of sent for comparison
-							final int sendCount = ldata.getHopCount() - 1;
-							sent[3] = (byte) ((sent[3] & (0x8f)) | (sendCount << 4));
-							if (Arrays.equals(recv, sent)) {
-								keepForCon = null;
-								setStateNotify(OK);
-								logger.info("received L_Data.con with hopcount decremented by 1 (sent {}, got {})",
-										sendCount + 1, sendCount);
-							}
+							logger.info("received L_Data.con with hop count decremented by 1 (sent {}, got {})",
+									sendCount + 1, sendCount);
 						}
 					}
 				}
 			}
-			else if (mc == CEMILData.MC_LDATA_REQ)
-				logger.warn("received L-Data request - ignored");
 		}
-		else
-			logger.info("skip tunneling request with rcv-seq {} (already received)", seq);
+		else if (mc == CEMILData.MC_LDATA_REQ)
+			logger.warn("received L-Data request - ignored");
+
 		return true;
 	}
 

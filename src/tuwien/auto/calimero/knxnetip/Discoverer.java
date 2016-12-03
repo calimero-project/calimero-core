@@ -420,7 +420,7 @@ public class Discoverer
 				final InetAddress a = ea.nextElement();
 				// without NAT, we only try IPv4 addresses
 				if (!nat && a.getAddress().length != 4)
-					logger.info("skip " + a + ", not an IPv4 address");
+					logger.debug("skip " + a + ", not an IPv4 address");
 				else
 					try {
 						final boolean skipLinkLocal = false;

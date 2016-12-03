@@ -113,8 +113,7 @@ public final class LogService
 		async(l, level, (Marker) null, "{}", msg, t);
 	}
 
-	static void async(final Logger l, final LogLevel level, final Marker m, final String msg,
-		final Throwable t)
+	static void async(final Logger l, final LogLevel level, final Marker m, final String msg, final Throwable t)
 	{
 		async(l, level, (Marker) null, "{}", msg, t);
 	}

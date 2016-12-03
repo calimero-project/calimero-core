@@ -452,13 +452,10 @@ public class CEMILData implements CEMI
 		return os.toByteArray();
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString()
 	{
-		final StringBuffer buf = new StringBuffer();
+		final StringBuilder buf = new StringBuilder();
 		buf.append(source).append("->").append(dst);
 		buf.append(" L_Data");
 		buf.append(mc == MC_LDATA_IND ? ".ind" : mc == MC_LDATA_REQ ? ".req" : ".con");
@@ -472,7 +469,7 @@ public class CEMILData implements CEMI
 			if (isRepetition())
 				buf.append(" repeat");
 		}
-		buf.append(" tpdu ").append(DataUnitBuilder.toHex(data, " "));
+		buf.append(", tpdu ").append(DataUnitBuilder.toHex(data, " "));
 		return buf.toString();
 	}
 

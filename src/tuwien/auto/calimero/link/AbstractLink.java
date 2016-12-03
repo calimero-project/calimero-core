@@ -142,7 +142,7 @@ public abstract class AbstractLink implements KNXNetworkLink
 				final int mc = f.getMessageCode();
 				if (mc == CEMILData.MC_LDATA_IND) {
 					addEvent(l -> l.indication(new FrameEvent(source, f)));
-					logger.debug("indication from {}", f.getSource());
+					logger.debug("indication {}", f.toString());
 				}
 				else if (mc == CEMILData.MC_LDATA_CON) {
 					addEvent(l -> l.confirmation(new FrameEvent(source, f)));
