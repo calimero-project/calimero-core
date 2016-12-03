@@ -111,6 +111,6 @@ Calimero uses the [Simple Logging Facade for Java (slf4j)](http://www.slf4j.org/
 Testing
 -------
 
-For unit tests, Calimero provides a _test network_, consisting of a KNXnet/IP server and a virtual KNX network with two KNX devices. The test network provides the remote endpoint for executing unit test for KNXnet/IP tunneling, busmonitoring, routing, device management, and KNX IP protocols.
+For unit tests, Calimero provides a [test network](https://github.com/calimero-project/calimero-testnetwork), consisting of a [KNXnet/IP server](https://github.com/calimero-project/calimero-server) and a virtual KNX network with two [KNX devices](https://github.com/calimero-project/calimero-device). The complete test network is implemented in software, and can be executed in any J2SE runtime environment. It provides the remote KNXnet/IP endpoint for executing unit tests for KNXnet/IP tunneling, busmonitoring, routing, device management, and KNX IP protocols. The same setup is used for Calimero Travis CI.
 
 Currently, the TP-UART and FT1.2 protocols can only be tested if the corresponding hardware is available. 
