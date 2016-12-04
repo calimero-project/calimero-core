@@ -168,6 +168,15 @@ public class KNXnetIPTunnel extends ClientConnection
 			return true;
 
 		final int seq = req.getSequenceNumber();
+		// ************** Star Workaround to treat missed telegram problem
+		if (seq==((getSeqRcv()+1) & 0xFF)){
+			// ups, we are one behind, don't know why, we missed it somewhere to increment or lost it.
+			// Fix this by just following the real counter again
+			logger.error("tunneling request with larger rcv-seq " + seq + ", expected "
+					+ getSeqRcv() + " -> fix this nasty situation");
+			incSeqRcv();
+		}	
+		// ************** End Workaround to treat missed telegram problem		
 		if (seq == getSeqRcv() || ((seq + 1) & 0xFF) == getSeqRcv()) {
 			final int status = h.getVersion() == KNXNETIP_VERSION_10 ? ErrorCodes.NO_ERROR
 					: ErrorCodes.VERSION_NOT_SUPPORTED;
