@@ -177,10 +177,10 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		if (!link.isOpen())
 			throw new KNXLinkClosedException(
 					"cannot initialize process communication using closed link " + link.getName());
-		lnk = link;
-		lnk.addLinkListener(lnkListener);
 		logger = LogManager.getManager().getLogService("process " + link.getName());
+		lnk = link;
 		listeners = new EventListeners(logger);
+		lnk.addLinkListener(lnkListener);
 	}
 
 	/* (non-Javadoc)
