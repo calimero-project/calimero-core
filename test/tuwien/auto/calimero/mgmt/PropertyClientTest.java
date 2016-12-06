@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,7 +50,6 @@ import tuwien.auto.calimero.exception.KNXTimeoutException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.KNXNetworkLinkIP;
 import tuwien.auto.calimero.link.medium.TPSettings;
-import tuwien.auto.calimero.log.LogLevel;
 import tuwien.auto.calimero.log.LogManager;
 import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
 
@@ -132,7 +131,6 @@ public class PropertyClientTest extends TestCase
 		if (lnk != null)
 			lnk.close();
 
-		Util.getLogWriter().setLogLevel(LogLevel.ALL);
 		LogManager.getManager().removeWriter(null, Util.getLogWriter());
 		super.tearDown();
 	}

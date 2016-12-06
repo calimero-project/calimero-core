@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ public final class Util
 	// make sure its the same subnet as the test device (for tests that set the address)
 	private static IndividualAddress nonExisting = new IndividualAddress(1, 1, 200);
 
-	private static final LogWriter w = new LogStreamWriter(LogLevel.ALL, System.out, true, false);
+	private static final LogWriter w = new LogStreamWriter(LogLevel.WARN, System.out, true, false);
 
 
 	private Util()
