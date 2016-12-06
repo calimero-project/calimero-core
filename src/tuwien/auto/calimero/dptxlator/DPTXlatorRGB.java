@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -194,11 +194,9 @@ public class DPTXlatorRGB extends DPTXlator {
 					throw new KNXIllegalArgumentException("expected component identifier "
 							+ "e.g. 'r:', 'g:', 'b:' in " + colorComponent);
 			}
-			if ((r == -1) || (g == -1) || (b == -1)) {
+			if ((r == -1) || (g == -1) || (b == -1))
 				throw newException("invalid color", value);
-			} else {
-				set(r, g, b, dst, index);
-			}
+			set(r, g, b, dst, index);
 		}
 		catch (final KNXIllegalArgumentException e) {
 			throw newException("invalid color", value, e);

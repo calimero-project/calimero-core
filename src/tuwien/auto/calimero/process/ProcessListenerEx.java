@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -190,12 +190,9 @@ public abstract class ProcessListenerEx implements ProcessListener
 			t.setData(e.getASDU());
 			return t.getValueFloat();
 		}
-		else {
-			final DPTXlator2ByteFloat t = new DPTXlator2ByteFloat(
-					DPTXlator2ByteFloat.DPT_RAIN_AMOUNT);
-			t.setData(e.getASDU());
-			return t.getValueDouble();
-		}
+		final DPTXlator2ByteFloat t = new DPTXlator2ByteFloat(DPTXlator2ByteFloat.DPT_RAIN_AMOUNT);
+		t.setData(e.getASDU());
+		return t.getValueDouble();
 	}
 
 	/**

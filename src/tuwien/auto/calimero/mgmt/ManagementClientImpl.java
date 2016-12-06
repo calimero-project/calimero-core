@@ -585,8 +585,8 @@ public class ManagementClientImpl implements ManagementClient
 					throw new KNXRemoteException("got no property description (object non-existant?)");
 				return new byte[] { apdu[2], apdu[3], apdu[4], apdu[5], apdu[6], apdu[7], apdu[8] };
 			}
-			else
-				logger.warn("wrong description response: OI " + (apdu[2] & 0xff) + " PID " + (apdu[3] & 0xff)
+
+			logger.warn("wrong description response: OI " + (apdu[2] & 0xff) + " PID " + (apdu[3] & 0xff)
 						+ " prop idx " + (apdu[4] & 0xff));
 		}
 		throw new KNXTimeoutException("timeout occurred while waiting for data response");
