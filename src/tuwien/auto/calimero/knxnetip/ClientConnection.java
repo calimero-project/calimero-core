@@ -142,7 +142,6 @@ abstract class ClientConnection extends ConnectionBase
 					+ ctrlEndpt.getAddress().getHostAddress() + ")");
 		useNat = useNAT;
 		logger = LogService.getLogger("calimero.knxnetip." + getName());
-		Exception thrown = null;
 		try {
 			// if we allow localEP to be null, we would create an unbound socket
 			if (localEP == null)
@@ -150,29 +149,22 @@ abstract class ClientConnection extends ConnectionBase
 			socket = new DatagramSocket(localEP);
 			ctrlSocket = socket;
 
-			logger.info("establish connection from " + socket.getLocalSocketAddress()
-				+ " to " + ctrlEndpt);
+			logger.info("establish connection from " + socket.getLocalSocketAddress() + " to " + ctrlEndpt);
 			// HPAI throws if wildcard local address (0.0.0.0) is supplied
-			final HPAI hpai = new HPAI(HPAI.IPV4_UDP, useNat ? null
-				: (InetSocketAddress) socket.getLocalSocketAddress());
+			final HPAI hpai = new HPAI(HPAI.IPV4_UDP,
+					useNat ? null : (InetSocketAddress) socket.getLocalSocketAddress());
 			final byte[] buf = PacketHelper.toPacket(new ConnectRequest(cri, hpai, hpai));
-			final DatagramPacket p = new DatagramPacket(buf, buf.length, ctrlEndpt.getAddress(),
-					ctrlEndpt.getPort());
+			final DatagramPacket p = new DatagramPacket(buf, buf.length, ctrlEndpt.getAddress(), ctrlEndpt.getPort());
 			ctrlSocket.send(p);
 		}
-		catch (final IOException e) {
-			thrown = e;
-		}
-		catch (final SecurityException e) {
-			thrown = e;
-		}
-		if (thrown != null) {
+		catch (IOException | SecurityException e) {
 			if (socket != null)
 				socket.close();
-			logger.error("communication failure on connect", thrown);
+			logger.error("communication failure on connect", e);
 			if (localEP.getAddress().isLoopbackAddress())
-				logger.warn("try to specify the actual IP address of the local host");
-			throw new KNXException("on connect to " + serverCtrlEP + ": " + thrown.getMessage());
+				logger.warn("local endpoint uses loopback address ({}), try with a different IP address",
+						localEP.getAddress());
+			throw new KNXException("on connect to " + serverCtrlEP + ": " + e.getMessage());
 		}
 
 		logger.debug("wait for connect response from " + ctrlEndpt + " ...");
@@ -189,8 +181,7 @@ abstract class ClientConnection extends ConnectionBase
 			if (!changed)
 				e = new KNXTimeoutException("timeout connecting to control endpoint " + ctrlEndpt);
 			else if (state == ACK_ERROR)
-				e = new KNXRemoteException("error response from control endpoint " + ctrlEndpt
-						+ ": " + status);
+				e = new KNXRemoteException("error response from control endpoint " + ctrlEndpt + ": " + status);
 			else
 				e = new KNXInvalidResponseException("invalid connect response from " + ctrlEndpt);
 			// quit, cleanup and notify user
