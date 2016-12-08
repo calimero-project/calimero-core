@@ -359,6 +359,7 @@ final class BcuSwitcher
 		}
 		catch (final InterruptedException e) {
 			conn.close();
+			Thread.currentThread().interrupt();
 			throw new KNXLinkClosedException(e.getMessage());
 		}
 		catch (final KNXAckTimeoutException e) {
@@ -377,6 +378,7 @@ final class BcuSwitcher
 		}
 		catch (final InterruptedException e) {
 			conn.close();
+			Thread.currentThread().interrupt();
 			throw new KNXLinkClosedException(e.getMessage());
 		}
 		catch (final KNXAckTimeoutException e) {
