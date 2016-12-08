@@ -138,6 +138,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	private int seqSend;
 
 	private final Semaphore sendWaitQueue = new Semaphore();
+	private boolean inBlockingSend;
 
 	/**
 	 * Base constructor to assign the supplied arguments.
@@ -199,13 +200,13 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 			logger.error("send invoked in error state " + state + " - aborted");
 			throw new KNXIllegalStateException("in error state, send aborted");
 		}
-		// arrange into line for blocking mode
-		if (mode != NonBlocking)
-			sendWaitQueue.acquire();
+		// arrange into line depending on blocking mode
+		sendWaitQueue.acquire(mode != NonBlocking);
 		synchronized (lock) {
 			if (mode == NonBlocking && state != OK && state != ACK_ERROR) {
 				logger.warn(
 						"nonblocking send invoked while waiting for data response in state " + state + " - aborted");
+				sendWaitQueue.release(false);
 				throw new KNXIllegalStateException("waiting for data response");
 			}
 			try {
@@ -213,6 +214,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 					throw new KNXConnectionClosedException("send attempt on closed connection");
 				}
 				updateState = mode == NonBlocking;
+				inBlockingSend = mode != NonBlocking;
 				final byte[] buf;
 				if (serviceRequest == KNXnetIPHeader.ROUTING_IND)
 					buf = PacketHelper.toPacket(new RoutingIndication(frame));
@@ -264,8 +266,10 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 			finally {
 				updateState = true;
 				setState(internalState);
-				if (mode != NonBlocking)
-					sendWaitQueue.release();
+				inBlockingSend = false;
+				// with routing we immediately release with any blocking mode, because there is no ack/.con
+				if (mode != NonBlocking || serviceRequest == KNXnetIPHeader.ROUTING_IND)
+					sendWaitQueue.release(mode != NonBlocking);
 			}
 		}
 	}
@@ -396,6 +400,8 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	{
 		synchronized (lock) {
 			setState(newState);
+			if (newState == OK && !inBlockingSend)
+				this.sendWaitQueue.release(false);
 			// worst case: we notify 2 threads, the closing one and 1 sending
 			lock.notifyAll();
 		}
@@ -566,19 +572,27 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		private Node head;
 		private Node tail;
 		private int cnt;
+		private int nonblockingCnt;
 
 		Semaphore()
 		{
 			cnt = 1;
+			nonblockingCnt = 0;
 		}
 
-		void acquire()
+		void acquire(final boolean blocking)
 		{
 			final Node n;
 			boolean interrupted = false;
 			synchronized (this) {
 				if (cnt > 0 && tail == null) {
 					--cnt;
+					if (!blocking)
+						nonblockingCnt++;
+					return;
+				}
+				if (!blocking) {
+					nonblockingCnt++;
 					return;
 				}
 				n = enqueue();
@@ -600,10 +614,19 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 				Thread.currentThread().interrupt();
 		}
 
-		synchronized void release()
+		synchronized void release(final boolean blocking)
 		{
-			if (++cnt > 0)
-				notifyNext();
+			if (blocking) {
+				if (++cnt > 0)
+					notifyNext();
+			}
+			else if (nonblockingCnt > 0) {
+				nonblockingCnt--;
+				if (nonblockingCnt == 0) {
+					if (++cnt > 0)
+						notifyNext();
+				}
+			}
 		}
 
 		private Node enqueue()
