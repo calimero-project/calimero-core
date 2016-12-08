@@ -137,6 +137,9 @@ abstract class ClientConnection extends ConnectionBase
 		ctrlEndpt = serverCtrlEP;
 		if (ctrlEndpt.isUnresolved())
 			throw new KNXException("server control endpoint is unresolved: " + serverCtrlEP);
+		if (ctrlEndpt.getAddress().isMulticastAddress())
+			throw new KNXIllegalArgumentException("server control endpoint cannot be a multicast address ("
+					+ ctrlEndpt.getAddress().getHostAddress() + ")");
 		useNat = useNAT;
 		logger = LogService.getLogger("calimero.knxnetip." + getName());
 		Exception thrown = null;
