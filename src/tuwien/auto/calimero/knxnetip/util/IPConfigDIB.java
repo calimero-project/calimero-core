@@ -205,7 +205,8 @@ public final class IPConfigDIB extends DIB
 		try {
 			return (Inet4Address) InetAddress.getByAddress(addr);
 		}
-		catch (final UnknownHostException ignore) {}
-		return null;
+		catch (final UnknownHostException ignore) { 
+			throw new KNXIllegalArgumentException("illegal length of IPv4 address", ignore);
+		}
 	}
 }

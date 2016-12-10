@@ -443,8 +443,9 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 			clone.addInfo = clone.addInfo.clone();
 			return clone;
 		}
-		catch (final CloneNotSupportedException ignored) {}
-		return null;
+		catch (final CloneNotSupportedException ignore) {
+			throw new UnsupportedOperationException("cloning cEMI L-Data", ignore);
+		}
 	}
 
 	@Override
