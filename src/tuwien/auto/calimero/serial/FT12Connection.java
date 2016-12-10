@@ -615,7 +615,7 @@ public class FT12Connection
 	private static String[] defaultPortPrefixes()
 	{
 		return System.getProperty("os.name").toLowerCase().indexOf("windows") > -1
-				? new String[]{ "\\\\.\\COM" } : new String[]{ "/dev/ttyS", "/dev/ttyUSB" };
+				? new String[]{ "\\\\.\\COM" } : new String[]{ "/dev/ttyS", "/dev/ttyUSB", "/dev/ttyACM" };
 	}
 
 	private final class Receiver extends Thread
