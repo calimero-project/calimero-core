@@ -174,7 +174,7 @@ abstract class ClientConnection extends ConnectionBase
 			if (state == OK) {
 				heartbeat = new HeartbeatMonitor();
 				heartbeat.start();
-				logger.info("connection established");
+				logger.info("connection established (channel {})", channelId);
 				return;
 			}
 			final KNXException e;

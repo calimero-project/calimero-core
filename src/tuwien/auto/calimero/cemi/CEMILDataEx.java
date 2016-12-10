@@ -327,9 +327,6 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.cemi.CEMILData#getStructLength()
-	 */
 	@Override
 	public int getStructLength()
 	{
@@ -522,7 +519,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		return tpdu.length <= 255;
 	}
 
-	private boolean checkAddInfoLength(final int infoType, final int len)
+	private static boolean checkAddInfoLength(final int infoType, final int len)
 	{
 		if (len > 255)
 			throw new KNXIllegalArgumentException(

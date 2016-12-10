@@ -588,9 +588,7 @@ public class CEMILData implements CEMI
 	}
 
 	/**
-	 * Set repeat flag in control field.
-	 * <p>
-	 * Note: uses message code type for decision.
+	 * Sets the repeat flag in control field, using the message code type for decision.
 	 *
 	 * @param repeat <code>true</code> for a repeat request or repeated frame,
 	 *        <code>false</code> otherwise
