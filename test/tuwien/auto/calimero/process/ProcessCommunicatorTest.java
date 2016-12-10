@@ -41,6 +41,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -493,8 +495,13 @@ public class ProcessCommunicatorTest
 					else
 						count.addAndGet(pc2.readFloat(dpFloat2, false) == d ? 1 : 0);
 				}
-				catch (KNXException | InterruptedException e) {}
-			});
+				catch (KNXException | InterruptedException e) {
+					final StringWriter errors = new StringWriter();
+					e.printStackTrace(new PrintWriter(errors));
+					fail("ProcessCommunicatorTest:testConcurrentRead2() thread " + Thread.currentThread().getName()
+							+ ": " + errors.toString());
+				}
+			}, "concurrent read index " + i);
 			threads.add(t);
 		}
 		threads.forEach(Thread::start);
