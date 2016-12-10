@@ -13,7 +13,6 @@
 		<url>https://github.com/calimero-project/calimero-core.git</url>
 	</scm>
 	<url>https://github.com/calimero-project/calimero-core</url>
-
 	<licenses>
 		<license>
 			<name>GNU General Public License, version 2, with the Classpath Exception</name>
@@ -26,12 +25,10 @@
 			<email>b.malinowsky@gmail.com</email>
 		</developer>
 	</developers>
-
 	<properties>
 		<exec.mainClass>tuwien.auto.calimero.Settings</exec.mainClass>
 		<test.exclude.groups></test.exclude.groups>
 	</properties>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -60,6 +57,15 @@
 				<configuration>
 					<useFile>false</useFile>
 					<excludedGroups>${test.exclude.groups}</excludedGroups>
+					<includes>
+						<include>**/Test*.java</include>
+						<include>**/*Test.java</include>
+						<include>**/*Tests.java</include>
+						<include>**/*TestCase.java</include>
+					</includes>
+					<properties>
+						<excludeTags>slow,ft12</excludeTags>
+					</properties>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -76,7 +82,6 @@
 			<version>1.0-2</version>
 		</dependency>
 	</dependencies>
-
 	<profiles>
 		<profile>
 			<id>testAll</id>
