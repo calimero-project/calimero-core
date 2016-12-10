@@ -93,7 +93,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	private final boolean detachMgmtClient;
 	private final TransportLayer tl;
 
-	private final Logger logger = LogService.getLogger("MgmtProc");
+	private final Logger logger = LogService.getLogger("calimero.mgmt.MgmtProc");
 
 	private static final class TLListener implements TransportListener
 	{

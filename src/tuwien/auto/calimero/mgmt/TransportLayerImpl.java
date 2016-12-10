@@ -208,7 +208,7 @@ public class TransportLayerImpl implements TransportLayer
 					"cannot initialize transport layer using closed link " + link.getName());
 		lnk = link;
 		lnk.addLinkListener(lnkListener);
-		logger = LogService.getLogger(getName());
+		logger = LogService.getLogger("calimero.mgmt." + getName());
 		listeners = new EventListeners<>(logger);
 		serverSide = serverEndpoint;
 	}

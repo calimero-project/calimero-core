@@ -203,7 +203,7 @@ public class ManagementClientImpl implements ManagementClient
 	{
 		tl = transportLayer;
 		tl.addTransportListener(tlListener);
-		logger = LogService.getLogger("MC " + link.getName());
+		logger = LogService.getLogger("calimero.mgmt.MC " + link.getName());
 		listeners = new EventListeners<>(logger);
 	}
 

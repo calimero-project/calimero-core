@@ -296,7 +296,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	{
 		ctrlEndpt = new InetSocketAddress(multicast, DEFAULT_PORT);
 		dataEndpt = ctrlEndpt;
-		logger = LogService.getLogger(getName());
+		logger = LogService.getLogger("calimero.knxnetip." + getName());
 
 		MulticastSocket s = null;
 		try {

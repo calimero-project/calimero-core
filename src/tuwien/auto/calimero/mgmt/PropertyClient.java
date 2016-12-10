@@ -472,7 +472,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 			pa.close();
 			throw e;
 		}
-		logger = LogService.getLogger("PC " + pa.getName());
+		logger = LogService.getLogger("calimero.mgmt.PC " + pa.getName());
 	}
 
 	/**
