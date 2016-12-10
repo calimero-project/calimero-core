@@ -417,7 +417,7 @@ public final class TranslatorTypes
 	 */
 	public static MainType getMainType(final int mainNumber)
 	{
-		return map.get(new Integer(mainNumber));
+		return map.get(mainNumber);
 	}
 
 	/**
@@ -501,7 +501,7 @@ public final class TranslatorTypes
 	{
 		try {
 			final int main = getMainNumber(mainNumber, dptID);
-			final MainType type = map.get(new Integer(main));
+			final MainType type = map.get(main);
 			if (type != null)
 				return type.createTranslator(dptID);
 		}

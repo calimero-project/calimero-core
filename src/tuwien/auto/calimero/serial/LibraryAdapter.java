@@ -163,7 +163,7 @@ public abstract class LibraryAdapter implements Closeable
 			logger.debug("using rxtx library for serial port access");
 			final Class<? extends LibraryAdapter> adapter = LibraryAdapter.class;
 			return adapter.cast(c.getConstructors()[0]
-					.newInstance(new Object[] { logger, portId, new Integer(baudrate) }));
+					.newInstance(new Object[] { logger, portId, Integer.valueOf(baudrate) }));
 		}
 		catch (final ClassNotFoundException e) {
 			logger.warn("no rxtx library adapter found");
@@ -215,7 +215,7 @@ public abstract class LibraryAdapter implements Closeable
 	public void setBaudRate(final int baudrate)
 	{
 		try {
-			invoke(this, "setBaudRate", new Object[] { new Integer(baudrate) });
+			invoke(this, "setBaudRate", new Object[] { Integer.valueOf(baudrate) });
 		}
 		catch (final Exception e) {}
 	}

@@ -144,7 +144,7 @@ final class TimerQueue extends Thread
 		// TODO change this if we find out we have greatly varying time-outs
 		synchronized (notifiables) {
 			notifiables.add(notifiable);
-			endTimes.add(new Long(endTime));
+			endTimes.add(Long.valueOf(endTime));
 			notifiables.notify();
 		}
 	}
