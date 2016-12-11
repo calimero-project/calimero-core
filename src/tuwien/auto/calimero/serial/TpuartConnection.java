@@ -158,7 +158,8 @@ public class TpuartConnection implements AutoCloseable
 	 * @param portId the identifier of the communication port
 	 * @param acknowledge a (possibly empty) collection of KNX addresses this endpoint shall issue a positive
 	 *        acknowledgement for, on receiving a valid TP1 frame with its destination address being an element in
-	 *        <code>acknowledge</code>
+	 *        <code>acknowledge</code>. By default, this endpoint also won't acknowledge the default individual
+	 *        address 0.2.ff on the TP1 network.
 	 * @throws KNXException on error opening the communication port, or initializing the TP-UART controller
 	 */
 	public TpuartConnection(final String portId, final Collection<? extends KNXAddress> acknowledge) throws KNXException
