@@ -36,8 +36,6 @@
 
 package tuwien.auto.calimero;
 
-import java.util.Arrays;
-
 import org.slf4j.Logger;
 
 import tuwien.auto.calimero.log.LogService;
@@ -421,19 +419,5 @@ public final class DataUnitBuilder
 				sb.append(sep);
 		}
 		return sb.toString();
-	}
-
-	/**
-	 * Returns a new byte array of { data[from], data[from + 1], .. , data[min(to,
-	 * data.length) - 1] }.
-	 *
-	 * @param data source data array
-	 * @param from start of range index
-	 * @param to end of range index, exclusive
-	 * @return the byte array filled with the corresponding data elements
-	 */
-	public static byte[] copyOfRange(final byte[] data, final int from, final int to)
-	{
-		return Arrays.copyOfRange(data, from, to);
 	}
 }

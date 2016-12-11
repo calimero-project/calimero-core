@@ -36,6 +36,7 @@
 
 package tuwien.auto.calimero.cemi;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -215,7 +216,7 @@ public final class CEMIFactory
 		if (mc != CEMIBusMon.MC_BUSMON_IND && mc != Emi1_LBusmon_ind)
 			throw new KNXFormatException("not a busmonitor frame with msg code 0x" + Integer.toHexString(mc));
 		return CEMIBusMon.newWithStatus(frame[1] & 0xff, (frame[2] & 0xff) << 8 | frame[3] & 0xff,
-				false, DataUnitBuilder.copyOfRange(frame, 4, frame.length));
+				false, Arrays.copyOfRange(frame, 4, frame.length));
 	}
 
 	/**
@@ -252,7 +253,7 @@ public final class CEMIFactory
 
 		if (mc == CEMIBusMon.MC_BUSMON_IND) {
 			return CEMIBusMon.newWithStatus(frame[1] & 0xff, (frame[2] & 0xff) << 8 | frame[3]
-					& 0xff, false, DataUnitBuilder.copyOfRange(frame, 4, frame.length));
+					& 0xff, false, Arrays.copyOfRange(frame, 4, frame.length));
 		}
 		final Priority p = Priority.get(frame[1] >> 2 & 0x3);
 		final boolean ack = (frame[1] & 0x02) != 0;
@@ -262,7 +263,7 @@ public final class CEMIFactory
 				: new IndividualAddress(dst);
 		final int hops = frame[6] >> 4 & 0x07;
 		final int len = (frame[6] & 0x0f) + 1;
-		final byte[] tpdu = DataUnitBuilder.copyOfRange(frame, 7, len + 7);
+		final byte[] tpdu = Arrays.copyOfRange(frame, 7, len + 7);
 		final int src = ((frame[2] & 0xff) << 8) | (frame[3] & 0xff);
 
 		if (c) return new CEMILData(mc, new IndividualAddress(src), a, tpdu, p, c);

@@ -942,7 +942,7 @@ public class ManagementClientImpl implements ManagementClient
 	{
 		for (int i = 0; i < l.size(); ++i) {
 			final byte[] pdu = l.get(i);
-			l.set(i, DataUnitBuilder.copyOfRange(pdu, 2, pdu.length));
+			l.set(i, Arrays.copyOfRange(pdu, 2, pdu.length));
 		}
 		return l;
 	}

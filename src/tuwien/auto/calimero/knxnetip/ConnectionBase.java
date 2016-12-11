@@ -45,6 +45,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 
@@ -498,7 +499,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 			// is correct and try to get its values
 			final ServiceRequest req = PacketHelper.getEmptyServiceRequest(h, data, offset);
 			logger.warn("received request with unknown cEMI data " + DataUnitBuilder.toHex(
-					DataUnitBuilder.copyOfRange(data, offset + 4, offset + h.getTotalLength() - h.getStructLength()),
+					Arrays.copyOfRange(data, offset + 4, offset + h.getTotalLength() - h.getStructLength()),
 					" "), e);
 			return req;
 		}

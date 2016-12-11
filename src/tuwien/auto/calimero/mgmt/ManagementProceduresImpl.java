@@ -530,10 +530,9 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		// write memory in chunks matching the maximum asdu length of the device
 		final int asduLength = readMaxAsduLength(d);
 		for (int i = 0; i < write.length; i += asduLength) {
-			final byte[] range = DataUnitBuilder.copyOfRange(write, i, i + asduLength);
+			final byte[] range = Arrays.copyOfRange(write, i, i + asduLength);
 
-			// on server verification, our mgmt client will already do the response
-			// value comparison
+			// on server verification, our mgmt client will already compare the response value
 			mc.writeMemory(d, (int) startAddress + i, range);
 
 			// on manual write verification, we explicitly read back memory
