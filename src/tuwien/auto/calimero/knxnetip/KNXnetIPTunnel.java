@@ -168,6 +168,20 @@ public class KNXnetIPTunnel extends ClientConnection
 			return true;
 
 		final int seq = req.getSequenceNumber();
+		if (seq == ((getSeqRcv() + 1) & 0xFF)) {
+			// Workaround for missed request problem (not part of the knxnet/ip tunneling spec):
+			// we missed a single request, hence, the receive sequence is one behind. If the remote
+			// endpoint didn't terminate the connection, but continues to send requests, this workaround
+			// re-syncs with the sequence of the sender.
+			final String s = System.getProperty("calimero.knxnetip.tunneling.resyncSkippedRcvSeq");
+			final boolean resync = "".equals(s) || "true".equalsIgnoreCase(s);
+			if (resync) {
+				logger.error("tunneling request with rcv-seq " + seq + ", expected " + getSeqRcv()
+						+ " -> re-sync with server (1 tunneled msg lost)");
+				incSeqRcv();
+			}
+		}
+
 		if (seq == getSeqRcv() || ((seq + 1) & 0xFF) == getSeqRcv()) {
 			final int status = h.getVersion() == KNXNETIP_VERSION_10 ? ErrorCodes.NO_ERROR
 					: ErrorCodes.VERSION_NOT_SUPPORTED;
