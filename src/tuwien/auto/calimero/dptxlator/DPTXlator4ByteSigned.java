@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2015 B. Malinowsky
+    Copyright (c) 2009, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -66,11 +66,11 @@ public class DPTXlator4ByteSigned extends DPTXlator
 			"2147483647", "counter pulses");
 
 	/**
-	 * DPT ID 13.002, Flow rate in m3/h with high resolution; values from <b>-2147483648</b> to
-	 * <b>2147483647</b>, resolution 0.0001 m3/h.
+	 * DPT ID 13.002, Flow rate in m³/h with high resolution; values from <b>-2147483648</b> to
+	 * <b>2147483647</b>, resolution 0.0001 m³/h.
 	 */
 	public static final DPT DPT_FLOWRATE = new DPT("13.002", "Flow rate", "-2147483648",
-			"2147483647", "m3/h");
+			"2147483647", "m³/h");
 
 	/**
 	 * DPT ID 13.010, Active energy in watthours; values from <b>-2147483648</b> to
