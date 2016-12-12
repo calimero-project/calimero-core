@@ -435,6 +435,8 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 					buf.append(" ext.timestamp ").append(toLong(info));
 				else if (i == ADDINFO_BIBAT)
 					buf.append(" bibat 0x").append(DataUnitBuilder.toHex(info, " "));
+				else
+					buf.append(" type ").append(i).append(" 0x").append(DataUnitBuilder.toHex(info, ""));
 		}
 		buf.append(s.substring(split + 1));
 		return buf.toString();
