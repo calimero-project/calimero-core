@@ -43,7 +43,7 @@ package tuwien.auto.calimero;
  */
 public final class Settings
 {
-	private static final String version = "2.3-beta";
+	private static final String version = "2.3";
 	private static final String library = "Calimero 2";
 	private static final String desc = "A library for KNX network access";
 
@@ -186,7 +186,7 @@ public final class Settings
 	 */
 	public static int getLibraryMode()
 	{
-		return DEV_MODE;
+		return DEPLOY_MODE;
 	}
 
 	// for now, this works by loading one class as representative from a bundle
