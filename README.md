@@ -1,4 +1,4 @@
-Calimero-core [![Build Status](https://travis-ci.org/calimero-project/calimero-core.svg?branch=feat/jse-embd8-c1)](https://travis-ci.org/calimero-project/calimero-core)
+Calimero-core [![Build Status](https://travis-ci.org/calimero-project/calimero-core.svg?branch=master)](https://travis-ci.org/calimero-project/calimero-core)
 =============
 
 Calimero-core library for Java SE, specifically Java SE Embedded 8. The minimum required runtime environment is 
