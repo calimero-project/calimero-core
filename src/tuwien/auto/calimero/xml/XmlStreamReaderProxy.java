@@ -195,5 +195,5 @@ public final class XmlStreamReaderProxy implements XmlReader
 	@Override
 	public String getPIData() { return r.getPIData(); }
 
-	private KNXMLException wrapped(final XMLStreamException e) { return new KNXMLException("", e); }
+	private KNXMLException wrapped(final XMLStreamException e) { return new KNXMLException(e.getMessage(), e); }
 }

@@ -104,7 +104,7 @@ public class KNXMLException extends RuntimeException
 	public KNXMLException(final String s, final XmlReader r)
 	{
 		super(createMsg(s, r));
-		item = r != null ? r.getLocalName() : "n/a";
+		item = r.getLocalName();
 		line = r.getLocation().getLineNumber();
 	}
 

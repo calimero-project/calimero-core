@@ -150,21 +150,21 @@ final class HidReportHeader
 		return os.toByteArray();
 	}
 
-	private int validateSequence(final int seq)
+	private static int validateSequence(final int seq)
 	{
 		if (seq < 1 || seq > 5)
 			throw new KNXIllegalArgumentException("sequence number " + seq + " not in [1..5]");
 		return seq;
 	}
 
-	private EnumSet<PacketType> validatePacketType(final EnumSet<PacketType> t)
+	private static EnumSet<PacketType> validatePacketType(final EnumSet<PacketType> t)
 	{
 		if (t.size() > 2)
 			throw new KNXIllegalArgumentException("invalid packet type " + t);
 		return t;
 	}
 
-	private EnumSet<PacketType> parseType(final int t)
+	private static EnumSet<PacketType> parseType(final int t)
 	{
 		final EnumSet<PacketType> set = EnumSet.allOf(PacketType.class);
 		for (final Iterator<PacketType> i = set.iterator(); i.hasNext();)
@@ -173,7 +173,7 @@ final class HidReportHeader
 		return set;
 	}
 
-	private int validateDataLength(final int l)
+	private static int validateDataLength(final int l)
 	{
 		if (l < 0 || l > (maxFrameSize - headerSize))
 			throw new KNXIllegalArgumentException("data length " + l + " not in [0..61]");

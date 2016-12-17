@@ -86,14 +86,11 @@ public class DefaultXmlWriter implements XmlWriter
 	 */
 	public DefaultXmlWriter(final Writer w)
 	{
-		setOutput(w);
+		this.w = new BufferedWriter(w);
+		layout = new Stack<>();
+		indent = 0;
+		newTag = false;
 	};
-
-	private void setOutput(final Writer output)
-	{
-		reset();
-		w = new BufferedWriter(output);
-	}
 
 	private void writeDeclaration(final boolean standalone, final String encoding,
 		final String version) throws KNXMLException
@@ -140,13 +137,6 @@ public class DefaultXmlWriter implements XmlWriter
 		for (int i = 0; i < indent; ++i)
 			w.write(' ');
 		return w;
-	}
-
-	private void reset()
-	{
-		layout = new Stack<>();
-		indent = 0;
-		newTag = false;
 	}
 
 	// helper class for tag writing

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -219,7 +219,7 @@ public class GroupAddress extends KNXAddress
 	 * @see tuwien.auto.calimero.KNXAddress#getType()
 	 */
 	@Override
-	public String getType()
+	public final String getType()
 	{
 		return ATTR_GROUP;
 	}
@@ -279,11 +279,8 @@ public class GroupAddress extends KNXAddress
 				init(Byte.parseByte(tokens[0]), Byte.parseByte(tokens[1]),
 						Short.parseShort(tokens[2]));
 		}
-		catch (final NumberFormatException e) {
-			throw new KNXFormatException("invalid group address", address);
-		}
-		catch (final KNXIllegalArgumentException e) {
-			throw new KNXFormatException(e.getMessage());
+		catch (NumberFormatException | KNXIllegalArgumentException e) {
+			throw new KNXFormatException("invalid group address", address, e);
 		}
 	}
 
