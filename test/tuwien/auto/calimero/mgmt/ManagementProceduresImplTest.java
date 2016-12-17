@@ -71,8 +71,7 @@ public class ManagementProceduresImplTest
 	@BeforeEach
 	void init() throws Exception
 	{
-		link = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, Util.getLocalHost(), Util.getServer(), false,
-				TPSettings.TP1);
+		link = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false, TPSettings.TP1);
 		mp = new ManagementProceduresImpl(link);
 		nonexist = Util.getNonExistingKnxDevice();
 	}

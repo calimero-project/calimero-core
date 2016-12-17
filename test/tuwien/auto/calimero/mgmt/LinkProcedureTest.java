@@ -62,8 +62,7 @@ class LinkProcedureTest
 	@BeforeEach
 	void init() throws KNXException, InterruptedException
 	{
-		link = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, Util.getLocalHost(), Util.getServer(), false,
-				new PLSettings());
+		link = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false, new PLSettings());
 		mgmt = new ManagementClientImpl(link);
 	}
 

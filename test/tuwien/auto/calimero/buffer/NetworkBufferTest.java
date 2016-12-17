@@ -115,7 +115,7 @@ public class NetworkBufferTest
 	@BeforeEach
 	void init() throws Exception
 	{
-		lnk = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, null, Util.getServer(), false, TPSettings.TP1);
+		lnk = KNXNetworkLinkIP.newTunnelingLink(null, Util.getServer(), false, TPSettings.TP1);
 		buffer = NetworkBuffer.createBuffer("test");
 	}
 

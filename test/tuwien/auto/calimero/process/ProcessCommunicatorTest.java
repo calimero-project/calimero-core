@@ -105,8 +105,7 @@ public class ProcessCommunicatorTest
 	@BeforeEach
 	void init() throws Exception
 	{
-		link = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, Util.getLocalHost(), Util.getServer(), false,
-				TPSettings.TP1);
+		link = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false, TPSettings.TP1);
 		pc = new ProcessCommunicatorImpl(link);
 		pc2 = new ProcessCommunicatorImpl(link);
 	}

@@ -127,7 +127,7 @@ public class KNXNetworkLinkIPTest
 	@BeforeEach
 	void init() throws Exception
 	{
-		tnl = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, Util.getLocalHost(), Util.getServer(), false,
+		tnl = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false,
 				TPSettings.TP1);
 		rtr = new KNXNetworkLinkIP(KNXNetworkLinkIP.ROUTING, Util.getLocalHost(),
 				new InetSocketAddress(InetAddress.getByName(KNXnetIPRouting.DEFAULT_MULTICAST), 0), false,
@@ -156,7 +156,7 @@ public class KNXNetworkLinkIPTest
 
 	/**
 	 * Test method for
-	 * {@link KNXNetworkLinkIP#KNXNetworkLinkIP(int, InetSocketAddress, InetSocketAddress, boolean, KNXMediumSettings)}.
+	 * {@link KNXNetworkLinkIP#newTunnelingLink(InetSocketAddress, InetSocketAddress, boolean, KNXMediumSettings)}.
 	 *
 	 * @throws KNXException
 	 * @throws InterruptedException on interrupted thread
@@ -170,14 +170,13 @@ public class KNXNetworkLinkIPTest
 			fail("illegal arg");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-		try (KNXNetworkLink l = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, new InetSocketAddress(0),
-				Util.getServer(), false, TPSettings.TP1)) {
+		try (KNXNetworkLink l = KNXNetworkLinkIP.newTunnelingLink(new InetSocketAddress(0), Util.getServer(), false,
+				TPSettings.TP1)) {
 			fail("wildcard no supported");
 		}
 		catch (final KNXIllegalArgumentException e) {}
 		// use default local host
-		final KNXNetworkLink lnk = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, null, Util.getServer(), false,
-				TPSettings.TP1);
+		final KNXNetworkLink lnk = KNXNetworkLinkIP.newTunnelingLink(null, Util.getServer(), false, TPSettings.TP1);
 		lnk.close();
 	}
 

@@ -166,8 +166,7 @@ public class TransportLayerImplTest
 	@BeforeEach
 	void init() throws Exception
 	{
-		nl = new KNXNetworkLinkIP(KNXNetworkLinkIP.TUNNELING, Util.getLocalHost(), Util.getServer(), false,
-				TPSettings.TP1);
+		nl = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false, TPSettings.TP1);
 		tl = new TransportLayerImpl(nl);
 		ltl = new TLListener();
 		tl.addTransportListener(ltl);
