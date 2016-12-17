@@ -118,11 +118,7 @@ public class DPTXlator8BitEnumTest extends TestCase
 	public final void testGetSubTypes()
 	{
 		final Map<String, DPT> subTypes = t.getSubTypes();
-		final Set<String> keySet = subTypes.keySet();
-		for (final String s : keySet) {
-			final DPT dpt = subTypes.get(s);
-			System.out.println(dpt);
-		}
+		assertEquals(53, subTypes.size());
 	}
 
 	public final void testSetValueInt() throws KNXFormatException

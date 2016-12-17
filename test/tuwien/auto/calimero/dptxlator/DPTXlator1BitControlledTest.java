@@ -37,8 +37,6 @@
 package tuwien.auto.calimero.dptxlator;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 
 import junit.framework.TestCase;
@@ -201,12 +199,6 @@ public class DPTXlator1BitControlledTest extends TestCase
 	{
 		final Map<String, DPT> types = t.getSubTypes();
 		assertEquals(12, types.size());
-		System.out.println("\n1 Bit controlled DPTs:");
-		final Collection<DPT> c = types.values();
-		for (final Iterator<DPT> i = c.iterator(); i.hasNext();) {
-			final DPT dpt = i.next();
-			System.out.println(dpt.toString());
-		}
 	}
 
 	/**

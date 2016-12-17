@@ -38,8 +38,6 @@ package tuwien.auto.calimero.dptxlator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -169,12 +167,6 @@ public class DPTXlator4ByteFloatTest extends TestCase
 	{
 		final Map<String, DPT> types = DPTXlator4ByteFloat.getSubTypesStatic();
 		assertEquals(80, types.size());
-		System.out.println("\n4 Byte Float DPTs:");
-		final Collection<DPT> c = types.values();
-		for (final Iterator<DPT> i = c.iterator(); i.hasNext();) {
-			final DPT dpt = i.next();
-			System.out.println(dpt.toString());
-		}
 	}
 
 	/**

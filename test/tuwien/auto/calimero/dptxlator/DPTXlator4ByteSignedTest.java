@@ -37,9 +37,6 @@
 package tuwien.auto.calimero.dptxlator;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
 
 import junit.framework.TestCase;
 import tuwien.auto.calimero.KNXFormatException;
@@ -249,13 +246,6 @@ public class DPTXlator4ByteSignedTest extends TestCase
 	public void testGetSubTypes()
 	{
 		assertEquals(9, t.getSubTypes().size());
-		final Map<String, DPT> types = t.getSubTypes();
-		System.out.println("\n4 Byte Signed DPTs:");
-		final Collection<DPT> c = types.values();
-		for (final Iterator<DPT> i = c.iterator(); i.hasNext();) {
-			final DPT dpt = i.next();
-			System.out.println(dpt.toString());
-		}
 	}
 
 	/**
