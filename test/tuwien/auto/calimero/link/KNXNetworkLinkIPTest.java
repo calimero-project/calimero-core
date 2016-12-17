@@ -191,17 +191,16 @@ public class KNXNetworkLinkIPTest
 	}
 
 	/**
-	 * Test method for {@link KNXNetworkLinkIP#KNXNetworkLinkIP(NetworkInterface, InetAddress, KNXMediumSettings)}.
+	 * Test method for {@link KNXNetworkLinkIP#newRoutingLink(NetworkInterface, InetAddress, KNXMediumSettings)}.
 	 *
 	 * @throws KNXException
 	 * @throws UnknownHostException
 	 */
 	@Test
-	public final void testKNXNetworkLinkIPNetworkInterfaceInetAddressKNXMediumSettings()
-		throws UnknownHostException, KNXException
+	void newRoutingLink() throws UnknownHostException, KNXException
 	{
-		final KNXNetworkLink lnk = new KNXNetworkLinkIP(null, InetAddress.getByName("224.0.23.14"), TPSettings.TP1);
-		lnk.close();
+		try (KNXNetworkLinkIP link = KNXNetworkLinkIP.newRoutingLink((NetworkInterface) null,
+				InetAddress.getByName("224.0.23.14"), TPSettings.TP1)) {}
 	}
 
 	/**
