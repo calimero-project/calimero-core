@@ -213,22 +213,6 @@ public class KNXNetworkLinkIP extends AbstractLink
 	}
 
 	/**
-	 * Creates a new network link based on the KNXnet/IP routing protocol, using a {@link KNXnetIPRouting}.
-	 *
-	 * @param netIf local network interface used to join the multicast group and for sending, use <code>null</code> for
-	 *        the host's default multicast interface
-	 * @param mcGroup address of the multicast group to join, use <code>null</code> for the default KNXnet/IP multicast
-	 *        address
-	 * @param settings medium settings defining device and medium specifics needed for communication
-	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
-	 */
-	public KNXNetworkLinkIP(final NetworkInterface netIf, final InetAddress mcGroup, final KNXMediumSettings settings)
-		throws KNXException
-	{
-		this(ROUTING, new KNXnetIPRouting(netIf, mcGroup), settings);
-	}
-
-	/**
 	 * Creates a new network link with <code>serviceMode</code> based on the supplied KNXnet/IP connection.
 	 *
 	 * @param c a KNXnet/IP tunneling or routing connection in open state

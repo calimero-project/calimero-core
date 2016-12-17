@@ -181,33 +181,6 @@ public class StateDP extends Datapoint
 	}
 
 	/**
-	 * Adds a group address to this datapoint to indicate that KNX messages with that
-	 * address are allowed to alter the associated datapoint state (i.e., a state value
-	 * related to this datapoint).
-	 * <p>
-	 * A group address can be marked as updating a state or invalidating a state. An
-	 * address is added at most once to each category.
-	 *
-	 * @param a the KNX group address to add
-	 * @param isUpdating <code>true</code> to mark the address as updating this datapoint
-	 *        state, <code>false</code> to mark it as state invalidating
-	 */
-	@Deprecated
-	public final void add(final GroupAddress a, final boolean isUpdating)
-	{
-		if (getMainAddress().equals(a))
-			throw new KNXIllegalArgumentException("address equals datapoint main address");
-		if (isUpdating) {
-			if (!updating.contains(a))
-				updating.add(a);
-		}
-		else {
-			if (!invalidating.contains(a))
-				invalidating.add(a);
-		}
-	}
-
-	/**
 	 * Adds an updating group address to this datapoint to indicate that KNX messages with that destination address are
 	 * allowed to update the associated datapoint state (i.e., the state value related to this datapoint). An address is
 	 * added at most once.
@@ -237,23 +210,6 @@ public class StateDP extends Datapoint
 					"updating address " + ga + " equals main address of this datapoint '" + getName() + "'");
 		if (!invalidating.contains(ga))
 			invalidating.add(ga);
-	}
-
-	/**
-	 * Removes an updating/invalidating group address from this datapoint, so the group address is no longer contained
-	 * in the corresponding updating/invalidating category.
-	 *
-	 * @param a the KNX group address to remove
-	 * @param fromUpdating <code>true</code> to remove from updating this datapoint state, <code>false</code> to remove
-	 *        from invalidating this datapoint state
-	 */
-	@Deprecated
-	public final void remove(final GroupAddress a, final boolean fromUpdating)
-	{
-		if (fromUpdating)
-			updating.remove(a);
-		else
-			invalidating.remove(a);
 	}
 
 	/**
