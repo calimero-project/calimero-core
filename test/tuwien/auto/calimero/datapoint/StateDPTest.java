@@ -238,17 +238,16 @@ public class StateDPTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.datapoint.StateDP#remove(
-	 * tuwien.auto.calimero.GroupAddress, boolean)}.
+	 * Test method for {@link tuwien.auto.calimero.datapoint.StateDP#removeAddress(tuwien.auto.calimero.GroupAddress)}.
 	 */
-	public final void testRemove()
+	public final void testRemoveAddress()
 	{
 		final StateDP dp = new StateDP(ga, "name1", inv, upd);
 		assertTrue(dp.isInvalidating(new GroupAddress(1, 1, 1)));
-		dp.remove(new GroupAddress(1, 1, 1), false);
+		dp.removeAddress(new GroupAddress(1, 1, 1));
 		assertFalse(dp.isInvalidating(new GroupAddress(1, 1, 1)));
 		assertTrue(dp.isUpdating(new GroupAddress(4, 4, 4)));
-		dp.remove(new GroupAddress(4, 4, 4), true);
+		dp.removeAddress(new GroupAddress(4, 4, 4));
 		assertFalse(dp.isUpdating(new GroupAddress(4, 4, 4)));
 	}
 
