@@ -61,25 +61,21 @@ import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 
 /**
- * Implementation of the KNX network link based on the KNXnet/IP protocol, using a
- * {@link KNXnetIPConnection}.
+ * Implementation of the KNX network link based on the KNXnet/IP protocol, using a {@link KNXnetIPConnection}.
  * <p>
- * Once a link has been closed, it is not available for further link communication, i.e. it can't be
- * reopened.
+ * Once a link has been closed, it is not available for further link communication, i.e. it can't be reopened.
  * <p>
- * If KNXnet/IP routing is used as base protocol, the send methods with wait for confirmation behave
- * equally like without wait specified, since routing is an unconfirmed protocol. This implies that
- * no confirmation frames are generated, thus {@link NetworkLinkListener#confirmation(FrameEvent)}
- * is not used.
+ * If KNXnet/IP routing is used as base protocol, the send methods with wait for confirmation behave equally like
+ * without wait specified, since routing is an unconfirmed protocol. This implies that no confirmation frames are
+ * generated, thus {@link NetworkLinkListener#confirmation(FrameEvent)} is not used.
  * <p>
  * IP address considerations:<br>
- * On more IP addresses assigned to the local host (on possibly several local network interfaces),
- * the default chosen local host address can differ from the expected. In this situation, the local
- * endpoint has to be specified manually during instantiation.<br>
- * Network Address Translation (NAT) aware communication can only be used, if the KNXnet/IP server
- * of the remote endpoint supports it. Otherwise, connection timeouts will occur. With NAT enabled,
- * KNXnet/IP accepts IPv6 addresses. By default, the KNXnet/IP protocol only works with IPv4
- * addresses.<br>
+ * On more IP addresses assigned to the local host (on possibly several local network interfaces), the default chosen
+ * local host address can differ from the expected. In this situation, the local endpoint has to be specified manually
+ * during instantiation.<br>
+ * Network Address Translation (NAT) aware communication can only be used, if the KNXnet/IP server of the remote
+ * endpoint supports it. Otherwise, connection timeouts will occur. With NAT enabled, KNXnet/IP accepts IPv6 addresses.
+ * By default, the KNXnet/IP protocol only works with IPv4 addresses.<br>
  *
  * @author B. Malinowsky
  */
@@ -120,30 +116,62 @@ public class KNXNetworkLinkIP extends AbstractLink
 	}
 
 	/**
-	 * Creates a new network link based on the KNXnet/IP protocol, using a
-	 * {@link KNXnetIPConnection}.
-	 * <p>
-	 * For more details on KNXnet/IP connections, refer to the various KNXnet/IP implementations.
+	 * Creates a new network link using the {@link KNXnetIPRouting} protocol, with the local endpoint specified by a
+	 * network interface.
 	 *
-	 * @param serviceMode mode of communication to open, <code>serviceMode</code> is one of the
-	 *        service mode constants (e.g. {@link #TUNNELING}); depending on the mode set, the
-	 *        expected local/remote endpoints might differ
+	 * @param netIf local network interface used to join the multicast group and for sending, use <code>null</code> for
+	 *        the host's default multicast interface
+	 * @param mcGroup address of the multicast group to join, use <code>null</code> for the default KNXnet/IP multicast
+	 *        address
+	 * @param settings medium settings defining device and medium specifics needed for communication
+	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
+	 */
+	public static KNXNetworkLinkIP newRoutingLink(final NetworkInterface netIf, final InetAddress mcGroup,
+		final KNXMediumSettings settings) throws KNXException
+	{
+		return new KNXNetworkLinkIP(ROUTING, new KNXnetIPRouting(netIf, mcGroup), settings);
+	}
+
+	/**
+	 * Creates a new network link using the {@link KNXnetIPRouting} protocol, with the local endpoint specified by an IP
+	 * address.
+	 *
+	 * @param localEP the IP address bound to a local network interface for joining the multicast group
+	 * @param mcGroup address of the multicast group to join, use <code>null</code> for the default KNXnet/IP multicast
+	 *        address
+	 * @param settings medium settings defining device and medium specifics needed for communication
+	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
+	 */
+	public static KNXNetworkLinkIP newRoutingLink(final InetAddress localEP, final InetAddress mcGroup,
+		final KNXMediumSettings settings) throws KNXException
+	{
+		try {
+			return newRoutingLink(NetworkInterface.getByInetAddress(localEP), mcGroup, settings);
+		}
+		catch (final SocketException e) {
+			throw new KNXException("error getting network interface: " + e.getMessage());
+		}
+	}
+
+	/**
+	 * Creates a new network link based on the KNXnet/IP protocol, using a {@link KNXnetIPConnection}.
+	 *
+	 * @param serviceMode mode of communication to open, <code>serviceMode</code> is one of the service mode constants
+	 *        (e.g. {@link #TUNNELING}); depending on the mode set, the expected local/remote endpoints might differ
 	 * @param localEP the local endpoint of the link to use;<br>
-	 *        - in tunneling mode (point-to-point), this is the client control endpoint, use
-	 *        <code>null</code> for the default local host and an ephemeral port number<br>
-	 *        - in {@link #ROUTING} mode, specifies the multicast interface, i.e., the local network
-	 *        interface is taken that has the IP address bound to it (if IP address is bound more
-	 *        than once, it's undefined which interface is returned), the port is not used; use
-	 *        <code>null</code> for <code>localEP</code> or an unresolved IP address to take the
-	 *        host's default multicast interface
+	 *        - in tunneling mode (point-to-point), this is the client control endpoint, use <code>null</code> for the
+	 *        default local host and an ephemeral port number<br>
+	 *        - in {@link #ROUTING} mode, specifies the multicast interface, i.e., the local network interface is taken
+	 *        that has the IP address bound to it (if IP address is bound more than once, it's undefined which interface
+	 *        is returned), the port is not used; use <code>null</code> for <code>localEP</code> or an unresolved IP
+	 *        address to take the host's default multicast interface
 	 * @param remoteEP the remote endpoint of the link to communicate with;<br>
 	 *        - in tunneling mode (point-to-point), this is the server control endpoint <br>
-	 *        - in {@link #ROUTING} mode, the IP address specifies the multicast group to join, the
-	 *        port is not used; use <code>null</code> for <code>remoteEP</code> or an unresolved IP
-	 *        address to take the default multicast group
-	 * @param useNAT <code>true</code> to use network address translation in tunneling service mode,
-	 *        <code>false</code> to use the default (non aware) mode; parameter is ignored for
-	 *        routing
+	 *        - in {@link #ROUTING} mode, the IP address specifies the multicast group to join, the port is not used;
+	 *        use <code>null</code> for <code>remoteEP</code> or an unresolved IP address to take the default multicast
+	 *        group
+	 * @param useNAT <code>true</code> to use network address translation in tunneling service mode, <code>false</code>
+	 *        to use the default (non aware) mode; parameter is ignored for routing
 	 * @param settings medium settings defining device and medium specifics needed for communication
 	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
 	 * @throws InterruptedException on interrupted thread while establishing link
