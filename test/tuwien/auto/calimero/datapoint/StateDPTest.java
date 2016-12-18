@@ -216,8 +216,8 @@ public class StateDPTest extends TestCase
 	}
 
 	/**
-	 * Test method for {@link tuwien.auto.calimero.datapoint.StateDP#add(
-	 * tuwien.auto.calimero.GroupAddress, boolean)}.
+	 * Test method for {@link StateDP#addUpdatingAddress(GroupAddress)} and
+	 * {@link StateDP#addInvalidatingAddress(GroupAddress)}.
 	 */
 	public final void testAdd()
 	{
