@@ -296,7 +296,7 @@ public abstract class Datapoint
 	@Override
 	public String toString()
 	{
-		return main.toString() + " '" + name + "', DPT main " + mainNo + " id "
+		return main.toString() + " '" + name + "', DPT" + (mainNo != 0 ? " main " + mainNo : "") + " id "
 				+ (dptId == null ? "-" : dptId) + ", " + priority.toString() + " priority";
 	}
 
