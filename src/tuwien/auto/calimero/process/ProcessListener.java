@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -162,7 +162,25 @@ public interface ProcessListener extends EventListener
 	}
 
 	/**
-	 * Returns the ASDU of the received process event as string datapoint value.
+	 * Returns the datapoint ASDU of the received process event, containing a value of DPT 9.x or 14.x, as either 2-byte
+	 * or 4-byte KNX floating point number.
+	 *
+	 * @param e the process event with the ASDU to translate
+	 * @return the received value of type double
+	 * @throws KNXFormatException on not supported or not available float DPT
+	 */
+	static double asFloat(final ProcessEvent e) throws KNXFormatException
+	{
+		final byte[] asdu = e.getASDU();
+		final DPTXlator t = asdu.length > 3 ? new DPTXlator4ByteFloat(DPTXlator4ByteFloat.DPT_TEMPERATURE_DIFFERENCE)
+				: new DPTXlator2ByteFloat(DPTXlator2ByteFloat.DPT_RAIN_AMOUNT);
+		t.setData(asdu);
+		return t.getNumericValue();
+	}
+
+	/**
+	 * Returns the ASDU of the received process event containing a value of DPT 16.001
+	 * ({@link DPTXlatorString#DPT_STRING_8859_1}), as string datapoint value.
 	 * <p>
 	 * The used character set is ISO-8859-1 (Latin 1), with an allowed string length of 14
 	 * characters.
