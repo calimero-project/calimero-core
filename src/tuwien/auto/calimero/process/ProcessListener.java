@@ -201,8 +201,26 @@ public interface ProcessListener extends EventListener
 	}
 
 	/**
-	 * Returns the ASDU of the received process event as datapoint value of the requested DPT in
+	 * Returns the ASDU of the received process event, containing a value of DPT <code>dptId</code>, translated as
 	 * String representation.
+	 * <p>
+	 * This method has to be invoked manually by the user (either in {@link #groupReadResponse(ProcessEvent)} or
+	 * {@link #groupWrite(ProcessEvent)}), depending on the received datapoint type.
+	 *
+	 * @param e the process event with the ASDU to translate
+	 * @param dptId datapoint type identifier specifying the value translation
+	 * @return the received value of the requested type as String representation
+	 * @throws KNXException on not supported or not available DPT
+	 * @see TranslatorTypes#createTranslator(int, String)
+	 */
+	static String asString(final ProcessEvent e, final String dptId) throws KNXException
+	{
+		return asString(e, 0, dptId);
+	}
+
+	/**
+	 * Returns the ASDU of the received process event, containing a value of <code>dptID</code>, as String
+	 * representation.
 	 * <p>
 	 * This method has to be invoked manually by the user (either in
 	 * {@link #groupReadResponse(ProcessEvent)} or {@link #groupWrite(ProcessEvent)}), depending on
