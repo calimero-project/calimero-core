@@ -42,27 +42,32 @@ import tuwien.auto.calimero.xml.XmlReader;
 /**
  * Represents an immutable KNX group address.
  * <p>
- * Both 2- and 3-level formats are supported. Available groups are<br>
+ * 2-level, 3-level, and free-style addresses are supported. The presentation styles are<br>
  * <ul>
  * <li>2-level group address: main/sub (5/11 bits)</li>
  * <li>3-level group address: main/middle/sub (5/3/8 bits)</li>
+ * <li>free-style group address: unstructured address (16 bits)</li>
  * </ul>
- * with separator of type '.' or '/'.<br>
- * By default, the 3-level group notation is used.
+ * all in decimal format, using '/' as separator if required.<br>
+ * By default, the 3-level preset is used.
  * <p>
- * Note, that the most significant bit of the main group (i.e., bit 15 in the unstructured
- * address) is reserved, but not in use for now. Hence this bit is not checked for, but
+ * Note, that the most significant bit of the main group, i.e., bit 15 in the unstructured
+ * address, is reserved, but not in use for now. This bit is not checked for, but
  * nevertheless stored and returned by this implementation.
  */
 public class GroupAddress extends KNXAddress
 {
 	static final String ATTR_GROUP = "group";
 
-	private static volatile boolean fmt3Level = true;
+	/** Supported address styles for group address presentation. */
+	public enum Presentation {
+		ThreeLevelStyle, TwoLevelStyle, FreeStyle,
+	}
+
+	private static volatile Presentation style = Presentation.ThreeLevelStyle;
 
 	/**
-	 * Creates a KNX group address from a 16 Bit address value.
-	 * <p>
+	 * Creates a KNX group address from a raw (or free-style) 16 Bit address value.
 	 *
 	 * @param address the address value in the range 0 &le; value &le; 0xFFFF
 	 */
@@ -73,7 +78,6 @@ public class GroupAddress extends KNXAddress
 
 	/**
 	 * Creates a KNX group address from the 3-level notation main-, middle- and sub-group.
-	 * <p>
 	 *
 	 * @param mainGroup main group value, in the range 0 &le; value &le; 0x1F
 	 * @param middleGroup middle group value, in the range 0 &le; value &le; 0x7
@@ -85,8 +89,7 @@ public class GroupAddress extends KNXAddress
 	}
 
 	/**
-	 * Creates a KNX group address from the 2-level notation main- and sub-group.
-	 * <p>
+	 * Creates a KNX group address from a 2-level presentation of main group and sub group.
 	 *
 	 * @param mainGroup main group value, in the range 0 &le; value &le; 0x1F
 	 * @param subGroup sub group value, in the range 0 &le; value &le; 0x7FF
@@ -110,15 +113,15 @@ public class GroupAddress extends KNXAddress
 	}
 
 	/**
-	 * Creates a KNX group address from a string <code>address</code> representation.
+	 * Creates a KNX group address from a string <code>address</code>.
 	 * <p>
-	 * The address string can either be formatted, e.g., "2/1/2", or the raw address, e.g., "4354".
-	 * A formatted address is a 2- or 3-level group address, the allowed separators are '.'
-	 * or '/', mutually exclusive.
+	 * The address string can use either presentation style, i.e., a 2-level, 3-level, or free-style group address. The
+	 * allowed separators are '.' or '/', mutually exclusive. Examples are "2/1/2" for a 3-level address, or "4354" for
+	 * a free-style or raw address.
 	 *
 	 * @param address string containing the KNX address
-	 * @throws KNXFormatException on unknown address type, wrong address syntax,
-	 *         group values out of range, or wrong separator used
+	 * @throws KNXFormatException on unknown address type, wrong address syntax, group values out of range, or wrong
+	 *         separator used
 	 */
 	public GroupAddress(final String address) throws KNXFormatException
 	{
@@ -149,20 +152,41 @@ public class GroupAddress extends KNXAddress
 	 * @param format3Level <code>true</code> for 3-level group format,
 	 *        <code>false</code> for 2-level group format
 	 */
+	@Deprecated
 	public static void setLevelPresentation(final boolean format3Level)
 	{
-		fmt3Level = format3Level;
+		style = format3Level ? Presentation.ThreeLevelStyle : Presentation.TwoLevelStyle;
+	}
+
+	/**
+	 * Presets the address presentation style for all KNX group addresses.
+	 * <p>
+	 * This preset only affects visual presentation and not internal operation, hence, it is a class setting.
+	 *
+	 * @param style address presentation style
+	 */
+	public static void addressStyle(final Presentation style)
+	{
+		GroupAddress.style = style;
+	}
+
+	/**
+	 * @return the address presentation style preset for all KNX group addresses
+	 */
+	public static Presentation addressStyle()
+	{
+		return style;
 	}
 
 	/**
 	 * Returns the current presentation of group addresses.
-	 * <p>
 	 *
 	 * @return <code>true</code> for 3-level formatting, <code>false</code> otherwise
 	 */
+	@Deprecated
 	public static boolean is3LevelPresentation()
 	{
-		return fmt3Level;
+		return style == Presentation.ThreeLevelStyle;
 	}
 
 	/**
@@ -215,9 +239,6 @@ public class GroupAddress extends KNXAddress
 		return address & 0x07FF;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.KNXAddress#getType()
-	 */
 	@Override
 	public final String getType()
 	{
@@ -225,25 +246,25 @@ public class GroupAddress extends KNXAddress
 	}
 
 	/**
-	 * Returns the address as string using the '/' separator.
-	 * <p>
-	 * Depending on {@link #is3LevelPresentation()}, the address is formatted in 2- or
-	 * 3-level group notation.
+	 * Returns the address as string, using the {@link #addressStyle()} preset with '/' as separator (if required).
 	 *
 	 * @return the address string
 	 */
 	@Override
 	public String toString()
 	{
-		if (fmt3Level)
-			return getMainGroup() + "/" + getMiddleGroup() + "/"
-				+ getSubGroup8();
-		return getMainGroup() + "/" + getSubGroup11();
+		switch (style) {
+		case ThreeLevelStyle:
+			return getMainGroup() + "/" + getMiddleGroup() + "/" + getSubGroup8();
+		case TwoLevelStyle:
+			return getMainGroup() + "/" + getSubGroup11();
+		default:
+			return Integer.toString(getRawAddress());
+		}
 	}
 
 	/**
 	 * Returns whether <code>obj</code> is equal to this KNX address (type).
-	 * <p>
 	 *
 	 * @param obj KNX address object
 	 * @return <code>true</code> iff <code>obj</code> is of this type and contains the
@@ -257,9 +278,6 @@ public class GroupAddress extends KNXAddress
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode()
 	{
