@@ -37,7 +37,10 @@
 package tuwien.auto.calimero.dptxlator;
 
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
@@ -166,6 +169,28 @@ public class DPTXlatorUtf8 extends DPTXlator
 	public final Map<String, DPT> getSubTypes()
 	{
 		return types;
+	}
+
+	@Override
+	public List<DPTXlator> split()
+	{
+		if (getItems() == 1)
+			return Collections.singletonList(this);
+
+		final List<DPTXlator> l = new ArrayList<>();
+		int from = 0;
+		for (int i = 0; i < data.length; i++) {
+			if (data[i] == 0) {
+				try {
+					l.add(new DPTXlatorUtf8(getType()));
+				}
+				catch (final KNXFormatException ignore) {}
+				final int to = i + 1;
+				l.get(l.size() - 1).data = Arrays.copyOfRange(data, from, to);
+				from = to;
+			}
+		}
+		return l;
 	}
 
 	/**

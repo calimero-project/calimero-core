@@ -36,8 +36,12 @@
 
 package tuwien.auto.calimero.dptxlator;
 
+import java.lang.reflect.Constructor;
 import java.util.AbstractCollection;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -370,6 +374,29 @@ public abstract class DPTXlator
 	public int getTypeSize()
 	{
 		return typeSize;
+	}
+
+	public List<DPTXlator> split()
+	{
+		if (getItems() > 1) {
+			final List<DPTXlator> l = new ArrayList<>();
+			final int size = Math.max(getTypeSize(), 1);
+			final byte[] range = new byte[size];
+			try {
+				final Constructor<? extends DPTXlator> c = getClass().getConstructor(DPT.class);
+				for (int offset = 0; offset < data.length; offset += size) {
+					for (int i = 0; i < size; i++)
+						range[i] = (byte) data[offset + i];
+
+					final DPTXlator t = c.newInstance(getType());
+					t.setData(range);
+					l.add(t);
+				}
+				return l;
+			}
+			catch (ReflectiveOperationException | IllegalArgumentException /*| SecurityException*/ e) {}
+		}
+		return Collections.singletonList(this);
 	}
 
 	/**
