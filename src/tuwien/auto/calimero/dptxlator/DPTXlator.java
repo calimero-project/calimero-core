@@ -367,7 +367,7 @@ public abstract class DPTXlator
 	 *
 	 * @return type size in bytes, 0 for types &lt;= 6 bits
 	 */
-	public final int getTypeSize()
+	public int getTypeSize()
 	{
 		return typeSize;
 	}

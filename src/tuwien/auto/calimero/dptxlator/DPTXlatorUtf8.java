@@ -157,6 +157,12 @@ public class DPTXlatorUtf8 extends DPTXlator
 	}
 
 	@Override
+	public final int getTypeSize()
+	{
+		return findOffsetFor(1, data);
+	}
+
+	@Override
 	public final Map<String, DPT> getSubTypes()
 	{
 		return types;
