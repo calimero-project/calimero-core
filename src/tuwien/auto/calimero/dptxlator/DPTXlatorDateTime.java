@@ -449,6 +449,12 @@ public class DPTXlatorDateTime extends DPTXlator
 		return fromDPTMilliseconds(0);
 	}
 
+	@Override
+	public double getNumericValue() throws KNXFormatException
+	{
+		return getValueMilliseconds();
+	}
+
 	/**
 	 * Sets date/time information for the given field of the first date/time item.
 	 * <p>

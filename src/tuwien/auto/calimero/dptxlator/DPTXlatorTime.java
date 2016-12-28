@@ -263,6 +263,12 @@ public class DPTXlatorTime extends DPTXlator
 	}
 
 	@Override
+	public double getNumericValue()
+	{
+		return getValueMilliseconds();
+	}
+
+	@Override
 	public void setData(final byte[] data, final int offset)
 	{
 		if (offset < 0 || offset > data.length)

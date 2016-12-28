@@ -222,6 +222,12 @@ public class DPTXlatorDate extends DPTXlator
 	}
 
 	@Override
+	public double getNumericValue() throws KNXFormatException
+	{
+		return getValueMilliseconds();
+	}
+
+	@Override
 	public void setData(final byte[] data, final int offset)
 	{
 		if (offset < 0 || offset > data.length)
