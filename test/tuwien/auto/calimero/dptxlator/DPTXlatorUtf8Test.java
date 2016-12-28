@@ -263,12 +263,9 @@ public class DPTXlatorUtf8Test extends TestCase
 	{
 		assertEquals(1, t.getTypeSize());
 		t.setValue(string1);
-		// XXX that's actually not intuitive
-		assertEquals(1, t.getTypeSize());
+		assertEquals(string1.length() + 1, t.getTypeSize());
 		t.setValues(strings);
-		assertEquals(1, t.getTypeSize());
-		//assertEquals(string1.length() + string2.length() + nonASCII.length() + nonLatin.length(),
-		//		xlator.getTypeSize());
+		assertEquals(strings[0].length() + 1, t.getTypeSize());
 	}
 
 	private void assertArrayEquals(final String[] exp, final String[] actual)
