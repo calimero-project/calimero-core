@@ -38,6 +38,7 @@ package tuwien.auto.calimero.dptxlator;
 
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -310,5 +311,13 @@ public class DPTXlatorDateTest extends TestCase
 			fail("invalid time");
 		}
 		catch (final KNXFormatException e) {}
+	}
+
+	public void testLocalDate()
+	{
+		final LocalDate date = t.localDate();
+		assertEquals(date.getYear(), t.getYear());
+		assertEquals(date.getMonthValue(), t.getMonth());
+		assertEquals(date.getDayOfMonth(), t.getDay());
 	}
 }

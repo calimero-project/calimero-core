@@ -38,6 +38,8 @@ package tuwien.auto.calimero.dptxlator;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -182,6 +184,16 @@ public class DPTXlatorDate extends DPTXlator
 	public final short getYear()
 	{
 		return absYear(data[YEAR]);
+	}
+
+	/**
+	 * @return the local date obtained from year, month, and day of the first translation item
+	 * @throws DateTimeException if the value of any field is out of range, or if the day-of-month is invalid for the
+	 *         month-year
+	 */
+	public final LocalDate localDate()
+	{
+		return LocalDate.of(getYear(), getMonth(), getDay());
 	}
 
 	/**
