@@ -156,36 +156,9 @@ public final class Settings
 		}
 	}
 
-	/**
-	 * This constant is for library internal use only: development mode identifier.
-	 */
-	public static final int DEV_MODE = 1;
-
-	/**
-	 * This constant is for library internal use only: deployed mode identifier.
-	 */
-	public static final int DEPLOY_MODE = 0;
-
-	/**
-	 * Library internal use only.
-	 * <p>
-	 * Used for development and debugging purposes, users of the library should not depend
-	 * on this function.
-	 * <p>
-	 * Querying library mode allows library functions to adapt its behavior, e.g.,
-	 * provide additional logging output.
-	 *
-	 * @return the current library mode
-	 */
-	public static int getLibraryMode()
-	{
-		return DEV_MODE;
-	}
-
 	// for now, this works by loading one class as representative from a bundle
 	// to check availability, then class name is truncated to bundle id
-	private static String getBundle(final String friendlyName, final String className,
-			final int truncate)
+	private static String getBundle(final String friendlyName, final String className, final int truncate)
 	{
 		try {
 			final ClassLoader cl = Settings.class.getClassLoader();
