@@ -645,7 +645,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Inactive(0, "inactive (no message sent)"),
 		SwitchOffSent(1, "Switch-Off message sent"),
 		SwitchOnSent(2, "Switch-On message sent"),
-		InfoOnOff(3, "inverse value of Info On/Off  is sent");
+		InfoOnOff(3, "inverse value of Info On/Off is sent");
 
 		SwitchPBAction(final int element, final String description)
 		{ //RP2
@@ -655,8 +655,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 
 	/** Light Dimming Sensor Basic Mode. */
 	public enum LdsbMode implements EnumBase<LdsbMode> {
-		OnePushButton(1,
-				"one push-button/binary input, Switch On/Off inverts on each transmission"),
+		OnePushButton(1, "one push-button/binary input, Switch On/Off inverts on each transmission"),
 		OnePushButtonDimUp(2, "one push-button/binary input, On/Dim-Up message sent"),
 		OnePushButtonDimDown(3, "one push-button/binary input, Off/Dim-Down message sent"),
 		TwoPushButtons(4, "two push-buttons/binary inputs mode");

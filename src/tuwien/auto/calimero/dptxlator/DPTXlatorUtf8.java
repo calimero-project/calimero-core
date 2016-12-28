@@ -63,7 +63,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * The default return value after creation is the empty string "" or 1 byte containing the
  * <i>NULL</i> (0x00) string termination character.<br>
  * Each character is encoded according the Unicode Transformation Format UTF-8, see
- * http://www.ietf.org/rfc/rfc3629.txt.<br>
+ * http://www.ietf.org/rfc/rfc3629.txt.
  */
 public class DPTXlatorUtf8 extends DPTXlator
 {
@@ -90,7 +90,6 @@ public class DPTXlatorUtf8 extends DPTXlator
 
 	/**
 	 * Creates a translator for the given datapoint type.
-	 * <p>
 	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
@@ -102,7 +101,6 @@ public class DPTXlatorUtf8 extends DPTXlator
 
 	/**
 	 * Creates a translator for the given datapoint type ID.
-	 * <p>
 	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptID</code>
@@ -114,9 +112,6 @@ public class DPTXlatorUtf8 extends DPTXlator
 		data = new short[1];
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#setValues(java.lang.String[])
-	 */
 	@Override
 	public void setValues(final String[] values) throws KNXFormatException
 	{
@@ -132,9 +127,6 @@ public class DPTXlatorUtf8 extends DPTXlator
 		items = values.length;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getAllValues()
-	 */
 	@Override
 	public String[] getAllValues()
 	{
@@ -144,18 +136,12 @@ public class DPTXlatorUtf8 extends DPTXlator
 		return buf;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#setValue(java.lang.String)
-	 */
 	@Override
 	public void setValue(final String value) throws KNXFormatException
 	{
 		setValues(new String[] { value });
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#setData(byte[], int)
-	 */
 	@Override
 	public void setData(final byte[] data, final int offset)
 	{
@@ -164,18 +150,12 @@ public class DPTXlatorUtf8 extends DPTXlator
 		toDPT(data, offset);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getItems()
-	 */
 	@Override
 	public int getItems()
 	{
 		return items;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
-	 */
 	@Override
 	public final Map<String, DPT> getSubTypes()
 	{
@@ -227,12 +207,8 @@ public class DPTXlatorUtf8 extends DPTXlator
 		countItems();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#toDPT(java.lang.String, short[], int)
-	 */
 	@Override
-	protected void toDPT(final String value, final short[] dst, final int index)
-		throws KNXFormatException
+	protected void toDPT(final String value, final short[] dst, final int index) throws KNXFormatException
 	{
 		final byte[] utfdata = toUtf8(value);
 		final int offset = findOffsetFor(index, dst);
@@ -248,8 +224,7 @@ public class DPTXlatorUtf8 extends DPTXlator
 		try {
 			final byte[] utfdata = value.getBytes("utf-8");
 			if (utfdata.length > maxLength - 1)
-				throw newException("UTF-8 string exceeds translator limit of " + maxLength
-						+ " bytes", value);
+				throw newException("UTF-8 string exceeds translator limit of " + maxLength + " bytes", value);
 			return utfdata;
 		}
 		catch (final UnsupportedEncodingException e) {

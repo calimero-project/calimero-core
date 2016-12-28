@@ -643,9 +643,6 @@ public class DPTXlatorDateTime extends DPTXlator
 		extFormat = extended;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
-	 */
 	@Override
 	public Map<String, DPT> getSubTypes()
 	{

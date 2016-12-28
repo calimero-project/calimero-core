@@ -153,7 +153,6 @@ public abstract class DPTXlator
 		}
 	}
 
-
 	/**
 	 * Returns all translation items as strings currently contained in this translator.
 	 * <p>

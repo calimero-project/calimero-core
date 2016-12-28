@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -245,13 +245,13 @@ public class DPTXlator3BitControlled extends DPTXlator
 	}
 
 	/**
-	 * Sets the stop code for the first translation item.
+	 * Sets the step code for the first translation item.
 	 * <p>
 	 * The stepcode is the encoded representation of the number of intervals. A stepcode
 	 * of 0 is used for step break indication.<br>
 	 * This method does not reset other item data or discard other translation items.
 	 *
-	 * @param value the stepcode, 0 &lt;= value &lt;= 7
+	 * @param value the stepcode, 0 &lt;= value &lt;= 7, 0 is step break indication
 	 * @see #setIntervals(int)
 	 */
 	public final void setStepCode(final int value)
@@ -281,8 +281,8 @@ public class DPTXlator3BitControlled extends DPTXlator
 	 * get divided.<br>
 	 * The value of <code>numberOfIntervals</code> is rounded to the nearest intervals
 	 * representable with a stepcode. A specified value exactly in between two
-	 * representable intervals is rounded off (e.g 48 rounded of to 32, 3 rounded of to
-	 * 2).<br>
+	 * representable intervals is rounded off, e.g., 48 is rounded off to 32, 3 is rounded off to
+	 * 2.<br>
 	 * This method does not reset other item data or discard other translation items.
 	 *
 	 * @param numberOfIntervals desired intervals, 1 &lt;= intervals &lt;= 64

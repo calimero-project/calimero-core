@@ -80,7 +80,6 @@ public abstract class UdpSocketLooper
 
 	/**
 	 * Creates a socket looper for the supplied UDP socket and timeout parameters.
-	 * <p>
 	 *
 	 * @param socket the UDP socket to loop on
 	 * @param closeSocket <code>true</code> to close the socket on {@link #quit()},
@@ -102,7 +101,6 @@ public abstract class UdpSocketLooper
 
 	/**
 	 * Runs the looper.
-	 * <p>
 	 *
 	 * @throws IOException
 	 */

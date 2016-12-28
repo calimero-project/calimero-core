@@ -179,9 +179,6 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		lnk.addLinkListener(lnkListener);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#setResponseTimeout(int)
-	 */
 	@Override
 	public void setResponseTimeout(final int timeout)
 	{
@@ -190,58 +187,36 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		responseTimeout = timeout;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#getResponseTimeout()
-	 */
 	@Override
 	public int getResponseTimeout()
 	{
 		return responseTimeout;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#setPriority
-	 * (tuwien.auto.calimero.Priority)
-	 */
 	@Override
 	public void setPriority(final Priority p)
 	{
 		priority = p;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#getPriority()
-	 */
 	@Override
 	public Priority getPriority()
 	{
 		return priority;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#addProcessListener
-	 * (tuwien.auto.calimero.process.ProcessListener)
-	 */
 	@Override
 	public void addProcessListener(final ProcessListener l)
 	{
 		listeners.add(l);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#removeProcessListener
-	 * (tuwien.auto.calimero.process.ProcessListener)
-	 */
 	@Override
 	public void removeProcessListener(final ProcessListener l)
 	{
 		listeners.remove(l);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#readBool
-	 * (tuwien.auto.calimero.GroupAddress)
-	 */
 	@Override
 	public boolean readBool(final GroupAddress dst) throws KNXTimeoutException, KNXRemoteException,
 		KNXLinkClosedException, KNXFormatException, InterruptedException
@@ -252,10 +227,6 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		return t.getValueBoolean();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#write
-	 * (tuwien.auto.calimero.GroupAddress, boolean)
-	 */
 	@Override
 	public void write(final GroupAddress dst, final boolean value)
 		throws KNXTimeoutException, KNXLinkClosedException
@@ -268,10 +239,6 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		catch (final KNXFormatException ignore) {}
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#readUnsigned
-	 * (tuwien.auto.calimero.GroupAddress, java.lang.String)
-	 */
 	@Override
 	public int readUnsigned(final GroupAddress dst, final String scale) throws KNXTimeoutException,
 		KNXRemoteException, KNXLinkClosedException, KNXFormatException, InterruptedException
@@ -282,10 +249,6 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		return t.getValueUnsigned();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#write
-	 * (tuwien.auto.calimero.GroupAddress, int, java.lang.String)
-	 */
 	@Override
 	public void write(final GroupAddress dst, final int value, final String scale)
 		throws KNXTimeoutException, KNXFormatException, KNXLinkClosedException
@@ -295,10 +258,6 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		write(dst, priority, t);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#readControl
-	 * (tuwien.auto.calimero.GroupAddress)
-	 */
 	@Override
 	public int readControl(final GroupAddress dst) throws KNXTimeoutException, KNXRemoteException,
 		KNXLinkClosedException, KNXFormatException, InterruptedException
@@ -310,10 +269,6 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		return t.getValueSigned();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#write
-	 * (tuwien.auto.calimero.GroupAddress, boolean, byte)
-	 */
 	@Override
 	public void write(final GroupAddress dst, final boolean control, final int stepcode)
 		throws KNXTimeoutException, KNXFormatException, KNXLinkClosedException
@@ -324,32 +279,22 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		write(dst, priority, t);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicationBase#write
-	 * (tuwien.auto.calimero.GroupAddress, float, boolean)
-	 */
 	@Override
 	public void write(final GroupAddress dst, final float value, final boolean use4ByteFloat)
 		throws KNXTimeoutException, KNXFormatException, KNXLinkClosedException
 	{
 		if (use4ByteFloat) {
-			final DPTXlator4ByteFloat t = new DPTXlator4ByteFloat(
-					DPTXlator4ByteFloat.DPT_TEMPERATURE_DIFFERENCE);
+			final DPTXlator4ByteFloat t = new DPTXlator4ByteFloat(DPTXlator4ByteFloat.DPT_TEMPERATURE_DIFFERENCE);
 			t.setValue(value);
 			write(dst, priority, t);
 		}
 		else {
-			final DPTXlator2ByteFloat t = new DPTXlator2ByteFloat(
-					DPTXlator2ByteFloat.DPT_RAIN_AMOUNT);
+			final DPTXlator2ByteFloat t = new DPTXlator2ByteFloat(DPTXlator2ByteFloat.DPT_RAIN_AMOUNT);
 			t.setValue(value);
 			write(dst, priority, t);
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#readFloat
-	 * (tuwien.auto.calimero.GroupAddress, boolean)
-	 */
 	@Override
 	public double readFloat(final GroupAddress dst, final boolean is4ByteFloat)
 		throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException, KNXFormatException,
@@ -364,10 +309,6 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		return t.getNumericValue();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#readString
-	 * (tuwien.auto.calimero.GroupAddress)
-	 */
 	@Override
 	public String readString(final GroupAddress dst) throws KNXTimeoutException, KNXRemoteException,
 		KNXLinkClosedException, KNXFormatException, InterruptedException
@@ -378,10 +319,6 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		return t.getValue();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#write
-	 * (tuwien.auto.calimero.GroupAddress, java.lang.String)
-	 */
 	@Override
 	public void write(final GroupAddress dst, final String value)
 		throws KNXTimeoutException, KNXFormatException, KNXLinkClosedException
@@ -391,10 +328,6 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		write(dst, priority, t);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#write
-	 * (tuwien.auto.calimero.GroupAddress, tuwien.auto.calimero.dptxlator.DPTXlator)
-	 */
 	@Override
 	public void write(final GroupAddress dst, final DPTXlator value)
 		throws KNXTimeoutException, KNXLinkClosedException
@@ -419,10 +352,6 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		return t.getValue();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#write
-	 * (tuwien.auto.calimero.datapoint.Datapoint, java.lang.String)
-	 */
 	@Override
 	public void write(final Datapoint dp, final String value) throws KNXException
 	{
@@ -431,9 +360,6 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		write(dp.getMainAddress(), dp.getPriority(), t);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.process.ProcessCommunicator#detach()
-	 */
 	@Override
 	public KNXNetworkLink detach()
 	{
