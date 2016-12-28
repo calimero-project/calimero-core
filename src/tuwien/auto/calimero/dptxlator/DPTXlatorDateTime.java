@@ -119,17 +119,12 @@ public class DPTXlatorDateTime extends DPTXlator
 	public static final int DAY_OF_WEEK = 3;
 
 	/**
-	 * Field number for <code>get</code> and <code>set</code> indicating whether the
-	 * work-day field is used; furthermore it is used to change the corresponding work-day
-	 * value.
+	 * Field number for <code>get</code> and <code>set</code> indicating whether the work-day field is used.
 	 * <p>
-	 * The work-day information can be specified in string values by using "workday" to
-	 * denote a working day.
+	 * The work-day information can be specified in string values by using "workday" to denote a working day.
 	 *
 	 * @see #setValidField(int, boolean)
 	 * @see #isValidField(int)
-	 * @see #setDateTimeFlag(int, boolean)
-	 * @see #getDateTimeFlag(int)
 	 */
 	public static final int WORKDAY = 4;
 
@@ -145,32 +140,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * @see #setDateTimeFlag(int, boolean)
 	 * @see #getDateTimeFlag(int)
 	 */
-	public static final int DAYLIGHT = 5;
-
-	/**
-	 * Field number to query or change the clock fault information.
-	 * <p>
-	 * A clock fault indicates one or more corrupted date/time fields, for example due to
-	 * power down of device, not configured clock, no reception of synchronization
-	 * message, ... .
-	 *
-	 * @see #setDateTimeFlag(int, boolean)
-	 * @see #getDateTimeFlag(int)
-	 */
-	public static final int CLOCK_FAULT = 6;
-
-	/**
-	 * Field number to query or change the external clock synchronization signal
-	 * information.
-	 * <p>
-	 * In string values, this information can be specified by using "in sync" or "no sync"
-	 * to set clock synchronization. Omitting this information defaults to no external
-	 * clock synchronization signal.
-	 *
-	 * @see #setDateTimeFlag(int, boolean)
-	 * @see #getDateTimeFlag(int)
-	 */
-	public static final int CLOCK_SYNC = 7;
+	private static final int DAYLIGHT = 5;
 
 	/**
 	 * Minimum year representable by this type, year = {@value #MIN_YEAR}.
@@ -452,72 +422,92 @@ public class DPTXlatorDateTime extends DPTXlator
 	}
 
 	/**
-	 * Sets date/time information for the given field of the first date/time item.
-	 * <p>
-	 * Allowed fields are {@link #CLOCK_FAULT}, {@link #CLOCK_SYNC}, {@link #WORKDAY}
-	 * and {@link #DAYLIGHT}.<br>
-	 * This method does not reset other item data or discard other translation items.
-	 *
-	 * @param field field number
-	 * @param value <code>true</code> to set the information flag, <code>false</code>
-	 *        to clear
-	 */
-	public final void setDateTimeFlag(final int field, final boolean value)
-	{
-		if (field == CLOCK_SYNC) {
-			setBitEx(0, QUALITY, value);
-			return;
-		}
-		final int f = field - WORKDAY;
-		if (f < 0 || f >= FLAG_MASKS.length)
-			throw new KNXIllegalArgumentException("illegal field");
-		setBit(0, FLAG_MASKS[f], value);
-	}
-
-	/**
-	 * Returns the information value of <code>field</code>.
-	 * <p>
-	 * Allowed fields are {@link #CLOCK_FAULT}, {@link #CLOCK_SYNC}, {@link #WORKDAY}
-	 * and {@link #DAYLIGHT}.
-	 *
-	 * @param field field number to query
-	 * @return the field value as boolean, <code>true</code> if set, <code>false</code>
-	 *         otherwise
-	 */
-	public final boolean getDateTimeFlag(final int field)
-	{
-		return getDateTimeFlag(0, field);
-	}
-
-	/**
 	 * Sets the clock fault information field of the first date/time item.
 	 * <p>
-	 * Equal to invoking {@link #setDateTimeFlag(int, boolean)} with field
-	 * {@link #CLOCK_FAULT}.<br>
+	 * A clock fault indicates one or more corrupted date/time fields, for example due to power-down of the KNX
+	 * device, a not configured clock, or no reception of synchronization message.
+	 * <p>
 	 * This method does not reset other item data or discard other translation items.
 	 *
-	 * @param fault <code>true</code> if clock is faulty, <code>false</code> otherwise
-	 * @see #setDateTimeFlag(int, boolean)
-	 * @see #CLOCK_FAULT
+	 * @param faulty <code>true</code> if clock is faulty, <code>false</code> otherwise
 	 */
-	public final void setFaultyClock(final boolean fault)
+	public final void setFaultyClock(final boolean faulty)
 	{
-		setBit(0, FAULT, fault);
+		setBit(0, FAULT, faulty);
 	}
 
 	/**
-	 * Returns whether the date/time information is marked as corrupted.
+	 * Returns whether the date/time information is marked as corrupted, to be checked before accessing further
+	 * date/time information to assure correct values.
 	 * <p>
-	 * It should always queried first, before accessing further date/time information, to
-	 * assure correct values.
+	 * A clock fault indicates one or more corrupted date/time fields, for example due to power-down of the KNX
+	 * device, a not configured clock, or no reception of synchronization message.
 	 *
 	 * @return <code>true</code> on clock fault, <code>false</code> otherwise
-	 * @see #getDateTimeFlag(int)
-	 * @see #CLOCK_FAULT
 	 */
 	public final boolean isFaultyClock()
 	{
 		return isBitSet(0, FAULT);
+	}
+
+	/**
+	 * Sets an externally synchronized clock for the first date/time item.
+	 *
+	 * @param externalSync <code>true</code> if externally synchronized clock, <code>false</code> otherwise
+	 */
+	public final void setClockSync(final boolean externalSync)
+	{
+		setBitEx(0, QUALITY, externalSync);
+	}
+
+	/**
+	 * Returns whether the clock reading used for the date/time information comes from an externally synchronized clock.
+	 *
+	 * @return <code>true</code> if clock uses external synchronization, <code>false</code> otherwise
+	 */
+	public final boolean isSyncClock()
+	{
+		return isBitSetEx(0, QUALITY);
+	}
+
+	/**
+	 * Sets workday information for the first date/time item.
+	 *
+	 * @param workday <code>true</code> to mark date as workday, <code>false</code> otherwise
+	 */
+	public final void setWorkday(final boolean workday)
+	{
+		setBit(0, WD, workday);
+	}
+
+	/**
+	 * @return <code>true</code> if date/time information is marked as working day, <code>false</code> otherwise
+	 */
+	public final boolean isWorkday()
+	{
+		return getDateTimeFlag(0, WORKDAY);
+	}
+
+	/**
+	 * Sets daylight saving time (DST) for the first date/time item; this setting does not affect any time field
+	 * information.
+	 *
+	 * @param dst <code>true</code> if daylight saving time is used, <code>false</code> otherwise
+	 */
+	public final void setDst(final boolean dst)
+	{
+		setBit(0, DST, dst);
+	}
+
+	/**
+	 * Returns whether time information is corrected for daylight saving time (DST).
+	 *
+	 * @return <code>true</code> if daylight saving time (DST) is used, <code>false</code> otherwise; any DST offset is
+	 *         already considered for time, i.e., the hour field contains the already adjusted value
+	 */
+	public final boolean isDst()
+	{
+		return getDateTimeFlag(0, DAYLIGHT);
 	}
 
 	/**
@@ -743,8 +733,6 @@ public class DPTXlatorDateTime extends DPTXlator
 
 	private boolean getDateTimeFlag(final int index, final int field)
 	{
-		if (field == CLOCK_SYNC)
-			return isBitSetEx(index, QUALITY);
 		final int f = field - WORKDAY;
 		if (f < 0 || f >= FLAG_MASKS.length)
 			throw new KNXIllegalArgumentException("illegal field");

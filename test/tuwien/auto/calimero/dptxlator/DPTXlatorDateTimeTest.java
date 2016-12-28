@@ -157,19 +157,17 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertEquals(8, t.getMonth());
 		assertEquals(27, t.getDay());
 		checkTime(12, 45, 33);
-		assertTrue(t.getDateTimeFlag(DPTXlatorDateTime.DAYLIGHT));
-		assertTrue(t.getDateTimeFlag(DPTXlatorDateTime.CLOCK_SYNC));
-		assertTrue(t.getDateTimeFlag(DPTXlatorDateTime.WORKDAY));
+		assertTrue(t.isDst());
+		assertTrue(t.isSyncClock());
+		assertTrue(t.isWorkday());
 
 		t.setData(new byte[] { 107, 8, 31, (byte) ((5 << 5) | 22), 45, 33, 0x41, (byte) 0x80 });
 		dataHelperThrow(new byte[] { 107, 8, 0, (byte) ((5 << 5) | 22), 45, 33, 0x41, (byte) 0x80 });
 		dataHelperThrow(new byte[] { 107, 0, 30, (byte) ((5 << 5) | 22), 45, 33, 0x41, (byte) 0x80 });
 		dataHelperThrow(new byte[] { 107, 13, 30, (byte) ((5 << 5) | 22), 45, 33, 0x41, (byte) 0x80 });
 		dataHelperThrow(new byte[] { 107, 5, 30, (byte) ((5 << 5) | 24), 45, 33, 0x41, (byte) 0x80 });
-		t.setData(new byte[] { 107, 9, 30, (byte) ((5 << 5) | 22), 1 << 6 | 62, 40, 0x43,
-			(byte) 0x80 });
-		dataHelperThrow(new byte[] { 107, 9, 30, (byte) ((5 << 5) | 22), 1 << 6 | 62, 40, 0x41,
-			(byte) 0x80 });
+		t.setData(new byte[] { 107, 9, 30, (byte) ((5 << 5) | 22), 1 << 6 | 62, 40, 0x43, (byte) 0x80 });
+		dataHelperThrow(new byte[] { 107, 9, 30, (byte) ((5 << 5) | 22), 1 << 6 | 62, 40, 0x41, (byte) 0x80 });
 	}
 
 	private void dataHelperThrow(final byte[] data)
@@ -352,15 +350,15 @@ public class DPTXlatorDateTimeTest extends TestCase
 	public final void testSetWorkday()
 	{
 		assertFalse(t.isValidField(DPTXlatorDateTime.WORKDAY));
-		assertFalse(t.getDateTimeFlag(DPTXlatorDateTime.WORKDAY));
-		t.setDateTimeFlag(DPTXlatorDateTime.WORKDAY, true);
+		assertFalse(t.isWorkday());
+		t.setWorkday(true);
 		t.setValidField(DPTXlatorDateTime.WORKDAY, true);
 		assertTrue(t.isValidField(DPTXlatorDateTime.WORKDAY));
-		assertTrue(t.getDateTimeFlag(DPTXlatorDateTime.WORKDAY));
-		t.setDateTimeFlag(DPTXlatorDateTime.WORKDAY, false);
+		assertTrue(t.isWorkday());
+		t.setWorkday(false);
 		t.setValidField(DPTXlatorDateTime.WORKDAY, false);
 		assertFalse(t.isValidField(DPTXlatorDateTime.WORKDAY));
-		assertFalse(t.getDateTimeFlag(DPTXlatorDateTime.WORKDAY));
+		assertFalse(t.isWorkday());
 	}
 
 	/**
@@ -518,11 +516,11 @@ public class DPTXlatorDateTimeTest extends TestCase
 	 */
 	public final void testSetDaylightTime()
 	{
-		assertFalse(t.getDateTimeFlag(DPTXlatorDateTime.DAYLIGHT));
-		t.setDateTimeFlag(DPTXlatorDateTime.DAYLIGHT, true);
-		assertTrue(t.getDateTimeFlag(DPTXlatorDateTime.DAYLIGHT));
-		t.setDateTimeFlag(DPTXlatorDateTime.DAYLIGHT, false);
-		assertFalse(t.getDateTimeFlag(DPTXlatorDateTime.DAYLIGHT));
+		assertFalse(t.isDst());
+		t.setDst(true);
+		assertTrue(t.isDst());
+		t.setDst(false);
+		assertFalse(t.isDst());
 	}
 
 	/**
@@ -530,11 +528,11 @@ public class DPTXlatorDateTimeTest extends TestCase
 	 */
 	public final void testSetQualityOfClock()
 	{
-		assertFalse(t.getDateTimeFlag(DPTXlatorDateTime.CLOCK_SYNC));
-		t.setDateTimeFlag(DPTXlatorDateTime.CLOCK_SYNC, true);
-		assertTrue(t.getDateTimeFlag(DPTXlatorDateTime.CLOCK_SYNC));
-		t.setDateTimeFlag(DPTXlatorDateTime.CLOCK_SYNC, false);
-		assertFalse(t.getDateTimeFlag(DPTXlatorDateTime.CLOCK_SYNC));
+		assertFalse(t.isSyncClock());
+		t.setClockSync(true);
+		assertTrue(t.isSyncClock());
+		t.setClockSync(false);
+		assertFalse(t.isSyncClock());
 	}
 
 	/**
@@ -661,11 +659,11 @@ public class DPTXlatorDateTimeTest extends TestCase
 	public final void testInDaylightTime() throws KNXFormatException
 	{
 		t.setValue(value);
-		assertTrue(t.getDateTimeFlag(DPTXlatorDateTime.DAYLIGHT));
+		assertTrue(t.isDst());
 		t.setData(data2);
-		assertTrue(t.getDateTimeFlag(DPTXlatorDateTime.DAYLIGHT));
+		assertTrue(t.isDst());
 		t.setValue(time);
-		assertFalse(t.getDateTimeFlag(DPTXlatorDateTime.DAYLIGHT));
+		assertFalse(t.isDst());
 	}
 
 	/**
@@ -676,13 +674,13 @@ public class DPTXlatorDateTimeTest extends TestCase
 	public final void testHasExternalSyncSignal() throws KNXFormatException
 	{
 		t.setValue(value);
-		assertTrue(t.getDateTimeFlag(DPTXlatorDateTime.CLOCK_SYNC));
+		assertTrue(t.isSyncClock());
 		t.setData(data);
-		assertTrue(t.getDateTimeFlag(DPTXlatorDateTime.CLOCK_SYNC));
+		assertTrue(t.isSyncClock());
 		t.setValue(value2);
-		assertFalse(t.getDateTimeFlag(DPTXlatorDateTime.CLOCK_SYNC));
+		assertFalse(t.isSyncClock());
 		t.setData(data2);
-		assertFalse(t.getDateTimeFlag(DPTXlatorDateTime.CLOCK_SYNC));
+		assertFalse(t.isSyncClock());
 	}
 
 	/**
@@ -690,13 +688,13 @@ public class DPTXlatorDateTimeTest extends TestCase
 	 */
 	public final void testIsWorkday()
 	{
-		assertFalse(t.getDateTimeFlag(DPTXlatorDateTime.WORKDAY));
-		t.setDateTimeFlag(DPTXlatorDateTime.WORKDAY, true);
-		assertTrue(t.getDateTimeFlag(DPTXlatorDateTime.WORKDAY));
-		t.setDateTimeFlag(DPTXlatorDateTime.WORKDAY, true);
-		assertTrue(t.getDateTimeFlag(DPTXlatorDateTime.WORKDAY));
-		t.setDateTimeFlag(DPTXlatorDateTime.WORKDAY, false);
-		assertFalse(t.getDateTimeFlag(DPTXlatorDateTime.WORKDAY));
+		assertFalse(t.isWorkday());
+		t.setWorkday(true);
+		assertTrue(t.isWorkday());
+		t.setWorkday(true);
+		assertTrue(t.isWorkday());
+		t.setWorkday(false);
+		assertFalse(t.isWorkday());
 	}
 
 	/**
@@ -710,8 +708,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 		t.setValue(c.getTimeInMillis());
 		assertTrue(t.validate());
 
-		t.setDateTimeFlag(DPTXlatorDateTime.DAYLIGHT, !t
-			.getDateTimeFlag(DPTXlatorDateTime.DAYLIGHT));
+		t.setDst(!t.isDst());
 		assertFalse(t.validate());
 
 		t.setValue(c.getTimeInMillis());
@@ -729,8 +726,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 		else
 			t.setValues(new String[] { "2002/12/31 23:59:59", "Sat, 2007/5/12 24:00:00 ", "2007/2/28 in sync" });
 		assertTrue(t.validate());
-		t.setValues(new String[] { "2002/12/31 23:59:59",
-			"Sat, 2007/5/12 24:00:00 DST ", "2007/2/29" });
+		t.setValues(new String[] { "2002/12/31 23:59:59", "Sat, 2007/5/12 24:00:00 DST ", "2007/2/29" });
 		assertFalse(t.validate());
 	}
 
