@@ -360,6 +360,23 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		write(dp.getMainAddress(), dp.getPriority(), t);
 	}
 
+	public double readNumeric(final Datapoint dp) throws KNXException, InterruptedException
+	{
+		final byte[] apdu = readFromGroup(dp.getMainAddress(), dp.getPriority(), 0, 8);
+		if (dp.getMainNumber() == 0 && dp.getDPT() == null) {
+			apdu[1] &= 0x3f;
+			// we're parsing the asdu as signed long
+			long l = 0;
+			final int offset = apdu.length == 2 ? 1 : 2;
+			for (int i = offset; i < apdu.length; i++)
+				l = (l << 8) + (apdu[i] & 0xff);
+			return l;
+		}
+		final DPTXlator t = TranslatorTypes.createTranslator(dp.getMainNumber(), dp.getDPT());
+		extractGroupASDU(apdu, t);
+		return t.getNumericValue();
+	}
+
 	@Override
 	public KNXNetworkLink detach()
 	{
