@@ -499,14 +499,17 @@ public final class TranslatorTypes
 	 */
 	public static DPTXlator createTranslator(final int mainNumber, final String dptID) throws KNXException
 	{
+		int main = 0;
 		try {
-			final int main = getMainNumber(mainNumber, dptID);
-			final MainType type = map.get(main);
-			if (type != null)
-				return type.createTranslator(dptID);
+			main = getMainNumber(mainNumber, dptID);
 		}
 		catch (final NumberFormatException e) {}
-		throw new KNXException("main number not found for " + dptID);
+		final MainType type = map.get(main);
+		if (type == null)
+			throw new KNXException("no DPT translator available for main number " + main + " (ID " + dptID + ")");
+
+		final String id = dptID != null ? dptID : type.getSubTypes().entrySet().iterator().next().getKey();
+		return type.createTranslator(id);
 	}
 
 	/**
