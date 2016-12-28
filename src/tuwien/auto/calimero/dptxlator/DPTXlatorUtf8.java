@@ -215,7 +215,7 @@ public class DPTXlatorUtf8 extends DPTXlator
 		for (int i = 0; i < utfdata.length; ++i)
 			dst[offset + i] = ubyte(utfdata[i]);
 		// ensure we are NULL terminated
-		if (utfdata[utfdata.length - 1] != 0)
+		if (utfdata.length == 0 || utfdata[utfdata.length - 1] != 0)
 			dst[offset + utfdata.length] = 0;
 	}
 
