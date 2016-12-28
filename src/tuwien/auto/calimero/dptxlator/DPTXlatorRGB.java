@@ -190,9 +190,12 @@ public class DPTXlatorRGB extends DPTXlator {
 									+ " in", value);
 						}
 					}
-					else
-						throw new KNXIllegalArgumentException("expected number after "
-								+ componentID + ":");
+					else {
+						// parse rgb string without component prefix, accept hex/octal/decimal number
+						final int v = Short.decode(componentID);
+						@SuppressWarnings("unused")
+						final int unused = count == 0 ? (r = v) : count == 1 ? (g = v) : (b = v);
+					}
 				}
 				else
 					throw new KNXIllegalArgumentException("expected component identifier "
