@@ -48,23 +48,27 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * Translator for KNX DPTs with main number 19, type <b>date with time</b>.
  * <p>
  * The KNX data type width is 8 bytes.<br>
- * The type contains date information (month, day of month, day of week), time information
- * (hour, minute, second), additional time information (work-day, daylight saving time
- * (DST)) and clock information (faulty clock, external clock synchronization signal). The
- * field usage of work-day, year, date, time, day of week field is optional. <br>
- * By default, on setting date/time information, only general range checks are performed,
- * no check is done whether the information corresponds to a valid calendar time (see
- * {@link #validate()}. All field-methods behave in non-lenient time value mode, i.e., no
- * value overflow is allowed and values are not normalized or adjusted using the next,
- * larger field. (e.g. February 29th will not result in March 1st on no leap year).<br>
- * This type permits the hour set to 24 (with minute and second only valid if 0),
- * representing midnight of the old day, to handle time information used in schedule
- * programs.
+ * The type contains date information (month, day of month, day of week), time information (hour, minute, second),
+ * additional time information (work-day, daylight saving time (DST)) and clock information (faulty clock, external
+ * clock synchronization signal). The field usage of work-day, year, date, time, day of week field is optional. <br>
+ * By default, on setting date/time information, only general range checks are performed, no check is done whether the
+ * information corresponds to a valid calendar time (see {@link #validate()}. All field-methods behave in non-lenient
+ * time value mode, i.e., no value overflow is allowed and values are not normalized or adjusted using the next, larger
+ * field. For example, February 29th will not result in March 1st on no leap year.<br>
+ * This type permits the hour set to 24 (with minute and second only valid if 0), representing midnight of the old day,
+ * to handle time information used in schedule programs.
  * <p>
- * The default return value after creation is the calendar value equal to
- * <code>1900/1/1 00:00:00</code> (year/month/day hh:mm:ss), no clock fault, not in
- * daylight saving time, no external clock synchronization signal, day of week and work
- * day fields are not used.
+ * The default return value after creation is the calendar value equal to <code>1900/1/1 00:00:00</code> (year/month/day
+ * hh:mm:ss), no clock fault, not in daylight saving time, no external clock synchronization signal, day of week and
+ * work day fields are not used.
+ * <p>
+ * The methods {@link #setValue(String)} and {@link #setValues(String[])} support the following information in
+ * addition to date/time information:
+ * <ul>
+ * <li>external clock synchronization: use "in sync" or "no sync" (defaults to no external clock synchronization)</li>
+ * <li>daylight saving time: use "DST" to indicate daylight saving time (defaults to no DST)</li>
+ * <li>workday: use "workday" to mark date as workday (by default, workday information is not used)</li>
+ * </ul>
  *
  * @author B. Malinowsky
  */
@@ -73,12 +77,10 @@ public class DPTXlatorDateTime extends DPTXlator
 	public static final String Description = "Date with Time";
 
 	/**
-	 * DPT ID 19.001, Date with time; values from <b>1900, 01/01 00:00:00</b> to
-	 * <b>2155, 12/31 24:00:00</b>.
+	 * DPT ID 19.001, Date with time; values from <b>1900/01/01 00:00:00</b> to <b>2155/12/31 24:00:00</b>.
 	 */
-	public static final DPT DPT_DATE_TIME =
-		new DPT("19.001", "Date with time", "1900, 01/01 00:00:00",
-			"2155, 12/31 24:00:00", "yr/mth/day hr:min:sec");
+	public static final DPT DPT_DATE_TIME = new DPT("19.001", "Date with time", "1900/01/01 00:00:00",
+			"2155/12/31 24:00:00", "yr/mth/day hr:min:sec");
 
 	/**
 	 * Field number for <code>get</code> and <code>set</code> indicating whether the
@@ -191,10 +193,8 @@ public class DPTXlatorDateTime extends DPTXlator
 	private static final String WORKDAY_SIGN = "workday";
 	private static final String SYNC_SIGN = "sync";
 
-	private static final String[] DAYS =
-		{ "Any day", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
-	private static final String[] FIELDS =
-		{ "year", "month", "day", "hour", "minute", "second" };
+	private static final String[] DAYS = { "Any day", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+	private static final String[] FIELDS = { "year", "month", "day", "hour", "minute", "second" };
 	private static final int[] MIN_VALUES = { MIN_YEAR, 1, 1, 0, 0, 0, 0 };
 	private static final int[] MAX_VALUES = { MAX_YEAR, 12, 31, 24, 59, 59, 7 };
 
@@ -240,8 +240,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * Creates a translator for the given datapoint type ID.
 	 *
 	 * @param dptID available implemented datapoint type ID
-	 * @throws KNXFormatException on wrong formatted or not expected (available)
-	 *         <code>dptID</code>
+	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptID</code>
 	 */
 	public DPTXlatorDateTime(final String dptID) throws KNXFormatException
 	{
@@ -250,9 +249,6 @@ public class DPTXlatorDateTime extends DPTXlator
 		data = new short[] { 0, 1, 1, 0, 0, 0, NO_WD | NO_DOW, 0 };
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getAllValues()
-	 */
 	@Override
 	public String[] getAllValues()
 	{
@@ -594,9 +590,6 @@ public class DPTXlatorDateTime extends DPTXlator
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#setData(byte[], int)
-	 */
 	@Override
 	public void setData(final byte[] data, final int offset)
 	{
@@ -816,8 +809,7 @@ public class DPTXlatorDateTime extends DPTXlator
 
 	// dst is assumed to be cleared
 	@Override
-	protected void toDPT(final String value, final short[] dst, final int index)
-		throws KNXFormatException
+	protected void toDPT(final String value, final short[] dst, final int index) throws KNXFormatException
 	{
 		final StringTokenizer t = new StringTokenizer(value, ":-/ (,.)");
 		final int k = 8 * index;
@@ -853,8 +845,7 @@ public class DPTXlatorDateTime extends DPTXlator
 					setBit(dst, index, WD, true);
 				}
 				else if (s.equalsIgnoreCase("no") || s.equalsIgnoreCase("in")) {
-					if (++sync > 1 || !t.hasMoreTokens()
-						|| !t.nextToken().equalsIgnoreCase(SYNC_SIGN))
+					if (++sync > 1 || !t.hasMoreTokens() || !t.nextToken().equalsIgnoreCase(SYNC_SIGN))
 						throw newException(s + ": '" + SYNC_SIGN + "' expected", s);
 					// check sync'd or not sync'd
 					if (s.charAt(0) == 'i' || s.charAt(0) == 'I')
@@ -889,8 +880,7 @@ public class DPTXlatorDateTime extends DPTXlator
 		for (int i = 0; i < count; ++i, ++field)
 			set(dst, index, field, numbers[i]);
 		// check time field, if set
-		if (field == SECOND + 1
-			&& !check24Hours(numbers[count - 3], numbers[count - 2], numbers[count - 1]))
+		if (field == SECOND + 1 && !check24Hours(numbers[count - 3], numbers[count - 2], numbers[count - 1]))
 			throw newException("incorrect time", value);
 	}
 
