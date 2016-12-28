@@ -37,6 +37,7 @@
 package tuwien.auto.calimero.dptxlator;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -272,6 +273,14 @@ public class DPTXlatorTimeTest extends TestCase
 		assertEquals(c.get(Calendar.HOUR_OF_DAY), t.getHour());
 		assertEquals(c.get(Calendar.MINUTE), t.getMinute());
 		assertEquals(c.get(Calendar.SECOND), t.getSecond());
+	}
+
+	public void testLocalTime()
+	{
+		final LocalTime time = t.localTime();
+		assertEquals(time.getHour(), t.getHour());
+		assertEquals(time.getMinute(), t.getMinute());
+		assertEquals(time.getSecond(), t.getSecond());
 	}
 
 	/**

@@ -38,6 +38,8 @@ package tuwien.auto.calimero.dptxlator;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DateTimeException;
+import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -219,6 +221,15 @@ public class DPTXlatorTime extends DPTXlator
 	public final int getSecond()
 	{
 		return data[SECOND];
+	}
+
+	/**
+	 * @return the local time obtained from hour, minute, and second of the first translation item
+	 * @throws DateTimeException if the value of any field is out of range
+	 */
+	public final LocalTime localTime()
+	{
+		return LocalTime.of(getHour(), getMinute(), getSecond());
 	}
 
 	/**
