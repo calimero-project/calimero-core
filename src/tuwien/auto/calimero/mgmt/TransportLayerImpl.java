@@ -46,6 +46,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
@@ -489,9 +490,9 @@ public class TransportLayerImpl implements TransportLayer
 				}
 				else {
 					// reset the sequence counters
-					p.setState(Connecting);
+					proxy.setState(Connecting);
 					// restart disconnect timer
-					p.setState(OpenIdle);
+					proxy.setState(OpenIdle);
 				}
 			}
 			else {
@@ -510,21 +511,21 @@ public class TransportLayerImpl implements TransportLayer
 				sendDisconnect(sender);
 			}
 			else {
+				Objects.requireNonNull(p);
 				p.restartTimeout();
 				if (seq == p.getSeqReceive()) {
-					lnk.sendRequest(sender, Priority.SYSTEM,
-							new byte[] { (byte) (ACK | p.getSeqReceive() << 2) });
+					lnk.sendRequest(sender, Priority.SYSTEM, new byte[] { (byte) (ACK | p.getSeqReceive() << 2) });
 					p.incSeqReceive();
 					fireFrameType(frame, 3);
 				}
 				else if (seq == (p.getSeqReceive() - 1 & 0xF))
 					lnk.sendRequest(sender, Priority.SYSTEM, new byte[] { (byte) (ACK | seq << 2) });
 				else
-					lnk.sendRequest(sender, Priority.SYSTEM,
-							new byte[] { (byte) (NACK | seq << 2) });
+					lnk.sendRequest(sender, Priority.SYSTEM, new byte[] { (byte) (NACK | seq << 2) });
 			}
 		}
 		else if ((ctrl & 0xC3) == ACK) {
+			Objects.requireNonNull(p);
 			if (d.getState() == Disconnected || !sender.equals(d.getAddress()))
 				sendDisconnect(sender);
 			else if (d.getState() == OpenWait && seq == p.getSeqSend()) {
@@ -535,15 +536,16 @@ public class TransportLayerImpl implements TransportLayer
 			else
 				disconnectIndicate(p, true);
 		}
-		else if ((ctrl & 0xC3) == NACK)
+		else if ((ctrl & 0xC3) == NACK) {
+			Objects.requireNonNull(p);
 			if (d.getState() == Disconnected || !sender.equals(d.getAddress()))
 				sendDisconnect(sender);
-			else if (d.getState() == OpenWait && seq == p.getSeqSend()
-					&& repeated < MAX_REPEAT) {
+			else if (d.getState() == OpenWait && seq == p.getSeqSend() && repeated < MAX_REPEAT) {
 				; // do nothing, we will send message again
 			}
 			else
 				disconnectIndicate(p, true);
+		}
 	}
 
 	private boolean waitForAck() throws KNXTimeoutException, KNXDisconnectException, KNXLinkClosedException
