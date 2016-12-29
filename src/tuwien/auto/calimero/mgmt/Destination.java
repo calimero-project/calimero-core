@@ -42,6 +42,11 @@ import static tuwien.auto.calimero.mgmt.Destination.State.Disconnected;
 import static tuwien.auto.calimero.mgmt.Destination.State.OpenIdle;
 import static tuwien.auto.calimero.mgmt.Destination.State.OpenWait;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
@@ -81,6 +86,8 @@ public class Destination implements AutoCloseable
 	{
 		private final TransportLayer aggr;
 		private Destination d;
+
+		Future<?> future = CompletableFuture.completedFuture(null);
 
 		/**
 		 * Creates a new aggregator proxy.
@@ -203,8 +210,8 @@ public class Destination implements AutoCloseable
 	// idle timeout for a connection in milliseconds
 	private static final int TIMEOUT = 6000;
 
-	// a disconnect timer for all active destination objects
-	private static TimerQueue disconnectTimer = new TimerQueue();
+	// scheduled disconnects for all active destination objects
+	private static final ScheduledThreadPoolExecutor disconnect = new ScheduledThreadPoolExecutor(0);
 
 	/** Destination state. */
 	public enum State {
@@ -415,30 +422,29 @@ public class Destination implements AutoCloseable
 		else if (state == OpenWait)
 			restartTimer(notify);
 		else if (state == Disconnected) {
-			disconnectTimer.cancel(notify);
+			remove(notify);
 			// required for server-side, otherwise server would expect old sequence and return NAK
 			seqSend = 0;
 			seqRcv = 0;
 		}
-		else if (state == Destroyed)
-			disconnectTimer.cancel(notify);
+		else if (state == Destroyed && notify != null) // destroy() calls us with notify = null, skip it
+			remove(notify);
 	}
 
-	private void restartTimer(final Runnable notify)
+	private synchronized void restartTimer(final Runnable notify)
 	{
 		if (!co)
 			throw new KNXIllegalStateException("no timer if not connection oriented");
 		if (state == Destroyed)
 			return;
 
-		if (!disconnectTimer.isAlive())
-			try {
-				disconnectTimer.start();
-			}
-			catch (final IllegalStateException ignore) {
-				// might occur due to concurrency when started by >1 destinations
-			}
-		disconnectTimer.cancel(notify);
-		disconnectTimer.submit(notify, System.currentTimeMillis() + TIMEOUT);
+		remove(notify);
+		((AggregatorProxy) notify).future = disconnect.schedule(notify, TIMEOUT, TimeUnit.MILLISECONDS);
+	}
+
+	private void remove(final Runnable notify)
+	{
+		final Future<?> future = ((AggregatorProxy) notify).future;
+		future.cancel(false);
 	}
 }
