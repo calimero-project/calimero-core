@@ -101,8 +101,8 @@ import tuwien.auto.calimero.serial.usb.TransferProtocolHeader.KnxTunnelEmi;
 import tuwien.auto.calimero.serial.usb.TransferProtocolHeader.Protocol;
 
 /**
- * KNX USB connection providing EMI data exchange and Bus Access Server Feature service. The
- * implementation for USB is based on javax.usb and usb4java.
+ * KNX USB connection providing EMI data exchange and Bus Access Server Feature service. The implementation for USB is
+ * based on javax.usb and usb4java.
  *
  * @author B. Malinowsky
  */
@@ -174,7 +174,6 @@ public class UsbConnection implements AutoCloseable
 		0x204b // busware TP-UART
 	};
 
-
 	// EP in/out: USB endpoint for asynchronous KNX data transfer over interrupt pipe
 	private static final byte knxEndpointOut = (byte) 0x02;
 	private static final byte knxEndpointIn = (byte) 0x81;
@@ -195,7 +194,6 @@ public class UsbConnection implements AutoCloseable
 	private final UsbPipe out;
 	private final UsbPipe in;
 
-
 	/*
 	 Device Feature Service protocol:
 	 Device Feature Get is always answered by Device Feature Response
@@ -210,8 +208,7 @@ public class UsbConnection implements AutoCloseable
 	// TODO Make sure list is not filled with junk data over time, e.g., add timestamp and sweep
 	// after > 5 * tunnelingTimeout. Also identify and log unknown entries.
 	// Not tested, because partial reports are not used currently
-	private final List<HidReport> partialReportList = Collections
-			.synchronizedList(new ArrayList<>());
+	private final List<HidReport> partialReportList = Collections.synchronizedList(new ArrayList<>());
 
 	private final UsbCallback callback = new UsbCallback();
 
@@ -260,8 +257,8 @@ public class UsbConnection implements AutoCloseable
 			final byte[] data = event.getData();
 			try {
 				final HidReport r = new HidReport(data);
-				logger.trace("EP {} {} I/O request {}", idx, dir, DataUnitBuilder.toHex(
-						Arrays.copyOfRange(data, 0, r.getReportHeader().getDataLength() + 3), ""));
+				logger.trace("EP {} {} I/O request {}", idx, dir, DataUnitBuilder
+						.toHex(Arrays.copyOfRange(data, 0, r.getReportHeader().getDataLength() + 3), ""));
 				final TransferProtocolHeader tph = r.getTransferProtocolHeader();
 				if (tph == null)
 					assemblePartialPackets(r);
@@ -277,8 +274,7 @@ public class UsbConnection implements AutoCloseable
 					}
 				}
 				else
-					logger.warn("unexpected service {}: {}", tph.getService(),
-							DataUnitBuilder.toHex(data, ""));
+					logger.warn("unexpected service {}: {}", tph.getService(), DataUnitBuilder.toHex(data, ""));
 			}
 			catch (final KNXFormatException | RuntimeException e) {
 				logger.error("creating HID class report from {}", DataUnitBuilder.toHex(data, ""), e);
@@ -341,8 +337,7 @@ public class UsbConnection implements AutoCloseable
 	}
 
 	/**
-	 * Returns the list of KNX devices currently attached to the host, based on known KNX vendor
-	 * IDs.
+	 * Returns the list of KNX devices currently attached to the host, based on known KNX vendor IDs.
 	 *
 	 * @return the list of found KNX devices
 	 * @throws SecurityException on error accessing javax.usb
@@ -361,8 +356,7 @@ public class UsbConnection implements AutoCloseable
 	}
 
 	// internal use only
-	public static List<UsbDevice> getVirtualSerialKnxDevices()
-		throws SecurityException, UsbException
+	public static List<UsbDevice> getVirtualSerialKnxDevices() throws SecurityException, UsbException
 	{
 		final List<UsbDevice> knx = new ArrayList<>();
 		for (final UsbDevice d : getDevices()) {
@@ -439,15 +433,14 @@ public class UsbConnection implements AutoCloseable
 
 			callback.start();
 		}
-		catch (final UsbNotActiveException | UsbDisconnectedException | UsbNotClaimedException
-				| UsbException e) {
+		catch (final UsbNotActiveException | UsbDisconnectedException | UsbNotClaimedException | UsbException e) {
 			throw new KNXException("open USB connection", e);
 		}
 	}
 
 	/**
-	 * Adds the specified event listener <code>l</code> to receive events from this connection. If
-	 * <code>l</code> was already added as listener, no action is performed.
+	 * Adds the specified event listener <code>l</code> to receive events from this connection. If <code>l</code> was
+	 * already added as listener, no action is performed.
 	 *
 	 * @param l the listener to add
 	 */
@@ -457,8 +450,8 @@ public class UsbConnection implements AutoCloseable
 	}
 
 	/**
-	 * Removes the specified event listener <code>l</code>, so it does no longer receive events from
-	 * this connection. If <code>l</code> was not added in the first place, no action is performed.
+	 * Removes the specified event listener <code>l</code>, so it does no longer receive events from this connection. If
+	 * <code>l</code> was not added in the first place, no action is performed.
 	 *
 	 * @param l the listener to remove
 	 */
@@ -467,26 +460,23 @@ public class UsbConnection implements AutoCloseable
 		listeners.remove(l);
 	}
 
-	public void send(final HidReport report, final boolean blocking) throws KNXPortClosedException,
-		KNXTimeoutException
+	public void send(final HidReport report, final boolean blocking) throws KNXPortClosedException, KNXTimeoutException
 	{
 		try {
 			final byte[] data = report.toByteArray();
-			logger.trace("sending I/O request {}", DataUnitBuilder.toHex(
-					Arrays.copyOfRange(data, 0, report.getReportHeader().getDataLength() + 3), ""));
+			logger.trace("sending I/O request {}", DataUnitBuilder
+					.toHex(Arrays.copyOfRange(data, 0, report.getReportHeader().getDataLength() + 3), ""));
 			out.syncSubmit(data);
 		}
-		catch (final UsbException | UsbNotActiveException | UsbNotClaimedException
-				| UsbDisconnectedException e) {
+		catch (final UsbException | UsbNotActiveException | UsbNotClaimedException | UsbDisconnectedException e) {
 			close();
 			throw new KNXPortClosedException("error sending report over USB", name, e);
 		}
 	}
 
 	/**
-	 * Returns the KNX device descriptor type 0 (mask version), use {@link DeviceDescriptor} for
-	 * decoding. The returned descriptor information format for device descriptor type 0 is as
-	 * follows (MSB to LSB):<br>
+	 * Returns the KNX device descriptor type 0 (mask version), use {@link DeviceDescriptor} for decoding. The returned
+	 * descriptor information format for device descriptor type 0 is as follows (MSB to LSB):<br>
 	 * <code>| Mask Type (8 bit) | Firmware Version (8 bit) |</code><br>
 	 * with the mask type split up into<br>
 	 * <code>| Medium Type (4 bit) | Firmware Type (4 bit)|</code><br>
@@ -500,8 +490,7 @@ public class UsbConnection implements AutoCloseable
 	 * @throws InterruptedException on interrupt
 	 * @see tuwien.auto.calimero.DeviceDescriptor
 	 */
-	public final int getDeviceDescriptorType0() throws KNXPortClosedException, KNXTimeoutException,
-		InterruptedException
+	public final int getDeviceDescriptorType0() throws KNXPortClosedException, KNXTimeoutException, InterruptedException
 	{
 		// device descriptor type 0 has a 2 byte structure
 		return (int) toUnsigned(getFeature(BusAccessServerFeature.DeviceDescriptorType0));
@@ -513,8 +502,8 @@ public class UsbConnection implements AutoCloseable
 	 * @throws KNXTimeoutException on response timeout
 	 * @throws InterruptedException on interrupt
 	 */
-	public final EnumSet<EmiType> getSupportedEmiTypes() throws KNXPortClosedException,
-		KNXTimeoutException, InterruptedException
+	public final EnumSet<EmiType> getSupportedEmiTypes()
+		throws KNXPortClosedException, KNXTimeoutException, InterruptedException
 	{
 		return EmiType.fromBits(getFeature(BusAccessServerFeature.SupportedEmiTypes)[1]);
 	}
@@ -525,8 +514,7 @@ public class UsbConnection implements AutoCloseable
 	 * @throws KNXTimeoutException on response timeout
 	 * @throws InterruptedException on interrupt
 	 */
-	public final EmiType getActiveEmiType() throws KNXPortClosedException, KNXTimeoutException,
-		InterruptedException
+	public final EmiType getActiveEmiType() throws KNXPortClosedException, KNXTimeoutException, InterruptedException
 	{
 		final int bits = (int) toUnsigned(getFeature(BusAccessServerFeature.ActiveEmiType));
 		final EnumSet<EmiType> all = EnumSet.allOf(EmiType.class);
@@ -540,16 +528,15 @@ public class UsbConnection implements AutoCloseable
 	}
 
 	/**
-	 * Sets the active EMI type for communication. Before setting an active EMI type, the supported
-	 * EMI types should be checked using {@link #getSupportedEmiTypes()}. If only one EMI type is
-	 * supported, KNX USB device support for this method is optional.
+	 * Sets the active EMI type for communication. Before setting an active EMI type, the supported EMI types should be
+	 * checked using {@link #getSupportedEmiTypes()}. If only one EMI type is supported, KNX USB device support for this
+	 * method is optional.
 	 *
 	 * @param active the EMI type to activate for communication
 	 * @throws KNXPortClosedException on closed port
 	 * @throws KNXTimeoutException on response timeout
 	 */
-	public final void setActiveEmiType(final EmiType active) throws KNXPortClosedException,
-		KNXTimeoutException
+	public final void setActiveEmiType(final EmiType active) throws KNXPortClosedException, KNXTimeoutException
 	{
 		final HidReport r = HidReport.createFeatureService(BusAccessServerService.Set,
 				BusAccessServerFeature.ActiveEmiType, new byte[] { (byte) active.emi.id() });
@@ -562,8 +549,8 @@ public class UsbConnection implements AutoCloseable
 	 * @throws KNXTimeoutException on response timeout
 	 * @throws InterruptedException on interrupt
 	 */
-	public final boolean isKnxConnectionActive() throws KNXPortClosedException,
-		KNXTimeoutException, InterruptedException
+	public final boolean isKnxConnectionActive()
+		throws KNXPortClosedException, KNXTimeoutException, InterruptedException
 	{
 		final int data = getFeature(BusAccessServerFeature.ConnectionStatus)[0];
 		return (data & 0x01) == 0x01;
@@ -575,8 +562,7 @@ public class UsbConnection implements AutoCloseable
 	 * @throws KNXTimeoutException on response timeout
 	 * @throws InterruptedException on interrupt
 	 */
-	public final int getManufacturerCode() throws KNXPortClosedException, KNXTimeoutException,
-		InterruptedException
+	public final int getManufacturerCode() throws KNXPortClosedException, KNXTimeoutException, InterruptedException
 	{
 		return (int) toUnsigned(getFeature(BusAccessServerFeature.Manufacturer));
 	}
@@ -595,8 +581,8 @@ public class UsbConnection implements AutoCloseable
 		close(CloseEvent.CLIENT_REQUEST, "user request");
 	}
 
-	private UsbInterface open(final UsbDevice device) throws UsbClaimException,
-		UsbNotActiveException, UsbDisconnectedException, UsbException
+	private UsbInterface open(final UsbDevice device)
+		throws UsbClaimException, UsbNotActiveException, UsbDisconnectedException, UsbException
 	{
 		logger.info(printInfo(device, logger, ""));
 
@@ -636,8 +622,8 @@ public class UsbConnection implements AutoCloseable
 				}
 			}
 		}
-		logger.debug("Found USB device endpoint addresses OUT 0x{}, IN 0x{}",
-				Integer.toHexString(epAddressOut & 0xff), Integer.toHexString(epAddressIn & 0xff));
+		logger.debug("Found USB device endpoint addresses OUT 0x{}, IN 0x{}", Integer.toHexString(epAddressOut & 0xff),
+				Integer.toHexString(epAddressIn & 0xff));
 		// ??? all devices I know use 0, so just stick to it for now
 		final UsbInterface usbIf = configuration.getUsbInterface((byte) 0);
 		try {
@@ -652,13 +638,12 @@ public class UsbConnection implements AutoCloseable
 		return usbIf;
 	}
 
-	private UsbPipe open(final UsbInterface usbIf, final byte endpointAddress) throws KNXException,
-		UsbNotActiveException, UsbNotClaimedException, UsbDisconnectedException, UsbException
+	private UsbPipe open(final UsbInterface usbIf, final byte endpointAddress)
+		throws KNXException, UsbNotActiveException, UsbNotClaimedException, UsbDisconnectedException, UsbException
 	{
 		final UsbEndpoint epout = usbIf.getUsbEndpoint(endpointAddress);
 		if (epout == null)
-			throw new KNXException(usbIf.getUsbConfiguration().getUsbDevice()
-					+ " contains no KNX USB data endpoint 0x"
+			throw new KNXException(usbIf.getUsbConfiguration().getUsbDevice() + " contains no KNX USB data endpoint 0x"
 					+ Integer.toUnsignedString(endpointAddress, 16));
 		final UsbPipe pipe = epout.getUsbPipe();
 		pipe.open();
@@ -689,12 +674,11 @@ public class UsbConnection implements AutoCloseable
 					ifname = s;
 			}
 			catch (final UnsupportedEncodingException e) {}
-			logger.trace("release USB interface {}, active={}, claimed={}", ifname,
-					knxUsbIf.isActive(), knxUsbIf.isClaimed());
+			logger.trace("release USB interface {}, active={}, claimed={}", ifname, knxUsbIf.isActive(),
+					knxUsbIf.isClaimed());
 			knxUsbIf.release();
 		}
-		catch (final UsbNotActiveException | UsbNotOpenException | UsbDisconnectedException
-				| UsbException e) {
+		catch (UsbNotActiveException | UsbNotOpenException | UsbDisconnectedException | UsbException e) {
 			logger.warn("close connection", e);
 		}
 		finally {
@@ -729,11 +713,10 @@ public class UsbConnection implements AutoCloseable
 		}
 	}
 
-	private byte[] getFeature(final BusAccessServerFeature feature) throws InterruptedException,
-		KNXPortClosedException, KNXTimeoutException
+	private byte[] getFeature(final BusAccessServerFeature feature)
+		throws InterruptedException, KNXPortClosedException, KNXTimeoutException
 	{
-		final HidReport r = HidReport.createFeatureService(BusAccessServerService.Get, feature,
-				new byte[0]);
+		final HidReport r = HidReport.createFeatureService(BusAccessServerService.Get, feature, new byte[0]);
 		send(r, true);
 		final HidReport res = waitForResponse();
 		return res.getData();
@@ -788,25 +771,24 @@ public class UsbConnection implements AutoCloseable
 			data.write(body, 0, body.length);
 		}
 		final byte[] assembled = data.toByteArray();
-		logger.debug("assembling completed using {} partial packets, KNX data frame: {}",
-				partialReportList.size(), DataUnitBuilder.toHex(assembled, " "));
+		logger.debug("assembling completed using {} partial packets, KNX data frame: {}", partialReportList.size(),
+				DataUnitBuilder.toHex(assembled, " "));
 		partialReportList.clear();
 		fireFrameReceived(emiType, assembled);
 	}
 
 	/**
-	 * Fires a frame received event ({@link KNXListener#frameReceived(FrameEvent)}) for the supplied
-	 * EMI <code>frame</code>.
+	 * Fires a frame received event ({@link KNXListener#frameReceived(FrameEvent)}) for the supplied EMI
+	 * <code>frame</code>.
 	 *
 	 * @param frame the EMI1/EMI2/cEMI L-data frame to generate the event for
 	 * @throws KNXFormatException on error creating cEMI message
 	 */
-	private void fireFrameReceived(final KnxTunnelEmi emiType, final byte[] frame)
-		throws KNXFormatException
+	private void fireFrameReceived(final KnxTunnelEmi emiType, final byte[] frame) throws KNXFormatException
 	{
 		logger.debug("received {} frame {}", emiType, DataUnitBuilder.toHex(frame, ""));
-		final FrameEvent fe = emiType == KnxTunnelEmi.CEmi ? new FrameEvent(this,
-				CEMIFactory.create(frame, 0, frame.length)) : new FrameEvent(this, frame);
+		final FrameEvent fe = emiType == KnxTunnelEmi.CEmi
+				? new FrameEvent(this, CEMIFactory.create(frame, 0, frame.length)) : new FrameEvent(this, frame);
 		listeners.fire(l -> l.frameReceived(fe));
 	}
 
@@ -821,8 +803,7 @@ public class UsbConnection implements AutoCloseable
 		return hub.getAttachedUsbDevices();
 	}
 
-	private static UsbDevice findDevice(final int vendorId, final int productId)
-		throws KNXException
+	private static UsbDevice findDevice(final int vendorId, final int productId) throws KNXException
 	{
 		try {
 			return findDevice(getRootHub(), vendorId, productId);
@@ -832,8 +813,7 @@ public class UsbConnection implements AutoCloseable
 		}
 	}
 
-	private static UsbDevice findDevice(final UsbHub hub, final int vendorId, final int productId)
-		throws KNXException
+	private static UsbDevice findDevice(final UsbHub hub, final int vendorId, final int productId) throws KNXException
 	{
 		for (final UsbDevice d : getAttachedDevices(hub)) {
 			final UsbDeviceDescriptor dd = d.getUsbDeviceDescriptor();
@@ -905,8 +885,7 @@ public class UsbConnection implements AutoCloseable
 		return l;
 	}
 
-	private static void traverse(final UsbDevice device, final StringBuilder sb,
-		final String indent)
+	private static void traverse(final UsbDevice device, final StringBuilder sb, final String indent)
 	{
 		try {
 			sb.append(printInfo(device, slogger, indent));
@@ -915,13 +894,11 @@ public class UsbConnection implements AutoCloseable
 			slogger.warn("Accessing USB device, " + e);
 		}
 		if (device.isUsbHub())
-			for (final Iterator<UsbDevice> i = getAttachedDevices((UsbHub) device).iterator(); i
-					.hasNext();)
+			for (final Iterator<UsbDevice> i = getAttachedDevices((UsbHub) device).iterator(); i.hasNext();)
 				traverse(i.next(), sb.append("\n"), indent + (i.hasNext() ? " |   " : "     "));
 	}
 
-	private static String printInfo(final UsbDevice device, final Logger l, final String indent)
-		throws UsbException
+	private static String printInfo(final UsbDevice device, final Logger l, final String indent) throws UsbException
 	{
 		final StringBuilder sb = new StringBuilder();
 		final UsbDeviceDescriptor dd = device.getUsbDeviceDescriptor();
@@ -1022,8 +999,8 @@ public class UsbConnection implements AutoCloseable
 				return Collections.emptyList();
 			}
 			try {
-				return StreamSupport.stream(list.spliterator(), false)
-						.map(UsbConnection::printInfo).collect(Collectors.toList());
+				return StreamSupport.stream(list.spliterator(), false).map(UsbConnection::printInfo)
+						.collect(Collectors.toList());
 			}
 			finally {
 				LibUsb.freeDeviceList(list, true);
@@ -1051,8 +1028,7 @@ public class UsbConnection implements AutoCloseable
 
 		final StringBuilder sb = new StringBuilder();
 		final String item = vendor != 0 ? toDeviceId(vendor, product) : "";
-		sb.append("Bus ").append(bus).append(" Device ").append(address).append(": ID ")
-				.append(item);
+		sb.append("Bus ").append(bus).append(" Device ").append(address).append(": ID ").append(item);
 
 		final String ind = "    ";
 		final DeviceHandle dh = new DeviceHandle();
@@ -1091,8 +1067,7 @@ public class UsbConnection implements AutoCloseable
 
 		final int speed = LibUsb.getDeviceSpeed(device);
 		if (speed != LibUsb.SPEED_UNKNOWN)
-			sb.append("\n").append(ind).append(DescriptorUtils.getSpeedName(speed))
-					.append(" Speed USB");
+			sb.append("\n").append(ind).append(DescriptorUtils.getSpeedName(speed)).append(" Speed USB");
 		return sb.toString();
 	}
 
@@ -1177,7 +1152,6 @@ public class UsbConnection implements AutoCloseable
 			return (data[0] & 0xff);
 		if (data.length == 2)
 			return (data[0] & 0xff) << 8 | data[1] & 0xff;
-		return (data[0] & 0xff) << 24 | (data[1] & 0xff) << 16 | (data[2] & 0xff) << 8 | data[3]
-				& 0xff;
+		return (data[0] & 0xff) << 24 | (data[1] & 0xff) << 16 | (data[2] & 0xff) << 8 | data[3] & 0xff;
 	}
 }

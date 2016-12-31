@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2016 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB;
  * Such response is sent by a server in reply to a description request from a client.<br>
  * A response contains various description information blocks (DIBs), mandatory being a Device DIB
  * and a Supported Service Families DIB. Optionally, the response might contain additional DIBs with
- * other information. Each DIB can at most occur once, the following DIBs are recognized:
+ * other information. Each DIB can at most occur once, the following DIBs are recognized (others are ignored):
  * <ul>
  * <li>{@link DeviceDIB}</li>
  * <li>{@link ServiceFamiliesDIB}</li>
@@ -84,7 +84,6 @@ public class DescriptionResponse extends ServiceType
 
 	/**
 	 * Creates a new description response out of a byte array.
-	 * <p>
 	 *
 	 * @param data byte array containing a description response structure
 	 * @param offset start offset of response in <code>data</code>
@@ -116,13 +115,11 @@ public class DescriptionResponse extends ServiceType
 			else if (type == DIB.MFR_DATA  && (unique = m == null))
 				m = new ManufacturerDIB(data, i);
 			else if (!unique)
-				throw new KNXFormatException("description response contains duplicate DIB type",
-						type);
+				throw new KNXFormatException("description response contains duplicate DIB type", type);
 			else if (type == 0 || size == 0) // break on invalid field, ensure we always progress i
 				break;
 			else
-				logger.warn("description response contains unknown DIB with type code "
-						+ type + " and size " + size + ", ignore");
+				logger.warn("skip unknown DIB in description response with type code {} and size {}", type, size);
 			i += size;
 		}
 
@@ -133,9 +130,7 @@ public class DescriptionResponse extends ServiceType
 	}
 
 	/**
-	 * Creates a new description response containing a device DIB and a supported service
-	 * families DIB.
-	 * <p>
+	 * Creates a new description response containing a device DIB and a supported service families DIB.
 	 *
 	 * @param device device description
 	 * @param suppSvcFam supported service families
@@ -148,14 +143,12 @@ public class DescriptionResponse extends ServiceType
 	/**
 	 * Creates a new description response containing a device DIB, a supported service
 	 * families DIB and a manufacturer DIB.
-	 * <p>
 	 *
 	 * @param device device description
 	 * @param suppSvcFam supported service families
 	 * @param mfr manufacturer specific data
 	 */
-	public DescriptionResponse(final DeviceDIB device, final ServiceFamiliesDIB suppSvcFam,
-		final ManufacturerDIB mfr)
+	public DescriptionResponse(final DeviceDIB device, final ServiceFamiliesDIB suppSvcFam, final ManufacturerDIB mfr)
 	{
 		this(device, suppSvcFam, null, null, null, mfr);
 	}
@@ -163,7 +156,6 @@ public class DescriptionResponse extends ServiceType
 	/**
 	 * Creates a new description response containing a device DIB, a supported service
 	 * families DIB and a manufacturer DIB.
-	 * <p>
 	 *
 	 * @param device device description
 	 * @param suppSvcFamilies supported service families
@@ -207,7 +199,6 @@ public class DescriptionResponse extends ServiceType
 
 	/**
 	 * Returns the device description information block contained in the response.
-	 * <p>
 	 *
 	 * @return a device DIB
 	 */
@@ -218,7 +209,6 @@ public class DescriptionResponse extends ServiceType
 
 	/**
 	 * Returns the supported service families description information block.
-	 * <p>
 	 *
 	 * @return a DIB with the supported service families
 	 */
@@ -232,7 +222,7 @@ public class DescriptionResponse extends ServiceType
 	 * the response.
 	 * <p>
 	 * The manufacturer data is not a mandatory part of a description response. It is only
-	 * available, if the optional DIB information of a response matches this DIB type.<br>
+	 * available, if the optional DIB information of a response matches this DIB type.
 	 *
 	 * @return a manufacturer DIB, or <code>null</code> if no such DIB
 	 */
@@ -260,9 +250,6 @@ public class DescriptionResponse extends ServiceType
 		return prime * device.hashCode();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceType#getStructLength()
-	 */
 	@Override
 	int getStructLength()
 	{
@@ -272,10 +259,6 @@ public class DescriptionResponse extends ServiceType
 		return len;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceType#toByteArray
-	 *      (java.io.ByteArrayOutputStream)
-	 */
 	@Override
 	byte[] toByteArray(final ByteArrayOutputStream os)
 	{
