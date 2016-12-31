@@ -40,6 +40,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.knxnetip.util.DIB;
@@ -248,6 +249,12 @@ public class DescriptionResponse extends ServiceType
 	{
 		final int prime = 17;
 		return prime * device.hashCode();
+	}
+
+	@Override
+	public String toString()
+	{
+		return getDescription().stream().map(Object::toString).collect(Collectors.joining(", "));
 	}
 
 	@Override
