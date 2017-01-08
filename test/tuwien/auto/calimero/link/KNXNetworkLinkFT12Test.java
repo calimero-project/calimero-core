@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -90,7 +90,6 @@ public class KNXNetworkLinkFT12Test
 			final CEMILData f = (CEMILData) e.getFrame();
 			ind = f;
 			assertEquals(CEMILData.MC_LDATA_IND, ind.getMessageCode());
-			System.out.println("indication");
 			Debug.printLData(ind);
 		}
 
@@ -103,7 +102,6 @@ public class KNXNetworkLinkFT12Test
 			con = f;
 			assertEquals(CEMILData.MC_LDATA_CON, f.getMessageCode());
 			assertTrue(f.isPositiveConfirmation());
-			System.out.println("confirmation");
 			Debug.printLData(f);
 		}
 
@@ -378,12 +376,10 @@ public class KNXNetworkLinkFT12Test
 	 * @throws KNXTimeoutException
 	 */
 	@Test
-	public final void testClose() throws InterruptedException, KNXTimeoutException
+	void testClose() throws InterruptedException, KNXTimeoutException
 	{
-		System.out.println(lnk.toString());
 		assertTrue(lnk.isOpen());
 		lnk.close();
-		System.out.println(lnk.toString());
 		// time for link event notifier
 		Thread.sleep(50);
 		assertTrue(nll.closed);

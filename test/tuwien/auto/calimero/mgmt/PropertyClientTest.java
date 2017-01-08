@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned;
+import tuwien.auto.calimero.knxnetip.Debug;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.KNXNetworkLinkIP;
 import tuwien.auto.calimero.link.medium.TPSettings;
@@ -163,7 +164,7 @@ public class PropertyClientTest
 	 * Test method for {@link PropertyClient#getObjectTypeName(int)}.
 	 */
 	@Test
-	public final void testGetObjectTypeName()
+	void testGetObjectTypeName()
 	{
 		for (int i = 0; i < 20; ++i) {
 			final String s = PropertyClient.getObjectTypeName(i);
@@ -171,7 +172,6 @@ public class PropertyClientTest
 				assertEquals("", s);
 			else
 				assertNotNull(s);
-			System.out.println(i + " = " + s);
 		}
 	}
 
@@ -259,11 +259,9 @@ public class PropertyClientTest
 		String s = rem.getProperty(0, 56);
 		assertNotNull(s);
 		assertTrue(s.length() > 0);
-		System.out.println("OT 0, PID 56: " + s);
 		s = local.getProperty(0, 56);
 		assertNotNull(s);
 		assertTrue(s.length() > 0);
-		System.out.println("OT 0, PID 56: " + s);
 	}
 
 	/**
@@ -378,6 +376,6 @@ public class PropertyClientTest
 		buf.append(", r-lvl=" + d.getReadLevel());
 		buf.append(", w-lvl=" + d.getWriteLevel());
 		buf.append(", writeenable=" + d.isWriteEnabled());
-		System.out.println(buf);
+		Debug.out(buf);
 	}
 }

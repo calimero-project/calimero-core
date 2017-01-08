@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -190,7 +190,7 @@ public class KNXnetIPTunnelTest
 		doSend(frameNoDest, con, posCon);
 		doSend(frameNoDest, con, posCon);
 		final long end = System.currentTimeMillis();
-		System.out.println("time for 10 send with con: " + (end - start));
+		System.out.println("time for 10 tunneling sends with .con: " + (end - start) + " ms");
 	}
 
 	/**
@@ -224,7 +224,6 @@ public class KNXnetIPTunnelTest
 						notify();
 					}
 					t.send(f, con);
-					System.out.println(getName() + " returned sending " + f.getSource());
 				}
 				catch (KNXTimeoutException | KNXConnectionClosedException | InterruptedException e) {
 					e.printStackTrace();
@@ -460,9 +459,7 @@ public class KNXnetIPTunnelTest
 	{
 		newTunnel();
 		assertEquals(KNXnetIPConnection.OK, t.getState());
-		System.out.println();
-		System.out.println("Testing heartbeat, this will take some minutes !!!");
-		System.out.println("...");
+		System.out.println("Testing heartbeat, this will take some minutes... ! ");
 		// give some seconds space for delay so we're on the safe side
 		Thread.sleep(4000);
 		Thread.sleep(60000);
@@ -483,9 +480,7 @@ public class KNXnetIPTunnelTest
 	{
 		newMonitor();
 		assertEquals(KNXnetIPConnection.OK, mon.getState());
-		System.out.println();
-		System.out.println("Testing heartbeat, this will take some minutes !!!");
-		System.out.println("...");
+		System.out.println("Testing heartbeat, this will take some minutes...!");
 		// give some seconds space for delay so we're on the save side
 		Thread.sleep(4000);
 		Thread.sleep(60000);

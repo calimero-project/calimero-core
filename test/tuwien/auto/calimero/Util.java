@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -189,11 +189,8 @@ public final class Util
 			final InetSocketAddress addr = new InetSocketAddress(localHost, 0);
 			if (printLocalHost) {
 				printLocalHost = false;
-				final String underline = addr.toString().replaceAll(".", "=");
 				System.out.println();
-				System.out.println("\t\tLocal host used in tests: " + addr);
-				System.out.println("\t\t==========================" + underline);
-				System.out.println();
+				System.out.println("calimero-core - local socket used in unit tests: " + addr);
 			}
 			return addr;
 		}
@@ -237,8 +234,8 @@ public final class Util
 					return server;
 				}
 			}
-			System.err.println("\n\tA unit test case requests the KNX test server, but no running instance was found!\n"
-					+ "\t\t--> Many tests requiring KNXnet/IP will fail.\n");
+			System.err.println("\nA unit test case requests the KNX test server, but no running instance was found!\n"
+					+ "\t--> Most tests requiring KNXnet/IP will fail.\n");
 			Assert.fail("no KNXnet/IP test-server found!");
 		}
 		return server;

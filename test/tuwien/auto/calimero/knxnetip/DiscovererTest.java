@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -172,8 +172,6 @@ public class DiscovererTest
 			final Result<DescriptionResponse> r = d.getDescription(new InetSocketAddress(
 					response.getControlEndpoint().getAddress(), response.getControlEndpoint().getPort()), timeout);
 			assertNotNull(r);
-//			System.out.println(
-//					"doGetDesc for " + response.getControlEndpoint() + " = " + r.getResponse().getDevice().getName());
 		}
 	}
 
@@ -231,8 +229,6 @@ public class DiscovererTest
 			final Result<SearchResponse> result = i.next();
 			final SearchResponse response = result.getResponse();
 			assertNotNull(response);
-//			System.out.println("doGetSearchRes " + i + " = " + response.getControlEndpoint() + ", "
-//					+ response.getServiceFamilies());
 		}
 	}
 
@@ -298,8 +294,6 @@ public class DiscovererTest
 			final Result<SearchResponse> result = i.next();
 			final SearchResponse response = result.getResponse();
 			assertNotNull(response);
-//			System.out.println("doStartSearchIF " + i + " = " + response.getControlEndpoint() + ", "
-//					+ response.getServiceFamilies());
 		}
 
 		// start 2 searches concurrently

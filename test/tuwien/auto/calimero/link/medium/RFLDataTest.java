@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015 B. Malinowsky
+    Copyright (c) 2015, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -201,7 +201,6 @@ public class RFLDataTest
 		final byte[] data = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
 		final int correctCrc = 0xfcbc;
 		final int calcCrc = RFLData.crc16(data, 0, data.length);
-//		System.out.println("calculated CRC=" + calcCrc + ", correct CRC=" + correctCrc);
 		Assert.assertEquals(correctCrc, calcCrc);
 	}
 }
