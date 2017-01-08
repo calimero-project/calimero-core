@@ -84,12 +84,12 @@ public class KNXNetworkLinkIP extends AbstractLink
 	/**
 	 * Service mode for link layer tunneling.
 	 */
-	public static final int TUNNELING = 1;
+	protected static final int TUNNELING = 1;
 
 	/**
 	 * Service mode for routing.
 	 */
-	public static final int ROUTING = 2;
+	protected static final int ROUTING = 2;
 
 	private final int mode;
 	private final KNXnetIPConnection conn;
@@ -178,7 +178,7 @@ public class KNXNetworkLinkIP extends AbstractLink
 	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
 	 * @throws InterruptedException on interrupted thread while establishing link
 	 */
-	public KNXNetworkLinkIP(final int serviceMode, final InetSocketAddress localEP, final InetSocketAddress remoteEP,
+	protected KNXNetworkLinkIP(final int serviceMode, final InetSocketAddress localEP, final InetSocketAddress remoteEP,
 		final boolean useNAT, final KNXMediumSettings settings) throws KNXException, InterruptedException
 	{
 		super(null, createLinkName(remoteEP), settings);
