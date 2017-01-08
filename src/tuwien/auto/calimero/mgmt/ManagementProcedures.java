@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -107,8 +107,10 @@ public interface ManagementProcedures extends AutoCloseable
 	 * The default individual address is 0xffff. After setting the default address,
 	 * devices in programming mode are restarted.
 	 *
-	 * @throws KNXException
+	 * @throws KNXException on resetting the address or restarting a device in programming mode
 	 * @throws InterruptedException on interrupted thread
+	 * @see ManagementClient#writeAddress(IndividualAddress)
+	 * @see ManagementClient#restart(Destination)
 	 */
 	void resetAddress() throws KNXException, InterruptedException;
 

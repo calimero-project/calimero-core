@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -124,6 +124,7 @@ public class KNXNetworkLinkIP extends AbstractLink
 	 * @param mcGroup address of the multicast group to join, use <code>null</code> for the default KNXnet/IP multicast
 	 *        address
 	 * @param settings medium settings defining device and medium specifics needed for communication
+	 * @return the network link in open state
 	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
 	 */
 	public static KNXNetworkLinkIP newRoutingLink(final NetworkInterface netIf, final InetAddress mcGroup,
@@ -140,6 +141,7 @@ public class KNXNetworkLinkIP extends AbstractLink
 	 * @param mcGroup address of the multicast group to join, use <code>null</code> for the default KNXnet/IP multicast
 	 *        address
 	 * @param settings medium settings defining device and medium specifics needed for communication
+	 * @return the network link in open state
 	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
 	 */
 	public static KNXNetworkLinkIP newRoutingLink(final InetAddress localEP, final InetAddress mcGroup,
@@ -215,6 +217,8 @@ public class KNXNetworkLinkIP extends AbstractLink
 	/**
 	 * Creates a new network link with <code>serviceMode</code> based on the supplied KNXnet/IP connection.
 	 *
+	 * @param serviceMode mode of communication, one of the service mode constants {@link #TUNNELING} or
+	 *        {@link #ROUTING}
 	 * @param c a KNXnet/IP tunneling or routing connection in open state
 	 * @param settings medium settings defining device and medium specifics needed for communication
 	 */

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -66,10 +66,9 @@ public class KNXNetworkLinkFT12 extends AbstractLink
 	 *
 	 * @param portID identifier of the serial communication port to use
 	 * @param settings medium settings defining device and medium specifics needed for communication
-	 * @throws KNXException
+	 * @throws KNXException on error creating FT1.2 connection, timeout, or interrupt switching to link layer mode
 	 */
-	public KNXNetworkLinkFT12(final String portID, final KNXMediumSettings settings)
-		throws KNXException
+	public KNXNetworkLinkFT12(final String portID, final KNXMediumSettings settings) throws KNXException
 	{
 		this(new FT12Connection(portID), settings);
 	}
@@ -82,10 +81,9 @@ public class KNXNetworkLinkFT12 extends AbstractLink
 	 *
 	 * @param portNumber port number of the serial communication port to use
 	 * @param settings medium settings defining device and medium specifics needed for communication
-	 * @throws KNXException
+	 * @throws KNXException on error creating FT1.2 connection, timeout, or interrupt switching to link layer mode
 	 */
-	public KNXNetworkLinkFT12(final int portNumber, final KNXMediumSettings settings)
-		throws KNXException
+	public KNXNetworkLinkFT12(final int portNumber, final KNXMediumSettings settings) throws KNXException
 	{
 		this(new FT12Connection(portNumber), settings);
 	}
@@ -97,8 +95,7 @@ public class KNXNetworkLinkFT12 extends AbstractLink
 	 * @param settings medium settings defining device and medium specifics needed for communication
 	 * @throws KNXException on error, timeout, or interrupt while switching to link layer mode
 	 */
-	protected KNXNetworkLinkFT12(final FT12Connection c, final KNXMediumSettings settings)
-		throws KNXException
+	protected KNXNetworkLinkFT12(final FT12Connection c, final KNXMediumSettings settings) throws KNXException
 	{
 		super(c, c.getPortID(), settings);
 		cEMI = false;
@@ -160,8 +157,7 @@ public class KNXNetworkLinkFT12 extends AbstractLink
 		}
 	}
 
-	private void normalMode() throws KNXAckTimeoutException, KNXPortClosedException,
-		InterruptedException
+	private void normalMode() throws KNXAckTimeoutException, KNXPortClosedException, InterruptedException
 	{
 		final byte[] switchNormal = { (byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
 		conn.send(switchNormal, true);

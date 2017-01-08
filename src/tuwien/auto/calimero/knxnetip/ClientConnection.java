@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2016 B. Malinowsky
+    Copyright (c) 2010, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -233,16 +233,14 @@ abstract class ClientConnection extends ConnectionBase
 
 	/**
 	 * @see tuwien.auto.calimero.knxnetip.ConnectionBase#handleServiceType
-	 *      (tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader, byte[], int,
-	 *      java.net.InetAddress, int)
-	 * @throws KNXFormatException
-	 * @throws IOException
+	 *      (tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader, byte[], int, java.net.InetAddress, int)
+	 * @throws KNXFormatException if the received service type consists of an invalid structure
+	 * @throws IOException on socket I/O error
 	 */
 	@SuppressWarnings("unused")
 	@Override
-	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data,
-		final int offset, final InetAddress src, final int port) throws KNXFormatException,
-		IOException
+	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset,
+		final InetAddress src, final int port) throws KNXFormatException, IOException
 	{
 		final int svc = h.getServiceType();
 		if (svc == KNXnetIPHeader.CONNECT_REQ)

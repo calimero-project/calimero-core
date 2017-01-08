@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2016 B. Malinowsky
+    Copyright (c) 2010, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -144,10 +144,10 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	/**
 	 * Base constructor to assign the supplied arguments.
 	 *
-	 * @param serviceRequest
-	 * @param serviceAck
-	 * @param maxSendAttempts
-	 * @param responseTimeout
+	 * @param serviceRequest service request code of the protocol
+	 * @param serviceAck service ack code of the protocol
+	 * @param maxSendAttempts maximum send attempts of a datagram
+	 * @param responseTimeout response timeout in seconds
 	 */
 	protected ConnectionBase(final int serviceRequest, final int serviceAck, final int maxSendAttempts,
 		final int responseTimeout)
@@ -410,7 +410,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 
 	/**
 	 * Called on {@link #close()}, containing all protocol specific actions to close a connection. Before this method
-	 * returns, {@link #cleanup(int, String, LogLevel, Throwable)} is called.
+	 * returns, {@link #cleanup} is called.
 	 *
 	 * @param initiator one of the constants of {@link CloseEvent}
 	 * @param reason short text statement why close was called on this connection
@@ -451,10 +451,10 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	}
 
 	/**
-	 * @param initiator
-	 * @param reason
-	 * @param level
-	 * @param t
+	 * @param initiator one of the constants of {@link CloseEvent}
+	 * @param reason short text statement why close was called on this connection
+	 * @param level log level to use for logging, adjust this to the reason of closing this connection
+	 * @param t a throwable, to pass to the logger if the close event was caused by some error, can be <code>null</code>
 	 */
 	protected void cleanup(final int initiator, final String reason, final LogLevel level, final Throwable t)
 	{

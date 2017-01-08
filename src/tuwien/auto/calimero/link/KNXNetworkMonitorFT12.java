@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ public class KNXNetworkMonitorFT12 extends AbstractMonitor
 	 * @param portID identifier of the serial communication port to use
 	 * @param settings medium settings defining the specific KNX medium needed for decoding raw
 	 *        frames received from the KNX network
-	 * @throws KNXException
+	 * @throws KNXException on error creating FT1.2 connection or entering busmonitor mode
 	 */
 	public KNXNetworkMonitorFT12(final String portID, final KNXMediumSettings settings)
 		throws KNXException
@@ -83,10 +83,9 @@ public class KNXNetworkMonitorFT12 extends AbstractMonitor
 	 * @param portNumber port number of the serial communication port to use
 	 * @param settings medium settings defining the specific KNX medium needed for decoding raw
 	 *        frames received from the KNX network
-	 * @throws KNXException
+	 * @throws KNXException on error creating FT1.2 connection or entering busmonitor mode
 	 */
-	public KNXNetworkMonitorFT12(final int portNumber, final KNXMediumSettings settings)
-		throws KNXException
+	public KNXNetworkMonitorFT12(final int portNumber, final KNXMediumSettings settings) throws KNXException
 	{
 		this(new FT12Connection(portNumber), settings);
 	}

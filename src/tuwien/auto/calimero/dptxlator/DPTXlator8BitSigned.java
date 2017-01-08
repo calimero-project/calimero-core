@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -117,7 +117,7 @@ public class DPTXlator8BitSigned extends DPTXlator
 	 * Sets one new translation item from a signed value, replacing any old items.
 	 *
 	 * @param value signed value, -128 &le; <code>value</code> &le; 127
-	 * @throws KNXFormatException
+	 * @throws KNXFormatException if <code>value</code> is out of range
 	 */
 	public final void setValue(final int value) throws KNXFormatException
 	{

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2016 B. Malinowsky
+    Copyright (c) 2010, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -102,7 +102,7 @@ public abstract class UdpSocketLooper
 	/**
 	 * Runs the looper.
 	 *
-	 * @throws IOException
+	 * @throws IOException on socket I/O error
 	 */
 	public void loop() throws IOException
 	{
@@ -169,17 +169,14 @@ public abstract class UdpSocketLooper
 		throws IOException;
 
 	/**
-	 * Quits the looper.
-	 * <p>
-	 * If closing the socket was requested during construction of this looper, the socket
-	 * is closed.
+	 * Quits the looper, closing the socket if requested during construction of this looper.
 	 */
 	public void quit()
 	{
+		quit = true;
 		// On platforms with non-interruptible network sockets, the receiver
 		// might not handle the interrupt flag for a longer period of time.
 		// That's why the closeSocket option can be set during construction.
-		quit = true;
 		if (closeSocket)
 			s.close();
 	}

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015 B. Malinowsky
+    Copyright (c) 2015, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -148,7 +148,7 @@ public final class Connector
 	 *
 	 * @param creator supplies the specific KNX network link
 	 * @return a new KNX network link with the specified (re-)connection behavior configured
-	 * @throws KNXException
+	 * @throws KNXException on error creating the network link
 	 * @throws InterruptedException on interrupted thread
 	 */
 	public KNXNetworkLink newLink(final TSupplier<? extends KNXNetworkLink> creator)
@@ -163,7 +163,7 @@ public final class Connector
 	 *
 	 * @param creator supplies the specific KNX network monitor
 	 * @return a new KNX network monitor with the specified (re-)connection behavior configured
-	 * @throws KNXException
+	 * @throws KNXException on error creating the monitor link
 	 * @throws InterruptedException on interrupted thread
 	 */
 	public KNXNetworkMonitor newMonitor(final TSupplier<? extends KNXNetworkMonitor> creator)

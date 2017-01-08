@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -62,6 +62,7 @@ public class KNXLinkClosedException extends KNXException
 	 * cause.
 	 *
 	 * @param s the detail message
+	 * @param cause the cause in form of a throwable object, can be null
 	 */
 	public KNXLinkClosedException(final String s, final Throwable cause)
 	{

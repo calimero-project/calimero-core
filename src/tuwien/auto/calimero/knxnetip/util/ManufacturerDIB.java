@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -57,7 +57,6 @@ public class ManufacturerDIB extends DIB
 
 	/**
 	 * Creates a manufacturer data DIB out of a byte array.
-	 * <p>
 	 *
 	 * @param data byte array containing manufacturer data DIB structure
 	 * @param offset start offset of DIB in <code>data</code>
@@ -79,10 +78,9 @@ public class ManufacturerDIB extends DIB
 	/**
 	 * Creates a manufacturer data DIB using a manufacturer identifier and a byte array
 	 * with manufacturer specific data.
-	 * <p>
 	 *
 	 * @param mfrID KNX manufacturer identifier, assigned by Konnex
-	 * @param mfrSpecificData
+	 * @param mfrSpecificData manufacturer data, <code>mfrSpecificData.length &gt; 0</code>
 	 */
 	public ManufacturerDIB(final int mfrID, final byte[] mfrSpecificData)
 	{

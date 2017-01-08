@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ public abstract class LibraryAdapter implements Closeable
 	 */
 	protected final Logger logger;
 
-	/** Returns all available serial communication port identifiers. */
+	/** @return all available serial communication port identifiers. */
 	public static List<String> getPortIdentifiers()
 	{
 		try {
@@ -248,9 +248,9 @@ public abstract class LibraryAdapter implements Closeable
 	 * @param method method name
 	 * @param args list of arguments
 	 * @return the result of the invoked method
-	 * @throws NoSuchMethodException
-	 * @throws IllegalAccessException
-	 * @throws InvocationTargetException
+	 * @throws NoSuchMethodException if a matching method is not found
+	 * @throws IllegalAccessException if <code>method</code> is inaccessible
+	 * @throws InvocationTargetException if the invoked method throws an exception
 	 * @see Class#getMethod(String, Class[])
 	 * @see Method#invoke(Object, Object[])
 	 */

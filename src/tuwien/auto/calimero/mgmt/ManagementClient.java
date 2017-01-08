@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -396,8 +396,8 @@ public interface ManagementClient extends AutoCloseable
 	 *         or a default of 0, with time &ge; 0 (time is returned conforming to the datapoint
 	 *         encoding with DPT ID 7.005 (DPT_TimePeriodSec))
 	 * @throws KNXTimeoutException on a timeout during send
-	 * @throws KNXRemoteException
-	 * @throws KNXDisconnectException
+	 * @throws KNXRemoteException on error to restart the communication partner
+	 * @throws KNXDisconnectException on transport layer disconnect in connection-oriented mode
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws InterruptedException on interrupted thread
 	 */
