@@ -114,3 +114,20 @@ Testing
 For unit tests, Calimero provides a [test network](https://github.com/calimero-project/calimero-testnetwork), consisting of a [KNXnet/IP server](https://github.com/calimero-project/calimero-server) and a virtual KNX network with two [KNX devices](https://github.com/calimero-project/calimero-device). The complete test network is implemented in software, and can be executed in any J2SE runtime environment. It provides the remote KNXnet/IP endpoint for executing unit tests for KNXnet/IP tunneling, busmonitoring, routing, device management, and KNX IP protocols. The same setup is used for Calimero Travis CI.
 
 Currently, the TP-UART and FT1.2 protocols can only be tested if the corresponding hardware is available. 
+
+More Features, Tools, Examples
+------------------------------
+
+* [introduction](https://github.com/calimero-project/introduction) provides code examples for programming with Calimero.
+
+* [calimero-tools](https://github.com/calimero-project/calimero-tools) offers command-line tools for KNX process communication, monitoring, and management.
+
+* [calimero-gui](https://github.com/calimero-project/calimero-gui) provides a graphical user interface (based on SWT) for process communication, monitoring, and management.
+
+* [calimero-server](https://github.com/calimero-project/calimero-server) is the Calimero KNXnet/IP Server, providing KNXnet/IP access to KNX networks.
+
+* [calimero-device](https://github.com/calimero-project/calimero-device) is the communication stack to implement a KNX device.
+
+* [serial-native](https://github.com/calimero-project/serial-native) provides native libraries for serial port access (using JNI) on Windows, Linux, and MacOS.
+
+* [import-ets-xml](https://github.com/calimero-project/import-ets-xml) allows importing ETS XML KNX datapoints for use with Calimero.
