@@ -195,8 +195,7 @@ public interface DeviceDescriptor
 				if (v.getMaskVersion() == descriptor)
 					return v;
 			}
-			throw new KNXIllegalArgumentException("unknown mask version "
-					+ getMaskVersionString(descriptor));
+			throw new KNXIllegalArgumentException("unknown mask version " + getMaskVersionString(descriptor));
 		}
 
 		/**
@@ -319,9 +318,13 @@ public interface DeviceDescriptor
 		private DD2(final byte[] descriptor)
 		{
 			if (descriptor.length != TYPE2_SIZE)
-				throw new KNXIllegalArgumentException("unspecified device descriptor type 2 using "
-						+ "length " + descriptor.length);
+				throw new KNXIllegalArgumentException(
+						"unspecified device descriptor type 2 using " + "length " + descriptor.length);
 			d = descriptor.clone();
+			// check upper two bits, the only values allowed are 0="link mgmt not supported" and 1="supports link mgmt"
+			final int v = (d[5] & 0xc0) >> 6;
+			if (v > 1)
+				throw new KNXIllegalArgumentException("undefined misc field value " + v + " (byte 5)");
 		}
 
 		public DD2(final int appManufacturer, final int deviceType, final int version,
@@ -373,14 +376,11 @@ public interface DeviceDescriptor
 		/**
 		 * @return <code>true</code> if network management procedures using A_Link_Read/Write are
 		 *         supported, <code>false</code> otherwise
-		 * @throws KNXFormatException
 		 */
-		public boolean isLinkManagementSupported() throws KNXFormatException
+		public boolean isLinkManagementSupported()
 		{
 			final int i = (d[5] & 0xc0) >> 6;
-			if (i > 1)
-				throw new KNXFormatException("undefined misc field value " + i);
-			return i != 0;
+			return i == 1;
 		}
 
 		/**
