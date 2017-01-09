@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2016 B. Malinowsky
+    Copyright (c) 2015, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -420,94 +420,6 @@ public interface DeviceDescriptor
 			final int offset = channelType.ordinal() * 2;
 			return get16Bits(6 + offset) & 0x1fff;
 		}
-
-		// ??? maybe add, maybe not
-//		/**
-//		 * The number of channels implemented in the device for channel 1.
-//		 *
-//		 * @return number of channels, <code>1 &le; channels &le; 8</code>
-//		 */
-//		public int getChannel1Channels()
-//		{
-//			return (get16Bits(6) >> 13) + 1;
-//		}
-//
-//		/**
-//		 * @return the 13 bit channel code of channel 1
-//		 */
-//		public int getChannel1Code()
-//		{
-//			return get16Bits(6) & 0x1fff;
-//		}
-//
-//		public int getChannelInfo2()
-//		{
-//			return get16Bits(8);
-//		}
-//
-//		/**
-//		 * The number of channels implemented in the device for channel 2.
-//		 *
-//		 * @return number of channels, <code>1 &le; channels &le; 8</code>
-//		 */
-//		public int getChannel2Channels()
-//		{
-//			return (get16Bits(8) >> 13) + 1;
-//		}
-//
-//		/**
-//		 * @return the 13 bit channel code of channel 2
-//		 */
-//		public int getChannel2Code()
-//		{
-//			return get16Bits(8) & 0x1fff;
-//		}
-//
-//		public int getChannelInfo3()
-//		{
-//			return get16Bits(10);
-//		}
-//
-//		/**
-//		 * The number of channels implemented in the device for channel 3.
-//		 *
-//		 * @return number of channels, <code>1 &le; channels &le; 8</code>
-//		 */
-//		public int getChannel3Channels()
-//		{
-//			return (get16Bits(10) >> 13) + 1;
-//		}
-//
-//		/**
-//		 * @return the 13 bit channel code of channel 3
-//		 */
-//		public int getChannel3Code()
-//		{
-//			return get16Bits(10) & 0x1fff;
-//		}
-//
-//		public int getChannelInfo4()
-//		{
-//			return get16Bits(12);
-//		}
-//
-//		/**
-//		 * The number of channels implemented in the device for channel 4.
-//		 *
-//		 * @return number of channels, <code>1 &le; channels &le; 8</code>
-//		 */
-//		public int getChannel4Channels()
-//		{
-//			return (get16Bits(12) >> 13) + 1;
-//		}
-//
-//		/**
-//		 * @return the 13 bit channel code of channel 4
-//		 */
-//		public int getChannel4Code()
-//		{
-//			return get16Bits(12) & 0x1fff;
-//		}
 
 		@Override
 		public String toString()
