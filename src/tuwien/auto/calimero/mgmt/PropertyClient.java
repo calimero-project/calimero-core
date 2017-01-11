@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -251,7 +251,6 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 
 		/**
 		 * Returns the property identifier part of this key.
-		 * <p>
 		 *
 		 * @return the PID as unsigned number
 		 */
@@ -262,7 +261,6 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 
 		/**
 		 * Returns whether the property is defined with global object type.
-		 * <p>
 		 *
 		 * @return <code>true</code> if property has global object type,
 		 *         <code>false</code> if property has a specific object type
@@ -272,18 +270,12 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 			return ot == GLOBAL_OBJTYPE;
 		}
 
-		/* (non-Javadoc)
-		 * @see java.lang.Object#hashCode()
-		 */
 		@Override
 		public int hashCode()
 		{
 			return ot << 16 | id;
 		}
 
-		/* (non-Javadoc)
-		 * @see java.lang.Object#equals(java.lang.Object)
-		 */
 		@Override
 		public boolean equals(final Object obj)
 		{
@@ -294,9 +286,6 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 			return false;
 		}
 
-		/* (non-Javadoc)
-		 * @see java.lang.Comparable#compareTo(java.lang.Object)
-		 */
 		@Override
 		public int compareTo(final PropertyKey o)
 		{
@@ -308,7 +297,6 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	/**
 	 * Stores property definition information of one property, used for type translation
 	 * and property lookup by a property client.
-	 * <p>
 	 *
 	 * @author B. Malinowsky
 	 */
@@ -575,8 +563,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	}
 
 	@Override
-	public Description getDescription(final int objIndex, final int pid)
-		throws KNXException, InterruptedException
+	public Description getDescription(final int objIndex, final int pid) throws KNXException, InterruptedException
 	{
 		if (pid == 0)
 			throw new KNXIllegalArgumentException("pid has to be > 0");
@@ -679,8 +666,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		return i;
 	}
 
-	private Description createDesc(final int oi, final byte[] desc) throws KNXException,
-		InterruptedException
+	private Description createDesc(final int oi, final byte[] desc) throws KNXException, InterruptedException
 	{
 		final Description d = new Description(getObjectType(oi, true), desc);
 		try {
@@ -695,8 +681,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		return d;
 	}
 
-	private int getObjectType(final int objIndex, final boolean queryObject) throws KNXException,
-		InterruptedException
+	private int getObjectType(final int objIndex, final boolean queryObject) throws KNXException, InterruptedException
 	{
 		for (final Iterator<Pair> i = objectTypes.iterator(); i.hasNext();) {
 			final Pair p = i.next();
@@ -715,8 +700,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		return tObjType.getValueUnsigned();
 	}
 
-	private DPTXlator createTranslator(final int objIndex, final int pid)
-		throws KNXException, InterruptedException
+	private DPTXlator createTranslator(final int objIndex, final int pid) throws KNXException, InterruptedException
 	{
 		final int ot = getObjectType(objIndex, true);
 		int pdt = -1;

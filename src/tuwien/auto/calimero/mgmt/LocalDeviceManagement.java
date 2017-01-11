@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2016 B. Malinowsky
+    Copyright (c) 2015, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -204,8 +204,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 		// int elements = 0;
 		// for (int i = 0; i < ret.length; ++i)
 		// 	elements = elements << 8 | ret[i] & 0xff;
-		return new byte[] { (byte) objIndex, (byte) p, (byte) propIndex, (byte) writeEnabled, 0, 0,
-			0 };
+		return new byte[] { (byte) objIndex, (byte) p, (byte) propIndex, (byte) writeEnabled, 0, 0, 0 };
 	}
 
 	@Override
