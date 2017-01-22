@@ -50,6 +50,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import tag.KnxnetIP;
+import tag.Slow;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.IndividualAddress;
@@ -189,6 +190,7 @@ public class KNXNetworkMonitorIPTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
+	@Slow
 	public final void testSetDecodeRawFrames() throws InterruptedException
 	{
 		mon.setDecodeRawFrames(true);

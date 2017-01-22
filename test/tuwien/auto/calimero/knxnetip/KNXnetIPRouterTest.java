@@ -58,6 +58,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import tag.KnxnetIP;
+import tag.Slow;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.GroupAddress;
@@ -217,6 +218,7 @@ public class KNXnetIPRouterTest
 	 * @throws KNXException
 	 */
 	@Test
+	@Slow
 	public final void testReceive() throws KNXException
 	{
 		newRouter();

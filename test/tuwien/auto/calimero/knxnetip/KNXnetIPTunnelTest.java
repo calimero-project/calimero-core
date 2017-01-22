@@ -311,6 +311,7 @@ public class KNXnetIPTunnelTest
 	}
 
 	@Test
+	@Slow
 	public final void testReceive() throws KNXException, InterruptedException
 	{
 		newTunnel();
