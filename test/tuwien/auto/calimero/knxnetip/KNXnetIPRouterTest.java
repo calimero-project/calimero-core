@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -220,7 +220,7 @@ public class KNXnetIPRouterTest
 	public final void testReceive() throws KNXException
 	{
 		newRouter();
-		System.out.println("waiting for some incoming frames...");
+		Util.out("waiting for some incoming frames...");
 		try {
 			Thread.sleep(10 * 1000);
 		}

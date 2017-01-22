@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -215,12 +215,10 @@ public class ManagementClientImplTest
 	{
 		IndividualAddress[] ias = mc.readAddress(true);
 		assertTrue(ias.length <= 1);
-		System.out.println(ias[0]);
 
 		final long start = System.currentTimeMillis();
 		ias = mc.readAddress(false);
 		assertTrue(System.currentTimeMillis() - start >= mc.getResponseTimeout() * 1000);
-		System.out.println(ias[0]);
 	}
 
 	/**

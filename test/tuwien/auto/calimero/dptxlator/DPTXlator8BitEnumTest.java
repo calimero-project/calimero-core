@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2016 B. Malinowsky
+    Copyright (c) 2015, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -104,7 +104,7 @@ public class DPTXlator8BitEnumTest extends TestCase
 		// translator specific
 		assertEquals("no fault", t.getValue());
 		t.setValue(1);
-		System.out.println(t.getValue());
+		assertFalse("should not equal \"no fault\"", "no fault".equals(t.getValue()));
 
 		// try a enum with no 0 element
 		final DPTXlator8BitEnum x = new DPTXlator8BitEnum(DPTXlator8BitEnum.DPT_AlarmClassType);

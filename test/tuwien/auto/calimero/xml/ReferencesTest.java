@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -73,12 +73,10 @@ public class ReferencesTest extends TestCase
 
 		s = "& < > \" '";
 		out = References.replaceFromRef(s);
-		System.out.println(out);
 		assertEquals("& < > \" '", out);
 
 		s = "&<>\"';";
 		out = References.replaceFromRef(s);
-		System.out.println(out);
 		assertEquals("&<>\"';", out);
 
 		s = "a text without any entities to replace";
@@ -101,13 +99,10 @@ public class ReferencesTest extends TestCase
 
 		s = "&&&<<<>\"'''>>";
 		out = References.replaceWithRef(s);
-		System.out.println(out);
 		assertEquals("&amp;&amp;&amp;&lt;&lt;&lt;&gt;&quot;&apos;&apos;&apos;&gt;&gt;", out);
 
 		s = " text & text < text > text \" text ' text ";
 		out = References.replaceWithRef(s);
-		System.out.println(out);
 		assertEquals(" text &amp; text &lt; text &gt; text &quot; text &apos; text ", out);
-
 	}
 }

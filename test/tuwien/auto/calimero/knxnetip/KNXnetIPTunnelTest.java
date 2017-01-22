@@ -314,7 +314,7 @@ public class KNXnetIPTunnelTest
 	public final void testReceive() throws KNXException, InterruptedException
 	{
 		newTunnel();
-		System.out.println("Tunnel: waiting for some incoming frames...");
+		Util.out("Tunnel: waiting for some incoming frames...");
 		try {
 			Thread.sleep(10 * 1000);
 		}
@@ -325,7 +325,7 @@ public class KNXnetIPTunnelTest
 	public final void testReceiveMonitor() throws KNXException, InterruptedException
 	{
 		newMonitor();
-		System.out.println("Monitor: waiting for some incoming frames...");
+		Util.out("Monitor: waiting for some incoming frames...");
 		try {
 			Thread.sleep(10 * 1000);
 		}

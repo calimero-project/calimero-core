@@ -74,6 +74,8 @@ public final class Util
 	private Util()
 	{}
 
+	private static boolean printToSystemOut = false;
+
 	/**
 	 * Standard out desc and toHexDec(bytes).
 	 *
@@ -82,7 +84,14 @@ public final class Util
 	 */
 	public static void out(final String desc, final byte[] bytes)
 	{
-		System.out.println(desc + ": " + toHexDec(bytes));
+		if (printToSystemOut)
+			System.out.println(desc + ": " + toHexDec(bytes));
+	}
+
+	public static void out(final Object print)
+	{
+		if (printToSystemOut)
+			System.out.println(print.toString());
 	}
 
 	/**

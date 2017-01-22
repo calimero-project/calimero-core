@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2016 B. Malinowsky
+    Copyright (c) 2015, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -199,7 +199,6 @@ public class DPTXlatorUtf8Test extends TestCase
 				utfdata3.length);
 		Assert.assertArrayEquals(data, t.getData());
 		assertArrayEquals(values, t.getAllValues());
-		System.out.println(new String(t.getData(), "utf-8"));
 
 		t.setValues(new String[0]);
 		Assert.assertArrayEquals(data, t.getData());

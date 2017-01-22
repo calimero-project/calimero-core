@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -91,10 +91,10 @@ public class KNXnetIPDevMgmtTest
 			final CEMIDevMgmt f = (CEMIDevMgmt) received;
 			Debug.printMData(f);
 			if (f.getPID() == 52)
-				System.out.println(new IndividualAddress(f.getPayload()));
+				new IndividualAddress(f.getPayload());
 			if (f.getPID() == 57)
 				try {
-					System.out.println(InetAddress.getByAddress(f.getPayload()));
+					InetAddress.getByAddress(f.getPayload());
 				}
 				catch (final UnknownHostException e1) {
 					e1.printStackTrace();

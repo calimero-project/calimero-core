@@ -193,7 +193,7 @@ public class KNXNetworkMonitorIPTest
 	{
 		mon.setDecodeRawFrames(true);
 		lmon.raw = null;
-		System.out.println("monitor: waiting for incoming frames..");
+		Util.out("monitor: waiting for incoming frames..");
 		Thread.sleep(10 * 1000);
 //		assertNotNull(lmon.raw);
 		mon.setDecodeRawFrames(false);

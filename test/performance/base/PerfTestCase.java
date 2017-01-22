@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ import java.io.PrintStream;
 import java.util.Arrays;
 
 import junit.framework.TestCase;
+import tuwien.auto.calimero.Util;
 
 /**
  * @author B. Malinowsky
@@ -67,7 +68,7 @@ public class PerfTestCase extends TestCase
 	/**
 	 * Creates a new test case for measuring performance.
 	 * <p>
-	 * 
+	 *
 	 * @param name name of test case name of test case
 	 */
 	public PerfTestCase(final String name)
@@ -106,7 +107,7 @@ public class PerfTestCase extends TestCase
 	/**
 	 * Returns the number of rounds to perform before timing the test.
 	 * <p>
-	 * 
+	 *
 	 * @return number of warm-up rounds
 	 */
 	public int getWarmupLaps()
@@ -117,7 +118,7 @@ public class PerfTestCase extends TestCase
 	/**
 	 * Returns the number of rounds to perform for measuring the test.
 	 * <p>
-	 * 
+	 *
 	 * @return number of measure rounds
 	 */
 	public int getMeasureLaps()
@@ -128,7 +129,7 @@ public class PerfTestCase extends TestCase
 	/**
 	 * Returns the normalize value used for the test case result.
 	 * <p>
-	 * 
+	 *
 	 * @return normalize value
 	 */
 	public int getNormalize()
@@ -143,7 +144,7 @@ public class PerfTestCase extends TestCase
 	 * case, to prevent extreme short time measurements for example. Then the normalize
 	 * value is set to the number of iterations and considered in the result.<br>
 	 * By default, normalize is set to 1.
-	 * 
+	 *
 	 * @param normalizer new normalize value
 	 */
 	public void setNormalize(final int normalizer)
@@ -157,36 +158,34 @@ public class PerfTestCase extends TestCase
 	public void printResults()
 	{
 		final Integer[] d = t.getDurations();
-		out.println("Timing results for " + getName());
-		out.println("Laps: " + warmups + " warmups, " + measure + " measured (out of "
-			+ d.length + "), " + (warmups + measure) + " total");
-		out.print("Avg lap: " + t.getAverageDuration() + " ms, normalized: "
-			+ (t.getAverageDuration() / normalize) + " ms");
+		Util.out("Timing results for " + getName());
+		Util.out("Laps: " + warmups + " warmups, " + measure + " measured (out of " + d.length + "), "
+				+ (warmups + measure) + " total");
+		String s = "Avg lap: " + t.getAverageDuration() + " ms, normalized: " + (t.getAverageDuration() / normalize)
+				+ " ms";
 		if (d.length > 3) {
 			final Integer[] d2 = t.getDurations(2);
 			long sum = 0;
 			for (int i = 0; i < d2.length; ++i)
 				sum += d2[i].intValue();
 			final float avg = (float) sum / d2.length;
-			out.print(" (" + avg + " ms / " + (avg / normalize)
-				+ " ms without extremes)");
+			s += " (" + avg + " ms / " + (avg / normalize) + " ms without extremes)";
 		}
-		out.println();
-		out.print("Lap times: ");
-		out.println(Arrays.asList(d));
+		Util.out(s);
+		Util.out("Lap times: " + Arrays.asList(d));
 	}
 
 	/**
 	 * Returns the performance timer.
 	 * <p>
-	 * 
+	 *
 	 * @return performance timer object
 	 */
 	protected PerfTimer getTimer()
 	{
 		return t;
 	}
-	
+
 	public final void testDummy()
 	{
 		// prevents jUnit warning "no test found in test case"
