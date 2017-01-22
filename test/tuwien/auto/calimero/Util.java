@@ -126,8 +126,6 @@ public final class Util
 		return buf.toString();
 	}
 
-	// marker method where previously a logging was initialized
-	public static void setupLogging() {}
 	public static void setupLogging(final String name) {}
 	// marker method where previously logging was torn down
 	public static void tearDownLogging() {}

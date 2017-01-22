@@ -54,15 +54,11 @@ sourceSets {
 }
 
 junitPlatform {
-//    version '1.0.0-SNAPSHOT'
     filters {
-        engines {
-//            include 'junit-jupiter', 'junit-vintage'
-        }
         tags {
             exclude 'ft12'
-//            exclude 'knxnetip'
             exclude 'slow'
+//            exclude 'knxnetip'
         }
     }
 }

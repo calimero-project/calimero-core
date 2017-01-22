@@ -609,7 +609,6 @@ public interface ManagementClient extends AutoCloseable
 
 	/**
 	 * Returns whether a network link is attached to this management client.
-	 * <p>
 	 *
 	 * @return <code>true</code> if link attached, <code>false</code> if detached
 	 */

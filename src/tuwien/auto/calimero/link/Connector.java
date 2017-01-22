@@ -143,8 +143,7 @@ public final class Connector
 	}
 
 	/**
-	 * Returns a new KNXNetworkLink with the specified behavior for (re-)connection to the KNX
-	 * network.
+	 * Returns a new KNXNetworkLink with the specified behavior for (re-)connection to the KNX network.
 	 *
 	 * @param creator supplies the specific KNX network link
 	 * @return a new KNX network link with the specified (re-)connection behavior configured
@@ -158,8 +157,7 @@ public final class Connector
 	}
 
 	/**
-	 * Returns a new KNXNetworMonitor with the specified behavior for (re-)connection to the KNX
-	 * network.
+	 * Returns a new KNXNetworMonitor with the specified behavior for (re-)connection to the KNX network.
 	 *
 	 * @param creator supplies the specific KNX network monitor
 	 * @return a new KNX network monitor with the specified (re-)connection behavior configured
@@ -188,13 +186,12 @@ public final class Connector
 		private static final ThreadFactory tf = Executors.defaultThreadFactory();
 		// we should replace this with a scheduled _cached_ thread pool executor implementation,
 		// this one is a fixed sized pool, with thread time-out enabled
-		private static ScheduledThreadPoolExecutor reconnect = new ScheduledThreadPoolExecutor(4,
-				(r) -> {
-					final Thread t = tf.newThread(r);
-					t.setName("Calimero Connector (" + t.getName() + ")");
-					t.setDaemon(true);
-					return t;
-				});
+		private static ScheduledThreadPoolExecutor reconnect = new ScheduledThreadPoolExecutor(4, runnable -> {
+			final Thread t = tf.newThread(runnable);
+			t.setName("Calimero Connector (" + t.getName() + ")");
+			t.setDaemon(true);
+			return t;
+		});
 
 		static {
 			// try to remove idle threads after a while

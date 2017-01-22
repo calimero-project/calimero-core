@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -77,7 +77,6 @@ public abstract class KNXMediumSettings
 
 	/**
 	 * Creates the medium settings for the specified KNX medium.
-	 * <p>
 	 *
 	 * @param medium the KNX medium type code, see definitions in {@link KNXMediumSettings}
 	 * @param device individual address to use as source address in KNX messages, supplying
@@ -102,7 +101,6 @@ public abstract class KNXMediumSettings
 
 	/**
 	 * Creates a new container for KNX device/medium settings.
-	 * <p>
 	 *
 	 * @param device individual device address to use as source address in KNX messages,
 	 *        specifying <code>null</code> uses the individual address 0.0.0
@@ -114,7 +112,6 @@ public abstract class KNXMediumSettings
 
 	/**
 	 * Sets the device individual address.
-	 * <p>
 	 *
 	 * @param device individual address to use as new source address in KNX messages
 	 */
@@ -125,7 +122,6 @@ public abstract class KNXMediumSettings
 
 	/**
 	 * Returns the device individual address.
-	 * <p>
 	 *
 	 * @return individual address
 	 */
@@ -137,7 +133,6 @@ public abstract class KNXMediumSettings
 	/**
 	 * Returns the KNX medium type identifier specifying the communication medium this
 	 * object represents.
-	 * <p>
 	 *
 	 * @return KNX medium type ID
 	 */
@@ -175,7 +170,6 @@ public abstract class KNXMediumSettings
 
 	/**
 	 * Returns a textual representation of the KNX medium type.
-	 * <p>
 	 *
 	 * @return KNX medium as string
 	 * @see #getMedium()
@@ -187,7 +181,6 @@ public abstract class KNXMediumSettings
 
 	/**
 	 * Returns a textual representation of the KNX medium type.
-	 * <p>
 	 *
 	 * @param knxMedium the KNX medium type identifier
 	 * @return KNX medium as string, or "unknown" on unknown medium type
@@ -219,9 +212,6 @@ public abstract class KNXMediumSettings
 		return 0;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString()
 	{
