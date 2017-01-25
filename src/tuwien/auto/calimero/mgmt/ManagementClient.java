@@ -289,7 +289,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @param remote address of remote endpoint, or <code>null</code> to use broadcast communication mode
 	 * @param objectType interface object type, <code>0 &le; iot &lt; 0xffff</code>
 	 * @param pid KNX property identifier, <code>0 &le; pid &lt; 0xff</code>
-	 * @param testInfo test information, <code>0 &lt; testInfo.length &lt; ???</code>
+	 * @param testInfo test information, <code>0 &lt; testInfo.length &lt; </code> parameter-specific
 	 * @return test result as byte array, <code>result.length &gt; 0</code>
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXTimeoutException on timeout during send or waiting for a response

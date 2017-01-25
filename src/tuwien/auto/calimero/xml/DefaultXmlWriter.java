@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,8 +49,8 @@ import tuwien.auto.calimero.KNXIllegalStateException;
 /**
  * Default XML writer implementation of the XmlWriter interface.
  * <p>
- * Does not add any feature not already documented in the implemented interface.<br>
- * This writer is not thread safe.
+ * Does not add any feature not already documented in the implemented interface. No support for XML namespaces,
+ * processing instructions, DTDs, and entity refs. This writer is not thread safe.
  *
  * @author B. Malinowsky
  */
@@ -68,9 +68,9 @@ public class DefaultXmlWriter implements XmlWriter
 
 	private final Map<String, Object> config = new HashMap<>();
 
-	private BufferedWriter w;
+	private final BufferedWriter w;
 	// xml layout stack
-	private Stack<Tag> layout;
+	private final Stack<Tag> layout;
 	// current layout indentation
 	private int indent;
 	private boolean newTag;
@@ -300,28 +300,19 @@ public class DefaultXmlWriter implements XmlWriter
 
 	@Override
 	public void writeNamespace(final String prefix, final String namespaceURI)
-	{
-		// TODO Auto-generated method stub
-	}
+	{}
 
 	@Override
 	public void writeDefaultNamespace(final String namespaceURI)
-	{
-		// TODO Auto-generated method stub
-	}
+	{}
 
 	@Override
 	public void writeProcessingInstruction(final String target)
-	{
-		// TODO Auto-generated method stub
-	}
+	{}
 
 	@Override
 	public void writeProcessingInstruction(final String target, final String data)
-
-	{
-		// TODO Auto-generated method stub
-	}
+	{}
 
 	@Override
 	public void writeCData(final String data)
@@ -331,15 +322,11 @@ public class DefaultXmlWriter implements XmlWriter
 
 	@Override
 	public void writeDTD(final String dtd)
-	{
-		// TODO Auto-generated method stub
-	}
+	{}
 
 	@Override
 	public void writeEntityRef(final String name)
-	{
-		// TODO Auto-generated method stub
-	}
+	{}
 
 	@Override
 	public void writeStartDocument()

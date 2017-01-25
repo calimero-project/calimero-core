@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,8 +48,8 @@ import java.util.Stack;
 /**
  * Default XML reader implementation of the XmlReader interface.
  * <p>
- * Does not add any feature not already documented in the implemented interface.<br>
- * This reader is not thread safe.
+ * Does not add any feature not already documented in the implemented interface. No support for XML namespaces and
+ * processing instructions. This reader is not thread safe.
  *
  * @author B. Malinowsky
  */
@@ -359,9 +359,7 @@ class DefaultXmlReader implements XmlReader
 
 	@Override
 	public void require(final int type, final String namespaceURI, final String localName)
-	{
-		// TODO Auto-generated method stub
-	}
+	{}
 
 	@Override
 	public String getElementText()
@@ -385,14 +383,12 @@ class DefaultXmlReader implements XmlReader
 	@Override
 	public String getNamespaceURI(final String prefix)
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public boolean isWhiteSpace()
 	{
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -423,7 +419,6 @@ class DefaultXmlReader implements XmlReader
 	public String getAttributeNamespace(final int index)
 	{
 		inStartEvent();
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -438,7 +433,6 @@ class DefaultXmlReader implements XmlReader
 	public String getAttributePrefix(final int index)
 	{
 		inStartEvent();
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -466,21 +460,18 @@ class DefaultXmlReader implements XmlReader
 	@Override
 	public int getNamespaceCount()
 	{
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public String getNamespacePrefix(final int index)
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getNamespaceURI(final int index)
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -543,14 +534,12 @@ class DefaultXmlReader implements XmlReader
 	@Override
 	public String getNamespaceURI()
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getPrefix()
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -581,14 +570,12 @@ class DefaultXmlReader implements XmlReader
 	@Override
 	public String getPITarget()
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getPIData()
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

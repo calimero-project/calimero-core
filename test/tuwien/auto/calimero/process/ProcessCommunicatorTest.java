@@ -284,7 +284,7 @@ public class ProcessCommunicatorTest
 					pc.readBool(dpBool);
 				}
 				catch (KNXException | InterruptedException e) {
-					fail(getName() + ": read bool");
+					fail(getName());
 				}
 			};
 		}.start();

@@ -195,7 +195,7 @@ public interface DeviceDescriptor
 				if (v.getMaskVersion() == descriptor)
 					return v;
 			}
-			throw new KNXIllegalArgumentException("unknown mask version " + getMaskVersionString(descriptor));
+			throw new KNXIllegalArgumentException("unknown mask version " + maskVersionString(descriptor));
 		}
 
 		/**
@@ -203,8 +203,7 @@ public interface DeviceDescriptor
 		 * @return a zero-padded string of length 4 holding the hexadecimal representation of the
 		 *         mask version (the used format is "%04X")
 		 */
-		// ??? maybe public
-		static String getMaskVersionString(final int descriptor)
+		static String maskVersionString(final int descriptor)
 		{
 			return String.format("%04X", descriptor);
 		}
@@ -290,7 +289,7 @@ public interface DeviceDescriptor
 		@Override
 		public String toString()
 		{
-			return getMaskVersionString(mv) + " - " + getDeviceProfile();
+			return maskVersionString(mv) + " - " + getDeviceProfile();
 		}
 
 		@Override

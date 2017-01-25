@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2016 B. Malinowsky
+    Copyright (c) 2009, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -66,7 +66,6 @@ public class DPTXlator4ByteFloatTest extends TestCase
 
 	private final String zero = "0.0";
 	private final String[] strings = { min, max, zero, value1, value2};
-	// TODO achieving a nice formatting of floats is cumbersome, use Java defaults here
 	private final String[] strCmp = { "1.4E-45", "3.40282E38", "0.0", "735", "54732.332"};
 
 	private final float[] floats =

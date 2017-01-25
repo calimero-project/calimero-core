@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -156,12 +156,12 @@ public class HPAI
 		if (addr != null) {
 			final InetAddress a = addr.getAddress();
 			if (a == null)
-				throw new KNXIllegalArgumentException("unresolved IP address");
+				throw new KNXIllegalArgumentException(addr + " is an unresolved IP address");
 			if (a.isAnyLocalAddress())
-				throw new KNXIllegalArgumentException("wildcard IP address");
+				throw new KNXIllegalArgumentException(a + " is a wildcard IP address");
 			address = a.getAddress();
 			if (address.length != 4)
-				throw new KNXIllegalArgumentException("not an IPv4 address");
+				throw new KNXIllegalArgumentException(a + " is not an IPv4 address");
 			port = addr.getPort();
 		}
 		else {

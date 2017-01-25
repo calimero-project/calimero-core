@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2016 B. Malinowsky
+    Copyright (c) 2015, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -96,7 +96,6 @@ public final class IPCurrentConfigDIB extends DIB
 
 	/**
 	 * Creates a IP current configuration DIB using the supplied device information.
-	 * <p>
 	 *
 	 * @param ip currently used IP address, use <code>null</code> or 0.0.0.0 if the device does not
 	 *        provide this information
@@ -119,10 +118,9 @@ public final class IPCurrentConfigDIB extends DIB
 		this.gw = gateway != null ? gateway.getAddress() : new byte[4];
 		this.dhcp = dhcp != null ? dhcp.getAddress() : new byte[4];
 
-		// NYI JRE >= 1.5: should use Integer.bitCount()
-		if (ipAssignmentMethod < 0 || ipAssignmentMethod > 0x15)
-			throw new KNXIllegalArgumentException("IP assignment method out of range [0..b1111]: "
-					+ ipAssignmentMethod);
+		if (ipAssignmentMethod < 0 || ipAssignmentMethod > 0x15 || Integer.bitCount(ipAssignmentMethod) != 1)
+			throw new KNXIllegalArgumentException(
+					"unsupported IP assignment method " + ipAssignmentMethod + " out of {1, 2, 4, 8}");
 		assignment = ipAssignmentMethod;
 	}
 
@@ -166,9 +164,6 @@ public final class IPCurrentConfigDIB extends DIB
 		return assignment;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString()
 	{
@@ -182,9 +177,6 @@ public final class IPCurrentConfigDIB extends DIB
 		return "IP current config DIB";
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.util.DIB#toByteArray()
-	 */
 	@Override
 	public byte[] toByteArray()
 	{

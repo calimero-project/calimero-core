@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2016 B. Malinowsky
+    Copyright (c) 2015, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -71,9 +71,6 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  */
 public class DPTXlatorUtf8 extends DPTXlator
 {
-	// XXX currently we use fixed type size of 1, which is not really intuitive
-	// maybe I should change that value to the encoded length of the first translation item
-
 	/**
 	 * DPT ID 28.001, UTF-8 encoding.
 	 */

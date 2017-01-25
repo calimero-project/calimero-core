@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2016 B. Malinowsky
+    Copyright (c) 2015, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -62,7 +62,6 @@ public final class KnxAddressesDIB extends DIB
 
 	/**
 	 * Creates a KNX addresses DIB out of a byte array.
-	 * <p>
 	 *
 	 * @param data byte array containing device DIB structure
 	 * @param offset start offset of DIB in <code>data</code>
@@ -106,18 +105,12 @@ public final class KnxAddressesDIB extends DIB
 		return Collections.unmodifiableList(addresses);
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString()
 	{
 		return addresses.toString();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.util.DIB#toByteArray()
-	 */
 	@Override
 	public byte[] toByteArray()
 	{
