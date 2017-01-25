@@ -53,7 +53,14 @@ sourceSets {
     }
 }
 
+jar {
+	manifest {
+		attributes 'Main-Class': mainClassName
+	}
+}
+
 junitPlatform {
+	details 'none' // 'tree'
     filters {
         tags {
             exclude 'ft12'
