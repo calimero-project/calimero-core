@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2016 B. Malinowsky
+    Copyright (c) 2015, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -382,6 +382,25 @@ public class DPTXlator8BitSignedTest extends TestCase
 			fail("out of range");
 		}
 		catch (final KNXIllegalArgumentException expected) {}
+	}
+
+	public final void testStatusBit() throws KNXFormatException
+	{
+		try {
+			t.statusBit(0);
+			fail("wrong xlator");
+		}
+		catch (final KNXIllegalStateException expected) {}
+
+		final DPTXlator8BitSigned t2 = new DPTXlator8BitSigned(sm);
+		for (int i = 0; i < 5; i++)
+			assertFalse(t2.statusBit(i));
+		t2.setStatusMode(true, true, true, true, true, 2);
+		for (int i = 0; i < 5; i++)
+			assertTrue(t2.statusBit(i));
+		t2.setStatusMode(true, false, true, false, true, 2);
+		assertFalse(t2.statusBit(1));
+		assertFalse(t2.statusBit(3));
 	}
 
 	/**

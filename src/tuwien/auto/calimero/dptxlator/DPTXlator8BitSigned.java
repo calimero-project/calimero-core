@@ -159,7 +159,7 @@ public class DPTXlator8BitSigned extends DPTXlator
 	 * @param c status bit 2
 	 * @param d status bit 3
 	 * @param e status bit 4
-	 * @param mode the active mode, <code>0</code> $le; mode $le; <code>2</code>
+	 * @param mode the active mode, <code>0</code> &le; mode &le; <code>2</code>
 	 */
 	public final void setStatusMode(final boolean a, final boolean b, final boolean c,
 		final boolean d, final boolean e, final int mode)
@@ -177,12 +177,21 @@ public class DPTXlator8BitSigned extends DPTXlator
 		data = new short[] { (short) (status | enc) };
 	}
 
-	// TODO status would be better be done as enum set?
-	// 0 = set, 1 = clear
-	boolean isStatusBitSet()
+	/**
+	 * Returns a status bit; this method is only applicable for DPT 6.020, other DPTs will cause a
+	 * {@link KNXIllegalStateException}.
+	 *
+	 * @param statusBit to check, <code>0 &le; statusBit &le; 4</code>
+	 * @return <code>true</code> if status bit is set, <code>false</code> otherwise
+	 * @see #setStatusMode
+	 */
+	boolean statusBit(final int statusBit)
 	{
-		// NYI
-		return false;
+		if (dpt != DPT_STATUS_MODE3)
+			throw new KNXIllegalStateException("translator not set to DPT 6.020 (Status with Mode)");
+		if (statusBit < 0 || statusBit > 4)
+			throw new KNXIllegalArgumentException("status bit " + statusBit + " out of range [0..4]");
+		return (data[0] & (0x80 >> statusBit)) != 0;
 	}
 
 	/**
