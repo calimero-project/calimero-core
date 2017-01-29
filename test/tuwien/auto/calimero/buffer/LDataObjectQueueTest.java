@@ -408,7 +408,8 @@ public class LDataObjectQueueTest extends TestCase
 		// resolution of currentTimeMillis is system dependent
 		// but should be <= 50 ms
 		for (int i = 0; i < stamps.length; ++i)
-			assertTrue(stamps[i] >= time[i] && stamps[i] <= time[i] + 50);
+			assertTrue("not in range: " + time[i] + " <= " + stamps[i] + " <= " + (time[i] + 50),
+					stamps[i] >= time[i] && stamps[i] <= time[i] + 50);
 		assertEquals(var.getTimestamp(), stamps[2]);
 
 		// fix
@@ -437,7 +438,8 @@ public class LDataObjectQueueTest extends TestCase
 		// resolution of currentTimeMillis is system dependent
 		// but should be <= 50 ms
 		for (int i = 0; i < stamps.length; ++i)
-			assertTrue(stamps[i] >= time[i] && stamps[i] <= time[i] + 50);
+			assertTrue("not in range: " + time[i] + " <= " + stamps[i] + " <= " + (time[i] + 50),
+					stamps[i] >= time[i] && stamps[i] <= time[i] + 50);
 		assertEquals(fix.getTimestamp(), stamps[3]);
 
 		// ring
