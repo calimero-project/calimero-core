@@ -563,7 +563,7 @@ public class Discoverer
 		finally {
 			s.close();
 		}
-		final String msg = "timeout, no description response received";
+		final String msg = "timeout, no description response received from " + server;
 		logger.warn(msg);
 		throw new KNXTimeoutException(msg);
 	}

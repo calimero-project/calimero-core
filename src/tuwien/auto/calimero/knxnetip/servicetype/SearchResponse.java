@@ -90,16 +90,13 @@ public class SearchResponse extends ServiceType
 	}
 
 	/**
-	 * Creates a new search response for the given control endpoint together with device
-	 * information.
-	 * <p>
+	 * Creates a new search response for the given control endpoint together with device information.
 	 *
 	 * @param ctrlEndpoint discovered control endpoint of the server sending this response
 	 * @param device server device description information
 	 * @param svcFamilies supported service families by the server
 	 */
-	public SearchResponse(final HPAI ctrlEndpoint, final DeviceDIB device,
-		final ServiceFamiliesDIB svcFamilies)
+	public SearchResponse(final HPAI ctrlEndpoint, final DeviceDIB device, final ServiceFamiliesDIB svcFamilies)
 	{
 		super(KNXnetIPHeader.SEARCH_RES);
 		endpt = ctrlEndpoint;
@@ -108,7 +105,6 @@ public class SearchResponse extends ServiceType
 
 	/**
 	 * Returns the server control endpoint.
-	 * <p>
 	 *
 	 * @return discovered control endpoint in a HPAI
 	 */
@@ -118,9 +114,7 @@ public class SearchResponse extends ServiceType
 	}
 
 	/**
-	 * Returns the device description information block of the server contained in the
-	 * response.
-	 * <p>
+	 * Returns the device description information block of the server contained in the response.
 	 *
 	 * @return a device DIB
 	 */
@@ -130,9 +124,7 @@ public class SearchResponse extends ServiceType
 	}
 
 	/**
-	 * Returns the supported service families description information block of the server
-	 * contained in the response.
-	 * <p>
+	 * Returns the supported service families description information block of the server contained in the response.
 	 *
 	 * @return a DIB with the supported service families
 	 */
@@ -165,9 +157,6 @@ public class SearchResponse extends ServiceType
 		return endpt + " " + desc;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceType#getStructLength()
-	 */
 	@Override
 	int getStructLength()
 	{
@@ -175,10 +164,6 @@ public class SearchResponse extends ServiceType
 				+ desc.getServiceFamilies().getStructLength();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceType#toByteArray
-	 *      (java.io.ByteArrayOutputStream)
-	 */
 	@Override
 	byte[] toByteArray(final ByteArrayOutputStream os)
 	{

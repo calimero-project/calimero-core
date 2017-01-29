@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -64,9 +64,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 public class DPTXlator3BitControlled extends DPTXlator
 {
 	/**
-	 * A DPT for the 3 Bit controlled, with additional access to the control information
-	 * DPT.
-	 * <p>
+	 * A DPT for the 3 Bit controlled, with additional access to the control information DPT.
 	 *
 	 * @author B. Malinowsky
 	 */
@@ -75,12 +73,10 @@ public class DPTXlator3BitControlled extends DPTXlator
 		private final DPT ctrl;
 
 		/**
-		 * Creates a new datapoint type information structure for the 3 Bit controlled
-		 * DPT.
+		 * Creates a new datapoint type information structure for the 3 Bit controlled DPT.
 		 * <p>
-		 * Such a DPT has a value range from the lower value information like returned
-		 * from the control DPT information and stepcode 7, to the upper value control DPT
-		 * and stepcode 7.
+		 * Such a DPT has a value range from the lower value information like returned from the control DPT information
+		 * and stepcode 7, to the upper value control DPT and stepcode 7.
 		 *
 		 * @param typeID {@inheritDoc}
 		 * @param description {@inheritDoc}
@@ -88,14 +84,12 @@ public class DPTXlator3BitControlled extends DPTXlator
 		 */
 		public DPT3BitControlled(final String typeID, final String description, final DPT control)
 		{
-			super(typeID, description, control.getLowerValue() + " 7", control.getUpperValue()
-					+ " 7");
+			super(typeID, description, control.getLowerValue() + " 7", control.getUpperValue() + " 7");
 			ctrl = control;
 		}
 
 		/**
 		 * Returns the DPT used to represent the control information of this DPT.
-		 * <p>
 		 *
 		 * @return the DPT for the control information
 		 */
@@ -129,7 +123,6 @@ public class DPTXlator3BitControlled extends DPTXlator
 
 	/**
 	 * Creates a translator for the given datapoint type.
-	 * <p>
 	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
@@ -141,7 +134,6 @@ public class DPTXlator3BitControlled extends DPTXlator
 
 	/**
 	 * Creates a translator for the given datapoint type ID.
-	 * <p>
 	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
@@ -202,9 +194,6 @@ public class DPTXlator3BitControlled extends DPTXlator
 		setStepCode(stepcode);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getAllValues()
-	 */
 	@Override
 	public String[] getAllValues()
 	{
@@ -263,7 +252,6 @@ public class DPTXlator3BitControlled extends DPTXlator
 
 	/**
 	 * Returns the stepcode of the first translation item.
-	 * <p>
 	 *
 	 * @return stepcode value, 0 &lt;= value &lt;= 7
 	 * @see #getIntervals()
@@ -311,9 +299,6 @@ public class DPTXlator3BitControlled extends DPTXlator
 		return code == 0 ? 0 : 1 << code - 1;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#setData(byte[], int)
-	 */
 	@Override
 	public void setData(final byte[] data, final int offset)
 	{
@@ -328,9 +313,6 @@ public class DPTXlator3BitControlled extends DPTXlator
 			this.data[i] = (short) (data[offset + i] & 0x0F);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getData(byte[], int)
-	 */
 	@Override
 	public byte[] getData(final byte[] dst, final int offset)
 	{
@@ -340,9 +322,6 @@ public class DPTXlator3BitControlled extends DPTXlator
 		return dst;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
-	 */
 	@Override
 	public final Map<String, DPT> getSubTypes()
 	{

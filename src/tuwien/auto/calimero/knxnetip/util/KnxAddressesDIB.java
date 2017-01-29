@@ -98,8 +98,7 @@ public final class KnxAddressesDIB extends DIB
 	}
 
 	/**
-	 * @return an unmodifiable list with the {@link IndividualAddress}es contained in this DIB, list
-	 *         size &ge; 1
+	 * @return an unmodifiable list with the {@link IndividualAddress}es contained in this DIB, list size &ge; 1
 	 */
 	public List<IndividualAddress> getAddresses()
 	{
