@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -789,6 +789,7 @@ public class Discoverer
 		{
 			try {
 				final KNXnetIPHeader h = new KNXnetIPHeader(data, offset);
+				final int bodyLen = h.getTotalLength() - h.getStructLength();
 				if (h.getTotalLength() > length)
 					logger.warn("ignore received packet from " + source + ", frame length does not match");
 				else if (search && h.getServiceType() == KNXnetIPHeader.SEARCH_RES) {
@@ -796,7 +797,7 @@ public class Discoverer
 					synchronized (receivers) {
 						if (receivers.contains(this)) {
 							final Result<SearchResponse> r = new Result<>(
-									new SearchResponse(data, offset + h.getStructLength()), nif, addrOnNetif);
+									new SearchResponse(data, offset + h.getStructLength(), bodyLen), nif, addrOnNetif);
 							if (!responses.contains(r))
 								responses.add(r);
 						}
@@ -805,7 +806,7 @@ public class Discoverer
 				else if (!search && h.getServiceType() == KNXnetIPHeader.DESCRIPTION_RES) {
 					if (source.equals(server)) {
 						try {
-							res = new DescriptionResponse(data, offset + h.getStructLength());
+							res = new DescriptionResponse(data, offset + h.getStructLength(), bodyLen);
 						}
 						catch (final KNXFormatException e) {
 							logger.error("invalid description response", e);

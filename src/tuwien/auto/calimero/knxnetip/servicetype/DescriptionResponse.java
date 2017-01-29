@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -88,10 +88,11 @@ public class DescriptionResponse extends ServiceType
 	 *
 	 * @param data byte array containing a description response structure
 	 * @param offset start offset of response in <code>data</code>
-	 * @throws KNXFormatException if no description response was found or invalid
-	 *         structure of DIBs carried in the response
+	 * @param length usable length of <code>data</code>, <code>0 &lt; length &le; (data.length - offset)</code>
+	 * @throws KNXFormatException if no description response was found or invalid structure of DIBs carried in the
+	 *         response
 	 */
-	public DescriptionResponse(final byte[] data, final int offset) throws KNXFormatException
+	public DescriptionResponse(final byte[] data, final int offset, final int length) throws KNXFormatException
 	{
 		super(KNXnetIPHeader.DESCRIPTION_RES);
 		device = new DeviceDIB(data, offset);
@@ -103,24 +104,26 @@ public class DescriptionResponse extends ServiceType
 		KnxAddressesDIB a = null;
 		ManufacturerDIB m = null;
 		int i = offset + device.getStructLength() + suppfam.getStructLength();
-		while (i + 1 < data.length) {
+		while (i + 1 < offset + length) {
 			final int size = data[i] & 0xff;
 			final int type = data[i + 1] & 0xff;
+			// skip any remaining DIBs on invalid size, as we cannot advance our index
+			if (size == 0)
+				break;
+
 			boolean unique = true;
 			if (type == DIB.IP_CONFIG && (unique = c == null))
 				c = new IPConfigDIB(data, i);
-			else if (type == DIB.IP_CURRENT_CONFIG  && (unique = cc == null))
+			else if (type == DIB.IP_CURRENT_CONFIG && (unique = cc == null))
 				cc = new IPCurrentConfigDIB(data, i);
-			else if (type == DIB.KNX_ADDRESSES  && (unique = a == null))
+			else if (type == DIB.KNX_ADDRESSES && (unique = a == null))
 				a = new KnxAddressesDIB(data, i);
-			else if (type == DIB.MFR_DATA  && (unique = m == null))
+			else if (type == DIB.MFR_DATA && (unique = m == null))
 				m = new ManufacturerDIB(data, i);
 			else if (!unique)
-				throw new KNXFormatException("description response contains duplicate DIB type", type);
-			else if (type == 0 || size == 0) // break on invalid field, ensure we always progress i
-				break;
+				throw new KNXFormatException("response contains duplicate DIB type", type);
 			else
-				logger.warn("skip unknown DIB in description response with type code {} and size {}", type, size);
+				logger.warn("skip unknown DIB in response with type code {} and size {}", type, size);
 			i += size;
 		}
 
@@ -128,6 +131,19 @@ public class DescriptionResponse extends ServiceType
 		currentConfig = cc;
 		addresses = a;
 		mfr = m;
+	}
+
+	/**
+	 * @deprecated Use {@link #DescriptionResponse(byte[], int, int)}.
+	 * @param data byte array containing a description response structure
+	 * @param offset start offset of response in <code>data</code>
+	 * @throws KNXFormatException if no description response was found or invalid structure of DIBs carried in the
+	 *         response
+	 */
+	@Deprecated
+	public DescriptionResponse(final byte[] data, final int offset) throws KNXFormatException
+	{
+		this(data, offset, data.length - offset);
 	}
 
 	/**
