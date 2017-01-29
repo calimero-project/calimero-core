@@ -76,7 +76,7 @@ public final class KnxAddressesDIB extends DIB
 			throw new KNXFormatException("KNX addresses DIB too short, < " + DIB_MIN_SIZE, size);
 		if (size % 2 != 0)
 			throw new KNXFormatException("KNX address DIB requires even size");
-		for (int i = 2; i < size; i += 2) {
+		for (int i = offset + 2; i < offset + size; i += 2) {
 			final int a = (data[i] & 0xff) << 8 | (data[i + 1] & 0xff);
 			addresses.add(new IndividualAddress(a));
 		}
