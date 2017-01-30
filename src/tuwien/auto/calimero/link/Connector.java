@@ -86,7 +86,7 @@ public final class Connector
 
 	// runs out earliest after (2^63-1)/1000/3600/24/365 ~ 3×10^8 years. Safe bet KNX got canned by then
 	public static final long NoMaxAttempts = Long.MAX_VALUE;
-	private long maxAttempts = 5;
+	private long maxAttempts = 10;
 
 	public Connector()
 	{}
