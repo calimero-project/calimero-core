@@ -157,7 +157,7 @@ public class HPAI
 			final InetAddress a = addr.getAddress();
 			if (a == null)
 				throw new KNXIllegalArgumentException(addr + " is an unresolved IP address");
-			if (a.isAnyLocalAddress())
+			if (a.isAnyLocalAddress() && addr.getPort() != 0)
 				throw new KNXIllegalArgumentException(a + " is a wildcard IP address");
 			address = a.getAddress();
 			if (address.length != 4)
