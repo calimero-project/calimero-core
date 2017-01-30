@@ -30,6 +30,7 @@ targetCompatibility = 1.8
 
 compileJava.options*.compilerArgs = [
 	'-Xlint:all',
+	'-Xlint:-options',
 	'-Werror'
 ]
 
