@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -158,36 +158,6 @@ public class CEMIDevMgmt implements CEMI
 	 */
 	public static final int MC_RESET_IND = 0xF0;
 
-	// mandatory properties for server objects
-
-//	/**
-//	 * Property for media types supported by cEMI server (read only), PID = {@value
-//	 * #PID_MEDIUM_TYPE}.
-//	 */
-//	public static final short PID_MEDIUM_TYPE = 51;
-//	// optional properties for server objects
-//	/**
-//	 * Property for the domain address used on PL medium (read / write), PID = {@value
-//	 * #PID_DOMAIN_ADDRESS}.
-//	 */
-//	public static final short PID_DOMAIN_ADDRESS = 70;
-//	/**
-//	 * Property for list of interface objects (read / write), PID = {@value #PID_IO_LIST}.
-//	 */
-//	public static final short PID_IO_LIST = 71;
-//	/**
-//	 * Property for communication mode (read / write), PID = {@value #PID_COMM_MODE}.
-//	 */
-//	public static final short PID_COMM_MODE = 52;
-//	/**
-//	 * Property for time base in extended relative timestamps (read only), PID = {@value
-//	 * #PID_TIMEBASE}.
-//	 */
-//	public static final short PID_TIMEBASE = 55;
-//	/**
-//	 * Property for transparency mode (read / write), PID = {@value #PID_TRANSP_ENABLE}.
-//	 */
-//	public static final short PID_TRANSP_ENABLE = 56;
 
 	private static BitSet msgCodes;
 	private static final int MC_OFFSET = 0xF0;
@@ -199,7 +169,7 @@ public class CEMIDevMgmt implements CEMI
 		"out of max. range (write value too high)",
 		"out of min. range (write value too low)",
 		"memory error (memory can not be written or only with faults)",
-		"read only (write access to a read-only or write-protected property)",
+		"read-only (write access to a read-only or write-protected property)",
 		"illegal command (command not valid or not supported)",
 		"void DP (read/write access to nonexisting property)",
 		"type conflict (write access with a wrong data type (datapoint length))",

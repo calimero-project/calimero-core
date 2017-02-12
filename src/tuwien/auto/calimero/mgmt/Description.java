@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ package tuwien.auto.calimero.mgmt;
  * be available.
  * <p>
  * Objects of this type are immutable.
- * 
+ *
  * @author B. Malinowsky
  */
 public final class Description
@@ -71,7 +71,7 @@ public final class Description
 	 * <p>
 	 * The description structure layout of <code>data</code> is according to the
 	 * application layer property description read service.
-	 * 
+	 *
 	 * @param objType interface object type the property belongs to
 	 * @param data byte array containing property description, starting at
 	 *        <code>data[0]</code>
@@ -92,8 +92,7 @@ public final class Description
 	/**
 	 * Creates a new description object for a property out of a data byte array, together
 	 * with object type and number of current elements.
-	 * <p>
-	 * 
+	 *
 	 * @param objType interface object type the property belongs to
 	 * @param currentElements current number of elements in the property
 	 * @param data byte array holding the description information, the structure is
@@ -107,8 +106,7 @@ public final class Description
 
 	/**
 	 * Creates a new description object for a property using the given parameters.
-	 * <p>
-	 * 
+	 *
 	 * @param objIndex index of the object in the device, starting with 0
 	 * @param objType interface object type the property belongs to
 	 * @param pid property identifier, a 6 Bit identifier
@@ -140,7 +138,7 @@ public final class Description
 	 * Returns the interface object server unique object index of the interface object
 	 * containing the property.
 	 * <p>
-	 * 
+	 *
 	 * @return the object index
 	 */
 	public int getObjectIndex()
@@ -150,7 +148,7 @@ public final class Description
 
 	/**
 	 * Returns the object type to which the property belongs to.
-	 * 
+	 *
 	 * @return the object type
 	 */
 	public int getObjectType()
@@ -161,7 +159,7 @@ public final class Description
 	/**
 	 * Returns the property index.
 	 * <p>
-	 * 
+	 *
 	 * @return the property index
 	 */
 	public int getPropIndex()
@@ -172,7 +170,7 @@ public final class Description
 	/**
 	 * Returns the property identifier.
 	 * <p>
-	 * 
+	 *
 	 * @return the PID
 	 */
 	public int getPID()
@@ -184,7 +182,7 @@ public final class Description
 	 * Returns the property data type.
 	 * <p>
 	 * With local device management, the PDT is not available and -1 is returned.
-	 * 
+	 *
 	 * @return the PDT or -1 for no PDT
 	 */
 	public int getPDT()
@@ -194,8 +192,7 @@ public final class Description
 
 	/**
 	 * Returns the current number of elements in the property.
-	 * <p>
-	 * 
+	 *
 	 * @return current elements
 	 */
 	public int getCurrentElements()
@@ -207,7 +204,7 @@ public final class Description
 	 * Returns the maximum number of elements allowed in the property.
 	 * <p>
 	 * With local device management, this attribute is not available and 0 is returned.
-	 * 
+	 *
 	 * @return maximum elements, or 0
 	 */
 	public int getMaxElements()
@@ -219,7 +216,7 @@ public final class Description
 	 * Returns the read access level for the property.
 	 * <p>
 	 * The level is between 0 (maximum access rights) and 15 (minimum access rights).
-	 * 
+	 *
 	 * @return the read level as 4 bit value
 	 */
 	public int getReadLevel()
@@ -231,7 +228,7 @@ public final class Description
 	 * Returns the write access level for the property.
 	 * <p>
 	 * The level is between 0 (maximum access rights) and 15 (minimum access rights).
-	 * 
+	 *
 	 * @return the write level as 4 bit value
 	 */
 	public int getWriteLevel()
@@ -242,7 +239,7 @@ public final class Description
 	/**
 	 * Returns whether the property is write-enabled or read-only.
 	 * <p>
-	 * 
+	 *
 	 * @return <code>true</code> if write enabled, <code>false</code> otherwise
 	 */
 	public boolean isWriteEnabled()
@@ -253,22 +250,22 @@ public final class Description
 	/**
 	 * Returns the property description in textual representation.
 	 * <p>
-	 * 
+	 *
 	 * @return a string representation of the description
 	 */
 	@Override
 	public String toString()
 	{
 		return "OT " + otype + " OI " + oindex + " PID " + id + " PI " + pindex + " PDT "
-				+ (pdt == -1 ? "-" : Integer.toString(getPDT())) + ", curr elements " + currElems
-				+ " (max " + maxElems + "), r/w access " + rLevel + "/" + wLevel
+				+ (pdt == -1 ? "-" : pdt) + ", " + currElems
+				+ " elements (max " + maxElems + "), r/w access " + rLevel + "/" + (wLevel == -1 ? "-" : wLevel)
 				+ (write ? " write-enabled" : " read-only");
 	}
 
 	/**
 	 * Returns the byte representation of this description structure.
 	 * <p>
-	 * 
+	 *
 	 * @return byte array containing structure data
 	 */
 	public byte[] toByteArray()

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -108,9 +108,6 @@ public final class NetworkBuffer
 		// listen on the link and update our buffers
 		private final class SquirrelListener implements NetworkLinkListener
 		{
-			SquirrelListener()
-			{}
-
 			@Override
 			public void confirmation(final FrameEvent e)
 			{
@@ -235,8 +232,7 @@ public final class NetworkBuffer
 			{
 				final RequestFilter rf = reqFilter;
 				// check valid access and A-group.read
-				if (rf == null || !isOpen() || nsdu.length < 2
-						|| DataUnitBuilder.getAPDUService(nsdu) != 0)
+				if (rf == null || !isOpen() || nsdu.length < 2 || DataUnitBuilder.getAPDUService(nsdu) != 0)
 					return false;
 				final CEMILData cemi = rf.request(dst, ConfigImpl.this);
 				if (cemi != null) {

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -141,16 +141,16 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 	 * <p>
 	 * The items with the cEMI frame indications are returned in FIFO order according the
 	 * time they were supplied to the filter and buffered in the first place, i.e., an
-	 * earlier accepted frame is returned before an frame accepted at some later time.<br>
+	 * earlier accepted frame is returned before a frame accepted at some later time.<br>
 	 * Every item is only returned once by this method, after that it is no longer marked
 	 * as new and will not cause {@link #hasNewIndication()} to return <code>true</code>
 	 * for it.<br>
 	 * If no indication is available, throws {@link KNXIllegalStateException}.
 	 * <p>
 	 * Nevertheless, the queued item might be retrieved directly through the used cache
-	 * (which is obtained by {@link Configuration#getCache()}). Whether or not an returned
+	 * (which is obtained by {@link Configuration#getCache()}). Whether or not a returned
 	 * item is completely consumed from the queue in the cache, i.e., removed from the
-	 * cache object in the cache, is specified in the {@link LDataObjectQueue} containing
+	 * cache object, is specified in the {@link LDataObjectQueue} containing
 	 * the item at creation time (which is a task of the network filter).
 	 * <p>
 	 * Note, if the accessed queue in the cache was modified between the time the

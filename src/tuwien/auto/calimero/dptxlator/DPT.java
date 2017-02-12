@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ package tuwien.auto.calimero.dptxlator;
  * Even though not enforced, the preferred way for identifying a DPT is to use a datapoint
  * type ID (dptID) value in the format "[main number].[sub number]".<br>
  * Instances of this type are immutable.
- * 
+ *
  * @author B. Malinowsky
  */
 public class DPT
@@ -61,8 +61,7 @@ public class DPT
 
 	/**
 	 * Creates a new datapoint type information structure.
-	 * <p>
-	 * 
+	 *
 	 * @param typeID datapoint type identifier
 	 * @param description short textual description
 	 * @param lower lower value information
@@ -81,8 +80,7 @@ public class DPT
 
 	/**
 	 * Creates a new datapoint type information structure for a DPT without a unit.
-	 * <p>
-	 * 
+	 *
 	 * @param typeID datapoint type identifier
 	 * @param description short textual description
 	 * @param lower lower value information
@@ -95,8 +93,7 @@ public class DPT
 
 	/**
 	 * Returns the DPT identifier.
-	 * <p>
-	 * 
+	 *
 	 * @return ID as string
 	 */
 	public final String getID()
@@ -106,8 +103,7 @@ public class DPT
 
 	/**
 	 * Returns the DPT description.
-	 * <p>
-	 * 
+	 *
 	 * @return description as string
 	 */
 	public final String getDescription()
@@ -117,8 +113,7 @@ public class DPT
 
 	/**
 	 * Returns the unit of measure for this DPT.
-	 * <p>
-	 * 
+	 *
 	 * @return unit as string, the empty string for no unit
 	 */
 	public final String getUnit()
@@ -132,7 +127,7 @@ public class DPT
 	 * The value either contains a string value representation of some lower bound in the
 	 * value range of this DPT, or a more general DPT encoding range information if
 	 * practicable.
-	 * 
+	 *
 	 * @return lower value as string
 	 */
 	public final String getLowerValue()
@@ -148,7 +143,7 @@ public class DPT
 	 * then.<br>
 	 * If no information about an upper value can be given, a DPT might set this
 	 * information optional, and the empty string is returned.
-	 * 
+	 *
 	 * @return value as string, or the empty string
 	 */
 	public final String getUpperValue()
@@ -158,34 +153,27 @@ public class DPT
 
 	/**
 	 * Returns the DPT's information in concise textual format.
-	 * <p>
-	 * 
+	 *
 	 * @return a string representation of the DPT
 	 */
 	@Override
 	public String toString()
 	{
-		final StringBuffer sb = new StringBuffer(30);
+		final StringBuffer sb = new StringBuffer(50);
 		sb.append(id).append(": ").append(desc).append(", values ").append(v1);
 		if (v2.length() > 0)
-			sb.append(' ').append(v2);
+			sb.append("..").append(v2);
 		if (unit.length() > 0)
 			sb.append(' ').append(unit);
 		return sb.toString();
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(final Object obj)
 	{
 		return obj == this || obj instanceof DPT && ((DPT) obj).id.equals(id);
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode()
 	{

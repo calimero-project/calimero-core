@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -70,9 +70,9 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * A datapoint type consists of a data type and a dimension. The data type is referred to through a main number, the
  * existing dimensions of a data type are listed through sub numbers. The data type specifies format and encoding, while
  * dimension specifies the range and unit.<br>
- * A datapoint type identifier (dptID for short), stands for one particular datapoint type. The preferred - but not
- * enforced - way of naming a dptID is using the expression "<i>main number</i>.<i>sub number</i>".<br>
- * In short, a datapoint type has a dptID and standardizes one combination of format, encoding, range and unit.
+ * A datapoint type identifier (DPT ID or dptId for short), stands for one particular datapoint type. The preferred -
+ * but not enforced - way of naming a dptId is using the expression "<i>main number</i>.<i>sub number</i>".<br>
+ * In short, a datapoint type has a dptId and standardizes one combination of format, encoding, range and unit.
  *
  * @author B. Malinowsky
  * @see DPTXlator
@@ -252,26 +252,26 @@ public final class TranslatorTypes
 		/**
 		 * Creates a new instance of the translator for the given datapoint type ID.
 		 *
-		 * @param dptID datapoint type ID for selecting a particular kind of value translation; if the datapoint type ID
+		 * @param dptId datapoint type ID for selecting a particular kind of value translation; if the datapoint type ID
 		 *        is not part of the translator of this main type, a {@link KNXFormatException} is thrown
 		 * @return the new {@link DPTXlator} instance
 		 * @throws KNXFormatException to forward all target exceptions thrown in the constructor of the translator
 		 * @throws KNXException thrown on translator class creation errors (e.g. security / access problems)
 		 */
-		public DPTXlator createTranslator(final String dptID) throws KNXException
+		public DPTXlator createTranslator(final String dptId) throws KNXException
 		{
 			try {
-				return xlator.getConstructor(String.class).newInstance(dptID);
+				return xlator.getConstructor(String.class).newInstance(dptId);
 			}
 			catch (final InvocationTargetException e) {
 				// try to forward encapsulated target exception
 				if (e.getTargetException() instanceof KNXFormatException)
 					throw (KNXFormatException) e.getTargetException();
 				// throw generic message
-				throw new KNXFormatException("failed to init translator", dptID);
+				throw new KNXFormatException("failed to init translator", dptId);
 			}
 			catch (final NoSuchMethodException e) {
-				DPTXlator.logger.error("DPT translator is required to have a public constructor(String dptID)");
+				DPTXlator.logger.error("DPT translator is required to have a public constructor(String dptId)");
 				throw new KNXException("interface specification error at translator");
 			}
 			catch (final Exception e) {
@@ -327,6 +327,12 @@ public final class TranslatorTypes
 				// no reason for InvocationTargetException
 				throw new KNXException("security / access problem, " + e.getMessage());
 			}
+		}
+
+		@Override
+		public String toString()
+		{
+			return getDescription();
 		}
 	}
 
@@ -450,8 +456,8 @@ public final class TranslatorTypes
 		for (final Iterator<MainType> i = map.values().iterator(); i.hasNext();) {
 			final MainType type = i.next();
 			try {
-				final String dptID = type.getSubTypes().keySet().iterator().next();
-				final int size = type.createTranslator(dptID).getTypeSize();
+				final String dptId = type.getSubTypes().keySet().iterator().next();
+				final int size = type.createTranslator(dptId).getTypeSize();
 				if (size == typeSize)
 					l.add(type);
 			}
@@ -463,17 +469,17 @@ public final class TranslatorTypes
 	/**
 	 * Does a lookup if the specified DPT is supported by a DPT translator.
 	 *
-	 * @param mainNumber data type main number, number &ge; 0; use 0 to infer translator type from <code>dptID</code>
+	 * @param mainNumber data type main number, number &ge; 0; use 0 to infer translator type from <code>dptId</code>
 	 *        argument only
-	 * @param dptID datapoint type ID to lookup this particular kind of value translation
+	 * @param dptId datapoint type ID to lookup this particular kind of value translation
 	 * @return <code>true</code> iff translator was found, <code>false</code> otherwise
 	 */
-	public static boolean hasTranslator(final int mainNumber, final String dptID)
+	public static boolean hasTranslator(final int mainNumber, final String dptId)
 	{
 		try {
-			final MainType t = getMainType(getMainNumber(mainNumber, dptID));
+			final MainType t = getMainType(getMainNumber(mainNumber, dptId));
 			if (t != null)
-				return t.getSubTypes().get(dptID) != null;
+				return t.getSubTypes().get(dptId) != null;
 		}
 		catch (final NumberFormatException e) {}
 		catch (final KNXException e) {}
@@ -485,30 +491,30 @@ public final class TranslatorTypes
 	 * <p>
 	 * The translation behavior of a DPT translator instance is uniquely defined by the supplied datapoint type ID.
 	 * <p>
-	 * If the <code>dptID</code> argument is built up the recommended way, that is "<i>main number</i>.<i>sub number</i>
+	 * If the <code>dptId</code> argument is built up the recommended way, that is "<i>main number</i>.<i>sub number</i>
 	 * ", the <code>mainNumber</code> argument might be left 0 to use the datapoint type ID only.<br>
-	 * Note, that we don't enforce any particular or standardized format on the dptID structure, so using a different
-	 * formatted dptID solely without main number argument results in undefined behavior.
+	 * Note, that we don't enforce any particular or standardized format on the <code>dptId</code> structure, so using a
+	 * different formatted dptId solely without main number argument results in undefined behavior.
 	 *
-	 * @param mainNumber data type main number, number &ge; 0; use 0 to infer translator type from <code>dptID</code>
+	 * @param mainNumber data type main number, number &ge; 0; use 0 to infer translator type from <code>dptId</code>
 	 *        argument only
-	 * @param dptID datapoint type ID for selecting a particular kind of value translation
+	 * @param dptId datapoint type ID for selecting a particular kind of value translation
 	 * @return the new {@link DPTXlator} object
 	 * @throws KNXException on main type not found or creation failed (refer to
 	 *         {@link MainType#createTranslator(String)})
 	 */
-	public static DPTXlator createTranslator(final int mainNumber, final String dptID) throws KNXException
+	public static DPTXlator createTranslator(final int mainNumber, final String dptId) throws KNXException
 	{
 		int main = 0;
 		try {
-			main = getMainNumber(mainNumber, dptID);
+			main = getMainNumber(mainNumber, dptId);
 		}
 		catch (final NumberFormatException e) {}
 		final MainType type = map.get(main);
 		if (type == null)
-			throw new KNXException("no DPT translator available for main number " + main + " (ID " + dptID + ")");
+			throw new KNXException("no DPT translator available for main number " + main + " (ID " + dptId + ")");
 
-		final String id = dptID != null ? dptID : type.getSubTypes().entrySet().iterator().next().getKey();
+		final String id = dptId != null && !dptId.isEmpty() ? dptId : type.getSubTypes().entrySet().iterator().next().getKey();
 		return type.createTranslator(id);
 	}
 
@@ -540,8 +546,8 @@ public final class TranslatorTypes
 	}
 
 	// throws NumberFormatException
-	private static int getMainNumber(final int mainNumber, final String dptID)
+	private static int getMainNumber(final int mainNumber, final String dptId)
 	{
-		return mainNumber != 0 ? mainNumber : Integer.parseInt(dptID.substring(0, dptID.indexOf('.')));
+		return mainNumber != 0 ? mainNumber : Integer.parseInt(dptId.substring(0, dptId.indexOf('.')));
 	}
 }
