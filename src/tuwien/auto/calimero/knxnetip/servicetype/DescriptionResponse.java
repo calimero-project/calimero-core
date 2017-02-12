@@ -38,8 +38,10 @@ package tuwien.auto.calimero.knxnetip.servicetype;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import tuwien.auto.calimero.KNXFormatException;
@@ -77,11 +79,9 @@ public class DescriptionResponse extends ServiceType
 	private final DeviceDIB device;
 	private final ServiceFamiliesDIB suppfam;
 
-	// the following DIBs are optional in the specification
-	private final IPConfigDIB config;
-	private final IPCurrentConfigDIB currentConfig;
-	private final KnxAddressesDIB addresses;
-	private final ManufacturerDIB mfr;
+	// the following DIBs are optional in the specification:
+	// IPConfigDIB, IPCurrentConfigDIB, KnxAddressesDIB, ManufacturerDIB
+	private final List<DIB> optional;
 
 	/**
 	 * Creates a new description response out of a byte array.
@@ -99,6 +99,7 @@ public class DescriptionResponse extends ServiceType
 		suppfam = new ServiceFamiliesDIB(data, offset + device.getStructLength());
 
 		// parse optional DIBs
+		optional = new ArrayList<>();
 		IPConfigDIB c = null;
 		IPCurrentConfigDIB cc = null;
 		KnxAddressesDIB a = null;
@@ -113,24 +114,19 @@ public class DescriptionResponse extends ServiceType
 
 			boolean unique = true;
 			if (type == DIB.IP_CONFIG && (unique = c == null))
-				c = new IPConfigDIB(data, i);
+				optional.add(c = new IPConfigDIB(data, i));
 			else if (type == DIB.IP_CURRENT_CONFIG && (unique = cc == null))
-				cc = new IPCurrentConfigDIB(data, i);
+				optional.add(cc = new IPCurrentConfigDIB(data, i));
 			else if (type == DIB.KNX_ADDRESSES && (unique = a == null))
-				a = new KnxAddressesDIB(data, i);
+				optional.add(a = new KnxAddressesDIB(data, i));
 			else if (type == DIB.MFR_DATA && (unique = m == null))
-				m = new ManufacturerDIB(data, i);
+				optional.add(m = new ManufacturerDIB(data, i));
 			else if (!unique)
 				throw new KNXFormatException("response contains duplicate DIB type", type);
 			else
 				logger.warn("skip unknown DIB in response with type code {} and size {}", type, size);
 			i += size;
 		}
-
-		config = c;
-		currentConfig = cc;
-		addresses = a;
-		mfr = m;
 	}
 
 	/**
@@ -147,51 +143,22 @@ public class DescriptionResponse extends ServiceType
 	}
 
 	/**
-	 * Creates a new description response containing a device DIB and a supported service families DIB.
+	 * Creates a new description response containing a device DIB, a supported service families DIB, and optional other
+	 * DIBs.
 	 *
 	 * @param device device description
-	 * @param suppSvcFam supported service families
+	 * @param svcFamilies supported service families
+	 * @param dibs optional DIBs to add to the response
 	 */
-	public DescriptionResponse(final DeviceDIB device, final ServiceFamiliesDIB suppSvcFam)
-	{
-		this(device, suppSvcFam, null, null, null, null);
-	}
-
-	/**
-	 * Creates a new description response containing a device DIB, a supported service
-	 * families DIB and a manufacturer DIB.
-	 *
-	 * @param device device description
-	 * @param suppSvcFam supported service families
-	 * @param mfr manufacturer specific data
-	 */
-	public DescriptionResponse(final DeviceDIB device, final ServiceFamiliesDIB suppSvcFam, final ManufacturerDIB mfr)
-	{
-		this(device, suppSvcFam, null, null, null, mfr);
-	}
-
-	/**
-	 * Creates a new description response containing a device DIB, a supported service
-	 * families DIB and a manufacturer DIB.
-	 *
-	 * @param device device description
-	 * @param suppSvcFamilies supported service families
-	 * @param config IP configuration
-	 * @param currentConfig IP current configuration
-	 * @param addresses KNX individual addresses information
-	 * @param mfr manufacturer specific data
-	 */
-	public DescriptionResponse(final DeviceDIB device, final ServiceFamiliesDIB suppSvcFamilies,
-		final IPConfigDIB config, final IPCurrentConfigDIB currentConfig,
-		final KnxAddressesDIB addresses, final ManufacturerDIB mfr)
+	public DescriptionResponse(final DeviceDIB device, final ServiceFamiliesDIB svcFamilies, final DIB... dibs)
 	{
 		super(KNXnetIPHeader.DESCRIPTION_RES);
 		this.device = device;
-		suppfam = suppSvcFamilies;
-		this.config = config;
-		this.currentConfig = currentConfig;
-		this.addresses = addresses;
-		this.mfr = mfr;
+		suppfam = svcFamilies;
+
+		optional = new ArrayList<>(Arrays.asList(dibs));
+		if (optional.removeIf(Objects::isNull))
+			ServiceType.logger.error("optional DIBs should not contain null elements", new NullPointerException());
 	}
 
 	/**
@@ -203,14 +170,7 @@ public class DescriptionResponse extends ServiceType
 		final List<DIB> l = new ArrayList<>();
 		l.add(device);
 		l.add(suppfam);
-		if (config != null)
-			l.add(config);
-		if (currentConfig != null)
-			l.add(currentConfig);
-		if (addresses != null)
-			l.add(addresses);
-		if (mfr != null)
-			l.add(mfr);
+		l.addAll(optional);
 		return l;
 	}
 
@@ -232,20 +192,6 @@ public class DescriptionResponse extends ServiceType
 	public final ServiceFamiliesDIB getServiceFamilies()
 	{
 		return suppfam;
-	}
-
-	/**
-	 * Returns the manufacturer data description information block optionally contained in
-	 * the response.
-	 * <p>
-	 * The manufacturer data is not a mandatory part of a description response. It is only
-	 * available, if the optional DIB information of a response matches this DIB type.
-	 *
-	 * @return a manufacturer DIB, or <code>null</code> if no such DIB
-	 */
-	public final ManufacturerDIB getManufacturerData()
-	{
-		return mfr;
 	}
 
 	@Override
