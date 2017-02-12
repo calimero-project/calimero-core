@@ -956,15 +956,18 @@ public class ManagementClientImpl implements ManagementClient
 	}
 
 	// returns property read.res element values
-	private static byte[] extractPropertyElements(final byte[] apdu, final int elements)
-		throws KNXRemoteException
+	private static byte[] extractPropertyElements(final byte[] apdu, final int elements) throws KNXRemoteException
 	{
+		final int objIndex = apdu[2] & 0xff;
+		final int pid = apdu[3] & 0xff;
 		// check if number of elements is 0, indicates access problem
 		final int number = (apdu[4] & 0xFF) >>> 4;
 		if (number == 0)
-			throw new KNXRemoteException("property access failed/forbidden");
+			throw new KNXRemoteException("property access OI " + objIndex + " PID " + pid + " failed/forbidden");
 		if (number != elements)
-			throw new KNXInvalidResponseException("number of elements differ");
+			throw new KNXInvalidResponseException(
+					String.format("property access OI %d PID %d expected %d elements (received %d)", objIndex, pid,
+							elements, number));
 		final byte[] prop = new byte[apdu.length - 6];
 		for (int i = 0; i < prop.length; ++i)
 			prop[i] = apdu[i + 6];
