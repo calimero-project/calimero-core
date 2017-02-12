@@ -36,10 +36,11 @@
 
 package tuwien.auto.calimero.mgmt;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -803,8 +804,8 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		@Override
 		public void save(final XmlWriter writer, final Collection<Property> definitions)
 		{
-			writer.writeComment("Calimero v" + Settings.getLibraryVersion()
-					+ " KNX property definitions, saved on " + new Date().toString());
+			writer.writeComment("Calimero v" + Settings.getLibraryVersion() + " KNX property definitions, saved on "
+					+ ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME));
 			writer.writeStartElement(PROPDEFS_TAG);
 			final int noType = -2;
 			int objType = noType;
