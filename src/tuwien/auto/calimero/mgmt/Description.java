@@ -59,7 +59,7 @@ public final class Description
 	private final int pindex;
 	private final int maxElems;
 	// current elements are set after object creation
-	private int currElems;
+	private final int currElems;
 	// data type is set to -1 after object creation if not available
 	private int pdt;
 	private final int rLevel;
@@ -78,15 +78,7 @@ public final class Description
 	 */
 	public Description(final int objType, final byte[] data)
 	{
-		otype = objType;
-		oindex = data[0] & 0xff;
-		id = data[1] & 0xff;
-		pindex = data[2] & 0xff;
-		write = (data[3] & 0x80) == 0x80 ? true : false;
-		pdt = data[3] & 0x3f;
-		maxElems = (data[4] & 0xff) << 8 | data[5] & 0xff;
-		rLevel = (data[6] & 0xff) >> 4;
-		wLevel = data[6] & 0x0f;
+		this(objType, 0, data);
 	}
 
 	/**
@@ -100,8 +92,16 @@ public final class Description
 	 */
 	public Description(final int objType, final int currentElements, final byte[] data)
 	{
-		this(objType, data);
+		otype = objType;
+		oindex = data[0] & 0xff;
+		id = data[1] & 0xff;
+		pindex = data[2] & 0xff;
+		write = (data[3] & 0x80) == 0x80 ? true : false;
+		pdt = data[3] & 0x3f;
+		maxElems = (data[4] & 0xff) << 8 | data[5] & 0xff;
 		currElems = currentElements;
+		rLevel = (data[6] & 0xff) >> 4;
+		wLevel = data[6] & 0x0f;
 	}
 
 	/**
@@ -283,12 +283,12 @@ public final class Description
 	}
 
 	// set 2 or 4 byte data array with element count, big endian
-	void setCurrentElements(final byte[] data)
+	static int parseCurrentElements(final byte[] data)
 	{
 		int elems = 0;
 		for (int i = 0; i < data.length; ++i)
 			elems = elems << 8 | data[i] & 0xff;
-		currElems = elems;
+		return elems;
 	}
 
 	void setPDT(final int type)
