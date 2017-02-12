@@ -533,11 +533,17 @@ public class ManagementClientImplTest
 	@Test
 	public final void testWritePropertyDestinationIntIntIntIntByteArray() throws KNXException, InterruptedException
 	{
-		final byte[] read = mc.readProperty(dco2, 0, 51, 1, 1);
-		mc.writeProperty(dco2, 0, 51, 1, 1, new byte[] { 7 });
-		final byte[] read2 = mc.readProperty(dco2, 0, 51, 1, 1);
+		final int pidProgramVersion = 13;
+
+		byte[] read = new byte[1];
+		try {
+			read = mc.readProperty(dco2, 0, pidProgramVersion, 1, 1);
+		}
+		catch (final KNXException ignore) {}
+		mc.writeProperty(dco2, 0, pidProgramVersion, 1, 1, new byte[] { 7 });
+		final byte[] read2 = mc.readProperty(dco2, 0, pidProgramVersion, 1, 1);
 		assertTrue(Arrays.equals(new byte[] { 7 }, read2));
-		mc.writeProperty(dco2, 0, 51, 1, 1, read);
+		mc.writeProperty(dco2, 0, pidProgramVersion, 1, 1, read);
 	}
 
 	/**

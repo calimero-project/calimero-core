@@ -55,6 +55,8 @@ import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned;
+import tuwien.auto.calimero.dptxlator.DPTXlator8BitUnsigned;
+import tuwien.auto.calimero.dptxlator.PropertyTypes;
 import tuwien.auto.calimero.knxnetip.Debug;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.KNXNetworkLinkIP;
@@ -335,14 +337,18 @@ public class PropertyClientTest
 	@Test
 	public final void testSetPropertyIntIntIntIntByteArray() throws KNXException, InterruptedException
 	{
-		// set routing count to
-		final byte[] cnt = rem.getProperty(0, 51, 1, 1);
-		--cnt[0];
-		rem.setProperty(0, 51, 1, 1, cnt);
-		final byte[] cnt2 = rem.getProperty(0, 51, 1, 1);
-		assertEquals(cnt[0], cnt2[0]);
-		++cnt[0];
-		rem.setProperty(0, 51, 1, 1, cnt);
+		final int pidProgramVersion = 13;
+		byte[] data = new byte[1];
+		try {
+			data = rem.getProperty(0, pidProgramVersion, 1, 1);
+		}
+		catch (final KNXException ignore) {}
+		--data[0];
+		rem.setProperty(0, pidProgramVersion, 1, 1, data);
+		final byte[] data2 = rem.getProperty(0, pidProgramVersion, 1, 1);
+		assertEquals(data[0], data2[0]);
+		++data[0];
+		rem.setProperty(0, pidProgramVersion, 1, 1, data);
 	}
 
 	/**
@@ -354,13 +360,21 @@ public class PropertyClientTest
 	@Test
 	public final void testSetPropertyIntIntIntString() throws KNXException, InterruptedException
 	{
-		// set routing count to
-		final String s = rem.getProperty(0, 51);
-		final int cnt = Integer.parseInt(new String(new char[] { s.charAt(0) }));
-		rem.setProperty(0, 51, 1, "3");
-		final String s2 = rem.getProperty(0, 51);
+		final int pidProgramVersion = 13;
+		// make sure we have a translator for the program version required PDT 21 (PDT_GENERIC_17)
+		PropertyTypes.getAllPropertyTypes().put(21,
+				new PropertyTypes.DPTID(5, DPTXlator8BitUnsigned.DPT_VALUE_1_UCOUNT.getID()));
+
+		String s = "0";
+		try {
+			s = rem.getProperty(0, pidProgramVersion);
+		}
+		catch (final KNXException ignore) {}
+		final int v = Integer.parseInt(new String(new char[] { s.charAt(0) }));
+		rem.setProperty(0, pidProgramVersion, 1, "3");
+		final String s2 = rem.getProperty(0, pidProgramVersion);
 		assertTrue(s2.startsWith("3"));
-		rem.setProperty(0, 51, 1, Integer.toString(cnt));
+		rem.setProperty(0, pidProgramVersion, 1, Integer.toString(v));
 	}
 
 	private void printDesc(final Description d)
