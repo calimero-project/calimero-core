@@ -87,7 +87,7 @@ public class DPTXlator8BitEnumTest extends TestCase
 		super.setUp();
 		Util.setupLogging("DPTXlator");
 		TranslatorTypes.createTranslator(0, "20.003");
-		t = new DPTXlator8BitEnum(DPTXlator8BitEnum.DPT_ApplicationArea.getID());
+		t = new DPTXlator8BitEnum(DPTXlator8BitEnum.DptApplicationArea.getID());
 	}
 
 	public final void testGetAllValues() throws KNXFormatException
@@ -107,7 +107,7 @@ public class DPTXlator8BitEnumTest extends TestCase
 		assertFalse("should not equal \"no fault\"", "no fault".equals(t.getValue()));
 
 		// try a enum with no 0 element
-		final DPTXlator8BitEnum x = new DPTXlator8BitEnum(DPTXlator8BitEnum.DPT_AlarmClassType);
+		final DPTXlator8BitEnum x = new DPTXlator8BitEnum(DPTXlator8BitEnum.DptAlarmClassType);
 		final int v = x.getValueUnsigned();
 		assertEquals(1, v);
 		final int element = DPTXlator8BitEnum.AlarmClassType.ExtendedAlarm.value();
