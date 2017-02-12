@@ -326,19 +326,11 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		public Property(final int pid, final String pidName, final String propertyName,
 			final int objectType, final int pdt, final String dpt)
 		{
-			id = pid;
-			name = pidName;
-			propName = propertyName;
-			objType = objectType;
-			this.pdt = pdt;
-			this.dpt = dpt;
-			read = 0;
-			write = 0;
+			this(pid, pidName, propertyName, objectType, pdt, dpt, 0, 0);
 		}
 
-		Property(final int pid, final String pidName, final String propertyName,
-			final int objectType, final int pdt, final String dpt, final int readLevel,
-			final int writeLevel)
+		Property(final int pid, final String pidName, final String propertyName, final int objectType, final int pdt,
+			final String dpt, final int readLevel, final int writeLevel)
 		{
 			id = pid;
 			name = pidName;
@@ -406,13 +398,17 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 
 		/**
 		 * Returns the property friendly name, a more readable name of the property.
-		 * <p>
 		 *
 		 * @return the property name
 		 */
 		public final String getName()
 		{
 			return propName;
+		}
+
+		public final boolean readOnly()
+		{
+			return write == -1;
 		}
 	}
 
@@ -669,13 +665,15 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 
 	private Description createDesc(final int oi, final byte[] desc) throws KNXException, InterruptedException
 	{
-		final Description d = new Description(getObjectType(oi, true), desc);
+		final int pid = desc[1] & 0xff;
+		byte[] data = new byte[4];
 		try {
-			d.setCurrentElements(pa.getProperty(oi, d.getPID(), 0, 1));
-		} catch (final KNXRemoteException e) {
-			logger.warn("failed to get current number of elements for OI {} PID {}: {}", oi, d.getPID(),
-					e.getMessage());
+			data = pa.getProperty(oi, pid, 0, 1);
 		}
+		catch (final KNXRemoteException e) {
+			logger.warn("failed to get current number of elements for OI {} PID {}: {}", oi, pid, e.getMessage());
+		}
+		final Description d = new Description(getObjectType(oi, true), Description.parseCurrentElements(data), desc);
 		// workaround for PDT on local DM
 		if (local)
 			d.setPDT(-1);
@@ -775,11 +773,12 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 							objType = "global".equals(type) ? -1 : toInt(type);
 						}
 						else if (reader.getLocalName().equals(PROPERTY_TAG)) {
-							parseRW(reader.getAttributeValue("", RW_ATTR));
+							final int[] rw = parseRW(reader.getAttributeValue("", RW_ATTR));
+							final boolean write = parseWriteEnabled(reader.getAttributeValue("", WRITE_ATTR));
 							list.add(new Property(toInt(reader.getAttributeValue("", PID_ATTR)),
 									reader.getAttributeValue("", PIDNAME_ATTR), reader.getAttributeValue("", NAME_ATTR),
 									objType, toInt(reader.getAttributeValue("", PDT_ATTR)),
-									reader.getAttributeValue("", DPT_ATTR)));
+									reader.getAttributeValue("", DPT_ATTR), rw[0], write ? rw[1] : -1));
 						}
 					}
 					else if (event == XmlReader.END_ELEMENT && reader.getLocalName().equals(PROPDEFS_TAG))
@@ -798,6 +797,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 			try (final XmlWriter w = XmlOutputFactory.newInstance().createXMLWriter(resource)) {
 				w.writeStartDocument("UTF-8", "1.0");
 				save(w, definitions);
+				w.writeEndDocument();
 			}
 		}
 
@@ -827,17 +827,17 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 				writer.writeAttribute(PDT_ATTR, p.pdt == -1 ? "<tbd>" : Integer.toString(p.pdt));
 				if (p.dpt != null && p.dpt.length() > 0)
 					writer.writeAttribute(DPT_ATTR, p.dpt);
-				// TOOD why don't we add r/w attribute values?
-				writer.writeAttribute(RW_ATTR, "");
-				writer.writeAttribute(WRITE_ATTR, "");
+				writer.writeAttribute(RW_ATTR, String.format("%d/%d", p.read, p.write));
+				writer.writeAttribute(WRITE_ATTR, p.readOnly() ? "0" : "1");
 				// write property
 				writer.writeStartElement(USAGE_TAG);
 				writer.writeEndElement();
 				writer.writeEndElement();
 			}
+			writer.writeEndElement();
 		}
 
-		private static int parseRW(final String rw)
+		private static int[] parseRW(final String rw)
 		{
 			final String s = rw.toLowerCase();
 			int read = 0;
@@ -852,8 +852,24 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 						write = write * 10 + c - '0';
 					else
 						read = read * 10 + c - '0';
+				else if (c == 'r')
+					read = 3;
+				else if (c == 'w')
+					write = 3;
 			}
-			return read << 8 | write;
+			return new int[] { read, write };
+		}
+
+		private static boolean parseWriteEnabled(final String attribute)
+		{
+			final String s = attribute.toLowerCase();
+			if ("0".equals(s) || "false".equals(s))
+				return false;
+			if ("1".equals(s) || "true".equals(s))
+				return true;
+			if ("<tbd>".equals(s) || "0/1".equals(s) || "w".equals(s))
+				return true;
+			return false;
 		}
 
 		private static int toInt(final String s) throws KNXFormatException
