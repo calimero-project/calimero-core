@@ -54,6 +54,15 @@ sourceSets {
     }
 }
 
+task testJar(type: Jar) {
+    classifier = 'tests'
+    from sourceSets.test.output
+}
+
+artifacts {
+    archives testJar
+}
+
 jar {
 	manifest {
 		attributes 'Main-Class': mainClassName
