@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -95,6 +95,19 @@ public class LocalDeviceMgmtAdapter extends LocalDeviceManagement
 		conn = (KNXnetIPConnection) c;
 		conn.addConnectionListener(new KNXListenerImpl());
 		init();
+	}
+
+	/**
+	 * Sends a reset request to the KNXnet/IP server. A successful reset request causes the KNXnet/IP server to close
+	 * the KNXnet/IP device management connection.
+	 *
+	 * @throws KNXConnectionClosedException on closed connection
+	 * @throws KNXTimeoutException if a timeout regarding a response message was encountered
+	 * @throws InterruptedException on thread interrupt
+	 */
+	public void reset() throws KNXConnectionClosedException, KNXTimeoutException, InterruptedException
+	{
+		send(new CEMIDevMgmt(CEMIDevMgmt.MC_RESET_REQ), BlockingMode.WaitForAck);
 	}
 
 	/**
