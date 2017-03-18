@@ -80,6 +80,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 		@Override
 		public void connectionClosed(final CloseEvent e)
 		{
+			closed = true;
 			if (listener == null)
 				return;
 			final int initiator = serverReset ? CloseEvent.SERVER_REQUEST : e.getInitiator();
