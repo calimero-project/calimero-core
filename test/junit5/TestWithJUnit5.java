@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2016 B. Malinowsky
+    Copyright (c) 2016, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@
 package junit5;
 
 import org.junit.platform.runner.JUnitPlatform;
-import org.junit.platform.runner.SelectPackages;
+import org.junit.platform.suite.api.SelectPackages;
 import org.junit.runner.RunWith;
 
 // Required to use JUnit 5 in Eclipse with its JUnit 4 runner
