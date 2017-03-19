@@ -44,13 +44,12 @@ mainClassName = 'tuwien.auto.calimero.Settings'
 
 sourceSets {
     main {
-        java.srcDir 'src'
-        resources.srcDir 'resources'
+        java.srcDirs = ['src']
+        resources.srcDirs = ['resources']
     }
     test {
-        java.srcDirs = [ 'test' ]
-        file('build/classes/test').mkdirs()
-        runtimeClasspath = runtimeClasspath + files('build/classes/test')
+        java.srcDirs = ['test']
+        resources.srcDirs = ['test/resources']
     }
 }
 
