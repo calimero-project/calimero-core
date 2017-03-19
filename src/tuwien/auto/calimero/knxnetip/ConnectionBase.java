@@ -60,6 +60,7 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.internal.EventListeners;
 import tuwien.auto.calimero.knxnetip.servicetype.DisconnectRequest;
+import tuwien.auto.calimero.knxnetip.servicetype.ErrorCodes;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingIndication;
@@ -461,6 +462,15 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		setStateNotify(CLOSED);
 		fireConnectionClosed(initiator, reason);
 		listeners.removeAll();
+	}
+
+	protected boolean supportedVersion(final KNXnetIPHeader h)
+	{
+		final boolean supported = h.getVersion() == KNXnetIPConnection.KNXNETIP_VERSION_10;
+		if (!supported)
+			logger.warn("KNXnet/IP {}.{} {}", h.getVersion() >> 4, h.getVersion() & 0xf,
+					ErrorCodes.getErrorMessage(ErrorCodes.VERSION_NOT_SUPPORTED));
+		return supported;
 	}
 
 	/**
