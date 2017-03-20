@@ -36,6 +36,8 @@
 
 package tuwien.auto.calimero.dptxlator;
 
+import static java.util.Collections.emptyList;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -54,6 +56,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
@@ -467,6 +470,37 @@ public final class TranslatorTypes
 	}
 
 	/**
+	 * Returns all main types of a specific data type size, based on the currently available main types as provided by
+	 * {@link TranslatorTypes#getAllMainTypes()}.
+	 * <p>
+	 * For example, when specifying a size of <code>2</code> bits, the returned list will contain the main type with
+	 * main number 2 (translator <b>1 Bit controlled</b>), assuming it is returned by
+	 * {@link TranslatorTypes#getAllMainTypes()}.
+	 *
+	 * @param size the data type size in bits
+	 * @return list of all available main types of the requested type size or the empty list
+	 */
+	public static List<MainType> ofBitSize(final int size)
+	{
+		if (size < 5) {
+			final MainType mainType = map.get(
+					size == 1 ? TYPE_BOOLEAN : size == 2 ? TYPE_1BIT_CONTROLLED : size == 4 ? TYPE_3BIT_CONTROLLED : 0);
+			return Optional.ofNullable(mainType).map(Collections::singletonList).orElse(emptyList());
+		}
+		final List<MainType> l = new ArrayList<>();
+		for (final MainType type : map.values()) {
+			try {
+				final String dptId = type.getSubTypes().keySet().iterator().next();
+				final int bits = type.createTranslator(dptId).getTypeSize() * 8;
+				if (bits == size)
+					l.add(type);
+			}
+			catch (final KNXException e) {}
+		}
+		return l;
+	}
+
+	/**
 	 * Does a lookup if the specified DPT is supported by a DPT translator.
 	 *
 	 * @param mainNumber data type main number, number &ge; 0; use 0 to infer translator type from <code>dptId</code>
@@ -514,8 +548,36 @@ public final class TranslatorTypes
 		if (type == null)
 			throw new KNXException("no DPT translator available for main number " + main + " (ID " + dptId + ")");
 
-		final String id = dptId != null && !dptId.isEmpty() ? dptId : type.getSubTypes().entrySet().iterator().next().getKey();
+		final String id = dptId != null && !dptId.isEmpty() ? dptId : type.getSubTypes().keySet().iterator().next();
 		return type.createTranslator(id);
+	}
+
+	/**
+	 * Creates a DPT translator for the given datapoint type main/sub number.
+	 *
+	 * @param mainNumber datapoint type main number, 0 &lt; mainNumber
+	 * @param subNumber datapoint type sub number selecting a particular kind of value translation; use 0 to request any
+	 *        type ID of that translator (in that case, appending the physical unit for string values is disabled)
+	 * @param data (optional) KNX datapoint type data to set in the created translator for translation
+	 * @return the new {@link DPTXlator} object
+	 * @throws KNXException if no matching DPT translator is available or creation failed (see
+	 *         {@link MainType#createTranslator(String)})
+	 */
+	public static DPTXlator createTranslator(final int mainNumber, final int subNumber, final byte... data)
+		throws KNXException
+	{
+		final MainType type = map.get(mainNumber);
+		if (type == null)
+			throw new KNXException("no DPT translator available for main number " + mainNumber);
+
+		final boolean withSub = subNumber != 0;
+		final String id = withSub ? String.format("%d.%03d", mainNumber, subNumber)
+				: type.getSubTypes().keySet().iterator().next();
+		final DPTXlator t = type.createTranslator(id);
+		t.setAppendUnit(withSub);
+		if (data.length > 0)
+			t.setData(data);
+		return t;
 	}
 
 	/**
@@ -528,7 +590,7 @@ public final class TranslatorTypes
 	 *
 	 * @param dpt datapoint type selecting a particular kind of value translation
 	 * @return the new {@link DPTXlator} object
-	 * @throws KNXException if no translator could be found or creation failed
+	 * @throws KNXException if no matching DPT translator is available or creation failed
 	 */
 	public static DPTXlator createTranslator(final DPT dpt) throws KNXException
 	{
@@ -543,6 +605,25 @@ public final class TranslatorTypes
 				catch (final KNXException ignore) {}
 		}
 		throw new KNXException("failed to create translator for DPT " + dpt.getID());
+	}
+
+	/**
+	 * Creates a DPT translator for the given datapoint type ID.
+	 *
+	 * @param dptId datapoint type ID, formatted as <code>&lt;main number&gt;.&lt;sub number&gt;</code> with a sub
+	 *        number < 100 zero-padded to 3 digits, e.g. "1.001"
+	 * @param data (optional) KNX datapoint type data to set in the created translator for translation
+	 * @return the new {@link DPTXlator} object
+	 * @throws KNXException if no matching DPT translator is available or creation failed (see
+	 *         {@link MainType#createTranslator(String)})
+	 */
+	public static DPTXlator createTranslator(final String dptId, final byte... data)
+		throws KNXException, KNXIllegalArgumentException
+	{
+		final DPTXlator t = createTranslator(0, dptId);
+		if (data.length > 0)
+			t.setData(data);
+		return t;
 	}
 
 	// throws NumberFormatException

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,11 +36,14 @@
 
 package tuwien.auto.calimero.dptxlator;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
 import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.dptxlator.TranslatorTypes.MainType;
 
@@ -132,6 +135,26 @@ public class TranslatorTypesTest extends TestCase
 			DPTXlatorBoolean.DPT_ENABLE).getClass(), DPTXlatorBoolean.class);
 	}
 
+	public void testOfBitSize()
+	{
+		List<MainType> ofBitSize = TranslatorTypes.ofBitSize(-1);
+		assertEquals(0, ofBitSize.size());
+		ofBitSize = TranslatorTypes.ofBitSize(0);
+		assertEquals(0, ofBitSize.size());
+		ofBitSize = TranslatorTypes.ofBitSize(1);
+		assertEquals(1, ofBitSize.size());
+		ofBitSize = TranslatorTypes.ofBitSize(2);
+		assertEquals(1, ofBitSize.size());
+		ofBitSize = TranslatorTypes.ofBitSize(4);
+		assertEquals(1, ofBitSize.size());
+		ofBitSize = TranslatorTypes.ofBitSize(32);
+		assertEquals(3, ofBitSize.size());
+		ofBitSize = TranslatorTypes.ofBitSize(64);
+		assertEquals(2, ofBitSize.size());
+		ofBitSize = TranslatorTypes.ofBitSize(123);
+		assertEquals(0, ofBitSize.size());
+	}
+
 	private void newMainTypeFail(final int mainNo, final Class<? extends DPTXlator> cl)
 	{
 		try {
@@ -184,5 +207,50 @@ public class TranslatorTypesTest extends TestCase
 			fail("not existant DPT");
 		}
 		catch (final KNXException e) {}
+	}
+
+	public void testCreateTranslatorWithData() throws KNXIllegalArgumentException, KNXException
+	{
+		DPTXlator t = TranslatorTypes.createTranslator("9.001");
+		assertEquals(0.0, t.getNumericValue());
+
+		t = TranslatorTypes.createTranslator("1.001");
+		assertEquals("off", t.getValue());
+
+		t = TranslatorTypes.createTranslator("1.001", (byte) 1);
+		assertEquals(1.0, t.getNumericValue());
+		assertEquals("on", t.getValue());
+
+		t = TranslatorTypes.createTranslator("9.001", (byte) 0xc, (byte) 0xe2);
+		assertEquals(25.0, t.getNumericValue());
+
+		t = TranslatorTypes.createTranslator("9.001", new byte[] { (byte) 0xc, (byte) 0xe2, (byte) 0xc, (byte) 0xf2 });
+		t.setAppendUnit(false);
+		assertEquals(2, t.getItems());
+		assertTrue(Arrays.deepEquals(new String[] { "25.0", "25.32" }, t.getAllValues()));
+	}
+
+	public void testCreateTranslatorWithMainSub() throws KNXException
+	{
+		final DPTXlator t = TranslatorTypes.createTranslator(9, 1);
+		assertEquals(DPTXlator2ByteFloat.DPT_TEMPERATURE, t.getType());
+		assertTrue(t.getValue().endsWith("C"));
+
+		DPTXlator t2 = TranslatorTypes.createTranslator(9, 0);
+		assertTrue(t2.getType().getID().startsWith("9"));
+
+		final byte[] data = new byte[] { (byte) 0xc, (byte) 0xe2 };
+		t2 = TranslatorTypes.createTranslator(9, 0, data);
+		assertTrue(t2.getType().getID().startsWith("9"));
+		assertTrue(Arrays.equals(data, t2.getData()));
+
+		try {
+			TranslatorTypes.createTranslator(9, -1);
+		}
+		catch (final KNXFormatException expected) {}
+		try {
+			TranslatorTypes.createTranslator(0, 1);
+		}
+		catch (final KNXException expected) {}
 	}
 }
