@@ -1160,7 +1160,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 	// this method checks whether the data item actually is part of the DPT enumeration
 	private short fromDPT(final int index) throws KNXFormatException
 	{
-		final short v = data[0];
+		final short v = data[index];
 		validate(v);
 		return v;
 	}
