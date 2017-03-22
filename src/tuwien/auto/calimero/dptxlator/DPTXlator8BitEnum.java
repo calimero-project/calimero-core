@@ -784,9 +784,9 @@ public class DPTXlator8BitEnum extends DPTXlator
 
 	// 20.1002
 	public enum RFModeSelect implements EnumBase<RFModeSelect> {
-		Async(0, "Asynchronous"),
-		AsyncBiBatMaster(1, "Asynchronous BiBat master"),
-		AsyncBiBatSlave(2, "Asynchronous BiBat slave");
+		Asynchronous(0, "Asynchronous"),
+		BiBatMaster(1, "Asynchronous + BiBat master"),
+		BiBatSlave(2, "Asynchronous + BiBat slave");
 
 		RFModeSelect(final int element, final String description)
 		{ //RP2
@@ -797,8 +797,8 @@ public class DPTXlator8BitEnum extends DPTXlator
 	// 20.1003
 	public enum RFFilterSelect implements EnumBase<RFFilterSelect> {
 		None(0, "no filter"),
-		DoA(1, "filtering by DoA"),
-		SN(2, "filtering by KNX serial number table"),
+		DomainAddress(1, "filtering by DoA"),
+		SerialNumber(2, "filtering by KNX serial number table"),
 		DoAAndSN(3, "filtering by DoA and S/N table");
 
 		RFFilterSelect(final int element, final String description)
