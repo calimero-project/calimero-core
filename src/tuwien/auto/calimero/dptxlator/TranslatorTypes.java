@@ -41,8 +41,8 @@ import static java.util.Collections.emptyList;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemNotFoundException;
@@ -51,6 +51,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -345,7 +346,7 @@ public final class TranslatorTypes
 		try {
 			loadTranslators("tuwien.auto.calimero.dptxlator");
 		}
-		catch (IOException | URISyntaxException e) {
+		catch (final Exception e) {
 			DPTXlator.logger.error("failed to initialize list of available DPT translators", e);
 		}
 	}
@@ -353,7 +354,7 @@ public final class TranslatorTypes
 	private TranslatorTypes()
 	{}
 
-	private static void loadTranslators(final String inPackage) throws IOException, URISyntaxException
+	private static void loadTranslators(final String inPackage) throws Exception
 	{
 		final ClassLoader cl = TranslatorTypes.class.getClassLoader();
 		final String name = inPackage.replace('.', '/');
@@ -365,6 +366,27 @@ public final class TranslatorTypes
 			catch (final FileSystemNotFoundException e) {
 				try (FileSystem fs = FileSystems.newFileSystem(uri, Collections.emptyMap())) {
 					loadTranslators(inPackage, fs.provider().getPath(uri));
+				}
+				catch (final Exception ex) {
+					if (!"bundle".equals(uri.getScheme()))
+						throw ex;
+
+					DPTXlator.logger.info("using osgi bundle wiring for {}", uri);
+					final String pkg = "org.osgi.framework.";
+					final Method getBundle = Class.forName(pkg + "FrameworkUtil").getMethod("getBundle", Class.class);
+					final Object bundleImpl = getBundle.invoke(null, TranslatorTypes.class);
+					DPTXlator.logger.debug("obtained bundle {}", bundleImpl);
+
+					final Method adapt = Class.forName(pkg + "Bundle").getMethod("adapt", Class.class);
+					final Class<?> wiring = Class.forName(pkg + "wiring.BundleWiring");
+					final Object wiringImpl = adapt.invoke(bundleImpl, wiring);
+
+					final Method listResources = wiring.getMethod("listResources", String.class, String.class,
+							int.class);
+					@SuppressWarnings("unchecked")
+					final Collection<String> classes = (Collection<String>) listResources.invoke(wiringImpl,
+							uri.getPath(), "*.class", 0);
+					classes.forEach(s -> addTranslator(s.replace('/', '.').replace(".class", "")));
 				}
 			}
 		}
