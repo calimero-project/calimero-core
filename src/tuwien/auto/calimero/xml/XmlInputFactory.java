@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -101,10 +101,9 @@ public final class XmlInputFactory // extends XMLInputFactory
 				l.debug("using StaX XMLStreamReader " + r.r.getClass().getName());
 				return r;
 			}
-			catch (final Exception | Error e) {
-				e.printStackTrace();
+			catch (Exception | Error e) {
+				l.info("no StaX implementation found ({})", e.toString());
 				// we fall back on our own minimal implementation
-				throw new KNXMLException("no StaX implementation found", e);
 			}
 		}
 		l.debug("using internal minimal XMLStreamReader implementation");
@@ -120,10 +119,9 @@ public final class XmlInputFactory // extends XMLInputFactory
 				l.debug("using StaX XMLStreamReader " + r.r.getClass().getName());
 				return r;
 			}
-			catch (final Exception | Error e) {
-				e.printStackTrace();
+			catch (Exception | Error e) {
+				l.info("no StaX implementation found ({})", e.toString());
 				// we fall back on our own minimal implementation
-				throw new KNXMLException("no StaX implementation found", e);
 			}
 		}
 		return new DefaultXmlReader(reader);
