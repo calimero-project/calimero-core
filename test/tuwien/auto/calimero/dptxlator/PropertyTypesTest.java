@@ -73,8 +73,8 @@ public class PropertyTypesTest extends TestCase
 	public final void testGetAllPropertyTypes()
 	{
 		final Map<Integer, DPTID> m = PropertyTypes.getAllPropertyTypes();
-		m.put(new Integer(1000), new DPTID(1000, "1000.001"));
-		m.remove(new Integer(1000));
+		m.put(1000, new DPTID(1000, "1000.001"));
+		m.remove(Integer.valueOf(1000));
 		for (final Iterator<Integer> i = m.keySet().iterator(); i.hasNext();) {
 			final Integer type = i.next();
 			assertTrue(type > 0);

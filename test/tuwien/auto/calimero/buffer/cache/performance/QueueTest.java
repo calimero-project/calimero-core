@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -133,7 +133,7 @@ public class QueueTest extends PerfTestCase
 		listFilled = new ArrayList<>(capacity);
 		for (int i = 0; i < capacity; ++i) {
 			primitiveFilled.add(System.currentTimeMillis());
-			listFilled.add(new Long(System.currentTimeMillis()));
+			listFilled.add(System.currentTimeMillis());
 		}
 	}
 
@@ -167,10 +167,10 @@ public class QueueTest extends PerfTestCase
 	public void testArrayListSet()
 	{
 		for (int i = 0; i < capacity; ++i)
-			list.add(new Long(System.currentTimeMillis()));
+			list.add(System.currentTimeMillis());
 
 		for (int i = capacity; i < iterations; ++i) {
-			final Long time = new Long(System.currentTimeMillis());
+			final Long time = System.currentTimeMillis();
 			list.set(i % capacity, time);
 			list.set(i % capacity, time);
 			list.set(i % capacity, time);

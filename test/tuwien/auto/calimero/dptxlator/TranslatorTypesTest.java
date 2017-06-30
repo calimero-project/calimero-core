@@ -82,7 +82,7 @@ public class TranslatorTypesTest extends TestCase
 	{
 		for (int i = 0; i < 100; ++i) {
 			if (TranslatorTypes.getMainType(i) == null
-				&& TranslatorTypes.getAllMainTypes().containsKey(new Integer(i)))
+				&& TranslatorTypes.getAllMainTypes().containsKey(Integer.valueOf(i)))
 				fail("not found but in type list");
 		}
 
@@ -130,7 +130,7 @@ public class TranslatorTypesTest extends TestCase
 		//newMainTypeFail(2000, Object.class);
 		newMainTypeFail(2000, DPTXlator.class);
 		final MainType mt = new MainType(2000, DPTXlatorBoolean.class, "DPTXlatorBoolean.class");
-		TranslatorTypes.getAllMainTypes().put(new Integer(2000), mt);
+		TranslatorTypes.getAllMainTypes().put(2000, mt);
 		assertEquals(TranslatorTypes.getMainType(2000).createTranslator(
 			DPTXlatorBoolean.DPT_ENABLE).getClass(), DPTXlatorBoolean.class);
 	}
