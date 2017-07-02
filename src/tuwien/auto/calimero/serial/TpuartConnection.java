@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2014, 2016 B. Malinowsky
+    Copyright (c) 2014, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 
@@ -422,6 +423,9 @@ public class TpuartConnection implements AutoCloseable
 		return valid;
 	}
 
+	// Stores the currently used max. inter-byte delay, to also be available for subsequent tpuart connections.
+	private static AtomicInteger maxInterByteDelay = new AtomicInteger(4000); // [us]
+
 	private final class Receiver extends Thread
 	{
 		private volatile boolean quit;
@@ -433,6 +437,9 @@ public class TpuartConnection implements AutoCloseable
 
 		private long lastUartState = System.currentTimeMillis();
 		private boolean uartStatePending;
+
+		private int maxDelay = maxInterByteDelay.get();
+		private int consecutiveFrameDrops = -1;
 
 		Receiver()
 		{
@@ -517,16 +524,29 @@ public class TpuartConnection implements AutoCloseable
 			}
 		}
 
+		private int maxInterByteDelay()
+		{
+			// cond: consecutively losing 4 frames (1 msg w/ 1 .ind + 2 .ind repetitions, and 1st .ind of next msg)
+			if (consecutiveFrameDrops >= 3) {
+				maxDelay = maxInterByteDelay.accumulateAndGet(Math.min(maxDelay + 500, 10_000), Math::max);
+				logger.warn("{} partial frames discarded, increase max. inter-byte delay to {} us",
+						consecutiveFrameDrops + 1, maxDelay);
+				consecutiveFrameDrops = -1;
+			}
+			return maxDelay;
+		}
+
 		private boolean parseFrame(final int c) throws IOException
 		{
 			int size = in.size();
 			// empty buffer if we didn't receive data for some time
-			if (size > 0 && ((lastRead + 4000) < (System.nanoTime() / 1000))) {
+			if (size > 0 && ((lastRead + maxInterByteDelay()) < (System.nanoTime() / 1000))) {
 				final byte[] buf = in.toByteArray();
 				in.reset();
 				size = 0;
 				logger.debug("reset input buffer, discard partial frame (length {}) {}", buf.length,
 						DataUnitBuilder.toHex(buf, " "));
+				consecutiveFrameDrops++;
 			}
 
 			if (size > 0) {
@@ -549,7 +569,7 @@ public class TpuartConnection implements AutoCloseable
 							final byte[] data = in.toByteArray();
 							logger.debug("received TP1 L-Data (length {}): {}", frame.length,
 									DataUnitBuilder.toHex(data, " "));
-
+							consecutiveFrameDrops = -1;
 							if (busmon) {
 								fireFrameReceived(createBusmonInd(data));
 							}
