@@ -395,14 +395,14 @@ public class LDataObjectQueueTest extends TestCase
 		long[] empty = var.getTimestamps();
 		assertEquals(0, empty.length);
 
-		var.setFrame(frame1);
 		time[0] = System.currentTimeMillis();
-		Thread.sleep(500);
 		var.setFrame(frame1);
+		Thread.sleep(500);
 		time[1] = System.currentTimeMillis();
-		Thread.sleep(500);
 		var.setFrame(frame1);
+		Thread.sleep(500);
 		time[2] = System.currentTimeMillis();
+		var.setFrame(frame1);
 		long[] stamps = var.getTimestamps();
 		assertEquals(3, stamps.length);
 		// resolution of currentTimeMillis is system dependent
@@ -416,23 +416,23 @@ public class LDataObjectQueueTest extends TestCase
 		empty = fix.getTimestamps();
 		assertEquals(0, empty.length);
 
-		fix.setFrame(frame2);
 		time[0] = System.currentTimeMillis();
-		Thread.sleep(200);
 		fix.setFrame(frame2);
+		Thread.sleep(200);
 		time[1] = System.currentTimeMillis();
-		Thread.sleep(200);
 		fix.setFrame(frame2);
+		Thread.sleep(200);
 		time[2] = System.currentTimeMillis();
-		Thread.sleep(200);
 		fix.setFrame(frame2);
+		Thread.sleep(200);
 		time[3] = System.currentTimeMillis();
-		Thread.sleep(200);
 		fix.setFrame(frame2);
+		Thread.sleep(200);
 		time[4] = System.currentTimeMillis();
-		Thread.sleep(200);
 		fix.setFrame(frame2);
+		Thread.sleep(200);
 		time[5] = System.currentTimeMillis();
+		fix.setFrame(frame2);
 		stamps = fix.getTimestamps();
 		assertEquals(4, stamps.length);
 		// resolution of currentTimeMillis is system dependent
@@ -446,22 +446,22 @@ public class LDataObjectQueueTest extends TestCase
 		empty = ring.getTimestamps();
 		assertEquals(0, empty.length);
 
-		ring.setFrame(frame1);
 		time[0] = System.currentTimeMillis();
+		ring.setFrame(frame1);
 		Thread.sleep(200);
-		ring.setFrame(frame2);
 		time[1] = System.currentTimeMillis();
+		ring.setFrame(frame2);
 		Thread.sleep(200);
-		ring.setFrame(frame3);
 		time[2] = System.currentTimeMillis();
+		ring.setFrame(frame3);
 		Thread.sleep(200);
 		final LDataObjectQueue.QueueItem item = ring.getItem();
 		assertEquals(frame2, item.getFrame());
 		assertTrue("not in range: " + time[1] + " <= " + item.getTimestamp() + " <= " + (time[1] + 50),
 				item.getTimestamp() >= time[1] && item.getTimestamp() <= time[1] + 50);
 
-		ring.setFrame(frame4);
 		time[3] = System.currentTimeMillis();
+		ring.setFrame(frame4);
 		stamps = ring.getTimestamps();
 		assertEquals(2, stamps.length);
 		// resolution of currentTimeMillis is system dependent
@@ -474,14 +474,14 @@ public class LDataObjectQueueTest extends TestCase
 		empty = one.getTimestamps();
 		assertEquals(0, empty.length);
 
-		one.setFrame(frame4);
 		time[0] = System.currentTimeMillis();
-		Thread.sleep(500);
 		one.setFrame(frame4);
+		Thread.sleep(500);
 		time[1] = System.currentTimeMillis();
-		Thread.sleep(500);
 		one.setFrame(frame4);
+		Thread.sleep(500);
 		time[2] = System.currentTimeMillis();
+		one.setFrame(frame4);
 		stamps = one.getTimestamps();
 		assertEquals(1, stamps.length);
 		assertTrue(stamps[0] >= time[0] && stamps[0] <= time[0] + 50);
