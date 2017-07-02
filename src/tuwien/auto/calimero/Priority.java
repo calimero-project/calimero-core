@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -141,7 +141,6 @@ public final class Priority
 	@Override
 	public String toString()
 	{
-		return value == 0 ? "system" : value == 1 ? "normal" : value == 2 ? "urgent"
-			: "low";
+		return value == 0 ? "system" : value == 1 ? "normal" : value == 2 ? "urgent" : "low";
 	}
 }

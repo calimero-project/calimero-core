@@ -164,7 +164,7 @@ abstract class ClientConnection extends ConnectionBase
 			if (localEP.getAddress().isLoopbackAddress())
 				logger.warn("local endpoint uses loopback address ({}), try with a different IP address",
 						localEP.getAddress());
-			throw new KNXException("on connect to " + serverCtrlEP + ": " + e.getMessage());
+			throw new KNXException("connecting from " + localEP + " to " + serverCtrlEP + ": " + e.getMessage());
 		}
 
 		logger.debug("wait for connect response from " + ctrlEndpt + " ...");

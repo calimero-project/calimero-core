@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -120,18 +120,18 @@ public class TransportLayerImpl implements TransportLayer
 						return;
 					}
 				}
+				AggregatorProxy ap = null;
+				synchronized (proxies) {
+					ap = proxies.get(src);
+				}
 				try {
-					AggregatorProxy ap = null;
-					synchronized (proxies) {
-						ap = proxies.get(f.getSource());
-					}
 					handleConnected(f, ap);
 				}
-				catch (final KNXLinkClosedException ignore) {
-					// we get notified with link-closed event
+				catch (KNXLinkClosedException | KNXTimeoutException ignore) {
+					// we get notified with link-closed event, possible timeouts on sending ack don't matter
 				}
-				catch (final KNXTimeoutException ignore) {
-					// possible timeouts on sending ack
+				catch (final RuntimeException rte) {
+					logger.error("{}: {}", ap != null ? ap.getDestination() : "destination n/a", f, rte);
 				}
 			}
 		}
@@ -525,10 +525,9 @@ public class TransportLayerImpl implements TransportLayer
 			}
 		}
 		else if ((ctrl & 0xC3) == ACK) {
-			Objects.requireNonNull(p);
 			if (d.getState() == Disconnected || !sender.equals(d.getAddress()))
 				sendDisconnect(sender);
-			else if (d.getState() == OpenWait && seq == p.getSeqSend()) {
+			else if (d.getState() == OpenWait && seq == Objects.requireNonNull(p).getSeqSend()) {
 				p.incSeqSend();
 				p.setState(OpenIdle);
 				logger.trace("positive ack by {}", d.getAddress());
@@ -537,10 +536,10 @@ public class TransportLayerImpl implements TransportLayer
 				disconnectIndicate(p, true);
 		}
 		else if ((ctrl & 0xC3) == NACK) {
-			Objects.requireNonNull(p);
 			if (d.getState() == Disconnected || !sender.equals(d.getAddress()))
 				sendDisconnect(sender);
-			else if (d.getState() == OpenWait && seq == p.getSeqSend() && repeated < MAX_REPEAT) {
+			else if (d.getState() == OpenWait && seq == Objects.requireNonNull(p).getSeqSend()
+					&& repeated < MAX_REPEAT) {
 				; // do nothing, we will send message again
 			}
 			else

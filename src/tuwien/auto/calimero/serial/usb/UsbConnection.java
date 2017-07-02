@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2016 B. Malinowsky
+    Copyright (c) 2015, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -314,7 +314,7 @@ public class UsbConnection implements AutoCloseable
 				}
 				catch (final UsbException ignore) {}
 			}
-			slogger.info("Found KNX devices:{}", sb);
+			slogger.info("Found KNX USB devices:{}", sb.length() == 0 ? " none" : sb);
 		}
 		catch (final SecurityException | UsbException e) {}
 	}
@@ -1057,11 +1057,11 @@ public class UsbConnection implements AutoCloseable
 			// has to be the same as the child one's
 			final int parentBus = LibUsb.getBusNumber(parent);
 			final int parentAddress = LibUsb.getDeviceAddress(parent);
-			attach += "Parent Hub " + parentBus + ":" + parentAddress;
+			attach = "Parent Hub " + parentBus + ":" + parentAddress;
 		}
 		final int port = LibUsb.getPortNumber(device);
 		if (port != 0)
-			attach += ", attached at port " + port;
+			attach += (attach.isEmpty() ? "Attached at port " : ", attached at port ") + port;
 		if (!attach.isEmpty())
 			sb.append("\n").append(ind).append(attach);
 

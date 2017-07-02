@@ -125,8 +125,7 @@ public class KNXNetworkLinkIPTest
 	@BeforeEach
 	void init() throws Exception
 	{
-		tnl = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false,
-				TPSettings.TP1);
+		tnl = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false, TPSettings.TP1);
 		rtr = new KNXNetworkLinkIP(KNXNetworkLinkIP.ROUTING, Util.getLocalHost(),
 				new InetSocketAddress(InetAddress.getByName(KNXnetIPRouting.DEFAULT_MULTICAST), 0), false,
 				TPSettings.TP1);
@@ -186,6 +185,10 @@ public class KNXNetworkLinkIPTest
 
 		try (KNXNetworkLink link = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false,
 				TPSettings.TP1)) {}
+
+		if (!Util.TEST_NAT)
+			return;
+		try (KNXNetworkLink link = KNXNetworkLinkIP.newTunnelingLink(null, Util.getServer(), true, TPSettings.TP1)) {}
 	}
 
 	/**

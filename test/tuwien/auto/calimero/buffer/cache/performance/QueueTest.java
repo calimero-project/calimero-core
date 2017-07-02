@@ -76,31 +76,31 @@ public class QueueTest extends PerfTestCase
 			arr[size++] = value;
 		}
 
-		int capacity()
-		{
-			return arr.length;
-		}
-
-		long get(final int index)
-		{
-			return arr[index];
-		}
+//		int capacity()
+//		{
+//			return arr.length;
+//		}
+//
+//		long get(final int index)
+//		{
+//			return arr[index];
+//		}
 
 		void set(final int index, final long value)
 		{
 			arr[index] = value;
 		}
 
-		int size()
-		{
-			return size;
-		}
-
-		void clear()
-		{
-			while (size > 0)
-				arr[--size] = 0;
-		}
+//		int size()
+//		{
+//			return size;
+//		}
+//
+//		void clear()
+//		{
+//			while (size > 0)
+//				arr[--size] = 0;
+//		}
 
 		long[] toArray()
 		{

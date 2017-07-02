@@ -79,7 +79,8 @@ public class ManagementProceduresImplTest
 	@AfterEach
 	void tearDown() throws Exception
 	{
-		link.close();
+		if (link != null)
+			link.close();
 	}
 
 	/**

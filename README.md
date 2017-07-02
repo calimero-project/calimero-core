@@ -24,10 +24,10 @@ Download
 
 ~~~ sh
 # Either using git
-$ git clone https://github.com/calimero-project/calimero.git calimero-core
+$ git clone https://github.com/calimero-project/calimero-core.git
 
 # Or using hub
-$ hub clone calimero-project/calimero calimero-core
+$ hub clone calimero-project/calimero-core
 ~~~
 
 Supported Features

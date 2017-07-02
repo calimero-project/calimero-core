@@ -113,9 +113,12 @@ public class ProcessCommunicatorTest
 	@AfterEach
 	void tearDown() throws Exception
 	{
-		pc.detach();
-		pc2.detach();
-		link.close();
+		if (pc != null)
+			pc.detach();
+		if (pc2 != null)
+			pc2.detach();
+		if (link != null)
+			link.close();
 	}
 
 	/**
@@ -284,7 +287,7 @@ public class ProcessCommunicatorTest
 					pc.readBool(dpBool);
 				}
 				catch (KNXException | InterruptedException e) {
-					fail(getName());
+					fail(getName() + ": " + e);
 				}
 			};
 		}.start();

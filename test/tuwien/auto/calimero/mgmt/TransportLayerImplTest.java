@@ -179,7 +179,8 @@ public class TransportLayerImplTest
 		if (tl != null) {
 			tl.detach();
 		}
-		nl.close();
+		if (nl != null)
+			nl.close();
 	}
 
 	@Test

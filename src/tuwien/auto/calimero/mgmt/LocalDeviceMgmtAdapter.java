@@ -117,7 +117,8 @@ public class LocalDeviceMgmtAdapter extends LocalDeviceManagement
 	@Override
 	public String getName()
 	{
-		return "Local-DM " + conn.getRemoteAddress();
+		final InetSocketAddress remote = conn.getRemoteAddress();
+		return "Local-DM " + remote.getAddress().getHostAddress() + ":" + remote.getPort();
 	}
 
 	@Override
