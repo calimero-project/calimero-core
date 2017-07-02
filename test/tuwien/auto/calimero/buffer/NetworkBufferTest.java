@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -124,7 +125,8 @@ public class NetworkBufferTest
 	{
 		if (lnk != null)
 			lnk.close();
-		buffer.destroy();
+		if (buffer != null)
+			buffer.close();
 	}
 
 	// some helpers
@@ -253,18 +255,17 @@ public class NetworkBufferTest
 	 * Test method for {@link NetworkBuffer#createBuffer(java.lang.String)}.
 	 */
 	@Test
-	public final void testCreateBuffer()
+	void testCreateBuffer()
 	{
 		final String id = "testInstallation";
-		final NetworkBuffer b = NetworkBuffer.createBuffer(id);
-		assertEquals(id, b.getInstallationID());
+		assertNotNull(NetworkBuffer.createBuffer(id));
 	}
 
 	/**
 	 * Test method for {@link NetworkBuffer#addConfiguration(tuwien.auto.calimero.link.KNXNetworkLink)}.
 	 */
 	@Test
-	public final void testCreateConfigurationKNXNetworkLink()
+	void testCreateConfigurationKNXNetworkLink()
 	{
 		final NetworkBuffer b = NetworkBuffer.createBuffer(null);
 		b.addConfiguration(lnk);
@@ -274,7 +275,7 @@ public class NetworkBufferTest
 	 * Test method for {@link NetworkBuffer#getConfiguration(tuwien.auto.calimero.link.KNXNetworkLink)}.
 	 */
 	@Test
-	public final void testGetConfiguration()
+	void testGetConfiguration()
 	{
 		final Configuration c = buffer.addConfiguration(lnk);
 		final Configuration c2 = buffer.getConfiguration(c.getBufferedLink());
@@ -285,7 +286,7 @@ public class NetworkBufferTest
 	 * Test method for {@link NetworkBuffer#removeConfiguration(Configuration)}.
 	 */
 	@Test
-	public final void testRemoveConfigurationConfiguration()
+	void testRemoveConfigurationConfiguration()
 	{
 		final Configuration c = buffer.addConfiguration(lnk);
 		final KNXNetworkLink buf = c.getBufferedLink();
@@ -300,7 +301,7 @@ public class NetworkBufferTest
 	 * @throws KNXException
 	 */
 	@Test
-	public final void testStateBasedBuffering() throws InterruptedException, KNXException
+	void testStateBasedBuffering() throws InterruptedException, KNXException
 	{
 		final GroupAddress group1 = new GroupAddress(1, 0, 1);
 		final GroupAddress group2 = new GroupAddress(1, 0, 11);
@@ -409,7 +410,7 @@ public class NetworkBufferTest
 	 * @throws KNXException
 	 */
 	@Test
-	public final void testCommandBasedBuffering() throws InterruptedException, KNXException
+	void testCommandBasedBuffering() throws InterruptedException, KNXException
 	{
 		final Configuration c = buffer.addConfiguration(lnk);
 		final CommandFilter f = new CommandFilter();
@@ -481,7 +482,7 @@ public class NetworkBufferTest
 	 * @throws KNXException
 	 */
 	@Test
-	public final void testQueryBufferOnly() throws InterruptedException, KNXException
+	void testQueryBufferOnly() throws InterruptedException, KNXException
 	{
 		final Configuration c = buffer.addConfiguration(lnk);
 		final StateFilter f = new StateFilter();

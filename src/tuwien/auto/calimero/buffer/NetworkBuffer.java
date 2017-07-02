@@ -60,38 +60,37 @@ import tuwien.auto.calimero.link.NetworkLinkListener;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 
 /**
- * A network buffer temporarily stores KNX network messages for better response and/or KNX network
- * performance. Reasons to use a network buffer might be to lower the response time when answering
- * frequently occurring application queries, leading to a better runtime performance. Another use
- * would be to enable user-polled applications. Interfaces for KNX access as well as the KNX
- * transmission medium differ in processing delays and maximum message rates. This can have adverse
- * effects, caused by queue overflows or dropped messages, for client applications that do not take
- * those limitations into account. Overall, a network buffer helps in keeping the KNX network
- * message load lower for client usage patterns that are not optimal for a KNX network.
+ * A network buffer temporarily stores KNX network messages for improving response and/or KNX network performance. The
+ * main purpose for using a network buffer is to lower response time as well as bus traffic when answering frequently
+ * occurring application queries, leading to better runtime performance. Another use-case is to enable user-side polling
+ * applications. Interfaces for KNX access as well as the KNX transmission medium differ in processing delays and
+ * maximum message rates. This can have adverse effects -- caused by queue overflows or dropped messages -- for client
+ * applications, which don't take those limitations into account. Overall, a network buffer helps in keeping the KNX
+ * network message load lower for client usage patterns that are not optimal for a KNX network.
  * <p>
- * The purpose of the network buffer is to locally reflect the most up-to-date state (or command
- * sequence) of KNX datapoints. It is not designed as general-purpose message store. KNX messages
- * are buffered at link layer (L_Data).
+ * A network buffer provides the most up-to-date state (or command sequence) of buffered KNX datapoints. It is not
+ * designed as general-purpose message store. KNX messages are buffered at link layer (L_Data).
  * <p>
- * A network buffer contains one or more {@link Configuration}s, each maintaining rules to filter
- * and buffer messages. A configuration works with filters set by the user for that particular
- * configuration. At two points in the messages flow a filter can be specified: when messages arrive
- * from the KNX network at the buffer, and when the buffer shall answers a message request. Two
- * types of filters exist for this, a {@link Configuration.NetworkFilter} applies its filter rules
- * on incoming messages, a {@link Configuration.RequestFilter} filters message requests from users
- * and answers them using the network buffer.<br>
- * If a configuration is active and no network filter is set, a default filter is used, which simply
- * accepts all cEMI L-Data.<br>
- * If no request filter is set, no buffer lookup is done on requests, instead the request is
- * forwarded directly to the KNX network.
- * <p>
- * In general, one network buffer is created for one KNX installation, to easier distinguish between
- * different installations. Nevertheless, this is not enforced in any way; a new configuration also
- * might just always use a new network buffer.
+ * A network buffer contains one or more {@link Configuration}s, each maintaining rules to filter and buffer messages. A
+ * configuration works with filters set by the user for that particular configuration. A filter can be specified at two
+ * points in the messages flow:
+ * <ol>
+ * <li>when messages arrive from the KNX network at the buffer, and</li>
+ * <li>when the buffer shall answers a message request from a user.</li>
+ * </ol>
+ * Two types of filters exist for this:
+ * <ol>
+ * <li>a {@link Configuration.NetworkFilter} applies its filter rules on incoming messages,
+ * <li>a {@link Configuration.RequestFilter} filters message requests from user-side and answers them using the network
+ * buffer.</li>
+ * </ol>
+ * Any active configuration without network filter uses a default filter which simply accepts all cEMI L-Data.<br>
+ * If no request filter is set, no buffer lookup is done on requests, instead the request is forwarded directly to the
+ * KNX network.
  *
  * @author B. Malinowsky
  */
-public final class NetworkBuffer
+public final class NetworkBuffer implements AutoCloseable
 {
 	// this is for network link only, for now
 	private static final class ConfigImpl implements Configuration
@@ -375,34 +374,17 @@ public final class NetworkBuffer
 		}
 	}
 
-	// all network buffers currently in use
-	// private static final List buffers = new ArrayList();
-	private static int uniqueInstID;
-
 	private final List<ConfigImpl> configs = Collections.synchronizedList(new ArrayList<>());
-	private final String name;
-
-	private NetworkBuffer(final String installation)
-	{
-		name = installation;
-	}
 
 	/**
 	 * Creates a new network buffer for a KNX installation.
-	 * <p>
-	 * To identify the buffer a unique installation identifier can be given through
-	 * <code>installationId</code>.<br>
-	 * If <code>null</code> or an empty string is supplied for the installation ID, a new default ID
-	 * is generated of the form "Installation [ID]", where [ID] is a unique incrementing number.
-	 * Note, the installation ID string is treated case sensitive.
 	 *
-	 * @param installationId installation identifier for the network buffer, or <code>null</code>
+	 * @param installationId not used
 	 * @return the new network buffer
 	 */
-	public static synchronized NetworkBuffer createBuffer(final String installationId)
+	public static NetworkBuffer createBuffer(final String installationId)
 	{
-		final NetworkBuffer b = new NetworkBuffer(validateInstID(installationId));
-		return b;
+		return new NetworkBuffer();
 	}
 
 	/**
@@ -465,7 +447,6 @@ public final class NetworkBuffer
 
 	/**
 	 * Returns all configurations of this network buffer.
-	 * <p>
 	 *
 	 * @return a new Configuration array holding the configurations, with the array
 	 *         length equal to the number of network buffer configurations
@@ -476,34 +457,24 @@ public final class NetworkBuffer
 	}
 
 	/**
-	 * Returns the installation identifier of this network buffer.
-	 * <p>
-	 *
-	 * @return installation ID
+	 * @deprecated Use {@link #close()}.
 	 */
-	public String getInstallationID()
+	@Deprecated
+	public void destroy()
 	{
-		return name;
+		close();
 	}
 
 	/**
-	 * Destroys this network buffer.
-	 * <p>
-	 * All configurations hold by this buffer are removed, see
-	 * {@link #removeConfiguration(Configuration)}.
+	 * Closes this network buffer, all configurations hold by this buffer are removed (see
+	 * {@link #removeConfiguration(Configuration)}).
 	 */
-	public void destroy()
+	@Override
+	public void close()
 	{
 		synchronized (configs) {
 			while (!configs.isEmpty())
 				removeConfiguration(configs.get(configs.size() - 1));
 		}
-	}
-
-	private static String validateInstID(final String instId)
-	{
-		if (instId == null || instId.length() == 0)
-			return "Installation " + ++uniqueInstID;
-		return instId;
 	}
 }
