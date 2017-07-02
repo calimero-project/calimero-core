@@ -441,6 +441,8 @@ public class TpuartConnection implements AutoCloseable
 		private int maxDelay = maxInterByteDelay.get();
 		private int consecutiveFrameDrops = -1;
 
+		private long coolDownUntil;
+
 		Receiver()
 		{
 			super("Calimero TP-UART receiver");
@@ -460,7 +462,7 @@ public class TpuartConnection implements AutoCloseable
 					drained++;
 			}
 			catch (final IOException ignore) {}
-			logger.trace("drain rx queue ({} bytes)", drained);
+			logger.trace("drained rx queue ({} bytes)", drained);
 
 			long enterIdleTimestamp = 0; // [ns]
 			while (!quit) {
@@ -476,6 +478,11 @@ public class TpuartConnection implements AutoCloseable
 						final long inactivity = 10000; // [us]
 						if (enterIdleTimestamp == 0)
 							enterIdleTimestamp = start;
+						else if (coolDownUntil > start) {
+							// we received a temperature warning and are in cool down mode (no sending allowed)
+							// throttle busy wait on input stream
+							Thread.sleep(1);
+						}
 						else if ((start - enterIdleTimestamp) / 1000 > inactivity) {
 							synchronized (enterIdleLock) {
 								idle = true;
@@ -502,6 +509,7 @@ public class TpuartConnection implements AutoCloseable
 				catch (final RuntimeException e) {
 					e.printStackTrace();
 				}
+				catch (final InterruptedException e) {}
 				catch (final IOException e) {
 					if (!quit)
 						close(CloseEvent.INTERNAL, "receiver communication failure");
@@ -622,9 +630,10 @@ public class TpuartConnection implements AutoCloseable
 			logger.debug("TP-UART status update: {}Temp. {}, Errors: Rx={} Tx={} Prot={}",
 					slaveCollision ? "Slave collision, " : "", tempWarning ? "warning" : "OK", rxError, txError,
 					protError);
-			// NYI if controller sends warning, we have to pause tx for 1 sec
-			if (tempWarning)
-				logger.warn("TP-UART high temperature warning!");
+			if (tempWarning) {
+				coolDownUntil = System.nanoTime() + 1_000_000_000;
+				logger.warn("TP-UART high temperature warning! Sending is paused for 1 second ...");
+			}
 			return true;
 		}
 
