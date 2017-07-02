@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,7 +46,6 @@ import tuwien.auto.calimero.link.NetworkLinkListener;
 
 /**
  * Property adapter for remote property services.
- * <p>
  *
  * @author B. Malinowsky
  */
@@ -55,14 +54,12 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 	private final ManagementClient mc;
 	private final Destination dst;
 	private byte[] key;
+	private volatile int accessLevel;
 	private final NetworkLinkListener nll;
 	private final PropertyAdapterListener pal;
 
 	private final class NLListener implements NetworkLinkListener
 	{
-		NLListener()
-		{}
-
 		@Override
 		public void confirmation(final FrameEvent e)
 		{}
@@ -74,8 +71,7 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 		@Override
 		public void linkClosed(final CloseEvent e)
 		{
-			pal.adapterClosed(new CloseEvent(RemotePropertyServiceAdapter.this, e
-				.getInitiator(), e.getReason()));
+			pal.adapterClosed(new CloseEvent(RemotePropertyServiceAdapter.this, e.getInitiator(), e.getReason()));
 		}
 	}
 
@@ -101,6 +97,7 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 		if (nll != null)
 			link.addLinkListener(nll);
 		key = null;
+		accessLevel = 15;
 	}
 
 	/**
@@ -111,7 +108,7 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 	 * @param remote KNX individual address to access its interface objects
 	 * @param l property adapter listener to get notified about adapter events, use
 	 *        <code>null</code> for no listener
-	 * @param authorizeKey byte array with authorization key
+	 * @param authorizeKey byte array with authorization key to obtain a certain access level
 	 * @throws KNXLinkClosedException if the network link is closed
 	 * @throws KNXException on failure during authorization
 	 * @throws InterruptedException on interrupted thread
@@ -123,7 +120,7 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 		this(link, remote, l, true);
 		key = authorizeKey.clone();
 		try {
-			mc.authorize(dst, key);
+			accessLevel = mc.authorize(dst, key);
 		}
 		catch (final KNXException e) {
 			close();
@@ -131,10 +128,15 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.PropertyAdapter#setProperty
-	 * (int, int, int, int, byte[])
+	/**
+	 * @return the access level granted by the remote communication endpoint, or minimum access rights (15) if
+	 *         remote property access was not authorized
 	 */
+	public final int accessLevel()
+	{
+		return accessLevel;
+	}
+
 	@Override
 	public void setProperty(final int objIndex, final int pid, final int start,
 		final int elements, final byte[] data) throws KNXException, InterruptedException
@@ -142,9 +144,6 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 		mc.writeProperty(dst, objIndex, pid, start, elements, data);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.PropertyAdapter#getProperty(int, int, int, int)
-	 */
 	@Override
 	public byte[] getProperty(final int objIndex, final int pid, final int start,
 		final int elements) throws KNXException, InterruptedException
@@ -152,9 +151,6 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 		return mc.readProperty(dst, objIndex, pid, start, elements);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.PropertyAdapter#getDescription(int, int, int)
-	 */
 	@Override
 	public byte[] getDescription(final int objIndex, final int pid, final int propIndex)
 		throws KNXException, InterruptedException
@@ -172,18 +168,12 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 		return "remote PS " + dst.getAddress();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.PropertyAdapter#isOpen()
-	 */
 	@Override
 	public boolean isOpen()
 	{
 		return mc.isOpen();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.PropertyAdapter#close()
-	 */
 	@Override
 	public void close()
 	{
