@@ -41,10 +41,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -149,6 +151,7 @@ public class TpuartConnection implements AutoCloseable
 	private final EventListeners<KNXListener> listeners = new EventListeners<>();
 
 	private final Set<KNXAddress> addresses = Collections.synchronizedSet(new HashSet<>());
+	private final List<KNXAddress> sending = Collections.synchronizedList(new ArrayList<>());
 
 	private final Logger logger;
 
@@ -259,7 +262,7 @@ public class TpuartConnection implements AutoCloseable
 		KNXAddress dst = null;
 		if (group) {
 			dst = new GroupAddress(new byte[] { frame[6], frame[7] });
-			addresses.add(dst);
+			sending.add(dst);
 		}
 
 		try {
@@ -292,7 +295,7 @@ public class TpuartConnection implements AutoCloseable
 		}
 		finally {
 			req = null;
-			addresses.remove(dst);
+			sending.remove(dst);
 		}
 	}
 
@@ -678,7 +681,7 @@ public class TpuartConnection implements AutoCloseable
 			// NAK: we don't care about that, because the TP-UART checks that for us
 			// Busy: we're never busy
 			int ack = AckInfo;
-			final boolean oneOfUs = addresses.contains(dst);
+			final boolean oneOfUs = addresses.contains(dst) || sending.contains(dst);
 			if (oneOfUs) {
 				ack |= 0x01;
 				os.write(new byte[] { (byte) ack });
