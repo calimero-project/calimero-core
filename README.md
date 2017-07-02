@@ -74,8 +74,10 @@ Supported Features
 * 18.x - Scene control
 * 19.x - Date with time
 * 20.x - 8 Bit enumeration, e.g., Occupancy Mode, Blinds Control Mode
+* 21.x - Bit array of length 8, e.g., General Status, Room Heating Controller Status
 * 28.x - UTF-8 string
 * 29.x - 64 Bit signed value, e.g., Active Energy, Apparent energy
+* 229.001 - M-Bus metering value, with the various M-Bus VIF/VIFE codings
 * 232.x - RGB color value
 
 ### Busmonitor
