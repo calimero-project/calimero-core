@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2016 B. Malinowsky
+    Copyright (c) 2015, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,8 @@
 
 package tuwien.auto.calimero.xml;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 
@@ -43,7 +45,6 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-
 
 /**
  * Proxies the XML stream reader interface {@link XMLStreamReader} with the derived Calimero stream
@@ -54,19 +55,20 @@ import javax.xml.stream.XMLStreamReader;
  */
 public final class XmlStreamReaderProxy implements XmlReader
 {
-	public static XmlStreamReaderProxy createXmlReader(final InputStream is)
+	public static XmlStreamReaderProxy createXmlReader(final InputStream is, final Closeable onClose)
 		throws XMLStreamException, FactoryConfigurationError {
-		return new XmlStreamReaderProxy(XMLInputFactory.newInstance().createXMLStreamReader(is));
+		return new XmlStreamReaderProxy(XMLInputFactory.newInstance().createXMLStreamReader(is), onClose);
 	}
 
 	public static XmlStreamReaderProxy createXmlReader(final Reader reader)
 		throws XMLStreamException, FactoryConfigurationError {
-		return new XmlStreamReaderProxy(XMLInputFactory.newInstance().createXMLStreamReader(reader));
+		return new XmlStreamReaderProxy(XMLInputFactory.newInstance().createXMLStreamReader(reader), () -> {});
 	}
 
 	final XMLStreamReader r;
+	private final Closeable close;
 
-	public XmlStreamReaderProxy(final XMLStreamReader reader) { r = reader; }
+	public XmlStreamReaderProxy(final XMLStreamReader reader, final Closeable onClose) { r = reader; close = onClose; }
 
 	@Override
 	public Object getProperty(final java.lang.String name)
@@ -103,7 +105,11 @@ public final class XmlStreamReaderProxy implements XmlReader
 
 	@Override
 	public void close() {
-		try { r.close(); } catch (final XMLStreamException e) { throw wrapped(e); }
+		try {
+			r.close();
+			close.close();
+		}
+		catch (XMLStreamException | IOException ignore) {}
 	}
 
 	@Override

@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class XmlInputFactory // extends XMLInputFactory
 {
-	public static final boolean INTERNAL_ONLY = false;
+	public static boolean INTERNAL_ONLY = false;
 
 	private static final Logger l = LoggerFactory.getLogger("calimero.xml");
 
@@ -84,7 +84,6 @@ public final class XmlInputFactory // extends XMLInputFactory
 	 * @return XML reader
 	 * @throws KNXMLException if creation of the reader failed or XML resource can't be resolved
 	 */
-	// XXX not from stream API
 	public XmlReader createXMLReader(final String baseUri) throws KNXMLException
 	{
 		final XmlResolver res = new XmlResolver();
@@ -97,7 +96,7 @@ public final class XmlInputFactory // extends XMLInputFactory
 		if (!INTERNAL_ONLY) {
 			l.trace("lookup system-provided XMLStreamReader");
 			try {
-				final XmlStreamReaderProxy r = XmlStreamReaderProxy.createXmlReader(is);
+				final XmlStreamReaderProxy r = XmlStreamReaderProxy.createXmlReader(is, is);
 				l.debug("using StaX XMLStreamReader " + r.r.getClass().getName());
 				return r;
 			}
@@ -107,7 +106,7 @@ public final class XmlInputFactory // extends XMLInputFactory
 			}
 		}
 		l.debug("using internal minimal XMLStreamReader implementation");
-		return new DefaultXmlReader(resolver.getInputReader(is));
+		return new DefaultXmlReader(resolver.getInputReader(is), true);
 	}
 
 	public XmlReader createXMLStreamReader(final Reader reader)
@@ -124,7 +123,7 @@ public final class XmlInputFactory // extends XMLInputFactory
 				// we fall back on our own minimal implementation
 			}
 		}
-		return new DefaultXmlReader(reader);
+		return new DefaultXmlReader(reader, false);
 	}
 
 	public XmlReader createXMLStreamReader(final InputStream stream)

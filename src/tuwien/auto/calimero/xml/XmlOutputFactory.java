@@ -67,19 +67,17 @@ public class XmlOutputFactory // extends XMLOutputFactory
 	}
 
 	/**
-	 * Creates a {@link XmlWriter} to write into the XML resource located by the specified
-	 * identifier.
-	 * <p>
+	 * Creates a {@link XmlWriter} to write into the XML resource located by the specified identifier.
 	 *
-	 * @param systemID location identifier of the XML resource
+	 * @param systemId location identifier of the XML resource
 	 * @return XML writer
 	 * @throws KNXMLException if creation of the writer failed or XML resource can't be resolved
 	 */
-	public XmlWriter createXMLWriter(final String systemID) throws KNXMLException
+	public XmlWriter createXMLWriter(final String systemId) throws KNXMLException
 	{
 		final XmlResolver res = new XmlResolver();
-		final OutputStream os = res.resolveOutput(systemID);
-		return createXMLStreamWriter(os);
+		final OutputStream os = res.resolveOutput(systemId);
+		return create(os, true);
 	}
 
 	public XmlWriter createXMLStreamWriter(final Writer stream)
@@ -96,16 +94,22 @@ public class XmlOutputFactory // extends XMLOutputFactory
 				// fall-through to minimal writer implementation
 			}
 		}
-		final DefaultXmlWriter w = new DefaultXmlWriter(stream);
+		final DefaultXmlWriter w = new DefaultXmlWriter(stream, false);
 		return w;
 	}
 
 	public XmlWriter createXMLStreamWriter(final OutputStream stream)
 	{
+		return create(stream, false);
+	}
+
+	private XmlWriter create(final OutputStream stream, final boolean closeStream)
+	{
 		if (!INTERNAL_ONLY) {
 			l.trace("lookup system-provided XMLStreamWriter");
 			try {
-				final XmlStreamWriterProxy w = XmlStreamWriterProxy.createXmlStreamWriter(stream);
+				final XmlStreamWriterProxy w = XmlStreamWriterProxy.createXmlStreamWriter(stream,
+						closeStream ? stream : () -> {});
 				l.debug("using StaX XMLStreamWriter " + w.w.getClass().getName());
 				return w;
 			}
@@ -116,8 +120,7 @@ public class XmlOutputFactory // extends XMLOutputFactory
 		}
 		try {
 			l.debug("using internal minimal XMLStreamWriter implementation");
-			// XXX our stream is not getting closed
-			return new DefaultXmlWriter(new OutputStreamWriter(stream, "UTF-8"));
+			return new DefaultXmlWriter(new OutputStreamWriter(stream, "UTF-8"), closeStream);
 		}
 		catch (final UnsupportedEncodingException e) {
 			throw new KNXMLException("encoding UTF-8 unknown", e);

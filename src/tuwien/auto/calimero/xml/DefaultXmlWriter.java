@@ -69,6 +69,7 @@ public class DefaultXmlWriter implements XmlWriter
 	private final Map<String, Object> config = new HashMap<>();
 
 	private final BufferedWriter w;
+	private final boolean close;
 	// xml layout stack
 	private final Stack<Tag> layout;
 	// current layout indentation
@@ -83,10 +84,12 @@ public class DefaultXmlWriter implements XmlWriter
 	 * The writer is buffered by this XML writer.
 	 *
 	 * @param w the output {@link Writer}
+	 * @param closeWriter close <code>w</code> when XML writer is closed
 	 */
-	public DefaultXmlWriter(final Writer w)
+	DefaultXmlWriter(final Writer w, final boolean closeWriter)
 	{
 		this.w = new BufferedWriter(w);
+		close = closeWriter;
 		layout = new Stack<>();
 		indent = 0;
 		newTag = false;
@@ -130,6 +133,11 @@ public class DefaultXmlWriter implements XmlWriter
 	public void close() throws KNXMLException
 	{
 		writeEndDocument();
+		try {
+			if (close)
+				w.close();
+		}
+		catch (final IOException ignore) {}
 	}
 
 	private BufferedWriter indent() throws IOException

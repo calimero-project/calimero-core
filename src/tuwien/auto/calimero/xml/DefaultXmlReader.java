@@ -57,14 +57,14 @@ class DefaultXmlReader implements XmlReader
 {
 	private final Map<String, Object> config = new HashMap<>();
 
-	private Reader r;
+	private final Reader r;
+	private final boolean close;
 
 	private String elemName;
 	private List<String> attributeName;
 	private List<String> attributeValue;
 	private String elemText;
 	private boolean emptyTag;
-
 
 	private final Stack<String> openElems = new Stack<>();
 	private int event;
@@ -79,26 +79,21 @@ class DefaultXmlReader implements XmlReader
 	private int textStart;
 	private int textLength;
 
-
 	/**
 	 * Creates a new XML reader with input <code>r</code>.
 	 * <p>
-	 * The {@link Reader} should already be buffered or wrapped with a buffered reader, if necessary
-	 * (e.g. when reading from a file).
+	 * If necessary, the {@link Reader} should already be buffered or wrapped with a buffered reader, e.g., when reading
+	 * from a file on disk.
 	 *
 	 * @param r a {@link Reader} for input
+	 * @param closeReader close <code>r</code> when XML reader is closed
 	 */
-	DefaultXmlReader(final Reader r)
+	DefaultXmlReader(final Reader r, final boolean closeReader)
 	{
-		reset();
-		setInput(r);
-	}
-
-	private void setInput(final Reader input)
-	{
-		if (r != null)
-			reset();
-		r = input;
+		this.r = r;
+		close = closeReader;
+		event = XmlReader.START_DOCUMENT;
+		line = 0;
 	}
 
 	private void setElement(final String name)
@@ -136,8 +131,7 @@ class DefaultXmlReader implements XmlReader
 				name = name.substring(0, name.length() - 1);
 			if (name.charAt(0) == '/') {
 				if (!name.substring(1).equals(openElems.peek()))
-					throw new KNXMLException("element end tag does not match start tag",
-							name.substring(1), line);
+					throw new KNXMLException("element end tag does not match start tag", name.substring(1), line);
 				setElement(openElems.pop());
 				event = XmlReader.END_ELEMENT;
 				return event;
@@ -215,6 +209,11 @@ class DefaultXmlReader implements XmlReader
 	@Override
 	public void close()
 	{
+		try {
+			if (close)
+				r.close();
+		}
+		catch (final IOException ignore) {}
 	}
 
 	private boolean canRead()
@@ -336,13 +335,6 @@ class DefaultXmlReader implements XmlReader
 			if (Character.isSpaceChar(s.charAt(i)))
 				return s.substring(0, i);
 		return s;
-	}
-
-	private void reset()
-	{
-		openElems.clear();
-		event = XmlReader.START_DOCUMENT;
-		line = 0;
 	}
 
 	@Override
@@ -525,8 +517,7 @@ class DefaultXmlReader implements XmlReader
 	@Override
 	public String getLocalName()
 	{
-		if (event != XmlReader.START_ELEMENT && event != XmlReader.END_ELEMENT
-				&& event != XmlReader.ENTITY_REFERENCE)
+		if (event != XmlReader.START_ELEMENT && event != XmlReader.END_ELEMENT && event != XmlReader.ENTITY_REFERENCE)
 			throw new IllegalStateException("no XML start/end element or entity reference");
 		return elemName;
 	}

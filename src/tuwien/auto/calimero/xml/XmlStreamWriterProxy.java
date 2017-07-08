@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015 B. Malinowsky
+    Copyright (c) 2015, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,8 @@
 
 package tuwien.auto.calimero.xml;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 
@@ -54,24 +56,24 @@ import javax.xml.stream.XMLStreamWriter;
 public final class XmlStreamWriterProxy implements XmlWriter
 {
 	final XMLStreamWriter w;
+	private final Closeable close;
 
-	public static XmlStreamWriterProxy createXmlStreamWriter(final OutputStream stream)
+	public static XmlStreamWriterProxy createXmlStreamWriter(final OutputStream stream, final Closeable onClose)
 		throws XMLStreamException, FactoryConfigurationError
 	{
-		return new XmlStreamWriterProxy(XMLOutputFactory.newInstance()
-				.createXMLStreamWriter(stream));
+		return new XmlStreamWriterProxy(XMLOutputFactory.newInstance().createXMLStreamWriter(stream), onClose);
 	}
 
 	public static XmlStreamWriterProxy createXmlStreamWriter(final Writer stream)
 		throws XMLStreamException, FactoryConfigurationError
 	{
-		return new XmlStreamWriterProxy(XMLOutputFactory.newInstance()
-				.createXMLStreamWriter(stream));
+		return new XmlStreamWriterProxy(XMLOutputFactory.newInstance().createXMLStreamWriter(stream), () -> {});
 	}
 
-	public XmlStreamWriterProxy(final XMLStreamWriter writer)
+	XmlStreamWriterProxy(final XMLStreamWriter writer, final Closeable onClose)
 	{
 		w = writer;
+		close = onClose;
 	}
 
 	@Override
@@ -169,10 +171,9 @@ public final class XmlStreamWriterProxy implements XmlWriter
 	{
 		try {
 			w.close();
+			close.close();
 		}
-		catch (final XMLStreamException e) {
-			throw new KNXMLException("close", e);
-		}
+		catch (XMLStreamException | IOException ignore) {}
 	}
 
 	@Override
