@@ -67,8 +67,6 @@ import tuwien.auto.calimero.link.medium.KNXMediumSettings;
  */
 public final class Connector
 {
-	// TODO cleanup exceptions, stack traces
-
 	// TODO with functional interfaces, we should move away from checked exceptions
 	@FunctionalInterface
 	public interface TSupplier<T>
@@ -220,10 +218,6 @@ public final class Connector
 					throw e;
 				logger().error("initial connection attempt", e);
 				scheduleConnect(connector.maxAttempts - 1);
-				// TODO should we wait here until scheduled connects are done?
-				// wait ... then check link:
-				//if (impl == null)
-				//	throw new KNXLinkClosedException("connect error");
 			}
 		}
 
@@ -354,8 +348,7 @@ public final class Connector
 		public void close()
 		{
 			closed = true;
-//			final boolean canceled = f.cancel(true);
-//			System.out.println("cancellation of " + f + " returned " + canceled);
+			f.cancel(true);
 			try {
 				if (impl != null)
 					impl.close();
@@ -417,15 +410,8 @@ public final class Connector
 								max, remaining);
 					connect();
 				}
-				catch (final InterruptedException e) {
-					// TODO The interruption policy is that we close the link resource. Hence,
-					// we could handle the interrupt as any other exception because the close flag
-					// should be set already.
-					e.printStackTrace();
-					System.out.println("interrupted: closed flag = " + closed);
-				}
-				catch (final KNXException | RuntimeException e) {
-					logger().error("connection attempt {}: {}", attempt, e.getMessage());
+				catch (KNXException | RuntimeException | InterruptedException e) {
+					logger().warn("connection attempt {}: {}", attempt, e.getMessage());
 					scheduleConnect(remaining);
 				}
 			};
