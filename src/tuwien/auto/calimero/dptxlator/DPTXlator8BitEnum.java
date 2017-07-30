@@ -70,6 +70,12 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 @SuppressWarnings("checkstyle:javadocvariable")
 public class DPTXlator8BitEnum extends DPTXlator
 {
+
+	// HVAC Command field (Z8): 8 bit enumeration value in case of a write service
+	enum HvacCommand {
+		NormalWrite, Override, Release, SetOutOfService, ResetOutOfService, AlarmAck, SetToDefault
+	}
+
 	// use a common base to store and access enumeration elements independent of specific type
 	private interface EnumBase<E extends EnumBase<E>>
 	{
