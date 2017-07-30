@@ -127,15 +127,15 @@ public class ManagementClientImplTest
 		final byte[] validKey = new byte[] { 0x10, 0x20, 0x30, 0x40 };
 		final byte[] defaultKey = new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff };
 		int level = mc.authorize(dco, invalidKey);
-		assertEquals(15, level);
+		assertTrue(15 == level || 3 == level);
 
 		// 2 is the associated access level on the KNX test device for this valid key
 		level = mc.authorize(dco, validKey);
 		assertEquals(2, level);
 
 		level = mc.authorize(dco, defaultKey);
-		// 14 is selected on the KNX test device as max. unauthorized access level
-		assertEquals(14, level);
+		// 3/15 is selected on the KNX test device as max. unauthorized access level
+		assertTrue(15 == level || 3 == level);
 	}
 
 	/**
