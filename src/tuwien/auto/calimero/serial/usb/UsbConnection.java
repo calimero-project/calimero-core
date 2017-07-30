@@ -145,6 +145,7 @@ public class UsbConnection implements AutoCloseable
 		0x147b, // ABB stotz-kontakt
 		0x16D0, // Tapko and others
 		0x0681, // Siemens OCI700 interface (Synco family)
+		0x04cc, // b+b
 	};
 
 	private static final int[] productIds = {
@@ -161,6 +162,8 @@ public class UsbConnection implements AutoCloseable
 		0x0490, 0x0491, 0x0492,
 		// uses OCI
 		0x0014,
+		// uses b+b, EIBWeiche USB
+		0x0301,
 	};
 
 
