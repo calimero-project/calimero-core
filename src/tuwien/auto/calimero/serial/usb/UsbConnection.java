@@ -63,7 +63,6 @@ import javax.usb.UsbException;
 import javax.usb.UsbHostManager;
 import javax.usb.UsbHub;
 import javax.usb.UsbInterface;
-import javax.usb.UsbInterfacePolicy;
 import javax.usb.UsbIrp;
 import javax.usb.UsbNotActiveException;
 import javax.usb.UsbNotClaimedException;
@@ -217,7 +216,7 @@ public class UsbConnection implements AutoCloseable
 
 	private final UsbCallback callback = new UsbCallback();
 
-	private final class UsbCallback extends Thread implements UsbPipeListener, UsbInterfacePolicy
+	private final class UsbCallback extends Thread implements UsbPipeListener
 	{
 		private volatile boolean close;
 
@@ -284,12 +283,6 @@ public class UsbConnection implements AutoCloseable
 			catch (final KNXFormatException | RuntimeException e) {
 				logger.error("creating HID class report from {}", DataUnitBuilder.toHex(data, ""), e);
 			}
-		}
-
-		@Override
-		public boolean forceClaim(final UsbInterface usbInterface)
-		{
-			return true;
 		}
 
 		private byte endpointAddress(final UsbPipeEvent event)
@@ -394,8 +387,8 @@ public class UsbConnection implements AutoCloseable
 	 * descriptor strings.
 	 *
 	 * @param device a <code>vendorId:productId</code> identifier, or a name (case-insensitive) that is used to match a
-	 *        KNX USB interface by its description strings, e.g, "siemens", "busch-jaeger", "abb". Note, that with more
-	 *        than one USB interfaces matching the criteria of <code>device</code>, the first one found is selected
+	 *        KNX USB device by its description strings, e.g, "siemens", "busch-jaeger", "abb". Note, that with more
+	 *        than one USB device matching the criteria of <code>device</code>, the first one found is selected
 	 * @throws KNXException on errors finding or accessing the USB interface, or opening the KNX USB connection
 	 */
 	public UsbConnection(final String device) throws KNXException
@@ -638,7 +631,7 @@ public class UsbConnection implements AutoCloseable
 			// At least on Linux, we might have to detach the kernel driver. Strangely,
 			// a failed claim presents itself as UsbPlatformException, indicating a busy device.
 			// Force unload any kernel USB drivers, might work on Linux/OSX, not on Windows.
-			usbIf.claim(callback);
+			usbIf.claim(forceClaim -> true);
 		}
 		return usbIf;
 	}
@@ -852,7 +845,7 @@ public class UsbConnection implements AutoCloseable
 //			return findDeviceByName(getRootHub(), device.toLowerCase());
 		}
 		catch (final SecurityException | UsbException | UsbDisconnectedException e) {
-			throw new KNXException("find USB interface by name " + device, e);
+			throw new KNXException("find USB device matching '" + device + "'", e);
 		}
 	}
 
@@ -877,7 +870,7 @@ public class UsbConnection implements AutoCloseable
 //			}
 //			catch (final KNXException e) {}
 //		}
-//		throw new KNXException("no USB device found by name " + device);
+//		throw new KNXException("no USB device found with name '" + device + "'");
 //	}
 
 	private static List<UsbDevice> collect(final UsbDevice device)
@@ -979,7 +972,7 @@ public class UsbConnection implements AutoCloseable
 		else
 			list.removeIf(i -> i.toLowerCase().indexOf(name.toLowerCase()) == -1);
 		if (list.isEmpty())
-			throw new KNXException("no USB interface found by name " + name);
+			throw new KNXException("no USB device found with name matching '" + name + "'");
 
 		final String desc = list.get(0);
 		final String id = desc.substring(desc.indexOf("ID") + 3, desc.indexOf("\n"));
