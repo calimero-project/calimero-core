@@ -329,7 +329,7 @@ class DefaultXmlReader implements XmlReader
 		return false;
 	}
 
-	private String splitOnSpace(final String s)
+	private static String splitOnSpace(final String s)
 	{
 		for (int i = 0; i < s.length(); ++i)
 			if (Character.isSpaceChar(s.charAt(i)))

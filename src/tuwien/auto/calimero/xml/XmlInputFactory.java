@@ -91,7 +91,7 @@ public final class XmlInputFactory // extends XMLInputFactory
 		return create(res, is);
 	}
 
-	private XmlReader create(final XmlResolver resolver, final InputStream is)
+	private static XmlReader create(final XmlResolver resolver, final InputStream is)
 	{
 		if (!INTERNAL_ONLY) {
 			l.trace("lookup system-provided XMLStreamReader");

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -201,7 +201,7 @@ public final class XmlResolver
 	}
 
 	// returns array with length 3 and optional entries version, encoding, standalone
-	private String[] readXMLDeclaration(final Reader r) throws KNXMLException
+	private static String[] readXMLDeclaration(final Reader r) throws KNXMLException
 	{
 		final StringBuffer buf = new StringBuffer(100);
 		try {
@@ -241,7 +241,7 @@ public final class XmlResolver
 		return new String[] { version, encoding, standalone };
 	}
 
-	private String getAttValue(final String s) throws KNXMLException
+	private static String getAttValue(final String s) throws KNXMLException
 	{
 		final String att = s.trim();
 		if (att.charAt(0) == '=' && att.length() > 2) {

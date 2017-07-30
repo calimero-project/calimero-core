@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2016 B. Malinowsky
+    Copyright (c) 2015, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -312,7 +312,7 @@ public final class LinkProcedure implements Runnable
 	/**
 	 * @param action link procedure event
 	 */
-	private void onCommand(final Action action)
+	private static void onCommand(final Action action)
 	{
 		logger.debug("on {}", action);
 	}

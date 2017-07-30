@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -169,8 +169,6 @@ public final class LogService
 		case ERROR:
 			logger.error(marker, format, o);
 			break;
-		default:
-			throw new KNXIllegalArgumentException("unknown log level");
 		}
 	}
 
@@ -187,8 +185,7 @@ public final class LogService
 			return logger.isWarnEnabled();
 		case ERROR:
 			return logger.isErrorEnabled();
-		default:
-			throw new KNXIllegalArgumentException("unknown log level");
 		}
+		throw new KNXIllegalArgumentException("unknown log level");
 	}
 }

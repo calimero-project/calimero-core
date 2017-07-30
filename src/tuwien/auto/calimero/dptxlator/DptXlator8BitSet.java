@@ -343,7 +343,7 @@ public class DptXlator8BitSet extends DPTXlator
 		dst[index] = (short) result;
 	}
 
-	private short toDpt(final EnumSet<?> elements)
+	private static short toDpt(final EnumSet<?> elements)
 	{
 		int v = 0;
 		for (final Enum<?> e : elements)

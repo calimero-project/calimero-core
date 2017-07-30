@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -549,7 +549,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		addInfo[infoType] = info.clone();
 	}
 
-	private long toLong(final byte[] data)
+	private static long toLong(final byte[] data)
 	{
 		final long l = (data[0] & 0xff) << 8 | data[1] & 0xff;
 		return l << 16 | (data[2] & 0xff) << 8 | data[3] & 0xff;

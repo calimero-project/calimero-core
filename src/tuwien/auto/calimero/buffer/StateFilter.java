@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -308,7 +308,7 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		createReferences(update, dp.getAddresses(true), dp.getMainAddress());
 	}
 
-	private void createReferences(final Map<KNXAddress, List<GroupAddress>> map,
+	private static void createReferences(final Map<KNXAddress, List<GroupAddress>> map,
 		final Collection<GroupAddress> forAddr, final GroupAddress toAddr)
 	{
 		for (final Iterator<GroupAddress> i = forAddr.iterator(); i.hasNext();) {
@@ -326,7 +326,7 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		destroyReferences(update, dp.getAddresses(true), dp.getMainAddress());
 	}
 
-	private void destroyReferences(final Map<KNXAddress, List<GroupAddress>> map,
+	private static void destroyReferences(final Map<KNXAddress, List<GroupAddress>> map,
 		final Collection<GroupAddress> forAddr, final GroupAddress toAddr)
 	{
 		for (final Iterator<GroupAddress> i = forAddr.iterator(); i.hasNext();) {

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -442,7 +442,7 @@ public class Destination implements AutoCloseable
 		((AggregatorProxy) notify).future = disconnect.schedule(notify, TIMEOUT, TimeUnit.MILLISECONDS);
 	}
 
-	private void remove(final Runnable notify)
+	private static void remove(final Runnable notify)
 	{
 		final Future<?> future = ((AggregatorProxy) notify).future;
 		future.cancel(false);

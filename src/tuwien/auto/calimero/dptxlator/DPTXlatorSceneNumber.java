@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2013, 2016 B. Malinowsky
+    Copyright (c) 2013, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -176,7 +176,7 @@ public class DPTXlatorSceneNumber extends DPTXlator
 		}
 	}
 
-	private short toDPT(final int value)
+	private static short toDPT(final int value)
 	{
 		if (value < 0 || value > 63)
 			throw new KNXIllegalArgumentException("input scene number out of range [0..63]");

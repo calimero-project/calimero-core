@@ -262,7 +262,7 @@ public class DPTXlatorUtf8 extends DPTXlator
 		}
 	}
 
-	private int findOffsetFor(final int index, final short[] dst)
+	private static int findOffsetFor(final int index, final short[] dst)
 	{
 		int offset = 0;
 		for (int idx = index; idx > 0;) {

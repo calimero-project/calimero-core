@@ -293,7 +293,7 @@ public class KNXnetIPTunnel extends ClientConnection
 		return true;
 	}
 
-	private List<Integer> additionalInfoTypesOf(final CEMILData ldata)
+	private static List<Integer> additionalInfoTypesOf(final CEMILData ldata)
 	{
 		if (ldata instanceof CEMILDataEx) {
 			final CEMILDataEx ext = (CEMILDataEx) ldata;
@@ -314,7 +314,7 @@ public class KNXnetIPTunnel extends ClientConnection
 			ext.getAdditionalInfo().forEach(info -> {
 				if (!types.contains(info.getType())) {
 					logger.warn("remove L-Data additional info type {}: {}", info.getType(),
-							DataUnitBuilder.toHex(info.getInfo(), ""));
+							DataUnitBuilder.toHex(info.getInfo(), " "));
 					ext.removeAdditionalInfo(info.getType());
 				}
 			});

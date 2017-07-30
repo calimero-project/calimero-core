@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -323,7 +323,7 @@ public class DPTXlatorDate extends DPTXlator
 		}
 	}
 
-	private short[] toDPT(final long milliseconds, final short[] dst, final int index)
+	private static short[] toDPT(final long milliseconds, final short[] dst, final int index)
 	{
 		synchronized (DPTXlatorDate.class) {
 			getCalendar().clear();
@@ -333,7 +333,7 @@ public class DPTXlatorDate extends DPTXlator
 		return dst;
 	}
 
-	private short[] set(final int year, final int month, final int day, final short[] dst, final int index)
+	private static short[] set(final int year, final int month, final int day, final short[] dst, final int index)
 	{
 		if (year < 1990 || year > 2089)
 			throw new KNXIllegalArgumentException("year out of range [1990..2089]");
@@ -348,7 +348,7 @@ public class DPTXlatorDate extends DPTXlator
 		return dst;
 	}
 
-	private short absYear(final int relative)
+	private static short absYear(final int relative)
 	{
 		if (relative > 99)
 			throw new KNXIllegalArgumentException("relative year out of range [0..99]");

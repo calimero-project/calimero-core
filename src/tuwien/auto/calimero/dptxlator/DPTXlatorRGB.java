@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -158,12 +158,13 @@ public class DPTXlatorRGB extends DPTXlator {
 	}
 
 	@Override
-	protected void toDPT(final String value, final short[] dst, final int index)
-		throws KNXFormatException
+	protected void toDPT(final String value, final short[] dst, final int index) throws KNXFormatException
 	{
 		final StringTokenizer t = new StringTokenizer(value, "- ");
 		final int maxTokens = 3;
-		int r=-1, g=-1, b=-1;
+		int r = -1;
+		int g = -1;
+		int b = -1;
 		try {
 			int count = 0;
 			for (; count < maxTokens && t.hasMoreTokens(); ++count) {
@@ -186,8 +187,7 @@ public class DPTXlatorRGB extends DPTXlator {
 							b = Short.parseShort(componentValue);
 						}
 						else {
-							throw newException("invalid color component " + componentID
-									+ " in", value);
+							throw newException("invalid color component " + componentID + " in", value);
 						}
 					}
 					else {
@@ -214,7 +214,7 @@ public class DPTXlatorRGB extends DPTXlator {
 		}
 	}
 
-	private short[] set(final int red, final int green, final int blue, final short[] dst,
+	private static short[] set(final int red, final int green, final int blue, final short[] dst,
 		final int index)
 	{
 		if (red < 0 || red > 255)

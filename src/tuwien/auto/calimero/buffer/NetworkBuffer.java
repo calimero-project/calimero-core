@@ -376,6 +376,8 @@ public final class NetworkBuffer implements AutoCloseable
 
 	private final List<ConfigImpl> configs = Collections.synchronizedList(new ArrayList<>());
 
+	private NetworkBuffer() {}
+
 	/**
 	 * Creates a new network buffer for a KNX installation.
 	 *

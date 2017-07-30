@@ -103,7 +103,7 @@ public class XmlOutputFactory // extends XMLOutputFactory
 		return create(stream, false);
 	}
 
-	private XmlWriter create(final OutputStream stream, final boolean closeStream)
+	private static XmlWriter create(final OutputStream stream, final boolean closeStream)
 	{
 		if (!INTERNAL_ONLY) {
 			l.trace("lookup system-provided XMLStreamWriter");

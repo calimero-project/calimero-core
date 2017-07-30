@@ -83,6 +83,21 @@ public interface ManagementProcedures extends AutoCloseable
 	IndividualAddress[] readAddress() throws KNXException, InterruptedException;
 
 	/**
+	 * Reads the individual address of a KNX device with known serial number.
+	 * <p>
+	 * This method corresponds to the KNX <i>NM_IndividualAddress_SerialNumber_Read</i> procedure.
+	 *
+	 * @param serialNo byte array with serial number, <code>serialNo.length</code> = 6
+	 * @return the individual address
+	 * @throws KNXTimeoutException on a timeout during send or no address response was received
+	 * @throws KNXInvalidResponseException on invalid read response message
+	 * @throws KNXLinkClosedException if network link to KNX network is closed
+	 * @throws KNXException on other read address errors
+	 * @throws InterruptedException on interrupted thread
+	 */
+	IndividualAddress readAddress(byte[] serialNo) throws KNXException, InterruptedException;
+
+	/**
 	 * Writes the individual address of a single KNX device set to programming mode.
 	 * <p>
 	 * This method corresponds to the KNX <i>NM_IndividualAddress_Write</i> procedure.<br>
@@ -98,6 +113,26 @@ public interface ManagementProcedures extends AutoCloseable
 	 * @throws InterruptedException on interrupted thread
 	 */
 	boolean writeAddress(IndividualAddress newAddress) throws KNXException, InterruptedException;
+
+	/**
+	 * Writes the individual address of a single KNX device with known serial number.
+	 * <p>
+	 * This method corresponds to the KNX <i>NM_IndividualAddress_SerialNumber_Write</i> procedure.<br>
+	 * Before writing the address, the procedure verifies the assigned individual address is unique,
+	 * and checks for successful address programming.<br>
+	 * Note that this procedure, in contrast to {@link #writeAddress(IndividualAddress)}, does not
+	 * restart the programmed device.
+	 *
+	 * @param serialNo the device serial number to be programmed, <code>serialNo.length = 6</code>
+	 * @param newAddress the new address for the device identified by <code>serialNo</code>
+	 * @return <code>true</code> if the new address is set and was verified successfully,
+	 *         <code>false</code> if the device reports back a differing (e.g., old) address on
+	 *         verification
+	 * @throws KNXException on any errors attempting to write or verify the written individual
+	 *         device address
+	 * @throws InterruptedException on interrupted thread
+	 */
+	boolean writeAddress(byte[] serialNo, IndividualAddress newAddress) throws KNXException, InterruptedException;
 
 	/**
 	 * Sets the individual address of all devices which are in programming mode to the
@@ -127,42 +162,6 @@ public interface ManagementProcedures extends AutoCloseable
 	 * @throws InterruptedException on interrupted thread
 	 */
 	boolean isAddressOccupied(IndividualAddress devAddr) throws KNXException, InterruptedException;
-
-	/**
-	 * Reads the individual address of a KNX device with known serial number.
-	 * <p>
-	 * This method corresponds to the KNX <i>NM_IndividualAddress_SerialNumber_Read</i> procedure.
-	 * <br>
-	 *
-	 * @param serialNo byte array with serial number, <code>serialNo.length</code> = 6
-	 * @return the individual address
-	 * @throws KNXTimeoutException on a timeout during send or no address response was received
-	 * @throws KNXInvalidResponseException on invalid read response message
-	 * @throws KNXLinkClosedException if network link to KNX network is closed
-	 * @throws KNXException on other read address errors
-	 * @throws InterruptedException on interrupted thread
-	 */
-	IndividualAddress readAddress(byte[] serialNo) throws KNXException, InterruptedException;
-
-	/**
-	 * Writes the individual address of a single KNX device with known serial number.
-	 * <p>
-	 * This method corresponds to the KNX <i>NM_IndividualAddress_SerialNumber_Write</i> procedure.<br>
-	 * Before writing the address, the procedure verifies the assigned individual address is unique,
-	 * and checks for successful address programming.<br>
-	 * Note that this procedure, in contrast to {@link #writeAddress(IndividualAddress)}, does not
-	 * restart the programmed device.
-	 *
-	 * @param serialNo the device serial number to be programmed, <code>serialNo.length = 6</code>
-	 * @param newAddress the new address for the device identified by <code>serialNo</code>
-	 * @return <code>true</code> if the new address is set and was verified successfully,
-	 *         <code>false</code> if the device reports back a differing (e.g., old) address on
-	 *         verification
-	 * @throws KNXException on any errors attempting to write or verify the written individual
-	 *         device address
-	 * @throws InterruptedException on interrupted thread
-	 */
-	boolean writeAddress(byte[] serialNo, IndividualAddress newAddress) throws KNXException, InterruptedException;
 
 	/**
 	 * Reads the domain address of a communication partner in the KNX network, providing both the individual address of

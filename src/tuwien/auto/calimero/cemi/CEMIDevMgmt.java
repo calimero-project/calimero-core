@@ -527,7 +527,7 @@ public class CEMIDevMgmt implements CEMI
 			throw new KNXFormatException("insufficient frame length", len);
 	}
 
-	private void initReset(final ByteArrayInputStream is) throws KNXFormatException
+	private static void initReset(final ByteArrayInputStream is) throws KNXFormatException
 	{
 		if (is.available() != 0)
 			throw new KNXFormatException("invalid length for a reset frame", is.available());

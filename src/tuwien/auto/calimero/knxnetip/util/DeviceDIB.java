@@ -150,7 +150,7 @@ public class DeviceDIB extends DIB
 
 		// be sure and check for characters in string
 		try {
-			name = new String(friendlyName.getBytes(), "ISO-8859-1");
+			name = new String(friendlyName.getBytes("ISO-8859-1"), "ISO-8859-1");
 		}
 		catch (final UnsupportedEncodingException e) {
 			// ISO 8859-1 support is mandatory on every Java platform

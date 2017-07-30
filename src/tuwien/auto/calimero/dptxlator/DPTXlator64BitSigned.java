@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2016 B. Malinowsky
+    Copyright (c) 2015, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -227,7 +227,7 @@ public class DPTXlator64BitSigned extends DPTXlator
 		}
 	}
 
-	private short[] toDPT(final long value, final short[] dst, final int index)
+	private static short[] toDPT(final long value, final short[] dst, final int index)
 	{
 		final int i = 8 * index;
 		dst[i] = (short) ((value >> 56) & 0xFF);

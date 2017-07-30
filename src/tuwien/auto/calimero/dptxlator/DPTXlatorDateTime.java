@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -647,14 +647,14 @@ public class DPTXlatorDateTime extends DPTXlator
 		return types;
 	}
 
-	private void checkRange(final int field, final int v)
+	private static void checkRange(final int field, final int v)
 	{
 		if (v < MIN_VALUES[field] || v > MAX_VALUES[field])
 			throw new KNXIllegalArgumentException(FIELDS[field] + " out of range: " + v);
 	}
 
 	// check on hour = 24, minutes and seconds have to be 0
-	private boolean check24Hours(final int hr, final int min, final int sec)
+	private static boolean check24Hours(final int hr, final int min, final int sec)
 	{
 		if (hr != 24 || min == 0 && sec == 0)
 			return true;
@@ -754,7 +754,7 @@ public class DPTXlatorDateTime extends DPTXlator
 		return (data[8 * index + 7] & mask) != 0;
 	}
 
-	private void set(final short[] dst, final int index, final int field, final int v)
+	private static void set(final short[] dst, final int index, final int field, final int v)
 	{
 		checkRange(field, v);
 		final int i = 8 * index + field;
@@ -774,7 +774,7 @@ public class DPTXlatorDateTime extends DPTXlator
 		setBit(data, index, mask, bit);
 	}
 
-	private void setBit(final short[] dst, final int index, final int mask, final boolean bit)
+	private static void setBit(final short[] dst, final int index, final int mask, final boolean bit)
 	{
 		if (bit)
 			dst[8 * index + 6] |= mask;
@@ -787,7 +787,7 @@ public class DPTXlatorDateTime extends DPTXlator
 		setBitEx(data, index, mask, bit);
 	}
 
-	private void setBitEx(final short[] v, final int index, final int mask, final boolean bit)
+	private static void setBitEx(final short[] v, final int index, final int mask, final boolean bit)
 	{
 		if (bit)
 			v[8 * index + 7] |= mask;

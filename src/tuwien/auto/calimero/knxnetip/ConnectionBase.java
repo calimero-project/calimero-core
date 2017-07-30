@@ -133,7 +133,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	private ReceiverLoop receiver;
 
 	// lock object to do wait() on for protocol timeouts
-	Object lock = new Object();
+	final Object lock = new Object();
 
 	// send/receive sequence numbers
 	private int seqRcv;

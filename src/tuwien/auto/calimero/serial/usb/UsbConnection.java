@@ -433,7 +433,7 @@ public class UsbConnection implements AutoCloseable
 
 			callback.start();
 		}
-		catch (final UsbNotActiveException | UsbDisconnectedException | UsbNotClaimedException | UsbException e) {
+		catch (UsbNotActiveException | UsbDisconnectedException | UsbNotClaimedException | UsbException e) {
 			throw new KNXException("open USB connection", e);
 		}
 	}
@@ -629,7 +629,7 @@ public class UsbConnection implements AutoCloseable
 		try {
 			usbIf.claim();
 		}
-		catch (final UsbClaimException | UsbPlatformException e) {
+		catch (UsbClaimException | UsbPlatformException e) {
 			// At least on Linux, we might have to detach the kernel driver. Strangely,
 			// a failed claim presents itself as UsbPlatformException, indicating a busy device.
 			// Force unload any kernel USB drivers, might work on Linux/OSX, not on Windows.
@@ -638,10 +638,10 @@ public class UsbConnection implements AutoCloseable
 		return usbIf;
 	}
 
-	private UsbPipe open(final UsbInterface usbIf, final byte endpointAddress)
+	private static UsbPipe open(final UsbInterface usbIf, final int endpointAddress)
 		throws KNXException, UsbNotActiveException, UsbNotClaimedException, UsbDisconnectedException, UsbException
 	{
-		final UsbEndpoint epout = usbIf.getUsbEndpoint(endpointAddress);
+		final UsbEndpoint epout = usbIf.getUsbEndpoint((byte) endpointAddress);
 		if (epout == null)
 			throw new KNXException(usbIf.getUsbConfiguration().getUsbDevice() + " contains no KNX USB data endpoint 0x"
 					+ Integer.toUnsignedString(endpointAddress, 16));
@@ -928,8 +928,7 @@ public class UsbConnection implements AutoCloseable
 				sb.append("\n").append(indent).append("S/N: ").append(device.getString(sno));
 		}
 		catch (final UnsupportedEncodingException e) {
-			l.error("Java platform lacks support for the required standard charset UTF-16LE");
-			e.printStackTrace();
+			l.error("Java platform lacks support for the required standard charset UTF-16LE", e);
 		}
 		catch (final UsbPlatformException e) {
 			// Thrown on Win 7/8 (USB error 8) on calling device.getString on most USB interfaces.
@@ -949,10 +948,12 @@ public class UsbConnection implements AutoCloseable
 	// pre: device = vendorId:productId
 	private static boolean isKnxInterfaceId(final String device)
 	{
-		boolean knownVendor = false, knownProduct = false;
+		boolean knownVendor = false;
+		boolean knownProduct = false;
 		final String[] split = device.split(":");
 		try {
-			final int vend = Integer.parseInt(split[0], 16), prod = Integer.parseInt(split[1], 16);
+			final int vend = Integer.parseInt(split[0], 16);
+			final int prod = Integer.parseInt(split[1], 16);
 			for (final int v : vendorIds)
 				knownVendor |= v == vend;
 			for (final int p : productIds)

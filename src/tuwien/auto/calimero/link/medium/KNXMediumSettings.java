@@ -95,8 +95,9 @@ public abstract class KNXMediumSettings
 			return new RFSettings(device);
 		case MEDIUM_KNXIP:
 			return new KnxIPSettings(device);
+		default:
+			throw new KNXIllegalArgumentException("unknown medium type " + medium);
 		}
-		throw new KNXIllegalArgumentException("unknown medium type " + medium);
 	}
 
 	/**

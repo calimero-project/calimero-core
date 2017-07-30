@@ -335,7 +335,7 @@ public class TpuartConnection implements AutoCloseable
 	}
 
 	// returns a TP1 std or ext frame
-	private byte[] cEmiToTP1(final byte[] frame)
+	private static byte[] cEmiToTP1(final byte[] frame)
 	{
 		// set frame type to std/ext
 		final int StdMaxApdu = 15;
@@ -377,7 +377,7 @@ public class TpuartConnection implements AutoCloseable
 		return tp1;
 	}
 
-	private byte[] toUartServices(final byte[] tp1)
+	private static byte[] toUartServices(final byte[] tp1)
 	{
 		final ByteArrayOutputStream data = new ByteArrayOutputStream(tp1.length * 2);
 		for (int i = 0; i < tp1.length - 1; i++) {

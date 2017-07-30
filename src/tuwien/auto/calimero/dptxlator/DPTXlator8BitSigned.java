@@ -226,7 +226,7 @@ public class DPTXlator8BitSigned extends DPTXlator
 		return types;
 	}
 
-	private byte fromDPT(final short data)
+	private static byte fromDPT(final short data)
 	{
 		return (byte) data;
 	}
@@ -280,7 +280,7 @@ public class DPTXlator8BitSigned extends DPTXlator
 		}
 	}
 
-	private short toDPT(final int value) throws KNXFormatException
+	private static short toDPT(final int value) throws KNXFormatException
 	{
 		if (value < -128 || value > 127)
 			throw new KNXFormatException("value out of range [-128 .. 127]", value);
