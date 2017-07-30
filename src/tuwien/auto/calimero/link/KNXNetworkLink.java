@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,7 +42,6 @@ import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
-import tuwien.auto.calimero.log.LogService;
 
 /**
  * KNX network link interface to communicate with destinations in a KNX network.
@@ -189,14 +188,10 @@ public interface KNXNetworkLink extends AutoCloseable
 	/**
 	 * Returns the name of the link, a short textual representation to identify a link.
 	 * <p>
-	 * The name is unique for links with different remote endpoints, or different types of
-	 * communication links.<br>
-	 * The returned name is used by this link for the name of its log service. Supply
-	 * {@link #getName()} to {@link LogService#getLogger(String)} to get the log
-	 * service of this link.
-	 * <p>
-	 * By default, "link " + address/ID of the remote endpoint is returned (e.g., "link
-	 * 192.168.0.10:3671" for an IP link).<br>
+	 * The name is unique for links with different remote endpoints, or different types of communication links. By
+	 * default, the address/ID of the remote endpoint is used, e.g., "192.168.0.10:3671" for an IP link.<br>
+	 * The name is also used for the link logger; by default, use "calimero.link." +
+	 * {@link #getName()} to retrieve the logger of this link.
 	 *
 	 * @return link name as string
 	 */
@@ -205,11 +200,10 @@ public interface KNXNetworkLink extends AutoCloseable
 	/**
 	 * Checks for open network link.
 	 * <p>
-	 * After a call to {@link #close()} or after the underlying protocol initiated the end
-	 * of the communication, this method always returns <code>false</code>.
+	 * After a call to {@link #close()} or after the underlying protocol initiated the end of the communication, this
+	 * method always returns <code>false</code>.
 	 *
-	 * @return <code>true</code> if this network link is open, <code>false</code> on
-	 *         closed
+	 * @return <code>true</code> if this network link is open, <code>false</code> if closed
 	 */
 	boolean isOpen();
 
@@ -217,7 +211,7 @@ public interface KNXNetworkLink extends AutoCloseable
 	 * Ends communication with the KNX network and closes the network link.
 	 * <p>
 	 * All registered link listeners get notified.<br>
-	 * If no communication access was established in the first place, no action is
+	 * If no communication access was established in the first place or the link already got closed, no action is
 	 * performed.
 	 */
 	@Override
