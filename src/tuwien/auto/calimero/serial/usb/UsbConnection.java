@@ -178,10 +178,6 @@ public class UsbConnection implements AutoCloseable
 		0x204b // busware TP-UART
 	};
 
-	// EP in/out: USB endpoint for asynchronous KNX data transfer over interrupt pipe
-	private static final byte knxEndpointOut = (byte) 0x02;
-	private static final byte knxEndpointIn = (byte) 0x81;
-
 	// maximum reply time for a response service is 1000 ms
 	// the additional milliseconds allow for delay of slow interfaces and OS crap
 	private static final int tunnelingTimeout = 1000 + 500; // ms
@@ -417,9 +413,15 @@ public class UsbConnection implements AutoCloseable
 			dev = device;
 			this.name = name;
 			logger = LoggerFactory.getLogger(logPrefix + "." + getName());
-			knxUsbIf = open(device);
-			out = open(knxUsbIf, knxEndpointOut);
-			in = open(knxUsbIf, knxEndpointIn);
+			final Object[] usbIfInOut = open(device);
+
+			knxUsbIf = (UsbInterface) usbIfInOut[0];
+			// EP address in/out: USB endpoints for asynchronous KNX data transfer over interrupt pipe
+			final int epAddressIn = (int) usbIfInOut[1];
+			final int epAddressOut = (int) usbIfInOut[2];
+
+			out = open(knxUsbIf, epAddressOut);
+			in = open(knxUsbIf, epAddressIn);
 			in.addUsbPipeListener(callback);
 			// if necessary, unclog the incoming pipe
 			UsbIrp irp;
@@ -579,16 +581,17 @@ public class UsbConnection implements AutoCloseable
 		close(CloseEvent.CLIENT_REQUEST, "user request");
 	}
 
-	private UsbInterface open(final UsbDevice device)
-		throws UsbClaimException, UsbNotActiveException, UsbDisconnectedException, UsbException
+	// returns [UsbInterface, Endpoint Address In, Endpoint Address Out]
+	private Object[] open(final UsbDevice device) throws UsbException
 	{
 		logger.info(printInfo(device, logger, ""));
 
 		final UsbConfiguration configuration = device.getActiveUsbConfiguration();
 		@SuppressWarnings("unchecked")
 		final List<UsbInterface> interfaces = configuration.getUsbInterfaces();
-		byte epAddressOut = 0;
-		byte epAddressIn = 0;
+		UsbInterface useUsbIf = null;
+		int epAddressOut = 0;
+		int epAddressIn = 0;
 		for (final UsbInterface uif : interfaces) {
 			@SuppressWarnings("unchecked")
 			final List<UsbInterface> settings = uif.getSettings();
@@ -606,24 +609,25 @@ public class UsbConnection implements AutoCloseable
 					final List<UsbEndpoint> endpoints = alt.getUsbEndpoints();
 					for (final UsbEndpoint endpoint : endpoints) {
 						final byte addr = endpoint.getUsbEndpointDescriptor().bEndpointAddress();
-						final int index = addr & UsbConst.ENDPOINT_NUMBER_MASK;
 
+						final int index = addr & UsbConst.ENDPOINT_NUMBER_MASK;
 						final String inout = DescriptorUtils.getDirectionName(addr);
 						logger.trace("EP {} {}", index, inout);
 
 						final boolean epIn = (addr & LibUsb.ENDPOINT_IN) == 0 ? false : true;
 						if (epIn && epAddressIn == 0)
-							epAddressIn = addr;
+							epAddressIn = addr & 0xff;
 						if (!epIn && epAddressOut == 0)
-							epAddressOut = addr;
+							epAddressOut = addr & 0xff;
+						if (useUsbIf == null && epAddressIn != 0 && epAddressOut != 0)
+							useUsbIf = alt;
 					}
 				}
 			}
 		}
-		logger.debug("Found USB device endpoint addresses OUT 0x{}, IN 0x{}", Integer.toHexString(epAddressOut & 0xff),
-				Integer.toHexString(epAddressIn & 0xff));
-		// ??? all devices I know use 0, so just stick to it for now
-		final UsbInterface usbIf = configuration.getUsbInterface((byte) 0);
+		logger.debug("Found USB device endpoint addresses OUT 0x{}, IN 0x{}", Integer.toHexString(epAddressOut),
+				Integer.toHexString(epAddressIn));
+		final UsbInterface usbIf = Optional.ofNullable(useUsbIf).orElse(configuration.getUsbInterface((byte) 0));
 		try {
 			usbIf.claim();
 		}
@@ -633,7 +637,7 @@ public class UsbConnection implements AutoCloseable
 			// Force unload any kernel USB drivers, might work on Linux/OSX, not on Windows.
 			usbIf.claim(forceClaim -> true);
 		}
-		return usbIf;
+		return new Object [] { usbIf, epAddressIn, epAddressOut };
 	}
 
 	private static UsbPipe open(final UsbInterface usbIf, final int endpointAddress)
