@@ -39,6 +39,7 @@ package tuwien.auto.calimero.serial.usb;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,6 +49,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
 import javax.usb.UsbClaimException;
@@ -1066,6 +1068,14 @@ public class UsbConnection implements AutoCloseable
 		final int port = LibUsb.getPortNumber(device);
 		if (port != 0)
 			attach += (attach.isEmpty() ? "Attached at port " : ", attached at port ") + port;
+
+		// try to show the full path of port numbers from root for this device
+		final ByteBuffer path = ByteBuffer.allocateDirect(8);
+        final int result = LibUsb.getPortNumbers(device, path);
+		if (result > 0)
+			attach += IntStream.range(0, result).map(path::get).mapToObj(Integer::toString)
+					.collect(Collectors.joining("/", " (/bus:" + LibUsb.getBusNumber(device) + "/", ")"));
+
 		if (!attach.isEmpty())
 			sb.append("\n").append(ind).append(attach);
 
