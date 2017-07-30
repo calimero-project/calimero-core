@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,6 +35,8 @@
 */
 
 package tuwien.auto.calimero.buffer;
+
+import java.util.function.Consumer;
 
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -102,26 +104,6 @@ public class LDataObjectQueue extends LDataObject
 		}
 	}
 
-	/**
-	 * Listener for queue events.
-	 * <p>
-	 * A notification callback is invoked synchronized with the event source, so the
-	 * listener will have a consistent view of the queue during that time, allowing to
-	 * take appropriate actions. During the callback no concurrent changes to the queue
-	 * object are possible.
-	 */
-	public interface QueueListener
-	{
-		/**
-		 * Called on a full queue. A notification is sent only once every time a queue got
-		 * filled up. In other words, no notifying is done by an already full queue on
-		 * receiving another frame.
-		 *
-		 * @param queue event source, the queue which reached its maximum size
-		 */
-		void queueFilled(LDataObjectQueue queue);
-	}
-
 	private static final int STD_BUFSIZE = 30;
 	private int next;
 	private int size;
@@ -131,7 +113,7 @@ public class LDataObjectQueue extends LDataObject
 	private final boolean overwrite;
 	private final boolean consuming;
 	private final boolean max;
-	private final QueueListener listener;
+	private final Consumer<LDataObjectQueue> queueFull;
 
 	/**
 	 * Creates a new LDataObjectQueue for KNX address <code>addr</code>.
@@ -164,13 +146,12 @@ public class LDataObjectQueue extends LDataObject
 		consuming = consumingRead;
 		overwrite = false;
 		max = false;
-		listener = null;
+		queueFull = q -> {};
 	}
 
 	/**
 	 * Creates a new LDataObjectQueue for KNX address <code>addr</code> with a fixed
 	 * maximum queue size.
-	 * <p>
 	 *
 	 * @param addr KNX address to create the queue for, this address is used to generate
 	 *        the cache object key
@@ -180,13 +161,12 @@ public class LDataObjectQueue extends LDataObject
 	 * @param maxSize the maximum queue size, i.e., max. number of frames hold by the
 	 *        queue, maxSize has to be &gt; 0
 	 * @param overwrite set <code>true</code> if on full queue a new frame should
-	 *        replace the oldest frame in the queue (i.e., ring buffer semantics),<br>
+	 *        replace the oldest frame in the queue (i.e., ring buffer semantics),
 	 *        set <code>false</code> if on full queue new frames should be ignored
-	 * @param l sets a queue listener to receive events from this queue, use
-	 *        <code>null</code> if no notifications are required
+	 * @param queueFull receive a notification if queue is full
 	 */
 	public LDataObjectQueue(final GroupAddress addr, final boolean consumingRead, final int maxSize,
-		final boolean overwrite, final QueueListener l)
+		final boolean overwrite, final Consumer<LDataObjectQueue> queueFull)
 	{
 		super(addr, new CEMILData[maxSize]);
 		// maxSize < 0 is already checked at array creation
@@ -196,7 +176,7 @@ public class LDataObjectQueue extends LDataObject
 		this.overwrite = overwrite;
 		consuming = consumingRead;
 		max = true;
-		listener = l;
+		this.queueFull = queueFull;
 	}
 
 	/**
@@ -397,14 +377,12 @@ public class LDataObjectQueue extends LDataObject
 		}
 	}
 
-	private synchronized void fireQueueFilled()
+	private void fireQueueFilled()
 	{
-		if (listener != null) {
-			try {
-				listener.queueFilled(this);
-			}
-			catch (final RuntimeException e) {}
+		try {
+			queueFull.accept(this);
 		}
+		catch (final RuntimeException e) {}
 	}
 
 	private int first()

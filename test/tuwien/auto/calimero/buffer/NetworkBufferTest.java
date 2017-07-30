@@ -45,6 +45,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -311,7 +313,6 @@ public class NetworkBufferTest
 		c.setFilter(f, f);
 		c.activate(true);
 		c.getBufferedLink().addLinkListener(linkListener);
-		@SuppressWarnings("resource")
 		final ProcessCommunicator pc = new ProcessCommunicatorImpl(c.getBufferedLink());
 
 		// buffered write, check of buffer
@@ -321,7 +322,6 @@ public class NetworkBufferTest
 		assertFalse(pc.readBool(group2));
 
 		final boolean b1 = pc.readBool(group1);
-		@SuppressWarnings("resource")
 		final ProcessCommunicator pc2 = new ProcessCommunicatorImpl(lnk);
 		final boolean b2 = pc2.readBool(group1);
 		assertEquals(b1, b2);
@@ -417,7 +417,6 @@ public class NetworkBufferTest
 		c.setFilter(f, f);
 		c.activate(true);
 		c.getBufferedLink().addLinkListener(linkListener);
-		@SuppressWarnings("resource")
 		final ProcessCommunicator pc = new ProcessCommunicatorImpl(c.getBufferedLink());
 
 		// buffered write, check of buffer
@@ -434,22 +433,14 @@ public class NetworkBufferTest
 
 		assertFalse(f.hasNewIndication());
 
-		final class ListenerImpl implements LDataObjectQueue.QueueListener
-		{
-			boolean filled;
-
-			@Override
-			public void queueFilled(final LDataObjectQueue queue)
-			{
-				filled = true;
-				assertEquals(10, queue.getFrames().length);
-				assertEquals(0, queue.getFrames().length);
-			}
-		}
-		final ListenerImpl listener = new ListenerImpl();
+		final AtomicBoolean filled = new AtomicBoolean();
+		final Consumer<LDataObjectQueue> listener = queue -> {
+			filled.set(true);
+			assertEquals(10, queue.getFrames().length);
+			assertEquals(0, queue.getFrames().length);
+		};
 		f.setQueueListener(listener);
 
-		@SuppressWarnings("resource")
 		final ProcessCommunicator pc2 = new ProcessCommunicatorImpl(lnk);
 		read(pc2, group1);
 		assertTrue(f.hasNewIndication());
@@ -458,7 +449,7 @@ public class NetworkBufferTest
 		for (int i = 0; i < 9; ++i)
 			write(pc2, invalidatingGroup, i % 2 != 0);
 		c.activate(false);
-		assertTrue(listener.filled);
+		assertTrue(filled.get());
 		assertTrue(f.hasNewIndication());
 
 		try {
@@ -489,7 +480,6 @@ public class NetworkBufferTest
 		c.setFilter(f, f);
 		c.setQueryBufferOnly(true);
 		c.activate(true);
-		@SuppressWarnings("resource")
 		final ProcessCommunicator pc = new ProcessCommunicatorImpl(c.getBufferedLink());
 
 		// buffered write, check of buffer
@@ -503,7 +493,6 @@ public class NetworkBufferTest
 			fail("there should be no " + group1 + " value in the buffer");
 		}
 		catch (final KNXTimeoutException e) {}
-		@SuppressWarnings("resource")
 		final ProcessCommunicator pc2 = new ProcessCommunicatorImpl(lnk);
 		/*final boolean b2 =*/ pc2.readBool(group1);
 		write(pc, invalidatingGroup, true);

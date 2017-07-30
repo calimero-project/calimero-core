@@ -39,6 +39,8 @@ package tuwien.auto.calimero.buffer;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.KNXAddress;
@@ -47,7 +49,6 @@ import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.buffer.Configuration.NetworkFilter;
 import tuwien.auto.calimero.buffer.Configuration.RequestFilter;
 import tuwien.auto.calimero.buffer.LDataObjectQueue.QueueItem;
-import tuwien.auto.calimero.buffer.LDataObjectQueue.QueueListener;
 import tuwien.auto.calimero.buffer.cache.Cache;
 import tuwien.auto.calimero.buffer.cache.CacheObject;
 import tuwien.auto.calimero.cemi.CEMI;
@@ -71,40 +72,18 @@ import tuwien.auto.calimero.log.LogService;
  */
 public class CommandFilter implements NetworkFilter, RequestFilter
 {
-	private final class QueueListenerImpl implements QueueListener
-	{
-		QueueListenerImpl()
-		{}
-
-		@Override
-		public void queueFilled(final LDataObjectQueue queue)
-		{
-			if (userListener != null)
-				try {
-					userListener.queueFilled(queue);
-				}
-				catch (final RuntimeException e) {
-					LogService.getLogger("calimero").error(
-						"L-Data queue listener unexpected behavior", e);
-				}
-		}
-	}
-
 	// stores LDataObjectQueues objects
 	private final List<CacheObject> indicationKeys = new LinkedList<>();
-	private final QueueListener ql = new QueueListenerImpl();
-	private volatile QueueListener userListener;
+	private volatile Consumer<LDataObjectQueue> userListener;
+	private final Consumer<LDataObjectQueue> queueFull = queue -> {
+		try {
+			Optional.ofNullable(userListener).ifPresent(listener -> listener.accept(queue));
+		}
+		catch (final RuntimeException e) {
+			LogService.getLogger("calimero.buffer").error("L-Data queue listener unexpected behavior", e);
+		}
+	};
 
-	/**
-	 * Creates a new command filter.
-	 */
-	public CommandFilter()
-	{}
-
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.buffer.Configuration.NetworkFilter#init
-	 * (tuwien.auto.calimero.buffer.Configuration)
-	 */
 	@Override
 	public void init(final Configuration c)
 	{}
@@ -117,7 +96,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 	 *
 	 * @param l the listener to set, use <code>null</code> for no listener
 	 */
-	public void setQueueListener(final QueueListener l)
+	public void setQueueListener(final Consumer<LDataObjectQueue> l)
 	{
 		userListener = l;
 	}
@@ -247,7 +226,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 		}
 		CacheObject co = cache.get(dst);
 		if (co == null)
-			co = new LDataObjectQueue(dst, true, 10, false, ql);
+			co = new LDataObjectQueue(dst, true, 10, false, queueFull);
 		cache.put(co);
 		synchronized (indicationKeys) {
 			indicationKeys.add(co);

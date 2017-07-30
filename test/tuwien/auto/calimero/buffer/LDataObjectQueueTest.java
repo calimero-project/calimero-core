@@ -36,6 +36,8 @@
 
 package tuwien.auto.calimero.buffer;
 
+import java.util.function.Consumer;
+
 import junit.framework.TestCase;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
@@ -52,18 +54,9 @@ public class LDataObjectQueueTest extends TestCase
 {
 	private LDataObjectQueue var, fix, ring, one;
 	private CEMILData frame1, frame2, frame3, frame4, frame5, diff;
-	private QueueListener l;
 
-	private final class QueueListener implements LDataObjectQueue.QueueListener
-	{
-		LDataObjectQueue q;
-
-		@Override
-		public void queueFilled(final LDataObjectQueue queue)
-		{
-			q = queue;
-		}
-	}
+	private volatile LDataObjectQueue queue;
+	private final Consumer<LDataObjectQueue> l = queue -> this.queue = queue;
 
 	/**
 	 * @param name name of test case
@@ -73,13 +66,9 @@ public class LDataObjectQueueTest extends TestCase
 		super(name);
 	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	@Override
 	protected void setUp() throws Exception
 	{
-		l = new QueueListener();
 		var = new LDataObjectQueue(new GroupAddress("10.4.10"));
 		fix = new LDataObjectQueue(new GroupAddress("10.4.10"), false, 4, false, l);
 		ring = new LDataObjectQueue(new GroupAddress("10.4.10"), true, 2, true, l);
@@ -105,9 +94,6 @@ public class LDataObjectQueueTest extends TestCase
 				new GroupAddress("5.5.5"), new byte[] { 6, }, Priority.NORMAL);
 	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
 	@Override
 	protected void tearDown() throws Exception
 	{
@@ -136,30 +122,30 @@ public class LDataObjectQueueTest extends TestCase
 		assertEquals(frame5, fix.getFrame());
 
 		fix.setFrame(frame3);
-		assertNull(l.q);
+		assertNull(queue);
 		fix.setFrame(frame2);
-		assertEquals(fix, l.q);
+		assertEquals(fix, queue);
 		assertEquals(frame5, fix.getFrame());
 		// this one shoudn't be set now
-		l.q = null;
+		queue = null;
 		fix.setFrame(frame1);
 		assertEquals(frame5, fix.getFrame());
-		assertNull(l.q);
+		assertNull(queue);
 
 		// ring
 		assertNull(ring.getFrame());
 		ring.setFrame(frame5);
 		assertEquals(frame5, ring.getFrame());
-		assertNull(l.q);
+		assertNull(queue);
 		// we consumed one frame, so no notifying
 		ring.setFrame(frame4);
-		assertNull(l.q);
+		assertNull(queue);
 		assertEquals(frame4, ring.getFrame());
 
 		ring.setFrame(frame3);
-		assertNull(l.q);
+		assertNull(queue);
 		ring.setFrame(frame2);
-		assertEquals(ring, l.q);
+		assertEquals(ring, queue);
 
 		assertEquals(frame3, ring.getFrame());
 		ring.setFrame(frame1);
@@ -254,11 +240,6 @@ public class LDataObjectQueueTest extends TestCase
 	}
 
 	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.LDataObjectQueue#LDataObjectQueue(GroupAddress,
-	 * boolean, int, boolean,
-	 * tuwien.auto.calimero.buffer.LDataObjectQueue.QueueListener)}.
-	 *
 	 * @throws KNXFormatException
 	 */
 	public void testCEMICacheObjectQueueGroupAddressIntBooleanBoolean()
@@ -510,7 +491,7 @@ public class LDataObjectQueueTest extends TestCase
 		ring.clear();
 		one.clear();
 		// we got notified, so reset for testGetFrame()
-		l.q = null;
+		queue = null;
 		testGetFrame();
 		var.clear();
 		fix.clear();
