@@ -548,7 +548,7 @@ public class Discoverer
 			final byte[] buf = PacketHelper.toPacket(new DescriptionRequest(nat ? null
 					: (InetSocketAddress) s.getLocalSocketAddress()));
 			s.send(new DatagramPacket(buf, buf.length, server));
-			final ReceiverLoop looper = new ReceiverLoop(s, 256, timeout * 1000, server);
+			final ReceiverLoop looper = new ReceiverLoop(s, 512, timeout * 1000, server);
 			looper.loop();
 			if (looper.thrown != null)
 				throw looper.thrown;
@@ -704,7 +704,7 @@ public class Discoverer
 	private ReceiverLoop startReceiver(final MulticastSocket socket, final InetAddress addrOnNetIf,
 		final int timeout, final String name)
 	{
-		final ReceiverLoop looper = new ReceiverLoop(socket, addrOnNetIf, 256, timeout * 1000, name
+		final ReceiverLoop looper = new ReceiverLoop(socket, addrOnNetIf, 512, timeout * 1000, name
 				+ ":" + socket.getLocalPort());
 		looper.t = new Thread(looper, "Discoverer " + name);
 		looper.t.setDaemon(true);
@@ -791,7 +791,8 @@ public class Discoverer
 				final KNXnetIPHeader h = new KNXnetIPHeader(data, offset);
 				final int bodyLen = h.getTotalLength() - h.getStructLength();
 				if (h.getTotalLength() > length)
-					logger.warn("ignore received packet from " + source + ", frame length does not match");
+					logger.warn("ignore received packet from {}, packet size {} > buffer size {}", source,
+							h.getTotalLength(), length);
 				else if (search && h.getServiceType() == KNXnetIPHeader.SEARCH_RES) {
 					// if our search is still running, add response if not already added
 					synchronized (receivers) {
