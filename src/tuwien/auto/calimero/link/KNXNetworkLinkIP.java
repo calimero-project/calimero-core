@@ -75,7 +75,7 @@ import tuwien.auto.calimero.link.medium.KNXMediumSettings;
  * during instantiation.<br>
  * Network Address Translation (NAT) aware communication can only be used, if the KNXnet/IP server of the remote
  * endpoint supports it. Otherwise, connection timeouts will occur. With NAT enabled, KNXnet/IP accepts IPv6 addresses.
- * By default, the KNXnet/IP protocol only works with IPv4 addresses.<br>
+ * By default, the KNXnet/IP protocol only works with IPv4 addresses.
  *
  * @author B. Malinowsky
  */
@@ -259,7 +259,7 @@ public class KNXNetworkLinkIP extends AbstractLink
 	@Override
 	public String toString()
 	{
-		return (mode == TUNNELING ? "tunneling" : "routing") + " link " + super.toString();
+		return (mode == TUNNELING ? "tunneling " : "routing ") + super.toString();
 	}
 
 	@Override

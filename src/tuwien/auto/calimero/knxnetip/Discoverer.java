@@ -556,7 +556,7 @@ public class Discoverer
 				return new Result<>(looper.res, NetworkInterface.getByInetAddress(host()), host());
 		}
 		catch (final IOException e) {
-			final String msg = "network failure on getting description";
+			final String msg = "network failure on getting description from " + server;
 			logger.error(msg, e);
 			throw new KNXException(msg, e);
 		}
@@ -627,7 +627,7 @@ public class Discoverer
 	}
 
 	// ni can be null to use default interface
-	private MulticastSocket createSocket(final boolean unicast, final InetAddress bindAddr,
+	private static MulticastSocket createSocket(final boolean unicast, final InetAddress bindAddr,
 		final int bindPort, final NetworkInterface ni, final boolean mcastResponse)
 		throws KNXException
 	{
@@ -683,7 +683,7 @@ public class Discoverer
 		return s;
 	}
 
-	private void join(final ReceiverLoop l) throws InterruptedException
+	private static void join(final ReceiverLoop l) throws InterruptedException
 	{
 		while (l.t.isAlive())
 			l.t.join();
