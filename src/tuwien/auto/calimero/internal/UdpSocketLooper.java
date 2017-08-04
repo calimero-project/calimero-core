@@ -55,6 +55,8 @@ public abstract class UdpSocketLooper
 	 */
 	protected DatagramSocket s;
 
+	protected volatile boolean reboundSocket;
+
 	/**
 	 * The socket timeout, set 0 for no timeout.
 	 */
@@ -134,6 +136,11 @@ public abstract class UdpSocketLooper
 				catch (final SocketTimeoutException e) {
 					if (total == 0 || start + total > System.currentTimeMillis())
 						onTimeout();
+				}
+				catch (final IOException e) {
+					if (!reboundSocket)
+						throw e;
+					reboundSocket = false;
 				}
 			}
 		}
