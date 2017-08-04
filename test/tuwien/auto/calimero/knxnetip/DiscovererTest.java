@@ -36,11 +36,11 @@
 
 package tuwien.auto.calimero.knxnetip;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
@@ -305,7 +305,7 @@ public class DiscovererTest
 			Thread.sleep(200);
 		final int expected = responses;
 		final int actual = d.getSearchResponses().size();
-		assertEquals("expected = " + expected + ", actual = " + actual, expected, actual);
+		assertEquals(expected, actual, "expected = " + expected + ", actual = " + actual);
 	}
 
 	/**
@@ -382,7 +382,7 @@ public class DiscovererTest
 		// the number of responses can vary based on network setup
 		final int expected = responses;
 		final int actual = d.getSearchResponses().size();
-		assertEquals("expected = " + expected + ", actual = " + actual, expected, actual);
+		assertEquals(expected, actual, "expected = " + expected + ", actual = " + actual);
 	}
 
 	/**

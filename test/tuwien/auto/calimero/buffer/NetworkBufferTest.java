@@ -36,12 +36,12 @@
 
 package tuwien.auto.calimero.buffer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -429,7 +429,7 @@ public class NetworkBufferTest
 
 		final QueueItem qi2 = f.getNextIndication();
 		Debug.printLData(qi2.getFrame());
-		assertTrue(qi.getTimestamp() + ", " + qi2.getTimestamp(), qi.getTimestamp() <= (qi2.getTimestamp()));
+		assertTrue(qi.getTimestamp() <= (qi2.getTimestamp()), qi.getTimestamp() + ", " + qi2.getTimestamp());
 
 		assertFalse(f.hasNewIndication());
 
