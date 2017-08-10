@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2016 B. Malinowsky
+    Copyright (c) 2015, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -146,7 +146,11 @@ public abstract class AbstractLink implements KNXNetworkLink
 				}
 				else if (mc == CEMILData.MC_LDATA_CON) {
 					addEvent(l -> l.confirmation(new FrameEvent(source, f)));
-					logger.debug("confirmation of {}", f.getDestination());
+					if (f.isPositiveConfirmation())
+						logger.debug("confirmation of {}", f.getDestination());
+					else
+						logger.warn("negative confirmation of {}", f.getDestination(),
+								DataUnitBuilder.toHex(f.toByteArray(), ""));
 				}
 				else
 					logger.warn("unspecified frame event - ignored, msg code = 0x" + Integer.toHexString(mc));

@@ -273,7 +273,7 @@ public class KNXNetworkLinkIP extends AbstractLink
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
 		try {
-			logger.debug("send {}: {}", (waitForCon ? "(wait for confirmation)" : ""), msg);
+			logger.debug("send {}{}", (waitForCon ? "(wait for confirmation) " : ""), msg);
 			conn.send(msg, waitForCon ? WaitForCon : WaitForAck);
 			logger.trace("send {}->{} succeeded", msg.getSource(), msg.getDestination());
 		}
