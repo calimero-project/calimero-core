@@ -149,7 +149,7 @@ public abstract class AbstractLink implements KNXNetworkLink
 					if (f.isPositiveConfirmation())
 						logger.debug("confirmation of {}", f.getDestination());
 					else
-						logger.warn("negative confirmation of {}", f.getDestination(),
+						logger.warn("negative confirmation of {}: {}", f.getDestination(),
 								DataUnitBuilder.toHex(f.toByteArray(), ""));
 				}
 				else
