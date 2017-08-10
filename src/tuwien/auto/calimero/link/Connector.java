@@ -201,7 +201,7 @@ public final class Connector
 		private final Connector connector;
 
 		private volatile boolean closed;
-		private volatile Future<?> f = CompletableFuture.completedFuture(null);
+		private volatile Future<?> f = CompletableFuture.completedFuture(Void.TYPE);
 		private final AtomicBoolean connecting = new AtomicBoolean();
 
 		private Link(final TSupplier<? extends T> creator, final Connector options)

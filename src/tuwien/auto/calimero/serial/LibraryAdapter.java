@@ -217,7 +217,7 @@ public abstract class LibraryAdapter implements Closeable
 		try {
 			invoke(this, "setBaudRate", new Object[] { Integer.valueOf(baudrate) });
 		}
-		catch (final Exception e) {}
+		catch (final Exception ignore) {}
 	}
 
 	/**
@@ -231,7 +231,7 @@ public abstract class LibraryAdapter implements Closeable
 		try {
 			return ((Integer) invoke(this, "getBaudRate", null)).intValue();
 		}
-		catch (final Exception e) {}
+		catch (final Exception ignore) {}
 		return 0;
 	}
 

@@ -87,7 +87,7 @@ public class Destination implements AutoCloseable
 		private final TransportLayer aggr;
 		private Destination d;
 
-		Future<?> future = CompletableFuture.completedFuture(null);
+		Future<?> future = CompletableFuture.completedFuture(Void.TYPE);
 
 		/**
 		 * Creates a new aggregator proxy.

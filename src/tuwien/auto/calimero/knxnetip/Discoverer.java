@@ -423,10 +423,10 @@ public class Discoverer
 					logger.debug("skip " + a + ", not an IPv4 address");
 				else
 					try {
-						final boolean skipLinkLocal = false;
+//						final boolean skipLinkLocal = false;
 						if (!(lo && a.isLoopbackAddress())) {
-							if (!(a.isLinkLocalAddress() && skipLinkLocal))
-								rcv.add(search(a, port, ni, timeout));
+//							if (!(a.isLinkLocalAddress() && skipLinkLocal))
+							rcv.add(search(a, port, ni, timeout));
 						}
 						if (a.isLoopbackAddress()) {
 							lo = true;

@@ -456,10 +456,9 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 			return;
 		if (ail > is.available())
 			throw new KNXFormatException("additional info length exceeds frame length", ail);
-		int remaining = ail;
-		for (; remaining > 0; remaining -= 2) {
-			if (remaining < 1)
-				throw new KNXFormatException("lack of space for additional info");
+		for (int remaining = ail; remaining > 0; remaining -= 2) {
+			if (remaining < 3)
+				throw new KNXFormatException("invalid additional info, remaining length " + remaining + " < 3 bytes");
 			final int type = is.read();
 			final int len = is.read();
 			if (len > remaining || !checkAddInfoLength(type, len))
