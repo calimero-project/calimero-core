@@ -368,7 +368,7 @@ public final class TranslatorTypes
 					loadTranslators(inPackage, fs.provider().getPath(uri));
 				}
 				catch (final Exception ex) {
-					if (!"bundle".equals(uri.getScheme()))
+					if (!"bundle".equals(uri.getScheme()) && !"bundleresource".equals(uri.getScheme()))
 						throw ex;
 
 					DPTXlator.logger.info("using osgi bundle wiring for {}", uri);
