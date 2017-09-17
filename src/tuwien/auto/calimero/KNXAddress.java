@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,14 +43,11 @@ import tuwien.auto.calimero.xml.XmlReader;
 import tuwien.auto.calimero.xml.XmlWriter;
 
 /**
- * Represents a KNX address.
- * <p>
- * An address consists of a 16 Bit unsigned value. Concrete implementations of address are
- * {@link GroupAddress} and {@link IndividualAddress}. Instances of <code>KNXAddress</code> are
- * immutable.<br>
+ * Represents a KNX address, consisting of a 16 Bit unsigned value. Concrete implementations of address are
+ * {@link GroupAddress} and {@link IndividualAddress}. Instances of <code>KNXAddress</code> are immutable.<br>
  * Loading and saving KNX addresses in XML format is supported.
  */
-public abstract class KNXAddress
+public abstract class KNXAddress implements Comparable<KNXAddress>
 {
 	private static final String ATTR_TYPE = "type";
 	private static final String TAG_ADDRESS = "knxAddress";
@@ -70,8 +67,8 @@ public abstract class KNXAddress
 	/**
 	 * Creates a KNX address from a byte array.
 	 * <p>
-	 * The address is read out of the first 2 byte fields, while the address array itself might be
-	 * longer. The content of <code>address</code> is not modified.
+	 * The address is read out of the first 2 byte fields, while the address array itself might be longer. The content
+	 * of <code>address</code> is not modified.
 	 *
 	 * @param address the address byte array in big-endian format, with address.length &ge; 2
 	 */
@@ -85,12 +82,11 @@ public abstract class KNXAddress
 	/**
 	 * Creates a KNX address from its XML representation.
 	 * <p>
-	 * If the current XML element position is no start tag, the next element tag is read.
-	 * The KNX address element is then expected to be the current element in the reader.
+	 * If the current XML element position is no start tag, the next element tag is read. The KNX address element is
+	 * then expected to be the current element in the reader.
 	 *
 	 * @param r a XML reader
-	 * @throws KNXMLException if the XML element represents no KNX address or the address
-	 *         couldn't be read correctly
+	 * @throws KNXMLException if the XML element represents no KNX address or the address couldn't be read correctly
 	 */
 	KNXAddress(final XmlReader r) throws KNXMLException
 	{
@@ -114,15 +110,12 @@ public abstract class KNXAddress
 	{}
 
 	/**
-	 * Creates a KNX address from xml input.
-	 * <p>
-	 * The KNX address element is expected to be the current or next element from the parser.
+	 * Creates a KNX address from xml input, the KNX address element is expected to be the current or next element from
+	 * the parser.
 	 *
 	 * @param r a XML reader
-	 * @return the created KNXAddress, either of subtype {@link GroupAddress} or
-	 *         {@link IndividualAddress}
-	 * @throws KNXMLException if the XML element is no KNX address, on unknown address type or wrong
-	 *         address syntax
+	 * @return the created KNXAddress, either of subtype {@link GroupAddress} or {@link IndividualAddress}
+	 * @throws KNXMLException if the XML element is no KNX address, on unknown address type or wrong address syntax
 	 */
 	public static KNXAddress create(final XmlReader r) throws KNXMLException
 	{
@@ -141,16 +134,13 @@ public abstract class KNXAddress
 	/**
 	 * Creates a KNX address from a string <code>address</code> representation.
 	 * <p>
-	 * An address level separator of type '.' found in <code>address</code> indicates an
-	 * individual address, i.e., an {@link IndividualAddress} is created, otherwise a
-	 * {@link GroupAddress} is created.<br>
+	 * An address level separator of type '.' found in <code>address</code> indicates an individual address, i.e., an
+	 * {@link IndividualAddress} is created, otherwise a {@link GroupAddress} is created.<br>
 	 * Allowed separators are '.' or '/', mutually exclusive.
 	 *
 	 * @param address string containing the KNX address
-	 * @return the created KNX address, either of subtype {@link GroupAddress} or
-	 *         {@link IndividualAddress}
-	 * @throws KNXFormatException thrown on unknown address type, wrong address syntax or
-	 *         wrong separator used
+	 * @return the created KNX address, either of subtype {@link GroupAddress} or {@link IndividualAddress}
+	 * @throws KNXFormatException thrown on unknown address type, wrong address syntax or wrong separator used
 	 */
 	public static KNXAddress create(final String address) throws KNXFormatException
 	{
@@ -204,6 +194,12 @@ public abstract class KNXAddress
 		return new byte[] { (byte) (address >>> 8), (byte) address };
 	}
 
+	@Override
+	public int compareTo(final KNXAddress other)
+	{
+		return address - other.address;
+	}
+
 	static String[] parse(final String address) throws KNXFormatException
 	{
 		StringTokenizer t = null;
@@ -220,8 +216,7 @@ public abstract class KNXAddress
 		else if (count == 3)
 			return new String[] { t.nextToken(), t.nextToken(), t.nextToken(), };
 		else
-			throw new KNXFormatException("wrong KNX address syntax with " + count + " levels",
-					address);
+			throw new KNXFormatException("wrong KNX address syntax with " + count + " levels", address);
 	}
 
 	abstract void init(final String address) throws KNXFormatException;
