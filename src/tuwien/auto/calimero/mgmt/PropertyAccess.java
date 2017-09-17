@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2016 B. Malinowsky
+    Copyright (c) 2010, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -377,7 +377,7 @@ public interface PropertyAccess
 		public static final int SUB_LCGROUPCONFIG = 55;
 
 		//
-		// properties of object type 9, CEMI server object
+		// properties of object type 8, CEMI server object
 		//
 
 		/**
