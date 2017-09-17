@@ -89,6 +89,9 @@
         <property pid="29" pidName="PID_OBJECT_INDEX" name="Object Index" pdt="2" dpt="5.010" rw="(3/x)" writeEnabled="0">
             <usage>Access to Object Index of any FB</usage>
         </property>
+        <property pid="30" pidName="PID_DOWNLOAD_COUNTER" name="Download Counter" pdt="4" dpt="7.010" rw="(3/x)" writeEnabled="0">
+            <usage>Download Counter</usage>
+        </property>
     </object>
     <object type="0">
         <property pid="51" pidName="PID_ROUTING_COUNT" name="Routing Count" pdt="2" rw="R(/W)" writeEnabled="0/1">
@@ -390,6 +393,9 @@
         </property>
         <property pid="63" pidName="PID_RF_FILTERING_MODE_SUPPORT" name="Supported RF Filtering Mode" pdt="51" rw="R" writeEnabled="0">
             <usage>Discussed on KSG meeting 2004.09.07.</usage>
+        </property>
+        <property pid="64" pidName="PID_COMM_MODES_SUPPORTED" name="cEMI Supported Communication Modes" pdt="52" rw="(3/x)" writeEnabled="0">
+            <usage>Allow discovering the Communication Modes supported by the cEMI Server</usage>
         </property>
     </object>
     <object type="9">
