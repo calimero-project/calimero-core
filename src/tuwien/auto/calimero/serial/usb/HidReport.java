@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015 B. Malinowsky
+    Copyright (c) 2015, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
+import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.serial.usb.HidReportHeader.PacketType;
@@ -280,6 +281,14 @@ public final class HidReport
 	public byte[] getData()
 	{
 		return data;
+	}
+
+	@Override
+	public String toString()
+	{
+		final Object feat = tph.getProtocol() == Protocol.BusAccessServerFeature ? getFeatureId() : "";
+		final String s = DataUnitBuilder.toHex(data, " ");
+		return rh + " " + tph + " " + feat + (s.isEmpty() ? "" : ": " + s);
 	}
 
 	// only applicable for the Bus Access Server Feature protocol

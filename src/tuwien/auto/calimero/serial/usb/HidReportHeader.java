@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2016 B. Malinowsky
+    Copyright (c) 2015, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -132,6 +132,12 @@ final class HidReportHeader
 	public int getDataLength()
 	{
 		return length;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "Report ID " + reportId + " seq " + seqNo + " " + type + " data length " + length;
 	}
 
 	int getStructLength()
