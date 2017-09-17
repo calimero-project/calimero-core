@@ -114,7 +114,7 @@ public class DPTXlatorUtf8 extends DPTXlator
 	}
 
 	@Override
-	public void setValues(final String[] values) throws KNXFormatException
+	public void setValues(final String... values) throws KNXFormatException
 	{
 		if (values.length == 0)
 			return;
