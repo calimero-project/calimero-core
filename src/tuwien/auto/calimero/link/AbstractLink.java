@@ -36,6 +36,9 @@
 
 package tuwien.auto.calimero.link;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.slf4j.Logger;
 
 import tuwien.auto.calimero.CloseEvent;
@@ -79,6 +82,7 @@ import tuwien.auto.calimero.log.LogService;
  * @see KNXNetworkLinkIP
  * @see KNXNetworkLinkFT12
  * @see KNXNetworkLinkUsb
+ * @see KNXNetworkLinkTpuart
  * @see Connector
  */
 public abstract class AbstractLink implements KNXNetworkLink
@@ -126,20 +130,31 @@ public abstract class AbstractLink implements KNXNetworkLink
 					return;
 
 				final CEMI cemi = onReceive(e);
+				final int mc = cemi.getMessageCode();
 				if (cemi instanceof CEMIDevMgmt) {
 					// XXX check .con correctly (required for setting cEMI link layer mode)
-					final int mc = cemi.getMessageCode();
+					final CEMIDevMgmt f = (CEMIDevMgmt) cemi;
 					if (mc == CEMIDevMgmt.MC_PROPWRITE_CON) {
-						final CEMIDevMgmt f = (CEMIDevMgmt) cemi;
 						if (f.isNegativeResponse())
 							logger.error("L-DM negative response, " + f.getErrorMessage());
+					}
+					else if (mc == CEMIDevMgmt.MC_PROPREAD_CON) {
+						final int cEmiServerObject = 8;
+						final int pidSupportedCommModes = 64;
+						if (f.getObjectType() == cEmiServerObject && f.getPID() == pidSupportedCommModes) {
+							// b3 = TLL | b2 = raw | b1 = BusMon | b0 = DLL
+							final int modes = f.getPayload()[1] & 0xff;
+							logger.debug("KNX interface supports {}", Stream
+									.of(bool(modes & 0b1000, "transport link layer"), bool(modes & 0b100, "raw mode"),
+											bool(modes & 0b10, "busmonitor"), bool(modes & 0b1, "data link layer"))
+									.filter(s -> !s.isEmpty()).collect(Collectors.joining(", ")));
+						}
 					}
 				}
 				// from this point on, we are only dealing with L_Data
 				if (!(cemi instanceof CEMILData))
 					return;
 				final CEMILData f = (CEMILData) cemi;
-				final int mc = f.getMessageCode();
 				if (mc == CEMILData.MC_LDATA_IND) {
 					addEvent(l -> l.indication(new FrameEvent(source, f)));
 					logger.debug("indication {}", f.toString());
@@ -168,6 +183,10 @@ public abstract class AbstractLink implements KNXNetworkLink
 			logger.info("link closed");
 		}
 	};
+
+	private static String bool(final int condition, final String ifTrue) {
+		return condition != 0 ? ifTrue : "";
+	}
 
 	/**
 	 * @param connection if not <code>null</code>, the link object will close this resource as last

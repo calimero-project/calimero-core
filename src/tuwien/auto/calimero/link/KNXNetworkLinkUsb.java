@@ -150,6 +150,10 @@ public class KNXNetworkLinkUsb extends AbstractLink
 		conn.addConnectionListener(notifier);
 		cEMI = emiTypes.contains(EmiType.CEmi);
 		sendCEmiAsByteArray = true;
+
+		if (activeEmi == EmiType.CEmi) {
+			supportedCommModes();
+		}
 	}
 
 	@Override
@@ -197,6 +201,17 @@ public class KNXNetworkLinkUsb extends AbstractLink
 			return activeEmi == active;
 		}
 		return false;
+	}
+
+	// cEMI only, requires cEMI server object
+	private void supportedCommModes() throws KNXPortClosedException, KNXTimeoutException
+	{
+		final int cEmiServerObject = 8;
+		final int pidSupportedCommModes = 64;
+		final int objectInstance = 1;
+		final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, cEmiServerObject, objectInstance,
+				pidSupportedCommModes, 1, 1, new byte[0]);
+		conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame.toByteArray()).get(0), true);
 	}
 
 	private void linkLayerMode() throws KNXException, InterruptedException
