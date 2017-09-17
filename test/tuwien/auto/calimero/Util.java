@@ -196,7 +196,6 @@ public final class Util
 			final InetSocketAddress addr = new InetSocketAddress(localHost, 0);
 			if (printLocalHost) {
 				printLocalHost = false;
-				System.out.println();
 				System.out.println("calimero-core - local socket used in unit tests: " + addr);
 			}
 			return addr;

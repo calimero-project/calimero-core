@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015 B. Malinowsky
+    Copyright (c) 2015, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -256,8 +256,8 @@ public class RFLData implements RawFrame
 		if (lteExt && tpci != Tpci.UnnumberedData.ordinal())
 			throw new KNXFormatException("RF LTE extended frame requires TPCI "
 					+ Tpci.UnnumberedData);
-		final int seq = (pci >>> 2) & 0x0f;
-		final int apci = DataUnitBuilder.getAPDUService(tpdu);
+//		final int seq = (pci >>> 2) & 0x0f;
+//		final int apci = DataUnitBuilder.getAPDUService(tpdu);
 
 		// TODO test only: move LTE-specific ASDU stuff out of L-Data parsing
 		// LTE frames contain the interface object type, IO instance, and PID
