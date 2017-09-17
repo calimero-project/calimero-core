@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,61 +36,44 @@
 
 package tuwien.auto.calimero.dptxlator;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.Util;
 
-/**
- * Test for DPTXlatorDate.
- * <p>
- *
- * @author B. Malinowsky
- */
-public class DPTXlatorDateTest extends TestCase
+class DPTXlatorDateTest
 {
 	private DPTXlatorDate t;
-	private final String[] values =
-		new String[] { "1999-09-10", "2000-01-01", "  2015-02-31  " };
+	private final String[] values = new String[] { "1999-09-10", "2000-01-01", "  2015-02-28  " };
 	private final DPT dpt = DPTXlatorDate.DPT_DATE;
 
 	// 2007-08-09
 	private final byte[] data = new byte[] { 0, 9, 8, 2007 - 2000, -1, -1 };
 
-	/**
-	 * @param name
-	 */
-	public DPTXlatorDateTest(final String name)
+	@BeforeEach
+	void init() throws Exception
 	{
-		super(name);
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-		Util.setupLogging("DPTXlator");
 		t = new DPTXlatorDate(dpt);
 		// reset to default to not interfere with tests
-		DPTXlatorDate.useValueFormat(null);
+		final DateTimeFormatter dtf = DateTimeFormatter.ISO_LOCAL_DATE
+				.withResolverStyle(DPTXlatorDate.defaultResolverStyle);
+		DPTXlatorDate.useValueFormat(dtf);
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDate#setValues(java.lang.String[])}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testSetValues() throws KNXFormatException
+	@Test
+	void testSetValues() throws KNXFormatException
 	{
 		t.setValues(values);
 		assertEquals(3, t.getItems());
@@ -99,12 +82,19 @@ public class DPTXlatorDateTest extends TestCase
 		assertEquals(10, t.getDay());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorDate#getAllValues()}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testGetAllValues() throws KNXFormatException
+	@Test
+	void setInvalidValue()
+	{
+		try {
+			final String invalidDate = "2015-02-29";
+			t.setValues(new String[] { invalidDate });
+			fail("invalid day in date " + invalidDate);
+		}
+		catch (final KNXFormatException expected) {}
+	}
+
+	@Test
+	void testGetAllValues() throws KNXFormatException
 	{
 		assertEquals(1, t.getAllValues().length);
 		Helper.assertSimilar("2000-01-01", t.getAllValues()[0]);
@@ -118,13 +108,8 @@ public class DPTXlatorDateTest extends TestCase
 		Helper.assertSimilar(all, values);
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDate#setValue(java.lang.String)}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testSetValueString() throws KNXFormatException
+	@Test
+	void testSetValueString() throws KNXFormatException
 	{
 		assertEquals(1, t.getItems());
 		t.setValue(dpt.getLowerValue());
@@ -151,16 +136,13 @@ public class DPTXlatorDateTest extends TestCase
 	{
 		try {
 			t.setValue(value);
-			fail("should throw");
+			fail("setting value '" + value + "' should throw");
 		}
 		catch (final KNXFormatException e) {}
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDate#setData(byte[], int)}.
-	 */
-	public final void testSetDataByteArrayInt()
+	@Test
+	void testSetDataByteArrayInt()
 	{
 		t.setData(data, 1);
 		assertEquals(1, t.getItems());
@@ -168,20 +150,22 @@ public class DPTXlatorDateTest extends TestCase
 		assertEquals(8, t.getMonth());
 		assertEquals(9, t.getDay());
 
+		t.setData(new byte[] { 31, 4, 2012 - 2000 }, 0);
+		try {
+			t.getAllValues();
+			fail("date 31 of April is not possible");
+		}
+		catch (final DateTimeException expected) {}
+
 		// on last value we use a reserved bit and therefore will see a warning
-		final byte[] d =
-			new byte[] { 15, 3, 2025 - 2000, 31, 12, 1999 - 1900, 31, 4, 2012 - 2000 };
+		final byte[] d = new byte[] { 15, 3, 2025 - 2000, 31, 12, 1999 - 1900, 30, 4, 2012 - 2000 };
 		t.setData(d, 0);
 		assertEquals(3, t.getItems());
-		Helper.assertSimilar(new String[] { "2025-03-15", "1999-12-31", "2012-04-31" }, t
-			.getAllValues());
+		Helper.assertSimilar(new String[] { "2025-03-15", "1999-12-31", "2012-04-30" }, t.getAllValues());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDate#getData(byte[], int)}.
-	 */
-	public final void testGetDataByteArrayInt()
+	@Test
+	void testGetDataByteArrayInt()
 	{
 		byte[] d = t.getData(new byte[5], 2);
 		final byte[] expected = new byte[] { 0, 0, 1, 1, 0, };
@@ -193,44 +177,33 @@ public class DPTXlatorDateTest extends TestCase
 			assertEquals(data[i], d[i]);
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorDate#getSubTypes()}.
-	 */
-	public final void testGetSubTypes()
+	@Test
+	void testGetSubTypes()
 	{
 		assertEquals(1, t.getSubTypes().size());
 		t.getSubTypes().containsKey(dpt.getID());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorDate#useValueFormat
-	 * (java.lang.String)}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testUseValueFormat() throws KNXFormatException
+	@Test
+	void testUseValueFormat() throws KNXFormatException
 	{
-		final String pattern = "EEEE, MMMMM dd, yyyy HH:mm";
+		final String pattern = "EEEE, MMMM dd, yyyy[ HH:mm]";
 		DPTXlatorDate.useValueFormat(pattern);
 		final SimpleDateFormat sdf = new SimpleDateFormat(pattern);
 		final DateFormatSymbols sym = sdf.getDateFormatSymbols();
-		final String v = sym.getWeekdays()[Calendar.SATURDAY] + ", "
-			+ sym.getMonths()[Calendar.APRIL]+ " 28, 2007 12:13";
+		final String v = sym.getWeekdays()[Calendar.SATURDAY] + ", " + sym.getMonths()[Calendar.APRIL]
+				+ " 28, 2007 12:13";
 		t.setValue(v);
 		assertEquals(1, t.getItems());
 		assertEquals(2007, t.getYear());
 		assertEquals(4, t.getMonth());
 		assertEquals(28, t.getDay());
 		final String s = t.getValue();
-		assertEquals(v.substring(0, v.lastIndexOf(' ')), s.substring(0, s
-			.lastIndexOf(' ')));
+		assertEquals(v.substring(0, v.lastIndexOf(' ')), s);
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDate#setValue(int, int, int)}.
-	 */
-	public final void testSetValueIntIntInt()
+	@Test
+	void testSetValueIntIntInt()
 	{
 		t.setValue(1990, 1, 1);
 		assertEquals(1990, t.getYear());
@@ -264,10 +237,8 @@ public class DPTXlatorDateTest extends TestCase
 		catch (final KNXIllegalArgumentException e) {}
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorDate#setValue(long)}.
-	 */
-	public final void testSetValueLong()
+	@Test
+	void testSetValueLong()
 	{
 		final Calendar c = Calendar.getInstance();
 		t.setValue(c.getTimeInMillis());
@@ -277,12 +248,8 @@ public class DPTXlatorDateTest extends TestCase
 		assertEquals(c.get(Calendar.DAY_OF_MONTH), t.getDay());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDate#getValueMilliseconds()}.
-	 * @throws KNXFormatException
-	 */
-	public final void testGetValueMilliseconds() throws KNXFormatException
+	@Test
+	void testGetValueMilliseconds() throws KNXFormatException
 	{
 		final Calendar c = Calendar.getInstance();
 		final SimpleDateFormat sdf = new SimpleDateFormat("EEE, d MMM yyyy");
@@ -310,10 +277,11 @@ public class DPTXlatorDateTest extends TestCase
 			t.getValueMilliseconds();
 			fail("invalid time");
 		}
-		catch (final KNXFormatException e) {}
+		catch (final KNXFormatException expected) {}
 	}
 
-	public void testLocalDate()
+	@Test
+	void testLocalDate()
 	{
 		final LocalDate date = t.localDate();
 		assertEquals(date.getYear(), t.getYear());

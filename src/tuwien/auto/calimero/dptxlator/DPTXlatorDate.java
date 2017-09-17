@@ -36,15 +36,16 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.DateTimeException;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.ResolverStyle;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -52,11 +53,9 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 /**
  * Translator for KNX DPTs with main number 11, type <b>date</b>.
  * <p>
- * The KNX data type width is 3 bytes.<br>
- * The type contains the date information year, month, and day of month. <br>
- * Where required in time calculation, the used calendar is based on the current time in the default time zone with the
- * default locale. All time information behaves in non-lenient mode, i.e., no value overflow is allowed and values are
- * not normalized or adjusted using the next, larger field.<br>
+ * The KNX data type width is 3 bytes, containing year, month, and day of month information. Date calculation is based
+ * on the system default time zone and locale. All time information behaves in strict (i.e., non-lenient) mode; no value
+ * overflow is allowed and values are not normalized or adjusted using the next, larger field.
  * <p>
  * The default return value after creation is <code>2000-01-01</code>.
  *
@@ -69,12 +68,15 @@ public class DPTXlatorDate extends DPTXlator
 	 */
 	public static final DPT DPT_DATE = new DPT("11.001", "Date", "1990-01-01", "2089-12-31", "yyyy-mm-dd");
 
+	// strict resolver style is default for ISO_DATE
+	static final ResolverStyle defaultResolverStyle = ResolverStyle.STRICT;
+
 	private static final int DAY = 0;
 	private static final int MONTH = 1;
 	private static final int YEAR = 2;
 
-	private static Calendar c;
-	private static SimpleDateFormat sdf;
+	// ??? maybe just convert everything based on ZoneOffset.UTC
+	private static volatile DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE.withResolverStyle(defaultResolverStyle);
 	private static final Map<String, DPT> types;
 
 	static {
@@ -96,38 +98,40 @@ public class DPTXlatorDate extends DPTXlator
 	/**
 	 * Creates a translator for the given datapoint type ID.
 	 *
-	 * @param dptID available implemented datapoint type ID
+	 * @param dptId available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptID</code>
 	 */
-	public DPTXlatorDate(final String dptID) throws KNXFormatException
+	public DPTXlatorDate(final String dptId) throws KNXFormatException
 	{
 		super(3);
-		setTypeID(types, dptID);
+		setTypeID(types, dptId);
 		data = new short[] { 1, 1, 0 };
 	}
 
 	/**
 	 * Sets a user defined date value format used by all instances of this class.
 	 * <p>
-	 * The pattern is specified according to {@link SimpleDateFormat}. Subsequent date information, supplied and
-	 * returned in textual representation, will use a layout formatted according this pattern.<br>
-	 * Note, the format will rely on calendar default time symbols (e.g., language specifics).<br>
-	 * If requesting a textual date representation, and using this value format leads to errors due to an invalid
-	 * calendar date, a short error message string will be returned.
+	 * The pattern is specified according to {@link DateTimeFormatter}. All date information, supplied and returned in
+	 * textual representation, will be parsed/formatted according to this pattern. The format will use the default
+	 * format locale. If requesting a textual date representation, and using this value format leads to errors due to an
+	 * invalid calendar date, a short error message string will be returned.
 	 *
-	 * @param pattern the new pattern specifying the value date format, <code>null</code> to reset to default value
-	 *        format
+	 * @param pattern the new pattern specifying the value date format
+	 * @see #useValueFormat(DateTimeFormatter)
 	 */
-	public static final synchronized void useValueFormat(final String pattern)
+	public static final void useValueFormat(final String pattern)
 	{
-		if (pattern == null)
-			sdf = null;
-		else if (sdf == null) {
-			sdf = new SimpleDateFormat(pattern);
-			sdf.setCalendar(getCalendar());
-		}
-		else
-			sdf.applyPattern(pattern);
+		useValueFormat(DateTimeFormatter.ofPattern(pattern).withResolverStyle(defaultResolverStyle));
+	}
+
+	/**
+	 * Sets a user defined date value format used by all instances of this class.
+	 *
+	 * @param formatter new date/time formatter
+	 */
+	public static final void useValueFormat(final DateTimeFormatter formatter)
+	{
+		dtf = formatter;
 	}
 
 	@Override
@@ -142,7 +146,7 @@ public class DPTXlatorDate extends DPTXlator
 	/**
 	 * Sets the year, month, and day of month for the first date item.
 	 * <p>
-	 * Any other items in the translator are discarded on successful set.<br>
+	 * Any other items in the translator are discarded on successful set.
 	 *
 	 * @param year year value, 1990 &lt;= year &lt;= 2089
 	 * @param month month value, 1 &lt;= month &lt;= 12
@@ -155,7 +159,6 @@ public class DPTXlatorDate extends DPTXlator
 
 	/**
 	 * Returns the day information.
-	 * <p>
 	 *
 	 * @return day of month value, 1 &lt;= day &lt;= 31
 	 */
@@ -166,7 +169,6 @@ public class DPTXlatorDate extends DPTXlator
 
 	/**
 	 * Returns the month information.
-	 * <p>
 	 *
 	 * @return month value, 1 &lt;= month &lt;= 12
 	 */
@@ -177,11 +179,10 @@ public class DPTXlatorDate extends DPTXlator
 
 	/**
 	 * Returns the year information.
-	 * <p>
 	 *
 	 * @return year value, 1990 &lt;= year &lt;= 2089
 	 */
-	public final short getYear()
+	public final int getYear()
 	{
 		return absYear(data[YEAR]);
 	}
@@ -193,15 +194,13 @@ public class DPTXlatorDate extends DPTXlator
 	 */
 	public final LocalDate localDate()
 	{
-		return LocalDate.of(getYear(), getMonth(), getDay());
+		return localDate(0);
 	}
 
 	/**
 	 * Sets the date for the first item using UTC millisecond information.
-	 * <p>
-	 * The <code>milliseconds</code> is interpreted with the translator default calendar.
 	 *
-	 * @param milliseconds time value in milliseconds, as used in {@link Calendar}
+	 * @param milliseconds time value in milliseconds from the epoch
 	 */
 	public final void setValue(final long milliseconds)
 	{
@@ -209,11 +208,9 @@ public class DPTXlatorDate extends DPTXlator
 	}
 
 	/**
-	 * Returns the date information in UTC milliseconds, using the translator default calendar.
-	 * <p>
-	 * The method uses year, month and day information for calculation. Any finer time granularity defaults to 0.<br>
+	 * Returns the date information in UTC milliseconds, using year, month and day information.
 	 *
-	 * @return the date as time in milliseconds as long, as used in {@link Calendar}
+	 * @return the date as time in milliseconds from the epoch
 	 * @throws KNXFormatException on invalid calendar date
 	 */
 	public final long getValueMilliseconds() throws KNXFormatException
@@ -264,72 +261,48 @@ public class DPTXlatorDate extends DPTXlator
 
 	private String fromDPT(final int index)
 	{
-		if (sdf != null)
-			synchronized (DPTXlatorDate.class) {
-				try {
-					return sdf.format(new Date(fromDPTMillis(index)));
-				}
-				catch (final KNXFormatException e) {}
-				return "invalid date";
-			}
-		final int i = index * 3;
-		// return year-month-day
-		final int d = data[i + DAY];
-		final int m = data[i + MONTH];
-		return Short.toString(absYear(data[i + YEAR])) + '-' + align(m) + m + '-' + align(d) + d;
+		return dtf.format(localDate(index));
 	}
 
 	private long fromDPTMillis(final int index) throws KNXFormatException
 	{
-		synchronized (DPTXlatorDate.class) {
-			getCalendar().clear();
-			final int i = index * 3;
-			c.set(Calendar.DAY_OF_MONTH, data[i + DAY]);
-			c.set(Calendar.MONTH, data[i + MONTH] - 1);
-			c.set(Calendar.YEAR, absYear(data[i + YEAR]));
-			try {
-				return c.getTimeInMillis();
-			}
-			catch (final IllegalArgumentException e) {
-				throw new KNXFormatException(e.getMessage());
-			}
+		try {
+			return localDate(index).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		}
+		catch (final Exception e) {
+			throw newException("invalid date", "index " + index, e);
+		}
+	}
+
+	private LocalDate localDate(final int index)
+	{
+		final int i = index * 3;
+		final int d = data[i + DAY];
+		final int m = data[i + MONTH];
+		final int y = absYear(data[i + YEAR]);
+		return LocalDate.of(y, m, d);
 	}
 
 	@Override
 	protected void toDPT(final String value, final short[] dst, final int index) throws KNXFormatException
 	{
-		if (sdf != null)
-			synchronized (DPTXlatorDate.class) {
-				toDPT(parse(value), dst, index);
-				return;
-			}
-		final StringTokenizer t = new StringTokenizer(value, "- ");
-		final int maxTokens = 3;
-		final int[] tokens = new int[maxTokens];
+		final String trimmed = value.trim();
 		try {
-			int count = 0;
-			for (; count < maxTokens && t.hasMoreTokens(); ++count)
-				tokens[count] = Short.parseShort(t.nextToken());
-			if (count < 3)
-				throw newException("invalid date", value);
-			set(tokens[0], tokens[1], tokens[2], dst, index);
+			final TemporalAccessor date = dtf.parse(trimmed);
+			final int y = date.get(ChronoField.YEAR_OF_ERA);
+			final int m = date.get(ChronoField.MONTH_OF_YEAR);
+			final int d = date.get(ChronoField.DAY_OF_MONTH);
+			set(y, m, d, dst, index);
 		}
-		catch (final KNXIllegalArgumentException e) {
-			throw newException("invalid date", value, e);
-		}
-		catch (final NumberFormatException e) {
-			throw newException("invalid number", value, e);
+		catch (final Exception e) {
+			throw newException("invalid date", trimmed, e);
 		}
 	}
 
 	private static short[] toDPT(final long milliseconds, final short[] dst, final int index)
 	{
-		synchronized (DPTXlatorDate.class) {
-			getCalendar().clear();
-			c.setTimeInMillis(milliseconds);
-			set(c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH), dst, index);
-		}
+		final LocalDate date = Instant.ofEpochMilli(milliseconds).atZone(ZoneId.systemDefault()).toLocalDate();
+		set(date.getYear(), date.getMonthValue(), date.getDayOfMonth(), dst, index);
 		return dst;
 	}
 
@@ -353,32 +326,5 @@ public class DPTXlatorDate extends DPTXlator
 		if (relative > 99)
 			throw new KNXIllegalArgumentException("relative year out of range [0..99]");
 		return (short) (relative + (relative < 90 ? 2000 : 1900));
-	}
-
-	private long parse(final String value) throws KNXFormatException
-	{
-		try {
-			return sdf.parse(value).getTime();
-		}
-		catch (final ParseException e) {
-			throw newException("invalid date format", value, e);
-		}
-	}
-
-	private static String align(final int number)
-	{
-		return number > 9 ? "" : "0";
-	}
-
-	private static Calendar getCalendar()
-	{
-		// don't need to synchronize, it's harmless if we have 2 instances
-		// and we synchronize on class anyway
-		if (c == null) {
-			final Calendar calendar = Calendar.getInstance();
-			calendar.setLenient(false);
-			c = calendar;
-		}
-		return c;
 	}
 }
