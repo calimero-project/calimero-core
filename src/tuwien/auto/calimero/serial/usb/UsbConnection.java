@@ -411,7 +411,7 @@ public class UsbConnection implements AutoCloseable
 	{
 		try {
 			dev = device;
-			this.name = name;
+			this.name = name.isEmpty() ? toDeviceId(device) : name;
 			logger = LoggerFactory.getLogger(logPrefix + "." + getName());
 			final Object[] usbIfInOut = open(device);
 
@@ -436,6 +436,11 @@ public class UsbConnection implements AutoCloseable
 		catch (UsbNotActiveException | UsbDisconnectedException | UsbNotClaimedException | UsbException e) {
 			throw new KNXException("open USB connection", e);
 		}
+	}
+
+	private static String toDeviceId(final UsbDevice device) {
+		final UsbDeviceDescriptor dd = device.getUsbDeviceDescriptor();
+		return toDeviceId(dd.idVendor(), dd.idProduct());
 	}
 
 	/**
