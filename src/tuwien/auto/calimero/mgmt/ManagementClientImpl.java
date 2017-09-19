@@ -38,12 +38,12 @@ package tuwien.auto.calimero.mgmt;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 
@@ -560,32 +560,33 @@ public class ManagementClientImpl implements ManagementClient
 		asdu[2] = (byte) ((elements << 4) | ((start >>> 8) & 0xF));
 		asdu[3] = (byte) start;
 
-		final List<byte[]> responses;
+		final List<byte[]> responses = new ArrayList<>();
 		synchronized (this) {
 			try {
 				send(dst, priority, DataUnitBuilder.createAPDU(PROPERTY_READ, asdu), PROPERTY_RESPONSE);
-				// if we are waiting for several responses, we pass no from address to accept
-				// messages from any sender
-				responses = waitForResponses(oneResponseOnly ? dst.getAddress() : null, priority, 4, 14,
-						oneResponseOnly);
+				// if we are waiting for several responses, pass null for address to accept messages from any sender
+				waitForResponses(oneResponseOnly ? dst.getAddress() : null, priority, 4, 14, apdu -> {
+					try {
+						responses.add(extractPropertyElements(apdu, objIndex, propertyId, elements));
+						return oneResponseOnly;
+					}
+					catch (final KNXInvalidResponseException e) {
+						logger.debug("skip invalid property read response: {}", e.getMessage());
+						return false;
+					}
+					catch (final KNXRemoteException e) {
+						logger.warn("problem reading property (response {})", DataUnitBuilder.toHex(apdu, " "), e);
+						return oneResponseOnly;
+					}
+				});
 			}
 			finally {
 				svcResponse = 0;
 			}
 		}
-		final List<byte[]> ret = new ArrayList<>();
-		for (final Iterator<byte[]> i = responses.iterator(); i.hasNext();) {
-			final byte[] apdu = i.next();
-			try {
-				ret.add(extractPropertyElements(apdu, elements));
-			}
-			catch (final KNXRemoteException e) {
-				if (responses.size() == 1)
-					throw e;
-				logger.warn("skip invalid property read response " + DataUnitBuilder.toHex(apdu, ""), e);
-			}
-		}
-		return ret;
+		if (responses.isEmpty())
+			throw new KNXTimeoutException("timeout waiting for property read response");
+		return responses;
 	}
 
 	@Override
@@ -894,6 +895,19 @@ public class ManagementClientImpl implements ManagementClient
 	}
 
 	private void waitForResponses(final IndividualAddress from, final Priority p, final int minAsduLen,
+		final int maxAsduLen, final Predicate<byte[]> response)
+		throws KNXInvalidResponseException, InterruptedException, KNXTimeoutException
+	{
+		long wait = responseTimeout * 1_000_000;
+		final long end = System.nanoTime() + wait;
+		while (wait > 0) {
+			if (response.test(waitForResponse(from, minAsduLen, maxAsduLen, wait / 1_000_000)))
+				break;
+			wait = end - System.nanoTime();
+		}
+	}
+
+	private void waitForResponses(final IndividualAddress from, final Priority p, final int minAsduLen,
 		final int maxAsduLen, final boolean oneOnly, final BiConsumer<IndividualAddress, byte[]> callback)
 			throws KNXInvalidResponseException, InterruptedException
 	{
@@ -956,18 +970,22 @@ public class ManagementClientImpl implements ManagementClient
 	}
 
 	// returns property read.res element values
-	private static byte[] extractPropertyElements(final byte[] apdu, final int elements) throws KNXRemoteException
+	private static byte[] extractPropertyElements(final byte[] apdu, final int objIndex, final int propertyId,
+		final int elements) throws KNXRemoteException
 	{
-		final int objIndex = apdu[2] & 0xff;
+		final int oi = apdu[2] & 0xff;
 		final int pid = apdu[3] & 0xff;
+		if (oi != objIndex || pid != propertyId)
+			throw new KNXInvalidResponseException(
+					String.format("property response mismatch, expected OI %d PID %d (received %d|%d)", objIndex,
+							propertyId, oi, pid));
 		// check if number of elements is 0, indicates access problem
 		final int number = (apdu[4] & 0xFF) >>> 4;
 		if (number == 0)
-			throw new KNXRemoteException("property access OI " + objIndex + " PID " + pid + " failed/forbidden");
+			throw new KNXRemoteException("property access OI " + oi + " PID " + pid + " failed/forbidden");
 		if (number != elements)
-			throw new KNXInvalidResponseException(
-					String.format("property access OI %d PID %d expected %d elements (received %d)", objIndex, pid,
-							elements, number));
+			throw new KNXInvalidResponseException(String.format(
+					"property access OI %d PID %d expected %d elements (received %d)", oi, pid, elements, number));
 		final byte[] prop = new byte[apdu.length - 6];
 		for (int i = 0; i < prop.length; ++i)
 			prop[i] = apdu[i + 6];
