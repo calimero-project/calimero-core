@@ -71,6 +71,8 @@ public abstract class KNXMediumSettings
 	 */
 	public static final int MEDIUM_KNXIP = 0x20;
 
+	/** Individual address <code>0.0.0</code>. */
+	public static final IndividualAddress BackboneRouter = new IndividualAddress(0);
 
 	// local device address if in transparent server mode
 	private IndividualAddress dev;
@@ -79,8 +81,7 @@ public abstract class KNXMediumSettings
 	 * Creates the medium settings for the specified KNX medium.
 	 *
 	 * @param medium the KNX medium type code, see definitions in {@link KNXMediumSettings}
-	 * @param device individual address to use as source address in KNX messages, supplying
-	 *        <code>null</code> will use the individual address 0.0.0
+	 * @param device individual address to use as source address in KNX messages
 	 * @return the initialized medium-specific settings
 	 * @throws KNXIllegalArgumentException on unknown medium code
 	 */
@@ -103,12 +104,11 @@ public abstract class KNXMediumSettings
 	/**
 	 * Creates a new container for KNX device/medium settings.
 	 *
-	 * @param device individual device address to use as source address in KNX messages,
-	 *        specifying <code>null</code> uses the individual address 0.0.0
+	 * @param device individual device address to use as source address in KNX messages
 	 */
 	protected KNXMediumSettings(final IndividualAddress device)
 	{
-		dev = device != null ? device : new IndividualAddress(0);
+		dev = device;
 	}
 
 	/**

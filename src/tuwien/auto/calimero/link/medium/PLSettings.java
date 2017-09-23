@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,23 +51,21 @@ public class PLSettings extends KNXMediumSettings
 	private byte[] doa;
 
 	/**
-	 * Creates a new default container with settings for PL110 medium, with the device address
-	 * initialized to 0.0.0 and domain address set to broadcast domain.
+	 * Creates new settings for PL110 medium, initialized with the device address 0.0.0 and the broadcast domain
+	 * address.
 	 */
 	public PLSettings()
 	{
-		super(null);
+		super(BackboneRouter);
 		doa = broadcastDomain;
 	}
 
 	/**
-	 * Creates a new settings container with medium information for PL110.
+	 * Creates new settings with medium information for PL110.
 	 *
-	 * @param device individual device address to use as source address in KNX messages, specifying
-	 *        <code>null</code> uses the individual address 0.0.0
-	 * @param domain byte array containing the domain address to use in KNX messages, address is
-	 *        given in network byte order, <code>domain.length</code> = 2, supplying
-	 *        <code>null</code> defaults to the broadcast domain
+	 * @param device individual device address to use as source address in KNX messages
+	 * @param domain byte array containing the domain address to use in KNX messages, address is given in network byte
+	 *        order, <code>domain.length</code> = 2, supplying <code>null</code> defaults to the broadcast domain
 	 */
 	public PLSettings(final IndividualAddress device, final byte[] domain)
 	{

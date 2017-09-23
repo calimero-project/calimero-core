@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -56,11 +56,10 @@ public class RFSettings extends KNXMediumSettings
 	/**
 	 * Creates a new settings container with the device individual address for RF medium.
 	 * <p>
-	 * The domain address is initialized to broadcast domain, serial number is 0,
-	 * unidirectional is set <code>false</code>.
+	 * The domain address is initialized to broadcast domain, serial number is 0, unidirectional is set
+	 * <code>false</code>.
 	 *
-	 * @param device device individual device address to use as source address in KNX
-	 *        messages, specifying <code>null</code> uses the individual address 0.0.0
+	 * @param device device individual device address to use as source address in KNX messages
 	 */
 	public RFSettings(final IndividualAddress device)
 	{
@@ -72,17 +71,12 @@ public class RFSettings extends KNXMediumSettings
 
 	/**
 	 * Creates a new settings container with RF medium specific information.
-	 * <p>
 	 *
-	 * @param device device individual device address to use as source address in KNX
-	 *        messages, specifying <code>null</code> uses the individual address 0.0.0
-	 * @param domain byte array containing the domain address to use in KNX messages,
-	 *        address is given in network byte order, <code>domain.length</code> = 6,
-	 *        supplying <code>null</code> defaults to the broadcast domain
-	 * @param serialNumber serial number of the device, <code>serialNumber.length</code> =
-	 *        6
-	 * @param unidirectional <code>true</code> to indicate an unidirectional device,
-	 *        <code>false</code> otherwise
+	 * @param device device individual device address to use as source address in KNX messages
+	 * @param domain byte array containing the domain address to use in KNX messages, address is given in network byte
+	 *        order, <code>domain.length</code> = 6, supplying <code>null</code> defaults to the broadcast domain
+	 * @param serialNumber serial number of the device, <code>serialNumber.length</code> = 6
+	 * @param unidirectional <code>true</code> to indicate an unidirectional device, <code>false</code> otherwise
 	 */
 	public RFSettings(final IndividualAddress device, final byte[] domain,
 		final byte[] serialNumber, final boolean unidirectional)

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -53,8 +53,7 @@ public class TPSettings extends KNXMediumSettings
 	/**
 	 * Creates a new settings container with TP1 medium specific information.
 	 *
-	 * @param device KNX individual device address to use as source address in KNX messages,
-	 *        specifying <code>null</code> uses the individual address 0.0.0
+	 * @param device KNX individual device address to use as source address in KNX messages
 	 */
 	public TPSettings(final IndividualAddress device)
 	{
@@ -62,12 +61,11 @@ public class TPSettings extends KNXMediumSettings
 	}
 
 	/**
-	 * Creates a new default container with settings for TP1 medium. The KNX device individual
-	 * address is initialized to 0.0.0.
+	 * Creates new default settings for TP1 medium, the KNX device address is initialized to 0.0.0.
 	 */
 	public TPSettings()
 	{
-		super(null);
+		super(BackboneRouter);
 	}
 
 	@Override
