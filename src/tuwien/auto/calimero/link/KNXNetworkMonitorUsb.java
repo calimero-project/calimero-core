@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2016 B. Malinowsky
+    Copyright (c) 2015, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -60,7 +60,6 @@ import tuwien.auto.calimero.serial.usb.UsbConnection.EmiType;
  *
  * @author B. Malinowsky
  */
-// XXX cEMI link layer monitor not tested
 public class KNXNetworkMonitorUsb extends AbstractMonitor
 {
 	private static final int PEI_SWITCH = 0xA9;

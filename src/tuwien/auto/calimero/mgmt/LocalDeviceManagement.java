@@ -160,13 +160,13 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 	{
 		// imitate property description:
 		// oindex: PropertyAccess.PID.IO_LIST
-		// pindex: supplied, conditional
 		// pid: supplied, conditional
+		// pindex: supplied, conditional
+		// read-only: only with write emulation
 		// pdt: -
-		// elements: current number of elements
+		// elements (2 bytes): current number of elements
 		// rLevel: - (not existent)
 		// wLevel: - (not existent)
-		// read-only: only with write emulation
 
 		if (pid != 0 || objIndex != lastObjIndex || propIndex < lastPropIndex)
 			resetLastDescription();
