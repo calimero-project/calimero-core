@@ -53,7 +53,6 @@ import tuwien.auto.calimero.DetachEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
@@ -70,7 +69,7 @@ import tuwien.auto.calimero.log.LogService;
  * <p>
  * Uses {@link TransportLayer} internally for communication. <br>
  * All management service methods invoked after a detach of the network link are allowed
- * to throw {@link KNXIllegalStateException}.
+ * to throw {@link IllegalStateException}.
  *
  * @author B. Malinowsky
  */

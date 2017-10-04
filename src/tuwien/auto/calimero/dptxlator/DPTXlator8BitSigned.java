@@ -41,7 +41,6 @@ import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.KNXIllegalStateException;
 
 /**
  * Translator for KNX DPTs with main number 6, type <b>8 Bit signed value</b>. The KNX data type
@@ -152,7 +151,7 @@ public class DPTXlator8BitSigned extends DPTXlator
 	/**
 	 * Sets the status and mode of the first translation item for DPT 6.020, Status with Mode, if
 	 * the translator is set to that particular datapoint type. This method is only applicable for
-	 * DPT 6.020, other DPTs will cause a {@link KNXIllegalStateException}.
+	 * DPT 6.020, other DPTs will cause a {@link IllegalStateException}.
 	 *
 	 * @param a status bit 0 (corresponding to the MSB, bit 7, in the encoding)
 	 * @param b status bit 1
@@ -165,7 +164,7 @@ public class DPTXlator8BitSigned extends DPTXlator
 		final boolean d, final boolean e, final int mode)
 	{
 		if (dpt != DPT_STATUS_MODE3)
-			throw new KNXIllegalStateException("translator not set to DPT 6.020 (Status with Mode)");
+			throw new IllegalStateException("translator not set to DPT 6.020 (Status with Mode)");
 		if (mode < 0 || mode > 2)
 			throw new KNXIllegalArgumentException("mode out of range [0..2]");
 		int status = a ? 1 << 7 : 0;
@@ -179,7 +178,7 @@ public class DPTXlator8BitSigned extends DPTXlator
 
 	/**
 	 * Returns a status bit; this method is only applicable for DPT 6.020, other DPTs will cause a
-	 * {@link KNXIllegalStateException}.
+	 * {@link IllegalStateException}.
 	 *
 	 * @param statusBit to check, <code>0 &le; statusBit &le; 4</code>
 	 * @return <code>true</code> if status bit is set, <code>false</code> otherwise
@@ -188,7 +187,7 @@ public class DPTXlator8BitSigned extends DPTXlator
 	boolean statusBit(final int statusBit)
 	{
 		if (dpt != DPT_STATUS_MODE3)
-			throw new KNXIllegalStateException("translator not set to DPT 6.020 (Status with Mode)");
+			throw new IllegalStateException("translator not set to DPT 6.020 (Status with Mode)");
 		if (statusBit < 0 || statusBit > 4)
 			throw new KNXIllegalArgumentException("status bit " + statusBit + " out of range [0..4]");
 		return (data[0] & (0x80 >> statusBit)) != 0;
@@ -197,17 +196,17 @@ public class DPTXlator8BitSigned extends DPTXlator
 	/**
 	 * Returns the mode of the first translation item for DPT 6.020, Status with Mode, if the
 	 * translator is set to that particular datapoint type. This method is only applicable for DPT
-	 * 6.020, other DPTs will cause a {@link KNXIllegalStateException}.
+	 * 6.020, other DPTs will cause a {@link IllegalStateException}.
 	 *
 	 * @return the active mode, with a value of either 0, 1, or 2
 	 */
 	public final int getMode()
 	{
 		if (dpt != DPT_STATUS_MODE3)
-			throw new KNXIllegalStateException("translator not set to DPT 6.020 (Status with Mode)");
+			throw new IllegalStateException("translator not set to DPT 6.020 (Status with Mode)");
 		final int enc = data[0] & 0x07;
 		if (enc != 1 && enc != 2 && enc != 4)
-			throw new KNXIllegalStateException("invalid mode encoding " + enc + " out of {1, 2, 4}");
+			throw new IllegalStateException("invalid mode encoding " + enc + " out of {1, 2, 4}");
 		return enc == 1 ? 0 : enc == 2 ? 1 : 2;
 	}
 

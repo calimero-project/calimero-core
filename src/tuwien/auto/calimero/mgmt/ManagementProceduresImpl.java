@@ -57,7 +57,6 @@ import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
@@ -187,7 +186,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	{
 		mc = mgmtClient;
 		if (!mc.isOpen())
-			throw new KNXIllegalStateException("management client not in open state");
+			throw new IllegalStateException("management client not in open state");
 		tl = transportLayer;
 		detachMgmtClient = false;
 	}

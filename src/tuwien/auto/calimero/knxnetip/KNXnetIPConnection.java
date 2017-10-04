@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,7 +38,6 @@ package tuwien.auto.calimero.knxnetip;
 
 import java.net.InetSocketAddress;
 
-import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMI;
@@ -164,7 +163,7 @@ public interface KNXnetIPConnection extends AutoCloseable
 	 * @throws KNXConnectionClosedException if no communication was established in the
 	 *         first place or communication was closed
 	 * @throws InterruptedException on thread interrupt
-	 * @throws KNXIllegalStateException if the send is not permitted by the protocol
+	 * @throws IllegalStateException if the send is not permitted by the protocol
 	 */
 	void send(CEMI frame, BlockingMode mode)
 		throws KNXTimeoutException, KNXConnectionClosedException, InterruptedException;

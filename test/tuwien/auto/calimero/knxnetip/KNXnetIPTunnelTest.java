@@ -59,7 +59,6 @@ import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
@@ -290,7 +289,7 @@ public class KNXnetIPTunnelTest
 			mon.send(frame, ack);
 			fail("no send in busmon");
 		}
-		catch (final KNXIllegalStateException e) {}
+		catch (final IllegalStateException e) {}
 		// on open monitor test behavior on new tunnel
 		try {
 			newTunnel();

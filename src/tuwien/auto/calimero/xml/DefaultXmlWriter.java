@@ -44,8 +44,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-import tuwien.auto.calimero.KNXIllegalStateException;
-
 /**
  * Default XML writer implementation of the XmlWriter interface.
  * <p>
@@ -252,7 +250,7 @@ public class DefaultXmlWriter implements XmlWriter
 	{
 		closeStartElement();
 		if (layout.empty())
-			throw new KNXIllegalStateException("no elements to end");
+			throw new IllegalStateException("no elements to end");
 		try {
 			layout.pop().endTag();
 			if (layout.empty())

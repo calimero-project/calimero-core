@@ -56,7 +56,6 @@ import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMI;
@@ -410,7 +409,7 @@ public class KNXnetIPRouting extends ConnectionBase
 		}
 		if (state < 0) {
 			logger.error("send invoked in error state " + state + " - aborted");
-			throw new KNXIllegalStateException("in error state, send aborted");
+			throw new IllegalStateException("in error state, send aborted");
 		}
 		try {
 			final DatagramPacket p = new DatagramPacket(packet, packet.length, dataEndpt.getAddress(),

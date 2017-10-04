@@ -58,7 +58,6 @@ import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
-import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.buffer.LDataObjectQueue.QueueItem;
@@ -463,7 +462,7 @@ public class NetworkBufferTest
 			}
 			assertFalse(f.hasNewIndication());
 		}
-		catch (final KNXIllegalStateException e) {}
+		catch (final IllegalStateException e) {}
 	}
 
 	/**

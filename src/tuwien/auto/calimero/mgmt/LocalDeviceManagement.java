@@ -47,7 +47,6 @@ import java.util.List;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXException;
-import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXRemoteException;
@@ -133,7 +132,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 		final byte[] data) throws KNXException, InterruptedException
 	{
 		if (closed)
-			throw new KNXIllegalStateException("adapter closed");
+			throw new IllegalStateException("adapter closed");
 		final int objectType = getObjectType(objIndex);
 		final int objectInstance = getObjectInstance(objIndex, objectType);
 		send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, objectType, objectInstance, pid, start,
@@ -146,7 +145,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 		throws KNXException, InterruptedException
 	{
 		if (closed)
-			throw new KNXIllegalStateException("adapter closed");
+			throw new IllegalStateException("adapter closed");
 		final int objectType = getObjectType(objIndex);
 		final int objectInstance = getObjectInstance(objIndex, objectType);
 		send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, objectType, objectInstance, pid, start,

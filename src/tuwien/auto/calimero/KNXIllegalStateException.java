@@ -37,13 +37,10 @@
 package tuwien.auto.calimero;
 
 /**
- * Thrown to indicate that a method was invoked at an inappropriate time.
- * <p>
- * The object which was operated on, is not in the correct state for that operation.
- * 
- * @author B. Malinowsky
+ * @deprecated Use {@link IllegalStateException}.
  */
-public class KNXIllegalStateException extends RuntimeException
+@Deprecated
+public class KNXIllegalStateException extends IllegalStateException
 {
 	private static final long serialVersionUID = 1L;
 
@@ -57,7 +54,7 @@ public class KNXIllegalStateException extends RuntimeException
 	 * Constructs a new <code>KNXIllegalStateException</code> with the specified detail
 	 * message.
 	 * <p>
-	 * 
+	 *
 	 * @param s the detail message
 	 */
 	public KNXIllegalStateException(final String s)

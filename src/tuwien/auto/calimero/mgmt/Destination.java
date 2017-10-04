@@ -48,7 +48,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import tuwien.auto.calimero.IndividualAddress;
-import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 
 /**
@@ -160,7 +159,7 @@ public class Destination implements AutoCloseable
 		 * <p>
 		 * This method is only used in connection oriented communication mode.
 		 *
-		 * @throws KNXIllegalStateException if invoked on not connection oriented mode
+		 * @throws IllegalStateException if invoked on not connection oriented mode
 		 */
 		public void restartTimeout()
 		{
@@ -434,7 +433,7 @@ public class Destination implements AutoCloseable
 	private synchronized void restartTimer(final Runnable notify)
 	{
 		if (!co)
-			throw new KNXIllegalStateException("no timer if not connection oriented");
+			throw new IllegalStateException("no timer if not connection oriented");
 		if (state == Destroyed)
 			return;
 

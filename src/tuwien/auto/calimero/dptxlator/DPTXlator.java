@@ -48,7 +48,6 @@ import org.slf4j.Logger;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.log.LogService;
 
 /**
@@ -467,7 +466,7 @@ public abstract class DPTXlator
 	 */
 	protected static Map<String, DPT> getSubTypesStatic()
 	{
-		throw new KNXIllegalStateException("invoke on specific translator");
+		throw new IllegalStateException("invoke on specific translator");
 	}
 
 	final String appendUnit(final String value)

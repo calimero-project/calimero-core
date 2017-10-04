@@ -53,7 +53,6 @@ import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
@@ -561,7 +560,7 @@ public class ManagementClientImplTest
 			mc.readAddress(true);
 			fail("we are closed");
 		}
-		catch (final KNXIllegalStateException e) {}
+		catch (final IllegalStateException e) {}
 	}
 
 	/**

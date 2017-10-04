@@ -162,7 +162,7 @@ public interface DeviceDescriptor
 					++i;
 			}
 			if (i != types.length)
-				throw new KNXIllegalStateException("mask versions missing");
+				throw new IllegalStateException("mask versions missing");
 		}
 
 		private final int mv;

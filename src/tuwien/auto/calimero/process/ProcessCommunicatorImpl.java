@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,7 +51,6 @@ import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
@@ -398,7 +397,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
 		if (detached)
-			throw new KNXIllegalStateException("process communicator detached");
+			throw new IllegalStateException("process communicator detached");
 		lnk.sendRequestWait(dst, p, createGroupAPDU(GROUP_WRITE, t));
 		if (logger.isTraceEnabled())
 			logger.trace("group write to " + dst + " succeeded");
@@ -409,7 +408,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 			KNXInvalidResponseException, KNXLinkClosedException, InterruptedException
 	{
 		if (detached)
-			throw new KNXIllegalStateException("process communicator detached");
+			throw new IllegalStateException("process communicator detached");
 		try {
 			synchronized (indications) {
 				readers.computeIfAbsent(dst, v -> new AtomicInteger()).incrementAndGet();

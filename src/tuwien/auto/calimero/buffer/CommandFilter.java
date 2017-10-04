@@ -45,7 +45,6 @@ import java.util.function.Consumer;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXFormatException;
-import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.buffer.Configuration.NetworkFilter;
 import tuwien.auto.calimero.buffer.Configuration.RequestFilter;
 import tuwien.auto.calimero.buffer.LDataObjectQueue.QueueItem;
@@ -124,7 +123,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 	 * Every item is only returned once by this method, after that it is no longer marked
 	 * as new and will not cause {@link #hasNewIndication()} to return <code>true</code>
 	 * for it.<br>
-	 * If no indication is available, throws {@link KNXIllegalStateException}.
+	 * If no indication is available, throws {@link IllegalStateException}.
 	 * <p>
 	 * Nevertheless, the queued item might be retrieved directly through the used cache
 	 * (which is obtained by {@link Configuration#getCache()}). Whether or not a returned
@@ -143,7 +142,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 	{
 		synchronized (indicationKeys) {
 			if (indicationKeys.isEmpty())
-				throw new KNXIllegalStateException("no indications");
+				throw new IllegalStateException("no indications");
 			return ((LDataObjectQueue) indicationKeys.remove(0)).getItem();
 		}
 	}

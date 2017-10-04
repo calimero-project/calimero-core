@@ -54,7 +54,6 @@ import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXAckTimeoutException;
 import tuwien.auto.calimero.KNXFormatException;
-import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMI;
@@ -181,7 +180,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	 * waiting until completion.
 	 * <p>
 	 * If mode is {@link BlockingMode#NonBlocking}, sending is only permitted if no other send is currently being done,
-	 * otherwise {@link KNXIllegalStateException} is thrown. In this mode, a user has to check communication state on
+	 * otherwise {@link IllegalStateException} is thrown. In this mode, a user has to check communication state on
 	 * its own ({@link #getState()}).
 	 */
 	@Override
@@ -200,7 +199,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		}
 		if (state < 0) {
 			logger.error("send invoked in error state " + state + " - aborted");
-			throw new KNXIllegalStateException("in error state, send aborted");
+			throw new IllegalStateException("in error state, send aborted");
 		}
 		// arrange into line depending on blocking mode
 		sendWaitQueue.acquire(mode != NonBlocking);
@@ -209,7 +208,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 				logger.warn(
 						"nonblocking send invoked while waiting for data response in state " + state + " - aborted");
 				sendWaitQueue.release(false);
-				throw new KNXIllegalStateException("waiting for data response");
+				throw new IllegalStateException("waiting for data response");
 			}
 			try {
 				if (state == CLOSED) {

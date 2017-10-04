@@ -46,7 +46,6 @@ import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
@@ -133,7 +132,7 @@ abstract class ClientConnection extends ConnectionBase
 		final CRI cri, final boolean useNAT) throws KNXException, InterruptedException
 	{
 		if (state != CLOSED)
-			throw new KNXIllegalStateException("open connection");
+			throw new IllegalStateException("open connection");
 		ctrlEndpt = serverCtrlEP;
 		if (ctrlEndpt.isUnresolved())
 			throw new KNXException("server control endpoint is unresolved: " + serverCtrlEP);

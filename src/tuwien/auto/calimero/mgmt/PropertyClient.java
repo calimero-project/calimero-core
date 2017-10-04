@@ -52,7 +52,6 @@ import org.slf4j.Logger;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.Settings;
 import tuwien.auto.calimero.dptxlator.DPTXlator;
@@ -140,7 +139,7 @@ import tuwien.auto.calimero.xml.XmlWriter;
  * data type (PDT) are available. Also, the maximum number of elements allowed in the
  * property is not available (only the current number of elements).<br>
  * All methods for property access invoked after a close of the property client will throw
- * a {@link KNXIllegalStateException}.
+ * a {@link IllegalStateException}.
  *
  * @author B. Malinowsky
  * @see PropertyAdapter

@@ -51,7 +51,6 @@ import tag.KnxnetIP;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
-import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned;
@@ -191,14 +190,14 @@ public class PropertyClientTest
 			remAdpt.setProperty(0, 11, 1, 1, new byte[] { 0 });
 			fail("closed");
 		}
-		catch (final KNXIllegalStateException e) {}
+		catch (final IllegalStateException e) {}
 
 		local.close();
 		try {
 			localAdpt.setProperty(0, 11, 1, 1, new byte[] { 0 });
 			fail("closed");
 		}
-		catch (final KNXIllegalStateException e) {}
+		catch (final IllegalStateException e) {}
 	}
 
 	/**

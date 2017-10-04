@@ -54,7 +54,6 @@ import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
@@ -173,7 +172,7 @@ public class KNXnetIPTunnel extends ClientConnection
 		throws KNXTimeoutException, KNXConnectionClosedException, InterruptedException
 	{
 		if (layer == BusMonitorLayer)
-			throw new KNXIllegalStateException("send not permitted in busmonitor mode");
+			throw new IllegalStateException("send not permitted in busmonitor mode");
 		if (!(frame instanceof CEMILData))
 			throw new KNXIllegalArgumentException("unsupported cEMI type " + frame.getClass());
 		super.send(frame, mode);

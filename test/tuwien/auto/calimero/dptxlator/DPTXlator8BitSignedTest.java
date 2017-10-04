@@ -41,7 +41,6 @@ import java.util.Arrays;
 import junit.framework.TestCase;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.Util;
 
 /**
@@ -360,7 +359,7 @@ public class DPTXlator8BitSignedTest extends TestCase
 			t.setStatusMode(true, true, true, true, true, 2);
 			fail("wrong xlator");
 		}
-		catch (final KNXIllegalStateException expected) {}
+		catch (final IllegalStateException expected) {}
 
 		final DPTXlator8BitSigned t2 = new DPTXlator8BitSigned(sm);
 		assertEquals(0, t2.getMode());
@@ -390,7 +389,7 @@ public class DPTXlator8BitSignedTest extends TestCase
 			t.statusBit(0);
 			fail("wrong xlator");
 		}
-		catch (final KNXIllegalStateException expected) {}
+		catch (final IllegalStateException expected) {}
 
 		final DPTXlator8BitSigned t2 = new DPTXlator8BitSigned(sm);
 		for (int i = 0; i < 5; i++)
@@ -412,7 +411,7 @@ public class DPTXlator8BitSignedTest extends TestCase
 			t.getMode();
 			fail("wrong xlator");
 		}
-		catch (final KNXIllegalStateException expected) {}
+		catch (final IllegalStateException expected) {}
 	}
 
 	private void setValueIntFail(final DPTXlator8BitSigned tr, final int v)

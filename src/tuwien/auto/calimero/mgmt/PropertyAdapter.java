@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,14 +37,13 @@
 package tuwien.auto.calimero.mgmt;
 
 import tuwien.auto.calimero.KNXException;
-import tuwien.auto.calimero.KNXIllegalStateException;
 
 /**
  * Adapter hiding protocol specifics and internals of accessing interface object properties.
  * <p>
  * A property adapter is created for one communication partner (KNX device, KNXnet/IP router). If {@link #close()} is
  * called by a user on an open adapter, all methods which do interface object property access are allowed to throw
- * {@link KNXIllegalStateException} if invoked on that closed adapter.<br>
+ * {@link IllegalStateException} if invoked on that closed adapter.<br>
  *
  * @author B. Malinowsky
  */
@@ -59,7 +58,7 @@ public interface PropertyAdapter extends AutoCloseable
 	 * @param elements number of elements to set
 	 * @param data byte array containing the property value data
 	 * @throws KNXException on error setting the interface object property
-	 * @throws KNXIllegalStateException if adapter was already closed
+	 * @throws IllegalStateException if adapter was already closed
 	 * @throws InterruptedException on interrupted thread
 	 */
 	void setProperty(int objIndex, int pid, int start, int elements, byte[] data)
@@ -74,7 +73,7 @@ public interface PropertyAdapter extends AutoCloseable
 	 * @param elements number of elements to get
 	 * @return byte array containing the property value data
 	 * @throws KNXException on error getting the interface object property
-	 * @throws KNXIllegalStateException if adapter was already closed
+	 * @throws IllegalStateException if adapter was already closed
 	 * @throws InterruptedException on interrupted thread
 	 */
 	byte[] getProperty(int objIndex, int pid, int start, int elements) throws KNXException, InterruptedException;
@@ -88,7 +87,7 @@ public interface PropertyAdapter extends AutoCloseable
 	 * @param propIndex property index, starts with index 0 for the first property
 	 * @return byte array containing the property description, starting with the property object index
 	 * @throws KNXException on error getting the property description
-	 * @throws KNXIllegalStateException if adapter was already closed
+	 * @throws IllegalStateException if adapter was already closed
 	 * @throws InterruptedException on interrupted thread
 	 */
 	byte[] getDescription(int objIndex, int pid, int propIndex) throws KNXException, InterruptedException;

@@ -57,7 +57,6 @@ import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.Util;
@@ -320,17 +319,17 @@ public class TransportLayerImplTest
 			tl.sendData(new IndividualAddress(4, 4, 4), p, new byte[] { 0, 0 });
 			fail("we are detached");
 		}
-		catch (final KNXIllegalStateException e) {}
+		catch (final IllegalStateException e) {}
 		try {
 			tl.connect(dco);
 			fail("we are detached");
 		}
-		catch (final KNXIllegalStateException e) {}
+		catch (final IllegalStateException e) {}
 		try {
 			tl.createDestination(new IndividualAddress(5, 5, 5), false, false, false);
 			fail("we are detached");
 		}
-		catch (final KNXIllegalStateException e) {}
+		catch (final IllegalStateException e) {}
 	}
 
 	/**
@@ -501,7 +500,7 @@ public class TransportLayerImplTest
 				tl.sendData(dco, p, tsduDescRead);
 				fail("we got detached");
 			}
-			catch (final KNXIllegalStateException expected) {}
+			catch (final IllegalStateException expected) {}
 		}
 		catch (final KNXDisconnectException e) {}
 		// for TL listener to process remaining indications

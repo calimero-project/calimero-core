@@ -58,7 +58,6 @@ import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.cemi.CEMI;
@@ -81,7 +80,7 @@ import tuwien.auto.calimero.mgmt.Destination.AggregatorProxy;
  * for any further layer 4 communication, and it can't be attached to a new network link.
  * <br>
  * All methods invoked after a detach of the network link used for communication are
- * allowed to throw {@link KNXIllegalStateException}.
+ * allowed to throw {@link IllegalStateException}.
  *
  * @author B. Malinowsky
  */
@@ -240,7 +239,7 @@ public class TransportLayerImpl implements TransportLayer
 		final boolean connectionOriented, final boolean keepAlive, final boolean verifyMode)
 	{
 		if (detached)
-			throw new KNXIllegalStateException("TL detached");
+			throw new IllegalStateException("TL detached");
 		synchronized (proxies) {
 			if (proxies.containsKey(remote))
 				throw new KNXIllegalArgumentException("destination already created: " + remote);
@@ -338,7 +337,7 @@ public class TransportLayerImpl implements TransportLayer
 	public void disconnect(final Destination d) throws KNXLinkClosedException
 	{
 		if (detached)
-			throw new KNXIllegalStateException("TL detached");
+			throw new IllegalStateException("TL detached");
 		if (d.getState() != Destroyed && d.getState() != Disconnected)
 			disconnectIndicate(getProxy(d), true);
 	}
@@ -399,7 +398,7 @@ public class TransportLayerImpl implements TransportLayer
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
 		if (detached)
-			throw new KNXIllegalStateException("TL detached");
+			throw new IllegalStateException("TL detached");
 		tsdu[0] &= 0x03;
 		lnk.sendRequestWait(addr, p, tsdu);
 	}
@@ -444,7 +443,7 @@ public class TransportLayerImpl implements TransportLayer
 	private AggregatorProxy getProxy(final Destination d)
 	{
 		if (detached)
-			throw new KNXIllegalStateException("TL detached");
+			throw new IllegalStateException("TL detached");
 		synchronized (proxies) {
 			final AggregatorProxy p = proxies.get(d.getAddress());
 			// TODO at this point, proxy might also be null because destination just got destroyed

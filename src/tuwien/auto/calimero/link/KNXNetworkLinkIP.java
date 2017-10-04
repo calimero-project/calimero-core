@@ -50,7 +50,6 @@ import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.KNXIllegalStateException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.cemi.CEMILData;
@@ -265,7 +264,7 @@ public class KNXNetworkLinkIP extends AbstractLink
 	@Override
 	protected void onSend(final KNXAddress dst, final byte[] msg, final boolean waitForCon)
 	{
-		throw new KNXIllegalStateException("KNXnet/IP uses cEMI only");
+		throw new IllegalStateException("KNXnet/IP uses cEMI only");
 	}
 
 	@Override
