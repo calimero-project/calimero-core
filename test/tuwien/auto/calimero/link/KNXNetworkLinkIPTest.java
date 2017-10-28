@@ -159,7 +159,7 @@ public class KNXNetworkLinkIPTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testKNXNetworkLinkIPConstructor() throws KNXException, InterruptedException
+	void testKNXNetworkLinkIPConstructor() throws KNXException, InterruptedException
 	{
 		tnl.close();
 		try (KNXNetworkLink l = new KNXNetworkLinkIP(100, new InetSocketAddress(0), Util.getServer(), false,
@@ -168,9 +168,7 @@ public class KNXNetworkLinkIPTest
 		}
 		catch (final KNXIllegalArgumentException e) {}
 		try (KNXNetworkLink l = KNXNetworkLinkIP.newTunnelingLink(new InetSocketAddress(0), Util.getServer(), false,
-				TPSettings.TP1)) {
-			fail("wildcard no supported");
-		}
+				TPSettings.TP1)) {}
 		catch (final KNXIllegalArgumentException e) {}
 		// use default local host
 		final KNXNetworkLink lnk = KNXNetworkLinkIP.newTunnelingLink(null, Util.getServer(), false, TPSettings.TP1);
@@ -208,7 +206,7 @@ public class KNXNetworkLinkIPTest
 	 * Test method for {@link KNXNetworkLinkIP#addLinkListener(NetworkLinkListener)}.
 	 */
 	@Test
-	public final void testAddLinkListener()
+	void testAddLinkListener()
 	{
 		tnl.addLinkListener(ltnl);
 		tnl.addLinkListener(ltnl);
@@ -218,7 +216,7 @@ public class KNXNetworkLinkIPTest
 	 * Test method for {@link KNXNetworkLinkIP#setKNXMedium(KNXMediumSettings)}.
 	 */
 	@Test
-	public final void testSetKNXMedium()
+	void testSetKNXMedium()
 	{
 		try {
 			tnl.setKNXMedium(new PLSettings());
@@ -245,7 +243,7 @@ public class KNXNetworkLinkIPTest
 	 * Test method for {@link KNXNetworkLinkIP#getKNXMedium()}.
 	 */
 	@Test
-	public final void testGetKNXMedium()
+	void testGetKNXMedium()
 	{
 		assertTrue(tnl.getKNXMedium() instanceof TPSettings);
 		assertEquals(0, tnl.getKNXMedium().getDeviceAddress().getRawAddress());
@@ -258,7 +256,7 @@ public class KNXNetworkLinkIPTest
 	 * @throws KNXTimeoutException
 	 */
 	@Test
-	public final void testClose() throws InterruptedException, KNXTimeoutException
+	void testClose() throws InterruptedException, KNXTimeoutException
 	{
 		assertTrue(tnl.isOpen());
 		tnl.close();
@@ -278,7 +276,7 @@ public class KNXNetworkLinkIPTest
 	 * Test method for {@link KNXNetworkLinkIP#getHopCount()}.
 	 */
 	@Test
-	public final void testGetHopCount()
+	void testGetHopCount()
 	{
 		assertEquals(6, rtr.getHopCount());
 		rtr.setHopCount(7);
@@ -299,7 +297,7 @@ public class KNXNetworkLinkIPTest
 	 * Test method for {@link KNXNetworkLinkIP#removeLinkListener(NetworkLinkListener)}.
 	 */
 	@Test
-	public final void testRemoveLinkListener()
+	void testRemoveLinkListener()
 	{
 		tnl.removeLinkListener(ltnl);
 		tnl.removeLinkListener(ltnl);
@@ -316,7 +314,7 @@ public class KNXNetworkLinkIPTest
 	 * @throws UnknownHostException
 	 */
 	@Test
-	public final void testSendRequestKNXAddressPriorityByteArray()
+	void testSendRequestKNXAddressPriorityByteArray()
 		throws InterruptedException, UnknownHostException, KNXException
 	{
 		doSend(true, new byte[] { 0, (byte) (0x80 | 1) });
@@ -354,7 +352,7 @@ public class KNXNetworkLinkIPTest
 	 * @throws KNXTimeoutException
 	 */
 	@Test
-	public final void testSendRequestCEMILData() throws KNXLinkClosedException, KNXTimeoutException
+	void testSendRequestCEMILData() throws KNXLinkClosedException, KNXTimeoutException
 	{
 		ltnl.con = null;
 		tnl.send(frame2, false);
@@ -379,7 +377,7 @@ public class KNXNetworkLinkIPTest
 	 * @throws KNXTimeoutException
 	 */
 	@Test
-	public final void testSendRequestWaitKNXAddressPriorityByteArray()
+	void testSendRequestWaitKNXAddressPriorityByteArray()
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
 		doSendWait(true, new byte[] { 0, (byte) (0x80 | 1) });
@@ -412,7 +410,7 @@ public class KNXNetworkLinkIPTest
 	 * @throws KNXTimeoutException
 	 */
 	@Test
-	public final void testSendRequestWaitCEMILData() throws KNXTimeoutException, KNXLinkClosedException
+	void testSendRequestWaitCEMILData() throws KNXTimeoutException, KNXLinkClosedException
 	{
 		ltnl.con = null;
 		try {
@@ -440,7 +438,7 @@ public class KNXNetworkLinkIPTest
 	 * @throws KNXException
 	 */
 	@Test
-	public final void testGetName() throws KNXException
+	void testGetName() throws KNXException
 	{
 		String n = tnl.getName();
 		assertTrue(n.indexOf(Util.getServer().getAddress().getHostAddress()) > -1);

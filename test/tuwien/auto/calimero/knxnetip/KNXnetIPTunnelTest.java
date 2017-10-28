@@ -387,10 +387,10 @@ public class KNXnetIPTunnelTest
 		catch (final KNXIllegalArgumentException e) {}
 
 		try (final KNXnetIPConnection c = new KNXnetIPTunnel(LinkLayer, new InetSocketAddress("0.0.0.0", 0),
-				new InetSocketAddress("127.0.0.1", 4000), false)) {
-			fail("wildcard for local socket not null");
+				new InetSocketAddress("127.0.0.1", 4000), false)) {}
+		catch (final KNXTimeoutException expected) {
+			// can happen if server does not respond on loopback
 		}
-		catch (final KNXIllegalArgumentException e) {}
 
 		newTunnel();
 		assertEquals(KNXnetIPConnection.OK, t.getState());
@@ -510,19 +510,19 @@ public class KNXnetIPTunnelTest
 
 	private void newTunnel() throws KNXException, InterruptedException
 	{
-		t = new KNXnetIPTunnel(LinkLayer, Util.getLocalHost(), Util.getServer(), false);
+		t = new KNXnetIPTunnel(LinkLayer, Util.localEndpoint(), Util.getServer(), false);
 		t.addConnectionListener(l);
 	}
 
 	private void newNATTunnel() throws KNXException, InterruptedException
 	{
-		tnat = new KNXnetIPTunnel(LinkLayer, Util.getLocalHost(), Util.getServer(), true);
+		tnat = new KNXnetIPTunnel(LinkLayer, Util.localEndpoint(), Util.getServer(), true);
 		tnat.addConnectionListener(lnat);
 	}
 
 	private void newMonitor() throws KNXException, InterruptedException
 	{
-		mon = new KNXnetIPTunnel(BusMonitorLayer, Util.getLocalHost(), Util.getServer(), false);
+		mon = new KNXnetIPTunnel(BusMonitorLayer, Util.localEndpoint(), Util.getServer(), false);
 		mon.addConnectionListener(lmon);
 	}
 }

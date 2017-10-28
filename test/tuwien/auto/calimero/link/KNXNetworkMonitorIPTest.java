@@ -59,7 +59,6 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.cemi.CEMIBusMon;
 import tuwien.auto.calimero.knxnetip.Debug;
-import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.link.medium.PLSettings;
 import tuwien.auto.calimero.link.medium.RawFrame;
 import tuwien.auto.calimero.link.medium.TPSettings;
@@ -119,32 +118,19 @@ public class KNXNetworkMonitorIPTest
 			mon.close();
 	}
 
-	/**
-	 * Test method for
-	 * {@link KNXNetworkMonitorIP#KNXNetworkMonitorIP(InetSocketAddress, InetSocketAddress, boolean, KNXMediumSettings)}
-	 * .
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testKNXNetworkMonitorIP() throws KNXException, InterruptedException
+	void testKNXNetworkMonitorIP() throws KNXException, InterruptedException
 	{
 		if (mon != null)
 			mon.close();
 		try (final KNXNetworkMonitor m = new KNXNetworkMonitorIP(new InetSocketAddress(0), Util.getServer(), false,
-				TPSettings.TP1)) {
-			fail("wildcard no supported");
-		}
+				TPSettings.TP1)) {}
 		catch (final KNXIllegalArgumentException e) {}
 		mon = new KNXNetworkMonitorIP(null, Util.getServer(), false, TPSettings.TP1);
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkMonitorIP#setKNXMedium(KNXMediumSettings)}.
-	 */
 	@Test
-	public final void testSetKNXMedium()
+	void testSetKNXMedium()
 	{
 		try {
 			mon.setKNXMedium(new PLSettings());
@@ -167,13 +153,8 @@ public class KNXNetworkMonitorIPTest
 		assertEquals(200, mon.getKNXMedium().getDeviceAddress().getRawAddress());
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkMonitorIP#close()}.
-	 *
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testClose() throws InterruptedException
+	void testClose() throws InterruptedException
 	{
 		assertTrue(mon.isOpen());
 		mon.close();
@@ -184,14 +165,9 @@ public class KNXNetworkMonitorIPTest
 		mon.close();
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkMonitorIP#setDecodeRawFrames(boolean)}.
-	 *
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	@Slow
-	public final void testSetDecodeRawFrames() throws InterruptedException
+	void testSetDecodeRawFrames() throws InterruptedException
 	{
 		mon.setDecodeRawFrames(true);
 		lmon.raw = null;
@@ -204,13 +180,8 @@ public class KNXNetworkMonitorIPTest
 		assertNull(lmon.raw);
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkMonitorIP#getName()}.
-	 *
-	 * @throws KNXException
-	 */
 	@Test
-	public final void testGetName() throws KNXException
+	void testGetName() throws KNXException
 	{
 		String n = mon.getName();
 		assertTrue(n.indexOf(Util.getServer().getAddress().getHostAddress()) > -1);

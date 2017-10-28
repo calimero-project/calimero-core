@@ -43,7 +43,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.time.Duration;
@@ -173,8 +172,7 @@ public class KNXnetIPRouterTest
 	@Test
 	public final void testSend2() throws KNXException, SocketException, UnknownHostException
 	{
-		r = new KNXnetIPRouting(NetworkInterface.getByInetAddress(Util.getLocalHost().getAddress()),
-				InetAddress.getByName(KNXnetIPRouting.DEFAULT_MULTICAST));
+		r = new KNXnetIPRouting(Util.localInterface(), InetAddress.getByName(KNXnetIPRouting.DEFAULT_MULTICAST));
 		r.addConnectionListener(l);
 		doSend(frame, noblock);
 		doSend(frame2, noblock);
@@ -203,8 +201,7 @@ public class KNXnetIPRouterTest
 		newRouter();
 		assertEquals(KNXnetIPConnection.OK, r.getState());
 		r.close();
-		r = new KNXnetIPRouting(NetworkInterface.getByInetAddress(Util.getLocalHost().getAddress()),
-				InetAddress.getByName(KNXnetIPRouting.DEFAULT_MULTICAST));
+		r = new KNXnetIPRouting(Util.localInterface(), InetAddress.getByName(KNXnetIPRouting.DEFAULT_MULTICAST));
 		r.close();
 		try {
 			r = new KNXnetIPRouting(null, InetAddress.getByName("224.0.23.11"));
@@ -297,8 +294,7 @@ public class KNXnetIPRouterTest
 		assertTrue(r.getRemoteAddress().getAddress().isAnyLocalAddress());
 		assertTrue(r.getRemoteAddress().getPort() == 0);
 
-		r = new KNXnetIPRouting(NetworkInterface.getByInetAddress(Util.getLocalHost().getAddress()),
-				InetAddress.getByName("224.0.23.33"));
+		r = new KNXnetIPRouting(Util.localInterface(), InetAddress.getByName("224.0.23.33"));
 		assertEquals(new InetSocketAddress("224.0.23.33", KNXnetIPConnection.DEFAULT_PORT), r.getRemoteAddress());
 		r.close();
 		assertTrue(r.getRemoteAddress().getAddress().isAnyLocalAddress());

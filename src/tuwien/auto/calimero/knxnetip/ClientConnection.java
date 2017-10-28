@@ -39,8 +39,15 @@ package tuwien.auto.calimero.knxnetip;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.Collections;
+import java.util.Optional;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.KNXException;
@@ -145,7 +152,15 @@ abstract class ClientConnection extends ConnectionBase
 			// if we allow localEP to be null, we would create an unbound socket
 			if (localEP == null)
 				throw new KNXIllegalArgumentException("no local endpoint specified");
-			socket = new DatagramSocket(localEP);
+			InetSocketAddress local = localEP;
+			// XXX getAddress could return null
+			if (local.getAddress().isAnyLocalAddress()) {
+				final InetAddress addr = useNAT ? null
+					: Optional.ofNullable(serverCtrlEP.getAddress()).flatMap(this::onSameSubnet)
+							.orElse(InetAddress.getLocalHost());
+				local = new InetSocketAddress(addr, 0);
+			}
+			socket = new DatagramSocket(local);
 			ctrlSocket = socket;
 
 			logger.info("establish connection from " + socket.getLocalSocketAddress() + " to " + ctrlEndpt);
@@ -155,6 +170,9 @@ abstract class ClientConnection extends ConnectionBase
 			final byte[] buf = PacketHelper.toPacket(new ConnectRequest(cri, hpai, hpai));
 			final DatagramPacket p = new DatagramPacket(buf, buf.length, ctrlEndpt.getAddress(), ctrlEndpt.getPort());
 			ctrlSocket.send(p);
+		}
+		catch (final UnknownHostException e) {
+			throw new KNXException("no local host address available", e);
 		}
 		catch (IOException | SecurityException e) {
 			if (socket != null)
@@ -366,6 +384,32 @@ abstract class ClientConnection extends ConnectionBase
 		socket.close();
 		setState(CLOSED);
 		logger.error("establishing connection failed, " + thrown.getMessage());
+	}
+
+	// finds a local IPv4 address with its network prefix "matching" the remote address
+	private Optional<InetAddress> onSameSubnet(final InetAddress remote)
+	{
+		try {
+			return Collections.list(NetworkInterface.getNetworkInterfaces()).stream()
+					.flatMap(ni -> ni.getInterfaceAddresses().stream())
+					.filter(ia -> ia.getAddress() instanceof Inet4Address)
+					.peek(ia -> logger.trace("match local address {}/{} to {}", ia.getAddress(),
+							ia.getNetworkPrefixLength(), remote))
+					.filter(ia -> matchesPrefix(ia, remote)).map(ia -> ia.getAddress()).findFirst();
+		}
+		catch (final SocketException ignore) {}
+		return Optional.empty();
+	}
+
+	private static boolean matchesPrefix(final InterfaceAddress ia, final InetAddress remote)
+	{
+		final byte[] a1 = ia.getAddress().getAddress();
+		final byte[] a2 = remote.getAddress();
+		final long mask = (0xffffffffL >> ia.getNetworkPrefixLength()) ^ 0xffffffffL;
+		for (int i = 0; i < a1.length; i++)
+			if ((a1[i] & (mask >> (24 - 8 * i))) != (a2[i] & (mask >> (24 - 8 * i))))
+				return false;
+		return true;
 	}
 
 	private final class HeartbeatMonitor extends Thread

@@ -37,11 +37,17 @@
 package tuwien.auto.calimero;
 
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Optional;
 
 import org.junit.Assert;
 
@@ -182,26 +188,63 @@ public final class Util
 		return nonExisting;
 	}
 
-	private static boolean printLocalHost = true;
-	private static InetAddress localHost;
-
 	/**
 	 * @return the local host used for testing
 	 */
 	public static InetSocketAddress getLocalHost()
 	{
-		try {
-			if (localHost == null)
-				localHost = InetAddress.getLocalHost();
-			final InetSocketAddress addr = new InetSocketAddress(localHost, 0);
-			if (printLocalHost) {
-				printLocalHost = false;
-				System.out.println("calimero-core - local socket used in unit tests: " + addr);
-			}
-			return addr;
-		}
-		catch (final UnknownHostException e) {}
 		return null;
+	}
+
+	/**
+	 * @return the local endpoint used for connecting to the test server
+	 */
+	public static InetSocketAddress localEndpoint()
+	{
+		return new InetSocketAddress(0);
+	}
+
+	/**
+	 * @return the local network interface used for connecting to the test server
+	 * @throws SocketException
+	 */
+	public static NetworkInterface localInterface() throws SocketException
+	{
+		try {
+			return NetworkInterface.getByInetAddress(onSameSubnet(getServer().getAddress()).get());
+		}
+		catch (final KNXException e) {
+			try {
+				return NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
+			}
+			catch (final UnknownHostException uhe) {
+				return null;
+			}
+		}
+	}
+
+	// finds a local IPv4 address with its network prefix "matching" the remote address
+	private static Optional<InetAddress> onSameSubnet(final InetAddress remote)
+	{
+		try {
+			return Collections.list(NetworkInterface.getNetworkInterfaces()).stream()
+					.flatMap(ni -> ni.getInterfaceAddresses().stream())
+					.filter(ia -> ia.getAddress() instanceof Inet4Address).filter(ia -> matchesPrefix(ia, remote))
+					.map(ia -> ia.getAddress()).findFirst();
+		}
+		catch (final SocketException ignore) {}
+		return Optional.empty();
+	}
+
+	private static boolean matchesPrefix(final InterfaceAddress ia, final InetAddress remote)
+	{
+		final byte[] a1 = ia.getAddress().getAddress();
+		final byte[] a2 = remote.getAddress();
+		final long mask = (0xffffffffL >> ia.getNetworkPrefixLength()) ^ 0xffffffffL;
+		for (int i = 0; i < a1.length; i++)
+			if ((a1[i] & (mask >> (24 - 8 * i))) != (a2[i] & (mask >> (24 - 8 * i))))
+				return false;
+		return true;
 	}
 
 	// we initially assume that our test server was started
@@ -223,7 +266,7 @@ public final class Util
 			Assert.fail("no KNXnet/IP test-server available!");
 		if (server == null) {
 			testServerRunning = false;
-			final Discoverer d = new Discoverer(getLocalHost().getAddress(), getLocalHost().getPort(), false, false);
+			final Discoverer d = new Discoverer(null, 0, false, false);
 			try {
 				d.startSearch(2, true);
 			}

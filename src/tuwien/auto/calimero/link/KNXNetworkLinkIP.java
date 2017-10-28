@@ -44,7 +44,6 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXAddress;
@@ -183,14 +182,7 @@ public class KNXNetworkLinkIP extends AbstractLink
 		super(null, createLinkName(remoteEP), settings);
 		switch (serviceMode) {
 		case TUNNELING:
-			InetSocketAddress local = localEP;
-			if (local == null)
-				try {
-					local = new InetSocketAddress(InetAddress.getLocalHost(), 0);
-				}
-				catch (final UnknownHostException e) {
-					throw new KNXException("no local host available");
-				}
+			final InetSocketAddress local = localEP == null ? new InetSocketAddress(0) : localEP;
 			conn = new KNXnetIPTunnel(LinkLayer, local, remoteEP, useNAT);
 			break;
 		case ROUTING:

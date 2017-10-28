@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,16 +36,14 @@
 
 package tuwien.auto.calimero.link;
 
-import java.net.InetAddress;
+import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.BusMonitorLayer;
+
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
-
-import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.BusMonitorLayer;
 
 /**
  * Implementation of the KNX network monitor link based on the KNXnet/IP protocol, using a
@@ -97,16 +95,10 @@ public class KNXNetworkMonitorIP extends AbstractMonitor
 	}
 
 	private static InetSocketAddress localEndpoint(final InetSocketAddress local)
-		throws KNXException
 	{
 		if (local != null)
 			return local;
-		try {
-			return new InetSocketAddress(InetAddress.getLocalHost(), 0);
-		}
-		catch (final UnknownHostException e) {
-			throw new KNXException("no local host available");
-		}
+		return new InetSocketAddress(0);
 	}
 
 	private static String monitorName(final InetSocketAddress remote)

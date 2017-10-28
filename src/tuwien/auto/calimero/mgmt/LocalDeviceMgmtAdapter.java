@@ -36,9 +36,7 @@
 
 package tuwien.auto.calimero.mgmt;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXTimeoutException;
@@ -132,14 +130,7 @@ public class LocalDeviceMgmtAdapter extends LocalDeviceManagement
 		final InetSocketAddress serverCtrlEP, final boolean useNat) throws KNXException,
 		InterruptedException
 	{
-		InetSocketAddress local = localEP;
-		if (local == null)
-			try {
-				local = new InetSocketAddress(InetAddress.getLocalHost(), 0);
-			}
-			catch (final UnknownHostException e) {
-				throw new KNXException("no local host available");
-			}
+		final InetSocketAddress local = localEP == null ? new InetSocketAddress(0) : localEP;
 		return new KNXnetIPDevMgmt(local, serverCtrlEP, useNat);
 	}
 }

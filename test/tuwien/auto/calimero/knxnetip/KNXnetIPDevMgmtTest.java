@@ -230,7 +230,7 @@ public class KNXnetIPDevMgmtTest
 
 	private void newMgmt() throws KNXException, InterruptedException
 	{
-		m = new KNXnetIPDevMgmt(Util.getLocalHost(), Util.getServer(), false);
+		m = new KNXnetIPDevMgmt(Util.localEndpoint(), Util.getServer(), false);
 		m.addConnectionListener(l);
 	}
 }

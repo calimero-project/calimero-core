@@ -358,7 +358,7 @@ public class Discoverer
 		final List<InetAddress> l = Optional.ofNullable(ni).map(NetworkInterface::getInetAddresses)
 				.map(Collections::list).orElse(new ArrayList<>());
 		// use any assigned (IPv4) address of netif, otherwise, use host
-		final InetAddress addr = l.stream().filter(ia -> nat || ia instanceof Inet4Address).findFirst().orElse(host());
+		final InetAddress addr = l.stream().filter(ia -> nat || ia instanceof Inet4Address).findFirst().orElse(host(null));
 
 		final ReceiverLoop r = search(addr, localPort, ni, timeout);
 		if (wait) {
@@ -543,7 +543,7 @@ public class Discoverer
 	{
 		if (timeout <= 0 || timeout >= Integer.MAX_VALUE / 1000)
 			throw new KNXIllegalArgumentException("timeout out of range");
-		final DatagramSocket s = createSocket(true, host(), port, null, false);
+		final DatagramSocket s = createSocket(true, host(server.getAddress()), port, null, false);
 		try {
 			final byte[] buf = PacketHelper.toPacket(new DescriptionRequest(nat ? null
 					: (InetSocketAddress) s.getLocalSocketAddress()));
@@ -553,7 +553,7 @@ public class Discoverer
 			if (looper.thrown != null)
 				throw looper.thrown;
 			if (looper.res != null)
-				return new Result<>(looper.res, NetworkInterface.getByInetAddress(host()), host());
+				return new Result<>(looper.res, NetworkInterface.getByInetAddress(host(server.getAddress())), host(server.getAddress()));
 		}
 		catch (final IOException e) {
 			final String msg = "network failure on getting description from " + server;
@@ -689,9 +689,11 @@ public class Discoverer
 			l.t.join();
 	}
 
-	private synchronized InetAddress host() throws KNXException
+	private synchronized InetAddress host(final InetAddress remote) throws KNXException
 	{
 		try {
+			if (remote == null)
+				return InetAddress.getLocalHost();
 			if (host == null)
 				host = InetAddress.getLocalHost();
 			return host;

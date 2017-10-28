@@ -43,7 +43,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Iterator;
 import java.util.List;
@@ -287,7 +286,7 @@ public class DiscovererTest
 	private void doStartSearchIF(final Discoverer d, final boolean usesMulticast)
 		throws SocketException, KNXException, InterruptedException
 	{
-		d.startSearch(40000, NetworkInterface.getByInetAddress(Util.getLocalHost().getAddress()), timeout, true);
+		d.startSearch(40000, Util.localInterface(), timeout, true);
 		final List<Result<SearchResponse>> search = d.getSearchResponses();
 		assertTrue(search.size() > 0);
 		for (final Iterator<Result<SearchResponse>> i = search.iterator(); i.hasNext();) {
@@ -299,8 +298,8 @@ public class DiscovererTest
 		// start 2 searches concurrently
 		final int responses = d.getSearchResponses().size();
 		d.clearSearchResponses();
-		d.startSearch(30000, NetworkInterface.getByInetAddress(Util.getLocalHost().getAddress()), timeout, false);
-		d.startSearch(30001, NetworkInterface.getByInetAddress(Util.getLocalHost().getAddress()), timeout, false);
+		d.startSearch(30000, Util.localInterface(), timeout, false);
+		d.startSearch(30001, Util.localInterface(), timeout, false);
 		while (d.isSearching())
 			Thread.sleep(200);
 		final int expected = responses;
