@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,25 +36,24 @@
 
 package tuwien.auto.calimero.dptxlator;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.Util;
 
-/**
- * Test for DPTXlatorTime.
- * <p>
- *
- * @author B. Malinowsky
- */
-public class DPTXlatorTimeTest extends TestCase
+class DPTXlatorTimeTest
 {
 	private DPTXlatorTime t;
 	private final String[] values = new String[] { "mon, 00:00:00", "WED, 23:59:59", "  12:43:23  " };
@@ -63,34 +62,16 @@ public class DPTXlatorTimeTest extends TestCase
 	// wed, 22:33:44, offset 1
 	private final byte[] data = new byte[] { 0, 2 << 5 | 22, 33, 44, -1, -1 };
 
-	/**
-	 * @param name
-	 */
-	public DPTXlatorTimeTest(final String name)
+	@BeforeEach
+	void init() throws Exception
 	{
-		super(name);
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-		Util.setupLogging("DPTXlator");
 		t = new DPTXlatorTime(DPTXlatorTime.DPT_TIMEOFDAY);
 		// reset to default to not interfere with tests
-		DPTXlatorTime.useValueFormat(null);
+		DPTXlatorTime.useValueFormat(DPTXlatorTime.builder.toFormatter());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#setValues(java.lang.String[])}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testSetValues() throws KNXFormatException
+	@Test
+	void testSetValues() throws KNXFormatException
 	{
 		t.setValues(values);
 		assertEquals(3, t.getItems());
@@ -100,30 +81,20 @@ public class DPTXlatorTimeTest extends TestCase
 		assertEquals(1, t.getDayOfWeek());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#getAllValues()}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testGetAllValues() throws KNXFormatException
+	@Test
+	void testGetAllValues() throws KNXFormatException
 	{
 		assertEquals(1, t.getAllValues().length);
-		Helper.assertSimilar("no-day, 00:00:00", t.getAllValues()[0]);
+		Helper.assertSimilar("00:00:00", t.getAllValues()[0]);
 		t.setValues(values);
-		Assert.assertEquals(values.length, t.getAllValues().length);
+		assertEquals(values.length, t.getAllValues().length);
 		final String[] all = t.getAllValues();
 		for (int i = 0; i < values.length; i++)
-			Assert.assertTrue(all[i].toLowerCase()
-				.indexOf(values[i].toLowerCase().trim()) > -1);
+			assertTrue(all[i].toLowerCase().indexOf(values[i].toLowerCase().trim()) > -1);
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#setValue(java.lang.String)}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testSetValueString() throws KNXFormatException
+	@Test
+	void testSetValueString() throws KNXFormatException
 	{
 		assertEquals(1, t.getItems());
 		t.setValue(dpt.getLowerValue());
@@ -140,17 +111,15 @@ public class DPTXlatorTimeTest extends TestCase
 		assertEquals(59, t.getSecond());
 		assertEquals(7, t.getDayOfWeek());
 
-		try {
-			t.setValue("wed 23:24");
-			fail("not valid");
-		}
-		catch (final KNXFormatException e) {}
+		t.setValue("wed 23:24");
+		assertEquals(3, t.getDayOfWeek());
+		assertEquals(23, t.getHour());
+		assertEquals(24, t.getMinute());
+		assertEquals(0, t.getSecond());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#setData(byte[], int)}.
-	 */
-	public final void testSetDataByteArrayInt()
+	@Test
+	void testSetDataByteArrayInt()
 	{
 		t.setData(data, 1);
 		assertEquals(1, t.getItems());
@@ -160,18 +129,14 @@ public class DPTXlatorTimeTest extends TestCase
 		assertEquals(2, t.getDayOfWeek());
 
 		// on last value we use a reserved bit and therefore will see a warning
-		final byte[] d = new byte[] { 1 << 5 | 4, 5, 6, 2 << 5 | 7, 8, 9,
-			10, 1 << 6 | 11, 12 };
+		final byte[] d = new byte[] { 1 << 5 | 4, 5, 6, 2 << 5 | 7, 8, 9, 10, 1 << 6 | 11, 12 };
 		t.setData(d, 0);
 		assertEquals(3, t.getItems());
-		Helper.assertSimilar(new String[] { "mon, 04:05:06", "tue, 07:08:09",
-			"no-day, 10:11:12" }, t.getAllValues());
+		Helper.assertSimilar(new String[] { "mon, 04:05:06", "tue, 07:08:09", "10:11:12" }, t.getAllValues());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#getData(byte[], int)}.
-	 */
-	public final void testGetDataByteArrayInt()
+	@Test
+	void testGetDataByteArrayInt()
 	{
 		byte[] d = t.getData(new byte[5], 2);
 		for (int i = 0; i < d.length; ++i)
@@ -182,20 +147,15 @@ public class DPTXlatorTimeTest extends TestCase
 			assertEquals(data[i], d[i]);
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#getSubTypes()}.
-	 */
-	public final void testGetSubTypes()
+	@Test
+	void testGetSubTypes()
 	{
 		assertEquals(1, t.getSubTypes().size());
 		t.getSubTypes().containsKey(dpt.getID());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#setValue(int, int, int, int)}.
-	 */
-	public final void testSetValueIntIntIntInt()
+	@Test
+	void testSetValueIntIntIntInt()
 	{
 		t.setValue(6, 15, 16, 17);
 		assertEquals(15, t.getHour());
@@ -222,22 +182,19 @@ public class DPTXlatorTimeTest extends TestCase
 		catch (final KNXIllegalArgumentException e) {}
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#getDayOfWeek()}.
-	 */
-	public final void testInitialGet()
+	@Test
+	void testInitialGet()
 	{
 		assertEquals(1, t.getItems());
 		assertEquals(0, t.getDayOfWeek());
 		assertEquals(0, t.getHour());
 		assertEquals(0, t.getMinute());
 		assertEquals(0, t.getSecond());
+		assertEquals("00:00:00", t.getValue());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#setValue(long)}.
-	 */
-	public final void testSetValueLong()
+	@Test
+	void testSetValueLong()
 	{
 		final Calendar c = Calendar.getInstance();
 		t.setValue(c.getTimeInMillis());
@@ -251,10 +208,8 @@ public class DPTXlatorTimeTest extends TestCase
 		assertEquals(c.get(Calendar.SECOND), t.getSecond());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#getValueMilliseconds()}.
-	 */
-	public final void testGetValueMilliseconds()
+	@Test
+	void testGetValueMilliseconds()
 	{
 		final Calendar c = Calendar.getInstance();
 		final SimpleDateFormat sdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
@@ -275,7 +230,8 @@ public class DPTXlatorTimeTest extends TestCase
 		assertEquals(c.get(Calendar.SECOND), t.getSecond());
 	}
 
-	public void testLocalTime()
+	@Test
+	void testLocalTime()
 	{
 		final LocalTime time = t.localTime();
 		assertEquals(time.getHour(), t.getHour());
@@ -283,15 +239,10 @@ public class DPTXlatorTimeTest extends TestCase
 		assertEquals(time.getSecond(), t.getSecond());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorTime#useValueFormat (java.lang.String)}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testUseValueFormat() throws KNXFormatException
+	@Test
+	void testUseValueFormat() throws KNXFormatException
 	{
-		DPTXlatorTime.useValueFormat("yyMMdd HHmmss");
+		DPTXlatorTime.useValueFormat("[uuMMdd ]HHmmss");
 		final String v = "071020 223344";
 		t.setValue(v);
 		assertEquals(22, t.getHour());
@@ -300,5 +251,15 @@ public class DPTXlatorTimeTest extends TestCase
 		assertEquals(6, t.getDayOfWeek());
 		final String s = t.getValue();
 		assertEquals(v.substring(v.indexOf(' ')), s.substring(s.indexOf(' ')));
+	}
+
+	@Test
+	void dayOfWeek()
+	{
+		assertFalse(t.dayOfWeek().isPresent());
+		for (int dow = 1; dow < 8; dow++) {
+			t.setValue(dow, 0, 0, 0);
+			assertEquals(DayOfWeek.of(dow), t.dayOfWeek().get());
+		}
 	}
 }
