@@ -583,8 +583,9 @@ public class ManagementClientImpl implements ManagementClient
 				svcResponse = 0;
 			}
 		}
+
 		if (responses.isEmpty())
-			throw new KNXTimeoutException("timeout waiting for property read response");
+			throw new KNXRemoteException("property access OI " + objIndex + " PID " + propertyId + " failed/forbidden");
 		return responses;
 	}
 
