@@ -109,6 +109,13 @@ import tuwien.auto.calimero.serial.usb.TransferProtocolHeader.Protocol;
  */
 public class UsbConnection implements AutoCloseable
 {
+	private static class KnxRuntimeException extends RuntimeException {
+		private static final long serialVersionUID = -1;
+		public KnxRuntimeException(final String message, final Throwable cause) {
+			super(message, cause);
+		}
+	}
+
 	/**
 	 * Available EMI types and their respective bit value representation.
 	 */
@@ -297,7 +304,7 @@ public class UsbConnection implements AutoCloseable
 		try {
 			printDevices();
 		}
-		catch (final SecurityException | UsbException e) {
+		catch (final KnxRuntimeException e) {
 			slogger.error("Enumerate USB devices, " + e);
 		}
 		try {
@@ -310,7 +317,7 @@ public class UsbConnection implements AutoCloseable
 			}
 			slogger.info("Found KNX USB devices:{}", sb.length() == 0 ? " none" : sb);
 		}
-		catch (final SecurityException | UsbException e) {}
+		catch (final RuntimeException e) {}
 	}
 
 	/**
@@ -325,7 +332,7 @@ public class UsbConnection implements AutoCloseable
 		((org.usb4java.javax.Services) UsbHostManager.getUsbServices()).scan();
 	}
 
-	public static List<UsbDevice> getDevices() throws SecurityException, UsbException
+	public static List<UsbDevice> getDevices()
 	{
 		return collect(getRootHub());
 	}
@@ -334,10 +341,8 @@ public class UsbConnection implements AutoCloseable
 	 * Returns the list of KNX devices currently attached to the host, based on known KNX vendor IDs.
 	 *
 	 * @return the list of found KNX devices
-	 * @throws SecurityException on error accessing javax.usb
-	 * @throws UsbException on error accessing javax.usb
 	 */
-	public static List<UsbDevice> getKnxDevices() throws SecurityException, UsbException
+	public static List<UsbDevice> getKnxDevices()
 	{
 		final List<UsbDevice> knx = new ArrayList<>();
 		for (final UsbDevice d : getDevices()) {
@@ -350,7 +355,7 @@ public class UsbConnection implements AutoCloseable
 	}
 
 	// internal use only
-	public static List<UsbDevice> getVirtualSerialKnxDevices() throws SecurityException, UsbException
+	public static List<UsbDevice> getVirtualSerialKnxDevices() throws SecurityException
 	{
 		final List<UsbDevice> knx = new ArrayList<>();
 		for (final UsbDevice d : getDevices()) {
@@ -365,7 +370,7 @@ public class UsbConnection implements AutoCloseable
 		return knx;
 	}
 
-	public static void printDevices() throws SecurityException, UsbException
+	public static void printDevices()
 	{
 		final StringBuilder sb = new StringBuilder();
 		traverse(getRootHub(), sb, "");
@@ -465,6 +470,7 @@ public class UsbConnection implements AutoCloseable
 		listeners.remove(l);
 	}
 
+	@SuppressWarnings("unused")
 	public void send(final HidReport report, final boolean blocking) throws KNXPortClosedException, KNXTimeoutException
 	{
 		try {
@@ -799,9 +805,14 @@ public class UsbConnection implements AutoCloseable
 		listeners.fire(l -> l.frameReceived(fe));
 	}
 
-	private static UsbHub getRootHub() throws SecurityException, UsbException
+	private static UsbHub getRootHub()
 	{
-		return UsbHostManager.getUsbServices().getRootUsbHub();
+		try {
+			return UsbHostManager.getUsbServices().getRootUsbHub();
+		}
+		catch (final UsbException | SecurityException e) {
+			throw new KnxRuntimeException("Accessing USB root hub", e);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -812,12 +823,7 @@ public class UsbConnection implements AutoCloseable
 
 	private static UsbDevice findDevice(final int vendorId, final int productId) throws KNXException
 	{
-		try {
-			return findDevice(getRootHub(), vendorId, productId);
-		}
-		catch (final SecurityException | UsbException e) {
-			throw new KNXException("Accessing USB root hub", e);
-		}
+		return findDevice(getRootHub(), vendorId, productId);
 	}
 
 	private static UsbDevice findDevice(final UsbHub hub, final int vendorId, final int productId) throws KNXException
@@ -853,7 +859,7 @@ public class UsbConnection implements AutoCloseable
 			return findDeviceByNameLowLevel(device);
 //			return findDeviceByName(getRootHub(), device.toLowerCase());
 		}
-		catch (final SecurityException | UsbException | UsbDisconnectedException e) {
+		catch (final SecurityException | UsbDisconnectedException e) {
 			throw new KNXException("find USB device matching '" + device + "'", e);
 		}
 	}
