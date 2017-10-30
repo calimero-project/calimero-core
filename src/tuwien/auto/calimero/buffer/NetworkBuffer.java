@@ -226,6 +226,12 @@ public final class NetworkBuffer implements AutoCloseable
 				listeners.removeAll();
 			}
 
+			@Override
+			public String toString()
+			{
+				return "network buffer " + base;
+			}
+
 			private boolean doBufferedResponse(final KNXAddress dst, final byte[] nsdu)
 				throws KNXTimeoutException
 			{
