@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@
 
 package tuwien.auto.calimero.dptxlator;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 
 import junit.framework.TestCase;
@@ -385,7 +386,7 @@ public class DPTXlator8BitUnsignedTest extends TestCase
 		assertEquals(100, tscaled.getValueUnsigned());
 		assertEquals(255, tscaled.getValueUnscaled());
 		Helper.assertSimilar(maxScale, tscaled.getValue());
-		final int[] scaledRaw = { 33, 0, 227 };
+		final int[] scaledRaw = { 34, 0, 227 };
 		for (int i = 0; i < scaledRaw.length; i++) {
 			tscaled.setValueUnscaled(scaledRaw[i]);
 			assertEquals(values[i], tscaled.getValueUnsigned());
@@ -402,15 +403,54 @@ public class DPTXlator8BitUnsignedTest extends TestCase
 		assertEquals(360, tangle.getValueUnsigned());
 		assertEquals(255, tangle.getValueUnscaled());
 		final int[] angleRaw = { 9, 0, 63 };
+		final DecimalFormat fmt = new DecimalFormat("##.#");
+		final String[] scaled = { fmt.format(12.7d), min, fmt.format(88.9d) };
 		for (int i = 0; i < angleRaw.length; i++) {
 			tangle.setValueUnscaled(angleRaw[i]);
 			assertEquals(values[i], tangle.getValueUnsigned());
-			Helper.assertSimilar(strings[i], tangle.getValue());
+			Helper.assertSimilar(scaled[i], tangle.getValue());
 		}
 		for (int i = 0; i < valuesRaw.length; i++) {
 			tangle.setValueUnscaled(valuesRaw[i]);
 			assertEquals(data[i], tangle.getData()[0]);
 			assertEquals(1, tscaled.getData().length);
+		}
+	}
+
+	public void testSetValuesWithFloatingPointNumbers() throws KNXFormatException {
+		final String values[] = { "0.0", "1.0e0", "11.1" };
+		for (final DPT dpt : dpts) {
+			final DPTXlator x = new DPTXlator8BitUnsigned(dpt);
+			x.setValues(values);
+		}
+	}
+
+	public void testScalingWithFloatingPointNumbers() throws KNXFormatException {
+		final DPTXlator x = new DPTXlator8BitUnsigned(DPTXlator8BitUnsigned.DPT_SCALING);
+		final double max = 100d;
+		x.setValue(max + " %");
+		assertEquals("100 %", x.getValue());
+		assertEquals(max, x.getNumericValue());
+
+		final double scaled = 80d * 100 / 255;
+		x.setValue(String.valueOf(scaled));
+		assertEquals(80, x.getData()[0] & 0xff);
+		assertEquals(String.format("%.1f %%", scaled), x.getValue());
+		assertEquals(scaled, x.getNumericValue());
+	}
+
+	public void testGetNumericValue() throws KNXFormatException {
+		for (final DPT dpt : dpts) {
+			final DPTXlator x = new DPTXlator8BitUnsigned(dpt);
+			assertEquals(0d,  x.getNumericValue(), 0);
+		}
+		final double scaled = (Math.round(12.345d * 255 / 100)) * 100d / 255;
+		final double angle = (Math.round(12.345d * 255 / 360)) * 360d / 255;
+		final double values[] = { scaled, angle, 12, 12, 12, 12 };
+		for (int i = 0; i < dpts.length; i++) {
+			final DPTXlator x = new DPTXlator8BitUnsigned(dpts[i]);
+			x.setValue("12.345");
+			assertEquals(x.getType().getDescription(), values[i],  x.getNumericValue());
 		}
 	}
 }

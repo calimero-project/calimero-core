@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@
 
 package tuwien.auto.calimero.dptxlator;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,17 +47,20 @@ import tuwien.auto.calimero.KNXFormatException;
  * <p>
  * The KNX data type width is 1 byte.<br>
  * The default return value after creation is 0.<br>
- * Note, that {@link #DPT_SCALING} and {@link #DPT_ANGLE} are scaled representations,
- * which means the DPT's value ranges [0..100] respectively [0..360] are mapped to the 8
- * Bit KNX value range [0..255], with mapped values rounded to the next nearest integer
- * value.
+ * Note, that {@link #DPT_SCALING} and {@link #DPT_ANGLE} are scaled representations, which means the DPT's value ranges
+ * [0..100] respectively [0..360] are mapped to the 8 Bit KNX value range [0..255], with mapped values rounded to the
+ * next nearest integer value.
  * <p>
- * In value methods expecting string items, the item might be formatted using decimal,
- * hexadecimal, and octal numbers, distinguished by using these prefixes:
+ * In value methods expecting string items, an item containing a floating point number is parsed according to
+ * {@link Double#parseDouble(String)}, an item containg a value without a fractional component might be formatted using
+ * decimal, hexadecimal, and octal numbers, distinguished by using these prefixes:
  * <dl>
- * <dt>no prefix</dt><dd>for decimal numeral</dd>
- * <dt><code>0x</code>, <code>0X</code>, <code>#</code><dd>for hexadecimal numeral</dd>
- * <dt><code>0</code><dd>for octal numeral</dd>
+ * <dt>no prefix</dt>
+ * <dd>for decimal numeral</dd>
+ * <dt><code>0x</code>, <code>0X</code>, <code>#</code>
+ * <dd>for hexadecimal numeral</dd>
+ * <dt><code>0</code>
+ * <dd>for octal numeral</dd>
  * </dl>
  */
 public class DPTXlator8BitUnsigned extends DPTXlator
@@ -187,7 +191,7 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	@Override
 	public final double getNumericValue()
 	{
-		return getValueUnsigned();
+		return toValue(data[0]);
 	}
 
 	/**
@@ -263,6 +267,15 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 		data = new short[1];
 	}
 
+	private double toValue(final short data)
+	{
+		if (dpt.equals(DPT_SCALING))
+			return data * 100.0d / 255;
+		if (dpt.equals(DPT_ANGLE))
+			return data * 360.0d / 255;
+		return data;
+	}
+
 	private short fromDPT(final short data)
 	{
 		short value = data;
@@ -275,7 +288,8 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 
 	private String makeString(final int index)
 	{
-		return appendUnit(Short.toString(fromDPT(data[index])));
+		final String s = new DecimalFormat("##.#").format(toValue(data[index]));
+		return appendUnit(s);
 	}
 
 	@Override
@@ -283,28 +297,32 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 		throws KNXFormatException
 	{
 		try {
-			dst[index] = toDPT(Short.decode(removeUnit(value)).shortValue());
+			try {
+				dst[index] = toDPT(Double.parseDouble(removeUnit(value)));
+			}
+			catch (final NumberFormatException e) {
+				dst[index] = toDPT(Short.decode(removeUnit(value)).shortValue());
+			}
 		}
 		catch (final NumberFormatException e) {
 			throw newException("wrong value format", value);
 		}
 	}
 
-	private short toDPT(final int value) throws KNXFormatException
+	private short toDPT(final double value) throws KNXFormatException
 	{
 		try {
 			if (value < 0 || value > Integer.parseInt(dpt.getUpperValue()))
 				throw newException("translation error, input value out of range ["
-						+ dpt.getLowerValue() + ".." + dpt.getUpperValue() + "]", Integer.toString(value));
+						+ dpt.getLowerValue() + ".." + dpt.getUpperValue() + "]", Double.toString(value));
 		}
 		catch (final NumberFormatException e) {
 			throw newException("parsing upper limit of " + dpt, dpt.getUpperValue());
 		}
-		int convert = value;
 		if (dpt.equals(DPT_SCALING))
-			convert = Math.round(value * 255.0f / 100);
-		else if (dpt.equals(DPT_ANGLE))
-			convert = Math.round(value * 255.0f / 360);
-		return (short) convert;
+			return (short) Math.round(value * 255 / 100);
+		if (dpt.equals(DPT_ANGLE))
+			return (short) Math.round(value * 255 / 360);
+		return (short) value;
 	}
 }
