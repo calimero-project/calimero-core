@@ -13,5 +13,5 @@ cache:
     - $HOME/.gradle/wrapper/
 
 before_script:
-  - (gradle -p test/testnetwork-launcher run &)
+  - (./gradlew -p test/testnetwork-launcher run &)
   - sleep 10
