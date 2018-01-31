@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -47,6 +48,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -454,5 +457,25 @@ public class KNXNetworkLinkIPTest
 		n = rtr.getName();
 		assertNotNull(n);
 		assertTrue(n.indexOf(KNXnetIPRouting.DEFAULT_MULTICAST) > -1);
+	}
+
+	@Test
+	void runNotifierOnlyAfterEstablishingConnection()
+	{
+		// create some links that fail during construction
+		final InetSocketAddress sa = new InetSocketAddress(0);
+		assertThrows(KNXException.class, () -> KNXNetworkLinkIP.newTunnelingLink(sa, sa, false, TPSettings.TP1),
+				"no KNXnet/IP server with wildcard IP");
+		assertThrows(KNXException.class, () -> KNXNetworkLinkIP.newTunnelingLink(sa,
+				new InetSocketAddress("1.0.0.1", 3671), false, TPSettings.TP1), "no KNXnet/IP server with that IP");
+
+		final Thread[] threads = new Thread[Thread.activeCount() + 10];
+		final int active = Thread.enumerate(threads);
+		assertTrue(active <= threads.length);
+
+		final List<Thread> list = Arrays.asList(threads).subList(0, active);
+		final long cnt = list.stream().map(Thread::getName).filter(s -> s.equals("Calimero link notifier")).count();
+		// we should only have our two initial link notifiers running, not the failed ones
+		assertEquals(2, cnt, "running notifiers");
 	}
 }

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -179,30 +179,7 @@ public class KNXNetworkLinkIP extends AbstractLink
 	protected KNXNetworkLinkIP(final int serviceMode, final InetSocketAddress localEP, final InetSocketAddress remoteEP,
 		final boolean useNAT, final KNXMediumSettings settings) throws KNXException, InterruptedException
 	{
-		super(null, createLinkName(remoteEP), settings);
-		switch (serviceMode) {
-		case TUNNELING:
-			final InetSocketAddress local = localEP == null ? new InetSocketAddress(0) : localEP;
-			conn = new KNXnetIPTunnel(LinkLayer, local, remoteEP, useNAT);
-			break;
-		case ROUTING:
-			NetworkInterface netIf = null;
-			if (localEP != null && !localEP.isUnresolved())
-				try {
-					netIf = NetworkInterface.getByInetAddress(localEP.getAddress());
-				}
-				catch (final SocketException e) {
-					throw new KNXException("error getting network interface: " + e.getMessage());
-				}
-			final InetAddress mcast = remoteEP != null ? remoteEP.getAddress() : null;
-			conn = new KNXnetIPRouting(netIf, mcast);
-			break;
-		default:
-			throw new KNXIllegalArgumentException("unknown service mode");
-		}
-		cEMI = true;
-		mode = serviceMode;
-		conn.addConnectionListener(notifier);
+		this(serviceMode, newConnection(serviceMode, localEP, remoteEP, useNAT), settings);
 	}
 
 	/**
@@ -275,10 +252,27 @@ public class KNXNetworkLinkIP extends AbstractLink
 		}
 	}
 
-	@Override
-	protected void onClose()
+	private static KNXnetIPConnection newConnection(final int serviceMode, final InetSocketAddress localEP,
+		final InetSocketAddress remoteEP, final boolean useNAT) throws KNXException, InterruptedException
 	{
-		conn.close();
+		switch (serviceMode) {
+		case TUNNELING:
+			final InetSocketAddress local = localEP == null ? new InetSocketAddress(0) : localEP;
+			return new KNXnetIPTunnel(LinkLayer, local, remoteEP, useNAT);
+		case ROUTING:
+			NetworkInterface netIf = null;
+			if (localEP != null && !localEP.isUnresolved())
+				try {
+					netIf = NetworkInterface.getByInetAddress(localEP.getAddress());
+				}
+				catch (final SocketException e) {
+					throw new KNXException("error getting network interface: " + e.getMessage());
+				}
+			final InetAddress mcast = remoteEP != null ? remoteEP.getAddress() : null;
+			return new KNXnetIPRouting(netIf, mcast);
+		default:
+			throw new KNXIllegalArgumentException("unknown service mode " + serviceMode);
+		}
 	}
 
 	private static String createLinkName(final InetSocketAddress endpt)
