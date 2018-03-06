@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -106,7 +106,7 @@ public class PositiveListCache extends ExpiringCache
 		else {
 			posList = new HashSet<>(positiveList);
 			// remove old keys not in the new list anymore
-			for (final Iterator<Object> i = map.keySet().iterator(); i.hasNext(); )
+			for (final Iterator<Object> i = map.keySet().iterator(); i.hasNext();)
 				if (!posList.contains(i.next()))
 					i.remove();
 		}

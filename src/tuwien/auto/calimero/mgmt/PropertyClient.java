@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -750,7 +750,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		@Override
 		public Collection<Property> load(final String resource) throws KNXMLException
 		{
-			try (final XmlReader r = XmlInputFactory.newInstance().createXMLReader(resource)) {
+			try (XmlReader r = XmlInputFactory.newInstance().createXMLReader(resource)) {
 				return load(r);
 			}
 		}
@@ -793,7 +793,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		@Override
 		public void save(final String resource, final Collection<Property> definitions)
 		{
-			try (final XmlWriter w = XmlOutputFactory.newInstance().createXMLWriter(resource)) {
+			try (XmlWriter w = XmlOutputFactory.newInstance().createXMLWriter(resource)) {
 				w.writeStartDocument("UTF-8", "1.0");
 				save(w, definitions);
 				w.writeEndDocument();

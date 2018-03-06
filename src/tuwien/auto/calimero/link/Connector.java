@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2017 B. Malinowsky
+    Copyright (c) 2015, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -78,7 +78,7 @@ public final class Connector
 	private boolean onSend = true;
 	private long reconnectWait = 2000; // [ms]
 	// reconnect on disconnect caused by:
-	private boolean initialError = false;
+	private boolean initialError;
 	private boolean serverError = true;
 	private boolean internalError = true;
 

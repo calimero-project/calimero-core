@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2017 B. Malinowsky
+    Copyright (c) 2010, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -191,9 +191,6 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		detachMgmtClient = false;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementProcedures#readAddress()
-	 */
 	@Override
 	public IndividualAddress[] readAddress() throws KNXException, InterruptedException
 	{
@@ -230,16 +227,12 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementProcedures
-	 * #writeAddress(tuwien.auto.calimero.IndividualAddress)
-	 */
 	@Override
 	public boolean writeAddress(final IndividualAddress newAddress) throws KNXException,
 		InterruptedException
 	{
 		boolean exists = false;
-		try (final Destination dst = getOrCreateDestination(newAddress)) {
+		try (Destination dst = getOrCreateDestination(newAddress)) {
 			mc.readDeviceDesc(dst, 0);
 			exists = true;
 		}
@@ -253,7 +246,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		boolean setAddr = false;
 		synchronized (mc) {
 			final int oldTimeout = mc.getResponseTimeout();
-			try (final Destination verify = mc.createDestination(newAddress, true)) {
+			try (Destination verify = mc.createDestination(newAddress, true)) {
 				mc.setResponseTimeout(1);
 				// ??? this does not conform to spec, where no max. attempts are given
 				// the problem is that we potentially loop forever (which would be correct)
@@ -290,14 +283,11 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementProcedures#resetAddress()
-	 */
 	@Override
 	public void resetAddress() throws KNXException, InterruptedException
 	{
 		final IndividualAddress def = new IndividualAddress(0xffff);
-		try (final Destination dst = mc.createDestination(def, true)) {
+		try (Destination dst = mc.createDestination(def, true)) {
 			while (true) {
 				mc.writeAddress(def);
 				mc.restart(dst);
@@ -312,15 +302,11 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementProcedures
-	 * #isAddressOccupied(tuwien.auto.calimero.IndividualAddress)
-	 */
 	@Override
 	public boolean isAddressOccupied(final IndividualAddress devAddr)
 		throws KNXException, InterruptedException
 	{
-		try (final Destination dst = mc.createDestination(devAddr, true)) {
+		try (Destination dst = mc.createDestination(devAddr, true)) {
 			mc.readDeviceDesc(dst, 0);
 		}
 		catch (final KNXTimeoutException e) {
@@ -334,9 +320,6 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementProcedures#readAddress(byte[])
-	 */
 	@Override
 	public IndividualAddress readAddress(final byte[] serialNo) throws KNXException,
 		InterruptedException
@@ -344,10 +327,6 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		return mc.readAddress(serialNo);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementProcedures
-	 * #writeAddress(byte[], tuwien.auto.calimero.IndividualAddress)
-	 */
 	@Override
 	public boolean writeAddress(final byte[] serialNo, final IndividualAddress newAddress)
 		throws KNXException, InterruptedException
@@ -368,9 +347,6 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		//		+ newAddress);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementProcedures#scanNetworkRouters()
-	 */
 	@Override
 	public IndividualAddress[] scanNetworkRouters() throws KNXTimeoutException,
 		KNXLinkClosedException, InterruptedException
@@ -381,9 +357,6 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		return scanAddresses(addresses, true);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementProcedures#scanNetworkDevices(int, int)
-	 */
 	@Override
 	public IndividualAddress[] scanNetworkDevices(final int area, final int line)
 		throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
@@ -414,15 +387,12 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		scanAddresses(addresses, false, device);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementProcedures#scanSerialNumbers(int)
-	 */
 	@Override
 	public List<byte[]> scanSerialNumbers(final int medium) throws KNXException, InterruptedException
 	{
 		synchronized (mc) {
 			final int oldTimeout = mc.getResponseTimeout();
-			try (final Destination dst = mc.createDestination(new IndividualAddress(0, medium, 0xff), true)) {
+			try (Destination dst = mc.createDestination(new IndividualAddress(0, medium, 0xff), true)) {
 				mc.setResponseTimeout(7);
 				return ((ManagementClientImpl) mc).readProperty2(dst, 0,
 						PropertyAccess.PID.SERIAL_NUMBER, 1, 1);
@@ -437,11 +407,6 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		return Collections.emptyList();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementProcedures#setProgrammingMode
-	 * (tuwien.auto.calimero.IndividualAddress, boolean)
-	 */
 	@Override
 	public void setProgrammingMode(final IndividualAddress device, final boolean programming)
 		throws KNXException, InterruptedException
@@ -470,11 +435,6 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		mc.writeMemory(d, memAddrProgMode, mem);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.ManagementProcedures#writeMemory
-	 * (tuwien.auto.calimero.IndividualAddress, long, byte[], boolean, boolean)
-	 */
 	@Override
 	public void writeMemory(final IndividualAddress device, final long startAddress,
 		final byte[] data, final boolean verifyWrite, final boolean verifyByServer)

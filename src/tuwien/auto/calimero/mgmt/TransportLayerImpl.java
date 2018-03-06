@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,9 +42,9 @@ import static tuwien.auto.calimero.mgmt.Destination.State.Disconnected;
 import static tuwien.auto.calimero.mgmt.Destination.State.OpenIdle;
 import static tuwien.auto.calimero.mgmt.Destination.State.OpenWait;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -169,7 +169,7 @@ public class TransportLayerImpl implements TransportLayer
 	private volatile boolean detached;
 	private final KNXNetworkLink lnk;
 	private final NetworkLinkListener lnkListener = new NLListener();
-	private final List<FrameEvent> indications = new LinkedList<>();
+	private final Deque<FrameEvent> indications = new ArrayDeque<>();
 	private final EventListeners<TransportListener> listeners;
 
 	// holds the mapping of connection destination address to proxy
@@ -548,13 +548,13 @@ public class TransportLayerImpl implements TransportLayer
 
 	private boolean waitForAck() throws KNXTimeoutException, KNXDisconnectException, KNXLinkClosedException
 	{
-		long remaining = ACK_TIMEOUT * 1000;
+		long remaining = ACK_TIMEOUT * 1000L;
 		final long end = System.currentTimeMillis() + remaining;
 		final Destination d = active.getDestination();
 		while (remaining > 0) {
 			try {
 				while (indications.size() > 0)
-					handleConnected((CEMILData) indications.remove(0).getFrame(), active);
+					handleConnected((CEMILData) indications.remove().getFrame(), active);
 				if (d.getState() == Disconnected || d.getState() == Destroyed)
 					throw new KNXDisconnectException(d.getAddress() + " disconnected while awaiting ACK", d);
 				if (d.getState() == OpenIdle)
@@ -593,8 +593,8 @@ public class TransportLayerImpl implements TransportLayer
 	{
 		p.setState(Disconnected);
 		// TODO add initiated by user and refactor into a method
-		p.getDestination().disconnectedBy = sendDisconnectReq ?
-				Destination.LOCAL_ENDPOINT : Destination.REMOTE_ENDPOINT;
+		p.getDestination().disconnectedBy = sendDisconnectReq ? Destination.LOCAL_ENDPOINT
+				: Destination.REMOTE_ENDPOINT;
 		try {
 			if (sendDisconnectReq)
 				sendDisconnect(p.getDestination().getAddress());

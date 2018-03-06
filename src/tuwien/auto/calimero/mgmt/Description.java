@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -98,7 +98,7 @@ public final class Description
 		pindex = data[2] & 0xff;
 		write = (data[3] & 0x80) == 0x80 ? true : false;
 		pdt = data[3] & 0x3f;
-		maxElems = (data[4] & 0xff) << 8 | data[5] & 0xff;
+		maxElems = (data[4] & 0xff) << 8 | (data[5] & 0xff);
 		currElems = currentElements;
 		rLevel = (data[6] & 0xff) >> 4;
 		wLevel = data[6] & 0x0f;
@@ -278,7 +278,7 @@ public final class Description
 		data[3] |= pdt & 0x3f;
 		data[4] = (byte) (maxElems >> 8);
 		data[5] = (byte) maxElems;
-		data[6] = (byte) (rLevel << 4 | wLevel & 0x0f);
+		data[6] = (byte) (rLevel << 4 | (wLevel & 0x0f));
 		return data;
 	}
 
@@ -287,7 +287,7 @@ public final class Description
 	{
 		int elems = 0;
 		for (int i = 0; i < data.length; ++i)
-			elems = elems << 8 | data[i] & 0xff;
+			elems = elems << 8 | (data[i] & 0xff);
 		return elems;
 	}
 

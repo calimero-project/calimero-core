@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2017 B. Malinowsky
+    Copyright (c) 2017, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ public class DptXlatorMeteringValue extends DPTXlator
 
 	private static final Map<String, DPT> types = new HashMap<>();
 
-	private final static int dimensionlessCounter = 0b10111010;
+	private static final int dimensionlessCounter = 0b10111010;
 	private final DptXlator8BitSet status = new DptXlator8BitSet(DptXlator8BitSet.DptGeneralStatus);
 	private final DPTXlator4ByteSigned cv = new DPTXlator4ByteSigned(DPTXlator4ByteSigned.DPT_COUNT);
 

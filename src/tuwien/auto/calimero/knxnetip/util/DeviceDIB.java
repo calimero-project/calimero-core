@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ package tuwien.auto.calimero.knxnetip.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -83,7 +84,7 @@ public class DeviceDIB extends DIB
 	private final byte[] serial = new byte[6];
 	private final int installationId;
 	private final IndividualAddress address;
-	private final byte[] mcast = new byte[4];
+	private final byte[] mcast;
 	private final byte[] mac = new byte[6];
 	private final String name;
 
@@ -108,11 +109,12 @@ public class DeviceDIB extends DIB
 			new byte[] { (byte) is.read(), (byte) is.read(), });
 		installationId = (is.read() << 8) | is.read();
 		is.read(serial, 0, serial.length);
+		mcast = new byte[4];
 		is.read(mcast, 0, mcast.length);
 		is.read(mac, 0, mac.length);
 
 		// device friendly name is optional
-		final StringBuffer sbuf = new StringBuffer(30);
+		final StringBuilder sbuf = new StringBuilder(30);
 		int i = 30;
 		for (int c = is.read(); i > 0 && c > 0; --i, c = is.read())
 			sbuf.append((char) c);
@@ -138,8 +140,8 @@ public class DeviceDIB extends DIB
 	 * @param knxAddress KNX individual address
 	 * @param serialNumber KNX serial number of the device, used to identify the device,
 	 *        <code>serialNumber.length == 6</code>
-	 * @param routingMulticast KNXnet/IP routing multicast address for a routing device, <code>null</code> 0.0.0.0 if
-	 *        the device does not support routing
+	 * @param routingMulticast KNXnet/IP IPv4 routing multicast address for a routing device, use IPv4 <code>0.0.0.0</code>
+	 *        if the device does not support routing
 	 * @param macAddress device Ethernet MAC address, <code>macAddress.length == 6</code>
 	 */
 	public DeviceDIB(final String friendlyName, final int deviceStatus,
@@ -181,12 +183,10 @@ public class DeviceDIB extends DIB
 
 		address = knxAddress;
 
-		final byte[] empty = new byte[] { 0, 0, 0, 0 };
-		final byte[] rmc = routingMulticast == null ? empty : routingMulticast.getAddress();
-		if (!Arrays.equals(rmc, empty) && !routingMulticast.isMulticastAddress())
-			throw new KNXIllegalArgumentException(routingMulticast.toString() + " is not a multicast address");
-		for (int i = 0; i < mcast.length; i++)
-			mcast[i] = rmc[i];
+		if (!(routingMulticast instanceof Inet4Address
+				&& (routingMulticast.isAnyLocalAddress() || routingMulticast.isMulticastAddress())))
+			throw new KNXIllegalArgumentException(routingMulticast.toString() + " is not an IPv4 multicast address");
+		mcast = routingMulticast.getAddress();
 
 		if (macAddress.length != mac.length)
 			throw new KNXIllegalArgumentException("MAC address length not equal to " + mac.length + " bytes");
@@ -365,9 +365,9 @@ public class DeviceDIB extends DIB
 		}
 		catch (final UnknownHostException ignore) {}
 		return "\"" + name + "\", KNX address " + address + ", KNX medium " + getKNXMediumString()
-				+ ", installation " + getInstallation() + " - project " + getProject()
+				+ ", Installation " + getInstallation() + " - Project " + getProject()
 				+ " (ID " + installationId + ")"
-				+ ", routing multicast address " + mc + ", MAC address " + getMACAddressString()
+				+ ", KNX IP multicast address " + mc + ", MAC address " + getMACAddressString()
 				+ ", S/N 0x" + getSerialNumberString();
 	}
 

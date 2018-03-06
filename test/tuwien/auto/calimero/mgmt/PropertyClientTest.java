@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -378,7 +378,7 @@ public class PropertyClientTest
 
 	private void printDesc(final Description d)
 	{
-		final StringBuffer buf = new StringBuffer();
+		final StringBuilder buf = new StringBuilder();
 		buf.append("OT=" + d.getObjectType());
 		buf.append(", OI=" + d.getObjectIndex());
 		buf.append(", PID=" + d.getPID());

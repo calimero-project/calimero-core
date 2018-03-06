@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2017 B. Malinowsky
+    Copyright (c) 2009, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -262,7 +262,7 @@ public class DPTXlator4ByteFloatTest extends TestCase
 		}
 		Locale.setDefault(saved);
 		// check if outputs are the same
-		for(int i = 1; i < output.size(); ++i) {
+		for (int i = 1; i < output.size(); ++i) {
 			final String first = output.get(i - 1);
 			final String second = output.get(i);
 			assertEquals(first, second);

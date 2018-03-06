@@ -418,7 +418,7 @@ public class DPTXlator8BitUnsignedTest extends TestCase
 	}
 
 	public void testSetValuesWithFloatingPointNumbers() throws KNXFormatException {
-		final String values[] = { "0.0", "1.0e0", "11.1" };
+		final String[] values = { "0.0", "1.0e0", "11.1" };
 		for (final DPT dpt : dpts) {
 			final DPTXlator x = new DPTXlator8BitUnsigned(dpt);
 			x.setValues(values);
@@ -446,7 +446,7 @@ public class DPTXlator8BitUnsignedTest extends TestCase
 		}
 		final double scaled = (Math.round(12.345d * 255 / 100)) * 100d / 255;
 		final double angle = (Math.round(12.345d * 255 / 360)) * 360d / 255;
-		final double values[] = { scaled, angle, 12, 12, 12, 12 };
+		final double[] values = { scaled, angle, 12, 12, 12, 12 };
 		for (int i = 0; i < dpts.length; i++) {
 			final DPTXlator x = new DPTXlator8BitUnsigned(dpts[i]);
 			x.setValue("12.345");

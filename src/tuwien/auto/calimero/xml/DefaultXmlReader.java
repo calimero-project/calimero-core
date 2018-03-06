@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -117,7 +117,7 @@ class DefaultXmlReader implements XmlReader
 			// if no comment and no closing tag
 			if (str.length() == 0 || skipComment(str) || skipInstruction(str))
 				continue;
-			final StringBuffer buf = new StringBuffer();
+			final StringBuilder buf = new StringBuilder();
 			if (readCDATASection(str, buf)) {
 				setElement(openElems.peek());
 				elemText = buf.toString();
@@ -162,7 +162,7 @@ class DefaultXmlReader implements XmlReader
 		if (index == -1)
 			throw new KNXMLException("no matching element open tag: " + name, this);
 		String end = null;
-		final StringBuffer content = new StringBuffer(50);
+		final StringBuilder content = new StringBuilder(50);
 		while (canRead()) {
 			// read text content
 			final String s = read('<');
@@ -228,7 +228,7 @@ class DefaultXmlReader implements XmlReader
 
 	private String read(final char delimiter) throws KNXMLException
 	{
-		final StringBuffer buf = new StringBuffer(50);
+		final StringBuilder buf = new StringBuilder(50);
 		try {
 			boolean cr = false;
 			for (int c = 0; (c = r.read()) != -1 && c != delimiter;) {
@@ -279,7 +279,7 @@ class DefaultXmlReader implements XmlReader
 		}
 	}
 
-	private boolean readCDATASection(final String s, final StringBuffer buf) throws KNXMLException
+	private boolean readCDATASection(final String s, final StringBuilder buf) throws KNXMLException
 	{
 		if (!s.startsWith("![CDATA["))
 			return false;

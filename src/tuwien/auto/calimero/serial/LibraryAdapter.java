@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -229,7 +229,7 @@ public abstract class LibraryAdapter implements Closeable
 	public int getBaudRate()
 	{
 		try {
-			return ((Integer) invoke(this, "getBaudRate", null)).intValue();
+			return ((Integer) invoke(this, "getBaudRate", new Object[0])).intValue();
 		}
 		catch (final Exception ignore) {}
 		return 0;
@@ -257,7 +257,7 @@ public abstract class LibraryAdapter implements Closeable
 	protected Object invoke(final Object obj, final String method, final Object[] args)
 		throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
 	{
-		final Class<?>[] c = new Class<?>[args == null ? 0 : args.length];
+		final Class<?>[] c = new Class<?>[args.length];
 		for (int i = 0; i < c.length; ++i) {
 			c[i] = args[i].getClass();
 			if (c[i] == Integer.class)

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015 B. Malinowsky
+    Copyright (c) 2015, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,9 +51,8 @@ import tuwien.auto.calimero.serial.TpuartConnection;
  *
  * @author B. Malinowsky
  */
-public class KNXNetworkMonitorTpuart extends AbstractMonitor
+public class KNXNetworkMonitorTpuart extends AbstractMonitor<TpuartConnection>
 {
-	private final TpuartConnection conn;
 	private static final KNXMediumSettings medium = TPSettings.TP1;
 
 	/**
@@ -67,18 +66,15 @@ public class KNXNetworkMonitorTpuart extends AbstractMonitor
 	 *        provide only the cEMI bus monitor indication in the notification
 	 * @throws KNXException on error establishing the TP-UART connection
 	 */
-	public KNXNetworkMonitorTpuart(final String portId, final boolean decodeRawFrames)
-		throws KNXException
+	public KNXNetworkMonitorTpuart(final String portId, final boolean decodeRawFrames) throws KNXException
 	{
-		this(new TpuartConnection(portId, Collections.emptyList()), "tpuart:" + portId,
-				decodeRawFrames);
+		this(new TpuartConnection(portId, Collections.emptyList()), "tpuart:" + portId, decodeRawFrames);
 	}
 
 	protected KNXNetworkMonitorTpuart(final TpuartConnection conn, final String name,
 		final boolean decodeRawFrames) throws KNXLinkClosedException
 	{
 		super(conn, name, medium);
-		this.conn = (TpuartConnection) super.conn;
 		enterBusmonitor();
 		setDecodeRawFrames(decodeRawFrames);
 		conn.addConnectionListener(notifier);

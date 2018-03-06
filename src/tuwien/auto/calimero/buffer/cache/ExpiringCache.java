@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -118,7 +118,7 @@ public abstract class ExpiringCache implements Cache
 		if (timeToExpire == 0 || !(map instanceof LinkedHashMap))
 			return;
 		final long now = System.currentTimeMillis();
-		final long duration = timeToExpire * 1000;
+		final long duration = timeToExpire * 1000L;
 		CacheObject o = null;
 		synchronized (this) {
 			for (final Iterator<CacheObject> i = map.values().iterator(); i.hasNext();) {

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2017 B. Malinowsky
+    Copyright (c) 2017, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -156,7 +156,7 @@ public class DptXlatorMeteringValueTest
 		assertEquals(555.123, t.getNumericValue());
 
 		t.setValue("555.123 l/h");
-		final String[] split = t.getValue().split(" ");
+		final String[] split = t.getValue().split(" ", -1);
 		assertEquals("0.55512", split[0].substring(0, 7));
 		assertEquals("m³/h", split[1]);
 		assertEquals(0.555123, t.getNumericValue(), 0.000001);
@@ -186,7 +186,7 @@ public class DptXlatorMeteringValueTest
 	void setStringValueWithStatus() throws KNXFormatException
 	{
 		t.setValue("OutOfService 555.123 kJ/h");
-		final String[] split = t.getValue().split(" ");
+		final String[] split = t.getValue().split(" ", -1);
 		assertEquals("OutOfService", split[0]);
 		assertEquals("555123.0", split[1]);
 		assertEquals("J/h", split[2]);
@@ -197,7 +197,7 @@ public class DptXlatorMeteringValueTest
 	void setStringValueWithMultiStatus() throws KNXFormatException
 	{
 		t.setValue("OutOfService Fault 555.123 kJ/h");
-		final String[] split = t.getValue().split(" ");
+		final String[] split = t.getValue().split(" ", -1);
 		assertEquals("Fault", split[0]);
 		assertEquals("OutOfService", split[1]);
 		assertEquals("555123.0", split[2]);

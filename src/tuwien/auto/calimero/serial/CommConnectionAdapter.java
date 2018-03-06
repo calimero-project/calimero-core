@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -94,7 +94,7 @@ class CommConnectionAdapter extends LibraryAdapter
 	public void close()
 	{
 		try {
-			invoke(conn, "close", null);
+			invoke(conn, "close", new Object[0]);
 		}
 		catch (final Exception ignore) {}
 	}
@@ -124,8 +124,8 @@ class CommConnectionAdapter extends LibraryAdapter
 			// query a CommConnection instance
 			cc = invoke(connector, "open", new String[] { "comm:" + portID + ";baudrate="
 					+ baudrate + ";bitsperchar=8;stopbits=1;parity=even;autocts=off;autorts=off" });
-			is = (InputStream) invoke(cc, "openInputStream", null);
-			os = (OutputStream) invoke(cc, "openOutputStream", null);
+			is = (InputStream) invoke(cc, "openInputStream", new Object[0]);
+			os = (OutputStream) invoke(cc, "openOutputStream", new Object[0]);
 			conn = cc;
 			return;
 		}
@@ -139,7 +139,8 @@ class CommConnectionAdapter extends LibraryAdapter
 		// NoSuchMethodException, IllegalAccessException, IllegalArgumentException
 		catch (final Exception e) {}
 		try {
-			invoke(cc, "close", null);
+			if (cc != null)
+				invoke(cc, "close", new Object[0]);
 			is.close();
 			os.close();
 		}

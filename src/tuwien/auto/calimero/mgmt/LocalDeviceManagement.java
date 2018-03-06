@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2017 B. Malinowsky
+    Copyright (c) 2015, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,10 +38,10 @@ package tuwien.auto.calimero.mgmt;
 
 import static tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode.WaitForCon;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Deque;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import tuwien.auto.calimero.CloseEvent;
@@ -72,8 +72,11 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 		@Override
 		public void frameReceived(final FrameEvent e)
 		{
-			if (e.getFrame() instanceof CEMIDevMgmt)
-				frames.add(e.getFrame());
+			if (e.getFrame() instanceof CEMIDevMgmt) {
+				synchronized (frames) {
+					frames.add(e.getFrame());
+				}
+			}
 		}
 
 		@Override
@@ -93,7 +96,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 	protected final AutoCloseable c;
 
 	private final PropertyAdapterListener listener;
-	private final List<CEMI> frames = Collections.synchronizedList(new LinkedList<>());
+	private final Deque<CEMI> frames = new ArrayDeque<>();
 	private volatile boolean serverReset;
 	private final List<Pair> interfaceObjects = new ArrayList<>();
 
@@ -225,26 +228,29 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 		}
 	}
 
-	protected abstract void send(final CEMIDevMgmt frame, final Object mode) throws KNXException, InterruptedException;
+	protected abstract void send(CEMIDevMgmt frame, Object mode) throws KNXException, InterruptedException;
 
-	protected byte[] findFrame(final int messageCode) throws KNXRemoteException
-	{
-		while (frames.size() > 0) {
-			final CEMIDevMgmt frame = (CEMIDevMgmt) frames.remove(0);
+	protected byte[] findFrame(final int messageCode) throws KNXRemoteException {
+		while (true) {
+			final CEMIDevMgmt frame;
+			synchronized (frames) {
+				if (frames.isEmpty())
+					throw new KNXInvalidResponseException(
+							String.format("confirmation expected (msg code 0x%x)", messageCode));
+				frame = (CEMIDevMgmt) frames.remove();
+			}
 			final int mc = frame.getMessageCode();
 			if (mc == CEMIDevMgmt.MC_RESET_IND) {
 				serverReset = true;
 				close();
-				throw new KNXRemoteException("reset by server");
+				throw new KNXRemoteException("received reset indication from server, connection closed");
 			}
 			else if (mc == messageCode) {
 				if (frame.isNegativeResponse())
-					throw new KNXRemoteException("L-DM negative response, "
-							+ frame.getErrorMessage());
+					throw new KNXRemoteException("L-DM negative response, " + frame.getErrorMessage());
 				return frame.getPayload();
 			}
 		}
-		throw new KNXInvalidResponseException("confirmation expected");
 	}
 
 	protected int getObjectType(final int objIndex) throws KNXRemoteException
@@ -275,7 +281,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 		int objects = 0;
 		try {
 			final byte[] ret = findFrame(CEMIDevMgmt.MC_PROPREAD_CON);
-			objects = (ret[0] & 0xff) << 8 | ret[1] & 0xff;
+			objects = (ret[0] & 0xff) << 8 | (ret[1] & 0xff);
 		}
 		catch (final KNXRemoteException e) {
 			// device only has device- and cEMI server-object
@@ -287,7 +293,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 				PropertyAccess.PID.IO_LIST, 1, objects), WaitForCon);
 		final byte[] ret = findFrame(CEMIDevMgmt.MC_PROPREAD_CON);
 		for (int i = 0; i < objects; ++i) {
-			final int objType = (ret[2 * i] & 0xff) << 8 | ret[2 * i + 1] & 0xff;
+			final int objType = (ret[2 * i] & 0xff) << 8 | (ret[2 * i + 1] & 0xff);
 			interfaceObjects.add(new Pair(i, objType));
 		}
 	}

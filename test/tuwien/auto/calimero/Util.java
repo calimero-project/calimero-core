@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ public final class Util
 	private Util()
 	{}
 
-	private static boolean printToSystemOut = false;
+	private static boolean printToSystemOut;
 
 	/**
 	 * Standard out desc and toHexDec(bytes).
@@ -108,7 +108,7 @@ public final class Util
 	 */
 	public static String toHexDec(final byte[] bytes)
 	{
-		final StringBuffer buf = new StringBuffer();
+		final StringBuilder buf = new StringBuilder();
 		final int max = Math.min(200, bytes.length);
 		for (int i = 0; i < max; ++i) {
 			final String hex = Integer.toHexString(bytes[i] & 0xff);
@@ -325,21 +325,21 @@ public final class Util
 	}
 
 	private static Path temp;
+	static {
+		try {
+			temp = Files.createTempDirectory("calimero-junit-");
+			temp.toFile().deleteOnExit();
+		}
+		catch (final IOException e) {
+			throw new RuntimeException("could not create temp directory", e);
+		}
+	}
 
 	/**
 	 * @return the base output directory used for unit testing
 	 */
 	public static String getTargetPath()
 	{
-		if (temp == null) {
-			try {
-				temp = Files.createTempDirectory("calimero-junit-");
-				temp.toFile().deleteOnExit();
-			}
-			catch (final IOException e) {
-				throw new RuntimeException("could not create temp directory", e);
-			}
-		}
 		return temp.toString() + "/";
 	}
 }

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2016 B. Malinowsky
+    Copyright (c) 2015, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ final class BcuSwitcher
 
 	/**
 	 * Bit field (bit set is active): Parity Bit (even) | DM | UE | serial PEI IF | app layer |
-	 * Transport layer | Link layer | Prog mode
+	 * Transport layer | Link layer | Prog mode .
 	 */
 	static final int AddrSystemState = 0x60;
 

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015 B. Malinowsky
+    Copyright (c) 2015, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -58,10 +58,8 @@ import tuwien.auto.calimero.serial.TpuartConnection;
  * @author B. Malinowsky
  * @see Connector
  */
-public class KNXNetworkLinkTpuart extends AbstractLink
+public class KNXNetworkLinkTpuart extends AbstractLink<TpuartConnection>
 {
-	private final TpuartConnection c;
-
 	/**
 	 * Creates a new network link for accessing the KNX network using the specified communication
 	 * port identifier. The parameter <code>acknowledge</code> allows to configure KNX addresses
@@ -82,8 +80,7 @@ public class KNXNetworkLinkTpuart extends AbstractLink
 		super(new TpuartConnection(portId, ensureDeviceAck(settings, acknowledge)),
 				"tpuart:" + portId, settings);
 		sendCEmiAsByteArray = true;
-		c = (TpuartConnection) conn;
-		c.addConnectionListener(notifier);
+		conn.addConnectionListener(notifier);
 	}
 
 	/**
@@ -99,8 +96,7 @@ public class KNXNetworkLinkTpuart extends AbstractLink
 		if (settings.getMedium() != KNXMediumSettings.MEDIUM_TP1)
 			throw new KNXIllegalArgumentException("TP-UART link supports only TP1 medium");
 		sendCEmiAsByteArray = true;
-		c = conn;
-		c.addConnectionListener(notifier);
+		conn.addConnectionListener(notifier);
 	}
 
 	/**
@@ -110,7 +106,7 @@ public class KNXNetworkLinkTpuart extends AbstractLink
 	 */
 	public final void addAddress(final KNXAddress ack)
 	{
-		c.addAddress(ack);
+		conn.addAddress(ack);
 	}
 
 	/**
@@ -120,7 +116,7 @@ public class KNXNetworkLinkTpuart extends AbstractLink
 	 */
 	public final void removeAddress(final KNXAddress ack)
 	{
-		c.removeAddress(ack);
+		conn.removeAddress(ack);
 	}
 
 	@Override
@@ -133,7 +129,7 @@ public class KNXNetworkLinkTpuart extends AbstractLink
 					(waitForCon ? "blocking for .con" : "non-blocking"));
 			if (logger.isTraceEnabled())
 				logger.trace("cEMI {}", DataUnitBuilder.toHex(msg, " "));
-			c.send(msg, waitForCon);
+			conn.send(msg, waitForCon);
 		}
 		catch (final InterruptedException | KNXPortClosedException e) {
 			close();

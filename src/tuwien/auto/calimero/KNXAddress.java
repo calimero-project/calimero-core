@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ public abstract class KNXAddress implements Comparable<KNXAddress>
 	{
 		if (address.length < 2)
 			throw new KNXIllegalArgumentException("address byte array too short");
-		this.address = (address[0] & 0xFF) << 8 | address[1] & 0xFF;
+		this.address = (address[0] & 0xFF) << 8 | (address[1] & 0xFF);
 	}
 
 	/**
@@ -219,7 +219,7 @@ public abstract class KNXAddress implements Comparable<KNXAddress>
 			throw new KNXFormatException("wrong KNX address syntax with " + count + " levels", address);
 	}
 
-	abstract void init(final String address) throws KNXFormatException;
+	abstract void init(String address) throws KNXFormatException;
 
 	void init(final int address)
 	{

@@ -77,7 +77,7 @@ import tuwien.auto.calimero.link.medium.KNXMediumSettings;
  *
  * @author B. Malinowsky
  */
-public class KNXNetworkLinkIP extends AbstractLink
+public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 {
 	/**
 	 * Service mode for link layer tunneling.
@@ -90,7 +90,6 @@ public class KNXNetworkLinkIP extends AbstractLink
 	protected static final int ROUTING = 2;
 
 	private final int mode;
-	private final KNXnetIPConnection conn;
 
 	/**
 	 * Creates a new network link using KNXnet/IP tunneling (internally using a {@link KNXnetIPConnection}) to a remote
@@ -196,7 +195,6 @@ public class KNXNetworkLinkIP extends AbstractLink
 		cEMI = true;
 
 		mode = serviceMode;
-		conn = c;
 		conn.addConnectionListener(notifier);
 	}
 

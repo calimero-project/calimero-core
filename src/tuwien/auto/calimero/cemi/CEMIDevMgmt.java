@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,79 +55,77 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 public class CEMIDevMgmt implements CEMI
 {
 	/**
-	 * Set of error codes for device management error handling
+	 * Set of error codes for device management error handling.
 	 */
 	public static final class ErrorCodes
 	{
 		/**
-		 * Error code: unknown error, used in negative read/write message confirmations
+		 * Error code: unknown error, used in negative read/write message confirmations.
 		 */
 		public static final int UNSPECIFIED_ERROR = 0x00;
 
 		/**
 		 * Error code: write value not allowed (used if {@link #OUT_OF_MAXRANGE} and
 		 * {@link #OUT_OF_MINRANGE} are not appropriate), used in negative write message
-		 * confirmations
+		 * confirmations.
 		 */
 		public static final int OUT_OF_RANGE = 0x01;
 
 		/**
-		 * Error code: write value too high, used in negative write message confirmations
+		 * Error code: write value too high, used in negative write message confirmations.
 		 */
 		public static final int OUT_OF_MAXRANGE = 0x02;
 
 		/**
-		 * Error code: write value too low, used in negative write message confirmations
+		 * Error code: write value too low, used in negative write message confirmations.
 		 */
 		public static final int OUT_OF_MINRANGE = 0x03;
 
 		/**
 		 * Error code: memory can not be written or only with fault(s), used in negative
-		 * write messages confirmations
+		 * write messages confirmations.
 		 */
 		public static final int MEMORY_ERROR = 0x04;
 
 		/**
 		 * Error code: write access to a 'read only' or a write protected property, used
-		 * in negative write request message confirmations
+		 * in negative write request message confirmations.
 		 */
 		public static final int READ_ONLY = 0x05;
 
 		/**
 		 * Error code: command not valid or not supported, used in negative write message
-		 * confirmations
+		 * confirmations.
 		 */
 		public static final int ILLEGAL_COMMAND = 0x06;
 
 		/**
 		 * Error code: read or write access to an non existing property, used in negative
-		 * read/write message confirmations
+		 * read/write message confirmations.
 		 */
 		public static final int VOID_DP = 0x07;
 
 		/**
 		 * Error code: write access with a wrong data type (datapoint length), used in
-		 * negative write message confirmations
+		 * negative write message confirmations.
 		 */
 		public static final int TYPE_CONFLICT = 0x08;
 
 		/**
 		 * Error code: read or write access to a non existing property array index, used
-		 * in negative read/write message confirmations
+		 * in negative read/write message confirmations.
 		 */
 		public static final int PROP_INDEX_RANGE_ERROR = 0x09;
 
 		/**
 		 * Error code: the property exists but can at this moment not be written with a new value,
-		 * used in negative write message confirmations
+		 * used in negative write message confirmations.
 		 */
 		public static final int VALUE_NOT_WRITEABLE_NOW = 0x0A;
 
 		// enforce non-instantiability
 		private ErrorCodes() {}
 	}
-
-	// ??? implement function properties
 
 	/**
 	 * Message code for property read request, code = {@value #MC_PROPREAD_REQ}.
@@ -491,7 +489,7 @@ public class CEMIDevMgmt implements CEMI
 	@Override
 	public String toString()
 	{
-		final StringBuffer buf = new StringBuffer(30);
+		final StringBuilder buf = new StringBuilder(30);
 		buf.append("DM ");
 		if (mc == MC_PROPREAD_REQ)
 			buf.append("prop-read.req");

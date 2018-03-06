@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ public class ManufacturerDIB extends DIB
 			throw new KNXFormatException("DIB is not of type manufacturer data", type);
 		if (size < 4)
 			throw new KNXFormatException("manufacturer DIB too short");
-		id = (data[offset + 2] & 0xFF) << 8 | data[offset + 3] & 0xFF;
+		id = (data[offset + 2] & 0xFF) << 8 | (data[offset + 3] & 0xFF);
 		mfrData = new byte[size - 4];
 		for (int i = 0; i < mfrData.length; ++i)
 			mfrData[i] = data[4 + offset + i];

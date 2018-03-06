@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2016 B. Malinowsky
+    Copyright (c) 2015, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -82,8 +82,8 @@ public class RoutingBusy extends ServiceType
 		if (size != typeSize)
 			throw new KNXFormatException("wrong size for routing busy indication", size);
 		state = data[offset + 1] & 0xFF;
-		waitTime = (data[offset + 2] & 0xFF) << 8 | data[offset + 3] & 0xFF;
-		ctrl = (data[offset + 4] & 0xFF) << 8 | data[offset + 5] & 0xFF;
+		waitTime = (data[offset + 2] & 0xFF) << 8 | (data[offset + 3] & 0xFF);
+		ctrl = (data[offset + 4] & 0xFF) << 8 | (data[offset + 5] & 0xFF);
 	}
 
 	/**

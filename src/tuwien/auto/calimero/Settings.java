@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -90,7 +90,7 @@ public final class Settings
 	{
 		if (!verbose)
 			return library + " version " + version;
-		final StringBuffer buf = new StringBuffer();
+		final StringBuilder buf = new StringBuilder();
 		buf.append(library).append(" - ").append(desc).append(sep);
 		buf.append("Version ").append(version).append(sep);
 		buf.append(group).append(", ");
@@ -116,7 +116,7 @@ public final class Settings
 	 */
 	public static String getBundleListing()
 	{
-		final StringBuffer buf = new StringBuffer();
+		final StringBuilder buf = new StringBuilder();
 		buf.append(getBundle("cEMI", "tuwien.auto.calimero.cemi.CEMI", 1)).append(sep);
 		buf.append(getBundle("KNXnet/IP", "tuwien.auto.calimero.knxnetip.KNXnetIPConnection", 1)).append(sep);
 		buf.append(getBundle("FT1.2", "tuwien.auto.calimero.serial.FT12Connection", 1)).append(sep);

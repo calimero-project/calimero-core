@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * Additionally, the router device state is supplied.
  * <p>
  * Objects of this type are immutable.
- * 
+ *
  * @author B. Malinowsky
  */
 public class RoutingLostMessage extends ServiceType
@@ -61,7 +61,7 @@ public class RoutingLostMessage extends ServiceType
 	/**
 	 * Creates a new routing lost message indication out of a byte array.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing a lost message indication structure
 	 * @param offset start offset of indication in <code>data</code>
 	 * @throws KNXFormatException if buffer is too short for routing lost message
@@ -76,13 +76,13 @@ public class RoutingLostMessage extends ServiceType
 		if (size != 4)
 			throw new KNXFormatException("wrong size for lost messages info", size);
 		state = data[offset + 1] & 0xFF;
-		lost = (data[offset + 2] & 0xFF) << 8 | data[offset + 3] & 0xFF;
+		lost = (data[offset + 2] & 0xFF) << 8 | (data[offset + 3] & 0xFF);
 	}
 
 	/**
 	 * Creates a new routing lost message indication.
 	 * <p>
-	 * 
+	 *
 	 * @param lostMessages number of KNXnet/IP routing messages lost
 	 * @param deviceState router device state, this router states are defined by the KNX
 	 *        property ID 69 in object type 11 of the KNX property definitions (with the
@@ -105,7 +105,7 @@ public class RoutingLostMessage extends ServiceType
 	/**
 	 * The number of lost KNXnet/IP routing messages.
 	 * <p>
-	 * 
+	 *
 	 * @return lost messages as unsigned 16 bit value
 	 */
 	public final int getLostMessages()
@@ -117,7 +117,7 @@ public class RoutingLostMessage extends ServiceType
 	 * Returns the router device state, i.e., the value of the property defined by PID 69
 	 * in object type 11 of the KNX property definitions.
 	 * <p>
-	 * 
+	 *
 	 * @return device state as unsigned byte
 	 */
 	public final int getDeviceState()
@@ -129,7 +129,7 @@ public class RoutingLostMessage extends ServiceType
 	 * Returns whether the KNX network cannot be accessed, causing the message loss.
 	 * <p>
 	 * The KNX fault mode is part of the device state.
-	 * 
+	 *
 	 * @return <code>true</code> on KNX access fault, <code>false</code> otherwise
 	 * @see #getDeviceState()
 	 */

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -208,7 +208,7 @@ public class NetworkBufferTest
 	private boolean read(final ProcessCommunicator pc, final GroupAddress dst)
 			throws KNXException, InterruptedException
 	{
-		boolean ret;
+		final boolean ret;
 		try {
 			waitObject.add(dst);
 			ret = pc.readBool(dst);
@@ -231,7 +231,7 @@ public class NetworkBufferTest
 			throws KNXException, InterruptedException
 	{
 		final GroupAddress dst = dp.getMainAddress();
-		String ret;
+		final String ret;
 		try {
 			waitObject.add(dst);
 			ret = pc.read(dp);

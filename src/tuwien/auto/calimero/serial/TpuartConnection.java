@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2014, 2017 B. Malinowsky
+    Copyright (c) 2014, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -338,9 +338,9 @@ public class TpuartConnection implements AutoCloseable
 	private static byte[] cEmiToTP1(final byte[] frame)
 	{
 		// set frame type to std/ext
-		final int StdMaxApdu = 15;
+		final int stdMaxApdu = 15;
 		final int cEmiPrefix = 10;
-		final boolean std = frame.length <= cEmiPrefix + StdMaxApdu;
+		final boolean std = frame.length <= cEmiPrefix + stdMaxApdu;
 
 		final byte[] tp1;
 		if (std) {
@@ -510,7 +510,7 @@ public class TpuartConnection implements AutoCloseable
 //					logger.trace("loop time = {} us", loop / 1000);
 				}
 				catch (final RuntimeException e) {
-					e.printStackTrace();
+					logger.warn("continue after internal error in receiver loop", e);
 				}
 				catch (final InterruptedException e) {}
 				catch (final IOException e) {
@@ -588,7 +588,9 @@ public class TpuartConnection implements AutoCloseable
 								fireFrameReceived(createLDataInd(data));
 						}
 						catch (final Exception e) {
-							e.printStackTrace();
+							logger.error("error creating {} from TP1 data (length {}): {}",
+									busmon ? "Busmon.ind" : "L-Data", frame.length, DataUnitBuilder.toHex(frame, " "),
+									e);
 						}
 						finally {
 							in.reset();

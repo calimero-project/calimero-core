@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@ final class References
 
 	static String replaceFromRef(final String text)
 	{
-		final StringBuffer mod = new StringBuffer(text.length());
+		final StringBuilder mod = new StringBuilder(text.length());
 		int pos = 0;
 		int oldpos = 0;
 		while ((pos = text.indexOf('&', pos)) != -1) {
@@ -104,7 +104,7 @@ final class References
 
 	static String replaceWithRef(final String text)
 	{
-		final StringBuffer mod = new StringBuffer((int)(1.5f * text.length()));
+		final StringBuilder mod = new StringBuilder((int) (1.5f * text.length()));
 		for (int i = 0; i < text.length(); ++i) {
 			final char c = text.charAt(i);
 			if (c == '&')

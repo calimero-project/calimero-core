@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2017 B. Malinowsky
+    Copyright (c) 2015, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -65,13 +65,13 @@ import tuwien.auto.calimero.log.LogService;
  *
  * @author B. Malinowsky
  */
-public abstract class AbstractMonitor implements KNXNetworkMonitor
+public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNetworkMonitor
 {
 	/** Implements KNXListener to listen to the monitor connection. */
 	protected final MonitorNotifier notifier;
 	protected final Logger logger;
 
-	final AutoCloseable conn;
+	final T conn;
 
 	private volatile boolean closed;
 	private KNXMediumSettings medium;
@@ -104,8 +104,8 @@ public abstract class AbstractMonitor implements KNXNetworkMonitor
 							+ Integer.toHexString(frame.getMessageCode()));
 					return;
 				}
-				logger.trace("received monitor indication");
-				final AbstractMonitor netmon = (AbstractMonitor) source;
+				logger.trace("{}", mon);
+				final AbstractMonitor<?> netmon = (AbstractMonitor<?>) source;
 				MonitorFrameEvent mfe = new MonitorFrameEvent(netmon, mon);
 				if (decode) {
 					try {
@@ -133,15 +133,13 @@ public abstract class AbstractMonitor implements KNXNetworkMonitor
 		@Override
 		public void connectionClosed(final CloseEvent e)
 		{
-			((AbstractMonitor) source).closed = true;
+			((AbstractMonitor<?>) source).closed = true;
 			super.connectionClosed(e);
 			logger.info("monitor closed");
 		}
 	}
 
-	protected AbstractMonitor(final AutoCloseable conn, final String name,
-		final KNXMediumSettings settings)
-	{
+	protected AbstractMonitor(final T conn, final String name, final KNXMediumSettings settings) {
 		this.conn = conn;
 		this.name = name;
 		logger = LogService.getLogger("calimero.link." + getName());

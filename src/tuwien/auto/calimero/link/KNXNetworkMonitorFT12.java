@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,19 +43,15 @@ import tuwien.auto.calimero.serial.FT12Connection;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
 
 /**
- * Implementation of the KNX network monitor link based on the FT1.2 protocol, using a
- * {@link FT12Connection}.
+ * Implementation of the KNX network monitor link based on the FT1.2 protocol, using a {@link FT12Connection}.
  * <p>
- * Once a monitor has been closed, it is not available for further link communication, i.e., it
- * can't be reopened.
+ * Once a monitor has been closed, it is not available for further link communication, i.e., it can't be reopened.
  *
  * @author B. Malinowsky
  */
-public class KNXNetworkMonitorFT12 extends AbstractMonitor
+public class KNXNetworkMonitorFT12 extends AbstractMonitor<FT12Connection>
 {
 	private static final int PEI_SWITCH = 0xA9;
-
-	private final FT12Connection conn;
 
 	/**
 	 * Creates a new network monitor based on the FT1.2 protocol for accessing the KNX network.
@@ -103,14 +99,12 @@ public class KNXNetworkMonitorFT12 extends AbstractMonitor
 		throws KNXException
 	{
 		super(conn, "monitor " + conn.getPortID(), settings);
-		this.conn = (FT12Connection) super.conn;
 		enterBusmonitor();
 		logger.info("in busmonitor mode - ready to receive");
 		conn.addConnectionListener(notifier);
 	}
 
-	private void enterBusmonitor()
-		throws KNXAckTimeoutException, KNXPortClosedException, KNXLinkClosedException
+	private void enterBusmonitor() throws KNXAckTimeoutException, KNXPortClosedException, KNXLinkClosedException
 	{
 		try {
 			final byte[] switchBusmon = { (byte) PEI_SWITCH, (byte) 0x90, 0x18, 0x34, 0x56, 0x78,
@@ -133,14 +127,11 @@ public class KNXNetworkMonitorFT12 extends AbstractMonitor
 		try {
 			normalMode();
 		}
-		catch (final KNXAckTimeoutException | KNXPortClosedException e) {}
+		catch (KNXAckTimeoutException | KNXPortClosedException e) {}
 	}
 
-	private void normalMode()
-		throws KNXAckTimeoutException, KNXPortClosedException, InterruptedException
-	{
-		final byte[] switchNormal = { (byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78,
-			(byte) 0x9A, };
+	private void normalMode() throws KNXAckTimeoutException, KNXPortClosedException, InterruptedException {
+		final byte[] switchNormal = { (byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
 		conn.send(switchNormal, true);
 	}
 }

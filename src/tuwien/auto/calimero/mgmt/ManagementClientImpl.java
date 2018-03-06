@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,9 +36,10 @@
 
 package tuwien.auto.calimero.mgmt;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -177,7 +178,7 @@ public class ManagementClientImpl implements ManagementClient
 	private final TLListener tlListener = new TLListener();
 	private volatile Priority priority = Priority.LOW;
 	private volatile int responseTimeout = 5000; // [ms]
-	private final List<FrameEvent> indications = new LinkedList<>();
+	private final Deque<FrameEvent> indications = new ArrayDeque<>();
 	private volatile int svcResponse;
 	private volatile boolean detached;
 	private final Logger logger;
@@ -847,7 +848,7 @@ public class ManagementClientImpl implements ManagementClient
 		synchronized (indications) {
 			while (remaining > 0) {
 				while (indications.size() > 0) {
-					final CEMI frame = indications.remove(0).getFrame();
+					final CEMI frame = indications.remove().getFrame();
 					final byte[] apdu = frame.getPayload();
 					if (svcResponse != DataUnitBuilder.getAPDUService(apdu))
 						continue;
@@ -898,7 +899,7 @@ public class ManagementClientImpl implements ManagementClient
 		final int maxAsduLen, final Predicate<byte[]> response)
 		throws KNXInvalidResponseException, InterruptedException, KNXTimeoutException
 	{
-		long wait = responseTimeout * 1_000_000;
+		long wait = responseTimeout * 1_000_000L;
 		final long end = System.nanoTime() + wait;
 		while (wait > 0) {
 			if (response.test(waitForResponse(from, minAsduLen, maxAsduLen, wait / 1_000_000)))

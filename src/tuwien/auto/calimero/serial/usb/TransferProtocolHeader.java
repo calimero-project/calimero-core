@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2017 B. Malinowsky
+    Copyright (c) 2015, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -134,7 +134,7 @@ public final class TransferProtocolHeader
 			throw new KNXFormatException("unsupported transfer protocol header size " + size + " != "
 					+ headerSize);
 		final int lhi = (frame[i++] & 0xff) << 8;
-		length = lhi | frame[i++] & 0xff;
+		length = lhi | (frame[i++] & 0xff);
 		final int p = frame[i++] & 0xff;
 		final int id = frame[i++] & 0xff;
 
@@ -155,7 +155,7 @@ public final class TransferProtocolHeader
 		svc = set.iterator().next();
 
 		final int mhi = (frame[i++] & 0xff) << 8;
-		manufacturer = mhi | frame[i++] & 0xff;
+		manufacturer = mhi | (frame[i++] & 0xff);
 	}
 
 	/**

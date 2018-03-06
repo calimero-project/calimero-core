@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2017 B. Malinowsky
+    Copyright (c) 2015, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -60,11 +60,10 @@ import tuwien.auto.calimero.serial.usb.UsbConnection.EmiType;
  *
  * @author B. Malinowsky
  */
-public class KNXNetworkMonitorUsb extends AbstractMonitor
+public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 {
 	private static final int PEI_SWITCH = 0xA9;
 
-	private final UsbConnection conn;
 	private final EnumSet<EmiType> emiTypes;
 	private EmiType activeEmi;
 
@@ -112,7 +111,6 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor
 		throws KNXException, InterruptedException
 	{
 		super(c, c.getName(), settings);
-		conn = c;
 		try {
 			if (!conn.isKnxConnectionActive())
 				throw new KNXConnectionClosedException("USB interface is not connected to KNX network");
@@ -154,11 +152,11 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor
 		throws KNXPortClosedException, KNXTimeoutException, KNXFormatException, InterruptedException
 	{
 		if (activeEmi == EmiType.CEmi) {
-			final int CEMI_SERVER_OBJECT = 8;
-			final int PID_COMM_MODE = 52;
+			final int cEmiServerObject = 8;
+			final int pidCommMode = 52;
 			final int objectInstance = 1;
-			final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, CEMI_SERVER_OBJECT, objectInstance,
-					PID_COMM_MODE, 1, 1, new byte[] { 1 });
+			final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, cEmiServerObject, objectInstance,
+					pidCommMode, 1, 1, new byte[] { 1 });
 			conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame.toByteArray()).get(0), true);
 			// TODO close monitor if we cannot switch to busmonitor
 			// check for .con

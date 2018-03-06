@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -431,7 +431,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	private byte[] waitForResponse(final GroupAddress from, final int minAPDU, final int maxAPDU)
 		throws KNXInvalidResponseException, KNXTimeoutException, InterruptedException
 	{
-		long remaining = responseTimeout * 1000;
+		long remaining = responseTimeout * 1000L;
 		final long end = System.currentTimeMillis() + remaining;
 		synchronized (indications) {
 			while (remaining > 0) {

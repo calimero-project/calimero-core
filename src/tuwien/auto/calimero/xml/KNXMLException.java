@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -110,7 +110,7 @@ public class KNXMLException extends RuntimeException
 
 	private static String createMsg(final String s, final XmlReader r)
 	{
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 		sb.append(s).append(" (line ").append(r.getLocation().getLineNumber());
 		sb.append(", element ");
 		sb.append(r.getLocalName());

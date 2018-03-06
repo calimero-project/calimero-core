@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2016 B. Malinowsky
+    Copyright (c) 2015, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -62,12 +62,11 @@ import tuwien.auto.calimero.serial.usb.UsbConnection.EmiType;
  *
  * @author B. Malinowsky
  */
-public class KNXNetworkLinkUsb extends AbstractLink
+public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 {
 	// EMI1/2 switch command
 	private static final int PEI_SWITCH = 0xA9;
 
-	private final UsbConnection conn;
 	private final EnumSet<EmiType> emiTypes;
 	private EmiType activeEmi;
 
@@ -117,7 +116,6 @@ public class KNXNetworkLinkUsb extends AbstractLink
 		throws KNXException, InterruptedException
 	{
 		super(c, c.getName(), settings);
-		conn = c;
 		try {
 			if (!conn.isKnxConnectionActive())
 				throw new KNXConnectionClosedException("USB interface is not connected to KNX network");

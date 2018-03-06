@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -53,14 +53,14 @@ import tuwien.auto.calimero.link.medium.TP1LPollData;
  */
 public final class Debug
 {
-	private static boolean printToSystemOut = false;
+	private static boolean printToSystemOut;
 
 	private Debug()
 	{}
 
 	public static void printLData(final String prefix, final CEMILData f)
 	{
-		final StringBuffer buf = new StringBuffer();
+		final StringBuilder buf = new StringBuilder();
 		buf.append(prefix);
 		buf.append("hopcount=" + f.getHopCount());
 		buf.append(", dst=" + f.getDestination());
@@ -85,7 +85,7 @@ public final class Debug
 
 	public static void printMData(final CEMIDevMgmt f)
 	{
-		final StringBuffer buf = new StringBuffer();
+		final StringBuilder buf = new StringBuilder();
 		buf.append("mc=" + f.getMessageCode());
 		buf.append(", neg.res=" + f.isNegativeResponse());
 		buf.append(", errmsg=" + f.getErrorMessage());
@@ -102,7 +102,7 @@ public final class Debug
 
 	public static void printMonData(final CEMIBusMon ind)
 	{
-		final StringBuffer buf = new StringBuffer();
+		final StringBuilder buf = new StringBuilder();
 		buf.append("seq=" + ind.getSequenceNumber());
 		buf.append(", timestamp=" + ind.getTimestamp());
 		buf.append(", tstamptype=" + ind.getTimestampType());
@@ -118,7 +118,7 @@ public final class Debug
 
 	public static void printTP1Frame(final RawFrame tp1)
 	{
-		final StringBuffer buf = new StringBuffer();
+		final StringBuilder buf = new StringBuilder();
 		final String type;
 		switch (tp1.getFrameType()) {
 		case RawFrame.ACK_FRAME:

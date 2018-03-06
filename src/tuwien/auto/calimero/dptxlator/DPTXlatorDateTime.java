@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -665,7 +665,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	{
 		if (isBitSet(index, FAULT))
 			return "corrupted date/time";
-		final StringBuffer sb = new StringBuffer(20);
+		final StringBuilder sb = new StringBuilder(20);
 		final int i = index * 8;
 		// year
 		if (!isBitSet(index, NO_YEAR))

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -215,7 +215,7 @@ public final class CEMIFactory
 		final int mc = frame[0] & 0xff;
 		if (mc != CEMIBusMon.MC_BUSMON_IND && mc != Emi1_LBusmon_ind)
 			throw new KNXFormatException("not a busmonitor frame with msg code 0x" + Integer.toHexString(mc));
-		return CEMIBusMon.newWithStatus(frame[1] & 0xff, (frame[2] & 0xff) << 8 | frame[3] & 0xff,
+		return CEMIBusMon.newWithStatus(frame[1] & 0xff, (frame[2] & 0xff) << 8 | (frame[3] & 0xff),
 				false, Arrays.copyOfRange(frame, 4, frame.length));
 	}
 
@@ -227,7 +227,7 @@ public final class CEMIFactory
 	 * @throws KNXFormatException if no (valid) EMI structure was found or unsupported EMI message
 	 *         code
 	 */
-	public static CEMI createFromEMI(final byte[] frame) throws KNXFormatException
+	public static CEMI fromEmi(final byte[] frame) throws KNXFormatException
 	{
 		// check for minimum frame length (i.e., a busmonitor frame)
 		if (frame.length < 4)
@@ -252,13 +252,13 @@ public final class CEMIFactory
 			mc = CEMILData.MC_LDATA_IND;
 
 		if (mc == CEMIBusMon.MC_BUSMON_IND) {
-			return CEMIBusMon.newWithStatus(frame[1] & 0xff, (frame[2] & 0xff) << 8 | frame[3]
-					& 0xff, false, Arrays.copyOfRange(frame, 4, frame.length));
+			return CEMIBusMon.newWithStatus(frame[1] & 0xff, (frame[2] & 0xff) << 8 | (frame[3] & 0xff), false,
+					Arrays.copyOfRange(frame, 4, frame.length));
 		}
 		final Priority p = Priority.get(frame[1] >> 2 & 0x3);
 		final boolean ack = (frame[1] & 0x02) != 0;
 		final boolean c = (frame[1] & 0x01) != 0;
-		final int dst = (frame[4] & 0xff) << 8 | frame[5] & 0xff;
+		final int dst = (frame[4] & 0xff) << 8 | (frame[5] & 0xff);
 		final KNXAddress a = (frame[6] & 0x80) != 0 ? (KNXAddress) new GroupAddress(dst)
 				: new IndividualAddress(dst);
 		final int hops = frame[6] >> 4 & 0x07;

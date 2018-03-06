@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -102,7 +102,7 @@ public class DPTXlator8BitSigned extends DPTXlator
 	{
 		super(1);
 		setTypeID(types, dptID);
-		if (dpt == DPT_STATUS_MODE3)
+		if (dpt.equals(DPT_STATUS_MODE3))
 			data[0] = 1;
 	}
 
@@ -163,7 +163,7 @@ public class DPTXlator8BitSigned extends DPTXlator
 	public final void setStatusMode(final boolean a, final boolean b, final boolean c,
 		final boolean d, final boolean e, final int mode)
 	{
-		if (dpt != DPT_STATUS_MODE3)
+		if (!dpt.equals(DPT_STATUS_MODE3))
 			throw new IllegalStateException("translator not set to DPT 6.020 (Status with Mode)");
 		if (mode < 0 || mode > 2)
 			throw new KNXIllegalArgumentException("mode out of range [0..2]");
@@ -186,7 +186,7 @@ public class DPTXlator8BitSigned extends DPTXlator
 	 */
 	boolean statusBit(final int statusBit)
 	{
-		if (dpt != DPT_STATUS_MODE3)
+		if (!dpt.equals(DPT_STATUS_MODE3))
 			throw new IllegalStateException("translator not set to DPT 6.020 (Status with Mode)");
 		if (statusBit < 0 || statusBit > 4)
 			throw new KNXIllegalArgumentException("status bit " + statusBit + " out of range [0..4]");
@@ -202,7 +202,7 @@ public class DPTXlator8BitSigned extends DPTXlator
 	 */
 	public final int getMode()
 	{
-		if (dpt != DPT_STATUS_MODE3)
+		if (!dpt.equals(DPT_STATUS_MODE3))
 			throw new IllegalStateException("translator not set to DPT 6.020 (Status with Mode)");
 		final int enc = data[0] & 0x07;
 		if (enc != 1 && enc != 2 && enc != 4)
@@ -232,9 +232,9 @@ public class DPTXlator8BitSigned extends DPTXlator
 
 	private String makeString(final int index)
 	{
-		if (dpt == DPT_STATUS_MODE3) {
+		if (dpt.equals(DPT_STATUS_MODE3)) {
 			final short d = data[index];
-			final StringBuffer sb = new StringBuffer();
+			final StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < 4; i++)
 				sb.append((d >> (7 - i)) & 0x01).append("/");
 			sb.append((d >> 3) & 0x01);
@@ -248,7 +248,7 @@ public class DPTXlator8BitSigned extends DPTXlator
 	protected void toDPT(final String value, final short[] dst, final int index)
 		throws KNXFormatException
 	{
-		if (dpt == DPT_STATUS_MODE3) {
+		if (dpt.equals(DPT_STATUS_MODE3)) {
 			if (value.length() != 11)
 				throw new KNXFormatException("status mode requires 11 characters", value);
 			short d = 0;

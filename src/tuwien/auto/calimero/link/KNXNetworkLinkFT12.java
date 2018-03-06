@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,11 +52,9 @@ import tuwien.auto.calimero.serial.KNXPortClosedException;
  *
  * @author B. Malinowsky
  */
-public class KNXNetworkLinkFT12 extends AbstractLink
+public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 {
 	private static final int PEI_SWITCH = 0xA9;
-
-	private final FT12Connection conn;
 
 	/**
 	 * Creates a new network link based on the FT1.2 protocol for accessing the KNX network.
@@ -100,7 +98,6 @@ public class KNXNetworkLinkFT12 extends AbstractLink
 		super(c, c.getPortID(), settings);
 		cEMI = false;
 		sendCEmiAsByteArray = true;
-		conn = c;
 		linkLayerMode();
 		conn.addConnectionListener(notifier);
 	}

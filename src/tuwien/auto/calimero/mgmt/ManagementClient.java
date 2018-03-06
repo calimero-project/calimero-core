@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -310,7 +310,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXTimeoutException on timeout during send
 	 */
-	void writeNetworkParameter(final IndividualAddress remote, final int objectType, final int pid, final byte[] value)
+	void writeNetworkParameter(IndividualAddress remote, int objectType, int pid, byte[] value)
 		throws KNXLinkClosedException, KNXTimeoutException;
 
 	/**
@@ -401,7 +401,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws InterruptedException on interrupted thread
 	 */
-	int restart(final Destination dst, int eraseCode, int channel) throws KNXTimeoutException,
+	int restart(Destination dst, int eraseCode, int channel) throws KNXTimeoutException,
 		KNXRemoteException, KNXDisconnectException, KNXLinkClosedException, InterruptedException;
 
 	/**

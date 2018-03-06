@@ -85,7 +85,7 @@ import tuwien.auto.calimero.log.LogService;
  * @see KNXNetworkLinkTpuart
  * @see Connector
  */
-public abstract class AbstractLink implements KNXNetworkLink
+public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetworkLink
 {
 	/** Logger for this link instance. */
 	protected final Logger logger;
@@ -110,7 +110,7 @@ public abstract class AbstractLink implements KNXNetworkLink
 	private volatile int hopCount = 6;
 	private KNXMediumSettings medium;
 
-	final AutoCloseable conn;
+	final T conn;
 
 	private final class LinkNotifier extends EventNotifier<NetworkLinkListener>
 	{
@@ -157,7 +157,7 @@ public abstract class AbstractLink implements KNXNetworkLink
 				final CEMILData f = (CEMILData) cemi;
 				if (mc == CEMILData.MC_LDATA_IND) {
 					addEvent(l -> l.indication(new FrameEvent(source, f)));
-					logger.debug("indication {}", f.toString());
+					logger.debug("indication {}", f);
 				}
 				else if (mc == CEMILData.MC_LDATA_CON) {
 					addEvent(l -> l.confirmation(new FrameEvent(source, f)));
@@ -178,7 +178,7 @@ public abstract class AbstractLink implements KNXNetworkLink
 		@Override
 		public void connectionClosed(final CloseEvent e)
 		{
-			((AbstractLink) source).closed = true;
+			AbstractLink.this.closed = true;
 			super.connectionClosed(e);
 			logger.info("link closed");
 		}
@@ -194,7 +194,7 @@ public abstract class AbstractLink implements KNXNetworkLink
 	 * @param name the link name
 	 * @param settings medium settings of the accessed KNX network
 	 */
-	protected AbstractLink(final AutoCloseable connection, final String name,
+	protected AbstractLink(final T connection, final String name,
 		final KNXMediumSettings settings)
 	{
 		conn = connection;
@@ -366,7 +366,7 @@ public abstract class AbstractLink implements KNXNetworkLink
 	 * @throws KNXTimeoutException on a timeout during send or while waiting for the confirmation
 	 * @throws KNXLinkClosedException if the link is closed
 	 */
-	protected abstract void onSend(final KNXAddress dst, final byte[] msg, final boolean waitForCon)
+	protected abstract void onSend(KNXAddress dst, byte[] msg, boolean waitForCon)
 		throws KNXTimeoutException, KNXLinkClosedException;
 
 	/**
@@ -396,7 +396,7 @@ public abstract class AbstractLink implements KNXNetworkLink
 	protected CEMI onReceive(final FrameEvent e) throws KNXFormatException
 	{
 		final CEMI f = e.getFrame();
-		return f != null ? f : CEMIFactory.createFromEMI(e.getFrameBytes());
+		return f != null ? f : CEMIFactory.fromEmi(e.getFrameBytes());
 	}
 
 	/**

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,9 +36,9 @@
 
 package tuwien.auto.calimero.buffer;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -72,7 +72,7 @@ import tuwien.auto.calimero.log.LogService;
 public class CommandFilter implements NetworkFilter, RequestFilter
 {
 	// stores LDataObjectQueues objects
-	private final List<CacheObject> indicationKeys = new LinkedList<>();
+	private final Deque<CacheObject> indicationKeys = new ArrayDeque<>();
 	private volatile Consumer<LDataObjectQueue> userListener;
 	private final Consumer<LDataObjectQueue> queueFull = queue -> {
 		try {
@@ -143,7 +143,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 		synchronized (indicationKeys) {
 			if (indicationKeys.isEmpty())
 				throw new IllegalStateException("no indications");
-			return ((LDataObjectQueue) indicationKeys.remove(0)).getItem();
+			return ((LDataObjectQueue) indicationKeys.remove()).getItem();
 		}
 	}
 
@@ -159,9 +159,11 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 		if (!(dst instanceof GroupAddress))
 			return null;
 		final DatapointModel<?> m = c.getDatapointModel();
-		final Datapoint dp;
-		if (m != null && ((dp = m.get((GroupAddress) dst)) == null || dp.isStateBased()))
-			return null;
+		if (m != null) {
+			final Datapoint dp = m.get((GroupAddress) dst);
+			if (dp == null || dp.isStateBased())
+				return null;
+		}
 		synchronized (indicationKeys) {
 			for (final Iterator<CacheObject> i = indicationKeys.iterator(); i.hasNext();) {
 				final CacheObject co = i.next();
@@ -207,9 +209,11 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 		// check if we have a datapoint model, whether it contains the address,
 		// and datapoint is command based
 		final DatapointModel<?> m = c.getDatapointModel();
-		final Datapoint dp;
-		if (m != null && ((dp = m.get(dst)) == null || dp.isStateBased()))
-			return;
+		if (m != null) {
+			final Datapoint dp = m.get(dst);
+			if (dp == null || dp.isStateBased())
+				return;
+		}
 		final byte[] d = f.getPayload();
 		// filter for A-Group.write (0x80) and A-Group.res (0x40) services
 		final int svc = d[0] & 0x03 | d[1] & 0xC0;

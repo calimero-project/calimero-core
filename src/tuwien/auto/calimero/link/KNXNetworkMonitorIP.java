@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ import tuwien.auto.calimero.link.medium.KNXMediumSettings;
  *
  * @author B. Malinowsky
  */
-public class KNXNetworkMonitorIP extends AbstractMonitor
+public class KNXNetworkMonitorIP extends AbstractMonitor<KNXnetIPConnection>
 {
 	/**
 	 * Creates a new network monitor based on the KNXnet/IP protocol for accessing the KNX network.

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2017 B. Malinowsky
+    Copyright (c) 2015, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -111,7 +111,7 @@ public class UsbConnection implements AutoCloseable
 {
 	private static class KnxRuntimeException extends RuntimeException {
 		private static final long serialVersionUID = -1;
-		public KnxRuntimeException(final String message, final Throwable cause) {
+		KnxRuntimeException(final String message, final Throwable cause) {
 			super(message, cause);
 		}
 	}
@@ -236,7 +236,7 @@ public class UsbConnection implements AutoCloseable
 					in.syncSubmit(new byte[64]);
 
 			}
-			catch (final UsbNotActiveException | UsbNotOpenException | IllegalArgumentException
+			catch (UsbNotActiveException | UsbNotOpenException | IllegalArgumentException
 					| UsbDisconnectedException | UsbException e) {
 				if (!close)
 					close(CloseEvent.INTERNAL, e.getMessage());
@@ -479,7 +479,7 @@ public class UsbConnection implements AutoCloseable
 					.toHex(Arrays.copyOfRange(data, 0, report.getReportHeader().getDataLength() + 3), ""));
 			out.syncSubmit(data);
 		}
-		catch (final UsbException | UsbNotActiveException | UsbNotClaimedException | UsbDisconnectedException e) {
+		catch (UsbException | UsbNotActiveException | UsbNotClaimedException | UsbDisconnectedException e) {
 			close();
 			throw new KNXPortClosedException("error sending report over USB", name, e);
 		}
@@ -846,7 +846,7 @@ public class UsbConnection implements AutoCloseable
 	{
 		try {
 			// check vendorId:productId format
-			final String[] split = device.split(":");
+			final String[] split = device.split(":", -1);
 			if (split.length == 2) {
 				try {
 					final int vendorId = Integer.parseInt(split[0], 16);
@@ -935,7 +935,7 @@ public class UsbConnection implements AutoCloseable
 				desc += "" + trimAtNull(device.getString(product));
 			if (manufacturer != 0)
 				desc += " (" + trimAtNull(device.getString(manufacturer)) + ")";
-			if (desc != indent)
+			if (!desc.equals(indent))
 				sb.append("\n").append(desc);
 			if (sno != 0)
 				sb.append("\n").append(indent).append("S/N: ").append(device.getString(sno));
@@ -963,7 +963,7 @@ public class UsbConnection implements AutoCloseable
 	{
 		boolean knownVendor = false;
 		boolean knownProduct = false;
-		final String[] split = device.split(":");
+		final String[] split = device.split(":", -1);
 		try {
 			final int vend = Integer.parseInt(split[0], 16);
 			final int prod = Integer.parseInt(split[1], 16);
@@ -1056,7 +1056,7 @@ public class UsbConnection implements AutoCloseable
 					desc += prodname;
 				if (man != null)
 					desc += " (" + man + ")";
-				if (desc != ind)
+				if (!desc.equals(ind))
 					sb.append("\n").append(desc);
 			}
 			finally {
@@ -1173,7 +1173,7 @@ public class UsbConnection implements AutoCloseable
 		if (data.length == 1)
 			return (data[0] & 0xff);
 		if (data.length == 2)
-			return (data[0] & 0xff) << 8 | data[1] & 0xff;
-		return (data[0] & 0xff) << 24 | (data[1] & 0xff) << 16 | (data[2] & 0xff) << 8 | data[3] & 0xff;
+			return (long) (data[0] & 0xff) << 8 | (data[1] & 0xff);
+		return (long) (data[0] & 0xff) << 24 | (data[1] & 0xff) << 16 | (data[2] & 0xff) << 8 | (data[3] & 0xff);
 	}
 }

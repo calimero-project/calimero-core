@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2017 B. Malinowsky
+    Copyright (c) 2010, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -148,11 +148,11 @@ abstract class ClientConnection extends ConnectionBase
 					+ ctrlEndpt.getAddress().getHostAddress() + ")");
 		useNat = useNAT;
 		logger = LogService.getLogger("calimero.knxnetip." + getName());
+		// if we allow localEP to be null, we would create an unbound socket
+		if (localEP == null)
+			throw new KNXIllegalArgumentException("no local endpoint specified");
+		InetSocketAddress local = localEP;
 		try {
-			// if we allow localEP to be null, we would create an unbound socket
-			if (localEP == null)
-				throw new KNXIllegalArgumentException("no local endpoint specified");
-			InetSocketAddress local = localEP;
 			// XXX getAddress could return null
 			if (local.getAddress().isAnyLocalAddress()) {
 				final InetAddress addr = useNAT ? null
@@ -444,7 +444,7 @@ abstract class ClientConnection extends ConnectionBase
 							received = false;
 							socket.send(p);
 
-							long remaining = CONNECTIONSTATE_REQ_TIMEOUT * 1000;
+							long remaining = CONNECTIONSTATE_REQ_TIMEOUT * 1000L;
 							final long end = System.currentTimeMillis() + remaining;
 							while (!received && remaining > 0) {
 								wait(remaining);

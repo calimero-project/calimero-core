@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2017 B. Malinowsky
+    Copyright (c) 2010, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -87,34 +87,34 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	// KNXnet/IP client SHALL wait 10 seconds for a connect response frame from server
 	static final int CONNECT_REQ_TIMEOUT = 10;
 
-	/** local control endpoint socket */
+	/** Local control endpoint socket. */
 	protected DatagramSocket ctrlSocket;
-	/** local data endpoint socket */
+	/** Local data endpoint socket. */
 	protected DatagramSocket socket;
 
-	/** remote control endpoint */
+	/** Remote control endpoint. */
 	protected InetSocketAddress ctrlEndpt;
-	/** remote data endpoint */
+	/** Remote data endpoint. */
 	protected InetSocketAddress dataEndpt;
 
-	/** connection KNX channel identifier */
+	/** Connection KNX channel identifier. */
 	protected int channelId;
-	/** use network address translation (NAT) aware communication */
+	/** Use network address translation (NAT) aware communication. */
 	protected boolean useNat;
 
-	/** service request code used for this connection type */
+	/** Service request code used for this connection type. */
 	protected final int serviceRequest;
-	/** acknowledgment service type used for this connection type */
+	/** Acknowledgment service type used for this connection type. */
 	protected final int serviceAck;
-	/** container for event listeners */
+	/** Container for event listeners. */
 	protected final EventListeners<KNXListener> listeners = new EventListeners<>();
-	/** logger for this connection */
+	/** Logger for this connection. */
 	protected Logger logger;
 
 	// current state visible to the user
 	// a state < 0 indicates severe error state
 	volatile int state = CLOSED;
-	/** internal state, so we can use states not visible to the user */
+	/** Internal state, so we can use states not visible to the user. */
 	protected volatile int internalState = CLOSED;
 	// should an internal state change update the state member
 	volatile boolean updateState = true;
@@ -430,7 +430,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 						useNat ? null : (InetSocketAddress) ctrlSocket.getLocalSocketAddress())));
 				final DatagramPacket p = new DatagramPacket(buf, buf.length, ctrlEndpt);
 				ctrlSocket.send(p);
-				long remaining = CONNECT_REQ_TIMEOUT * 1000;
+				long remaining = CONNECT_REQ_TIMEOUT * 1000L;
 				final long end = System.currentTimeMillis() + remaining;
 				while (closing == 1 && remaining > 0) {
 					lock.wait(remaining);
@@ -646,7 +646,8 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 				tail = n;
 			else
 				head.next = n;
-			return head = n;
+			head = n;
+			return head;
 		}
 
 		private void notifyNext()
