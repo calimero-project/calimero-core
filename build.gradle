@@ -5,7 +5,6 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0-SNAPSHOT'
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.15.0'
     }
 }
@@ -15,13 +14,11 @@ repositories {
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 
-ext.junitJupiterVersion = '5.0.0-SNAPSHOT'
-ext.junitPlatformVersion = '1.0.0-SNAPSHOT'
+ext.junitJupiterVersion = '5.1.0'
 
 apply plugin: 'java-library'
 apply plugin: 'maven'
 apply plugin:'application'
-apply plugin: 'org.junit.platform.gradle.plugin'
 apply plugin: 'com.github.ben-manes.versions'
 
 group = 'com.github.calimero'
@@ -54,6 +51,7 @@ sourceSets {
     }
     test {
         java.srcDirs = ['test']
+        java.exclude 'resources/'
         resources.srcDirs = ['test/resources']
     }
 }
@@ -73,27 +71,20 @@ jar {
 	}
 }
 
-junitPlatform {
-	details 'none' // 'tree'
-    filters {
-        tags {
-            exclude 'ft12'
-            exclude 'slow'
-//            exclude 'knxnetip'
-        }
-    }
+test {
+	useJUnitPlatform() {
+		excludeTags 'ft12', 'slow'
+//		excludeTags 'knxnetip'
+	}
 }
 
 dependencies {
-    api 'org.slf4j:slf4j-api:1.8.0-alpha2'
+    api 'org.slf4j:slf4j-api:1.8.0-beta1'
     api 'org.usb4java:usb4java-javax:1.2.0'
-    compileOnly 'javax.xml.stream:stax-api:1.0-2'
+	compileOnly 'javax.xml.stream:stax-api:1.0-2'
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
-    testImplementation("org.junit.platform:junit-platform-runner:${junitPlatformVersion}")
-    testRuntimeOnly 'junit:junit:4.12'
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
-    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:4.12.0-SNAPSHOT'
-
-//    testRuntime 'org.slf4j:slf4j-simple:1.7.22'
+	testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+	testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+	testCompileOnly 'junit:junit:4.12'
+	testRuntimeOnly "org.junit.vintage:junit-vintage-engine:${junitJupiterVersion}"
 }
