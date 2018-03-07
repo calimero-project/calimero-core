@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -144,21 +144,6 @@ public class GroupAddress extends KNXAddress
 	}
 
 	/**
-	 * Specifies the level presentation for KNX group addresses.
-	 * <p>
-	 * Note that, since this notation of levels only affects visual presentation and not
-	 * internal operation, this is a class setting.
-	 *
-	 * @param format3Level <code>true</code> for 3-level group format,
-	 *        <code>false</code> for 2-level group format
-	 */
-	@Deprecated
-	public static void setLevelPresentation(final boolean format3Level)
-	{
-		style = format3Level ? Presentation.ThreeLevelStyle : Presentation.TwoLevelStyle;
-	}
-
-	/**
 	 * Presets the address presentation style for all KNX group addresses.
 	 * <p>
 	 * This preset only affects visual presentation and not internal operation, hence, it is a class setting.
@@ -176,17 +161,6 @@ public class GroupAddress extends KNXAddress
 	public static Presentation addressStyle()
 	{
 		return style;
-	}
-
-	/**
-	 * Returns the current presentation of group addresses.
-	 *
-	 * @return <code>true</code> for 3-level formatting, <code>false</code> otherwise
-	 */
-	@Deprecated
-	public static boolean is3LevelPresentation()
-	{
-		return style == Presentation.ThreeLevelStyle;
 	}
 
 	/**
