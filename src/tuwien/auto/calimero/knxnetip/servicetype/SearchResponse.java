@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -75,18 +75,6 @@ public class SearchResponse extends ServiceType
 		super(KNXnetIPHeader.SEARCH_RES);
 		endpt = new HPAI(data, offset);
 		desc = new DescriptionResponse(data, offset + endpt.getStructLength(), length - endpt.getStructLength());
-	}
-
-	/**
-	 * @deprecated Use {@link #SearchResponse(byte[], int, int)}.
-	 * @param data byte array containing a search response structure
-	 * @param offset start offset of response in <code>data</code>
-	 * @throws KNXFormatException if no search response was found or invalid structure
-	 */
-	@Deprecated
-	public SearchResponse(final byte[] data, final int offset) throws KNXFormatException
-	{
-		this(data, offset, data.length - offset);
 	}
 
 	/**

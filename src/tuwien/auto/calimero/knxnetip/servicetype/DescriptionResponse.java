@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -127,19 +127,6 @@ public class DescriptionResponse extends ServiceType
 				logger.warn("skip unknown DIB in response with type code {} and size {}", type, size);
 			i += size;
 		}
-	}
-
-	/**
-	 * @deprecated Use {@link #DescriptionResponse(byte[], int, int)}.
-	 * @param data byte array containing a description response structure
-	 * @param offset start offset of response in <code>data</code>
-	 * @throws KNXFormatException if no description response was found or invalid structure of DIBs carried in the
-	 *         response
-	 */
-	@Deprecated
-	public DescriptionResponse(final byte[] data, final int offset) throws KNXFormatException
-	{
-		this(data, offset, data.length - offset);
 	}
 
 	/**

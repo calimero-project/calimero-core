@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -462,15 +462,6 @@ public final class NetworkBuffer implements AutoCloseable
 	public Configuration[] getAllConfigurations()
 	{
 		return configs.toArray(new Configuration[configs.size()]);
-	}
-
-	/**
-	 * @deprecated Use {@link #close()}.
-	 */
-	@Deprecated
-	public void destroy()
-	{
-		close();
 	}
 
 	/**
