@@ -298,7 +298,7 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	{
 		try {
 			try {
-				dst[index] = toDPT(Double.parseDouble(removeUnit(value)));
+				dst[index] = toDPT(Double.parseDouble(removeUnit(value).replace(',', '.')));
 			}
 			catch (final NumberFormatException e) {
 				dst[index] = toDPT(Short.decode(removeUnit(value)).shortValue());
