@@ -151,7 +151,7 @@ public class UsbConnection implements AutoCloseable
 		0x0e77, // Siemens: also used in Weinzierl, Merlin, Hensel
 		0x145c, // Busch-Jaeger
 		0x147b, // ABB stotz-kontakt
-		0x16D0, // Tapko and others
+		0x16D0, 0x28c2, // Tapko and others
 		0x0681, // Siemens OCI700 interface (Synco family)
 		0x04cc, // b+b
 	};
@@ -167,7 +167,7 @@ public class UsbConnection implements AutoCloseable
 		// uses ABB
 		0x5120,
 		// uses Tapko
-		0x0490, 0x0491, 0x0492,
+		0x0008, 0x0490, 0x0491, 0x0492,
 		// uses OCI
 		0x0014,
 		// uses b+b, EIBWeiche USB
