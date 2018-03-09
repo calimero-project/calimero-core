@@ -123,7 +123,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 	 * Every item is only returned once by this method, after that it is no longer marked
 	 * as new and will not cause {@link #hasNewIndication()} to return <code>true</code>
 	 * for it.<br>
-	 * If no indication is available, throws {@link IllegalStateException}.
+	 * If no indication is available, throws {@link java.util.NoSuchElementException}.
 	 * <p>
 	 * Nevertheless, the queued item might be retrieved directly through the used cache
 	 * (which is obtained by {@link Configuration#getCache()}). Whether or not a returned
@@ -141,8 +141,6 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 	public QueueItem getNextIndication()
 	{
 		synchronized (indicationKeys) {
-			if (indicationKeys.isEmpty())
-				throw new IllegalStateException("no indications");
 			return ((LDataObjectQueue) indicationKeys.remove()).getItem();
 		}
 	}
