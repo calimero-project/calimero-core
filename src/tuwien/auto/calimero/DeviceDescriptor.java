@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2017 B. Malinowsky
+    Copyright (c) 2015, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -103,6 +103,8 @@ public interface DeviceDescriptor
 		/** */
 		public static final DD0 TYPE_0310 = new DD0(0x0310, "TP1 USB interface v1");
 		/** */
+		public static final DD0 TYPE_0311 = new DD0(0x0311, "TP1 USB interface v2");
+		/** */
 		public static final DD0 TYPE_0700 = new DD0(0x0700, "BIM M112");
 		/** */
 		public static final DD0 TYPE_0701 = new DD0(0x0701, "BIM M112");
@@ -131,6 +133,10 @@ public interface DeviceDescriptor
 		/** */
 		public static final DD0 TYPE_1013 = new DD0(0x1013, "BCU 1");
 		/** */
+		public static final DD0 TYPE_1310 = new DD0(0x1310, "PL110 USB interface v1");
+		/** */
+		public static final DD0 TYPE_1311 = new DD0(0x1311, "PL110 USB interface v2");
+		/** */
 		public static final DD0 TYPE_17B0 = new DD0(0x17B0, "System B");
 		/** */
 		public static final DD0 TYPE_1900 = new DD0(0x1900, "Media Coupler PL-TP");
@@ -139,7 +145,7 @@ public interface DeviceDescriptor
 		/** */
 		public static final DD0 TYPE_2110 = new DD0(0x2110, "Unidirectional devices");
 		/** */
-		public static final DD0 TYPE_2311 = new DD0(0x2322, "RF USB interface v2");
+		public static final DD0 TYPE_2311 = new DD0(0x2311, "RF USB interface v2");
 		/** */
 		public static final DD0 TYPE_3012 = new DD0(0x3012, "BCU 1");
 		/** */
@@ -147,11 +153,11 @@ public interface DeviceDescriptor
 		/** */
 		public static final DD0 TYPE_5705 = new DD0(0x5705, "System 7");
 
-		private static final DD0[] types = new DD0[] { TYPE_0010, TYPE_0011, TYPE_0012, TYPE_0013,
-			TYPE_0020, TYPE_0021, TYPE_0025, TYPE_0300, TYPE_0310, TYPE_0700, TYPE_0701, TYPE_0705,
-			TYPE_07B0, TYPE_0810, TYPE_0811, TYPE_0910, TYPE_0911, TYPE_0912, TYPE_091A, TYPE_0AFD,
-			TYPE_0AFE, TYPE_1012, TYPE_1013, TYPE_17B0, TYPE_1900, TYPE_2010, TYPE_2110, TYPE_2311,
-			TYPE_3012, TYPE_4012, TYPE_5705, };
+		private static final DD0[] types = new DD0[] { TYPE_0010, TYPE_0011, TYPE_0012, TYPE_0013, TYPE_0020, TYPE_0021,
+			TYPE_0025, TYPE_0300, TYPE_0310, TYPE_0311, TYPE_0700, TYPE_0701, TYPE_0705, TYPE_07B0, TYPE_0810,
+			TYPE_0811, TYPE_0910, TYPE_0911, TYPE_0912, TYPE_091A, TYPE_0AFD, TYPE_0AFE, TYPE_1012, TYPE_1013,
+			TYPE_1310, TYPE_1311, TYPE_17B0, TYPE_1900, TYPE_2010, TYPE_2110, TYPE_2311, TYPE_3012, TYPE_4012,
+			TYPE_5705, };
 
 		static {
 			// ensure our DD0 array is up-to-date with the declared mask versions
