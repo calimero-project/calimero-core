@@ -129,13 +129,12 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		}
 
 		@Override
-		public void confirmation(final FrameEvent e)
-		{}
+		public void confirmation(final FrameEvent e) {}
 
 		@Override
 		public void linkClosed(final CloseEvent e)
 		{
-			logger.info("attached link was closed");
+			logger.info("attached link was closed ({})", e.getReason());
 			detach();
 		}
 	}
@@ -172,7 +171,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		if (!link.isOpen())
 			throw new KNXLinkClosedException(
 					"cannot initialize process communication using closed link " + link.getName());
-		logger = LogService.getLogger("calimero.process.process " + link.getName());
+		logger = LogService.getLogger("calimero.process.communication " + link.getName());
 		lnk = link;
 		listeners = new EventListeners<>(logger);
 		lnk.addLinkListener(lnkListener);
@@ -389,7 +388,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		}
 		lnk.removeLinkListener(lnkListener);
 		fireDetached();
-		logger.info("detached from " + lnk.getName());
+		logger.info("detached from {}", lnk.getName());
 		return lnk;
 	}
 
@@ -399,8 +398,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		if (detached)
 			throw new IllegalStateException("process communicator detached");
 		lnk.sendRequestWait(dst, p, createGroupAPDU(GROUP_WRITE, t));
-		if (logger.isTraceEnabled())
-			logger.trace("group write to " + dst + " succeeded");
+		logger.trace("group write to {} succeeded", dst);
 	}
 
 	private byte[] readFromGroup(final GroupAddress dst, final Priority p,
