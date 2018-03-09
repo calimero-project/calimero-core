@@ -451,18 +451,15 @@ public class NetworkBufferTest
 		assertTrue(filled.get());
 		assertTrue(f.hasNewIndication());
 
-		try {
-			QueueItem qi3 = f.getNextIndication();
-			assertEquals(group1, qi3.getFrame().getDestination());
-			assertTrue(f.hasNewIndication());
-			for (int i = 0; i < 10; ++i) {
-				qi3 = f.getNextIndication();
-				assertNull(qi3.getFrame());
-				assertEquals(0, qi3.getTimestamp());
-			}
-			assertFalse(f.hasNewIndication());
+		QueueItem qi3 = f.getNextIndication();
+		assertEquals(group1, qi3.getFrame().getDestination());
+		assertTrue(f.hasNewIndication());
+		for (int i = 0; i < 10; ++i) {
+			qi3 = f.getNextIndication();
+			assertNull(qi3.getFrame());
+			assertEquals(0, qi3.getTimestamp());
 		}
-		catch (final IllegalStateException e) {}
+		assertFalse(f.hasNewIndication());
 	}
 
 	/**
