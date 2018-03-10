@@ -266,8 +266,9 @@ public class UsbConnection implements AutoCloseable
 				final HidReport r = new HidReport(data);
 				logger.trace("EP {} {} I/O request {}", idx, dir, DataUnitBuilder
 						.toHex(Arrays.copyOfRange(data, 0, r.getReportHeader().getDataLength() + 3), ""));
+				final EnumSet<PacketType> packetType = r.getReportHeader().getPacketType();
 				final TransferProtocolHeader tph = r.getTransferProtocolHeader();
-				if (tph == null)
+				if (packetType.contains(PacketType.Partial) || tph == null)
 					assemblePartialPackets(r);
 				else if (tph.getProtocol() == Protocol.KnxTunnel)
 					fireFrameReceived((KnxTunnelEmi) tph.getService(), r.getData());
@@ -773,9 +774,12 @@ public class UsbConnection implements AutoCloseable
 		for (int i = 0; i < partialReportList.size(); i++) {
 			final HidReport r = partialReportList.get(i);
 			if (r.getReportHeader().getSeqNumber() != i + 1) {
-				// unexpected order, ignore complete KNX frame and delete received reports
+				// unexpected order, ignore complete KNX frame and discard received reports
+				final String reports = partialReportList.stream().map(Object::toString)
+						.collect(Collectors.joining("]\n\t[", "\t[", "]"));
+				logger.warn("received out of order HID report (expected seq {}, got {}) - ignore complete KNX frame, "
+						+ "discard reports:\n{}", i + 1, r.getReportHeader().getSeqNumber(), reports);
 				partialReportList.clear();
-				logger.warn("received out of order HID report - ignore complete KNX frame");
 				return;
 			}
 			if (r.getReportHeader().getPacketType().contains(PacketType.Start))
@@ -784,7 +788,7 @@ public class UsbConnection implements AutoCloseable
 			data.write(body, 0, body.length);
 		}
 		final byte[] assembled = data.toByteArray();
-		logger.debug("assembling completed using {} partial packets, KNX data frame: {}", partialReportList.size(),
+		logger.debug("assembling KNX data frame from {} partial packets complete: {}", partialReportList.size(),
 				DataUnitBuilder.toHex(assembled, " "));
 		partialReportList.clear();
 		fireFrameReceived(emiType, assembled);

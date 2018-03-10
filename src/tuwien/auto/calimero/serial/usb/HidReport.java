@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2017 B. Malinowsky
+    Copyright (c) 2015, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -145,13 +145,13 @@ public final class HidReport
 			packetType.add(PacketType.Partial);
 		int offset = 0;
 		for (int i = 1; i < 6; i++) {
-			final int to = Math.min(offset + frame.length, offset + maxData);
+			final int to = Math.min(frame.length, offset + maxData);
 			final byte[] range = Arrays.copyOfRange(frame, offset, to);
 			offset = to;
 			if (offset >= frame.length)
 				packetType.add(PacketType.End);
-			l.add(new HidReport(i, packetType, Protocol.KnxTunnel, emi, noEmiMsgCode, range));
-			if (range.length <= maxData)
+			l.add(new HidReport(i, packetType.clone(), Protocol.KnxTunnel, emi, noEmiMsgCode, range));
+			if (offset >= frame.length)
 				break;
 			packetType.remove(PacketType.Start);
 			maxData = maxDataPartialPacket;
@@ -286,9 +286,12 @@ public final class HidReport
 	@Override
 	public String toString()
 	{
+		final String hex = DataUnitBuilder.toHex(data, " ");
+		final String s = hex.isEmpty() ? "" : ": " + hex;
+		if (tph == null)
+			return rh + s;
 		final Object feat = tph.getProtocol() == Protocol.BusAccessServerFeature ? getFeatureId() : "";
-		final String s = DataUnitBuilder.toHex(data, " ");
-		return rh + " " + tph + " " + feat + (s.isEmpty() ? "" : ": " + s);
+		return rh + " " + tph + " " + feat + s;
 	}
 
 	// only applicable for the Bus Access Server Feature protocol
