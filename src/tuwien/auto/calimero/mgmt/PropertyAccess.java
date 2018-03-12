@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2017 B. Malinowsky
+    Copyright (c) 2010, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ public interface PropertyAccess
 	 *
 	 * @author B. Malinowsky
 	 */
-	final class PID
+	interface PID
 	{
 		//
 		// global properties (server object type = global)
@@ -336,6 +336,11 @@ public interface PropertyAccess
 		public static final int IO_LIST = 71;
 
 		/**
+		 * Device object (object type 0) property "RF domain address".
+		 */
+		int RF_DOMAIN_ADDRESS = 82;
+
+		/**
 		 * Device object property "Device Descriptor Type 0".
 		 */
 		// PDT,DPT: PDT_GENERIC_02
@@ -377,7 +382,7 @@ public interface PropertyAccess
 		public static final int SUB_LCGROUPCONFIG = 55;
 
 		//
-		// properties of object type 8, CEMI server object
+		// properties of object type 8, cEMI server object
 		//
 
 		/**
@@ -391,6 +396,48 @@ public interface PropertyAccess
 		 * Bit 4 - 15 (MSB): reserved
 		 */
 		public static final int MEDIUM_TYPE = 51;
+
+		/**
+		 * cEMI server object (object type 8) property "Communication mode".
+		 */
+		int COMM_MODE = 52;
+
+		/**
+		 * cEMI server object (object type 8) property "cEMI client subnetwork address", i.e., the subnetwork address
+		 * part of a KNX Individual Address.
+		 */
+		int CLIENT_SNA = 57;
+
+		/**
+		 * cEMI server object (object type 8) property "Device address of the cEMI client", i.e., the device part of a
+		 * KNX Individual Address.
+		 */
+		int CLIENT_DEVICE_ADDRESS = 58;
+
+		/**
+		 * cEMI server object (object type 8) property "Selected RF mode".
+		 */
+		int RF_MODE_SELECT = 60;
+
+		/**
+		 * cEMI server object (object type 8) property "Supported RF modes".
+		 */
+		int RF_MODE_SUPPORT = 61;
+
+		/**
+		 * cEMI server object (object type 8) property "cEMI supported communication modes" (property datatype: PDT_BITSET16).
+		 */
+		int COMM_MODES_SUPPORTED = 64;
+
+		/**
+		 * cEMI server object (object type 8) property "Supported filtering modes".
+		 */
+		int FILTERING_MODE_SUPPORT = 65;
+
+		/**
+		 * cEMI server object (object type 8) property "Selected filtering modes".
+		 */
+		int FILTERING_MODE_SELECT = 66;
 
 		//
 		// properties of object type 11, KNXnet/IP parameter object
@@ -615,10 +662,6 @@ public interface PropertyAccess
 		 * Implementations of masks 0x091A and 0x5705 may not have this property.
 		 */
 		public static final int ROUTING_BUSY_WAIT_TIME = 78;
-
-
-		// enfore non-instantiability
-		private PID() {}
 	}
 
 	/**
