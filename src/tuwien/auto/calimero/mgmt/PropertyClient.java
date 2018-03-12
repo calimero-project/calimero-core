@@ -415,10 +415,10 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	// the offset of a name in the array corresponds to the object type number
 	private static final String[] OBJECT_TYPE_NAMES = { "Device Object",
 		"Addresstable Object", "Associationtable Object", "Applicationprogram Object",
-		"Interfaceprogram Object", "EIB-Object Associationtable Object", "Router Object",
+		"Interfaceprogram Object", "KNX-Object Associationtable Object", "Router Object",
 		"LTE Address Filter Table Object", "cEMI Server Object",
 		"Group Object Table Object", "Polling Master", "KNXnet/IP Parameter Object",
-		"Application Controller", "File Server Object", };
+		"Application Controller", "File Server Object", "", "", "", "", "", "RF Medium Object" };
 
 
 	private final Map<PropertyKey, Property> properties = Collections.synchronizedMap(new HashMap<>());
