@@ -391,6 +391,14 @@ public final class DataUnitBuilder
 			return "A_NetworkParameter.response";
 		case 0b1111100100:
 			return "A_NetworkParameter.write";
+		case 0b1111101000:
+			return "A_GroupPropValue.read";
+		case 0b1111101001:
+			return "A_GroupPropValue.response";
+		case 0b1111101010:
+			return "A_GroupPropValue.write";
+		case 0b1111101011:
+			return "A_GroupPropValue.info";
 		default:
 			return "unknown APCI";
 		}
