@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -76,6 +76,10 @@ public abstract class KNXMediumSettings
 
 	// local device address if in transparent server mode
 	private IndividualAddress dev;
+
+	// max APDU can be between 15 and 254 bytes (255 is Escape code for extended L-Data frames)
+	// should be set according to PropertyAccess.PID.MAX_APDULENGTH, mandatory for new implementations after 2007
+	private volatile int maxApduLength = 15;
 
 	/**
 	 * Creates the medium settings for the specified KNX medium.
@@ -201,6 +205,15 @@ public abstract class KNXMediumSettings
 		default:
 			return "unknown";
 		}
+	}
+
+	/**
+	 * Returns the maximum APDU length used in the communication with the KNX network.
+	 *
+	 * @return APDU length in the range [15, ..., 254]
+	 */
+	public final int maxApduLength() {
+		return maxApduLength;
 	}
 
 	/**
