@@ -388,7 +388,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		}
 		lnk.removeLinkListener(lnkListener);
 		fireDetached();
-		logger.info("detached from {}", lnk.getName());
+		logger.info("detached from link {}", lnk.getName());
 		return lnk;
 	}
 

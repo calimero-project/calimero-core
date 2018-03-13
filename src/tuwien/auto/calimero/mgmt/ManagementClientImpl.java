@@ -575,7 +575,8 @@ public class ManagementClientImpl implements ManagementClient
 						return false;
 					}
 					catch (final KNXRemoteException e) {
-						logger.warn("problem reading property (response {})", DataUnitBuilder.toHex(apdu, " "), e);
+						logger.warn("problem reading property (response {}): {}", DataUnitBuilder.toHex(apdu, " "),
+								e.getMessage());
 						return oneResponseOnly;
 					}
 				});
