@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2017 B. Malinowsky
+    Copyright (c) 2015, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -57,8 +57,8 @@ public class RFLData implements RawFrame
 	// TODO RawFrameBase is right now not the best fit as base type, because
 	// RF frames do not use the priority field
 
-	// min length of having 1. and 2. block = [10 + CRC] [16 + CRC]
-	private static final int MinLength = 30;
+	// min length of having 1. and 2. block = [10 + CRC] [12 + CRC]
+	private static final int MinLength = 26;
 	// magic value for future extensions
 	private static final int ReservedLength = 0xff;
 	// the KNX RF frame type
@@ -151,8 +151,9 @@ public class RFLData implements RawFrame
 
 	public RFLData(final byte[] frame, final int offset) throws KNXFormatException
 	{
-		final ByteArrayInputStream is = new ByteArrayInputStream(frame, offset, frame.length
-				- offset);
+		final ByteArrayInputStream is = new ByteArrayInputStream(frame, offset, frame.length - offset);
+
+		// first data block has 10 bytes, following blocks contain 16 bytes, but last block may have less than 16 bytes
 		if (is.available() < MinLength)
 			throw new KNXFormatException("minimum data length < " + MinLength, is.available());
 
@@ -191,7 +192,7 @@ public class RFLData implements RawFrame
 		verifyCrc(crc1, frame, offset, 10);
 
 		//
-		// 2nd block, 16 octets
+		// 2nd block, max. 16 octets
 		//
 
 		// KNX control field, contains the frame type
@@ -209,13 +210,6 @@ public class RFLData implements RawFrame
 		final boolean lteExt = (extFormat & 0x0c) == 0x04;
 		if (!std && !lteExt)
 			throw new KNXFormatException("unsupported frame format", extFormat);
-
-		// Check HVAC Easy Extension bits
-		if (lteExt) {
-			// LTE-HEE bits 1 and 0 contain the extension of the group address
-			final int ext = extFormat >> 2;
-			System.out.println("LTE-HEE address ext = " + ext);
-		}
 
 		// KNX source address
 		final byte[] addr = new byte[2];
@@ -244,33 +238,22 @@ public class RFLData implements RawFrame
 		tpdu = new byte[tpduSize];
 		// read TPDU contained in 2nd block
 		is.read(tpdu, 0, Math.min(Block2TpduSize, tpduSize));
-		// make sure we fast forward to the end of 2nd data block for short TPDUs
-		for (int i = tpduSize; i < Block2TpduSize; i++)
-			if (is.read() != 0)
-				throw new KNXFormatException("2nd data block after TPDU not zeroed out");
 
 		// TODO test only: check TPCI/APCI and seq contained in TPDU
 		final int pci = tpdu[0] & 0xff;
 		final int tpci = (pci >>> 6);
 		// LTE has tpci always set 0
 		if (lteExt && tpci != Tpci.UnnumberedData.ordinal())
-			throw new KNXFormatException("RF LTE extended frame requires TPCI "
-					+ Tpci.UnnumberedData);
-//		final int seq = (pci >>> 2) & 0x0f;
-//		final int apci = DataUnitBuilder.getAPDUService(tpdu);
+			throw new KNXFormatException("RF LTE extended frame requires TPCI " + Tpci.UnnumberedData);
 
-		// TODO test only: move LTE-specific ASDU stuff out of L-Data parsing
-		// LTE frames contain the interface object type, IO instance, and PID
-		if (lteExt) {
-			final int iot = ((tpdu[2] & 0xff) << 8) | (tpdu[3] & 0xff);
-			final int ioi = tpdu[4] & 0xff;
-			final int pid = tpdu[5] & 0xff;
-			System.out.println("LTE IOT=" + iot + " IO instance=" + ioi + " PID=" + pid);
-		}
+		// for LTE, seq is fixed to 1
+//		final int seq = (pci >>> 2) & 0x0f;
+
 
 		// 2nd block CRC
 		final int crc2 = (is.read() << 8) | is.read();
-		verifyCrc(crc2, frame, offset + 12, 16);
+		final int block2Size = Math.min(Block2TpduSize, tpduSize) + 6;
+		verifyCrc(crc2, frame, offset + 12, block2Size);
 
 		//
 		// 3rd block ...
