@@ -117,6 +117,8 @@ public final class Priority
 	{
 		if ("system".equalsIgnoreCase(value))
 			return SYSTEM;
+		if ("high".equalsIgnoreCase(value))
+			return SYSTEM;
 		if ("normal".equalsIgnoreCase(value))
 			return NORMAL;
 		if ("urgent".equalsIgnoreCase(value))
