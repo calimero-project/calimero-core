@@ -312,6 +312,8 @@ public final class DataUnitBuilder
 			return "T_Ack seq " + (ctrl >> 2 & 0xF);
 		if ((ctrl & 0xC3) == T_NAK)
 			return "T_Nak seq " + (ctrl >> 2 & 0xF);
+		if ((ctrl & 0x04) == 0x04)
+			return "T_TagGroup";
 		return "unknown TPCI";
 	}
 
