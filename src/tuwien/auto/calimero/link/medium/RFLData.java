@@ -57,8 +57,10 @@ public class RFLData implements RawFrame
 	// TODO RawFrameBase is right now not the best fit as base type, because
 	// RF frames do not use the priority field
 
-	// min length of having 1. and 2. block = [10 + CRC] [12 + CRC]
-	private static final int MinLength = 26;
+	// Fast Ack frame: min length of having 1. and 2. block = [10 + CRC] [6 + CRC]
+	// BiBat Sync frame: min length of having 1. and 2. block = [10 + CRC] [7 + CRC]
+	// LTE HEE frame: min length of having 1. and 2. block = [10 + CRC] [12 + CRC]
+	private static final int MinLength = 20;
 	// magic value for future extensions
 	private static final int ReservedLength = 0xff;
 	// the KNX RF frame type
