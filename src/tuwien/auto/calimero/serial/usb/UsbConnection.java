@@ -262,6 +262,11 @@ public class UsbConnection implements AutoCloseable
 			final String dir = DescriptorUtils.getDirectionName(epaddr);
 
 			final byte[] data = event.getData();
+			// with some implementations, we might get a 0-length or unchanged array back, skip further parsing
+			if (event.getActualLength() == 0 || Arrays.equals(data, new byte[64])) {
+				logger.debug("EP {} {} empty I/O request (length {})", idx, dir, event.getActualLength());
+				return;
+			}
 			try {
 				final HidReport r = new HidReport(data);
 				logger.trace("EP {} {} I/O request {}", idx, dir, DataUnitBuilder
