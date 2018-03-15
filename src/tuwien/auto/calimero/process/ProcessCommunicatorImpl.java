@@ -278,12 +278,12 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	}
 
 	@Override
-	public void write(final GroupAddress dst, final float value, final boolean use4ByteFloat)
+	public void write(final GroupAddress dst, final double value, final boolean use4ByteFloat)
 		throws KNXTimeoutException, KNXFormatException, KNXLinkClosedException
 	{
 		if (use4ByteFloat) {
 			final DPTXlator4ByteFloat t = new DPTXlator4ByteFloat(DPTXlator4ByteFloat.DPT_TEMPERATURE_DIFFERENCE);
-			t.setValue(value);
+			t.setValue((float) value);
 			write(dst, priority, t);
 		}
 		else {

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2016 B. Malinowsky
+    Copyright (c) 2010, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -248,7 +248,7 @@ public interface ProcessCommunicationBase extends AutoCloseable
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other write problems
 	 */
-	void write(GroupAddress dst, float value, boolean use4ByteFloat) throws KNXException;
+	void write(GroupAddress dst, double value, boolean use4ByteFloat) throws KNXException;
 
 	/**
 	 * Writes a string datapoint value to a group destination.
