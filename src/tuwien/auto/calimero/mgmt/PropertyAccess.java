@@ -71,7 +71,7 @@ public interface PropertyAccess
 		 * Object Type Device Object.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_INT,DPT_PropDataType
-		public static final int OBJECT_TYPE = 1;
+		int OBJECT_TYPE = 1;
 
 		/**
 		 * Global property "Interface Object Name".
@@ -79,7 +79,7 @@ public interface PropertyAccess
 		 * Name of the Interface Object.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_CHAR[]
-		public static final int OBJECT_NAME = 2;
+		int OBJECT_NAME = 2;
 
 		/**
 		 * ! to be defined ! Property name:
@@ -97,7 +97,7 @@ public interface PropertyAccess
 		 * Access to load state machines.
 		 */
 		// PDT,DPT: PDT_CONTROL
-		public static final int LOAD_STATE_CONTROL = 5;
+		int LOAD_STATE_CONTROL = 5;
 
 		/**
 		 * Global property "Run Control".
@@ -105,13 +105,13 @@ public interface PropertyAccess
 		 * Access to run state machines.
 		 */
 		// PDT,DPT: PDT_CONTROL
-		public static final int RUN_STATE_CONTROL = 6;
+		int RUN_STATE_CONTROL = 6;
 
 		/**
 		 * Global property "Table Reference".
 		 */
 		// PDT,DPT: PDT_UNSIGNED_LONG
-		public static final int TABLE_REFERENCE = 7;
+		int TABLE_REFERENCE = 7;
 
 		/**
 		 * Global property "Service Control".
@@ -119,7 +119,7 @@ public interface PropertyAccess
 		 * Service Control, Permanent Control field for the Device.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_INT
-		public static final int SERVICE_CONTROL = 8;
+		int SERVICE_CONTROL = 8;
 
 		/**
 		 * Global property "Firmware Revision".
@@ -127,7 +127,7 @@ public interface PropertyAccess
 		 * Revision number of the Firmware.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_CHAR
-		public static final int FIRMWARE_REVISION = 9;
+		int FIRMWARE_REVISION = 9;
 
 		/**
 		 * ! to be defined ! Property name:
@@ -142,7 +142,7 @@ public interface PropertyAccess
 		 * KNX Serial Number of the device.
 		 */
 		// PDT,DPT: PDT_GENERIC_06
-		public static final int SERIAL_NUMBER = 11;
+		int SERIAL_NUMBER = 11;
 
 		/**
 		 * Global property "Manufacturer Identifier".
@@ -150,7 +150,7 @@ public interface PropertyAccess
 		 * Manufacturer code.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_INT
-		public static final int MANUFACTURER_ID = 12;
+		int MANUFACTURER_ID = 12;
 
 		/**
 		 * Global property "Application Version".
@@ -158,7 +158,7 @@ public interface PropertyAccess
 		 * Version of the Application Program.
 		 */
 		// PDT,DPT: PDT_GENERIC_05
-		public static final int PROGRAM_VERSION = 13;
+		int PROGRAM_VERSION = 13;
 
 		/**
 		 * Global property "Device Control".
@@ -166,7 +166,7 @@ public interface PropertyAccess
 		 * Device Control, Temporary Control field for the Device.
 		 */
 		// PDT,DPT: PDT_BISET8,DPT_Device_Control
-		public static final int DEVICE_CONTROL = 14;
+		int DEVICE_CONTROL = 14;
 
 		/**
 		 * Global property "Order Info".
@@ -174,7 +174,7 @@ public interface PropertyAccess
 		 * OrderInfo, Manufacturer specific Order ID.
 		 */
 		// PDT,DPT: PDT_GENERIC_10
-		public static final int ORDER_INFO = 15;
+		int ORDER_INFO = 15;
 
 		/**
 		 * Global property "PEI Type".
@@ -182,7 +182,7 @@ public interface PropertyAccess
 		 * Connected or required PEI-type.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_CHAR
-		public static final int PEI_TYPE = 16;
+		int PEI_TYPE = 16;
 
 		/**
 		 * Global property "PortADDR".
@@ -190,7 +190,7 @@ public interface PropertyAccess
 		 * PortAddr, Direction bits for Port A.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_CHAR
-		public static final int PORT_CONFIGURATION = 17;
+		int PORT_CONFIGURATION = 17;
 
 		/**
 		 * Global property "Pollgroup Settings".
@@ -198,7 +198,7 @@ public interface PropertyAccess
 		 * Pollgroup settings (polling group and slot number).
 		 */
 		// PDT,DPT: PDT_POLL_GROUP_SETTINGS
-		public static final int POLL_GROUP_SETTINGS = 18;
+		int POLL_GROUP_SETTINGS = 18;
 
 		/**
 		 * Global property "Manufacturer Data".
@@ -206,7 +206,7 @@ public interface PropertyAccess
 		 * Manufacturer Data.
 		 */
 		// PDT,DPT: PDT_GENERIC_04
-		public static final int MANUFACTURER_DATA = 19;
+		int MANUFACTURER_DATA = 19;
 
 		/**
 		 * ! to be defined ! Property name:
@@ -219,7 +219,7 @@ public interface PropertyAccess
 		 * Description, Description of the device.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_CHAR[ ]
-		public static final int DESCRIPTION = 21;
+		int DESCRIPTION = 21;
 
 		/**
 		 * ! to be defined ! Property name:
@@ -232,7 +232,7 @@ public interface PropertyAccess
 		 * Group Address Table, Association Table.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_INT[]
-		public static final int TABLE = 23;
+		int TABLE = 23;
 
 		/**
 		 * Global property "Interface Object Link".
@@ -241,7 +241,7 @@ public interface PropertyAccess
 		 */
 		// PDT,DPT: PDT_FUNCTION
 		// this property is specified uses British spelling
-		public static final int ENROL = 24;
+		int ENROL = 24;
 
 		/**
 		 * Global property "Version".
@@ -249,7 +249,7 @@ public interface PropertyAccess
 		 * Generic version information.
 		 */
 		// PDT,DPT: PDT_VERSION (U6U6U6)
-		public static final int VERSION = 25;
+		int VERSION = 25;
 
 		/**
 		 * ! to be defined ! Property name: Group Address Assignment.
@@ -262,7 +262,7 @@ public interface PropertyAccess
 		 * Sub-segmentation of memory space and checksum.
 		 */
 		// PDT,DPT: PDT_GENERIC_07[]
-		public static final int MCB_TABLE = 27;
+		int MCB_TABLE = 27;
 
 		/**
 		 * Global property "Error code".
@@ -270,7 +270,7 @@ public interface PropertyAccess
 		 * Error code when load state machine indicates "error".
 		 */
 		// PDT,DPT: PDT_GENERIC_01
-		public static final int ERROR_CODE = 28;
+		int ERROR_CODE = 28;
 
 		/**
 		 * Global property "Object Index".
@@ -278,7 +278,7 @@ public interface PropertyAccess
 		 * Access to the object index of a function block.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_CHAR
-		public static final int OBJECT_INDEX = 29;
+		int OBJECT_INDEX = 29;
 
 		//
 		// properties of object type 0, Device Object
@@ -293,7 +293,7 @@ public interface PropertyAccess
 		 * Bits 1 to 7 - reserved
 		 */
 		// PDT,DPT: PDT_BITSET8
-		public static final int PROGMODE = 54;
+		int PROGMODE = 54;
 
 		/**
 		 * Device object property "Max. APDU-Length".
@@ -301,7 +301,7 @@ public interface PropertyAccess
 		 * Maximum APDU length.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_INT
-		public static final int MAX_APDULENGTH = 56;
+		int MAX_APDULENGTH = 56;
 
 		/**
 		 * Device object property "Subnetwork Address".
@@ -309,7 +309,7 @@ public interface PropertyAccess
 		 * KNX subnet address, i.e., the high octet of the KNX individual address.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_CHAR
-		public static final int SUBNET_ADDRESS = 57;
+		int SUBNET_ADDRESS = 57;
 
 		/**
 		 * Device object property "Device Address".
@@ -317,7 +317,7 @@ public interface PropertyAccess
 		 * Device address, i.e., the low octet of the KNX individual address.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_CHAR
-		public static final int DEVICE_ADDRESS = 58;
+		int DEVICE_ADDRESS = 58;
 
 		/**
 		 * Device object property "Domain Address".
@@ -325,7 +325,7 @@ public interface PropertyAccess
 		 * Domain address of a KNX device.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_INT
-		public static final int DOMAIN_ADDRESS = 70;
+		int DOMAIN_ADDRESS = 70;
 
 		/**
 		 * Device object property "Interface Object List".
@@ -333,7 +333,7 @@ public interface PropertyAccess
 		 * Used with cEMI functionality.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_INT
-		public static final int IO_LIST = 71;
+		int IO_LIST = 71;
 
 		/**
 		 * Device object (object type 0) property "RF domain address".
@@ -344,7 +344,7 @@ public interface PropertyAccess
 		 * Device object property "Device Descriptor Type 0".
 		 */
 		// PDT,DPT: PDT_GENERIC_02
-		public static final int DEVICE_DESCRIPTOR = 83;
+		int DEVICE_DESCRIPTOR = 83;
 
 
 		//
@@ -355,31 +355,31 @@ public interface PropertyAccess
 		 * Router object property "Line Status", status of the subnetwork connected to the secondary
 		 * side of the coupler. Bit 0 = PowerDownSubline: 0 = power up, 1 = power down.
 		 */
-		public static final int LINE_STATUS = 51;
+		int LINE_STATUS = 51;
 
 		/**
 		 * Router object property "Main Line Coupler Config", for point-to-point and broadcast
 		 * frames on the primary side subnetwork of the coupler.
 		 */
-		public static final int MAIN_LCCONFIG = 52;
+		int MAIN_LCCONFIG = 52;
 
 		/**
 		 * Router object property "Sub Line Coupler Config", for point-to-point and broadcast
 		 * frames on the secondary side subnetwork of the coupler.
 		 */
-		public static final int SUB_LCCONFIG = 53;
+		int SUB_LCCONFIG = 53;
 
 		/**
 		 * Router object property "Main Line Coupler Group Config", for multicast
 		 * frames (group communication) on the primary side subnetwork of the coupler.
 		 */
-		public static final int MAIN_LCGROUPCONFIG = 54;
+		int MAIN_LCGROUPCONFIG = 54;
 
 		/**
 		 * Router object property "Sub Line Coupler Group Config", for multicast
 		 * frames (group communication) on the secondary side subnetwork of the coupler.
 		 */
-		public static final int SUB_LCGROUPCONFIG = 55;
+		int SUB_LCGROUPCONFIG = 55;
 
 		//
 		// properties of object type 8, cEMI server object
@@ -395,7 +395,7 @@ public interface PropertyAccess
 		 * Bit 3: RF
 		 * Bit 4 - 15 (MSB): reserved
 		 */
-		public static final int MEDIUM_TYPE = 51;
+		int MEDIUM_TYPE = 51;
 
 		/**
 		 * cEMI server object (object type 8) property "Communication mode".
@@ -450,7 +450,7 @@ public interface PropertyAccess
 		 * device resides.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_INT
-		public static final int PROJECT_INSTALLATION_ID = 51;
+		int PROJECT_INSTALLATION_ID = 51;
 
 		/**
 		 * Object type 11 property "KNX Individual Address".
@@ -458,7 +458,7 @@ public interface PropertyAccess
 		 * Individual Address of the KNXnet/IP server.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_INT
-		public static final int KNX_INDIVIDUAL_ADDRESS = 52;
+		int KNX_INDIVIDUAL_ADDRESS = 52;
 
 		/**
 		 * Object type 11 property "Additional Individual Addresses".
@@ -467,7 +467,7 @@ public interface PropertyAccess
 		 * tunneling servers.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_INT[]
-		public static final int ADDITIONAL_INDIVIDUAL_ADDRESSES = 53;
+		int ADDITIONAL_INDIVIDUAL_ADDRESSES = 53;
 
 		/**
 		 * Object type 11 property "Current IP Assignment Method".
@@ -475,7 +475,7 @@ public interface PropertyAccess
 		 * Used IP address assignment method.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_CHAR
-		public static final int CURRENT_IP_ASSIGNMENT_METHOD = 54;
+		int CURRENT_IP_ASSIGNMENT_METHOD = 54;
 
 		/**
 		 * Object type 11 property "IP Assignment Method".
@@ -483,7 +483,7 @@ public interface PropertyAccess
 		 * Enabled IP assignment methods that can be used.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_CHAR
-		public static final int IP_ASSIGNMENT_METHOD = 55;
+		int IP_ASSIGNMENT_METHOD = 55;
 
 		/**
 		 * Object type 11 property "IP Capabilities".
@@ -491,7 +491,7 @@ public interface PropertyAccess
 		 * Capabilities of the KNXnet/IP device for obtaining an IP address.
 		 */
 		// PDT,DPT: PDT_BITSET_8
-		public static final int IP_CAPABILITIES = 56;
+		int IP_CAPABILITIES = 56;
 
 		/**
 		 * Object type 11 property "Current IP Address".
@@ -499,7 +499,7 @@ public interface PropertyAccess
 		 * Currently used IP address.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_LONG
-		public static final int CURRENT_IP_ADDRESS = 57;
+		int CURRENT_IP_ADDRESS = 57;
 
 		/**
 		 * Object type 11 property "Current Subnet Mask".
@@ -507,7 +507,7 @@ public interface PropertyAccess
 		 * Currently used IP subnet mask.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_LONG
-		public static final int CURRENT_SUBNET_MASK = 58;
+		int CURRENT_SUBNET_MASK = 58;
 
 		/**
 		 * Object type 11 property "Current Default Gateway".
@@ -515,7 +515,7 @@ public interface PropertyAccess
 		 * IP Address of the KNXnet/IP device's default gateway.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_LONG
-		public static final int CURRENT_DEFAULT_GATEWAY = 59;
+		int CURRENT_DEFAULT_GATEWAY = 59;
 
 		/**
 		 * Object type 11 property "IP Address".
@@ -523,7 +523,7 @@ public interface PropertyAccess
 		 * Configured fixed IP Address.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_LONG
-		public static final int IP_ADDRESS = 60;
+		int IP_ADDRESS = 60;
 
 		/**
 		 * Object type 11 property "Subnet Mask".
@@ -531,7 +531,7 @@ public interface PropertyAccess
 		 * Configured IP subnet mask.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_LONG
-		public static final int SUBNET_MASK = 61;
+		int SUBNET_MASK = 61;
 
 		/**
 		 * Object type 11 property "Default Gateway".
@@ -539,7 +539,7 @@ public interface PropertyAccess
 		 * Configured IP address of the default gateway.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_LONG
-		public static final int DEFAULT_GATEWAY = 62;
+		int DEFAULT_GATEWAY = 62;
 
 		/**
 		 * Object type 11 property "DHCP/BootP Server".
@@ -548,7 +548,7 @@ public interface PropertyAccess
 		 * its IP address.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_LONG
-		public static final int DHCP_BOOTP_SERVER = 63;
+		int DHCP_BOOTP_SERVER = 63;
 
 		/**
 		 * Object type 11 property "MAC Address".
@@ -556,7 +556,7 @@ public interface PropertyAccess
 		 * MAC address of the KNXnet/IP device.
 		 */
 		// PDT,DPT: PDT_GENERIC_06
-		public static final int MAC_ADDRESS = 64;
+		int MAC_ADDRESS = 64;
 
 		/**
 		 * Object type 11 property "System Setup Multicast Address".
@@ -564,7 +564,7 @@ public interface PropertyAccess
 		 * KNXnet/IP system set-up multicast address. Value is fixed to 224.0.23.12.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_LONG
-		public static final int SYSTEM_SETUP_MULTICAST_ADDRESS = 65;
+		int SYSTEM_SETUP_MULTICAST_ADDRESS = 65;
 
 		/**
 		 * Object type 11 property "Routing Multicast Address".
@@ -572,7 +572,7 @@ public interface PropertyAccess
 		 * Routing multicast address.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_LONG
-		public static final int ROUTING_MULTICAST_ADDRESS = 66;
+		int ROUTING_MULTICAST_ADDRESS = 66;
 
 		/**
 		 * Object type 11 property "Time To Live".
@@ -580,7 +580,7 @@ public interface PropertyAccess
 		 * TTL value to be used by KNXnet/IP devices.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_CHAR
-		public static final int TTL = 67;
+		int TTL = 67;
 
 		/**
 		 * Object type 11 property "KNXnet/IP Device Capabilities".
@@ -588,7 +588,7 @@ public interface PropertyAccess
 		 * KNXnet/IP protocols supported by the KNXnet/IP device.
 		 */
 		// PDT,DPT: PDT_BITSET_16
-		public static final int KNXNETIP_DEVICE_CAPABILITIES = 68;
+		int KNXNETIP_DEVICE_CAPABILITIES = 68;
 
 		/**
 		 * Object type 11 property "KNXnet/IP Device State".
@@ -596,7 +596,7 @@ public interface PropertyAccess
 		 * Various KNXnet/IP device status info, like KNX or IP network connection failure.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_CHAR
-		public static final int KNXNETIP_DEVICE_STATE = 69;
+		int KNXNETIP_DEVICE_STATE = 69;
 
 		/**
 		 * Object type 11 property "KNXnet/IP Routing Capabilities".
@@ -604,7 +604,7 @@ public interface PropertyAccess
 		 * Supported features by the KNXnet/IP Router.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_CHAR
-		public static final int KNXNETIP_ROUTING_CAPABILITIES = 70;
+		int KNXNETIP_ROUTING_CAPABILITIES = 70;
 
 		/**
 		 * Object type 11 property "Priority FIFO Enabled".
@@ -612,7 +612,7 @@ public interface PropertyAccess
 		 * Indication of whether the priority FIFO is enabled of disabled.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_CHAR
-		public static final int PRIORITY_FIFO_ENABLED = 71;
+		int PRIORITY_FIFO_ENABLED = 71;
 
 		/**
 		 * Object type 11 property "Queue Overflow to IP".
@@ -620,7 +620,7 @@ public interface PropertyAccess
 		 * Number of telegrams lost due to overflow of queue to IP.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_INT
-		public static final int QUEUE_OVERFLOW_TO_IP = 72;
+		int QUEUE_OVERFLOW_TO_IP = 72;
 
 		/**
 		 * Object type 11 property "Queue overflow to KNX".
@@ -628,7 +628,7 @@ public interface PropertyAccess
 		 * Number of telegrams lost due to overflow of queue to KNX.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_INT
-		public static final int QUEUE_OVERFLOW_TO_KNX = 73;
+		int QUEUE_OVERFLOW_TO_KNX = 73;
 
 		/**
 		 * Object type 11 property "Telegrams Transmitted to IP".
@@ -636,7 +636,7 @@ public interface PropertyAccess
 		 * Number of telegrams successfully transmitted to IP.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_LONG
-		public static final int MSG_TRANSMIT_TO_IP = 74;
+		int MSG_TRANSMIT_TO_IP = 74;
 
 		/**
 		 * Object type 11 property "Telegrams Transmitted to KNX".
@@ -644,7 +644,7 @@ public interface PropertyAccess
 		 * Number of telegrams successfully transmitted to KNX.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_LONG
-		public static final int MSG_TRANSMIT_TO_KNX = 75;
+		int MSG_TRANSMIT_TO_KNX = 75;
 
 		/**
 		 * Object type 11 property "Friendly Name".
@@ -652,7 +652,7 @@ public interface PropertyAccess
 		 * Human Readable Friendly Name.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_CHAR[30]
-		public static final int FRIENDLY_NAME = 76;
+		int FRIENDLY_NAME = 76;
 
 		/**
 		 * Object type 11 property "Routing Busy Wait Time".
@@ -661,7 +661,7 @@ public interface PropertyAccess
 		 * PDT: PDT_UNSIGNED_INT<br>
 		 * Implementations of masks 0x091A and 0x5705 may not have this property.
 		 */
-		public static final int ROUTING_BUSY_WAIT_TIME = 78;
+		int ROUTING_BUSY_WAIT_TIME = 78;
 	}
 
 	/**
