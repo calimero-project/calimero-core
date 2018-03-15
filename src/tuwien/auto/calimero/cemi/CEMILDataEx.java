@@ -406,6 +406,8 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		final StringBuilder buf = new StringBuilder(s.length() + 30);
 		final int split = s.indexOf(',');
 		buf.append(s.substring(0, split + 1));
+		if ((ctrl2 & 0x04) == 0x04)
+			buf.append(" LTE");
 		for (int i = 0; i < addInfo.length; ++i) {
 			final byte[] info = addInfo[i];
 			if (info != null)
