@@ -86,6 +86,7 @@ import org.usb4java.LibUsb;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
+import tuwien.auto.calimero.DeviceDescriptor.DD0;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
@@ -492,25 +493,26 @@ public class UsbConnection implements AutoCloseable
 	}
 
 	/**
-	 * Returns the KNX device descriptor type 0 (mask version), use {@link DeviceDescriptor} for decoding. The returned
-	 * descriptor information format for device descriptor type 0 is as follows (MSB to LSB):<br>
-	 * <code>| Mask Type (8 bit) | Firmware Version (8 bit) |</code><br>
-	 * with the mask type split up into<br>
-	 * <code>| Medium Type (4 bit) | Firmware Type (4 bit)|</code><br>
-	 * and the firmware version split up into<br>
-	 * <code>| Version (4 bit) | Subcode (4 bit) |</code><br>
-	 * <br>
+	 * @deprecated Use {@link #deviceDescriptor()}.
+	 */
+	@Deprecated
+	public final int getDeviceDescriptorType0() throws KNXPortClosedException, KNXTimeoutException, InterruptedException
+	{
+		// device descriptor type 0 has a 2 byte structure
+		return (int) toUnsigned(getFeature(BusAccessServerFeature.DeviceDescriptorType0));
+	}
+
+	/**
+	 * Returns the KNX device descriptor type 0 of the USB interface.
 	 *
-	 * @return the descriptor type 0
+	 * @return device descriptor type 0
 	 * @throws KNXPortClosedException on closed port
 	 * @throws KNXTimeoutException on response timeout
 	 * @throws InterruptedException on interrupt
 	 * @see tuwien.auto.calimero.DeviceDescriptor
 	 */
-	public final int getDeviceDescriptorType0() throws KNXPortClosedException, KNXTimeoutException, InterruptedException
-	{
-		// device descriptor type 0 has a 2 byte structure
-		return (int) toUnsigned(getFeature(BusAccessServerFeature.DeviceDescriptorType0));
+	public final DD0 deviceDescriptor() throws KNXPortClosedException, KNXTimeoutException, InterruptedException {
+		return DD0.from((int) toUnsigned(getFeature(BusAccessServerFeature.DeviceDescriptorType0)));
 	}
 
 	/**

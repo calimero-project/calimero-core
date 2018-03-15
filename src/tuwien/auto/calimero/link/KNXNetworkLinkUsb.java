@@ -40,7 +40,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 import tuwien.auto.calimero.DataUnitBuilder;
-import tuwien.auto.calimero.DeviceDescriptor;
+import tuwien.auto.calimero.DeviceDescriptor.DD0;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXTimeoutException;
@@ -133,8 +133,8 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 			try {
 				// report device descriptor before switching to link layer mode
 				// not all devices provide a device descriptor 0
-				final int dd0 = conn.getDeviceDescriptorType0();
-				logger.info("Device Descriptor (Mask Version) {}", DeviceDescriptor.DD0.fromType0(dd0));
+				final DD0 dd0 = conn.deviceDescriptor();
+				logger.info("Device Descriptor (Mask Version) {}", dd0);
 			}
 			catch (final KNXTimeoutException expected) {}
 
