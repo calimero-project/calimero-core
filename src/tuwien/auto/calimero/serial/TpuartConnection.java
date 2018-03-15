@@ -169,7 +169,7 @@ public class TpuartConnection implements AutoCloseable
 	public TpuartConnection(final String portId, final Collection<? extends KNXAddress> acknowledge) throws KNXException
 	{
 		this.portId = portId;
-		logger = LogService.getAsyncLogger("calimero.serial.tpuart");
+		logger = LogService.getAsyncLogger("calimero.serial.tpuart:" + portId);
 		adapter = LibraryAdapter.open(logger, portId, 19200, 0);
 		os = adapter.getOutputStream();
 		is = adapter.getInputStream();
