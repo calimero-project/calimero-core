@@ -195,13 +195,18 @@ public interface DeviceDescriptor
 		 * @param descriptor the type 0 descriptor (mask version), contained in the lower 16 bits
 		 * @return the corresponding {@link DD0} object
 		 */
-		public static DD0 fromType0(final int descriptor)
-		{
+		public static DD0 from(final int descriptor) {
 			for (final DD0 v : types) {
-				if (v.getMaskVersion() == descriptor)
+				if (v.maskVersion() == descriptor)
 					return v;
 			}
 			throw new KNXIllegalArgumentException("unknown mask version " + maskVersionString(descriptor));
+		}
+
+		@Deprecated
+		public static DD0 fromType0(final int descriptor)
+		{
+			return from(descriptor);
 		}
 
 		/**
@@ -223,7 +228,7 @@ public interface DeviceDescriptor
 		/**
 		 * @return the mask version as 16 bit value
 		 */
-		public int getMaskVersion()
+		public int maskVersion()
 		{
 			return mv;
 		}
@@ -239,7 +244,7 @@ public interface DeviceDescriptor
 		/**
 		 * @return the KNX medium as {@link KNXMediumSettings}
 		 */
-		public KNXMediumSettings getMedium()
+		public KNXMediumSettings medium()
 		{
 			final int type = getMediumType();
 			switch (type) {
@@ -248,13 +253,13 @@ public interface DeviceDescriptor
 			case 1:
 				return new PLSettings();
 			case 2:
-				return new RFSettings(new IndividualAddress(0));
+				return new RFSettings(KNXMediumSettings.BackboneRouter);
 			case 3:
 				throw new KNXIllegalArgumentException("TP0 medium not supported any longer");
 			case 4:
 				throw new KNXIllegalArgumentException("PL132 medium not supported any longer");
 			case 5:
-				return new KnxIPSettings(new IndividualAddress(0));
+				return new KnxIPSettings(KNXMediumSettings.BackboneRouter);
 			default:
 				throw new KNXIllegalArgumentException("unknown KNX medium type " + type);
 			}
@@ -315,7 +320,7 @@ public interface DeviceDescriptor
 		 * @param data the type 2 descriptor data, <code>data.length == 14</code>
 		 * @return the corresponding {@link DD2} object
 		 */
-		public static DD2 fromType2(final byte[] data)
+		public static DD2 from(final byte[] data)
 		{
 			return new DD2(data);
 		}
