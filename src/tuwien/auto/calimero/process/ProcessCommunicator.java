@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -150,6 +150,20 @@ public interface ProcessCommunicator extends ProcessCommunicationBase
 	 */
 	double readFloat(GroupAddress dst, boolean is4ByteFloat) throws KNXException,
 		InterruptedException;
+
+	/**
+	 * Reads a floating point datapoint value from a group destination.
+	 *
+	 * @param dst group destination to read from
+	 * @return the read floating point value
+	 * @throws KNXTimeoutException on a timeout during send or no read response was received
+	 * @throws KNXInvalidResponseException on invalid read response message
+	 * @throws KNXLinkClosedException if network link to KNX network is closed
+	 * @throws KNXFormatException on translation problem of the response data
+	 * @throws KNXException on other read problems
+	 * @throws InterruptedException on interrupt during read
+	 */
+	double readFloat(GroupAddress dst) throws KNXException, InterruptedException;
 
 	/**
 	 * Reads a string datapoint value from a group destination.

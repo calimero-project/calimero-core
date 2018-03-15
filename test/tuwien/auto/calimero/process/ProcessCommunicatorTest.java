@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -62,6 +62,8 @@ import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.datapoint.Datapoint;
 import tuwien.auto.calimero.datapoint.StateDP;
+import tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat;
+import tuwien.auto.calimero.dptxlator.DPTXlator4ByteFloat;
 import tuwien.auto.calimero.dptxlator.DPTXlator8BitUnsigned;
 import tuwien.auto.calimero.dptxlator.DPTXlatorString;
 import tuwien.auto.calimero.link.KNXNetworkLink;
@@ -377,6 +379,15 @@ public class ProcessCommunicatorTest
 	{
 		/*final double f2 =*/ pc.readFloat(dpFloat2, false);
 		/*final double f4 =*/ pc.readFloat(dpFloat4, true);
+	}
+
+	@Test
+	void readFloat() throws KNXException, InterruptedException
+	{
+		final double f2 = pc.readFloat(dpFloat2);
+		new DPTXlator2ByteFloat(DPTXlator2ByteFloat.DPT_RAIN_AMOUNT).setValue(f2);
+		final double f4 = pc.readFloat(dpFloat4);
+		new DPTXlator4ByteFloat(DPTXlator4ByteFloat.DPT_TEMPERATURE_DIFFERENCE).setValue((float) f4);
 	}
 
 	/**
