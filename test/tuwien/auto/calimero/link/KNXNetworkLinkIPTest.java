@@ -68,7 +68,6 @@ import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.knxnetip.Debug;
 import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
-import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.link.medium.PLSettings;
 import tuwien.auto.calimero.link.medium.TPSettings;
 
@@ -154,13 +153,6 @@ public class KNXNetworkLinkIPTest
 			rtr.close();
 	}
 
-	/**
-	 * Test method for
-	 * {@link KNXNetworkLinkIP#newTunnelingLink(InetSocketAddress, InetSocketAddress, boolean, KNXMediumSettings)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testKNXNetworkLinkIPConstructor() throws KNXException, InterruptedException
 	{
@@ -192,12 +184,6 @@ public class KNXNetworkLinkIPTest
 		try (KNXNetworkLink link = KNXNetworkLinkIP.newTunnelingLink(null, Util.getServer(), true, TPSettings.TP1)) {}
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkLinkIP#newRoutingLink(NetworkInterface, InetAddress, KNXMediumSettings)}.
-	 *
-	 * @throws KNXException
-	 * @throws UnknownHostException
-	 */
 	@Test
 	void newRoutingLink() throws UnknownHostException, KNXException
 	{
@@ -205,9 +191,6 @@ public class KNXNetworkLinkIPTest
 				InetAddress.getByName("224.0.23.14"), TPSettings.TP1)) {}
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkLinkIP#addLinkListener(NetworkLinkListener)}.
-	 */
 	@Test
 	void testAddLinkListener()
 	{
@@ -215,9 +198,6 @@ public class KNXNetworkLinkIPTest
 		tnl.addLinkListener(ltnl);
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkLinkIP#setKNXMedium(KNXMediumSettings)}.
-	 */
 	@Test
 	void testSetKNXMedium()
 	{
@@ -242,9 +222,6 @@ public class KNXNetworkLinkIPTest
 		assertEquals(200, tnl.getKNXMedium().getDeviceAddress().getRawAddress());
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkLinkIP#getKNXMedium()}.
-	 */
 	@Test
 	void testGetKNXMedium()
 	{
@@ -252,12 +229,6 @@ public class KNXNetworkLinkIPTest
 		assertEquals(0, tnl.getKNXMedium().getDeviceAddress().getRawAddress());
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkLinkIP#close()}.
-	 *
-	 * @throws InterruptedException on interrupted thread
-	 * @throws KNXTimeoutException
-	 */
 	@Test
 	void testClose() throws InterruptedException, KNXTimeoutException
 	{
@@ -275,9 +246,6 @@ public class KNXNetworkLinkIPTest
 		catch (final KNXLinkClosedException e) {}
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkLinkIP#getHopCount()}.
-	 */
 	@Test
 	void testGetHopCount()
 	{
@@ -296,9 +264,6 @@ public class KNXNetworkLinkIPTest
 		catch (final KNXIllegalArgumentException e) {}
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkLinkIP#removeLinkListener(NetworkLinkListener)}.
-	 */
 	@Test
 	void testRemoveLinkListener()
 	{
@@ -308,14 +273,6 @@ public class KNXNetworkLinkIPTest
 		tnl.removeLinkListener(lrtr);
 	}
 
-	/**
-	 * Test method for
-	 * {@link KNXNetworkLinkIP#sendRequest(tuwien.auto.calimero.KNXAddress, tuwien.auto.calimero.Priority, byte[])}.
-	 *
-	 * @throws InterruptedException on interrupted thread
-	 * @throws KNXException
-	 * @throws UnknownHostException
-	 */
 	@Test
 	void testSendRequestKNXAddressPriorityByteArray()
 		throws InterruptedException, UnknownHostException, KNXException
@@ -348,12 +305,6 @@ public class KNXNetworkLinkIPTest
 		}
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkLinkIP#send(CEMILData, boolean)}.
-	 *
-	 * @throws KNXLinkClosedException
-	 * @throws KNXTimeoutException
-	 */
 	@Test
 	void testSendRequestCEMILData() throws KNXLinkClosedException, KNXTimeoutException
 	{
@@ -372,13 +323,6 @@ public class KNXNetworkLinkIPTest
 		catch (final InterruptedException e) {}
 	}
 
-	/**
-	 * Test method for
-	 * {@link KNXNetworkLinkIP#sendRequestWait(tuwien.auto.calimero.KNXAddress, tuwien.auto.calimero.Priority, byte[])}.
-	 *
-	 * @throws KNXLinkClosedException
-	 * @throws KNXTimeoutException
-	 */
 	@Test
 	void testSendRequestWaitKNXAddressPriorityByteArray()
 		throws KNXTimeoutException, KNXLinkClosedException
@@ -406,12 +350,6 @@ public class KNXNetworkLinkIPTest
 		}
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkLinkIP#send(tuwien.auto.calimero.cemi.CEMILData, boolean)}.
-	 *
-	 * @throws KNXLinkClosedException
-	 * @throws KNXTimeoutException
-	 */
 	@Test
 	void testSendRequestWaitCEMILData() throws KNXTimeoutException, KNXLinkClosedException
 	{
@@ -435,11 +373,6 @@ public class KNXNetworkLinkIPTest
 		catch (final InterruptedException e) {}
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkLinkIP#getName()}.
-	 *
-	 * @throws KNXException
-	 */
 	@Test
 	void testGetName() throws KNXException
 	{

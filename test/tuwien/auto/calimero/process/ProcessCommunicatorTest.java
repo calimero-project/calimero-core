@@ -74,7 +74,7 @@ import tuwien.auto.calimero.link.medium.TPSettings;
  * @author B. Malinowsky
  */
 @KnxnetIP
-public class ProcessCommunicatorTest
+class ProcessCommunicatorTest
 {
 	private ProcessCommunicator pc;
 	private ProcessCommunicator pc2;
@@ -90,10 +90,7 @@ public class ProcessCommunicatorTest
 
 	private final String dpStringValue = "Hello KNX!";
 
-	/**
-	 * @throws KNXFormatException
-	 */
-	public ProcessCommunicatorTest() throws KNXFormatException
+	ProcessCommunicatorTest() throws KNXFormatException
 	{
 		dpBool = new GroupAddress("1/0/1");
 		dpBool2 = new GroupAddress("1/0/11");
@@ -123,11 +120,8 @@ public class ProcessCommunicatorTest
 			link.close();
 	}
 
-	/**
-	 * Test method for {@link ProcessCommunicator#setResponseTimeout(int)}.
-	 */
 	@Test
-	public final void testSetResponseTimeout()
+	void testSetResponseTimeout()
 	{
 		pc.setResponseTimeout(2);
 		assertEquals(2, pc.getResponseTimeout());
@@ -142,21 +136,15 @@ public class ProcessCommunicatorTest
 		assertEquals(5, pc.getResponseTimeout());
 	}
 
-	/**
-	 * Test method for {@link ProcessCommunicator#getResponseTimeout()}.
-	 */
 	@Test
-	public final void testGetResponseTimeout()
+	void testGetResponseTimeout()
 	{
 		// test for correct standard timeout
 		assertEquals(10, pc.getResponseTimeout());
 	}
 
-	/**
-	 * Test method for {@link ProcessCommunicator#setPriority(tuwien.auto.calimero.Priority)}.
-	 */
 	@Test
-	public final void testSetPriority()
+	void testSetPriority()
 	{
 		pc.setPriority(Priority.SYSTEM);
 		assertEquals(Priority.SYSTEM, pc.getPriority());
@@ -165,21 +153,15 @@ public class ProcessCommunicatorTest
 		assertEquals(Priority.LOW, pc.getPriority());
 	}
 
-	/**
-	 * Test method for {@link ProcessCommunicator#getPriority()}.
-	 */
 	@Test
-	public final void testGetPriority()
+	void testGetPriority()
 	{
 		// test for default priority
 		assertEquals(Priority.LOW, pc.getPriority());
 	}
 
-	/**
-	 * Test method for {@link ProcessCommunicator#addProcessListener(ProcessListener)}.
-	 */
 	@Test
-	public final void testAddProcessListener()
+	void testAddProcessListener()
 	{
 		final ProcessListener l = new ProcessListener() {
 			@Override
@@ -205,11 +187,8 @@ public class ProcessCommunicatorTest
 		pc.addProcessListener(l);
 	}
 
-	/**
-	 * Test method for {@link ProcessCommunicator#removeProcessListener(ProcessListener)}.
-	 */
 	@Test
-	public final void testRemoveProcessListener()
+	void testRemoveProcessListener()
 	{
 		final ProcessListener l = new ProcessListener() {
 			@Override
@@ -234,14 +213,8 @@ public class ProcessCommunicatorTest
 		pc.removeProcessListener(l);
 	}
 
-	/**
-	 * Test method for {@link ProcessCommunicator#readBool(tuwien.auto.calimero.GroupAddress)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testReadBool() throws KNXException, InterruptedException
+	void testReadBool() throws KNXException, InterruptedException
 	{
 		// test concurrent read, needs breakpoints in waitForResponse method
 		// useful to see behavior when more than one indication is in the queue
@@ -296,14 +269,8 @@ public class ProcessCommunicatorTest
 		pc.readBool(dpBool2);
 	}
 
-	/**
-	 * Test method for {@link ProcessCommunicator#write(tuwien.auto.calimero.GroupAddress, boolean)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testWriteGroupAddressBoolean() throws KNXException, InterruptedException
+	void testWriteGroupAddressBoolean() throws KNXException, InterruptedException
 	{
 		// read from same address
 		// if we are testing with a virtual network make sure we have some value set
@@ -315,27 +282,15 @@ public class ProcessCommunicatorTest
 		assertFalse(pc.readBool(dpBool));
 	}
 
-	/**
-	 * Test method for {@link ProcessCommunicator#readUnsigned(tuwien.auto.calimero.GroupAddress, java.lang.String)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testReadUnsigned() throws KNXException, InterruptedException
+	void testReadUnsigned() throws KNXException, InterruptedException
 	{
 		// read from same address
 		pc.readUnsigned(dpUnsigned1, ProcessCommunicationBase.SCALING);
 	}
 
-	/**
-	 * Test method for {@link ProcessCommunicator#write(tuwien.auto.calimero.GroupAddress, int, java.lang.String)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testWriteGroupAddressIntString() throws KNXException, InterruptedException
+	void testWriteGroupAddressIntString() throws KNXException, InterruptedException
 	{
 		final int v = 80;
 		pc.write(dpUnsigned1, v, ProcessCommunicationBase.SCALING);
@@ -344,38 +299,21 @@ public class ProcessCommunicatorTest
 		assertEquals(v, i);
 	}
 
-	/**
-	 * Test method for {@link ProcessCommunicator#readControl(tuwien.auto.calimero.GroupAddress)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testReadControl() throws KNXException, InterruptedException
+	void testReadControl() throws KNXException, InterruptedException
 	{
 		pc.readControl(dpControl);
 	}
 
-	/**
-	 * Test method for {@link ProcessCommunicator#write(tuwien.auto.calimero.GroupAddress, boolean, int)}.
-	 *
-	 * @throws KNXException
-	 */
 	@Test
-	public final void testWriteGroupAddressBooleanInt() throws KNXException
+	void testWriteGroupAddressBooleanInt() throws KNXException
 	{
 		final GroupAddress addr = new GroupAddress(1, 0, 1);
 		pc.write(addr, true, 4);
 	}
 
-	/**
-	 * Test method for {@link ProcessCommunicator#readFloat(tuwien.auto.calimero.GroupAddress, boolean)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testReadFloatBoolean() throws KNXException, InterruptedException
+	void testReadFloatBoolean() throws KNXException, InterruptedException
 	{
 		/*final double f2 =*/ pc.readFloat(dpFloat2, false);
 		/*final double f4 =*/ pc.readFloat(dpFloat4, true);
@@ -390,41 +328,24 @@ public class ProcessCommunicatorTest
 		new DPTXlator4ByteFloat(DPTXlator4ByteFloat.DPT_TEMPERATURE_DIFFERENCE).setValue((float) f4);
 	}
 
-	/**
-	 * Test method for {@link ProcessCommunicator#write(tuwien.auto.calimero.GroupAddress, float, boolean)}.
-	 *
-	 * @throws KNXException
-	 */
 	@Test
-	public final void testWriteGroupAddressFloatBoolean() throws KNXException
+	void testWriteFloatingPoint() throws KNXException
 	{
 		final float f = (float) 0.01;
 		pc.write(dpFloat2, f, false);
 		pc.write(dpFloat4, f, true);
 	}
 
-	/**
-	 * Test method for {@link ProcessCommunicator#readString(tuwien.auto.calimero.GroupAddress)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testReadString() throws KNXException, InterruptedException
+	void testReadString() throws KNXException, InterruptedException
 	{
 		final String s = pc.readString(dpString);
 		assertTrue(s.length() > 0);
 		assertEquals(dpStringValue, s);
 	}
 
-	/**
-	 * Test method for {@link ProcessCommunicator#write(tuwien.auto.calimero.GroupAddress, java.lang.String)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testWriteGroupAddressString() throws KNXException, InterruptedException
+	void testWriteGroupAddressString() throws KNXException, InterruptedException
 	{
 		pc.write(dpString, "test");
 		pc.write(dpString, "test2");
@@ -433,14 +354,8 @@ public class ProcessCommunicatorTest
 		pc.write(dpString, dpStringValue);
 	}
 
-	/**
-	 * Test method for {@link ProcessCommunicator#read(tuwien.auto.calimero.datapoint.Datapoint)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testRead() throws KNXException, InterruptedException
+	void testRead() throws KNXException, InterruptedException
 	{
 		final Datapoint dp = new StateDP(dpString, "test datapoint");
 		dp.setDPT(0, DPTXlatorString.DPT_STRING_8859_1.getID());
@@ -448,11 +363,8 @@ public class ProcessCommunicatorTest
 		assertTrue(res.length() > 0);
 	}
 
-	/**
-	 * Test method for {@link ProcessCommunicator#read(Datapoint)}.
-	 */
 	@Test
-	public final void testConcurrentRead()
+	void testConcurrentRead()
 	{
 		final Datapoint dp = new StateDP(dpString, "test datapoint");
 		dp.setDPT(0, DPTXlatorString.DPT_STRING_8859_1.getID());
@@ -477,14 +389,8 @@ public class ProcessCommunicatorTest
 		assertEquals(threads.size(), count.get());
 	}
 
-	/**
-	 * Test method for {@link ProcessCommunicator#read(Datapoint)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testConcurrentRead2() throws KNXException, InterruptedException
+	void testConcurrentRead2() throws KNXException, InterruptedException
 	{
 		final List<Thread> threads = new ArrayList<>();
 		final AtomicInteger count = new AtomicInteger();
@@ -518,11 +424,8 @@ public class ProcessCommunicatorTest
 		assertEquals(threads.size(), count.get());
 	}
 
-	/**
-	 * Test method for {@link ProcessCommunicator#read(Datapoint)}.
-	 */
 	@Test
-	public final void testConcurrentReadNonExistingDestination()
+	void testConcurrentReadNonExistingDestination()
 	{
 		final List<Thread> threads = new ArrayList<>();
 		final AtomicInteger count = new AtomicInteger();
@@ -550,24 +453,16 @@ public class ProcessCommunicatorTest
 		assertTrue(now.isBefore(start.plusSeconds(12)));
 	}
 
-	/**
-	 * Test method for {@link ProcessCommunicator#write(tuwien.auto.calimero.datapoint.Datapoint, java.lang.String)}.
-	 *
-	 * @throws KNXException
-	 */
 	@Test
-	public final void testWriteDatapointString() throws KNXException
+	void testWriteDatapointString() throws KNXException
 	{
 		final Datapoint dp = new StateDP(dpUnsigned1, "test datapoint");
 		dp.setDPT(0, DPTXlator8BitUnsigned.DPT_PERCENT_U8.getID());
 		pc2.write(dp, "80");
 	}
 
-	/**
-	 * Test method for {@link ProcessCommunicator#detach()}.
-	 */
 	@Test
-	public final void testDetach()
+	void testDetach()
 	{
 		final KNXNetworkLink ret = pc.detach();
 		assertEquals(link, ret);

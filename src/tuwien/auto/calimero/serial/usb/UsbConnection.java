@@ -316,13 +316,14 @@ public class UsbConnection implements AutoCloseable
 		}
 		try {
 			final StringBuilder sb = new StringBuilder();
-			for (final UsbDevice d : getKnxDevices()) {
+			final List<UsbDevice> devices = getKnxDevices();
+			for (final UsbDevice d : devices) {
 				try {
 					sb.append("\n").append(printInfo(d, slogger, " |   "));
 				}
 				catch (final UsbException ignore) {}
 			}
-			slogger.info("Found KNX USB devices:{}", sb.length() == 0 ? " none" : sb);
+			slogger.info("Found {} KNX USB devices{}{}", devices.size(), sb.length() > 0 ? ":" : "",  sb);
 		}
 		catch (final RuntimeException e) {}
 	}

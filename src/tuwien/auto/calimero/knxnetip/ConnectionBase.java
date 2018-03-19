@@ -301,7 +301,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	@Override
 	public final void close()
 	{
-		close(CloseEvent.USER_REQUEST, "user request", LogLevel.INFO, null);
+		close(CloseEvent.USER_REQUEST, "user request", LogLevel.DEBUG, null);
 	}
 
 	/**
