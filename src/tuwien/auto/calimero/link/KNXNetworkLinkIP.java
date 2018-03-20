@@ -45,15 +45,19 @@ import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 
+import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
+import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.knxnetip.KNXConnectionClosedException;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
+import tuwien.auto.calimero.knxnetip.KNXnetIPDevMgmt;
 import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
@@ -90,6 +94,8 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	protected static final int ROUTING = 2;
 
 	private final int mode;
+
+	private KNXnetIPDevMgmt mgmt;
 
 	/**
 	 * Creates a new network link using KNXnet/IP tunneling (internally using a {@link KNXnetIPConnection}) to a remote
@@ -179,6 +185,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 		final boolean useNAT, final KNXMediumSettings settings) throws KNXException, InterruptedException
 	{
 		this(serviceMode, newConnection(serviceMode, localEP, remoteEP, useNAT), settings);
+		configureWithServerSettings(localEP, remoteEP, useNAT);
 	}
 
 	/**
@@ -247,6 +254,33 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 			logger.error("send error, closing link", e);
 			close();
 			throw new KNXLinkClosedException("link closed, " + e.getMessage());
+		}
+	}
+
+	@Override
+	void onSend(final CEMIDevMgmt frame)
+		throws KNXTimeoutException, KNXConnectionClosedException, InterruptedException {
+		mgmt.send(frame, WaitForCon);
+	}
+
+	private void configureWithServerSettings(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP,
+		final boolean useNat) throws InterruptedException {
+		try (KNXnetIPDevMgmt mgmt = new KNXnetIPDevMgmt(localEP, serverCtrlEP, useNat)) {
+			this.mgmt = mgmt;
+			mgmt.addConnectionListener(new KNXListener() {
+				@Override
+				public void frameReceived(final FrameEvent e) {
+					onDevMgmt((CEMIDevMgmt) e.getFrame());
+				}
+
+				@Override
+				public void connectionClosed(final CloseEvent e) {}
+			});
+
+			setMaxApduLength();
+		}
+		catch (KNXException | RuntimeException e) {
+			logger.warn("skip link configuration (use defaults)", e);
 		}
 	}
 
