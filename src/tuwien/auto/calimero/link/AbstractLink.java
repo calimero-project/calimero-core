@@ -36,8 +36,7 @@
 
 package tuwien.auto.calimero.link;
 
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 
@@ -47,6 +46,7 @@ import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAddress;
+import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXTimeoutException;
@@ -112,6 +112,8 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 
 	final T conn;
 
+	private CEMIDevMgmt devMgmt;
+
 	private final class LinkNotifier extends EventNotifier<NetworkLinkListener>
 	{
 		LinkNotifier()
@@ -130,31 +132,14 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 					return;
 
 				final CEMI cemi = onReceive(e);
-				final int mc = cemi.getMessageCode();
-				if (cemi instanceof CEMIDevMgmt) {
-					// XXX check .con correctly (required for setting cEMI link layer mode)
-					final CEMIDevMgmt f = (CEMIDevMgmt) cemi;
-					if (mc == CEMIDevMgmt.MC_PROPWRITE_CON) {
-						if (f.isNegativeResponse())
-							logger.error("L-DM negative response, " + f.getErrorMessage());
-					}
-					else if (mc == CEMIDevMgmt.MC_PROPREAD_CON) {
-						final int cEmiServerObject = 8;
-						final int pidSupportedCommModes = 64;
-						if (f.getObjectType() == cEmiServerObject && f.getPID() == pidSupportedCommModes) {
-							// b3 = TLL | b2 = raw | b1 = BusMon | b0 = DLL
-							final int modes = f.getPayload()[1] & 0xff;
-							logger.debug("KNX interface supports {}", Stream
-									.of(bool(modes & 0b1000, "transport link layer"), bool(modes & 0b100, "raw mode"),
-											bool(modes & 0b10, "busmonitor"), bool(modes & 0b1, "data link layer"))
-									.filter(s -> !s.isEmpty()).collect(Collectors.joining(", ")));
-						}
-					}
-				}
+				if (cemi instanceof CEMIDevMgmt)
+					onDevMgmt((CEMIDevMgmt) cemi);
+
 				// from this point on, we are only dealing with L_Data
 				if (!(cemi instanceof CEMILData))
 					return;
 				final CEMILData f = (CEMILData) cemi;
+				final int mc = cemi.getMessageCode();
 				if (mc == CEMILData.MC_LDATA_IND) {
 					addEvent(l -> l.indication(new FrameEvent(source, f)));
 					logger.debug("indication {}", f);
@@ -184,18 +169,13 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		}
 	};
 
-	private static String bool(final int condition, final String ifTrue) {
-		return condition != 0 ? ifTrue : "";
-	}
-
 	/**
 	 * @param connection if not <code>null</code>, the link object will close this resource as last
 	 *        action before returning from {@link #close()}, relinquishing any underlying resources
 	 * @param name the link name
 	 * @param settings medium settings of the accessed KNX network
 	 */
-	protected AbstractLink(final T connection, final String name,
-		final KNXMediumSettings settings)
+	protected AbstractLink(final T connection, final String name, final KNXMediumSettings settings)
 	{
 		conn = connection;
 		this.name = name;
@@ -404,6 +384,83 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	 * protocol, or releasing link-specific resources.
 	 */
 	protected void onClose() {}
+
+	@SuppressWarnings("unused")
+	void onSend(final CEMIDevMgmt frame) throws KNXException, InterruptedException {}
+
+	void onDevMgmt(final CEMIDevMgmt f) {
+		final int mc = f.getMessageCode();
+		if (mc == CEMIDevMgmt.MC_PROPWRITE_CON) {
+			if (f.isNegativeResponse())
+				logger.error("L-DM negative response, " + f.getErrorMessage());
+		}
+		synchronized (this) {
+			devMgmt = f;
+			notifyAll();
+		}
+	}
+
+	static final int cemiServerObject = 8;
+
+	void mediumType() throws KNXException, InterruptedException {
+		final int pidMediumType = 51;
+		final int supplied = getKNXMedium().getMedium();
+		final int medium = read(cemiServerObject, pidMediumType).map(KNXNetworkLinkUsb::unsigned).orElse(supplied);
+		if (supplied != medium)
+			logger.error("wrong communication medium setting: using {} with {} interface",
+					KNXMediumSettings.getMediumString(supplied), KNXMediumSettings.getMediumString(medium));
+	}
+
+	void setMaxApduLength() throws KNXException, InterruptedException {
+		final KNXMediumSettings settings = getKNXMedium();
+		maxApduLength().ifPresent(settings::setMaxApduLength);
+		if (settings.maxApduLength() != 15)
+			logger.debug("using max. APDU length of {}", settings.maxApduLength());
+	}
+
+	Optional<Integer> maxApduLength() throws KNXException, InterruptedException {
+		final int pidMaxApduLength = 56;
+		return read(0, pidMaxApduLength).map(KNXNetworkLinkUsb::unsigned);
+	}
+
+	Optional<byte[]> read(final int objectType, final int pid) throws KNXException, InterruptedException {
+		if (!cEMI)
+			return Optional.empty();
+		final int objectInstance = 1;
+		onSend(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, objectType, objectInstance, pid, 1, 1));
+		return responseFor(CEMIDevMgmt.MC_PROPREAD_CON, pid);
+	}
+
+	// usable for max 31 data bits
+	static int unsigned(final byte... data) {
+		int value = 0;
+		for (final byte b : data)
+			value = value << 8 | (b & 0xff);
+		return value;
+	}
+
+	private synchronized Optional<byte[]> responseFor(final int messageCode, final int pid) throws InterruptedException {
+		long remaining = 1000_000_000L;
+		final long end = System.nanoTime() + remaining;
+
+		while (remaining > 0) {
+			if (devMgmt != null) {
+				final CEMIDevMgmt f = devMgmt;
+				devMgmt = null;
+
+				if (f.getMessageCode() == messageCode && f.getPID() == pid) {
+					final byte[] data = f.getPayload();
+					if (f.isNegativeResponse() || data.length == 0)
+						break;
+
+					return Optional.of(data);
+				}
+			}
+			wait(remaining / 1000_000);
+			remaining = end - System.nanoTime();
+		}
+		return Optional.empty();
+	}
 
 	private CEMILData adjustMsgType(final CEMILData msg)
 	{

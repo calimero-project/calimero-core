@@ -38,9 +38,13 @@ package tuwien.auto.calimero.link;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.DeviceDescriptor.DD0;
+import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXTimeoutException;
@@ -149,9 +153,10 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 		cEMI = emiTypes.contains(EmiType.CEmi);
 		sendCEmiAsByteArray = true;
 
-		if (activeEmi == EmiType.CEmi) {
-			supportedCommModes();
-		}
+		supportedCommModes();
+		deviceAddr();
+		mediumType();
+		setMaxApduLength();
 	}
 
 	@Override
@@ -190,6 +195,11 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 		}
 	}
 
+	@Override
+	void onSend(final CEMIDevMgmt frame) throws KNXPortClosedException, KNXTimeoutException {
+		conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame.toByteArray()).get(0), true);
+	}
+
 	private boolean trySetActiveEmi(final EmiType active) throws KNXPortClosedException,
 		KNXTimeoutException, InterruptedException
 	{
@@ -201,25 +211,13 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 		return false;
 	}
 
-	// cEMI only, requires cEMI server object
-	private void supportedCommModes() throws KNXPortClosedException, KNXTimeoutException
-	{
-		final int cEmiServerObject = 8;
-		final int pidSupportedCommModes = 64;
-		final int objectInstance = 1;
-		final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, cEmiServerObject, objectInstance,
-				pidSupportedCommModes, 1, 1, new byte[0]);
-		conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame.toByteArray()).get(0), true);
-	}
-
 	private void linkLayerMode() throws KNXException, InterruptedException
 	{
 		if (activeEmi == EmiType.CEmi) {
-			final int CEMI_SERVER_OBJECT = 8;
-			final int PID_COMM_MODE = 52;
 			final int objectInstance = 1;
-			final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, CEMI_SERVER_OBJECT,
-					objectInstance, PID_COMM_MODE, 1, 1, new byte[] { 0 });
+			final int pidCommMode = 52;
+			final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, cemiServerObject,
+					objectInstance, pidCommMode, 1, 1, new byte[] { 0 });
 			conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame.toByteArray()).get(0), true);
 			// check for .con
 			//findFrame(CEMIDevMgmt.MC_PROPWRITE_CON);
@@ -233,8 +231,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 		}
 	}
 
-	private void normalMode() throws KNXPortClosedException, KNXTimeoutException,
-		InterruptedException
+	private void normalMode() throws KNXPortClosedException, KNXTimeoutException, InterruptedException
 	{
 		if (activeEmi == EmiType.CEmi) {
 			final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_RESET_REQ);
@@ -244,9 +241,35 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 			new BcuSwitcher(conn, logger).reset();
 		}
 		else {
-			final byte[] switchNormal = { (byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78,
-				(byte) 0x9A, };
+			final byte[] switchNormal = { (byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
 			conn.send(HidReport.create(activeEmi.emi, switchNormal).get(0), true);
+		}
+	}
+
+	private void supportedCommModes() throws KNXException, InterruptedException {
+		// supported comm modes: b3 = TLL | b2 = raw | b1 = BusMon | b0 = DLL
+		final int pidSupportedCommModes = 64;
+		read(cemiServerObject, pidSupportedCommModes).map(AbstractLink::unsigned).ifPresent(this::logCommModes);
+	}
+
+	private void logCommModes(final int modes) {
+		logger.debug("KNX USB interface supports {}",
+				Stream.of(bool(modes & 0b1000, "transport link layer"), bool(modes & 0b100, "raw mode"),
+						bool(modes & 0b10, "busmonitor"), bool(modes & 0b1, "data link layer"))
+						.filter(s -> !s.isEmpty()).collect(Collectors.joining(", ")));
+	}
+
+	private static String bool(final int condition, final String ifTrue) {
+		return condition != 0 ? ifTrue : "";
+	}
+
+	private void deviceAddr() throws KNXException, InterruptedException {
+		final int pidSubnet = 57;
+		final int pidDeviceAddr = 58;
+		final Optional<byte[]> subnet = read(0, pidSubnet);
+		if (subnet.isPresent()) {
+			final int addr = read(0, pidDeviceAddr).map(data -> unsigned(subnet.get()[0], data[0])).orElse(0);
+			logger.debug("KNX USB interface address {}", new IndividualAddress(addr));
 		}
 	}
 }
