@@ -36,9 +36,6 @@
 
 package tuwien.auto.calimero;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.link.medium.KnxIPSettings;
 import tuwien.auto.calimero.link.medium.PLSettings;
@@ -60,6 +57,12 @@ public interface DeviceDescriptor
 	int TYPE_SIZE = 2;
 	int TYPE2_SIZE = 14;
 
+	@Deprecated
+	static DeviceDescriptor fromType(final byte[] data) throws KNXFormatException
+	{
+		return from(data);
+	}
+
 	/**
 	 * Construct a device descriptor by parsing raw data.
 	 *
@@ -67,10 +70,10 @@ public interface DeviceDescriptor
 	 * @return a {@link DeviceDescriptor}
 	 * @throws KNXFormatException if the data does not contain a valid device descriptor
 	 */
-	static DeviceDescriptor fromType(final byte[] data) throws KNXFormatException
+	static DeviceDescriptor from(final byte[] data) throws KNXFormatException
 	{
 		if (data.length == TYPE_SIZE)
-			return DD0.fromType0(data);
+			return DD0.from(data);
 		if (data.length == TYPE2_SIZE)
 			return new DD2(data);
 		throw new KNXFormatException("unknown device descriptor type of size " + data.length);
@@ -82,94 +85,77 @@ public interface DeviceDescriptor
 	 * The Device Descriptor Type 0 (DD0) format, providing the available mask versions for type 0.
 	 * The terminology 'mask version' is equivalent with DD0.
 	 */
-	final class DD0 implements DeviceDescriptor
+	enum DD0 implements DeviceDescriptor
 	{
 		/** */
-		public static final DD0 TYPE_0010 = new DD0(0x0010, "System 1 (BCU 1)");
+		TYPE_0010(0x0010, "System 1 (BCU 1)"),
 		/** */
-		public static final DD0 TYPE_0011 = new DD0(0x0011, "System 1 (BCU 1)");
+		TYPE_0011(0x0011, "System 1 (BCU 1)"),
 		/** */
-		public static final DD0 TYPE_0012 = new DD0(0x0012, "System 1 (BCU 1)");
+		TYPE_0012(0x0012, "System 1 (BCU 1)"),
 		/** */
-		public static final DD0 TYPE_0013 = new DD0(0x0013, "System 1 (BCU 1)");
+		TYPE_0013(0x0013, "System 1 (BCU 1)"),
 		/** */
-		public static final DD0 TYPE_0020 = new DD0(0x0020, "System 2 (BCU 2)");
+		TYPE_0020(0x0020, "System 2 (BCU 2)"),
 		/** */
-		public static final DD0 TYPE_0021 = new DD0(0x0021, "System 2 (BCU 2)");
+		TYPE_0021(0x0021, "System 2 (BCU 2)"),
 		/** */
-		public static final DD0 TYPE_0025 = new DD0(0x0025, "System 2 (BCU 2)");
+		TYPE_0025(0x0025, "System 2 (BCU 2)"),
 		/** */
-		public static final DD0 TYPE_0300 = new DD0(0x0300, "System 300");
+		TYPE_0300(0x0300, "System 300"),
 		/** */
-		public static final DD0 TYPE_0310 = new DD0(0x0310, "TP1 USB interface v1");
+		TYPE_0310(0x0310, "TP1 USB interface v1"),
 		/** */
-		public static final DD0 TYPE_0311 = new DD0(0x0311, "TP1 USB interface v2");
+		TYPE_0311(0x0311, "TP1 USB interface v2"),
 		/** */
-		public static final DD0 TYPE_0700 = new DD0(0x0700, "BIM M112");
+		TYPE_0700(0x0700, "BIM M112"),
 		/** */
-		public static final DD0 TYPE_0701 = new DD0(0x0701, "BIM M112");
+		TYPE_0701(0x0701, "BIM M112"),
 		/** */
-		public static final DD0 TYPE_0705 = new DD0(0x0705, "BIM M112");
+		TYPE_0705(0x0705, "BIM M112"),
 		/** */
-		public static final DD0 TYPE_07B0 = new DD0(0x07B0, "System B");
+		TYPE_07B0(0x07B0, "System B"),
 		/** */
-		public static final DD0 TYPE_0810 = new DD0(0x0810, "IR-Decoder");
+		TYPE_0810(0x0810, "IR-Decoder"),
 		/** */
-		public static final DD0 TYPE_0811 = new DD0(0x0811, "IR-Decoder");
+		TYPE_0811(0x0811, "IR-Decoder"),
 		/** */
-		public static final DD0 TYPE_0910 = new DD0(0x0910, "Coupler 1.0");
+		TYPE_0910(0x0910, "Coupler 1.0"),
 		/** */
-		public static final DD0 TYPE_0911 = new DD0(0x0911, "Coupler 1.1");
+		TYPE_0911(0x0911, "Coupler 1.1"),
 		/** */
-		public static final DD0 TYPE_0912 = new DD0(0x0912, "Coupler 1.2");
+		TYPE_0912(0x0912, "Coupler 1.2"),
 		/** */
-		public static final DD0 TYPE_091A = new DD0(0x091A, "KNXnet/IP Router");
+		TYPE_091A(0x091A, "KNXnet/IP Router"),
 		/** */
-		public static final DD0 TYPE_0AFD = new DD0(0x0AFD, "none");
+		TYPE_0AFD(0x0AFD, "none"),
 		/** */
-		public static final DD0 TYPE_0AFE = new DD0(0x0AFE, "none");
+		TYPE_0AFE(0x0AFE, "none"),
 		/** */
-		public static final DD0 TYPE_1012 = new DD0(0x1012, "BCU 1");
+		TYPE_1012(0x1012, "BCU 1"),
 		/** */
-		public static final DD0 TYPE_1013 = new DD0(0x1013, "BCU 1");
+		TYPE_1013(0x1013, "BCU 1"),
 		/** */
-		public static final DD0 TYPE_1310 = new DD0(0x1310, "PL110 USB interface v1");
+		TYPE_1310(0x1310, "PL110 USB interface v1"),
 		/** */
-		public static final DD0 TYPE_1311 = new DD0(0x1311, "PL110 USB interface v2");
+		TYPE_1311(0x1311, "PL110 USB interface v2"),
 		/** */
-		public static final DD0 TYPE_17B0 = new DD0(0x17B0, "System B");
+		TYPE_17B0(0x17B0, "System B"),
 		/** */
-		public static final DD0 TYPE_1900 = new DD0(0x1900, "Media Coupler PL-TP");
+		TYPE_1900(0x1900, "Media Coupler PL-TP"),
 		/** */
-		public static final DD0 TYPE_2010 = new DD0(0x2010, "Bidirectional devices");
+		TYPE_2010(0x2010, "Bidirectional devices"),
 		/** */
-		public static final DD0 TYPE_2110 = new DD0(0x2110, "Unidirectional devices");
+		TYPE_2110(0x2110, "Unidirectional devices"),
 		/** */
-		public static final DD0 TYPE_2311 = new DD0(0x2311, "RF USB interface v2");
+		TYPE_2311(0x2311, "RF USB interface v2"),
 		/** */
-		public static final DD0 TYPE_3012 = new DD0(0x3012, "BCU 1");
+		TYPE_3012(0x3012, "BCU 1"),
 		/** */
-		public static final DD0 TYPE_4012 = new DD0(0x4012, "BCU 1");
+		TYPE_4012(0x4012, "BCU 1"),
 		/** */
-		public static final DD0 TYPE_5705 = new DD0(0x5705, "System 7");
+		TYPE_5705(0x5705, "System 7");
 
-		private static final DD0[] types = new DD0[] { TYPE_0010, TYPE_0011, TYPE_0012, TYPE_0013, TYPE_0020, TYPE_0021,
-			TYPE_0025, TYPE_0300, TYPE_0310, TYPE_0311, TYPE_0700, TYPE_0701, TYPE_0705, TYPE_07B0, TYPE_0810,
-			TYPE_0811, TYPE_0910, TYPE_0911, TYPE_0912, TYPE_091A, TYPE_0AFD, TYPE_0AFE, TYPE_1012, TYPE_1013,
-			TYPE_1310, TYPE_1311, TYPE_17B0, TYPE_1900, TYPE_2010, TYPE_2110, TYPE_2311, TYPE_3012, TYPE_4012,
-			TYPE_5705, };
-
-		static {
-			// ensure our DD0 array is up-to-date with the declared mask versions
-			int i = 0;
-			for (final Field f : DD0.class.getDeclaredFields()) {
-				final int mod = f.getModifiers();
-				if (Modifier.isStatic(mod) && f.getName().startsWith("TYPE_"))
-					++i;
-			}
-			if (i != types.length)
-				throw new IllegalStateException("mask versions missing");
-		}
 
 		private final int mv;
 		private final String profile;
@@ -180,13 +166,19 @@ public interface DeviceDescriptor
 		 * @param data the type 0 descriptor data (mask version), <code>data.length == 2</code>
 		 * @return the corresponding {@link DD0} object
 		 */
-		public static DD0 fromType0(final byte[] data)
+		public static DD0 from(final byte[] data)
 		{
 			if (data.length != 2)
 				throw new KNXIllegalArgumentException("unspecified device descriptor type 0 using "
 						+ "length " + data.length + ": " + DataUnitBuilder.toHex(data, ""));
 			final int i = (data[0] & 0xff) << 8 | data[1] & 0xff;
 			return fromType0(i);
+		}
+
+		@Deprecated
+		public static DD0 fromType0(final byte[] data)
+		{
+			return from(data);
 		}
 
 		/**
@@ -196,7 +188,7 @@ public interface DeviceDescriptor
 		 * @return the corresponding {@link DD0} object
 		 */
 		public static DD0 from(final int descriptor) {
-			for (final DD0 v : types) {
+			for (final DD0 v : values()) {
 				if (v.maskVersion() == descriptor)
 					return v;
 			}
@@ -219,7 +211,7 @@ public interface DeviceDescriptor
 			return String.format("%04X", descriptor);
 		}
 
-		private DD0(final int mask, final String profile)
+		DD0(final int mask, final String profile)
 		{
 			this.mv = mask;
 			this.profile = profile;
@@ -235,8 +227,9 @@ public interface DeviceDescriptor
 
 		/**
 		 * @return the medium type as 4 bit value
+		 * @see #medium()
 		 */
-		public int getMediumType()
+		public int mediumType()
 		{
 			return (mv >> 12) & 0x0f;
 		}
@@ -246,7 +239,7 @@ public interface DeviceDescriptor
 		 */
 		public KNXMediumSettings medium()
 		{
-			final int type = getMediumType();
+			final int type = mediumType();
 			switch (type) {
 			case 0:
 				return TPSettings.TP1;
@@ -268,31 +261,31 @@ public interface DeviceDescriptor
 		/**
 		 * @return the firmware type
 		 */
-		public int getFirmwareType()
+		public int firmwareType()
 		{
 			return (mv >> 8) & 0x0f;
 		}
 
 		/**
-		 * @return the firmware version
+		 * @return the firmware version as 4 bit value (bits 7-4 of the device descriptor)
 		 */
-		public int getFirmwareVersion()
+		public int firmwareVersion()
 		{
 			return (mv >> 4) & 0x0f;
 		}
 
 		/**
-		 * @return the firmware version subcode part
+		 * @return the firmware version subcode as 4 bit value (lowest 4 bits of the device descriptor)
 		 */
-		public int getSubcode()
+		public int firmwareSubcode()
 		{
-			return (mv >> 0) & 0x0f;
+			return mv & 0x0f;
 		}
 
 		/**
 		 * @return the device profile name as human readable string
 		 */
-		public String getDeviceProfile()
+		public String deviceProfile()
 		{
 			return profile;
 		}
@@ -300,7 +293,7 @@ public interface DeviceDescriptor
 		@Override
 		public String toString()
 		{
-			return maskVersionString(mv) + " - " + getDeviceProfile();
+			return maskVersionString(mv) + " - " + deviceProfile();
 		}
 
 		@Override
@@ -362,7 +355,7 @@ public interface DeviceDescriptor
 		/**
 		 * @return the 16 bit KNX application manufacturer code of this descriptor
 		 */
-		public int getApplicationManufacturer()
+		public int applicationManufacturer()
 		{
 			return get16Bits(0);
 		}
@@ -370,7 +363,7 @@ public interface DeviceDescriptor
 		/**
 		 * @return the 16 bit manufacturer specific device type of this descriptor
 		 */
-		public int getDeviceType()
+		public int deviceType()
 		{
 			return get16Bits(2);
 		}
@@ -378,7 +371,7 @@ public interface DeviceDescriptor
 		/**
 		 * @return the 8 bit version of the manufacturer specific device type of this descriptor
 		 */
-		public int getVersion()
+		public int version()
 		{
 			return d[4] & 0xff;
 		}
@@ -387,7 +380,7 @@ public interface DeviceDescriptor
 		 * @return <code>true</code> if network management procedures using A_Link_Read/Write are
 		 *         supported, <code>false</code> otherwise
 		 */
-		public boolean isLinkManagementSupported()
+		public boolean supportsLinkManagement()
 		{
 			final int i = (d[5] & 0xc0) >> 6;
 			return i == 1;
@@ -400,7 +393,7 @@ public interface DeviceDescriptor
 		 *
 		 * @return the current Logical Tag Base as 6 bit value
 		 */
-		public int getLogicalTagBase()
+		public int logicalTagBase()
 		{
 			return d[5] & 0x3f;
 		}
@@ -415,7 +408,7 @@ public interface DeviceDescriptor
 		 * @param channelType the requested channel type
 		 * @return the number of channels, <code>1 &le; channels &le; 8</code>
 		 */
-		public int getChannels(final Channel channelType)
+		public int channels(final Channel channelType)
 		{
 			final int offset = channelType.ordinal() * 2;
 			return (get16Bits(6 + offset) >> 13) + 1;
@@ -425,7 +418,7 @@ public interface DeviceDescriptor
 		 * @param channelType the requested channel type
 		 * @return the 13 bit channel code of the specified channel type
 		 */
-		public int getChannelCode(final Channel channelType)
+		public int channelCode(final Channel channelType)
 		{
 			final int offset = channelType.ordinal() * 2;
 			return get16Bits(6 + offset) & 0x1fff;
