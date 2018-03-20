@@ -418,7 +418,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		"Interfaceprogram Object", "KNX-Object Associationtable Object", "Router Object",
 		"LTE Address Filter Table Object", "cEMI Server Object",
 		"Group Object Table Object", "Polling Master", "KNXnet/IP Parameter Object",
-		"Application Controller", "File Server Object", "", "", "", "", "", "RF Medium Object" };
+		"Application Controller", "File Server Object", "", "", "", "Security Object", "", "RF Medium Object" };
 
 
 	private final Map<PropertyKey, Property> properties = Collections.synchronizedMap(new HashMap<>());

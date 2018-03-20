@@ -169,7 +169,7 @@ public class PropertyClientTest
 	{
 		for (int i = 0; i < 20; ++i) {
 			final String s = PropertyClient.getObjectTypeName(i);
-			if (i > 13 && i != 19)
+			if (i > 13 && i != 17 && i != 19)
 				assertEquals("", s);
 			else
 				assertNotNull(s);
