@@ -142,7 +142,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 
 	private static final int ADDINFO_ESC = 0xFF;
 
-	private static final int[] ADDINFO_LENGTHS = { 0, 2, 8, 1, 2, 4, 4, 2, };
+	private static final int[] ADDINFO_LENGTHS = { 0, 2, 8, 1, 2, 4, 4, 2, 4, 3 };
 
 	private byte[][] addInfo = new byte[10][];
 
