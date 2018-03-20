@@ -216,6 +216,12 @@ public abstract class KNXMediumSettings
 		return maxApduLength;
 	}
 
+	public void setMaxApduLength(final int maxApduLength) {
+		if (maxApduLength < 15 || maxApduLength > 254)
+			throw new KNXIllegalArgumentException("invalid maximum APDU setting of " + maxApduLength);
+		this.maxApduLength = maxApduLength;
+	}
+
 	/**
 	 * Returns the medium dependent time factor required for calculating certain protocol timings.
 	 *
