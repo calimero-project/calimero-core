@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -155,6 +155,10 @@ public class KNXnetIPHeader
 	 */
 	public static final int KNXNETIP_VERSION_10 = 0x10;
 
+	static final int KnxSecureVersion_13 = 0x13;
+
+	public static final int SecureWrapper = 0xaa00;
+
 	private static final int HEADER_SIZE_10 = 0x06;
 
 	private final int headersize;
@@ -186,11 +190,11 @@ public class KNXnetIPHeader
 		totalsize = (high << 8) | low;
 
 		if (headersize != HEADER_SIZE_10)
-			throw new KNXFormatException("unsupported header size, expected " + HEADER_SIZE_10,
-					headersize);
-		if (version != KNXNETIP_VERSION_10)
-			throw new KNXFormatException("unsupported KNXnet/IP protocol version, expected "
-					+ KNXNETIP_VERSION_10, version);
+			throw new KNXFormatException("unsupported header size, expected " + HEADER_SIZE_10, headersize);
+		if (version != KNXNETIP_VERSION_10 && version != KnxSecureVersion_13)
+			throw new KNXFormatException(
+					String.format("unsupported KNXnet/IP protocol version, expected 0x%1h or 0x%2h",
+							KNXNETIP_VERSION_10, KnxSecureVersion_13), version);
 	}
 
 	/**
@@ -207,8 +211,8 @@ public class KNXnetIPHeader
 		if (serviceType < 0 || serviceType > 0xFFFF)
 			throw new KNXIllegalArgumentException("service type out of range [0..0xFFFF]");
 		headersize = HEADER_SIZE_10;
-		version = KNXNETIP_VERSION_10;
 		service = serviceType;
+		version = (service & 0xaa00) == 0xaa00 ? KnxSecureVersion_13 : KNXNETIP_VERSION_10;
 		totalsize = headersize + serviceLength;
 	}
 
@@ -231,7 +235,7 @@ public class KNXnetIPHeader
 	 */
 	public int getVersion()
 	{
-		return KNXNETIP_VERSION_10;
+		return version;
 	}
 
 	/**

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,13 +37,16 @@
 package tuwien.auto.calimero.knxnetip.servicetype;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 
 import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.knxnetip.util.HPAI;
 
 /**
  * Little helpers to handle KNXnet/IP packets and service types.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public final class PacketHelper
@@ -55,7 +58,7 @@ public final class PacketHelper
 	 * Creates a packet with a KNXnet/IP message header v1.0, containing the specified
 	 * service <code>type</code>, and generates the corresponding byte representation
 	 * of this structure.
-	 * 
+	 *
 	 * @param type service type to pack
 	 * @return the packet as byte array
 	 */
@@ -71,7 +74,7 @@ public final class PacketHelper
 	 * Creates a new service request using the <code>data</code> byte array and
 	 * information from the KNXnet/IP header.
 	 * <p>
-	 * 
+	 *
 	 * @param h KNXnet/IP header associated with <code>data</code>
 	 * @param data byte array containing the data following the KNXnet/IP header in the
 	 *        message structure
@@ -84,10 +87,9 @@ public final class PacketHelper
 	public static ServiceRequest getServiceRequest(final KNXnetIPHeader h, final byte[] data,
 		final int offset) throws KNXFormatException
 	{
-		return new ServiceRequest(h.getServiceType(), data, offset, h.getTotalLength()
-				- h.getStructLength());
+		return new ServiceRequest(h.getServiceType(), data, offset, h.getTotalLength() - h.getStructLength());
 	}
-	
+
 	/**
 	 * Internal use only.
 	 * <p>
@@ -97,7 +99,7 @@ public final class PacketHelper
 	 * i.e., the returned service request is incomplete and {@link ServiceRequest#getCEMI()}
 	 * returns <code>null</code>. The service request must not be used for the creation
 	 * of KNXnet/IP packets.
-	 * 
+	 *
 	 * @param h KNXnet/IP header associated with <code>data</code>
 	 * @param data byte array containing the data following the KNXnet/IP header in the
 	 *        message structure
@@ -109,7 +111,45 @@ public final class PacketHelper
 	public static ServiceRequest getEmptyServiceRequest(final KNXnetIPHeader h, final byte[] data,
 		final int offset) throws KNXFormatException
 	{
-		return new ServiceRequest(h.getServiceType(), data, offset, h.getTotalLength()
-				- h.getStructLength(), null);
+		return new ServiceRequest(h.getServiceType(), data, offset, h.getTotalLength() - h.getStructLength(), null);
+	}
+
+	private static final int SecureChannelRequest = 0xaa01;
+	// response to auth is a channel status within 10 seconds
+	private static final int SecureChannelAuth = 0xaa03;
+
+	private static final int macSize = 16;
+	private static final int keyLength = 36;
+
+
+	public static boolean isKnxSecure(final KNXnetIPHeader h) {
+		return h.getVersion() == KNXnetIPHeader.KnxSecureVersion_13
+				&& ((h.getServiceType() & KNXnetIPHeader.SecureWrapper) == KNXnetIPHeader.SecureWrapper);
+	}
+
+	public static byte[] newChannelRequest(final HPAI hpai, final byte[] ecdhPublicKey) {
+		if (ecdhPublicKey.length != keyLength)
+			throw new KNXIllegalArgumentException("Diffie-Hellman key required to be 36 bytes");
+
+		final int length = hpai.getStructLength() + ecdhPublicKey.length;
+		final KNXnetIPHeader header = new KNXnetIPHeader(SecureChannelRequest, length);
+
+		final ByteBuffer buffer = ByteBuffer.allocate(header.getTotalLength());
+		buffer.put(header.toByteArray());
+		buffer.put(hpai.toByteArray());
+		buffer.put(ecdhPublicKey);
+		return buffer.array();
+	}
+
+	public static byte[] newChannelAuth(final int channelIdx, final int authContext, final byte[] mac) {
+		final int length = 2 + macSize;
+		final KNXnetIPHeader header = new KNXnetIPHeader(SecureChannelAuth, length);
+
+		final ByteBuffer buffer = ByteBuffer.allocate(header.getTotalLength());
+		buffer.put(header.toByteArray());
+		buffer.putShort((short) authContext);
+		buffer.put(mac);
+
+		return buffer.array();
 	}
 }
