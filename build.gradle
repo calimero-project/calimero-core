@@ -33,7 +33,7 @@ compileTestJava.options.encoding = 'UTF-8'
 compileJava.options*.compilerArgs = [
 	'-Xlint:all',
 	'-Xlint:-options',
-	'-Werror'
+//	'-Werror'
 ]
 
 compileTestJava.options*.compilerArgs = [

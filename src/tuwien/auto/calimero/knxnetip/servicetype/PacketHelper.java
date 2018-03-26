@@ -114,16 +114,16 @@ public final class PacketHelper
 		return new ServiceRequest(h.getServiceType(), data, offset, h.getTotalLength() - h.getStructLength(), null);
 	}
 
-	private static final int SecureChannelRequest = 0xaa01;
+	private static final int SecureSessionRequest = 0x0951;
 	// response to auth is a channel status within 10 seconds
-	private static final int SecureChannelAuth = 0xaa03;
+	private static final int SecureSessionAuth = 0x0953;
 
 	private static final int macSize = 16;
 	private static final int keyLength = 36;
 
 
 	public static boolean isKnxSecure(final KNXnetIPHeader h) {
-		return h.getVersion() == KNXnetIPHeader.KnxSecureVersion_13
+		return h.getVersion() == KNXnetIPHeader.KNXNETIP_VERSION_10
 				&& ((h.getServiceType() & KNXnetIPHeader.SecureWrapper) == KNXnetIPHeader.SecureWrapper);
 	}
 
@@ -132,7 +132,7 @@ public final class PacketHelper
 			throw new KNXIllegalArgumentException("Diffie-Hellman key required to be 36 bytes");
 
 		final int length = hpai.getStructLength() + ecdhPublicKey.length;
-		final KNXnetIPHeader header = new KNXnetIPHeader(SecureChannelRequest, length);
+		final KNXnetIPHeader header = new KNXnetIPHeader(SecureSessionRequest, length);
 
 		final ByteBuffer buffer = ByteBuffer.allocate(header.getTotalLength());
 		buffer.put(header.toByteArray());
@@ -143,7 +143,7 @@ public final class PacketHelper
 
 	public static byte[] newChannelAuth(final int channelIdx, final int authContext, final byte[] mac) {
 		final int length = 2 + macSize;
-		final KNXnetIPHeader header = new KNXnetIPHeader(SecureChannelAuth, length);
+		final KNXnetIPHeader header = new KNXnetIPHeader(SecureSessionAuth, length);
 
 		final ByteBuffer buffer = ByteBuffer.allocate(header.getTotalLength());
 		buffer.put(header.toByteArray());

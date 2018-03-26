@@ -155,9 +155,13 @@ public class KNXnetIPHeader
 	 */
 	public static final int KNXNETIP_VERSION_10 = 0x10;
 
-	static final int KnxSecureVersion_13 = 0x13;
+	public static final int SecureWrapper = 0x0950;
+	private static final int SecureSessionReq = 0x0951;
+	private static final int SecureSessionRes = 0x0952;
+	private static final int SecureSessionAuth = 0x0953;
+	private static final int SecureSessionStatus = 0x0954;
+	private static final int SecureGroupSync = 0x0955;
 
-	public static final int SecureWrapper = 0xaa00;
 
 	private static final int HEADER_SIZE_10 = 0x06;
 
@@ -191,10 +195,10 @@ public class KNXnetIPHeader
 
 		if (headersize != HEADER_SIZE_10)
 			throw new KNXFormatException("unsupported header size, expected " + HEADER_SIZE_10, headersize);
-		if (version != KNXNETIP_VERSION_10 && version != KnxSecureVersion_13)
+		if (version != KNXNETIP_VERSION_10)
 			throw new KNXFormatException(
-					String.format("unsupported KNXnet/IP protocol version, expected 0x%1h or 0x%2h",
-							KNXNETIP_VERSION_10, KnxSecureVersion_13), version);
+					String.format("unsupported KNXnet/IP protocol version, expected 0x%1h", KNXNETIP_VERSION_10),
+					version);
 	}
 
 	/**
@@ -212,7 +216,7 @@ public class KNXnetIPHeader
 			throw new KNXIllegalArgumentException("service type out of range [0..0xFFFF]");
 		headersize = HEADER_SIZE_10;
 		service = serviceType;
-		version = (service & 0xaa00) == 0xaa00 ? KnxSecureVersion_13 : KNXNETIP_VERSION_10;
+		version = KNXNETIP_VERSION_10;
 		totalsize = headersize + serviceLength;
 	}
 
@@ -332,6 +336,12 @@ public class KNXnetIPHeader
 			return "routing-lost.msg";
 		case ROUTING_BUSY:
 			return "routing-busy.ind";
+		case SecureWrapper: return "secure-msg";
+		case SecureSessionReq: return "session.req";
+		case SecureSessionRes: return "session.res";
+		case SecureSessionAuth: return "session-auth";
+		case SecureSessionStatus: return "session-status";
+		case SecureGroupSync: return "group-sync";
 		default:
 			return "unknown service";
 		}

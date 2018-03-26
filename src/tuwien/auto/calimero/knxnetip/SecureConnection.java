@@ -36,42 +36,50 @@
 
 package tuwien.auto.calimero.knxnetip;
 
-import java.math.BigInteger;
+import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.nio.ByteBuffer;
+import java.security.GeneralSecurityException;
+import java.security.Key;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
+import tuwien.auto.calimero.DataUnitBuilder;
+import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXRemoteException;
+import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
+import tuwien.auto.calimero.knxnetip.servicetype.ServiceRequest;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
 import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.log.LogService.LogLevel;
 
-final class SecureConnection {
+final class SecureConnection extends KNXnetIPRouting {
 
-	private static final int SecureSvc = 0xaa00;
+	private static final int SecureSvc = 0x0950;
+	private static final int SecureSessionResponse = 0x0952;
+	private static final int SecureSessionStatus = 0x0954;
+	private static final int SecureGroupSync = 0x0955;
 
-	private static final int SecureChannelResponse = 0xaa02;
-	private static final int SecureChannelStatus = 0xaa04;
-	private static final int SecureGroupSyncRequest = 0xaa06;
-	private static final int SecureGroupSyncResponse = 0xaa07;
-
-	private static final int aesKeySize = 128; // [bits]
+	static final int aesKeySize = 128; // [bits]
 	private static final int macSize = 16; // [bytes]
 	private static final int keyLength = 36; // [bytes]
-
-	private final Logger logger = LoggerFactory.getLogger("[temp logger] Knx-Secure");
 
 	private final byte[] ecdhPublicKey;
 
@@ -82,20 +90,39 @@ final class SecureConnection {
 	private static final int channelSetupTimeout = 30; // [s]
 
 	private byte[] serverPublicKey;
-	private int channelIdx;
+	private int sessionId;
 
 
 	// routing connection setup
 
+	private static final ScheduledThreadPoolExecutor groupSyncSender = new ScheduledThreadPoolExecutor(1, r -> {
+		final Thread t = new Thread(r);
+		t.setName("KNX/IP secure group sync");
+		t.setDaemon(true);
+		return t;
+	});
+
+	static {
+		// remove idle threads after a while
+		groupSyncSender.setKeepAliveTime(30, TimeUnit.SECONDS);
+		groupSyncSender.allowCoreThreadTimeOut(true);
+	}
+
+	// assign dummy to have it initialized
+	private Future<?> groupSync = CompletableFuture.completedFuture(Void.TYPE);
+
 	private byte[] groupKey;
+	private final Key secretKey;
 
 	// multicast timestamp sync
 	private static final Duration timestampExpiresAfter = Duration.ofMinutes(60 + new Random().nextInt(11));
 	private long timestampExpiresAt = 0 + timestampExpiresAfter.toMillis();
 	// offset to adjust local clock upon receiving a valid secure packet or group sync response
 	private long timestampOffset = -System.nanoTime() / 1_000_000L; // [ms]
+	private static final long queryInterval = 10_000; // [ms]
 
 	private final int mcastLatencyTolerance = 3000; // [ms]
+
 
 
 	public static KNXnetIPConnection newTunneling(final TunnelingLayer knxLayer, final InetSocketAddress localEP,
@@ -103,28 +130,42 @@ final class SecureConnection {
 		return null;
 	};
 
-	public static KNXnetIPConnection newRouting(final NetworkInterface netIf, final InetAddress mcGroup) {
-		return null;
+	public static KNXnetIPConnection newRouting(final NetworkInterface netIf, final InetAddress mcGroup)
+		throws KNXException {
+		return new SecureConnection(netIf, mcGroup);
 	};
 
-	private SecureConnection() {
+	private SecureConnection(final NetworkInterface netIf, final InetAddress mcGroup) throws KNXException {
+		super(netIf, mcGroup);
+
 		ecdhPublicKey = null;
+//		final byte[] key = fromHex("374708fff7719dd5979ec875d56cd228");
+		final byte[] key = new byte[16];
+		secretKey = createSecretKey(key);
+		scheduleGroupSync(new Random().nextInt(10_000));
 	}
 
-	private void setupSecureChannel() {
-		// channel.req -> channel.res -> auth.req -> channel.status
+	@Override
+	public void send(final CEMI frame, final BlockingMode mode) throws KNXConnectionClosedException {
+		final long seq = 0;
+		final int tag = 0;
 
-		// send connectRequest(hpai);
-		// waitForStateChange
+		final byte[] knxip = PacketHelper.toPacket(new ServiceRequest(serviceRequest, channelId, getSeqSend(), frame));
+		final byte[] wrapped = newSecurePacket(seq, tag, knxip);
+
+		// XXX we have to forward to standard send, not this one
+		send(wrapped);
 	}
 
-	private byte[] connectRequest(final HPAI hpai)  {
-		return PacketHelper.newChannelRequest(hpai, ecdhPublicKey);
+	@Override
+	public String getName() {
+		final String lock = new String(Character.toChars(0x1F512));
+		return "KNX/IP " + lock + " Routing " + ctrlEndpt.getAddress().getHostAddress() + ":" + ctrlEndpt.getPort();
 	}
 
-//	@Override
+	@Override
 	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset,
-		final InetAddress src, final int port) throws KNXFormatException, KNXRemoteException {
+		final InetAddress src, final int port) throws KNXFormatException, IOException {
 		final int svc = h.getServiceType();
 
 		if (!PacketHelper.isKnxSecure(h)) {
@@ -132,94 +173,150 @@ final class SecureConnection {
 			return false;
 		}
 
-		if (svc == SecureChannelResponse) {
-			final Object[] res = newChannelResponse(h, data, offset);
-			channelIdx = (int) res[0];
-			serverPublicKey = (byte[]) res[1];
+		if (svc == SecureSessionResponse) {
+			try {
+				final Object[] res = newChannelResponse(h, data, offset);
+				sessionId = (int) res[0];
+				serverPublicKey = (byte[]) res[1];
 
-			final int authContext = 2;
-			final byte[] mac = null;
-			final byte[] auth = PacketHelper.newChannelAuth(channelIdx, authContext, mac);
-			final byte[] packet = newSecurePacket(channelIdx, 1, 0, auth);
-
-			// NYI send auth
+				final int authContext = 2;
+				final byte[] mac = null;
+				final byte[] auth = PacketHelper.newChannelAuth(sessionId, authContext, mac);
+				final byte[] packet = newSecurePacket(1, 0, auth);
+				// NYI send auth
+			}
+			catch (final KNXRemoteException e) {
+				// TODO wrap this exception at origin because we don't support it in our method signature
+				logger.error("server session response error", e);
+			}
 		}
-		else if (svc == SecureGroupSyncRequest)
-			onGroupSync(true, newGroupSync(h, data, offset));
-		else if (svc == SecureGroupSyncResponse)
-			onGroupSync(false, newGroupSync(h, data, offset));
-		else if (svc == KNXnetIPHeader.SecureWrapper) {
+		else if (svc == SecureGroupSync)
+			onGroupSync(newGroupSync(h, data, offset));
+		else if (svc == SecureSvc) {
 			// NYI verify fields
 			final Object[] fields = unwrap(h, data, offset);
-			final byte[] knxipPacket = (byte[]) fields[3];
-			final KNXnetIPHeader containedHeader = new KNXnetIPHeader(knxipPacket, 0);
+			final long timestamp = (long) fields[1];
+			if (!withinTolerance(timestamp)) {
+				logger.warn("{}:{} timestamp {} outside latency tolerance of {} ms (local {}) - ignore", src,
+						port, timestamp, mcastLatencyTolerance, timestamp());
+				return true;
+			}
 
-			if (containedHeader.getServiceType() == SecureChannelStatus) {
+			final byte[] packet = (byte[]) fields[4];
+			final KNXnetIPHeader containedHeader = new KNXnetIPHeader(packet, 0);
+
+			if (containedHeader.getServiceType() == SecureSessionStatus) {
 				final int status = newChannelStatus(h, data, offset);
-				LogService.log(logger, status == 0 ? LogLevel.TRACE : LogLevel.ERROR, "secure channel {}",
+				LogService.log(logger, status == 0 ? LogLevel.TRACE : LogLevel.ERROR, "secure session {}",
 						statusMsg(status));
 			}
 			else {
-				// let base class handle contained decrypted knxip packet
-//				return super.handleServiceType(containedHeader, knxipPacket, containedHeader.getStructLength(), src, port);
+				// let base class handle contained in decrypted knxip packet
+				return super.handleServiceType(containedHeader, packet, containedHeader.getStructLength(), src,
+						port);
 			}
 		}
 		else
 			logger.warn("received unsupported secure service type 0x{} - ignore", Integer.toHexString(svc));
 
-		return false;
+		return true;
 	}
 
-	// upon receiving a sync request, we answer within [0..5] seconds using a single sync response, only iff we
-	// didn't receive another response with a greater timestamp in between
-	private void onGroupSync(final boolean request, final long timestamp) {
-		boolean scheduleResponse = request;
+	@Override
+	protected void close(final int initiator, final String reason, final LogLevel level, final Throwable t) {
+		groupSync.cancel(true);
+		super.close(initiator, reason, level, t);
+	}
 
-		final long now = System.nanoTime() / 1000_000L;
-		if (timestamp > now + timestampOffset) {
-			timestampOffset = timestamp - now;
-			timestampExpiresAt = now + timestampExpiresAfter.toMillis();
-			if (!request)
-				scheduleResponse = false;
+	// unicast session
+	private void setupSecureChannel() {
+		// session.req -> session.res -> auth.req -> session-status
+
+		// send
+		final HPAI hpai = null;
+		sessionRequest(hpai);
+		// waitForStateChange
+	}
+
+	private byte[] sessionRequest(final HPAI hpai)  {
+		return PacketHelper.newChannelRequest(hpai, ecdhPublicKey);
+	}
+
+	private boolean withinTolerance(final long timestamp) {
+		onGroupSync(timestamp);
+		final long diff = timestamp() - timestamp;
+		return diff <= mcastLatencyTolerance;
+	}
+
+	// upon receiving a group sync, we answer within [0..5] seconds using a single sync, but only iff we
+	// didn't receive another sync with a greater timestamp in between
+	private void onGroupSync(final long timestamp) {
+		final long local = timestamp();
+		if (timestamp > local) {
+			logger.debug("sync timestamp +{} ms", timestamp - local);
+			timestampOffset += timestamp - local;
+			final long abs = local - timestampOffset;
+			timestampExpiresAt = abs + timestampExpiresAfter.toMillis();
+			groupSync.cancel(false);
+		}
+		else if (timestamp < (local - mcastLatencyTolerance)) {
+			// received old timestamp, schedule group sync
+			scheduleGroupSync(new Random().nextInt(5_000));
 		}
 	}
 
-	private static String statusMsg(final int status) {
-		final String[] msg = { "authorization success", "authorization failed", "unauthorized", "timeout" };
-		if (status > 3)
-			return "unknown status " + status;
-		return msg[status];
+	private void scheduleGroupSync(final long initialDelay) {
+		logger.trace("schedule group sync (initial delay {} ms)", initialDelay);
+		groupSync.cancel(false);
+		groupSync = groupSyncSender.scheduleWithFixedDelay(this::sendGroupSync, initialDelay, queryInterval,
+				TimeUnit.MILLISECONDS);
+	}
+
+	private void sendGroupSync() {
+		try {
+			final long timestamp = timestamp();
+			final byte[] sync = newGroupSync(timestamp);
+			logger.debug("sending group sync timestamp {} ms", timestamp);
+			socket.send(new DatagramPacket(sync, sync.length, dataEndpt.getAddress(), dataEndpt.getPort()));
+		}
+		catch (IOException | RuntimeException e) {
+			logger.warn("sending group sync failed", e);
+		}
+	}
+
+	private long timestamp() {
+		final long now = System.nanoTime() / 1000_000L;
+		return now + timestampOffset;
 	}
 
 	// for multicast, the channel index = 0
 	// seq: for unicast connections: monotonically increasing counter of sender.
 	// seq: for multicasts, time stamp [ms]
 	// domainMask: for unicasts, mask is 0
-	private byte[] newSecurePacket(final int channelIdx, final long seq, final int domainMask,
-		final byte[] knxipPacket) {
-		if (channelIdx < 0 || channelIdx > 0xffff)
-			throw new KNXIllegalArgumentException("secure channel index " + channelIdx + " out of range [0..0xffff]");
+	private byte[] newSecurePacket(final long seq, final int msgTag, final byte[] knxipPacket) {
 		if (seq < 0 || seq > 0xffff_ffff_ffffL)
 			throw new KNXIllegalArgumentException(
 					"sequence / group counter " + seq + " out of range [0..0xffffffffffff]");
-		if (domainMask < 0 || domainMask > 0xffff)
-			throw new KNXIllegalArgumentException("security domain mask " + domainMask + " out of range [0..0xffff]");
+		if (msgTag < 0 || msgTag > 0xffff)
+			throw new KNXIllegalArgumentException("message tag " + msgTag + " out of range [0..0xffff]");
 
-		final int svcLength = 2 + 6 + 2 + knxipPacket.length + macSize;
+		final int svcLength = 2 + 6 + 6 + 2 + knxipPacket.length + macSize;
 		final KNXnetIPHeader header = new KNXnetIPHeader(KNXnetIPHeader.SecureWrapper, svcLength);
 
 		final ByteBuffer buffer = ByteBuffer.allocate(header.getTotalLength());
 		buffer.put(header.toByteArray());
-		buffer.putShort((short) channelIdx);
+		buffer.putShort((short) sessionId);
 		buffer.putShort((short) (seq >> 32));
 		buffer.putInt((int) seq);
-		buffer.putShort((short) domainMask);
+		final long sno = 0;
+		buffer.putShort((short) (sno >> 32));
+		buffer.putInt((int) sno);
+		buffer.putShort((short) msgTag);
 		buffer.put(knxipPacket);
 
-		final int offset = header.getStructLength() + 2 + 6;
-		final byte[] mac = cbcMac(buffer.array(), offset, 2 + knxipPacket.length);
+		final byte[] mac = cbcMac(buffer.array(), 0, buffer.position(), seq);
 		buffer.put(mac);
-		encrypt(buffer.array(), header.getStructLength() + 2 + 6);
+		encrypt(buffer.array(), header.getStructLength() + 2 + 6 + 6 + 2);
 		return buffer.array();
 	}
 
@@ -227,32 +324,40 @@ final class SecureConnection {
 		if ((h.getServiceType() & SecureSvc) != SecureSvc)
 			throw new KNXIllegalArgumentException("not a secure service type");
 
-		final int minLength = h.getStructLength() + 2 + 6 + 2 + h.getStructLength() + macSize;
-		if (h.getTotalLength() < minLength)
-			throw new KNXFormatException("secure packet length < required minimum length " + minLength,
-					h.getTotalLength());
+		final int total = h.getTotalLength();
+		final int hdrLength = h.getStructLength();
+		final int minLength = hdrLength + 2 + 6 + 6 + 2 + hdrLength + macSize;
+		if (total < minLength)
+			throw new KNXFormatException("secure packet length < required minimum length " + minLength, total);
 
-		final int length = 0;
-		final ByteBuffer buffer = ByteBuffer.wrap(data, offset, length);
-		final int channelIdx = buffer.getShort() & 0xffff;
-		long seq = (buffer.getShort() & 0xffff) << 32;
-		seq |= buffer.getInt() & 0xffffffffL;
-		final ByteBuffer dec = decrypt(buffer);
+		final ByteBuffer buffer = ByteBuffer.wrap(data, offset, total - hdrLength);
+		final int sid = buffer.getShort() & 0xffff;
+		if (sid != sessionId)
+			throw new KNXFormatException("secure session mismatch (expected ID " + sid + ")", "" + sid);
 
-		final int domainMask = dec.getShort() & 0xffff;
-		final byte[] knxipPacket = new byte[h.getTotalLength() - minLength + h.getStructLength()];
+		final long seq = uint48(buffer);
+		final long sno = uint48(buffer);
+		final int tag = buffer.getShort() & 0xffff;
+		final ByteBuffer dec = decrypt(buffer, seq);
+
+		final byte[] knxipPacket = new byte[total - minLength + hdrLength];
+		logger.trace("unwrap lengths: total {}, min {}, remaining {}, packet {}", total, minLength, dec.remaining(),
+				knxipPacket.length);
 		dec.get(knxipPacket);
 		final byte[] mac = new byte[macSize];
 		dec.get(mac);
 		// NYI check mac
 
-		return new Object[] { channelIdx, seq, domainMask, knxipPacket };
+		logger.trace("received {} (session {} seq {} S/N {} tag {})", DataUnitBuilder.toHex(knxipPacket, " "), sid, seq,
+				sno, tag);
+
+		return new Object[] { sid, seq, sno, tag, knxipPacket };
 	}
 
 	private Object[] newChannelResponse(final KNXnetIPHeader h, final byte[] data, final int offset)
 		throws KNXFormatException, KNXRemoteException {
 
-		if (h.getServiceType() != SecureChannelResponse)
+		if (h.getServiceType() != SecureSessionResponse)
 			throw new IllegalArgumentException("no secure channel response");
 		if (h.getTotalLength() != 0x3c && h.getTotalLength() != 0x08)
 			throw new KNXFormatException("invalid length " + data.length + " for a secure channel response");
@@ -260,8 +365,8 @@ final class SecureConnection {
 		final int start = offset + h.getStructLength();
 		final ByteBuffer buffer = ByteBuffer.wrap(data, start, data.length - start);
 
-		channelIdx = buffer.getShort() & 0xffff;
-		if (channelIdx == 0)
+		sessionId = buffer.getShort() & 0xffff;
+		if (sessionId == 0)
 			throw new KNXRemoteException("no more free secure channels / remote endpoint busy");
 
 		serverPublicKey = new byte[keyLength];
@@ -273,18 +378,18 @@ final class SecureConnection {
 		final byte[] clientPublicKey = ecdhPublicKey;
 		final byte[] sessionKey = new byte[16];
 
-		final BigInteger xor = new BigInteger(serverPublicKey).xor(new BigInteger(clientPublicKey));
-		final byte[] mac = cbcMac(xor.toByteArray(), 0, serverPublicKey.length);
+		final byte[] xor = xor(serverPublicKey, 0, clientPublicKey, 0, serverPublicKey.length);
+		final byte[] mac = cbcMac(xor, 0, serverPublicKey.length, 0);
 
 		// TODO compare encryped mac
 
-		return new Object[] { channelIdx, serverPublicKey };
+		return new Object[] { sessionId, serverPublicKey };
 	}
 
 	private int newChannelStatus(final KNXnetIPHeader h, final byte[] data, final int offset)
 		throws KNXFormatException {
 
-		if (h.getServiceType() != SecureChannelStatus)
+		if (h.getServiceType() != SecureSessionStatus)
 			throw new KNXIllegalArgumentException("no secure channel status");
 		if (h.getTotalLength() != 8)
 			throw new KNXFormatException("invalid length " + h.getTotalLength() + " for a secure channel status");
@@ -294,52 +399,162 @@ final class SecureConnection {
 		// 2: error unauthorized
 		// 3: timeout
 		final int status = data[offset + h.getStructLength()] & 0xff;
-		if (status > 3)
-			; // log warning or throw with unknown status
+//		if (status > 3)
+//			; // log warning or throw with unknown status
 		return status;
 	}
 
-	private byte[] newGroupSync(final boolean request, final long timestamp) {
+	private byte[] newGroupSync(final long timestamp) {
 		if (timestamp < 0 || timestamp > 0xffff_ffff_ffffL)
 			throw new KNXIllegalArgumentException("timestamp " + timestamp + " out of range [0..0xffffffffffff]");
 
-		final KNXnetIPHeader header = new KNXnetIPHeader(request ? SecureGroupSyncRequest : SecureGroupSyncResponse, 22);
+		final KNXnetIPHeader header = new KNXnetIPHeader(SecureGroupSync, 0x1e);
 
 		final ByteBuffer buffer = ByteBuffer.allocate(header.getTotalLength());
 		buffer.put(header.toByteArray());
+
 		buffer.putShort((short) (timestamp >> 32));
 		buffer.putInt((int) timestamp);
 
-		final byte[] mac = cbcMac(buffer.array(), 0, header.getStructLength() + 6);
+		final long sno = 0;
+		buffer.putShort((short) (sno >> 32));
+		buffer.putInt((int) sno);
+
+		final int tag = 0;
+		buffer.putShort((short) tag);
+
+		final byte[] mac = cbcMac(buffer.array(), 0, header.getStructLength() + 6 + 6 + 2, timestamp);
+		encrypt(mac, 0);
 		buffer.put(mac);
 		return buffer.array();
 	}
 
 	private long newGroupSync(final KNXnetIPHeader h, final byte[] data, final int offset) throws KNXFormatException {
-		if (h.getTotalLength() != 0x1c)
+		if (h.getTotalLength() != 0x24)
 			throw new KNXFormatException("invalid length " + data.length + " for a secure group sync");
 
-		long timestamp = 0;
-		for (int i = 0; i < 6; i++)
-			timestamp = (timestamp << 8) | (data[offset + i] & 0xff);
-		final byte[] mac = Arrays.copyOfRange(data, offset + 6, data.length);
+		final ByteBuffer buffer = ByteBuffer.wrap(data, offset, h.getTotalLength() - h.getStructLength());
+
+		final long timestamp = uint48(buffer);
+		final long sno = uint48(buffer);
+		final int msgTag = buffer.getShort() & 0xffff;
+		final ByteBuffer mac = decrypt(buffer, timestamp);
+
 		// NYI check mac
-		final byte[] cmp = cbcMac(data, offset - h.getStructLength(), h.getStructLength() + 6);
+		final byte[] cmp = cbcMac(data, offset - h.getStructLength(), h.getTotalLength() - macSize, timestamp);
+		logger.trace("MAC\n\trcv {}\n\tcmp {}", DataUnitBuilder.toHex(mac.array(), ""), DataUnitBuilder.toHex(cmp, ""));
+
+		logger.trace("received group sync timestamp {} ms (S/N {}, tag {})", timestamp, Long.toHexString(sno), msgTag);
 		return timestamp;
+	}
+
+	private static Key createSecretKey(final byte[] key) {
+		return new SecretKeySpec(key, 0, key.length, "AES");
 	}
 
 	private void encrypt(final byte[] data, final int offset) {
 		// NYI
+		try {
+			final ByteBuffer ts = ByteBuffer.allocate(8);
+			ts.putLong(timestamp()).flip().position(2);
+			final byte[] tsdata = new byte[6];
+			ts.get(tsdata);
+
+			final Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
+			final byte[] t0 = Arrays.copyOf(tsdata, 16);
+			final int counter = 0;
+			t0[15] = counter;
+			final IvParameterSpec ivSpec = new IvParameterSpec(t0);
+			cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec);
+
+			final byte[] cipherText = cipher.doFinal(data, offset, data.length - offset);
+			System.arraycopy(cipherText, 0, data, offset, cipherText.length);
+		}
+		catch (final GeneralSecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
-	private ByteBuffer decrypt(final ByteBuffer buffer) {
-		// NYI
-		return null;
+	private ByteBuffer decrypt(final ByteBuffer buffer, final long seq) {
+		final ByteBuffer plain = ByteBuffer.allocate(buffer.remaining());
+
+		try {
+			final ByteBuffer ts = ByteBuffer.allocate(8);
+			ts.putLong(seq).flip().position(2);
+			final byte[] tsdata = new byte[6];
+			ts.get(tsdata);
+
+			final byte[] t0 = Arrays.copyOf(tsdata, 16);
+
+			final Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
+			final IvParameterSpec ivSpec = new IvParameterSpec(t0);
+			cipher.init(Cipher.DECRYPT_MODE, secretKey, ivSpec);
+
+			logger.trace("decrypt length {}", buffer.remaining());
+			cipher.doFinal(buffer, plain);
+			plain.flip();
+		}
+		catch (final GeneralSecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return plain;
 	}
 
 	// calculated using session (for unicast) or group key (for multicast)
-	private byte[] cbcMac(final byte[] data, final int offset, final int length) {
+	private byte[] cbcMac(final byte[] data, final int offset, final int length, final long seq) {
 		// NYI
-		return new byte[macSize];
+		logger.trace("calculating CBC-MAC for (length {}): {}", length,
+				DataUnitBuilder.toHex(Arrays.copyOfRange(data, offset, offset + length), " "));
+		try {
+			final ByteBuffer ts = ByteBuffer.allocate(8);
+			ts.putLong(seq).flip().position(2);
+			final byte[] tsdata = new byte[6];
+			ts.get(tsdata);
+
+			final Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+
+			final byte[] t0 = new byte[16];
+			final IvParameterSpec ivSpec = new IvParameterSpec(t0);
+			cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec);
+
+			final byte[] mac = new byte[macSize];
+			return mac;
+		}
+		catch (final GeneralSecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private static String statusMsg(final int status) {
+		final String[] msg = { "authorization success", "authorization failed", "unauthorized", "timeout" };
+		if (status > 3)
+			return "unknown status " + status;
+		return msg[status];
+	}
+
+	private static byte[] xor(final byte[] a, final int offsetA, final byte[] b, final int offsetB, final int len) {
+		if (a.length - len < offsetA || b.length - len < offsetB)
+			throw new KNXIllegalArgumentException("illegal offset or length");
+		final byte[] res = new byte[len];
+		for (int i = 0; i < len; i++)
+			res[i] = (byte) (a[i + offsetA] ^ b[i + offsetB]);
+		return res;
+	}
+
+	private static long uint48(final ByteBuffer buffer) {
+		long l = (buffer.getShort() & 0xffffL) << 32;
+		l |= buffer.getInt() & 0xffffffffL;
+		return l;
+	}
+
+	private static byte[] fromHex(final String s) {
+		final byte[] data = new byte[s.length() / 2];
+		for (int i = 0; i < s.length(); i += 2)
+			data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
+		return data;
 	}
 }
