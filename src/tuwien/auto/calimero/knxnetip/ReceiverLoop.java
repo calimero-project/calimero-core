@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2016 B. Malinowsky
+    Copyright (c) 2010, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -86,7 +86,7 @@ final class ReceiverLoop extends UdpSocketLooper implements Runnable
 				logger.warn("received frame with service type 0x0 - ignored");
 			else if (!conn.handleServiceType(h, data, offset + h.getStructLength(),
 					source.getAddress(), source.getPort()))
-				logger.warn("received unknown frame, service type 0x"
+				logger.info("received unknown frame with service type 0x"
 						+ Integer.toHexString(h.getServiceType()) + " - ignored");
 		}
 		catch (KNXFormatException | RuntimeException e) {

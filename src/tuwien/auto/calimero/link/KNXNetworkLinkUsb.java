@@ -253,7 +253,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 	}
 
 	private void logCommModes(final int modes) {
-		logger.debug("KNX USB interface supports {}",
+		logger.debug("KNX interface supports {}",
 				Stream.of(bool(modes & 0b1000, "transport link layer"), bool(modes & 0b100, "raw mode"),
 						bool(modes & 0b10, "busmonitor"), bool(modes & 0b1, "data link layer"))
 						.filter(s -> !s.isEmpty()).collect(Collectors.joining(", ")));
@@ -269,7 +269,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 		final Optional<byte[]> subnet = read(0, pidSubnet);
 		if (subnet.isPresent()) {
 			final int addr = read(0, pidDeviceAddr).map(data -> unsigned(subnet.get()[0], data[0])).orElse(0);
-			logger.debug("KNX USB interface address {}", new IndividualAddress(addr));
+			logger.debug("KNX interface address {}", new IndividualAddress(addr));
 		}
 	}
 }
