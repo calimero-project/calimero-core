@@ -155,12 +155,21 @@ public class KNXnetIPHeader
 	 */
 	public static final int KNXNETIP_VERSION_10 = 0x10;
 
+	// KNX IP Secure
+
 	public static final int SecureWrapper = 0x0950;
 	private static final int SecureSessionReq = 0x0951;
 	private static final int SecureSessionRes = 0x0952;
 	private static final int SecureSessionAuth = 0x0953;
 	private static final int SecureSessionStatus = 0x0954;
 	private static final int SecureGroupSync = 0x0955;
+
+	// KNX IP Tunneling Mgmt
+
+	private static final int TunnelingFeatureGet = 0x0422;
+	private static final int TunnelingFeatureRes = 0x0423;
+	private static final int TunnelingFeatureSet = 0x0424;
+	private static final int TunnelingFeatureInfo = 0x0425;
 
 
 	private static final int HEADER_SIZE_10 = 0x06;
@@ -342,6 +351,10 @@ public class KNXnetIPHeader
 		case SecureSessionAuth: return "session-auth";
 		case SecureSessionStatus: return "session-status";
 		case SecureGroupSync: return "group-sync";
+		case TunnelingFeatureGet: return "tunneling-feat.get";
+		case TunnelingFeatureRes: return "tunneling-feat.res";
+		case TunnelingFeatureSet: return "tunneling-feat.set";
+		case TunnelingFeatureInfo: return "tunneling-feat.info";
 		default:
 			return "unknown service";
 		}

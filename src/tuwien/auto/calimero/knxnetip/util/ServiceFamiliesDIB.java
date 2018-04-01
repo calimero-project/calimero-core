@@ -95,8 +95,13 @@ public class ServiceFamiliesDIB extends DIB
 	 */
 	public static final int OBJECT_SERVER = 0x08;
 
+	/**
+	 * Service family identifier representing the service type 'Security'.
+	 */
+	static final int Security = 9;
+
 	private static final String[] familyNames = { null, null, "Core", "Device Management",
-		"Tunneling", "Routing", "Remote Logging", "Remote Configuration/Diagnosis", "Object Server" };
+		"Tunneling", "Routing", "Remote Logging", "Remote Configuration/Diagnosis", "Object Server", "Security" };
 
 	private final int[] ids;
 	private final int[] versions;

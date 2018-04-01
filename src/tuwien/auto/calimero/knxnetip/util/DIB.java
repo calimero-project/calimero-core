@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -58,11 +58,6 @@ public abstract class DIB
 	public static final int DEVICE_INFO = 0x01;
 
 	/**
-	 * Description type code for further data defined by device manufacturer.
-	 */
-	public static final int MFR_DATA = 0xFE;
-
-	/**
 	 * Description type code for service families supported by the device.
 	 */
 	public static final int SUPP_SVC_FAMILIES = 0x02;
@@ -81,6 +76,15 @@ public abstract class DIB
 	 * Description type code for the KNX addresses device information.
 	 */
 	public static final int KNX_ADDRESSES = 0x05;
+
+	static final int SecuredServiceFamilies = 0x06;
+	static final int TunnelingInfo = 0x07;
+
+	/**
+	 * Description type code for further data defined by device manufacturer.
+	 */
+	public static final int MFR_DATA = 0xFE;
+
 
 	final int size;
 	final int type;
