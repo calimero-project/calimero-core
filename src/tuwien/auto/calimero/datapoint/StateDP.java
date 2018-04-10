@@ -264,7 +264,7 @@ public class StateDP extends Datapoint
 	@Override
 	public String toString()
 	{
-		return "state DP " + locations() + " " + super.toString();
+		return "state DP " + locations + " " + super.toString();
 	}
 
 	@Override
@@ -327,7 +327,7 @@ public class StateDP extends Datapoint
 		w.writeEndElement();
 	}
 
-	private Collection<String> locations()
+	public Collection<String> getLocations()
 	{
 		return locations;
 	}
