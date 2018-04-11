@@ -327,7 +327,7 @@ public class StateDP extends Datapoint
 		w.writeEndElement();
 	}
 
-	public Collection<String> getLocations()
+	public List<String> locations()
 	{
 		return locations;
 	}
