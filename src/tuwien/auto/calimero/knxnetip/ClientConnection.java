@@ -178,9 +178,9 @@ abstract class ClientConnection extends ConnectionBase
 			if (socket != null)
 				socket.close();
 			logger.error("communication failure on connect", e);
-			if (localEP.getAddress().isLoopbackAddress())
+			if (local.getAddress().isLoopbackAddress())
 				logger.warn("local endpoint uses loopback address ({}), try with a different IP address",
-						localEP.getAddress());
+						local.getAddress());
 			throw new KNXException("connecting from " + localEP + " to " + serverCtrlEP + ": " + e.getMessage());
 		}
 
