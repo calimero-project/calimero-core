@@ -153,7 +153,8 @@ abstract class ClientConnection extends ConnectionBase
 			throw new KNXIllegalArgumentException("no local endpoint specified");
 		InetSocketAddress local = localEP;
 		try {
-			// XXX getAddress could return null
+			if (local.isUnresolved())
+				throw new KNXIllegalArgumentException("unresolved address " + local);
 			if (local.getAddress().isAnyLocalAddress()) {
 				final InetAddress addr = useNAT ? null
 					: Optional.ofNullable(serverCtrlEP.getAddress()).flatMap(this::onSameSubnet)
