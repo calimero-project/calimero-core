@@ -235,7 +235,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		if (count < 0 || count > 7)
 			throw new KNXIllegalArgumentException("hop count out of range [0..7]");
 		hopCount = count;
-		logger.info("hop count set to " + count);
+		logger.debug("hop count set to {}", count);
 	}
 
 	@Override
