@@ -494,16 +494,6 @@ public class UsbConnection implements AutoCloseable
 	}
 
 	/**
-	 * @deprecated Use {@link #deviceDescriptor()}.
-	 */
-	@Deprecated
-	public final int getDeviceDescriptorType0() throws KNXPortClosedException, KNXTimeoutException, InterruptedException
-	{
-		// device descriptor type 0 has a 2 byte structure
-		return (int) toUnsigned(getFeature(BusAccessServerFeature.DeviceDescriptorType0));
-	}
-
-	/**
 	 * Returns the KNX device descriptor type 0 of the USB interface.
 	 *
 	 * @return device descriptor type 0

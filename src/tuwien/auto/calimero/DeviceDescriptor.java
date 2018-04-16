@@ -172,13 +172,7 @@ public interface DeviceDescriptor
 				throw new KNXIllegalArgumentException("unspecified device descriptor type 0 using "
 						+ "length " + data.length + ": " + DataUnitBuilder.toHex(data, ""));
 			final int i = (data[0] & 0xff) << 8 | data[1] & 0xff;
-			return fromType0(i);
-		}
-
-		@Deprecated
-		public static DD0 fromType0(final byte[] data)
-		{
-			return from(data);
+			return from(i);
 		}
 
 		/**
@@ -193,12 +187,6 @@ public interface DeviceDescriptor
 					return v;
 			}
 			throw new KNXIllegalArgumentException("unknown mask version " + maskVersionString(descriptor));
-		}
-
-		@Deprecated
-		public static DD0 fromType0(final int descriptor)
-		{
-			return from(descriptor);
 		}
 
 		/**
