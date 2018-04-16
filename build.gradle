@@ -84,6 +84,7 @@ dependencies {
 	compileOnly 'javax.xml.stream:stax-api:1.0-2'
 
 	testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+	testImplementation "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}"
 	testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
 	testCompileOnly 'junit:junit:4.12'
 	testRuntimeOnly "org.junit.vintage:junit-vintage-engine:${junitJupiterVersion}"

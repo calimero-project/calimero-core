@@ -42,7 +42,6 @@ import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -396,20 +395,23 @@ abstract class ClientConnection extends ConnectionBase
 					.filter(ia -> ia.getAddress() instanceof Inet4Address)
 					.peek(ia -> logger.trace("match local address {}/{} to {}", ia.getAddress(),
 							ia.getNetworkPrefixLength(), remote))
-					.filter(ia -> matchesPrefix(ia, remote)).map(ia -> ia.getAddress()).findFirst();
+					.filter(ia -> matchesPrefix(ia.getAddress(), ia.getNetworkPrefixLength(), remote))
+					.map(ia -> ia.getAddress()).findFirst();
 		}
 		catch (final SocketException ignore) {}
 		return Optional.empty();
 	}
 
-	private static boolean matchesPrefix(final InterfaceAddress ia, final InetAddress remote)
+	static boolean matchesPrefix(final InetAddress local, final int maskLength, final InetAddress remote)
 	{
-		final byte[] a1 = ia.getAddress().getAddress();
+		final byte[] a1 = local.getAddress();
 		final byte[] a2 = remote.getAddress();
-		final long mask = (0xffffffffL >> ia.getNetworkPrefixLength()) ^ 0xffffffffL;
-		for (int i = 0; i < a1.length; i++)
-			if ((a1[i] & (mask >> (24 - 8 * i))) != (a2[i] & (mask >> (24 - 8 * i))))
+		final long mask = (0xffffffffL >> maskLength) ^ 0xffffffffL;
+		for (int i = 0; i < a1.length; i++) {
+			final int byteMask = (int) ((mask >> (24 - 8 * i)) & 0xff);
+			if ((a1[i] & byteMask) != (a2[i] & byteMask))
 				return false;
+		}
 		return true;
 	}
 
