@@ -52,10 +52,7 @@ public interface PropertyAccess
 	 * global) and PIDs of the KNXnet/IP parameter object (interface object type 11).
 	 * <p>
 	 * Users are encouraged to use these more descriptive name constants instead of plain
-	 * PID integer values for better readability.<br>
-	 * The PIDs are put into their own class to create an encapsulation besides the
-	 * property access interface, since these constants are solely for the user's sake,
-	 * implementations of the {@link PropertyAccess} interface do not depend on them.<br>
+	 * PID integer values for better readability.
 	 *
 	 * @author B. Malinowsky
 	 */

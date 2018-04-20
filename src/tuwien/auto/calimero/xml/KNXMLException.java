@@ -49,15 +49,6 @@ public class KNXMLException extends RuntimeException
 	private final int line;
 
 	/**
-	 * Constructs a new <code>KNXMLException</code> without a detail message.
-	 */
-	public KNXMLException()
-	{
-		item = null;
-		line = 0;
-	}
-
-	/**
 	 * Constructs a new <code>KNXMLException</code> with the specified detail message.
 	 * <p>
 	 *

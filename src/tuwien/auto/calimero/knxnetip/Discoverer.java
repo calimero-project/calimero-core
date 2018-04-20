@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -635,7 +635,7 @@ public class Discoverer
 		try {
 			if (unicast)
 				return new MulticastSocket(new InetSocketAddress(bindAddr, bindPort));
-			s = new MulticastSocket(null);//mcastResponse ? SEARCH_PORT : bindPort);
+			s = new MulticastSocket(null);
 			if (mcastResponse)
 				s.bind(new InetSocketAddress(SEARCH_PORT));
 			else

@@ -149,11 +149,6 @@ class DefaultXmlReader implements XmlReader
 		return event;
 	}
 
-	private int w_read()
-	{
-		return read();
-	}
-
 	private void complete(final String name) throws KNXMLException
 	{
 		if (emptyTag)
@@ -199,11 +194,6 @@ class DefaultXmlReader implements XmlReader
 				}
 		}
 		throw new KNXMLException("end of XML input with elements left open", end, line);
-	}
-
-	private void w_complete(final String name)
-	{
-		complete(name);
 	}
 
 	@Override
@@ -356,14 +346,14 @@ class DefaultXmlReader implements XmlReader
 	@Override
 	public String getElementText()
 	{
-		w_complete(elemName);
+		complete(elemName);
 		return elemText;
 	}
 
 	@Override
 	public int nextTag()
 	{
-		return w_read();
+		return read();
 	}
 
 	@Override
@@ -482,7 +472,7 @@ class DefaultXmlReader implements XmlReader
 	@Override
 	public char[] getTextCharacters()
 	{
-		w_complete(elemName);
+		complete(elemName);
 		return elemText.toCharArray();
 	}
 
