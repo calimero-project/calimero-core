@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -340,11 +340,14 @@ public class DPTXlator2ByteFloat extends DPTXlator
 		}
 	}
 
+	private static final double negLimit = -671088.64d;
+	private static final double posLimit = 670760.96d;
+
 	private double getLimit(final String limit) throws KNXFormatException
 	{
 		try {
 			final double d = Double.parseDouble(limit);
-			if (d >= -671088.64d && d <= 670760.96d)
+			if (d >= negLimit && d <= posLimit)
 				return d;
 		}
 		catch (final NumberFormatException e) {}

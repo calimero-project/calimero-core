@@ -269,10 +269,13 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 
 	private double toValue(final short data)
 	{
+		final double maxPercent = 100.0d;
+		final double maxAngle = 360.0d;
+
 		if (dpt.equals(DPT_SCALING))
-			return data * 100.0d / 255;
+			return data * maxPercent / 255;
 		if (dpt.equals(DPT_ANGLE))
-			return data * 360.0d / 255;
+			return data * maxAngle / 255;
 		return data;
 	}
 

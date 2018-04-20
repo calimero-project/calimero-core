@@ -205,7 +205,7 @@ public final class XmlResolver
 	{
 		final StringBuilder buf = new StringBuilder(100);
 		try {
-			for (int c = 0; (c = r.read()) != -1 && c != '?';)
+			for (int c = r.read(); c != -1 && c != '?'; c = r.read())
 				buf.append((char) c);
 		}
 		catch (final IOException e) {

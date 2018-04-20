@@ -231,7 +231,7 @@ class DefaultXmlReader implements XmlReader
 		final StringBuilder buf = new StringBuilder(50);
 		try {
 			boolean cr = false;
-			for (int c = 0; (c = r.read()) != -1 && c != delimiter;) {
+			for (int c = r.read(); c != -1 && c != delimiter; c = r.read()) {
 				if (c == '\n')
 					++line;
 				else if (cr) {

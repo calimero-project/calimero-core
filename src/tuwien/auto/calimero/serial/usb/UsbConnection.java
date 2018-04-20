@@ -610,9 +610,9 @@ public class UsbConnection implements AutoCloseable
 				logger.trace("Interface {}, setting {}", alt,
 						alt.getUsbInterfaceDescriptor().bAlternateSetting() & 0xff);
 				// KNX USB has a HID class interface
-				final int INTERFACE_CLASS_HID = 0x03;
+				final int interfaceClassHid = 0x03;
 				final byte ifClass = alt.getUsbInterfaceDescriptor().bInterfaceClass();
-				if (ifClass != INTERFACE_CLASS_HID)
+				if (ifClass != interfaceClassHid)
 					logger.warn("{} {} doesn't look right, no HID class", device, alt);
 				else {
 					@SuppressWarnings("unchecked")
