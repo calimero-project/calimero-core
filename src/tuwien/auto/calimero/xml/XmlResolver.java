@@ -86,7 +86,7 @@ public final class XmlResolver
 	{
 		try {
 			try {
-				LoggerFactory.getLogger("calimero.xml").debug("resolve {}", baseURI);
+				LoggerFactory.getLogger("calimero.xml").trace("resolve {}", baseURI);
 				final URL loc = new URL(baseURI);
 				return loc.openConnection().getInputStream();
 			}

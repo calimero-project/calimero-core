@@ -146,7 +146,7 @@ public abstract class LibraryAdapter implements Closeable
 				conn.setControl(SerialComAdapter.STOPBITS, SerialComAdapter.ONE_STOPBIT);
 				conn.setControl(SerialComAdapter.DATABITS, 8);
 				conn.setControl(SerialComAdapter.FLOWCTRL, SerialComAdapter.FLOWCTRL_NONE);
-				logger.info("setup serial port: baudrate " + conn.getBaudRate() + ", even parity, "
+				logger.debug("setup serial port: baudrate " + conn.getBaudRate() + ", even parity, "
 						+ conn.getControl(SerialComAdapter.DATABITS) + " databits, "
 						+ conn.getControl(SerialComAdapter.STOPBITS) + " stopbits, timeouts: "
 						+ conn.getTimeouts());

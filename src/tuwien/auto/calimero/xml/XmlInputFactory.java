@@ -91,30 +91,27 @@ public final class XmlInputFactory // extends XMLInputFactory
 
 	private static XmlReader create(final XmlResolver resolver, final InputStream is)
 	{
-		l.trace("lookup system-provided XMLStreamReader");
 		try {
 			final XmlStreamReaderProxy r = XmlStreamReaderProxy.createXmlReader(is, is);
-			l.debug("using StaX XMLStreamReader " + r.r.getClass().getName());
+			l.trace("using StaX XMLStreamReader {}", r.r.getClass().getName());
 			return r;
 		}
 		catch (Exception | Error e) {
-			l.info("no StaX implementation found ({})", e.toString());
+			l.trace("no StaX implementation found ({}), using internal XMLStreamReader", e.toString());
 			// we fall back on our own minimal implementation
 		}
-		l.debug("using internal minimal XMLStreamReader implementation");
 		return new DefaultXmlReader(resolver.getInputReader(is), true);
 	}
 
 	public XmlReader createXMLStreamReader(final Reader reader)
 	{
-		l.trace("lookup system-provided XMLStreamReader");
 		try {
 			final XmlStreamReaderProxy r = XmlStreamReaderProxy.createXmlReader(reader);
-			l.debug("using StaX XMLStreamReader " + r.r.getClass().getName());
+			l.trace("using StaX XMLStreamReader {}", r.r.getClass().getName());
 			return r;
 		}
 		catch (Exception | Error e) {
-			l.info("no StaX implementation found ({})", e.toString());
+			l.trace("no StaX implementation found ({}), using internal XMLStreamReader", e.toString());
 			// we fall back on our own minimal implementation
 		}
 		return new DefaultXmlReader(reader, false);

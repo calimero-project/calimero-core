@@ -80,18 +80,16 @@ public class XmlOutputFactory // extends XMLOutputFactory
 
 	public XmlWriter createXMLStreamWriter(final Writer stream)
 	{
-		l.trace("lookup system-provided XMLStreamWriter");
 		try {
 			final XmlStreamWriterProxy w = XmlStreamWriterProxy.createXmlStreamWriter(stream);
-			l.debug("using StaX XMLStreamWriter " + w.w.getClass().getName());
+			l.trace("using StaX XMLStreamWriter {}", w.w.getClass().getName());
 			return w;
 		}
 		catch (Exception | Error e) {
-			l.info("no StaX implementation found ({})", e.toString());
+			l.trace("no StaX implementation found ({}), using internal XMLStreamWriter", e.toString());
 			// fall-through to minimal writer implementation
 		}
-		final DefaultXmlWriter w = new DefaultXmlWriter(stream, false);
-		return w;
+		return new DefaultXmlWriter(stream, false);
 	}
 
 	public XmlWriter createXMLStreamWriter(final OutputStream stream)
@@ -101,19 +99,17 @@ public class XmlOutputFactory // extends XMLOutputFactory
 
 	private static XmlWriter create(final OutputStream stream, final boolean closeStream)
 	{
-		l.trace("lookup system-provided XMLStreamWriter");
 		try {
 			final XmlStreamWriterProxy w = XmlStreamWriterProxy.createXmlStreamWriter(stream,
 					closeStream ? stream : () -> {});
-			l.debug("using StaX XMLStreamWriter " + w.w.getClass().getName());
+			l.trace("using StaX XMLStreamWriter {}", w.w.getClass().getName());
 			return w;
 		}
 		catch (Exception | Error e) {
-			l.info("no StaX implementation found ({})", e.toString());
+			l.trace("no StaX implementation found ({}), using internal XMLStreamWriter", e.toString());
 			// fall-through to minimal writer implementation
 		}
 		try {
-			l.debug("using internal minimal XMLStreamWriter implementation");
 			return new DefaultXmlWriter(new OutputStreamWriter(stream, "UTF-8"), closeStream);
 		}
 		catch (final UnsupportedEncodingException e) {
