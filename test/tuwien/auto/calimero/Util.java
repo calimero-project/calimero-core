@@ -241,9 +241,11 @@ public final class Util
 		final byte[] a1 = ia.getAddress().getAddress();
 		final byte[] a2 = remote.getAddress();
 		final long mask = (0xffffffffL >> ia.getNetworkPrefixLength()) ^ 0xffffffffL;
-		for (int i = 0; i < a1.length; i++)
-			if ((a1[i] & (mask >> (24 - 8 * i))) != (a2[i] & (mask >> (24 - 8 * i))))
+		for (int i = 0; i < a1.length; i++) {
+			final int byteMask = (int) ((mask >> (24 - 8 * i)) & 0xff);
+			if ((a1[i] & byteMask) != (a2[i] & byteMask))
 				return false;
+		}
 		return true;
 	}
 
