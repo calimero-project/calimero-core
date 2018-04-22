@@ -280,7 +280,7 @@ public final class HidReport
 	 */
 	public byte[] getData()
 	{
-		return data;
+		return data.clone();
 	}
 
 	@Override

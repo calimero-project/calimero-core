@@ -80,7 +80,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 				throw new KNXIllegalArgumentException(
 						"invalid length " + info.length + " for cEMI additional info type " + infoType);
 			type = infoType;
-			data = info;
+			data = info.clone();
 		}
 
 		/**
@@ -91,7 +91,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		 */
 		public final byte[] getInfo()
 		{
-			return data;
+			return data.clone();
 		}
 
 		/**

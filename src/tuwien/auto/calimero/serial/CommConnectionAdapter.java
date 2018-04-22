@@ -36,6 +36,7 @@
 
 package tuwien.auto.calimero.serial;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -45,8 +46,7 @@ import org.slf4j.Logger;
 import tuwien.auto.calimero.KNXException;
 
 /**
- * Adapter for Java ME CDC javax.microedition.io.CommConnection.
- * <p>
+ * Adapter for Java ME Embedded javax.microedition.io.CommConnection.
  *
  * @author B. Malinowsky
  */
@@ -96,21 +96,15 @@ class CommConnectionAdapter extends LibraryAdapter
 		try {
 			invoke(conn, "close", new Object[0]);
 		}
-		catch (final Exception ignore) {}
+		catch (ReflectiveOperationException | RuntimeException ignore) {}
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.serial.LibraryAdapter#getInputStream()
-	 */
 	@Override
 	public InputStream getInputStream()
 	{
 		return is;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.serial.LibraryAdapter#getOutputStream()
-	 */
 	@Override
 	public OutputStream getOutputStream()
 	{
@@ -137,14 +131,14 @@ class CommConnectionAdapter extends LibraryAdapter
 			logger.error("CommConnection: " + e.getCause().getMessage());
 		}
 		// NoSuchMethodException, IllegalAccessException, IllegalArgumentException
-		catch (final Exception e) {}
+		catch (ReflectiveOperationException | RuntimeException e) {}
 		try {
 			if (cc != null)
 				invoke(cc, "close", new Object[0]);
 			is.close();
 			os.close();
 		}
-		catch (final Exception mainlyNPE) {}
+		catch (ReflectiveOperationException | IOException | RuntimeException mainlyNPE) {}
 		throw new KNXException("failed to open CommConnection");
 	}
 }

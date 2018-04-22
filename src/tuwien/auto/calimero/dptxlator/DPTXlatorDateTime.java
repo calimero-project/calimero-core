@@ -847,12 +847,12 @@ public class DPTXlatorDateTime extends DPTXlator
 					final boolean anyday = dow == 0 && t.hasMoreTokens()
 						&& t.nextToken().equalsIgnoreCase("day");
 					if (dow <= 0 && !anyday)
-						newException(s + ": wrong weekday", s, null);
+						throw newException(s + ": wrong weekday", s, null);
 					set(dst, index, DOW, dow);
 					setBit(dst, index, NO_DOW, false);
 				}
 				else
-					newException("wrong date/time " + s, s, null);
+					throw newException("wrong date/time " + s, s, null);
 			}
 		}
 		// find out date/time combination, and store numbers into fields

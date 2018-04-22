@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2017 B. Malinowsky
+    Copyright (c) 2017, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -303,12 +303,12 @@ public class DptXlator8BitSet extends DPTXlator
 
 	private String textOf(final int index)
 	{
-		String s = "";
+		final StringBuilder s = new StringBuilder();
 		final int d = data[index];
 		for (int i = 0x80; i > 0; i >>= 1)
 			if ((d & i) == i)
-				s += ((EnumDpt<?>) dpt).textOf(i) + " ";
-		return s.trim();
+				s.append(((EnumDpt<?>) dpt).textOf(i) + " ");
+		return s.toString().trim();
 	}
 
 	@Override
