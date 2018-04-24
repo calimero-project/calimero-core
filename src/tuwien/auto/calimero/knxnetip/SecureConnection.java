@@ -41,6 +41,7 @@ import static tuwien.auto.calimero.DataUnitBuilder.toHex;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
@@ -48,6 +49,9 @@ import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.security.Key;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.Security;
 import java.time.Duration;
 import java.util.Arrays;
@@ -62,11 +66,13 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.math.ec.rfc7748.X25519;
+import org.slf4j.LoggerFactory;
 
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.KNXRemoteException;
+import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
@@ -77,17 +83,18 @@ import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
- * Provides KNX IP Secure routing and tunneling connections.
+ * Provides KNX IP Secure routing and tunneling connections (experimental).
  */
-final class SecureConnection extends KNXnetIPRouting {
+public final class SecureConnection extends KNXnetIPRouting {
 
 	private static final int SecureSvc = 0x0950;
 	private static final int SecureSessionResponse = 0x0952;
+	private static final int SecureSessionAuth = 0x0953;
 	private static final int SecureSessionStatus = 0x0954;
 	private static final int SecureGroupSync = 0x0955;
 
 	private static final int macSize = 16; // [bytes]
-	private static final int keyLength = 36; // [bytes]
+	private static final int keyLength = 32; // [bytes]
 
 
 	static {
@@ -95,17 +102,26 @@ final class SecureConnection extends KNXnetIPRouting {
 	}
 
 	private final byte[] sno;
+	private Key secretKey;
+	private int sessionId;
 
 	// tunneling connection setup
 
-	private final byte[] ecdhPublicKey;
+	private static Key deviceAuthKey = createSecretKey(new byte[16]);
+
+	private final byte[] privateKey = new byte[keyLength];
+	private final byte[] publicKey = new byte[keyLength];
 
 	// timeout channel.req -> channel.res
-	private static final int channelSetupTimeout = 30; // [s]
+	private static final int sessionSetupTimeout = 30_000; // [ms]
 
-	private byte[] serverPublicKey;
-	private int sessionId;
+	private static final int SessionSetup = -1;
+	private volatile int sessionStatus = SessionSetup;
 
+	private DatagramSocket localSocket;
+	private ReceiverLoop setupLoop;
+	private int seq;
+	private int rcvSeq;
 
 	// routing connection setup
 
@@ -126,8 +142,6 @@ final class SecureConnection extends KNXnetIPRouting {
 	private Future<?> groupSync = CompletableFuture.completedFuture(Void.TYPE);
 	private volatile boolean syncedWithGroup;
 
-	private final Key secretKey;
-
 	// multicast timestamp sync
 	private static final Duration timestampExpiresAfter = Duration.ofMinutes(60 + new Random().nextInt(11));
 	private long timestampExpiresAt = 0 + timestampExpiresAfter.toMillis();
@@ -139,8 +153,8 @@ final class SecureConnection extends KNXnetIPRouting {
 
 
 	public static KNXnetIPConnection newTunneling(final TunnelingLayer knxLayer, final InetSocketAddress localEP,
-		final InetSocketAddress serverCtrlEP, final boolean useNat) {
-		return null;
+		final InetSocketAddress serverCtrlEP, final boolean useNat) throws KNXException, InterruptedException {
+		return new SecureConnection(knxLayer, localEP, serverCtrlEP, useNat);
 	};
 
 	public static KNXnetIPConnection newRouting(final NetworkInterface netIf, final InetAddress mcGroup,
@@ -161,9 +175,25 @@ final class SecureConnection extends KNXnetIPRouting {
 		secretKey = createSecretKey(groupKey);
 		// we don't randomize initial delay [0..10] seconds to minimize uncertainty window of eventual group sync
 		scheduleGroupSync(0);
+	}
 
-		// unicast stuff
-		ecdhPublicKey = null;
+	private SecureConnection(final TunnelingLayer knxLayer, final InetSocketAddress localEP,
+		final InetSocketAddress serverCtrlEP, final boolean useNat) throws KNXException {
+		super(null);
+
+		sno = deriveSerialNumber(localEP);
+		setupSecureSession(localEP, serverCtrlEP);
+		// NYI tcp, secure wrapper
+	}
+
+	private static byte[] deriveSerialNumber(final InetSocketAddress localEP) {
+		try {
+			final NetworkInterface netif = NetworkInterface.getByInetAddress(localEP.getAddress());
+			if (netif != null)
+				return Arrays.copyOf(netif.getHardwareAddress(), 6);
+		}
+		catch (final SocketException e) {}
+		return new byte[6];
 	}
 
 	@Override
@@ -184,7 +214,7 @@ final class SecureConnection extends KNXnetIPRouting {
 	@Override
 	public String getName() {
 		final String lock = new String(Character.toChars(0x1F512));
-		return "KNX/IP " + lock + " Routing " + ctrlEndpt.getAddress().getHostAddress() + ":" + ctrlEndpt.getPort();
+		return "KNX/IP " + lock + " Routing " + ctrlEndpt.getAddress().getHostAddress();
 	}
 
 	@Override
@@ -199,19 +229,18 @@ final class SecureConnection extends KNXnetIPRouting {
 
 		if (svc == SecureSessionResponse) {
 			try {
-				final Object[] res = newChannelResponse(h, data, offset);
-				sessionId = (int) res[0];
-				serverPublicKey = (byte[]) res[1];
+				final Object[] res = newSessionResponse(h, data, offset);
 
 				final int authContext = 2;
-				final byte[] mac = null;
-				final byte[] auth = PacketHelper.newChannelAuth(sessionId, authContext, mac);
-				final byte[] packet = newSecurePacket(1, 0, auth);
-				// NYI send auth
+				final byte[] serverPublicKey = (byte[]) res[1];
+				final byte[] auth = newSessionAuth(authContext, serverPublicKey);
+				final byte[] packet = newSecurePacket(seq++, 0, auth);
+				logger.debug("requesting user access {}", authContext);
+				localSocket.send(new DatagramPacket(packet, packet.length, src, port));
 			}
-			catch (final KNXRemoteException e) {
-				// TODO wrap this exception at origin because we don't support it in our method signature
-				logger.error("server session response error", e);
+			catch (final RuntimeException e) {
+				setupLoop.quit();
+				logger.error("negotiating session key failed", e);
 			}
 		}
 		else if (svc == SecureGroupSync)
@@ -219,7 +248,7 @@ final class SecureConnection extends KNXnetIPRouting {
 		else if (svc == SecureSvc) {
 			final Object[] fields = unwrap(h, data, offset);
 			final long timestamp = (long) fields[1];
-			if (!withinTolerance(timestamp)) {
+			if (sessionId == 0 && !withinTolerance(timestamp)) {
 				logger.warn("{}:{} timestamp {} outside latency tolerance of {} ms (local {}) - ignore", src,
 						port, timestamp, mcastLatencyTolerance, timestamp());
 				return true;
@@ -229,14 +258,17 @@ final class SecureConnection extends KNXnetIPRouting {
 			final KNXnetIPHeader containedHeader = new KNXnetIPHeader(packet, 0);
 
 			if (containedHeader.getServiceType() == SecureSessionStatus) {
-				final int status = newChannelStatus(h, data, offset);
+				final int status = newChannelStatus(containedHeader, packet, containedHeader.getStructLength());
 				LogService.log(logger, status == 0 ? LogLevel.TRACE : LogLevel.ERROR, "secure session {}",
 						statusMsg(status));
+				setupLoop.quit();
+				sessionStatus = status;
+				if (status != 0) // XXX do we need this throw, its swallowed by the loop anyway?
+					throw new KnxSecureException("secure session " + statusMsg(status));
 			}
 			else {
 				// let base class handle contained in decrypted knxip packet
-				return super.handleServiceType(containedHeader, packet, containedHeader.getStructLength(), src,
-						port);
+				return super.handleServiceType(containedHeader, packet, containedHeader.getStructLength(), src, port);
 			}
 		}
 		else
@@ -252,17 +284,35 @@ final class SecureConnection extends KNXnetIPRouting {
 	}
 
 	// unicast session
-	private void setupSecureChannel() {
-		// session.req -> session.res -> auth.req -> session-status
+	// session.req -> session.res -> auth.req -> session-status
+	private void setupSecureSession(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP) throws KNXException {
 
-		// send
-		final HPAI hpai = null;
-		sessionRequest(hpai);
-		// waitForStateChange
-	}
+		final String lock = new String(Character.toChars(0x1F512));
+		logger = LoggerFactory.getLogger("calimero.knxnetip.KNX/IP " + lock + " Session " + serverCtrlEP.getAddress().getHostAddress() + ":"
+				+ serverCtrlEP.getPort());
 
-	private byte[] sessionRequest(final HPAI hpai)  {
-		return PacketHelper.newChannelRequest(hpai, ecdhPublicKey);
+		logger.debug("setup secure session with {}", serverCtrlEP);
+		generateKeyPair(privateKey, publicKey);
+		try (DatagramSocket local = new DatagramSocket(localEP)) {
+			localSocket = local;
+			final HPAI hpai = new HPAI(HPAI.IPV4_UDP, useNat ? null : (InetSocketAddress) local.getLocalSocketAddress());
+			final byte[] sessionReq = PacketHelper.newChannelRequest(hpai, publicKey);
+			local.send(new DatagramPacket(sessionReq, sessionReq.length, serverCtrlEP));
+
+			setupLoop = new ReceiverLoop(this, local, 512, 0, sessionSetupTimeout);
+			setupLoop.run();
+			if (sessionStatus == SessionSetup)
+				throw new KNXTimeoutException("timeout establishing secure session with " + serverCtrlEP);
+			if (sessionStatus != 0)
+				throw new KnxSecureException("secure session " + statusMsg(sessionStatus));
+		}
+		catch (final IOException e) {
+			throw new KNXException("I/O error establishing secure session with " + serverCtrlEP, e);
+		}
+		finally {
+			Arrays.fill(privateKey, (byte) 0);
+			Arrays.fill(publicKey, (byte) 0);
+		}
 	}
 
 	private boolean withinTolerance(final long timestamp) {
@@ -316,10 +366,10 @@ final class SecureConnection extends KNXnetIPRouting {
 		return now + timestampOffset;
 	}
 
-	// for multicast, the channel index = 0
+	// for multicast, the session index = 0
 	// seq: for unicast connections: monotonically increasing counter of sender.
-	// seq: for multicasts, time stamp [ms]
-	// domainMask: for unicasts, mask is 0
+	// seq: for multicasts, timestamp [ms]
+	// msg tag: for unicasts, tag is 0
 	private byte[] newSecurePacket(final long seq, final int msgTag, final byte[] knxipPacket) {
 		if (seq < 0 || seq > 0xffff_ffff_ffffL)
 			throw new KNXIllegalArgumentException(
@@ -346,7 +396,55 @@ final class SecureConnection extends KNXnetIPRouting {
 		return buffer.array();
 	}
 
+	public static byte[] newSecurePacket(final long sessionId, final long seq, final byte[] sno, final int msgTag,
+		final byte[] knxipPacket, final Key secretKey) {
+		if (seq < 0 || seq > 0xffff_ffff_ffffL)
+			throw new KNXIllegalArgumentException(
+					"sequence / group counter " + seq + " out of range [0..0xffffffffffff]");
+		if (msgTag < 0 || msgTag > 0xffff)
+			throw new KNXIllegalArgumentException("message tag " + msgTag + " out of range [0..0xffff]");
+
+		final int svcLength = 2 + 6 + 6 + 2 + knxipPacket.length + macSize;
+		final KNXnetIPHeader header = new KNXnetIPHeader(KNXnetIPHeader.SecureWrapper, svcLength);
+
+		final ByteBuffer buffer = ByteBuffer.allocate(header.getTotalLength());
+		buffer.put(header.toByteArray());
+		buffer.putShort((short) sessionId);
+		buffer.putShort((short) (seq >> 32));
+		buffer.putInt((int) seq);
+		buffer.put(sno);
+		buffer.putShort((short) msgTag);
+		buffer.put(knxipPacket);
+
+		final byte[] secInfo = securityInfo(buffer.array(), header.getStructLength() + 2, knxipPacket.length);
+		final byte[] mac = cbcMac(buffer.array(), 0, buffer.position(), secretKey, secInfo);
+		buffer.put(mac);
+		encrypt(buffer.array(), header.getStructLength() + 2 + 6 + 6 + 2, secretKey,
+				securityInfo(buffer.array(), 8, 0xff00));
+		return buffer.array();
+	}
+
 	private Object[] unwrap(final KNXnetIPHeader h, final byte[] data, final int offset) throws KNXFormatException {
+		final Object[] fields = unwrap(h, data, offset, secretKey);
+
+		final int sid = (int) fields[0];
+		if (sid != sessionId)
+			throw new KnxSecureException("secure session mismatch: received ID " + sid + ", expected " + sessionId);
+
+		final long seq = (long) fields[1];
+		if (sessionId != 0 && seq < rcvSeq)
+			throw new KnxSecureException("received secure packet with sequence " + seq + " < expected " + rcvSeq);
+		++rcvSeq;
+
+		final long sno = (long) fields[2];
+		final int tag = (int) fields[3];
+		final byte[] knxipPacket = (byte[]) fields[4];
+		logger.trace("received {} (session {} seq {} S/N {} tag {})", toHex(knxipPacket, " "), sid, seq, sno, tag);
+		return fields;
+	}
+
+	public static Object[] unwrap(final KNXnetIPHeader h, final byte[] data, final int offset, final Key secretKey)
+		throws KNXFormatException {
 		if ((h.getServiceType() & SecureSvc) != SecureSvc)
 			throw new KNXIllegalArgumentException("not a secure service type");
 
@@ -358,14 +456,12 @@ final class SecureConnection extends KNXnetIPRouting {
 
 		final ByteBuffer buffer = ByteBuffer.wrap(data, offset, total - hdrLength);
 		final int sid = buffer.getShort() & 0xffff;
-		if (sid != sessionId)
-			throw new KnxSecureException("secure session mismatch: received ID " + sid + ", expected " + sessionId);
 
 		final long seq = uint48(buffer);
 		final long sno = uint48(buffer);
 		final int tag = buffer.getShort() & 0xffff;
 
-		final ByteBuffer dec = decrypt(buffer, securityInfo(data, offset + 2, 0xff00));
+		final ByteBuffer dec = decrypt(buffer, secretKey, securityInfo(data, offset + 2, 0xff00));
 
 		final byte[] knxipPacket = new byte[total - minLength + hdrLength];
 		dec.get(knxipPacket);
@@ -374,43 +470,56 @@ final class SecureConnection extends KNXnetIPRouting {
 
 		final byte[] frame = Arrays.copyOfRange(data, offset - hdrLength, offset + total - hdrLength);
 		System.arraycopy(knxipPacket, 0, frame, hdrLength + 2 + 6 + 6 + 2, knxipPacket.length);
-		cbcMacVerify(frame, 0, total - macSize, securityInfo(data, offset + 2, knxipPacket.length), mac);
-
-		logger.trace("received {} (session {} seq {} S/N {} tag {})", toHex(knxipPacket, " "), sid, seq, sno, tag);
+		cbcMacVerify(frame, 0, total - macSize, secretKey, securityInfo(data, offset + 2, knxipPacket.length), mac);
 
 		return new Object[] { sid, seq, sno, tag, knxipPacket };
 	}
 
-	private Object[] newChannelResponse(final KNXnetIPHeader h, final byte[] data, final int offset)
-		throws KNXFormatException, KNXRemoteException {
+	private Object[] newSessionResponse(final KNXnetIPHeader h, final byte[] data, final int offset)
+		throws KNXFormatException {
 
 		if (h.getServiceType() != SecureSessionResponse)
 			throw new IllegalArgumentException("no secure channel response");
-		if (h.getTotalLength() != 0x3c && h.getTotalLength() != 0x08)
+		if (h.getTotalLength() != 0x38 && h.getTotalLength() != 0x08)
 			throw new KNXFormatException("invalid length " + data.length + " for a secure channel response");
 
-		final int start = offset + h.getStructLength();
-		final ByteBuffer buffer = ByteBuffer.wrap(data, start, data.length - start);
+		final ByteBuffer buffer = ByteBuffer.wrap(data, offset, h.getTotalLength() - h.getStructLength());
 
 		sessionId = buffer.getShort() & 0xffff;
 		if (sessionId == 0)
-			throw new KNXRemoteException("no more free secure channels / remote endpoint busy");
+			throw new KnxSecureException("no more free secure channels / remote endpoint busy");
 
-		serverPublicKey = new byte[keyLength];
+		final byte[] serverPublicKey = new byte[keyLength];
 		buffer.get(serverPublicKey);
-		final byte[] aes128 = new byte[macSize];
-		buffer.get(aes128);
 
-		// NYI
-		final byte[] clientPublicKey = ecdhPublicKey;
-		final byte[] sessionKey = new byte[16];
+		final byte[] sessionKey = sessionKey(keyAgreement(serverPublicKey));
+		secretKey = createSecretKey(sessionKey);
+		logger.trace("*** security sensitive information! using session key {} ***", toHex(sessionKey, ""));
 
-		final byte[] xor = xor(serverPublicKey, 0, clientPublicKey, 0, serverPublicKey.length);
-		final byte[] mac = cbcMac(xor, 0, serverPublicKey.length, null);
-
-		// TODO compare encryped mac
+		final ByteBuffer mac = decrypt(buffer, securityInfo(new byte[16], 0, 0xff00));
+		final byte[] xor = xor(serverPublicKey, 0, publicKey, 0, keyLength);
+		final byte[] verifyAgainst = cbcMacSimple(xor, 0, keyLength);
+		final boolean authenticated = Arrays.equals(mac.array(), verifyAgainst);
+		if (!authenticated) {
+			final String packet = toHex(Arrays.copyOfRange(data, offset - 6, offset - 6 + 0x38), " ");
+			throw new KnxSecureException("authentication failed for session response " + packet);
+		}
 
 		return new Object[] { sessionId, serverPublicKey };
+	}
+
+	private byte[] newSessionAuth(final int authContext, final byte[] serverPublicKey) {
+		final KNXnetIPHeader header = new KNXnetIPHeader(SecureSessionAuth, 2 + macSize);
+
+		final ByteBuffer buffer = ByteBuffer.allocate(header.getTotalLength());
+		buffer.put(header.toByteArray());
+		buffer.putShort((short) authContext);
+
+		final byte[] xor = xor(serverPublicKey, 0, publicKey, 0, keyLength);
+		final byte[] mac = cbcMacSimple(xor, 0, keyLength);
+		buffer.put(mac);
+
+		return buffer.array();
 	}
 
 	private int newChannelStatus(final KNXnetIPHeader h, final byte[] data, final int offset)
@@ -425,9 +534,7 @@ final class SecureConnection extends KNXnetIPRouting {
 		// 1: auth failed
 		// 2: error unauthorized
 		// 3: timeout
-		final int status = data[offset + h.getStructLength()] & 0xff;
-//		if (status > 3)
-//			; // log warning or throw with unknown status
+		final int status = data[offset] & 0xff;
 		return status;
 	}
 
@@ -466,15 +573,19 @@ final class SecureConnection extends KNXnetIPRouting {
 		final ByteBuffer mac = decrypt(buffer, securityInfo(data, offset, 0xff00));
 
 		final byte[] secInfo = securityInfo(buffer.array(), 6, 0);
-		cbcMacVerify(data, offset - h.getStructLength(), h.getTotalLength() - macSize, secInfo, mac.array());
+		cbcMacVerify(data, offset - h.getStructLength(), h.getTotalLength() - macSize, secretKey, secInfo, mac.array());
 		logger.trace("received group sync timestamp {} ms (S/N {}, tag {})", timestamp, Long.toHexString(sno), msgTag);
 		return timestamp;
 	}
 
 	private void encrypt(final byte[] data, final int offset, final byte[] secInfo) {
+		encrypt(data, offset, secretKey, secInfo);
+	}
+
+	public static void encrypt(final byte[] data, final int offset, final Key secretKey, final byte[] secInfo) {
 		try {
 			final ByteBuffer encrypt = ByteBuffer.wrap(data, offset, data.length - offset);
-			final ByteBuffer result = cipher(encrypt, secInfo);
+			final ByteBuffer result = cipher(encrypt, secretKey, secInfo);
 			System.arraycopy(result.array(), 0, data, offset, result.remaining());
 		}
 		catch (final GeneralSecurityException e) {
@@ -483,17 +594,22 @@ final class SecureConnection extends KNXnetIPRouting {
 	}
 
 	private ByteBuffer decrypt(final ByteBuffer buffer, final byte[] secInfo) {
+		return decrypt(buffer, secretKey, secInfo);
+	}
+
+	private static ByteBuffer decrypt(final ByteBuffer buffer, final Key secretKey, final byte[] secInfo) {
 		try {
-			return cipher(buffer, secInfo);
+			return cipher(buffer, secretKey, secInfo);
 		}
 		catch (final GeneralSecurityException e) {
 			throw new KnxSecureException("decrypting error", e);
 		}
 	}
 
-	private ByteBuffer cipher(final ByteBuffer buffer, final byte[] secInfo) throws GeneralSecurityException {
+	private static ByteBuffer cipher(final ByteBuffer buffer, final Key secretKey, final byte[] secInfo)
+		throws GeneralSecurityException {
 		final int blocks = (buffer.remaining() + 0xf) >> 4;
-		final byte[] cipher = cipherStream(blocks, secInfo);
+		final byte[] cipher = cipherStream(blocks, secretKey, secInfo);
 
 		final ByteBuffer result = ByteBuffer.allocate(buffer.remaining());
 		if (blocks > 1) {
@@ -505,7 +621,8 @@ final class SecureConnection extends KNXnetIPRouting {
 		return (ByteBuffer) result.flip();
 	}
 
-	private byte[] cipherStream(final int blocks, final byte[] secInfo) throws GeneralSecurityException {
+	private static byte[] cipherStream(final int blocks, final Key secretKey, final byte[] secInfo)
+		throws GeneralSecurityException {
 		final Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
 		cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 
@@ -519,14 +636,12 @@ final class SecureConnection extends KNXnetIPRouting {
 		return baos.toByteArray();
 	}
 
-	private void cbcMacVerify(final byte[] data, final int offset, final int length, final byte[] secInfo,
-		final byte[] verifyAgainst) {
-		final byte[] mac = cbcMac(data, offset, length, secInfo);
+	private static void cbcMacVerify(final byte[] data, final int offset, final int length, final Key secretKey,
+		final byte[] secInfo, final byte[] verifyAgainst) {
+		final byte[] mac = cbcMac(data, offset, length, secretKey, secInfo);
 		final boolean authenticated = Arrays.equals(mac, verifyAgainst);
 		if (!authenticated) {
 			final String packet = toHex(Arrays.copyOfRange(data, offset, offset + length), " ");
-			logger.debug("authentication failed for {}\n\treceived MAC   {}\n\tcalculated MAC {}", packet,
-					toHex(verifyAgainst, ""), toHex(mac, ""));
 			throw new KnxSecureException("authentication failed for " + packet);
 		}
 	}
@@ -566,6 +681,59 @@ final class SecureConnection extends KNXnetIPRouting {
 		}
 	}
 
+	private static byte[] cbcMac(final byte[] data, final int offset, final int length, final Key secretKey,
+		final byte[] secInfo) {
+		final byte[] log = Arrays.copyOfRange(data, offset, offset + length);
+
+		final byte[] hdr = Arrays.copyOfRange(data, offset, offset + 6);
+
+		final int packetOffset = hdr.length + 2 + 6 + 6 + 2;
+		byte[] session = new byte[0];
+		byte[] frame = new byte[0];
+		if (length > packetOffset) {
+			session = Arrays.copyOfRange(data, offset + 6, offset + 8);
+			frame = Arrays.copyOfRange(data, offset + packetOffset, offset + length);
+		}
+
+		try {
+			final Cipher cipher = Cipher.getInstance("AES/CBC/ZeroBytePadding");
+			final IvParameterSpec ivSpec = new IvParameterSpec(new byte[16]);
+			cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec);
+
+			cipher.update(secInfo);
+
+			final byte[] lenBuf = new byte[] { 0, (byte) (hdr.length + session.length) };
+			cipher.update(lenBuf);
+			cipher.update(hdr);
+			cipher.update(session);
+
+			final byte[] result = cipher.doFinal(frame);
+			final byte[] mac = Arrays.copyOfRange(result, result.length - macSize, result.length);
+			return mac;
+		}
+		catch (final GeneralSecurityException e) {
+			throw new KnxSecureException("calculating CBC-MAC of " + toHex(log, " "), e);
+		}
+	}
+
+	private byte[] cbcMacSimple(final byte[] data, final int offset, final int length) {
+		final byte[] log = Arrays.copyOfRange(data, offset, offset + length);
+		logger.trace("authenticating (length {}): {}", length, toHex(log, " "));
+
+		try {
+			final Cipher cipher = Cipher.getInstance("AES/CBC/ZeroBytePadding");
+			final IvParameterSpec ivSpec = new IvParameterSpec(new byte[16]);
+			cipher.init(Cipher.ENCRYPT_MODE, deviceAuthKey, ivSpec);
+
+			final byte[] result = cipher.doFinal(data, offset, length);
+			final byte[] mac = Arrays.copyOfRange(result, result.length - macSize, result.length);
+			return mac;
+		}
+		catch (final GeneralSecurityException e) {
+			throw new KnxSecureException("calculating CBC-MAC of " + toHex(log, " "), e);
+		}
+	}
+
 	private static byte[] securityInfo(final byte[] data, final int offset, final int lengthInfo) {
 		final byte[] secInfo = Arrays.copyOfRange(data, offset, offset + 16);
 		secInfo[14] = (byte) (lengthInfo >> 8);
@@ -582,8 +750,31 @@ final class SecureConnection extends KNXnetIPRouting {
 
 	private static Key createSecretKey(final byte[] key) {
 		if (key.length != 16)
-			throw new KNXIllegalArgumentException("KNX group key has to be 16 bytes in length");
+			throw new KNXIllegalArgumentException("KNX group key has to be " + macSize + " bytes in length");
 		return new SecretKeySpec(key, 0, key.length, "AES");
+	}
+
+	private static void generateKeyPair(final byte[] privateKey, final byte[] publicKey) {
+		new SecureRandom().nextBytes(privateKey);
+		X25519.scalarMultBase(privateKey, 0, publicKey, 0);
+	}
+
+	private byte[] keyAgreement(final byte[] serverPublicKey) {
+		final byte[] sharedSecret = new byte[keyLength];
+		X25519.scalarMult(privateKey, 0, serverPublicKey, 0, sharedSecret, 0);
+		return sharedSecret;
+	}
+
+	private static byte[] sessionKey(final byte[] sharedSecret) {
+		try {
+			final MessageDigest digest = MessageDigest.getInstance("SHA-256");
+			final byte[] hash = digest.digest(sharedSecret);
+			return Arrays.copyOfRange(hash, 0, 16);
+		}
+		catch (final NoSuchAlgorithmException e) {
+			// every platform is required to support SHA-256
+			throw new KnxSecureException("platform does not support SHA-256 algorithm", e);
+		}
 	}
 
 	private static byte[] xor(final byte[] a, final int offsetA, final byte[] b, final int offsetB, final int len) {
