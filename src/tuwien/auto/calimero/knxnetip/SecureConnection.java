@@ -81,18 +81,6 @@ import tuwien.auto.calimero.log.LogService.LogLevel;
  */
 final class SecureConnection extends KNXnetIPRouting {
 
-	private static class KnxSecureException extends RuntimeException {
-		private static final long serialVersionUID = 1;
-
-		KnxSecureException(final String message, final Throwable cause) {
-			super(message, cause);
-		}
-
-		KnxSecureException(final String message) {
-			super(message);
-		}
-	}
-
 	private static final int SecureSvc = 0x0950;
 	private static final int SecureSessionResponse = 0x0952;
 	private static final int SecureSessionStatus = 0x0954;
