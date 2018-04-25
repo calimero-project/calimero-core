@@ -54,6 +54,7 @@ import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.knxnetip.KNXConnectionClosedException;
 import tuwien.auto.calimero.link.BcuSwitcher.BcuMode;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
+import tuwien.auto.calimero.link.medium.RFSettings;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
 import tuwien.auto.calimero.serial.usb.HidReport;
 import tuwien.auto.calimero.serial.usb.TransferProtocolHeader.KnxTunnelEmi;
@@ -157,6 +158,8 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 		deviceAddr();
 		mediumType();
 		setMaxApduLength();
+		setDomain();
+		disableFilters();
 	}
 
 	@Override
@@ -271,5 +274,29 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 			final int addr = read(0, pidDeviceAddr).map(data -> unsigned(subnet.get()[0], data[0])).orElse(0);
 			logger.debug("KNX interface address {}", new IndividualAddress(addr));
 		}
+	}
+
+	private void setDomain() throws KNXException {
+		if (getKNXMedium().getMedium() != KNXMediumSettings.MEDIUM_RF)
+			return;
+		final RFSettings rf = (RFSettings) getKNXMedium();
+		final int rfDoA = 82;
+		write(0, rfDoA, rf.getDomainAddress());
+	}
+
+	private void disableFilters() throws KNXException {
+		if (getKNXMedium().getMedium() != KNXMediumSettings.MEDIUM_RF)
+			return;
+		final int pidFilteringModeSelect = 66;
+		write(cemiServerObject, pidFilteringModeSelect, new byte[] { 0, 0xf });
+	}
+
+	private void write(final int objectType, final int pid, final byte[] data) throws KNXException {
+		if (!cEMI)
+			return;
+		final int objectInstance = 1;
+		final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, objectType, objectInstance, pid, 1, 1, data);
+		logger.trace("write mgmt OT {} PID {} data 0x{}", objectType, pid, DataUnitBuilder.toHex(data, ""));
+		conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame.toByteArray()).get(0), true);
 	}
 }
