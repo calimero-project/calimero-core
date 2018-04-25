@@ -397,6 +397,12 @@
         <property pid="64" pidName="PID_COMM_MODES_SUPPORTED" name="cEMI Supported Communication Modes" pdt="52" rw="(3/x)" writeEnabled="0">
             <usage>Allow discovering the Communication Modes supported by the cEMI Server</usage>
         </property>
+        <property pid="65" pidName="PID_FILTERING_MODE_SUPPORT" name="Supported Filtering Modes" pdt="52" rw="(3/x)" writeEnabled="0">
+            <usage>Supported filtering mode(s) of the cEMI Data Link Layer</usage>
+        </property>
+        <property pid="66" pidName="PID_FILTERING_MODE_SELECT" name="Filtering Mode Selection" pdt="52" rw="(3/x)" writeEnabled="1">
+            <usage>Control filtering of received frames by the cEMI Data Link Layer</usage>
+        </property>
     </object>
     <object type="9">
         <property pid="51" pidName="PID_GRPOBJTABLE" name="Object Table" pdt="22" rw="R(/W)" writeEnabled="0/1">
