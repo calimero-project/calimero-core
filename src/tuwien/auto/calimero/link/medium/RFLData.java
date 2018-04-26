@@ -404,7 +404,11 @@ public class RFLData implements RawFrame
 		if (lteExt)
 			sb.append("LTE ");
 		sb.append(getFrameType(ctrl >>> 4));
-		sb.append(" ").append(src).append("->").append(dst);
+		sb.append(" ").append(src).append("->");
+		if (lteExt)
+			sb.append(lteTag(ctrl, dst));
+		else
+			sb.append(dst);
 
 		sb.append(isSystemBroadcast() ? " SN " : " DoA ").append(
 				DataUnitBuilder.toHex(getDoAorSN(), ""));
@@ -414,6 +418,49 @@ public class RFLData implements RawFrame
 
 		sb.append(": ").append(DataUnitBuilder.toHex(tpdu, ""));
 		return sb.toString();
+	}
+
+	private static String lteTag(final int extFormat, final KNXAddress dst) {
+		// LTE-HEE bits 1 and 0 contain the extension of the group address
+		final int ext = extFormat & 0b11;
+		final int rawAddress = dst.getRawAddress();
+		if (rawAddress == 0)
+			return "broadcast";
+
+		// geographical tags: Apartment/Room/...
+		if (ext <= 1) {
+			final int aptFloor = (ext << 6) | ((rawAddress & 0b1111110000000000) >> 10);
+			final int room = (rawAddress & 0b1111110000) >> 4;
+			final int subzone = rawAddress & 0b1111;
+			return (aptFloor == 0 ? "*" : aptFloor) + "/" + (room == 0 ? "*" : room) + "/"
+					+ (subzone == 0 ? "*" : subzone);
+		}
+		// application specific tags
+		if (ext == 2) {
+			final int domain = rawAddress & 0xf000;
+			if (domain == 0) {
+				// TODO improve output format for domain 0
+				final int mapping = (rawAddress >> 5);
+				final int producer = (rawAddress >> 5) & 0xf;
+				final int zone = rawAddress & 0x1f;
+				if (mapping < 7) {
+					// distribution (segments or zones)
+					final String[] zones = { "", "D HotWater", "D ColdWater", "D Vent", "DHW", "Outside", "Calendar" };
+					return zone + " (Z HVAC " + zones[mapping] + ")";
+				}
+				// producers and their zones
+				if ((mapping & 0x70) == 0x10)
+					return producer + "/" + zone + " (P/Z HVAC HotWater)";
+				if ((mapping & 0x70) == 0x20)
+					return producer + "/" + zone + " (P/Z HVAC ColdWater)";
+
+				final String s = String.format("%8s", Integer.toBinaryString(rawAddress & 0xfff)).replace(' ', '0');
+				return "0b" + s + " (HVAC)";
+			}
+			return domain + "/0x" + Integer.toHexString(rawAddress & 0xfff) + " (app)";
+		}
+		// ext = 3, unassigned (peripheral) tags & broadcast
+		return "0x" + Integer.toHexString(rawAddress & 0xfff) + " (?)";
 	}
 
 	private static String getFrameType(final int format)
