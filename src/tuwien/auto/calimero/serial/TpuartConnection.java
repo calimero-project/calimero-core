@@ -402,8 +402,10 @@ public class TpuartConnection implements AutoCloseable
 				remaining = end - System.currentTimeMillis();
 			}
 		}
-		logger.trace("ACK received after {} ms", ExchangeTimeout - remaining);
-		return remaining > 0;
+		final boolean rcvdCon = remaining > 0;
+		if (rcvdCon)
+			logger.trace("ACK received after {} ms", ExchangeTimeout - remaining);
+		return rcvdCon;
 	}
 
 	private static int checksum(final byte[] frame)
