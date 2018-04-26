@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -158,6 +158,7 @@ public class CEMILDataExTest extends TestCase
 		catch (final KNXIllegalArgumentException e) {}
 		final byte[] getPL = f.getAdditionalInfo(CEMILDataEx.ADDINFO_PLMEDIUM);
 		assertTrue(Arrays.equals(plinfo, getPL));
+		f.additionalInfo().removeIf(info -> info.getType() == CEMILDataEx.ADDINFO_TIMESTAMP_EXT);
 		f.addAdditionalInfo(CEMILDataEx.ADDINFO_TIMESTAMP_EXT, new byte[] { 4, 4, 4, 4 });
 		final byte[] getTS = f.getAdditionalInfo(CEMILDataEx.ADDINFO_TIMESTAMP_EXT);
 		assertTrue(Arrays.equals(new byte[] { 4, 4, 4, 4 }, getTS));
@@ -214,7 +215,7 @@ public class CEMILDataExTest extends TestCase
 	 */
 	public final void testClone()
 	{
-		final CEMILDataEx f2 = (CEMILDataEx) f.clone();
+		final CEMILDataEx f2 = f.clone();
 		final List<AddInfo> l = f.getAdditionalInfo();
 		final List<AddInfo> l2 = f2.getAdditionalInfo();
 		for (int i = 0; i < l.size(); ++i)

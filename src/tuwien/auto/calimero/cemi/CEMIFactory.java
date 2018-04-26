@@ -362,7 +362,7 @@ public final class CEMIFactory
 	{
 		// on original == null we just return null, too
 		if (original instanceof CEMILDataEx)
-			return (CEMI) ((CEMILDataEx) original).clone();
+			return ((CEMILDataEx) original).clone();
 		// all other are immutable
 		return original;
 	}

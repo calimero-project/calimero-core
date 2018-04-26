@@ -39,6 +39,7 @@ package tuwien.auto.calimero.cemi;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import tuwien.auto.calimero.DataUnitBuilder;
@@ -144,7 +145,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 
 	private static final int[] ADDINFO_LENGTHS = { 0, 2, 8, 1, 2, 4, 4, 2, 4, 3 };
 
-	private byte[][] addInfo = new byte[10][];
+	private final List<AddInfo> addInfo = Collections.synchronizedList(new ArrayList<>());
 
 	/**
 	 * Creates a new L-Data message from a byte stream.
@@ -280,6 +281,21 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		this(msgCode, src, dst, tpdu, p, repeat, true, false, hopCount);
 	}
 
+	private CEMILDataEx(final CEMILDataEx rhs) {
+		super(rhs.getMessageCode(), rhs.getSource(), rhs.getDestination(), rhs.getPayload(), rhs.getPriority(), rhs.isRepetition(),
+				!rhs.isSystemBroadcast(), rhs.isAckRequested(), rhs.getHopCount());
+		ctrl1 = rhs.ctrl1;
+		ctrl2 |= rhs.ctrl2 & 0x0f;
+		rhs.additionalInfo().forEach(info -> addInfo.add(new AddInfo(info.type, info.data)));
+	}
+
+	/**
+	 * @return mutable list with cEMI additional info, empty list if no additional info
+	 */
+	List<AddInfo> additionalInfo() {
+		return addInfo;
+	}
+
 	/**
 	 * Adds additional information to the message.
 	 * <p>
@@ -295,7 +311,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		if (!checkAddInfoLength(infoType, info.length))
 			throw new KNXIllegalArgumentException("wrong info data length, expected "
 					+ ADDINFO_LENGTHS[infoType] + " bytes");
-		putAddInfo(infoType, info);
+		addInfo.add(new AddInfo(infoType, info));
 	}
 
 	/**
@@ -306,11 +322,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 */
 	public synchronized List<AddInfo> getAdditionalInfo()
 	{
-		final List<AddInfo> l = new ArrayList<>();
-		for (int i = 0; i < addInfo.length; ++i)
-			if (addInfo[i] != null)
-				l.add(new AddInfo(i, addInfo[i].clone()));
-		return l;
+		return new ArrayList<>(addInfo);
 	}
 
 	/**
@@ -322,8 +334,10 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 */
 	public synchronized byte[] getAdditionalInfo(final int infoType)
 	{
-		if (infoType < addInfo.length && addInfo[infoType] != null)
-			return addInfo[infoType].clone();
+		for (final AddInfo info : addInfo) {
+			if (info.type == infoType)
+				return info.getInfo();
+		}
 		return null;
 	}
 
@@ -377,8 +391,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 */
 	public synchronized void removeAdditionalInfo(final int infoType)
 	{
-		if (infoType < addInfo.length)
-			addInfo[infoType] = null;
+		addInfo.removeIf(info -> info.type == infoType);
 	}
 
 	@Override
@@ -415,27 +428,33 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		final int split = s.indexOf(',');
 		buf.append(s.substring(svcStart, split + 1));
 
-		for (int i = 0; i < addInfo.length; ++i) {
-			final byte[] info = addInfo[i];
-			if (info != null)
-				if (i == ADDINFO_PLMEDIUM) {
-					buf.append(" domain ");
-					buf.append(Integer.toHexString((info[0] & 0xff) << 8 | (info[1] & 0xff)));
-				}
-				else if (i == ADDINFO_RFMEDIUM)
-					buf.append(" ").append(new RFMediumInfo(info, !isDomainBroadcast())).append(",");
-				else if (i == ADDINFO_TIMESTAMP) {
-					buf.append(" timestamp ");
-					buf.append((info[0] & 0xff) << 8 | (info[1] & 0xff));
-				}
-				else if (i == ADDINFO_TIMEDELAY)
-					buf.append(" timedelay ").append(toLong(info));
-				else if (i == ADDINFO_TIMESTAMP_EXT)
-					buf.append(" ext.timestamp ").append(toLong(info));
-				else if (i == ADDINFO_BIBAT)
-					buf.append(" bibat 0x").append(DataUnitBuilder.toHex(info, " "));
-				else
-					buf.append(" type ").append(i).append(" 0x").append(DataUnitBuilder.toHex(info, ""));
+		for (final AddInfo addInfo : addInfo) {
+			final byte[] info = addInfo.data;
+			switch (addInfo.type) {
+			case ADDINFO_PLMEDIUM:
+				buf.append(" domain ");
+				buf.append(Integer.toHexString((info[0] & 0xff) << 8 | (info[1] & 0xff)));
+				break;
+			case ADDINFO_RFMEDIUM:
+				buf.append(" ").append(new RFMediumInfo(info, !isDomainBroadcast())).append(",");
+				break;
+			case ADDINFO_TIMESTAMP:
+				buf.append(" timestamp ");
+				buf.append((info[0] & 0xff) << 8 | (info[1] & 0xff));
+				break;
+			case ADDINFO_TIMEDELAY:
+				buf.append(" timedelay ").append(toLong(info));
+				break;
+			case ADDINFO_TIMESTAMP_EXT:
+				buf.append(" ext.timestamp ").append(toLong(info));
+				break;
+			case ADDINFO_BIBAT:
+				buf.append(" bibat 0x").append(DataUnitBuilder.toHex(info, " "));
+				break;
+			default:
+				buf.append(" type ").append(addInfo.type).append(" 0x").append(DataUnitBuilder.toHex(info, ""));
+				break;
+			}
 		}
 		buf.append(s.substring(split + 1));
 		return buf.toString();
@@ -485,19 +504,9 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	}
 
 	@Override
-	public Object clone()
+	public CEMILDataEx clone()
 	{
-		try {
-			final CEMILDataEx clone = (CEMILDataEx) super.clone();
-			clone.data = getPayload();
-			// the byte arrays with additional info content are used internal only
-			// and don't need to be cloned
-			clone.addInfo = clone.addInfo.clone();
-			return clone;
-		}
-		catch (final CloneNotSupportedException ignore) {
-			throw new UnsupportedOperationException("cloning cEMI L-Data", ignore);
-		}
+		return new CEMILDataEx(this);
 	}
 
 	@Override
@@ -518,7 +527,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 						+ " with invalid length", len);
 			final byte[] info = new byte[len];
 			is.read(info, 0, len);
-			putAddInfo(type, info);
+			addInfo.add(new AddInfo(type, info));
 			remaining -= len;
 		}
 	}
@@ -545,22 +554,25 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 * @param os the output stream
 	 */
 	@Override
-	synchronized void writeAddInfo(final ByteArrayOutputStream os)
+	void writeAddInfo(final ByteArrayOutputStream os)
 	{
-		os.write(getAddInfoLength());
-		for (int i = 0; i < addInfo.length; i++)
-			if (addInfo[i] != null) {
-				os.write(i);
-				os.write(addInfo[i].length);
-				os.write(addInfo[i], 0, addInfo[i].length);
+		synchronized (addInfo) {
+			os.write(getAddInfoLength());
+			addInfo.sort((lhs, rhs) -> lhs.type - rhs.type);
+			for (final AddInfo info : addInfo) {
+				os.write(info.type);
+				os.write(info.data.length);
+				os.write(info.data, 0, info.data.length);
 			}
+		}
 	}
 
 	@Override
 	void writePayload(final ByteArrayOutputStream os)
 	{
 		// RF frames don't use NPDU length field
-		os.write(addInfo[ADDINFO_RFMEDIUM] != null ? 0 : data.length - 1);
+		final boolean rf = addInfo.stream().anyMatch(info -> info.type == ADDINFO_RFMEDIUM);
+		os.write(rf ? 0 : data.length - 1);
 		os.write(data, 0, data.length);
 	}
 
@@ -581,23 +593,11 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		return true;
 	}
 
-	private synchronized int getAddInfoLength()
+	private int getAddInfoLength()
 	{
-		int len = 0;
-		for (int i = 0; i < addInfo.length; i++)
-			if (addInfo[i] != null)
-				len += 2 + addInfo[i].length;
-		return len;
-	}
-
-	private void putAddInfo(final int infoType, final byte[] info)
-	{
-		if (addInfo.length <= infoType) {
-			final byte[][] newInfo = new byte[Math.max(2 * addInfo.length, infoType + 1)][];
-			System.arraycopy(addInfo, 0, newInfo, 0, addInfo.length);
-			addInfo = newInfo;
+		synchronized (addInfo) {
+			return addInfo.stream().mapToInt(info -> 2 + info.data.length).sum();
 		}
-		addInfo[infoType] = info.clone();
 	}
 
 	private static long toLong(final byte[] data)
