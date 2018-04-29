@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -192,9 +192,19 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		// filter for A-Group write (0x80) and read.res (0x40) services
 		final int svc = d[0] & 0x03 | d[1] & 0xC0;
 		CEMILData copy;
-		if (svc == 0x40)
-			// actually, read.res could be in a L-Data.con, too... ignore for now
-			copy = f;
+		if (svc == 0x40) {
+			// read.res could be in a L-Data.con, too
+			if (f.getMessageCode() == CEMILData.MC_LDATA_CON)
+				try {
+					copy = (CEMILData) CEMIFactory.create(CEMILData.MC_LDATA_IND, d, f);
+				}
+				catch (final KNXFormatException e) {
+					LogService.getLogger("calimero").error("create L_Data.ind for network buffer: {}", f, e);
+					return;
+				}
+			else
+				copy = f;
+		}
 		else if (svc == 0x80) {
 			// adjust to read response frame
 			d[1] = (byte) (d[1] & 0x3f | 0x40);
