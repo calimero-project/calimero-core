@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -369,7 +369,7 @@ public class KNXnetIPRouting extends ConnectionBase
 						DataUnitBuilder.toHex(data, " "));
 			loggedGiraUnsupportedSvcType = true;
 		}
-		else if (svc != KNXnetIPHeader.SEARCH_REQ && svc != KNXnetIPHeader.SEARCH_RES)
+		else if (!PacketHelper.isKnxSecure(h) && svc != KNXnetIPHeader.SEARCH_REQ && svc != KNXnetIPHeader.SEARCH_RES)
 			// silently ignore multicast packets from searches,
 			// to avoid logged warnings about unknown frames
 			return super.handleServiceType(h, data, offset, src, port);
