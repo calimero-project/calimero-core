@@ -60,6 +60,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -149,7 +150,9 @@ public final class SecureConnection extends KNXnetIPRouting {
 	private long timestampOffset = -System.nanoTime() / 1_000_000L; // [ms]
 	private static final long queryInterval = 10_000; // [ms]
 
-	private final int mcastLatencyTolerance = 3000; // [ms]
+	private final int mcastLatencyTolerance; // [ms]
+
+	private final AtomicInteger routingCount = new AtomicInteger();
 
 
 	public static KNXnetIPConnection newTunneling(final TunnelingLayer knxLayer, final InetSocketAddress localEP,
@@ -157,13 +160,13 @@ public final class SecureConnection extends KNXnetIPRouting {
 		return new SecureConnection(knxLayer, localEP, serverCtrlEP, useNat);
 	};
 
-	public static KNXnetIPConnection newRouting(final NetworkInterface netIf, final InetAddress mcGroup,
-		final byte[] groupKey) throws KNXException {
-		return new SecureConnection(netIf, mcGroup, groupKey);
+	public static KNXnetIPConnection newRouting(final NetworkInterface netIf, final InetAddress mcGroup, final byte[] groupKey,
+		final int latencyTolerance) throws KNXException {
+		return new SecureConnection(netIf, mcGroup, groupKey, latencyTolerance);
 	};
 
-	private SecureConnection(final NetworkInterface netif, final InetAddress mcGroup, final byte[] groupKey)
-		throws KNXException {
+	private SecureConnection(final NetworkInterface netif, final InetAddress mcGroup, final byte[] groupKey,
+		final int latencyTolerance) throws KNXException {
 		super(netif, mcGroup);
 
 		byte[] hwAddr = new byte[6];
@@ -173,6 +176,8 @@ public final class SecureConnection extends KNXnetIPRouting {
 		catch (final SocketException e) {}
 		sno = hwAddr;
 		secretKey = createSecretKey(groupKey);
+		mcastLatencyTolerance = latencyTolerance;
+
 		// we don't randomize initial delay [0..10] seconds to minimize uncertainty window of eventual group sync
 		scheduleGroupSync(0);
 	}
@@ -184,6 +189,8 @@ public final class SecureConnection extends KNXnetIPRouting {
 		sno = deriveSerialNumber(localEP);
 		setupSecureSession(localEP, serverCtrlEP);
 		// NYI tcp, secure wrapper
+
+		mcastLatencyTolerance = 0;
 	}
 
 	private static byte[] deriveSerialNumber(final InetSocketAddress localEP) {
@@ -198,7 +205,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 	@Override
 	public void send(final CEMI frame, final BlockingMode mode) throws KNXConnectionClosedException {
-		final int tag = 0;
+		final int tag = routingCount.getAndIncrement() % 0x10000;
 
 //		final byte[] knxip = PacketHelper.toPacket(new ServiceRequest(serviceRequest, channelId, getSeqSend(), frame));
 
@@ -215,6 +222,11 @@ public final class SecureConnection extends KNXnetIPRouting {
 	public String getName() {
 		final String lock = new String(Character.toChars(0x1F512));
 		return "KNX/IP " + lock + " Routing " + ctrlEndpt.getAddress().getHostAddress();
+	}
+
+	@Override
+	public String toString() {
+		return getName();
 	}
 
 	@Override
