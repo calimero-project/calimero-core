@@ -36,6 +36,7 @@
 
 package tuwien.auto.calimero.link;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -74,9 +75,8 @@ public final class Connector
 		T get() throws KNXException, InterruptedException;
 	}
 
-	private boolean onCreation = true;
 	private boolean onSend = true;
-	private long reconnectWait = 2000; // [ms]
+	private long reconnectDelay = 2000; // [ms]
 	// reconnect on disconnect caused by:
 	private boolean initialError;
 	private boolean serverError = true;
@@ -92,23 +92,13 @@ public final class Connector
 	// copy ctor
 	private Connector(final Connector rhs)
 	{
-		this.onCreation = rhs.onCreation;
 		this.onSend = rhs.onSend;
-		this.reconnectWait = rhs.reconnectWait;
+		this.reconnectDelay = rhs.reconnectDelay;
 		this.initialError = rhs.initialError;
 		this.serverError = rhs.serverError;
 		this.internalError = rhs.internalError;
 		this.maxAttempts = rhs.maxAttempts;
 	}
-
-	// rare use-case, comment out for now: disabling connect on creation
-	// only makes sense for KNXNetworkLink, and only if a send method is called eventually
-	// Alternatively, make it a setter for "block during first attempt in constructor"
-//	public Connector connectOnCreation(final boolean connect)
-//	{
-//		this.onCreation = connect;
-//		return this;
-//	}
 
 	// on successful connection, the attempts are reset to maxAttempts
 	public Connector maxConnectAttempts(final long maxAttempts)
@@ -125,9 +115,15 @@ public final class Connector
 		return this;
 	}
 
+	@Deprecated
 	public Connector reconnectWait(final long wait, final TimeUnit unit)
 	{
-		reconnectWait = unit.toMillis(wait);
+		reconnectDelay = unit.toMillis(wait);
+		return this;
+	}
+
+	public Connector reconnectDelay(final Duration delay) {
+		reconnectDelay = delay.toMillis();
 		return this;
 	}
 
@@ -210,8 +206,7 @@ public final class Connector
 			this.creator = creator;
 			connector = new Connector(options);
 			try {
-				if (connector.onCreation)
-					connect();
+				connect();
 			}
 			catch (final KNXException e) {
 				if (!connector.initialError)
@@ -335,7 +330,7 @@ public final class Connector
 				return ((KNXNetworkLink) t).getName();
 			if (t instanceof KNXNetworkMonitor)
 				return ((KNXNetworkMonitor) t).getName();
-			return "calimero.link";
+			return "connector";
 		}
 
 		@Override
@@ -415,7 +410,7 @@ public final class Connector
 					scheduleConnect(remaining);
 				}
 			};
-			f = reconnect.schedule(s, connector.reconnectWait, TimeUnit.MILLISECONDS);
+			f = reconnect.schedule(s, connector.reconnectDelay, TimeUnit.MILLISECONDS);
 		}
 
 		private AutoCloseable connect() throws InterruptedException, KNXException
@@ -482,7 +477,7 @@ public final class Connector
 
 		private Logger logger()
 		{
-			return LoggerFactory.getLogger(getName());
+			return LoggerFactory.getLogger("calimero.link." + getName());
 		}
 	}
 }
