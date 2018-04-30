@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,51 +38,42 @@ package tuwien.auto.calimero;
 
 
 /**
- * Priority of KNX messages for access on a KNX medium.
- * <p>
- * All possible priority values are supplied as immutable Priority constants.
+ * KNX message priorities for sending on a KNX medium.
  *
  * @author B. Malinowsky
  */
-public final class Priority
-{
+public enum Priority {
 	/**
 	 * System priority, reserved for high priority management and system configuration.
 	 */
-	public static final Priority SYSTEM = new Priority(0x00);
-
-	/**
-	 * Urgent priority, for urgent frames.
-	 */
-	public static final Priority URGENT = new Priority(0x02);
+	SYSTEM,
 
 	/**
 	 * Normal priority, the default for short frames.
 	 */
-	public static final Priority NORMAL = new Priority(0x01);
+	NORMAL,
+
+	/**
+	 * Urgent priority, for urgent frames.
+	 */
+	URGENT,
 
 	/**
 	 * Low priority, used for long frames.
 	 */
-	public static final Priority LOW = new Priority(0x03);
+	LOW;
 
 	/**
 	 * Constant with the 2 Bit representation of this priority used in the message
 	 * priority field.
 	 */
-	public final int value;
-
-	private Priority(final int v)
-	{
-		value = v;
-	}
+	public final int value = ordinal();
 
 	/**
 	 * Returns the priority of the supplied priority value code.
-	 * <p>
 	 *
 	 * @param value priority value code, 0 &lt;= value &lt;= 3
-	 * @return the corresponding priority object
+	 * @return the corresponding priority
 	 */
 	public static Priority get(final int value)
 	{
