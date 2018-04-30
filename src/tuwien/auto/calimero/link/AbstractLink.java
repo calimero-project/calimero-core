@@ -56,6 +56,7 @@ import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.cemi.CEMILDataEx;
+import tuwien.auto.calimero.cemi.CEMILDataEx.AddInfo;
 import tuwien.auto.calimero.cemi.RFMediumInfo;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.link.medium.PLSettings;
@@ -478,7 +479,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		if (medium instanceof PLSettings) {
 			final CEMILDataEx f = (CEMILDataEx) msg;
 			if (f.getAdditionalInfo(CEMILDataEx.ADDINFO_PLMEDIUM) == null)
-				f.addAdditionalInfo(CEMILDataEx.ADDINFO_PLMEDIUM, ((PLSettings) medium).getDomainAddress());
+				f.additionalInfo().add(new AddInfo(CEMILDataEx.ADDINFO_PLMEDIUM, ((PLSettings) medium).getDomainAddress()));
 		}
 		else if (medium.getMedium() == KNXMediumSettings.MEDIUM_RF) {
 			final CEMILDataEx f = (CEMILDataEx) msg;
@@ -486,7 +487,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 				final RFSettings rf = (RFSettings) medium;
 				final byte[] sn = f.isDomainBroadcast() ? rf.getDomainAddress() : rf.getSerialNumber();
 				final byte[] ai = new RFMediumInfo(true, rf.isUnidirectional(), sn, 255).getInfo();
-				f.addAdditionalInfo(CEMILDataEx.ADDINFO_RFMEDIUM, ai);
+				f.additionalInfo().add(new AddInfo(CEMILDataEx.ADDINFO_RFMEDIUM, ai));
 				s = f.isDomainBroadcast() ? "(using domain address)" : "(using device SN)";
 			}
 		}
@@ -528,11 +529,24 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		if (nsdu.length <= 16 && tp)
 			return new CEMILData(mc, src, d, nsdu, p, repeat, hopCount);
 
-		final boolean pl = medium.getMedium() == KNXMediumSettings.MEDIUM_PL110;
-		// TODO allow domain bcast for RF, currently we send all RF L_Data as system broadcast
-		final boolean domainBcast = tp ? true : pl && dst != null ? true : false;
-		final CEMILDataEx f = new CEMILDataEx(mc, src, d, nsdu, p, repeat, domainBcast, false, hopCount);
+		final CEMILDataEx f = new CEMILDataEx(mc, src, d, nsdu, p, repeat, domainBcast(dst), false, hopCount);
 		addMediumInfo(f);
 		return f;
+	}
+
+	private boolean domainBcast(final KNXAddress dst) {
+		if (medium.getMedium() == KNXMediumSettings.MEDIUM_TP1)
+			return true;
+		if (medium.getMedium() == KNXMediumSettings.MEDIUM_PL110)
+			return dst != null;
+		if (medium.getMedium() == KNXMediumSettings.MEDIUM_RF) {
+			final RFSettings rfSettings = (RFSettings) medium;
+			if (rfSettings.isUnidirectional())
+				return false;
+			if (dst instanceof IndividualAddress)
+				return true;
+			return false; // we send broadcasts always as system broadcast
+		}
+		return true;
 	}
 }
