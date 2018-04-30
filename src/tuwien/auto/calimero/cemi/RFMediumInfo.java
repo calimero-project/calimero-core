@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2016 B. Malinowsky
+    Copyright (c) 2015, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ public final class RFMediumInfo extends AddInfo
 	 */
 	public enum RSS {
 		/** RSS = void / no measurement. */
-		Void("void (no measurement)"),
+		Void("void"),
 		/** RSS = weak. */
 		Weak("weak"),
 		/** RSS = medium. */
@@ -212,7 +212,7 @@ public final class RFMediumInfo extends AddInfo
 	{
 		final String domain = isSystemBroadcast() ? "SN " : "DoA ";
 		final RSS retxRss = getRetransmitterRSS();
-		final String rtx = retxRss == RSS.Void ? "" : " , ReTX lowest RSS=" + retxRss;
+		final String rtx = retxRss == RSS.Void ? "" : " ReTx RSS=" + retxRss;
 		final String battery = isBatteryOk() ? "OK" : "weak";
 
 		return "RF " + domain + DataUnitBuilder.toHex(getDoAorSN(), "") + ", LFN "
