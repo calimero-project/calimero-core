@@ -37,8 +37,6 @@
 package tuwien.auto.calimero.cemi;
 
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
 
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.GroupAddress;
@@ -47,7 +45,6 @@ import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Priority;
-import tuwien.auto.calimero.cemi.CEMILDataEx.AddInfo;
 
 /**
  * Factory helper for creating and copying cEMI messages.
@@ -382,11 +379,7 @@ public final class CEMIFactory
 					f.isDomainBroadcast(), f.isAckRequested(), f.getHopCount());
 			copy.ctrl2 |= original.ctrl2 & 0x0f;
 			// copy additional info
-			final List<AddInfo> l = f.getAdditionalInfo();
-			for (final Iterator<AddInfo> i = l.iterator(); i.hasNext();) {
-				final CEMILDataEx.AddInfo info = i.next();
-				copy.addAdditionalInfo(info.getType(), info.getInfo());
-			}
+			copy.additionalInfo().addAll(f.additionalInfo());
 			return copy;
 		}
 		if (ext)

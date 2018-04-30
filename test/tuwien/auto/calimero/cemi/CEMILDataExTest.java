@@ -36,10 +36,21 @@
 
 package tuwien.auto.calimero.cemi;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -49,7 +60,7 @@ import tuwien.auto.calimero.cemi.CEMILDataEx.AddInfo;
 /**
  * @author B. Malinowsky
  */
-public class CEMILDataExTest extends TestCase
+class CEMILDataExTest
 {
 	private CEMILDataEx f;
 	private final IndividualAddress src = new IndividualAddress(1, 2, 3);
@@ -58,167 +69,96 @@ public class CEMILDataExTest extends TestCase
 	private final byte[] plinfo = new byte[] { 0x10, 0x20 };
 	private final byte[] extts = new byte[] { (byte) 0x80, 0x2, 0x3, 0x4 };
 
-	/**
-	 * @param name name of test case
-	 */
-	public CEMILDataExTest(final String name)
-	{
-		super(name);
-	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
+	@BeforeEach
+	void init() throws Exception
 	{
-		super.setUp();
 		f = new CEMILDataEx(CEMILData.MC_LDATA_REQ, src, dst, tpdu, Priority.LOW);
-		f.addAdditionalInfo(CEMILDataEx.ADDINFO_PLMEDIUM, plinfo);
-		f.addAdditionalInfo(CEMILDataEx.ADDINFO_TIMESTAMP_EXT, extts);
+		f.additionalInfo().add(new AddInfo(CEMILDataEx.ADDINFO_PLMEDIUM, plinfo));
+		f.additionalInfo().add(new AddInfo(CEMILDataEx.ADDINFO_TIMESTAMP_EXT, extts));
 	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
-	{
-		super.tearDown();
-	}
-
-	/**
-	 * Test method for {@link tuwien.auto.calimero.cemi.CEMILDataEx#getStructLength()}.
-	 */
-	public final void testGetStructLength()
+	@Test
+	void testGetStructLength()
 	{
 		assertEquals(11 + 2 + 2 + 2 + 4, f.getStructLength());
-		f.removeAdditionalInfo(CEMILDataEx.ADDINFO_PLMEDIUM);
-		f.removeAdditionalInfo(CEMILDataEx.ADDINFO_TIMESTAMP_EXT);
+		f.additionalInfo().removeIf(info -> info.getType() == CEMILDataEx.ADDINFO_PLMEDIUM);
+		f.additionalInfo().removeIf(info -> info.getType() == CEMILDataEx.ADDINFO_TIMESTAMP_EXT);
 		assertEquals(11, f.getStructLength());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.cemi.CEMILDataEx#toString()}.
-	 */
-	public final void testToString()
+	@Test
+	void testToString()
 	{
 		assertNotNull(f.toString());
 		assertNotNull(new CEMILDataEx(CEMILData.MC_LDATA_REQ, src, dst, tpdu, Priority.LOW).toString());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.cemi.CEMILDataEx#setHopCount(int)}.
-	 */
-	public final void testSetHopCount()
+	@Test
+	void testSetHopCount()
 	{
 		assertEquals(6, f.getHopCount());
 		f.setHopCount(2);
 		assertEquals(2, f.getHopCount());
 		f.setHopCount(7);
 		assertEquals(7, f.getHopCount());
-		try {
-			f.setHopCount(8);
-			fail("out of range");
-		}
-		catch (final KNXIllegalArgumentException e) {}
+		assertThrows(KNXIllegalArgumentException.class, () -> f.setHopCount(8), "out of range");
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.cemi.CEMILDataEx#setPriority
-	 * (tuwien.auto.calimero.Priority)}.
-	 */
-	public final void testSetPriority()
+	@Test
+	void testSetPriority()
 	{
 		assertEquals(Priority.LOW, f.getPriority());
 		f.setPriority(Priority.SYSTEM);
 		assertEquals(Priority.SYSTEM, f.getPriority());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.cemi.CEMILDataEx#setBroadcast(boolean)}.
-	 */
-	public final void testSetBroadcast()
+	@Test
+	void testSetBroadcast()
 	{
 		assertTrue(f.isDomainBroadcast());
 		f.setBroadcast(false);
 		assertFalse(f.isDomainBroadcast());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.cemi.CEMILDataEx#addAdditionalInfo(int, byte[])}.
-	 */
-	public final void testAddAdditionalInfo()
+	@Test
+	void addAdditionalInfo()
 	{
-		try {
-			f.addAdditionalInfo(CEMILDataEx.ADDINFO_PLMEDIUM, new byte[] { 1 });
-			fail("wrong length");
-		}
-		catch (final KNXIllegalArgumentException e) {}
+		assertThrows(KNXIllegalArgumentException.class, () -> new AddInfo(CEMILDataEx.ADDINFO_PLMEDIUM, new byte[] { 1 }), "wrong length");
+
 		final byte[] getPL = f.getAdditionalInfo(CEMILDataEx.ADDINFO_PLMEDIUM);
 		assertTrue(Arrays.equals(plinfo, getPL));
 		f.additionalInfo().removeIf(info -> info.getType() == CEMILDataEx.ADDINFO_TIMESTAMP_EXT);
-		f.addAdditionalInfo(CEMILDataEx.ADDINFO_TIMESTAMP_EXT, new byte[] { 4, 4, 4, 4 });
+		f.additionalInfo().add(new AddInfo(CEMILDataEx.ADDINFO_TIMESTAMP_EXT, new byte[] { 4, 4, 4, 4 }));
 		final byte[] getTS = f.getAdditionalInfo(CEMILDataEx.ADDINFO_TIMESTAMP_EXT);
 		assertTrue(Arrays.equals(new byte[] { 4, 4, 4, 4 }, getTS));
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.cemi.CEMILDataEx#getAdditionalInfo()}.
-	 */
-	public final void testGetAdditionalInfo()
-	{
-		final List<AddInfo> l = f.getAdditionalInfo();
-		assertEquals(2, l.size());
-		assertEquals(CEMILDataEx.ADDINFO_PLMEDIUM, l.get(0)
-			.getType());
-		assertEquals(2, l.get(0).getInfo().length);
-		assertEquals(CEMILDataEx.ADDINFO_TIMESTAMP_EXT, l.get(1)
-			.getType());
-		assertEquals(4, l.get(1).getInfo().length);
-	}
-
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.cemi.CEMILDataEx#getAdditionalInfo(int)}.
-	 */
-	public final void testGetAdditionalInfoInt()
+	@Test
+	void testGetAdditionalInfoInt()
 	{
 		assertNull(f.getAdditionalInfo(CEMILDataEx.ADDINFO_RFMEDIUM));
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.cemi.CEMILDataEx#isExtendedFrame()}.
-	 */
-	public final void testIsExtendedFrame()
+	@Test
+	void testIsExtendedFrame()
 	{
 		assertFalse(f.isExtendedFrame());
-		final CEMILDataEx f2 =
-			new CEMILDataEx(CEMILData.MC_LDATA_REQ, src, dst, new byte[] { 0, 1, 2, 3, 4,
-				5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 }, Priority.LOW);
+		final CEMILDataEx f2 = new CEMILDataEx(CEMILData.MC_LDATA_REQ, src, dst,
+				new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 }, Priority.LOW);
 		assertTrue(f2.isExtendedFrame());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.cemi.CEMILDataEx#removeAdditionalInfo(int)}.
-	 */
-	public final void testRemoveAdditionalInfo()
+	@Test
+	void testClone()
 	{
-		f.removeAdditionalInfo(CEMILDataEx.ADDINFO_TIMESTAMP_EXT);
-		assertNull(f.getAdditionalInfo(CEMILDataEx.ADDINFO_TIMESTAMP_EXT));
-	}
-
-	/**
-	 * Test method for {@link tuwien.auto.calimero.cemi.CEMILDataEx#clone()}.
-	 */
-	public final void testClone()
-	{
-		final CEMILDataEx f2 = f.clone();
-		final List<AddInfo> l = f.getAdditionalInfo();
-		final List<AddInfo> l2 = f2.getAdditionalInfo();
-		for (int i = 0; i < l.size(); ++i)
-			assertNotSame(l.get(i), l2.get(i));
+		final CEMILDataEx clone = f.clone();
+		assertArrayEquals(f.toByteArray(), clone.toByteArray());
+		final List<AddInfo> l = f.additionalInfo();
+		final List<AddInfo> l2 = clone.additionalInfo();
+		for (int i = 0; i < l.size(); ++i) {
+			assertEquals(l.get(i).getType(), l2.get(i).getType());
+			assertNotSame(l.get(i).getInfo(), l2.get(i).getInfo());
+		}
 	}
 }

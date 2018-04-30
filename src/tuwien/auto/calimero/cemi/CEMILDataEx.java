@@ -68,15 +68,17 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		private final byte[] data;
 
 		/**
-		 * Creates new wrapper for additional information.
+		 * Creates new cEMI additional information using the type ID and a copy of the supplied info data.
 		 *
 		 * @param infoType additional information type ID
 		 * @param info information data
 		 */
 		public AddInfo(final int infoType, final byte[] info)
 		{
+			if (infoType < 0 || infoType >= ADDINFO_ESC)
+				throw new KNXIllegalArgumentException("cEMI additional info type " + infoType + " out of range [0..254]");
 			if (info.length > 255)
-				throw new KNXIllegalArgumentException("cEMI additional info exceeds maximum length of 255 bytes");
+				throw new KNXIllegalArgumentException("cEMI additional info of type " + infoType + " exceeds maximum length of 255 bytes");
 			if (infoType < ADDINFO_LENGTHS.length && info.length != ADDINFO_LENGTHS[infoType])
 				throw new KNXIllegalArgumentException(
 						"invalid length " + info.length + " for cEMI additional info type " + infoType);
@@ -85,8 +87,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		}
 
 		/**
-		 * Returns the additional information data wrapped by this type.
-		 * <p>
+		 * Returns the additional information associated with this type.
 		 *
 		 * @return the data as byte array
 		 */
@@ -96,15 +97,33 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		}
 
 		/**
-		 * Returns the type of additional information (see ADDINFO_* constants in class
-		 * CEMILDataEx).
-		 * <p>
+		 * Returns the type of additional information (see ADDINFO_* constants in class CEMILDataEx).
 		 *
 		 * @return type ID
 		 */
 		public final int getType()
 		{
 			return type;
+		}
+
+		@Override
+		public String toString() {
+			switch (type) {
+			case ADDINFO_PLMEDIUM:
+				return "PL DoA " + (Integer.toHexString((data[0] & 0xff) << 8 | (data[1] & 0xff)));
+			case ADDINFO_RFMEDIUM:
+				return new RFMediumInfo(data, false).toString(); // we default to domain broadcast
+			case ADDINFO_TIMESTAMP:
+				return "timestamp " + ((data[0] & 0xff) << 8 | (data[1] & 0xff));
+			case ADDINFO_TIMEDELAY:
+				return "timedelay " + toLong(data);
+			case ADDINFO_TIMESTAMP_EXT:
+				return "ext.timestamp " + toLong(data);
+			case ADDINFO_BIBAT:
+				return "BiBat 0x" + DataUnitBuilder.toHex(data, " ");
+			default:
+				return "type " + type + " = 0x" + DataUnitBuilder.toHex(data, "");
+			}
 		}
 	}
 
@@ -292,34 +311,30 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/**
 	 * @return mutable list with cEMI additional info, empty list if no additional info
 	 */
-	List<AddInfo> additionalInfo() {
+	public List<AddInfo> additionalInfo() {
 		return addInfo;
 	}
 
 	/**
-	 * Adds additional information to the message.
-	 * <p>
-	 * It replaces additional information of the same type, if any was previously added.
-	 *
+	 * @deprecated Use {@link #additionalInfo()}.
 	 * @param infoType type ID of additional information
 	 * @param info additional information data
 	 */
+	@Deprecated
 	public synchronized void addAdditionalInfo(final int infoType, final byte[] info)
 	{
 		if (infoType < 0 || infoType >= ADDINFO_ESC)
 			throw new KNXIllegalArgumentException("info type out of range [0..254]");
 		if (!checkAddInfoLength(infoType, info.length))
-			throw new KNXIllegalArgumentException("wrong info data length, expected "
-					+ ADDINFO_LENGTHS[infoType] + " bytes");
+			throw new KNXIllegalArgumentException("wrong info data length, expected " + ADDINFO_LENGTHS[infoType] + " bytes");
 		addInfo.add(new AddInfo(infoType, info));
 	}
 
 	/**
-	 * Returns all additional information currently set.
-	 * <p>
-	 *
+	 * @deprecated Use {@link #additionalInfo()}.
 	 * @return a List with {@link AddInfo} objects
 	 */
+	@Deprecated
 	public synchronized List<AddInfo> getAdditionalInfo()
 	{
 		return new ArrayList<>(addInfo);
@@ -385,10 +400,10 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	}
 
 	/**
-	 * Removes the additional information with the supplied type ID.
-	 *
+	 * @deprecated Use {@link #additionalInfo()}.removeIf(info -&gt; info.type == infoType).
 	 * @param infoType type ID of additional information to remove
 	 */
+	@Deprecated
 	public synchronized void removeAdditionalInfo(final int infoType)
 	{
 		addInfo.removeIf(info -> info.type == infoType);
@@ -429,32 +444,12 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		buf.append(s.substring(svcStart, split + 1));
 
 		for (final AddInfo addInfo : addInfo) {
-			final byte[] info = addInfo.data;
-			switch (addInfo.type) {
-			case ADDINFO_PLMEDIUM:
-				buf.append(" domain ");
-				buf.append(Integer.toHexString((info[0] & 0xff) << 8 | (info[1] & 0xff)));
-				break;
-			case ADDINFO_RFMEDIUM:
-				buf.append(" ").append(new RFMediumInfo(info, !isDomainBroadcast())).append(",");
-				break;
-			case ADDINFO_TIMESTAMP:
-				buf.append(" timestamp ");
-				buf.append((info[0] & 0xff) << 8 | (info[1] & 0xff));
-				break;
-			case ADDINFO_TIMEDELAY:
-				buf.append(" timedelay ").append(toLong(info));
-				break;
-			case ADDINFO_TIMESTAMP_EXT:
-				buf.append(" ext.timestamp ").append(toLong(info));
-				break;
-			case ADDINFO_BIBAT:
-				buf.append(" bibat 0x").append(DataUnitBuilder.toHex(info, " "));
-				break;
-			default:
-				buf.append(" type ").append(addInfo.type).append(" 0x").append(DataUnitBuilder.toHex(info, ""));
-				break;
-			}
+			buf.append(" ");
+			if (addInfo.type == ADDINFO_RFMEDIUM)
+				buf.append(new RFMediumInfo(addInfo.data, !isDomainBroadcast()));
+			else
+				buf.append(addInfo);
+			buf.append(",");
 		}
 		buf.append(s.substring(split + 1));
 		return buf.toString();
@@ -522,12 +517,16 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 				throw new KNXFormatException("invalid additional info, remaining length " + remaining + " < 3 bytes");
 			final int type = is.read();
 			final int len = is.read();
-			if (len > remaining || !checkAddInfoLength(type, len))
-				throw new KNXFormatException("additional info type 0x" + Integer.toHexString(type)
-						+ " with invalid length", len);
+			if (len > remaining)
+				throw new KNXFormatException("additional info length of type " + type + " exceeds info block", len);
 			final byte[] info = new byte[len];
 			is.read(info, 0, len);
-			addInfo.add(new AddInfo(type, info));
+			try {
+				addInfo.add(new AddInfo(type, info));
+			}
+			catch (final KNXIllegalArgumentException e) {
+				throw new KNXFormatException(e.getMessage());
+			}
 			remaining -= len;
 		}
 	}
