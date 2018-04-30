@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -296,8 +297,7 @@ public class KNXnetIPTunnel extends ClientConnection
 	{
 		if (ldata instanceof CEMILDataEx) {
 			final CEMILDataEx ext = (CEMILDataEx) ldata;
-			final List<AddInfo> info = ext.getAdditionalInfo();
-			return info.stream().map(AddInfo::getType).collect(Collectors.toList());
+			return ext.additionalInfo().stream().map(AddInfo::getType).collect(Collectors.toList());
 		}
 		return Collections.emptyList();
 	}
@@ -309,14 +309,16 @@ public class KNXnetIPTunnel extends ClientConnection
 		final byte[] data;
 		if (ldata instanceof CEMILDataEx) {
 			final CEMILDataEx ext = ((CEMILDataEx) ldata);
-			// remove all add.infos that are not in the types list
-			ext.getAdditionalInfo().forEach(info -> {
-				if (!types.contains(info.getType())) {
-					logger.warn("remove L-Data additional info type {}: {}", info.getType(),
-							DataUnitBuilder.toHex(info.getInfo(), " "));
-					ext.removeAdditionalInfo(info.getType());
+			final List<AddInfo> additionalInfo = ext.additionalInfo();
+			synchronized (additionalInfo) {
+				for (final Iterator<AddInfo> i = additionalInfo.iterator(); i.hasNext();) {
+					final AddInfo info = i.next();
+					if (!types.contains(info.getType())) {
+						logger.warn("remove L-Data additional info {}", info);
+						i.remove();
+					}
 				}
-			});
+			}
 		}
 		data = ldata.toByteArray();
 		// set msg code field 0
