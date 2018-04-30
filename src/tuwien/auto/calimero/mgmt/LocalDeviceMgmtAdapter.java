@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,7 +37,9 @@
 package tuwien.auto.calimero.mgmt;
 
 import java.net.InetSocketAddress;
+import java.util.function.Consumer;
 
+import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
@@ -76,8 +78,7 @@ public class LocalDeviceMgmtAdapter extends LocalDeviceManagement
 	 * @param serverCtrlEP the remote server control endpoint used for connect request
 	 * @param useNat <code>true</code> to use a network address translation aware communication
 	 *        mechanism, <code>false</code> to use the default way
-	 * @param l property adapter listener to get notified about adapter events, use
-	 *        <code>null</code> for no listener
+	 * @param adapterClosed receives notification about adapter close event
 	 * @param queryWriteEnable <code>true</code> to check whether a property is write enabled or
 	 *        read only, <code>false</code> to skip the check
 	 * @throws KNXException on failure establishing local device management connection or failure
@@ -86,10 +87,10 @@ public class LocalDeviceMgmtAdapter extends LocalDeviceManagement
 	 */
 	public LocalDeviceMgmtAdapter(final InetSocketAddress localEP,
 		final InetSocketAddress serverCtrlEP, final boolean useNat,
-		final PropertyAdapterListener l, final boolean queryWriteEnable) throws KNXException,
+		final Consumer<CloseEvent> adapterClosed, final boolean queryWriteEnable) throws KNXException,
 		InterruptedException
 	{
-		super(create(localEP, serverCtrlEP, useNat), l, queryWriteEnable);
+		super(create(localEP, serverCtrlEP, useNat), adapterClosed, queryWriteEnable);
 		conn = (KNXnetIPConnection) c;
 		conn.addConnectionListener(new KNXListenerImpl());
 		init();

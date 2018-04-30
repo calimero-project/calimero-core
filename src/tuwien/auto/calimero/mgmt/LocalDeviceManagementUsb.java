@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015 B. Malinowsky
+    Copyright (c) 2015, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,7 +38,9 @@ package tuwien.auto.calimero.mgmt;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Consumer;
 
+import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXRemoteException;
@@ -68,7 +70,7 @@ public class LocalDeviceManagementUsb extends LocalDeviceManagement
 	 * Creates a new property adapter for local device management. The cEMI server is specified by
 	 * the supplied USB connection.
 	 * <p>
-	 * A note on write enabled / read only properties:<br>
+	 * A note on write-enabled / read-only properties:<br>
 	 * The check whether a property is read only or write enabled, is done by issuing a write
 	 * request for that property. Due to the memory layout, write cycles of a memory location and
 	 * similar, this might not always be desired. To enable or skip this check, the
@@ -76,18 +78,17 @@ public class LocalDeviceManagementUsb extends LocalDeviceManagement
 	 * only of interest when getting a property description {@link #getDescription(int, int, int)}.
 	 *
 	 * @param c the USB connection
-	 * @param l property adapter listener to get notified about adapter events, use
-	 *        <code>null</code> for no listener
+	 * @param adapterClosed receives notification about adapter close event
 	 * @param queryWriteEnable <code>true</code> to check whether a property is write enabled or
 	 *        read only, <code>false</code> to skip the check
 	 * @throws KNXException on failure establishing local device management connection or failure
 	 *         while initializing the property adapter
 	 * @throws InterruptedException on interrupt during initialization
 	 */
-	public LocalDeviceManagementUsb(final UsbConnection c, final PropertyAdapterListener l,
+	public LocalDeviceManagementUsb(final UsbConnection c, final Consumer<CloseEvent> adapterClosed,
 		final boolean queryWriteEnable) throws KNXException, InterruptedException
 	{
-		super(c, l, queryWriteEnable);
+		super(c, adapterClosed, queryWriteEnable);
 
 		conn = c;
 		final EnumSet<EmiType> emiTypes = conn.getSupportedEmiTypes();

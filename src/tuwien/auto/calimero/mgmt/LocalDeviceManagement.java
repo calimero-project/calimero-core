@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
@@ -83,10 +84,8 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 		public void connectionClosed(final CloseEvent e)
 		{
 			closed = true;
-			if (listener == null)
-				return;
 			final int initiator = serverReset ? CloseEvent.SERVER_REQUEST : e.getInitiator();
-			listener.adapterClosed(new CloseEvent(LocalDeviceManagement.this, initiator,
+			adapterClosed.accept(new CloseEvent(LocalDeviceManagement.this, initiator,
 					serverReset ? "server reset" : e.getReason()));
 		}
 	}
@@ -94,8 +93,8 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 	private static final int DEVICE_OBJECT = 0;
 
 	protected final AutoCloseable c;
+	private final Consumer<CloseEvent> adapterClosed;
 
-	private final PropertyAdapterListener listener;
 	private final Deque<CEMI> frames = new ArrayDeque<>();
 	private volatile boolean serverReset;
 	private final List<Pair> interfaceObjects = new ArrayList<>();
@@ -107,11 +106,11 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 	private int lastPropIndex;
 	private int lastPid;
 
-	LocalDeviceManagement(final AutoCloseable connection, final PropertyAdapterListener l,
+	LocalDeviceManagement(final AutoCloseable connection, final Consumer<CloseEvent> adapterClosed,
 		final boolean queryWriteEnable)
 	{
 		c = connection;
-		listener = l;
+		this.adapterClosed = adapterClosed;
 		checkRW = queryWriteEnable;
 	}
 

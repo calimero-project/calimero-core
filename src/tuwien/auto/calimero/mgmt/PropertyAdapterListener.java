@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,21 +39,16 @@ package tuwien.auto.calimero.mgmt;
 import tuwien.auto.calimero.CloseEvent;
 
 /**
- * Listener interface to receive events of a property adapter.
- * <p>
- * 
+ * @deprecated Use lambda expression.
  * @author B. Malinowsky
- * @see PropertyAdapter
  */
+@Deprecated
 public interface PropertyAdapterListener
 {
 	/**
-	 * The adapter is closed.
-	 * <p>
-	 * This notification is primary for detecting a disconnection initiated by the
-	 * remote endpoint.
-	 * 
+	 * @deprecated
 	 * @param e close event object
 	 */
+	@Deprecated
 	void adapterClosed(CloseEvent e);
 }

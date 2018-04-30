@@ -36,6 +36,8 @@
 
 package tuwien.auto.calimero.mgmt;
 
+import java.util.function.Consumer;
+
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.IndividualAddress;
@@ -55,23 +57,19 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 	private final Destination dst;
 	private byte[] key;
 	private volatile int accessLevel;
-	private final NetworkLinkListener nll;
-	private final PropertyAdapterListener pal;
+	private final NetworkLinkListener nll = new NLListener();
+	private final Consumer<CloseEvent> adapterClosed;
 
-	private final class NLListener implements NetworkLinkListener
-	{
+	private final class NLListener implements NetworkLinkListener {
 		@Override
-		public void confirmation(final FrameEvent e)
-		{}
+		public void confirmation(final FrameEvent e) {}
 
 		@Override
-		public void indication(final FrameEvent e)
-		{}
+		public void indication(final FrameEvent e) {}
 
 		@Override
-		public void linkClosed(final CloseEvent e)
-		{
-			pal.adapterClosed(new CloseEvent(RemotePropertyServiceAdapter.this, e.getInitiator(), e.getReason()));
+		public void linkClosed(final CloseEvent e) {
+			adapterClosed.accept(new CloseEvent(RemotePropertyServiceAdapter.this, e.getInitiator(), e.getReason()));
 		}
 	}
 
@@ -80,22 +78,19 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 	 *
 	 * @param link KNX network link used for communication with the KNX network
 	 * @param remote KNX individual address to access its interface objects
-	 * @param l property adapter listener to get notified about adapter events, use
-	 *        <code>null</code> for no listener
+	 * @param adapterClosed receives notification about adapter close event
 	 * @param connOriented <code>true</code> to use connection oriented mode for access,
 	 *        <code>false</code> to use connectionless mode
 	 * @throws KNXLinkClosedException if the network link is closed
 	 */
 	public RemotePropertyServiceAdapter(final KNXNetworkLink link,
-		final IndividualAddress remote, final PropertyAdapterListener l,
+		final IndividualAddress remote, final Consumer<CloseEvent> adapterClosed,
 		final boolean connOriented) throws KNXLinkClosedException
 	{
 		mc = new ManagementClientImpl(link);
 		dst = mc.createDestination(remote, connOriented);
-		pal = l;
-		nll = pal != null ? new NLListener() : null;
-		if (nll != null)
-			link.addLinkListener(nll);
+		this.adapterClosed = adapterClosed;
+		link.addLinkListener(nll);
 		key = null;
 		accessLevel = 15;
 	}
@@ -106,18 +101,17 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 	 *
 	 * @param link KNX network link used for communication with the KNX network
 	 * @param remote KNX individual address to access its interface objects
-	 * @param l property adapter listener to get notified about adapter events, use
-	 *        <code>null</code> for no listener
+	 * @param adapterClosed receives notification about adapter close event
 	 * @param authorizeKey byte array with authorization key to obtain a certain access level
 	 * @throws KNXLinkClosedException if the network link is closed
 	 * @throws KNXException on failure during authorization
 	 * @throws InterruptedException on interrupted thread
 	 */
 	public RemotePropertyServiceAdapter(final KNXNetworkLink link,
-		final IndividualAddress remote, final PropertyAdapterListener l,
+		final IndividualAddress remote, final Consumer<CloseEvent> adapterClosed,
 		final byte[] authorizeKey) throws KNXException, InterruptedException
 	{
-		this(link, remote, l, true);
+		this(link, remote, adapterClosed, true);
 		key = authorizeKey.clone();
 		try {
 			accessLevel = mc.authorize(dst, key);
@@ -182,7 +176,7 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 	public void close()
 	{
 		final KNXNetworkLink lnk = mc.detach();
-		if (lnk != null && nll != null)
+		if (lnk != null)
 			lnk.removeLinkListener(nll);
 	}
 }

@@ -42,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,7 +67,7 @@ import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
  * @author B. Malinowsky
  */
 @KnxnetIP
-public class PropertyClientTest
+class PropertyClientTest
 {
 	private static final String PIDResource = Util.getPath() + "properties.xml";
 
@@ -78,33 +79,26 @@ public class PropertyClientTest
 
 	private IndividualAddress remote;
 
-	private PropertyListenerImpl ll;
+	private volatile boolean closed;
+	private final Consumer<CloseEvent> adapterClosed = this::adapterClosed;
 
-	private class PropertyListenerImpl implements PropertyAdapterListener
-	{
-		volatile boolean closed;
-
-		@Override
-		public void adapterClosed(final CloseEvent e)
-		{
-			assertTrue(localAdpt == e.getSource() || remAdpt == e.getSource());
-			if (closed)
-				fail("already closed");
-			closed = true;
-		}
-
+	private void adapterClosed(final CloseEvent e) {
+		assertTrue(localAdpt == e.getSource() || remAdpt == e.getSource());
+		if (closed)
+			fail("already closed");
+		closed = true;
 	}
 
 	@BeforeEach
 	void init() throws Exception
 	{
 		remote = Util.getKnxDeviceCO();
+		closed = false;
 		try {
 			lnk = KNXNetworkLinkIP.newTunnelingLink(null, Util.getServer(), false, TPSettings.TP1);
 			remAdpt = new RemotePropertyServiceAdapter(lnk, remote, null, true);
 			rem = new PropertyClient(remAdpt);
-			ll = new PropertyListenerImpl();
-			localAdpt = new LocalDeviceMgmtAdapter(null, Util.getServer(), false, ll, true);
+			localAdpt = new LocalDeviceMgmtAdapter(null, Util.getServer(), false, adapterClosed, true);
 			local = new PropertyClient(localAdpt);
 
 			rem.addDefinitions(new PropertyClient.XmlPropertyDefinitions().load(PIDResource));
@@ -119,6 +113,7 @@ public class PropertyClientTest
 	@AfterEach
 	void tearDown() throws Exception
 	{
+		closed = false;
 		if (rem != null)
 			rem.close();
 		if (local != null)
@@ -134,7 +129,7 @@ public class PropertyClientTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testPropertyClient() throws KNXException, InterruptedException
+	void testPropertyClient() throws KNXException, InterruptedException
 	{
 		rem.close();
 		remAdpt = null;
@@ -155,10 +150,9 @@ public class PropertyClientTest
 		remAdpt.close();
 		assertTrue(lnk.isOpen());
 
-		final PropertyListenerImpl l = new PropertyListenerImpl();
-		remAdpt = new RemotePropertyServiceAdapter(lnk, remote, l, true);
+		remAdpt = new RemotePropertyServiceAdapter(lnk, remote, adapterClosed, true);
 		lnk.close();
-		assertTrue(l.closed);
+		assertTrue(closed);
 	}
 
 	/**
@@ -183,7 +177,7 @@ public class PropertyClientTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testClose() throws KNXException, InterruptedException
+	void testClose() throws KNXException, InterruptedException
 	{
 		rem.close();
 		try {
@@ -207,7 +201,7 @@ public class PropertyClientTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testLocalGetDescription() throws KNXException, InterruptedException
+	void testLocalGetDescription() throws KNXException, InterruptedException
 	{
 		printDesc(local.getDescription(0, PID.SERIAL_NUMBER));
 	}
@@ -219,7 +213,7 @@ public class PropertyClientTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testRemoteGetDescription() throws KNXException, InterruptedException
+	void testRemoteGetDescription() throws KNXException, InterruptedException
 	{
 		printDesc(rem.getDescription(0, PID.SERIAL_NUMBER));
 	}
@@ -231,7 +225,7 @@ public class PropertyClientTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testGetDescriptionByIndex() throws KNXException, InterruptedException
+	void testGetDescriptionByIndex() throws KNXException, InterruptedException
 	{
 		final Description d, d2;
 		printDesc(d = rem.getDescriptionByIndex(0, 1));
@@ -255,7 +249,7 @@ public class PropertyClientTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testGetPropertyIntInt() throws KNXException, InterruptedException
+	void testGetPropertyIntInt() throws KNXException, InterruptedException
 	{
 		String s = rem.getProperty(0, 56);
 		assertNotNull(s);
@@ -272,7 +266,7 @@ public class PropertyClientTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testGetPropertyIntIntIntInt() throws KNXException, InterruptedException
+	void testGetPropertyIntIntIntInt() throws KNXException, InterruptedException
 	{
 		Util.out("OT 0 PID 56", rem.getProperty(0, 56, 1, 1));
 		Util.out("OT 0 PID 56", local.getProperty(0, 56, 1, 1));
@@ -285,7 +279,7 @@ public class PropertyClientTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testGetPropertyTranslated() throws KNXException, InterruptedException
+	void testGetPropertyTranslated() throws KNXException, InterruptedException
 	{
 		final DPTXlator2ByteUnsigned t = (DPTXlator2ByteUnsigned) rem.getPropertyTranslated(0, 56, 1, 1);
 		assertEquals(15, t.getValueUnsigned());
@@ -300,7 +294,7 @@ public class PropertyClientTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testScanPropertiesBooleanConsumer() throws KNXException, InterruptedException
+	void testScanPropertiesBooleanConsumer() throws KNXException, InterruptedException
 	{
 		final AtomicBoolean i = new AtomicBoolean();
 		final AtomicBoolean k = new AtomicBoolean();
@@ -317,7 +311,7 @@ public class PropertyClientTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testScanPropertiesIntegerBooleanConsumer() throws KNXException, InterruptedException
+	void testScanPropertiesIntegerBooleanConsumer() throws KNXException, InterruptedException
 	{
 		final AtomicBoolean i = new AtomicBoolean();
 		final AtomicBoolean k = new AtomicBoolean();
@@ -334,7 +328,7 @@ public class PropertyClientTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testSetPropertyIntIntIntIntByteArray() throws KNXException, InterruptedException
+	void testSetPropertyIntIntIntIntByteArray() throws KNXException, InterruptedException
 	{
 		final int pidProgramVersion = 13;
 		byte[] data = new byte[1];
@@ -357,7 +351,7 @@ public class PropertyClientTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testSetPropertyIntIntIntString() throws KNXException, InterruptedException
+	void testSetPropertyIntIntIntString() throws KNXException, InterruptedException
 	{
 		final int pidProgramVersion = 13;
 		// make sure we have a translator for the program version required PDT 21 (PDT_GENERIC_17)
