@@ -140,7 +140,7 @@ class ProcessCommunicatorTest
 	void testGetResponseTimeout()
 	{
 		// test for correct standard timeout
-		assertEquals(10, pc.getResponseTimeout());
+		assertEquals(5, pc.getResponseTimeout());
 	}
 
 	@Test
@@ -449,8 +449,9 @@ class ProcessCommunicatorTest
 		});
 		assertEquals(0, count.get());
 		final LocalTime now = LocalTime.now();
-		assertTrue(now.isAfter(start.plusSeconds(10)));
-		assertTrue(now.isBefore(start.plusSeconds(12)));
+		final int timeout = pc2.getResponseTimeout();
+		assertTrue(now.isAfter(start.plusSeconds(timeout)));
+		assertTrue(now.isBefore(start.plusSeconds(timeout + 2)));
 	}
 
 	@Test

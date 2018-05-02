@@ -153,7 +153,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 
 	private volatile Priority priority = Priority.LOW;
 	// maximum wait time in seconds for a response message
-	private volatile int responseTimeout = 10;
+	private volatile int responseTimeout = 5;
 	private volatile boolean detached;
 	private final Logger logger;
 
