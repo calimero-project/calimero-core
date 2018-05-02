@@ -142,9 +142,6 @@ class SerialComAdapter extends LibraryAdapter
 			this.writeTotalConstant = writeTotalConstant;
 		}
 
-		/* (non-Javadoc)
-		 * @see java.lang.Object#toString()
-		 */
 		@Override
 		public String toString()
 		{
@@ -172,19 +169,16 @@ class SerialComAdapter extends LibraryAdapter
 		super(logger);
 		if (portId == null)
 			throw new NullPointerException("no port id");
-		//logger.info("Java library path = " + System.getProperty("java.library.path"));
 		if (!loaded)
 			throw new IOException("no serial I/O communication support");
 		open(portId);
 	}
 
 	/**
-	 * Returns whether the platform dependent serial communication library is available or
-	 * not.
-	 * <p>
+	 * Returns whether the platform dependent serial communication library is available or not.
 	 *
-	 * @return <code>true</code> if library was loaded and is available,
-	 *         <code>false</code> if SerialComAdapter functionality can not be used
+	 * @return <code>true</code> if library was loaded and is available, <code>false</code> if SerialComAdapter
+	 *         functionality can not be used
 	 */
 	static boolean isAvailable()
 	{
@@ -206,10 +200,6 @@ class SerialComAdapter extends LibraryAdapter
 
 	native Timeouts getTimeouts() throws IOException;
 
-	/* (non-Javadoc)
-	 * Like CommConnection in Java ME
-	 * @see javax.microedition.io.CommConnection#setBaudRate(int)
-	 */
 	@Override
 	public final void setBaudRate(final int baudrate)
 	{
@@ -221,10 +211,6 @@ class SerialComAdapter extends LibraryAdapter
 		}
 	}
 
-	/* (non-Javadoc)
-	 * Like CommConnection in Java ME
-	 * @see javax.microedition.io.CommConnection#getBaudRate()
-	 */
 	@Override
 	public final int getBaudRate()
 	{
