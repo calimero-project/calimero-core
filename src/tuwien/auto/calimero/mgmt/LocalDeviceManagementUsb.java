@@ -117,10 +117,11 @@ public class LocalDeviceManagementUsb extends LocalDeviceManagement
 	 * @throws KNXTimeoutException on timeout setting the property elements
 	 * @throws KNXRemoteException on remote error or invalid response
 	 * @throws KNXPortClosedException if adapter is closed
+	 * @throws InterruptedException on interrupt
 	 */
 	public void setProperty(final int objectType, final int objectInstance, final int propertyId,
 		final int start, final int elements, final byte[] data) throws KNXTimeoutException,
-		KNXRemoteException, KNXPortClosedException
+		KNXRemoteException, KNXPortClosedException, InterruptedException
 	{
 		send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, objectType, objectInstance, propertyId,
 				start, elements, data), null);
@@ -139,10 +140,11 @@ public class LocalDeviceManagementUsb extends LocalDeviceManagement
 	 * @throws KNXTimeoutException on timeout setting the property elements
 	 * @throws KNXRemoteException on remote error or invalid response
 	 * @throws KNXPortClosedException if adapter is closed
+	 * @throws InterruptedException on interrupt
 	 */
 	public byte[] getProperty(final int objectType, final int objectInstance, final int propertyId,
 		final int start, final int elements) throws KNXTimeoutException, KNXRemoteException,
-		KNXPortClosedException
+		KNXPortClosedException, InterruptedException
 	{
 		send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, objectType, objectInstance, propertyId,
 				start, elements), null);
@@ -168,7 +170,7 @@ public class LocalDeviceManagementUsb extends LocalDeviceManagement
 	}
 
 	@Override
-	protected byte[] findFrame(final int messageCode) throws KNXRemoteException
+	protected byte[] findFrame(final int messageCode) throws KNXRemoteException, InterruptedException
 	{
 		long remaining = responseTimeout;
 		final long end = System.currentTimeMillis() + remaining;
@@ -180,10 +182,7 @@ public class LocalDeviceManagementUsb extends LocalDeviceManagement
 			catch (final KNXInvalidResponseException e) {}
 			remaining = end - System.currentTimeMillis();
 			// TODO replace busy waiting
-			try {
-				Thread.sleep(50);
-			}
-			catch (final InterruptedException e) {}
+			Thread.sleep(50);
 		}
 		throw new KNXInvalidResponseException("expected service confirmation msg code 0x"
 				+ Integer.toHexString(messageCode));

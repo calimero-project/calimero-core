@@ -229,7 +229,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 
 	protected abstract void send(CEMIDevMgmt frame, Object mode) throws KNXException, InterruptedException;
 
-	protected byte[] findFrame(final int messageCode) throws KNXRemoteException {
+	protected byte[] findFrame(final int messageCode) throws KNXRemoteException, InterruptedException {
 		while (true) {
 			final CEMIDevMgmt frame;
 			synchronized (frames) {
