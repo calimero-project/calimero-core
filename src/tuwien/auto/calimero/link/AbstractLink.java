@@ -271,7 +271,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 			onSend(adjusted, waitForCon);
 			return;
 		}
-		onSend(msg.getDestination(), createEmi(msg), waitForCon);
+		onSend(msg.getDestination(), createEmi(msg, waitForCon), waitForCon);
 	}
 
 	@Override
@@ -509,11 +509,12 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	}
 
 	// Creates the target EMI format using a cEMI L-Data message
-	private byte[] createEmi(final CEMILData f)
+	private byte[] createEmi(final CEMILData f, final boolean waitForCon)
 	{
 		if (cEMI) {
 			final CEMILData adjusted = adjustMsgType(f);
 			addMediumInfo(adjusted);
+			logger.debug("send {}{}", (waitForCon ? "(wait for confirmation) " : ""), adjusted);
 			return adjusted.toByteArray();
 		}
 		return CEMIFactory.toEmi(f);

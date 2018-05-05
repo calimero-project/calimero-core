@@ -158,7 +158,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 		deviceAddr();
 		mediumType();
 		setMaxApduLength();
-		setDomain();
+//		setDomain();
 		disableFilters();
 	}
 
@@ -167,9 +167,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
 		try {
-			final boolean trace = logger.isTraceEnabled();
-			logger.debug("send message to {}, {}blocking", dst, (waitForCon ? "" : "non-"));
-			if (trace)
+			if (logger.isTraceEnabled())
 				logger.trace("EMI {}", DataUnitBuilder.toHex(msg, " "));
 			final List<HidReport> reports = HidReport.create(activeEmi.emi, msg);
 			for (final HidReport r : reports)

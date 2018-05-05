@@ -666,6 +666,7 @@ public class UsbConnection implements AutoCloseable
 	{
 		if (!knxUsbIf.isClaimed())
 			return;
+		final boolean win = System.getProperty("os.name", "unknown").toLowerCase().contains("win");
 		try {
 			in.removeUsbPipeListener(callback);
 			callback.quit();
@@ -691,10 +692,15 @@ public class UsbConnection implements AutoCloseable
 			knxUsbIf.release();
 		}
 		catch (UsbNotActiveException | UsbNotOpenException | UsbDisconnectedException | UsbException e) {
-			logger.warn("close connection", e);
+			// windows always throws "USB error 5: Unable to release interface: Entity not found", avoid noise
+			if (win && e instanceof UsbPlatformException)
+				logger.debug("close connection, {}", e.getMessage());
+			else
+				logger.warn("close connection", e);
 		}
 		finally {
-			removeClaimedInterfaceNumberOnWindows();
+			if (win)
+				removeClaimedInterfaceNumberOnWindows();
 		}
 		listeners.fire(l -> l.connectionClosed(new CloseEvent(this, initiator, reason)));
 	}
@@ -704,9 +710,6 @@ public class UsbConnection implements AutoCloseable
 	// Subsequent claims of that interface then always fail.
 	private void removeClaimedInterfaceNumberOnWindows()
 	{
-		final String os = System.getProperty("os.name", "unknown").toLowerCase();
-		if (!os.contains("win"))
-			return;
 		try {
 			final Class<? extends UsbDevice> c = dev.getClass();
 			final Class<?> abstractDevice = c.getSuperclass();
