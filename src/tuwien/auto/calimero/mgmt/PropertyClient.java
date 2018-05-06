@@ -53,6 +53,7 @@ import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXRemoteException;
+import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Settings;
 import tuwien.auto.calimero.dptxlator.DPTXlator;
 import tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned;
@@ -654,7 +655,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 			}
 		}
 		catch (final KNXException e) {
-			if (!KNXRemoteException.class.equals(e.getClass())) {
+			if (!KNXRemoteException.class.equals(e.getClass()) && !KNXTimeoutException.class.equals(e.getClass())) {
 				logger.error("scan properties failed", e);
 				throw e;
 			}
