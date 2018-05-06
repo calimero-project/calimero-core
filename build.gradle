@@ -5,7 +5,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.15.0'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.17.0'
     }
 }
 
@@ -22,7 +22,7 @@ apply plugin:'application'
 apply plugin: 'com.github.ben-manes.versions'
 
 group = 'com.github.calimero'
-version = '2.4-SNAPSHOT'
+version = '2.4-rc1'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
