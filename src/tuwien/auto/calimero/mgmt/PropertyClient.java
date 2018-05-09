@@ -885,7 +885,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 				return false;
 			if ("1".equals(s) || "true".equals(s))
 				return true;
-			if ("<tbd>".equals(s) || "0/1".equals(s) || "w".equals(s))
+			if ("w".equals(s))
 				return true;
 			return false;
 		}
