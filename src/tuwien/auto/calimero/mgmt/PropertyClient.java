@@ -406,9 +406,27 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 			return propName;
 		}
 
+		/**
+		 * @return <code>true</code> if property is read-only, <code>false</code> if property is write-enabled
+		 */
 		public final boolean readOnly()
 		{
 			return write == -1;
+		}
+
+		/**
+		 * @return required access level for property write access to write-enabled property, <code>level &ge; 0</code>;
+		 *         level is undefined for read-only property
+		 */
+		public final int writeLevel() {
+			return write;
+		}
+
+		/**
+		 * @return required access level for property read access, level &ge; 0
+		 */
+		public final int readLevel() {
+			return read;
 		}
 	}
 
