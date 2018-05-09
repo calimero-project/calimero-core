@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -260,9 +260,7 @@ public interface ManagementProcedures extends AutoCloseable
 	 * medium.<br>
 	 * Recognized network media:
 	 * <ul>
-	 * <li>1: TP 0</li>
 	 * <li>2: TP 1</li>
-	 * <li>3: PL 132</li>
 	 * <li>4: PL 110</li>
 	 * <li>5: RF</li>
 	 * </ul>

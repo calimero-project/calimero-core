@@ -469,7 +469,7 @@ public class TransportLayerImpl implements TransportLayer
 		if (ctrl == CONNECT) {
 			if (serverSide) {
 				AggregatorProxy proxy = p;
-				// TODO problem: if we receive a new connect, but an old destination is still
+				// if we receive a new connect, but an old destination is still
 				// here configured as connection-less, we get a problem with setting
 				// the connection timeout (connectionless has no support for that)
 				if (proxy != null && !d.isConnectionOriented()) {

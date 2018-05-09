@@ -54,7 +54,7 @@ import tuwien.auto.calimero.cemi.RFMediumInfo.RSS;
  */
 public class RFLData implements RawFrame
 {
-	// TODO RawFrameBase is right now not the best fit as base type, because
+	// RawFrameBase is right now not the best fit as base type, because
 	// RF frames do not use the priority field
 
 	// Fast Ack frame: min length of having 1. and 2. block = [10 + CRC] [6 + CRC]
@@ -241,7 +241,6 @@ public class RFLData implements RawFrame
 		// read TPDU contained in 2nd block
 		is.read(tpdu, 0, Math.min(Block2TpduSize, tpduSize));
 
-		// TODO test only: check TPCI/APCI and seq contained in TPDU
 		final int pci = tpdu[0] & 0xff;
 		final int tpci = (pci >>> 6);
 		// LTE has tpci always set 0

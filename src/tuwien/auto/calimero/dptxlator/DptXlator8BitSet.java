@@ -171,7 +171,6 @@ public class DptXlator8BitSet extends DPTXlator
 	public enum VentilationControllerStatus implements EnumBase<VentilationControllerStatus> {
 		Fault, FanActive, Heat, Cool;
 	}
-	// TODO or name it DptAirHandlerUnitStatus as in the DPT spec
 	public static final EnumDpt<VentilationControllerStatus> DptVentilationControllerStatus = new EnumDpt<>("21.106",
 			VentilationControllerStatus.class);
 
