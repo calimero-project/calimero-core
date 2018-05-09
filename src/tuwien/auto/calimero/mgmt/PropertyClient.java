@@ -538,7 +538,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 
 	@Override
 	public void setProperty(final int objIndex, final int pid, final int start,
-		final int elements, final byte[] data) throws KNXException, InterruptedException
+		final int elements, final byte... data) throws KNXException, InterruptedException
 	{
 		pa.setProperty(objIndex, pid, start, elements, data);
 	}
