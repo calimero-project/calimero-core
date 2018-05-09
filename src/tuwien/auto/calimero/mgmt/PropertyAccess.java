@@ -688,7 +688,7 @@ public interface PropertyAccess
 	 * @throws KNXException on adapter errors while setting the property elements
 	 * @throws InterruptedException on thread interrupt
 	 */
-	void setProperty(int objIndex, int pid, int start, int elements, byte[] data)
+	void setProperty(int objIndex, int pid, int start, int elements, byte... data)
 		throws KNXException, InterruptedException;
 
 	/**

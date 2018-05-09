@@ -62,8 +62,8 @@ Supported Features
 * 229.001 - M-Bus metering value, with the various M-Bus VIF/VIFE codings
 * 232.x - RGB color value
 
-### Busmonitor
-Access via KNXnet/IP, KNX USB, KNX RF USB, and FT1.2 (KNX RF USB is not tested -- no busmonitor hardware available)
+### Network Monitor / Busmonitor
+Access via KNXnet/IP, KNX USB, KNX RF USB, TP-UART, and FT1.2
 
 #### Raw Frame Decoding
 * TP1
