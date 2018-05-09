@@ -134,12 +134,11 @@ public interface ProcessCommunicator extends ProcessCommunicationBase
 	int readControl(GroupAddress dst) throws KNXException, InterruptedException;
 
 	/**
-	 * Reads a floating point datapoint value from a group destination.
-	 *
+	 * @deprecated Use {@link #readFloat(GroupAddress)}.
 	 * @param dst group destination to read from
-	 * @param is4ByteFloat specifies the datapoint floating point type the datapoint is encoded
-	 *        with: either a 2-byte KNX float of DPT main number 9 (<code>false</code>), or a 4-byte
-	 *        float of DPT main number 14 (<code>true</code>)
+	 * @param is4ByteFloat specifies the datapoint floating point type the datapoint is encoded with: either a 2-byte
+	 *        KNX float of DPT main number 9 (<code>false</code>), or a 4-byte float of DPT main number 14
+	 *        (<code>true</code>)
 	 * @return the read floating point value
 	 * @throws KNXTimeoutException on a timeout during send or no read response was received
 	 * @throws KNXInvalidResponseException on invalid read response message
@@ -148,8 +147,11 @@ public interface ProcessCommunicator extends ProcessCommunicationBase
 	 * @throws KNXException on other read problems
 	 * @throws InterruptedException on interrupt during read
 	 */
-	double readFloat(GroupAddress dst, boolean is4ByteFloat) throws KNXException,
-		InterruptedException;
+	@Deprecated
+	default double readFloat(final GroupAddress dst, final boolean is4ByteFloat) throws KNXException,
+		InterruptedException {
+		return readFloat(dst);
+	}
 
 	/**
 	 * Reads a floating point datapoint value from a group destination.

@@ -294,20 +294,6 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	}
 
 	@Override
-	public double readFloat(final GroupAddress dst, final boolean is4ByteFloat)
-		throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException, KNXFormatException,
-		InterruptedException
-	{
-		final DPTXlator t = is4ByteFloat
-				? new DPTXlator4ByteFloat(DPTXlator4ByteFloat.DPT_TEMPERATURE_DIFFERENCE)
-				: new DPTXlator2ByteFloat(DPTXlator2ByteFloat.DPT_RAIN_AMOUNT);
-		final int size = is4ByteFloat ? 4 : 2;
-		final byte[] apdu = readFromGroup(dst, priority, size, size);
-		extractGroupASDU(apdu, t);
-		return t.getNumericValue();
-	}
-
-	@Override
 	public double readFloat(final GroupAddress dst) throws KNXTimeoutException, KNXRemoteException,
 		KNXLinkClosedException, KNXFormatException, InterruptedException {
 		final byte[] apdu = readFromGroup(dst, priority, 2, 4);

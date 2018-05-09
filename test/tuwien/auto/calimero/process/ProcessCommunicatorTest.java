@@ -313,13 +313,6 @@ class ProcessCommunicatorTest
 	}
 
 	@Test
-	void testReadFloatBoolean() throws KNXException, InterruptedException
-	{
-		/*final double f2 =*/ pc.readFloat(dpFloat2, false);
-		/*final double f4 =*/ pc.readFloat(dpFloat4, true);
-	}
-
-	@Test
 	void readFloat() throws KNXException, InterruptedException
 	{
 		final double f2 = pc.readFloat(dpFloat2);
@@ -395,7 +388,7 @@ class ProcessCommunicatorTest
 		final List<Thread> threads = new ArrayList<>();
 		final AtomicInteger count = new AtomicInteger();
 		final boolean b = pc2.readBool(dpBool);
-		final double d = pc2.readFloat(dpFloat2, false);
+		final double d = pc2.readFloat(dpFloat2);
 		for (int i = 0; i < 20; i++) {
 			final int index = i;
 			final Thread t = new Thread(() -> {
@@ -403,7 +396,7 @@ class ProcessCommunicatorTest
 					if (index % 2 == 0)
 						count.addAndGet(pc2.readBool(dpBool) == b ? 1 : 0);
 					else
-						count.addAndGet(pc2.readFloat(dpFloat2, false) == d ? 1 : 0);
+						count.addAndGet(pc2.readFloat(dpFloat2) == d ? 1 : 0);
 				}
 				catch (KNXException | InterruptedException e) {
 					final StringWriter errors = new StringWriter();
