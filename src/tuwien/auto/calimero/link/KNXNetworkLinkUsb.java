@@ -54,7 +54,6 @@ import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.knxnetip.KNXConnectionClosedException;
 import tuwien.auto.calimero.link.BcuSwitcher.BcuMode;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
-import tuwien.auto.calimero.link.medium.RFSettings;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
 import tuwien.auto.calimero.serial.usb.HidReport;
 import tuwien.auto.calimero.serial.usb.TransferProtocolHeader.KnxTunnelEmi;
@@ -126,12 +125,6 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 				throw new KNXConnectionClosedException("USB interface is not connected to KNX network");
 
 			emiTypes = conn.getSupportedEmiTypes();
-			// Responding to active EMI type is optional (and might fail) if only one EMI type is
-			// supported. Or, we get a positive response, but with no emi type set (void)
-//			EmiType active = conn.getActiveEmiType();
-//			if (emiTypes.size() == 1)
-//				activeEmi = emiTypes.iterator().next();
-//			else
 			if (!trySetActiveEmi(EmiType.CEmi) && !trySetActiveEmi(EmiType.Emi2) && !trySetActiveEmi(EmiType.Emi1)) {
 				throw new KNXConnectionClosedException("failed to set active any supported EMI type");
 			}
@@ -158,7 +151,6 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 		deviceAddr();
 		mediumType();
 		setMaxApduLength();
-//		setDomain();
 		disableFilters();
 	}
 
@@ -272,14 +264,6 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 			final int addr = read(0, pidDeviceAddr).map(data -> unsigned(subnet.get()[0], data[0])).orElse(0);
 			logger.debug("KNX interface address {}", new IndividualAddress(addr));
 		}
-	}
-
-	private void setDomain() throws KNXException {
-		if (getKNXMedium().getMedium() != KNXMediumSettings.MEDIUM_RF)
-			return;
-		final RFSettings rf = (RFSettings) getKNXMedium();
-		final int rfDoA = 82;
-		write(0, rfDoA, rf.getDomainAddress());
 	}
 
 	private void disableFilters() throws KNXException {

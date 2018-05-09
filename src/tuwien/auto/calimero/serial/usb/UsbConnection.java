@@ -763,7 +763,6 @@ public class UsbConnection implements AutoCloseable
 		}
 	}
 
-	// NYI partial packets are not tested
 	private void assemblePartialPackets(final HidReport part) throws KNXFormatException
 	{
 		partialReportList.add(part);
@@ -1100,8 +1099,8 @@ public class UsbConnection implements AutoCloseable
 
 	public static Device findDeviceLowLevel(final int vendorId, final int productId)
 	{
-		final Context ctx = new Context();
-		int err = LibUsb.init(ctx);
+		final Context ctx = null; // use default context
+		int err = LibUsb.init(null);
 		if (err != 0) {
 			slogger.error("LibUsb initialization error {}: {}", -err, LibUsb.strError(err));
 			return null;
@@ -1132,7 +1131,7 @@ public class UsbConnection implements AutoCloseable
 			}
 		}
 		finally {
-			// XXX we can't call exit here, as we return a Device for subsequent usage
+			// we can't call exit here, as we return a Device for subsequent usage
 //			LibUsb.exit(ctx);
 		}
 		return null;
