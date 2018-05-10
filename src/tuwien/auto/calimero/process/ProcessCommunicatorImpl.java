@@ -354,6 +354,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		write(dp.getMainAddress(), dp.getPriority(), t);
 	}
 
+	@Override
 	public double readNumeric(final Datapoint dp) throws KNXException, InterruptedException
 	{
 		final byte[] apdu = readFromGroup(dp.getMainAddress(), dp.getPriority(), 0, 8);
