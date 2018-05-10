@@ -192,7 +192,7 @@ public interface ProcessCommunicator extends ProcessCommunicationBase
 	 * If no {@link DPT} is set for <code>dp</code>, a non-translated representation of the ASDU is
 	 * returned, e.g., a hexadecimal value string.
 	 *
-	 * @param dp the datapoint for read
+	 * @param dp the datapoint to read
 	 * @return the read datapoint value in textual representation (translated using the DPT)
 	 * @throws KNXTimeoutException on a timeout during send or no read response was received
 	 * @throws KNXInvalidResponseException on invalid read response message
@@ -202,6 +202,26 @@ public interface ProcessCommunicator extends ProcessCommunicationBase
 	 * @throws InterruptedException on interrupt during read
 	 */
 	String read(Datapoint dp) throws KNXException, InterruptedException;
+
+	/**
+	 * Reads a numeric datapoint value from a group destination.
+	 * <p>
+	 * This method is applicable for any datapoint where the DPT translation fits into a <code>double</code> or
+	 * <code>long</code> data type. If no numeric representation is defined for <code>dp</code>, any returned value or
+	 * exception is implementation-specific. For example, an implementation might parse the ASDU into a value of type
+	 * <code>long</code>.<br>
+	 * The used KNX message priority is according the supplied datapoint priority.
+	 *
+	 * @param dp the datapoint to read
+	 * @return the read datapoint value in numerical representation (translated using the DPT)
+	 * @throws KNXTimeoutException on a timeout during send or no read response was received
+	 * @throws KNXInvalidResponseException on invalid read response message
+	 * @throws KNXLinkClosedException if network link to KNX network is closed
+	 * @throws KNXFormatException on translation error of the response data
+	 * @throws KNXException if no appropriate DPT translator for the datapoint type is available
+	 * @throws InterruptedException on interrupt during read
+	 */
+	double readNumeric(Datapoint dp) throws KNXException, InterruptedException;
 
 	/**
 	 * Detaches the network link from this process communicator.
