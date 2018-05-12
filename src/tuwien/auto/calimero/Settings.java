@@ -43,7 +43,7 @@ package tuwien.auto.calimero;
  */
 public final class Settings
 {
-	private static final String version = "2.4-dev";
+	private static final String version = "2.5-dev";
 	private static final String library = "Calimero 2";
 	private static final String desc = "A library for KNX network access";
 

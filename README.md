@@ -1,8 +1,8 @@
 Calimero-core [![Build Status](https://travis-ci.org/calimero-project/calimero-core.svg?branch=master)](https://travis-ci.org/calimero-project/calimero-core)
 =============
 
-Calimero-core library for Java SE, specifically Java SE Embedded 8. The minimum required runtime environment is 
-the profile [compact1](http://www.oracle.com/technetwork/java/embedded/resources/tech/compact-profiles-overview-2157132.html).
+The calimero-core library provides KNX communication protocols, KNX datapoint & property access, and management functionality. The minimum required runtime environment is Java SE 9 (module _java.base_).
+Calimero is developed with a focus on applications that run on embedded devices and require a small footprint.
 
 Code examples for using this library are shown in [introduction](https://github.com/calimero-project/introduction).
 
@@ -21,6 +21,7 @@ Supported Features
 --------
 
 ### Access Protocols
+* KNX IP Secure Multicast (experimental)
 * KNXnet/IP
     * Discovery and Self-description
     * Tunneling
@@ -101,23 +102,6 @@ Before running any KNXnet/IP or KNX IP tests, start the test network (`gradle ru
 in the directory _calimero-core/test/testnetwork-launcher_. When using Gradle, KNXnet/IP tests can be excluded via `junitPlatform.filters.exclude 'knxnetip'`.
 
 Currently, the TP-UART and FT1.2 protocols can only be tested if the corresponding hardware is available. 
-
-Embedded Profile
-----
-
-Beginning with calimero version 2.4, Java SE Embedded 8 (compact1) is required.
-Java SE Embedded 8 with the compact1 profile is similar to Java ME CDC and Foundation Profile, 
-providing an environment for headless applications on embedded devices that require a small footprint. 
-
-Because of the big step in the minimum required runtime environment, the Calimero public API for Embedded 8 is not kept binary compatible to Calimero for Java ME CDC. Overall, the required modifications are minimal.
-
-### Main breaking changes from earlier versions of Calimero
-
-* Some API methods got updated to use `@FunctionalInterface`s
-* Use of `enum`s
-* XML processing defaults to the Streaming API for XML (StAX)
-* Use of the [Simple Logging Facade for Java (slf4j)](http://www.slf4j.org/)
-* Remove or replace `@Deprecated` parts of the library
 
 
 More Features, Tools, Examples
