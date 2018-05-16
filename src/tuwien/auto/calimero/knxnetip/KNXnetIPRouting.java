@@ -317,6 +317,8 @@ public class KNXnetIPRouting extends ConnectionBase
 					s.joinGroup(multicast);
 				}
 			}
+			// send out beyond local network
+			s.setTimeToLive(16);
 		}
 		catch (final IOException e) {
 			if (s != null)
