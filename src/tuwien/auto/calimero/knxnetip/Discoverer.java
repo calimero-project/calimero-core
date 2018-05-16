@@ -171,12 +171,14 @@ public class Discoverer
 		private final T response;
 		private final NetworkInterface ni;
 		private final InetAddress addr;
+		private final InetSocketAddress remote;
 
-		Result(final T r, final NetworkInterface outgoing, final InetAddress bind)
+		Result(final T r, final NetworkInterface outgoing, final InetAddress bind, final InetSocketAddress remote)
 		{
 			response = r;
 			ni = outgoing;
 			addr = bind;
+			this.remote = remote;
 		}
 
 		/**
@@ -203,6 +205,13 @@ public class Discoverer
 			return addr;
 		}
 
+		/**
+		 * @return address of the remote endpoint which sent the response
+		 */
+		public InetSocketAddress remoteEndpoint() {
+			return remote;
+		}
+
 		@Override
 		public boolean equals(final Object obj)
 		{
@@ -213,15 +222,15 @@ public class Discoverer
 			final Result<?> other = (Result<?>) obj;
 			return getNetworkInterface().equals(other.getNetworkInterface())
 					&& getAddress().equals(other.getAddress())
-					&& getResponse().equals(other.getResponse());
+					&& getResponse().equals(other.getResponse()) && remote.equals(other.remote);
 		}
 
 		@Override
 		public int hashCode()
 		{
 			final int prime = 17;
-			return prime * (prime * getNetworkInterface().hashCode() + getAddress().hashCode())
-					+ getResponse().hashCode();
+			return prime * (prime * (prime * getNetworkInterface().hashCode() + getAddress().hashCode())
+					+ getResponse().hashCode()) + remote.hashCode();
 		}
 	}
 
@@ -553,7 +562,8 @@ public class Discoverer
 			if (looper.thrown != null)
 				throw looper.thrown;
 			if (looper.res != null)
-				return new Result<>(looper.res, NetworkInterface.getByInetAddress(host(server.getAddress())), host(server.getAddress()));
+				return new Result<>(looper.res, NetworkInterface.getByInetAddress(host(server.getAddress())), host(server.getAddress()),
+						server);
 		}
 		catch (final IOException e) {
 			final String msg = "network failure on getting description from " + server;
@@ -800,7 +810,7 @@ public class Discoverer
 					synchronized (receivers) {
 						if (receivers.contains(this)) {
 							final Result<SearchResponse> r = new Result<>(
-									new SearchResponse(data, offset + h.getStructLength(), bodyLen), nif, addrOnNetif);
+									new SearchResponse(data, offset + h.getStructLength(), bodyLen), nif, addrOnNetif, source);
 							if (!responses.contains(r))
 								responses.add(r);
 						}
