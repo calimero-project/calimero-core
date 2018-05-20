@@ -44,6 +44,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
@@ -84,6 +85,19 @@ import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 {
 	/**
+	 * KNXnet/IP system setup multicast address, KNXnet/IP routers are by default members of that multicast group.
+	 */
+	public static final InetAddress DefaultMulticast;
+	static {
+		try {
+			DefaultMulticast = InetAddress.getByName("224.0.23.12");
+		}
+		catch (final UnknownHostException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
 	 * Service mode for link layer tunneling.
 	 */
 	protected static final int TUNNELING = 1;
@@ -101,8 +115,8 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 * Creates a new network link using KNXnet/IP tunneling (internally using a {@link KNXnetIPConnection}) to a remote
 	 * KNXnet/IP server endpoint.
 	 *
-	 * @param localEP the local endpoint of the link to use; this is the client control endpoint, use <code>null</code>
-	 *        for the default local host and an ephemeral port number<br>
+	 * @param localEP the local control endpoint of the link to use, supply the wildcard address to use a local IP on
+	 *        the same subnet as <code>remoteEP</code> and an ephemeral port number
 	 * @param remoteEP the remote endpoint of the link to communicate with; this is the KNXnet/IP server control
 	 *        endpoint
 	 * @param useNAT <code>true</code> to use network address translation (NAT) in tunneling service mode,
@@ -124,8 +138,8 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 *
 	 * @param netIf local network interface used to join the multicast group and for sending, use <code>null</code> for
 	 *        the host's default multicast interface
-	 * @param mcGroup address of the multicast group to join, use <code>null</code> for the default KNXnet/IP multicast
-	 *        address
+	 * @param mcGroup address of the multicast group to join, use {@link #DefaultMulticast} for the default KNX IP
+	 *        multicast address
 	 * @param settings medium settings defining device and medium specifics needed for communication
 	 * @return the network link in open state
 	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
@@ -141,8 +155,8 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 * address.
 	 *
 	 * @param localEP the IP address bound to a local network interface for joining the multicast group
-	 * @param mcGroup address of the multicast group to join, use <code>null</code> for the default KNXnet/IP multicast
-	 *        address
+	 * @param mcGroup address of the multicast group to join, use {@link #DefaultMulticast} for the default KNX IP
+	 *        multicast address
 	 * @param settings medium settings defining device and medium specifics needed for communication
 	 * @return the network link in open state
 	 * @throws KNXException on failure establishing link using the KNXnet/IP connection

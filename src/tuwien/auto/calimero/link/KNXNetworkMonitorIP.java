@@ -59,15 +59,14 @@ public class KNXNetworkMonitorIP extends AbstractMonitor<KNXnetIPConnection>
 {
 	/**
 	 * Creates a new network monitor based on the KNXnet/IP protocol for accessing the KNX network.
-	 * <p>
 	 *
-	 * @param localEP the local endpoint to use for the link, this is the client control endpoint,
-	 *        use <code>null</code> for the default local host and an ephemeral port number
+	 * @param localEP the local control endpoint to use for the link, supply the wildcard address to use a local IP on
+	 *        the same subnet as <code>remoteEP</code> and an ephemeral port number
 	 * @param remoteEP the remote endpoint of the link; this is the server control endpoint
-	 * @param useNAT <code>true</code> to use network address translation in the KNXnet/IP protocol,
-	 *        <code>false</code> to use the default (non aware) mode
-	 * @param settings medium settings defining the specific KNX medium needed for decoding raw
-	 *        frames received from the KNX network
+	 * @param useNAT <code>true</code> to use network address translation in the KNXnet/IP protocol, <code>false</code>
+	 *        to use the default (non aware) mode
+	 * @param settings medium settings defining the specific KNX medium needed for decoding raw frames received from the
+	 *        KNX network
 	 * @throws KNXException on failure establishing the link
 	 * @throws InterruptedException on interrupted thread while establishing link
 	 */
@@ -75,8 +74,7 @@ public class KNXNetworkMonitorIP extends AbstractMonitor<KNXnetIPConnection>
 		final boolean useNAT, final KNXMediumSettings settings)
 			throws KNXException, InterruptedException
 	{
-		this(new KNXnetIPTunnel(BusMonitorLayer, localEndpoint(localEP), remoteEP,
-				useNAT), settings);
+		this(new KNXnetIPTunnel(BusMonitorLayer, localEndpoint(localEP), remoteEP, useNAT), settings);
 		logger.info("in busmonitor mode - ready to receive");
 		((KNXnetIPTunnel) super.conn).addConnectionListener(notifier);
 	}
