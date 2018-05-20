@@ -57,7 +57,13 @@ final class ReceiverLoop extends UdpSocketLooper implements Runnable
 	ReceiverLoop(final ConnectionBase connection, final DatagramSocket socket,
 		final int receiveBufferSize)
 	{
-		super(socket, true, receiveBufferSize, 0, 0);
+		this(connection, socket, receiveBufferSize, 0, 0);
+	}
+
+	// precondition: an initialized logger instance in ConnectionBase
+	ReceiverLoop(final ConnectionBase connection, final DatagramSocket socket, final int receiveBufferSize,
+		final int socketTimeout, final int loopTimeout) {
+		super(socket, true, receiveBufferSize, socketTimeout, loopTimeout);
 		conn = connection;
 		logger = connection.logger;
 	}

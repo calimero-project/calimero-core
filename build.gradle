@@ -34,7 +34,7 @@ compileTestJava.options.encoding = 'UTF-8'
 compileJava.options*.compilerArgs = [
 	'-Xlint:all',
 	'-Xlint:-options',
-	'-Werror'
+//	'-Werror'
 ]
 
 compileTestJava.options*.compilerArgs = [
@@ -103,4 +103,6 @@ dependencies {
 	testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
 	testCompileOnly 'junit:junit:4.12'
 	testRuntimeOnly "org.junit.vintage:junit-vintage-engine:${junitJupiterVersion}"
+	// provider for knx ip secure
+	implementation 'org.bouncycastle:bcpkix-jdk15on:1.59'
 }

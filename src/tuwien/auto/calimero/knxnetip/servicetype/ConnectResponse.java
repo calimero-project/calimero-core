@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,12 +54,15 @@ import tuwien.auto.calimero.knxnetip.util.HPAI;
  * valid data.
  * <p>
  * Objects of this type are immutable.
- * 
+ *
  * @author B. Malinowsky
  * @see tuwien.auto.calimero.knxnetip.servicetype.ConnectRequest
  */
 public class ConnectResponse extends ServiceType
 {
+	private static final int NoMoreUniqueConnections = 0x25;
+	private static final int AuthError = 0x28;
+
 	private final int status;
 	private int channelid;
 	private CRD crd;
@@ -68,7 +71,7 @@ public class ConnectResponse extends ServiceType
 	/**
 	 * Creates a connect response out of a byte array.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing a connect response structure
 	 * @param offset start offset of response in <code>data</code>
 	 * @throws KNXFormatException if no connect response was found or invalid structure
@@ -90,7 +93,7 @@ public class ConnectResponse extends ServiceType
 	/**
 	 * Creates a connect response indicating no success or some error condition.
 	 * <p>
-	 * 
+	 *
 	 * @param status status code giving information of refusal to the corresponding
 	 *        request, 0 &lt;= status &lt;= 255
 	 */
@@ -105,7 +108,7 @@ public class ConnectResponse extends ServiceType
 	/**
 	 * Creates a connect response with full customization of response information.
 	 * <p>
-	 * 
+	 *
 	 * @param channelID communication channel ID to use for the connection, 0 &lt;= id
 	 *        &lt;= 255
 	 * @param status status code information to the corresponding request, 0 &lt;= status
@@ -131,7 +134,7 @@ public class ConnectResponse extends ServiceType
 	 * Returns the communication channel ID on a successful established connection.
 	 * <p>
 	 * The ID is not valid otherwise, check the status code of the response.
-	 * 
+	 *
 	 * @return communication channel identifier as unsigned byte
 	 */
 	public final int getChannelID()
@@ -145,7 +148,7 @@ public class ConnectResponse extends ServiceType
 	 * <p>
 	 * The CRD is <code>null</code> on error, check the status code of the response
 	 * before.
-	 * 
+	 *
 	 * @return CRD, or <code>null</code>
 	 */
 	public final CRD getCRD()
@@ -158,7 +161,7 @@ public class ConnectResponse extends ServiceType
 	 * established connection.
 	 * <p>
 	 * The HPAI is <code>null</code> otherwise, check the status code of the response.
-	 * 
+	 *
 	 * @return data endpoint in a HPAI, or <code>null</code>
 	 */
 	public final HPAI getDataEndpoint()
@@ -169,7 +172,7 @@ public class ConnectResponse extends ServiceType
 	/**
 	 * Returns the status code, indicating success or some error condition.
 	 * <p>
-	 * 
+	 *
 	 * @return status code as unsigned byte
 	 */
 	public final int getStatus()
@@ -180,7 +183,7 @@ public class ConnectResponse extends ServiceType
 	/**
 	 * Returns a textual representation of the status code.
 	 * <p>
-	 * 
+	 *
 	 * @return short description of status as string
 	 */
 	public String getStatusString()
@@ -194,11 +197,15 @@ public class ConnectResponse extends ServiceType
 			return "one or more connection options are not supported";
 		case ErrorCodes.NO_MORE_CONNECTIONS:
 			return "could not accept new connection (maximum reached)";
+		case NoMoreUniqueConnections:
+			return "KNXnet/IP tunneling address for connection is not unique";
+		case ErrorCodes.KNX_CONNECTION:
+			return "server detected error concerning KNX subsystem connection";
+		case AuthError:
+			return "authorization error";
 		case ErrorCodes.TUNNELING_LAYER:
 			return "the requested tunneling layer is not supported";
 		// this error code is also returned by N146 device for some reason
-		case ErrorCodes.KNX_CONNECTION:
-			return "server detected error concerning KNX subsystem connection";
 		default:
 			return "unknown status";
 		}
