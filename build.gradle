@@ -15,6 +15,7 @@ repositories {
 }
 
 ext.junitJupiterVersion = '5.2.0'
+ext.desc = 'Calimero, a free KNX network library'
 
 apply plugin: 'java-library'
 apply plugin: 'maven'
