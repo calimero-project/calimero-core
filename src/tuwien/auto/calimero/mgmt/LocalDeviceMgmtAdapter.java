@@ -73,8 +73,8 @@ public class LocalDeviceMgmtAdapter extends LocalDeviceManagement
 	 * enabled check is only of interest when getting a property description
 	 * {@link #getDescription(int, int, int)}.
 	 *
-	 * @param localEP the local endpoint of the connection, use <code>null</code> for assigning the
-	 *        default local host and an unused (ephemeral) port
+	 * @param localEP the local endpoint of the connection, supply the wildcard address to use a
+	 *        local IP on the same subnet as <code>serverCtrlEP</code> and an unused (ephemeral) port
 	 * @param serverCtrlEP the remote server control endpoint used for connect request
 	 * @param useNat <code>true</code> to use a network address translation aware communication
 	 *        mechanism, <code>false</code> to use the default way
@@ -131,7 +131,6 @@ public class LocalDeviceMgmtAdapter extends LocalDeviceManagement
 		final InetSocketAddress serverCtrlEP, final boolean useNat) throws KNXException,
 		InterruptedException
 	{
-		final InetSocketAddress local = localEP == null ? new InetSocketAddress(0) : localEP;
-		return new KNXnetIPDevMgmt(local, serverCtrlEP, useNat);
+		return new KNXnetIPDevMgmt(localEP, serverCtrlEP, useNat);
 	}
 }
