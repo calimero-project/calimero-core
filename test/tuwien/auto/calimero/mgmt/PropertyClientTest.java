@@ -41,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.net.InetSocketAddress;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -98,7 +99,7 @@ class PropertyClientTest
 			lnk = KNXNetworkLinkIP.newTunnelingLink(null, Util.getServer(), false, TPSettings.TP1);
 			remAdpt = new RemotePropertyServiceAdapter(lnk, remote, null, true);
 			rem = new PropertyClient(remAdpt);
-			localAdpt = new LocalDeviceMgmtAdapter(null, Util.getServer(), false, adapterClosed, true);
+			localAdpt = new LocalDeviceMgmtAdapter(new InetSocketAddress(0), Util.getServer(), false, adapterClosed, true);
 			local = new PropertyClient(localAdpt);
 
 			rem.addDefinitions(new PropertyClient.XmlPropertyDefinitions().load(PIDResource));
