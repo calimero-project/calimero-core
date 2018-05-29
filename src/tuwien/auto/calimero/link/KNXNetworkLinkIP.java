@@ -45,6 +45,7 @@ import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.time.Duration;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
@@ -61,6 +62,7 @@ import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.knxnetip.KNXnetIPDevMgmt;
 import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
+import tuwien.auto.calimero.knxnetip.SecureConnection;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 
 /**
@@ -170,6 +172,25 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 		catch (final SocketException e) {
 			throw new KNXException("error getting network interface: " + e.getMessage());
 		}
+	}
+
+	/**
+	 * Creates a new secure network link using the KNX IP Secure Routing protocol.
+	 *
+	 * @param netif local network interface used to join the multicast group and for sending
+	 * @param mcGroup address of the multicast group to join, use {@link #DefaultMulticast} for the default KNX IP
+	 *        multicast address
+	 * @param groupKey KNX IP Secure group key (backbone key), <code>groupKey.length == 16</code>
+	 * @param latencyTolerance time window for accepting secure multicasts, depending on max. end-to-end network latency
+	 *        (typically 500 ms to 5000 ms), <code>latencyTolerance.toMillis() &gt; 0</code>
+	 * @param settings medium settings defining device and medium specifics needed for communication
+	 * @return the network link in open state
+	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
+	 */
+	public static KNXNetworkLinkIP newSecureRoutingLink(final NetworkInterface netif, final InetAddress mcGroup, final byte[] groupKey,
+		final Duration latencyTolerance, final KNXMediumSettings settings) throws KNXException {
+		return new KNXNetworkLinkIP(ROUTING, SecureConnection.newRouting(netif, mcGroup, groupKey, (int) latencyTolerance.toMillis()),
+				settings);
 	}
 
 	/**

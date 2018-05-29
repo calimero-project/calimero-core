@@ -47,7 +47,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -55,6 +57,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import tag.KnxSecure;
 import tag.KnxnetIP;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
@@ -410,5 +413,23 @@ public class KNXNetworkLinkIPTest
 		final long cnt = list.stream().map(Thread::getName).filter(s -> s.equals("Calimero link notifier")).count();
 		// we should only have our two initial link notifiers running, not the failed ones
 		assertEquals(2, cnt, "running notifiers");
+	}
+
+	@Test
+	@KnxSecure
+	void secureRoutingLink() throws KNXException, SocketException {
+		final NetworkInterface netif = Util.localInterface();
+		final byte[] groupKey = new byte[16];
+		try (KNXNetworkLink link = KNXNetworkLinkIP.newSecureRoutingLink(netif, KNXNetworkLinkIP.DefaultMulticast, groupKey,
+				Duration.ofMillis(2000), TPSettings.TP1)) {}
+	}
+
+	@Test
+	@KnxSecure
+	void secureRoutingInvalidKeyLength() throws SocketException {
+		final NetworkInterface netif = Util.localInterface();
+		final byte[] groupKey = new byte[10];
+		assertThrows(KNXIllegalArgumentException.class, () -> KNXNetworkLinkIP.newSecureRoutingLink(netif,
+				KNXNetworkLinkIP.DefaultMulticast, groupKey, Duration.ofMillis(2000), TPSettings.TP1));
 	}
 }
