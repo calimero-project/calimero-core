@@ -158,23 +158,18 @@ public final class SecureConnection extends KNXnetIPRouting {
 	public static KNXnetIPConnection newTunneling(final TunnelingLayer knxLayer, final InetSocketAddress localEP,
 		final InetSocketAddress serverCtrlEP, final boolean useNat) throws KNXException, InterruptedException {
 		return new SecureConnection(knxLayer, localEP, serverCtrlEP, useNat);
-	};
+	}
 
 	public static KNXnetIPConnection newRouting(final NetworkInterface netIf, final InetAddress mcGroup, final byte[] groupKey,
 		final int latencyTolerance) throws KNXException {
 		return new SecureConnection(netIf, mcGroup, groupKey, latencyTolerance);
-	};
+	}
 
 	private SecureConnection(final NetworkInterface netif, final InetAddress mcGroup, final byte[] groupKey,
 		final int latencyTolerance) throws KNXException {
 		super(netif, mcGroup);
 
-		byte[] hwAddr = new byte[6];
-		try {
-			hwAddr = Arrays.copyOf(netif.getHardwareAddress(), 6);
-		}
-		catch (final SocketException e) {}
-		sno = hwAddr;
+		sno = deriveSerialNumber(netif);
 		secretKey = createSecretKey(groupKey);
 		mcastLatencyTolerance = latencyTolerance;
 
@@ -195,11 +190,21 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 	private static byte[] deriveSerialNumber(final InetSocketAddress localEP) {
 		try {
-			final NetworkInterface netif = NetworkInterface.getByInetAddress(localEP.getAddress());
-			if (netif != null)
-				return Arrays.copyOf(netif.getHardwareAddress(), 6);
+			return deriveSerialNumber(NetworkInterface.getByInetAddress(localEP.getAddress()));
 		}
-		catch (final SocketException e) {}
+		catch (final SocketException ignore) {}
+		return new byte[6];
+	}
+
+	private static byte[] deriveSerialNumber(final NetworkInterface netif) {
+		try {
+			if (netif != null) {
+				final byte[] hardwareAddress = netif.getHardwareAddress();
+				if (hardwareAddress != null)
+					return Arrays.copyOf(hardwareAddress, 6);
+			}
+		}
+		catch (final SocketException ignore) {}
 		return new byte[6];
 	}
 
@@ -630,7 +635,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		}
 		for (int i = 0; result.hasRemaining(); i++)
 			result.put((byte) (buffer.get() ^ cipher[i]));
-		return (ByteBuffer) result.flip();
+		return result.flip();
 	}
 
 	private static byte[] cipherStream(final int blocks, final Key secretKey, final byte[] secInfo)

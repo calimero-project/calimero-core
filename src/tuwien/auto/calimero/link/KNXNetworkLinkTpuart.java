@@ -124,9 +124,6 @@ public class KNXNetworkLinkTpuart extends AbstractLink<TpuartConnection>
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
 		try {
-			final IndividualAddress src = new IndividualAddress(new byte[] { msg[4], msg[5] });
-			logger.debug("send {}->{}, {}", src, dst,
-					(waitForCon ? "blocking for .con" : "non-blocking"));
 			if (logger.isTraceEnabled())
 				logger.trace("cEMI {}", DataUnitBuilder.toHex(msg, " "));
 			conn.send(msg, waitForCon);
