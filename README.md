@@ -21,7 +21,7 @@ Supported Features
 --------
 
 ### Access Protocols
-* KNX IP Secure Multicast (experimental)
+* KNX IP Secure Multicast (experimental, an example of creating a secure network link is shown [here](https://github.com/calimero-project/introduction/blob/master/2.5/src/main/java/KnxipSecure.java))
 * KNXnet/IP
     * Discovery and Self-description
     * Tunneling
