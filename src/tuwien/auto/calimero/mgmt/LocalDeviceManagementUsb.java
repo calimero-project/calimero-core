@@ -113,14 +113,14 @@ public class LocalDeviceManagementUsb extends LocalDeviceManagement
 	 * @param propertyId the property identifier (PID)
 	 * @param start start index in the property value to start writing to
 	 * @param elements number of elements to set
-	 * @param data byte array containing the property value data
+	 * @param data byte array containing the property data
 	 * @throws KNXTimeoutException on timeout setting the property elements
 	 * @throws KNXRemoteException on remote error or invalid response
 	 * @throws KNXPortClosedException if adapter is closed
 	 * @throws InterruptedException on interrupt
 	 */
 	public void setProperty(final int objectType, final int objectInstance, final int propertyId,
-		final int start, final int elements, final byte[] data) throws KNXTimeoutException,
+		final int start, final int elements, final byte... data) throws KNXTimeoutException,
 		KNXRemoteException, KNXPortClosedException, InterruptedException
 	{
 		send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, objectType, objectInstance, propertyId,
