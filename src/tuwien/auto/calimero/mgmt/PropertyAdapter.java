@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -56,12 +56,12 @@ public interface PropertyAdapter extends AutoCloseable
 	 * @param pid property identifier
 	 * @param start start index in the property value to start writing to
 	 * @param elements number of elements to set
-	 * @param data byte array containing the property value data
+	 * @param data byte array containing the property data
 	 * @throws KNXException on error setting the interface object property
 	 * @throws IllegalStateException if adapter was already closed
 	 * @throws InterruptedException on interrupted thread
 	 */
-	void setProperty(int objIndex, int pid, int start, int elements, byte[] data)
+	void setProperty(int objIndex, int pid, int start, int elements, byte... data)
 		throws KNXException, InterruptedException;
 
 	/**
@@ -71,7 +71,7 @@ public interface PropertyAdapter extends AutoCloseable
 	 * @param pid property identifier
 	 * @param start start index in the property value to start reading from
 	 * @param elements number of elements to get
-	 * @return byte array containing the property value data
+	 * @return byte array containing the property data
 	 * @throws KNXException on error getting the interface object property
 	 * @throws IllegalStateException if adapter was already closed
 	 * @throws InterruptedException on interrupted thread

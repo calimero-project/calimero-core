@@ -137,7 +137,7 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 
 	@Override
 	public void setProperty(final int objIndex, final int pid, final int start,
-		final int elements, final byte[] data) throws KNXException, InterruptedException
+		final int elements, final byte... data) throws KNXException, InterruptedException
 	{
 		mc.writeProperty(dst, objIndex, pid, start, elements, data);
 	}

@@ -131,7 +131,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 
 	@Override
 	public void setProperty(final int objIndex, final int pid, final int start, final int elements,
-		final byte[] data) throws KNXException, InterruptedException
+		final byte... data) throws KNXException, InterruptedException
 	{
 		if (closed)
 			throw new IllegalStateException("adapter closed");
