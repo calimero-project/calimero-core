@@ -186,7 +186,10 @@ public class KNXnetIPRouting extends ConnectionBase
 			// we always succeed...
 			setState(OK);
 		}
-		catch (KNXTimeoutException | InterruptedException ignore) {}
+		catch (final KNXTimeoutException ignore) {}
+		catch (final InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
 	}
 
 	public final void send(final RoutingBusy busy) throws KNXConnectionClosedException

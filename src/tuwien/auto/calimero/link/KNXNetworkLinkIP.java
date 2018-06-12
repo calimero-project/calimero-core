@@ -267,6 +267,8 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 		catch (InterruptedException | KNXConnectionClosedException e) {
 			logger.error("send error, closing link", e);
 			close();
+			if (e instanceof InterruptedException)
+				Thread.currentThread().interrupt();
 			throw new KNXLinkClosedException("link closed, " + e.getMessage());
 		}
 	}

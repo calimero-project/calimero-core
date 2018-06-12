@@ -113,6 +113,7 @@ public class KNXNetworkMonitorFT12 extends AbstractMonitor<FT12Connection>
 		}
 		catch (final InterruptedException e) {
 			conn.close();
+			Thread.currentThread().interrupt();
 			throw new KNXLinkClosedException(e.getMessage());
 		}
 		catch (final KNXAckTimeoutException e) {
