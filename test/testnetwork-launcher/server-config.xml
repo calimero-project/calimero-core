@@ -3,8 +3,8 @@
 <knxServer name="test-server" friendlyName="calimero-core knx test-server">
 	<discovery activate="true" listenNetIf="all" outgoingNetIf="all"/>
 	<serviceContainer activate="true" routing="true" listenNetIf="any"
-		networkMonitoring="true" udpPort="3671" reuseCtrlEP="false">
-		<knxAddress type="individual">1.1.1</knxAddress>
+		networkMonitoring="true" udpPort="3671">
+		<knxAddress type="individual">1.1.0</knxAddress>
 		<disruptionBuffer expirationTimeout="30" udpPort="5555-5559"/>
 		<knxSubnet type="virtual" medium="pl110" domainAddress="6c">KnxTestNetwork</knxSubnet>
 		<groupAddressFilter>
