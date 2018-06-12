@@ -453,14 +453,13 @@ public class ManagementClientImpl implements ManagementClient
 	}
 
 	@Override
-	public void restart(final Destination dst) throws KNXTimeoutException, KNXLinkClosedException
+	public void restart(final Destination dst) throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		try {
 			restart(true, dst, 0, 0);
 		}
 		catch (final KNXRemoteException ignore) { }
 		catch (final KNXDisconnectException ignore) { }
-		catch (final InterruptedException ignore) { }
 	}
 
 	@Override

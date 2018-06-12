@@ -357,8 +357,9 @@ public interface ManagementClient extends AutoCloseable
 	 * @param dst destination to reset
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
+	 * @throws InterruptedException on interrupted thread
 	 */
-	void restart(Destination dst) throws KNXTimeoutException, KNXLinkClosedException;
+	void restart(Destination dst) throws KNXTimeoutException, KNXLinkClosedException, InterruptedException;
 
 	/**
 	 * Initiates a master reset of the controller of a communication partner.

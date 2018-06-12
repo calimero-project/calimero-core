@@ -113,7 +113,7 @@ public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 			conn.send(msg, waitForCon);
 			logger.trace("send to {} succeeded", dst);
 		}
-		catch (final KNXPortClosedException | InterruptedException e) {
+		catch (KNXPortClosedException | InterruptedException e) {
 			logger.error("send error, closing link", e);
 			close();
 			if (e instanceof InterruptedException)
@@ -146,6 +146,7 @@ public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 		}
 		catch (final InterruptedException e) {
 			conn.close();
+			Thread.currentThread().interrupt();
 			throw new KNXLinkClosedException(e.getMessage());
 		}
 		catch (final KNXAckTimeoutException e) {
