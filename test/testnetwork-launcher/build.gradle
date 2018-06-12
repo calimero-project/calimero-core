@@ -12,11 +12,12 @@ run {
 }
 
 group = 'com.github.calimero'
-version = '2.4-SNAPSHOT'
+version = '2.4-rc1'
 
-repositories {        
-    mavenCentral()
+repositories {
     mavenLocal()
+    jcenter()
+    mavenCentral()
     maven {
         url "https://oss.sonatype.org/content/repositories/snapshots"
     }
