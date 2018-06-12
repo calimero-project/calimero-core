@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -147,8 +147,7 @@ public interface KNXNetworkLink extends AutoCloseable
 	 *         service acknowledgment using a reliable transmission protocol)
 	 * @throws KNXLinkClosedException if the link is closed
 	 */
-	void sendRequest(KNXAddress dst, Priority p, byte[] nsdu) throws KNXTimeoutException,
-		KNXLinkClosedException;
+	void sendRequest(KNXAddress dst, Priority p, byte[] nsdu) throws KNXTimeoutException, KNXLinkClosedException;
 
 	/**
 	 * Sends a link layer request message to the given destination, and waits for the
@@ -166,8 +165,7 @@ public interface KNXNetworkLink extends AutoCloseable
 	 *         confirmation
 	 * @throws KNXLinkClosedException if the link is closed
 	 */
-	void sendRequestWait(KNXAddress dst, Priority p, byte[] nsdu)
-		throws KNXTimeoutException, KNXLinkClosedException;
+	void sendRequestWait(KNXAddress dst, Priority p, byte[] nsdu) throws KNXTimeoutException, KNXLinkClosedException;
 
 	/**
 	 * Sends a KNX link layer message supplied as type cEMI L-data.
@@ -182,8 +180,7 @@ public interface KNXNetworkLink extends AutoCloseable
 	 *         acknowledgment using a reliable transmission protocol)
 	 * @throws KNXLinkClosedException if the link is closed
 	 */
-	void send(CEMILData msg, boolean waitForCon) throws KNXTimeoutException,
-		KNXLinkClosedException;
+	void send(CEMILData msg, boolean waitForCon) throws KNXTimeoutException, KNXLinkClosedException;
 
 	/**
 	 * Returns the name of the link, a short textual representation to identify a link.

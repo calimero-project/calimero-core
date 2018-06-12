@@ -86,8 +86,7 @@ public final class Connector
 	public static final long NoMaxAttempts = Long.MAX_VALUE;
 	private long maxAttempts = 10;
 
-	public Connector()
-	{}
+	public Connector() {}
 
 	// copy ctor
 	private Connector(final Connector rhs)
