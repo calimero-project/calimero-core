@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,9 +50,7 @@ import tuwien.auto.calimero.xml.XmlReader;
 import tuwien.auto.calimero.xml.XmlWriter;
 
 /**
- * A datapoint model storing datapoints with no defined order or hierarchy using a map
- * implementation.
- * <p>
+ * A datapoint model storing datapoints with no defined order or hierarchy using a map implementation.
  *
  * @author B. Malinowsky
  */
@@ -63,16 +61,20 @@ public class DatapointMap<T extends Datapoint> implements DatapointModel<T>, Cha
 	private final Map<GroupAddress, T> points;
 	private final EventListeners<ChangeListener> listeners = new EventListeners<>();
 
-	// NYI ensure we only load valid types based on parameterization, assign from constructor
-	// parameter or factory method
-	private final Class<Datapoint> dpTypeRef = Datapoint.class;
+	private final Class<? extends Datapoint> dpTypeRef;
 
 	/**
 	 * Creates a new empty datapoint map.
 	 */
 	public DatapointMap()
 	{
+		this(Datapoint.class);
+	}
+
+	DatapointMap(final Class<? extends Datapoint> type)
+	{
 		points = Collections.synchronizedMap(new HashMap<>(20));
+		dpTypeRef = type;
 	}
 
 	/**
@@ -96,6 +98,7 @@ public class DatapointMap<T extends Datapoint> implements DatapointModel<T>, Cha
 			m.put(dp.getMainAddress(), dp);
 		}
 		points = Collections.synchronizedMap(m);
+		dpTypeRef = Datapoint.class;
 	}
 
 	@Override

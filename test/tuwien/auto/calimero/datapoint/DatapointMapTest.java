@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,7 +47,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import tuwien.auto.calimero.GroupAddress;
@@ -188,7 +187,6 @@ public class DatapointMapTest
 	 * @throws KNXMLException
 	 */
 	@Test
-	@Disabled
 	public final void testLoad() throws KNXMLException
 	{
 		final XmlWriter w = XmlOutputFactory.newInstance().createXMLWriter(dpFile);
@@ -242,7 +240,7 @@ public class DatapointMapTest
 		w5.close();
 		final XmlReader r5 = XmlInputFactory.newInstance().createXMLReader(dpFile);
 		try {
-			new DatapointMap<StateDP>().load(r5);
+			new DatapointMap<StateDP>(StateDP.class).load(r5);
 			fail("loaded command DP into state-based DP map");
 		}
 		catch (final KNXMLException expected) {}
