@@ -76,7 +76,7 @@ public abstract class EventNotifier<T extends LinkListener> extends Thread imple
 	private final EventListeners<T> listeners;
 
 	private final Deque<Consumer<? super T>> events = new ArrayDeque<>();
-	private volatile boolean stop;
+	private volatile boolean running = true;
 
 	EventNotifier(final Object source, final Logger logger)
 	{
@@ -91,7 +91,7 @@ public abstract class EventNotifier<T extends LinkListener> extends Thread imple
 	public final void run()
 	{
 		try {
-			while (true) {
+			while (running) {
 				final Consumer<? super T> c;
 				synchronized (events) {
 					while (events.isEmpty())
@@ -102,10 +102,20 @@ public abstract class EventNotifier<T extends LinkListener> extends Thread imple
 			}
 		}
 		catch (final InterruptedException e) {}
-		// empty event queue
-		synchronized (events) {
-			while (!events.isEmpty())
-				fire(events.remove());
+		finally {
+			drainEvents();
+		}
+	}
+
+	private void drainEvents() {
+		while (true) {
+			final Consumer<? super T> c;
+			synchronized (events) {
+				if (events.isEmpty())
+					return;
+				c = events.remove();
+			}
+			fire(c);
 		}
 	}
 
@@ -126,18 +136,14 @@ public abstract class EventNotifier<T extends LinkListener> extends Thread imple
 
 	final void addEvent(final Consumer<? super T> c)
 	{
-		if (!stop) {
-			synchronized (events) {
-				events.add(c);
-				events.notify();
-			}
+		synchronized (events) {
+			events.add(c);
+			events.notify();
 		}
 	}
 
 	final void addListener(final T l)
 	{
-		if (stop)
-			return;
 		listeners.add(l);
 	}
 
@@ -148,6 +154,7 @@ public abstract class EventNotifier<T extends LinkListener> extends Thread imple
 
 	final void quit()
 	{
+		running = false;
 		interrupt();
 		if (currentThread() != this) {
 			try {
