@@ -198,6 +198,7 @@ public final class Connector
 		private volatile boolean closed;
 		private volatile Future<?> f = CompletableFuture.completedFuture(Void.TYPE);
 		private final AtomicBoolean connecting = new AtomicBoolean();
+		private final Object lock = new Object();
 
 		private Link(final TSupplier<? extends T> creator, final Connector options)
 			throws KNXException, InterruptedException
@@ -447,16 +448,16 @@ public final class Connector
 				}
 				finally {
 					connecting.set(false);
-					synchronized (connecting) {
-						connecting.notifyAll();
+					synchronized (lock) {
+						lock.notifyAll();
 					}
 				}
 			}
 			else {
 				// if a connection attempt is active, we use that one
-				synchronized (connecting) {
+				synchronized (lock) {
 					while (connecting.get())
-						connecting.wait();
+						lock.wait();
 				}
 				if (!targetOpen())
 					throw new KNXLinkClosedException("ongoing connect attempt we waited for failed");
