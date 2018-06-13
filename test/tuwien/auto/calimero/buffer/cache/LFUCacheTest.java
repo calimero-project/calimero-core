@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -83,8 +83,7 @@ public class LFUCacheTest extends TestCase
 		o4 = new CacheObject("4", "value 4");
 		o5 = new CacheObject("5", "value 5");
 		o6 = new CacheObject("6", "value 6");
-		co =
-			new LDataObject(new CEMILData(CEMILData.MC_LDATA_IND,
+		co = new LDataObject(new CEMILData(CEMILData.MC_LDATA_IND,
 				new IndividualAddress(0), new IndividualAddress("1.1.1"),
 				new byte[] { 10 }, Priority.NORMAL));
 	}
@@ -95,6 +94,9 @@ public class LFUCacheTest extends TestCase
 	@Override
 	protected void tearDown() throws Exception
 	{
+		var.clear();
+		fix.clear();
+		exp.clear();
 		super.tearDown();
 	}
 
