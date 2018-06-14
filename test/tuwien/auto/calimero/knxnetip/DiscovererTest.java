@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,7 +42,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.Iterator;
 import java.util.List;
@@ -167,9 +166,7 @@ public class DiscovererTest
 		assertTrue(search.size() > 0);
 		for (final Iterator<Result<SearchResponse>> i = search.iterator(); i.hasNext();) {
 			final Result<SearchResponse> result = i.next();
-			final SearchResponse response = result.getResponse();
-			final Result<DescriptionResponse> r = d.getDescription(new InetSocketAddress(
-					response.getControlEndpoint().getAddress(), response.getControlEndpoint().getPort()), timeout);
+			final Result<DescriptionResponse> r = d.getDescription(result.remoteEndpoint(), timeout);
 			assertNotNull(r);
 		}
 	}
