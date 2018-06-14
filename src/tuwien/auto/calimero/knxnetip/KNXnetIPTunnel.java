@@ -152,11 +152,9 @@ public class KNXnetIPTunnel extends ClientConnection
 		InterruptedException
 	{
 		super(KNXnetIPHeader.TUNNELING_REQ, KNXnetIPHeader.TUNNELING_ACK, 2, TUNNELING_REQ_TIMEOUT);
-		if (Objects.isNull(knxLayer))
-			throw new NullPointerException("Tunneling Layer");
+		layer = Objects.requireNonNull(knxLayer, "Tunneling Layer");
 		if (knxLayer == RawLayer)
 			throw new KNXIllegalArgumentException("Raw tunnel to KNX network not supported: " + knxLayer);
-		layer = knxLayer;
 		connect(localEP, serverCtrlEP, new TunnelCRI(knxLayer), useNAT);
 	}
 
