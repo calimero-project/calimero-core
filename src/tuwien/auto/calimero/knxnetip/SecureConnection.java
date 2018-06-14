@@ -161,17 +161,17 @@ public final class SecureConnection extends KNXnetIPRouting {
 	}
 
 	public static KNXnetIPConnection newRouting(final NetworkInterface netIf, final InetAddress mcGroup, final byte[] groupKey,
-		final int latencyTolerance) throws KNXException {
+		final Duration latencyTolerance) throws KNXException {
 		return new SecureConnection(netIf, mcGroup, groupKey, latencyTolerance);
 	}
 
 	private SecureConnection(final NetworkInterface netif, final InetAddress mcGroup, final byte[] groupKey,
-		final int latencyTolerance) throws KNXException {
+		final Duration latencyTolerance) throws KNXException {
 		super(netif, mcGroup);
 
 		sno = deriveSerialNumber(netif);
 		secretKey = createSecretKey(groupKey);
-		mcastLatencyTolerance = latencyTolerance;
+		mcastLatencyTolerance = (int) latencyTolerance.toMillis();
 
 		// we don't randomize initial delay [0..10] seconds to minimize uncertainty window of eventual group sync
 		scheduleGroupSync(0);

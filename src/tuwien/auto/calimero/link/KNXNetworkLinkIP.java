@@ -189,7 +189,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 */
 	public static KNXNetworkLinkIP newSecureRoutingLink(final NetworkInterface netif, final InetAddress mcGroup, final byte[] groupKey,
 		final Duration latencyTolerance, final KNXMediumSettings settings) throws KNXException {
-		return new KNXNetworkLinkIP(ROUTING, SecureConnection.newRouting(netif, mcGroup, groupKey, (int) latencyTolerance.toMillis()),
+		return new KNXNetworkLinkIP(ROUTING, SecureConnection.newRouting(netif, mcGroup, groupKey, latencyTolerance),
 				settings);
 	}
 
