@@ -42,6 +42,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.Iterator;
 import java.util.List;
@@ -54,10 +56,12 @@ import junit.framework.AssertionFailedError;
 import tag.KnxnetIP;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.knxnetip.Discoverer.Result;
 import tuwien.auto.calimero.knxnetip.servicetype.DescriptionResponse;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
+import tuwien.auto.calimero.knxnetip.util.HPAI;
 
 /**
  * @author B. Malinowsky
@@ -164,11 +168,24 @@ public class DiscovererTest
 		d.startSearch(timeout, true);
 		final List<Result<SearchResponse>> search = d.getSearchResponses();
 		assertTrue(search.size() > 0);
-		for (final Iterator<Result<SearchResponse>> i = search.iterator(); i.hasNext();) {
-			final Result<SearchResponse> result = i.next();
-			final Result<DescriptionResponse> r = d.getDescription(result.remoteEndpoint(), timeout);
-			assertNotNull(r);
+		int count = 0;
+		for (final Result<SearchResponse> result : search) {
+			final HPAI endpoint = result.getResponse().getControlEndpoint();
+			final InetAddress addr = endpoint.getAddress();
+			final int port = endpoint.getPort();
+			final boolean useNat = port == 0 || addr.isAnyLocalAddress();
+			final InetSocketAddress server = useNat ? result.remoteEndpoint() : new InetSocketAddress(addr, port);
+			try {
+				final Result<DescriptionResponse> r = d.getDescription(server, timeout);
+				assertNotNull(r);
+				count++;
+			}
+			catch (final KNXTimeoutException e) {
+				if (!useNat)
+					throw e;
+			}
 		}
+		assertTrue(count > 0);
 	}
 
 	/**
