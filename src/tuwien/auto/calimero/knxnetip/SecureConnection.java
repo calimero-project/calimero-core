@@ -44,6 +44,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
@@ -61,6 +62,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -261,11 +263,11 @@ public final class SecureConnection extends KNXnetIPRouting {
 			}
 		}
 		else if (svc == SecureGroupSync)
-			onGroupSync(newGroupSync(h, data, offset));
+			onGroupSync(src, newGroupSync(h, data, offset));
 		else if (svc == SecureSvc) {
 			final Object[] fields = unwrap(h, data, offset);
 			final long timestamp = (long) fields[1];
-			if (sessionId == 0 && !withinTolerance(timestamp)) {
+			if (sessionId == 0 && !withinTolerance(src, timestamp)) {
 				logger.warn("{}:{} timestamp {} outside latency tolerance of {} ms (local {}) - ignore", src,
 						port, timestamp, mcastLatencyTolerance, timestamp());
 				return true;
@@ -332,15 +334,15 @@ public final class SecureConnection extends KNXnetIPRouting {
 		}
 	}
 
-	private boolean withinTolerance(final long timestamp) {
-		onGroupSync(timestamp);
+	private boolean withinTolerance(final InetAddress src, final long timestamp) {
+		onGroupSync(src, timestamp);
 		final long diff = timestamp() - timestamp;
 		return diff <= mcastLatencyTolerance;
 	}
 
 	// upon receiving a group sync, we answer within [0..5] seconds using a single sync, but only iff we
 	// didn't receive another sync with a greater timestamp in between
-	private void onGroupSync(final long timestamp) {
+	private void onGroupSync(final InetAddress src, final long timestamp) {
 		final long local = timestamp();
 		if (timestamp > local) {
 			logger.debug("sync timestamp +{} ms", timestamp - local);
@@ -348,15 +350,31 @@ public final class SecureConnection extends KNXnetIPRouting {
 			final long abs = local - timestampOffset;
 			timestampExpiresAt = abs + timestampExpiresAfter.toMillis();
 			groupSync.cancel(false);
+		}
 
-			if (!syncedWithGroup)
-				logger.info("synchronized with group " + getRemoteAddress().getAddress().getHostAddress());
-			syncedWithGroup = true;
+		if (timestamp >= (local - mcastLatencyTolerance)) {
+			// we only consider messages sent by other nodes
+			if (!syncedWithGroup && !isLocalIpAddress(src)) {
+				logger.info("synchronized with group {}", getRemoteAddress().getAddress().getHostAddress());
+				syncedWithGroup = true;
+				groupSync.cancel(false);
+			}
 		}
 		else if (timestamp < (local - mcastLatencyTolerance)) {
 			// received old timestamp, schedule group sync
-			scheduleGroupSync(new Random().nextInt(5_000));
+			scheduleGroupSync((int) (Math.random() / Math.nextDown(1.0) * 5_000));
 		}
+	}
+
+	private boolean isLocalIpAddress(final InetAddress addr) {
+		Stream<NetworkInterface> netifs = Stream.empty();
+		try {
+			final NetworkInterface ni = ((MulticastSocket) socket).getNetworkInterface();
+			final boolean noneSet = ni.getInetAddresses().nextElement().isAnyLocalAddress();
+			netifs = noneSet ? NetworkInterface.networkInterfaces() : Stream.of(ni);
+		}
+		catch (final SocketException e) {}
+		return netifs.flatMap(ni -> ni.inetAddresses()).anyMatch(addr::equals);
 	}
 
 	private void scheduleGroupSync(final long initialDelay) {
