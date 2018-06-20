@@ -37,8 +37,11 @@
 package tuwien.auto.calimero.knxnetip.servicetype;
 
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.knxnetip.util.DIB;
 import tuwien.auto.calimero.knxnetip.util.DeviceDIB;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
 import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB;
@@ -63,6 +66,22 @@ public class SearchResponse extends ServiceType
 	private final DescriptionResponse desc;
 
 	/**
+	 * Creates a new search response from a byte array.
+	 *
+	 * @param h KNXnet/IP header preceding the search response in the byte array
+	 * @param data byte array containing a search response
+	 * @param offset start offset of response in <code>data</code>
+	 * @return search response
+	 * @throws KNXFormatException on wrong structure size or invalid host protocol address information
+	 */
+	public static SearchResponse from(final KNXnetIPHeader h, final byte[] data, final int offset) throws KNXFormatException {
+		final int svcType = h.getServiceType();
+		if (svcType != KNXnetIPHeader.SEARCH_RES && svcType != KNXnetIPHeader.SearchResponse)
+			throw new KNXIllegalArgumentException("not a search response");
+		return new SearchResponse(svcType, data, offset, h.getTotalLength() - h.getStructLength());
+	}
+
+	/**
 	 * Creates a new search response out of a byte array.
 	 *
 	 * @param data byte array containing a search response structure
@@ -72,7 +91,11 @@ public class SearchResponse extends ServiceType
 	 */
 	public SearchResponse(final byte[] data, final int offset, final int length) throws KNXFormatException
 	{
-		super(KNXnetIPHeader.SEARCH_RES);
+		this(KNXnetIPHeader.SEARCH_RES, data, offset, length);
+	}
+
+	private SearchResponse(final int svcType, final byte[] data, final int offset, final int length) throws KNXFormatException {
+		super(svcType);
 		endpt = new HPAI(data, offset);
 		desc = new DescriptionResponse(data, offset + endpt.getStructLength(), length - endpt.getStructLength());
 	}
@@ -89,6 +112,22 @@ public class SearchResponse extends ServiceType
 		super(KNXnetIPHeader.SEARCH_RES);
 		endpt = ctrlEndpoint;
 		desc = new DescriptionResponse(device, svcFamilies);
+	}
+
+	/**
+	 * Creates a new search response for the given control endpoint together with device information.
+	 *
+	 * @param ext search response with extra DIBs
+	 * @param ctrlEndpoint discovered control endpoint of the server sending this response
+	 * @param dibs server device description information
+	 */
+	public SearchResponse(final boolean ext, final HPAI ctrlEndpoint, final List<DIB> dibs) {
+		super(ext ? KNXnetIPHeader.SearchResponse : KNXnetIPHeader.SEARCH_RES);
+		endpt = ctrlEndpoint;
+		if (dibs.size() < 2)
+			throw new KNXIllegalArgumentException("search response shall contain device & service families DIB");
+		desc = new DescriptionResponse((DeviceDIB) dibs.get(0), (ServiceFamiliesDIB) dibs.get(1),
+				dibs.subList(2, dibs.size()).toArray(new DIB[0]));
 	}
 
 	/**
@@ -148,8 +187,7 @@ public class SearchResponse extends ServiceType
 	@Override
 	int getStructLength()
 	{
-		return endpt.getStructLength() + desc.getDevice().getStructLength()
-				+ desc.getServiceFamilies().getStructLength();
+		return endpt.getStructLength() + desc.getStructLength();
 	}
 
 	@Override
@@ -157,10 +195,10 @@ public class SearchResponse extends ServiceType
 	{
 		byte[] buf = endpt.toByteArray();
 		os.write(buf, 0, buf.length);
-		buf = desc.getDevice().toByteArray();
-		os.write(buf, 0, buf.length);
-		buf = desc.getServiceFamilies().toByteArray();
-		os.write(buf, 0, buf.length);
+		for (final DIB dib : desc.getDescription()) {
+			buf = dib.toByteArray();
+			os.write(buf, 0, buf.length);
+		}
 		return os.toByteArray();
 	}
 }

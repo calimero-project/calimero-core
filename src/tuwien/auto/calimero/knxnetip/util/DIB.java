@@ -77,8 +77,12 @@ public abstract class DIB
 	 */
 	public static final int KNX_ADDRESSES = 0x05;
 
-	static final int SecuredServiceFamilies = 0x06;
-	static final int TunnelingInfo = 0x07;
+
+	// KNX IP Secure Unicast
+
+	public static final int SecureServiceFamilies = 0x06;
+	public static final int Tunneling = 0x07;
+	public static final int AdditionalDeviceInfo = 0x08;
 
 	/**
 	 * Description type code for further data defined by device manufacturer.

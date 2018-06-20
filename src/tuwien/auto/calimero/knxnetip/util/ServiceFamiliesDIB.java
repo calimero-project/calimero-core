@@ -116,7 +116,7 @@ public class ServiceFamiliesDIB extends DIB
 	public ServiceFamiliesDIB(final byte[] data, final int offset) throws KNXFormatException
 	{
 		super(data, offset);
-		if (type != SUPP_SVC_FAMILIES)
+		if (type != SUPP_SVC_FAMILIES && type != SecureServiceFamilies)
 			throw new KNXFormatException("not a supported service families DIB", type);
 		final ByteArrayInputStream is = new ByteArrayInputStream(data, offset + 2, size - 2);
 		ids = new int[size / 2 - 1];
@@ -125,6 +125,10 @@ public class ServiceFamiliesDIB extends DIB
 			ids[i] = is.read();
 			versions[i] = is.read();
 		}
+	}
+
+	public static ServiceFamiliesDIB newSecureServiceFamilies(final int[] familyIds, final int[] familyVersions) {
+		return new ServiceFamiliesDIB(true, familyIds, familyVersions);
 	}
 
 	/**
@@ -149,16 +153,21 @@ public class ServiceFamiliesDIB extends DIB
 	 */
 	public ServiceFamiliesDIB(final int[] familyIDs, final int[] familyVersions)
 	{
-		super(2 + 2 * familyIDs.length, SUPP_SVC_FAMILIES);
+		this(false, familyIDs, familyVersions);
+	}
+
+	private ServiceFamiliesDIB(final boolean secure, final int[] familyIds, final int[] familyVersions)
+	{
+		super(2 + 2 * familyIds.length, secure ? SecureServiceFamilies : SUPP_SVC_FAMILIES);
 		// maximum size of 20 is arbitrarily chosen as sanitation measure, but considered
 		// a reasonable boundary
-		if (familyIDs.length != familyVersions.length || familyIDs.length > 20)
+		if (familyIds.length != familyVersions.length || familyIds.length > 20)
 			throw new KNXIllegalArgumentException("size of arrays have to match, with size <= 20");
 
-		ids = new int[familyIDs.length];
+		ids = new int[familyIds.length];
 		versions = new int[ids.length];
 		for (int i = 0; i < ids.length; ++i)
-			add(familyIDs[i], familyVersions[i], i);
+			add(familyIds[i], familyVersions[i], i);
 	}
 
 	/**

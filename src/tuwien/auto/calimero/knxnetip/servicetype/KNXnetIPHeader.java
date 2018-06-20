@@ -155,6 +155,11 @@ public class KNXnetIPHeader
 	 */
 	public static final int KNXNETIP_VERSION_10 = 0x10;
 
+	// Search for KNX IP Secure Unicasts Setups
+
+	public static final int SearchRequest = 0x20b;
+	public static final int SearchResponse = 0x20c;
+
 	// KNX IP Secure
 
 	public static final int SecureWrapper = 0x0950;
@@ -345,6 +350,8 @@ public class KNXnetIPHeader
 			return "routing-lost.msg";
 		case ROUTING_BUSY:
 			return "routing-busy.ind";
+		case SearchRequest: return "search.req";
+		case SearchResponse: return "search.res";
 		case SecureWrapper: return "secure-msg";
 		case SecureSessionReq: return "session.req";
 		case SecureSessionRes: return "session.res";

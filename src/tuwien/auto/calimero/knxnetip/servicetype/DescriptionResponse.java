@@ -45,6 +45,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.knxnetip.util.AdditionalDeviceDib;
 import tuwien.auto.calimero.knxnetip.util.DIB;
 import tuwien.auto.calimero.knxnetip.util.DeviceDIB;
 import tuwien.auto.calimero.knxnetip.util.IPConfigDIB;
@@ -52,6 +53,7 @@ import tuwien.auto.calimero.knxnetip.util.IPCurrentConfigDIB;
 import tuwien.auto.calimero.knxnetip.util.KnxAddressesDIB;
 import tuwien.auto.calimero.knxnetip.util.ManufacturerDIB;
 import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB;
+import tuwien.auto.calimero.knxnetip.util.TunnelingDib;
 
 /**
  * Represents a description response.
@@ -103,6 +105,9 @@ public class DescriptionResponse extends ServiceType
 		IPConfigDIB c = null;
 		IPCurrentConfigDIB cc = null;
 		KnxAddressesDIB a = null;
+		ServiceFamiliesDIB s = null;
+		TunnelingDib t = null;
+		AdditionalDeviceDib d = null;
 		ManufacturerDIB m = null;
 		int i = offset + device.getStructLength() + suppfam.getStructLength();
 		while (i + 1 < offset + length) {
@@ -121,6 +126,12 @@ public class DescriptionResponse extends ServiceType
 				optional.add(a = new KnxAddressesDIB(data, i));
 			else if (type == DIB.MFR_DATA && (unique = m == null))
 				optional.add(m = new ManufacturerDIB(data, i));
+			else if (type == DIB.SecureServiceFamilies && (unique = s == null))
+				optional.add(s = new ServiceFamiliesDIB(data, i));
+			else if (type == DIB.Tunneling && (unique = t == null))
+				optional.add(t = new TunnelingDib(data, i, size));
+			else if (type == DIB.AdditionalDeviceInfo && (unique = d == null))
+				optional.add(d = new AdditionalDeviceDib(data, i, size));
 			else if (!unique)
 				throw new KNXFormatException("response contains duplicate DIB type", type);
 			else
