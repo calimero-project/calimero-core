@@ -259,7 +259,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 			if (p.oindex == objIndex)
 				return p.otype;
 		}
-		throw new KNXRemoteException("object not listed");
+		throw new KNXRemoteException("interface object with index " + objIndex + " not listed");
 	}
 
 	private int getObjectInstance(final int objIndex, final int objectType)
