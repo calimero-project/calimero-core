@@ -104,5 +104,5 @@ dependencies {
 	testCompileOnly 'junit:junit:4.12'
 	testRuntimeOnly "org.junit.vintage:junit-vintage-engine:${junitJupiterVersion}"
 	// provider for knx ip secure
-	implementation 'org.bouncycastle:bcpkix-jdk15on:1.59'
+	implementation 'org.bouncycastle:bcprov-jdk15on:1.59'
 }
