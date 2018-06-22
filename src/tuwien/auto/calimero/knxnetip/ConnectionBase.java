@@ -221,8 +221,6 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 					buf = PacketHelper.toPacket(new RoutingIndication(frame));
 				else
 					buf = PacketHelper.toPacket(new ServiceRequest(serviceRequest, channelId, getSeqSend(), frame));
-				final DatagramPacket p = new DatagramPacket(buf, buf.length, dataEndpt.getAddress(),
-						dataEndpt.getPort());
 				keepForCon = frame;
 				int attempt = 0;
 				for (; attempt < maxSendAttempts; ++attempt) {
@@ -230,7 +228,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 						logger.trace("sending cEMI frame seq {}, {}, attempt {} (channel {}) {}", getSeqSend(), mode,
 								(attempt + 1), channelId, DataUnitBuilder.toHex(buf, " "));
 
-					socket.send(p);
+					send(buf, dataEndpt);
 					// shortcut for routing, don't switch into 'ack-pending'
 					if (serviceRequest == KNXnetIPHeader.ROUTING_IND)
 						return;
@@ -273,6 +271,11 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 					sendWaitQueue.release(mode != NonBlocking);
 			}
 		}
+	}
+
+	protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
+		final DatagramPacket p = new DatagramPacket(packet, packet.length, dataEndpt);
+		socket.send(p);
 	}
 
 	@Override

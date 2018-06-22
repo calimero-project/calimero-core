@@ -40,7 +40,6 @@ import static tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode.NonB
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
-import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
@@ -418,9 +417,7 @@ public class KNXnetIPRouting extends ConnectionBase
 			throw new IllegalStateException("in error state, send aborted");
 		}
 		try {
-			final DatagramPacket p = new DatagramPacket(packet, packet.length, dataEndpt.getAddress(),
-					dataEndpt.getPort());
-			socket.send(p);
+			send(packet, dataEndpt);
 			setState(OK);
 		}
 		catch (final InterruptedIOException e) {

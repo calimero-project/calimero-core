@@ -76,11 +76,9 @@ import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXTimeoutException;
-import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
-import tuwien.auto.calimero.knxnetip.servicetype.RoutingIndication;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
 import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.log.LogService.LogLevel;
@@ -211,18 +209,13 @@ public final class SecureConnection extends KNXnetIPRouting {
 	}
 
 	@Override
-	public void send(final CEMI frame, final BlockingMode mode) throws KNXConnectionClosedException {
-		final int tag = routingCount.getAndIncrement() % 0x10000;
-
-//		final byte[] knxip = PacketHelper.toPacket(new ServiceRequest(serviceRequest, channelId, getSeqSend(), frame));
-
+	protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
 		if (!syncedWithGroup)
-			logger.warn("sending while not yet synchronized with group {}", ctrlEndpt.getAddress().getHostAddress());
-		final byte[] knxip = PacketHelper.toPacket(new RoutingIndication(frame));
-		final byte[] wrapped = newSecurePacket(timestamp(), tag, knxip);
-
-		// XXX we have to forward to standard send, not this one
-		send(wrapped);
+			logger.warn("sending while not yet synchronized with group {}", dst.getAddress().getHostAddress());
+		final int tag = routingCount.getAndIncrement() % 0x10000;
+		final byte[] wrapped = newSecurePacket(timestamp(), tag, packet);
+		final DatagramPacket p = new DatagramPacket(wrapped, wrapped.length, dst);
+		socket.send(p);
 	}
 
 	@Override
