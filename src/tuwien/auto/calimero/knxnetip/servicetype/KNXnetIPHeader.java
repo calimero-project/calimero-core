@@ -234,6 +234,10 @@ public class KNXnetIPHeader
 		totalsize = headersize + serviceLength;
 	}
 
+	public final boolean isSecure() {
+		return getVersion() == KNXNETIP_VERSION_10 && ((getServiceType() & SecureWrapper) == SecureWrapper);
+	}
+
 	/**
 	 * Returns the service type identifier.
 	 * <p>
