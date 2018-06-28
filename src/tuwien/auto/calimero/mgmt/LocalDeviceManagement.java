@@ -41,7 +41,6 @@ import static tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode.Wait
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -56,18 +55,6 @@ import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 
 abstract class LocalDeviceManagement implements PropertyAdapter
 {
-	protected static final class Pair
-	{
-		final int oindex;
-		final int otype;
-
-		Pair(final int objIndex, final int objType)
-		{
-			oindex = objIndex;
-			otype = objType;
-		}
-	}
-
 	protected final class KNXListenerImpl implements KNXListener
 	{
 		@Override
@@ -97,7 +84,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 
 	private final Deque<CEMI> frames = new ArrayDeque<>();
 	private volatile boolean serverReset;
-	private final List<Pair> interfaceObjects = new ArrayList<>();
+	private final List<Integer> interfaceObjects = new ArrayList<>();
 
 	private final boolean checkRW;
 	private volatile boolean closed;
@@ -254,11 +241,8 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 
 	protected int getObjectType(final int objIndex) throws KNXRemoteException
 	{
-		for (final Iterator<Pair> i = interfaceObjects.iterator(); i.hasNext();) {
-			final Pair p = i.next();
-			if (p.oindex == objIndex)
-				return p.otype;
-		}
+		if (objIndex < interfaceObjects.size())
+			return interfaceObjects.get(objIndex);
 		throw new KNXRemoteException("interface object with index " + objIndex + " not listed");
 	}
 
@@ -266,8 +250,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 	{
 		int instance = 0;
 		for (int i = 0; i <= objIndex; i++) {
-			final Pair p = interfaceObjects.get(i);
-			if (p.otype == objectType)
+			if (interfaceObjects.get(i) == objectType)
 				instance++;
 		}
 		return instance;
@@ -284,8 +267,8 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 		}
 		catch (final KNXRemoteException e) {
 			// device only has device- and cEMI server-object
-			interfaceObjects.add(new Pair(0, DEVICE_OBJECT));
-			interfaceObjects.add(new Pair(1, 8));
+			interfaceObjects.add(DEVICE_OBJECT);
+			interfaceObjects.add(8);
 			return;
 		}
 		send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, DEVICE_OBJECT, 1,
@@ -293,7 +276,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 		final byte[] ret = findFrame(CEMIDevMgmt.MC_PROPREAD_CON);
 		for (int i = 0; i < objects; ++i) {
 			final int objType = (ret[2 * i] & 0xff) << 8 | (ret[2 * i + 1] & 0xff);
-			interfaceObjects.add(new Pair(i, objType));
+			interfaceObjects.add(objType);
 		}
 	}
 
