@@ -234,7 +234,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		final InetAddress src, final int port) throws KNXFormatException, IOException {
 		final int svc = h.getServiceType();
 
-		if (!PacketHelper.isKnxSecure(h)) {
+		if (!h.isSecure()) {
 			logger.trace("received insecure service type 0x{} - ignore", Integer.toHexString(svc));
 			return true;
 		}
