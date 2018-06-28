@@ -307,9 +307,8 @@ public class KNXnetIPHeader
 	@Override
 	public String toString()
 	{
-		return "KNXnet/IP " + (version / 0x10) + "." + (version % 0x10) + ", "
-				+ getSvcName(service) + " (0x" + Integer.toHexString(service) + "), header size "
-				+ headersize + " total " + totalsize;
+		return "KNXnet/IP " + getSvcName(service) + " (0x" + Integer.toHexString(service)
+				+ " v" + (version / 0x10) + "." + (version % 0x10) + ") length " + totalsize;
 	}
 
 	// TODO make public?
