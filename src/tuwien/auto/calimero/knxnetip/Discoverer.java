@@ -71,6 +71,7 @@ import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchRequest;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
+import tuwien.auto.calimero.knxnetip.util.DIB;
 import tuwien.auto.calimero.log.LogService;
 
 /**
@@ -615,9 +616,17 @@ public class Discoverer
 			// IP multicast responses MUST be forwarded by NAT without
 			// modifications to IP/port, hence, we can safely state them in our HPAI
 			final InetSocketAddress res = mcast ? new InetSocketAddress(SYSTEM_SETUP_MULTICAST, s.getLocalPort())
-					: nat ? null : new InetSocketAddress(localAddr, s.getLocalPort());
-			final byte[] buf = PacketHelper.toPacket(new SearchRequest(res));
-			s.send(new DatagramPacket(buf, buf.length, SYSTEM_SETUP_MULTICAST, SEARCH_PORT));
+					: nat ? new InetSocketAddress(0) : new InetSocketAddress(localAddr, s.getLocalPort());
+
+			// send search request with additional DIBs
+			final byte[] extraDibs = PacketHelper.toPacket(new SearchRequest(res, DIB.DEVICE_INFO, DIB.SUPP_SVC_FAMILIES,
+					DIB.AdditionalDeviceInfo, DIB.SecureServiceFamilies, DIB.Tunneling));
+			s.send(new DatagramPacket(extraDibs, extraDibs.length, SYSTEM_SETUP_MULTICAST, SEARCH_PORT));
+
+			// send standard search request
+			final byte[] std = PacketHelper.toPacket(new SearchRequest(res));
+			s.send(new DatagramPacket(std, std.length, SYSTEM_SETUP_MULTICAST, SEARCH_PORT));
+
 			synchronized (receivers) {
 				final ReceiverLoop l = startReceiver(s, localAddr, timeout, nifName + localAddr.getHostAddress());
 				receivers.add(l);
@@ -802,21 +811,22 @@ public class Discoverer
 			try {
 				final KNXnetIPHeader h = new KNXnetIPHeader(data, offset);
 				final int bodyLen = h.getTotalLength() - h.getStructLength();
+				final int svc = h.getServiceType();
 				if (h.getTotalLength() > length)
 					logger.warn("ignore received packet from {}, packet size {} > buffer size {}", source,
 							h.getTotalLength(), length);
-				else if (search && h.getServiceType() == KNXnetIPHeader.SEARCH_RES) {
+				else if (search && (svc == KNXnetIPHeader.SEARCH_RES || svc == KNXnetIPHeader.SearchResponse)) {
 					// if our search is still running, add response if not already added
 					synchronized (receivers) {
 						if (receivers.contains(this)) {
-							final Result<SearchResponse> r = new Result<>(
-									new SearchResponse(data, offset + h.getStructLength(), bodyLen), nif, addrOnNetif, source);
+							final Result<SearchResponse> r = new Result<>(SearchResponse.from(h, data, offset + h.getStructLength()), nif,
+									addrOnNetif, source);
 							if (!responses.contains(r))
 								responses.add(r);
 						}
 					}
 				}
-				else if (!search && h.getServiceType() == KNXnetIPHeader.DESCRIPTION_RES) {
+				else if (!search && svc == KNXnetIPHeader.DESCRIPTION_RES) {
 					if (source.equals(server)) {
 						try {
 							res = new DescriptionResponse(data, offset + h.getStructLength(), bodyLen);

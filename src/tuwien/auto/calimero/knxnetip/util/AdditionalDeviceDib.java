@@ -52,9 +52,10 @@ public class AdditionalDeviceDib extends DIB {
 	private final int maxApduLength;
 	private final DD0 dd;
 
-	public AdditionalDeviceDib(final int status, final int maxApduLength, final DeviceDescriptor.DD0 dd) {
+	// medium status is PID_MEDIUM_STATUS (PID = 51)
+	public AdditionalDeviceDib(final int mediumStatus, final int maxApduLength, final DeviceDescriptor.DD0 dd) {
 		super(dibSize, DIB.AdditionalDeviceInfo);
-		this.status = status;
+		this.status = mediumStatus;
 		this.maxApduLength = maxApduLength;
 		this.dd = dd;
 	}
@@ -73,12 +74,31 @@ public class AdditionalDeviceDib extends DIB {
 		dd = DD0.from(buf.getShort() & 0xffff);
 	}
 
+	public final int maxApduLength() {
+		return maxApduLength;
+	}
+
+	public final DD0 deviceDescriptor() {
+		return dd;
+	}
+
+	// bit 0 of medium status is communication possible/impossible
+	boolean communicationPossible() {
+		return (status & 1) == 0;
+	}
+
+	@Override
+	public String toString() {
+		final String s = communicationPossible() ? "possible" : "impossible";
+		return "DD0 " + dd + " communication " + s + " max APDU length " + maxApduLength;
+	}
+
 	@Override
 	public byte[] toByteArray() {
 		final ByteBuffer buf = ByteBuffer.wrap(super.toByteArray()).position(2);
 		buf.put((byte) status);
 		buf.put((byte) 0);
-		buf.putShort((short) (maxApduLength));
+		buf.putShort((short) maxApduLength);
 		buf.put(dd.toByteArray());
 		return buf.array();
 	}

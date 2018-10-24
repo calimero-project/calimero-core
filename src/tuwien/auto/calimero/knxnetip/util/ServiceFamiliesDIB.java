@@ -270,15 +270,18 @@ public class ServiceFamiliesDIB extends DIB
 
 	/**
 	 * Returns a textual representation of this supported service families DIB.
-	 * <p>
 	 *
 	 * @return a string representation of the DIB object
 	 */
 	@Override
 	public String toString()
 	{
+		if (type == SecureServiceFamilies && ids.length == 0)
+			return "KNX IP Secure n/a";
 		final StringBuilder buf = new StringBuilder();
 		for (int i = 0; i < ids.length; i++) {
+			if (type == SecureServiceFamilies)
+				buf.append("Secure ");
 			buf.append(getFamilyName(ids[i]));
 			buf.append(" (v").append(versions[i]).append(")");
 			if (i + 1 < ids.length)

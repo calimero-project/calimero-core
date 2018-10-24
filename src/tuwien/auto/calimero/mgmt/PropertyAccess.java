@@ -353,6 +353,11 @@ public interface PropertyAccess
 		 * side of the coupler. Bit 0 = PowerDownSubline: 0 = power up, 1 = power down.
 		 */
 		int LINE_STATUS = 51;
+		/**
+		 * Router object property "Medium Status", status of the communication medium connected to the communication
+		 * interface. Bit 0 = Communication: 0 = possible, 1 = impossible.
+		 */
+		int MEDIUM_STATUS = 51;
 
 		/**
 		 * Router object property "Main Line Coupler Config", for point-to-point and broadcast

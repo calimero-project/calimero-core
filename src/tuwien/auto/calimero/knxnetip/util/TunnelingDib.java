@@ -37,7 +37,9 @@
 package tuwien.auto.calimero.knxnetip.util;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXFormatException;
@@ -48,6 +50,10 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  */
 public class TunnelingDib extends DIB {
 	private final IndividualAddress[] addresses;
+	// Each address comes with a status, being a bit field:
+	// Bit 0: Free, slot is not occupied
+	// Bit 1: Authorized, client requires authorization for this slot
+	// Bit 2: Usable, slot is currently usable
 	private final int[] status;
 
 	public TunnelingDib(final List<IndividualAddress> addresses, final int[] status) {
@@ -71,8 +77,27 @@ public class TunnelingDib extends DIB {
 		status = new int[entries];
 		for (int i = 0; i < entries; i++) {
 			addresses[i] = new IndividualAddress(buf.getShort() & 0xffff);
-			status[i] = buf.getShort() & 0xffff;
+			buf.get(); // reserved
+			status[i] = buf.get() & 0xff;
 		}
+	}
+
+	private static String formatStatus(final int status) {
+		final List<String> l = new ArrayList<>();
+		l.add((status & 1) == 1 ? "free" : "occupied");
+		if ((status & 2) == 2)
+			l.add("authorized");
+		if ((status & 4) == 4)
+			l.add("usable");
+		return l.stream().collect(Collectors.joining(", "));
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < addresses.length; i++)
+			sb.append(addresses[i] + " (" + formatStatus(status[i]) + ") ");
+		return sb.toString();
 	}
 
 	@Override
@@ -81,8 +106,8 @@ public class TunnelingDib extends DIB {
 		buf.putShort((short) addresses.length);
 		for (int k = 0; k < addresses.length; k++) {
 			buf.put(addresses[k].toByteArray());
+			buf.put((byte) 0); // reserved
 			buf.put((byte) status[k]);
-			buf.put((byte) 0);
 		}
 		return buf.array();
 	}

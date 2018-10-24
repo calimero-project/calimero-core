@@ -142,17 +142,18 @@ public class SearchRequest extends ServiceType
 	}
 
 	/**
-	 * Creates a new search request with the given response address and request for DIBs.
+	 * Creates a new search request with the given response address and request specific DIBs.
 	 *
-	 * @param responseAddr address of the client discovery endpoint used for the response, use <code>null</code> to
-	 *        create a NAT aware search request
+	 * @param responseAddr address of the client discovery endpoint used for the response; to create a NAT aware search
+	 *        request, use the anylocal/wildcard address with port 0 ({@code new InetSocketAddress(0)})
 	 * @param requestDibs list of descriptor type codes, requesting the corresponding DIBs in a search response
 	 */
-	public SearchRequest(final InetSocketAddress responseAddr, final List<Integer> requestDibs)
+	public SearchRequest(final InetSocketAddress responseAddr, final int... requestDibs)
 	{
 		super(KNXnetIPHeader.SearchRequest);
 		endpoint = new HPAI(HPAI.IPV4_UDP, responseAddr);
-		dibs.addAll(requestDibs);
+		for (final int dib : requestDibs)
+			dibs.add(dib);
 	}
 
 	/**

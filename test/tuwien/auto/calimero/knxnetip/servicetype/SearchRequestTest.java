@@ -49,7 +49,8 @@ import tuwien.auto.calimero.KNXFormatException;
 class SearchRequestTest {
 
 	private final InetSocketAddress responseAddr = new InetSocketAddress("192.168.10.10", 3671);
-	private final List<Integer> dibs = List.of(1, 2, 8, 6, 7);
+	private final int[] dibs = { 1, 2, 8, 6, 7 };
+	private final List<Integer> dibsList = List.of(1, 2, 8, 6, 7);
 
 	@Test
 	void parseRequestWithoutDibs() throws KNXFormatException {
@@ -68,12 +69,12 @@ class SearchRequestTest {
 		assertEquals(KNXnetIPHeader.SearchRequest, h.getServiceType());
 
 		final SearchRequest req = SearchRequest.from(h, packet, h.getStructLength());
-		assertEquals(dibs, req.requestedDibs(), "DIB type codes mismatch");
+		assertEquals(dibsList, req.requestedDibs(), "DIB type codes mismatch");
 	}
 
 	@Test
 	void parseRequestWithEmptyDibs() throws KNXFormatException {
-		final byte[] packet = PacketHelper.toPacket(new SearchRequest(responseAddr, List.of()));
+		final byte[] packet = PacketHelper.toPacket(new SearchRequest(responseAddr, new int[0]));
 		final KNXnetIPHeader h = new KNXnetIPHeader(packet, 0);
 		assertEquals(KNXnetIPHeader.SearchRequest, h.getServiceType());
 
@@ -90,10 +91,9 @@ class SearchRequestTest {
 	@Test
 	void newRequestWithDibs() {
 		final SearchRequest req = new SearchRequest(responseAddr, dibs);
-		assertEquals(dibs, req.requestedDibs(), "DIB type codes mismatch");
+		assertEquals(dibsList, req.requestedDibs(), "DIB type codes mismatch");
 
-		final List<Integer> shortList = List.of(1, 2);
-		final SearchRequest shortReq = new SearchRequest(responseAddr, shortList);
-		assertEquals(shortList, shortReq.requestedDibs(), "DIB type codes mismatch");
+		final SearchRequest shortReq = new SearchRequest(responseAddr, 1, 2);
+		assertEquals(List.of(1, 2), shortReq.requestedDibs(), "DIB type codes mismatch");
 	}
 }
