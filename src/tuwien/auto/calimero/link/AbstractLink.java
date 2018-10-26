@@ -421,7 +421,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 
 	Optional<Integer> maxApduLength() throws KNXException, InterruptedException {
 		final int pidMaxApduLength = 56;
-		return read(0, pidMaxApduLength).map(KNXNetworkLinkUsb::unsigned);
+		return read(0, pidMaxApduLength).map(AbstractLink::unsigned);
 	}
 
 	Optional<byte[]> read(final int objectType, final int pid) throws KNXException, InterruptedException {
