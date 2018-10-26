@@ -513,15 +513,13 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	}
 
 	/**
-	 * Returns the property definitions used by property clients, if definitions were
-	 * loaded.
+	 * Returns the property definitions used by property clients.
 	 * <p>
 	 * The returned map is synchronized and references the one used by the property
 	 * client. Property definitions might be added or removed as required. Modifications
 	 * will influence subsequent lookup behavior of the property client.<br>
-	 * A map key is of type {@link PropertyKey}, a map value is of type {@link Property}.
 	 *
-	 * @return property map, or <code>null</code> if no definitions loaded
+	 * @return property map
 	 */
 	public Map<PropertyKey, Property> getDefinitions()
 	{
