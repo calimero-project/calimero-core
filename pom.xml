@@ -27,7 +27,7 @@
 	</developers>
 	<properties>
 		<exec.mainClass>tuwien.auto.calimero.Settings</exec.mainClass>
-		<test.exclude.groups></test.exclude.groups>
+		<test.exclude.tags>slow,ft12</test.exclude.tags>
 	</properties>
 	<build>
 		<plugins>
@@ -63,16 +63,13 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<useFile>false</useFile>
-					<excludedGroups>${test.exclude.groups}</excludedGroups>
+					<excludedGroups>${test.exclude.tags}</excludedGroups>
 					<includes>
 						<include>**/Test*.java</include>
 						<include>**/*Test.java</include>
 						<include>**/*Tests.java</include>
 						<include>**/*TestCase.java</include>
 					</includes>
-					<properties>
-						<excludeTags>slow,ft12</excludeTags>
-					</properties>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -81,7 +78,7 @@
 		<dependency>
 			<groupId>org.usb4java</groupId>
 			<artifactId>usb4java-javax</artifactId>
-			<version>1.2.0</version>
+			<version>1.3.0</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.xml.stream</groupId>
