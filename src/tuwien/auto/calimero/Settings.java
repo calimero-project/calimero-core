@@ -36,20 +36,25 @@
 
 package tuwien.auto.calimero;
 
+import static java.util.stream.Collectors.joining;
+
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 /**
- * General settings used in Calimero 2 as well as library user information.
+ * General settings used in Calimero as well as library user information.
  *
  * @author B. Malinowsky
  */
 public final class Settings
 {
 	private static final String version = "2.5-dev";
-	private static final String library = "Calimero 2";
+	private static final String library = "Calimero";
 	private static final String desc = "A library for KNX network access";
 
 	private static final String tuwien = "Vienna University of Technology";
 	private static final String group = "Automation Systems Group";
-	private static final String copyright = "(c) 2006-2018";
+	private static final String copyright = "Copyright \u00A9 2006-2018";
 
 	// aligns the bundle package name following the friendly name,
 	// works for friendly name with max length of 20 chars
@@ -58,8 +63,7 @@ public final class Settings
 	private static final String sep = "\n";
 
 
-	private Settings()
-	{}
+	private Settings() {}
 
 	/**
 	 * Returns the core library version as string representation.
@@ -91,8 +95,8 @@ public final class Settings
 		if (!verbose)
 			return library + " version " + version;
 		final StringBuilder buf = new StringBuilder();
-		buf.append(library).append(" - ").append(desc).append(sep);
-		buf.append("Version ").append(version).append(sep);
+		buf.append(library).append(" version ").append(version).append(" - ");
+		buf.append(desc).append(sep);
 		buf.append(group).append(", ");
 		buf.append(tuwien).append(sep);
 		buf.append(copyright);
@@ -100,20 +104,10 @@ public final class Settings
 	}
 
 	/**
-	 * Returns a listing containing all library bundles, stating each bundle's presence for
-	 * use.
-	 * <p>
-	 * For loading a bundle, the default system class loader is used. A bundle is present
-	 * if it can be loaded using the class loader, otherwise it is considered not
-	 * available for use.<br>
-	 * An available bundle entry starts with a '+' and consists of a short bundle name and
-	 * the base package identifier string, a bundle not present starts with '-' and
-	 * consists of a short name and is marked with the suffix "- not available".<br>
-	 * The bundle entries in the returned string are separated using the newline ('\n')
-	 * character.
-	 *
+	 * @deprecated No replacement.
 	 * @return the bundle listing as string
 	 */
+	@Deprecated
 	public static String getBundleListing()
 	{
 		final StringBuilder buf = new StringBuilder();
@@ -151,9 +145,27 @@ public final class Settings
 			out(getLibraryHeader(false));
 		else {
 			out(getLibraryHeader(true));
-			out(sep + "Available bundles:");
-			out(getBundleListing());
+			out(sep + "Supported protocols: " + supportedProtocols().collect(joining(", ")));
 		}
+	}
+
+	private static Stream<String> supportedProtocols() {
+		final String[] proto = { "KNXnet/IP", "KNX IP", "FT1.2", "TP-Uart", "KNX USB", "KNX RF USB" };
+		final String prefix = "tuwien.auto.calimero.";
+		final String[] check = { "knxnetip.KNXnetIPConnection", "knxnetip.KNXnetIPConnection", "serial.FT12Connection",
+			"serial.TpuartConnection", "serial.usb.UsbConnection", "serial.usb.UsbConnection" };
+
+		return IntStream.range(0, proto.length).filter(i -> loadable(prefix + check[i])).mapToObj(i -> proto[i]);
+	}
+
+	private static boolean loadable(final String className) {
+		try {
+			final ClassLoader cl = Settings.class.getClassLoader();
+			cl.loadClass(className);
+			return true;
+		}
+		catch (ClassNotFoundException | NoClassDefFoundError ignored) {}
+		return false;
 	}
 
 	// for now, this works by loading one class as representative from a bundle
