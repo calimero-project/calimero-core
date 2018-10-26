@@ -375,7 +375,9 @@ public class KNXnetIPRouting extends ConnectionBase
 						DataUnitBuilder.toHex(data, " "));
 			loggedGiraUnsupportedSvcType = true;
 		}
-		else if (svc != KNXnetIPHeader.SEARCH_REQ && svc != KNXnetIPHeader.SEARCH_RES)
+		else if (svc != KNXnetIPHeader.SEARCH_REQ && svc != KNXnetIPHeader.SEARCH_RES
+				&& svc != KNXnetIPHeader.SearchRequest && svc != KNXnetIPHeader.SearchResponse)
+
 			// silently ignore multicast packets from searches,
 			// to avoid logged warnings about unknown frames
 			return super.handleServiceType(h, data, offset, src, port);

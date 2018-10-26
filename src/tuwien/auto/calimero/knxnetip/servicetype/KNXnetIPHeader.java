@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -149,6 +149,11 @@ public class KNXnetIPHeader
 	 * Service type identifier for a buffer overflow warning indication with multicast.
 	 */
 	public static final int ROUTING_BUSY = 0x0532;
+
+	// Search for KNX IP Secure Unicast Setups
+
+	public static final int SearchRequest = 0x20b;
+	public static final int SearchResponse = 0x20c;
 
 	/**
 	 * Version identifier for KNXnet/IP protocol version 1.0.
