@@ -24,7 +24,7 @@ apply plugin:'application'
 apply plugin: 'com.github.ben-manes.versions'
 
 group = 'com.github.calimero'
-version = '2.4-rc1'
+version = '2.4-rc2'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8

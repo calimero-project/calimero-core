@@ -48,7 +48,7 @@ import java.util.stream.Stream;
  */
 public final class Settings
 {
-	private static final String version = "2.4-rc1";
+	private static final String version = "2.4-rc2";
 	private static final String library = "Calimero";
 	private static final String desc = "A library for KNX network access";
 
