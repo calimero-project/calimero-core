@@ -1,1 +1,3 @@
 rootProject.name = 'calimero-core'
+
+enableFeaturePreview('STABLE_PUBLISHING')
