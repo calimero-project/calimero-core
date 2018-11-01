@@ -18,7 +18,7 @@ ext.junitJupiterVersion = '5.3.1'
 ext.desc = 'Calimero, a free KNX network library'
 
 apply plugin: 'java-library'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin:'application'
 apply plugin: 'com.github.ben-manes.versions'
 
@@ -91,6 +91,19 @@ test {
 		excludeTags 'ft12', 'slow'
 //		excludeTags 'knxnetip'
 	}
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifact testJar {
+                classifier "tests"
+            }
+            artifact testSourcesJar {
+                classifier "test-sources"
+            }
+        }
+    }
 }
 
 dependencies {
