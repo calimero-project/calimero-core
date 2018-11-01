@@ -39,14 +39,23 @@ package tuwien.auto.calimero.knxnetip;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
+import java.time.Duration;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,7 +76,7 @@ import tuwien.auto.calimero.knxnetip.util.HPAI;
  * @author B. Malinowsky
  */
 @KnxnetIP
-public class DiscovererTest
+class DiscovererTest
 {
 	private Discoverer ddef;
 	private Discoverer dnat;
@@ -100,7 +109,7 @@ public class DiscovererTest
 	 * @throws KNXException
 	 */
 	@Test
-	public final void testDiscoverer() throws KNXException
+	void testDiscoverer() throws KNXException
 	{
 		try {
 			ddef = new Discoverer(-1, false);
@@ -122,7 +131,7 @@ public class DiscovererTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testClearSearchResponses() throws KNXException, InterruptedException
+	void testClearSearchResponses() throws KNXException, InterruptedException
 	{
 		ddef.startSearch(timeout, true);
 		assertTrue(ddef.getSearchResponses().size() > 0);
@@ -137,7 +146,7 @@ public class DiscovererTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testGetDescription() throws KNXException, InterruptedException
+	void testGetDescription() throws KNXException, InterruptedException
 	{
 		doGetDesc(ddef);
 	}
@@ -149,7 +158,7 @@ public class DiscovererTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testNATGetDescription() throws KNXException, InterruptedException
+	void testNATGetDescription() throws KNXException, InterruptedException
 	{
 		if (!Util.TEST_NAT) {
 			System.out.println("\n==== skip testNATGetDescription ====\n");
@@ -195,7 +204,7 @@ public class DiscovererTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testGetSearchResponses() throws KNXException, InterruptedException
+	void testGetSearchResponses() throws KNXException, InterruptedException
 	{
 		doGetSearchRes(ddef);
 	}
@@ -207,7 +216,7 @@ public class DiscovererTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testNATGetSearchResponses() throws KNXException, InterruptedException
+	void testNATGetSearchResponses() throws KNXException, InterruptedException
 	{
 		if (!Util.TEST_NAT) {
 			System.out.println("\n==== skip testNATGetSearchResponses ====\n");
@@ -228,7 +237,7 @@ public class DiscovererTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testMcastGetSearchResponses() throws KNXException, InterruptedException
+	void testMcastGetSearchResponses() throws KNXException, InterruptedException
 	{
 		doGetSearchRes(dmcast);
 	}
@@ -253,7 +262,7 @@ public class DiscovererTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testStartSearchIntNetworkInterfaceIntBoolean()
+	void testStartSearchIntNetworkInterfaceIntBoolean()
 		throws SocketException, KNXException, InterruptedException
 	{
 		doStartSearchIF(ddef, false);
@@ -266,7 +275,7 @@ public class DiscovererTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testNATStartSearchIntNetworkInterfaceIntBoolean() throws SocketException, InterruptedException
+	void testNATStartSearchIntNetworkInterfaceIntBoolean() throws SocketException, InterruptedException
 	{
 		if (!Util.TEST_NAT) {
 			System.out.println("\n==== skip testNATStartSearchIntNetworkInterfaceIntBoolean ====\n");
@@ -291,7 +300,7 @@ public class DiscovererTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testMcastStartSearchIntNetworkInterfaceIntBoolean()
+	void testMcastStartSearchIntNetworkInterfaceIntBoolean()
 		throws SocketException, KNXException, InterruptedException
 	{
 		doStartSearchIF(dmcast, true);
@@ -328,7 +337,7 @@ public class DiscovererTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testStartSearchIntBoolean() throws KNXException, InterruptedException
+	void testStartSearchIntBoolean() throws KNXException, InterruptedException
 	{
 		doStartSearch(ddef, false);
 	}
@@ -340,7 +349,7 @@ public class DiscovererTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testNATStartSearchIntBoolean() throws KNXException, InterruptedException
+	void testNATStartSearchIntBoolean() throws KNXException, InterruptedException
 	{
 		if (!Util.TEST_NAT) {
 			System.out.println("\n==== skip testNATStartSearchIntBoolean ====\n");
@@ -361,7 +370,7 @@ public class DiscovererTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testMcastStartSearchIntBoolean() throws KNXException, InterruptedException
+	void testMcastStartSearchIntBoolean() throws KNXException, InterruptedException
 	{
 		doStartSearch(dmcast, true);
 	}
@@ -405,7 +414,7 @@ public class DiscovererTest
 	 * @throws KNXException
 	 */
 	@Test
-	public final void testStopSearch() throws InterruptedException, KNXException
+	void testStopSearch() throws InterruptedException, KNXException
 	{
 		ddef.startSearch(timeout, false);
 		ddef.startSearch(timeout, false);
@@ -414,7 +423,7 @@ public class DiscovererTest
 		ddef.stopSearch();
 		final int responses = ddef.getSearchResponses().size();
 		assertFalse(ddef.isSearching());
-		Thread.sleep(timeout);
+		Thread.sleep(timeout * 1000);
 		assertFalse(ddef.isSearching());
 		assertEquals(responses, ddef.getSearchResponses().size());
 
@@ -449,7 +458,7 @@ public class DiscovererTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	public final void testIsSearching() throws KNXException, InterruptedException
+	void testIsSearching() throws KNXException, InterruptedException
 	{
 		ddef.startSearch(timeout, false);
 		assertTrue(ddef.isSearching());
@@ -465,7 +474,7 @@ public class DiscovererTest
 	 * @throws KNXException
 	 */
 	@Test
-	public final void testStartSearchInterrupt() throws KNXException
+	void testStartSearchInterrupt() throws KNXException
 	{
 		final Thread t = Thread.currentThread();
 		try {
@@ -490,5 +499,63 @@ public class DiscovererTest
 			return;
 		}
 		fail("not interrupted");
+	}
+
+	@Test
+	void searchAsync() throws InterruptedException, ExecutionException, TimeoutException {
+		final Duration timeout = Duration.ofSeconds(this.timeout);
+		final CompletableFuture<List<Result<SearchResponse>>> search = ddef.searchAsync(timeout);
+		final List<Result<SearchResponse>> result = search.get(timeout.toMillis() + 200, TimeUnit.MILLISECONDS);
+		assertTrue(!result.isEmpty());
+	}
+
+	@Test
+	void searchAsyncTimeout() {
+		final Duration timeout = Duration.ofSeconds(10);
+		final CompletableFuture<List<Result<SearchResponse>>> search = ddef.searchAsync(timeout);
+		assertThrows(TimeoutException.class, () -> search.get(1000, TimeUnit.MILLISECONDS));
+		assertFalse(search.isCompletedExceptionally());
+		assertFalse(search.isDone());
+		assertTrue(ddef.isSearching());
+	}
+
+	@Test
+	void searchAsyncCancel() throws InterruptedException {
+		searchAsyncCancel(ddef);
+	}
+
+	@Test
+	void searchAsyncNatCancel() throws InterruptedException {
+		searchAsyncCancel(dnat);
+	}
+
+	@Test
+	void searchAsyncMcastCancel() throws InterruptedException {
+		searchAsyncCancel(dmcast);
+	}
+
+	private static void searchAsyncCancel(final Discoverer d) throws InterruptedException {
+		allReceiverThreadsIdle();
+
+		final Duration timeout = Duration.ofSeconds(10);
+		final CompletableFuture<List<Result<SearchResponse>>> search = d.searchAsync(timeout);
+		Thread.sleep(1000);
+		search.cancel(false);
+		assertThrows(CancellationException.class, () -> search.get());
+		assertTrue(search.isCompletedExceptionally());
+		assertTrue(search.isDone());
+		assertFalse(d.isSearching());
+
+		Thread.sleep(100);
+		allReceiverThreadsIdle();
+	}
+
+	// checks that all used receiver threads are idle
+	private static void allReceiverThreadsIdle() {
+		final Thread[] threads = new Thread[Thread.activeCount() + 5];
+		assertTrue(Thread.enumerate(threads) < threads.length);
+		final List<Thread> l = Arrays.asList(threads);
+		assertTrue(l.stream().filter(Objects::nonNull).map(Thread::getName).filter(s -> s.startsWith("Discoverer"))
+				.allMatch(s -> s.equals("Discoverer (idle)")));
 	}
 }
