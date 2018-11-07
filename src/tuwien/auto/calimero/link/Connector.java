@@ -406,7 +406,9 @@ public final class Connector
 					connect();
 				}
 				catch (KNXException | RuntimeException | InterruptedException e) {
-					logger().warn("connection attempt {}: {}", attempt, e.getMessage());
+					final Throwable cause = e.getCause();
+					final String detail = cause != null && cause.getMessage() != null ? " (" + cause.getMessage() + ")" : "";
+					logger().warn("connection attempt {}: {}{}", attempt, e.getMessage(), detail);
 					scheduleConnect(remaining);
 				}
 			};
@@ -431,7 +433,7 @@ public final class Connector
 						link.setKNXMedium(settings);
 						link.setHopCount(hopCount);
 						link.addLinkListener(this);
-						listeners.forEach((l) -> link.addLinkListener((NetworkLinkListener) l));
+						listeners.forEach(l -> link.addLinkListener((NetworkLinkListener) l));
 					}
 					else if (t instanceof KNXNetworkMonitor) {
 						final KNXNetworkMonitor monitor = (KNXNetworkMonitor) t;
