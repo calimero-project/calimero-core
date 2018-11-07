@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -179,79 +179,79 @@ public final class PropertyTypes
 	 */
 	public static final int PDT_GENERIC_01 = 0x11;
 	/**
-	 * PDT_GENERIC_02, PDT = 0x12, format undefined, length = 1 octet.
+	 * PDT_GENERIC_02, PDT = 0x12, format undefined, length = 2 octet.
 	 */
 	public static final int PDT_GENERIC_02 = 0x12;
 	/**
-	 * PDT_GENERIC_03, PDT = 0x13, format undefined, length = 1 octet.
+	 * PDT_GENERIC_03, PDT = 0x13, format undefined, length = 3 octet.
 	 */
 	public static final int PDT_GENERIC_03 = 0x13;
 	/**
-	 * PDT_GENERIC_04, PDT = 0x14, format undefined, length = 1 octet.
+	 * PDT_GENERIC_04, PDT = 0x14, format undefined, length = 4 octet.
 	 */
 	public static final int PDT_GENERIC_04 = 0x14;
 	/**
-	 * PDT_GENERIC_05, PDT = 0x15, format undefined, length = 1 octet.
+	 * PDT_GENERIC_05, PDT = 0x15, format undefined, length = 5 octet.
 	 */
 	public static final int PDT_GENERIC_05 = 0x15;
 	/**
-	 * PDT_GENERIC_06, PDT = 0x16, format undefined, length = 1 octet.
+	 * PDT_GENERIC_06, PDT = 0x16, format undefined, length = 6 octet.
 	 */
 	public static final int PDT_GENERIC_06 = 0x16;
 	/**
-	 * PDT_GENERIC_07, PDT = 0x17, format undefined, length = 1 octet.
+	 * PDT_GENERIC_07, PDT = 0x17, format undefined, length = 7 octet.
 	 */
 	public static final int PDT_GENERIC_07 = 0x17;
 	/**
-	 * PDT_GENERIC_08, PDT = 0x18, format undefined, length = 1 octet.
+	 * PDT_GENERIC_08, PDT = 0x18, format undefined, length = 8 octet.
 	 */
 	public static final int PDT_GENERIC_08 = 0x18;
 	/**
-	 * PDT_GENERIC_09, PDT = 0x19, format undefined, length = 1 octet.
+	 * PDT_GENERIC_09, PDT = 0x19, format undefined, length = 9 octet.
 	 */
 	public static final int PDT_GENERIC_09 = 0x19;
 	/**
-	 * PDT_GENERIC_10, PDT = 0x1A, format undefined, length = 1 octet.
+	 * PDT_GENERIC_10, PDT = 0x1A, format undefined, length = 10 octet.
 	 */
 	public static final int PDT_GENERIC_10 = 0x1A;
 	/**
-	 * PDT_GENERIC_11, PDT = 0x1B, format undefined, length = 1 octet.
+	 * PDT_GENERIC_11, PDT = 0x1B, format undefined, length = 11 octet.
 	 */
 	public static final int PDT_GENERIC_11 = 0x1B;
 	/**
-	 * PDT_GENERIC_12, PDT = 0x1C, format undefined, length = 1 octet.
+	 * PDT_GENERIC_12, PDT = 0x1C, format undefined, length = 12 octet.
 	 */
 	public static final int PDT_GENERIC_12 = 0x1C;
 	/**
-	 * PDT_GENERIC_13, PDT = 0x1D, format undefined, length = 1 octet.
+	 * PDT_GENERIC_13, PDT = 0x1D, format undefined, length = 13 octet.
 	 */
 	public static final int PDT_GENERIC_13 = 0x1D;
 	/**
-	 * PDT_GENERIC_14, PDT = 0x1E, format undefined, length = 1 octet.
+	 * PDT_GENERIC_14, PDT = 0x1E, format undefined, length = 14 octet.
 	 */
 	public static final int PDT_GENERIC_14 = 0x1E;
 	/**
-	 * PDT_GENERIC_15, PDT = 0x1F, format undefined, length = 1 octet.
+	 * PDT_GENERIC_15, PDT = 0x1F, format undefined, length = 15 octet.
 	 */
 	public static final int PDT_GENERIC_15 = 0x1F;
 	/**
-	 * PDT_GENERIC_16, PDT = 0x20, format undefined, length = 1 octet.
+	 * PDT_GENERIC_16, PDT = 0x20, format undefined, length = 16 octet.
 	 */
 	public static final int PDT_GENERIC_16 = 0x20;
 	/**
-	 * PDT_GENERIC_17, PDT = 0x21, format undefined, length = 1 octet.
+	 * PDT_GENERIC_17, PDT = 0x21, format undefined, length = 17 octet.
 	 */
 	public static final int PDT_GENERIC_17 = 0x21;
 	/**
-	 * PDT_GENERIC_18, PDT = 0x22, format undefined, length = 1 octet.
+	 * PDT_GENERIC_18, PDT = 0x22, format undefined, length = 18 octet.
 	 */
 	public static final int PDT_GENERIC_18 = 0x22;
 	/**
-	 * PDT_GENERIC_19, PDT = 0x23, format undefined, length = 1 octet.
+	 * PDT_GENERIC_19, PDT = 0x23, format undefined, length = 19 octet.
 	 */
 	public static final int PDT_GENERIC_19 = 0x23;
 	/**
-	 * PDT_GENERIC_20, PDT = 0x24, format undefined, length = 1 octet.
+	 * PDT_GENERIC_20, PDT = 0x24, format undefined, length = 20 octet.
 	 */
 	public static final int PDT_GENERIC_20 = 0x24;
 
