@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -84,9 +84,7 @@ public class EventListeners<T>
 	 */
 	public void add(final T l)
 	{
-		if (!listeners.addIfAbsent(l))
-			if (logger != null)
-				logger.warn("event listener already registered");
+		listeners.addIfAbsent(l);
 	}
 
 	/**
