@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -74,7 +74,8 @@ public class DPTXlator2ByteUnsignedTest extends TestCase
 		DPTXlator2ByteUnsigned.DPT_TIMEPERIOD_HOURS,
 		DPTXlator2ByteUnsigned.DPT_ELECTRICAL_CURRENT,
 		DPTXlator2ByteUnsigned.DPT_BRIGHTNESS,
-		DPTXlator2ByteUnsigned.DPT_LENGTH
+		DPTXlator2ByteUnsigned.DPT_LENGTH,
+		DPTXlator2ByteUnsigned.DPT_ABSOLUTE_COLOR_TEMPERATURE
 	};
 
 	/**
