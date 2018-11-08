@@ -151,6 +151,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 	private static final long queryInterval = 10_000; // [ms]
 
 	private final int mcastLatencyTolerance; // [ms]
+	private final int syncLatencyTolerance; // [ms]
 
 	private final AtomicInteger routingCount = new AtomicInteger();
 
@@ -172,7 +173,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		sno = deriveSerialNumber(netif);
 		secretKey = createSecretKey(groupKey);
 		mcastLatencyTolerance = (int) latencyTolerance.toMillis();
-
+		syncLatencyTolerance = mcastLatencyTolerance / 10;
 		// we don't randomize initial delay [0..10] seconds to minimize uncertainty window of eventual group sync
 		scheduleGroupSync(0);
 	}
@@ -186,6 +187,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		// NYI tcp, secure wrapper
 
 		mcastLatencyTolerance = 0;
+		syncLatencyTolerance = 0;
 	}
 
 	private static byte[] deriveSerialNumber(final InetSocketAddress localEP) {
