@@ -134,6 +134,13 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 		return new KNXNetworkLinkIP(TUNNELING, localEP, remoteEP, useNAT, settings);
 	}
 
+	public static KNXNetworkLinkIP newSecureTunnelingLink(final InetSocketAddress localEP, final InetSocketAddress remoteEP,
+		final boolean useNat, final byte[] deviceAuthCode, final int userId, final byte[] userKey, final KNXMediumSettings settings)
+		throws KNXException, InterruptedException {
+		final KNXnetIPConnection c = SecureConnection.newTunneling(LinkLayer, localEP, remoteEP, useNat, deviceAuthCode, userId, userKey);
+		return new KNXNetworkLinkIP(TUNNELING, c, settings);
+	}
+
 	/**
 	 * Creates a new network link using the {@link KNXnetIPRouting} protocol, with the local endpoint specified by a
 	 * network interface.
