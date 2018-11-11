@@ -274,8 +274,11 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	}
 
 	protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
-		final DatagramPacket p = new DatagramPacket(packet, packet.length, dataEndpt);
-		socket.send(p);
+		final DatagramPacket p = new DatagramPacket(packet, packet.length, dst);
+		if (dst.equals(dataEndpt))
+			socket.send(p);
+		else
+			ctrlSocket.send(p);
 	}
 
 	@Override
@@ -431,8 +434,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 			synchronized (lock) {
 				final byte[] buf = PacketHelper.toPacket(new DisconnectRequest(channelId, new HPAI(HPAI.IPV4_UDP,
 						useNat ? null : (InetSocketAddress) ctrlSocket.getLocalSocketAddress())));
-				final DatagramPacket p = new DatagramPacket(buf, buf.length, ctrlEndpt);
-				ctrlSocket.send(p);
+				send(buf, ctrlEndpt);
 				long remaining = CONNECT_REQ_TIMEOUT * 1000L;
 				final long end = System.currentTimeMillis() + remaining;
 				while (closing == 1 && remaining > 0) {

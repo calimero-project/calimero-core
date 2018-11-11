@@ -168,8 +168,7 @@ abstract class ClientConnection extends ConnectionBase
 			final HPAI hpai = new HPAI(HPAI.IPV4_UDP,
 					useNat ? null : (InetSocketAddress) socket.getLocalSocketAddress());
 			final byte[] buf = PacketHelper.toPacket(new ConnectRequest(cri, hpai, hpai));
-			final DatagramPacket p = new DatagramPacket(buf, buf.length, ctrlEndpt.getAddress(), ctrlEndpt.getPort());
-			ctrlSocket.send(p);
+			send(buf, ctrlEndpt);
 		}
 		catch (final UnknownHostException e) {
 			throw new KNXException("no local host address available", e);
@@ -435,8 +434,6 @@ abstract class ClientConnection extends ConnectionBase
 			final byte[] buf = PacketHelper.toPacket(new ConnectionstateRequest(channelId,
 					new HPAI(HPAI.IPV4_UDP, useNat ? null : (InetSocketAddress) socket
 							.getLocalSocketAddress())));
-			final DatagramPacket p = new DatagramPacket(buf, buf.length, ctrlEndpt.getAddress(),
-					ctrlEndpt.getPort());
 			try {
 				while (true) {
 					Thread.sleep(HEARTBEAT_INTERVAL * 1000);
@@ -445,7 +442,7 @@ abstract class ClientConnection extends ConnectionBase
 						logger.trace("sending connection state request, attempt " + (i + 1));
 						synchronized (this) {
 							received = false;
-							socket.send(p);
+							send(buf, ctrlEndpt);
 
 							long remaining = CONNECTIONSTATE_REQ_TIMEOUT * 1000L;
 							final long end = System.currentTimeMillis() + remaining;
