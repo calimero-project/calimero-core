@@ -88,7 +88,9 @@ import org.slf4j.LoggerFactory;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
@@ -143,6 +145,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 	private ReceiverLoop setupLoop;
 	private int seq;
 	private int rcvSeq;
+	private final KNXnetIPTunnel tunnel;
 
 	// routing connection setup
 
@@ -205,6 +208,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		deviceAuthKey = null;
 		userId = 0;
 		userKey = null;
+		tunnel = null;
 	}
 
 	private SecureConnection(final TunnelingLayer knxLayer, final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP,
@@ -217,8 +221,55 @@ public final class SecureConnection extends KNXnetIPRouting {
 		this.userId = userId;
 		this.userKey = createSecretKey(userKey);
 		setupSecureSession(localEP, serverCtrlEP);
-		// NYI tcp, secure wrapper
 
+		tunnel = new KNXnetIPTunnel(knxLayer, localEP, serverCtrlEP, useNat) {
+			@Override
+			public String getName() {
+				final String lock = new String(Character.toChars(0x1F512));
+				return "KNX/IP " + lock + " Tunneling " + ctrlEndpt.getAddress().getHostAddress() + ":" + ctrlEndpt.getPort();
+			}
+
+			@Override
+			protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset, final InetAddress src,
+				final int port) throws KNXFormatException, IOException {
+
+				final int svc = h.getServiceType();
+				if (!h.isSecure()) {
+					logger.trace("received insecure service type 0x{} - ignore", Integer.toHexString(svc));
+					return true;
+				}
+				if (svc == SecureSvc) {
+					final Object[] fields = unwrap(h, data, offset);
+					final byte[] packet = (byte[]) fields[4];
+					final KNXnetIPHeader containedHeader = new KNXnetIPHeader(packet, 0);
+
+					if (containedHeader.getServiceType() == SecureSessionStatus) {
+						final int status = newChannelStatus(containedHeader, packet, containedHeader.getStructLength());
+						LogService.log(logger, status == 0 ? LogLevel.TRACE : LogLevel.ERROR, "secure session {} user {} {}", sessionId,
+								userId, statusMsg(status));
+						setupLoop.quit();
+						sessionStatus = status;
+						if (status != 0) // XXX do we need this throw, its swallowed by the loop anyway?
+							throw new KnxSecureException("secure session " + statusMsg(status));
+					}
+					else {
+						// let base class handle decrypted knxip packet
+						return super.handleServiceType(containedHeader, packet, containedHeader.getStructLength(), src, port);
+					}
+				}
+				else
+					logger.warn("received unsupported secure service type 0x{} - ignore", Integer.toHexString(svc));
+				return true;
+			}
+
+			@Override
+			protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
+				final byte[] wrapped = newSecurePacket(seq++, 0, packet);
+				super.send(wrapped, dst);
+			}
+		};
+
+		// unused
 		mcastLatencyTolerance = 0;
 		syncLatencyTolerance = 0;
 	}
@@ -244,13 +295,36 @@ public final class SecureConnection extends KNXnetIPRouting {
 	}
 
 	@Override
-	protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
-		if (!syncedWithGroup)
-			logger.warn("sending while not yet synchronized with group {}", dst.getAddress().getHostAddress());
-		final int tag = routingCount.getAndIncrement() % 0x10000;
-		final byte[] wrapped = newSecurePacket(timestamp(), tag, packet);
-		final DatagramPacket p = new DatagramPacket(wrapped, wrapped.length, dst);
-		socket.send(p);
+	public void addConnectionListener(final KNXListener l) {
+		if (tunnel != null)
+			tunnel.addConnectionListener(l);
+		else
+			super.addConnectionListener(l);
+	}
+
+	@Override
+	public void removeConnectionListener(final KNXListener l) {
+		if (tunnel != null)
+			tunnel.addConnectionListener(l);
+		else
+			super.removeConnectionListener(l);
+	}
+
+	@Override
+	public void send(final CEMI frame, final BlockingMode mode) throws KNXConnectionClosedException {
+		if (tunnel != null) {
+			try {
+				tunnel.send(frame, mode);
+			}
+			catch (KNXTimeoutException | InterruptedException e) {
+				if (tunnel.getState() == KNXnetIPConnection.CLOSED)
+					throw new KNXConnectionClosedException(e.getMessage());
+				// TODO
+				logger.error("tunneling error", e);
+			}
+		}
+		else
+			super.send(frame, mode);
 	}
 
 	@Override
@@ -262,6 +336,16 @@ public final class SecureConnection extends KNXnetIPRouting {
 	@Override
 	public String toString() {
 		return getName();
+	}
+
+	@Override
+	protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
+		if (!syncedWithGroup)
+			logger.warn("sending while not yet synchronized with group {}", dst.getAddress().getHostAddress());
+		final int tag = routingCount.getAndIncrement() % 0x10000;
+		final byte[] wrapped = newSecurePacket(timestamp(), tag, packet);
+		final DatagramPacket p = new DatagramPacket(wrapped, wrapped.length, dst);
+		socket.send(p);
 	}
 
 	@Override
