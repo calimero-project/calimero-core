@@ -502,6 +502,27 @@
         <property pid="76" pidName="PID_FRIENDLY_NAME" name="Friendly Name" pdt="2" rw="R/W" writeEnabled="1">
             <usage>Human Readable Friendly Name</usage>
         </property>
+        <property pid="91" pidName="PID_BACKBONE_KEY" name="KNX IP secure group key" pdt="32" rw="" writeEnabled="0">
+            <usage>Key for encryption, decryption and MAC in secure group communication</usage>
+        </property>
+        <property pid="92" pidName="PID_DEVICE_AUTHENTICATION_CODE" name="KNX IP device authentication code" pdt="32" rw="" writeEnabled="0">
+            <usage>Device authentication code for authentication in secure unicast communication</usage>
+        </property>
+        <property pid="93" pidName="PID_PASSWORD_HASHES" name="KNX IP secure password hashes" pdt="32" rw="" writeEnabled="0">
+            <usage>Password hashes for authenticating clients during secure unicast connection setup</usage>
+        </property>
+        <property pid="94" pidName="PID_SECURED_SERVICE_FAMILIES" name="KNX IP secured services" pdt="52" rw="R" writeEnabled="0">
+            <usage>Indicates the services for which communication security is enforced</usage>
+        </property>
+        <property pid="95" pidName="PID_MULTICAST_LATENCY_TOLERANCE" name="KNX IP secure multicast latency tolerance" pdt="4" rw="R" writeEnabled="0">
+            <usage>Length of the acceptance window for accepting incoming multicast frames with a past timestamp</usage>
+        </property>
+        <property pid="96" pidName="PID_SYNC_LATENCY_FRACTION" name="KNX IP secure sync latency fraction" pdt="54" rw="R" writeEnabled="0">
+            <usage>Fraction of the latency tolerance within devices are considered to be in sync</usage>
+        </property>
+        <property pid="97" pidName="PID_TUNNELING_USERS" name="Tunneling users" pdt="18" rw="" writeEnabled="0">
+            <usage>List of tunneling users</usage>
+        </property>
     </object>
     <object type="12">
         <property pid="51" pidName="PID_AR_TYPE_REPORT" name="" pdt="19" rw="" writeEnabled="">
