@@ -158,7 +158,7 @@ abstract class ClientConnection extends ConnectionBase
 				final InetAddress addr = useNAT ? null
 					: Optional.ofNullable(serverCtrlEP.getAddress()).flatMap(this::onSameSubnet)
 							.orElse(InetAddress.getLocalHost());
-				local = new InetSocketAddress(addr, 0);
+				local = new InetSocketAddress(addr, localEP.getPort());
 			}
 			socket = new DatagramSocket(local);
 			ctrlSocket = socket;
