@@ -78,6 +78,7 @@ import java.util.stream.Stream;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyAgreement;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -125,7 +126,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 	// tunneling connection setup
 
-	private final Key deviceAuthKey;
+	private final SecretKey deviceAuthKey;
 	private final int userId;
 	private final Key userKey;
 	private final byte[] privateKey = new byte[keyLength];
@@ -184,7 +185,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		throws KNXException, InterruptedException {
 
 		final byte[] devAuth = deviceAuthCode.length == 0 ? new byte[16] : deviceAuthCode;
-		final byte[] key = userKey.length == 0 ? emptyUserPwdHash : userKey;
+		final byte[] key = userKey.length == 0 ? emptyUserPwdHash.clone() : userKey;
 		return new SecureConnection(knxLayer, localEP, serverCtrlEP, useNat, devAuth, userId, key);
 	}
 
@@ -459,6 +460,12 @@ public final class SecureConnection extends KNXnetIPRouting {
 		finally {
 			Arrays.fill(privateKey, (byte) 0);
 			Arrays.fill(publicKey, (byte) 0);
+			// key.destroy() is not implemented
+//			try {
+//				privateKey11.destroy();
+//				deviceAuthKey.destroy();
+//			}
+//			catch (final DestroyFailedException e) {}
 		}
 	}
 
@@ -944,10 +951,12 @@ public final class SecureConnection extends KNXnetIPRouting {
 		return msg[status];
 	}
 
-	private static Key createSecretKey(final byte[] key) {
+	private static SecretKey createSecretKey(final byte[] key) {
 		if (key.length != 16)
-			throw new KNXIllegalArgumentException("KNX key has to be " + macSize + " bytes in length");
-		return new SecretKeySpec(key, 0, key.length, "AES");
+			throw new KNXIllegalArgumentException("KNX key has to be 16 bytes in length");
+		final SecretKeySpec spec = new SecretKeySpec(key, "AES");
+		Arrays.fill(key, (byte) 0);
+		return spec;
 	}
 
 	private static void generateKeyPair(final byte[] privateKey, final byte[] publicKey) {
