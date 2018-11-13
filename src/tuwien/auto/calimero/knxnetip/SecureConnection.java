@@ -196,12 +196,14 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 	private SecureConnection(final NetworkInterface netif, final InetAddress mcGroup, final byte[] groupKey,
 		final Duration latencyTolerance) throws KNXException {
-		super(netif, mcGroup);
+		super(mcGroup);
 
 		sno = deriveSerialNumber(netif);
 		secretKey = createSecretKey(groupKey);
 		mcastLatencyTolerance = (int) latencyTolerance.toMillis();
 		syncLatencyTolerance = mcastLatencyTolerance / 10;
+
+		init(netif, true, true);
 		// we don't randomize initial delay [0..10] seconds to minimize uncertainty window of eventual group sync
 		scheduleGroupSync(0);
 
