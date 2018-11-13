@@ -401,6 +401,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 				localSocket.send(new DatagramPacket(packet, packet.length, src, port));
 			}
 			catch (final RuntimeException e) {
+				sessionStatus = 1;
 				setupLoop.quit();
 				logger.error("negotiating session key failed", e);
 			}
