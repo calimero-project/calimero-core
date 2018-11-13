@@ -281,7 +281,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 
 	private void configureWithServerSettings(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP,
 		final boolean useNat) throws InterruptedException {
-		try (KNXnetIPDevMgmt mgmt = new KNXnetIPDevMgmt(localEP, serverCtrlEP, useNat)) {
+		try (KNXnetIPDevMgmt mgmt = new KNXnetIPDevMgmt(new InetSocketAddress(localEP.getAddress(), 0), serverCtrlEP, useNat)) {
 			this.mgmt = mgmt;
 			mgmt.addConnectionListener(new KNXListener() {
 				@Override
