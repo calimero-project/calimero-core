@@ -47,11 +47,13 @@ import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.security.Key;
@@ -68,6 +70,7 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.KeySpec;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -219,13 +222,27 @@ public final class SecureConnection extends KNXnetIPRouting {
 		throws KNXException, InterruptedException {
 		super(null);
 
-		sno = deriveSerialNumber(localEP);
+		InetSocketAddress local = localEP;
+		if (local.isUnresolved())
+			throw new KNXIllegalArgumentException("unresolved address " + local);
+		if (local.getAddress().isAnyLocalAddress()) {
+			try {
+				final InetAddress addr = useNat ? null : Optional.ofNullable(serverCtrlEP.getAddress())
+						.flatMap(SecureConnection::onSameSubnet).orElse(InetAddress.getLocalHost());
+				local = new InetSocketAddress(addr, localEP.getPort());
+			}
+			catch (final UnknownHostException e) {
+				throw new KNXException("no local host address available", e);
+			}
+		}
+
+		sno = deriveSerialNumber(local);
 		deviceAuthKey = createSecretKey(deviceAuthCode);
 		this.userId = userId;
 		this.userKey = createSecretKey(userKey);
-		setupSecureSession(localEP, serverCtrlEP);
+		setupSecureSession(local, serverCtrlEP);
 
-		tunnel = new KNXnetIPTunnel(knxLayer, localEP, serverCtrlEP, useNat) {
+		tunnel = new KNXnetIPTunnel(knxLayer, local, serverCtrlEP, useNat) {
 			@Override
 			public String getName() {
 				final String lock = new String(Character.toChars(0x1F512));
@@ -275,6 +292,19 @@ public final class SecureConnection extends KNXnetIPRouting {
 		// unused
 		mcastLatencyTolerance = 0;
 		syncLatencyTolerance = 0;
+	}
+
+	// finds a local IPv4 address with its network prefix "matching" the remote address
+	private static Optional<InetAddress> onSameSubnet(final InetAddress remote) {
+		try {
+			return NetworkInterface.networkInterfaces().flatMap(ni -> ni.getInterfaceAddresses().stream())
+					.filter(ia -> ia.getAddress() instanceof Inet4Address)
+//					.peek(ia -> logger.trace("match local address {}/{} to {}", ia.getAddress(), ia.getNetworkPrefixLength(), remote))
+					.filter(ia -> ClientConnection.matchesPrefix(ia.getAddress(), ia.getNetworkPrefixLength(), remote))
+					.map(ia -> ia.getAddress()).findFirst();
+		}
+		catch (final SocketException ignore) {}
+		return Optional.empty();
 	}
 
 	private static byte[] deriveSerialNumber(final InetSocketAddress localEP) {
@@ -411,8 +441,12 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 	@Override
 	protected void close(final int initiator, final String reason, final LogLevel level, final Throwable t) {
-		groupSync.cancel(true);
-		super.close(initiator, reason, level, t);
+		if (tunnel != null)
+			tunnel.close();
+		else {
+			groupSync.cancel(true);
+			super.close(initiator, reason, level, t);
+		}
 	}
 
 	// unicast session
