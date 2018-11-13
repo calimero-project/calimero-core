@@ -21,7 +21,11 @@ Supported Features
 --------
 
 ### Access Protocols
-* KNX IP Secure Multicast (experimental, an example of creating a secure network link is shown [here](https://github.com/calimero-project/introduction/blob/master/2.5/src/main/java/KnxipSecure.java))
+* KNX IP Secure (UDP)
+    * Discovery and Self-description
+    * Tunneling
+    * Multicast ([example](https://github.com/calimero-project/introduction/blob/master/2.5/src/main/java/KnxipSecure.java) of creating a secure network link)
+    * Busmonitor
 * KNXnet/IP
     * Discovery and Self-description
     * Tunneling
@@ -99,7 +103,7 @@ Testing
 For unit tests, Calimero provides a [test network](https://github.com/calimero-project/calimero-testnetwork), consisting of a [KNXnet/IP server](https://github.com/calimero-project/calimero-server) and a virtual KNX network with two [KNX devices](https://github.com/calimero-project/calimero-device). The complete test network is implemented in software, and can be executed in any J2SE runtime environment. It provides the remote KNXnet/IP endpoint for executing unit tests for KNXnet/IP tunneling, busmonitoring, routing, device management, and KNX IP protocols. The same setup is used for Calimero Travis CI.
 
 Before running any KNXnet/IP or KNX IP tests, start the test network (`gradle run`)
-in the directory _calimero-core/test/testnetwork-launcher_. When using Gradle, KNXnet/IP tests can be excluded via `junitPlatform.filters.exclude 'knxnetip'`.
+in the directory _calimero-core/test/testnetwork-launcher_. When using Gradle, KNXnet/IP tests can be excluded via `useJUnitPlatform() { excludeTags 'knxnetip' }`.
 
 Currently, the TP-UART and FT1.2 protocols can only be tested if the corresponding hardware is available. 
 
