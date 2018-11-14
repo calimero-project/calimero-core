@@ -1,5 +1,5 @@
 language: java
-dist: trusty
+dist: xenial
 jdk:
   - oraclejdk9
 
@@ -12,5 +12,6 @@ cache:
     - $HOME/.gradle/wrapper/
 
 before_script:
+  - ifconfig
   - (./gradlew -p test/testnetwork-launcher run &)
   - sleep 10
