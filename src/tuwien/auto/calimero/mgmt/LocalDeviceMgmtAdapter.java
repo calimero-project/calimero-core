@@ -47,6 +47,7 @@ import tuwien.auto.calimero.knxnetip.KNXConnectionClosedException;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode;
 import tuwien.auto.calimero.knxnetip.KNXnetIPDevMgmt;
+import tuwien.auto.calimero.knxnetip.SecureConnection;
 
 /**
  * Property adapter for KNXnet/IP local device management.
@@ -59,6 +60,12 @@ import tuwien.auto.calimero.knxnetip.KNXnetIPDevMgmt;
 public class LocalDeviceMgmtAdapter extends LocalDeviceManagement
 {
 	private final KNXnetIPConnection conn;
+
+	public static LocalDeviceMgmtAdapter newSecureAdapter(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP,
+		final boolean useNat, final byte[] deviceAuthCode, final byte[] userKey) throws KNXException, InterruptedException {
+		final KNXnetIPConnection mgmt = SecureConnection.newDeviceManagement(localEP, serverCtrlEP, useNat, deviceAuthCode, userKey);
+		return new LocalDeviceMgmtAdapter(mgmt, close -> {}, false);
+	}
 
 	/**
 	 * Creates a new property adapter for local device management.
@@ -90,8 +97,13 @@ public class LocalDeviceMgmtAdapter extends LocalDeviceManagement
 		final Consumer<CloseEvent> adapterClosed, final boolean queryWriteEnable) throws KNXException,
 		InterruptedException
 	{
-		super(create(localEP, serverCtrlEP, useNat), adapterClosed, queryWriteEnable);
-		conn = (KNXnetIPConnection) c;
+		this(create(localEP, serverCtrlEP, useNat), adapterClosed, queryWriteEnable);
+	}
+
+	LocalDeviceMgmtAdapter(final KNXnetIPConnection mgmt, final Consumer<CloseEvent> adapterClosed, final boolean queryWriteEnable)
+		throws KNXException, InterruptedException {
+		super(mgmt, adapterClosed, queryWriteEnable);
+		conn = mgmt;
 		conn.addConnectionListener(new KNXListenerImpl());
 		init();
 	}

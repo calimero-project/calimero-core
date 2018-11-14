@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@
 package tuwien.auto.calimero.knxnetip;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
@@ -134,8 +133,7 @@ public class KNXnetIPDevMgmt extends ClientConnection
 			final int status = h.getVersion() == KNXNETIP_VERSION_10 ? ErrorCodes.NO_ERROR
 					: ErrorCodes.VERSION_NOT_SUPPORTED;
 			final byte[] buf = PacketHelper.toPacket(new ServiceAck(serviceAck, channelId, seq, status));
-			final DatagramPacket p = new DatagramPacket(buf, buf.length, dataEndpt.getAddress(), dataEndpt.getPort());
-			socket.send(p);
+			send(buf, dataEndpt);
 			incSeqRcv();
 			if (status == ErrorCodes.VERSION_NOT_SUPPORTED) {
 				close(CloseEvent.INTERNAL, "protocol version changed", LogLevel.ERROR, null);
