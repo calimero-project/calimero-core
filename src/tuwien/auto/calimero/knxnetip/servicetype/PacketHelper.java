@@ -45,14 +45,12 @@ import tuwien.auto.calimero.knxnetip.util.HPAI;
 
 /**
  * Little helpers to handle KNXnet/IP packets and service types.
- * <p>
  *
  * @author B. Malinowsky
  */
 public final class PacketHelper
 {
-	private PacketHelper()
-	{}
+	private PacketHelper() {}
 
 	/**
 	 * Creates a packet with a KNXnet/IP message header v1.0, containing the specified
@@ -73,7 +71,6 @@ public final class PacketHelper
 	/**
 	 * Creates a new service request using the <code>data</code> byte array and
 	 * information from the KNXnet/IP header.
-	 * <p>
 	 *
 	 * @param h KNXnet/IP header associated with <code>data</code>
 	 * @param data byte array containing the data following the KNXnet/IP header in the
@@ -115,17 +112,7 @@ public final class PacketHelper
 	}
 
 	private static final int SecureSessionRequest = 0x0951;
-	// response to auth is a channel status within 10 seconds
-	private static final int SecureSessionAuth = 0x0953;
-
-	private static final int macSize = 16;
 	private static final int keyLength = 32;
-
-
-	public static boolean isKnxSecure(final KNXnetIPHeader h) {
-		return h.getVersion() == KNXnetIPHeader.KNXNETIP_VERSION_10
-				&& ((h.getServiceType() & KNXnetIPHeader.SecureWrapper) == KNXnetIPHeader.SecureWrapper);
-	}
 
 	public static byte[] newChannelRequest(final HPAI hpai, final byte[] ecdhPublicKey) {
 		if (ecdhPublicKey.length != keyLength)
