@@ -276,7 +276,7 @@ class DiscovererTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	@DisabledIfEnvironmentVariable(named="TRAVIS", matches="*")
+	@DisabledIfEnvironmentVariable(named="TRAVIS", matches=".*")
 	void testNATStartSearchIntNetworkInterfaceIntBoolean() throws SocketException, InterruptedException
 	{
 		if (!Util.TEST_NAT) {
@@ -302,7 +302,7 @@ class DiscovererTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
-	@DisabledIfEnvironmentVariable(named="TRAVIS", matches="*")
+	@DisabledIfEnvironmentVariable(named="TRAVIS", matches=".*")
 	void testMcastStartSearchIntNetworkInterfaceIntBoolean()
 		throws SocketException, KNXException, InterruptedException
 	{
