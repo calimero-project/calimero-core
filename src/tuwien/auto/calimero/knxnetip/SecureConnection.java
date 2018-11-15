@@ -139,8 +139,8 @@ public final class SecureConnection extends KNXnetIPRouting {
 	private static final byte[] emptyUserPwdHash = { (byte) 0xe9, (byte) 0xc3, 0x04, (byte) 0xb9, 0x14, (byte) 0xa3, 0x51, 0x75,
 		(byte) 0xfd, 0x7d, 0x1c, 0x67, 0x3a, (byte) 0xb5, 0x2f, (byte) 0xe1 };
 
-	// timeout channel.req -> channel.res
-	private static final int sessionSetupTimeout = 30_000; // [ms]
+	// timeout session.req -> session.res, and session.auth -> session.status
+	private static final int sessionSetupTimeout = 10_000; // [ms]
 
 	private static final int SessionSetup = -1;
 	private volatile int sessionStatus = SessionSetup;
