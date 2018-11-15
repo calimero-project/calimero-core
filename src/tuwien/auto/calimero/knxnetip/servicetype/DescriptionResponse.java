@@ -189,8 +189,7 @@ public class DescriptionResponse extends ServiceType
 		if (!(obj instanceof DescriptionResponse))
 			return false;
 		final DescriptionResponse other = (DescriptionResponse) obj;
-		// device DIB should suffice for equality
-		return device.equals(other.device);
+		return device.equals(other.device) && optional.size() == other.optional.size();
 	}
 
 	@Override
