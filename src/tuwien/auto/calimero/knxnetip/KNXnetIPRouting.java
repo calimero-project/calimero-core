@@ -399,7 +399,7 @@ public class KNXnetIPRouting extends ConnectionBase
 			((MulticastSocket) socket).leaveGroup(multicast);
 		}
 		catch (final IOException e) {
-			logger.warn("problem on leaving multicast group", e);
+			logger.debug("problem leaving multicast group {} ({})", multicast.getHostAddress(), e.toString());
 		}
 		finally {
 			stopReceiver();
