@@ -216,6 +216,12 @@ public final class SecureConnection extends KNXnetIPRouting {
 		init(netif, true, true);
 		// we don't randomize initial delay [0..10] seconds to minimize uncertainty window of eventual group sync
 		scheduleGroupSync(0);
+		try {
+			awaitGroupSync();
+		}
+		catch (final InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
 
 		// unused
 		deviceAuthKey = null;
@@ -480,7 +486,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 				final byte[] serverPublicKey = (byte[]) res[1];
 				final byte[] auth = newSessionAuth(serverPublicKey);
 				final byte[] packet = newSecurePacket(seq++, 0, auth);
-				logger.debug("requesting user access {}", userId);
+				logger.debug("secure session {}, request access for user {}", sessionId, userId);
 				localSocket.send(new DatagramPacket(packet, packet.length, src, port));
 			}
 			catch (final RuntimeException e) {
@@ -505,8 +511,8 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 			if (containedHeader.getServiceType() == SecureSessionStatus) {
 				final int status = newChannelStatus(containedHeader, packet, containedHeader.getStructLength());
-				LogService.log(logger, status == 0 ? LogLevel.DEBUG : LogLevel.ERROR, "secure session {} user {} {}", sessionId, userId,
-						statusMsg(status));
+				LogService.log(logger, status == 0 ? LogLevel.DEBUG : LogLevel.ERROR, "secure session {} {} for user {}", sessionId,
+						statusMsg(status), userId);
 				setupLoop.quit();
 				sessionStatus = status;
 				if (status != 0) // XXX do we need this throw, its swallowed by the loop anyway?
@@ -604,21 +610,40 @@ public final class SecureConnection extends KNXnetIPRouting {
 			timestampOffset += timestamp - local;
 			final long abs = local - timestampOffset;
 			timestampExpiresAt = abs + timestampExpiresAfter.toMillis();
-			groupSync.cancel(false);
+			syncedWithGroup();
 		}
-
-		if (timestamp >= (local - mcastLatencyTolerance)) {
+		else if (timestamp >= (local - syncLatencyTolerance)) {
 			// we only consider messages sent by other nodes
-			if (!syncedWithGroup && !isLocalIpAddress(src)) {
-				logger.info("synchronized with group {}", getRemoteAddress().getAddress().getHostAddress());
-				syncedWithGroup = true;
-				groupSync.cancel(false);
-			}
+			if (!isLocalIpAddress(src))
+				syncedWithGroup();
 		}
-		else if (timestamp < (local - mcastLatencyTolerance)) {
+		else if (timestamp < (local - syncLatencyTolerance)) {
 			// received old timestamp, schedule group sync
 			scheduleGroupSync((int) (Math.random() / Math.nextDown(1.0) * 5_000));
 		}
+	}
+
+	private void syncedWithGroup() {
+		groupSync.cancel(false);
+		if (!syncedWithGroup) {
+			logger.info("synchronized with group {}", getRemoteAddress().getAddress().getHostAddress());
+			syncedWithGroup = true;
+			synchronized (this) {
+				notifyAll();
+			}
+		}
+	}
+
+	private void awaitGroupSync() throws InterruptedException {
+		long remaining = 5_000;
+		final long end = System.nanoTime() / 1_000_000 + remaining;
+		while (remaining > 0 && !syncedWithGroup) {
+			synchronized (this) {
+				wait(remaining);
+			}
+			remaining = end - System.nanoTime() / 1_000_000;
+		}
+		logger.trace("waited {} ms for group sync", (5_000 - remaining));
 	}
 
 	private boolean isLocalIpAddress(final InetAddress addr) {
