@@ -53,7 +53,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  */
 public class DptXlatorBrightnessClrTempTransition extends DPTXlator {
 	/**
-	 * DPT ID 249.600, RGBW brightness, color temperature, transition; values from <b>0 % 0 K 0 s</b> to <b>100 % 65535
+	 * DPT ID 249.600, brightness, color temperature, transition; values from <b>0 % 0 K 0 s</b> to <b>100 % 65535
 	 * K 6553.5 s</b>.
 	 */
 	public static final DPT DptBrightnessClrTempTransition = new DPT("249.600", "brightness, color temperature, transition",
