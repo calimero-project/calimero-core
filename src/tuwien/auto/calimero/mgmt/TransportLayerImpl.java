@@ -497,7 +497,7 @@ public class TransportLayerImpl implements TransportLayer
 			else {
 				// don't allow (client side)
 				if (d.getState() == Disconnected)
-					sendDisconnect(sender);
+					checkSendDisconnect(frame);
 			}
 		}
 		else if (ctrl == DISCONNECT) {
@@ -506,8 +506,7 @@ public class TransportLayerImpl implements TransportLayer
 		}
 		else if ((ctrl & 0xC0) == DATA_CONNECTED) {
 			if (d.getState() == Disconnected || !sender.equals(d.getAddress())) {
-				logger.trace("send disconnect to {}", sender);
-				sendDisconnect(sender);
+				checkSendDisconnect(frame);
 			}
 			else {
 				Objects.requireNonNull(p);
@@ -525,7 +524,7 @@ public class TransportLayerImpl implements TransportLayer
 		}
 		else if ((ctrl & 0xC3) == ACK) {
 			if (d.getState() == Disconnected || !sender.equals(d.getAddress()))
-				sendDisconnect(sender);
+				checkSendDisconnect(frame);
 			else if (d.getState() == OpenWait && seq == Objects.requireNonNull(p).getSeqSend()) {
 				p.incSeqSend();
 				p.setState(OpenIdle);
@@ -536,7 +535,7 @@ public class TransportLayerImpl implements TransportLayer
 		}
 		else if ((ctrl & 0xC3) == NACK) {
 			if (d.getState() == Disconnected || !sender.equals(d.getAddress()))
-				sendDisconnect(sender);
+				checkSendDisconnect(frame);
 			else if (d.getState() == OpenWait && seq == Objects.requireNonNull(p).getSeqSend()
 					&& repeated < MAX_REPEAT) {
 				; // do nothing, we will send message again
@@ -614,10 +613,17 @@ public class TransportLayerImpl implements TransportLayer
 		}
 	}
 
+	private void checkSendDisconnect(final CEMILData frame) throws KNXLinkClosedException {
+		final IndividualAddress device = lnk.getKNXMedium().getDeviceAddress();
+		if (device.getRawAddress() == 0 || device.equals(frame.getDestination()))
+			sendDisconnect(frame.getSource());
+	}
+
 	private void sendDisconnect(final IndividualAddress addr) throws KNXLinkClosedException
 	{
-		final byte[] tpdu = new byte[] { (byte) DISCONNECT };
+		final byte[] tpdu = { (byte) DISCONNECT };
 		try {
+			logger.trace("send disconnect to {}", addr);
 			lnk.sendRequestWait(addr, Priority.SYSTEM, tpdu);
 		}
 		catch (final KNXTimeoutException ignore) {
