@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2017 B. Malinowsky
+    Copyright (c) 2009, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -113,10 +113,9 @@ public class DPTXlator4ByteSigned extends DPTXlator
 			"Reactive energy in kVARh", "-2147483648", "2147483647", "kVARh");
 
 	/**
-	 * DPT ID 13.100, Delta time in seconds; values from <b>-2147483648</b> to <b>2147483647</b> s.
+	 * DPT ID 13.100, time lag in seconds; values from <b>-2147483648</b> to <b>2147483647</b> s.
 	 */
-	public static final DPT DPT_DELTA_TIME = new DPT("13.100", "Delta time in seconds",
-			"-2147483648", "2147483647", "s");
+	public static final DPT DPT_DELTA_TIME = new DPT("13.100", "time lag", "-2147483648", "2147483647", "s");
 
 	private static final Map<String, DPT> types;
 
