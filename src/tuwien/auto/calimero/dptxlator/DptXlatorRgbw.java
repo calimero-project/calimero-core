@@ -51,6 +51,8 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * In value methods expecting string items, values are parsed as floating point value.
  */
 public class DptXlatorRgbw extends DPTXlator {
+	public static final String Description = "RGBW color";
+
 	/**
 	 * DPT ID 251.600, RGBW color; values from <b>0 0 0 0 %</b> to <b>100 100 100 100 %</b>.
 	 */

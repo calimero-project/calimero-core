@@ -51,6 +51,8 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * In value methods expecting string items, x, y, and brightness are parsed as floating point value.
  */
 public class DptXlatorXyY extends DPTXlator {
+	public static final String Description = "xyY color";
+
 	/**
 	 * DPT ID 242.600, color xyY; values from <b>(0, 0) 0 %</b> to <b>(1, 1) 100 %</b>.
 	 */

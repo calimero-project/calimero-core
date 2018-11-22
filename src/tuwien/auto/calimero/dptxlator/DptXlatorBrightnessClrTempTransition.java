@@ -52,6 +52,8 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * In value methods expecting string items, brightness and transition are parsed as floating point value.
  */
 public class DptXlatorBrightnessClrTempTransition extends DPTXlator {
+	public static final String Description = "brightness & color temperature transition";
+
 	/**
 	 * DPT ID 249.600, brightness, color temperature, transition; values from <b>0 % 0 K 0 s</b> to <b>100 % 65535
 	 * K 6553.5 s</b>.
