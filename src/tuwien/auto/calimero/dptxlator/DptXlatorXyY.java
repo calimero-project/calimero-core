@@ -174,7 +174,7 @@ public class DptXlatorXyY extends DPTXlator {
 		final String[] fields = value.split(" ");
 		int i = 0;
 
-		// max fields defined byeither "(x, y) Y" or "(x, y) Y %"
+		// max fields defined by either "(x, y) Y" or "(x, y) Y %"
 		if (fields.length > 3 && !(fields.length == 4 && "%".equals(fields[3])))
 			throw newException("unsupported format for color (x, y) Y", value);
 

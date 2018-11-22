@@ -153,22 +153,26 @@ public class DptXlatorBrightnessClrTempControl extends DPTXlator {
 
 	@Override
 	protected void toDPT(final String value, final short[] dst, final int index) throws KNXFormatException {
-		final String[] fields = value.split(" ");
+		if (value.isEmpty())
+			return;
+		final String[] fields = value.split(" ", 0);
 		// either 1 or 2 stepcodes w/ control
-		if (fields.length != 6 && fields.length != 3)
+		if (fields.length != 8 && fields.length != 4)
 			throw newException("unsupported format for brightness & color temperature control", value);
 
 		int valid = 0;
 		final int offset = index * 3;
-		if (clrTempSuffix.equals(fields[2])) {
+		if (clrTempSuffix.equals(fields[3])) {
 			valid |= 2;
 			t.setValue(value);
 			dst[offset] = ubyte(t.getData()[0]);
 		}
 
-		if (brightnessSuffix.equals(fields[2]) || (fields.length == 6 && brightnessSuffix.equals(fields[5]))) {
+		if (brightnessSuffix.equals(fields[3]) || (fields.length == 8 && brightnessSuffix.equals(fields[7]))) {
+			final int suffix = value.indexOf(clrTempSuffix);
+			final int start = suffix == -1 ? 0 : suffix + clrTempSuffix.length();
 			valid |= 1;
-			t.setValue(fields[1]);
+			t.setValue(value.substring(start));
 			dst[offset + 1] = ubyte(t.getData()[0]);
 		}
 		dst[offset + 2] = (short) valid;
