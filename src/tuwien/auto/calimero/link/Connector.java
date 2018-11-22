@@ -181,7 +181,7 @@ public final class Connector
 		// this one is a fixed sized pool, with thread time-out enabled
 		private static ScheduledThreadPoolExecutor reconnect = new ScheduledThreadPoolExecutor(4, runnable -> {
 			final Thread t = tf.newThread(runnable);
-			t.setName("Calimero Connector (" + t.getName() + ")");
+			t.setName("Calimero Connector (" + t.getId() + ")");
 			t.setDaemon(true);
 			return t;
 		});
