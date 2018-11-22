@@ -770,8 +770,8 @@ public final class SecureConnection extends KNXnetIPRouting {
 			throw new KNXFormatException("secure packet length < required minimum length " + minLength, total);
 
 		final ByteBuffer buffer = ByteBuffer.wrap(data, offset, total - hdrLength);
-		final int sid = buffer.getShort() & 0xffff;
 
+		final int sid = buffer.getShort() & 0xffff;
 		final long seq = uint48(buffer);
 		final long sno = uint48(buffer);
 		final int tag = buffer.getShort() & 0xffff;
@@ -783,7 +783,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		final byte[] mac = new byte[macSize];
 		dec.get(mac);
 
-		final byte[] frame = Arrays.copyOfRange(data, offset - hdrLength, offset + total - hdrLength);
+		final byte[] frame = Arrays.copyOfRange(data, offset - hdrLength, offset - hdrLength + total);
 		System.arraycopy(knxipPacket, 0, frame, hdrLength + 2 + 6 + 6 + 2, knxipPacket.length);
 		cbcMacVerify(frame, 0, total - macSize, secretKey, securityInfo(data, offset + 2, knxipPacket.length), mac);
 
@@ -1015,13 +1015,15 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 			cipher.update(secInfo);
 
-			final byte[] lenBuf = new byte[] { 0, (byte) (hdr.length + session.length) };
+			final byte[] lenBuf = { 0, (byte) (hdr.length + session.length) };
 			cipher.update(lenBuf);
 			cipher.update(hdr);
 			cipher.update(session);
 
 			final byte[] result = cipher.doFinal(frame);
-			final byte[] mac = Arrays.copyOfRange(result, result.length - macSize, result.length);
+			final int checkLength = 16 + 2 + 6 + 2 + frame.length;
+			final int extraPadding = checkLength > 32 && checkLength % 16 == 0 ? macSize : 0;
+			final byte[] mac = Arrays.copyOfRange(result, result.length - macSize - extraPadding, result.length - extraPadding);
 			return mac;
 		}
 		catch (final GeneralSecurityException e) {
@@ -1050,13 +1052,15 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 			cipher.update(secInfo);
 
-			final byte[] lenBuf = new byte[] { 0, (byte) (hdr.length + session.length) };
+			final byte[] lenBuf = { 0, (byte) (hdr.length + session.length) };
 			cipher.update(lenBuf);
 			cipher.update(hdr);
 			cipher.update(session);
 
 			final byte[] result = cipher.doFinal(frame);
-			final byte[] mac = Arrays.copyOfRange(result, result.length - macSize, result.length);
+			final int checkLength = 16 + 2 + 6 + 2 + frame.length;
+			final int extraPadding = checkLength > 32 && checkLength % 16 == 0 ? macSize : 0;
+			final byte[] mac = Arrays.copyOfRange(result, result.length - macSize - extraPadding, result.length - extraPadding);
 			return mac;
 		}
 		catch (final GeneralSecurityException e) {
