@@ -49,6 +49,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * Tunneling DIB. Objects of this type are immutable.
  */
 public class TunnelingDib extends DIB {
+	private final short maxApduLength;
 	private final IndividualAddress[] addresses;
 	// Each address comes with a status, being a bit field:
 	// Bit 0: Free, slot is not occupied
@@ -57,22 +58,34 @@ public class TunnelingDib extends DIB {
 	private final int[] status;
 
 	public TunnelingDib(final List<IndividualAddress> addresses, final int[] status) {
+		this((short) 0xfe, addresses, status);
+	}
+
+	public TunnelingDib(final short maxApduLength, final List<IndividualAddress> addresses, final int[] status) {
 		super(2 + 2 + 4 * addresses.size(), DIB.Tunneling);
+
+		if (addresses.isEmpty())
+			throw new KNXIllegalArgumentException("at least one address must be given");
 		if (addresses.size() != status.length)
 			throw new KNXIllegalArgumentException("list sizes of addresses and status must be equal");
+
+		this.maxApduLength = maxApduLength;
 		this.addresses = addresses.toArray(new IndividualAddress[0]);
 		this.status = status.clone();
 	}
 
 	public TunnelingDib(final byte[] data, final int offset, final int length) throws KNXFormatException {
 		super(data, offset);
+
 		if (type != Tunneling)
 			throw new KNXFormatException("not a tunneling DIB", type);
 		if (length < 4)
 			throw new KNXFormatException("tunneling DIB too short", length);
 
 		final ByteBuffer buf = ByteBuffer.wrap(data, offset + 2, length - 2);
-		final int entries = buf.getShort() & 0xffff;
+		maxApduLength = buf.getShort();
+
+		final int entries = buf.remaining() / 4;
 		addresses = new IndividualAddress[entries];
 		status = new int[entries];
 		for (int i = 0; i < entries; i++) {
@@ -95,6 +108,7 @@ public class TunnelingDib extends DIB {
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
+		sb.append("maximum APDU length: " + String.valueOf(maxApduLength) + " ");
 		for (int i = 0; i < addresses.length; i++)
 			sb.append(addresses[i] + " (" + formatStatus(status[i]) + ") ");
 		return sb.toString();
@@ -103,7 +117,7 @@ public class TunnelingDib extends DIB {
 	@Override
 	public byte[] toByteArray() {
 		final ByteBuffer buf = ByteBuffer.wrap(super.toByteArray()).position(2);
-		buf.putShort((short) addresses.length);
+		buf.putShort(maxApduLength);
 		for (int k = 0; k < addresses.length; k++) {
 			buf.put(addresses[k].toByteArray());
 			buf.put((byte) 0); // reserved
