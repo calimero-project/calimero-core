@@ -36,6 +36,8 @@
 
 package tuwien.auto.calimero.knxnetip.servicetype;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -131,5 +133,22 @@ class SearchResponseTest {
 
 		assertThrows(KNXIllegalArgumentException.class, () -> new SearchResponse(false, hpai, List.of(device)), "DIB list size < 2");
 		assertThrows(KNXIllegalArgumentException.class, () -> new SearchResponse(true, hpai, List.of(device)), "DIB list size < 2");
+	}
+
+	@Test
+	void testTunnelingDib() throws KNXFormatException {
+		assertThrows(KNXFormatException.class, () -> new TunnelingDib(tunneling.toByteArray(), 0, 4), "Dib size < 8");
+		assertThrows(KNXFormatException.class, () -> new TunnelingDib(tunneling.toByteArray(), 0, 5), "Dib size < 8");
+		assertThrows(KNXFormatException.class, () -> new TunnelingDib(tunneling.toByteArray(), 0, 6), "Dib size < 8");
+		assertThrows(KNXFormatException.class, () -> new TunnelingDib(tunneling.toByteArray(), 0, 7), "Dib size < 8");
+		assertDoesNotThrow(() -> new TunnelingDib(tunneling.toByteArray(), 0, 8));
+
+		TunnelingDib dib = tunneling;
+		byte[] bytes = new byte[]{(byte) 0x08, (byte) 0x07, (byte) 0x00, (byte) 0xfe, (byte) 0x12, (byte) 0x03, (byte) 0xff, (byte) 0xf9};
+		assertArrayEquals(bytes, dib.toByteArray());
+
+		dib = new TunnelingDib(List.of(new IndividualAddress(1, 2, 3)), new int[] { 7 });
+		bytes = new byte[]{(byte) 0x08, (byte) 0x07, (byte) 0x00, (byte) 0xfe, (byte) 0x12, (byte) 0x03, (byte) 0xff, (byte) 0xff};
+		assertArrayEquals(bytes, dib.toByteArray());
 	}
 }
