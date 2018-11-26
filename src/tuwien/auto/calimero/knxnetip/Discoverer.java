@@ -832,8 +832,10 @@ public class Discoverer
 				}
 			}
 			catch (final KNXFormatException e) {
-				final String item = e.getItem() != null ? " (" + e.getItem() + ")" : "";
-				logger.info("ignore received packet from " + source + ", " + e.getMessage() + item);
+				logger.info("ignore received packet from {}, {}", source, e.getMessage());
+			}
+			catch (final RuntimeException e) {
+				logger.error("error parsing received packet from {}", source, e);
 			}
 		}
 	}
