@@ -77,6 +77,7 @@ import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchRequest;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
 import tuwien.auto.calimero.knxnetip.util.DIB;
+import tuwien.auto.calimero.knxnetip.util.Srp;
 import tuwien.auto.calimero.log.LogService;
 
 /**
@@ -644,8 +645,9 @@ public class Discoverer
 					: nat ? new InetSocketAddress(0) : new InetSocketAddress(localAddr, s.getLocalPort());
 
 			// send search request with additional DIBs
-			final byte[] extraDibs = PacketHelper.toPacket(new SearchRequest(res, DIB.DEVICE_INFO, DIB.SUPP_SVC_FAMILIES,
-					DIB.AdditionalDeviceInfo, DIB.SecureServiceFamilies, DIB.Tunneling));
+			final byte[] extraDibs = PacketHelper.toPacket(new SearchRequest(res,
+				new Srp(Srp.Type.RequestDibs, false, (byte) DIB.DEVICE_INFO, (byte) DIB.SUPP_SVC_FAMILIES,
+					(byte) DIB.AdditionalDeviceInfo, (byte) DIB.SecureServiceFamilies, (byte) DIB.Tunneling)));
 			s.send(new DatagramPacket(extraDibs, extraDibs.length, SYSTEM_SETUP_MULTICAST, SEARCH_PORT));
 
 			// send standard search request

@@ -98,7 +98,7 @@ public class ServiceFamiliesDIB extends DIB
 	/**
 	 * Service family identifier representing the service type 'Security'.
 	 */
-	static final int Security = 9;
+	public static final int Security = 0x09;
 
 	private static final String[] familyNames = { null, null, "Core", "Device Management",
 		"Tunneling", "Routing", "Remote Logging", "Remote Configuration/Diagnosis", "Object Server", "Security" };

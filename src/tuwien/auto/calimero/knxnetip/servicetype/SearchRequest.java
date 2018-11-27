@@ -2,6 +2,7 @@
     Calimero 2 - A library for KNX network access
     Copyright (c) 2005 B. Erb
     Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2018 Karsten Heimrich
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,14 +42,13 @@ import java.io.ByteArrayOutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
+import tuwien.auto.calimero.knxnetip.util.Srp;
 
 /**
  * Represents a KNXnet/IP search request.
@@ -62,15 +62,16 @@ import tuwien.auto.calimero.knxnetip.util.HPAI;
  *
  * @author Bernhard Erb
  * @author B. Malinowsky
+ * @author Karsten Heimrich
  * @see tuwien.auto.calimero.knxnetip.servicetype.SearchResponse
  * @see tuwien.auto.calimero.knxnetip.Discoverer
  */
 public class SearchRequest extends ServiceType
 {
 	private final HPAI endpoint;
-	private final List<Integer> dibs = new ArrayList<>();
+	private final List<Srp> srps = new ArrayList<>();
 
-	private static final int RequestDibs = 4;
+	private static final int MinimumStructSize = 8;
 
 	/**
 	 * Creates a new search request from a byte array.
@@ -97,35 +98,22 @@ public class SearchRequest extends ServiceType
 	 */
 	public SearchRequest(final byte[] data, final int offset) throws KNXFormatException
 	{
-		this(KNXnetIPHeader.SEARCH_REQ, data, offset, 14 - 6);
+		this(KNXnetIPHeader.SEARCH_REQ, data, offset, MinimumStructSize);
 	}
 
 	private SearchRequest(final int svc, final byte[] data, final int offset, final int length) throws KNXFormatException {
 		super(svc);
-		final boolean ext = svc == KNXnetIPHeader.SearchRequest ? true : false;
-		final int svcTypeLen = (ext ? 16 : 14) - 6;
-		if (length < svcTypeLen)
-			throw new KNXFormatException("wrong size for search.req, requires " + svcTypeLen + " bytes", length);
+		if (length < MinimumStructSize)
+			throw new KNXFormatException("wrong size for search.req, requires " + MinimumStructSize + " bytes", length);
 		endpoint = new HPAI(data, offset);
 
-		if (ext) {
-			int i = offset + endpoint.getStructLength();
-			final int dibSize = data[i] & 0xff;
-			if (i + dibSize > offset + length)
-				throw new KNXFormatException("DIB size exceeds length of search.req", dibSize);
-			final int req = data[++i] & 0xff;
-			if (req == RequestDibs) {
-				final int entries = dibSize - 2;
-				for (int k = 0; k < entries; k++)
-					dibs.add(data[++i] & 0xff);
-				// last DIB request entry is allowed to be empty
-				if (entries > 0 && dibs.get(entries - 1) == 0)
-					dibs.remove(entries - 1);
-				return;
+		if (svc == KNXnetIPHeader.SearchRequest && length > MinimumStructSize) {
+			int index = offset + endpoint.getStructLength();
+			while (index < length) {
+				final Srp srp = new Srp(data, index);
+				srps.add(srp);
+				index += srp.getStructLength();
 			}
-
-			final byte[] remainder = Arrays.copyOfRange(data, offset + endpoint.getStructLength(), offset + length);
-			logger.warn("search.req contains unknown DIB {}", DataUnitBuilder.toHex(remainder, " "));
 		}
 	}
 
@@ -146,14 +134,15 @@ public class SearchRequest extends ServiceType
 	 *
 	 * @param responseAddr address of the client discovery endpoint used for the response; to create a NAT aware search
 	 *        request, use the anylocal/wildcard address with port 0 ({@code new InetSocketAddress(0)})
-	 * @param requestDibs list of descriptor type codes, requesting the corresponding DIBs in a search response
+	 * @param searchParameters list of optional search request parameter (SRP) blocks, specializing the extended search
+	 *        request
 	 */
-	public SearchRequest(final InetSocketAddress responseAddr, final int... requestDibs)
+	public SearchRequest(final InetSocketAddress responseAddr, final Srp... searchParameters)
 	{
 		super(KNXnetIPHeader.SearchRequest);
 		endpoint = new HPAI(HPAI.IPV4_UDP, responseAddr);
-		for (final int dib : requestDibs)
-			dibs.add(dib);
+		for (final Srp searchParameter : searchParameters)
+			srps.add(searchParameter);
 	}
 
 	/**
@@ -180,34 +169,35 @@ public class SearchRequest extends ServiceType
 	}
 
 	/**
-	 * @return unmodifiable list of requested DIBs
+	 * @return unmodifiable list of search request parameter (SRP) blocks
 	 */
-	public final List<Integer> requestedDibs() {
-		return Collections.unmodifiableList(dibs);
+	public final List<Srp> searchParameters() {
+		return Collections.unmodifiableList(srps);
 	}
 
 	@Override
 	int getStructLength()
 	{
-		return endpoint.getStructLength() + requestDibsSize();
+		return endpoint.getStructLength() + searchParametersSize();
 	}
 
 	@Override
 	byte[] toByteArray(final ByteArrayOutputStream os)
 	{
-		final byte[] buf = endpoint.toByteArray();
+		byte[] buf = endpoint.toByteArray();
 		os.write(buf, 0, buf.length);
 		if (svcType == KNXnetIPHeader.SearchRequest) {
-			os.write(requestDibsSize());
-			os.write(RequestDibs);
-			dibs.forEach(os::write);
-			if (dibs.size() % 2 != 0)
-				os.write(0);
+			for (final Srp srp : srps) {
+				buf = srp.toByteArray();
+				os.write(buf, 0, buf.length);
+			}
 		}
 		return os.toByteArray();
 	}
 
-	private int requestDibsSize() {
-		return (svcType == KNXnetIPHeader.SearchRequest) ? 2 + dibs.size() + dibs.size() % 2 : 0;
+	private int searchParametersSize() {
+		if (svcType == KNXnetIPHeader.SearchRequest)
+			return srps.stream().map(Srp::getStructLength).mapToInt(Integer::intValue).sum();
+		return 0;
 	}
 }
