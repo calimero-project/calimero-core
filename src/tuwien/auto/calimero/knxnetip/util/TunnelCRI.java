@@ -102,20 +102,21 @@ public class TunnelCRI extends CRI
 	 *
 	 * @return layer value as unsigned byte
 	 */
+	// TODO maybe deprecate in favor of the enum version
 	public final int getKNXLayer()
 	{
 		return opt[0] & 0xFF;
 	}
 
-//	/**
-//	 * Returns the requested tunneling layer.
-//	 *
-//	 * @return tunneling layer
-//	 */
-//	public final TunnelingLayer getLayer()
-//	{
-//		return TunnelingLayer.from(getKNXLayer());
-//	}
+	/**
+	 * Returns the requested tunneling layer.
+	 *
+	 * @return tunneling layer
+	 */
+	public final TunnelingLayer tunnelingLayer()
+	{
+		return TunnelingLayer.from(getKNXLayer());
+	}
 
 	/**
 	 * Returns a textual representation of this tunnel CRI.
