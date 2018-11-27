@@ -79,7 +79,7 @@ public class TunnelingDib extends DIB {
 
 		if (type != Tunneling)
 			throw new KNXFormatException("not a tunneling DIB", type);
-		if (length < 4)
+		if (length < 8)
 			throw new KNXFormatException("tunneling DIB too short", length);
 
 		final ByteBuffer buf = ByteBuffer.wrap(data, offset + 2, length - 2);
@@ -120,8 +120,8 @@ public class TunnelingDib extends DIB {
 		buf.putShort(maxApduLength);
 		for (int k = 0; k < addresses.length; k++) {
 			buf.put(addresses[k].toByteArray());
-			buf.put((byte) 0); // reserved
-			buf.put((byte) status[k]);
+			buf.put((byte) 0xff); // reserved
+			buf.put((byte) (status[k] | 0xf8));
 		}
 		return buf.array();
 	}
