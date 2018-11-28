@@ -53,10 +53,10 @@ public class AdditionalDeviceDib extends DIB {
 	private final DD0 dd;
 
 	// medium status is PID_MEDIUM_STATUS (PID = 51)
-	public AdditionalDeviceDib(final int mediumStatus, final int maxApduLength, final DeviceDescriptor.DD0 dd) {
+	public AdditionalDeviceDib(final int mediumStatus, final int maxLocalApduLength, final DeviceDescriptor.DD0 dd) {
 		super(dibSize, DIB.AdditionalDeviceInfo);
 		this.status = mediumStatus;
-		this.maxApduLength = maxApduLength;
+		this.maxApduLength = maxLocalApduLength;
 		this.dd = dd;
 	}
 
@@ -74,7 +74,13 @@ public class AdditionalDeviceDib extends DIB {
 		dd = DD0.from(buf.getShort() & 0xffff);
 	}
 
-	public final int maxApduLength() {
+	/**
+	 * Returns the maximum APDU length supported for local device management.
+	 *
+	 * @return APDU length in bytes
+	 * @see tuwien.auto.calimero.knxnetip.KNXnetIPDevMgmt
+	 */
+	public final int maxLocalApduLength() {
 		return maxApduLength;
 	}
 
@@ -82,15 +88,20 @@ public class AdditionalDeviceDib extends DIB {
 		return dd;
 	}
 
-	// bit 0 of medium status is communication possible/impossible
-	boolean communicationPossible() {
+	/**
+	 * Returns the current communication status of the KNX communication medium connected to the communication
+	 * interface (e.g., TP1 subnet of a KNXnet/IP server).
+	 *
+	 * @return <code>true</code> if communication is possible, <code>false</code> otherwise
+	 */
+	public final boolean communicationPossible() {
 		return (status & 1) == 0;
 	}
 
 	@Override
 	public String toString() {
 		final String s = communicationPossible() ? "possible" : "impossible";
-		return "DD0 " + dd + " communication " + s + " max APDU length " + maxApduLength;
+		return "DD0 " + dd + " communication " + s + ", max local APDU length " + maxApduLength;
 	}
 
 	@Override
