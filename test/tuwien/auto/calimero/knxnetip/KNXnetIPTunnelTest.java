@@ -492,6 +492,23 @@ public class KNXnetIPTunnelTest
 		}
 	}
 
+	@Test
+	void requestAvailableTunnelingAddress() throws KNXException, InterruptedException {
+		final IndividualAddress requestAddress = new IndividualAddress(1, 1, 30);
+		t = new KNXnetIPTunnel(LinkLayer, Util.localEndpoint(), Util.getServer(), false, requestAddress);
+//		assertEquals(requestAddress, t.tunnelingAddress());
+	}
+
+	@Test
+	void requestUsedTunnelingAddress() throws KNXException, InterruptedException {
+		final IndividualAddress requestAddress = new IndividualAddress(1, 1, 25);
+		try (KNXnetIPTunnel snatch = new KNXnetIPTunnel(LinkLayer, Util.localEndpoint(), Util.getServer(), false, requestAddress)) {
+//			assertEquals(requestAddress, snatch.tunnelingAddress());
+			t = new KNXnetIPTunnel(LinkLayer, Util.localEndpoint(), Util.getServer(), false, requestAddress);
+//			assertNotEquals(requestAddress, t.tunnelingAddress());
+		}
+	}
+
 	private void newTunnel() throws KNXException, InterruptedException
 	{
 		t = new KNXnetIPTunnel(LinkLayer, Util.localEndpoint(), Util.getServer(), false);

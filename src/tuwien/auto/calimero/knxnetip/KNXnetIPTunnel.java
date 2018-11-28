@@ -51,6 +51,7 @@ import java.util.stream.Collectors;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
+import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -155,6 +156,16 @@ public class KNXnetIPTunnel extends ClientConnection
 		if (knxLayer == RawLayer)
 			throw new KNXIllegalArgumentException("Raw tunnel to KNX network not supported: " + knxLayer);
 		connect(localEP, serverCtrlEP, new TunnelCRI(knxLayer), useNAT);
+	}
+
+	// TODO basically for link layer tunneling: newLinkLayerTunnel(...)
+	KNXnetIPTunnel(final TunnelingLayer knxLayer, final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP,
+		final boolean useNAT, final IndividualAddress tunnelingAddress) throws KNXException, InterruptedException {
+		super(KNXnetIPHeader.TUNNELING_REQ, KNXnetIPHeader.TUNNELING_ACK, 2, TUNNELING_REQ_TIMEOUT);
+		layer = Objects.requireNonNull(knxLayer, "Tunneling Layer");
+		if (knxLayer == RawLayer)
+			throw new KNXIllegalArgumentException("Raw tunnel to KNX network not supported: " + knxLayer);
+		connect(localEP, serverCtrlEP, new TunnelCRI(knxLayer, tunnelingAddress), useNAT);
 	}
 
 	/**
