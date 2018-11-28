@@ -171,10 +171,10 @@ public class KNXnetIPHeader
 
 	// KNX IP Tunneling Mgmt
 
-	private static final int TunnelingFeatureGet = 0x0422;
-	private static final int TunnelingFeatureRes = 0x0423;
-	private static final int TunnelingFeatureSet = 0x0424;
-	private static final int TunnelingFeatureInfo = 0x0425;
+	static final int TunnelingFeatureGet = 0x0422;
+	static final int TunnelingFeatureRes = 0x0423;
+	static final int TunnelingFeatureSet = 0x0424;
+	static final int TunnelingFeatureInfo = 0x0425;
 
 
 	private static final int HEADER_SIZE_10 = 0x06;
