@@ -80,6 +80,8 @@ import tuwien.auto.calimero.knxnetip.util.DIB;
 import tuwien.auto.calimero.knxnetip.util.Srp;
 import tuwien.auto.calimero.log.LogService;
 
+import static tuwien.auto.calimero.knxnetip.util.Srp.withDeviceDescription;
+
 /**
  * Does KNXnet/IP discovery and retrieval of self description from other devices.
  * <p>
@@ -646,8 +648,8 @@ public class Discoverer
 
 			// send search request with additional DIBs
 			final byte[] extraDibs = PacketHelper.toPacket(new SearchRequest(res,
-				new Srp(Srp.Type.RequestDibs, false, (byte) DIB.DEVICE_INFO, (byte) DIB.SUPP_SVC_FAMILIES,
-					(byte) DIB.AdditionalDeviceInfo, (byte) DIB.SecureServiceFamilies, (byte) DIB.Tunneling)));
+				withDeviceDescription(DIB.DEVICE_INFO, DIB.SUPP_SVC_FAMILIES, DIB.AdditionalDeviceInfo,
+					DIB.SecureServiceFamilies, DIB.Tunneling)));
 			s.send(new DatagramPacket(extraDibs, extraDibs.length, SYSTEM_SETUP_MULTICAST, SEARCH_PORT));
 
 			// send standard search request

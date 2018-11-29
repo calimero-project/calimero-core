@@ -39,6 +39,8 @@ package tuwien.auto.calimero.knxnetip.util;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 
+import java.nio.ByteBuffer;
+
 /**
  * Search Request Parameter Block (SRP).
  * <p>
@@ -178,6 +180,51 @@ public final class Srp
 		} else {
 			this.data = new byte[0];
 		}
+	}
+
+	/**
+	 * Returns a search request parameter block to limit the extended search request to KNXnet/IP router or
+	 * server devices where programming mode is currently enabled. The mandatory flag of the SRP is not set.
+	 *
+	 * @return search request parameter block for devices currently in programming mode
+	 */
+	public static Srp inProgrammingMode() {
+		return new Srp(Type.SelectByProgrammingMode, false);
+	}
+
+	/**
+	 * Returns a search request parameter block to limit the extended search request to KNXnet/IP router
+	 * or server devices where programming mode is currently enabled. The mandatory flag of the SRP is set.
+	 *
+	 * @return mandatory search request parameter block for devices currently in programming mode
+	 */
+	public static Srp inProgrammingModeOnly() {
+		return new Srp(Type.SelectByProgrammingMode, true);
+	}
+
+	public static Srp withMacAddress(final byte[] macAddress) {
+		return new Srp(Type.SelectByMacAddress, false);
+	}
+
+	public static Srp withMacAddressOnly(final byte[] macAddress) {
+		return new Srp(Type.SelectByMacAddress, true);
+	}
+
+	public static Srp withService(final int familyId, final int familyVersion) {
+		return new Srp(Type.SelectByService, false, (byte) familyId, (byte) familyVersion);
+	}
+
+	public static Srp withServiceOnly(final int familyId, final int familyVersion) {
+		return new Srp(Type.SelectByService, true, (byte) familyId, (byte) familyVersion);
+	}
+
+	public static Srp withDeviceDescription(final int descriptionType, final int... additionalDescriptionTypes) {
+		final ByteBuffer buffer = ByteBuffer.allocate(additionalDescriptionTypes.length + 1);
+		for (final int dt : additionalDescriptionTypes)
+			buffer.put((byte) dt);
+		buffer.put((byte) descriptionType);
+
+		return new Srp(Type.RequestDibs, false, buffer.array());
 	}
 
 	/**
