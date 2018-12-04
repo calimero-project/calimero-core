@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ import tuwien.auto.calimero.cemi.CEMIFactory;
  * Such a service request is used for tunnel or device management connections. It carries
  * a cEMI frame containing the actual KNX frame data.<br>
  * A service request is contained in the body of a KNXnet/IP frame.
- * 
+ *
  * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceAck
  */
 public class ServiceRequest extends ServiceType
@@ -65,7 +65,7 @@ public class ServiceRequest extends ServiceType
 	/**
 	 * Creates a new service request out of a byte array.
 	 * <p>
-	 * 
+	 *
 	 * @param serviceType service request type identifier describing the request in
 	 *        <code>data</code>, 0 &lt;= type &lt;= 0xFFFF
 	 * @param data byte array containing a service request structure
@@ -83,6 +83,9 @@ public class ServiceRequest extends ServiceType
 			cemi = CEMIFactory.create(data, offset + CONN_HEADER_SIZE, length - CONN_HEADER_SIZE);
 		else if (svcType == KNXnetIPHeader.DEVICE_CONFIGURATION_REQ)
 			cemi = new CEMIDevMgmt(data, offset + CONN_HEADER_SIZE, length - CONN_HEADER_SIZE);
+		else if (svcType == KNXnetIPHeader.TunnelingFeatureGet || svcType == KNXnetIPHeader.TunnelingFeatureResponse
+				|| svcType == KNXnetIPHeader.TunnelingFeatureSet || svcType == KNXnetIPHeader.TunnelingFeatureInfo)
+			cemi = null;
 		else
 			throw new KNXIllegalArgumentException("unsupported service request type");
 	}
@@ -90,7 +93,7 @@ public class ServiceRequest extends ServiceType
 	/**
 	 * Creates a new service request.
 	 * <p>
-	 * 
+	 *
 	 * @param serviceType service request type identifier, 0 &lt;= type &lt;= 0xFFFF
 	 * @param channelID channel ID of communication this request belongs to, 0 &lt;= id
 	 *        &lt;= 255
@@ -128,11 +131,11 @@ public class ServiceRequest extends ServiceType
 		/* final int reserved = */is.read();
 		cemi = frame;
 	}
-	
+
 	/**
 	 * Returns the service type identifier of the request.
 	 * <p>
-	 * 
+	 *
 	 * @return service type as unsigned 16 bit value
 	 */
 	public final int getServiceType()
@@ -143,7 +146,7 @@ public class ServiceRequest extends ServiceType
 	/**
 	 * Returns the communication channel identifier associated with the request.
 	 * <p>
-	 * 
+	 *
 	 * @return communication channel ID as unsigned byte
 	 */
 	public final int getChannelID()
@@ -154,7 +157,7 @@ public class ServiceRequest extends ServiceType
 	/**
 	 * Returns the sequence number of the sending endpoint.
 	 * <p>
-	 * 
+	 *
 	 * @return sequence number as unsigned byte
 	 */
 	public final int getSequenceNumber()
@@ -165,7 +168,7 @@ public class ServiceRequest extends ServiceType
 	/**
 	 * Returns the cEMI frame carried by the request.
 	 * <p>
-	 * 
+	 *
 	 * @return a cEMI type
 	 */
 	public final CEMI getCEMI()

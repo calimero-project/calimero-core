@@ -171,10 +171,10 @@ public class KNXnetIPHeader
 
 	// KNX IP Tunneling Mgmt
 
-	static final int TunnelingFeatureGet = 0x0422;
-	static final int TunnelingFeatureRes = 0x0423;
-	static final int TunnelingFeatureSet = 0x0424;
-	static final int TunnelingFeatureInfo = 0x0425;
+	public static final int TunnelingFeatureGet = 0x0422;
+	public static final int TunnelingFeatureResponse = 0x0423;
+	public static final int TunnelingFeatureSet = 0x0424;
+	public static final int TunnelingFeatureInfo = 0x0425;
 
 
 	private static final int HEADER_SIZE_10 = 0x06;
@@ -362,7 +362,7 @@ public class KNXnetIPHeader
 		case SecureSessionStatus: return "session-status";
 		case SecureGroupSync: return "group-sync";
 		case TunnelingFeatureGet: return "tunneling-feat.get";
-		case TunnelingFeatureRes: return "tunneling-feat.res";
+		case TunnelingFeatureResponse: return "tunneling-feat.res";
 		case TunnelingFeatureSet: return "tunneling-feat.set";
 		case TunnelingFeatureInfo: return "tunneling-feat.info";
 		default:

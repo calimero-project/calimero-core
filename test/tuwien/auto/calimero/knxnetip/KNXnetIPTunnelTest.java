@@ -50,6 +50,8 @@ import java.util.Vector;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import tag.KnxnetIP;
 import tag.Slow;
@@ -66,6 +68,7 @@ import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIBusMon;
 import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature.InterfaceFeature;
 
 /**
  * @author B. Malinowsky
@@ -507,6 +510,24 @@ public class KNXnetIPTunnelTest
 			t = new KNXnetIPTunnel(LinkLayer, Util.localEndpoint(), Util.getServer(), false, requestAddress);
 //			assertNotEquals(requestAddress, t.tunnelingAddress());
 		}
+	}
+
+	@ParameterizedTest
+	@EnumSource(InterfaceFeature.class)
+	void tunnelingFeatureGet(final InterfaceFeature feature) throws InterruptedException, KNXException {
+		newTunnel();
+		t.send(feature);
+	}
+
+	@ParameterizedTest
+	@EnumSource(InterfaceFeature.class)
+	void tunnelingFeatureSet(final InterfaceFeature feature) throws InterruptedException, KNXException {
+		newTunnel();
+		final List<InterfaceFeature> twoBytes = List.of(InterfaceFeature.SupportedEmiTypes, InterfaceFeature.DeviceDescriptorType0,
+				InterfaceFeature.Manufacturer, InterfaceFeature.IndividualAddress, InterfaceFeature.MaxApduLength);
+		final int length = twoBytes.contains(feature) ? 2 : 1;
+
+		t.send(feature, new byte[length]);
 	}
 
 	private void newTunnel() throws KNXException, InterruptedException

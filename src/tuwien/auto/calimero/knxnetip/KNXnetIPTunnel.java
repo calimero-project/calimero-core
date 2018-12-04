@@ -40,8 +40,10 @@ import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.BusMon
 import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.RawLayer;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -52,6 +54,7 @@ import java.util.stream.Collectors;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.IndividualAddress;
+import tuwien.auto.calimero.KNXAckTimeoutException;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -68,6 +71,8 @@ import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.servicetype.ServiceAck;
 import tuwien.auto.calimero.knxnetip.servicetype.ServiceRequest;
+import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature;
+import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature.InterfaceFeature;
 import tuwien.auto.calimero.knxnetip.util.TunnelCRI;
 import tuwien.auto.calimero.log.LogService.LogLevel;
 
@@ -187,6 +192,71 @@ public class KNXnetIPTunnel extends ClientConnection
 		super.send(frame, mode);
 	}
 
+	// sends a tunneling feature-get service
+	// sendFeature / getFeature?
+	void send(final InterfaceFeature feature) throws KNXConnectionClosedException, KNXAckTimeoutException, InterruptedException {
+		synchronized (lock) {
+			final TunnelingFeature get = TunnelingFeature.newGet(channelId, getSeqSend(), feature);
+			send(get);
+		}
+	}
+
+	// sends a tunneling feature-set service
+	// sendFeature / setFeature?
+	void send(final InterfaceFeature feature, final byte... featureValue)
+		throws KNXConnectionClosedException, KNXAckTimeoutException, InterruptedException {
+		synchronized (lock) {
+			final TunnelingFeature set = TunnelingFeature.newSet(channelId, getSeqSend(), feature, featureValue);
+			send(set);
+		}
+	}
+
+	// pre-cond: send lock hold
+	// pre-cond: there is no cEMI send in progress, cEMI frames use the ConnectionBase::sendWaitQueue
+	private void send(final TunnelingFeature tunnelingFeature)
+		throws KNXConnectionClosedException, KNXAckTimeoutException, InterruptedException {
+		if (layer == TunnelingLayer.BusMonitorLayer)
+			throw new IllegalStateException("send not permitted in busmonitor mode");
+		if (state < 0)
+			throw new IllegalStateException("in error state, send aborted");
+		if (state == CLOSED)
+			throw new KNXConnectionClosedException("send attempt on closed connection");
+
+//		sendWaitQueue.acquire(true);
+		final byte[] buf = PacketHelper.toPacket(tunnelingFeature);
+		try {
+			int attempt = 0;
+			for (; attempt < maxSendAttempts; ++attempt) {
+				logger.trace("sending {}, attempt {}", tunnelingFeature, attempt + 1);
+				updateState = false;
+
+				send(buf, dataEndpt);
+				internalState = ACK_PENDING;
+				// always forward this state to user
+				state = ACK_PENDING;
+				waitForStateChange(ACK_PENDING, responseTimeout);
+				if (internalState == ClientConnection.CEMI_CON_PENDING || internalState == OK)
+					break;
+			}
+			if (attempt == maxSendAttempts) {
+				final KNXAckTimeoutException e = new KNXAckTimeoutException("maximum send attempts, no service acknowledgment received");
+				close(CloseEvent.INTERNAL, "maximum send attempts", LogLevel.ERROR, e);
+				throw e;
+			}
+		}
+		catch (final InterruptedIOException e) {
+			throw new InterruptedException("interrupted I/O, " + e);
+		}
+		catch (final IOException e) {
+			close(CloseEvent.INTERNAL, "communication failure", LogLevel.ERROR, e);
+			throw new KNXConnectionClosedException("connection closed");
+		}
+		finally {
+			updateState = true;
+			setState(OK);
+		}
+	}
+
 	@Override
 	public String getName()
 	{
@@ -200,7 +270,8 @@ public class KNXnetIPTunnel extends ClientConnection
 		if (super.handleServiceType(h, data, offset, src, port))
 			return true;
 		final int svc = h.getServiceType();
-		if (svc != serviceRequest)
+		// { tunneling.req/ack, tunneling-feat.x }
+		if (svc < serviceRequest || svc > KNXnetIPHeader.TunnelingFeatureInfo)
 			return false;
 
 		final ServiceRequest req = getServiceRequest(h, data, offset);
@@ -249,6 +320,13 @@ public class KNXnetIPTunnel extends ClientConnection
 
 		// further process all expected tunneling requests
 		incSeqRcv();
+
+		if (svc >= KNXnetIPHeader.TunnelingFeatureGet && svc <= KNXnetIPHeader.TunnelingFeatureInfo) {
+			final ByteBuffer buffer = ByteBuffer.wrap(data, offset, h.getTotalLength() - h.getStructLength());
+			logger.debug("received {}", TunnelingFeature.from(svc, buffer));
+			return true;
+		}
+
 		final CEMI cemi = req.getCEMI();
 		// leave if we are working with an empty (broken) service request
 		if (cemi == null)
