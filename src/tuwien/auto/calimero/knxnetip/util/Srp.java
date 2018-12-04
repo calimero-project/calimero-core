@@ -89,11 +89,11 @@ public final class Srp
 
 		private final int type;
 
-		public final int getValue() {
+		private final int getValue() {
 			return type;
 		}
 
-		public static Type from(final int code) {
+		private static Type from(final int code) {
 			for (final Type t : Type.values()) {
 				if (code == t.type)
 					return t;
@@ -117,7 +117,7 @@ public final class Srp
 	 * Creates a new SRP and initializes basic fields.
 	 * <p>
 	 *
-	 * @param srpType one of the search request parameter block types {@see Type}
+	 * @param srpType one of the search request parameter block types (see {@link Type})
 	 * @param isMandatory to be evaluated by a KNXnet/IP router or server device
 	 * @param data byte array containing additional data, ignored for select by programming mode SRPs
 	 */
@@ -183,41 +183,73 @@ public final class Srp
 	}
 
 	/**
-	 * Returns a search request parameter block to limit the extended search request to KNXnet/IP router or
+	 * Creates a search request parameter block to limit the extended search request to KNXnet/IP router or
 	 * server devices where programming mode is currently enabled. The mandatory flag of the SRP is not set.
 	 *
 	 * @return search request parameter block for devices currently in programming mode
 	 */
-	public static Srp inProgrammingMode() {
+	public static Srp withProgrammingMode() {
 		return new Srp(Type.SelectByProgrammingMode, false);
 	}
 
 	/**
-	 * Returns a search request parameter block to limit the extended search request to KNXnet/IP router
+	 * Creates a search request parameter block to limit the extended search request to KNXnet/IP router
 	 * or server devices where programming mode is currently enabled. The mandatory flag of the SRP is set.
 	 *
 	 * @return mandatory search request parameter block for devices currently in programming mode
 	 */
-	public static Srp inProgrammingModeOnly() {
+	public static Srp withProgrammingModeOnly() {
 		return new Srp(Type.SelectByProgrammingMode, true);
 	}
 
+	/**
+	 * Creates a search request parameter block to limit the extended search request to KNXnet/IP router
+	 * or server devices with the given MAC address. The mandatory flag of the SRP is not set.
+	 *
+	 * @return search request parameter block for devices with a given MAC address
+	 */
 	public static Srp withMacAddress(final byte[] macAddress) {
 		return new Srp(Type.SelectByMacAddress, false);
 	}
 
+	/**
+	 * Creates a search request parameter block to limit the extended search request to KNXnet/IP router
+	 * or server devices with the given MAC address. The mandatory flag of the SRP is set.
+	 *
+	 * @return mandatory search request parameter block for with a given MAC address
+	 */
 	public static Srp withMacAddressOnly(final byte[] macAddress) {
 		return new Srp(Type.SelectByMacAddress, true);
 	}
 
+	/**
+	 * Creates a search request parameter block to limit the extended search request to KNXnet/IP router
+	 * or server devices with the given service family and corresponding family version. The mandatory flag
+	 * of the SRP is not set.
+	 *
+	 * @return search request parameter block for devices with a given service family and version
+	 */
 	public static Srp withService(final int familyId, final int familyVersion) {
 		return new Srp(Type.SelectByService, false, (byte) familyId, (byte) familyVersion);
 	}
 
+	/**
+	 * Creates a search request parameter block to limit the extended search request to KNXnet/IP router
+	 * or server devices with the given service family and corresponding family version. The mandatory flag
+	 * of the SRP is set.
+	 *
+	 * @return mandatory search request parameter block for devices with a given service family and version
+	 */
 	public static Srp withServiceOnly(final int familyId, final int familyVersion) {
 		return new Srp(Type.SelectByService, true, (byte) familyId, (byte) familyVersion);
 	}
 
+	/**
+	 * Creates a search request parameter block with a set of description types to indicate a KNXnet/IP router
+	 * or server to include corresponding DIBs in the search response. The mandatory flag of the SRP is not set.
+	 *
+	 * @return search request parameter block with a set of description types
+	 */
 	public static Srp withDeviceDescription(final int descriptionType, final int... additionalDescriptionTypes) {
 		final ByteBuffer buffer = ByteBuffer.allocate(additionalDescriptionTypes.length + 1);
 		for (final int dt : additionalDescriptionTypes)
@@ -243,7 +275,7 @@ public final class Srp
 	 * The type specifies which kind of search request parameter information is contained in
 	 * the SRP.
 	 *
-	 * @return search request parameter type {@see Type}
+	 * @return search request parameter type (see {@link Type})
 	 */
 	public final Srp.Type getType() {
 		return type;
@@ -253,7 +285,7 @@ public final class Srp
 	 * Returns the mandatory flag of this SRP.
 	 * <p>
 	 *
-	 * @return <code>true</code> if the mandatory bit is set, <type>false</type> otherwise
+	 * @return <code>true</code> if the mandatory bit is set, <code>false</code> otherwise
 	 */
 	public final boolean isMandatory() {
 		return mandatory;
