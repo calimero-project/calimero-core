@@ -62,7 +62,7 @@ public class TunnelingDib extends DIB {
 	}
 
 	public TunnelingDib(final short maxApduLength, final List<IndividualAddress> addresses, final int[] status) {
-		super(2 + 2 + 4 * addresses.size(), DIB.Tunneling);
+		super(2 + 2 + 4 * addresses.size(), DIB.TunnelingInfo);
 
 		if (addresses.isEmpty())
 			throw new KNXIllegalArgumentException("at least one address must be given");
@@ -77,7 +77,7 @@ public class TunnelingDib extends DIB {
 	public TunnelingDib(final byte[] data, final int offset, final int length) throws KNXFormatException {
 		super(data, offset);
 
-		if (type != Tunneling)
+		if (type != TunnelingInfo)
 			throw new KNXFormatException("not a tunneling DIB", type);
 		if (length < 8)
 			throw new KNXFormatException("tunneling DIB too short", length);

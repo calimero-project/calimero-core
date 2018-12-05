@@ -649,7 +649,7 @@ public class Discoverer
 			// send search request with additional DIBs
 			final byte[] extraDibs = PacketHelper.toPacket(new SearchRequest(res,
 				withDeviceDescription(DIB.DEVICE_INFO, DIB.SUPP_SVC_FAMILIES, DIB.AdditionalDeviceInfo,
-					DIB.SecureServiceFamilies, DIB.Tunneling)));
+					DIB.SecureServiceFamilies, DIB.TunnelingInfo)));
 			s.send(new DatagramPacket(extraDibs, extraDibs.length, SYSTEM_SETUP_MULTICAST, SEARCH_PORT));
 
 			// send standard search request

@@ -128,7 +128,7 @@ public class DescriptionResponse extends ServiceType
 				optional.add(m = new ManufacturerDIB(data, i));
 			else if (type == DIB.SecureServiceFamilies && (unique = s == null))
 				optional.add(s = new ServiceFamiliesDIB(data, i));
-			else if (type == DIB.Tunneling && (unique = t == null))
+			else if (type == DIB.TunnelingInfo && (unique = t == null))
 				optional.add(t = new TunnelingDib(data, i, size));
 			else if (type == DIB.AdditionalDeviceInfo && (unique = d == null))
 				optional.add(d = new AdditionalDeviceDib(data, i, size));
