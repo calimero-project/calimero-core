@@ -206,6 +206,7 @@ public final class Srp
 	 * Creates a search request parameter block to limit the extended search request to KNXnet/IP router
 	 * or server devices with the given MAC address. The mandatory flag of the SRP is not set.
 	 *
+	 * @param macAddress the MAC address used in the search request parameter block
 	 * @return search request parameter block for devices with a given MAC address
 	 */
 	public static Srp withMacAddress(final byte[] macAddress) {
@@ -216,6 +217,7 @@ public final class Srp
 	 * Creates a search request parameter block to limit the extended search request to KNXnet/IP router
 	 * or server devices with the given MAC address. The mandatory flag of the SRP is set.
 	 *
+	 * @param macAddress the MAC address used in the search request parameter block
 	 * @return mandatory search request parameter block for with a given MAC address
 	 */
 	public static Srp withMacAddressOnly(final byte[] macAddress) {
@@ -227,6 +229,8 @@ public final class Srp
 	 * or server devices with the given service family and corresponding family version. The mandatory flag
 	 * of the SRP is not set.
 	 *
+	 * @param familyId the family ID used in the in the search request parameter block
+	 * @param familyVersion the family version used in the in the search request parameter block
 	 * @return search request parameter block for devices with a given service family and version
 	 */
 	public static Srp withService(final int familyId, final int familyVersion) {
@@ -238,6 +242,8 @@ public final class Srp
 	 * or server devices with the given service family and corresponding family version. The mandatory flag
 	 * of the SRP is set.
 	 *
+	 * @param familyId the family ID used in the in the search request parameter block
+	 * @param familyVersion the family version used in the in the search request parameter block
 	 * @return mandatory search request parameter block for devices with a given service family and version
 	 */
 	public static Srp withServiceOnly(final int familyId, final int familyVersion) {
@@ -248,6 +254,8 @@ public final class Srp
 	 * Creates a search request parameter block with a set of description types to indicate a KNXnet/IP router
 	 * or server to include corresponding DIBs in the search response. The mandatory flag of the SRP is not set.
 	 *
+	 * @param descriptionType the description type used in the in the search request parameter block
+	 * @param additionalDescriptionTypes additional description types used in the in the search request parameter block
 	 * @return search request parameter block with a set of description types
 	 */
 	public static Srp withDeviceDescription(final int descriptionType, final int... additionalDescriptionTypes) {
@@ -306,7 +314,7 @@ public final class Srp
 	 * Returns the byte representation of the whole SRP structure.
 	 * <p>
 	 *
-	 * @return byte array containing structure
+	 * @return byte array containing the SRP structure
 	 */
 	public final byte[] toByteArray() {
 		final byte[] buf = new byte[size];
