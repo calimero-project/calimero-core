@@ -55,6 +55,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyFactory;
@@ -82,7 +83,9 @@ import java.util.stream.Stream;
 import javax.crypto.Cipher;
 import javax.crypto.KeyAgreement;
 import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -202,6 +205,56 @@ public final class SecureConnection extends KNXnetIPRouting {
 		final byte[] devAuth = deviceAuthCode.length == 0 ? new byte[16] : deviceAuthCode;
 		final byte[] key = userKey.length == 0 ? emptyUserPwdHash.clone() : userKey;
 		return new SecureConnection(localEP, serverCtrlEP, useNat, devAuth, key);
+	}
+
+	/**
+	 * Creates the hash value for the given password using PBKDF2 with the HMAC-SHA256 hash function. Before returning,
+	 * this method fills the {@code password} array with zeros.
+	 *
+	 * @param password input user password interpreted using the US-ASCII character encoding, the replacement for
+	 *        unknown or non-printable characters is '?'
+	 * @return the derived 16 byte hash value
+	 */
+	public static byte[] hashUserPassword(final char[] password) {
+		final byte[] salt = "user-password.1.secure.ip.knx.org".getBytes(StandardCharsets.US_ASCII);
+		return pbkdf2WithHmacSha256(password, salt);
+	}
+
+	/**
+	 * Creates the hash value for the given device authentication code using PBKDF2 with the HMAC-SHA256 hash
+	 * function. Before returning, this method fills the {@code authCode} array with zeros.
+	 *
+	 * @param authCode input device authentication code interpreted using the US-ASCII character encoding, the
+	 *        replacement for unknown or non-printable characters is '?'
+	 * @return the derived 16 byte hash value
+	 */
+	public static byte[] hashDeviceAuthenticationCode(final char[] authCode) {
+		final byte[] salt = "device-authentication-code.1.secure.ip.knx.org".getBytes(StandardCharsets.US_ASCII);
+		return pbkdf2WithHmacSha256(authCode, salt);
+	}
+
+	private static byte[] pbkdf2WithHmacSha256(final char[] password, final byte[] salt) {
+		for (int i = 0; i < password.length; i++) {
+			final char c = password[i];
+			if (c < 0x20 || c > 0x7E)
+				password[i] = '?';
+		}
+
+		final int iterations = 65_536;
+		final int keyLength = 16 * 8;
+		try {
+			final SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+			final PBEKeySpec spec = new PBEKeySpec(password, salt, iterations, keyLength);
+			final SecretKey key = skf.generateSecret(spec);
+			return key.getEncoded();
+		}
+		catch (final GeneralSecurityException e) {
+			// NoSuchAlgorithmException or InvalidKeySpecException, both imply a setup/programming error
+			throw new RuntimeException(e);
+		}
+		finally {
+			Arrays.fill(password, (char) 0);
+		}
 	}
 
 	private SecureConnection(final NetworkInterface netif, final InetAddress mcGroup, final byte[] groupKey,
