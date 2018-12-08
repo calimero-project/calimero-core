@@ -1,7 +1,6 @@
 language: java
 dist: xenial
 jdk:
-  - oraclejdk9
   - openjdk11
 
 before_cache:
