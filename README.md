@@ -1,21 +1,15 @@
 Calimero-core [![Build Status](https://travis-ci.org/calimero-project/calimero-core.svg?branch=master)](https://travis-ci.org/calimero-project/calimero-core)
 =============
+~~~ sh
+git clone https://github.com/calimero-project/calimero-core.git
+~~~
 
-The calimero-core library provides KNX communication protocols, KNX datapoint & property access, and management functionality. Java SE 9 (module _java.base_) is the minimum required runtime environment.
+Calimero-core provides KNX communication protocols, KNX datapoint & property access, and management functionality. [Java SE 11](https://jdk.java.net/11/)<sup>1</sup> (_java.base_) is the minimum required runtime environment.
 Calimero was developed with a focus on applications that run on embedded devices and require a small footprint.
 
 Code examples for using this library are shown in the [introduction](https://github.com/calimero-project/introduction).
 
-Download
---------
-
-~~~ sh
-# Either using git
-$ git clone https://github.com/calimero-project/calimero-core.git
-
-# Or using hub
-$ hub clone calimero-project/calimero-core
-~~~
+<sup>1</sup> Java 9 (used during development) reached end-of-life, Java 11 is the current LTS version.
 
 Supported Features
 --------
@@ -26,6 +20,7 @@ Supported Features
     * Tunneling
     * Multicast ([example](https://github.com/calimero-project/introduction/blob/master/2.5/src/main/java/KnxipSecure.java) of creating a secure network link)
     * Busmonitor
+    * Device Management
 * KNXnet/IP
     * Discovery and Self-description
     * Tunneling
@@ -112,15 +107,9 @@ More Features, Tools, Examples
 ------------------------------
 
 * [introduction](https://github.com/calimero-project/introduction) provides code examples for programming with Calimero.
-
 * [calimero-tools](https://github.com/calimero-project/calimero-tools) offers command-line tools for KNX process communication, monitoring, and management.
-
 * [calimero-gui](https://github.com/calimero-project/calimero-gui) provides a graphical user interface (based on SWT) for process communication, monitoring, and management.
-
 * [calimero-server](https://github.com/calimero-project/calimero-server) is the Calimero KNXnet/IP Server and provides KNXnet/IP access to KNX networks.
-
 * [calimero-device](https://github.com/calimero-project/calimero-device) is the communication stack to implement a KNX device.
-
 * [serial-native](https://github.com/calimero-project/serial-native) provides native libraries for serial port access (using JNI) on Windows, Linux, and MacOS.
-
 * [import-ets-xml](https://github.com/calimero-project/import-ets-xml) imports ETS XML KNX datapoints for use with Calimero.
