@@ -36,9 +36,7 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import java.lang.reflect.Field;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
 
@@ -128,22 +126,7 @@ public class DptXlator16BitSet extends DPTXlator {
 	}
 	public static final EnumDpt<Medium> DptMedia = new EnumDpt<>("22.1000", Medium.class);
 
-	private static final Map<String, DPT> types;
-
-	static {
-		types = new HashMap<>();
-		final Field[] fields = DptXlator16BitSet.class.getFields();
-		for (int i = 0; i < fields.length; i++) {
-			try {
-				final Object o = fields[i].get(null);
-				if (o instanceof DPT) {
-					final DPT dpt = (DPT) o;
-					types.put(dpt.getID(), dpt);
-				}
-			}
-			catch (final IllegalAccessException e) {}
-		}
-	}
+	private static final Map<String, DPT> types = loadDatapointTypes(DptXlator16BitSet.class);
 
 	/**
 	 * Creates a translator for the given datapoint type.

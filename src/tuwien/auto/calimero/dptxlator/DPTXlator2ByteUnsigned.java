@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,6 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
@@ -137,26 +136,10 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	public static final DPT DPT_ABSOLUTE_COLOR_TEMPERATURE = new DPT("7.600", "Absolute color temperature", "0", "65535", "K");
 
 
-	private static final Map<String, DPT> types;
+	private static final Map<String, DPT> types  = loadDatapointTypes(DPTXlator2ByteUnsigned.class);
 
 	private final int min;
 	private final int max;
-
-	static {
-		types = new HashMap<>(15);
-		types.put(DPT_VALUE_2_UCOUNT.getID(), DPT_VALUE_2_UCOUNT);
-		types.put(DPT_PROP_DATATYPE.getID(), DPT_PROP_DATATYPE);
-		types.put(DPT_TIMEPERIOD.getID(), DPT_TIMEPERIOD);
-		types.put(DPT_TIMEPERIOD_10.getID(), DPT_TIMEPERIOD_10);
-		types.put(DPT_TIMEPERIOD_100.getID(), DPT_TIMEPERIOD_100);
-		types.put(DPT_TIMEPERIOD_SEC.getID(), DPT_TIMEPERIOD_SEC);
-		types.put(DPT_TIMEPERIOD_MIN.getID(), DPT_TIMEPERIOD_MIN);
-		types.put(DPT_TIMEPERIOD_HOURS.getID(), DPT_TIMEPERIOD_HOURS);
-		types.put(DPT_LENGTH.getID(), DPT_LENGTH);
-		types.put(DPT_ELECTRICAL_CURRENT.getID(), DPT_ELECTRICAL_CURRENT);
-		types.put(DPT_BRIGHTNESS.getID(), DPT_BRIGHTNESS);
-		types.put(DPT_ABSOLUTE_COLOR_TEMPERATURE.getID(), DPT_ABSOLUTE_COLOR_TEMPERATURE);
-	}
 
 	/**
 	 * Creates a translator for the given datapoint type.

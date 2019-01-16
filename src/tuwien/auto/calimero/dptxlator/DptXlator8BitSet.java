@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2017, 2018 B. Malinowsky
+    Copyright (c) 2017, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,9 +36,7 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import java.lang.reflect.Field;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
@@ -200,22 +198,7 @@ public class DptXlator8BitSet extends DPTXlator
 	public static final EnumDpt<ChannelActivationState> DptChannelActivation = new EnumDpt<>("21.1010",
 			ChannelActivationState.class);
 
-	private static final Map<String, DPT> types;
-
-	static {
-		types = new HashMap<>();
-		final Field[] fields = DptXlator8BitSet.class.getFields();
-		for (int i = 0; i < fields.length; i++) {
-			try {
-				final Object o = fields[i].get(null);
-				if (o instanceof DPT) {
-					final DPT dpt = (DPT) o;
-					types.put(dpt.getID(), dpt);
-				}
-			}
-			catch (final IllegalAccessException e) {}
-		}
-	}
+	private static final Map<String, DPT> types = loadDatapointTypes(DptXlator8BitSet.class);
 
 	/**
 	 * Creates a translator for the given datapoint type.

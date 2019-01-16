@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2016 B. Malinowsky
+    Copyright (c) 2009, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,10 +36,8 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -609,21 +607,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	public static final DPT DPT_WORK = new DPT("14.079", "Work", "-3.40282347e+38f",
 			"3.40282347e+38f", "J");
 
-	private static final Map<String, DPT> types = new HashMap<>(100);
-
-	static {
-		final Field[] fields = DPTXlator4ByteFloat.class.getFields();
-		for (int i = 0; i < fields.length; i++) {
-			try {
-				final Object o = fields[i].get(null);
-				if (o instanceof DPT) {
-					final DPT dpt = (DPT) o;
-					types.put(dpt.getID(), dpt);
-				}
-			}
-			catch (final IllegalAccessException e) {}
-		}
-	}
+	private static final Map<String, DPT> types = loadDatapointTypes(DPTXlator4ByteFloat.class);
 
 	private final float min;
 	private final float max;
