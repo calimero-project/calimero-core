@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018 B. Malinowsky
+    Copyright (c) 2018, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -96,7 +96,7 @@ public class DptXlator16BitSet extends DPTXlator {
 
 		private T find(final String description) {
 			for (final T e : EnumSet.allOf(elements))
-				if (e.name().equals(description))
+				if (e.name().equals(description) || friendly(e.value()).equals(description))
 					return e;
 			return null;
 		}
@@ -227,8 +227,9 @@ public class DptXlator16BitSet extends DPTXlator {
 		for (int i = 0x4000; i > 0; i >>= 1)
 			if ((d & i) == i)
 				joiner.add(((EnumDpt<?>) dpt).friendly(i));
-		// special case: controller is cooling if HeatingMode = false and CoolingDisabled = false
-		if (joiner.length() == 0)
+		// RHCC status special case: controller is cooling if HeatingMode = false and CoolingDisabled = false
+		// show cooling mode in case no other bit is set
+		if (dpt.equals(DptRhccStatus) && joiner.length() == 0)
 			return "Cooling Mode";
 		return joiner.toString();
 	}
@@ -242,23 +243,34 @@ public class DptXlator16BitSet extends DPTXlator {
 			validate(result);
 		}
 		catch (final NumberFormatException nfe) {
-			// try as sequence
-			final String[] split = value.split(" ", 0);
+			final EnumDpt<?> enumDpt = (EnumDpt<?>) dpt;
+
+			// try as sequence: if sequence contains "," we use that as delimiter
+			String regex = value.contains(",") ? "," : " ";
+			// special case: a single pretty-printed constant, where we cannot use space delimiter
+			if ("Cooling Mode".equals(value) || enumDpt.find(value) != null)
+				regex = ",";
+
+			final String[] split = value.split(regex, 0);
 			if (split.length == 1 && "".equals(split[0]))
 				return;
+
 			for (int i = 0; i < split.length; i++) {
-				final String s = split[split.length - 1 - i];
+				final String s = split[split.length - 1 - i].trim(); // trim in case of ',' delimiter
 
 				// try bit flag
 				final int bit = "1".equals(s) || "true".equalsIgnoreCase(s) ? 1 : "0".equals(s) || "false".equalsIgnoreCase(s) ? 0 : -1;
 				if (bit == 1)
 					result |= bit << i;
 				else if (bit == -1) {
+					// RHCC status special case: controller in 'Cooling Mode' means HeatingMode = false and CoolingDisabled = false
+					if (dpt.equals(DptRhccStatus) && "Cooling Mode".equals(s))
+						continue;
+
 					// try enum element name
-					final EnumDpt<?> enumDpt = (EnumDpt<?>) dpt;
 					final Enum<?> e = enumDpt.find(s);
 					if (e == null)
-						throw newException("value is no element of " + enumDpt.elements.getSimpleName(), value);
+						throw newException("value is no element of " + enumDpt.elements.getSimpleName(), s);
 					result |= 1 << e.ordinal();
 				}
 			}

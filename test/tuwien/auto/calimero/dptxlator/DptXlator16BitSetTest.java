@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018 B. Malinowsky
+    Copyright (c) 2018, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,6 +47,7 @@ import static tuwien.auto.calimero.dptxlator.DptXlator16BitSet.RhccStatus.Heatin
 import static tuwien.auto.calimero.dptxlator.DptXlator16BitSet.RhccStatus.OverheatAlarm;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -55,6 +56,7 @@ import org.junit.jupiter.api.Test;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.dptxlator.DptXlator16BitSet.Medium;
+import tuwien.auto.calimero.dptxlator.DptXlator16BitSet.RhccStatus;
 
 class DptXlator16BitSetTest {
 	private DptXlator16BitSet t;
@@ -235,5 +237,36 @@ class DptXlator16BitSetTest {
 		t = new DptXlator16BitSet(DptXlator16BitSet.DptMedia);
 		t.setValue("1 1 0 1 1 0");
 		assertEquals("Knxip, RF, PL110, TP1", t.getValue());
+	}
+
+	@Test
+	void useNoMedium() throws KNXFormatException {
+		t = new DptXlator16BitSet(DptXlator16BitSet.DptMedia);
+
+		t.setValue(t.getValue());
+		assertEquals("", t.getValue());
+		assertEquals(0, t.getNumericValue());
+
+		t.setValue(EnumSet.noneOf(DptXlator16BitSet.Medium.class));
+		assertEquals("", t.getValue());
+		assertEquals(0, t.getNumericValue());
+	}
+
+	@Test
+	void setPrettyPrintedConstants() throws KNXFormatException {
+		t.setValue(t.getValue());
+		assertEquals(0, t.getNumericValue());
+
+		t.setValue(EnumSet.of(RhccStatus.EarlyMorningStart));
+		t.setValue(t.getValue());
+
+		t.setValue(EnumSet.of(RhccStatus.EarlyMorningStart, RhccStatus.FrostAlarm));
+		t.setValue(t.getValue());
+	}
+
+	@Test
+	void stringifyEnumConstants() throws KNXFormatException {
+		t.setValue(RhccStatus.EarlyEveningShutdown.name());
+		t.setValue(RhccStatus.EarlyEveningShutdown.name() + " " + RhccStatus.OverheatAlarm.name());
 	}
 }
