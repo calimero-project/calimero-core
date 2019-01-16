@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,6 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
@@ -180,30 +179,7 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	public static final DPT DPT_WIND_SPEED_KMH = new DPT("9.028", "Wind speed", "0", "670760.96",
 			"km/h");
 
-	private static final Map<String, DPT> types;
-
-	static {
-		types = new HashMap<>(25);
-		types.put(DPT_TEMPERATURE.getID(), DPT_TEMPERATURE);
-		types.put(DPT_TEMPERATURE_DIFFERENCE.getID(), DPT_TEMPERATURE_DIFFERENCE);
-		types.put(DPT_TEMPERATURE_GRADIENT.getID(), DPT_TEMPERATURE_GRADIENT);
-		types.put(DPT_INTENSITY_OF_LIGHT.getID(), DPT_INTENSITY_OF_LIGHT);
-		types.put(DPT_WIND_SPEED.getID(), DPT_WIND_SPEED);
-		types.put(DPT_AIR_PRESSURE.getID(), DPT_AIR_PRESSURE);
-		types.put(DPT_HUMIDITY.getID(), DPT_HUMIDITY);
-		types.put(DPT_AIRQUALITY.getID(), DPT_AIRQUALITY);
-		types.put(DPT_TIME_DIFFERENCE1.getID(), DPT_TIME_DIFFERENCE1);
-		types.put(DPT_TIME_DIFFERENCE2.getID(), DPT_TIME_DIFFERENCE2);
-		types.put(DPT_VOLTAGE.getID(), DPT_VOLTAGE);
-		types.put(DPT_ELECTRICAL_CURRENT.getID(), DPT_ELECTRICAL_CURRENT);
-		types.put(DPT_POWERDENSITY.getID(), DPT_POWERDENSITY);
-		types.put(DPT_KELVIN_PER_PERCENT.getID(), DPT_KELVIN_PER_PERCENT);
-		types.put(DPT_POWER.getID(), DPT_POWER);
-		types.put(DPT_VOLUME_FLOW.getID(), DPT_VOLUME_FLOW);
-		types.put(DPT_RAIN_AMOUNT.getID(), DPT_RAIN_AMOUNT);
-		types.put(DPT_TEMP_F.getID(), DPT_TEMP_F);
-		types.put(DPT_WIND_SPEED_KMH.getID(), DPT_WIND_SPEED_KMH);
-	}
+	private static final Map<String, DPT> types = loadDatapointTypes(DPTXlator2ByteFloat.class);
 
 	private final double min;
 	private final double max;

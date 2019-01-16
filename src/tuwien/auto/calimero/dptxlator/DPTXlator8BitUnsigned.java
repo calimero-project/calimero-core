@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@
 package tuwien.auto.calimero.dptxlator;
 
 import java.text.DecimalFormat;
-import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
@@ -104,17 +103,7 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	public static final DPT DPT_VALUE_1_UCOUNT = new DPT("5.010", "Unsigned count", "0", "255",
 			"counter pulses");
 
-	private static final Map<String, DPT> types;
-
-	static {
-		types = new HashMap<>();
-		types.put(DPT_SCALING.getID(), DPT_SCALING);
-		types.put(DPT_ANGLE.getID(), DPT_ANGLE);
-		types.put(DPT_PERCENT_U8.getID(), DPT_PERCENT_U8);
-		types.put(DPT_DECIMALFACTOR.getID(), DPT_DECIMALFACTOR);
-		types.put(DPT_VALUE_1_UCOUNT.getID(), DPT_VALUE_1_UCOUNT);
-		types.put(DPT_TARIFF.getID(), DPT_TARIFF);
-	}
+	private static final Map<String, DPT> types = loadDatapointTypes(DPTXlator8BitUnsigned.class);
 
 	/**
 	 * Creates a translator for the given datapoint type.

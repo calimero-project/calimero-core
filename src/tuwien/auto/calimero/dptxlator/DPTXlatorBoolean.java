@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,6 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
@@ -177,34 +176,7 @@ public class DPTXlatorBoolean extends DPTXlator
 	 */
 	public static final DPT DPT_HEAT_COOL = new DPT("1.100", "Heat/Cool", "cooling", "heating");
 
-	private static final Map<String, DPT> types;
-
-	static {
-		types = new HashMap<>(30);
-		types.put(DPT_SWITCH.getID(), DPT_SWITCH);
-		types.put(DPT_BOOL.getID(), DPT_BOOL);
-		types.put(DPT_ENABLE.getID(), DPT_ENABLE);
-		types.put(DPT_RAMP.getID(), DPT_RAMP);
-		types.put(DPT_ALARM.getID(), DPT_ALARM);
-		types.put(DPT_BINARYVALUE.getID(), DPT_BINARYVALUE);
-		types.put(DPT_STEP.getID(), DPT_STEP);
-		types.put(DPT_UPDOWN.getID(), DPT_UPDOWN);
-		types.put(DPT_OPENCLOSE.getID(), DPT_OPENCLOSE);
-		types.put(DPT_START.getID(), DPT_START);
-		types.put(DPT_STATE.getID(), DPT_STATE);
-		types.put(DPT_INVERT.getID(), DPT_INVERT);
-		types.put(DPT_DIMSENDSTYLE.getID(), DPT_DIMSENDSTYLE);
-		types.put(DPT_INPUTSOURCE.getID(), DPT_INPUTSOURCE);
-		types.put(DPT_RESET.getID(), DPT_RESET);
-		types.put(DPT_ACK.getID(), DPT_ACK);
-		types.put(DPT_TRIGGER.getID(), DPT_TRIGGER);
-		types.put(DPT_OCCUPANCY.getID(), DPT_OCCUPANCY);
-		types.put(DPT_WINDOW_DOOR.getID(), DPT_WINDOW_DOOR);
-		types.put(DPT_LOGICAL_FUNCTION.getID(), DPT_LOGICAL_FUNCTION);
-		types.put(DPT_SCENE_AB.getID(), DPT_SCENE_AB);
-		types.put(DPT_SHUTTER_BLINDS_MODE.getID(), DPT_SHUTTER_BLINDS_MODE);
-		types.put(DPT_HEAT_COOL.getID(), DPT_HEAT_COOL);
-	}
+	private static final Map<String, DPT> types = loadDatapointTypes(DPTXlatorBoolean.class);
 
 	/**
 	 * Creates a translator for the given datapoint type.
