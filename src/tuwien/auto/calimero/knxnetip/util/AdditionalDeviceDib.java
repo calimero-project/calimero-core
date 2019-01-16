@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018 B. Malinowsky
+    Copyright (c) 2018, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ import java.nio.ByteBuffer;
 
 import tuwien.auto.calimero.DeviceDescriptor;
 import tuwien.auto.calimero.DeviceDescriptor.DD0;
-import tuwien.auto.calimero.KNXFormatException;;
+import tuwien.auto.calimero.KNXFormatException;
 
 /**
  * Device DIB, providing additional information to {@link DeviceDIB}. Objects of this type are immutable.
