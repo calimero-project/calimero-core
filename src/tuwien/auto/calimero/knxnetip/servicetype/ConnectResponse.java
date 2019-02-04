@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -62,6 +62,10 @@ public class ConnectResponse extends ServiceType
 {
 	private static final int NoMoreUniqueConnections = 0x25;
 	private static final int AuthError = 0x28;
+	private static final int NoTunnelingAddress = 0x2d;
+	private static final int ConnectionInUse = 0x2e;
+	private static final int Error = 0x0f;
+
 
 	private final int status;
 	private int channelid;
@@ -201,19 +205,21 @@ public class ConnectResponse extends ServiceType
 			return "KNXnet/IP tunneling address for connection is not unique";
 		case ErrorCodes.KNX_CONNECTION:
 			return "server detected error concerning KNX subsystem connection";
-		case AuthError:
-			return "authorization error";
 		case ErrorCodes.TUNNELING_LAYER:
 			return "the requested tunneling layer is not supported";
-		// this error code is also returned by N146 device for some reason
+		case AuthError:
+			return "authorization error";
+		case NoTunnelingAddress:
+			return "requested address is not a tunneling address";
+		case ConnectionInUse:
+			return "requested address is in use";
+		case Error:
+			return "undefined error";
 		default:
 			return "unknown status";
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceType#getStructLength()
-	 */
 	@Override
 	int getStructLength()
 	{
@@ -223,10 +229,6 @@ public class ConnectResponse extends ServiceType
 		return len;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceType#toByteArray
-	 *      (java.io.ByteArrayOutputStream)
-	 */
 	@Override
 	byte[] toByteArray(final ByteArrayOutputStream os)
 	{
