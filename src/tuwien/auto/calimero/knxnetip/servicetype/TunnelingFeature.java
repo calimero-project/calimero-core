@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018 B. Malinowsky
+    Copyright (c) 2018, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -68,9 +68,9 @@ public final class TunnelingFeature extends ServiceType {
 //		private static final int Success = 0;
 //		private static final int SuccessWithCrc = 1;
 //
-//		private static final int MemoryError = 0x0;
-//		private static final int ImpossibleCommand = 0x0;
+//		private static final int MemoryError = 0xf1;
 //		private static final int InvalidCommand = 0xf2;
+//		private static final int ImpossibleCommand = 0xf3;
 //		private static final int LengthExceedsMaxApduLength = 0xf4;
 //		private static final int DataOverflow = 0xf5;
 //		private static final int DataMin = 0xf6;
@@ -83,6 +83,7 @@ public final class TunnelingFeature extends ServiceType {
 //		private static final int AddressVoid = 0xfd;
 //		private static final int DataTypeConflict = 0xfe;
 //		private static final int Error = 0xff;
+
 //	}
 
 	public enum Result {
@@ -91,7 +92,9 @@ public final class TunnelingFeature extends ServiceType {
 		SuccessWithCrc(1),
 		InvalidCommand(0xf2), // ets: also non-existing or protected resource
 		AccessReadOnly(0xfb),
-		Error(0xff);
+		Error(0xff),
+		DataVoid(0xf8),
+		AddressVoid(0xfd);
 		// @formatter:on
 
 		static Result from(final int code) {
