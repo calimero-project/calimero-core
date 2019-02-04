@@ -176,6 +176,16 @@ public class DPTXlatorBoolean extends DPTXlator
 	 */
 	public static final DPT DPT_HEAT_COOL = new DPT("1.100", "Heat/Cool", "cooling", "heating");
 
+	/**
+	 * DPT ID 1.1200, Consumer/Producer (Metering); values <b>consumer</b>, <b>producer</b>.
+	 */
+	public static final DPT DPT_CONSUMER_PRODUCER = new DPT("1.1200", "Consumer/Producer", "consumer", "producer");
+
+	/**
+	 * DPT ID 1.1201, Energy direction (Metering); values <b>positive</b>, <b>negative</b>.
+	 */
+	public static final DPT DPT_ENERGY_DIRECTION = new DPT("1.1201", "Energy direction", "positive", "negative");
+
 	private static final Map<String, DPT> types = loadDatapointTypes(DPTXlatorBoolean.class);
 
 	/**

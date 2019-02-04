@@ -607,6 +607,10 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	public static final DPT DPT_WORK = new DPT("14.079", "Work", "-3.40282347e+38f",
 			"3.40282347e+38f", "J");
 
+	/** DPT ID 14.080, Apparent Power; values from <b>-3.40282347e+38f</b> to <b>3.40282347e+38f</b> VA. */
+	public static final DPT DPT_APPARENT_POWER = new DPT("14.080", "Apparent Power", "-3.40282347e+38f",
+			"3.40282347e+38f", "VA");
+
 	private static final Map<String, DPT> types = loadDatapointTypes(DPTXlator4ByteFloat.class);
 
 	private final float min;

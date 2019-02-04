@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2018 B. Malinowsky
+    Copyright (c) 2009, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -156,7 +156,7 @@ public class DPTXlator4ByteFloatTest extends TestCase
 	public void testGetSubTypes()
 	{
 		final Map<String, DPT> types = x.getSubTypes();
-		assertEquals(80, types.size());
+		assertEquals(81, types.size());
 	}
 
 	/**
@@ -165,7 +165,7 @@ public class DPTXlator4ByteFloatTest extends TestCase
 	public void testGetSubTypesStatic()
 	{
 		final Map<String, DPT> types = DPTXlator4ByteFloat.getSubTypesStatic();
-		assertEquals(80, types.size());
+		assertEquals(81, types.size());
 	}
 
 	/**
