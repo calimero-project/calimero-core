@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -95,9 +95,16 @@ public final class DataUnitBuilder
 			if (apci6 == 0)
 				return apci4 << 6;
 		}
-		// ADC codes
-		else if (apci4 == 6 || apci4 == 7)
+		// ADC read code
+		else if (apci4 == 6)
 			return apci4 << 6;
+		else if (apci4 == 7) {
+			// extended memory r/w services use the same 4 MSB as the ADC response code
+			if (apdu.length > 5 || apci6 > 0x30)
+				return apci4 << 6 | apci6;
+			// ADC response code
+			return apci4 << 6;
+		}
 		// memory codes
 		else if (apci4 == 8 || apci4 == 9 || apci4 == 10)
 			return apci4 << 6;
@@ -401,8 +408,16 @@ public final class DataUnitBuilder
 			return "A_GroupPropValue.write";
 		case 0b1111101011:
 			return "A_GroupPropValue.info";
+		case 0b0111111011:
+			return "A_MemoryExtended.write";
+		case 0b0111111100:
+			return "A_MemoryExtended.write-response";
+		case 0b0111111101:
+			return "A_MemoryExtended.read";
+		case 0b0111111110:
+			return "A_MemoryExtended.read-response";
 		default:
-			return "unknown APCI";
+			return "APCI 0x" + Integer.toHexString(apci);
 		}
 	}
 

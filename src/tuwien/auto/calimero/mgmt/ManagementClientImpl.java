@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,11 @@
 
 package tuwien.auto.calimero.mgmt;
 
+import static java.lang.String.format;
+import static tuwien.auto.calimero.DataUnitBuilder.createAPDU;
+import static tuwien.auto.calimero.DataUnitBuilder.createLengthOptimizedAPDU;
+
+import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,6 +63,7 @@ import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
+import tuwien.auto.calimero.ReturnCode;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.internal.EventListeners;
@@ -116,6 +122,11 @@ public class ManagementClientImpl implements ManagementClient
 	private static final int NetworkParamResponse = 0b1111011011;
 	static final int NetworkParamWrite = 0b1111100100;
 
+	private static final int MemoryExtendedWrite = 0b0111111011;
+	private static final int MemoryExtendedWriteResponse = 0b0111111100;
+	private static final int MemoryExtendedRead = 0b0111111101;
+	private static final int MemoryExtendedReadResponse = 0b0111111110;
+
 	// serves as both req and res
 	private static final int RESTART = 0x0380;
 
@@ -173,6 +184,9 @@ public class ManagementClientImpl implements ManagementClient
 			listeners.fire(c -> c.accept(e));
 		}
 	};
+
+
+	private static final boolean extMemoryServices = true;
 
 	private final TransportLayer tl;
 	private final TLListener tlListener = new TLListener();
@@ -678,15 +692,31 @@ public class ManagementClientImpl implements ManagementClient
 		throws KNXTimeoutException, KNXDisconnectException, KNXRemoteException,
 		KNXLinkClosedException, InterruptedException
 	{
-		if (startAddr < 0 || startAddr > 0xFFFF || bytes < 1 || bytes > 63)
+		final int maxStartAddress = extMemoryServices ? 0xffffff : 0xffff;
+		final int maxBytes = extMemoryServices ? 248 : 63;
+		if (startAddr < 0 || startAddr > maxStartAddress || bytes < 1 || bytes > maxBytes)
 			throw new KNXIllegalArgumentException("argument value out of range");
 		if (dst.isConnectionOriented())
 			tl.connect(dst);
 		else
 			logger.error("read memory in connectionless mode, " + dst.toString());
+
+		// use extended read service for memory access above 65 K
+		if (startAddr > 0xffff) {
+			final byte[] send = createAPDU(MemoryExtendedRead,
+					new byte[] { (byte) bytes, (byte) (startAddr >>> 16), (byte) (startAddr >>> 8), (byte) startAddr });
+			final byte[] apdu = sendWait(dst, priority, send, MemoryExtendedReadResponse, 4, 252);
+			final ReturnCode ret = ReturnCode.of(apdu[2] & 0xff);
+			if (ret != ReturnCode.Success)
+				throw new KNXRemoteException(
+						format("read memory from %s 0x%x: %s", dst.getAddress(), startAddr, ret.description()));
+			return Arrays.copyOfRange(apdu, 6, apdu.length);
+		}
+
 		final byte[] apdu = sendWait(dst, priority,
-				DataUnitBuilder.createLengthOptimizedAPDU(MEMORY_READ, new byte[] { (byte) bytes,
-					(byte) (startAddr >>> 8), (byte) startAddr }), MEMORY_RESPONSE, 2, 65);
+				createLengthOptimizedAPDU(MEMORY_READ,
+						new byte[] { (byte) bytes, (byte) (startAddr >>> 8), (byte) startAddr }),
+				MEMORY_RESPONSE, 2, 65);
 		int no = apdu[1] & 0x3F;
 		if (no == 0)
 			throw new KNXRemoteException("could not read memory from 0x"
@@ -702,18 +732,42 @@ public class ManagementClientImpl implements ManagementClient
 		throws KNXDisconnectException, KNXTimeoutException, KNXRemoteException,
 		KNXLinkClosedException, InterruptedException
 	{
-		if (startAddr < 0 || startAddr > 0xFFFF || data.length == 0 || data.length > 63)
+		final int maxStartAddress = extMemoryServices ? 0xffffff : 0xffff;
+		final int maxBytes = extMemoryServices ? 250 : 63;
+		if (startAddr < 0 || startAddr > maxStartAddress || data.length == 0 || data.length > maxBytes)
 			throw new KNXIllegalArgumentException("argument value out of range");
+
+		if (dst.isConnectionOriented())
+			tl.connect(dst);
+		else
+			logger.error("write memory in connectionless mode, " + dst.toString());
+
+		// use extended write service for memory access above 65 K
+		if (startAddr > 0xffff) {
+			final byte[] addrBytes = { (byte) (startAddr >>> 16), (byte) (startAddr >>> 8), (byte) startAddr };
+			final byte[] asdu = ByteBuffer.allocate(4 + data.length).put((byte) data.length).put(addrBytes).put(data)
+					.array();
+			final byte[] send = createAPDU(MemoryExtendedWrite, asdu);
+			final byte[] apdu = sendWait(dst, priority, send, MemoryExtendedWriteResponse, 4, 252);
+			final ReturnCode ret = ReturnCode.of(apdu[2] & 0xff);
+			if (ret == ReturnCode.Success)
+				return;
+			String desc = ret.description();
+			if (ret == ReturnCode.SuccessWithCrc) {
+				final int crc = ((apdu[6] & 0xff) << 8) | (apdu[7] & 0xff);
+				if (crc16Ccitt(asdu) == crc)
+					return;
+				desc = "data verification failed (crc mismatch)";
+			}
+			throw new KNXRemoteException(format("write memory to %s 0x%x: %s", dst.getAddress(), startAddr, desc));
+		}
+
 		final byte[] asdu = new byte[data.length + 3];
 		asdu[0] = (byte) data.length;
 		asdu[1] = (byte) (startAddr >> 8);
 		asdu[2] = (byte) startAddr;
 		for (int i = 0; i < data.length; ++i)
 			asdu[3 + i] = data[i];
-		if (dst.isConnectionOriented())
-			tl.connect(dst);
-		else
-			logger.error("write memory in connectionless mode, " + dst.toString());
 		final byte[] send = DataUnitBuilder.createLengthOptimizedAPDU(MEMORY_WRITE, asdu);
 		if (dst.isVerifyMode()) {
 			// explicitly read back data
@@ -728,6 +782,20 @@ public class ManagementClientImpl implements ManagementClient
 		}
 		else
 			tl.sendData(dst, priority, send);
+	}
+
+	static int crc16Ccitt(final byte[] input) {
+		final int polynom = 0x1021;
+		final byte[] padded = Arrays.copyOf(input, input.length + 2);
+		int result = 0xffff;
+		for (int i = 0; i < 8 * padded.length; i++) {
+			result <<= 1;
+			final int nextBit = (padded[i / 8] >> (7 - (i % 8))) & 0x1;
+			result |= nextBit;
+			if ((result & 0x10000) != 0)
+				result ^= polynom;
+		}
+		return result & 0xffff;
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,15 +38,19 @@ package tuwien.auto.calimero.mgmt;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import tag.KnxnetIP;
 import tuwien.auto.calimero.IndividualAddress;
@@ -256,21 +260,21 @@ public class ManagementClientImplTest
 			fail("invalid mem address");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-		try {
-			mc.readMemory(dco, 0x10000, 2);
-			fail("invalid mem address");
-		}
-		catch (final KNXIllegalArgumentException e) {}
+//		try {
+//			mc.readMemory(dco, 0x10000, 2);
+//			fail("invalid mem address");
+//		}
+//		catch (final KNXIllegalArgumentException e) {}
 		try {
 			mc.readMemory(dco, 0x100, -1);
 			fail("invalid mem range");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-		try {
-			mc.readMemory(dco, 0x100, 64);
-			fail("invalid mem range");
-		}
-		catch (final KNXIllegalArgumentException e) {}
+//		try {
+//			mc.readMemory(dco, 0x100, 64);
+//			fail("invalid mem range");
+//		}
+//		catch (final KNXIllegalArgumentException e) {}
 
 		final byte[] mem = mc.readMemory(dco2, 0x105, 2);
 		Util.out("read mem from 0x105", mem);
@@ -734,5 +738,42 @@ public class ManagementClientImplTest
 		Util.out(dco2.getAddress().toString() + " has desc.type 0", desc);
 		// desc = mc.readDeviceDesc(dco2, 2);
 		// Debug.out(dco2.getAddress().toString() + " has desc.type 2 = ", desc);
+	}
+
+	@Test
+	void writeMemoryExtended() throws KNXException, InterruptedException {
+		final byte[] mem = new byte[1];
+		mc.writeMemory(dco, 0x10000, mem);
+	}
+
+	@Test
+	void writeMemoryExtendedOutOfRange() {
+		final byte[] mem = new byte[1];
+		assertThrows(KNXIllegalArgumentException.class, () -> mc.writeMemory(dco, 0x1000000, mem));
+	}
+
+	@Test
+	void writeMemoryExtendedMaxData() {
+		final byte[] mem = new byte[250];
+		assertThrows(KNXIllegalArgumentException.class, () -> mc.writeMemory(dco, 0x10000, mem));
+	}
+
+	@Test
+	void writeMemoryExtendedTooMuchData() {
+		final byte[] mem = new byte[251];
+		assertThrows(KNXIllegalArgumentException.class, () -> mc.writeMemory(dco, 0x10000, mem));
+	}
+
+	@Test
+	void readMemoryExtended() throws KNXException, InterruptedException {
+		mc.readMemory(dco, 0x10000, 1);
+	}
+
+	@ParameterizedTest
+	@CsvSource({ "A, 0x9479", "123456789, 0xe5cc" })
+	void crc16Ccitt(final String msg, final String crc) {
+		final byte[] test = msg.getBytes(StandardCharsets.US_ASCII);
+		final int value = ManagementClientImpl.crc16Ccitt(test);
+		assertEquals((int) Integer.decode(crc), value);
 	}
 }
