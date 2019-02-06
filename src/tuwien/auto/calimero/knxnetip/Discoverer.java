@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -316,6 +316,34 @@ public class Discoverer
 		}
 		catch (final KNXException e) {
 			return CompletableFuture.failedFuture(e);
+		}
+	}
+
+	// extended unicast search to server control endpoint
+	CompletableFuture<Result<SearchResponse>> search(final InetSocketAddress serverControlEndpoint,
+		final Srp... searchParameters) throws KNXException {
+
+		final InetAddress addr = host(host);
+		final MulticastSocket s = createSocket(true, addr, port, null, false);
+		// create a new socket address with host, since the socket might
+		// return the wildcard address for loopback or default host address; but port
+		// is necessarily queried from socket since it might have been 0 before (for ephemeral port)
+		final InetSocketAddress local = new InetSocketAddress(addr, s.getLocalPort());
+		logger.debug("search {} -> server control endpoint {}", local, serverControlEndpoint);
+		try {
+			final boolean tcp = false;
+			final InetSocketAddress res = tcp || nat ? new InetSocketAddress(0) : local;
+
+			final byte[] request = PacketHelper.toPacket(new SearchRequest(res, searchParameters));
+			s.send(new DatagramPacket(request, request.length, serverControlEndpoint));
+
+			// TODO getSearchResponses here is wrong (w/ multiple searches, also receiver should return it asap)
+			return receiveAsync(s, addr, Duration.ofSeconds(10), "" + addr.getHostAddress())
+					.thenApply(__ -> getSearchResponses().get(0));
+		}
+		catch (final IOException e) {
+			s.close();
+			throw new KNXException("search request to " + serverControlEndpoint + " failed on " + local, e);
 		}
 	}
 

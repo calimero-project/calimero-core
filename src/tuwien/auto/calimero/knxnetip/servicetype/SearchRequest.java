@@ -1,7 +1,7 @@
 /*
     Calimero 2 - A library for KNX network access
     Copyright (c) 2005 B. Erb
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
     Copyright (c) 2018 Karsten Heimrich
 
     This program is free software; you can redistribute it and/or modify
@@ -130,7 +130,7 @@ public class SearchRequest extends ServiceType
 	}
 
 	/**
-	 * Creates a new search request with the given response address and request specific DIBs.
+	 * Creates a new search request with the given response address and search parameters.
 	 *
 	 * @param responseAddr address of the client discovery endpoint used for the response; to create a NAT aware search
 	 *        request, use the anylocal/wildcard address with port 0 ({@code new InetSocketAddress(0)})

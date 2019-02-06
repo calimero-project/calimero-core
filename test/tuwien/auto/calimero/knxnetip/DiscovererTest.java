@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static tuwien.auto.calimero.knxnetip.util.Srp.withService;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -64,6 +65,7 @@ import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
 import junit.framework.AssertionFailedError;
 import tag.KnxnetIP;
+import tag.Slow;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXTimeoutException;
@@ -72,6 +74,7 @@ import tuwien.auto.calimero.knxnetip.Discoverer.Result;
 import tuwien.auto.calimero.knxnetip.servicetype.DescriptionResponse;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
+import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB;
 
 /**
  * @author B. Malinowsky
@@ -560,5 +563,22 @@ class DiscovererTest
 		final List<Thread> l = Arrays.asList(threads);
 		assertTrue(l.stream().filter(Objects::nonNull).map(Thread::getName).filter(s -> s.startsWith("Discoverer"))
 				.allMatch(s -> s.equals("Discoverer (idle)")));
+	}
+
+	@Test
+	void searchControlEndpoint() throws KNXException, InterruptedException, ExecutionException {
+		final InetSocketAddress server = Util.getServer();
+		final CompletableFuture<Result<SearchResponse>> search = ddef.search(server,
+				withService(ServiceFamiliesDIB.CORE, 2));
+		assertEquals(server, search.get().remoteEndpoint());
+	}
+
+	@Test
+	@Slow
+	void searchNonExistingControlEndpoint() throws KNXException {
+		final InetSocketAddress server = new InetSocketAddress(Util.getServer().getAddress(), 5000);
+		final CompletableFuture<Result<SearchResponse>> search = ddef.search(server,
+				withService(ServiceFamiliesDIB.CORE, 2));
+		assertThrows(ExecutionException.class, search::get);
 	}
 }
