@@ -36,7 +36,7 @@
 
 package tuwien.auto.calimero.knxnetip.servicetype;
 
-import static tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature.Result.Success;
+import static tuwien.auto.calimero.ReturnCode.Success;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
@@ -45,6 +45,7 @@ import java.util.Optional;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.ReturnCode;
 
 /**
  * Provides minimal management services over a KNXnet/IP tunneling connection (similar to the KNX USB Bus Access Server
@@ -55,58 +56,16 @@ public final class TunnelingFeature extends ServiceType {
 	// TODO list of features is reused from the USB Bus Access Server Feature protocol
 //	HidReport.BusAccessServerFeature featureId;
 	public enum InterfaceFeature {
-		SupportedEmiTypes, DeviceDescriptorType0, ConnectionStatus, Manufacturer, ActiveEmiType, IndividualAddress, MaxApduLength,
+		SupportedEmiTypes,
+		DeviceDescriptorType0,
+		ConnectionStatus,
+		Manufacturer,
+		ActiveEmiType,
+		IndividualAddress,
+		MaxApduLength,
 		EnableFeatureInfoService;
 
 		int id() { return ordinal() + 1; }
-
-		String friendly() { return name().replaceAll("(\\p{Lower})\\B([A-Z])", "$1 $2").toLowerCase(); }
-	}
-
-	// list of RCs used with tunneling feature services
-//	class RC {
-//		private static final int Success = 0;
-//		private static final int SuccessWithCrc = 1;
-//
-//		private static final int MemoryError = 0xf1;
-//		private static final int InvalidCommand = 0xf2;
-//		private static final int ImpossibleCommand = 0xf3;
-//		private static final int LengthExceedsMaxApduLength = 0xf4;
-//		private static final int DataOverflow = 0xf5;
-//		private static final int DataMin = 0xf6;
-//		private static final int DataMax = 0xf7;
-//		private static final int DataVoid = 0xf8;
-//		private static final int TemporarilyNotAvailable = 0xf9;
-//		private static final int AccessWriteOnly = 0xfa;
-//		private static final int AccessReadOnly = 0xfb;
-//		private static final int AccessDenied = 0xfc;
-//		private static final int AddressVoid = 0xfd;
-//		private static final int DataTypeConflict = 0xfe;
-//		private static final int Error = 0xff;
-
-//	}
-
-	public enum Result {
-		// @formatter:off
-		Success(0),
-		SuccessWithCrc(1),
-		InvalidCommand(0xf2), // ets: also non-existing or protected resource
-		AccessReadOnly(0xfb),
-		Error(0xff),
-		DataVoid(0xf8),
-		AddressVoid(0xfd);
-		// @formatter:on
-
-		static Result from(final int code) {
-			for (final Result s : values())
-				if (code == s.code)
-					return s;
-			throw new KNXIllegalArgumentException("invalid tunneling feature result code 0x" + Integer.toHexString(code));
-		}
-
-		private final int code;
-
-		private Result(final int code) { this.code = code; }
 
 		String friendly() { return name().replaceAll("(\\p{Lower})\\B([A-Z])", "$1 $2").toLowerCase(); }
 	}
@@ -133,9 +92,10 @@ public final class TunnelingFeature extends ServiceType {
 	 * @param featureValue feature value sent with a response (optional, depdending on {@code result})
 	 * @return new tunneling feature-response service
 	 */
-	public static TunnelingFeature newResponse(final int channelId, final int seq, final InterfaceFeature featureId, final Result result,
-		final byte... featureValue) {
-		return new TunnelingFeature(KNXnetIPHeader.TunnelingFeatureResponse, channelId, seq, featureId, result, featureValue);
+	public static TunnelingFeature newResponse(final int channelId, final int seq, final InterfaceFeature featureId,
+		final ReturnCode result, final byte... featureValue) {
+		return new TunnelingFeature(KNXnetIPHeader.TunnelingFeatureResponse, channelId, seq, featureId, result,
+				featureValue);
 	}
 
 	/**
@@ -186,11 +146,11 @@ public final class TunnelingFeature extends ServiceType {
 	private final int seq;
 
 	private final InterfaceFeature featureId;
-	private final Result status;
+	private final ReturnCode status;
 	private final byte[] data;
 
 	private TunnelingFeature(final int serviceType, final int channelId, final int seq, final InterfaceFeature featureId,
-		final Result status, final byte... data) {
+		final ReturnCode status, final byte... data) {
 		super(serviceType);
 
 		this.channelId = channelId;
@@ -213,9 +173,9 @@ public final class TunnelingFeature extends ServiceType {
 		seq = bb.get() & 0xff;
 		/* int reserved = */ bb.get();
 
-		featureId = InterfaceFeature.values()[(bb.get() & 0xff) - 1];
-		status = Result.from(bb.get() & 0xff);
-		if (status.code > 0xf0)
+		featureId = InterfaceFeature.values()[(bb.get() & 0xff) - 1]; // TODO sanitize received interface feature id
+		status = ReturnCode.of(bb.get() & 0xff);
+		if (status.code() > 0xf0)
 			logger.warn("channel {} feature {} responded with '{}'", channelId, featureId.friendly(), status.friendly());
 		data = new byte[bb.remaining()];
 		bb.get(data);
@@ -224,7 +184,7 @@ public final class TunnelingFeature extends ServiceType {
 
 	private void validateFeatureValueLength() {
 		final int length;
-		if (svcType == KNXnetIPHeader.TunnelingFeatureGet || status.code > 0x7f)
+		if (svcType == KNXnetIPHeader.TunnelingFeatureGet || status.code() > 0x7f)
 			length = 0;
 		else {
 			switch (featureId) {
@@ -265,7 +225,7 @@ public final class TunnelingFeature extends ServiceType {
 		return data.length > 0 ? Optional.of(data) : Optional.empty();
 	}
 
-	Result status() {
+	ReturnCode status() {
 		return status;
 	}
 
@@ -288,7 +248,7 @@ public final class TunnelingFeature extends ServiceType {
 		os.write(0);
 
 		os.write(featureId.id());
-		os.write(status.code);
+		os.write(status.code());
 		os.write(data, 0, data.length);
 		return os.toByteArray();
 	}
