@@ -36,10 +36,10 @@
 
 package tuwien.auto.calimero.knxnetip.util;
 
+import java.nio.ByteBuffer;
+
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-
-import java.nio.ByteBuffer;
 
 /**
  * Search Request Parameter Block (SRP).
@@ -210,7 +210,7 @@ public final class Srp
 	 * @return search request parameter block for devices with a given MAC address
 	 */
 	public static Srp withMacAddress(final byte[] macAddress) {
-		return new Srp(Type.SelectByMacAddress, false);
+		return new Srp(Type.SelectByMacAddress, false, macAddress);
 	}
 
 	/**
@@ -221,7 +221,7 @@ public final class Srp
 	 * @return mandatory search request parameter block for with a given MAC address
 	 */
 	public static Srp withMacAddressOnly(final byte[] macAddress) {
-		return new Srp(Type.SelectByMacAddress, true);
+		return new Srp(Type.SelectByMacAddress, true, macAddress);
 	}
 
 	/**
