@@ -108,9 +108,9 @@ public class SearchRequest extends ServiceType
 		endpoint = new HPAI(data, offset);
 
 		if (svc == KNXnetIPHeader.SearchRequest && length > MinimumStructSize) {
-			int index = offset + endpoint.getStructLength();
+			int index = endpoint.getStructLength();
 			while (index < length) {
-				final Srp srp = new Srp(data, index);
+				final Srp srp = new Srp(data, offset + index);
 				srps.add(srp);
 				index += srp.getStructLength();
 			}

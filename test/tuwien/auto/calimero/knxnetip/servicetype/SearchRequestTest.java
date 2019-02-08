@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018 B. Malinowsky
+    Copyright (c) 2018, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,13 +41,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 import tuwien.auto.calimero.KNXFormatException;
-import tuwien.auto.calimero.knxnetip.util.Srp;
 import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB;
+import tuwien.auto.calimero.knxnetip.util.Srp;
 
 class SearchRequestTest {
 
@@ -77,6 +78,19 @@ class SearchRequestTest {
 	}
 
 	@Test
+	void parseRequestWithSrpAtNonZeroOffset() throws KNXFormatException {
+		final byte[] packet = PacketHelper.toPacket(new SearchRequest(responseAddr, dib));
+
+		final int offset = 10;
+		final byte[] data = ByteBuffer.allocate(50).put(new byte[offset]).put(packet).array();
+		final KNXnetIPHeader h = new KNXnetIPHeader(data, offset);
+		assertEquals(KNXnetIPHeader.SearchRequest, h.getServiceType());
+
+		final SearchRequest req = SearchRequest.from(h, data, offset + h.getStructLength());
+		assertArrayEquals(dibBytes, req.searchParameters().get(0).getData(), "SRP mismatch");
+	}
+
+	@Test
 	void parseRequestWithEmptySrps() throws KNXFormatException {
 		final byte[] packet = PacketHelper.toPacket(new SearchRequest(responseAddr, new Srp[0]));
 		final KNXnetIPHeader h = new KNXnetIPHeader(packet, 0);
@@ -97,7 +111,7 @@ class SearchRequestTest {
 		final SearchRequest req = new SearchRequest(responseAddr, dib);
 		assertArrayEquals(dibBytes, req.searchParameters().get(0).getData(), "SRP mismatch");
 
-		byte[] dib = {0x01, 0x02};
+		final byte[] dib = {0x01, 0x02};
 		final SearchRequest shortReq = new SearchRequest(responseAddr, new Srp(Srp.Type.RequestDibs, false, dib));
 		assertArrayEquals(dib, shortReq.searchParameters().get(0).getData(), "SRP mismatch");
 	}
