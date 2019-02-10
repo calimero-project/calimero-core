@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018 K.Heimrich
+    Copyright (c) 2018, 2019 K.Heimrich
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -59,30 +59,30 @@ public final class Srp
 	public enum Type {
 		/**
 		 * The invalid type is used to test the behavior of the KNXnet/IP router or server for unknown
-		 * SRPs. Please do not use in production type.
+		 * SRPs. Please do not use in production.
 		 */
-		InvalidSrp(0x00),
+		Invalid(0x00),
 
 		/**
-		 * The select by programming mode type-type is used to indicate that a client is interested only in the
+		 * The select by programming mode type is used to indicate that a client is interested only in the
 		 * response from KNXnet/IP router or server where programming mode is currently enabled.
 		 */
 		SelectByProgrammingMode(0x01),
 
 		/**
-		 * The select by MAC address type-type is used to indicate that a client is interested only in the
+		 * The select by MAC address type is used to indicate that a client is interested only in the
 		 * response from KNXnet/IP router or server with the given MAC address.
 		 */
 		SelectByMacAddress(0x02),
 
 		/**
-		 * The select by service type-type is used to indicate that a client is interested only in the response
+		 * The select by service type is used to indicate that a client is interested only in the response
 		 * from KNXnet/IP router or server supporting the given service family and in at least the given version.
 		 */
 		SelectByService(0x03),
 
 		/**
-		 * The request DIBs type-type is used to indicate that a client is interested in at least the given
+		 * The request DIBs type is used to indicate that a client is interested in at least the given
 		 * description types.
 		 */
 		RequestDibs(0x04);
@@ -115,7 +115,6 @@ public final class Srp
 
 	/**
 	 * Creates a new SRP and initializes basic fields.
-	 * <p>
 	 *
 	 * @param srpType one of the search request parameter block types (see {@link Type})
 	 * @param isMandatory to be evaluated by a KNXnet/IP router or server device
@@ -126,7 +125,7 @@ public final class Srp
 		mandatory = isMandatory;
 
 		switch (srpType) {
-		case InvalidSrp:
+		case Invalid:
 		case SelectByProgrammingMode:
 			size = SrpHeaderSize;
 			this.data = new byte[0];
@@ -157,7 +156,6 @@ public final class Srp
 
 	/**
 	 * Creates a new SRP out of a byte array.
-	 * <p>
 	 *
 	 * @param data byte array containing SRP structure
 	 * @param offset start offset of SRP in <code>data</code>
@@ -189,16 +187,6 @@ public final class Srp
 	 * @return search request parameter block for devices currently in programming mode
 	 */
 	public static Srp withProgrammingMode() {
-		return new Srp(Type.SelectByProgrammingMode, false);
-	}
-
-	/**
-	 * Creates a search request parameter block to limit the extended search request to KNXnet/IP router
-	 * or server devices where programming mode is currently enabled. The mandatory flag of the SRP is set.
-	 *
-	 * @return mandatory search request parameter block for devices currently in programming mode
-	 */
-	public static Srp withProgrammingModeOnly() {
 		return new Srp(Type.SelectByProgrammingMode, true);
 	}
 
@@ -210,17 +198,6 @@ public final class Srp
 	 * @return search request parameter block for devices with a given MAC address
 	 */
 	public static Srp withMacAddress(final byte[] macAddress) {
-		return new Srp(Type.SelectByMacAddress, false, macAddress);
-	}
-
-	/**
-	 * Creates a search request parameter block to limit the extended search request to KNXnet/IP router
-	 * or server devices with the given MAC address. The mandatory flag of the SRP is set.
-	 *
-	 * @param macAddress the MAC address used in the search request parameter block
-	 * @return mandatory search request parameter block for with a given MAC address
-	 */
-	public static Srp withMacAddressOnly(final byte[] macAddress) {
 		return new Srp(Type.SelectByMacAddress, true, macAddress);
 	}
 
@@ -234,19 +211,6 @@ public final class Srp
 	 * @return search request parameter block for devices with a given service family and version
 	 */
 	public static Srp withService(final int familyId, final int familyVersion) {
-		return new Srp(Type.SelectByService, false, (byte) familyId, (byte) familyVersion);
-	}
-
-	/**
-	 * Creates a search request parameter block to limit the extended search request to KNXnet/IP router
-	 * or server devices with the given service family and corresponding family version. The mandatory flag
-	 * of the SRP is set.
-	 *
-	 * @param familyId the family ID used in the in the search request parameter block
-	 * @param familyVersion the family version used in the in the search request parameter block
-	 * @return mandatory search request parameter block for devices with a given service family and version
-	 */
-	public static Srp withServiceOnly(final int familyId, final int familyVersion) {
 		return new Srp(Type.SelectByService, true, (byte) familyId, (byte) familyVersion);
 	}
 
@@ -264,12 +228,11 @@ public final class Srp
 			buffer.put((byte) dt);
 		buffer.put((byte) descriptionType);
 
-		return new Srp(Type.RequestDibs, false, buffer.array());
+		return new Srp(Type.RequestDibs, true, buffer.array());
 	}
 
 	/**
 	 * Returns the structure length of this SRP in bytes.
-	 * <p>
 	 *
 	 * @return structure length as unsigned byte
 	 */
@@ -291,7 +254,6 @@ public final class Srp
 
 	/**
 	 * Returns the mandatory flag of this SRP.
-	 * <p>
 	 *
 	 * @return <code>true</code> if the mandatory bit is set, <code>false</code> otherwise
 	 */
@@ -312,7 +274,6 @@ public final class Srp
 
 	/**
 	 * Returns the byte representation of the whole SRP structure.
-	 * <p>
 	 *
 	 * @return byte array containing the SRP structure
 	 */
