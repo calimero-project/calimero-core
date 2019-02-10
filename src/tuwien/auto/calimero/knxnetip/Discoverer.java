@@ -36,6 +36,8 @@
 
 package tuwien.auto.calimero.knxnetip;
 
+import static tuwien.auto.calimero.knxnetip.util.Srp.withDeviceDescription;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -61,6 +63,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 
@@ -79,8 +82,6 @@ import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
 import tuwien.auto.calimero.knxnetip.util.DIB;
 import tuwien.auto.calimero.knxnetip.util.Srp;
 import tuwien.auto.calimero.log.LogService;
-
-import static tuwien.auto.calimero.knxnetip.util.Srp.withDeviceDescription;
 
 /**
  * Does KNXnet/IP discovery and retrieval of self description from other devices.
@@ -310,9 +311,9 @@ public class Discoverer
 			throw new KNXException("IPv4 address required if NAT is not used (supplied " + host.getHostAddress() + ")");
 	}
 
-	CompletableFuture<List<Result<SearchResponse>>> searchAsync(final Duration timeout) {
+	CompletableFuture<List<Result<SearchResponse>>> search(final Duration timeout) {
 		try {
-			return search(timeout);
+			return searchAsync(timeout);
 		}
 		catch (final KNXException e) {
 			return CompletableFuture.failedFuture(e);
@@ -320,7 +321,7 @@ public class Discoverer
 	}
 
 	// extended unicast search to server control endpoint
-	CompletableFuture<Result<SearchResponse>> search(final InetSocketAddress serverControlEndpoint,
+	public CompletableFuture<Result<SearchResponse>> search(final InetSocketAddress serverControlEndpoint,
 		final Srp... searchParameters) throws KNXException {
 
 		final InetAddress addr = host(host);
@@ -336,10 +337,7 @@ public class Discoverer
 
 			final byte[] request = PacketHelper.toPacket(new SearchRequest(res, searchParameters));
 			s.send(new DatagramPacket(request, request.length, serverControlEndpoint));
-
-			// TODO getSearchResponses here is wrong (w/ multiple searches, also receiver should return it asap)
-			return receiveAsync(s, addr, Duration.ofSeconds(10), "" + addr.getHostAddress())
-					.thenApply(__ -> getSearchResponses().get(0));
+			return receiveAsync(s, serverControlEndpoint, Duration.ofSeconds(10));
 		}
 		catch (final IOException e) {
 			s.close();
@@ -468,7 +466,7 @@ public class Discoverer
 		}
 	}
 
-	private CompletableFuture<List<Result<SearchResponse>>> search(final Duration timeout) throws KNXException {
+	private CompletableFuture<List<Result<SearchResponse>>> searchAsync(final Duration timeout) throws KNXException {
 		if (timeout.isNegative())
 			throw new KNXIllegalArgumentException("timeout has to be >= 0");
 		final NetworkInterface[] nifs;
@@ -788,9 +786,25 @@ public class Discoverer
 		return cf;
 	}
 
+	private CompletableFuture<Result<SearchResponse>> receiveAsync(final MulticastSocket socket,
+		final InetSocketAddress serverCtrlEndpoint, final Duration timeout) throws SocketException {
+
+		final NetworkInterface nif = socket.getNetworkInterface();
+		final InetAddress addr = socket.getLocalAddress();
+		final ReceiverLoop looper = new ReceiverLoop(socket, 512, 0, serverCtrlEndpoint);
+		final CompletableFuture<Result<SearchResponse>> cf = CompletableFuture.runAsync(looper, executor)
+				.thenApply(__ -> new Result<>(looper.sr, nif, addr, serverCtrlEndpoint))
+				.orTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS);
+		cf.exceptionally(t -> {
+			looper.quit();
+			return null;
+		});
+		return cf;
+	}
+
 	private final class ReceiverLoop extends UdpSocketLooper implements Runnable
 	{
-		private final boolean search;
+		private final boolean multicast;
 		private final InetSocketAddress server;
 		private NetworkInterface nif;
 
@@ -799,6 +813,7 @@ public class Discoverer
 
 		// used for description looper
 		private DescriptionResponse res;
+		private SearchResponse sr;
 		private KNXInvalidResponseException thrown;
 		private final String id;
 
@@ -815,7 +830,7 @@ public class Discoverer
 				throw new KNXIllegalArgumentException("getting network interface of socket " + socket, e);
 			}
 			this.addrOnNetif = addrOnNetIf;
-			search = true;
+			multicast = true;
 			server = null;
 			id = name;
 		}
@@ -827,9 +842,18 @@ public class Discoverer
 		{
 			super(socket, true, receiveBufferSize, 0, timeout);
 			addrOnNetif = null;
-			search = false;
+			multicast = false;
 			server = queriedServer;
 			id = "" + socket.getLocalSocketAddress();
+		}
+
+		ReceiverLoop(final DatagramSocket socket, final int receiveBufferSize, final Duration timeout,
+			final InetSocketAddress serverCtrlEndpoint) {
+			super(socket, true, receiveBufferSize, 0, (int) timeout.toMillis());
+			addrOnNetif = null;
+			multicast = false;
+			server = serverCtrlEndpoint;
+			id = "" + serverCtrlEndpoint;
 		}
 
 		@Override
@@ -853,7 +877,7 @@ public class Discoverer
 		@Override
 		public void quit()
 		{
-			if (search) {
+			if (multicast) {
 				try {
 					((MulticastSocket) s).leaveGroup(new InetSocketAddress(SYSTEM_SETUP_MULTICAST, 0), null);
 				}
@@ -873,7 +897,7 @@ public class Discoverer
 				if (h.getTotalLength() > length)
 					logger.warn("ignore received packet from {}, packet size {} > buffer size {}", source,
 							h.getTotalLength(), length);
-				else if (search && (svc == KNXnetIPHeader.SEARCH_RES || svc == KNXnetIPHeader.SearchResponse)) {
+				else if (multicast && (svc == KNXnetIPHeader.SEARCH_RES || svc == KNXnetIPHeader.SearchResponse)) {
 					// if our search is still running, add response if not already added
 					synchronized (receivers) {
 						if (receivers.contains(this)) {
@@ -884,7 +908,7 @@ public class Discoverer
 						}
 					}
 				}
-				else if (!search && svc == KNXnetIPHeader.DESCRIPTION_RES) {
+				else if (!multicast && svc == KNXnetIPHeader.DESCRIPTION_RES) {
 					if (source.equals(server)) {
 						try {
 							res = new DescriptionResponse(data, offset + h.getStructLength(), bodyLen);
@@ -892,6 +916,19 @@ public class Discoverer
 						catch (final KNXFormatException e) {
 							logger.error("invalid description response", e);
 							thrown = new KNXInvalidResponseException("description response from " + source, e);
+						}
+						finally {
+							quit();
+						}
+					}
+				}
+				else if (!multicast && svc == KNXnetIPHeader.SearchResponse) {
+					if (source.equals(server)) {
+						try {
+							sr = SearchResponse.from(h, data, offset + h.getStructLength());
+						}
+						catch (final KNXFormatException e) {
+							thrown = new KNXInvalidResponseException("search response from " + source, e);
 						}
 						finally {
 							quit();
