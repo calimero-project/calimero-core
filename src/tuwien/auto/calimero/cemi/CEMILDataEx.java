@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -253,9 +253,9 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 *        </ul>
 	 *        for indication message - <code>true</code> if is repeated frame, <code>false</code>
 	 *        otherwise
-	 * @param broadcast system / domain broadcast behavior, applicable on open media only:
-	 *        <code>false</code> for system broadcast, <code>true</code> for broadcast; on closed
-	 *        media set <code>true</code> for "don't care"
+	 * @param domainBroadcast system / domain broadcast behavior:
+	 *        <code>true</code> for domain broadcast, <code>false</code> for system broadcast (on TP1 medium,
+	 *        set <code>true</code> for "don't care")
 	 * @param ack acknowledge request, <code>true</code> if acknowledge is requested,
 	 *        <code>false</code> for default behavior; meaning of default behavior on media:
 	 *        <ul>
@@ -264,10 +264,10 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 * @param hopCount hop count starting value set in control field, in the range 0 &le; value &le; 7
 	 */
 	public CEMILDataEx(final int msgCode, final IndividualAddress src, final KNXAddress dst,
-		final byte[] tpdu, final Priority p, final boolean repeat, final boolean broadcast,
+		final byte[] tpdu, final Priority p, final boolean repeat, final boolean domainBroadcast,
 		final boolean ack, final int hopCount)
 	{
-		super(msgCode, src, dst, tpdu, p, repeat, broadcast, ack, hopCount);
+		super(msgCode, src, dst, tpdu, p, repeat, domainBroadcast, ack, hopCount);
 		// check extended frame
 		if (tpdu.length > 16)
 			ctrl1 &= ~0x80;

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ import static tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode.NonB
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
@@ -52,6 +53,8 @@ import java.util.List;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
+import tuwien.auto.calimero.GroupAddress;
+import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -59,6 +62,7 @@ import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.internal.UdpSocketLooper;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingBusy;
@@ -70,30 +74,28 @@ import tuwien.auto.calimero.log.LogService.LogLevel;
 /**
  * KNXnet/IP connection using the KNXnet/IP routing protocol.
  * <p>
- * A KNXnet/IP router is a fast replacement for line/backbone couplers and connected
- * main/backbone lines, using Ethernet cabling for example.<br>
- * The router use point to multipoint communication (multicast). By default, routers are
- * joined to the {@link KNXnetIPRouting#DEFAULT_MULTICAST} multicast group. On more KNX
- * installations in one IP network, different multicast addresses have to be assigned.<br>
- * All IP datagrams use UDP port number 3671, and only datagrams on this port are
- * observed.<br>
+ * A KNXnet/IP router is a fast replacement for line/backbone couplers and connected main/backbone lines, using Ethernet
+ * cabling for example.<br>
+ * The router use point to multipoint communication (multicast). By default, routers are joined to the
+ * {@link KNXnetIPRouting#DEFAULT_MULTICAST} multicast group. On more KNX installations in one IP network, different
+ * multicast addresses have to be assigned.<br>
+ * All IP datagrams use UDP port number 3671, and only datagrams on this port are observed. KNXnet/IP Routing always
+ * listens on the system setup multicast group for IP system broadcasts.<br>
  * The routing protocol is an unconfirmed service.
  * <p>
- * Optionally, a listener of type {@link RoutingListener} can be supplied to
- * {@link #addConnectionListener(KNXListener)} instead of a default {@link KNXListener},
- * to receive {@link RoutingListener#lostMessage(LostMessageEvent)} notifications.
+ * Optionally, a listener of type {@link RoutingListener} can be supplied to {@link #addConnectionListener(KNXListener)}
+ * instead of a default {@link KNXListener}, to receive {@link RoutingListener#lostMessage(LostMessageEvent)}
+ * notifications.
  * <p>
  * Multicast considerations:<br>
- * The multicast loopback behavior defines whether multicast datagrams are looped back to
- * the local socket, see {@link MulticastSocket#setLoopbackMode(boolean)}. By default, the
- * loopback mode of the multicast socket used for sending multicast datagrams is enabled.
- * This behavior can be changed by using a KNXnetIPRouting sub type and initializing it by
- * calling {@link #init(NetworkInterface, boolean, boolean)}.
+ * The multicast loopback behavior defines whether multicast datagrams are looped back to the local socket, see
+ * {@link MulticastSocket#setLoopbackMode(boolean)}. By default, the loopback mode of the multicast socket used for
+ * sending multicast datagrams is enabled. This behavior can be changed by using a KNXnetIPRouting sub type and
+ * initializing it by calling {@link #init(NetworkInterface, boolean, boolean)}.
  * <p>
- * A multicast datagram sent with an initial hop count greater 1 may be delivered to the
- * sending host on a different interface (than the sending one), if the host is a member
- * of the multicast group on that interface. The loopback mode setting of the sender's
- * socket has no effect on this behavior.
+ * A multicast datagram sent with an initial hop count greater 1 may be delivered to the sending host on a different
+ * interface (than the sending one), if the host is a member of the multicast group on that interface. The loopback mode
+ * setting of the sender's socket has no effect on this behavior.
  *
  * @author B. Malinowsky
  */
@@ -107,6 +109,10 @@ public class KNXnetIPRouting extends ConnectionBase
 	 */
 	public static final String DEFAULT_MULTICAST = Discoverer.SEARCH_MULTICAST;
 
+	private static final InetAddress systemBroadcast = Discoverer.SYSTEM_SETUP_MULTICAST;
+
+	private static final int RoutingSystemBroadcast = 0x0533;
+
 	// newer Gira servers have a "reliable communication" option, which uses the
 	// following unsupported service type; not part of the knx spec
 	private static final int GiraUnsupportedSvcType = 0x538;
@@ -114,6 +120,8 @@ public class KNXnetIPRouting extends ConnectionBase
 	private boolean loggedGiraUnsupportedSvcType;
 
 	private final InetAddress multicast;
+
+	private MulticastSocket sysBcastSocket;
 
 	private volatile boolean loopbackEnabled;
 	// This list is used for multicast packets that are looped back in loopback mode. If loopback
@@ -181,9 +189,23 @@ public class KNXnetIPRouting extends ConnectionBase
 				}
 				logger.trace("add to multicast loopback frame buffer: {}", frame);
 			}
-			super.send(frame, NonBlocking);
+			// filter IP system broadcasts and always send them unsecured
+			if (isSystemBroadcast(frame)) {
+				final byte[] buf = PacketHelper.toPacket(new RoutingIndication(frame));
+				final DatagramPacket p = new DatagramPacket(buf, buf.length, systemBroadcast, DEFAULT_PORT);
+				if (sysBcastSocket != null)
+					sysBcastSocket.send(p);
+				else
+					socket.send(p);
+			}
+			else
+				super.send(frame, NonBlocking);
 			// we always succeed...
 			setState(OK);
+		}
+		catch (final IOException e) {
+			close(CloseEvent.INTERNAL, "communication failure", LogLevel.ERROR, e);
+			throw new KNXConnectionClosedException("connection closed (" + e.getMessage() + ")");
 		}
 		catch (final KNXTimeoutException ignore) {}
 		catch (final InterruptedException e) {
@@ -301,10 +323,16 @@ public class KNXnetIPRouting extends ConnectionBase
 		MulticastSocket s = null;
 		try {
 			s = new MulticastSocket(DEFAULT_PORT);
+			if (!multicast.equals(systemBroadcast))
+				sysBcastSocket = new MulticastSocket(DEFAULT_PORT);
+
 			if (netIf != null) {
 				s.setNetworkInterface(netIf);
 				// port number is not used in join group
 				s.joinGroup(new InetSocketAddress(multicast, 0), netIf);
+				if (sysBcastSocket != null)
+					sysBcastSocket.joinGroup(new InetSocketAddress(systemBroadcast, 0), netIf);
+
 				logger.info("using network interface {}", netIf.getName());
 			}
 			else {
@@ -313,10 +341,14 @@ public class KNXnetIPRouting extends ConnectionBase
 					// set. With the following being the first join call, it will not fail, even
 					// if no network interface was set
 					s.joinGroup(new InetSocketAddress(multicast, 0), null);
+					if (sysBcastSocket != null)
+						s.joinGroup(new InetSocketAddress(systemBroadcast, 0), null);
 				}
 				catch (final IOException e) {
 					// Try the simple call as backup, as it works without problem on Linux/Windows
 					s.joinGroup(multicast);
+					if (sysBcastSocket != null)
+						s.joinGroup(systemBroadcast);
 				}
 			}
 			// send out beyond local network
@@ -341,6 +373,35 @@ public class KNXnetIPRouting extends ConnectionBase
 		socket = s;
 		if (startReceiver)
 			startReceiver();
+		if (sysBcastSocket != null) {
+			final UdpSocketLooper sysBcastLooper = new UdpSocketLooper(sysBcastSocket, true) {
+				@Override
+				protected void onReceive(final InetSocketAddress source, final byte[] data, final int offset,
+					final int length) {
+					try {
+						final KNXnetIPHeader h = new KNXnetIPHeader(data, offset);
+						if (h.getTotalLength() > length)
+							logger.warn("received frame length " + length + " for " + h + " - ignored");
+						else if (!systemBroadcast(h, data, offset + h.getStructLength(), source.getAddress(),
+								source.getPort()))
+							logger.info("received unknown frame with service type 0x"
+									+ Integer.toHexString(h.getServiceType()) + " - ignored");
+					}
+					catch (KNXFormatException | RuntimeException e) {
+						logger.warn("received invalid frame", e);
+					}
+				}
+			};
+
+			new Thread(() -> {
+				try {
+					sysBcastLooper.loop();
+				}
+				catch (final IOException e) {
+					close(CloseEvent.INTERNAL, "receiver communication failure", LogLevel.ERROR, e);
+				}
+			}, "KNX IP system broadcast receiver").start();
+		}
 		setState(OK);
 	}
 
@@ -374,6 +435,9 @@ public class KNXnetIPRouting extends ConnectionBase
 						DataUnitBuilder.toHex(data, " "));
 			loggedGiraUnsupportedSvcType = true;
 		}
+		else if (svc == RoutingSystemBroadcast && multicast.equals(systemBroadcast)) {
+			return systemBroadcast(h, data, offset, src, port);
+		}
 		// skip multicast packets from searches & secure services, to avoid logged warnings about unknown frames
 		else if (!h.isSecure() && svc != KNXnetIPHeader.SEARCH_REQ && svc != KNXnetIPHeader.SEARCH_RES
 				&& svc != KNXnetIPHeader.SearchRequest && svc != KNXnetIPHeader.SearchResponse)
@@ -403,6 +467,16 @@ public class KNXnetIPRouting extends ConnectionBase
 			socket.close();
 			cleanup(initiator, reason, level, t);
 		}
+
+		if (sysBcastSocket != null) {
+			try {
+				sysBcastSocket.leaveGroup(systemBroadcast);
+			}
+			catch (final IOException ignore) {}
+			finally {
+				sysBcastSocket.close();
+			}
+		}
 	}
 
 	protected void send(final byte[] packet) throws KNXConnectionClosedException
@@ -429,6 +503,36 @@ public class KNXnetIPRouting extends ConnectionBase
 			close(CloseEvent.INTERNAL, "communication failure", LogLevel.ERROR, e);
 			throw new KNXConnectionClosedException("connection closed");
 		}
+	}
+
+	private boolean systemBroadcast(final KNXnetIPHeader h, final byte[] data, final int offset, final InetAddress src,
+		final int port) throws KNXFormatException {
+
+		final int svc = h.getServiceType();
+		if (h.getVersion() != KNXNETIP_VERSION_10)
+			close(CloseEvent.INTERNAL, "protocol version changed", LogLevel.ERROR, null);
+		else if (svc == RoutingSystemBroadcast) {
+			final RoutingIndication ind = new RoutingIndication(data, offset, h.getTotalLength() - h.getStructLength());
+			final CEMI frame = ind.getCEMI();
+			if (discardLoopbackFrame(frame))
+				return true;
+			if (isSystemBroadcast(frame))
+				fireFrameReceived(frame);
+			else
+				logger.debug("received invalid IP system broadcast {}, ignore", frame);
+		}
+		return true;
+	}
+
+	// with a secure APDU or sync.req/res, the SBC has to be checked on an upper layer
+	private static boolean isSystemBroadcast(final CEMI frame) {
+		if (frame instanceof CEMILData) {
+			final CEMILData ldata = (CEMILData) frame;
+			final KNXAddress dst = ldata.getDestination();
+			if (ldata.isSystemBroadcast() && dst instanceof GroupAddress && dst.getRawAddress() == 0)
+				return true;
+		}
+		return false;
 	}
 
 	private void fireLostMessage(final InetSocketAddress sender, final RoutingLostMessage lost)

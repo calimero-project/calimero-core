@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,13 +36,17 @@
 
 package tuwien.auto.calimero.knxnetip;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.MulticastSocket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.time.Duration;
@@ -62,13 +66,19 @@ import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
+import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.cemi.CEMILDataEx;
+import tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode;
+import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingBusy;
+import tuwien.auto.calimero.knxnetip.servicetype.RoutingIndication;
 
 /**
  * @author B. Malinowsky
@@ -374,5 +384,63 @@ public class KNXnetIPRouterTest
 	{
 		r = new KNXnetIPRouting(null, null);
 		r.addConnectionListener(l);
+	}
+
+	@Test
+	void initWithSystemBroadcastSocket() throws UnknownHostException, KNXException {
+		r = new KNXnetIPRouting(null, InetAddress.getByName("224.0.23.13"));
+	}
+
+	@Test
+	void systemBroadcastWithDefaultSocket() throws KNXException, IOException {
+		sysBroadcast(Discoverer.SYSTEM_SETUP_MULTICAST, Discoverer.SYSTEM_SETUP_MULTICAST);
+	}
+
+	@Test
+	void systemBroadcastWithSysBcastSocket() throws KNXException, IOException {
+		sysBroadcast(InetAddress.getByName("224.0.23.13"), InetAddress.getByName("224.0.23.14"));
+	}
+
+	private void sysBroadcast(final InetAddress senderGroup, final InetAddress receiverGroup) throws KNXException,
+		UnknownHostException, IOException, SocketException, KNXConnectionClosedException, KNXFormatException {
+
+		final CEMILDataEx sysBcast = newSystemBroadcastFrame();
+
+		// receiver
+		r = new KNXnetIPRouting(null, receiverGroup);
+		r.addConnectionListener(l);
+
+		try (KNXnetIPRouting sender = new KNXnetIPRouting(null, senderGroup);
+				MulticastSocket verify = new MulticastSocket(KNXnetIPConnection.DEFAULT_PORT)) {
+
+			verify.joinGroup(new InetSocketAddress(Discoverer.SYSTEM_SETUP_MULTICAST, 0), null);
+			verify.setSoTimeout(1000);
+
+			sender.send(sysBcast, BlockingMode.NonBlocking);
+
+			final byte[] buf = new byte[512];
+			final DatagramPacket p = new DatagramPacket(buf, buf.length);
+			verify.receive(p);
+			final KNXnetIPHeader header = new KNXnetIPHeader(buf, 0);
+			final RoutingIndication ind = new RoutingIndication(p.getData(), header.getStructLength(),
+					header.getTotalLength() - header.getStructLength());
+			assertSystemBroadcast(sysBcast, (CEMILData) ind.getCEMI());
+
+		}
+		assertSystemBroadcast(sysBcast, (CEMILData) l.received);
+	}
+
+	private CEMILDataEx newSystemBroadcastFrame() {
+		final IndividualAddress src = new IndividualAddress(1, 2, 3);
+		final KNXAddress dst = new GroupAddress(0);
+		final byte[] tpdu = { 4, 4, 4, 4 };
+		return new CEMILDataEx(CEMILData.MC_LDATA_IND, src, dst, tpdu, Priority.LOW, false, false, false, 6);
+	}
+
+	private void assertSystemBroadcast(final CEMILData expected, final CEMILData actual) {
+		assertEquals(CEMILData.MC_LDATA_IND, actual.getMessageCode());
+		assertEquals(expected.getSource(), actual.getSource());
+		assertEquals(expected.getDestination(), actual.getDestination());
+		assertArrayEquals(expected.getPayload(), actual.getPayload());
 	}
 }
