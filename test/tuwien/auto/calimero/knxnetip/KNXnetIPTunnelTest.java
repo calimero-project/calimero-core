@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,6 +54,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import tag.KnxnetIP;
+import tag.KnxnetIPSequential;
 import tag.Slow;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
@@ -285,6 +286,7 @@ public class KNXnetIPTunnelTest
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@Test
+	@KnxnetIPSequential
 	void testMonitorSend() throws KNXException, InterruptedException
 	{
 		newMonitor();
@@ -302,6 +304,7 @@ public class KNXnetIPTunnelTest
 	}
 
 	@Test
+	@KnxnetIPSequential
 	void testTunnelWithMonitor() throws KNXException, InterruptedException
 	{
 		newTunnel();
@@ -325,6 +328,7 @@ public class KNXnetIPTunnelTest
 	}
 
 	@Test
+	@KnxnetIPSequential
 	void testReceiveMonitor() throws KNXException, InterruptedException
 	{
 		newMonitor();
@@ -392,6 +396,7 @@ public class KNXnetIPTunnelTest
 	}
 
 	@Test
+	@KnxnetIPSequential
 	void testKNXnetIPMonitor() throws KNXException, InterruptedException
 	{
 		newMonitor();
@@ -463,6 +468,7 @@ public class KNXnetIPTunnelTest
 	 */
 	@Test
 	@Slow
+	@KnxnetIPSequential
 	void testMonitorGetState() throws KNXException, InterruptedException
 	{
 		newMonitor();

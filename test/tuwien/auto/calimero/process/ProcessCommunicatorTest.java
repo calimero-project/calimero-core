@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,6 +51,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import tag.KnxnetIP;
 import tuwien.auto.calimero.DetachEvent;
@@ -74,6 +75,7 @@ import tuwien.auto.calimero.link.medium.TPSettings;
  * @author B. Malinowsky
  */
 @KnxnetIP
+@ResourceLock("calimero.datapoint")
 class ProcessCommunicatorTest
 {
 	private ProcessCommunicator pc;

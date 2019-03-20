@@ -62,6 +62,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 import junit.framework.AssertionFailedError;
 import tag.KnxnetIP;
@@ -80,6 +82,7 @@ import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB;
  * @author B. Malinowsky
  */
 @KnxnetIP
+@Execution(ExecutionMode.SAME_THREAD)
 class DiscovererTest
 {
 	private Discoverer ddef;

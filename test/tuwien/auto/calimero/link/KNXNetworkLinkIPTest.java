@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -59,6 +59,7 @@ import org.junit.jupiter.api.Test;
 
 import tag.KnxSecure;
 import tag.KnxnetIP;
+import tag.KnxnetIPSequential;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.GroupAddress;
@@ -396,6 +397,7 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
+	@KnxnetIPSequential
 	void runNotifierOnlyAfterEstablishingConnection()
 	{
 		// create some links that fail during construction

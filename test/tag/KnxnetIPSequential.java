@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2016, 2019 B. Malinowsky
+    Copyright (c) 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,8 @@
 
 package tag;
 
+import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -46,6 +48,6 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 
 @Target({ ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
-@Tag("ft12")
-@ResourceLock("calimero.ft12")
-public @interface FT12 {}
+@Tag("knxnetip")
+@ResourceLock(value = "calimero.knxnetip", mode = READ_WRITE)
+public @interface KnxnetIPSequential {}
