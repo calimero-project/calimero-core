@@ -156,7 +156,7 @@ public final class DataUnitBuilder
 	 * @param asdu application layer service data unit, <code>asdu.length</code> &lt; 255
 	 * @return APDU as byte array
 	 */
-	public static byte[] createAPDU(final int service, final byte[] asdu)
+	public static byte[] createAPDU(final int service, final byte... asdu)
 	{
 		if (asdu.length > 254)
 			throw new KNXIllegalArgumentException("ASDU length exceeds maximum of 254 bytes");
@@ -180,7 +180,7 @@ public final class DataUnitBuilder
 	 *        <code>null</code> for no ASDU
 	 * @return APDU as byte array
 	 */
-	public static byte[] createLengthOptimizedAPDU(final int service, final byte[] asdu)
+	public static byte[] createLengthOptimizedAPDU(final int service, final byte... asdu)
 	{
 		final byte[] apdu = new byte[(asdu != null && asdu.length > 0) ? 1 + asdu.length : 2];
 		if (apdu.length > 255)
@@ -416,6 +416,26 @@ public final class DataUnitBuilder
 			return "A_MemoryExtended.read";
 		case 0b0111111110:
 			return "A_MemoryExtended.read-response";
+		case 0b0111001000:
+			return "A_SystemNetworkParameter.read";
+		case 0b0111001001:
+			return "A_SystemNetworkParameter.response";
+		case 0b0111001010:
+			return "A_SystemNetworkParameter.write";
+		case 0b1111101100:
+			return "A_DoA-S/N.read";
+		case 0b1111101101:
+			return "A_DoA-S/N.response";
+		case 0b1111101110:
+			return "A_DoA-S/N.write";
+		case 0b1011000111:
+			return "A_FunctionPropertyCommand";
+		case 0b1011001001:
+			return "A_FunctionPropertyState.response";
+		case 0b0111010100:
+			return "A_FunctionPropertyExtCommand";
+		case 0b0111010110:
+			return "A_FunctionPropertyExtState.response";
 		default:
 			return "APCI 0x" + Integer.toHexString(apci);
 		}
