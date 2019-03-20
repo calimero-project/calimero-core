@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -220,16 +220,16 @@ public class StateFilter implements NetworkFilter, RequestFilter
 			return;
 
 		// adjust some fields of the frame to buffer: hop count, repetition
-		// make sure the frame hop count is 6 or 7
+		// make sure the frame hop count is 6
 		final int hops = 6;
 		if (copy instanceof CEMILDataEx) {
-			if (copy.getHopCount() < hops)
+			if (copy.getHopCount() != hops)
 				((CEMILDataEx) copy).setHopCount(hops);
 			if (copy.isRepetition())
 				copy = CEMIFactory.create(null, null, copy, false, false);
 		}
 		else {
-			if (copy.getHopCount() < hops || copy.isRepetition())
+			if (copy.getHopCount() != hops || copy.isRepetition())
 				copy = new CEMILData(copy.getMessageCode(), copy.getSource(),
 						copy.getDestination(), copy.getPayload(), copy.getPriority(), false, hops);
 		}
