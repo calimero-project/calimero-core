@@ -36,6 +36,7 @@
 
 package tuwien.auto.calimero;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -61,7 +62,6 @@ class ReturnCodeTest {
 		for (int i = 0; i < 0xff; i++)
 			if (!ReturnCode.values.containsKey(i))
 				assertTrue(ReturnCode.of(i).description().startsWith("unknown"));
-		System.out.println(ReturnCode.of(53).friendly());
 	}
 
 	@ParameterizedTest
@@ -69,7 +69,7 @@ class ReturnCodeTest {
 	void friendlyCodeName(final ReturnCode c) {
 		// checks non-empty and formatting
 		if (c != ReturnCode.Success && c != ReturnCode.Error)
-			assertTrue(c.friendly().contains(" "));
+			assertTrue(c.friendly().contains(" ") || c.friendly().startsWith("0x"), c.friendly());
 		assertTrue(c.friendly().length() > 0);
 	}
 
@@ -77,8 +77,9 @@ class ReturnCodeTest {
 	@MethodSource("values")
 	void description(final ReturnCode c) {
 		assertTrue(c.description().length() > 0);
-		if (c != ReturnCode.Success && c != ReturnCode.Error)
-			assertTrue(c.friendly().contains(" "));
+		assertTrue(c.description().contains(" "));
+		if (c.friendly().startsWith("0x"))
+			assertEquals("unknown return code", c.description());
 	}
 
 	static ReturnCode[] values() {

@@ -36,6 +36,7 @@
 
 package tuwien.auto.calimero;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,7 +46,7 @@ import java.util.Map;
  * Note, that several older KNX services and functions do not use these return codes.
  */
 public final class ReturnCode {
-	static Map<Integer, ReturnCode> values = java.util.Collections.synchronizedMap(new HashMap<>());
+	static Map<Integer, ReturnCode> values = Collections.synchronizedMap(new HashMap<>());
 
 	// Generic positive return codes
 
