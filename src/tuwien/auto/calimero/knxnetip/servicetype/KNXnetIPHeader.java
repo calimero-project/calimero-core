@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -149,6 +149,11 @@ public class KNXnetIPHeader
 	 * Service type identifier for a buffer overflow warning indication with multicast.
 	 */
 	public static final int ROUTING_BUSY = 0x0532;
+
+	/**
+	 * Service type identifier for a routing system broadcast with multicast.
+	 */
+	public static final int RoutingSystemBroadcast = 0x0533;
 
 	/**
 	 * Version identifier for KNXnet/IP protocol version 1.0.
@@ -315,7 +320,6 @@ public class KNXnetIPHeader
 				+ " v" + (version / 0x10) + "." + (version % 0x10) + ") length " + totalsize;
 	}
 
-	// TODO make public?
 	static String getSvcName(final int svcType)
 	{
 		switch (svcType) {
@@ -353,6 +357,8 @@ public class KNXnetIPHeader
 			return "routing-lost.msg";
 		case ROUTING_BUSY:
 			return "routing-busy.ind";
+		case RoutingSystemBroadcast:
+			return "routing-system-broadcast";
 		case SearchRequest: return "search.req";
 		case SearchResponse: return "search.res";
 		case SecureWrapper: return "secure-msg";

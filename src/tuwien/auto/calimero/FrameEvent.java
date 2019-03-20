@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -61,19 +61,33 @@ public class FrameEvent extends EventObject
 	private final CEMI c;
 	private final byte[] b;
 
+	private final boolean systemBroadcast;
+
 	/**
 	 * Creates a new frame event for <code>frame</code>.
-	 * <p>
 	 *
 	 * @param source the creator of this event
 	 * @param frame cEMI frame
 	 */
-	public FrameEvent(final Object source, final CEMI frame)
+	public FrameEvent(final Object source, final CEMI frame) {
+		this(source, frame, false);
+	}
+
+	/**
+	 * Creates a new frame event for <code>frame</code>.
+	 *
+	 * @param source the creator of this event
+	 * @param frame cEMI frame
+	 * @param systemBroadcast <code>true</code> if the cEMI frame was received as IP system broadcast,
+	 *        <code>false</code> otherwise
+	 */
+	public FrameEvent(final Object source, final CEMI frame, final boolean systemBroadcast)
 	{
 		super(source);
 		id = idCounter.incrementAndGet();
 		c = frame;
 		b = null;
+		this.systemBroadcast = systemBroadcast;
 	}
 
 	/**
@@ -89,6 +103,7 @@ public class FrameEvent extends EventObject
 		id = idCounter.incrementAndGet();
 		b = frame;
 		c = null;
+		systemBroadcast = false;
 	}
 
 	/**
@@ -114,4 +129,6 @@ public class FrameEvent extends EventObject
 	}
 
 	public final long id() { return id; }
+
+	public final boolean systemBroadcast() { return systemBroadcast; }
 }

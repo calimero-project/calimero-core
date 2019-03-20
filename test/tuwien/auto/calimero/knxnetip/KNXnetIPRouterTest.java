@@ -36,6 +36,7 @@
 
 package tuwien.auto.calimero.knxnetip;
 
+import static java.nio.ByteBuffer.allocate;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -63,6 +64,7 @@ import org.junit.jupiter.api.Test;
 import tag.KnxnetIP;
 import tag.Slow;
 import tuwien.auto.calimero.CloseEvent;
+import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
@@ -78,7 +80,8 @@ import tuwien.auto.calimero.cemi.CEMILDataEx;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingBusy;
-import tuwien.auto.calimero.knxnetip.servicetype.RoutingIndication;
+import tuwien.auto.calimero.knxnetip.servicetype.RoutingSystemBroadcast;
+import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
 
 /**
  * @author B. Malinowsky
@@ -404,7 +407,7 @@ public class KNXnetIPRouterTest
 	private void sysBroadcast(final InetAddress senderGroup, final InetAddress receiverGroup) throws KNXException,
 		UnknownHostException, IOException, SocketException, KNXConnectionClosedException, KNXFormatException {
 
-		final CEMILDataEx sysBcast = newSystemBroadcastFrame();
+		final CEMILDataEx sysBcast = newSystemBroadcastFrame(systemNetworkParamResponse());
 
 		// receiver
 		r = new KNXnetIPRouting(null, receiverGroup);
@@ -422,19 +425,30 @@ public class KNXnetIPRouterTest
 			final DatagramPacket p = new DatagramPacket(buf, buf.length);
 			verify.receive(p);
 			final KNXnetIPHeader header = new KNXnetIPHeader(buf, 0);
-			final RoutingIndication ind = new RoutingIndication(p.getData(), header.getStructLength(),
+			final RoutingSystemBroadcast ind = new RoutingSystemBroadcast(buf, header.getStructLength(),
 					header.getTotalLength() - header.getStructLength());
-			assertSystemBroadcast(sysBcast, (CEMILData) ind.getCEMI());
-
+			assertSystemBroadcast(sysBcast, (CEMILData) ind.cemi());
 		}
 		assertSystemBroadcast(sysBcast, (CEMILData) l.received);
 	}
 
-	private CEMILDataEx newSystemBroadcastFrame() {
-		final IndividualAddress src = new IndividualAddress(1, 2, 3);
+	private CEMILDataEx newSystemBroadcastFrame(final byte[] tpdu) {
+		final IndividualAddress src = new IndividualAddress(1, 1, 20);
 		final KNXAddress dst = new GroupAddress(0);
-		final byte[] tpdu = { 4, 4, 4, 4 };
-		return new CEMILDataEx(CEMILData.MC_LDATA_IND, src, dst, tpdu, Priority.LOW, false, false, false, 6);
+		return new CEMILDataEx(CEMILData.MC_LDATA_IND, src, dst, tpdu, Priority.SYSTEM, false, false, false, 6);
+	}
+
+	private byte[] systemNetworkParamResponse() {
+		final int objectType = 0;
+		final int pid = PID.SERIAL_NUMBER;
+		final int operand = 1;
+		final byte[] value = { 1, 2, 3, 4, 5, 6 };
+		final byte[] asdu = allocate(5 + value.length).putShort((short) objectType).putShort((short) (pid << 4))
+				.put((byte) operand).put(value).array();
+
+		final int SystemNetworkParamResponse = 0b0111001001;
+		final byte[] tsdu = DataUnitBuilder.createAPDU(SystemNetworkParamResponse, asdu);
+		return tsdu;
 	}
 
 	private void assertSystemBroadcast(final CEMILData expected, final CEMILData actual) {

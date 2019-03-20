@@ -53,8 +53,7 @@ import java.util.List;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
-import tuwien.auto.calimero.GroupAddress;
-import tuwien.auto.calimero.KNXAddress;
+import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -68,6 +67,7 @@ import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingBusy;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingIndication;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingLostMessage;
+import tuwien.auto.calimero.knxnetip.servicetype.RoutingSystemBroadcast;
 import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.log.LogService.LogLevel;
 
@@ -110,8 +110,6 @@ public class KNXnetIPRouting extends ConnectionBase
 	public static final String DEFAULT_MULTICAST = Discoverer.SEARCH_MULTICAST;
 
 	private static final InetAddress systemBroadcast = Discoverer.SYSTEM_SETUP_MULTICAST;
-
-	private static final int RoutingSystemBroadcast = 0x0533;
 
 	// newer Gira servers have a "reliable communication" option, which uses the
 	// following unsupported service type; not part of the knx spec
@@ -182,6 +180,8 @@ public class KNXnetIPRouting extends ConnectionBase
 	@Override
 	public void send(final CEMI frame, final BlockingMode mode) throws KNXConnectionClosedException
 	{
+		if (frame.getMessageCode() != CEMILData.MC_LDATA_IND)
+			throw new KNXIllegalArgumentException("cEMI frame is not an L-Data.ind");
 		try {
 			if (loopbackEnabled) {
 				synchronized (loopbackFrames) {
@@ -190,8 +190,8 @@ public class KNXnetIPRouting extends ConnectionBase
 				logger.trace("add to multicast loopback frame buffer: {}", frame);
 			}
 			// filter IP system broadcasts and always send them unsecured
-			if (isSystemBroadcast(frame)) {
-				final byte[] buf = PacketHelper.toPacket(new RoutingIndication(frame));
+			if (RoutingSystemBroadcast.isSystemBroadcast(frame)) {
+				final byte[] buf = PacketHelper.toPacket(new RoutingSystemBroadcast(frame));
 				final DatagramPacket p = new DatagramPacket(buf, buf.length, systemBroadcast, DEFAULT_PORT);
 				if (sysBcastSocket != null)
 					sysBcastSocket.send(p);
@@ -342,13 +342,13 @@ public class KNXnetIPRouting extends ConnectionBase
 					// if no network interface was set
 					s.joinGroup(new InetSocketAddress(multicast, 0), null);
 					if (sysBcastSocket != null)
-						s.joinGroup(new InetSocketAddress(systemBroadcast, 0), null);
+						sysBcastSocket.joinGroup(new InetSocketAddress(systemBroadcast, 0), null);
 				}
 				catch (final IOException e) {
 					// Try the simple call as backup, as it works without problem on Linux/Windows
 					s.joinGroup(multicast);
 					if (sysBcastSocket != null)
-						s.joinGroup(systemBroadcast);
+						sysBcastSocket.joinGroup(systemBroadcast);
 				}
 			}
 			// send out beyond local network
@@ -382,10 +382,11 @@ public class KNXnetIPRouting extends ConnectionBase
 						final KNXnetIPHeader h = new KNXnetIPHeader(data, offset);
 						if (h.getTotalLength() > length)
 							logger.warn("received frame length " + length + " for " + h + " - ignored");
-						else if (!systemBroadcast(h, data, offset + h.getStructLength(), source.getAddress(),
-								source.getPort()))
-							logger.info("received unknown frame with service type 0x"
-									+ Integer.toHexString(h.getServiceType()) + " - ignored");
+						else if (h.getVersion() != KNXNETIP_VERSION_10)
+							close(CloseEvent.INTERNAL, "protocol version changed", LogLevel.ERROR, null);
+						else
+							systemBroadcast(h, data, offset + h.getStructLength(), source.getAddress(),
+									source.getPort());
 					}
 					catch (KNXFormatException | RuntimeException e) {
 						logger.warn("received invalid frame", e);
@@ -429,14 +430,14 @@ public class KNXnetIPRouting extends ConnectionBase
 			final RoutingBusy busy = new RoutingBusy(data, offset);
 			fireRoutingBusy(new InetSocketAddress(src, port), busy);
 		}
+		else if (svc == KNXnetIPHeader.RoutingSystemBroadcast && multicast.equals(systemBroadcast)) {
+			return systemBroadcast(h, data, offset, src, port);
+		}
 		else if (svc == GiraUnsupportedSvcType) {
 			if (!loggedGiraUnsupportedSvcType)
 				logger.warn("received unsupported Gira-specific service type 0x538, will be silently ignored: {}",
 						DataUnitBuilder.toHex(data, " "));
 			loggedGiraUnsupportedSvcType = true;
-		}
-		else if (svc == RoutingSystemBroadcast && multicast.equals(systemBroadcast)) {
-			return systemBroadcast(h, data, offset, src, port);
 		}
 		// skip multicast packets from searches & secure services, to avoid logged warnings about unknown frames
 		else if (!h.isSecure() && svc != KNXnetIPHeader.SEARCH_REQ && svc != KNXnetIPHeader.SEARCH_RES
@@ -509,28 +510,15 @@ public class KNXnetIPRouting extends ConnectionBase
 		final int port) throws KNXFormatException {
 
 		final int svc = h.getServiceType();
-		if (h.getVersion() != KNXNETIP_VERSION_10)
-			close(CloseEvent.INTERNAL, "protocol version changed", LogLevel.ERROR, null);
-		else if (svc == RoutingSystemBroadcast) {
-			final RoutingIndication ind = new RoutingIndication(data, offset, h.getTotalLength() - h.getStructLength());
-			final CEMI frame = ind.getCEMI();
+		if (svc == KNXnetIPHeader.RoutingSystemBroadcast) {
+			final RoutingSystemBroadcast ind = new RoutingSystemBroadcast(data, offset,
+					h.getTotalLength() - h.getStructLength());
+			final CEMI frame = ind.cemi();
 			if (discardLoopbackFrame(frame))
 				return true;
-			if (isSystemBroadcast(frame))
-				fireFrameReceived(frame);
-			else
-				logger.debug("received invalid IP system broadcast {}, ignore", frame);
-		}
-		return true;
-	}
-
-	// with a secure APDU or sync.req/res, the SBC has to be checked on an upper layer
-	private static boolean isSystemBroadcast(final CEMI frame) {
-		if (frame instanceof CEMILData) {
-			final CEMILData ldata = (CEMILData) frame;
-			final KNXAddress dst = ldata.getDestination();
-			if (ldata.isSystemBroadcast() && dst instanceof GroupAddress && dst.getRawAddress() == 0)
-				return true;
+			final FrameEvent fe = new FrameEvent(this, frame, true);
+			listeners.fire(l -> l.frameReceived(fe));
+			return true;
 		}
 		return false;
 	}
