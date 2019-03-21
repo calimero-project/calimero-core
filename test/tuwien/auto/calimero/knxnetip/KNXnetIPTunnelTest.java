@@ -161,12 +161,6 @@ class KNXnetIPTunnelTest
 			mon.close();
 	}
 
-	/**
-	 * Test method for {@link KNXnetIPTunnel#send(CEMI, tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testSend() throws KNXException, InterruptedException
 	{
@@ -196,12 +190,6 @@ class KNXnetIPTunnelTest
 		System.out.println("time for 10 tunneling sends with .con: " + (end - start) + " ms");
 	}
 
-	/**
-	 * Test method for {@link KNXnetIPTunnel#send(CEMI, tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testFIFOSend() throws KNXException, InterruptedException
 	{
@@ -259,12 +247,6 @@ class KNXnetIPTunnelTest
 		}
 	}
 
-	/**
-	 * Test method for {@link KNXnetIPTunnel#send(tuwien.auto.calimero.cemi.CEMI, KNXnetIPConnection.BlockingMode)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testNATSend() throws KNXException, InterruptedException
 	{
@@ -279,12 +261,6 @@ class KNXnetIPTunnelTest
 		doNATSend(frameNoDest, con, true);
 	}
 
-	/**
-	 * Test method for {@link KNXnetIPTunnel#send(CEMI, KNXnetIPConnection.BlockingMode)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	@KnxnetIPSequential
 	void testMonitorSend() throws KNXException, InterruptedException

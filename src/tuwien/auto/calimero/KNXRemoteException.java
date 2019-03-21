@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,9 +39,8 @@ package tuwien.auto.calimero;
 
 /**
  * Thrown when a message received from a remote endpoint indicates problems or signals
- * error conditions at the remote server, for example due to a invalid formatted request
+ * error conditions at the remote server, for example due to an invalid formatted request
  * or processing result.
- * <p>
  *
  * @author B. Malinowsky
  */
@@ -52,7 +51,6 @@ public class KNXRemoteException extends KNXException
 	/**
 	 * Constructs a new <code>KNXRemoteException</code> with the specified detail
 	 * message.
-	 * <p>
 	 *
 	 * @param s the detail message
 	 */

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2018 B. Malinowsky
+    Copyright (c) 2010, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -420,7 +420,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			return;
 		}
 		catch (final KNXException e) {
-			logger.warn("setting programming mode via property failed, (" + e + "), try via memory");
+			logger.warn("setting programming mode via property failed, (" + e + "), trying via memory");
 		}
 
 		// read from memory where device keeps programming mode

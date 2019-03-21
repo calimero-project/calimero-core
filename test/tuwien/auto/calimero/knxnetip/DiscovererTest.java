@@ -110,11 +110,6 @@ class DiscovererTest
 			dmcast.stopSearch();
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.knxnetip.Discoverer#Discoverer(int, boolean)}.
-	 *
-	 * @throws KNXException
-	 */
 	@Test
 	void testDiscoverer() throws KNXException
 	{
@@ -131,12 +126,6 @@ class DiscovererTest
 		ddef = new Discoverer(0, false);
 	}
 
-	/**
-	 * Test method for {@link Discoverer#clearSearchResponses()}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testClearSearchResponses() throws KNXException, InterruptedException
 	{
@@ -146,24 +135,12 @@ class DiscovererTest
 		assertTrue(ddef.getSearchResponses().size() == 0);
 	}
 
-	/**
-	 * Test method for {@link Discoverer#getDescription(java.net.InetSocketAddress, int)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testGetDescription() throws KNXException, InterruptedException
 	{
 		doGetDesc(ddef);
 	}
 
-	/**
-	 * Test method for {@link Discoverer#getDescription(java.net.InetSocketAddress, int)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testNATGetDescription() throws KNXException, InterruptedException
 	{
@@ -204,24 +181,12 @@ class DiscovererTest
 		assertTrue(count > 0);
 	}
 
-	/**
-	 * Test method for {@link Discoverer#getSearchResponses()}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testGetSearchResponses() throws KNXException, InterruptedException
 	{
 		doGetSearchRes(ddef);
 	}
 
-	/**
-	 * Test method for {@link Discoverer#getSearchResponses()}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testNATGetSearchResponses() throws KNXException, InterruptedException
 	{
@@ -237,12 +202,6 @@ class DiscovererTest
 		}
 	}
 
-	/**
-	 * Test method for {@link Discoverer#getSearchResponses()}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testMcastGetSearchResponses() throws KNXException, InterruptedException
 	{
@@ -261,13 +220,6 @@ class DiscovererTest
 		}
 	}
 
-	/**
-	 * Test method for {@link Discoverer#startSearch(int, java.net.NetworkInterface, int, boolean)}.
-	 *
-	 * @throws KNXException
-	 * @throws SocketException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testStartSearchIntNetworkInterfaceIntBoolean()
 		throws SocketException, KNXException, InterruptedException
@@ -275,12 +227,6 @@ class DiscovererTest
 		doStartSearchIF(ddef, false);
 	}
 
-	/**
-	 * Test method for {@link Discoverer#startSearch(int, java.net.NetworkInterface, int, boolean)}.
-	 *
-	 * @throws SocketException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	@DisabledIfEnvironmentVariable(named="TRAVIS", matches=".*")
 	void testNATStartSearchIntNetworkInterfaceIntBoolean() throws SocketException, InterruptedException
@@ -300,13 +246,6 @@ class DiscovererTest
 		}
 	}
 
-	/**
-	 * Test method for {@link Discoverer#startSearch(int, java.net.NetworkInterface, int, boolean)}.
-	 *
-	 * @throws KNXException
-	 * @throws SocketException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	@DisabledIfEnvironmentVariable(named="TRAVIS", matches=".*")
 	void testMcastStartSearchIntNetworkInterfaceIntBoolean()
@@ -339,24 +278,12 @@ class DiscovererTest
 		assertEquals(expected, actual, "expected = " + expected + ", actual = " + actual);
 	}
 
-	/**
-	 * Test method for {@link Discoverer#startSearch(int, boolean)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testStartSearchIntBoolean() throws KNXException, InterruptedException
 	{
 		doStartSearch(ddef, false);
 	}
 
-	/**
-	 * Test method for {@link Discoverer#startSearch(int, boolean)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testNATStartSearchIntBoolean() throws KNXException, InterruptedException
 	{
@@ -372,22 +299,12 @@ class DiscovererTest
 		}
 	}
 
-	/**
-	 * Test method for {@link Discoverer#startSearch(int, boolean)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testMcastStartSearchIntBoolean() throws KNXException, InterruptedException
 	{
 		doStartSearch(dmcast, true);
 	}
 
-	/**
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	private void doStartSearch(final Discoverer d, final boolean usesMulticast) throws KNXException, InterruptedException
 	{
 		try {
@@ -416,12 +333,6 @@ class DiscovererTest
 		assertEquals(expected, actual, "expected = " + expected + ", actual = " + actual);
 	}
 
-	/**
-	 * Test method for {@link Discoverer#stopSearch()}.
-	 *
-	 * @throws InterruptedException on interrupted thread
-	 * @throws KNXException
-	 */
 	@Test
 	void testStopSearch() throws InterruptedException, KNXException
 	{
@@ -460,12 +371,6 @@ class DiscovererTest
 		assertEquals(stopper.res, ddef.getSearchResponses().size());
 	}
 
-	/**
-	 * Test method for {@link Discoverer#isSearching()}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testIsSearching() throws KNXException, InterruptedException
 	{
@@ -477,11 +382,6 @@ class DiscovererTest
 		assertFalse(ddef.isSearching());
 	}
 
-	/**
-	 * Test method for {@link Discoverer#startSearch(int, boolean)}.
-	 *
-	 * @throws KNXException
-	 */
 	@Test
 	void testStartSearchInterrupt() throws KNXException
 	{
