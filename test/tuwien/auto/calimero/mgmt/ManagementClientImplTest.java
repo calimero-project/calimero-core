@@ -532,25 +532,26 @@ class ManagementClientImplTest
 	@Test
 	void testReadNetworkParameterBroadcast() throws KNXException, InterruptedException
 	{
-		mc.readNetworkParameter(null, NetworkParamObjectType, NetworkParamPid, new byte[] {});
+		mc.readNetworkParameter(null, NetworkParamObjectType, NetworkParamPid, (byte) 0);
 	}
 
 	@Test
 	void testReadNetworkParameter() throws KNXException, InterruptedException
 	{
-		mc.readNetworkParameter(dcl.getAddress(), NetworkParamObjectType, NetworkParamPid, new byte[] { 0 });
+		mc.readNetworkParameter(dcl.getAddress(), NetworkParamObjectType, NetworkParamPid, (byte) 0);
 	}
 
 	@Test
 	void testReadUnsupportedNetworkParameter() throws InterruptedException, KNXException
 	{
+		final byte testInfo = 1;
 		try {
-			mc.readNetworkParameter(dcl.getAddress(), 99, 254, new byte[] {});
+			mc.readNetworkParameter(dcl.getAddress(), 99, 254, testInfo);
 			fail("unsupported object type");
 		}
 		catch (final KNXInvalidResponseException expected) {}
 		try {
-			mc.readNetworkParameter(dcl.getAddress(), 0, 254, new byte[] {});
+			mc.readNetworkParameter(dcl.getAddress(), 0, 254, testInfo);
 			fail("unsupported pid");
 		}
 		catch (final KNXInvalidResponseException expected) {}
@@ -559,13 +560,14 @@ class ManagementClientImplTest
 	@Test
 	void testReadUnsupportedNetworkParameterBroadcast() throws InterruptedException, KNXException
 	{
+		final byte testInfo = 1;
 		try {
-			mc.readNetworkParameter(null, 99, 254, new byte[] {});
+			mc.readNetworkParameter(null, 99, 254, testInfo);
 			fail("unsupported object type, should be timeout");
 		}
 		catch (final KNXTimeoutException expected) {}
 		try {
-			mc.readNetworkParameter(null, 0, 254, new byte[] {});
+			mc.readNetworkParameter(null, 0, 254, testInfo);
 			fail("unsupported pid, should be timeout");
 		}
 		catch (final KNXTimeoutException expected) {}
