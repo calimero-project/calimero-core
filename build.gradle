@@ -5,7 +5,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.20.0'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.21.0'
     }
 }
 
@@ -107,7 +107,7 @@ publishing {
 }
 
 dependencies {
-    api 'org.slf4j:slf4j-api:1.8.0-beta2'
+    api 'org.slf4j:slf4j-api:1.8.0-beta4'
     api 'org.usb4java:usb4java-javax:1.3.0'
 	compileOnly 'javax.xml.stream:stax-api:1.0-2'
 
@@ -117,5 +117,5 @@ dependencies {
 	testCompileOnly 'junit:junit:4.12'
 	testRuntimeOnly "org.junit.vintage:junit-vintage-engine:${junitJupiterVersion}"
 	// provider for knx ip secure
-	implementation 'org.bouncycastle:bcprov-jdk15on:1.60'
+	implementation 'org.bouncycastle:bcprov-jdk15on:1.61'
 }
