@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -287,7 +287,7 @@ public interface ManagementClient extends AutoCloseable
 	 * thrown.
 	 *
 	 * @param remote address of remote endpoint, or <code>null</code> to use broadcast communication mode
-	 * @param objectType interface object type, <code>0 &le; iot &lt; 0xffff</code>
+	 * @param objectType interface object type, <code>0 &le; objectType &lt; 0xffff</code>
 	 * @param pid KNX property identifier, <code>0 &le; pid &lt; 0xff</code>
 	 * @param testInfo test information, <code>0 &lt; testInfo.length &lt; </code> parameter-specific
 	 * @return test result as byte array, <code>result.length &gt; 0</code>
@@ -296,7 +296,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @throws KNXInvalidResponseException on invalid read response message
 	 * @throws InterruptedException on interrupted thread
 	 */
-	byte[] readNetworkParameter(IndividualAddress remote, int objectType, int pid, byte[] testInfo)
+	byte[] readNetworkParameter(IndividualAddress remote, int objectType, int pid, byte... testInfo)
 		throws KNXException, InterruptedException;
 
 	/**
@@ -304,14 +304,49 @@ public interface ManagementClient extends AutoCloseable
 	 * without any further action.
 	 *
 	 * @param remote address of remote endpoint, or <code>null</code> to use broadcast communication
-	 * @param objectType interface object type
-	 * @param pid KNX property identifier
+	 * @param objectType interface object type, <code>0 &le; objectType &lt; 0xffff</code>
+	 * @param pid KNX property identifier, <code>0 &le; pid &lt; 0xff</code>
 	 * @param value value to write
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXTimeoutException on timeout during send
 	 */
-	void writeNetworkParameter(IndividualAddress remote, int objectType, int pid, byte[] value)
+	void writeNetworkParameter(IndividualAddress remote, int objectType, int pid, byte... value)
 		throws KNXLinkClosedException, KNXTimeoutException;
+
+	/**
+	 * Reads the current configuration of a network parameter.
+	 * <p>
+	 * On open communication medium, a system broadcast (point to all-point) is used; on closed communication medium, a
+	 * broadcast (point to domain) is used.
+	 *
+	 * @param objectType interface object type, <code>0 &le; objectType &lt; 0xffff</code>
+	 * @param pid KNX property identifier, <code>0 &le; pid &lt; 0xfff</code>
+	 * @param operand operand, being the first byte of the test information
+	 * @param additionalTestInfo any additional test information after the operand
+	 * @return list of test results as byte array, with each <code>result.length &gt; 0</code>
+	 * @throws KNXLinkClosedException if network link to KNX network is closed
+	 * @throws KNXTimeoutException on timeout during send or waiting for a response
+	 * @throws KNXInvalidResponseException on invalid read response message
+	 * @throws InterruptedException on interrupted thread
+	 */
+	List<byte[]> readSystemNetworkParameter(int objectType, int pid, int operand, byte... additionalTestInfo)
+		throws KNXException, InterruptedException;
+
+	/**
+	 * Writes network configuration information in one or multiple management servers.
+	 * <p>
+	 * On open communication medium, a system broadcast (point to all-point) is used; on closed communication medium, a
+	 * broadcast (point to domain) is used. A remote endpoint will neglect write requests with unknown parameter types
+	 * without any further action.
+	 *
+	 * @param objectType interface object type, <code>0 &le; objectType &lt; 0xffff</code>
+	 * @param pid KNX property identifier, <code>0 &le; pid &lt; 0xfff</code>
+	 * @param value value to write
+	 * @throws KNXLinkClosedException if network link to KNX network is closed
+	 * @throws KNXTimeoutException on timeout during send
+	 */
+	void writeSystemNetworkParameter(int objectType, int pid, byte... value)
+			throws KNXLinkClosedException, KNXTimeoutException;
 
 	/**
 	 * Reads the device descriptor information of a communication partner its controller.

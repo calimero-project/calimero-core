@@ -714,14 +714,26 @@ public class ManagementClientImplTest
 		catch (final KNXTimeoutException expected) {}
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#readDeviceDesc(Destination, int)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testReadDeviceDesc() throws KNXException, InterruptedException
+	void readSystemNetworkParameterInProgrammingMode() throws KNXException, InterruptedException {
+		final List<byte[]> l = mc.readSystemNetworkParameter(0, PID.SERIAL_NUMBER, 1);
+		assertFalse(l.isEmpty());
+		l.forEach(sn -> assertEquals(6, sn.length));
+	}
+
+	@Test
+	void readSystemNetworkParameterStartup() throws KNXException, InterruptedException {
+		final byte maxWaitSeconds = 2;
+		List<byte[]> l = mc.readSystemNetworkParameter(0, PID.SERIAL_NUMBER, 3, maxWaitSeconds);
+		assertTrue(!l.isEmpty(), "devices should respond once");
+		l.forEach(sn -> assertEquals(6, sn.length));
+
+		l = mc.readSystemNetworkParameter(0, PID.SERIAL_NUMBER, 3, maxWaitSeconds);
+		assertTrue(l.isEmpty(), "devices should not respond twice");
+	}
+
+	@Test
+	void testReadDeviceDesc() throws KNXException, InterruptedException
 	{
 		try {
 			mc.readDeviceDesc(dco, -1);

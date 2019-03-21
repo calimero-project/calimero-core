@@ -37,10 +37,12 @@
 package tuwien.auto.calimero.mgmt;
 
 import static java.lang.String.format;
+import static java.nio.ByteBuffer.allocate;
+import static java.util.stream.Collectors.toList;
 import static tuwien.auto.calimero.DataUnitBuilder.createAPDU;
 import static tuwien.auto.calimero.DataUnitBuilder.createLengthOptimizedAPDU;
 
-import java.nio.ByteBuffer;
+import java.time.Duration;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,6 +50,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -58,6 +61,7 @@ import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.DetachEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.IndividualAddress;
+import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXRemoteException;
@@ -117,6 +121,10 @@ public class ManagementClientImpl implements ManagementClient
 	private static final int PROPERTY_READ = 0x03D5;
 	private static final int PROPERTY_RESPONSE = 0x03D6;
 	private static final int PROPERTY_WRITE = 0x03D7;
+
+	private static final int SystemNetworkParamRead = 0b0111001000;
+	private static final int SystemNetworkParamResponse = 0b0111001001;
+	private static final int SystemNetworkParamWrite = 0b0111001010;
 
 	private static final int NetworkParamRead = 0b1111011010;
 	private static final int NetworkParamResponse = 0b1111011011;
@@ -395,7 +403,7 @@ public class ManagementClientImpl implements ManagementClient
 
 	@Override
 	public byte[] readNetworkParameter(final IndividualAddress remote, final int objectType, final int pid,
-		final byte[] testInfo)
+		final byte... testInfo)
 		throws KNXLinkClosedException, KNXTimeoutException, KNXInvalidResponseException, InterruptedException
 	{
 		synchronized (this) {
@@ -426,7 +434,7 @@ public class ManagementClientImpl implements ManagementClient
 
 	@Override
 	public void writeNetworkParameter(final IndividualAddress remote, final int objectType, final int pid,
-		final byte[] value) throws KNXLinkClosedException, KNXTimeoutException
+		final byte... value) throws KNXLinkClosedException, KNXTimeoutException
 	{
 		sendNetworkParameter(NetworkParamWrite, remote, objectType, pid, value);
 	}
@@ -449,6 +457,67 @@ public class ManagementClientImpl implements ManagementClient
 			tl.sendData(remote, p, tsdu);
 		else
 			tl.broadcast(true, p, tsdu);
+	}
+
+	@Override
+	public List<byte[]> readSystemNetworkParameter(final int objectType, final int pid, final int operand,
+		final byte... additionalTestInfo) throws KNXException, InterruptedException {
+
+		if (operand < 0 || operand > 0xfe)
+			throw new KNXIllegalArgumentException("operand out of range");
+		final byte[] testInfo = allocate(1 + additionalTestInfo.length).put((byte) operand)
+				.put(additionalTestInfo).array();
+
+		synchronized (this) {
+			try {
+				svcResponse = SystemNetworkParamResponse;
+				sendSystemNetworkParameter(SystemNetworkParamRead, objectType, pid, testInfo);
+
+				final BiPredicate<IndividualAddress, byte[]> testParamType = (responder, apdu) -> {
+					if (apdu.length < 6)
+						return false;
+					final int receivedIot = (apdu[2] & 0xff) << 8 | (apdu[3] & 0xff);
+					final int receivedPid = (apdu[4] & 0xff) << 4 | (apdu[5] & 0xf0) >> 4;
+					if (apdu.length == 6) {
+						final String s = receivedPid == 0xff ? receivedIot == 0xffff ? "object type" : "PID" : "response";
+						logger.info("system network parameter read response from {} for interface object type {} "
+								+ "PID {}: unsupported {}", responder, objectType, pid, s);
+						return false;
+					}
+					final int receivedOperand = apdu[6] & 0xff;
+					return receivedIot == objectType && receivedPid == pid && receivedOperand == operand;
+				};
+
+				final Duration waitTime = Duration.ofSeconds(operand == 1 ? 1
+						: operand == 2 || operand == 3 ? additionalTestInfo[0] & 0xff : getResponseTimeout())
+						.plusMillis(500); // allow some communication overhead (medium access & device delay times)
+
+				final List<byte[]> responders = waitForResponses(4, 12, testParamType, waitTime, false);
+				final int prefix = 2 + 4 + 1 + additionalTestInfo.length;
+				return responders.stream().map(r -> Arrays.copyOfRange(r, prefix, r.length)).collect(toList());
+			}
+			finally {
+				svcResponse = 0;
+			}
+		}
+	}
+
+	@Override
+	public void writeSystemNetworkParameter(final int objectType, final int pid, final byte... value)
+			throws KNXLinkClosedException, KNXTimeoutException {
+		sendSystemNetworkParameter(SystemNetworkParamWrite, objectType, pid, value);
+	}
+
+	private void sendSystemNetworkParameter(final int apci, final int objectType, final int pid, final byte[] value)
+		throws KNXTimeoutException, KNXLinkClosedException {
+		if (objectType < 0 || objectType > 0xffff || pid < 0 || pid > 0xfff)
+			throw new KNXIllegalArgumentException("IOT or PID argument out of range");
+
+		final byte[] asdu = allocate(4 + value.length).putShort((short) objectType).putShort((short) (pid << 4))
+				.put(value).array();
+
+		final byte[] tsdu = DataUnitBuilder.createAPDU(apci, asdu);
+		tl.broadcast(true, Priority.SYSTEM, tsdu);
 	}
 
 	@Override
@@ -745,8 +814,7 @@ public class ManagementClientImpl implements ManagementClient
 		// use extended write service for memory access above 65 K
 		if (startAddr > 0xffff) {
 			final byte[] addrBytes = { (byte) (startAddr >>> 16), (byte) (startAddr >>> 8), (byte) startAddr };
-			final byte[] asdu = ByteBuffer.allocate(4 + data.length).put((byte) data.length).put(addrBytes).put(data)
-					.array();
+			final byte[] asdu = allocate(4 + data.length).put((byte) data.length).put(addrBytes).put(data).array();
 			final byte[] send = createAPDU(MemoryExtendedWrite, asdu);
 			final byte[] apdu = sendWait(dst, priority, send, MemoryExtendedWriteResponse, 4, 252);
 			final ReturnCode ret = ReturnCode.of(apdu[2] & 0xff);
@@ -957,6 +1025,27 @@ public class ManagementClientImpl implements ManagementClient
 				if (oneOnly)
 					break;
 				wait = end - System.currentTimeMillis();
+			}
+		}
+		catch (final KNXTimeoutException e) {}
+		return l;
+	}
+
+	private List<byte[]> waitForResponses(final int minAsduLen, final int maxAsduLen,
+		final BiPredicate<IndividualAddress, byte[]> test, final Duration waitTime, final boolean oneOnly)
+			throws KNXInvalidResponseException, InterruptedException {
+		final List<byte[]> l = new ArrayList<>();
+		try {
+			long remaining = waitTime.toMillis();
+			final long end = System.nanoTime() / 1_000_000 + remaining;
+			while (remaining > 0) {
+				final List<IndividualAddress> responder = new ArrayList<>();
+				final byte[] res = waitForResponse(null, minAsduLen, maxAsduLen, remaining, Optional.of(responder));
+				if (test.test(responder.get(0), res))
+					l.add(res);
+				if (oneOnly)
+					break;
+				remaining = end - System.nanoTime() / 1_000_000;
 			}
 		}
 		catch (final KNXTimeoutException e) {}
