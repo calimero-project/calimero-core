@@ -75,7 +75,7 @@ import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature.InterfaceFeatu
  * @author B. Malinowsky
  */
 @KnxnetIP
-public class KNXnetIPTunnelTest
+class KNXnetIPTunnelTest
 {
 	private static KNXnetIPConnection.BlockingMode noblock = KNXnetIPConnection.BlockingMode.NonBlocking;
 	private static KNXnetIPConnection.BlockingMode ack = KNXnetIPConnection.BlockingMode.WaitForAck;

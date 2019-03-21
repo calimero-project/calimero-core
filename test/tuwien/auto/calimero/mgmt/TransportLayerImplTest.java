@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ import tuwien.auto.calimero.link.medium.TPSettings;
  * @author B. Malinowsky
  */
 @KnxnetIP
-public class TransportLayerImplTest
+class TransportLayerImplTest
 {
 	private KNXNetworkLink nl;
 	private TransportLayer tl;
@@ -183,7 +183,7 @@ public class TransportLayerImplTest
 	}
 
 	@Test
-	public final void testTransportLayerImpl()
+	void testTransportLayerImpl()
 	{
 		nl.close();
 		try {
@@ -193,25 +193,15 @@ public class TransportLayerImplTest
 		catch (final KNXLinkClosedException e) {}
 	}
 
-	/**
-	 * Test method for {@link TransportLayerImpl#addTransportListener(TransportListener)}.
-	 */
 	@Test
-	public final void testAddEventListener()
+	void testAddEventListener()
 	{
 		tl.addTransportListener(new TLListener());
 		tl.addTransportListener(ltl);
 	}
 
-	/**
-	 * Test method for {@link TransportLayerImpl#broadcast(boolean, Priority, byte[])}.
-	 *
-	 * @throws KNXLinkClosedException
-	 * @throws KNXTimeoutException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testBroadcast() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
+	void testBroadcast() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		final int indAddrRead = 0x0100;
 		final byte[] tsdu = new byte[] { (byte) (indAddrRead >> 8), (byte) indAddrRead };
@@ -220,14 +210,8 @@ public class TransportLayerImplTest
 		assertFalse(ltl.broad.isEmpty(), "no broadcast received");
 	}
 
-	/**
-	 * Test method for {@link TransportLayerImpl#connect(Destination)}.
-	 *
-	 * @throws KNXLinkClosedException
-	 * @throws KNXTimeoutException
-	 */
 	@Test
-	public final void testConnect() throws KNXTimeoutException, KNXLinkClosedException
+	void testConnect() throws KNXTimeoutException, KNXLinkClosedException
 	{
 		tl.connect(dco);
 		tl.connect(dco);
@@ -243,11 +227,8 @@ public class TransportLayerImplTest
 		catch (final KNXIllegalArgumentException e) {}
 	}
 
-	/**
-	 * Test method for {@link TransportLayerImpl#createDestination(tuwien.auto.calimero.IndividualAddress, boolean)}.
-	 */
 	@Test
-	public final void testCreateDestinationIndividualAddressBoolean()
+	void testCreateDestinationIndividualAddressBoolean()
 	{
 		assertTrue(dco.isConnectionOriented());
 		assertEquals(Util.getKnxDeviceCO(), dco.getAddress());
@@ -257,12 +238,8 @@ public class TransportLayerImplTest
 		assertEquals(Util.getRouterAddress(), d.getAddress());
 	}
 
-	/**
-	 * Test method for
-	 * {@link TransportLayerImpl#createDestination(tuwien.auto.calimero.IndividualAddress, boolean, boolean, boolean)}.
-	 */
 	@Test
-	public final void testCreateDestinationIndividualAddressBooleanBooleanBoolean()
+	void testCreateDestinationIndividualAddressBooleanBooleanBoolean()
 	{
 		Destination d;
 		try {
@@ -278,13 +255,8 @@ public class TransportLayerImplTest
 		assertTrue(d.isVerifyMode());
 	}
 
-	/**
-	 * Test method for {@link TransportLayerImpl#detach()}.
-	 *
-	 * @throws KNXLinkClosedException
-	 */
 	@Test
-	public final void testDetach() throws KNXLinkClosedException
+	void testDetach() throws KNXLinkClosedException
 	{
 		assertFalse(ltl.detached);
 		tl.detach();
@@ -304,14 +276,8 @@ public class TransportLayerImplTest
 		assertFalse(l2.detached);
 	}
 
-	/**
-	 * Test method for {@link TransportLayerImpl#detach()}.
-	 *
-	 * @throws KNXLinkClosedException
-	 * @throws KNXTimeoutException
-	 */
 	@Test
-	public final void testDetach2() throws KNXTimeoutException, KNXLinkClosedException
+	void testDetach2() throws KNXTimeoutException, KNXLinkClosedException
 	{
 		tl.detach();
 		tl.detach();
@@ -332,24 +298,15 @@ public class TransportLayerImplTest
 		catch (final IllegalStateException e) {}
 	}
 
-	/**
-	 * Test method for {@link TransportLayerImpl#detach()}.
-	 */
 	@Test
-	public final void testDetach3()
+	void testDetach3()
 	{
 		nl.close();
 		tl.detach();
 	}
 
-	/**
-	 * Test method for {@link TransportLayerImpl#disconnect(Destination)}.
-	 *
-	 * @throws KNXLinkClosedException
-	 * @throws KNXTimeoutException
-	 */
 	@Test
-	public final void testDisconnect() throws KNXLinkClosedException, KNXTimeoutException
+	void testDisconnect() throws KNXLinkClosedException, KNXTimeoutException
 	{
 		tl.disconnect(dco);
 		tl.disconnect(dco);
@@ -377,11 +334,8 @@ public class TransportLayerImplTest
 		d2.destroy();
 	}
 
-	/**
-	 * Test method for {@link TransportLayerImpl#getName()}.
-	 */
 	@Test
-	public final void testGetName()
+	void testGetName()
 	{
 		String n = tl.getName();
 		assertTrue(n.indexOf(nl.getName()) > -1);
@@ -392,11 +346,8 @@ public class TransportLayerImplTest
 		assertTrue(n.indexOf("TL") > -1);
 	}
 
-	/**
-	 * Test method for {@link TransportLayerImpl#removeTransportListener(TransportListener)}.
-	 */
 	@Test
-	public final void testRemoveEventListener()
+	void testRemoveEventListener()
 	{
 		tl.removeTransportListener(ltl);
 		tl.removeTransportListener(ltl);
@@ -404,16 +355,8 @@ public class TransportLayerImplTest
 		tl.removeTransportListener(new TLListener());
 	}
 
-	/**
-	 * Test method for {@link TransportLayerImpl#sendData(Destination, tuwien.auto.calimero.Priority, byte[])}.
-	 *
-	 * @throws KNXLinkClosedException
-	 * @throws KNXTimeoutException
-	 * @throws KNXDisconnectException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testSendDataDestinationPriorityByteArray()
+	void testSendDataDestinationPriorityByteArray()
 		throws KNXDisconnectException, KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		try {
@@ -448,15 +391,8 @@ public class TransportLayerImplTest
 		catch (final KNXIllegalArgumentException e) {}
 	}
 
-	/**
-	 * Test method for {@link TransportLayerImpl#sendData(Destination, tuwien.auto.calimero.Priority, byte[])}.
-	 *
-	 * @throws KNXTimeoutException
-	 * @throws KNXLinkClosedException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public void testSendDataNonExistingAddress()
+	void testSendDataNonExistingAddress()
 		throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		// not existing device address
@@ -473,7 +409,7 @@ public class TransportLayerImplTest
 	}
 
 	@Test
-	public void testSendDataDetach() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
+	void testSendDataDetach() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		// do a detach while waiting for L4 ack
 		tl.connect(dco);
@@ -507,14 +443,8 @@ public class TransportLayerImplTest
 		Thread.sleep(500);
 	}
 
-	/**
-	 * @throws KNXTimeoutException
-	 * @throws KNXLinkClosedException
-	 * @throws KNXDisconnectException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public void testSendDataLinkClose()
+	void testSendDataLinkClose()
 		throws KNXTimeoutException, KNXLinkClosedException, KNXDisconnectException, InterruptedException
 	{
 		// do a link closed while waiting for L4 response
@@ -524,16 +454,8 @@ public class TransportLayerImplTest
 		nl.close();
 	}
 
-	/**
-	 * Test method for
-	 * {@link TransportLayerImpl#sendData(tuwien.auto.calimero.KNXAddress, tuwien.auto.calimero.Priority, byte[])}.
-	 *
-	 * @throws KNXLinkClosedException
-	 * @throws KNXTimeoutException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testSendDataKNXAddressPriorityByteArray()
+	void testSendDataKNXAddressPriorityByteArray()
 		throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		final int propRead = 0x03D5;

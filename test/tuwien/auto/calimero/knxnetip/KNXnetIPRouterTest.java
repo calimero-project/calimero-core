@@ -42,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode.NonBlocking;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -87,10 +88,8 @@ import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
  * @author B. Malinowsky
  */
 @KnxnetIP
-public class KNXnetIPRouterTest
+class KNXnetIPRouterTest
 {
-	private static KNXnetIPConnection.BlockingMode noblock = KNXnetIPConnection.BlockingMode.NonBlocking;
-
 	private KNXnetIPRouting r;
 	private RouterListenerImpl l;
 
@@ -161,35 +160,23 @@ public class KNXnetIPRouterTest
 		}
 	}
 
-	/**
-	 * Test method for {@link KNXnetIPRouting#send(tuwien.auto.calimero.cemi.CEMI, KNXnetIPConnection.BlockingMode)}.
-	 *
-	 * @throws KNXException
-	 */
 	@Test
-	public final void testSend() throws KNXException
+	void testSend() throws KNXException
 	{
 		newRouter();
-		doSend(frame, noblock);
-		doSend(frame2, noblock);
-		doSend(frameNoDest, noblock);
+		doSend(frame, NonBlocking);
+		doSend(frame2, NonBlocking);
+		doSend(frameNoDest, NonBlocking);
 	}
 
-	/**
-	 * Test method for {@link KNXnetIPRouting#send(tuwien.auto.calimero.cemi.CEMI, KNXnetIPConnection.BlockingMode)}.
-	 *
-	 * @throws KNXException
-	 * @throws UnknownHostException
-	 * @throws SocketException
-	 */
 	@Test
-	public final void testSend2() throws KNXException, SocketException, UnknownHostException
+	void testSend2() throws KNXException, SocketException, UnknownHostException
 	{
 		r = new KNXnetIPRouting(Util.localInterface(), InetAddress.getByName(KNXnetIPRouting.DEFAULT_MULTICAST));
 		r.addConnectionListener(l);
-		doSend(frame, noblock);
-		doSend(frame2, noblock);
-		doSend(frameNoDest, noblock);
+		doSend(frame, NonBlocking);
+		doSend(frame2, NonBlocking);
+		doSend(frameNoDest, NonBlocking);
 	}
 
 	private void doSend(final CEMILData f, final KNXnetIPConnection.BlockingMode m) throws KNXConnectionClosedException
@@ -201,15 +188,8 @@ public class KNXnetIPRouterTest
 		catch (final InterruptedException e) {}
 	}
 
-	/**
-	 * Test method for {@link KNXnetIPRouting#KNXnetIPRouting(java.net.NetworkInterface, java.net.InetAddress)}.
-	 *
-	 * @throws KNXException
-	 * @throws UnknownHostException
-	 * @throws SocketException
-	 */
 	@Test
-	public final void testKNXnetIPRouter() throws SocketException, UnknownHostException, KNXException
+	void testKNXnetIPRouter() throws SocketException, UnknownHostException, KNXException
 	{
 		newRouter();
 		assertEquals(KNXnetIPConnection.OK, r.getState());
@@ -224,12 +204,9 @@ public class KNXnetIPRouterTest
 		r = new KNXnetIPRouting(null, InetAddress.getByName("224.0.23.13"));
 	}
 
-	/**
-	 * @throws KNXException
-	 */
 	@Test
 	@Slow
-	public final void testReceive() throws KNXException
+	void testReceive() throws KNXException
 	{
 		newRouter();
 		Util.out("waiting for some incoming frames...");
@@ -239,13 +216,8 @@ public class KNXnetIPRouterTest
 		catch (final InterruptedException e) {}
 	}
 
-	/**
-	 * Test method for {@link KNXnetIPRouting#setHopCount(int)}.
-	 *
-	 * @throws KNXException
-	 */
 	@Test
-	public final void testSetHopCount() throws KNXException
+	void testSetHopCount() throws KNXException
 	{
 		newRouter();
 		final int hobbes = r.getHopCount();
@@ -271,34 +243,22 @@ public class KNXnetIPRouterTest
 		r.setHopCount(20);
 	}
 
-	/**
-	 * Test method for {@link KNXnetIPRouting#close()}.
-	 *
-	 * @throws KNXException
-	 */
 	@Test
-	public final void testClose() throws KNXException
+	void testClose() throws KNXException
 	{
 		newRouter();
 		r.close();
 		assertEquals(KNXnetIPConnection.CLOSED, r.getState());
 		try {
-			r.send(frame, noblock);
+			r.send(frame, NonBlocking);
 			fail("we are closed");
 		}
 		catch (final KNXConnectionClosedException e) {}
 		assertEquals(KNXnetIPConnection.CLOSED, r.getState());
 	}
 
-	/**
-	 * Test method for {@link KNXnetIPRouting#getRemoteAddress()}.
-	 *
-	 * @throws KNXException
-	 * @throws UnknownHostException
-	 * @throws SocketException
-	 */
 	@Test
-	public final void testGetRemoteAddress() throws KNXException, SocketException, UnknownHostException
+	void testGetRemoteAddress() throws KNXException, SocketException, UnknownHostException
 	{
 		newRouter();
 		assertEquals(new InetSocketAddress(KNXnetIPRouting.DEFAULT_MULTICAST, KNXnetIPConnection.DEFAULT_PORT),
@@ -320,7 +280,7 @@ public class KNXnetIPRouterTest
 		newRouter();
 		int sent = 0;
 		while (sent < 1000 && l.lost.isEmpty()) {
-			r.send(frame, noblock);
+			r.send(frame, NonBlocking);
 			++sent;
 			try {
 				Thread.sleep(10);

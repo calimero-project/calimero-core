@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -130,14 +130,8 @@ public class KNXnetIPDevMgmtTest
 		}
 	}
 
-	/**
-	 * Test method for {@link KNXnetIPDevMgmt#send(CEMI, KNXnetIPConnection.BlockingMode)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testSend() throws KNXException, InterruptedException
+	void testSend() throws KNXException, InterruptedException
 	{
 		newMgmt();
 		doSend(frame, con, true);
@@ -155,28 +149,15 @@ public class KNXnetIPDevMgmtTest
 		l.received = null;
 	}
 
-	/**
-	 * Test method for
-	 * {@link KNXnetIPDevMgmt#KNXnetIPDevMgmt(java.net.InetSocketAddress, java.net.InetSocketAddress, boolean)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testKNXnetIPDevMgmt() throws KNXException, InterruptedException
+	void testKNXnetIPDevMgmt() throws KNXException, InterruptedException
 	{
 		newMgmt();
 		assertEquals(KNXnetIPConnection.OK, m.getState());
 	}
 
-	/**
-	 * Test method for {@link KNXnetIPDevMgmt#close()}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testClose() throws KNXException, InterruptedException
+	void testClose() throws KNXException, InterruptedException
 	{
 		newMgmt();
 		m.close();
@@ -189,14 +170,8 @@ public class KNXnetIPDevMgmtTest
 		assertEquals(KNXnetIPConnection.CLOSED, m.getState());
 	}
 
-	/**
-	 * Test method for {@link KNXnetIPDevMgmt#getRemoteAddress()}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testGetRemoteAddress() throws KNXException, InterruptedException
+	void testGetRemoteAddress() throws KNXException, InterruptedException
 	{
 		newMgmt();
 		assertEquals(Util.getServer(), m.getRemoteAddress());
@@ -205,15 +180,9 @@ public class KNXnetIPDevMgmtTest
 		assertTrue(m.getRemoteAddress().getPort() == 0);
 	}
 
-	/**
-	 * Test method for {@link KNXnetIPDevMgmt#getState()}.
-	 *
-	 * @throws InterruptedException on interrupted thread
-	 * @throws KNXException
-	 */
 	@Test
 	@Slow
-	public final void testGetState() throws InterruptedException, KNXException
+	void testGetState() throws InterruptedException, KNXException
 	{
 		newMgmt();
 		assertEquals(KNXnetIPConnection.OK, m.getState());

@@ -65,12 +65,13 @@ import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.KNXNetworkLinkIP;
 import tuwien.auto.calimero.link.medium.TPSettings;
+import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
 
 /**
  * @author B. Malinowsky
  */
 @KnxnetIP
-public class ManagementClientImplTest
+class ManagementClientImplTest
 {
 	private KNXNetworkLink lnk;
 	private ManagementClient mc;
@@ -96,11 +97,8 @@ public class ManagementClientImplTest
 			lnk.close();
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#ManagementClientImpl(tuwien.auto.calimero.link.KNXNetworkLink)}.
-	 */
 	@Test
-	public final void testManagementClientImpl()
+	void testManagementClientImpl()
 	{
 		mc.detach();
 		lnk.close();
@@ -111,14 +109,8 @@ public class ManagementClientImplTest
 		catch (final KNXLinkClosedException e) {}
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#authorize(Destination, byte[])}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testAuthorize() throws KNXException, InterruptedException
+	void testAuthorize() throws KNXException, InterruptedException
 	{
 		try {
 			mc.authorize(dco, new byte[] { 0x10, 0x10, 0x10 });
@@ -141,14 +133,8 @@ public class ManagementClientImplTest
 		assertTrue(15 == level || 3 == level);
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#authorize(Destination, byte[])}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testAuthorizeCL() throws KNXException, InterruptedException
+	void testAuthorizeCL() throws KNXException, InterruptedException
 	{
 		try {
 			/*final int level =*/ mc.authorize(dcl, new byte[] { 0x10, 0x10, 0x10, 0x10 });
@@ -157,14 +143,8 @@ public class ManagementClientImplTest
 		catch (final KNXDisconnectException e) {}
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#readADC(Destination, int, int)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testReadADC() throws KNXException, InterruptedException
+	void testReadADC() throws KNXException, InterruptedException
 	{
 		try {
 			mc.readADC(dco, -1, 1);
@@ -191,14 +171,8 @@ public class ManagementClientImplTest
 		assertTrue(adc > 0);
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#readADC(Destination, int, int)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testReadADCCL() throws KNXException, InterruptedException
+	void testReadADCCL() throws KNXException, InterruptedException
 	{
 		try {
 			/*final int adc =*/ mc.readADC(dcl, 1, 1);
@@ -207,14 +181,8 @@ public class ManagementClientImplTest
 		catch (final KNXDisconnectException e) {}
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#readAddress(boolean)}.
-	 *
-	 * @throws InterruptedException on interrupted thread
-	 * @throws KNXException
-	 */
 	@Test
-	public final void testReadAddressBoolean() throws InterruptedException, KNXException
+	void testReadAddressBoolean() throws InterruptedException, KNXException
 	{
 		IndividualAddress[] ias = mc.readAddress(true);
 		assertTrue(ias.length <= 1);
@@ -224,14 +192,8 @@ public class ManagementClientImplTest
 		assertTrue(System.currentTimeMillis() - start >= mc.getResponseTimeout() * 1000);
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#readAddress(byte[])}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testReadAddressByteArray() throws KNXException, InterruptedException
+	void testReadAddressByteArray() throws KNXException, InterruptedException
 	{
 		try {
 			mc.readAddress(new byte[] { 0x10, 0x10, 0x10, 0x10, 0x10 });
@@ -246,14 +208,8 @@ public class ManagementClientImplTest
 		assertEquals(addr, ia);
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#readMemory(Destination, int, int)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testReadMemory() throws KNXException, InterruptedException
+	void testReadMemory() throws KNXException, InterruptedException
 	{
 		try {
 			mc.readMemory(dco, -1, 2);
@@ -280,14 +236,8 @@ public class ManagementClientImplTest
 		Util.out("read mem from 0x105", mem);
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#readMemory(Destination, int, int)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testReadMemoryCL() throws KNXException, InterruptedException
+	void testReadMemoryCL() throws KNXException, InterruptedException
 	{
 		try {
 			/*final byte[] mem =*/ mc.readMemory(dcl, 0x105, 2);
@@ -296,14 +246,8 @@ public class ManagementClientImplTest
 		catch (final KNXDisconnectException e) {}
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#readProperty(Destination, int, int, int, int)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testReadPropertyDestinationIntIntIntInt() throws KNXException, InterruptedException
+	void testReadPropertyDestinationIntIntIntInt() throws KNXException, InterruptedException
 	{
 		try {
 			mc.readProperty(dco, -1, 2, 1, 1);
@@ -349,28 +293,16 @@ public class ManagementClientImplTest
 		/*final byte[] prop =*/ mc.readProperty(dco2, 0, 11, 1, 1);
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#readProperty(Destination, int, int, int, int)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testReadPropertyDestinationIntIntIntIntCL() throws KNXException, InterruptedException
+	void testReadPropertyDestinationIntIntIntIntCL() throws KNXException, InterruptedException
 	{
 		dcl.destroy();
 		final Destination connless = mc.createDestination(Util.getKnxDevice(), false);
 		/*final byte[] prop =*/ mc.readProperty(connless, 0, 14, 1, 1);
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#readPropertyDesc(Destination, int, int, int)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testReadPropertyDescDestinationIntIntInt() throws KNXException, InterruptedException
+	void testReadPropertyDescDestinationIntIntInt() throws KNXException, InterruptedException
 	{
 		try {
 			mc.readPropertyDesc(dco, -1, 2, 1);
@@ -411,14 +343,8 @@ public class ManagementClientImplTest
 		//assertTrue(Arrays.equals(desc, cmp));
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#writeAddress(tuwien.auto.calimero.IndividualAddress)}.
-	 *
-	 * @throws InterruptedException on interrupted thread
-	 * @throws KNXException
-	 */
 	@Test
-	public final void testWriteAddressIndividualAddress() throws InterruptedException, KNXException
+	void testWriteAddressIndividualAddress() throws InterruptedException, KNXException
 	{
 		final IndividualAddress[] orig = mc.readAddress(true);
 
@@ -437,14 +363,8 @@ public class ManagementClientImplTest
 		assertEquals(orig[0], mc.readAddress(true)[0]);
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#writeAddress(byte[], tuwien.auto.calimero.IndividualAddress)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testWriteAddressByteArrayIndividualAddress() throws KNXException, InterruptedException
+	void testWriteAddressByteArrayIndividualAddress() throws KNXException, InterruptedException
 	{
 		final byte[] sno = new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
 		final IndividualAddress write = mc.readAddress(sno);
@@ -460,14 +380,8 @@ public class ManagementClientImplTest
 		mc.writeAddress(sno, write);
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#writeKey(Destination, int, byte[])}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testWriteKey() throws KNXException, InterruptedException
+	void testWriteKey() throws KNXException, InterruptedException
 	{
 		try {
 			mc.writeKey(dco, -1, new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 });
@@ -488,54 +402,28 @@ public class ManagementClientImplTest
 		mc.writeKey(dco, 1, new byte[] { 0x01, 0x02, 0x03, 0x04 });
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#writeMemory(Destination, int, byte[])}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testWriteMemory() throws KNXException, InterruptedException
+	void testWriteMemory() throws KNXException, InterruptedException
 	{
 		final byte[] mem = mc.readMemory(dco, 0x105, 2);
 		mc.writeMemory(dco, 0x105, mem);
 	}
 
-	/**
-	 * Test method for
-	 * {@link ManagementClientImpl#createDestination(tuwien.auto.calimero.IndividualAddress, boolean, boolean, boolean)}
-	 * .
-	 *
-	 * @throws KNXFormatException
-	 */
 	@Test
-	public final void testCreateDestination() throws KNXFormatException
+	void testCreateDestination() throws KNXFormatException
 	{
 		mc.createDestination(new IndividualAddress("1.1.1"), false);
 		mc.createDestination(new IndividualAddress("2.2.2"), true, false, true);
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#restart(Destination)}.
-	 *
-	 * @throws KNXLinkClosedException
-	 * @throws KNXTimeoutException
-	 * @throws InterruptedException
-	 */
 	@Test
-	public final void testRestart() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
+	void testRestart() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		mc.restart(dcl);
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#writeProperty(Destination, int, int, int, int, byte[])}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testWritePropertyDestinationIntIntIntIntByteArray() throws KNXException, InterruptedException
+	void testWritePropertyDestinationIntIntIntIntByteArray() throws KNXException, InterruptedException
 	{
 		final int pidProgramVersion = 13;
 
@@ -550,14 +438,8 @@ public class ManagementClientImplTest
 		mc.writeProperty(dco2, 0, pidProgramVersion, 1, 1, read);
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#detach()}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testClose() throws KNXException, InterruptedException
+	void testClose() throws KNXException, InterruptedException
 	{
 		mc.detach();
 		assertFalse(mc.isOpen());
@@ -568,37 +450,24 @@ public class ManagementClientImplTest
 		catch (final IllegalStateException e) {}
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#getResponseTimeout()}.
-	 */
 	@Test
-	public final void testGetResponseTimeout()
+	void testGetResponseTimeout()
 	{
 		assertEquals(5, mc.getResponseTimeout());
 		mc.setResponseTimeout(10);
 		assertEquals(10, mc.getResponseTimeout());
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#getPriority()}.
-	 */
 	@Test
-	public final void testGetPriority()
+	void testGetPriority()
 	{
 		assertEquals(Priority.LOW, mc.getPriority());
 		mc.setPriority(Priority.URGENT);
 		assertEquals(Priority.URGENT, mc.getPriority());
 	}
 
-	/**
-	 * Test method for
-	 * {@link ManagementClientImpl#readDomainAddress(byte[], tuwien.auto.calimero.IndividualAddress, int)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testReadDomainAddressIntIndividualAddressInt() throws KNXException, InterruptedException
+	void testReadDomainAddressIntIndividualAddressInt() throws KNXException, InterruptedException
 	{
 		try {
 			mc.readDomainAddress(new byte[] { 1, }, Util.getKnxDeviceCO(), -1);
@@ -622,27 +491,15 @@ public class ManagementClientImplTest
 		/*doas =*/ mc.readDomainAddress(domain, start, 5);
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#readDomainAddress(boolean)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testReadDomainAddressBoolean() throws KNXException, InterruptedException
+	void testReadDomainAddressBoolean() throws KNXException, InterruptedException
 	{
 		final List<byte[]> domain = mc.readDomainAddress(true);
 		assertTrue(domain.size() <= 1);
 	}
 
-	/**
-	 * Test method for {@link ManagementClientImpl#writeDomainAddress(byte[])}.
-	 *
-	 * @throws KNXLinkClosedException
-	 * @throws KNXTimeoutException
-	 */
 	@Test
-	public final void testWriteDomainAddress() throws KNXTimeoutException, KNXLinkClosedException
+	void testWriteDomainAddress() throws KNXTimeoutException, KNXLinkClosedException
 	{
 		try {
 			mc.writeDomainAddress(new byte[] { 1, 2, 3 });
@@ -661,31 +518,31 @@ public class ManagementClientImplTest
 	private static final int NetworkParamPid = 59;
 
 	@Test
-	public final void testWriteNetworkParameter() throws KNXLinkClosedException, KNXTimeoutException
+	void testWriteNetworkParameter() throws KNXLinkClosedException, KNXTimeoutException
 	{
 		mc.writeNetworkParameter(dcl.getAddress(), NetworkParamObjectType, NetworkParamPid, new byte[] { 0 });
 	}
 
 	@Test
-	public final void testWriteNetworkParameterBroadcast() throws KNXLinkClosedException, KNXTimeoutException
+	void testWriteNetworkParameterBroadcast() throws KNXLinkClosedException, KNXTimeoutException
 	{
 		mc.writeNetworkParameter(null, NetworkParamObjectType, NetworkParamPid, new byte[] { 0 });
 	}
 
 	@Test
-	public final void testReadNetworkParameterBroadcast() throws KNXException, InterruptedException
+	void testReadNetworkParameterBroadcast() throws KNXException, InterruptedException
 	{
 		mc.readNetworkParameter(null, NetworkParamObjectType, NetworkParamPid, new byte[] {});
 	}
 
 	@Test
-	public final void testReadNetworkParameter() throws KNXException, InterruptedException
+	void testReadNetworkParameter() throws KNXException, InterruptedException
 	{
 		mc.readNetworkParameter(dcl.getAddress(), NetworkParamObjectType, NetworkParamPid, new byte[] { 0 });
 	}
 
 	@Test
-	public final void testReadUnsupportedNetworkParameter() throws InterruptedException, KNXException
+	void testReadUnsupportedNetworkParameter() throws InterruptedException, KNXException
 	{
 		try {
 			mc.readNetworkParameter(dcl.getAddress(), 99, 254, new byte[] {});
@@ -700,7 +557,7 @@ public class ManagementClientImplTest
 	}
 
 	@Test
-	public final void testReadUnsupportedNetworkParameterBroadcast() throws InterruptedException, KNXException
+	void testReadUnsupportedNetworkParameterBroadcast() throws InterruptedException, KNXException
 	{
 		try {
 			mc.readNetworkParameter(null, 99, 254, new byte[] {});
