@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -193,7 +193,7 @@ public final class Util
 	 */
 	public static InetSocketAddress getLocalHost()
 	{
-		return null;
+		return new InetSocketAddress(0);
 	}
 
 	/**
@@ -260,7 +260,7 @@ public final class Util
 	 * @return socket address
 	 * @throws KNXException if KNXnet/IP discovery failed
 	 */
-	public static InetSocketAddress getServer() throws KNXException
+	public synchronized static InetSocketAddress getServer() throws KNXException
 	{
 		// we try once to find our running test server, on failure subsequent calls will
 		// immediately return to speed up tests
