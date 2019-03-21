@@ -45,6 +45,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -87,9 +90,9 @@ class TransportLayerImplTest
 
 	private final class TLListener implements TransportListener
 	{
-		final List<CEMI> broad = new Vector<>();
+		final BlockingQueue<CEMI> broad = new ArrayBlockingQueue<>(10);
 		final List<CEMI> conn = new Vector<>();
-		final List<CEMI> ind = new Vector<>();
+		final BlockingQueue<CEMI> ind = new ArrayBlockingQueue<>(10);
 		final List<CEMI> group = new Vector<>();
 		final List<Destination> dis = new Vector<>();
 		volatile boolean closed;
@@ -204,10 +207,11 @@ class TransportLayerImplTest
 	void testBroadcast() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		final int indAddrRead = 0x0100;
+
 		final byte[] tsdu = new byte[] { (byte) (indAddrRead >> 8), (byte) indAddrRead };
 		tl.broadcast(false, Priority.SYSTEM, tsdu);
-		Thread.sleep(500);
-		assertFalse(ltl.broad.isEmpty(), "no broadcast received");
+		final CEMILData ldata = (CEMILData) ltl.broad.poll(3, TimeUnit.SECONDS);
+		assertNotNull(ldata, "no broadcast received");
 	}
 
 	@Test
@@ -459,10 +463,15 @@ class TransportLayerImplTest
 		throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		final int propRead = 0x03D5;
+		final int propResponse = 0x03D6;
+
 		// read pid max_apdu_length
 		final byte[] tsdu = new byte[] { (byte) (propRead >> 8), (byte) propRead, 0, 56, 0x10, 1, };
 		tl.sendData(Util.getKnxDevice(), p, tsdu);
-		Thread.sleep(500);
-		assertFalse(ltl.ind.isEmpty());
+		final CEMILData ldata = (CEMILData) ltl.ind.poll(3, TimeUnit.SECONDS);
+		assertNotNull(ldata, "no property response received");
+		final byte[] response = ldata.getPayload();
+		assertEquals(propResponse >> 8, response[0] & 0xff);
+		assertEquals(propResponse & 0xff, response[1] & 0xff);
 	}
 }
