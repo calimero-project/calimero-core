@@ -202,6 +202,9 @@
         <property pid="86" pidName="PID_GROUP_TELEGR_RATE_LIMIT_NO_OF_TELEGR" name="group telegram rate limitation number of telegrams" pdt="4" rw="R/W" writeEnabled="1">
             <usage>Telegram rate limitation number</usage>
         </property>
+        <property pid="89" pidName="PID_FEATURES_SUPPORTED" name="Supported Features" pdt="26" rw="3/1" writeEnabled="0">
+            <usage>Indicates the functionality of a device</usage>
+        </property>
         <property pid="101" pidName="PID_CHANNEL_01_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">
             <usage>Channel 1 Param, Easy configuration channel parameter</usage>
         </property>
@@ -344,6 +347,9 @@
         </property>
         <property pid="58" pidName="PID_MAX_APDU_LENGTH" name="Max. APDU-Length" pdt="4" rw="R" writeEnabled="0">
             <usage>Max. APDU-Length</usage>
+        </property>
+        <property pid="120" pidName="PID_IP_SBC_CONTROL" name="IP System Broadcast Routing" pdt="0x3E" rw="2/2" writeEnabled="1" accessPolicy="3FF/00C">
+            <usage>Enable and disable the IP System Broadcast Routing Mode</usage>
         </property>
     </object>
     <object type="7">
@@ -502,31 +508,76 @@
         <property pid="76" pidName="PID_FRIENDLY_NAME" name="Friendly Name" pdt="2" rw="R/W" writeEnabled="1">
             <usage>Human Readable Friendly Name</usage>
         </property>
-        <property pid="91" pidName="PID_BACKBONE_KEY" name="KNX IP secure group key" pdt="32" rw="" writeEnabled="0">
+        <property pid="91" pidName="PID_BACKBONE_KEY" name="KNX IP secure group key" pdt="32" rw="x/2" writeEnabled="0" accessPolicy="008/008">
             <usage>Key for encryption, decryption and MAC in secure group communication</usage>
         </property>
-        <property pid="92" pidName="PID_DEVICE_AUTHENTICATION_CODE" name="KNX IP device authentication code" pdt="32" rw="" writeEnabled="0">
+        <property pid="92" pidName="PID_DEVICE_AUTHENTICATION_CODE" name="KNX IP device authentication code" pdt="32" rw="x/2" writeEnabled="0"
+            accessPolicy="008/008">
             <usage>Device authentication code for authentication in secure unicast communication</usage>
         </property>
-        <property pid="93" pidName="PID_PASSWORD_HASHES" name="KNX IP secure password hashes" pdt="32" rw="" writeEnabled="0">
+        <property pid="93" pidName="PID_PASSWORD_HASHES" name="KNX IP secure password hashes" pdt="32" rw="x/2" writeEnabled="0" accessPolicy="008/008">
             <usage>Password hashes for authenticating clients during secure unicast connection setup</usage>
         </property>
-        <property pid="94" pidName="PID_SECURED_SERVICE_FAMILIES" name="KNX IP secured services" pdt="52" rw="R" writeEnabled="0">
+        <property pid="94" pidName="PID_SECURED_SERVICE_FAMILIES" name="KNX IP secured services" pdt="52" rw="3/2" writeEnabled="0"
+            accessPolicy="15D/15D">
             <usage>Indicates the services for which communication security is enforced</usage>
         </property>
-        <property pid="95" pidName="PID_MULTICAST_LATENCY_TOLERANCE" name="KNX IP secure multicast latency tolerance" pdt="4" rw="R" writeEnabled="0">
+        <property pid="95" pidName="PID_MULTICAST_LATENCY_TOLERANCE" name="KNX IP secure multicast latency tolerance" pdt="4" dpt="7.002" rw="3/2"
+            writeEnabled="0" accessPolicy="15D/15D">
             <usage>Length of the acceptance window for accepting incoming multicast frames with a past timestamp</usage>
         </property>
-        <property pid="96" pidName="PID_SYNC_LATENCY_FRACTION" name="KNX IP secure sync latency fraction" pdt="54" rw="R" writeEnabled="0">
+        <property pid="96" pidName="PID_SYNC_LATENCY_FRACTION" name="KNX IP secure sync latency fraction" pdt="54" dpt="5.001" rw="3/2"
+            writeEnabled="0" accessPolicy="15D/15D">
             <usage>Fraction of the latency tolerance within devices are considered to be in sync</usage>
         </property>
-        <property pid="97" pidName="PID_TUNNELING_USERS" name="Tunneling users" pdt="18" rw="" writeEnabled="0">
+        <property pid="97" pidName="PID_TUNNELING_USERS" name="Tunneling users" pdt="18" rw="2/2" writeEnabled="0" accessPolicy="00C/00C">
             <usage>List of tunneling users</usage>
         </property>
     </object>
     <object type="12">
         <property pid="51" pidName="PID_AR_TYPE_REPORT" name="" pdt="19" rw="" writeEnabled="">
             <usage></usage>
+        </property>
+    </object>
+    <object type="17">
+        <property pid="51" pidName="PID_SECURITY_MODE" name="Security Mode" pdt="62" rw="2/2" writeEnabled="1" accessPolicy="1DD/1DD">
+            <usage>Enable and disable the Security Mode</usage>
+        </property>
+        <property pid="52" pidName="PID_P2P_KEY_TABLE" name="Point-to-point Key Table" pdt="36" rw="2/2" writeEnabled="1" accessPolicy="00C/00C">
+            <usage>Security keys used for securing point-to-point and broadcast communication</usage>
+        </property>
+        <property pid="53" pidName="PID_GRP_KEY_TABLE" name="Group Key Table" pdt="34" rw="2/2" writeEnabled="1" accessPolicy="00C/00C">
+            <usage>Security keys used for securing standard mode group communication</usage>
+        </property>
+        <property pid="54" pidName="PID_SECURITY_INDIVIDUAL_ADDRESS_TABLE" name="Security Individual Address Table" pdt="24" rw="2/2" writeEnabled=""
+            accessPolicy="00C/00C">
+            <usage>IAs and last valid sequence numbers of communication partners with secure links</usage>
+        </property>
+        <property pid="55" pidName="PID_SECURITY_FAILURES_LOG" name="Security Failures Log" pdt="62" rw="3/2" writeEnabled="1" accessPolicy="15D/15D">
+            <usage>Provides security failure information</usage>
+        </property>
+        <property pid="56" pidName="PID_TOOL_KEY" name="Tool Key" pdt="32" rw="x/2" writeEnabled="1" accessPolicy="008/008">
+            <usage>Stores the security information for the central MaC in S-Mode and Ctrl-Mode</usage>
+        </property>
+        <property pid="57" pidName="PID_SECURITY_REPORT" name="Security Report" pdt="51" dpt="21.1002" rw="3/2" writeEnabled="1" accessPolicy="15D/15D">
+            <usage>KNX Data Security-related status and diagnostic information</usage>
+        </property>
+        <property pid="58" pidName="PID_SECURITY_REPORT_CONTROL" name="Security Report Control" pdt="50" dpt="1.003" rw="2/2" writeEnabled="1"
+            accessPolicy="00C/00C">
+            <usage>Control the spontaneous communication of the security report through DMP_InterfaceObject-InfoReport_RCl</usage>
+        </property>
+        <property pid="59" pidName="PID_SEQUENCE_NUMBER_SENDING" name="Sequence Number Sending" pdt="22" rw="2/2" writeEnabled="1"
+            accessPolicy="00C/00C">
+            <usage>Sequence Number used for the next outgoing secure communication</usage>
+        </property>
+        <property pid="60" pidName="PID_ZONE_KEY_TABLE" name="LTE Mode Zone Key Table" pdt="35" rw="2/2" writeEnabled="1" accessPolicy="00C/00C">
+            <usage>Security keys used for securing zone addressing communication</usage>
+        </property>
+        <property pid="61" pidName="PID_GO_SECURITY_FLAGS" name="Group Object Security Flags" pdt="17" rw="2/2" writeEnabled="1" accessPolicy="00C/00C">
+            <usage>Defines the required security requirements for each group object</usage>
+        </property>
+        <property pid="62" pidName="PID_ROLE_TABLE" name="Role Table" pdt="17" rw="3/x" writeEnabled="1" accessPolicy="15D/15D">
+            <usage>Role table</usage>
         </property>
     </object>
 </propertyDefinitions>
