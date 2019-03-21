@@ -173,7 +173,10 @@ public final class TunnelingFeature extends ServiceType {
 		seq = bb.get() & 0xff;
 		/* int reserved = */ bb.get();
 
-		featureId = InterfaceFeature.values()[(bb.get() & 0xff) - 1]; // TODO sanitize received interface feature id
+		final int id = bb.get() & 0xff;
+		if (id > InterfaceFeature.values().length)
+			throw new KNXFormatException(ReturnCode.AddressVoid.description(), id);
+		featureId = InterfaceFeature.values()[id - 1];
 		status = ReturnCode.of(bb.get() & 0xff);
 		if (status.code() > 0xf0)
 			logger.warn("channel {} feature {} responded with '{}'", channelId, featureId.friendly(), status.friendly());
@@ -184,7 +187,7 @@ public final class TunnelingFeature extends ServiceType {
 
 	private void validateFeatureValueLength() {
 		final int length;
-		if (svcType == KNXnetIPHeader.TunnelingFeatureGet || status.code() > 0x7f)
+		if (svcType == KNXnetIPHeader.TunnelingFeatureGet)
 			length = 0;
 		else {
 			switch (featureId) {
@@ -209,11 +212,11 @@ public final class TunnelingFeature extends ServiceType {
 					KNXnetIPHeader.getSvcName(svcType), featureId.friendly(), DataUnitBuilder.toHex(data, ""), data.length, length));
 	}
 
-	public final int channelId() {
+	public int channelId() {
 		return channelId;
 	}
 
-	public final int sequenceNumber() {
+	public int sequenceNumber() {
 		return seq;
 	}
 
@@ -221,11 +224,11 @@ public final class TunnelingFeature extends ServiceType {
 		return featureId;
 	}
 
-	public final Optional<byte[]> featureValue() {
+	public Optional<byte[]> featureValue() {
 		return data.length > 0 ? Optional.of(data) : Optional.empty();
 	}
 
-	ReturnCode status() {
+	public ReturnCode status() {
 		return status;
 	}
 
