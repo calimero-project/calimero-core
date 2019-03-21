@@ -46,6 +46,9 @@ import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.LinkLa
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,13 +65,14 @@ import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
+import tuwien.auto.calimero.ReturnCode;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIBusMon;
 import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature;
 import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature.InterfaceFeature;
 
 /**
@@ -93,11 +97,13 @@ class KNXnetIPTunnelTest
 	// should be a frame with unused destination address
 	private CEMILData frameNoDest;
 
-	private final class KNXListenerImpl implements KNXListener
+	private final class KNXListenerImpl implements TunnelingListener
 	{
 		boolean closed;
 		CEMI received;
 		List<CEMI> fifoReceived = new Vector<>();
+
+		BlockingQueue<TunnelingFeature> featureResponse = new ArrayBlockingQueue<>(1);
 
 		@Override
 		public void frameReceived(final FrameEvent e)
@@ -113,7 +119,6 @@ class KNXnetIPTunnelTest
 			if (e.getFrame() instanceof CEMIBusMon) {
 				Debug.printMonData((CEMIBusMon) e.getFrame());
 			}
-			// Debug.parseLData((CEMILData) received);
 			fifoReceived.add(e.getFrame());
 		}
 
@@ -131,6 +136,14 @@ class KNXnetIPTunnelTest
 				fail("already closed");
 			closed = true;
 		}
+
+		@Override
+		public void featureResponse(final TunnelingFeature feature) {
+			featureResponse.add(feature);
+		}
+
+		@Override
+		public void featureInfo(final TunnelingFeature feature) {}
 	}
 
 	@BeforeEach
@@ -499,6 +512,9 @@ class KNXnetIPTunnelTest
 	void tunnelingFeatureGet(final InterfaceFeature feature) throws InterruptedException, KNXException {
 		newTunnel();
 		t.send(feature);
+		final TunnelingFeature response = l.featureResponse.poll(3, TimeUnit.SECONDS);
+		assertNotNull(response);
+		assertEquals(feature, response.featureId());
 	}
 
 	@ParameterizedTest
@@ -510,6 +526,11 @@ class KNXnetIPTunnelTest
 		final int length = twoBytes.contains(feature) ? 2 : 1;
 
 		t.send(feature, new byte[length]);
+		final TunnelingFeature response = l.featureResponse.poll(3, TimeUnit.SECONDS);
+		assertNotNull(response);
+		assertEquals(feature, response.featureId());
+		if (feature != InterfaceFeature.IndividualAddress && feature != InterfaceFeature.EnableFeatureInfoService)
+			assertEquals(ReturnCode.AccessReadOnly, response.status());
 	}
 
 	private void newTunnel() throws KNXException, InterruptedException

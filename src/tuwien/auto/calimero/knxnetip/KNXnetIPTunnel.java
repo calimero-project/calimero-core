@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -323,7 +323,11 @@ public class KNXnetIPTunnel extends ClientConnection
 
 		if (svc >= KNXnetIPHeader.TunnelingFeatureGet && svc <= KNXnetIPHeader.TunnelingFeatureInfo) {
 			final ByteBuffer buffer = ByteBuffer.wrap(data, offset, h.getTotalLength() - h.getStructLength());
-			logger.debug("received {}", TunnelingFeature.from(svc, buffer));
+			final TunnelingFeature feature = TunnelingFeature.from(svc, buffer);
+			logger.trace("received {}", feature);
+
+			listeners.listeners().stream().filter(TunnelingListener.class::isInstance)
+					.map(TunnelingListener.class::cast).forEach(tl -> notifyFeatureReceived(tl, svc, feature));
 			return true;
 		}
 
@@ -376,6 +380,20 @@ public class KNXnetIPTunnel extends ClientConnection
 			logger.warn("received L-Data request - ignored");
 
 		return true;
+	}
+
+	private void notifyFeatureReceived(final TunnelingListener tl, final int svc, final TunnelingFeature feature) {
+		try {
+			if (svc == KNXnetIPHeader.TunnelingFeatureResponse)
+				tl.featureResponse(feature);
+			else if (svc == KNXnetIPHeader.TunnelingFeatureInfo)
+				tl.featureInfo(feature);
+			else
+				logger.warn("unsupported {} - ignored", feature);
+		}
+		catch (final RuntimeException rte) {
+			logger.warn("catch your runtime exceptions in {}!", tl.getClass().getName(), rte);
+		}
 	}
 
 	private static List<Integer> additionalInfoTypesOf(final CEMILData ldata)
