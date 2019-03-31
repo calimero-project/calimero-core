@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -169,9 +169,9 @@ public class CEMIDevMgmt implements CEMI
 		"memory error (memory can not be written or only with faults)",
 		"read-only (write access to a read-only or write-protected property)",
 		"illegal command (command not valid or not supported)",
-		"void DP (read/write access to nonexisting property)",
+		"void DP (read/write access to nonexistent property)",
 		"type conflict (write access with a wrong data type (datapoint length))",
-		"property index/range error (read/write access to nonexisting property index)", };
+		"property index/range error (read/write access to nonexistent property index)", };
 
 	private final int mc;
 	private int iot;
@@ -220,13 +220,11 @@ public class CEMIDevMgmt implements CEMI
 	}
 
 	/**
-	 * Creates a new device management message with the given message code.
+	 * Creates a new device management message with the given message code, only used for reset messages.
 	 * <p>
 	 * The message structure (and resulting frame) will only consist of the message code
 	 * field. All other device management methods are not used (and will consequently
 	 * return 0 or empty fields by default).
-	 * <p>
-	 * Used for reset messages.
 	 *
 	 * @param msgCode a reset message code value specified by this class
 	 */
@@ -305,9 +303,6 @@ public class CEMIDevMgmt implements CEMI
 		return errors[errorCode];
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.cemi.CEMI#getMessageCode()
-	 */
 	@Override
 	public final int getMessageCode()
 	{
@@ -452,18 +447,12 @@ public class CEMIDevMgmt implements CEMI
 		return getErrorMessage(data[0] & 0xff);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.cemi.CEMI#getStructLength()
-	 */
 	@Override
 	public final int getStructLength()
 	{
 		return header + data.length;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.cemi.CEMI#toByteArray()
-	 */
 	@Override
 	public byte[] toByteArray()
 	{
@@ -483,9 +472,6 @@ public class CEMIDevMgmt implements CEMI
 		return buf;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString()
 	{

@@ -189,7 +189,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 *        multicast address
 	 * @param groupKey KNX IP Secure group key (backbone key), <code>groupKey.length == 16</code>
 	 * @param latencyTolerance time window for accepting secure multicasts, depending on max. end-to-end network latency
-	 *        (typically 500 ms to 5000 ms), <code>latencyTolerance.toMillis() &gt; 0</code>
+	 *        (typically 500 ms to 5000 ms), <code>0 &lt; latencyTolerance.toMillis() &le; 8000</code>
 	 * @param settings medium settings defining device and medium specifics needed for communication
 	 * @return the network link in open state
 	 * @throws KNXException on failure establishing link using the KNXnet/IP connection

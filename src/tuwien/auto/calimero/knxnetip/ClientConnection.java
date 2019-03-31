@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2018 B. Malinowsky
+    Copyright (c) 2010, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -382,7 +382,9 @@ abstract class ClientConnection extends ConnectionBase
 		stopReceiver();
 		socket.close();
 		setState(CLOSED);
-		logger.error("establishing connection failed, " + thrown.getMessage());
+		String msg = thrown.getMessage();
+		msg = msg != null && msg.length() > 0 ? msg : thrown.getClass().getSimpleName();
+		logger.error("establishing connection failed, {}", msg);
 	}
 
 	// finds a local IPv4 address with its network prefix "matching" the remote address
