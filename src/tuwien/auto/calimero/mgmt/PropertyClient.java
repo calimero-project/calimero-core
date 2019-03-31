@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -311,6 +311,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		final String propName;
 		final int read;
 		final int write;
+		final int accessPolicy;
 
 		/**
 		 * Creates a new property object of the supplied information.
@@ -326,11 +327,11 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		public Property(final int pid, final String pidName, final String propertyName,
 			final int objectType, final int pdt, final String dpt)
 		{
-			this(pid, pidName, propertyName, objectType, pdt, dpt, 0, 0);
+			this(pid, pidName, propertyName, objectType, pdt, dpt, 0, 0, 0);
 		}
 
 		Property(final int pid, final String pidName, final String propertyName, final int objectType, final int pdt,
-			final String dpt, final int readLevel, final int writeLevel)
+			final String dpt, final int readLevel, final int writeLevel, final int accessPolicy)
 		{
 			id = pid;
 			name = pidName;
@@ -340,6 +341,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 			this.dpt = dpt;
 			read = readLevel;
 			write = writeLevel;
+			this.accessPolicy = accessPolicy;
 		}
 
 		/**
@@ -428,6 +430,11 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		public final int readLevel() {
 			return read;
 		}
+
+		/**
+		 * @return access policy for security modes off/on, or 0 if no policy is set
+		 */
+		final int accessPolicy() { return accessPolicy; }
 	}
 
 	// mapping of object type numbers to the associated object type names
@@ -791,10 +798,11 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 						else if (reader.getLocalName().equals(PROPERTY_TAG)) {
 							final int[] rw = parseRW(reader.getAttributeValue("", RW_ATTR));
 							final boolean write = parseWriteEnabled(reader.getAttributeValue("", WRITE_ATTR));
+							final int accessPolicy = parseAccessPolicy(reader.getAttributeValue("", "accessPolicy"));
 							list.add(new Property(toInt(reader.getAttributeValue("", PID_ATTR)),
 									reader.getAttributeValue("", PIDNAME_ATTR), reader.getAttributeValue("", NAME_ATTR),
 									objType, toInt(reader.getAttributeValue("", PDT_ATTR)),
-									reader.getAttributeValue("", DPT_ATTR), rw[0], write ? rw[1] : -1));
+									reader.getAttributeValue("", DPT_ATTR), rw[0], write ? rw[1] : -1, accessPolicy));
 						}
 					}
 					else if (event == XmlReader.END_ELEMENT && reader.getLocalName().equals(PROPDEFS_TAG))
@@ -886,6 +894,17 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 			if ("w".equals(s))
 				return true;
 			return false;
+		}
+
+		private static int parseAccessPolicy(final String attribute) throws KNXFormatException {
+			if (attribute == null || attribute.isEmpty())
+				return 0;
+			final int slash = attribute.indexOf('/');
+			final int off = Integer.parseInt(attribute.substring(0, slash), 16);
+			final int on = Integer.parseInt(attribute.substring(slash + 1), 16);
+			if (off > 0x3ff || on > 0x3ff)
+				throw new KNXFormatException("invalid access policy", attribute);
+			return (off << 10) | on;
 		}
 
 		private static int toInt(final String s) throws KNXFormatException
