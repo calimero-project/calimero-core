@@ -409,6 +409,12 @@
         <property pid="66" pidName="PID_FILTERING_MODE_SELECT" name="Filtering Mode Selection" pdt="52" rw="(3/x)" writeEnabled="1">
             <usage>Control filtering of received frames by the cEMI Data Link Layer</usage>
         </property>
+        <property pid="68" pidName="PID_MAX_INTERFACE_APDU_LENGTH" name="APDU length for subnet access" pdt="4" rw="3/x" writeEnabled="0" accessPolicy="155/155">
+            <usage>Maximum length of the APDU over KNXnet/IP Tunneling to the field-level medium</usage>
+        </property>
+        <property pid="69" pidName="PID_MAX_LOCAL_APDU_LENGTH" name="APDU length for local management" pdt="4" rw="3/x" writeEnabled="0" accessPolicy="155/155">
+            <usage>Maximum length of the APDU over KNXnet/IP Tunneling to the own management in the cEMI interface device</usage>
+        </property>
     </object>
     <object type="9">
         <property pid="51" pidName="PID_GRPOBJTABLE" name="Object Table" pdt="22" rw="R(/W)" writeEnabled="0/1">
@@ -507,6 +513,12 @@
         </property>
         <property pid="76" pidName="PID_FRIENDLY_NAME" name="Friendly Name" pdt="2" rw="R/W" writeEnabled="1">
             <usage>Human Readable Friendly Name</usage>
+        </property>
+        <property pid="78" pidName="PID_ROUTING_BUSY_WAIT_TIME" name="Routing busy wait time" pdt="4" rw="3/1" writeEnabled="1">
+            <usage>Value of the wait time sent with a routing busy frame (in milliseconds)</usage>
+        </property>
+        <property pid="79" pidName="PID_TUNNELING_ADDRESSES" name="Tunneling addresses" pdt="2" rw="3/x" writeEnabled="0" accessPolicy="155/004">
+            <usage>Individual addresses the MaS will use for tunneling connections</usage>
         </property>
         <property pid="91" pidName="PID_BACKBONE_KEY" name="KNX IP secure group key" pdt="32" rw="x/2" writeEnabled="0" accessPolicy="008/008">
             <usage>Key for encryption, decryption and MAC in secure group communication</usage>
