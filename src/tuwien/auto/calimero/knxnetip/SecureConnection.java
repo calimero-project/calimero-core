@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018 B. Malinowsky
+    Copyright (c) 2018, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -72,10 +72,10 @@ import java.security.spec.KeySpec;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -154,7 +154,37 @@ public final class SecureConnection extends KNXnetIPRouting {
 	private int rcvSeq;
 	private final KNXnetIPConnection tunnel;
 
+
 	// routing connection setup
+
+	private final int mcastLatencyTolerance; // [ms]
+	private final int syncLatencyTolerance; // [ms]
+
+	private final AtomicInteger routingCount = new AtomicInteger();
+
+	// bookkeeping for multicast group timestamp sync
+
+	// offset to adjust local clock upon receiving a valid secure packet or group sync response
+	private long timestampOffset = -System.nanoTime() / 1_000_000L; // [ms]
+
+	private volatile boolean syncedWithGroup;
+	private volatile int sentGroupSyncTag;
+
+	private static final int syncQueryInterval = 10_000; // [ms]
+	private static final int minDelayTimeKeeperUpdateNotify = 100; // [ms]
+
+	private int minDelayUpdateNotify;
+	private int maxDelayUpdateNotify;
+	private int minDelayPeriodicNotify;
+	private int maxDelayPeriodicNotify;
+	private volatile boolean periodicSchedule = true;
+
+	// info for scheduled outgoing group sync
+	private byte[] timerNotifySN;
+	private int timerNotifyTag;
+
+	// assign dummy to have it initialized
+	private Future<?> groupSync = CompletableFuture.completedFuture(Void.TYPE);
 
 	private static final ScheduledThreadPoolExecutor groupSyncSender = new ScheduledThreadPoolExecutor(1, r -> {
 		final Thread t = new Thread(r);
@@ -169,22 +199,6 @@ public final class SecureConnection extends KNXnetIPRouting {
 		groupSyncSender.allowCoreThreadTimeOut(true);
 	}
 
-	// assign dummy to have it initialized
-	private Future<?> groupSync = CompletableFuture.completedFuture(Void.TYPE);
-	private volatile boolean syncedWithGroup;
-
-	// multicast timestamp sync
-	private static final Duration timestampExpiresAfter = Duration.ofMinutes(60 + new Random().nextInt(11));
-	private long timestampExpiresAt = 0 + timestampExpiresAfter.toMillis();
-	// offset to adjust local clock upon receiving a valid secure packet or group sync response
-	private long timestampOffset = -System.nanoTime() / 1_000_000L; // [ms]
-	private static final long queryInterval = 10_000; // [ms]
-
-	private final int mcastLatencyTolerance; // [ms]
-	private final int syncLatencyTolerance; // [ms]
-
-	private final AtomicInteger routingCount = new AtomicInteger();
-
 
 	public static KNXnetIPConnection newTunneling(final TunnelingLayer knxLayer, final InetSocketAddress localEP,
 		final InetSocketAddress serverCtrlEP, final boolean useNat, final byte[] deviceAuthCode, final int userId, final byte[] userKey)
@@ -195,6 +209,19 @@ public final class SecureConnection extends KNXnetIPRouting {
 		return new SecureConnection(knxLayer, localEP, serverCtrlEP, useNat, devAuth, userId, key);
 	}
 
+	/**
+	 * Implementation note: the connection acquires an authentic timer value after joining the requested multicast
+	 * group. For example, given a latency tolerance of 2 seconds, this adds a worst-case upper bound of 6.5 seconds,
+	 * before the connection can be used.
+	 *
+	 * @param netIf network interface to join the multicast group
+	 * @param mcGroup a valid KNX multicast address (see {@link KNXnetIPRouting#isValidRoutingMulticast(InetAddress)}
+	 * @param groupKey secure group key (backbone key), {@code groupKey.length == 16}
+	 * @param latencyTolerance the acceptance window for incoming secure multicasts having a past multicast timer value;
+	 *        <code>0 &lt; latencyTolerance.toMillis() &le; 8000</code>, depending on max. end-to-end network latency
+	 * @return new secure routing connection
+	 * @throws KNXException if creation or initialization of the multicast socket failed
+	 */
 	public static KNXnetIPConnection newRouting(final NetworkInterface netIf, final InetAddress mcGroup, final byte[] groupKey,
 		final Duration latencyTolerance) throws KNXException {
 		return new SecureConnection(netIf, mcGroup, groupKey, latencyTolerance);
@@ -515,12 +542,11 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 	@Override
 	protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
-		if (!syncedWithGroup)
-			logger.warn("sending while not yet synchronized with group {}", dst.getAddress().getHostAddress());
 		final int tag = routingCount.getAndIncrement() % 0x10000;
 		final byte[] wrapped = newSecurePacket(timestamp(), tag, packet);
 		final DatagramPacket p = new DatagramPacket(wrapped, wrapped.length, dst);
 		socket.send(p);
+		scheduleGroupSync(periodicNotifyDelay());
 	}
 
 	@Override
@@ -548,12 +574,14 @@ public final class SecureConnection extends KNXnetIPRouting {
 				logger.error("negotiating session key failed", e);
 			}
 		}
-		else if (svc == SecureGroupSync)
-			onGroupSync(src, newGroupSync(h, data, offset));
+		else if (svc == SecureGroupSync) {
+			final Object[] fields = newGroupSync(h, data, offset);
+			onGroupSync(src, (long) fields[0], true, (byte[]) fields[1], (int) fields[2]);
+		}
 		else if (svc == SecureSvc) {
 			final Object[] fields = unwrap(h, data, offset);
 			final long timestamp = (long) fields[1];
-			if (sessionId == 0 && !withinTolerance(src, timestamp)) {
+			if (sessionId == 0 && !withinTolerance(src, timestamp, (byte[]) fields[2], (int) fields[3])) {
 				logger.warn("{}:{} timestamp {} outside latency tolerance of {} ms (local {}) - ignore", src,
 						port, timestamp, mcastLatencyTolerance, timestamp());
 				return true;
@@ -648,37 +676,72 @@ public final class SecureConnection extends KNXnetIPRouting {
 		}
 	}
 
-	private boolean withinTolerance(final InetAddress src, final long timestamp) {
-		onGroupSync(src, timestamp);
+	private boolean withinTolerance(final InetAddress src, final long timestamp, final byte[] sn, final int tag) {
+		onGroupSync(src, timestamp, false, sn, tag);
 		final long diff = timestamp() - timestamp;
 		return diff <= mcastLatencyTolerance;
 	}
 
-	// upon receiving a group sync, we answer within [0..5] seconds using a single sync, but only iff we
-	// didn't receive another sync with a greater timestamp in between
-	private void onGroupSync(final InetAddress src, final long timestamp) {
+	private void onGroupSync(final InetAddress src, final long timestamp, final boolean byTimerNotify, final byte[] sn,
+		final int tag) {
 		final long local = timestamp();
 		if (timestamp > local) {
 			logger.debug("sync timestamp +{} ms", timestamp - local);
 			timestampOffset += timestamp - local;
-			final long abs = local - timestampOffset;
-			timestampExpiresAt = abs + timestampExpiresAfter.toMillis();
-			syncedWithGroup();
+			syncedWithGroup(byTimerNotify, sn, tag);
 		}
-		else if (timestamp >= (local - syncLatencyTolerance)) {
-			// we only consider messages sent by other nodes
-			if (!isLocalIpAddress(src))
-				syncedWithGroup();
+		else if (timestamp > (local - syncLatencyTolerance)) {
+			// only consider sync messages sent by other nodes
+			if (tag != sentGroupSyncTag || !isLocalIpAddress(src))
+				syncedWithGroup(byTimerNotify, sn, tag);
 		}
-		else if (timestamp < (local - syncLatencyTolerance)) {
-			// received old timestamp, schedule group sync
-			scheduleGroupSync((int) (Math.random() / Math.nextDown(1.0) * 5_000));
+		else if (timestamp > (local - mcastLatencyTolerance)) {
+			// received old timestamp within tolerance, do nothing
+		}
+		else if (timestamp <= (local - mcastLatencyTolerance)) {
+			// received outdated timestamp, schedule group sync if we haven't done so already ...
+			if (periodicSchedule) {
+				timerNotifySN = sn;
+				timerNotifyTag = tag;
+				periodicSchedule = false;
+				scheduleGroupSync(randomClosedRange(minDelayUpdateNotify, maxDelayUpdateNotify));
+			}
 		}
 	}
 
-	private void syncedWithGroup() {
-		groupSync.cancel(false);
-		if (!syncedWithGroup) {
+	private synchronized void becomeTimeFollower() {
+		final int maxDelayTimeKeeperUpdateNotify = minDelayTimeKeeperUpdateNotify + 1 * syncLatencyTolerance;
+		final int minDelayTimeKeeperPeriodicNotify = syncQueryInterval;
+		final int maxDelayTimeKeeperPeriodicNotify = minDelayTimeKeeperPeriodicNotify + 3 * syncLatencyTolerance;
+
+		final int minDelayTimeFollowerUpdateNotify = maxDelayTimeKeeperUpdateNotify + 1 * syncLatencyTolerance;
+		final int maxDelayTimeFollowerUpdateNotify = minDelayTimeFollowerUpdateNotify + 10 * syncLatencyTolerance;
+		final int minDelayTimeFollowerPeriodicNotify = maxDelayTimeKeeperPeriodicNotify + 1 * syncLatencyTolerance;
+		final int maxDelayTimeFollowerPeriodicNotify = minDelayTimeFollowerPeriodicNotify + 10 * syncLatencyTolerance;
+
+		minDelayUpdateNotify = minDelayTimeFollowerUpdateNotify;
+		maxDelayUpdateNotify = maxDelayTimeFollowerUpdateNotify;
+		minDelayPeriodicNotify = minDelayTimeFollowerPeriodicNotify;
+		maxDelayPeriodicNotify = maxDelayTimeFollowerPeriodicNotify;
+	}
+
+	private synchronized void becomeTimeKeeper() {
+		final int maxDelayTimeKeeperUpdateNotify = minDelayTimeKeeperUpdateNotify + 1 * syncLatencyTolerance;
+		final int minDelayTimeKeeperPeriodicNotify = syncQueryInterval;
+		final int maxDelayTimeKeeperPeriodicNotify = minDelayTimeKeeperPeriodicNotify + 3 * syncLatencyTolerance;
+
+		minDelayUpdateNotify = minDelayTimeKeeperUpdateNotify;
+		maxDelayUpdateNotify = maxDelayTimeKeeperUpdateNotify;
+		minDelayPeriodicNotify = minDelayTimeKeeperPeriodicNotify;
+		maxDelayPeriodicNotify = maxDelayTimeKeeperPeriodicNotify;
+	}
+
+	private void syncedWithGroup(final boolean byTimerNotify, final byte[] sn, final int tag) {
+		if (byTimerNotify)
+			becomeTimeFollower();
+
+		scheduleGroupSync(periodicNotifyDelay());
+		if (!syncedWithGroup && tag == sentGroupSyncTag && Arrays.equals(sno, sn)) {
 			logger.info("synchronized with group {}", getRemoteAddress().getAddress().getHostAddress());
 			syncedWithGroup = true;
 			synchronized (this) {
@@ -688,15 +751,18 @@ public final class SecureConnection extends KNXnetIPRouting {
 	}
 
 	private void awaitGroupSync() throws InterruptedException {
-		long remaining = 5_000;
-		final long end = System.nanoTime() / 1_000_000 + remaining;
+		// max. waiting time = 2 * latency tolerance + maxDelayTimeFollowerUpdateNotify
+		final long wait = 2 * mcastLatencyTolerance + 100 + 12 * syncLatencyTolerance;
+		final long end = System.nanoTime() / 1_000_000 + wait;
+		long remaining = wait;
 		while (remaining > 0 && !syncedWithGroup) {
 			synchronized (this) {
 				wait(remaining);
 			}
 			remaining = end - System.nanoTime() / 1_000_000;
 		}
-		logger.trace("waited {} ms for group sync", (5_000 - remaining));
+		syncedWithGroup = true;
+		logger.trace("waited {} ms for group sync", wait - remaining);
 	}
 
 	private boolean isLocalIpAddress(final InetAddress addr) {
@@ -713,7 +779,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 	private void scheduleGroupSync(final long initialDelay) {
 		logger.trace("schedule group sync (initial delay {} ms)", initialDelay);
 		groupSync.cancel(false);
-		groupSync = groupSyncSender.scheduleWithFixedDelay(this::sendGroupSync, initialDelay, queryInterval,
+		groupSync = groupSyncSender.scheduleWithFixedDelay(this::sendGroupSync, initialDelay, syncQueryInterval,
 				TimeUnit.MILLISECONDS);
 	}
 
@@ -721,7 +787,13 @@ public final class SecureConnection extends KNXnetIPRouting {
 		try {
 			final long timestamp = timestamp();
 			final byte[] sync = newGroupSync(timestamp);
-			logger.debug("sending group sync timestamp {} ms", timestamp);
+			logger.debug("sending group sync timestamp {} ms (S/N {}, tag {})", timestamp,
+					toHex(periodicSchedule ? sno : timerNotifySN, ""),
+					periodicSchedule ? sentGroupSyncTag : timerNotifyTag);
+
+			// schedule next sync before send to maintain happens-before with sync rcv
+			becomeTimeKeeper();
+			scheduleGroupSync(periodicNotifyDelay());
 			socket.send(new DatagramPacket(sync, sync.length, dataEndpt.getAddress(), dataEndpt.getPort()));
 		}
 		catch (IOException | RuntimeException e) {
@@ -732,6 +804,15 @@ public final class SecureConnection extends KNXnetIPRouting {
 	private long timestamp() {
 		final long now = System.nanoTime() / 1000_000L;
 		return now + timestampOffset;
+	}
+
+	private synchronized int periodicNotifyDelay() {
+		periodicSchedule = true;
+		return randomClosedRange(minDelayPeriodicNotify, maxDelayPeriodicNotify);
+	}
+
+	private static int randomClosedRange(final int min, final int max) {
+		return ThreadLocalRandom.current().nextInt(min, max + 1);
 	}
 
 	// for multicast, the session index = 0
@@ -804,11 +885,13 @@ public final class SecureConnection extends KNXnetIPRouting {
 			throw new KnxSecureException("received secure packet with sequence " + seq + " < expected " + rcvSeq);
 		++rcvSeq;
 
-		final long sno = (long) fields[2];
+		final long snLong = (long) fields[2];
+		final byte[] sn = ByteBuffer.allocate(6).putShort((short) (snLong >> 32)).putInt((int) snLong).array();
 		final int tag = (int) fields[3];
 		final byte[] knxipPacket = (byte[]) fields[4];
-		logger.trace("received {} (session {} seq {} S/N {} tag {})", toHex(knxipPacket, " "), sid, seq, sno, tag);
-		return fields;
+		logger.trace("received {} (session {} seq {} S/N {} tag {})", toHex(knxipPacket, " "), sid, seq, toHex(sn, ""),
+				tag);
+		return new Object[] { fields[0], fields[1], sn, fields[3], fields[4] };
 	}
 
 	public static Object[] unwrap(final KNXnetIPHeader h, final byte[] data, final int offset, final Key secretKey)
@@ -948,11 +1031,13 @@ public final class SecureConnection extends KNXnetIPRouting {
 		final ByteBuffer buffer = ByteBuffer.allocate(header.getTotalLength());
 		buffer.put(header.toByteArray());
 
-		buffer.putShort((short) (timestamp >> 32));
-		buffer.putInt((int) timestamp);
-		buffer.put(sno);
-		final int tag = 0;
-		buffer.putShort((short) tag);
+		buffer.putShort((short) (timestamp >> 32)).putInt((int) timestamp);
+		if (periodicSchedule) {
+			sentGroupSyncTag = randomClosedRange(1, 0xffff);
+			buffer.put(sno).putShort((short) sentGroupSyncTag);
+		}
+		else
+			buffer.put(timerNotifySN).putShort((short) timerNotifyTag);
 
 		final byte[] mac = cbcMac(buffer.array(), 0, header.getStructLength() + 6 + 6 + 2, securityInfo(buffer.array(), 6, 0));
 		final byte[] secInfo = securityInfo(buffer.array(), 6, 0xff00);
@@ -961,22 +1046,23 @@ public final class SecureConnection extends KNXnetIPRouting {
 		return buffer.array();
 	}
 
-	private long newGroupSync(final KNXnetIPHeader h, final byte[] data, final int offset) throws KNXFormatException {
+	private Object[] newGroupSync(final KNXnetIPHeader h, final byte[] data, final int offset) throws KNXFormatException {
 		if (h.getTotalLength() != 0x24)
 			throw new KNXFormatException("invalid length " + data.length + " for a secure group sync");
 
 		final ByteBuffer buffer = ByteBuffer.wrap(data, offset, h.getTotalLength() - h.getStructLength());
 
 		final long timestamp = uint48(buffer);
-		final long sno = uint48(buffer);
+		final byte[] sn = new byte[6];
+		buffer.get(sn);
 		final int msgTag = buffer.getShort() & 0xffff;
 
 		final ByteBuffer mac = decrypt(buffer, securityInfo(data, offset, 0xff00));
 
 		final byte[] secInfo = securityInfo(buffer.array(), 6, 0);
 		cbcMacVerify(data, offset - h.getStructLength(), h.getTotalLength() - macSize, secretKey, secInfo, mac.array());
-		logger.trace("received group sync timestamp {} ms (S/N {}, tag {})", timestamp, Long.toHexString(sno), msgTag);
-		return timestamp;
+		logger.trace("received group sync timestamp {} ms (S/N {}, tag {})", timestamp, toHex(sn, ""), msgTag);
+		return new Object[] { timestamp, sn, msgTag };
 	}
 
 	private void encrypt(final byte[] data, final int offset, final byte[] secInfo) {
