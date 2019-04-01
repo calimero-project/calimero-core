@@ -643,6 +643,7 @@ public class ManagementClientImpl implements ManagementClient
 		asdu[3] = (byte) start;
 
 		final List<byte[]> responses = new ArrayList<>();
+		final List<KNXRemoteException> exceptions = new ArrayList<>();
 		synchronized (this) {
 			try {
 				send(dst, priority, DataUnitBuilder.createAPDU(PROPERTY_READ, asdu), PROPERTY_RESPONSE);
@@ -657,8 +658,7 @@ public class ManagementClientImpl implements ManagementClient
 						return false;
 					}
 					catch (final KNXRemoteException e) {
-						logger.warn("problem reading property (response {}): {}", DataUnitBuilder.toHex(apdu, " "),
-								e.getMessage());
+						exceptions.add(e);
 						return oneResponseOnly;
 					}
 				});
@@ -667,9 +667,15 @@ public class ManagementClientImpl implements ManagementClient
 				svcResponse = 0;
 			}
 		}
-
-		if (responses.isEmpty())
-			throw new KNXRemoteException("property access OI " + objIndex + " PID " + propertyId + " failed/forbidden");
+		if (responses.isEmpty()) {
+			if (exceptions.size() == 1)
+				throw exceptions.get(0);
+			final KNXRemoteException e = new KNXRemoteException(
+					"reading property " + dst.getAddress() + " OI " + objIndex + " PID " + propertyId + " failed");
+			if (exceptions.size() > 0)
+				exceptions.forEach(e::addSuppressed);
+			throw e;
+		}
 		return responses;
 	}
 
