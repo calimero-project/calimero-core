@@ -55,6 +55,9 @@ import java.time.Duration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.AfterEach;
@@ -71,7 +74,6 @@ import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
-import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.Util;
@@ -103,7 +105,7 @@ class KNXnetIPRouterTest
 	private final class RouterListenerImpl implements RoutingListener
 	{
 		volatile boolean closed;
-		volatile CEMI received;
+		BlockingQueue<CEMI> received = new ArrayBlockingQueue<>(10);
 		List<LostMessageEvent> lost = new Vector<>();
 
 		@Override
@@ -111,8 +113,7 @@ class KNXnetIPRouterTest
 		{
 			assertNotNull(e);
 			assertEquals(r, e.getSource());
-			received = e.getFrame();
-			Debug.printLData((CEMILData) received);
+			received.add(e.getFrame());
 		}
 
 		@Override
@@ -355,17 +356,17 @@ class KNXnetIPRouterTest
 	}
 
 	@Test
-	void systemBroadcastWithDefaultSocket() throws KNXException, IOException {
+	void systemBroadcastWithDefaultSocket() throws KNXException, IOException, InterruptedException {
 		sysBroadcast(Discoverer.SYSTEM_SETUP_MULTICAST, Discoverer.SYSTEM_SETUP_MULTICAST);
 	}
 
 	@Test
-	void systemBroadcastWithSysBcastSocket() throws KNXException, IOException {
+	void systemBroadcastWithSysBcastSocket() throws KNXException, IOException, InterruptedException {
 		sysBroadcast(InetAddress.getByName("224.0.23.13"), InetAddress.getByName("224.0.23.14"));
 	}
 
-	private void sysBroadcast(final InetAddress senderGroup, final InetAddress receiverGroup) throws KNXException,
-		UnknownHostException, IOException, SocketException, KNXConnectionClosedException, KNXFormatException {
+	private void sysBroadcast(final InetAddress senderGroup, final InetAddress receiverGroup)
+		throws KNXException, IOException, InterruptedException {
 
 		final CEMILDataEx sysBcast = newSystemBroadcastFrame(systemNetworkParamResponse());
 
@@ -389,7 +390,7 @@ class KNXnetIPRouterTest
 					header.getTotalLength() - header.getStructLength());
 			assertSystemBroadcast(sysBcast, (CEMILData) ind.cemi());
 		}
-		assertSystemBroadcast(sysBcast, (CEMILData) l.received);
+		assertSystemBroadcast(sysBcast, (CEMILData) l.received.poll(2, TimeUnit.SECONDS));
 	}
 
 	private CEMILDataEx newSystemBroadcastFrame(final byte[] tpdu) {
