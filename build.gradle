@@ -91,6 +91,9 @@ test {
 	useJUnitPlatform() {
 		excludeTags 'ft12', 'slow'
 //		excludeTags 'knxnetip'
+		testLogging {
+			exceptionFormat "full"
+		}
 	}
 }
 
