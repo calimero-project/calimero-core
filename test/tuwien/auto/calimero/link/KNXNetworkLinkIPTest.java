@@ -169,23 +169,18 @@ public class KNXNetworkLinkIPTest
 		try (KNXNetworkLink l = KNXNetworkLinkIP.newTunnelingLink(new InetSocketAddress(0), Util.getServer(), false,
 				TPSettings.TP1)) {}
 		catch (final KNXIllegalArgumentException e) {}
-		// use default local host
-		final KNXNetworkLink lnk = KNXNetworkLinkIP.newTunnelingLink(null, Util.getServer(), false, TPSettings.TP1);
-		lnk.close();
 	}
 
 	@Test
 	void tunnelingLinkFactoryMethod() throws KNXException, InterruptedException
 	{
-		// TODO null argument requesting default local endpoint might fail based on system settings
-		try (KNXNetworkLink link = KNXNetworkLinkIP.newTunnelingLink(null, Util.getServer(), false, TPSettings.TP1)) {}
-
 		try (KNXNetworkLink link = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false,
 				TPSettings.TP1)) {}
 
 		if (!Util.TEST_NAT)
 			return;
-		try (KNXNetworkLink link = KNXNetworkLinkIP.newTunnelingLink(null, Util.getServer(), true, TPSettings.TP1)) {}
+		try (KNXNetworkLink link = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), true,
+				TPSettings.TP1)) {}
 	}
 
 	@Test

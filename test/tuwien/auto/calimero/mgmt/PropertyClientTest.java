@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -96,7 +96,7 @@ class PropertyClientTest
 		remote = Util.getKnxDeviceCO();
 		closed = false;
 		try {
-			lnk = KNXNetworkLinkIP.newTunnelingLink(null, Util.getServer(), false, TPSettings.TP1);
+			lnk = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false, TPSettings.TP1);
 			remAdpt = new RemotePropertyServiceAdapter(lnk, remote, null, true);
 			rem = new PropertyClient(remAdpt);
 			localAdpt = new LocalDeviceMgmtAdapter(new InetSocketAddress(0), Util.getServer(), false, adapterClosed, true);

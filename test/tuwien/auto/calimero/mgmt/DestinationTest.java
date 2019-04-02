@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -113,7 +113,7 @@ public class DestinationTest
 	@BeforeEach
 	void init() throws Exception
 	{
-		lnk = KNXNetworkLinkIP.newTunnelingLink(null, Util.getServer(), false, TPSettings.TP1);
+		lnk = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false, TPSettings.TP1);
 		tl = new TransportLayerImpl(lnk);
 		dst = tl.createDestination(new IndividualAddress("2.2.2"), true, false, false);
 		tll = new TLListener();
