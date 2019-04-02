@@ -453,9 +453,8 @@ class DiscovererTest
 		assertThrows(CancellationException.class, () -> search.get());
 		assertTrue(search.isCompletedExceptionally());
 		assertTrue(search.isDone());
-		assertFalse(d.isSearching());
-
-		Thread.sleep(100);
+		while (d.isSearching())
+			Thread.sleep(50);
 		allReceiverThreadsIdle();
 	}
 

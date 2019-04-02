@@ -871,6 +871,7 @@ public class Discoverer
 			finally {
 				logger.trace("stopped on " + id);
 				Thread.currentThread().setName("Discoverer (idle)");
+				receivers.remove(this);
 			}
 		}
 
@@ -882,7 +883,6 @@ public class Discoverer
 					((MulticastSocket) s).leaveGroup(new InetSocketAddress(SYSTEM_SETUP_MULTICAST, 0), null);
 				}
 				catch (final IOException ignore) {}
-				receivers.remove(this);
 			}
 			super.quit();
 		}
