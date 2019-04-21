@@ -54,6 +54,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import tag.KnxnetIP;
+import tag.KnxnetIPSequential;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DetachEvent;
 import tuwien.auto.calimero.FrameEvent;
@@ -91,7 +92,7 @@ class TransportLayerImplTest
 	private final class TLListener implements TransportListener
 	{
 		final BlockingQueue<CEMI> broad = new ArrayBlockingQueue<>(10);
-		final List<CEMI> conn = new Vector<>();
+		final BlockingQueue<CEMI> conn = new ArrayBlockingQueue<>(10);
 		final BlockingQueue<CEMI> ind = new ArrayBlockingQueue<>(10);
 		final List<CEMI> group = new Vector<>();
 		final List<Destination> dis = new Vector<>();
@@ -204,6 +205,7 @@ class TransportLayerImplTest
 	}
 
 	@Test
+	@KnxnetIPSequential
 	void testBroadcast() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		final int indAddrRead = 0x0100;
@@ -371,12 +373,10 @@ class TransportLayerImplTest
 
 		tl.connect(dco);
 		tl.sendData(dco, p, tsduDescRead);
-		Thread.sleep(500);
-		assertEquals(1, ltl.conn.size());
+		assertNotNull(ltl.conn.poll(3, TimeUnit.SECONDS));
 		// second time
 		tl.sendData(dco, p, tsduDescRead);
-		Thread.sleep(500);
-		assertEquals(2, ltl.conn.size());
+		assertNotNull(ltl.conn.poll(3, TimeUnit.SECONDS));
 		tl.disconnect(dco);
 
 		try {
@@ -384,7 +384,6 @@ class TransportLayerImplTest
 			fail("disconnected");
 		}
 		catch (final KNXDisconnectException e) {}
-		assertEquals(2, ltl.conn.size());
 
 		final TransportLayer tl2 = new TransportLayerImpl(nl);
 		final Destination d2 = tl2.createDestination(new IndividualAddress(3, 1, 1), true);
@@ -463,15 +462,11 @@ class TransportLayerImplTest
 		throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		final int propRead = 0x03D5;
-		final int propResponse = 0x03D6;
 
 		// read pid max_apdu_length
 		final byte[] tsdu = new byte[] { (byte) (propRead >> 8), (byte) propRead, 0, 56, 0x10, 1, };
 		tl.sendData(Util.getKnxDevice(), p, tsdu);
 		final CEMILData ldata = (CEMILData) ltl.ind.poll(3, TimeUnit.SECONDS);
 		assertNotNull(ldata, "no property response received");
-		final byte[] response = ldata.getPayload();
-		assertEquals(propResponse >> 8, response[0] & 0xff);
-		assertEquals(propResponse & 0xff, response[1] & 0xff);
 	}
 }

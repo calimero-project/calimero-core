@@ -53,6 +53,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import tag.KnxnetIP;
+import tag.KnxnetIPSequential;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.GroupAddress;
@@ -469,6 +470,7 @@ public class NetworkBufferTest
 	 * @throws KNXException
 	 */
 	@Test
+	@KnxnetIPSequential
 	void testQueryBufferOnly() throws InterruptedException, KNXException
 	{
 		final Configuration c = buffer.addConfiguration(lnk);

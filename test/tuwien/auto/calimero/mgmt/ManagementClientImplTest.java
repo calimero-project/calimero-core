@@ -53,6 +53,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import tag.KnxnetIP;
+import tag.KnxnetIPSequential;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
@@ -182,6 +183,7 @@ class ManagementClientImplTest
 	}
 
 	@Test
+	@KnxnetIPSequential
 	void testReadAddressBoolean() throws InterruptedException, KNXException
 	{
 		IndividualAddress[] ias = mc.readAddress(true);
@@ -585,6 +587,7 @@ class ManagementClientImplTest
 		final byte maxWaitSeconds = 2;
 		List<byte[]> l = mc.readSystemNetworkParameter(0, PID.SERIAL_NUMBER, 3, maxWaitSeconds);
 		assertTrue(!l.isEmpty(), "devices should respond once");
+		assertEquals(2, l.size(), "2 test devices, each should respond once");
 		l.forEach(sn -> assertEquals(6, sn.length));
 
 		l = mc.readSystemNetworkParameter(0, PID.SERIAL_NUMBER, 3, maxWaitSeconds);

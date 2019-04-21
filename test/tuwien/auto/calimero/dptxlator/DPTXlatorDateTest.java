@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,6 +38,8 @@ package tuwien.auto.calimero.dptxlator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ;
+import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -49,10 +51,12 @@ import java.util.Date;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 
+@ResourceLock(value = "calimero.dptxlator.date", mode = READ)
 class DPTXlatorDateTest
 {
 	private DPTXlatorDate t;
@@ -185,6 +189,7 @@ class DPTXlatorDateTest
 	}
 
 	@Test
+	@ResourceLock(value = "calimero.dptxlator.date", mode = READ_WRITE)
 	void testUseValueFormat() throws KNXFormatException
 	{
 		final String pattern = "EEEE, MMMM dd, yyyy[ HH:mm]";
