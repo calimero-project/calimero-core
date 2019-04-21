@@ -321,6 +321,21 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
+	public enum CloudCover implements EnumBase<CloudCover> {
+		Cloudless(0, "Cloudless"),
+		Sunny(1, "Sunny"),
+		Sunshiny(2, "Sunshiny"),
+		LightlyCloudy(3, "Lightly cloudy"),
+		ScatteredClouds(4, "Scattered clouds"),
+		Cloudy(5, "Cloudy"),
+		SixOktas(6, "6 oktas"),
+		SevenOktas(7, "7 oktas"),
+		Overcast(8, "Overcast"),
+		SkyObstructedFromView(9, "Sky obstructed from view");
+
+		CloudCover(final int element, final String description) { init(element, description); }
+	}
+
 	public enum FuelType implements EnumBase<FuelType> {
 		Auto(0, "auto"),
 		Oil(1, "oil"),
@@ -929,6 +944,8 @@ public class DPTXlator8BitEnum extends DPTXlator
 			"Sensor Select", SensorSelect.class, "0", "4");
 	public static final EnumDpt<ActuatorConnectType> DptActuatorConnectType = new EnumDpt<>(
 			"20.020", "Actuator Connect Type", ActuatorConnectType.class, "1", "2");
+	public static final EnumDpt<CloudCover> DptCloudCover = new EnumDpt<>("20.021", "Cloud Cover", CloudCover.class,
+			"0", "9");
 	public static final EnumDpt<FuelType> DptFuelType = new EnumDpt<>("20.100", "Fuel Type",
 			FuelType.class, "0", "3");
 	public static final EnumDpt<BurnerType> DptBurnerType = new EnumDpt<>("20.101", "Burner Type",
