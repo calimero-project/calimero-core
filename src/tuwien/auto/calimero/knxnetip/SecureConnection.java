@@ -560,7 +560,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 		if (svc == SecureSessionResponse) {
 			try {
-				final Object[] res = newSessionResponse(h, data, offset);
+				final Object[] res = newSessionResponse(h, data, offset, src, port);
 
 				final byte[] serverPublicKey = (byte[]) res[1];
 				final byte[] auth = newSessionAuth(serverPublicKey);
@@ -926,7 +926,8 @@ public final class SecureConnection extends KNXnetIPRouting {
 		return new Object[] { sid, seq, sno, tag, knxipPacket };
 	}
 
-	private Object[] newSessionResponse(final KNXnetIPHeader h, final byte[] data, final int offset)
+	private Object[] newSessionResponse(final KNXnetIPHeader h, final byte[] data, final int offset,
+			final InetAddress src, final int port)
 		throws KNXFormatException {
 
 		if (h.getServiceType() != SecureSessionResponse)
@@ -960,7 +961,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 		final boolean skipDeviceAuth = Arrays.equals(deviceAuthKey.getEncoded(), new byte[16]);
 		if (skipDeviceAuth) {
-			logger.warn("skipping device authentication for session {}", sessionId);
+			logger.warn("skipping device authentication of {}:{} (no device key)", src.getHostAddress(), port);
 		}
 		else {
 			final ByteBuffer mac = decrypt(buffer, deviceAuthKey, securityInfo(new byte[16], 0, 0xff00));
