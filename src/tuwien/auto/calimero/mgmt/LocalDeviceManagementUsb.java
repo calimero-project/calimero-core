@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2018 B. Malinowsky
+    Copyright (c) 2015, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -123,9 +123,10 @@ public class LocalDeviceManagementUsb extends LocalDeviceManagement
 		final int start, final int elements, final byte... data) throws KNXTimeoutException,
 		KNXRemoteException, KNXPortClosedException, InterruptedException
 	{
-		send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, objectType, objectInstance, propertyId,
-				start, elements, data), null);
-		findFrame(CEMIDevMgmt.MC_PROPWRITE_CON);
+		final CEMIDevMgmt req = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, objectType, objectInstance, propertyId,
+				start, elements, data);
+		send(req, null);
+		findFrame(CEMIDevMgmt.MC_PROPWRITE_CON, req);
 	}
 
 	/**
@@ -146,9 +147,10 @@ public class LocalDeviceManagementUsb extends LocalDeviceManagement
 		final int start, final int elements) throws KNXTimeoutException, KNXRemoteException,
 		KNXPortClosedException, InterruptedException
 	{
-		send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, objectType, objectInstance, propertyId,
-				start, elements), null);
-		return findFrame(CEMIDevMgmt.MC_PROPREAD_CON);
+		final CEMIDevMgmt req = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, objectType, objectInstance, propertyId,
+				start, elements);
+		send(req, null);
+		return findFrame(CEMIDevMgmt.MC_PROPREAD_CON, req);
 	}
 
 	/**
@@ -170,21 +172,21 @@ public class LocalDeviceManagementUsb extends LocalDeviceManagement
 	}
 
 	@Override
-	protected byte[] findFrame(final int messageCode) throws KNXRemoteException, InterruptedException
+	protected byte[] findFrame(final int messageCode, final CEMIDevMgmt request) throws KNXRemoteException, InterruptedException
 	{
 		long remaining = responseTimeout;
 		final long end = System.currentTimeMillis() + remaining;
 
 		while (remaining > 0) {
 			try {
-				return super.findFrame(messageCode);
+				return super.findFrame(messageCode, request);
 			}
 			catch (final KNXInvalidResponseException e) {}
 			remaining = end - System.currentTimeMillis();
 			// TODO replace busy waiting
 			Thread.sleep(50);
 		}
-		throw new KNXInvalidResponseException("expected service confirmation msg code 0x"
-				+ Integer.toHexString(messageCode));
+		throw new KNXInvalidResponseException(
+				"expected service confirmation msg code 0x" + Integer.toHexString(messageCode));
 	}
 }

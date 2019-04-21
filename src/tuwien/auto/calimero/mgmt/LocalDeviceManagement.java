@@ -124,9 +124,10 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 			throw new IllegalStateException("adapter closed");
 		final int objectType = getObjectType(objIndex);
 		final int objectInstance = getObjectInstance(objIndex, objectType);
-		send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, objectType, objectInstance, pid, start,
-				elements, data), WaitForCon);
-		findFrame(CEMIDevMgmt.MC_PROPWRITE_CON);
+		final CEMIDevMgmt req = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, objectType, objectInstance, pid, start,
+				elements, data);
+		send(req, WaitForCon);
+		findFrame(CEMIDevMgmt.MC_PROPWRITE_CON, req);
 	}
 
 	@Override
@@ -137,9 +138,10 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 			throw new IllegalStateException("adapter closed");
 		final int objectType = getObjectType(objIndex);
 		final int objectInstance = getObjectInstance(objIndex, objectType);
-		send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, objectType, objectInstance, pid, start,
-				elements), WaitForCon);
-		return findFrame(CEMIDevMgmt.MC_PROPREAD_CON);
+		final CEMIDevMgmt req = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, objectType, objectInstance, pid, start,
+				elements);
+		send(req, WaitForCon);
+		return findFrame(CEMIDevMgmt.MC_PROPREAD_CON, req);
 	}
 
 	@Override
@@ -217,7 +219,8 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 	protected abstract void send(CEMIDevMgmt frame, Object mode) throws KNXException, InterruptedException;
 
 	@SuppressWarnings("unused")
-	protected byte[] findFrame(final int messageCode) throws KNXRemoteException, InterruptedException {
+	protected byte[] findFrame(final int messageCode, final CEMIDevMgmt request)
+		throws KNXRemoteException, InterruptedException {
 		while (true) {
 			final CEMIDevMgmt frame;
 			synchronized (frames) {
@@ -232,10 +235,13 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 				close();
 				throw new KNXRemoteException("received reset indication from server, connection closed");
 			}
-			else if (mc == messageCode) {
+			else if (mc == messageCode && frame.getObjectType() == request.getObjectType()
+					&& frame.getObjectInstance() == request.getObjectInstance()
+					&& frame.getPID() == request.getPID()) {
 				if (frame.isNegativeResponse())
 					throw new KNXRemoteException(frame.getErrorMessage());
-				return frame.getPayload();
+				if (frame.getElementCount() == request.getElementCount())
+					return frame.getPayload();
 			}
 		}
 	}
@@ -259,11 +265,12 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 
 	protected void initInterfaceObjects() throws KNXException, InterruptedException
 	{
-		send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, DEVICE_OBJECT, 1,
-				PropertyAccess.PID.IO_LIST, 0, 1), WaitForCon);
+		final CEMIDevMgmt req = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, DEVICE_OBJECT, 1,
+				PropertyAccess.PID.IO_LIST, 0, 1);
+		send(req, WaitForCon);
 		int objects = 0;
 		try {
-			final byte[] ret = findFrame(CEMIDevMgmt.MC_PROPREAD_CON);
+			final byte[] ret = findFrame(CEMIDevMgmt.MC_PROPREAD_CON, req);
 			objects = (ret[0] & 0xff) << 8 | (ret[1] & 0xff);
 		}
 		catch (final KNXRemoteException e) {
@@ -272,9 +279,10 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 			interfaceObjects.add(8);
 			return;
 		}
-		send(new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, DEVICE_OBJECT, 1,
-				PropertyAccess.PID.IO_LIST, 1, objects), WaitForCon);
-		final byte[] ret = findFrame(CEMIDevMgmt.MC_PROPREAD_CON);
+		final CEMIDevMgmt req2 = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, DEVICE_OBJECT, 1,
+				PropertyAccess.PID.IO_LIST, 1, objects);
+		send(req2, WaitForCon);
+		final byte[] ret = findFrame(CEMIDevMgmt.MC_PROPREAD_CON, req2);
 		for (int i = 0; i < objects; ++i) {
 			final int objType = (ret[2 * i] & 0xff) << 8 | (ret[2 * i + 1] & 0xff);
 			interfaceObjects.add(objType);
