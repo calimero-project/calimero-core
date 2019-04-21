@@ -594,9 +594,12 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 
 	private int getAddInfoLength()
 	{
+		int len = 0;
 		synchronized (addInfo) {
-			return addInfo.stream().mapToInt(info -> 2 + info.data.length).sum();
+			for (final AddInfo info : addInfo)
+				len += 2 + info.data.length;
 		}
+		return len;
 	}
 
 	private static long toLong(final byte[] data)
