@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -611,18 +611,25 @@ public final class TranslatorTypes
 	 * enumerated to find an appropriate translator.
 	 *
 	 * @param dpt datapoint type selecting a particular kind of value translation
+	 * @param data (optional) KNX datapoint data to set in the created translator for translation
 	 * @return the new {@link DPTXlator} object
 	 * @throws KNXException if no matching DPT translator is available or creation failed
 	 */
-	public static DPTXlator createTranslator(final DPT dpt) throws KNXException
-	{
+	public static DPTXlator createTranslator(final DPT dpt, final byte... data) throws KNXException {
+		final DPTXlator t = createTranslator(dpt);
+		if (data.length > 0)
+			t.setData(data);
+		return t;
+	}
+
+	private static DPTXlator createTranslator(final DPT dpt) throws KNXException {
 		try {
 			return createTranslator(0, dpt.getID());
 		}
 		catch (final KNXException e) {
-			for (final Iterator<MainType> i = map.values().iterator(); i.hasNext();)
+			for (final MainType type : map.values())
 				try {
-					return i.next().createTranslator(dpt);
+					return type.createTranslator(dpt);
 				}
 				catch (final KNXException ignore) {}
 		}
