@@ -44,7 +44,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static tuwien.auto.calimero.knxnetip.util.Srp.withService;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.time.Duration;
@@ -70,12 +69,10 @@ import tag.KnxnetIP;
 import tag.Slow;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.knxnetip.Discoverer.Result;
 import tuwien.auto.calimero.knxnetip.servicetype.DescriptionResponse;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
-import tuwien.auto.calimero.knxnetip.util.HPAI;
 import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB;
 
 /**
@@ -156,29 +153,10 @@ class DiscovererTest
 		}
 	}
 
-	private void doGetDesc(final Discoverer d) throws KNXException, InterruptedException
-	{
-		d.startSearch(timeout, true);
-		final List<Result<SearchResponse>> search = d.getSearchResponses();
-		assertTrue(search.size() > 0);
-		int count = 0;
-		for (final Result<SearchResponse> result : search) {
-			final HPAI endpoint = result.getResponse().getControlEndpoint();
-			final InetAddress addr = endpoint.getAddress();
-			final int port = endpoint.getPort();
-			final boolean useNat = port == 0 || addr.isAnyLocalAddress();
-			final InetSocketAddress server = useNat ? result.remoteEndpoint() : new InetSocketAddress(addr, port);
-			try {
-				final Result<DescriptionResponse> r = d.getDescription(server, timeout);
-				assertNotNull(r);
-				count++;
-			}
-			catch (final KNXTimeoutException e) {
-				if (!useNat)
-					throw e;
-			}
-		}
-		assertTrue(count > 0);
+	private void doGetDesc(final Discoverer d) throws KNXException {
+		final InetSocketAddress server = Util.getServer();
+		final Result<DescriptionResponse> r = d.getDescription(server, timeout);
+		assertNotNull(r);
 	}
 
 	@Test
