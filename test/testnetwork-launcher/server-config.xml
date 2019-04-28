@@ -5,6 +5,7 @@
 	<serviceContainer activate="true" routing="true" listenNetIf="any"
 		networkMonitoring="true" udpPort="3671">
 		<knxAddress type="individual">1.1.0</knxAddress>
+		<routing>224.0.23.12</routing>
 		<disruptionBuffer expirationTimeout="30" udpPort="5555-5559"/>
 		<knxSubnet type="virtual" medium="pl110" domainAddress="6c">KnxTestNetwork</knxSubnet>
 		<groupAddressFilter>
@@ -17,8 +18,28 @@
 			<knxAddress type="group">1/07</knxAddress> <!-- 1/0/7 -->
 			<knxAddress type="group">0x80b</knxAddress> <!-- 1/0/11 -->
 			<knxAddress type="group">1/0/111</knxAddress>
-			<knxAddress type="group">0/0/0</knxAddress>
 		</groupAddressFilter>
+		<tunnelingUsers>
+			<user id="2">
+				<knxAddress type="individual">1.1.11</knxAddress>
+				<knxAddress type="individual">1.1.15</knxAddress>
+			</user>
+			<user id="3">
+				<knxAddress type="individual">1.1.11</knxAddress>
+				<knxAddress type="individual">1.1.10</knxAddress>
+				<knxAddress type="individual">1.1.13</knxAddress>
+				<knxAddress type="individual">1.1.12</knxAddress>
+			</user>
+			<user id="4" />
+			<user id="100">
+				<knxAddress type="individual">1.1.20</knxAddress>
+				<knxAddress type="individual">1.1.21</knxAddress>
+				<knxAddress type="individual">1.1.22</knxAddress>
+				<knxAddress type="individual">1.1.23</knxAddress>
+				<knxAddress type="individual">1.1.24</knxAddress>
+				<knxAddress type="individual">1.1.25</knxAddress>
+			</user>
+		</tunnelingUsers>
 		<additionalAddresses>
 			<knxAddress type="individual">1.1.10</knxAddress>
 			<knxAddress type="individual">1.1.11</knxAddress>

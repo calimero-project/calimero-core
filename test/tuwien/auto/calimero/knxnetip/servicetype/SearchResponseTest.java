@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018 B. Malinowsky
+    Copyright (c) 2018, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -136,7 +136,7 @@ class SearchResponseTest {
 	}
 
 	@Test
-	void testTunnelingDib() throws KNXFormatException {
+	void testTunnelingDib() {
 		assertThrows(KNXFormatException.class, () -> new TunnelingDib(tunneling.toByteArray(), 0, 4), "Dib size < 8");
 		assertThrows(KNXFormatException.class, () -> new TunnelingDib(tunneling.toByteArray(), 0, 5), "Dib size < 8");
 		assertThrows(KNXFormatException.class, () -> new TunnelingDib(tunneling.toByteArray(), 0, 6), "Dib size < 8");

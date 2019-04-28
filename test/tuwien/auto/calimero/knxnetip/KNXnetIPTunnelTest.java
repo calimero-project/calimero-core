@@ -38,6 +38,7 @@ package tuwien.auto.calimero.knxnetip;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.BusMonitorLayer;
@@ -492,18 +493,15 @@ class KNXnetIPTunnelTest
 
 	@Test
 	void requestAvailableTunnelingAddress() throws KNXException, InterruptedException {
-		final IndividualAddress requestAddress = new IndividualAddress(1, 1, 30);
+		final IndividualAddress requestAddress = new IndividualAddress(1, 1, 15);
 		t = new KNXnetIPTunnel(LinkLayer, Util.localEndpoint(), Util.getServer(), false, requestAddress);
-//		assertEquals(requestAddress, t.tunnelingAddress());
 	}
 
 	@Test
 	void requestUsedTunnelingAddress() throws KNXException, InterruptedException {
 		final IndividualAddress requestAddress = new IndividualAddress(1, 1, 25);
-		try (KNXnetIPTunnel snatch = new KNXnetIPTunnel(LinkLayer, Util.localEndpoint(), Util.getServer(), false, requestAddress)) {
-//			assertEquals(requestAddress, snatch.tunnelingAddress());
-			t = new KNXnetIPTunnel(LinkLayer, Util.localEndpoint(), Util.getServer(), false, requestAddress);
-//			assertNotEquals(requestAddress, t.tunnelingAddress());
+		try (final KNXnetIPTunnel snatch = new KNXnetIPTunnel(LinkLayer, Util.localEndpoint(), Util.getServer(), false, requestAddress)) {
+			assertThrows(KNXException.class, () -> new KNXnetIPTunnel(LinkLayer, Util.localEndpoint(), Util.getServer(), false, requestAddress));
 		}
 	}
 
