@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,14 +37,15 @@
 package tuwien.auto.calimero.knxnetip.servicetype;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.knxnetip.util.AdditionalDeviceDib;
 import tuwien.auto.calimero.knxnetip.util.DIB;
 import tuwien.auto.calimero.knxnetip.util.DeviceDIB;
@@ -69,6 +70,8 @@ import tuwien.auto.calimero.knxnetip.util.TunnelingDib;
  * <li>{@link IPCurrentConfigDIB}</li>
  * <li>{@link KnxAddressesDIB}</li>
  * <li>{@link ManufacturerDIB}</li>
+ * <li>{@link TunnelingDib}</li>
+ * <li>{@link AdditionalDeviceDib}</li>
  * </ul>
  * <p>
  * Objects of this type are immutable.
@@ -78,12 +81,7 @@ import tuwien.auto.calimero.knxnetip.util.TunnelingDib;
  */
 public class DescriptionResponse extends ServiceType
 {
-	private final DeviceDIB device;
-	private final ServiceFamiliesDIB suppfam;
-
-	// the following DIBs are optional in the specification:
-	// IPConfigDIB, IPCurrentConfigDIB, KnxAddressesDIB, ManufacturerDIB
-	private final List<DIB> optional;
+	private final Map<Integer, DIB> dibs = new HashMap<>();
 
 	/**
 	 * Creates a new description response out of a byte array.
@@ -97,47 +95,39 @@ public class DescriptionResponse extends ServiceType
 	public DescriptionResponse(final byte[] data, final int offset, final int length) throws KNXFormatException
 	{
 		super(KNXnetIPHeader.DESCRIPTION_RES);
-		device = new DeviceDIB(data, offset);
-		suppfam = new ServiceFamiliesDIB(data, offset + device.getStructLength());
 
-		// parse optional DIBs
-		optional = new ArrayList<>();
-		IPConfigDIB c = null;
-		IPCurrentConfigDIB cc = null;
-		KnxAddressesDIB a = null;
-		ServiceFamiliesDIB s = null;
-		TunnelingDib t = null;
-		AdditionalDeviceDib d = null;
-		ManufacturerDIB m = null;
-		int i = offset + device.getStructLength() + suppfam.getStructLength();
+		int i = offset;
 		while (i + 1 < offset + length) {
 			final int size = data[i] & 0xff;
-			final int type = data[i + 1] & 0xff;
 			// skip any remaining DIBs on invalid size, as we cannot advance our index
 			if (size == 0)
 				break;
-
-			boolean unique = true;
-			if (type == DIB.IP_CONFIG && (unique = c == null))
-				optional.add(c = new IPConfigDIB(data, i));
-			else if (type == DIB.IP_CURRENT_CONFIG && (unique = cc == null))
-				optional.add(cc = new IPCurrentConfigDIB(data, i));
-			else if (type == DIB.KNX_ADDRESSES && (unique = a == null))
-				optional.add(a = new KnxAddressesDIB(data, i));
-			else if (type == DIB.MFR_DATA && (unique = m == null))
-				optional.add(m = new ManufacturerDIB(data, i));
-			else if (type == DIB.SecureServiceFamilies && (unique = s == null))
-				optional.add(s = new ServiceFamiliesDIB(data, i));
-			else if (type == DIB.TunnelingInfo && (unique = t == null))
-				optional.add(t = new TunnelingDib(data, i, size));
-			else if (type == DIB.AdditionalDeviceInfo && (unique = d == null))
-				optional.add(d = new AdditionalDeviceDib(data, i, size));
-			else if (!unique)
+			final int type = data[i + 1] & 0xff;
+			if (dibs.containsKey(type))
 				throw new KNXFormatException("response contains duplicate DIB type", type);
+			final DIB dib = parseDib(type, data, i, size);
+			if (dib == null)
+				logger.warn("skip unknown DIB in response of type {} and size {}", type, size);
 			else
-				logger.warn("skip unknown DIB in response with type code {} and size {}", type, size);
+				dibs.put(type, dib);
 			i += size;
 		}
+	}
+
+	private static DIB parseDib(final int type, final byte[] data, final int offset, final int size)
+		throws KNXFormatException {
+		switch (type) {
+		case DIB.DEVICE_INFO: return new DeviceDIB(data, offset);
+		case DIB.SUPP_SVC_FAMILIES: return new ServiceFamiliesDIB(data, offset);
+		case DIB.IP_CONFIG: return new IPConfigDIB(data, offset);
+		case DIB.IP_CURRENT_CONFIG: return new IPCurrentConfigDIB(data, offset);
+		case DIB.KNX_ADDRESSES: return new KnxAddressesDIB(data, offset);
+		case DIB.MFR_DATA: return new ManufacturerDIB(data, offset);
+		case DIB.SecureServiceFamilies: return new ServiceFamiliesDIB(data, offset);
+		case DIB.TunnelingInfo: return new TunnelingDib(data, offset, size);
+		case DIB.AdditionalDeviceInfo: return new AdditionalDeviceDib(data, offset, size);
+		}
+		return null;
 	}
 
 	/**
@@ -146,17 +136,20 @@ public class DescriptionResponse extends ServiceType
 	 *
 	 * @param device device description
 	 * @param svcFamilies supported service families
-	 * @param dibs optional DIBs to add to the response
+	 * @param additionalDibs optional DIBs to add to the response
 	 */
-	public DescriptionResponse(final DeviceDIB device, final ServiceFamiliesDIB svcFamilies, final DIB... dibs)
+	public DescriptionResponse(final DeviceDIB device, final ServiceFamiliesDIB svcFamilies, final DIB... additionalDibs)
 	{
 		super(KNXnetIPHeader.DESCRIPTION_RES);
-		this.device = device;
-		suppfam = svcFamilies;
 
-		optional = new ArrayList<>(Arrays.asList(dibs));
-		if (optional.removeIf(Objects::isNull))
-			ServiceType.logger.error("optional DIBs should not contain null elements", new NullPointerException());
+		dibs.put(device.getDescTypeCode(), device);
+		dibs.put(svcFamilies.getDescTypeCode(), svcFamilies);
+		for (final DIB dib : additionalDibs) {
+			final int type = dib.getDescTypeCode();
+			if (dibs.containsKey(type))
+				throw new KNXIllegalArgumentException("response contains duplicate DIB type " + type);
+			dibs.put(type, dib);
+		}
 	}
 
 	/**
@@ -165,11 +158,7 @@ public class DescriptionResponse extends ServiceType
 	 */
 	public final List<DIB> getDescription()
 	{
-		final List<DIB> l = new ArrayList<>();
-		l.add(device);
-		l.add(suppfam);
-		l.addAll(optional);
-		return l;
+		return Arrays.asList(dibs.values().toArray(new DIB[dibs.size()]));
 	}
 
 	/**
@@ -179,7 +168,7 @@ public class DescriptionResponse extends ServiceType
 	 */
 	public final DeviceDIB getDevice()
 	{
-		return device;
+		return (DeviceDIB) dibs.get(DIB.DEVICE_INFO);
 	}
 
 	/**
@@ -189,7 +178,7 @@ public class DescriptionResponse extends ServiceType
 	 */
 	public final ServiceFamiliesDIB getServiceFamilies()
 	{
-		return suppfam;
+		return (ServiceFamiliesDIB) dibs.get(DIB.SUPP_SVC_FAMILIES);
 	}
 
 	@Override
@@ -200,14 +189,14 @@ public class DescriptionResponse extends ServiceType
 		if (!(obj instanceof DescriptionResponse))
 			return false;
 		final DescriptionResponse other = (DescriptionResponse) obj;
-		return device.equals(other.device) && optional.size() == other.optional.size();
+		return dibs.equals(other.dibs);
 	}
 
 	@Override
 	public int hashCode()
 	{
 		final int prime = 17;
-		return prime * device.hashCode();
+		return prime * dibs.hashCode();
 	}
 
 	@Override
