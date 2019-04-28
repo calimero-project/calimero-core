@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2017 B. Malinowsky
+    Copyright (c) 2017, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -116,7 +116,7 @@ public class DptXlator8BitSetTest
 	void getSubTypes()
 	{
 		final Map<String, DPT> subTypes = t.getSubTypes();
-		assertEquals(13, subTypes.size());
+		assertEquals(14, subTypes.size());
 	}
 
 	@Test

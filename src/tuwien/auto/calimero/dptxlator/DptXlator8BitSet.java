@@ -192,6 +192,11 @@ public class DptXlator8BitSet extends DPTXlator
 	}
 	public static final EnumDpt<RFFilterModes> DptRFFilterInfo = new EnumDpt<>("21.1001", RFFilterModes.class);
 
+	public enum SecurityReport implements EnumBase<SecurityReport> {
+		SecurityFailure;
+	}
+	public static final EnumDpt<SecurityReport> DptSecurityReport = new EnumDpt<>("21.1002", SecurityReport.class);
+
 	public enum ChannelActivationState implements EnumBase<ChannelActivationState> {
 		Channel1, Channel2, Channel3, Channel4, Channel5, Channel6, Channel7, Channel8;
 	}
