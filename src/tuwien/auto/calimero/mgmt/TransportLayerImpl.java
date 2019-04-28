@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -88,12 +88,8 @@ public class TransportLayerImpl implements TransportLayer
 {
 	private final class NLListener implements NetworkLinkListener
 	{
-		NLListener()
-		{}
-
 		@Override
-		public void confirmation(final FrameEvent e)
-		{}
+		public void confirmation(final FrameEvent e) {}
 
 		@Override
 		public void indication(final FrameEvent e)
@@ -264,10 +260,6 @@ public class TransportLayerImpl implements TransportLayer
 		return proxy != null ? proxy.getDestination() : null;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.TransportLayer#destroyDestination
-	 * (tuwien.auto.calimero.mgmt.Destination)
-	 */
 	@Override
 	public void destroyDestination(final Destination d)
 	{
@@ -288,30 +280,18 @@ public class TransportLayerImpl implements TransportLayer
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.TransportLayer#addTransportListener
-	 * (tuwien.auto.calimero.mgmt.TransportListener)
-	 */
 	@Override
 	public void addTransportListener(final TransportListener l)
 	{
 		listeners.add(l);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.TransportLayer#removeTransportListener
-	 * (tuwien.auto.calimero.mgmt.TransportListener)
-	 */
 	@Override
 	public void removeTransportListener(final TransportListener l)
 	{
 		listeners.remove(l);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.TransportLayer#connect
-	 * (tuwien.auto.calimero.mgmt.Destination)
-	 */
 	@Override
 	public void connect(final Destination d) throws KNXTimeoutException, KNXLinkClosedException
 	{
@@ -329,10 +309,6 @@ public class TransportLayerImpl implements TransportLayer
 		logger.trace("connected with {}", d.getAddress());
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.TransportLayer#disconnect
-	 * (tuwien.auto.calimero.mgmt.Destination)
-	 */
 	@Override
 	public void disconnect(final Destination d) throws KNXLinkClosedException
 	{
@@ -342,10 +318,6 @@ public class TransportLayerImpl implements TransportLayer
 			disconnectIndicate(getProxy(d), true);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.TransportLayer#sendData
-	 * (tuwien.auto.calimero.mgmt.Destination, tuwien.auto.calimero.Priority, byte[])
-	 */
 	@Override
 	public void sendData(final Destination d, final Priority p, final byte[] tsdu)
 		throws KNXDisconnectException, KNXLinkClosedException
@@ -389,10 +361,6 @@ public class TransportLayerImpl implements TransportLayer
 		throw new KNXDisconnectException("send data connected failed", d);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.TransportLayer#sendData
-	 * (tuwien.auto.calimero.KNXAddress, tuwien.auto.calimero.Priority, byte[])
-	 */
 	@Override
 	public void sendData(final KNXAddress addr, final Priority p, final byte[] tsdu)
 		throws KNXTimeoutException, KNXLinkClosedException
@@ -403,10 +371,6 @@ public class TransportLayerImpl implements TransportLayer
 		lnk.sendRequestWait(addr, p, tsdu);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.TransportLayer#broadcast
-	 * (boolean, tuwien.auto.calimero.Priority, byte[])
-	 */
 	@Override
 	public void broadcast(final boolean system, final Priority p, final byte[] tsdu)
 		throws KNXTimeoutException, KNXLinkClosedException
@@ -424,9 +388,6 @@ public class TransportLayerImpl implements TransportLayer
 		return "TL " + (detached ? "(detached)" : lnk.getName());
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.mgmt.TransportLayer#detach()
-	 */
 	@Override
 	public synchronized KNXNetworkLink detach()
 	{
