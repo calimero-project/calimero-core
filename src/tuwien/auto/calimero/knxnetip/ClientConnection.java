@@ -49,6 +49,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import tuwien.auto.calimero.CloseEvent;
+import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -67,6 +68,7 @@ import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.servicetype.ServiceAck;
 import tuwien.auto.calimero.knxnetip.util.CRI;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
+import tuwien.auto.calimero.knxnetip.util.TunnelCRD;
 import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.log.LogService.LogLevel;
 
@@ -100,12 +102,14 @@ abstract class ClientConnection extends ConnectionBase
 	private static final int CONFIRMATION_TIMEOUT = 3;
 
 	private HeartbeatMonitor heartbeat;
+	private IndividualAddress tunnelingAddress;
 
 	// additional textual information about connection status
 	// only set on some errors in receiver, check before using it
 	private String status = "";
 
 	private volatile boolean cleanup;
+
 
 	// logger is initialized in connect, when name of connection is available
 	ClientConnection(final int serviceRequest, final int serviceAck,
@@ -190,7 +194,13 @@ abstract class ClientConnection extends ConnectionBase
 			if (state == OK) {
 				heartbeat = new HeartbeatMonitor();
 				heartbeat.start();
-				logger.info("connection established (channel {})", channelId);
+
+				String optionalConnectionInfo = "";
+				if (tunnelingAddress != null)
+					optionalConnectionInfo = ", tunneling address " + tunnelingAddress;
+				logger.info("connection established (data endpoint {}:{}, channel {}{})",
+						dataEndpt.getAddress().getHostAddress(), dataEndpt.getPort(), channelId,
+						optionalConnectionInfo);
 				return;
 			}
 			final KNXException e;
@@ -266,20 +276,21 @@ abstract class ClientConnection extends ConnectionBase
 			// we do an additional check for UDP to be on the safe side
 			// endpoint is only != null on no error
 			final HPAI ep = res.getDataEndpoint();
-			if (res.getStatus() == ErrorCodes.NO_ERROR
-				&& ep.getHostProtocol() == HPAI.IPV4_UDP) {
+			if (res.getStatus() == ErrorCodes.NO_ERROR && ep.getHostProtocol() == HPAI.IPV4_UDP) {
 				channelId = res.getChannelID();
 				final InetAddress ip = ep.getAddress();
 				// in NAT aware mode, if the data EP is incomplete or left
 				// empty, we fall back to the IP address and port of the sender
 				if (useNat && (ip == null || ip.isAnyLocalAddress() || ep.getPort() == 0)) {
 					dataEndpt = new InetSocketAddress(src, port);
-					logger.debug("NAT aware mode: using server data endpoint " + dataEndpt);
 				}
 				else {
 					dataEndpt = new InetSocketAddress(ip, ep.getPort());
-					logger.debug("using server-assigned data endpoint " + dataEndpt);
 				}
+
+				if (res.getCRD() instanceof TunnelCRD)
+					tunnelingAddress = ((TunnelCRD) res.getCRD()).getAssignedAddress();
+
 				checkVersion(h);
 				setStateNotify(OK);
 				return true;
