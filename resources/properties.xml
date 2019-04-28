@@ -8,13 +8,13 @@
         <property pid="2" pidName="PID_OBJECT_NAME" name="Interface Object Name" pdt="2" rw="R(/W)" writeEnabled="0/1">
             <usage>Name of the Interface Object</usage>
         </property>
-        <property pid="3" pidName="PID_SEMAPHOR" name="" pdt="-" rw="" writeEnabled="">
+        <property pid="3" pidName="PID_SEMAPHOR" name="Semaphor" pdt="-" rw="" writeEnabled="">
             <usage></usage>
         </property>
-        <property pid="4" pidName="PID_GROUP_OBJECT_REFERENCE" name="" pdt="-" rw="" writeEnabled="">
+        <property pid="4" pidName="PID_GROUP_OBJECT_REFERENCE" name="Group Object Reference" pdt="-" rw="" writeEnabled="">
             <usage></usage>
         </property>
-        <property pid="5" pidName="PID_LOAD_STATE_CONTROL" name="Load Control" pdt="0" rw="R/W" writeEnabled="1">
+        <property pid="5" pidName="PID_LOAD_STATE_CONTROL" name="Load State Control" pdt="0" rw="R/W" writeEnabled="1">
             <usage>Access to load state machines</usage>
         </property>
         <property pid="6" pidName="PID_RUN_STATE_CONTROL" name="Run Control" pdt="0" rw="R(/W)" writeEnabled="1">
@@ -103,8 +103,8 @@
         <property pid="53" pidName="PID_ERROR_FLAGS" name="Error Flags" pdt="2" rw="R(/W)" writeEnabled="0/1">
             <usage>Errorflags</usage>
         </property>
-        <property pid="54" pidName="PID_PROGMODE" name="Programming Mode" pdt="51" rw="R/W" writeEnabled="1">
-            <usage>ProgrammingMode, Bit 0 = Programming Mode</usage>
+        <property pid="54" pidName="PID_PROGMODE" name="Programming Mode" pdt="51" dpt="1.011" rw="R/W" writeEnabled="1">
+            <usage>Programming mode, Bit 0 = programming mode</usage>
         </property>
         <property pid="55" pidName="PID_PRODUCT_ID" name="Product Identification" pdt="26" rw="R" writeEnabled="0">
             <usage>Product Identification, Manufacturer Specific Device type</usage>
@@ -324,8 +324,8 @@
         </property>
     </object>
     <object type="6">
-        <property pid="51" pidName="PID_LINE_STATUS" name="Line Status" pdt="17" rw="3/-" writeEnabled="1">
-            <usage>Status of the subline</usage>
+        <property pid="51" pidName="PID_MEDIUM_STATUS" name="Medium Status" pdt="17" rw="3/-" writeEnabled="1">
+            <usage>Status of the communication medium</usage>
         </property>
         <property pid="52" pidName="PID_MAIN_LCCONFIG" name="Line Coupler Configuration for Main Line" pdt="17" rw="3/0" writeEnabled="0">
             <usage>Defines the handling of point-to-point addressed and broadcast frames from the primary side</usage>
@@ -530,7 +530,7 @@
         <property pid="93" pidName="PID_PASSWORD_HASHES" name="KNX IP secure password hashes" pdt="32" rw="x/2" writeEnabled="0" accessPolicy="008/008">
             <usage>Password hashes for authenticating clients during secure unicast connection setup</usage>
         </property>
-        <property pid="94" pidName="PID_SECURED_SERVICE_FAMILIES" name="KNX IP secured services" pdt="52" rw="3/2" writeEnabled="0"
+        <property pid="94" pidName="PID_SECURED_SERVICE_FAMILIES" name="KNX IP secured services" pdt="62" rw="3/2" writeEnabled="0"
             accessPolicy="15D/15D">
             <usage>Indicates the services for which communication security is enforced</usage>
         </property>
