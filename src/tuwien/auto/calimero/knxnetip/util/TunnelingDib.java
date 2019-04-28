@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018 B. Malinowsky
+    Copyright (c) 2018, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,7 +38,9 @@ package tuwien.auto.calimero.knxnetip.util;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import tuwien.auto.calimero.IndividualAddress;
@@ -91,7 +93,7 @@ public class TunnelingDib extends DIB {
 		for (int i = 0; i < entries; i++) {
 			addresses[i] = new IndividualAddress(buf.getShort() & 0xffff);
 			buf.get(); // reserved
-			status[i] = buf.get() & 0xff;
+			status[i] = buf.get() & 0x07;
 		}
 	}
 
@@ -124,5 +126,26 @@ public class TunnelingDib extends DIB {
 			buf.put((byte) (status[k] | 0xf8));
 		}
 		return buf.array();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Objects.hash(maxApduLength);
+		result = prime * result + Arrays.hashCode(addresses);
+		result = prime * result + Arrays.hashCode(status);
+		return result;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof TunnelingDib))
+			return false;
+		final TunnelingDib other = (TunnelingDib) obj;
+		return maxApduLength == other.maxApduLength && Arrays.equals(addresses, other.addresses)
+				&& Arrays.equals(status, other.status);
 	}
 }

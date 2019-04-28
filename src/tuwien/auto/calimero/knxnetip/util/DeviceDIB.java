@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.Objects;
 
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.IndividualAddress;
@@ -372,29 +373,6 @@ public class DeviceDIB extends DIB
 	}
 
 	@Override
-	public boolean equals(final Object obj)
-	{
-		if (this == obj)
-			return true;
-		if (!(obj instanceof DeviceDIB))
-			return false;
-		final DeviceDIB other = (DeviceDIB) obj;
-		return address.equals(other.address) && name.equals(other.name) && status == other.status
-				&& knxmedium == other.knxmedium
-				&& Arrays.hashCode(serial) == Arrays.hashCode(other.serial)
-				&& installationId == other.installationId
-				&& Arrays.hashCode(mcast) == Arrays.hashCode(other.mcast)
-				&& Arrays.hashCode(mac) == Arrays.hashCode(other.mac);
-	}
-
-	@Override
-	public int hashCode()
-	{
-		return status + knxmedium + installationId + address.hashCode() + name.hashCode()
-				+ Arrays.hashCode(serial) + Arrays.hashCode(mcast) + Arrays.hashCode(mac);
-	}
-
-	@Override
 	public byte[] toByteArray()
 	{
 		final byte[] buf = super.toByteArray();
@@ -415,5 +393,29 @@ public class DeviceDIB extends DIB
 		for (int k = 0; k < name.length(); ++k)
 			buf[i++] = (byte) name.charAt(k);
 		return buf;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Objects.hash(status, knxmedium, installationId, address, name);
+		result = prime * result + Arrays.hashCode(serial);
+		result = prime * result + Arrays.hashCode(mcast);
+		result = prime * result + Arrays.hashCode(mac);
+		return result;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof DeviceDIB))
+			return false;
+		final DeviceDIB other = (DeviceDIB) obj;
+		return address.equals(other.address) && name.equals(other.name) && status == other.status
+				&& knxmedium == other.knxmedium && Arrays.equals(serial, other.serial)
+				&& installationId == other.installationId && Arrays.equals(mcast, other.mcast)
+				&& Arrays.equals(mac, other.mac) && name.equals(other.name);
 	}
 }

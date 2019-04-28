@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2017 B. Malinowsky
+    Copyright (c) 2015, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -123,5 +123,20 @@ public final class KnxAddressesDIB extends DIB
 			buf[i++] = raw[1];
 		}
 		return buf;
+	}
+
+	@Override
+	public int hashCode() {
+		return addresses.hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof KnxAddressesDIB))
+			return false;
+		final KnxAddressesDIB other = (KnxAddressesDIB) obj;
+		return addresses.equals(other.addresses);
 	}
 }

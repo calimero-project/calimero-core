@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 package tuwien.auto.calimero.knxnetip.util;
 
 import java.io.ByteArrayInputStream;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -288,6 +289,25 @@ public class ServiceFamiliesDIB extends DIB
 				buf.append(", ");
 		}
 		return buf.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(ids);
+		result = prime * result + Arrays.hashCode(versions);
+		return result;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof ServiceFamiliesDIB))
+			return false;
+		final ServiceFamiliesDIB other = (ServiceFamiliesDIB) obj;
+		return Arrays.equals(ids, other.ids) && Arrays.equals(versions, other.versions);
 	}
 
 	private void add(final int familyId, final int familyVersion, final int position)

@@ -37,6 +37,7 @@
 package tuwien.auto.calimero.knxnetip.util;
 
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
 import tuwien.auto.calimero.DeviceDescriptor;
 import tuwien.auto.calimero.DeviceDescriptor.DD0;
@@ -112,5 +113,20 @@ public class AdditionalDeviceDib extends DIB {
 		buf.putShort((short) maxApduLength);
 		buf.put(dd.toByteArray());
 		return buf.array();
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(status, maxApduLength, dd);
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof AdditionalDeviceDib))
+			return false;
+		final AdditionalDeviceDib other = (AdditionalDeviceDib) obj;
+		return status == other.status && maxApduLength == other.maxApduLength && dd == other.dd;
 	}
 }

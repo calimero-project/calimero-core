@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2016 B. Malinowsky
+    Copyright (c) 2015, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,6 +40,8 @@ import java.io.ByteArrayInputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.Objects;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -164,9 +166,6 @@ public final class IPConfigDIB extends DIB
 		return assignment;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString()
 	{
@@ -180,9 +179,6 @@ public final class IPConfigDIB extends DIB
 		return "IP config DIB";
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.util.DIB#toByteArray()
-	 */
 	@Override
 	public byte[] toByteArray()
 	{
@@ -200,13 +196,35 @@ public final class IPConfigDIB extends DIB
 		return buf;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(ip);
+		result = prime * result + Arrays.hashCode(subnet);
+		result = prime * result + Arrays.hashCode(gw);
+		result = prime * result + Objects.hash(caps, assignment);
+		return result;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof IPConfigDIB))
+			return false;
+		final IPConfigDIB other = (IPConfigDIB) obj;
+		return caps == other.caps && assignment == other.assignment && Arrays.equals(ip, other.ip)
+				&& Arrays.equals(subnet, other.subnet) && Arrays.equals(gw, other.gw);
+	}
+
 	private static Inet4Address asInet4Address(final byte[] addr)
 	{
 		try {
 			return (Inet4Address) InetAddress.getByAddress(addr);
 		}
-		catch (final UnknownHostException ignore) { 
-			throw new KNXIllegalArgumentException("illegal length of IPv4 address", ignore);
+		catch (final UnknownHostException e) {
+			throw new KNXIllegalArgumentException("illegal length of IPv4 address", e);
 		}
 	}
 }
