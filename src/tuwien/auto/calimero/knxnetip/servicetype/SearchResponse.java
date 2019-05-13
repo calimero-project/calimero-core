@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 package tuwien.auto.calimero.knxnetip.servicetype;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Collection;
 import java.util.List;
 
 import tuwien.auto.calimero.KNXFormatException;
@@ -158,6 +159,10 @@ public class SearchResponse extends ServiceType
 	public final ServiceFamiliesDIB getServiceFamilies()
 	{
 		return desc.getServiceFamilies();
+	}
+
+	public final Collection<DIB> description() {
+		return desc.getDescription();
 	}
 
 	@Override
