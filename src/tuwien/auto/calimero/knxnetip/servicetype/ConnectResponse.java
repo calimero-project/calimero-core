@@ -208,7 +208,7 @@ public class ConnectResponse extends ServiceType
 		case ErrorCodes.TUNNELING_LAYER:
 			return "the requested tunneling layer is not supported";
 		case AuthError:
-			return "authorization error";
+			return "not authorized to establish the requested connection";
 		case NoTunnelingAddress:
 			return "requested address is not a tunneling address";
 		case ConnectionInUse:

@@ -159,7 +159,7 @@ public class KNXnetIPTunnel extends ClientConnection
 		super(KNXnetIPHeader.TUNNELING_REQ, KNXnetIPHeader.TUNNELING_ACK, 2, TUNNELING_REQ_TIMEOUT);
 		layer = Objects.requireNonNull(knxLayer, "Tunneling Layer");
 		if (knxLayer == RawLayer)
-			throw new KNXIllegalArgumentException("Raw tunnel to KNX network not supported: " + knxLayer);
+			throw new KNXIllegalArgumentException("Raw tunnel to KNX network not supported");
 		connect(localEP, serverCtrlEP, new TunnelCRI(knxLayer), useNAT);
 	}
 
@@ -169,7 +169,7 @@ public class KNXnetIPTunnel extends ClientConnection
 		super(KNXnetIPHeader.TUNNELING_REQ, KNXnetIPHeader.TUNNELING_ACK, 2, TUNNELING_REQ_TIMEOUT);
 		layer = Objects.requireNonNull(knxLayer, "Tunneling Layer");
 		if (knxLayer == RawLayer)
-			throw new KNXIllegalArgumentException("Raw tunnel to KNX network not supported: " + knxLayer);
+			throw new KNXIllegalArgumentException("Raw tunnel to KNX network not supported");
 		connect(localEP, serverCtrlEP, new TunnelCRI(knxLayer, tunnelingAddress), useNAT);
 	}
 

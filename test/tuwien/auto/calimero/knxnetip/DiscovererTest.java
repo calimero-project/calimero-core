@@ -133,13 +133,13 @@ class DiscovererTest
 	}
 
 	@Test
-	void testGetDescription() throws KNXException, InterruptedException
+	void testGetDescription() throws KNXException
 	{
 		doGetDesc(ddef);
 	}
 
 	@Test
-	void testNATGetDescription() throws KNXException, InterruptedException
+	void testNATGetDescription() throws KNXException
 	{
 		if (!Util.TEST_NAT) {
 			System.out.println("\n==== skip testNATGetDescription ====\n");

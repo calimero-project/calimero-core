@@ -436,7 +436,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	static int unsigned(final byte... data) {
 		int value = 0;
 		for (final byte b : data)
-			value = value << 8 | (b & 0xff);
+			value = (value << 8) | (b & 0xff);
 		return value;
 	}
 
