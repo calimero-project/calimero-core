@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,8 +51,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * The address information is used to describe a communication channel. Its structure
  * varies according to the used underlying protocol. This class is implemented for IPv4.
  * <br>
- * For IP networks with NAT, consider use of {@link #HPAI(int, InetSocketAddress)}.<br>
- * UDP is the default communication mode with mandatory support used in KNXnet/IP.
+ * For IP networks with NAT, consider use of {@link #HPAI(int, InetSocketAddress)}.
  * <p>
  * Objects of this type are immutable.
  *
@@ -76,6 +75,10 @@ public class HPAI
 	private final int hostprot;
 	private final byte[] address;
 	private final int port;
+
+
+	/** Host protocol address information for TCP, set to route back endpoint. */
+	public static final HPAI Tcp = new HPAI(IPV4_TCP, null);
 
 	/**
 	 * Creates a HPAI out of a byte array.
@@ -143,7 +146,7 @@ public class HPAI
 	 * <code>addr</code> <code>null</code>.
 	 *
 	 * @param hostProtocol host protocol code (UDP or TCP, see class constants)
-	 * @param addr socket with IP address and port number, if <code>addr</code> =
+	 * @param addr socket address with IP address and port number, if <code>addr</code> =
 	 *        <code>null</code> address and port are initialized to 0
 	 */
 	public HPAI(final int hostProtocol, final InetSocketAddress addr)
