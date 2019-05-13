@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2018 B. Malinowsky
+    Copyright (c) 2015, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 package tuwien.auto.calimero.link;
 
 import java.util.Optional;
+import java.util.StringJoiner;
 
 import org.slf4j.Logger;
 
@@ -406,10 +407,23 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	void mediumType() throws KNXException, InterruptedException {
 		final int pidMediumType = 51;
 		final int supplied = getKNXMedium().getMedium();
-		final int medium = read(cemiServerObject, pidMediumType).map(KNXNetworkLinkUsb::unsigned).orElse(supplied);
-		if (supplied != medium)
-			logger.error("wrong communication medium setting: using {} with {} interface",
-					KNXMediumSettings.getMediumString(supplied), KNXMediumSettings.getMediumString(medium));
+		final int types = read(cemiServerObject, pidMediumType).map(AbstractLink::unsigned).orElse(supplied);
+		if ((types & supplied) != supplied)
+			logger.warn("wrong communication medium setting: using {} to access {} medium",
+					KNXMediumSettings.getMediumString(supplied), mediumTypes(types));
+	}
+
+	private static String mediumTypes(final int types) {
+		final var joiner = new StringJoiner(", ").setEmptyValue("unknown");
+		if ((types & 0x02) > 0)
+			joiner.add("TP1");
+		if ((types & 0x04) > 0)
+			joiner.add("PL110");
+		if ((types & 0x10) > 0)
+			joiner.add("RF");
+		if ((types & 0x20) > 0)
+			joiner.add("IP");
+		return joiner.toString();
 	}
 
 	void setMaxApduLength() throws KNXException, InterruptedException {
