@@ -92,16 +92,19 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.math.ec.rfc7748.X25519;
 import org.slf4j.LoggerFactory;
 
+import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMI;
+import tuwien.auto.calimero.knxnetip.Connection.SecureSession;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
+import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.log.LogService.LogLevel;
 
@@ -132,15 +135,11 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 	// tunneling connection setup
 
-	private final SecretKey deviceAuthKey;
-	private final int userId;
-	private final Key userKey;
+	private SecureSession session;
+
 	private final byte[] privateKey = new byte[keyLength];
 	private PrivateKey privateKey11;
 	private final byte[] publicKey = new byte[keyLength];
-
-	private static final byte[] emptyUserPwdHash = { (byte) 0xe9, (byte) 0xc3, 0x04, (byte) 0xb9, 0x14, (byte) 0xa3, 0x51, 0x75,
-		(byte) 0xfd, 0x7d, 0x1c, 0x67, 0x3a, (byte) 0xb5, 0x2f, (byte) 0xe1 };
 
 	// timeout session.req -> session.res, and session.auth -> session.status
 	private static final int sessionSetupTimeout = 10_000; // [ms]
@@ -150,8 +149,6 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 	private DatagramSocket localSocket;
 	private ReceiverLoop setupLoop;
-	private int seq;
-	private int rcvSeq;
 	private final KNXnetIPConnection tunnel;
 
 
@@ -201,12 +198,12 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 
 	public static KNXnetIPConnection newTunneling(final TunnelingLayer knxLayer, final InetSocketAddress localEP,
-		final InetSocketAddress serverCtrlEP, final boolean useNat, final byte[] deviceAuthCode, final int userId, final byte[] userKey)
-		throws KNXException, InterruptedException {
+		final InetSocketAddress serverCtrlEP, final boolean useNat, final byte[] deviceAuthCode, final int userId,
+		final byte[] userKey) throws KNXException, InterruptedException {
 
 		final byte[] devAuth = deviceAuthCode.length == 0 ? new byte[16] : deviceAuthCode;
-		final byte[] key = userKey.length == 0 ? emptyUserPwdHash.clone() : userKey;
-		return new SecureConnection(knxLayer, localEP, serverCtrlEP, useNat, devAuth, userId, key);
+		final var tunnelingAddress = KNXMediumSettings.BackboneRouter;
+		return new SecureConnection(knxLayer, localEP, serverCtrlEP, useNat, devAuth, userId, userKey, tunnelingAddress);
 	}
 
 	/**
@@ -230,8 +227,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 	public static KNXnetIPConnection newDeviceManagement(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP,
 		final boolean useNat, final byte[] deviceAuthCode, final byte[] userKey) throws KNXException, InterruptedException {
 		final byte[] devAuth = deviceAuthCode.length == 0 ? new byte[16] : deviceAuthCode;
-		final byte[] key = userKey.length == 0 ? emptyUserPwdHash.clone() : userKey;
-		return new SecureConnection(localEP, serverCtrlEP, useNat, devAuth, key);
+		return new SecureConnection(localEP, serverCtrlEP, useNat, devAuth, userKey);
 	}
 
 	/**
@@ -304,15 +300,12 @@ public final class SecureConnection extends KNXnetIPRouting {
 		}
 
 		// unused
-		deviceAuthKey = null;
-		userId = 0;
-		userKey = null;
 		tunnel = null;
 	}
 
-	private SecureConnection(final TunnelingLayer knxLayer, final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP,
-		final boolean useNat, final byte[] deviceAuthCode, final int userId, final byte[] userKey)
-		throws KNXException, InterruptedException {
+	private SecureConnection(final TunnelingLayer knxLayer, final InetSocketAddress localEP,
+		final InetSocketAddress serverCtrlEP, final boolean useNat, final byte[] deviceAuthCode, final int userId,
+		final byte[] userKey, final IndividualAddress tunnelingAddress) throws KNXException, InterruptedException {
 		super(null);
 
 		InetSocketAddress local = localEP;
@@ -329,10 +322,9 @@ public final class SecureConnection extends KNXnetIPRouting {
 			}
 		}
 
-		sno = deriveSerialNumber(local);
-		deviceAuthKey = createSecretKey(deviceAuthCode);
-		this.userId = userId;
-		this.userKey = createSecretKey(userKey);
+		session = Connection.Udp.new SecureSession(userId, userKey, deviceAuthCode);
+
+		sno = session.serialNumber();
 		setupSecureSession(local, serverCtrlEP);
 
 		tunnel = new KNXnetIPTunnel(knxLayer, local, serverCtrlEP, useNat) {
@@ -358,8 +350,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 					if (containedHeader.getServiceType() == SecureSessionStatus) {
 						final int status = newChannelStatus(containedHeader, packet, containedHeader.getStructLength());
-						LogService.log(logger, status == 0 ? LogLevel.TRACE : LogLevel.ERROR, "secure session {} user {} {}", sessionId,
-								userId, statusMsg(status));
+						LogService.log(logger, status == 0 ? LogLevel.TRACE : LogLevel.ERROR, "{}", session);
 						setupLoop.quit();
 						sessionStatus = status;
 						if (status != 0) // XXX do we need this throw, its swallowed by the loop anyway?
@@ -377,7 +368,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 			@Override
 			protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
-				final byte[] wrapped = newSecurePacket(seq++, 0, packet);
+				final byte[] wrapped = newSecurePacket(session.nextSendSeq(), 0, packet);
 				super.send(wrapped, dst);
 			}
 		};
@@ -405,10 +396,8 @@ public final class SecureConnection extends KNXnetIPRouting {
 			}
 		}
 
-		sno = deriveSerialNumber(local);
-		deviceAuthKey = createSecretKey(deviceAuthCode);
-		this.userId = 1;
-		this.userKey = createSecretKey(userKey);
+		session = Connection.Udp.new SecureSession(1, userKey, deviceAuthCode);
+		sno = session.serialNumber();
 		setupSecureSession(local, serverCtrlEP);
 
 		tunnel = new KNXnetIPDevMgmt(localEP, serverCtrlEP, useNat) {
@@ -420,7 +409,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 			@Override
 			protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
-				final byte[] wrapped = newSecurePacket(seq++, 0, packet);
+				final byte[] wrapped = newSecurePacket(session.nextSendSeq(), 0, packet);
 				super.send(wrapped, dst);
 			}
 
@@ -440,8 +429,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 					if (containedHeader.getServiceType() == SecureSessionStatus) {
 						final int status = newChannelStatus(containedHeader, packet, containedHeader.getStructLength());
-						LogService.log(logger, status == 0 ? LogLevel.TRACE : LogLevel.ERROR, "secure session {} user {} {}", sessionId,
-								userId, statusMsg(status));
+						LogService.log(logger, status == 0 ? LogLevel.TRACE : LogLevel.ERROR, "{}", session);
 						setupLoop.quit();
 						sessionStatus = status;
 						if (status != 0) // XXX do we need this throw, its swallowed by the loop anyway?
@@ -464,7 +452,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 	}
 
 	// finds a local IPv4 address with its network prefix "matching" the remote address
-	private static Optional<InetAddress> onSameSubnet(final InetAddress remote) {
+	static Optional<InetAddress> onSameSubnet(final InetAddress remote) {
 		try {
 			return NetworkInterface.networkInterfaces().flatMap(ni -> ni.getInterfaceAddresses().stream())
 					.filter(ia -> ia.getAddress() instanceof Inet4Address)
@@ -474,14 +462,6 @@ public final class SecureConnection extends KNXnetIPRouting {
 		}
 		catch (final SocketException ignore) {}
 		return Optional.empty();
-	}
-
-	private static byte[] deriveSerialNumber(final InetSocketAddress localEP) {
-		try {
-			return deriveSerialNumber(NetworkInterface.getByInetAddress(localEP.getAddress()));
-		}
-		catch (final SocketException ignore) {}
-		return new byte[6];
 	}
 
 	private static byte[] deriveSerialNumber(final NetworkInterface netif) {
@@ -564,9 +544,12 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 				final byte[] serverPublicKey = (byte[]) res[1];
 				final byte[] auth = newSessionAuth(serverPublicKey);
-				final byte[] packet = newSecurePacket(seq++, 0, auth);
-				logger.debug("secure session {}, request access for user {}", sessionId, userId);
-				localSocket.send(new DatagramPacket(packet, packet.length, src, port));
+				final byte[] packet = newSecurePacket(session.nextSendSeq(), 0, auth);
+				logger.debug("secure session {}, request access for user {}", sessionId, session.user());
+				if (localSocket != null)
+					localSocket.send(new DatagramPacket(packet, packet.length, src, port));
+				else
+					session.connection().send(packet);
 			}
 			catch (final RuntimeException e) {
 				sessionStatus = 1;
@@ -592,8 +575,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 			if (containedHeader.getServiceType() == SecureSessionStatus) {
 				final int status = newChannelStatus(containedHeader, packet, containedHeader.getStructLength());
-				LogService.log(logger, status == 0 ? LogLevel.DEBUG : LogLevel.ERROR, "secure session {} {} for user {}", sessionId,
-						statusMsg(status), userId);
+				LogService.log(logger, status == 0 ? LogLevel.DEBUG : LogLevel.ERROR, "{}", session);
 				setupLoop.quit();
 				sessionStatus = status;
 				if (status != 0) // XXX do we need this throw, its swallowed by the loop anyway?
@@ -881,9 +863,11 @@ public final class SecureConnection extends KNXnetIPRouting {
 			throw new KnxSecureException("secure session mismatch: received ID " + sid + ", expected " + sessionId);
 
 		final long seq = (long) fields[1];
-		if (sessionId != 0 && seq < rcvSeq)
-			throw new KnxSecureException("received secure packet with sequence " + seq + " < expected " + rcvSeq);
-		++rcvSeq;
+		if (sessionId != 0) {
+			final var rcvSeq = session.nextReceiveSeq();
+			if (seq < rcvSeq)
+				throw new KnxSecureException("received secure packet with sequence " + seq + " < expected " + rcvSeq);
+		}
 
 		final long snLong = (long) fields[2];
 		final byte[] sn = ByteBuffer.allocate(6).putShort((short) (snLong >> 32)).putInt((int) snLong).array();
@@ -959,12 +943,12 @@ public final class SecureConnection extends KNXnetIPRouting {
 		final byte[] sessionKey = sessionKey(sharedSecret);
 		secretKey = createSecretKey(sessionKey);
 
-		final boolean skipDeviceAuth = Arrays.equals(deviceAuthKey.getEncoded(), new byte[16]);
+		final boolean skipDeviceAuth = Arrays.equals(session.deviceAuthKey().getEncoded(), new byte[16]);
 		if (skipDeviceAuth) {
 			logger.warn("skipping device authentication of {}:{} (no device key)", src.getHostAddress(), port);
 		}
 		else {
-			final ByteBuffer mac = decrypt(buffer, deviceAuthKey, securityInfo(new byte[16], 0, 0xff00));
+			final ByteBuffer mac = decrypt(buffer, session.deviceAuthKey(), securityInfo(new byte[16], 0, 0xff00));
 
 			final int msgLen = h.getStructLength() + 2 + keyLength;
 			final ByteBuffer macInput = ByteBuffer.allocate(16 + 2 + msgLen);
@@ -975,7 +959,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 			macInput.putShort((short) sessionId);
 			macInput.put(xor(serverPublicKey, 0, publicKey, 0, keyLength));
 
-			final byte[] verifyAgainst = cbcMacSimple(deviceAuthKey, macInput.array(), 0, macInput.capacity());
+			final byte[] verifyAgainst = cbcMacSimple(session.deviceAuthKey(), macInput.array(), 0, macInput.capacity());
 			final boolean authenticated = Arrays.equals(mac.array(), verifyAgainst);
 			if (!authenticated) {
 				final String packet = toHex(Arrays.copyOfRange(data, offset - 6, offset - 6 + 0x38), " ");
@@ -991,7 +975,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 		final ByteBuffer buffer = ByteBuffer.allocate(header.getTotalLength());
 		buffer.put(header.toByteArray());
-		buffer.putShort((short) userId);
+		buffer.putShort((short) session.user());
 
 		final int msgLen = 6 + 2 + keyLength;
 		final ByteBuffer macInput = ByteBuffer.allocate(16 + 2 + msgLen);
@@ -1000,8 +984,8 @@ public final class SecureConnection extends KNXnetIPRouting {
 		macInput.put((byte) msgLen);
 		macInput.put(buffer.array(), 0, buffer.position());
 		macInput.put(xor(serverPublicKey, 0, publicKey, 0, keyLength));
-		final byte[] mac = cbcMacSimple(userKey, macInput.array(), 0, macInput.capacity());
-		encrypt(mac, 0, userKey, securityInfo(new byte[16], 8, 0xff00));
+		final byte[] mac = cbcMacSimple(session.userKey(), macInput.array(), 0, macInput.capacity());
+		encrypt(mac, 0, session.userKey(), securityInfo(new byte[16], 8, 0xff00));
 
 		buffer.put(mac);
 		return buffer.array();
@@ -1240,7 +1224,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		return msg[status];
 	}
 
-	private static SecretKey createSecretKey(final byte[] key) {
+	static SecretKey createSecretKey(final byte[] key) {
 		if (key.length != 16)
 			throw new KNXIllegalArgumentException("KNX key has to be 16 bytes in length");
 		final SecretKeySpec spec = new SecretKeySpec(key, "AES");
