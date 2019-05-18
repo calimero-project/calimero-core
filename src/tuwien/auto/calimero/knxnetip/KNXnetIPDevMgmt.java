@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -94,6 +94,13 @@ public class KNXnetIPDevMgmt extends ClientConnection
 		connect(localEP, serverCtrlEP, cri, useNAT);
 	}
 
+	KNXnetIPDevMgmt(final Connection connection) throws KNXException, InterruptedException {
+		super(KNXnetIPHeader.DEVICE_CONFIGURATION_REQ, KNXnetIPHeader.DEVICE_CONFIGURATION_ACK, 4,
+				CONFIGURATION_REQ_TIMEOUT, connection);
+		final CRI cri = CRI.createRequest(DEVICE_MGMT_CONNECTION, null);
+		connect(connection, cri);
+	}
+
 	/**
 	 * Sends a cEMI device management frame to the remote server communicating with this endpoint.
 	 *
@@ -128,32 +135,36 @@ public class KNXnetIPDevMgmt extends ClientConnection
 		if (!checkChannelId(req.getChannelID(), "request"))
 			return true;
 
-		final int seq = req.getSequenceNumber();
-		if (seq == getSeqRcv()) {
-			final int status = h.getVersion() == KNXNETIP_VERSION_10 ? ErrorCodes.NO_ERROR
-					: ErrorCodes.VERSION_NOT_SUPPORTED;
-			final byte[] buf = PacketHelper.toPacket(new ServiceAck(serviceAck, channelId, seq, status));
-			send(buf, dataEndpt);
-			incSeqRcv();
-			if (status == ErrorCodes.VERSION_NOT_SUPPORTED) {
-				close(CloseEvent.INTERNAL, "protocol version changed", LogLevel.ERROR, null);
-				return true;
+		final int status = h.getVersion() == KNXNETIP_VERSION_10 ? ErrorCodes.NO_ERROR
+				: ErrorCodes.VERSION_NOT_SUPPORTED;
+		if (!tcp) {
+			final int seq = req.getSequenceNumber();
+			if (seq == getSeqRcv()) {
+				final byte[] buf = PacketHelper.toPacket(new ServiceAck(serviceAck, channelId, seq, status));
+				send(buf, dataEndpt);
+				incSeqRcv();
 			}
-			final CEMI cemi = req.getCEMI();
-			// leave if we are working with an empty (broken) service request
-			if (cemi == null)
-				return true;
-			final int mc = cemi.getMessageCode();
-			if (mc == CEMIDevMgmt.MC_PROPINFO_IND || mc == CEMIDevMgmt.MC_RESET_IND)
-				fireFrameReceived(cemi);
-			else if (mc == CEMIDevMgmt.MC_PROPREAD_CON || mc == CEMIDevMgmt.MC_PROPWRITE_CON) {
-				// invariant: notify listener before return from blocking send
-				fireFrameReceived(cemi);
-				setStateNotify(OK);
-			}
+			else
+				logger.warn("received dev.mgmt request with rcv-seq {}, expected {} - ignored", seq, getSeqRcv());
 		}
-		else
-			logger.warn("received dev.mgmt request with rcv-seq " + seq + ", expected " + getSeqRcv() + " - ignored");
+
+		if (status == ErrorCodes.VERSION_NOT_SUPPORTED) {
+			close(CloseEvent.INTERNAL, "protocol version changed", LogLevel.ERROR, null);
+			return true;
+		}
+		final CEMI cemi = req.getCEMI();
+		// leave if we are working with an empty (broken) service request
+		if (cemi == null)
+			return true;
+		final int mc = cemi.getMessageCode();
+		if (mc == CEMIDevMgmt.MC_PROPINFO_IND || mc == CEMIDevMgmt.MC_RESET_IND)
+			fireFrameReceived(cemi);
+		else if (mc == CEMIDevMgmt.MC_PROPREAD_CON || mc == CEMIDevMgmt.MC_PROPWRITE_CON) {
+			// invariant: notify listener before return from blocking send
+			fireFrameReceived(cemi);
+			setStateNotify(OK);
+		}
+
 		return true;
 	}
 }

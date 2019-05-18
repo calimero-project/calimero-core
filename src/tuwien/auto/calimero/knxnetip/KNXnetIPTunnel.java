@@ -74,6 +74,7 @@ import tuwien.auto.calimero.knxnetip.servicetype.ServiceRequest;
 import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature;
 import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature.InterfaceFeature;
 import tuwien.auto.calimero.knxnetip.util.TunnelCRI;
+import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
@@ -133,6 +134,12 @@ public class KNXnetIPTunnel extends ClientConnection
 
 	private final TunnelingLayer layer;
 
+
+	public static KNXnetIPTunnel newTcpTunnel(final TunnelingLayer knxLayer, final Connection connection,
+			final IndividualAddress tunnelingAddress) throws KNXException, InterruptedException {
+		return new KNXnetIPTunnel(knxLayer, connection, tunnelingAddress);
+	}
+
 	/**
 	 * Creates a new KNXnet/IP tunneling connection to a remote server.
 	 * <p>
@@ -171,6 +178,18 @@ public class KNXnetIPTunnel extends ClientConnection
 		if (knxLayer == RawLayer)
 			throw new KNXIllegalArgumentException("Raw tunnel to KNX network not supported");
 		connect(localEP, serverCtrlEP, new TunnelCRI(knxLayer, tunnelingAddress), useNAT);
+	}
+
+	KNXnetIPTunnel(final TunnelingLayer knxLayer, final Connection connection,
+			final IndividualAddress tunnelingAddress) throws KNXException, InterruptedException {
+		super(KNXnetIPHeader.TUNNELING_REQ, KNXnetIPHeader.TUNNELING_ACK, 1, TUNNELING_REQ_TIMEOUT, connection);
+		layer = Objects.requireNonNull(knxLayer, "Tunneling Layer");
+		if (knxLayer == RawLayer)
+			throw new KNXIllegalArgumentException("Raw tunnel to KNX network not supported");
+
+		final var cri = tunnelingAddress.equals(KNXMediumSettings.BackboneRouter) ? new TunnelCRI(knxLayer)
+				: new TunnelCRI(knxLayer, tunnelingAddress);
+		connect(connection, cri);
 	}
 
 	/**
@@ -278,48 +297,51 @@ public class KNXnetIPTunnel extends ClientConnection
 		if (!checkChannelId(req.getChannelID(), "request"))
 			return true;
 
-		final int seq = req.getSequenceNumber();
-		final boolean missed = ((seq - 1) & 0xFF) == getSeqRcv();
-		if (missed) {
-			// Workaround for missed request problem (not part of the knxnet/ip tunneling spec):
-			// we missed a single request, hence, the receive sequence is one behind. If the remote
-			// endpoint didn't terminate the connection, but continues to send requests, this workaround
-			// re-syncs with the sequence of the sender.
-			final String s = System.getProperty("calimero.knxnetip.tunneling.resyncSkippedRcvSeq");
-			final boolean resync = "".equals(s) || "true".equalsIgnoreCase(s);
-			if (resync) {
-				logger.error("tunneling request with rcv-seq " + seq + ", expected " + getSeqRcv()
-						+ " -> re-sync with server (1 tunneled msg lost)");
-				incSeqRcv();
+		// tunneling sequence and ack is only used over udp connections, not tcp
+		if (!tcp) {
+			final int seq = req.getSequenceNumber();
+			final boolean missed = ((seq - 1) & 0xFF) == getSeqRcv();
+			if (missed) {
+				// Workaround for missed request problem (not part of the knxnet/ip tunneling spec):
+				// we missed a single request, hence, the receive sequence is one behind. If the remote
+				// endpoint didn't terminate the connection, but continues to send requests, this workaround
+				// re-syncs with the sequence of the sender.
+				final String s = System.getProperty("calimero.knxnetip.tunneling.resyncSkippedRcvSeq");
+				final boolean resync = "".equals(s) || "true".equalsIgnoreCase(s);
+				if (resync) {
+					logger.error("tunneling request with rcv-seq " + seq + ", expected " + getSeqRcv()
+							+ " -> re-sync with server (1 tunneled msg lost)");
+					incSeqRcv();
+				}
 			}
-		}
-		final boolean expected = seq == getSeqRcv();
-		final boolean repeated = ((seq + 1) & 0xFF) == getSeqRcv();
+			final boolean expected = seq == getSeqRcv();
+			final boolean repeated = ((seq + 1) & 0xFF) == getSeqRcv();
 
-		// send KNXnet/IP service ack
-		if (expected || repeated) {
-			final int status = h.getVersion() == KNXNETIP_VERSION_10 ? ErrorCodes.NO_ERROR
-					: ErrorCodes.VERSION_NOT_SUPPORTED;
-			final byte[] buf = PacketHelper.toPacket(new ServiceAck(serviceAck, channelId, seq, status));
-			send(buf, dataEndpt);
-			if (status == ErrorCodes.VERSION_NOT_SUPPORTED) {
-				close(CloseEvent.INTERNAL, "protocol version changed", LogLevel.ERROR, null);
+			// send KNXnet/IP service ack
+			if (expected || repeated) {
+				final int status = h.getVersion() == KNXNETIP_VERSION_10 ? ErrorCodes.NO_ERROR
+						: ErrorCodes.VERSION_NOT_SUPPORTED;
+				final byte[] buf = PacketHelper.toPacket(new ServiceAck(serviceAck, channelId, seq, status));
+				send(buf, dataEndpt);
+				if (status == ErrorCodes.VERSION_NOT_SUPPORTED) {
+					close(CloseEvent.INTERNAL, "protocol version changed", LogLevel.ERROR, null);
+					return true;
+				}
+			}
+			else {
+				logger.warn("tunneling request with invalid rcv-seq {}, expected {}", seq, getSeqRcv());
 				return true;
 			}
-		}
-		else {
-			logger.warn("tunneling request with invalid rcv-seq {}, expected {}", seq, getSeqRcv());
-			return true;
+
+			// ignore repeated tunneling requests
+			if (repeated) {
+				logger.debug("skip tunneling request with rcv-seq {} (already received)", seq);
+				return true;
+			}
+
+			incSeqRcv();
 		}
 
-		// ignore repeated tunneling requests
-		if (repeated) {
-			logger.debug("skip tunneling request with rcv-seq {} (already received)", seq);
-			return true;
-		}
-
-		// further process all expected tunneling requests
-		incSeqRcv();
 
 		if (svc >= KNXnetIPHeader.TunnelingFeatureGet && svc <= KNXnetIPHeader.TunnelingFeatureInfo) {
 			final ByteBuffer buffer = ByteBuffer.wrap(data, offset, h.getTotalLength() - h.getStructLength());

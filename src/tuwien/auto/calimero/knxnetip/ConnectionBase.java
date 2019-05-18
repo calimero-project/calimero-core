@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2018 B. Malinowsky
+    Copyright (c) 2010, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -87,9 +87,9 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	// KNXnet/IP client SHALL wait 10 seconds for a connect response frame from server
 	static final int CONNECT_REQ_TIMEOUT = 10;
 
-	/** Local control endpoint socket. */
+	/** Local control endpoint socket, only assigned and valid if UDP is used. */
 	protected DatagramSocket ctrlSocket;
-	/** Local data endpoint socket. */
+	/** Local data endpoint socket, only assigned and valid if UDP is used. */
 	protected DatagramSocket socket;
 
 	/** Remote control endpoint. */
@@ -232,6 +232,11 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 					// shortcut for routing, don't switch into 'ack-pending'
 					if (serviceRequest == KNXnetIPHeader.ROUTING_IND)
 						return;
+					// skip ack transition if we're using a tcp socket
+					if (socket == null) {
+						internalState = ClientConnection.CEMI_CON_PENDING;
+						break;
+					}
 					internalState = ACK_PENDING;
 					// always forward this state to user
 					state = ACK_PENDING;
@@ -432,8 +437,10 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		}
 		try {
 			synchronized (lock) {
-				final byte[] buf = PacketHelper.toPacket(new DisconnectRequest(channelId, new HPAI(HPAI.IPV4_UDP,
-						useNat ? null : (InetSocketAddress) ctrlSocket.getLocalSocketAddress())));
+				final boolean tcp = ctrlSocket == null;
+				final var hpai = tcp ? HPAI.Tcp : new HPAI(HPAI.IPV4_UDP,
+						useNat ? null : (InetSocketAddress) ctrlSocket.getLocalSocketAddress());
+				final byte[] buf = PacketHelper.toPacket(new DisconnectRequest(channelId, hpai));
 				send(buf, ctrlEndpt);
 				long remaining = CONNECT_REQ_TIMEOUT * 1000L;
 				final long end = System.currentTimeMillis() + remaining;

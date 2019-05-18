@@ -75,7 +75,7 @@ import tuwien.auto.calimero.log.LogService.LogLevel;
 /**
  * Base implementation for client tunneling, device management, and routing.
  * <p>
- * The communication on OSI layer 4 is done with UDP.<br>
+ * The communication on OSI layer 4 is done with UDP or TCP.<br>
  * Implements a communication heartbeat monitor.
  *
  * @author B. Malinowsky
@@ -110,12 +110,34 @@ abstract class ClientConnection extends ConnectionBase
 
 	private volatile boolean cleanup;
 
+	final boolean tcp;
+	private final Connection connection;
 
 	// logger is initialized in connect, when name of connection is available
-	ClientConnection(final int serviceRequest, final int serviceAck,
-		final int maxSendAttempts, final int responseTimeout)
-	{
+	ClientConnection(final int serviceRequest, final int serviceAck, final int maxSendAttempts,
+			final int responseTimeout, final Connection connection) {
 		super(serviceRequest, serviceAck, maxSendAttempts, responseTimeout);
+		tcp = connection != Connection.Udp;
+		this.connection = connection;
+	}
+
+	ClientConnection(final int serviceRequest, final int serviceAck, final int maxSendAttempts,
+			final int responseTimeout) {
+		this(serviceRequest, serviceAck, maxSendAttempts, responseTimeout, Connection.Udp);
+	}
+
+	protected void connect(final Connection c, final CRI cri) throws KNXException, InterruptedException {
+		try {
+			c.connect();
+			c.registerConnectRequest(this);
+			connect(c.localEndpoint(), c.server(), cri, false);
+		}
+		catch (final IOException e) {
+			throw new KNXException("connecting " + connection, e);
+		}
+		finally {
+			c.unregisterConnectRequest(this);
+		}
 	}
 
 	/**
@@ -164,13 +186,16 @@ abstract class ClientConnection extends ConnectionBase
 							.orElse(InetAddress.getLocalHost());
 				local = new InetSocketAddress(addr, localEP.getPort());
 			}
-			socket = new DatagramSocket(local);
-			ctrlSocket = socket;
 
-			logger.info("establish connection from " + socket.getLocalSocketAddress() + " to " + ctrlEndpt);
+			if (!tcp) {
+				socket = new DatagramSocket(local);
+				ctrlSocket = socket;
+			}
+
+			final var lsa = localSocketAddress();
+			logger.info("establish connection from {} to {} ({})", lsa, ctrlEndpt, tcp ? "tcp" : "udp");
 			// HPAI throws if wildcard local address (0.0.0.0) is supplied
-			final HPAI hpai = new HPAI(HPAI.IPV4_UDP,
-					useNat ? null : (InetSocketAddress) socket.getLocalSocketAddress());
+			final var hpai = tcp ? HPAI.Tcp : new HPAI(HPAI.IPV4_UDP, useNat ? null : lsa);
 			final byte[] buf = PacketHelper.toPacket(new ConnectRequest(cri, hpai, hpai));
 			send(buf, ctrlEndpt);
 		}
@@ -178,8 +203,7 @@ abstract class ClientConnection extends ConnectionBase
 			throw new KNXException("no local host address available", e);
 		}
 		catch (IOException | SecurityException e) {
-			if (socket != null)
-				socket.close();
+			closeSocket();
 			logger.error("communication failure on connect", e);
 			if (local.getAddress().isLoopbackAddress())
 				logger.warn("local endpoint uses loopback address ({}), try with a different IP address",
@@ -188,7 +212,8 @@ abstract class ClientConnection extends ConnectionBase
 		}
 
 		logger.debug("wait for connect response from " + ctrlEndpt + " ...");
-		startReceiver();
+		if (!tcp)
+			startReceiver();
 		try {
 			final boolean changed = waitForStateChange(CLOSED, CONNECT_REQ_TIMEOUT);
 			if (state == OK) {
@@ -221,6 +246,14 @@ abstract class ClientConnection extends ConnectionBase
 	}
 
 	@Override
+	protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
+		if (tcp)
+			connection.send(packet);
+		else
+			super.send(packet, dst);
+	}
+
+	@Override
 	protected void cleanup(final int initiator, final String reason, final LogLevel level,
 		final Throwable t)
 	{
@@ -236,7 +269,7 @@ abstract class ClientConnection extends ConnectionBase
 		if (heartbeat != null)
 			heartbeat.quit();
 		stopReceiver();
-		socket.close();
+		closeSocket();
 		// ensure user sees final state CLOSED
 		updateState = true;
 		super.cleanup(initiator, reason, level, t);
@@ -273,15 +306,25 @@ abstract class ClientConnection extends ConnectionBase
 			logger.warn("received connect request - ignored");
 		else if (svc == KNXnetIPHeader.CONNECT_RES) {
 			final ConnectResponse res = new ConnectResponse(data, offset);
-			// we do an additional check for UDP to be on the safe side
-			// endpoint is only != null on no error
+			// address info is only != null on no error
 			final HPAI ep = res.getDataEndpoint();
-			if (res.getStatus() == ErrorCodes.NO_ERROR && ep.getHostProtocol() == HPAI.IPV4_UDP) {
+			if (res.getStatus() == ErrorCodes.NO_ERROR && !(tcp ^ (ep.getHostProtocol() == HPAI.IPV4_TCP))) {
 				channelId = res.getChannelID();
 				final InetAddress ip = ep.getAddress();
-				// in NAT aware mode, if the data EP is incomplete or left
-				// empty, we fall back to the IP address and port of the sender
-				if (useNat && (ip == null || ip.isAnyLocalAddress() || ep.getPort() == 0)) {
+
+				if (tcp) {
+					final boolean dataRouteBack = ep.getAddress().isAnyLocalAddress() && ep.getPort() == 0;
+					if (!dataRouteBack) {
+						final String msg = "connect response from " + src + ":" + port
+								+ " does not contain route-back data endpoint";
+						close(CloseEvent.INTERNAL, msg, LogLevel.ERROR, null);
+						return true;
+					}
+					dataEndpt = new InetSocketAddress(src, port);
+				}
+				else if (useNat && (ip == null || ip.isAnyLocalAddress() || ep.getPort() == 0)) {
+					// in NAT aware mode, if the data EP is incomplete or left
+					// empty, we fall back to the IP address and port of the sender
 					dataEndpt = new InetSocketAddress(src, port);
 				}
 				else {
@@ -324,6 +367,10 @@ abstract class ClientConnection extends ConnectionBase
 			setStateNotify(CLOSED);
 		}
 		else if (svc == serviceAck) {
+			// with tcp, service acks are not required and just ignored
+			if (tcp)
+				return true;
+
 			final ServiceAck res = new ServiceAck(svc, data, offset);
 			if (!checkChannelId(res.getChannelID(), "acknowledgment"))
 				return true;
@@ -335,8 +382,7 @@ abstract class ClientConnection extends ConnectionBase
 					return true;
 				incSeqSend();
 				// update state and notify our lock
-				setStateNotify(res.getStatus() == ErrorCodes.NO_ERROR ? CEMI_CON_PENDING
-						: ACK_ERROR);
+				setStateNotify(res.getStatus() == ErrorCodes.NO_ERROR ? CEMI_CON_PENDING : ACK_ERROR);
 				if (logger.isTraceEnabled())
 					logger.trace("received service ack {} from {} (channel {})",
 							res.getSequenceNumber(), ctrlEndpt, channelId);
@@ -347,6 +393,10 @@ abstract class ClientConnection extends ConnectionBase
 		else
 			return false;
 		return true;
+	}
+
+	private InetSocketAddress localSocketAddress() {
+		return (InetSocketAddress) (tcp ? connection.localEndpoint() : socket.getLocalSocketAddress());
 	}
 
 	private void disconnectRequested(final DisconnectRequest req)
@@ -391,11 +441,16 @@ abstract class ClientConnection extends ConnectionBase
 	private void connectCleanup(final Exception thrown)
 	{
 		stopReceiver();
-		socket.close();
+		closeSocket();
 		setState(CLOSED);
 		String msg = thrown.getMessage();
 		msg = msg != null && msg.length() > 0 ? msg : thrown.getClass().getSimpleName();
 		logger.error("establishing connection failed, {}", msg);
+	}
+
+	private void closeSocket() {
+		if (socket != null)
+			socket.close();
 	}
 
 	// finds a local IPv4 address with its network prefix "matching" the remote address
@@ -444,9 +499,8 @@ abstract class ClientConnection extends ConnectionBase
 		@Override
 		public void run()
 		{
-			final byte[] buf = PacketHelper.toPacket(new ConnectionstateRequest(channelId,
-					new HPAI(HPAI.IPV4_UDP, useNat ? null : (InetSocketAddress) socket
-							.getLocalSocketAddress())));
+			final var hpai = tcp ? HPAI.Tcp : new HPAI(HPAI.IPV4_UDP, useNat ? null : localSocketAddress());
+			final byte[] buf = PacketHelper.toPacket(new ConnectionstateRequest(channelId, hpai));
 			try {
 				while (true) {
 					Thread.sleep(HEARTBEAT_INTERVAL * 1000);
