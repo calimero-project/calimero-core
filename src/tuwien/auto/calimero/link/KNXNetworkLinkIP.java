@@ -57,11 +57,14 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.knxnetip.Connection;
+import tuwien.auto.calimero.knxnetip.Connection.SecureSession;
 import tuwien.auto.calimero.knxnetip.KNXConnectionClosedException;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.knxnetip.KNXnetIPDevMgmt;
 import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
+import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
 import tuwien.auto.calimero.knxnetip.SecureConnection;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 
@@ -134,10 +137,22 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 		return new KNXNetworkLinkIP(TUNNELING, localEP, remoteEP, useNAT, settings);
 	}
 
+	public static KNXNetworkLinkIP newTunnelingLink(final Connection connection, final KNXMediumSettings settings)
+			throws KNXException, InterruptedException {
+		return new KNXNetworkLinkIP(TUNNELING, KNXnetIPTunnel.newTcpTunnel(TunnelingLayer.LinkLayer, connection,
+				settings.getDeviceAddress()), settings);
+	}
+
 	public static KNXNetworkLinkIP newSecureTunnelingLink(final InetSocketAddress localEP, final InetSocketAddress remoteEP,
 		final boolean useNat, final byte[] deviceAuthCode, final int userId, final byte[] userKey, final KNXMediumSettings settings)
 		throws KNXException, InterruptedException {
 		final KNXnetIPConnection c = SecureConnection.newTunneling(LinkLayer, localEP, remoteEP, useNat, deviceAuthCode, userId, userKey);
+		return new KNXNetworkLinkIP(TUNNELING, c, settings);
+	}
+
+	public static KNXNetworkLinkIP newSecureTunnelingLink(final SecureSession session, final KNXMediumSettings settings)
+			throws KNXException, InterruptedException {
+		final KNXnetIPConnection c = SecureConnection.newTunneling(LinkLayer, session, settings.getDeviceAddress());
 		return new KNXNetworkLinkIP(TUNNELING, c, settings);
 	}
 
@@ -322,6 +337,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 				public void connectionClosed(final CloseEvent e) {}
 			});
 
+			mediumType();
 			setMaxApduLength();
 		}
 		catch (KNXException | RuntimeException e) {
