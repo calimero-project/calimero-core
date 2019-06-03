@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2018 B. Malinowsky
+    Copyright (c) 2010, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ public interface PropertyAccess
 {
 	/**
 	 * Defines property identifiers (PIDs) for global properties (interface object type =
-	 * global) and PIDs of the KNXnet/IP parameter object (interface object type 11).
+	 * global), Device object, Router object, cEMI Server object, and KNXnet/IP parameter object.
 	 * <p>
 	 * Users are encouraged to use these more descriptive name constants instead of plain
 	 * PID integer values for better readability.
