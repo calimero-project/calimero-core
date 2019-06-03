@@ -278,7 +278,11 @@ public final class Connection implements Closeable {
 
 		void registerConnectRequest(final ClientConnection c) { ongoingConnectRequests.add(c); }
 
-		void unregisterConnectRequest(final ClientConnection c) { ongoingConnectRequests.remove(c); }
+		void unregisterConnectRequest(final ClientConnection c) {
+			ongoingConnectRequests.remove(c);
+			if (c.getState() == KNXnetIPConnection.OK)
+				securedConnections.put(c.channelId, c);
+		}
 
 		long nextSendSeq() { return sendSeq.getAndIncrement(); }
 
@@ -299,15 +303,14 @@ public final class Connection implements Closeable {
 				connect();
 				final byte[] sessionReq = PacketHelper.newChannelRequest(HPAI.Tcp, publicKey);
 				send(sessionReq);
-
 				awaitAuthenticationStatus();
 
-				if (sessionState == SessionState.Idle)
-					throw new KNXTimeoutException("timeout establishing secure session with " + server);
-				if (sessionState == SessionState.Unauthenticated) {
+				if (sessionState == SessionState.Unauthenticated || sessionStatus != AuthSuccess) {
 					sessionState = SessionState.Idle;
 					throw new KnxSecureException("secure session " + SecureConnection.statusMsg(sessionStatus));
 				}
+				if (sessionState == SessionState.Idle)
+					throw new KNXTimeoutException("timeout establishing secure session with " + server);
 
 				final var delay = keepAliveInvterval.toMillis();
 				keepAliveFuture = keepAliveSender.scheduleWithFixedDelay(this::sendKeepAlive, delay, delay,
@@ -337,7 +340,7 @@ public final class Connection implements Closeable {
 			Arrays.fill(tmp, (byte) 0);
 		}
 
-		private void awaitAuthenticationStatus() throws InterruptedException {
+		private void awaitAuthenticationStatus() throws InterruptedException, KNXTimeoutException {
 			long end = System.nanoTime() / 1_000_000 + sessionSetupTimeout;
 			long remaining = sessionSetupTimeout;
 			boolean inAuth = false;
@@ -351,6 +354,8 @@ public final class Connection implements Closeable {
 					end = end - remaining + sessionSetupTimeout;
 				}
 			}
+			if (remaining <= 0)
+				throw new KNXTimeoutException("timeout establishing secure session with " + addressPort(server));
 		}
 
 		private boolean acceptServiceType(final KNXnetIPHeader h, final byte[] data, final int offset, final int length)
@@ -424,10 +429,8 @@ public final class Connection implements Closeable {
 			var connection = securedConnections.get(channelId);
 			if (connection == null) {
 				synchronized (ongoingConnectRequests) {
-					if (!ongoingConnectRequests.isEmpty()) {
+					if (!ongoingConnectRequests.isEmpty())
 						connection = ongoingConnectRequests.remove(0);
-						securedConnections.put(channelId, connection);
-					}
 				}
 			}
 
@@ -435,7 +438,7 @@ public final class Connection implements Closeable {
 				if (connection != null) {
 					connection.handleServiceType(header, data, offset, server.getAddress(), server.getPort());
 					if (header.getServiceType() == KNXnetIPHeader.DISCONNECT_RES) {
-						logger.trace("remove secure connection {}", connection);
+						logger.trace("remove connection {}", connection);
 						securedConnections.remove(channelId);
 					}
 				}
@@ -498,8 +501,6 @@ public final class Connection implements Closeable {
 			sessionId = buffer.getShort() & 0xffff;
 			if (sessionId == 0)
 				throw new KnxSecureException("no more free secure sessions, or remote endpoint busy");
-			sessions.put(sessionId, this);
-			inSessionRequestStage = null;
 
 			final byte[] serverPublicKey = new byte[keyLength];
 			buffer.get(serverPublicKey);
@@ -512,7 +513,12 @@ public final class Connection implements Closeable {
 				throw new KnxSecureException("key agreement failed", e);
 			}
 			final byte[] sessionKey = SecureConnection.sessionKey(sharedSecret);
-			secretKey = SecureConnection.createSecretKey(sessionKey);
+			synchronized (this) {
+				secretKey = SecureConnection.createSecretKey(sessionKey);
+			}
+
+			sessions.put(sessionId, this);
+			inSessionRequestStage = null;
 
 			final boolean skipDeviceAuth = Arrays.equals(deviceAuthKey.getEncoded(), new byte[16]);
 			if (skipDeviceAuth) {
@@ -591,13 +597,18 @@ public final class Connection implements Closeable {
 		}
 	}
 
+	public static Connection newTcpConnection(final InetSocketAddress local, final InetSocketAddress server)
+			throws KNXException {
+		return new Connection(local, server);
+	}
+
 	private Connection(final InetSocketAddress server) {
 		this.server = server;
 		socket = new Socket();
 		logger = LoggerFactory.getLogger("calimero.knxnetip.tcp " + addressPort(server));
 	}
 
-	public Connection(final InetSocketAddress local, final InetSocketAddress server) throws KNXException {
+	protected Connection(final InetSocketAddress local, final InetSocketAddress server) throws KNXException {
 		this(server);
 		if (local.isUnresolved())
 			throw new KNXIllegalArgumentException("unresolved address " + local);
@@ -642,6 +653,12 @@ public final class Connection implements Closeable {
 		catch (final IOException ignore) {}
 	}
 
+	@Override
+	public String toString() {
+		final var state = socket.isClosed() ? "closed" : socket.isConnected() ? "connected" : "bound";
+		return addressPort(localEndpoint()) + " " + addressPort(server) + " (" + state +")";
+	}
+
 	Socket socket() { return socket; }
 
 	void send(final byte[] data) throws IOException {
@@ -652,7 +669,11 @@ public final class Connection implements Closeable {
 
 	void registerConnectRequest(final ClientConnection c) { ongoingConnectRequests.add(c); }
 
-	void unregisterConnectRequest(final ClientConnection c) { ongoingConnectRequests.remove(c); }
+	void unregisterConnectRequest(final ClientConnection c) {
+		ongoingConnectRequests.remove(c);
+		if (c.getState() == KNXnetIPConnection.OK)
+			unsecuredConnections.put(c.channelId, c);
+	}
 
 	// InetSocketAddress::toString always prepends a '/' even if there is no host name
 	static String addressPort(final InetSocketAddress addr) {
@@ -680,22 +701,23 @@ public final class Connection implements Closeable {
 		try {
 			final var in = socket.getInputStream();
 			while (!socket.isClosed()) {
-				final int read = in.read(data, offset, data.length - offset);
-				if (read == -1)
-					return;
-				offset += read;
-
 				if (offset >= 6) {
 					try {
 						final var header = new KNXnetIPHeader(data, 0);
 						if (header.getTotalLength() <= offset) {
-							final int length = offset - header.getStructLength();
-							offset = 0;
+							final int length = header.getTotalLength() - header.getStructLength();
+							final int leftover = offset - header.getTotalLength();
+							offset = leftover;
 
 							if (header.isSecure())
 								dispatchToSession(header, data, header.getStructLength(), length);
 							else
 								dispatchToConnection(header, data, header.getStructLength());
+
+							if (leftover > 0) {
+								System.arraycopy(data, header.getTotalLength(), data, 0, leftover);
+								continue;
+							}
 						}
 						// skip bodies which do not fit into rcv buffer
 						else if (header.getTotalLength() > rcvBufferSize) {
@@ -709,6 +731,11 @@ public final class Connection implements Closeable {
 						offset = 0;
 					}
 				}
+
+				final int read = in.read(data, offset, data.length - offset);
+				if (read == -1)
+					return;
+				offset += read;
 			}
 		}
 		catch (final InterruptedIOException e) {
@@ -726,7 +753,10 @@ public final class Connection implements Closeable {
 		if (sessionId == 0)
 			throw new KnxSecureException("no more free secure sessions, or remote endpoint busy");
 
-		final var session = sessions.getOrDefault(sessionId, inSessionRequestStage);
+		var session = sessions.get(sessionId);
+		if (session == null && header.getServiceType() == SecureSession.SecureSessionResponse)
+			session = inSessionRequestStage;
+
 		if (session != null)
 			session.acceptServiceType(header, data, offset, length);
 		else
@@ -739,10 +769,8 @@ public final class Connection implements Closeable {
 		var connection = unsecuredConnections.get(channelId);
 		if (connection == null) {
 			synchronized (ongoingConnectRequests) {
-				if (!ongoingConnectRequests.isEmpty()) {
+				if (!ongoingConnectRequests.isEmpty())
 					connection = ongoingConnectRequests.remove(0);
-					unsecuredConnections.put(channelId, connection);
-				}
 			}
 		}
 

@@ -1217,8 +1217,6 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 	private byte[] cbcMac(final byte[] data, final int offset, final int length, final byte[] secInfo) {
 		final byte[] log = Arrays.copyOfRange(data, offset, offset + length);
-		logger.trace("authenticating (length {}): {}", length, toHex(log, " "));
-
 		final byte[] hdr = Arrays.copyOfRange(data, offset, offset + 6);
 
 		final int packetOffset = hdr.length + 2 + 6 + 6 + 2;

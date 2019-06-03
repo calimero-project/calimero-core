@@ -343,7 +343,6 @@ abstract class ClientConnection extends ConnectionBase
 			else
 				status = res.getStatusString();
 
-			logger.error(status);
 			setStateNotify(ACK_ERROR);
 		}
 		else if (svc == KNXnetIPHeader.CONNECTIONSTATE_REQ)
@@ -393,6 +392,15 @@ abstract class ClientConnection extends ConnectionBase
 		else
 			return false;
 		return true;
+	}
+
+	@Override
+	String connectionState() {
+		switch (state) {
+		case CEMI_CON_PENDING: return "cEMI.con pending";
+		case UNKNOWN_ERROR: return "unknown error";
+		default: return super.connectionState();
+		}
 	}
 
 	private InetSocketAddress localSocketAddress() {

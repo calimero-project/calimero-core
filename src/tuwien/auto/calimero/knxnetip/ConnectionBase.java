@@ -315,6 +315,11 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		close(CloseEvent.USER_REQUEST, "user request", LogLevel.DEBUG, null);
 	}
 
+	@Override
+	public String toString() {
+		return getName() + (channelId != 0 ? (" channel " + channelId) : "") + " (state " + connectionState() + ")";
+	}
+
 	/**
 	 * Returns the protocol's current receive sequence number.
 	 *
@@ -440,6 +445,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 				final boolean tcp = ctrlSocket == null;
 				final var hpai = tcp ? HPAI.Tcp : new HPAI(HPAI.IPV4_UDP,
 						useNat ? null : (InetSocketAddress) ctrlSocket.getLocalSocketAddress());
+				logger.trace("sending disconnect request for {}", this);
 				final byte[] buf = PacketHelper.toPacket(new DisconnectRequest(channelId, hpai));
 				send(buf, ctrlEndpt);
 				long remaining = CONNECT_REQ_TIMEOUT * 1000L;
@@ -568,6 +574,16 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	@SuppressWarnings("unused")
 	void doExtraBlockingModes() throws KNXTimeoutException, InterruptedException
 	{}
+
+	String connectionState() {
+		switch (state) {
+		case OK: return "OK";
+		case CLOSED: return "closed";
+		case ACK_PENDING: return "ACK pending";
+		case ACK_ERROR: return "ACK error";
+		default: return "unknown";
+		}
+	}
 
 	private void fireConnectionClosed(final int initiator, final String reason)
 	{
