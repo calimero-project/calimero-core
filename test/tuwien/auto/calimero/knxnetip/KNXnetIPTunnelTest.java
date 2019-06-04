@@ -45,6 +45,7 @@ import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.BusMon
 import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.LinkLayer;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -73,8 +74,10 @@ import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIBusMon;
 import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode;
 import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature;
 import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature.InterfaceFeature;
+import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 
 /**
  * @author B. Malinowsky
@@ -85,6 +88,8 @@ class KNXnetIPTunnelTest
 	private static KNXnetIPConnection.BlockingMode noblock = KNXnetIPConnection.BlockingMode.NonBlocking;
 	private static KNXnetIPConnection.BlockingMode ack = KNXnetIPConnection.BlockingMode.WaitForAck;
 	private static KNXnetIPConnection.BlockingMode con = KNXnetIPConnection.BlockingMode.WaitForCon;
+
+	private Connection connection;
 
 	private KNXnetIPTunnel t;
 	private KNXnetIPTunnel tnat;
@@ -105,22 +110,31 @@ class KNXnetIPTunnelTest
 		List<CEMI> fifoReceived = new Vector<>();
 
 		BlockingQueue<TunnelingFeature> featureResponse = new ArrayBlockingQueue<>(1);
+		BlockingQueue<CEMILData> con = new ArrayBlockingQueue<>(100);
 
 		@Override
 		public void frameReceived(final FrameEvent e)
 		{
-			assertNotNull(e);
-			if (this == l)
-				assertEquals(t, e.getSource());
-			if (this == lnat)
-				assertEquals(tnat, e.getSource());
-			if (this == lmon)
-				assertEquals(mon, e.getSource());
-			received = e.getFrame();
-			if (e.getFrame() instanceof CEMIBusMon) {
-				Debug.printMonData((CEMIBusMon) e.getFrame());
+			try {
+				assertNotNull(e);
+				if (this == l)
+					assertEquals(t, e.getSource());
+				if (this == lnat)
+					assertEquals(tnat, e.getSource());
+				if (this == lmon)
+					assertEquals(mon, e.getSource());
+				received = e.getFrame();
+				if (received.getMessageCode() == CEMILData.MC_LDATA_CON) {
+					con.add((CEMILData) received);
+				}
+				if (e.getFrame() instanceof CEMIBusMon) {
+					Debug.printMonData((CEMIBusMon) e.getFrame());
+				}
+				fifoReceived.add(e.getFrame());
 			}
-			fifoReceived.add(e.getFrame());
+			catch (final RuntimeException rte) {
+				fail("exception in frame received", rte);
+			}
 		}
 
 		@Override
@@ -173,6 +187,9 @@ class KNXnetIPTunnelTest
 		}
 		if (mon != null)
 			mon.close();
+
+		if (connection != null)
+			connection.close();
 	}
 
 	@Test
@@ -189,7 +206,6 @@ class KNXnetIPTunnelTest
 		doSend(frame, ack, true);
 		doSend(frame2, con, true);
 
-		final long start = System.currentTimeMillis();
 		doSend(frameNoDest, con, posCon);
 		doSend(frameNoDest, con, posCon);
 		doSend(frameNoDest, con, posCon);
@@ -200,8 +216,6 @@ class KNXnetIPTunnelTest
 		doSend(frameNoDest, con, posCon);
 		doSend(frameNoDest, con, posCon);
 		doSend(frameNoDest, con, posCon);
-		final long end = System.currentTimeMillis();
-		System.out.println("time for 10 tunneling sends with .con: " + (end - start) + " ms");
 	}
 
 	@Test
@@ -231,7 +245,7 @@ class KNXnetIPTunnelTest
 					t.send(f, con);
 				}
 				catch (KNXTimeoutException | KNXConnectionClosedException | InterruptedException e) {
-					e.printStackTrace();
+					fail("send fifo message in " + Thread.currentThread().getName());
 				}
 			}
 		}
@@ -241,23 +255,30 @@ class KNXnetIPTunnelTest
 		for (int i = 0; i < sends; i++) {
 			threads[i] = new Sender("sender " + (i + 1));
 		}
-		Thread.sleep(50);
-		final long start = System.currentTimeMillis();
 		for (int i = 0; i < threads.length; i++) {
 			synchronized (threads[i]) {
 				threads[i].start();
 				threads[i].wait();
 			}
-			Thread.sleep(20);
 		}
 		for (int i = 0; i < threads.length; i++) {
 			threads[i].join();
 		}
-		final long end = System.currentTimeMillis();
-		System.out.println("time for " + sends + " send MT with con: " + (end - start));
-		assertEquals(sends, l.fifoReceived.size());
+		final int size = l.fifoReceived.size();
+		assertTrue(sends >= size, "sends = " + sends + ", received = " + size);
+
+		final List<IndividualAddress> fifoAddresses = new ArrayList<>();
+		synchronized (l.fifoReceived) {
+			for (final CEMI cemi : l.fifoReceived) {
+				if (cemi instanceof CEMILData) {
+					final CEMILData ldata = (CEMILData) cemi;
+					fifoAddresses.add(ldata.getSource());
+				}
+			}
+		}
 		for (int i = 0; i < sends; i++) {
-			assertEquals(new IndividualAddress(i + 1), ((CEMILData) l.fifoReceived.get(i)).getSource());
+			final IndividualAddress addr = new IndividualAddress(i + 1);
+			assertTrue(fifoAddresses.contains(addr), "no .con for " + addr);
 		}
 	}
 
@@ -348,9 +369,9 @@ class KNXnetIPTunnelTest
 				}
 				catch (final InterruptedException e) {}
 		}
-		assertNotNull(l.received);
-		final CEMILData fcon = (CEMILData) l.received;
-		assertEquals(positiveConfirmation, fcon.isPositiveConfirmation());
+		final CEMILData con = l.con.poll(1, TimeUnit.SECONDS);
+		assertNotNull(con);
+		assertEquals(positiveConfirmation, con.isPositiveConfirmation());
 		l.received = null;
 	}
 
@@ -360,9 +381,9 @@ class KNXnetIPTunnelTest
 	{
 		lnat.received = null;
 		tnat.send(f, m);
-		assertNotNull(lnat.received);
-		final CEMILData fcon = (CEMILData) lnat.received;
-		assertEquals(positiveConfirmation, fcon.isPositiveConfirmation());
+		final CEMILData con = lnat.con.poll(1, TimeUnit.SECONDS);
+		assertNotNull(con);
+		assertEquals(positiveConfirmation, con.isPositiveConfirmation());
 		lnat.received = null;
 	}
 
@@ -498,6 +519,13 @@ class KNXnetIPTunnelTest
 	}
 
 	@Test
+	void requestNonAvailableTunnelingAddress() {
+		final IndividualAddress requestAddress = new IndividualAddress(1, 1, 200);
+		assertThrows(KNXException.class,
+				() -> new KNXnetIPTunnel(LinkLayer, Util.localEndpoint(), Util.getServer(), false, requestAddress));
+	}
+
+	@Test
 	void requestUsedTunnelingAddress() throws KNXException, InterruptedException {
 		final IndividualAddress requestAddress = new IndividualAddress(1, 1, 25);
 		try (final KNXnetIPTunnel snatch = new KNXnetIPTunnel(LinkLayer, Util.localEndpoint(), Util.getServer(), false, requestAddress)) {
@@ -531,6 +559,21 @@ class KNXnetIPTunnelTest
 			assertEquals(ReturnCode.AccessReadOnly, response.status());
 	}
 
+	@Test
+	void tcpConnection() throws KNXException, InterruptedException {
+		newTcpTunnel();
+		assertEquals(KNXnetIPConnection.OK, t.getState());
+		assertEquals(Util.getServer(), t.getRemoteAddress());
+	}
+
+	@Test
+	void tcpSend() throws KNXException, InterruptedException {
+		newTcpTunnel();
+		doSend(frame, BlockingMode.WaitForCon, true);
+		doSend(frame, BlockingMode.WaitForCon, true);
+		doSend(frame, BlockingMode.WaitForCon, true);
+	}
+
 	private void newTunnel() throws KNXException, InterruptedException
 	{
 		t = new KNXnetIPTunnel(LinkLayer, Util.localEndpoint(), Util.getServer(), false);
@@ -541,6 +584,13 @@ class KNXnetIPTunnelTest
 	{
 		tnat = new KNXnetIPTunnel(LinkLayer, Util.localEndpoint(), Util.getServer(), true);
 		tnat.addConnectionListener(lnat);
+	}
+
+	private void newTcpTunnel() throws KNXException, InterruptedException {
+		connection = Connection.newTcpConnection(Util.localEndpoint(), Util.getServer());
+		t = new KNXnetIPTunnel(LinkLayer, connection, KNXMediumSettings.BackboneRouter);
+		System.out.println(t);
+		t.addConnectionListener(l);
 	}
 
 	private void newMonitor() throws KNXException, InterruptedException

@@ -43,6 +43,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -81,6 +84,7 @@ public class KNXnetIPDevMgmtTest
 	{
 		boolean closed;
 		CEMI received;
+		BlockingQueue<CEMIDevMgmt> propCon = new ArrayBlockingQueue<>(1);
 
 		@Override
 		public void frameReceived(final FrameEvent e)
@@ -89,6 +93,8 @@ public class KNXnetIPDevMgmtTest
 			assertEquals(m, e.getSource());
 			received = e.getFrame();
 			final CEMIDevMgmt f = (CEMIDevMgmt) received;
+			if (received.getMessageCode() == CEMIDevMgmt.MC_PROPREAD_CON)
+				propCon.add(f);
 			Debug.printMData(f);
 			if (f.getPID() == 52)
 				new IndividualAddress(f.getPayload());
@@ -143,9 +149,9 @@ public class KNXnetIPDevMgmtTest
 	{
 		l.received = null;
 		m.send(f, mode);
-		assertNotNull(l.received);
-		final CEMIDevMgmt fcon = (CEMIDevMgmt) l.received;
-		assertEquals(!positiveResponse, fcon.isNegativeResponse());
+		final CEMIDevMgmt con = l.propCon.poll(1, TimeUnit.SECONDS);
+		assertNotNull(con);
+		assertEquals(!positiveResponse, con.isNegativeResponse());
 		l.received = null;
 	}
 
@@ -200,6 +206,26 @@ public class KNXnetIPDevMgmtTest
 	private void newMgmt() throws KNXException, InterruptedException
 	{
 		m = new KNXnetIPDevMgmt(Util.localEndpoint(), Util.getServer(), false);
+		m.addConnectionListener(l);
+	}
+
+	@Test
+	void tcpConnection() throws KNXException, InterruptedException {
+		newTcpMgmt();
+		assertEquals(KNXnetIPConnection.OK, m.getState());
+		assertEquals(Util.getServer(), m.getRemoteAddress());
+	}
+
+	@Test
+	void tcpSend() throws KNXException, InterruptedException {
+		newTcpMgmt();
+		doSend(frame, con, true);
+		doSend(frame2, con, true);
+	}
+
+	private void newTcpMgmt() throws KNXException, InterruptedException {
+		final var connection = Connection.newTcpConnection(Util.localEndpoint(), Util.getServer());
+		m = new KNXnetIPDevMgmt(connection);
 		m.addConnectionListener(l);
 	}
 }
