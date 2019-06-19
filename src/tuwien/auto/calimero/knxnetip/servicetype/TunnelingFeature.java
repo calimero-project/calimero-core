@@ -235,7 +235,7 @@ public final class TunnelingFeature extends ServiceType {
 	@Override
 	public String toString() {
 		final String s = status == Success ? DataUnitBuilder.toHex(featureValue().orElse(new byte[0]), "") : status.friendly();
-		return String.format("%s (channel %d seq %d) %s %s", KNXnetIPHeader.getSvcName(svcType), channelId, seq, featureId.friendly(), s);
+		return String.format("%s (channel %d) %s %s", KNXnetIPHeader.getSvcName(svcType), channelId, featureId.friendly(), s);
 	}
 
 	@Override
