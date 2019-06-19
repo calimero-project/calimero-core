@@ -505,13 +505,7 @@ public final class Connection implements Closeable {
 			final byte[] serverPublicKey = new byte[keyLength];
 			buffer.get(serverPublicKey);
 
-			final byte[] sharedSecret;
-			try {
-				sharedSecret = SecureConnection.keyAgreement(privateKey, serverPublicKey);
-			}
-			catch (final GeneralSecurityException e) {
-				throw new KnxSecureException("key agreement failed", e);
-			}
+			final byte[] sharedSecret = SecureConnection.keyAgreement(privateKey, serverPublicKey);
 			final byte[] sessionKey = SecureConnection.sessionKey(sharedSecret);
 			synchronized (this) {
 				secretKey = SecureConnection.createSecretKey(sessionKey);

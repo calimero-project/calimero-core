@@ -40,10 +40,6 @@ import static tuwien.auto.calimero.DataUnitBuilder.toHex;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
-import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -65,10 +61,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.SecureRandom;
-import java.security.Security;
-import java.security.spec.AlgorithmParameterSpec;
+import java.security.interfaces.XECPublicKey;
 import java.security.spec.KeySpec;
+import java.security.spec.NamedParameterSpec;
+import java.security.spec.XECPublicKeySpec;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Optional;
@@ -88,8 +84,6 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.math.ec.rfc7748.X25519;
 import org.slf4j.LoggerFactory;
 
 import tuwien.auto.calimero.IndividualAddress;
@@ -124,12 +118,6 @@ public final class SecureConnection extends KNXnetIPRouting {
 	private static final int keyLength = 32; // [bytes]
 
 
-	static {
-		// still load BC for zero byte padding
-//		if (Runtime.version().version().get(0) < 11)
-			Security.addProvider(new BouncyCastleProvider());
-	}
-
 	private final byte[] sno;
 	private Key secretKey;
 	private int sessionId;
@@ -138,8 +126,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 	private SecureSession session;
 
-	private final byte[] privateKey = new byte[keyLength];
-	private PrivateKey privateKey11;
+	private PrivateKey privateKey;
 	private final byte[] publicKey = new byte[keyLength];
 
 	// timeout session.req -> session.res, and session.auth -> session.status
@@ -708,24 +695,16 @@ public final class SecureConnection extends KNXnetIPRouting {
 				+ serverCtrlEP.getPort());
 
 		logger.debug("setup secure session with {}", serverCtrlEP);
-		if (Runtime.version().version().get(0) < 11) {
-			generateKeyPair(privateKey, publicKey);
+		try {
+			final KeyPair keyPair = generateKeyPair();
+			privateKey = keyPair.getPrivate();
+			final BigInteger u = ((XECPublicKey) keyPair.getPublic()).getU();
+			final byte[] tmp = u.toByteArray();
+			reverse(tmp);
+			System.arraycopy(tmp, 0, publicKey, 0, tmp.length);
 		}
-		else {
-			try {
-				final KeyPair keyPair = generateKeyPair();
-				privateKey11 = keyPair.getPrivate();
-				// we're compiling for java 9
-//				final BigInteger u = ((XECPublicKey) public1).getU();
-				final MethodHandle bind = MethodHandles.lookup().bind(keyPair.getPublic(), "getU", MethodType.methodType(BigInteger.class));
-				final BigInteger u = (BigInteger) bind.invoke();
-				final byte[] tmp = u.toByteArray();
-				reverse(tmp);
-				System.arraycopy(tmp, 0, publicKey, 0, tmp.length);
-			}
-			catch (final Throwable e) {
-				throw new KnxSecureException("error creating secure key pair for " + serverCtrlEP, e);
-			}
+		catch (final Throwable e) {
+			throw new KnxSecureException("error creating secure key pair for " + serverCtrlEP, e);
 		}
 		try (DatagramSocket local = new DatagramSocket(localEP)) {
 			localSocket = local;
@@ -744,12 +723,10 @@ public final class SecureConnection extends KNXnetIPRouting {
 			throw new KNXException("I/O error establishing secure session with " + serverCtrlEP, e);
 		}
 		finally {
-			Arrays.fill(privateKey, (byte) 0);
 			Arrays.fill(publicKey, (byte) 0);
 			// key.destroy() is not implemented
 //			try {
-//				privateKey11.destroy();
-//				deviceAuthKey.destroy();
+//				privateKey.destroy();
 //			}
 //			catch (final DestroyFailedException e) {}
 		}
@@ -1025,18 +1002,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		final byte[] serverPublicKey = new byte[keyLength];
 		buffer.get(serverPublicKey);
 
-		final byte[] sharedSecret;
-		if (Runtime.version().version().get(0) < 11) {
-			sharedSecret = keyAgreement(serverPublicKey);
-		}
-		else {
-			try {
-				sharedSecret = keyAgreement(privateKey11, serverPublicKey);
-			}
-			catch (final GeneralSecurityException e) {
-				throw new KnxSecureException("key agreement", e);
-			}
-		}
+		final byte[] sharedSecret = keyAgreement(privateKey, serverPublicKey);
 		final byte[] sessionKey = sessionKey(sharedSecret);
 		secretKey = createSecretKey(sessionKey);
 
@@ -1216,44 +1182,12 @@ public final class SecureConnection extends KNXnetIPRouting {
 	}
 
 	private byte[] cbcMac(final byte[] data, final int offset, final int length, final byte[] secInfo) {
-		final byte[] log = Arrays.copyOfRange(data, offset, offset + length);
-		final byte[] hdr = Arrays.copyOfRange(data, offset, offset + 6);
-
-		final int packetOffset = hdr.length + 2 + 6 + 6 + 2;
-		byte[] session = new byte[0];
-		byte[] frame = new byte[0];
-		if (length > packetOffset) {
-			session = Arrays.copyOfRange(data, offset + 6, offset + 8);
-			frame = Arrays.copyOfRange(data, offset + packetOffset, offset + length);
-		}
-
-		try {
-			final Cipher cipher = Cipher.getInstance("AES/CBC/ZeroBytePadding");
-			final IvParameterSpec ivSpec = new IvParameterSpec(new byte[16]);
-			cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec);
-
-			cipher.update(secInfo);
-
-			final byte[] lenBuf = { 0, (byte) (hdr.length + session.length) };
-			cipher.update(lenBuf);
-			cipher.update(hdr);
-			cipher.update(session);
-
-			final byte[] result = cipher.doFinal(frame);
-			final int checkLength = 16 + 2 + 6 + 2 + frame.length;
-			final int extraPadding = checkLength > 32 && checkLength % 16 == 0 ? macSize : 0;
-			final byte[] mac = Arrays.copyOfRange(result, result.length - macSize - extraPadding, result.length - extraPadding);
-			return mac;
-		}
-		catch (final GeneralSecurityException e) {
-			throw new KnxSecureException("calculating CBC-MAC of " + toHex(log, " "), e);
-		}
+		return cbcMac(data, offset, length, secretKey, secInfo);
 	}
 
 	private static byte[] cbcMac(final byte[] data, final int offset, final int length, final Key secretKey,
 		final byte[] secInfo) {
 		final byte[] log = Arrays.copyOfRange(data, offset, offset + length);
-
 		final byte[] hdr = Arrays.copyOfRange(data, offset, offset + 6);
 
 		final int packetOffset = hdr.length + 2 + 6 + 6 + 2;
@@ -1265,7 +1199,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		}
 
 		try {
-			final Cipher cipher = Cipher.getInstance("AES/CBC/ZeroBytePadding");
+			final Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
 			final IvParameterSpec ivSpec = new IvParameterSpec(new byte[16]);
 			cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec);
 
@@ -1276,10 +1210,11 @@ public final class SecureConnection extends KNXnetIPRouting {
 			cipher.update(hdr);
 			cipher.update(session);
 
-			final byte[] result = cipher.doFinal(frame);
-			final int checkLength = 16 + 2 + 6 + 2 + frame.length;
-			final int extraPadding = checkLength > 32 && checkLength % 16 == 0 ? macSize : 0;
-			final byte[] mac = Arrays.copyOfRange(result, result.length - macSize - extraPadding, result.length - extraPadding);
+			final int checkLength = 16 + 2 + 6 + session.length + frame.length;
+			final byte[] padded = Arrays.copyOfRange(frame, 0, frame.length + 15 - (checkLength + 15) % 16);
+			final byte[] result = cipher.doFinal(padded);
+
+			final byte[] mac = Arrays.copyOfRange(result, result.length - macSize, result.length);
 			return mac;
 		}
 		catch (final GeneralSecurityException e) {
@@ -1288,20 +1223,21 @@ public final class SecureConnection extends KNXnetIPRouting {
 	}
 
 	private byte[] cbcMacSimple(final Key secretKey, final byte[] data, final int offset, final int length) {
-		final byte[] log = Arrays.copyOfRange(data, offset, offset + length);
-		logger.trace("authenticating (length {}): {}", length, toHex(log, " "));
+		final byte[] exact = Arrays.copyOfRange(data, offset, offset + length);
+		logger.trace("authenticating (length {}): {}", length, toHex(exact, " "));
 
 		try {
-			final Cipher cipher = Cipher.getInstance("AES/CBC/ZeroBytePadding");
+			final Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
 			final IvParameterSpec ivSpec = new IvParameterSpec(new byte[16]);
 			cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec);
 
-			final byte[] result = cipher.doFinal(data, offset, length);
+			final byte[] padded = Arrays.copyOfRange(exact, 0, (length + 15) / 16 * 16);
+			final byte[] result = cipher.doFinal(padded);
 			final byte[] mac = Arrays.copyOfRange(result, result.length - macSize, result.length);
 			return mac;
 		}
 		catch (final GeneralSecurityException e) {
-			throw new KnxSecureException("calculating CBC-MAC of " + toHex(log, " "), e);
+			throw new KnxSecureException("calculating CBC-MAC of " + toHex(exact, " "), e);
 		}
 	}
 
@@ -1327,45 +1263,25 @@ public final class SecureConnection extends KNXnetIPRouting {
 		return spec;
 	}
 
-	private static void generateKeyPair(final byte[] privateKey, final byte[] publicKey) {
-		new SecureRandom().nextBytes(privateKey);
-		X25519.scalarMultBase(privateKey, 0, publicKey, 0);
-	}
-
-	// use java SunEC provider
 	private static KeyPair generateKeyPair() throws NoSuchAlgorithmException {
 		final KeyPairGenerator gen = KeyPairGenerator.getInstance("X25519");
 		return gen.generateKeyPair();
 	}
 
-	private byte[] keyAgreement(final byte[] serverPublicKey) {
-		final byte[] sharedSecret = new byte[keyLength];
-		X25519.scalarMult(privateKey, 0, serverPublicKey, 0, sharedSecret, 0);
-		return sharedSecret;
-	}
-
-	// use java SunEC provider
-	// we're compiling for java 9, so reflectively access X25519 stuff
-	static byte[] keyAgreement(final PrivateKey privateKey, final byte[] spk) throws GeneralSecurityException {
-		final byte[] reversed = spk.clone();
-		reverse(reversed);
-//		final KeySpec spec = new XECPublicKeySpec(NamedParameterSpec.X25519, new BigInteger(1, reversed));
-		final KeySpec spec;
+	static byte[] keyAgreement(final PrivateKey privateKey, final byte[] spk) {
 		try {
-			final AlgorithmParameterSpec params = (AlgorithmParameterSpec) constructor("java.security.spec.NamedParameterSpec",
-					String.class).newInstance("X25519");
-			spec = (KeySpec) constructor("java.security.spec.XECPublicKeySpec", AlgorithmParameterSpec.class, BigInteger.class)
-					.newInstance(params, new BigInteger(1, reversed));
+			final byte[] reversed = spk.clone();
+			reverse(reversed);
+			final KeySpec spec = new XECPublicKeySpec(NamedParameterSpec.X25519, new BigInteger(1, reversed));
+			final PublicKey pubKey = KeyFactory.getInstance("X25519").generatePublic(spec);
+			final KeyAgreement ka = KeyAgreement.getInstance("X25519");
+			ka.init(privateKey);
+			ka.doPhase(pubKey, true);
+			return ka.generateSecret();
 		}
-		catch (IllegalArgumentException | ReflectiveOperationException e) {
-			throw new KnxSecureException("creating key spec for client public key", e);
+		catch (final GeneralSecurityException e) {
+			throw new KnxSecureException("key agreement failed", e);
 		}
-
-		final PublicKey pubKey = KeyFactory.getInstance("X25519").generatePublic(spec);
-		final KeyAgreement ka = KeyAgreement.getInstance("X25519");
-		ka.init(privateKey);
-		ka.doPhase(pubKey, true);
-		return ka.generateSecret();
 	}
 
 	static byte[] sessionKey(final byte[] sharedSecret) {
@@ -1401,12 +1317,5 @@ public final class SecureConnection extends KNXnetIPRouting {
 			array[i] = array[array.length - 1 - i];
 			array[array.length - 1 - i] = b;
 		}
-	}
-
-	private static Constructor<?> constructor(final String className, final Class<?>... parameterTypes)
-		throws ReflectiveOperationException {
-		final Class<?> clazz = Class.forName(className);
-		final Constructor<?> constructor = clazz.getConstructor(parameterTypes);
-		return constructor;
 	}
 }
