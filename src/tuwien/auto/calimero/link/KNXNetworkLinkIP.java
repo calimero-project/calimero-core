@@ -49,12 +49,15 @@ import java.time.Duration;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
+import tuwien.auto.calimero.IndividualAddress;
+import tuwien.auto.calimero.KNXAckTimeoutException;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
+import tuwien.auto.calimero.ReturnCode;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.knxnetip.Connection;
@@ -66,6 +69,9 @@ import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
 import tuwien.auto.calimero.knxnetip.SecureConnection;
+import tuwien.auto.calimero.knxnetip.TunnelingListener;
+import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature;
+import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature.InterfaceFeature;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 
 /**
@@ -108,6 +114,11 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	protected static final int TUNNELING = 1;
 
 	/**
+	 * Service mode for link layer tunneling v2.
+	 */
+	protected static final int TunnelingV2 = 3;
+
+	/**
 	 * Service mode for routing.
 	 */
 	protected static final int ROUTING = 2;
@@ -147,13 +158,13 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 		final boolean useNat, final byte[] deviceAuthCode, final int userId, final byte[] userKey, final KNXMediumSettings settings)
 		throws KNXException, InterruptedException {
 		final KNXnetIPConnection c = SecureConnection.newTunneling(LinkLayer, localEP, remoteEP, useNat, deviceAuthCode, userId, userKey);
-		return new KNXNetworkLinkIP(TUNNELING, c, settings);
+		return new KNXNetworkLinkIP(TunnelingV2, c, settings);
 	}
 
 	public static KNXNetworkLinkIP newSecureTunnelingLink(final SecureSession session, final KNXMediumSettings settings)
 			throws KNXException, InterruptedException {
 		final KNXnetIPConnection c = SecureConnection.newTunneling(LinkLayer, session, settings.getDeviceAddress());
-		return new KNXNetworkLinkIP(TUNNELING, c, settings);
+		return new KNXNetworkLinkIP(TunnelingV2, c, settings);
 	}
 
 	/**
@@ -171,7 +182,12 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	public static KNXNetworkLinkIP newRoutingLink(final NetworkInterface netIf, final InetAddress mcGroup,
 		final KNXMediumSettings settings) throws KNXException
 	{
-		return new KNXNetworkLinkIP(ROUTING, new KNXnetIPRouting(netIf, mcGroup), settings);
+		try {
+			return new KNXNetworkLinkIP(ROUTING, new KNXnetIPRouting(netIf, mcGroup), settings);
+		}
+		catch (final InterruptedException unreachable) {
+			throw new IllegalStateException();
+		}
 	}
 
 	/**
@@ -211,8 +227,13 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 */
 	public static KNXNetworkLinkIP newSecureRoutingLink(final NetworkInterface netif, final InetAddress mcGroup, final byte[] groupKey,
 		final Duration latencyTolerance, final KNXMediumSettings settings) throws KNXException {
-		return new KNXNetworkLinkIP(ROUTING, SecureConnection.newRouting(netif, mcGroup, groupKey, latencyTolerance),
-				settings);
+		try {
+			return new KNXNetworkLinkIP(ROUTING, SecureConnection.newRouting(netif, mcGroup, groupKey, latencyTolerance),
+					settings);
+		}
+		catch (final InterruptedException unreachable) {
+			throw new IllegalStateException();
+		}
 	}
 
 	/**
@@ -249,18 +270,65 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	/**
 	 * Creates a new network link with <code>serviceMode</code> based on the supplied KNXnet/IP connection.
 	 *
-	 * @param serviceMode mode of communication, one of the service mode constants {@link #TUNNELING} or
-	 *        {@link #ROUTING}
+	 * @param serviceMode mode of communication, one of the service mode constants {@link #TUNNELING},
+	 *        {@link #TunnelingV2}, or {@link #ROUTING}
 	 * @param c a KNXnet/IP tunneling or routing connection in open state
 	 * @param settings medium settings defining device and medium specifics needed for communication
+	 * @throws InterruptedException
+	 * @throws KNXConnectionClosedException
+	 * @throws KNXAckTimeoutException
 	 */
 	protected KNXNetworkLinkIP(final int serviceMode, final KNXnetIPConnection c, final KNXMediumSettings settings)
-	{
+		throws KNXAckTimeoutException, KNXConnectionClosedException, InterruptedException {
 		super(c, createLinkName(c.getRemoteAddress()), settings);
 		cEMI = true;
 
 		mode = serviceMode;
 		conn.addConnectionListener(notifier);
+		if (c instanceof KNXnetIPTunnel && mode == TunnelingV2) {
+			final var tunnel = (KNXnetIPTunnel) c;
+			tunnel.addConnectionListener(new TunnelingListener() {
+				@Override
+				public void featureResponse(final TunnelingFeature feature) {
+					if (valid(feature)) {
+						if (feature.featureId() == InterfaceFeature.MaxApduLength)
+							getKNXMedium().setMaxApduLength(unsigned(feature.featureValue().get()));
+					}
+				}
+
+				@Override
+				public void featureInfo(final TunnelingFeature feature) {
+					if (!valid(feature))
+						return;
+					if (feature.featureId() == InterfaceFeature.ConnectionStatus) {
+						final var connected = feature.featureValue().get()[0] == 1;
+						if (connected)
+							logger.info("subnet connected");
+						else
+							logger.warn("no connection to subnet");
+					}
+					if (feature.featureId() == InterfaceFeature.IndividualAddress)
+						getKNXMedium().setDeviceAddress(new IndividualAddress(feature.featureValue().get()));
+				}
+
+				private boolean valid(final TunnelingFeature feature) {
+					final boolean valid = feature.status() == ReturnCode.Success;
+					if (!valid)
+						logger.warn("received {}", feature);
+					return valid;
+				}
+
+				@Override
+				public void frameReceived(final FrameEvent e) {}
+
+				@Override
+				public void connectionClosed(final CloseEvent e) {}
+			});
+			tunnel.send(InterfaceFeature.EnableFeatureInfoService, (byte) 1);
+			tunnel.send(InterfaceFeature.IndividualAddress);
+			tunnel.send(InterfaceFeature.MaxApduLength);
+			tunnel.send(InterfaceFeature.DeviceDescriptorType0);
+		}
 	}
 
 	/**
@@ -271,7 +339,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	public void sendRequest(final KNXAddress dst, final Priority p, final byte[] nsdu)
 		throws KNXLinkClosedException, KNXTimeoutException
 	{
-		final int mc = mode == TUNNELING ? CEMILData.MC_LDATA_REQ : CEMILData.MC_LDATA_IND;
+		final int mc = mode == ROUTING ? CEMILData.MC_LDATA_IND : CEMILData.MC_LDATA_REQ;
 		send(mc, dst, p, nsdu, false);
 	}
 
@@ -283,14 +351,14 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	public void sendRequestWait(final KNXAddress dst, final Priority p, final byte[] nsdu)
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
-		final int mc = mode == TUNNELING ? CEMILData.MC_LDATA_REQ : CEMILData.MC_LDATA_IND;
+		final int mc = mode == ROUTING ? CEMILData.MC_LDATA_IND : CEMILData.MC_LDATA_REQ;
 		send(mc, dst, p, nsdu, true);
 	}
 
 	@Override
 	public String toString()
 	{
-		return (mode == TUNNELING ? "tunneling " : "routing ") + super.toString();
+		return (mode == ROUTING ? "routing " : "tunneling ") + super.toString();
 	}
 
 	@Override
@@ -350,6 +418,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	{
 		switch (serviceMode) {
 		case TUNNELING:
+		case TunnelingV2:
 			final InetSocketAddress local = localEP == null ? new InetSocketAddress(0) : localEP;
 			return new KNXnetIPTunnel(LinkLayer, local, remoteEP, useNAT);
 		case ROUTING:

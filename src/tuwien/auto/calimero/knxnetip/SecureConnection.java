@@ -197,7 +197,34 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 	public static KNXnetIPConnection newTunneling(final TunnelingLayer knxLayer, final SecureSession session,
 			final IndividualAddress tunnelingAddress) throws KNXException, InterruptedException {
-		return new SecureConnection(knxLayer, session, tunnelingAddress);
+
+		session.ensureOpen();
+		final var tunnel = new KNXnetIPTunnel(knxLayer, session.connection(), tunnelingAddress) {
+			@Override
+			public String getName() {
+				final String lock = new String(Character.toChars(0x1F512));
+				return "KNX IP " + lock + " Tunneling " + Connection.addressPort(ctrlEndpt);
+			}
+
+			@Override
+			protected void connect(final Connection c, final CRI cri) throws KNXException, InterruptedException {
+				session.registerConnectRequest(this);
+				try {
+					super.connect(c.localEndpoint(), c.server(), cri, false);
+				}
+				finally {
+					session.unregisterConnectRequest(this);
+				}
+			}
+
+			@Override
+			protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
+				final byte[] wrapped = newSecurePacket(session.id(), session.nextSendSeq(), session.serialNumber(), 0,
+						packet, session.secretKey);
+				super.send(wrapped, dst);
+			}
+		};
+		return tunnel;
 	}
 
 	/**
@@ -363,48 +390,6 @@ public final class SecureConnection extends KNXnetIPRouting {
 				else
 					logger.warn("received unsupported secure service type 0x{} - ignore", Integer.toHexString(svc));
 				return true;
-			}
-
-			@Override
-			protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
-				final byte[] wrapped = newSecurePacket(session.nextSendSeq(), 0, packet);
-				super.send(wrapped, dst);
-			}
-		};
-
-		// unused
-		mcastLatencyTolerance = 0;
-		syncLatencyTolerance = 0;
-	}
-
-	private SecureConnection(final TunnelingLayer knxLayer, final SecureSession session,
-		final IndividualAddress tunnelingAddress) throws KNXException, InterruptedException {
-		super(null);
-
-		this.session = session;
-		sno = session.serialNumber();
-		session.ensureOpen();
-		secretKey = session.secretKey;
-		sessionId = session.id();
-
-		logger = LoggerFactory.getLogger("unused");
-
-		tunnel = new KNXnetIPTunnel(knxLayer, session.connection(), tunnelingAddress) {
-			@Override
-			public String getName() {
-				final String lock = new String(Character.toChars(0x1F512));
-				return "KNX IP " + lock + " Tunneling " + Connection.addressPort(ctrlEndpt);
-			}
-
-			@Override
-			protected void connect(final Connection c, final CRI cri) throws KNXException, InterruptedException {
-				session.registerConnectRequest(this);
-				try {
-					super.connect(c.localEndpoint(), c.server(), cri, false);
-				}
-				finally {
-					session.unregisterConnectRequest(this);
-				}
 			}
 
 			@Override
@@ -595,6 +580,8 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 	@Override
 	public String getName() {
+		if (tunnel != null)
+			return tunnel.getName();
 		final String lock = new String(Character.toChars(0x1F512));
 		return "KNX/IP " + lock + " Routing " + ctrlEndpt.getAddress().getHostAddress();
 	}

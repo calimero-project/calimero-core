@@ -720,7 +720,7 @@ public final class Connection implements Closeable {
 							offset = 0;
 						}
 					}
-					catch (final KNXFormatException e) {
+					catch (KNXFormatException | KnxSecureException e) {
 						logger.warn("received invalid frame", e);
 						offset = 0;
 					}
@@ -780,8 +780,14 @@ public final class Connection implements Closeable {
 	private static int channelId(final KNXnetIPHeader header, final byte[] data, final int offset) {
 		// communication channel ID in the connection header of a tunneling/config request has a different offset
 		// than in connection management services
-		final var channelIdOffset = header.getServiceType() == KNXnetIPHeader.TUNNELING_REQ ||
-				header.getServiceType() == KNXnetIPHeader.DEVICE_CONFIGURATION_REQ ? offset + 1 : offset;
+		int channelIdOffset = offset;
+		switch (header.getServiceType()) {
+		case KNXnetIPHeader.TUNNELING_REQ:
+		case KNXnetIPHeader.DEVICE_CONFIGURATION_REQ:
+		case KNXnetIPHeader.TunnelingFeatureResponse:
+		case KNXnetIPHeader.TunnelingFeatureInfo:
+			channelIdOffset = offset + 1;
+		}
 		final var channelId = data[channelIdOffset] & 0xff;
 		return channelId;
 	}

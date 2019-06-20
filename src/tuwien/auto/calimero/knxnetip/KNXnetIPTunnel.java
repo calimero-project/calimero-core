@@ -213,7 +213,7 @@ public class KNXnetIPTunnel extends ClientConnection
 
 	// sends a tunneling feature-get service
 	// sendFeature / getFeature?
-	void send(final InterfaceFeature feature) throws KNXConnectionClosedException, KNXAckTimeoutException, InterruptedException {
+	public void send(final InterfaceFeature feature) throws KNXConnectionClosedException, KNXAckTimeoutException, InterruptedException {
 		synchronized (lock) {
 			final TunnelingFeature get = TunnelingFeature.newGet(channelId, getSeqSend(), feature);
 			send(get);
@@ -222,7 +222,7 @@ public class KNXnetIPTunnel extends ClientConnection
 
 	// sends a tunneling feature-set service
 	// sendFeature / setFeature?
-	void send(final InterfaceFeature feature, final byte... featureValue)
+	public void send(final InterfaceFeature feature, final byte... featureValue)
 		throws KNXConnectionClosedException, KNXAckTimeoutException, InterruptedException {
 		synchronized (lock) {
 			final TunnelingFeature set = TunnelingFeature.newSet(channelId, getSeqSend(), feature, featureValue);
@@ -250,6 +250,11 @@ public class KNXnetIPTunnel extends ClientConnection
 				updateState = false;
 
 				send(buf, dataEndpt);
+				// skip ack transition if we're using a tcp socket
+				if (socket == null) {
+					internalState = ClientConnection.CEMI_CON_PENDING;
+					break;
+				}
 				internalState = ACK_PENDING;
 				// always forward this state to user
 				state = ACK_PENDING;
@@ -341,7 +346,6 @@ public class KNXnetIPTunnel extends ClientConnection
 
 			incSeqRcv();
 		}
-
 
 		if (svc >= KNXnetIPHeader.TunnelingFeatureGet && svc <= KNXnetIPHeader.TunnelingFeatureInfo) {
 			final ByteBuffer buffer = ByteBuffer.wrap(data, offset, h.getTotalLength() - h.getStructLength());
