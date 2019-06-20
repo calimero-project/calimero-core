@@ -177,7 +177,9 @@ public class KNXnetIPTunnel extends ClientConnection
 		layer = Objects.requireNonNull(knxLayer, "Tunneling Layer");
 		if (knxLayer == RawLayer)
 			throw new KNXIllegalArgumentException("Raw tunnel to KNX network not supported");
-		connect(localEP, serverCtrlEP, new TunnelCRI(knxLayer, tunnelingAddress), useNAT);
+		final var cri = tunnelingAddress.equals(KNXMediumSettings.BackboneRouter) ? new TunnelCRI(knxLayer)
+				: new TunnelCRI(knxLayer, tunnelingAddress);
+		connect(localEP, serverCtrlEP, cri, useNAT);
 	}
 
 	protected KNXnetIPTunnel(final TunnelingLayer knxLayer, final Connection connection,
