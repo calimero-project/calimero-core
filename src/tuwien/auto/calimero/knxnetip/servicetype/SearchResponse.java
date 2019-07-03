@@ -186,6 +186,8 @@ public class SearchResponse extends ServiceType
 	@Override
 	public String toString()
 	{
+		if (endpt.getHostProtocol() == HPAI.IPV4_TCP)
+			return desc.toString();
 		return endpt + " " + desc;
 	}
 
