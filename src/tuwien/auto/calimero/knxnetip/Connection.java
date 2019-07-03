@@ -457,8 +457,11 @@ public final class Connection implements Closeable {
 				send(newStatusInfo(sessionId, nextSendSeq(), KeepAlive));
 			}
 			catch (final IOException e) {
-				if (sessionState == SessionState.Authenticated && !socket.isClosed())
+				if (sessionState == SessionState.Authenticated && !socket.isClosed()) {
 					logger.warn("error sending keep-alive: {}", e.getMessage());
+					close();
+					Connection.this.close();
+				}
 			}
 		}
 
