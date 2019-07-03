@@ -109,6 +109,10 @@ public class HPAI
 		int p = (data[i++] & 0xFF) << 8;
 		p |= data[i] & 0xFF;
 		port = p;
+
+		if (hostprot == IPV4_TCP && (port != 0 || !Arrays.equals(address, new byte[4])))
+			throw new KNXFormatException("HPAI for TCP does not contain route back endpoint",
+					getAddress().getHostAddress() + ":" + port);
 	}
 
 	/**
