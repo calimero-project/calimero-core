@@ -73,13 +73,13 @@ class ConnectionTest {
 
 	@Test
 	void multipleSessions() throws KNXException, InterruptedException {
-		try (var session1 = conn.new SecureSession(1, userKey1, deviceAuthCode.clone())) {
+		try (var session1 = conn.newSecureSession(1, userKey1, deviceAuthCode.clone())) {
 			session1.ensureOpen();
 			assertEquals(1, conn.sessions.size());
-			try (var session2 = conn.new SecureSession(2, userKey2, deviceAuthCode.clone())) {
+			try (var session2 = conn.newSecureSession(2, userKey2, deviceAuthCode.clone())) {
 				session2.ensureOpen();
 				assertEquals(2, conn.sessions.size());
-				try (var session3 = conn.new SecureSession(3, userKey3, deviceAuthCode.clone())) {
+				try (var session3 = conn.newSecureSession(3, userKey3, deviceAuthCode.clone())) {
 					session3.ensureOpen();
 					assertEquals(3, conn.sessions.size());
 				}
@@ -90,7 +90,7 @@ class ConnectionTest {
 
 	@Test
 	void singleSecureConnection() throws KNXException, InterruptedException {
-		try (var session1 = conn.new SecureSession(1, userKey1, deviceAuthCode.clone())) {
+		try (var session1 = conn.newSecureSession(1, userKey1, deviceAuthCode.clone())) {
 			try (var tunnel = SecureConnection.newTunneling(TunnelingLayer.LinkLayer, session1,
 					KNXMediumSettings.BackboneRouter)) {
 
@@ -102,7 +102,7 @@ class ConnectionTest {
 
 	@Test
 	void multipleSecureConnections() throws KNXException, InterruptedException {
-		try (var session1 = conn.new SecureSession(1, userKey1, deviceAuthCode.clone())) {
+		try (var session1 = conn.newSecureSession(1, userKey1, deviceAuthCode.clone())) {
 			for (int i = 0; i < 8; i++)
 				SecureConnection.newTunneling(TunnelingLayer.LinkLayer, session1, KNXMediumSettings.BackboneRouter);
 
@@ -114,12 +114,12 @@ class ConnectionTest {
 
 	@Test
 	void multipleSessionsMultipleConnections() throws KNXException, InterruptedException {
-		try (var session1 = conn.new SecureSession(1, userKey1, deviceAuthCode.clone())) {
+		try (var session1 = conn.newSecureSession(1, userKey1, deviceAuthCode.clone())) {
 			// doing a basic connect request here might take away the tunneling address of user 2
 			SecureConnection.newTunneling(TunnelingLayer.LinkLayer, session1, KNXMediumSettings.BackboneRouter);
-			try (var session2 = conn.new SecureSession(2, userKey2, deviceAuthCode.clone())) {
+			try (var session2 = conn.newSecureSession(2, userKey2, deviceAuthCode.clone())) {
 				SecureConnection.newTunneling(TunnelingLayer.LinkLayer, session2, KNXMediumSettings.BackboneRouter);
-				try (var session3 = conn.new SecureSession(3, userKey3, deviceAuthCode.clone())) {
+				try (var session3 = conn.newSecureSession(3, userKey3, deviceAuthCode.clone())) {
 					SecureConnection.newTunneling(TunnelingLayer.LinkLayer, session3, KNXMediumSettings.BackboneRouter);
 
 					assertEquals(3, conn.sessions.size());
@@ -135,7 +135,7 @@ class ConnectionTest {
 	@Slow
 	void manySecureSessions() {
 		for (int i = 0; i < 5000; ++i) {
-			final SecureSession session = conn.new SecureSession(1, userKey1.clone(), deviceAuthCode.clone());
+			final SecureSession session = conn.newSecureSession(1, userKey1.clone(), deviceAuthCode.clone());
 			try {
 				session.ensureOpen();
 			}
@@ -154,14 +154,14 @@ class ConnectionTest {
 	@Slow
 	@SuppressWarnings("resource")
 	void manyAlternateSecureSessions() {
-		SecureSession old = conn.new SecureSession(2, userKey2.clone(), deviceAuthCode.clone());
+		SecureSession old = conn.newSecureSession(2, userKey2.clone(), deviceAuthCode.clone());
 		boolean user1 = true;
 		for (int i = 0; i < 5000; ++i) {
 			final SecureSession session;
 			if (user1)
-				session = conn.new SecureSession(1, userKey1.clone(), deviceAuthCode.clone());
+				session = conn.newSecureSession(1, userKey1.clone(), deviceAuthCode.clone());
 			else
-				session = conn.new SecureSession(2, userKey2.clone(), deviceAuthCode.clone());
+				session = conn.newSecureSession(2, userKey2.clone(), deviceAuthCode.clone());
 
 			user1 = !user1;
 			try {

@@ -218,7 +218,7 @@ public final class Connection implements Closeable {
 		private final Logger logger;
 
 
-		public SecureSession(final int user, final byte[] userKey, final byte[] deviceAuthCode) {
+		private SecureSession(final int user, final byte[] userKey, final byte[] deviceAuthCode) {
 			this.user = user;
 
 			final byte[] key = userKey.length == 0 ? emptyUserPwdHash.clone() : userKey;
@@ -628,6 +628,10 @@ public final class Connection implements Closeable {
 		catch (final IOException e) {
 			throw new KNXException("binding to local address " + bind, e);
 		}
+	}
+
+	public SecureSession newSecureSession(final int user, final byte[] userKey, final byte[] deviceAuthCode) {
+		return new SecureSession(user, userKey, deviceAuthCode);
 	}
 
 	public InetSocketAddress localEndpoint() { return (InetSocketAddress) socket.getLocalSocketAddress(); }

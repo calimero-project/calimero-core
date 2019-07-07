@@ -348,7 +348,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 			}
 		}
 
-		session = Connection.Udp.new SecureSession(userId, userKey, deviceAuthCode);
+		session = Connection.Udp.newSecureSession(userId, userKey, deviceAuthCode);
 
 		sno = session.serialNumber();
 		setupSecureSession(local, serverCtrlEP);
@@ -422,7 +422,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 			}
 		}
 
-		session = Connection.Udp.new SecureSession(1, userKey, deviceAuthCode);
+		session = Connection.Udp.newSecureSession(1, userKey, deviceAuthCode);
 		sno = session.serialNumber();
 		setupSecureSession(local, serverCtrlEP);
 
