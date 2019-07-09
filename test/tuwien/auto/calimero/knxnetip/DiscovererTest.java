@@ -237,7 +237,7 @@ class DiscovererTest
 	{
 		d.startSearch(40000, Util.localInterface(), timeout, true);
 		final List<Result<SearchResponse>> search = d.getSearchResponses();
-		assertTrue(search.size() > 0);
+		assertTrue(search.size() > 0, "search results > 0");
 		for (final Iterator<Result<SearchResponse>> i = search.iterator(); i.hasNext();) {
 			final Result<SearchResponse> result = i.next();
 			final SearchResponse response = result.getResponse();
@@ -320,7 +320,8 @@ class DiscovererTest
 		Thread.sleep(10);
 		ddef.stopSearch();
 		final int responses = ddef.getSearchResponses().size();
-		assertFalse(ddef.isSearching());
+		Thread.sleep(100);
+		assertFalse(ddef.isSearching(), "is searching");
 		Thread.sleep(timeout * 1000);
 		assertFalse(ddef.isSearching());
 		assertEquals(responses, ddef.getSearchResponses().size());
@@ -437,7 +438,8 @@ class DiscovererTest
 	}
 
 	// checks that all used receiver threads are idle
-	private static void allReceiverThreadsIdle() {
+	private static void allReceiverThreadsIdle() throws InterruptedException {
+		Thread.sleep(100);
 		final Thread[] threads = new Thread[Thread.activeCount() + 5];
 		assertTrue(Thread.enumerate(threads) < threads.length);
 		final List<Thread> l = Arrays.asList(threads);
