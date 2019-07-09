@@ -638,7 +638,12 @@ public final class Connection implements Closeable {
 
 	public InetSocketAddress server() { return server; }
 
-	public boolean isConnected() { return socket.isConnected(); }
+	public boolean isConnected() {
+		final var connected = socket.isConnected();
+		if (socket.isClosed())
+			return false;
+		return connected;
+	}
 
 	@Override
 	public void close() {
@@ -744,6 +749,8 @@ public final class Connection implements Closeable {
 		}
 		catch (IOException | RuntimeException e) {
 			logger.error("receiver communication failure", e);
+		}
+		finally {
 			close();
 		}
 	}
