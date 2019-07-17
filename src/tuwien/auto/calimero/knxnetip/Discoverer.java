@@ -179,14 +179,14 @@ public class Discoverer
 	{
 		private final T response;
 		private final NetworkInterface ni;
-		private final InetAddress addr;
+		private final InetSocketAddress local;
 		private final InetSocketAddress remote;
 
-		Result(final T r, final NetworkInterface outgoing, final InetAddress bind, final InetSocketAddress remote)
+		Result(final T r, final NetworkInterface outgoing, final InetSocketAddress local, final InetSocketAddress remote)
 		{
 			response = r;
 			ni = outgoing;
-			addr = bind;
+			this.local = local;
 			this.remote = remote;
 		}
 
@@ -211,8 +211,13 @@ public class Discoverer
 		 */
 		public InetAddress getAddress()
 		{
-			return addr;
+			return local.getAddress();
 		}
+
+		/**
+		 * @return local endpoint used for the discovery or description request
+		 */
+		public InetSocketAddress localEndpoint() { return local; }
 
 		/**
 		 * @return address of the remote endpoint which sent the response
@@ -223,7 +228,7 @@ public class Discoverer
 
 		@Override
 		public String toString() {
-			return addr.getHostAddress() + " (" + ni.getName() + ") <- " + response;
+			return local + " (" + ni.getName() + ") <- " + response;
 		}
 
 		@Override
@@ -608,6 +613,7 @@ public class Discoverer
 		if (timeout <= 0 || timeout >= Integer.MAX_VALUE / 1000)
 			throw new KNXIllegalArgumentException("timeout out of range");
 		final DatagramSocket s = createSocket(true, host(server.getAddress()), port, null, false);
+		final var local = (InetSocketAddress) s.getLocalSocketAddress();
 		try {
 			final byte[] buf = PacketHelper.toPacket(new DescriptionRequest(nat ? null
 					: (InetSocketAddress) s.getLocalSocketAddress()));
@@ -617,8 +623,8 @@ public class Discoverer
 			if (looper.thrown != null)
 				throw looper.thrown;
 			if (looper.res != null)
-				return new Result<>(looper.res, NetworkInterface.getByInetAddress(host(server.getAddress())), host(server.getAddress()),
-						server);
+				return new Result<>(looper.res, NetworkInterface.getByInetAddress(host(server.getAddress())),
+						local, server);
 		}
 		catch (final IOException e) {
 			final String msg = "network failure on getting description from " + server;
@@ -790,10 +796,9 @@ public class Discoverer
 		final InetSocketAddress serverCtrlEndpoint, final Duration timeout) throws SocketException {
 
 		final NetworkInterface nif = socket.getNetworkInterface();
-		final InetAddress addr = socket.getLocalAddress();
 		final ReceiverLoop looper = new ReceiverLoop(socket, 512, 0, serverCtrlEndpoint);
 		final CompletableFuture<Result<SearchResponse>> cf = CompletableFuture.runAsync(looper, executor)
-				.thenApply(__ -> new Result<>(looper.sr, nif, addr, serverCtrlEndpoint))
+				.thenApply(__ -> new Result<>(looper.sr, nif, (InetSocketAddress) socket.getLocalSocketAddress(), serverCtrlEndpoint))
 				.orTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS);
 		cf.exceptionally(t -> {
 			looper.quit();
@@ -901,8 +906,9 @@ public class Discoverer
 					// if our search is still running, add response if not already added
 					synchronized (receivers) {
 						if (receivers.contains(this)) {
-							final Result<SearchResponse> r = new Result<>(SearchResponse.from(h, data, offset + h.getStructLength()), nif,
-									addrOnNetif, source);
+							final var response = SearchResponse.from(h, data, offset + h.getStructLength());
+							final Result<SearchResponse> r = new Result<>(response, nif,
+									new InetSocketAddress(addrOnNetif, 0), source);
 							if (!responses.contains(r))
 								responses.add(r);
 						}

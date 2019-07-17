@@ -38,6 +38,7 @@ package tuwien.auto.calimero.knxnetip;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -157,6 +158,8 @@ class DiscovererTest
 		final InetSocketAddress server = Util.getServer();
 		final Result<DescriptionResponse> r = d.getDescription(server, timeout);
 		assertNotNull(r);
+		assertNotNull(r.localEndpoint());
+		assertNotEquals(0, r.localEndpoint().getPort());
 	}
 
 	@Test
@@ -195,6 +198,8 @@ class DiscovererTest
 			final Result<SearchResponse> result = i.next();
 			final SearchResponse response = result.getResponse();
 			assertNotNull(response);
+			assertNotNull(result.localEndpoint().getAddress());
+			assertEquals(0, result.localEndpoint().getPort());
 		}
 	}
 
@@ -317,10 +322,10 @@ class DiscovererTest
 		ddef.startSearch(timeout, false);
 		ddef.startSearch(timeout, false);
 		ddef.startSearch(timeout, false);
-		Thread.sleep(10);
+		Thread.sleep(100);
 		ddef.stopSearch();
 		final int responses = ddef.getSearchResponses().size();
-		Thread.sleep(100);
+		Thread.sleep(500);
 		assertFalse(ddef.isSearching(), "is searching");
 		Thread.sleep(timeout * 1000);
 		assertFalse(ddef.isSearching());
