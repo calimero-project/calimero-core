@@ -610,8 +610,14 @@ public final class SecureConnection extends KNXnetIPRouting {
 			}
 		}
 		else if (svc == SecureGroupSync) {
-			final Object[] fields = newGroupSync(h, data, offset);
-			onGroupSync(src, (long) fields[0], true, (byte[]) fields[1], (int) fields[2]);
+			try {
+				final Object[] fields = newGroupSync(h, data, offset);
+				onGroupSync(src, (long) fields[0], true, (byte[]) fields[1], (int) fields[2]);
+			}
+			catch (final KnxSecureException e) {
+				logger.debug("group sync {}", e.getMessage());
+				return true;
+			}
 		}
 		else if (svc == SecureSvc) {
 			final Object[] fields = unwrap(h, data, offset);
