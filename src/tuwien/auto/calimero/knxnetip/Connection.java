@@ -37,6 +37,7 @@
 package tuwien.auto.calimero.knxnetip;
 
 import static tuwien.auto.calimero.DataUnitBuilder.toHex;
+import static tuwien.auto.calimero.knxnetip.SecureConnection.secureSymbol;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -163,8 +164,6 @@ public final class Connection implements Closeable {
 		return new byte[6];
 	}
 
-	private static final String lock = new String(Character.toChars(0x1F512));
-
 	private enum SessionState { Idle, Unauthenticated, Authenticated }
 
 	public final class SecureSession implements AutoCloseable {
@@ -229,7 +228,7 @@ public final class Connection implements Closeable {
 
 			sno = deriveSerialNumber((InetSocketAddress) socket.getLocalSocketAddress());
 
-			logger = LoggerFactory.getLogger("calimero.knxnetip." + lock + " Session " + addressPort(server));
+			logger = LoggerFactory.getLogger("calimero.knxnetip." + secureSymbol + " Session " + addressPort(server));
 		}
 
 		public int id() { return sessionId; }
@@ -265,7 +264,7 @@ public final class Connection implements Closeable {
 
 		@Override
 		public String toString() {
-			return lock + " session " + sessionId + " (user " + user + "): " + sessionState;
+			return secureSymbol + " session " + sessionId + " (user " + user + "): " + sessionState;
 		}
 
 		SecretKey deviceAuthKey() { return deviceAuthKey; }

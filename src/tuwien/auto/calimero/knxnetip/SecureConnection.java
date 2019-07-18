@@ -117,6 +117,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 	private static final int macSize = 16; // [bytes]
 	private static final int keyLength = 32; // [bytes]
 
+	static final String secureSymbol = new String(Character.toChars(0x1F512));
 
 	private final byte[] sno;
 	private Key secretKey;
@@ -202,8 +203,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		final var tunnel = new KNXnetIPTunnel(knxLayer, session.connection(), tunnelingAddress) {
 			@Override
 			public String getName() {
-				final String lock = new String(Character.toChars(0x1F512));
-				return "KNX IP " + lock + " Tunneling " + Connection.addressPort(ctrlEndpt);
+				return "KNX IP " + secureSymbol + " Tunneling " + Connection.addressPort(ctrlEndpt);
 			}
 
 			@Override
@@ -253,7 +253,34 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 	public static KNXnetIPConnection newDeviceManagement(final SecureSession session)
 			throws KNXException, InterruptedException {
-		return new SecureConnection(session);
+
+		session.ensureOpen();
+		final var tunnel = new KNXnetIPDevMgmt(session.connection()) {
+			@Override
+			public String getName() {
+				return "KNX IP " + secureSymbol + " Management " + Connection.addressPort(ctrlEndpt);
+			}
+
+			@Override
+			protected void connect(final Connection c, final CRI cri) throws KNXException, InterruptedException {
+				session.registerConnectRequest(this);
+				try {
+					super.connect(c.localEndpoint(), c.server(), cri, false);
+				}
+				finally {
+					session.unregisterConnectRequest(this);
+				}
+			}
+
+			@Override
+			protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
+				final byte[] wrapped = newSecurePacket(session.id(), session.nextSendSeq(), session.serialNumber(), 0,
+						packet, session.secretKey);
+				super.send(wrapped, dst);
+			}
+		};
+
+		return tunnel;
 	}
 
 	/**
@@ -356,8 +383,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		tunnel = new KNXnetIPTunnel(knxLayer, localEP, serverCtrlEP, useNat, tunnelingAddress) {
 			@Override
 			public String getName() {
-				final String lock = new String(Character.toChars(0x1F512));
-				return "KNX/IP " + lock + " Tunneling " + ctrlEndpt.getAddress().getHostAddress() + ":" + ctrlEndpt.getPort();
+				return "KNX/IP " + secureSymbol + " Tunneling " + ctrlEndpt.getAddress().getHostAddress() + ":" + ctrlEndpt.getPort();
 			}
 
 			@Override
@@ -429,8 +455,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		tunnel = new KNXnetIPDevMgmt(localEP, serverCtrlEP, useNat) {
 			@Override
 			public String getName() {
-				final String lock = new String(Character.toChars(0x1F512));
-				return "KNX/IP " + lock + " Management " + ctrlEndpt.getAddress().getHostAddress() + ":" + ctrlEndpt.getPort();
+				return "KNX/IP " + secureSymbol + " Management " + ctrlEndpt.getAddress().getHostAddress() + ":" + ctrlEndpt.getPort();
 			}
 
 			@Override
@@ -469,49 +494,6 @@ public final class SecureConnection extends KNXnetIPRouting {
 				else
 					logger.warn("received unsupported secure service type 0x{} - ignore", Integer.toHexString(svc));
 				return true;
-			}
-		};
-
-		// unused
-		mcastLatencyTolerance = 0;
-		syncLatencyTolerance = 0;
-	}
-
-	private SecureConnection(final SecureSession session)
-		throws KNXException, InterruptedException {
-		super(null);
-
-		logger = LoggerFactory.getLogger("unused");
-
-		this.session = session;
-		sno = session.serialNumber();
-		session.ensureOpen();
-
-		secretKey = session.secretKey;
-		sessionId = session.id();
-
-		tunnel = new KNXnetIPDevMgmt(session.connection()) {
-			@Override
-			public String getName() {
-				final String lock = new String(Character.toChars(0x1F512));
-				return "KNX IP " + lock + " Management " + Connection.addressPort(ctrlEndpt);
-			}
-
-			@Override
-			protected void connect(final Connection c, final CRI cri) throws KNXException, InterruptedException {
-				session.registerConnectRequest(this);
-				try {
-					super.connect(c.localEndpoint(), c.server(), cri, false);
-				}
-				finally {
-					session.unregisterConnectRequest(this);
-				}
-			}
-
-			@Override
-			protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
-				final byte[] wrapped = newSecurePacket(session.nextSendSeq(), 0, packet);
-				super.send(wrapped, dst);
 			}
 		};
 
@@ -582,8 +564,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 	public String getName() {
 		if (tunnel != null)
 			return tunnel.getName();
-		final String lock = new String(Character.toChars(0x1F512));
-		return "KNX/IP " + lock + " Routing " + ctrlEndpt.getAddress().getHostAddress();
+		return "KNX/IP " + secureSymbol + " Routing " + ctrlEndpt.getAddress().getHostAddress();
 	}
 
 	@Override
@@ -677,8 +658,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 	// session.req -> session.res -> auth.req -> session-status
 	private void setupSecureSession(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP) throws KNXException {
 
-		final String lock = new String(Character.toChars(0x1F512));
-		logger = LoggerFactory.getLogger("calimero.knxnetip.KNX/IP " + lock + " Session " + serverCtrlEP.getAddress().getHostAddress() + ":"
+		logger = LoggerFactory.getLogger("calimero.knxnetip.KNX/IP " + secureSymbol + " Session " + serverCtrlEP.getAddress().getHostAddress() + ":"
 				+ serverCtrlEP.getPort());
 
 		logger.debug("setup secure session with {}", serverCtrlEP);
