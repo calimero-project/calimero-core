@@ -164,12 +164,15 @@ public class HPAI
 			final InetAddress a = addr.getAddress();
 			if (a == null)
 				throw new KNXIllegalArgumentException(addr + " is an unresolved IP address");
-			if (a.isAnyLocalAddress() && addr.getPort() != 0)
-				throw new KNXIllegalArgumentException(a + " is a wildcard IP address");
 			address = a.getAddress();
+			port = addr.getPort();
+			if (a.isAnyLocalAddress() && port != 0)
+				throw new KNXIllegalArgumentException(a + " is a wildcard IP address");
+			if (hostprot == IPV4_TCP && !(a.isAnyLocalAddress() && port == 0))
+				throw new KNXIllegalArgumentException("HPAI for TCP does not contain route back endpoint: "
+						+ getAddress().getHostAddress() + ":" + port);
 			if (address.length != 4)
 				throw new KNXIllegalArgumentException(a + " is not an IPv4 address");
-			port = addr.getPort();
 		}
 		else {
 			address = new byte[4];
@@ -186,6 +189,15 @@ public class HPAI
 	public final int getHostProtocol()
 	{
 		return hostprot;
+	}
+
+	/**
+	 * Indicates whether this HPAI is a route back HPAI, required for UDP NAT and TCP connections.
+	 *
+	 * @return <code>true</code> if this HPAI is a route back HPAI, <code>false</code> otherwise
+	 */
+	public final boolean isRouteBack() {
+		return port == 0 && Arrays.equals(address, new byte[4]);
 	}
 
 	/**

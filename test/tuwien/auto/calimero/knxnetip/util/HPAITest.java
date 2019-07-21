@@ -36,7 +36,9 @@
 
 package tuwien.auto.calimero.knxnetip.util;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -56,14 +58,31 @@ class HPAITest {
 	@Test
 	void tcpHpaiWithNonZeroPort() throws UnknownHostException {
 		final var addr = InetAddress.getByName("192.168.10.1");
-		final var data = new HPAI(HPAI.IPV4_TCP, new InetSocketAddress(addr, 1)).toByteArray();
+		final var data = new HPAI(HPAI.IPV4_UDP, new InetSocketAddress(addr, 1)).toByteArray();
+		data[1] = HPAI.IPV4_TCP;
 		assertThrows(KNXFormatException.class, () -> new HPAI(data, 0));
 	}
 
 	@Test
 	void tcpHpaiWithInvalidIpAddress() throws UnknownHostException {
 		final var addr = InetAddress.getByName("192.168.10.1");
-		final var data = new HPAI(HPAI.IPV4_TCP, new InetSocketAddress(addr, 0)).toByteArray();
+		final var data = new HPAI(HPAI.IPV4_UDP, new InetSocketAddress(addr, 0)).toByteArray();
+		data[1] = HPAI.IPV4_TCP;
 		assertThrows(KNXFormatException.class, () -> new HPAI(data, 0));
+	}
+
+	@Test
+	void tcpIsRouteBackHpai() {
+		assertTrue(HPAI.Tcp.isRouteBack());
+	}
+
+	@Test
+	void natIsRouteBackHpai() {
+		assertTrue(new HPAI(HPAI.IPV4_UDP, null).isRouteBack());
+	}
+
+	@Test
+	void nonRouteBackHpai() throws UnknownHostException {
+		assertFalse(new HPAI(HPAI.IPV4_UDP, InetAddress.getByName("127.0.0.1"), 1234).isRouteBack());
 	}
 }
