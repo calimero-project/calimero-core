@@ -59,6 +59,7 @@ import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.KnxRuntimeException;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.internal.UdpSocketLooper;
@@ -263,6 +264,15 @@ public class KNXnetIPRouting extends ConnectionBase
 			logger.error("failed to get hop count", e);
 		}
 		return 1;
+	}
+
+	public final NetworkInterface networkInterface() {
+		try {
+			return ((MulticastSocket) socket).getNetworkInterface();
+		}
+		catch (final SocketException e) {
+			throw new KnxRuntimeException("socket error getting network interface", e);
+		}
 	}
 
 	/**
