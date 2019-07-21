@@ -73,8 +73,9 @@ public class LocalDeviceManagementIp extends LocalDeviceManagement {
 	 * @param session secure session with a KNXnet/IP server
 	 * @param adapterClosed receives the notification if the adapter got closed
 	 * @return a new local device management connection
-	 * @throws KNXException
-	 * @throws InterruptedException
+	 * @throws KNXException if establishing the local device management connection or initializing the property adapter
+	 *         fails
+	 * @throws InterruptedException on interrupted thread while initializing the adapter
 	 */
 	public static LocalDeviceManagementIp newSecureAdapter(final SecureSession session,
 			final Consumer<CloseEvent> adapterClosed) throws KNXException, InterruptedException {

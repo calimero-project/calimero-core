@@ -130,6 +130,7 @@ public final class TunnelingFeature extends ServiceType {
 	 * Creates a new tunneling feature service by parsing the supplied byte buffer containing a tunneling feature
 	 * service.
 	 *
+	 * @param svcType tunneling feature service type
 	 * @param buffer byte buffer positioned at the start of the feature service (within a KNXnet/IP tunneling datagram)
 	 * @return a tunneling feature service
 	 * @throws KNXFormatException if the structure is invalid or an invalid tunneling feature service was found

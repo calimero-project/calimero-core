@@ -383,7 +383,7 @@ public final class Keyring {
 	 * @param keyringPassword keyring password used for keyring encryption
 	 * @return <code>true</code> if signature is valid, <code>false</code> otherwise
 	 * @throws KNXMLException on XML parsing errors during signature verification
-	 * @throws KnxSecureException
+	 * @throws KnxSecureException if generating the secret key for the password hash fails
 	 */
 	public boolean verifySignature(final char[] keyringPassword) {
 		try {
@@ -426,7 +426,7 @@ public final class Keyring {
 	 * @param input encrypted key
 	 * @param keyringPassword the password of this keyring
 	 * @return decrypted key as byte array
-	 * @throws KnxSecureException
+	 * @throws KnxSecureException for cryptographic setup/algorithm problems
 	 */
 	public byte[] decryptKey(final byte[] input, final char[] keyringPassword) {
 		final var pwdHash = hashKeyringPwd(keyringPassword);
@@ -448,7 +448,7 @@ public final class Keyring {
 	 * @param input encrypted password
 	 * @param keyringPassword the password of this keyring
 	 * @return decrypted password as char array
-	 * @throws KnxSecureException
+	 * @throws KnxSecureException for cryptographic setup/algorithm problems
 	 */
 	public char[] decryptPassword(final byte[] input, final char[] keyringPassword) {
 		final var keyringPwdHash = hashKeyringPwd(keyringPassword);
@@ -540,7 +540,7 @@ public final class Keyring {
 		final var keySpec = new PBEKeySpec(password, salt, iterations, keyLength);
 		try {
 			final var secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-			logger.trace("using secret key provider {}", secretKeyFactory.getProvider());
+//			logger.trace("using secret key provider {}", secretKeyFactory.getProvider());
 			final var secretKey = secretKeyFactory.generateSecret(keySpec);
 			return secretKey.getEncoded();
 		}

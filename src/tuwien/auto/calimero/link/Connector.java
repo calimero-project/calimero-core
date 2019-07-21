@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2018 B. Malinowsky
+    Copyright (c) 2015, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -181,7 +181,7 @@ public final class Connector
 		// this one is a fixed sized pool, with thread time-out enabled
 		private static ScheduledThreadPoolExecutor reconnect = new ScheduledThreadPoolExecutor(4, runnable -> {
 			final Thread t = tf.newThread(runnable);
-			t.setName("Calimero Connector (" + t.getId() + ")");
+			t.setName("Calimero Connector " + t.getId());
 			t.setDaemon(true);
 			return t;
 		});
@@ -398,11 +398,12 @@ public final class Connector
 			final long attempt = max - remaining;
 			final Runnable s = () -> {
 				try {
+					final String maxSuffix;
 					if (connector.maxAttempts == NoMaxAttempts)
-						logger().info("execute scheduled connect {} (no max)", attempt);
+						maxSuffix = " (no max)";
 					else
-						logger().info("execute scheduled connect {}/{} ({} remaining)", attempt,
-								max, remaining);
+						maxSuffix = "/" + max + " (" + remaining + " remaining)";
+					logger().debug("execute scheduled connect {}{}", attempt, maxSuffix);
 					connect();
 				}
 				catch (KNXException | RuntimeException | InterruptedException e) {

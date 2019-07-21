@@ -274,9 +274,9 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 *        {@link #TunnelingV2}, or {@link #ROUTING}
 	 * @param c a KNXnet/IP tunneling or routing connection in open state
 	 * @param settings medium settings defining device and medium specifics needed for communication
-	 * @throws InterruptedException
-	 * @throws KNXConnectionClosedException
-	 * @throws KNXAckTimeoutException
+	 * @throws InterruptedException if a feature info service got interrupted
+	 * @throws KNXConnectionClosedException if the tunneling connection got closed while executing feature info services
+	 * @throws KNXAckTimeoutException if a timeout occurred during feature info services
 	 */
 	protected KNXNetworkLinkIP(final int serviceMode, final KNXnetIPConnection c, final KNXMediumSettings settings)
 		throws KNXAckTimeoutException, KNXConnectionClosedException, InterruptedException {
