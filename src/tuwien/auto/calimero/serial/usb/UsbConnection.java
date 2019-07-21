@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2018 B. Malinowsky
+    Copyright (c) 2015, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -93,6 +93,7 @@ import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.KnxRuntimeException;
 import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.internal.EventListeners;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
@@ -110,13 +111,6 @@ import tuwien.auto.calimero.serial.usb.TransferProtocolHeader.Protocol;
  */
 public class UsbConnection implements AutoCloseable
 {
-	private static class KnxRuntimeException extends RuntimeException {
-		private static final long serialVersionUID = -1;
-		KnxRuntimeException(final String message, final Throwable cause) {
-			super(message, cause);
-		}
-	}
-
 	/**
 	 * Available EMI types and their respective bit value representation.
 	 */
