@@ -433,7 +433,7 @@ public final class Keyring {
 		try {
 			return aes128Cbc(input, pwdHash, createdHash);
 		}
-		catch (final GeneralSecurityException e) {
+		catch (GeneralSecurityException | RuntimeException e) {
 			throw new KnxSecureException("decrypting key data", e);
 		}
 		finally {
@@ -460,7 +460,7 @@ public final class Keyring {
 			Arrays.fill(pwdData, (byte) 0);
 			return chars;
 		}
-		catch (final GeneralSecurityException e) {
+		catch (GeneralSecurityException | RuntimeException e) {
 			throw new KnxSecureException("decrypting password data", e);
 		}
 		finally {
