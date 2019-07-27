@@ -51,6 +51,13 @@ import tuwien.auto.calimero.serial.KNXPortClosedException;
  */
 public class KNXNetworkMonitorFT12 extends AbstractMonitor<FT12Connection>
 {
+	private final boolean cEMI;
+
+	public static KNXNetworkMonitorFT12 newCemiMonitor(final String portId, final KNXMediumSettings settings)
+			throws KNXException {
+		return new KNXNetworkMonitorFT12(new FT12Connection(portId), settings, true);
+	}
+
 	/**
 	 * Creates a new network monitor based on the FT1.2 protocol for accessing the KNX network.
 	 * <p>
@@ -96,22 +103,37 @@ public class KNXNetworkMonitorFT12 extends AbstractMonitor<FT12Connection>
 	protected KNXNetworkMonitorFT12(final FT12Connection conn, final KNXMediumSettings settings)
 		throws KNXException
 	{
+		this(conn, settings, false);
+	}
+
+	/**
+	 * Creates a new network monitor using the supplied FT1.2 connection with either cEMI or EMI2 format.
+	 *
+	 * @param conn an open FT12Connection, the link takes ownership
+	 * @param settings medium settings defining the specific KNX medium needed for decoding raw
+	 *        frames received from the KNX network
+	 * @param cEMI <code>true</code> to use cEMI format, <code>false</code> to use EMI2 format
+	 * @throws KNXException on error entering busmonitor mode
+	 */
+	protected KNXNetworkMonitorFT12(final FT12Connection conn, final KNXMediumSettings settings, final boolean cEMI)
+			throws KNXException
+	{
 		super(conn, "monitor " + conn.getPortID(), settings);
+		this.cEMI = cEMI;
 		enterBusmonitor();
 		logger.info("in busmonitor mode - ready to receive");
 		conn.addConnectionListener(notifier);
 	}
 
-	private void enterBusmonitor() throws KNXAckTimeoutException, KNXPortClosedException, KNXLinkClosedException
-	{
-		new BcuSwitcher(conn).enterBusmonitor(false);
+	private void enterBusmonitor() throws KNXAckTimeoutException, KNXPortClosedException, KNXLinkClosedException {
+		new BcuSwitcher(conn).enterBusmonitor(cEMI);
 	}
 
 	@Override
 	protected void leaveBusmonitor() throws InterruptedException
 	{
 		try {
-			new BcuSwitcher(conn).leaveBusmonitor(false);
+			new BcuSwitcher(conn).leaveBusmonitor(cEMI);
 		}
 		catch (KNXAckTimeoutException | KNXPortClosedException e) {}
 	}

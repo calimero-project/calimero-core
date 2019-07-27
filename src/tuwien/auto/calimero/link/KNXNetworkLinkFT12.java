@@ -53,6 +53,11 @@ import tuwien.auto.calimero.serial.KNXPortClosedException;
  */
 public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 {
+	public static KNXNetworkLinkFT12 newCemiLink(final String portId, final KNXMediumSettings settings)
+			throws KNXException {
+		return new KNXNetworkLinkFT12(new FT12Connection(portId), settings, true);
+	}
+
 	/**
 	 * Creates a new network link based on the FT1.2 protocol for accessing the KNX network.
 	 * <p>
