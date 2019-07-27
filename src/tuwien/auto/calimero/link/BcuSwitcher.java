@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2018 B. Malinowsky
+    Copyright (c) 2015, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,6 +51,8 @@ import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.cemi.CEMI;
+import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.serial.FT12Connection;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
 import tuwien.auto.calimero.serial.usb.HidReport;
@@ -335,6 +337,25 @@ final class BcuSwitcher
 	// EMI 2 PEI switch
 	private static final int peiSwitch_req = 0xA9;
 
+	//
+	// cEMI device mgmt property access
+	//
+
+	private static final int cemiServerObjectType = 8;
+	private static final int objectInstance = 1;
+	private static final int pidCommMode = 52; // PID.COMM_MODE
+
+	static final int DataLinkLayer = 0;
+	static final int Busmonitor = 1;
+	static final int BaosMode = 0xf0; // manufacturer-specific use for BAOS modules
+	static final int NoLayer = 0xff;
+
+	static byte[] commModeRequest(final int commMode) {
+		final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, cemiServerObjectType, objectInstance,
+				pidCommMode, 1, 1, new byte[] { (byte) commMode });
+		return frame.toByteArray();
+	}
+
 	private final FT12Connection conn;
 
 	BcuSwitcher(final FT12Connection conn)
@@ -344,23 +365,21 @@ final class BcuSwitcher
 		logger = null;
 	}
 
-	void normalMode() throws KNXAckTimeoutException, KNXPortClosedException, InterruptedException
-	{
-		final byte[] switchNormal = { (byte) peiSwitch_req, 0x1E, 0x12, 0x34, 0x56, 0x78,
-			(byte) 0x9A, };
-		conn.send(switchNormal, true);
+	void normalMode(final boolean cEMI) throws KNXAckTimeoutException, KNXPortClosedException, InterruptedException {
+		final byte[] switchNormal = { (byte) peiSwitch_req, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
+		conn.send(cEMI ? commModeRequest(NoLayer) : switchNormal, true);
 	}
 
-	void linkLayerMode() throws KNXException
-	{
+	void linkLayerMode(final boolean cEMI) throws KNXException {
 		final byte[] switchLinkLayer = { (byte) peiSwitch_req, 0x00, 0x18, 0x34, 0x56, 0x78, 0x0A, };
 		try {
-			conn.send(switchLinkLayer, true);
+			conn.send(cEMI ? commModeRequest(DataLinkLayer) : switchLinkLayer, true);
+			// TODO check .con for error case
 		}
 		catch (final InterruptedException e) {
 			conn.close();
 			Thread.currentThread().interrupt();
-			throw new KNXLinkClosedException(e.getMessage());
+			throw new KNXLinkClosedException(e.getMessage() != null ? e.getMessage() : "thread interrupted");
 		}
 		catch (final KNXAckTimeoutException e) {
 			conn.close();
@@ -368,18 +387,16 @@ final class BcuSwitcher
 		}
 	}
 
-	void enterBusmonitor() throws KNXAckTimeoutException, KNXPortClosedException,
-		KNXLinkClosedException
-	{
+	void enterBusmonitor(final boolean cEMI)
+			throws KNXAckTimeoutException, KNXPortClosedException, KNXLinkClosedException {
 		try {
-			final byte[] switchBusmon = { (byte) peiSwitch_req, (byte) 0x90, 0x18, 0x34, 0x56,
-				0x78, 0x0A, };
-			conn.send(switchBusmon, true);
+			final byte[] switchBusmon = { (byte) peiSwitch_req, (byte) 0x90, 0x18, 0x34, 0x56, 0x78, 0x0A, };
+			conn.send(cEMI? commModeRequest(Busmonitor) : switchBusmon, true);
 		}
 		catch (final InterruptedException e) {
 			conn.close();
 			Thread.currentThread().interrupt();
-			throw new KNXLinkClosedException(e.getMessage());
+			throw new KNXLinkClosedException(e.getMessage() != null ? e.getMessage() : "thread interrupted");
 		}
 		catch (final KNXAckTimeoutException e) {
 			conn.close();
@@ -387,9 +404,8 @@ final class BcuSwitcher
 		}
 	}
 
-	void leaveBusmonitor() throws KNXAckTimeoutException, KNXPortClosedException,
-		InterruptedException
-	{
-		normalMode();
+	void leaveBusmonitor(final boolean cEMI)
+			throws KNXAckTimeoutException, KNXPortClosedException, InterruptedException {
+		normalMode(cEMI);
 	}
 }
