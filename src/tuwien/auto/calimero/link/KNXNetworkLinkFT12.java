@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,15 +47,12 @@ import tuwien.auto.calimero.serial.FT12Connection;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
 
 /**
- * Implementation of the KNX network network link based on the FT1.2 protocol, using a
- * {@link FT12Connection}.
+ * Implementation of the KNX network network link based on the FT1.2 protocol, using a {@link FT12Connection}.
  *
  * @author B. Malinowsky
  */
 public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 {
-	private static final int PEI_SWITCH = 0xA9;
-
 	/**
 	 * Creates a new network link based on the FT1.2 protocol for accessing the KNX network.
 	 * <p>
@@ -95,8 +92,21 @@ public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 	 */
 	protected KNXNetworkLinkFT12(final FT12Connection c, final KNXMediumSettings settings) throws KNXException
 	{
+		this(c, settings, false);
+	}
+
+	/**
+	 * Creates a new KNX network link using the supplied FT1.2 protocol connection with either cEMI or EMI2 format.
+	 *
+	 * @param c a FT1.2 protocol connection in open state
+	 * @param settings medium settings defining device and medium specifics needed for communication
+	 * @param cEMI <code>true</code> to use cEMI format, <code>false</code> to use EMI2 format
+	 * @throws KNXException on error, timeout, or interrupt while switching to link layer mode
+	 */
+	protected KNXNetworkLinkFT12(final FT12Connection c, final KNXMediumSettings settings, final boolean cEMI)
+			throws KNXException {
 		super(c, c.getPortID(), settings);
-		cEMI = false;
+		this.cEMI = cEMI;
 		sendCEmiAsByteArray = true;
 		linkLayerMode();
 		conn.addConnectionListener(notifier);
@@ -123,8 +133,7 @@ public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 	}
 
 	@Override
-	protected void onSend(final CEMILData msg, final boolean waitForCon)
-	{}
+	protected void onSend(final CEMILData msg, final boolean waitForCon) {}
 
 	@Override
 	protected void onClose()
@@ -133,31 +142,15 @@ public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 			normalMode();
 		}
 		catch (final Exception e) {
-			logger.error("could not switch BCU back to normal mode", e);
+			logger.warn("could not switch BCU back to normal mode", e);
 		}
 	}
 
-	private void linkLayerMode() throws KNXException
-	{
-		// link layer mode
-		final byte[] switchLinkLayer = { (byte) PEI_SWITCH, 0x00, 0x18, 0x34, 0x56, 0x78, 0x0A, };
-		try {
-			conn.send(switchLinkLayer, true);
-		}
-		catch (final InterruptedException e) {
-			conn.close();
-			Thread.currentThread().interrupt();
-			throw new KNXLinkClosedException(e.getMessage());
-		}
-		catch (final KNXAckTimeoutException e) {
-			conn.close();
-			throw e;
-		}
+	private void linkLayerMode() throws KNXException {
+		new BcuSwitcher(conn).linkLayerMode(cEMI);
 	}
 
-	private void normalMode() throws KNXAckTimeoutException, KNXPortClosedException, InterruptedException
-	{
-		final byte[] switchNormal = { (byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
-		conn.send(switchNormal, true);
+	private void normalMode() throws KNXAckTimeoutException, KNXPortClosedException, InterruptedException {
+		new BcuSwitcher(conn).normalMode(cEMI);
 	}
 }

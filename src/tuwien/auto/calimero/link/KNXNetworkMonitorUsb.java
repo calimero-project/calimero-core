@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2018 B. Malinowsky
+    Copyright (c) 2015, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -152,12 +152,8 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 		throws KNXPortClosedException, KNXTimeoutException, KNXFormatException, InterruptedException
 	{
 		if (activeEmi == EmiType.CEmi) {
-			final int cEmiServerObject = 8;
-			final int pidCommMode = 52;
-			final int objectInstance = 1;
-			final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, cEmiServerObject, objectInstance,
-					pidCommMode, 1, 1, new byte[] { 1 });
-			conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame.toByteArray()).get(0), true);
+			final var frame = BcuSwitcher.commModeRequest(BcuSwitcher.Busmonitor);
+			conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame).get(0), true);
 			// TODO close monitor if we cannot switch to busmonitor
 			// check for .con
 			//findFrame(CEMIDevMgmt.MC_PROPWRITE_CON);

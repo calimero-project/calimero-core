@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2018 B. Malinowsky
+    Copyright (c) 2015, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -207,11 +207,8 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 	private void linkLayerMode() throws KNXException, InterruptedException
 	{
 		if (activeEmi == EmiType.CEmi) {
-			final int objectInstance = 1;
-			final int pidCommMode = 52;
-			final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, cemiServerObject,
-					objectInstance, pidCommMode, 1, 1, new byte[] { 0 });
-			conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame.toByteArray()).get(0), true);
+			final var frame = BcuSwitcher.commModeRequest(BcuSwitcher.DataLinkLayer);
+			conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame).get(0), true);
 			// check for .con
 			//findFrame(CEMIDevMgmt.MC_PROPWRITE_CON);
 		}

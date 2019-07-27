@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,8 +51,6 @@ import tuwien.auto.calimero.serial.KNXPortClosedException;
  */
 public class KNXNetworkMonitorFT12 extends AbstractMonitor<FT12Connection>
 {
-	private static final int PEI_SWITCH = 0xA9;
-
 	/**
 	 * Creates a new network monitor based on the FT1.2 protocol for accessing the KNX network.
 	 * <p>
@@ -106,33 +104,15 @@ public class KNXNetworkMonitorFT12 extends AbstractMonitor<FT12Connection>
 
 	private void enterBusmonitor() throws KNXAckTimeoutException, KNXPortClosedException, KNXLinkClosedException
 	{
-		try {
-			final byte[] switchBusmon = { (byte) PEI_SWITCH, (byte) 0x90, 0x18, 0x34, 0x56, 0x78,
-				0x0A, };
-			conn.send(switchBusmon, true);
-		}
-		catch (final InterruptedException e) {
-			conn.close();
-			Thread.currentThread().interrupt();
-			throw new KNXLinkClosedException(e.getMessage());
-		}
-		catch (final KNXAckTimeoutException e) {
-			conn.close();
-			throw e;
-		}
+		new BcuSwitcher(conn).enterBusmonitor(false);
 	}
 
 	@Override
 	protected void leaveBusmonitor() throws InterruptedException
 	{
 		try {
-			normalMode();
+			new BcuSwitcher(conn).leaveBusmonitor(false);
 		}
 		catch (KNXAckTimeoutException | KNXPortClosedException e) {}
-	}
-
-	private void normalMode() throws KNXAckTimeoutException, KNXPortClosedException, InterruptedException {
-		final byte[] switchNormal = { (byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
-		conn.send(switchNormal, true);
 	}
 }
