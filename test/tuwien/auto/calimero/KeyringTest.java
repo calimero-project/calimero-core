@@ -42,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static tuwien.auto.calimero.DataUnitBuilder.fromHex;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -199,13 +200,5 @@ class KeyringTest {
 	@Test
 	void keyringWithoutKeyringElement() {
 		assertThrows(KNXMLException.class, () -> Keyring.load("test/resources/NoKeyringElement.knxkeys"));
-	}
-
-	private static byte[] fromHex(final String hex) {
-		final int len = hex.length();
-		final byte[] data = new byte[len / 2];
-		for (int i = 0; i < len; i += 2)
-			data[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4) + Character.digit(hex.charAt(i + 1), 16));
-		return data;
 	}
 }

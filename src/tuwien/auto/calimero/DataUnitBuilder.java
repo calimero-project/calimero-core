@@ -465,4 +465,22 @@ public final class DataUnitBuilder
 		}
 		return sb.toString();
 	}
+
+	/**
+	 * Parses <code>hex</code> as unsigned hexadecimal value into a byte array. Input containing space characters
+	 * (ASCII code 0x20) is treated as if the spaces are non-existent.
+	 *
+	 * @param hex hexadecimal string representation, without any hexadecimal prefixes (like 0x); <code>hex.length</code>
+	 *        (ignoring spaces) has to be even
+	 * @return byte array containing the parsed value, with array length equal to <code>hex.length / 2</code> (not
+	 * considering any spaces)
+	 */
+	public static byte[] fromHex(final String hex) {
+		final String s = hex.replace(" ", "");
+		final int len = s.length();
+		final byte[] data = new byte[len / 2];
+		for (int i = 0; i < len; i += 2)
+			data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
+		return data;
+	}
 }
