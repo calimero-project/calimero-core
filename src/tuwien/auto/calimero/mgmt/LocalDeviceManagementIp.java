@@ -60,10 +60,46 @@ public class LocalDeviceManagementIp extends LocalDeviceManagement {
 
 	private final KNXnetIPConnection conn;
 
+	/**
+	 * Creates a new property service adapter for local device management of a KNXnet/IP server using TCP.
+	 *
+	 * @param connection the TCP connection to the server
+	 * @param adapterClosed receives the notification if the adapter got closed
+	 * @throws KNXException on failure establishing local device management connection or failure while initializing the
+	 *         property adapter
+	 * @throws InterruptedException on interrupted thread while initializing the adapter
+	 */
 	public static LocalDeviceManagementIp newAdapter(final Connection connection,
 			final Consumer<CloseEvent> adapterClosed) throws KNXException, InterruptedException {
 		final var mgmt = new KNXnetIPDevMgmt(connection);
 		return new LocalDeviceManagementIp(mgmt, adapterClosed, false);
+	}
+
+	/**
+	 * Creates a new property service adapter for local device management of a KNXnet/IP server using UDP.
+	 * <p>
+	 * A note on write-enabled / read-only properties:<br>
+	 * The check whether a property is read only or write enabled, is done by issuing a write request for that property.
+	 * Due to the memory layout, write cycles of a memory location and similar, this might not always be desired. To
+	 * enable or skip this check, <code>queryWriteEnable</code> has to be set appropriately. Currently, the write
+	 * enabled check is only of interest when getting a property description {@link #getDescription(int, int, int)}.
+	 *
+	 * @param localEP the local endpoint of the connection, supply the wildcard address to use a local IP on the same
+	 *        subnet as <code>serverCtrlEP</code> and an unused (ephemeral) port
+	 * @param serverCtrlEP the remote server control endpoint used for connect request
+	 * @param useNat <code>true</code> to use network address translation (NAT) aware communication, <code>false</code>
+	 *        to use the default way
+	 * @param queryWriteEnable <code>true</code> to check whether a property is write-enabled or read-only,
+	 *        <code>false</code> to skip the check
+	 * @param adapterClosed receives the notification if the adapter got closed
+	 * @throws KNXException on failure establishing local device management connection or failure while initializing the
+	 *         property adapter
+	 * @throws InterruptedException on interrupted thread while initializing the adapter
+	 */
+	public static LocalDeviceManagementIp newAdapter(final InetSocketAddress localEP,
+			final InetSocketAddress serverCtrlEP, final boolean useNat, final boolean queryWriteEnable,
+			final Consumer<CloseEvent> adapterClosed) throws KNXException, InterruptedException {
+		return new LocalDeviceManagementIp(localEP, serverCtrlEP, useNat, adapterClosed, queryWriteEnable);
 	}
 
 	/**

@@ -99,7 +99,8 @@ class PropertyClientTest
 			lnk = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false, TPSettings.TP1);
 			remAdpt = new RemotePropertyServiceAdapter(lnk, remote, null, true);
 			rem = new PropertyClient(remAdpt);
-			localAdpt = new LocalDeviceMgmtAdapter(new InetSocketAddress(0), Util.getServer(), false, adapterClosed, true);
+			localAdpt = LocalDeviceManagementIp.newAdapter(new InetSocketAddress(0), Util.getServer(), false,
+					true, adapterClosed);
 			local = new PropertyClient(localAdpt);
 
 			rem.addDefinitions(new PropertyClient.XmlPropertyDefinitions().load(PIDResource));
