@@ -796,9 +796,10 @@ public class Discoverer
 		final InetSocketAddress serverCtrlEndpoint, final Duration timeout) throws SocketException {
 
 		final NetworkInterface nif = socket.getNetworkInterface();
+		final InetSocketAddress local = (InetSocketAddress) socket.getLocalSocketAddress();
 		final ReceiverLoop looper = new ReceiverLoop(socket, 512, 0, serverCtrlEndpoint);
 		final CompletableFuture<Result<SearchResponse>> cf = CompletableFuture.runAsync(looper, executor)
-				.thenApply(__ -> new Result<>(looper.sr, nif, (InetSocketAddress) socket.getLocalSocketAddress(), serverCtrlEndpoint))
+				.thenApply(__ -> new Result<>(looper.sr, nif, local, serverCtrlEndpoint))
 				.orTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS);
 		cf.exceptionally(t -> {
 			looper.quit();
