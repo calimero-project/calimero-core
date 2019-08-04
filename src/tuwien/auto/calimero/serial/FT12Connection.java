@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -207,7 +207,7 @@ public class FT12Connection implements AutoCloseable
 
 	private FT12Connection(final String originalPortId, final String portId, final int baudrate) throws KNXException
 	{
-		logger = LogService.getLogger("calimero.serial.ft12." + originalPortId);
+		logger = LogService.getLogger("calimero.serial.ft12:" + originalPortId);
 		open(portId, baudrate);
 		try {
 			sendReset();
