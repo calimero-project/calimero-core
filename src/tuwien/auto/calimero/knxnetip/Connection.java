@@ -48,6 +48,7 @@ import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
@@ -80,10 +81,10 @@ import javax.crypto.spec.IvParameterSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.KnxRuntimeException;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
@@ -269,7 +270,7 @@ public final class Connection implements Closeable {
 
 		SecretKey deviceAuthKey() { return deviceAuthKey; }
 
-		void ensureOpen() throws KNXException, InterruptedException {
+		void ensureOpen() throws KNXTimeoutException, KNXConnectionClosedException, InterruptedException {
 			if (sessionState == SessionState.Authenticated)
 				return;
 			setupSecureSession();
@@ -287,7 +288,8 @@ public final class Connection implements Closeable {
 
 		long nextReceiveSeq() { return rcvSeq.getAndIncrement(); }
 
-		private void setupSecureSession() throws KNXException, InterruptedException {
+		private void setupSecureSession()
+				throws KNXTimeoutException, KNXConnectionClosedException, InterruptedException {
 			sessionRequestLock.lock();
 			try {
 				if (sessionState == SessionState.Authenticated)
@@ -318,8 +320,15 @@ public final class Connection implements Closeable {
 			catch (final GeneralSecurityException e) {
 				throw new KnxSecureException("error creating key pair for " + server, e);
 			}
+			catch (final SocketTimeoutException e) {
+				Thread.currentThread().interrupt();
+				throw new InterruptedException(
+						"interrupted I/O establishing secure session with " + server + ": " + e.getMessage());
+			}
 			catch (final IOException e) {
-				throw new KNXException("I/O error establishing secure session with " + server, e);
+				close();
+				Connection.this.close();
+				throw new KNXConnectionClosedException("I/O error establishing secure session with " + server, e);
 			}
 			finally {
 				sessionRequestLock.unlock();
@@ -593,8 +602,7 @@ public final class Connection implements Closeable {
 		}
 	}
 
-	public static Connection newTcpConnection(final InetSocketAddress local, final InetSocketAddress server)
-			throws KNXException {
+	public static Connection newTcpConnection(final InetSocketAddress local, final InetSocketAddress server) {
 		return new Connection(local, server);
 	}
 
@@ -604,7 +612,7 @@ public final class Connection implements Closeable {
 		logger = LoggerFactory.getLogger("calimero.knxnetip.tcp " + addressPort(server));
 	}
 
-	protected Connection(final InetSocketAddress local, final InetSocketAddress server) throws KNXException {
+	protected Connection(final InetSocketAddress local, final InetSocketAddress server) {
 		this(server);
 		if (local.isUnresolved())
 			throw new KNXIllegalArgumentException("unresolved address " + local);
@@ -617,7 +625,7 @@ public final class Connection implements Closeable {
 				bind = new InetSocketAddress(addr, local.getPort());
 			}
 			catch (final UnknownHostException e) {
-				throw new KNXException("no local host address available", e);
+				throw new KnxRuntimeException("no local host address available", e);
 			}
 		}
 
@@ -625,7 +633,7 @@ public final class Connection implements Closeable {
 			socket.bind(bind);
 		}
 		catch (final IOException e) {
-			throw new KNXException("binding to local address " + bind, e);
+			throw new KnxRuntimeException("binding to local address " + bind, e);
 		}
 	}
 

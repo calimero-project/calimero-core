@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ import tuwien.auto.calimero.KNXException;
 /**
  * Thrown to indicate an illegal operation due to a closed KNXnet/IP communication
  * connection.
- * 
+ *
  * @author B. Malinowsky
  */
 public class KNXConnectionClosedException extends KNXException
@@ -52,18 +52,26 @@ public class KNXConnectionClosedException extends KNXException
 	 * Constructs a new <code>KNXConnectionClosedException</code> without a detail
 	 * message.
 	 */
-	public KNXConnectionClosedException()
-	{}
+	public KNXConnectionClosedException() {}
 
 	/**
 	 * Constructs a new <code>KNXConnectionClosedException</code> with the specified
 	 * detail message.
-	 * <p>
-	 * 
+	 *
 	 * @param s the detail message
 	 */
 	public KNXConnectionClosedException(final String s)
 	{
 		super(s);
+	}
+
+	/**
+	 * Constructs a new <code>KNXConnectionClosedException</code> with the specified detail message and cause.
+	 *
+	 * @param message the detail message
+	 * @param cause the cause
+	 */
+	public KNXConnectionClosedException(final String message, final Throwable cause) {
+		super(message, cause);
 	}
 }
