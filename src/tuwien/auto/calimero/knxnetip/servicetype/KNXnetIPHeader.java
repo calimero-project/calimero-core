@@ -168,8 +168,8 @@ public class KNXnetIPHeader
 	// KNX IP Secure
 
 	public static final int SecureWrapper = 0x0950;
-	private static final int SecureSessionReq = 0x0951;
-	private static final int SecureSessionRes = 0x0952;
+	private static final int SecureSessionRequest = 0x0951;
+	private static final int SecureSessionResponse = 0x0952;
 	private static final int SecureSessionAuth = 0x0953;
 	private static final int SecureSessionStatus = 0x0954;
 	private static final int SecureGroupSync = 0x0955;
@@ -362,8 +362,8 @@ public class KNXnetIPHeader
 		case SearchRequest: return "search.req";
 		case SearchResponse: return "search.res";
 		case SecureWrapper: return "secure-msg";
-		case SecureSessionReq: return "session.req";
-		case SecureSessionRes: return "session.res";
+		case SecureSessionRequest: return "session.req";
+		case SecureSessionResponse: return "session.res";
 		case SecureSessionAuth: return "session-auth";
 		case SecureSessionStatus: return "session-status";
 		case SecureGroupSync: return "group-sync";

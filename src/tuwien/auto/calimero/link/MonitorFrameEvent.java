@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ import tuwien.auto.calimero.link.medium.RawFrame;
  * received indication frame.
  * <p>
  * The source of the event is a {@link KNXNetworkMonitor}.
- * 
+ *
  * @author B. Malinowsky
  */
 public class MonitorFrameEvent extends FrameEvent
@@ -58,7 +58,7 @@ public class MonitorFrameEvent extends FrameEvent
 
 	/**
 	 * Creates a new monitor frame event with the indication frame.
-	 * 
+	 *
 	 * @param source the network monitor which received the frame
 	 * @param frame monitor indication frame encapsulated in cEMI type
 	 */
@@ -72,7 +72,7 @@ public class MonitorFrameEvent extends FrameEvent
 	/**
 	 * Creates a new monitor frame event with the indication frame and the decoded raw
 	 * frame.
-	 * 
+	 *
 	 * @param source the network monitor which received the frame
 	 * @param frame monitor indication frame encapsulated in cEMI type
 	 * @param rawFrame the decoded raw frame on medium encapsulated in type RawFrame, use
@@ -89,7 +89,7 @@ public class MonitorFrameEvent extends FrameEvent
 	/**
 	 * Creates a new monitor frame event with the indication frame and error information about a
 	 * failed decoding of the raw frame.
-	 * 
+	 *
 	 * @param source the network monitor which received the frame
 	 * @param frame monitor indication frame encapsulated in cEMI type
 	 * @param decodeError the exception object obtained during decoding the received raw
@@ -102,28 +102,28 @@ public class MonitorFrameEvent extends FrameEvent
 		raw = null;
 		e = decodeError;
 	}
-	
+
 	/**
 	 * Returns the decoded raw frame on medium.
 	 * <p>
 	 * If decoding of raw frames is enabled and this method returns <code>null</code>, try
 	 * {@link #getDecodeError()} for decode error information.
-	 * 
+	 *
 	 * @return the frame of type RawFrame or <code>null</code> on no decoded raw frame
 	 */
 	public final RawFrame getRawFrame()
 	{
 		return raw;
 	}
-	
+
 	/**
 	 * Returns the exception object obtained during creation of a decoded raw frame, providing error
 	 * information while decoding the raw frame on medium.<p>
-	 * 
+	 *
 	 * If decoding of raw frames is disabled, this method returns always <code>null</code>.
-	 * 
+	 *
 	 * @return the exception object, or <code>null</code> if {@link #getRawFrame()} returns the
-	 *         decoded {@link RawFrame}, i.e., not <code>null</code>
+	 *         decoded {@link RawFrame}
 	 */
 	public final KNXFormatException getDecodeError()
 	{

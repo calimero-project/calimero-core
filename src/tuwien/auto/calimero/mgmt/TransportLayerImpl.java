@@ -397,7 +397,7 @@ public class TransportLayerImpl implements TransportLayer
 		lnk.removeLinkListener(lnkListener);
 		detached = true;
 		fireDetached();
-		logger.debug("detached from " + lnk.getName());
+		logger.debug("detached from {}", lnk);
 		return lnk;
 	}
 

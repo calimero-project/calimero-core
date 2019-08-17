@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2018 B. Malinowsky
+    Copyright (c) 2015, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -114,7 +114,7 @@ public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNet
 						mfe = new MonitorFrameEvent(netmon, mon, rf);
 					}
 					catch (final KNXFormatException ex) {
-						logger.error("decoding raw frame", ex);
+						logger.warn("decoding raw frame", ex);
 						mfe = new MonitorFrameEvent(netmon, mon, ex);
 						// workaround for PL, BCU might not have switched to ext. busmonitor
 						if (extBusmon) {
@@ -125,7 +125,7 @@ public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNet
 				}
 				addEvent(new Indication(mfe));
 			}
-			catch (final KNXFormatException | RuntimeException ex) {
+			catch (KNXFormatException | RuntimeException ex) {
 				logger.warn("unspecified frame event - ignored", ex);
 			}
 		}

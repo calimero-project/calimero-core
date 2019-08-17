@@ -152,13 +152,13 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 						logger.debug("confirmation of {}", f.getDestination());
 					else
 						logger.warn("negative confirmation of {}: {}", f.getDestination(),
-								DataUnitBuilder.toHex(f.toByteArray(), ""));
+								DataUnitBuilder.toHex(f.toByteArray(), " "));
 				}
 				else
 					logger.warn("unspecified frame event - ignored, msg code = 0x" + Integer.toHexString(mc));
 			}
 			catch (final KNXFormatException | RuntimeException ex) {
-				logger.warn("received unspecified frame {}", DataUnitBuilder.toHex(e.getFrameBytes(), ""), ex);
+				logger.warn("received unspecified frame {}", DataUnitBuilder.toHex(e.getFrameBytes(), " "), ex);
 			}
 		}
 
