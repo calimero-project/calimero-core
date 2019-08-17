@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,22 +54,6 @@ import tuwien.auto.calimero.internal.EventListeners;
  */
 public abstract class EventNotifier<T extends LinkListener> extends Thread implements KNXListener
 {
-	static final class Indication implements Consumer<LinkListener>
-	{
-		private final FrameEvent event;
-
-		Indication(final FrameEvent e)
-		{
-			event = e;
-		}
-
-		@Override
-		public void accept(final LinkListener l)
-		{
-			l.indication(event);
-		}
-	}
-
 	final Logger logger;
 	final Object source;
 

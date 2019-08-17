@@ -123,7 +123,8 @@ public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNet
 						}
 					}
 				}
-				addEvent(new Indication(mfe));
+				final var event = mfe;
+				addEvent(l -> l.indication(event));
 			}
 			catch (KNXFormatException | RuntimeException ex) {
 				logger.warn("unspecified frame event - ignored", ex);
