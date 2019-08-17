@@ -335,7 +335,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		}
 		catch (final GeneralSecurityException e) {
 			// NoSuchAlgorithmException or InvalidKeySpecException, both imply a setup/programming error
-			throw new RuntimeException(e);
+			throw new KnxSecureException("PBKDF2WithHmacSHA256", e);
 		}
 		finally {
 			Arrays.fill(password, (char) 0);
