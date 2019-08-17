@@ -68,6 +68,7 @@ import java.security.spec.XECPublicKeySpec;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -183,6 +184,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		// remove idle threads after a while
 		groupSyncSender.setKeepAliveTime(30, TimeUnit.SECONDS);
 		groupSyncSender.allowCoreThreadTimeOut(true);
+		groupSyncSender.setRemoveOnCancelPolicy(true);
 	}
 
 
@@ -807,7 +809,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 	private void scheduleGroupSync(final long initialDelay) {
 		logger.trace("schedule group sync (initial delay {} ms)", initialDelay);
-		groupSync.cancel(false);
+		groupSync.cancel(true);
 		groupSync = groupSyncSender.scheduleWithFixedDelay(this::sendGroupSync, initialDelay, syncQueryInterval,
 				TimeUnit.MILLISECONDS);
 	}
@@ -826,6 +828,10 @@ public final class SecureConnection extends KNXnetIPRouting {
 			socket.send(new DatagramPacket(sync, sync.length, dataEndpt.getAddress(), dataEndpt.getPort()));
 		}
 		catch (IOException | RuntimeException e) {
+			if (socket.isClosed()) {
+				groupSync.cancel(true);
+				throw new CancellationException("stop group sync for " + this);
+			}
 			logger.warn("sending group sync failed", e);
 		}
 	}
