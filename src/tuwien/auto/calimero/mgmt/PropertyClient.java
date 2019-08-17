@@ -669,13 +669,15 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	{
 		int i = 0;
 		try {
+			if (!allProperties) {
+				// specifically ask for pid 1 -> description of object type
+				consumer.accept(createDesc(objIndex, pa.getDescription(objIndex, 1, 0)));
+				return 1;
+			}
 			// property with index 0 is description of object type
 			// rest are ordinary properties of the object
-			for (;; ++i) {
+			for (;; ++i)
 				consumer.accept(createDesc(objIndex, pa.getDescription(objIndex, 0, i)));
-				if (!allProperties)
-					return 1;
-			}
 		}
 		catch (final KNXException e) {
 			if (!KNXRemoteException.class.equals(e.getClass()) && !KNXTimeoutException.class.equals(e.getClass())) {
