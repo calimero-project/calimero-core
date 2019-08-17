@@ -299,13 +299,20 @@ public final class SecureConnection extends KNXnetIPRouting {
 	}
 
 	/**
-	 * Creates the hash value for the given device authentication code using PBKDF2 with the HMAC-SHA256 hash
-	 * function. Before returning, this method fills the {@code authCode} array with zeros.
+	 * Creates the hash value for the given device authentication password, for use as device authentication code.
+	 * This method uses PBKDF2 with the HMAC-SHA256 hash function; before this method returns, {@code password}
+	 * is filled with zeros.
 	 *
-	 * @param authCode input device authentication code interpreted using the US-ASCII character encoding, the
+	 * @param password input device authentication password interpreted using the US-ASCII character encoding, the
 	 *        replacement for unknown or non-printable characters is '?'
-	 * @return the derived 16 byte hash value
+	 * @return the derived device authentication code as 16 byte hash value
 	 */
+	public static byte[] hashDeviceAuthenticationPassword(final char[] password) {
+		final byte[] salt = "device-authentication-code.1.secure.ip.knx.org".getBytes(StandardCharsets.US_ASCII);
+		return pbkdf2WithHmacSha256(password, salt);
+	}
+
+	@Deprecated
 	public static byte[] hashDeviceAuthenticationCode(final char[] authCode) {
 		final byte[] salt = "device-authentication-code.1.secure.ip.knx.org".getBytes(StandardCharsets.US_ASCII);
 		return pbkdf2WithHmacSha256(authCode, salt);
