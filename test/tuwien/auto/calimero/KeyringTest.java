@@ -51,7 +51,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import tuwien.auto.calimero.Keyring.Interface;
-import tuwien.auto.calimero.knxnetip.KnxSecureException;
 import tuwien.auto.calimero.xml.KNXMLException;
 
 class KeyringTest {

@@ -93,6 +93,7 @@ import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.KnxSecureException;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.knxnetip.Connection.SecureSession;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;

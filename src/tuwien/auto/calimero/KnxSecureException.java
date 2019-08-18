@@ -34,7 +34,7 @@
     version.
 */
 
-package tuwien.auto.calimero.knxnetip;
+package tuwien.auto.calimero;
 
 public class KnxSecureException extends RuntimeException {
 	private static final long serialVersionUID = 1;
