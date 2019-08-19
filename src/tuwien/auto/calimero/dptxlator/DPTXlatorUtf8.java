@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2017 B. Malinowsky
+    Copyright (c) 2015, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -209,13 +209,7 @@ public class DPTXlatorUtf8 extends DPTXlator
 		final byte[] utfdata = new byte[length];
 		for (int i = 0; i < utfdata.length; i++)
 			utfdata[i] = (byte) data[offset + i];
-		try {
-			return new String(utfdata, 0, length, "utf-8");
-		}
-		catch (final UnsupportedEncodingException e) {
-			// in such JVM, all bets are off
-			throw new RuntimeException("JVM mandatory UTF-8 charset not available!", e);
-		}
+		return new String(utfdata, 0, length, StandardCharsets.UTF_8);
 	}
 
 	private void toDPT(final byte[] buf, final int offset)
@@ -250,16 +244,10 @@ public class DPTXlatorUtf8 extends DPTXlator
 
 	private byte[] toUtf8(final String value) throws KNXFormatException
 	{
-		try {
-			final byte[] utfdata = value.getBytes("utf-8");
-			if (utfdata.length > maxLength - 1)
-				throw newException("UTF-8 string exceeds translator limit of " + maxLength + " bytes", value);
-			return utfdata;
-		}
-		catch (final UnsupportedEncodingException e) {
-			// in such JVM, all bets are off
-			throw new RuntimeException("JVM mandatory UTF-8 charset not available!", e);
-		}
+		final byte[] utfdata = value.getBytes(StandardCharsets.UTF_8);
+		if (utfdata.length > maxLength - 1)
+			throw newException("UTF-8 string exceeds translator limit of " + maxLength + " bytes", value);
+		return utfdata;
 	}
 
 	private static int findOffsetFor(final int index, final short[] dst)

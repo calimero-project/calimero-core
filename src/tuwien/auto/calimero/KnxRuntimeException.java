@@ -45,4 +45,8 @@ public class KnxRuntimeException extends RuntimeException {
 	public KnxRuntimeException(final String message, final Throwable cause) {
 		super(message, cause);
 	}
+
+	public KnxRuntimeException(final String message) {
+		super(message);
+	}
 }

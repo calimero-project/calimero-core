@@ -56,6 +56,7 @@ import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.KnxRuntimeException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.ReturnCode;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
@@ -104,7 +105,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 			DefaultMulticast = InetAddress.getByName("224.0.23.12");
 		}
 		catch (final UnknownHostException e) {
-			throw new RuntimeException(e);
+			throw new KnxRuntimeException("KNXnet/IP system setup multicast address", e);
 		}
 	}
 
