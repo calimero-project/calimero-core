@@ -336,7 +336,8 @@ public class DeviceDIB extends DIB
 	 */
 	public final String getSerialNumberString()
 	{
-		return DataUnitBuilder.toHex(serial, "");
+		final var sn = DataUnitBuilder.toHex(serial, "");
+		return sn.substring(0, 4) + ":" + sn.substring(4);
 	}
 
 	/**
@@ -369,7 +370,7 @@ public class DeviceDIB extends DIB
 				+ ", Installation " + getInstallation() + " - Project " + getProject()
 				+ " (ID " + installationId + ")"
 				+ ", KNX IP multicast address " + mc + ", MAC address " + getMACAddressString()
-				+ ", S/N 0x" + getSerialNumberString();
+				+ ", S/N " + getSerialNumberString();
 	}
 
 	@Override
