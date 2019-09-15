@@ -305,10 +305,11 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	{
 		final int id;
 		final String name;
+		final String propName;
+		final String description;
 		final int objType;
 		final int pdt;
 		final String dpt;
-		final String propName;
 		final int read;
 		final int write;
 		final int accessPolicy;
@@ -327,15 +328,16 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		public Property(final int pid, final String pidName, final String propertyName,
 			final int objectType, final int pdt, final String dpt)
 		{
-			this(pid, pidName, propertyName, objectType, pdt, dpt, 0, 0, 0);
+			this(pid, pidName, propertyName, "n/a", objectType, pdt, dpt, 0, 0, 0);
 		}
 
-		Property(final int pid, final String pidName, final String propertyName, final int objectType, final int pdt,
-			final String dpt, final int readLevel, final int writeLevel, final int accessPolicy)
-		{
+		Property(final int pid, final String pidName, final String propertyName, final String description,
+				final int objectType, final int pdt, final String dpt, final int readLevel, final int writeLevel,
+				final int accessPolicy) {
 			id = pid;
 			name = pidName;
 			propName = propertyName;
+			this.description = description;
 			objType = objectType;
 			this.pdt = pdt;
 			this.dpt = dpt;
@@ -407,6 +409,8 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		{
 			return propName;
 		}
+
+		public final String description() { return description; }
 
 		/**
 		 * @return <code>true</code> if property is read-only, <code>false</code> if property is write-enabled
@@ -805,13 +809,23 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 							objType = "global".equals(type) ? -1 : toInt(type);
 						}
 						else if (reader.getLocalName().equals(PROPERTY_TAG)) {
+							final int pid = toInt(reader.getAttributeValue("", PID_ATTR));
+							final String pidName = reader.getAttributeValue("", PIDNAME_ATTR);
+							final String friendly = reader.getAttributeValue("", NAME_ATTR);
+							final int pdt = toInt(reader.getAttributeValue("", PDT_ATTR));
+							final String dpt = reader.getAttributeValue("", DPT_ATTR);
+
 							final int[] rw = parseRW(reader.getAttributeValue("", RW_ATTR));
 							final boolean write = parseWriteEnabled(reader.getAttributeValue("", WRITE_ATTR));
 							final int accessPolicy = parseAccessPolicy(reader.getAttributeValue("", "accessPolicy"));
-							list.add(new Property(toInt(reader.getAttributeValue("", PID_ATTR)),
-									reader.getAttributeValue("", PIDNAME_ATTR), reader.getAttributeValue("", NAME_ATTR),
-									objType, toInt(reader.getAttributeValue("", PDT_ATTR)),
-									reader.getAttributeValue("", DPT_ATTR), rw[0], write ? rw[1] : -1, accessPolicy));
+
+							String description = "";
+							if (reader.nextTag() == XmlReader.START_ELEMENT
+									&& reader.getLocalName().equals(USAGE_TAG))
+								description = reader.getElementText();
+
+							list.add(new Property(pid, pidName, friendly, description, objType, pdt, dpt, rw[0],
+									write ? rw[1] : -1, accessPolicy));
 						}
 					}
 					else if (event == XmlReader.END_ELEMENT && reader.getLocalName().equals(PROPDEFS_TAG))
