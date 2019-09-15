@@ -432,10 +432,30 @@ public final class DataUnitBuilder
 			return "A_FunctionPropertyCommand";
 		case 0b1011001001:
 			return "A_FunctionPropertyState.response";
+		// services for extended interface object addressing
+		case 0b0111001100:
+			return "A_PropertyExtValue.read";
+		case 0b0111001101:
+			return "A_PropertyExtValue.response";
+		case 0b0111001110:
+			return "A_PropertyExtValue.write";
+		case 0b0111001111:
+			return "A_PropertyExtValue.write-response";
+		case 0b0111010000:
+			return "A_PropertyExtValue.write-uncon";
+		case 0b0111010001:
+			return "A_PropertyExtValue.info";
+		case 0b0111010010:
+			return "A_PropertyExtDescription.read";
+		case 0b0111010011:
+			return "A_PropertyExtDescription.response";
 		case 0b0111010100:
 			return "A_FunctionPropertyExtCommand";
+		case 0b0111010101:
+			return "A_FunctionPropertyExtState.read";
 		case 0b0111010110:
 			return "A_FunctionPropertyExtState.response";
+
 		default:
 			return "APCI 0x" + Integer.toHexString(apci);
 		}
