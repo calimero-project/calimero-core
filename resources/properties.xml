@@ -3,7 +3,7 @@
 <propertyDefinitions>
     <object type="global">
         <property pid="1" pidName="PID_OBJECT_TYPE" name="Interface Object Type" pdt="4" dpt="7.010" rw="R" writeEnabled="0">
-            <usage>Object Type Device Object</usage>
+            <usage>Object type of the interface object</usage>
         </property>
         <property pid="2" pidName="PID_OBJECT_NAME" name="Interface Object Name" pdt="2" rw="R(/W)" writeEnabled="0/1">
             <usage>Name of the Interface Object</usage>
@@ -327,16 +327,16 @@
         <property pid="51" pidName="PID_MEDIUM_STATUS" name="Medium Status" pdt="17" rw="3/-" writeEnabled="1">
             <usage>Status of the communication medium</usage>
         </property>
-        <property pid="52" pidName="PID_MAIN_LCCONFIG" name="Line Coupler Configuration for Main Line" pdt="17" rw="3/0" writeEnabled="0">
+        <property pid="52" pidName="PID_MAIN_LCCONFIG" name="Line Coupler Configuration for Main Line" pdt="17" rw="3/3" writeEnabled="1">
             <usage>Defines the handling of point-to-point addressed and broadcast frames from the primary side</usage>
         </property>
-        <property pid="53" pidName="PID_SUB_LCCONFIG" name="Line Coupler Configuration for Subline" pdt="17" rw="3/0" writeEnabled="0">
+        <property pid="53" pidName="PID_SUB_LCCONFIG" name="Line Coupler Configuration for Subline" pdt="17" rw="3/3" writeEnabled="1">
             <usage>Defines the handling of point-to-point addressed and broadcast frames from the secondary side</usage>
         </property>
-        <property pid="54" pidName="PID_MAIN_LCGRPCONFIG" name="Line Coupler Configuration for multicast from Main Line" pdt="17" rw="3/0" writeEnabled="0">
+        <property pid="54" pidName="PID_MAIN_LCGRPCONFIG" name="Line Coupler Configuration for multicast from Main Line" pdt="17" rw="3/3" writeEnabled="1">
             <usage>Defines the handling of multicast frames from the primary side</usage>
         </property>
-        <property pid="55" pidName="PID_SUB_LCGRPCONFIG" name="Line Coupler Configuration for multicast from Subline" pdt="17" rw="3/0" writeEnabled="0">
+        <property pid="55" pidName="PID_SUB_LCGRPCONFIG" name="Line Coupler Configuration for multicast from Subline" pdt="17" rw="3/3" writeEnabled="1">
             <usage>Defines the handling of multicast frames from the secondary side</usage>
         </property>
         <property pid="56" pidName="PID_ROUTETABLE_CONTROL" name="Routing Table Control" pdt="62" rw="3/0" writeEnabled="0">
@@ -351,6 +351,31 @@
         <property pid="120" pidName="PID_IP_SBC_CONTROL" name="IP System Broadcast Routing" pdt="0x3E" rw="2/2" writeEnabled="1" accessPolicy="3FF/00C">
             <usage>Enable and disable the IP System Broadcast Routing Mode</usage>
         </property>
+		<!-- Enertex-specific -->
+		<property pid="201" pidName="PID_MAIN_LCGRPCONFIG_HIGH"
+			name="Extended filter for multicasts from main line" pdt="0x02" rw="3/0" writeEnabled="0">
+			<usage>Defines a filter for each main group [0..31] for IP to KNX</usage>
+		</property>
+		<property pid="202" pidName="PID_SUB_LCGRPCONFIG_HIGH"
+			name="Extended filter for multicasts from sub line" pdt="0x02" rw="3/0" writeEnabled="0">
+			<usage>Defines a filter for each main group [0..31] for KNX to IP</usage>
+		</property>
+		<property pid="203" pidName="PID_ENX_SYSTEMBC" name="Compatibility mode for system broadcasts" pdt="0x32" dpt="1.001"
+			rw="3/3" writeEnabled="1">
+			<usage>With IP routing, set specific bits in system broadcasts for communication with older devices</usage>
+		</property>
+		<property pid="206" pidName="PID_ENX_SEND_ALAWAYS_ACK" name="ACK every telegram" pdt="0x32" dpt="1.001"
+			rw="3/3" writeEnabled="1">
+			<usage>Every received telegram is acknowledged</usage>
+		</property>
+		<property pid="208" pidName="PID_ENX_LOCK_PROGKNX" name="Lock programming from KNX side" pdt="0x32"
+			dpt="1.001" rw="3/3" writeEnabled="1">
+			<usage>The interface can be locked to not be programmed over the KNX bus</usage>
+		</property>
+		<property pid="209" pidName="PID_ENX_LEGACY_ROUTING" name="Enable legacy routing algorithm" pdt="0x32"
+			dpt="1.001" rw="3/3" writeEnabled="1">
+			<usage>Routing count algorithm for hop count 7 according to pre-2018 specification</usage>
+		</property>
     </object>
     <object type="7">
         <property pid="51" pidName="PID_LTE_ROUTESELECT" name="LTE Frames Routing Selection" pdt="17" rw="3/0" writeEnabled="0">
@@ -544,7 +569,20 @@
         </property>
         <property pid="97" pidName="PID_TUNNELING_USERS" name="Tunneling users" pdt="18" rw="2/2" writeEnabled="0" accessPolicy="00C/00C">
             <usage>List of tunneling users</usage>
-        </property>
+	    </property>
+		<!-- Enertex-specific -->
+		<property pid="204" pidName="PID_ENX_TUNNELING_REQUEST_TIMEOUT"
+			name="Tunneling request timeout" pdt="0x02" rw="3/3" writeEnabled="1">
+			<usage>Expected maximum response time for UDP based tunneling [1.0 .. 10.0]</usage>
+		</property>
+		<property pid="207" pidName="PID_ENX_TUNNELING_UDP"
+			name="UDP-only tunneling connection" pdt="0x02" dpt="1.001" rw="3/3" writeEnabled="1">
+			<usage>Force clients to use a UDP connection for tunneling (and not TCP)</usage>
+		</property>
+		<property pid="205" pidName="PID_ENX_BASICCRI_TUNNELING_PREFERRED_IP"
+			name="Preferred tunnel for an IP address" pdt="0x09" rw="3/3" writeEnabled="1">
+			<usage>Assigns the tunnel used with a basic connection request to a IP address</usage>
+		</property>
     </object>
     <object type="12">
         <property pid="51" pidName="PID_AR_TYPE_REPORT" name="" pdt="19" rw="" writeEnabled="">
@@ -590,6 +628,15 @@
         </property>
         <property pid="62" pidName="PID_ROLE_TABLE" name="Role Table" pdt="17" rw="3/x" writeEnabled="1" accessPolicy="15D/15D">
             <usage>Role table</usage>
+        </property>
+    </object>
+    <!-- Enertex-specific -->
+    <object type="50001" name="Enertex device">
+        <property pid="209" pidName="PID_ENX_BLOCKFILTER" name="Block group filters" pdt="0x32" dpt="1.001" rw="3/3" writeEnabled="1">
+            <usage>Disable all group address filters (forward everything)</usage>
+        </property>
+        <property pid="211" pidName="PID_ENX_TELEGRAMMRATE_LIMIT" name="Telegram rate limit" pdt="0x02" rw="3/3" writeEnabled="1">
+            <usage>Telegram rate</usage>
         </property>
     </object>
 </propertyDefinitions>
