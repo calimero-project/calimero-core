@@ -1054,10 +1054,11 @@ public class ManagementClientImpl implements ManagementClient
 			while (remaining > 0) {
 				final List<IndividualAddress> responder = new ArrayList<>();
 				final byte[] res = waitForResponse(null, minAsduLen, maxAsduLen, remaining, Optional.of(responder));
-				if (test.test(responder.get(0), res))
+				if (test.test(responder.get(0), res)) {
 					l.add(res);
-				if (oneOnly)
-					break;
+					if (oneOnly)
+						break;
+				}
 				remaining = end - System.nanoTime() / 1_000_000;
 			}
 		}
