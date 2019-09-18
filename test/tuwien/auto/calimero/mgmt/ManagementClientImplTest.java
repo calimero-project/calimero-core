@@ -58,7 +58,6 @@ import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.Util;
@@ -547,32 +546,20 @@ class ManagementClientImplTest
 	void testReadUnsupportedNetworkParameter() throws InterruptedException, KNXException
 	{
 		final byte testInfo = 1;
-		try {
-			mc.readNetworkParameter(dcl.getAddress(), 99, 254, testInfo);
-			fail("unsupported object type");
-		}
-		catch (final KNXInvalidResponseException expected) {}
-		try {
-			mc.readNetworkParameter(dcl.getAddress(), 0, 254, testInfo);
-			fail("unsupported pid");
-		}
-		catch (final KNXInvalidResponseException expected) {}
+		var responses = mc.readNetworkParameter(dcl.getAddress(), 99, 254, testInfo);
+		assertTrue(responses.isEmpty());
+		responses = mc.readNetworkParameter(dcl.getAddress(), 0, 254, testInfo);
+		assertTrue(responses.isEmpty());
 	}
 
 	@Test
 	void testReadUnsupportedNetworkParameterBroadcast() throws InterruptedException, KNXException
 	{
 		final byte testInfo = 1;
-		try {
-			mc.readNetworkParameter(null, 99, 254, testInfo);
-			fail("unsupported object type, should be timeout");
-		}
-		catch (final KNXTimeoutException expected) {}
-		try {
-			mc.readNetworkParameter(null, 0, 254, testInfo);
-			fail("unsupported pid, should be timeout");
-		}
-		catch (final KNXTimeoutException expected) {}
+		var responses = mc.readNetworkParameter(null, 99, 254, testInfo);
+		assertTrue(responses.isEmpty());
+		responses = mc.readNetworkParameter(null, 0, 254, testInfo);
+		assertTrue(responses.isEmpty());
 	}
 
 	@Test

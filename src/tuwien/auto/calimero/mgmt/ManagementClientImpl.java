@@ -402,7 +402,7 @@ public class ManagementClientImpl implements ManagementClient
 	}
 
 	@Override
-	public byte[] readNetworkParameter(final IndividualAddress remote, final int objectType, final int pid,
+	public List<byte[]> readNetworkParameter(final IndividualAddress remote, final int objectType, final int pid,
 		final byte... testInfo)
 		throws KNXLinkClosedException, KNXTimeoutException, KNXInvalidResponseException, InterruptedException
 	{
@@ -410,21 +410,28 @@ public class ManagementClientImpl implements ManagementClient
 			try {
 				svcResponse = NetworkParamResponse;
 				sendNetworkParameter(NetworkParamRead, remote, objectType, pid, testInfo);
-				final byte[] res = waitForResponse(remote, 3, 14, responseTimeout);
-				final int receivedIot = (res[2] & 0xff) << 8 | (res[3] & 0xff);
-				final int receivedPid = res[4] & 0xff;
-				String s = "network parameter read response from " + remote + ": ";
-				if (receivedPid == 0xff) {
-					if (receivedIot == 0xffff)
-						s += "unsupported interface object type " + objectType;
-					else
-						s += "unsupported PID " + pid;
-					throw new KNXInvalidResponseException(s);
-				}
-				if (receivedIot != objectType || receivedPid != pid)
-					throw new KNXInvalidResponseException(s + "mismatch OT " + receivedIot + ", PID " + receivedPid);
-				final int offset = 2 + 3 + testInfo.length;
-				return Arrays.copyOfRange(res, offset, res.length);
+
+				final BiPredicate<IndividualAddress, byte[]> testResponse = (responder, apdu) -> {
+					if (apdu.length < 5)
+						return false;
+
+					final int receivedIot = (apdu[2] & 0xff) << 8 | (apdu[3] & 0xff);
+					final int receivedPid = apdu[4] & 0xff;
+					if (apdu.length == 5) {
+						final String s = receivedPid == 0xff ? receivedIot == 0xffff ? "object type" : "PID"
+								: "response";
+						logger.info("network parameter read response from {} for interface object type {} "
+								+ "PID {}: unsupported {}", responder, objectType, pid, s);
+						return false;
+					}
+					return receivedIot == objectType && receivedPid == pid;
+				};
+
+				final var waitTime = Duration.ofMillis(responseTimeout);
+				final List<byte[]> responses = waitForResponses(3, 14, testResponse, waitTime, false);
+
+				final int prefix = 2 + 3 + testInfo.length;
+				return responses.stream().map(r -> Arrays.copyOfRange(r, prefix, r.length)).collect(toList());
 			}
 			finally {
 				svcResponse = 0;

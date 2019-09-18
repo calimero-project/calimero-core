@@ -280,23 +280,22 @@ public interface ManagementClient extends AutoCloseable
 	 * Reads the current configuration of a network parameter from a {@code remote} endpoint. In broadcast communication
 	 * mode, the remote endpoint will ignore a network parameter read request on 1) reading a network parameter that is
 	 * not supported by the remote endpoint in question, or 2) on a negative check with respect to the supplied
-	 * parameters against the test information {@code testInfo}. In both cases, a timeout exception will occur.<br>
+	 * parameters against the test information {@code testInfo}.<br>
 	 * In point-to-point communication mode, the remote endpoint will answer with a negative response if 1) the
 	 * interface object type is not supported, 2) the PID is not supported, or 3) on a negative check of the
-	 * investigated parameters against the test information. In both cases, <code>KNXInvalidResponseException</code> is
-	 * thrown.
+	 * investigated parameters against the test information.
 	 *
 	 * @param remote address of remote endpoint, or <code>null</code> to use broadcast communication mode
 	 * @param objectType interface object type, <code>0 &le; objectType &lt; 0xffff</code>
 	 * @param pid KNX property identifier, <code>0 &le; pid &lt; 0xff</code>
 	 * @param testInfo test information, <code>0 &lt; testInfo.length &lt; </code> parameter-specific
-	 * @return test result as byte array, <code>result.length &gt; 0</code>
+	 * @return received responses as (empty) list of byte arrays, <code>byte array length &gt; 0</code>
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXTimeoutException on timeout during send or waiting for a response
 	 * @throws KNXInvalidResponseException on invalid read response message
 	 * @throws InterruptedException on interrupted thread
 	 */
-	byte[] readNetworkParameter(IndividualAddress remote, int objectType, int pid, byte... testInfo)
+	List<byte[]> readNetworkParameter(IndividualAddress remote, int objectType, int pid, byte... testInfo)
 		throws KNXException, InterruptedException;
 
 	/**
