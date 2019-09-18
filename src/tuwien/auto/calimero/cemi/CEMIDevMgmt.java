@@ -195,7 +195,6 @@ public class CEMIDevMgmt implements CEMI
 
 	/**
 	 * Creates a new device management message from a byte stream.
-	 * <p>
 	 *
 	 * @param data byte stream containing a cEMI device management message
 	 * @param offset start offset of cEMI frame in <code>data</code>
@@ -210,7 +209,7 @@ public class CEMIDevMgmt implements CEMI
 		checkLength(is, 1);
 		mc = is.read();
 		if (mc < MC_OFFSET || !msgCodes.get(mc - MC_OFFSET))
-			throw new KNXFormatException("unknown message code");
+			throw new KNXFormatException("unknown message code 0x" + Integer.toHexString(mc));
 		if (mc == MC_RESET_REQ || mc == MC_RESET_IND)
 			initReset(is);
 		else {
@@ -547,15 +546,15 @@ public class CEMIDevMgmt implements CEMI
 		final int startIndex, final int elements)
 	{
 		if (objType < 0 || objType > 0xFFFF)
-			throw new KNXIllegalArgumentException("interface object type out of range [0..0xFFFF]");
+			throw new KNXIllegalArgumentException("interface object type " + objType + " out of range [0..0xFFFF]");
 		if (objInstance < 1 || objInstance > 0xFF)
-			throw new KNXIllegalArgumentException("object instance out of range [1..0xFF]");
+			throw new KNXIllegalArgumentException("object instance " + objInstance + " out of range [1..0xFF]");
 		if (propID < 0 || propID > 0xFF)
-			throw new KNXIllegalArgumentException("property ID out of range [0..0xFF]");
+			throw new KNXIllegalArgumentException("property ID " + propID + " out of range [0..0xFF]");
 		if (startIndex < 0 || startIndex > 0xFFF)
-			throw new KNXIllegalArgumentException("start index out of range [0..0xFFF]");
+			throw new KNXIllegalArgumentException("start index " + startIndex + " out of range [0..0xFFF]");
 		if (elements < 0 || elements > 0xF)
-			throw new KNXIllegalArgumentException("elements out of range [0..0xF]");
+			throw new KNXIllegalArgumentException("elements " + elements + " out of range [0..0xF]");
 		if (mc == MC_PROPREAD_REQ || mc == MC_PROPWRITE_REQ || mc == MC_PROPINFO_IND)
 			if (elements < 1)
 				throw new KNXIllegalArgumentException("elements may not be 0");

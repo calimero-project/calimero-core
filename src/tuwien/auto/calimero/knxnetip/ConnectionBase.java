@@ -572,8 +572,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@SuppressWarnings("unused")
-	void doExtraBlockingModes() throws KNXTimeoutException, InterruptedException
-	{}
+	void doExtraBlockingModes() throws KNXTimeoutException, InterruptedException {}
 
 	String connectionState() {
 		switch (state) {

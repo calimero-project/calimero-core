@@ -293,6 +293,11 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 			final int rhs = o.hashCode();
 			return hashCode() < rhs ? -1 : hashCode() > rhs ? 1 : 0;
 		}
+
+		@Override
+		public String toString() {
+			return getObjectTypeName(ot) + " PID " + id;
+		}
 	}
 
 	/**

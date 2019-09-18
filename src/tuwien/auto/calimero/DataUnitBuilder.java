@@ -60,8 +60,7 @@ public final class DataUnitBuilder
 	private static final int T_ACK = 0xC2;
 	private static final int T_NAK = 0xC3;
 
-	private DataUnitBuilder()
-	{}
+	private DataUnitBuilder() {}
 
 	/**
 	 * Returns the application layer service of a given protocol data unit.
@@ -366,11 +365,11 @@ public final class DataUnitBuilder
 		case 0xC0:
 			return "A_IndAddr.write";
 		case 0x03DC:
-			return "A_IndAddr-sno.read";
+			return "A_IndAddr-S/N.read";
 		case 0x03DD:
-			return "A_IndAddr-sno.response";
+			return "A_IndAddr-S/N.response";
 		case 0x03DE:
-			return "A_IndAddr-sno.write";
+			return "A_IndAddr-S/N.write";
 		case 0x300:
 			return "A_Device-desc.read";
 		case 0x340:

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -270,8 +270,7 @@ public class CEMILData implements CEMI
 		this(msgCode, src, dst, tpdu, p, repeat, true, false, hopCount);
 	}
 
-	CEMILData()
-	{}
+	CEMILData() {}
 
 	/* (non-Javadoc)
 	 * @see tuwien.auto.calimero.cemi.CEMI#getMessageCode()

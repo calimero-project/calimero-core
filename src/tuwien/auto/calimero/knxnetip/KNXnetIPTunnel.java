@@ -405,7 +405,7 @@ public class KNXnetIPTunnel extends ClientConnection
 			}
 		}
 		else if (mc == CEMILData.MC_LDATA_REQ)
-			logger.warn("received L-Data request - ignored");
+			logger.warn("received L-Data request - ignore {}", cemi);
 
 		return true;
 	}

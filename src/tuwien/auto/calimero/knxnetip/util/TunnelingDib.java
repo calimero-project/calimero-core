@@ -110,7 +110,7 @@ public class TunnelingDib extends DIB {
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append("maximum APDU length: " + String.valueOf(maxApduLength) + ", ");
+		sb.append("maximum APDU length: " + maxApduLength + ", addresses ");
 		for (int i = 0; i < addresses.length; i++)
 			sb.append(addresses[i] + " (" + formatStatus(status[i]) + ") ");
 		return sb.toString();

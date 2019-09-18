@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,7 +42,6 @@ import java.io.ByteArrayOutputStream;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.cemi.CEMI;
-import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.cemi.CEMIFactory;
 
 /**
@@ -82,7 +81,7 @@ public class ServiceRequest extends ServiceType
 		if (svcType == KNXnetIPHeader.TUNNELING_REQ)
 			cemi = CEMIFactory.create(data, offset + CONN_HEADER_SIZE, length - CONN_HEADER_SIZE);
 		else if (svcType == KNXnetIPHeader.DEVICE_CONFIGURATION_REQ)
-			cemi = new CEMIDevMgmt(data, offset + CONN_HEADER_SIZE, length - CONN_HEADER_SIZE);
+			cemi = CEMIFactory.create(data, offset + CONN_HEADER_SIZE, length - CONN_HEADER_SIZE);
 		else if (svcType == KNXnetIPHeader.TunnelingFeatureGet || svcType == KNXnetIPHeader.TunnelingFeatureResponse
 				|| svcType == KNXnetIPHeader.TunnelingFeatureSet || svcType == KNXnetIPHeader.TunnelingFeatureInfo)
 			cemi = null;
