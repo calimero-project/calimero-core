@@ -15,7 +15,7 @@ Supported Features
 --------
 
 ### Access Protocols
-* KNX IP Secure (UDP)
+* KNX IP Secure
     * Discovery and Self-description
     * Tunneling
     * Multicast ([example](https://github.com/calimero-project/introduction/blob/master/2.5/src/main/java/KnxipSecure.java) of creating a secure network link)
@@ -30,7 +30,7 @@ Supported Features
 * KNX IP
 * KNX RF USB
 * KNX USB
-* KNX FT1.2 Protocol (serial connections)
+* KNX FT1.2 protocol (serial connections using EMI2 or cEMI)
 * TP-UART (access TP1 networks over serial connections)
 
 ### Process Communication
