@@ -59,7 +59,7 @@ class ConnectionTest {
 	private final byte[] userKey2 = SecureConnection.hashUserPassword("user2".toCharArray());
 	private final byte[] userKey3 = SecureConnection.hashUserPassword("user3".toCharArray());
 
-	private final byte[] deviceAuthCode = SecureConnection.hashDeviceAuthenticationCode("dev".toCharArray());
+	private final byte[] deviceAuthCode = SecureConnection.hashDeviceAuthenticationPassword("dev".toCharArray());
 
 	@BeforeEach
 	void init() throws KNXException {

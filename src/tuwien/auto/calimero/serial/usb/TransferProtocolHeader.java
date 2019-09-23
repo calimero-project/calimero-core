@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2018 B. Malinowsky
+    Copyright (c) 2015, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -87,6 +87,9 @@ public final class TransferProtocolHeader
 
 		@Override
 		public int id() { return ordinal() + 1; }
+
+		@Override
+		public String toString() { return this == Emi1 ? "EMI1" : this == Emi2 ? "EMI2" : "cEMI"; }
 	}
 
 	/** Service IDs for Bus Access Server device feature service. */

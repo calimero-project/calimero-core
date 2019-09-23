@@ -936,7 +936,7 @@ public class UsbConnection implements AutoCloseable
 			if (!desc.equals(indent))
 				sb.append("\n").append(desc);
 			if (sno != 0)
-				sb.append("\n").append(indent).append("S/N: ").append(device.getString(sno));
+				sb.append("\n").append(indent).append("S/N ").append(device.getString(sno));
 		}
 		catch (final UnsupportedEncodingException e) {
 			l.error("Java platform lacks support for the required standard charset UTF-16LE", e);
