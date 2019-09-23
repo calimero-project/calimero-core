@@ -343,7 +343,7 @@ final class BcuSwitcher
 
 	private static final int cemiServerObjectType = 8;
 	private static final int objectInstance = 1;
-	private static final int pidCommMode = 52; // PID.COMM_MODE
+	static final int pidCommMode = 52; // PID.COMM_MODE
 
 	static final int DataLinkLayer = 0;
 	static final int Busmonitor = 1;

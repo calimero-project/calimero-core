@@ -209,8 +209,8 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 		if (activeEmi == EmiType.CEmi) {
 			final var frame = BcuSwitcher.commModeRequest(BcuSwitcher.DataLinkLayer);
 			conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame).get(0), true);
-			// check for .con
-			//findFrame(CEMIDevMgmt.MC_PROPWRITE_CON);
+			// wait for .con
+			responseFor(CEMIDevMgmt.MC_PROPWRITE_CON, BcuSwitcher.pidCommMode);
 		}
 		else if (activeEmi == EmiType.Emi1) {
 			new BcuSwitcher(conn, logger).enter(BcuMode.LinkLayer);

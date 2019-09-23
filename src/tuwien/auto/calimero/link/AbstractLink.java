@@ -454,9 +454,9 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		return value;
 	}
 
-	private synchronized Optional<byte[]> responseFor(final int messageCode, final int pid) throws InterruptedException {
-		long remaining = 1000_000_000L;
-		final long end = System.nanoTime() + remaining;
+	synchronized Optional<byte[]> responseFor(final int messageCode, final int pid) throws InterruptedException {
+		long remaining = 1000L;
+		final long end = System.nanoTime() / 1000_000 + remaining;
 
 		while (remaining > 0) {
 			if (devMgmt != null) {
@@ -471,8 +471,8 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 					return Optional.of(data);
 				}
 			}
-			wait(remaining / 1000_000);
-			remaining = end - System.nanoTime();
+			wait(remaining);
+			remaining = end - System.nanoTime() / 1000_000;
 		}
 		return Optional.empty();
 	}
