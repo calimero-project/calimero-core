@@ -586,16 +586,22 @@ public class ManagementProceduresImpl implements ManagementProcedures
 
 	private void scanAddresses(final List<IndividualAddress> addresses, final boolean routers,
 		final Consumer<IndividualAddress> response)
-			throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
+			throws KNXLinkClosedException, InterruptedException
 	{
 		final TransportListener tll = new TLListener(response, routers);
 		tl.addTransportListener(tll);
 
-		List<Destination> dst = new ArrayList<>();
+		final List<Destination> dst = new ArrayList<>();
 		try {
-			dst = addresses.stream().map((a) -> getOrCreateDestination(a, true, false)).collect(Collectors.toList());
-			for (final Destination d : dst) {
-				tl.connect(d);
+			for (final var address : addresses) {
+				final var d = getOrCreateDestination(address, true, false);
+				dst.add(d);
+				try {
+					tl.connect(d);
+				}
+				catch (final KNXTimeoutException e) {
+					logger.info("connect timeout during address scan for {}", d);
+				}
 				// increased from 100 (the default) to minimize chance of overflow over FT1.2
 				Thread.sleep(115);
 			}
