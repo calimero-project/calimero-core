@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2014, 2018 B. Malinowsky
+    Copyright (c) 2014, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -676,8 +676,10 @@ public class TpuartConnection implements AutoCloseable
 		{
 			if (busmon || frameAcked)
 				return;
-			final byte[] addr = new byte[] { frame[3], frame[4] };
-			final boolean group = (frame[5] & 0x80) == 0x80;
+			final int addrOffset = extFrame ? 4 : 3;
+			final byte[] addr = new byte[] { frame[addrOffset], frame[addrOffset + 1] };
+			final int addrTypeOffset = extFrame ? 1 : 5;
+			final boolean group = (frame[addrTypeOffset] & 0x80) == 0x80;
 			final KNXAddress dst = group ? new GroupAddress(addr) : new IndividualAddress(addr);
 
 			// We can answer as follows:
