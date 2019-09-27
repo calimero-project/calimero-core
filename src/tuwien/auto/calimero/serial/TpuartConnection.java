@@ -440,6 +440,7 @@ public class TpuartConnection implements AutoCloseable
 		private boolean extFrame;
 		private boolean frameAcked;
 
+		private byte[] lastReceived = new byte[0];
 		private long lastUartState = System.currentTimeMillis();
 		private boolean uartStatePending;
 
@@ -586,8 +587,19 @@ public class TpuartConnection implements AutoCloseable
 							if (busmon) {
 								fireFrameReceived(createBusmonInd(data));
 							}
-							else
-								fireFrameReceived(createLDataInd(data));
+							else {
+								// check repetition of a directly preceding correctly received frame
+								final boolean repeated = (data[0] & RepeatFlag) == 0;
+								if (repeated && Arrays.equals(lastReceived, 0, lastReceived.length - 2, frame, 0, data.length - 2)) {
+									logger.debug("ignore repetition of directly preceding correctly received frame");
+								}
+								else {
+									lastReceived = data.clone();
+									lastReceived[0] &= ~RepeatFlag; // set repeat flag
+
+									fireFrameReceived(createLDataInd(data));
+								}
+							}
 						}
 						catch (final Exception e) {
 							logger.error("error creating {} from TP1 data (length {}): {}",
