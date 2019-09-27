@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@ import static tuwien.auto.calimero.mgmt.Destination.State.Disconnected;
 import static tuwien.auto.calimero.mgmt.Destination.State.OpenIdle;
 import static tuwien.auto.calimero.mgmt.Destination.State.OpenWait;
 
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -396,6 +397,17 @@ public class Destination implements AutoCloseable
 			s = s + "connectionless, ";
 		return s + (verify ? "" : "no") + " verify mode";
 	}
+
+	// required for extended property services
+	private volatile int[] interfaceObjectList;
+
+	// not present if property was never queried, returned list is empty if device does not keep an object list
+	Optional<int[]> interfaceObjectList() {
+		final var ioList = interfaceObjectList;
+		return ioList == null ? Optional.empty() : Optional.of(ioList.clone());
+	}
+
+	void setInterfaceObjectList(final int[] ioList) { interfaceObjectList = ioList.clone(); }
 
 	int getDisconnectedBy()
 	{

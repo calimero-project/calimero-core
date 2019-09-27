@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ public final class Description
 {
 	private final int oindex;
 	private final int otype;
+	private final int objectInstance;
 	private final int id;
 	private final int pindex;
 	private final int maxElems;
@@ -65,6 +66,11 @@ public final class Description
 	private final int rLevel;
 	private final int wLevel;
 	private final boolean write;
+
+	// extended property description service
+	static Description of(final int objectIndex, final byte[] data) {
+		return new Description(true, objectIndex, data.clone());
+	}
 
 	/**
 	 * Creates a new description object for a property out of a byte array.
@@ -93,6 +99,7 @@ public final class Description
 	public Description(final int objType, final int currentElements, final byte[] data)
 	{
 		otype = objType;
+		objectInstance = 0;
 		oindex = data[0] & 0xff;
 		id = data[1] & 0xff;
 		pindex = data[2] & 0xff;
@@ -123,6 +130,7 @@ public final class Description
 		final int maxElements, final int readLevel, final int writeLevel)
 	{
 		otype = objType;
+		objectInstance = 0;
 		oindex = objIndex;
 		id = pid;
 		pindex = propIndex;
@@ -132,6 +140,28 @@ public final class Description
 		maxElems = maxElements;
 		rLevel = readLevel;
 		wLevel = writeLevel;
+	}
+
+	private Description(final boolean ext, final int objectIndex, final byte[] data) {
+		oindex = objectIndex;
+		otype = (data[0] & 0xff) << 8 | data[1] & 0xff;
+		objectInstance = (((data[2] & 0xff) << 4) | ((data[3] & 0xf0) >> 4));
+
+		id = (((data[3] & 0xf) << 8) | (data[4] & 0xff));
+		pdt = (data[5] >> 4) & 0xf;
+		pindex = (((data[5] & 0xf) << 8) | (data[6] & 0xff));
+
+		final int dptMain = (data[7] & 0xff) << 8 | data[8] & 0xff;
+		final int dptSub = (data[9] & 0xff) << 8 | data[10] & 0xff;
+		final String dpt = dptMain + "." + dptSub;
+		write = (data[11] & 0x80) == 0x80;
+		pdt = data[11] & 0x2f;
+		maxElems = (data[12] & 0xff) << 8 | data[13] & 0xff;
+		rLevel = (data[14] & 0xf0) >> 4;
+		wLevel = data[14] & 0xf;
+
+		// not provided with extended property services
+		currElems = 0;
 	}
 
 	/**

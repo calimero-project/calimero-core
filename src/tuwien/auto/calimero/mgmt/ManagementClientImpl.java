@@ -74,6 +74,7 @@ import tuwien.auto.calimero.internal.EventListeners;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.log.LogService;
+import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
 
 /**
  * Implementation of management client.
@@ -642,7 +643,9 @@ public class ManagementClientImpl implements ManagementClient
 	{
 		if (objIndex < 0 || objIndex > 255 || propertyId < 0 || propertyId > 255
 			|| start < 0 || start > 0xFFF || elements < 0 || elements > 15)
-			throw new KNXIllegalArgumentException("argument value out of range");
+			throw new KNXIllegalArgumentException(String.format("argument value out of range: "
+					+ "OI 0 < %d < 256, PID 0 < %d < 256, start 0 < %d < 256, elems 0 < %d < 16",
+					objIndex, propertyId, start, elements));
 		final byte[] asdu = new byte[4];
 		asdu[0] = (byte) objIndex;
 		asdu[1] = (byte) propertyId;
@@ -719,12 +722,104 @@ public class ManagementClientImpl implements ManagementClient
 				throw new KNXRemoteException("read back failed (erroneous property data)");
 	}
 
+	private static final int PropertyExtDescRead = 0b0111010010;
+	private static final int PropertyExtDescResponse = 0b0111010011;
+
+	private int[] getOrQueryInterfaceObjectList(final Destination dst)
+			throws KNXTimeoutException, KNXDisconnectException, KNXLinkClosedException, InterruptedException {
+		final Optional<int[]> opt = dst.interfaceObjectList();
+		if (opt.isPresent())
+			return opt.get();
+		int[] list = {};
+		try {
+			final int elems = unsigned(readProperty(dst, 0, PID.IO_LIST, 0, 1));
+			list = new int[elems];
+			// NYI use bigger stride based on supported apdu length
+			for (int i = 0; i < list.length; i++)
+				list[i] = unsigned(readProperty(dst, 0, PID.IO_LIST, i + 1, 1));
+		}
+		catch (final KNXRemoteException e) {
+			logger.debug("device {} does not support extended property services ({})", dst.getAddress(), e.toString());
+		}
+		dst.setInterfaceObjectList(list);
+		return list;
+	}
+
+	private static int unsigned(final byte[] data) {
+		int i = 0;
+		for (final byte b : data)
+			i = i << 8 | b & 0xff;
+		return i;
+	}
+
+	private Description readPropertyExtDescription(final Destination dst, final int objIndex, final int propertyId,
+		final int propIndex) throws KNXTimeoutException, KNXRemoteException, KNXDisconnectException,
+		KNXLinkClosedException, InterruptedException {
+		if (objIndex < 0 || objIndex > 255 || propertyId < 0 || propertyId > 255 || propIndex < 0 || propIndex > 255)
+			throw new KNXIllegalArgumentException("argument value out of range");
+
+		final var ioList = getOrQueryInterfaceObjectList(dst);
+		if (!(ioList.length > objIndex))
+			return null;
+
+		final int objType = ioList[objIndex];
+		final int objInstance = 1;
+		final int propDescType = 0;
+		final byte[] send = DataUnitBuilder.createAPDU(PropertyExtDescRead,
+				new byte[] { (byte) (objType >> 8), (byte) objType, (byte) (objInstance >> 4),
+					(byte) (((objInstance & 0xf) << 4) | (propertyId >> 8)), (byte) propertyId,
+					(byte) ((propDescType << 4) | (propIndex >> 8)), (byte) (propertyId == 0 ? propIndex : 0) });
+
+		for (int i = 0; i < 2; i++) {
+			final byte[] apdu = sendWait2(dst, priority, send, PropertyExtDescResponse, 15, 15);
+			final int rcvPropertyId = (((apdu[5] & 0xf) << 8) | (apdu[6] & 0xff));
+			final int rcvPropDescType = (apdu[7] >> 4) & 0xf;
+			final int rcvPropertyIdx = (((apdu[7] & 0xf) << 8) | (apdu[8] & 0xff));
+
+			// make sure the response contains the requested description
+			final boolean objTypeOk = objType == ((apdu[2] & 0xff) << 8 | apdu[3] & 0xff);
+			final boolean oiOk = objInstance == ((apdu[4] & 0xff) << 4 | (apdu[5] & 0xf0) >> 4);
+			final boolean pidOk = propertyId == 0 || propertyId == rcvPropertyId;
+			final boolean pidxOk = propertyId != 0 || propIndex == rcvPropertyIdx;
+
+			final int dptMain = (apdu[9] & 0xff) << 8 | apdu[10] & 0xff;
+			final int dptSub = (apdu[11] & 0xff) << 8 | apdu[12] & 0xff;
+			final boolean writeable = (apdu[13] & 0x80) == 0x80;
+			final int pdt = apdu[13] & 0x2f;
+			final int maxElems = (apdu[14] & 0xff) << 8 | apdu[15] & 0xff;
+			final int readLevel = (apdu[16] & 0xf0) >> 4;
+			final int writeLevel = apdu[16] & 0xf;
+			if (rcvPropDescType == 0 && dptMain == 0 && dptSub == 0 && !writeable && pdt == 0 && maxElems == 0
+					&& readLevel == 0 && writeLevel == 0) {
+				throw new KNXRemoteException("problem with property description request (IOT or PID non-existant?)");
+			}
+
+			if (rcvPropDescType != 0)
+				throw new KNXRemoteException("property description type " + rcvPropDescType + " not supported");
+
+			if (objTypeOk && oiOk && pidOk && pidxOk)
+				return Description.of(objIndex, Arrays.copyOfRange(apdu, 2, apdu.length));
+
+			logger.warn("wrong description response: OI {} PID {} prop idx {}", apdu[2] & 0xff, apdu[3] & 0xff,
+					apdu[4] & 0xff);
+		}
+		throw new KNXTimeoutException("timeout occurred while waiting for data response");
+	}
+
+	private static final boolean useExtPropertyServices = false;
+
 	@Override
 	public byte[] readPropertyDesc(final Destination dst, final int objIndex,
 		final int propertyId, final int propIndex) throws KNXTimeoutException,
 		KNXRemoteException, KNXDisconnectException, KNXLinkClosedException,
 		InterruptedException
 	{
+		if (useExtPropertyServices) {
+			final var desc = readPropertyExtDescription(dst, objIndex, propertyId, propIndex);
+			if (desc != null)
+				return desc.toByteArray();
+		}
+
 		if (objIndex < 0 || objIndex > 255 || propertyId < 0 || propertyId > 255 || propIndex < 0 || propIndex > 255)
 			throw new KNXIllegalArgumentException("argument value out of range");
 		final byte[] send = DataUnitBuilder.createAPDU(PROPERTY_DESC_READ, new byte[] {
