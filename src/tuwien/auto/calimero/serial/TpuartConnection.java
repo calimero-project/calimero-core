@@ -174,6 +174,7 @@ public class TpuartConnection implements AutoCloseable
 		os = adapter.getOutputStream();
 		is = adapter.getInputStream();
 
+		addresses.add(new GroupAddress(0));
 		addresses.addAll(acknowledge);
 
 		receiver = new Receiver();
