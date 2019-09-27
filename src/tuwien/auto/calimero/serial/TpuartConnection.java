@@ -501,7 +501,7 @@ public class TpuartConnection implements AutoCloseable
 
 					final long idlePeriod = (start - enterIdleTimestamp) / 1000;
 					if (enterIdleTimestamp != 0 && idlePeriod > 100_000)
-						logger.trace("return from extended idle period of {} us", idlePeriod);
+						logger.trace("receiver woke from extended idle period of {} us", idlePeriod);
 					idle = false;
 					enterIdleTimestamp = 0;
 
@@ -567,8 +567,8 @@ public class TpuartConnection implements AutoCloseable
 			if (size > 0) {
 				in.write(c);
 				lastRead = System.nanoTime() / 1000;
-				final int minLength = extFrame ? 6 : 5;
-				if (size + 1 > minLength) {
+				final int minLength = extFrame ? 7 : 6;
+				if (size + 1 >= minLength) {
 					final byte[] frame = in.toByteArray();
 					ack(frame);
 
@@ -647,9 +647,10 @@ public class TpuartConnection implements AutoCloseable
 			final boolean txError = (c & 0x20) == 0x20; // send 0, receive 1
 			final boolean protError = (c & 0x10) == 0x10; // illegal ctrl byte
 			final boolean tempWarning = (c & 0x08) == 0x08; // too hot
-			logger.debug("TP-UART status update: {}Temp. {}, Errors: Rx={} Tx={} Prot={}",
-					slaveCollision ? "Slave collision, " : "", tempWarning ? "warning" : "OK", rxError, txError,
-					protError);
+			if (slaveCollision || rxError || txError || protError || tempWarning)
+				logger.debug("TP-UART status update: {}Temp. {}, Errors: Rx={} Tx={} Prot={}",
+						slaveCollision ? "slave collision, " : "", tempWarning ? "warning" : "OK", rxError, txError,
+						protError);
 			if (tempWarning) {
 				coolDownUntil = System.nanoTime() + 1_000_000_000;
 				logger.warn("TP-UART high temperature warning! Sending is paused for 1 second ...");
@@ -676,7 +677,7 @@ public class TpuartConnection implements AutoCloseable
 			final boolean start = (c & 0xd0) == StdFrameFormat || (c & 0xd0) == ExtFrameFormat;
 			if (start) {
 				final boolean repeated = (c & RepeatFlag) == 0;
-				logger.trace("Start of frame 0x{}, repeated = {}", Integer.toHexString(c), repeated);
+				logger.trace("start of frame 0x{}, repeated = {}", Integer.toHexString(c), repeated);
 				extFrame = (c & 0xd0) == ExtFrameFormat;
 			}
 			return start;
