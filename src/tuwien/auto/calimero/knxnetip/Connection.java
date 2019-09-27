@@ -102,6 +102,7 @@ public final class Connection implements Closeable {
 
 	private static final Duration connectionTimeout = Duration.ofMillis(5000);
 
+	private volatile InetSocketAddress localEndpoint;
 	// ??? we currently cannot reuse a connection once it got closed
 	private final InetSocketAddress server;
 	private final Socket socket;
@@ -632,6 +633,8 @@ public final class Connection implements Closeable {
 
 		try {
 			socket.bind(bind);
+			// socket returns any-local after socket is closed, so keep actual address after bind
+			localEndpoint = (InetSocketAddress) socket.getLocalSocketAddress();
 		}
 		catch (final IOException e) {
 			throw new KnxRuntimeException("binding to local address " + bind, e);
@@ -642,7 +645,7 @@ public final class Connection implements Closeable {
 		return new SecureSession(user, userKey, deviceAuthCode);
 	}
 
-	public InetSocketAddress localEndpoint() { return (InetSocketAddress) socket.getLocalSocketAddress(); }
+	public InetSocketAddress localEndpoint() { return localEndpoint; }
 
 	public InetSocketAddress server() { return server; }
 
