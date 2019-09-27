@@ -41,13 +41,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
@@ -151,7 +151,7 @@ public class TpuartConnection implements AutoCloseable
 	private final EventListeners<KNXListener> listeners = new EventListeners<>();
 
 	private final Set<KNXAddress> addresses = Collections.synchronizedSet(new HashSet<>());
-	private final List<KNXAddress> sending = Collections.synchronizedList(new ArrayList<>());
+	private final Map<KNXAddress, Long> sending = new ConcurrentHashMap<>();
 
 	private final Logger logger;
 
@@ -263,7 +263,7 @@ public class TpuartConnection implements AutoCloseable
 		KNXAddress dst = null;
 		if (group) {
 			dst = new GroupAddress(new byte[] { frame[6], frame[7] });
-			sending.add(dst);
+			sending.put(dst, System.nanoTime());
 		}
 
 		try {
@@ -296,7 +296,6 @@ public class TpuartConnection implements AutoCloseable
 		}
 		finally {
 			req = null;
-			sending.remove(dst);
 		}
 	}
 
@@ -701,7 +700,13 @@ public class TpuartConnection implements AutoCloseable
 			// NAK: we don't care about that, because the TP-UART checks that for us
 			// Busy: we're never busy
 			int ack = AckInfo;
-			final boolean oneOfUs = addresses.contains(dst) || sending.contains(dst);
+
+			final long timestamp = sending.getOrDefault(dst, 0L);
+			final boolean groupResponse = (System.nanoTime() - timestamp) < 3_000_000_000L;
+			if (timestamp > 0 && !groupResponse)
+				sending.remove(dst);
+
+			final boolean oneOfUs = addresses.contains(dst) || groupResponse;
 			if (oneOfUs) {
 				ack |= 0x01;
 				os.write(new byte[] { (byte) ack });
