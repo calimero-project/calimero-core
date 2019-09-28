@@ -429,7 +429,7 @@ public class TpuartConnection implements AutoCloseable
 	}
 
 	// Stores the currently used max. inter-byte delay, to also be available for subsequent tpuart connections.
-	private static AtomicInteger maxInterByteDelay = new AtomicInteger(4000); // [us]
+	private static AtomicInteger maxInterByteDelay = new AtomicInteger(5200); // 50 bit times [us]
 
 	private final class Receiver extends Thread
 	{
