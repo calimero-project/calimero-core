@@ -392,7 +392,7 @@ public class Destination implements AutoCloseable
 			return s + getStateString();
 		// keep-alive and detailed state only apply in CO mode
 		if (co)
-			s = s + getStateString() +  ", conn.-oriented," + (alive ? "w/" : " no") + " keep-alive, ";
+			s = s + getStateString() +  ", conn.-oriented," + (alive ? "" : " no") + " keep-alive, ";
 		else
 			s = s + "connectionless, ";
 		return s + (verify ? "" : "no") + " verify mode";

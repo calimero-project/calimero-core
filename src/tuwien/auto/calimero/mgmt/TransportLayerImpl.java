@@ -242,7 +242,7 @@ public class TransportLayerImpl implements TransportLayer
 			final AggregatorProxy p = new AggregatorProxy(this);
 			final Destination d = new Destination(p, remote, connectionOriented, keepAlive, verifyMode);
 			proxies.put(remote, p);
-			logger.trace("created {} destination for {}", (connectionOriented ? "co" : "cl"), remote);
+			logger.trace("created {}", d);
 			return d;
 		}
 	}
