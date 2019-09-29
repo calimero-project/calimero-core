@@ -552,20 +552,25 @@ public class TpuartConnection implements AutoCloseable
 
 		private boolean parseFrame(final int c) throws IOException
 		{
+			final long now = System.nanoTime() / 1000;
 			int size = in.size();
-			// empty buffer if we didn't receive data for some time
-			if (size > 0 && ((lastRead + maxInterByteDelay()) < (System.nanoTime() / 1000))) {
-				final byte[] buf = in.toByteArray();
-				in.reset();
-				size = 0;
-				logger.debug("reset input buffer, discard partial frame (length {}) {}", buf.length,
-						DataUnitBuilder.toHex(buf, " "));
-				consecutiveFrameDrops++;
+			if (size > 0) {
+				// empty current buffer if we didn't receive data for some time
+				final int minLength = extFrame ? 7 : 6;
+				final long diff = now - lastRead;
+				if (size < minLength && diff > maxInterByteDelay()) {
+					resetReceiveBuffer(c, diff);
+					size = 0;
+				}
+				else if (size >= minLength && diff > 4 * maxInterByteDelay()) {
+					resetReceiveBuffer(c, diff);
+					size = 0;
+				}
 			}
 
 			if (size > 0) {
 				in.write(c);
-				lastRead = System.nanoTime() / 1000;
+				lastRead = now;
 				final int minLength = extFrame ? 7 : 6;
 				if (size + 1 >= minLength) {
 					final byte[] frame = in.toByteArray();
@@ -613,7 +618,7 @@ public class TpuartConnection implements AutoCloseable
 				}
 			}
 			else if (isLDataStart(c)) {
-				lastRead = System.nanoTime() / 1000;
+				lastRead = now;
 				in.reset();
 				in.write(c);
 				frameAcked = false;
@@ -624,6 +629,15 @@ public class TpuartConnection implements AutoCloseable
 			else
 				return false;
 			return true;
+		}
+
+		private void resetReceiveBuffer(final int c, final long diff) {
+			final byte[] buf = in.toByteArray();
+			in.reset();
+			logger.debug("reset receive buffer after {} us, char 0x{}, discard partial frame (length {}) {}", diff,
+					Integer.toHexString(c), buf.length,
+					DataUnitBuilder.toHex(buf, " "));
+			consecutiveFrameDrops++;
 		}
 
 		private void readUartState() throws IOException
