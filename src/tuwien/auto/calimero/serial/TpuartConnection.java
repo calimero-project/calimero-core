@@ -259,19 +259,17 @@ public class TpuartConnection implements AutoCloseable
 	public void send(final byte[] frame, final boolean waitForCon)
 		throws KNXPortClosedException, KNXAckTimeoutException, InterruptedException
 	{
-		final boolean group = (frame[3] & 0x80) == 0x80;
-		KNXAddress dst = null;
-		if (group) {
-			dst = new GroupAddress(new byte[] { frame[6], frame[7] });
-			sending.put(dst, System.nanoTime());
-		}
-
 		try {
 			final byte[] data = toUartServices(cEmiToTP1(frame));
 			if (logger.isTraceEnabled())
 				logger.trace("create UART services {}", DataUnitBuilder.toHex(data, " "));
 			req = frame.clone();
 			final long start = System.nanoTime();
+
+			final boolean group = (frame[3] & 0x80) == 0x80;
+			if (group)
+				sending.put(new GroupAddress(new byte[] { frame[6], frame[7] }), start);
+
 			synchronized (enterIdleLock) {
 				while (!idle)
 					enterIdleLock.wait();
