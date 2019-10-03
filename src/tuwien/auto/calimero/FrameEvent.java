@@ -37,7 +37,6 @@
 package tuwien.auto.calimero;
 
 import java.util.EventObject;
-import java.util.concurrent.atomic.AtomicLong;
 
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIFactory;
@@ -54,8 +53,6 @@ import tuwien.auto.calimero.cemi.CEMIFactory;
 public class FrameEvent extends EventObject
 {
 	private static final long serialVersionUID = 1L;
-
-	private static final AtomicLong idCounter = new AtomicLong();
 
 	private final long id;
 	private final CEMI c;
@@ -84,7 +81,7 @@ public class FrameEvent extends EventObject
 	public FrameEvent(final Object source, final CEMI frame, final boolean systemBroadcast)
 	{
 		super(source);
-		id = idCounter.incrementAndGet();
+		id = System.nanoTime();
 		c = frame;
 		b = null;
 		this.systemBroadcast = systemBroadcast;
@@ -100,7 +97,7 @@ public class FrameEvent extends EventObject
 	public FrameEvent(final Object source, final byte[] frame)
 	{
 		super(source);
-		id = idCounter.incrementAndGet();
+		id = System.nanoTime();
 		b = frame;
 		c = null;
 		systemBroadcast = false;

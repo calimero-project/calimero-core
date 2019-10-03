@@ -394,8 +394,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			final int oldTimeout = mc.getResponseTimeout();
 			try (Destination dst = mc.createDestination(new IndividualAddress(0, medium, 0xff), true)) {
 				mc.setResponseTimeout(7);
-				return ((ManagementClientImpl) mc).readProperty2(dst, 0,
-						PropertyAccess.PID.SERIAL_NUMBER, 1, 1);
+				return ((ManagementClientImpl) mc).readProperty(dst, 0, PropertyAccess.PID.SERIAL_NUMBER, 1, 1, false);
 			}
 			catch (final KNXTimeoutException e) {
 				// no response is fine

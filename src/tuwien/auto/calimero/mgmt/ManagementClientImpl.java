@@ -47,12 +47,13 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 
@@ -180,15 +181,12 @@ public class ManagementClientImpl implements ManagementClient
 			logger.info("attached link was closed");
 		}
 
-		private void checkResponse(final FrameEvent e)
-		{
-			if (svcResponse != 0) {
-				final byte[] tpdu = e.getFrame().getPayload();
-				if (DataUnitBuilder.getAPDUService(tpdu) == svcResponse)
-					synchronized (indications) {
-						indications.add(e);
-						indications.notify();
-					}
+		private void checkResponse(final FrameEvent e) {
+			if (isActiveService(e)) {
+				synchronized (indications) {
+					indications.add(e);
+					indications.notifyAll();
+				}
 			}
 			listeners.fire(c -> c.accept(e));
 		}
@@ -202,7 +200,7 @@ public class ManagementClientImpl implements ManagementClient
 	private volatile Priority priority = Priority.LOW;
 	private volatile int responseTimeout = 5000; // [ms]
 	private final Deque<FrameEvent> indications = new ArrayDeque<>();
-	private volatile int svcResponse;
+	private final ConcurrentHashMap<Integer, Long> activeServiceResponses = new ConcurrentHashMap<>();
 	private volatile boolean detachTransportLayer;
 	private volatile boolean detached;
 	private final Logger logger;
@@ -301,31 +299,17 @@ public class ManagementClientImpl implements ManagementClient
 	}
 
 	@Override
-	public synchronized IndividualAddress[] readAddress(final boolean oneAddressOnly)
+	public IndividualAddress[] readAddress(final boolean oneAddressOnly)
 		throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException,
 		InterruptedException
 	{
+		final long start = registerActiveService(IND_ADDR_RESPONSE);
+		tl.broadcast(false, Priority.SYSTEM, DataUnitBuilder.createLengthOptimizedAPDU(IND_ADDR_READ, null));
 		final List<IndividualAddress> l = new ArrayList<>();
-		try {
-			svcResponse = IND_ADDR_RESPONSE;
-			tl.broadcast(false, Priority.SYSTEM,
-					DataUnitBuilder.createLengthOptimizedAPDU(IND_ADDR_READ, null));
-			long wait = responseTimeout;
-			final long end = System.currentTimeMillis() + wait;
-			while (wait > 0) {
-				l.add(new IndividualAddress(waitForResponse(null, 0, 0, wait)));
-				if (oneAddressOnly)
-					break;
-				wait = end - System.currentTimeMillis();
-			}
-		}
-		catch (final KNXTimeoutException e) {
-			if (l.isEmpty())
-				throw e;
-		}
-		finally {
-			svcResponse = 0;
-		}
+		waitForResponses(IND_ADDR_RESPONSE, 0, 0, start, responseTimeout, (source, data) -> {
+			l.add(source);
+			return Optional.of(source.toByteArray());
+		}, oneAddressOnly);
 		return l.toArray(new IndividualAddress[l.size()]);
 	}
 
@@ -344,21 +328,17 @@ public class ManagementClientImpl implements ManagementClient
 	}
 
 	@Override
-	public synchronized IndividualAddress readAddress(final byte[] serialNo)
-		throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException,
-		InterruptedException
+	public IndividualAddress readAddress(final byte[] serialNo)
+		throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException, InterruptedException
 	{
 		if (serialNo.length != 6)
 			throw new KNXIllegalArgumentException("length of serial number not 6 bytes");
-		try {
-			svcResponse = IND_ADDR_SN_RESPONSE;
-			tl.broadcast(false, Priority.SYSTEM,
-					DataUnitBuilder.createAPDU(IND_ADDR_SN_READ, serialNo));
-			return new IndividualAddress(waitForResponse(null, 10, 10, responseTimeout));
-		}
-		finally {
-			svcResponse = 0;
-		}
+		final long start = registerActiveService(IND_ADDR_SN_RESPONSE);
+		tl.broadcast(false, Priority.SYSTEM, DataUnitBuilder.createAPDU(IND_ADDR_SN_READ, serialNo));
+		final byte[] address = waitForResponses(IND_ADDR_SN_RESPONSE, 10, 10, start, responseTimeout, (source,
+			apdu) -> Arrays.equals(serialNo, 0, 6, apdu, 2, 8) ? Optional.of(source.toByteArray()) : Optional.empty(),
+				true).get(0);
+		return new IndividualAddress(address);
 	}
 
 	@Override
@@ -371,7 +351,7 @@ public class ManagementClientImpl implements ManagementClient
 	}
 
 	@Override
-	public synchronized List<byte[]> readDomainAddress(final boolean oneDomainOnly)
+	public List<byte[]> readDomainAddress(final boolean oneDomainOnly)
 		throws KNXLinkClosedException, KNXInvalidResponseException, KNXTimeoutException,
 		InterruptedException
 	{
@@ -381,12 +361,19 @@ public class ManagementClientImpl implements ManagementClient
 	}
 
 	@Override
-	public synchronized void readDomainAddress(final BiConsumer<IndividualAddress, byte[]> response)
+	public void readDomainAddress(final BiConsumer<IndividualAddress, byte[]> response)
 		throws KNXLinkClosedException, KNXInvalidResponseException, KNXTimeoutException, InterruptedException
 	{
-		// we allow 6 bytes ASDU for RF domains
-		readBroadcast(priority, DataUnitBuilder.createLengthOptimizedAPDU(DOA_READ, null), DOA_RESPONSE, 2, 6, false,
-				response);
+		final long start = registerActiveService(DOA_RESPONSE);
+		tl.broadcast(true, priority, DataUnitBuilder.createLengthOptimizedAPDU(DOA_READ, null));
+		try {
+			// we allow 6 bytes ASDU for RF domains
+			waitForResponses(DOA_RESPONSE, 2, 6, start, responseTimeout, (source, apdu1) -> {
+				response.accept(source, Arrays.copyOfRange(apdu1, 2, apdu1.length));
+				return Optional.of(apdu1);
+			}, false);
+		}
+		catch (final KNXTimeoutException e) {}
 	}
 
 	@Override
@@ -409,36 +396,32 @@ public class ManagementClientImpl implements ManagementClient
 		final byte... testInfo)
 		throws KNXLinkClosedException, KNXTimeoutException, KNXInvalidResponseException, InterruptedException
 	{
-		synchronized (this) {
-			try {
-				svcResponse = NetworkParamResponse;
-				sendNetworkParameter(NetworkParamRead, remote, objectType, pid, testInfo);
+		final long start = registerActiveService(NetworkParamResponse);
+		sendNetworkParameter(NetworkParamRead, remote, objectType, pid, testInfo);
 
-				final BiPredicate<IndividualAddress, byte[]> testResponse = (responder, apdu) -> {
-					if (apdu.length < 5)
-						return false;
+		final BiFunction<IndividualAddress, byte[], Optional<byte[]>> testResponse = (responder, apdu) -> {
+			if (apdu.length < 5)
+				return Optional.empty();
 
-					final int receivedIot = (apdu[2] & 0xff) << 8 | (apdu[3] & 0xff);
-					final int receivedPid = apdu[4] & 0xff;
-					if (apdu.length == 5) {
-						final String s = receivedPid == 0xff ? receivedIot == 0xffff ? "object type" : "PID"
-								: "response";
-						logger.info("network parameter read response from {} for interface object type {} "
-								+ "PID {}: unsupported {}", responder, objectType, pid, s);
-						return false;
-					}
-					return receivedIot == objectType && receivedPid == pid;
-				};
-
-				final var waitTime = Duration.ofMillis(responseTimeout);
-				final List<byte[]> responses = waitForResponses(3, 14, testResponse, waitTime, false);
-
-				final int prefix = 2 + 3 + testInfo.length;
-				return responses.stream().map(r -> Arrays.copyOfRange(r, prefix, r.length)).collect(toList());
+			final int receivedIot = (apdu[2] & 0xff) << 8 | (apdu[3] & 0xff);
+			final int receivedPid = apdu[4] & 0xff;
+			if (apdu.length == 5) {
+				final String s = receivedPid == 0xff ? receivedIot == 0xffff ? "object type" : "PID" : "response";
+				logger.info("network parameter read response from {} for interface object type {} "
+						+ "PID {}: unsupported {}", responder, objectType, pid, s);
+				return Optional.empty();
 			}
-			finally {
-				svcResponse = 0;
-			}
+			return receivedIot == objectType && receivedPid == pid ? Optional.of(apdu) : Optional.empty();
+		};
+
+		try {
+			final List<byte[]> responses = waitForResponses(NetworkParamResponse, 3, 14, start, responseTimeout,
+					testResponse, false);
+			final int prefix = 2 + 3 + testInfo.length;
+			return responses.stream().map(r -> Arrays.copyOfRange(r, prefix, r.length)).collect(toList());
+		}
+		catch (final KNXTimeoutException e) {
+			return List.of();
 		}
 	}
 
@@ -478,37 +461,38 @@ public class ManagementClientImpl implements ManagementClient
 		final byte[] testInfo = allocate(1 + additionalTestInfo.length).put((byte) operand)
 				.put(additionalTestInfo).array();
 
-		synchronized (this) {
-			try {
-				svcResponse = SystemNetworkParamResponse;
-				sendSystemNetworkParameter(SystemNetworkParamRead, objectType, pid, testInfo);
+		final long start = registerActiveService(SystemNetworkParamResponse);
+		sendSystemNetworkParameter(SystemNetworkParamRead, objectType, pid, testInfo);
 
-				final BiPredicate<IndividualAddress, byte[]> testParamType = (responder, apdu) -> {
-					if (apdu.length < 6)
-						return false;
-					final int receivedIot = (apdu[2] & 0xff) << 8 | (apdu[3] & 0xff);
-					final int receivedPid = (apdu[4] & 0xff) << 4 | (apdu[5] & 0xf0) >> 4;
-					if (apdu.length == 6) {
-						final String s = receivedPid == 0xff ? receivedIot == 0xffff ? "object type" : "PID" : "response";
-						logger.info("system network parameter read response from {} for interface object type {} "
-								+ "PID {}: unsupported {}", responder, objectType, pid, s);
-						return false;
-					}
-					final int receivedOperand = apdu[6] & 0xff;
-					return receivedIot == objectType && receivedPid == pid && receivedOperand == operand;
-				};
+		final BiFunction<IndividualAddress, byte[], Optional<byte[]>> testParamType = (responder, apdu) -> {
+			if (apdu.length < 6)
+				return Optional.empty();
+			final int receivedIot = (apdu[2] & 0xff) << 8 | (apdu[3] & 0xff);
+			final int receivedPid = (apdu[4] & 0xff) << 4 | (apdu[5] & 0xf0) >> 4;
+			if (apdu.length == 6) {
+				final String s = receivedPid == 0xff ? receivedIot == 0xffff ? "object type" : "PID" : "response";
+				logger.info("system network parameter read response from {} for interface object type {} "
+						+ "PID {}: unsupported {}", responder, objectType, pid, s);
+				return Optional.empty();
+			}
+			final int receivedOperand = apdu[6] & 0xff;
+			return receivedIot == objectType && receivedPid == pid && receivedOperand == operand ? Optional.of(apdu)
+					: Optional.empty();
+		};
 
-				final Duration waitTime = Duration.ofSeconds(operand == 1 ? 1
+		final Duration waitTime = Duration
+				.ofSeconds(operand == 1 ? 1
 						: operand == 2 || operand == 3 ? additionalTestInfo[0] & 0xff : getResponseTimeout())
-						.plusMillis(500); // allow some communication overhead (medium access & device delay times)
+				.plusMillis(500); // allow some communication overhead (medium access & device delay times)
 
-				final List<byte[]> responders = waitForResponses(4, 12, testParamType, waitTime, false);
-				final int prefix = 2 + 4 + 1 + additionalTestInfo.length;
-				return responders.stream().map(r -> Arrays.copyOfRange(r, prefix, r.length)).collect(toList());
-			}
-			finally {
-				svcResponse = 0;
-			}
+		try {
+			final List<byte[]> responders = waitForResponses(SystemNetworkParamResponse, 4, 12, start,
+					waitTime.toMillis(), testParamType, false);
+			final int prefix = 2 + 4 + 1 + additionalTestInfo.length;
+			return responders.stream().map(r -> Arrays.copyOfRange(r, prefix, r.length)).collect(toList());
+		}
+		catch (final KNXTimeoutException e) {
+			return List.of();
 		}
 	}
 
@@ -624,21 +608,10 @@ public class ManagementClientImpl implements ManagementClient
 		final int start, final int elements) throws KNXTimeoutException, KNXRemoteException,
 		KNXDisconnectException, KNXLinkClosedException, InterruptedException
 	{
-		final List<byte[]> l = readProperty(dst, objIndex, propertyId, start, elements, true);
-		if (l.isEmpty())
-			throw new KNXTimeoutException("timeout waiting for property response");
-		return l.get(0);
+		return readProperty(dst, objIndex, propertyId, start, elements, true).get(0);
 	}
 
-	// as readProperty, but collects all responses until response timeout is reached
-	List<byte[]> readProperty2(final Destination dst, final int objIndex, final int propertyId,
-		final int start, final int elements) throws KNXTimeoutException, KNXRemoteException,
-		KNXDisconnectException, KNXLinkClosedException, InterruptedException
-	{
-		return readProperty(dst, objIndex, propertyId, start, elements, false);
-	}
-
-	private List<byte[]> readProperty(final Destination dst, final int objIndex, final int propertyId,
+	List<byte[]> readProperty(final Destination dst, final int objIndex, final int propertyId,
 		final int start, final int elements, final boolean oneResponseOnly)
 		throws KNXTimeoutException, KNXRemoteException, KNXDisconnectException,
 		KNXLinkClosedException, InterruptedException
@@ -656,29 +629,23 @@ public class ManagementClientImpl implements ManagementClient
 
 		final List<byte[]> responses = new ArrayList<>();
 		final List<KNXRemoteException> exceptions = new ArrayList<>();
-		synchronized (this) {
+		final long startSend = send(dst, priority, DataUnitBuilder.createAPDU(PROPERTY_READ, asdu), PROPERTY_RESPONSE);
+		waitForResponses(PROPERTY_RESPONSE, 4, 14, startSend, responseTimeout, (source, apdu) -> {
 			try {
-				send(dst, priority, DataUnitBuilder.createAPDU(PROPERTY_READ, asdu), PROPERTY_RESPONSE);
-				// if we are waiting for several responses, pass null for address to accept messages from any sender
-				waitForResponses(oneResponseOnly ? dst.getAddress() : null, priority, 4, 14, apdu -> {
-					try {
-						responses.add(extractPropertyElements(apdu, objIndex, propertyId, elements));
-						return oneResponseOnly;
-					}
-					catch (final KNXInvalidResponseException e) {
-						logger.debug("skip invalid property read response: {}", e.getMessage());
-						return false;
-					}
-					catch (final KNXRemoteException e) {
-						exceptions.add(e);
-						return oneResponseOnly;
-					}
-				});
+				if (source.equals(dst.getAddress())) {
+					responses.add(extractPropertyElements(apdu, objIndex, propertyId, elements));
+					return Optional.of(apdu);
+				}
 			}
-			finally {
-				svcResponse = 0;
+			catch (final KNXInvalidResponseException e) {
+				logger.debug("skip invalid property read response: {}", e.getMessage());
 			}
-		}
+			catch (final KNXRemoteException e) {
+				exceptions.add(e);
+			}
+			return Optional.empty();
+		}, oneResponseOnly);
+
 		if (responses.isEmpty()) {
 			if (exceptions.size() == 1)
 				throw exceptions.get(0);
@@ -1034,199 +1001,123 @@ public class ManagementClientImpl implements ManagementClient
 		return lnk;
 	}
 
+	private long registerActiveService(final int serviceType) {
+		final long now = System.nanoTime();
+		activeServiceResponses.merge(serviceType, now + responseTimeout * 1_000_000L,
+				(oldValue, value) -> oldValue < value ? value : oldValue);
+		return now;
+	}
+
+	private boolean isActiveService(final int serviceType, final long timestamp) {
+		return activeServiceResponses.computeIfPresent(serviceType,
+				(__, activeUntil) -> activeUntil < timestamp ? null : activeUntil) != null;
+	}
+
+	private boolean isActiveService(final FrameEvent e) {
+		return isActiveService(DataUnitBuilder.getAPDUService(e.getFrame().getPayload()), e.id());
+	}
+
 	// helper which sets the expected svc response, and sends in CO or CL mode
-	private void send(final Destination d, final Priority p, final byte[] apdu, final int response)
+	private long send(final Destination d, final Priority p, final byte[] apdu, final int response)
 		throws KNXTimeoutException, KNXDisconnectException, KNXLinkClosedException
 	{
-		svcResponse = response;
+		final long start = registerActiveService(response);
 		if (d.isConnectionOriented()) {
 			tl.connect(d);
 			tl.sendData(d, p, apdu);
 		}
 		else
 			tl.sendData(d.getAddress(), p, apdu);
+		return start;
 	}
 
-	private synchronized byte[] sendWait(final Destination d, final Priority p,
+	private byte[] sendWait(final Destination d, final Priority p,
 		final byte[] apdu, final int response, final int minAsduLen, final int maxAsduLen)
 		throws KNXDisconnectException, KNXTimeoutException, KNXInvalidResponseException,
 		KNXLinkClosedException, InterruptedException
 	{
-		try {
-			svcResponse = response;
-			tl.sendData(d, p, apdu);
-			return waitForResponse(d.getAddress(), minAsduLen, maxAsduLen, responseTimeout);
-		}
-		finally {
-			svcResponse = 0;
-		}
+		final long start = registerActiveService(response);
+		tl.sendData(d, p, apdu);
+		return waitForResponse(d.getAddress(), response, minAsduLen, maxAsduLen, start, responseTimeout);
 	}
 
-	private synchronized byte[] sendWait2(final Destination d, final Priority p,
+	private byte[] sendWait2(final Destination d, final Priority p,
 		final byte[] apdu, final int response, final int minAsduLen, final int maxAsduLen)
 		throws KNXDisconnectException, KNXTimeoutException, KNXInvalidResponseException,
 		KNXLinkClosedException, InterruptedException
 	{
-		try {
-			send(d, p, apdu, response);
-			return waitForResponse(d.getAddress(), minAsduLen, maxAsduLen, responseTimeout);
-		}
-		finally {
-			svcResponse = 0;
-		}
+		final long start = send(d, p, apdu, response);
+		return waitForResponse(d.getAddress(), response, minAsduLen, maxAsduLen, start, responseTimeout);
 	}
 
 	// timeout in milliseconds
 	// min + max ASDU len are *not* including any field that contains ACPI
-	private byte[] waitForResponse(final IndividualAddress from, final int minAsduLen, final int maxAsduLen,
-		final long timeout) throws KNXInvalidResponseException, KNXTimeoutException, InterruptedException
-	{
-		return waitForResponse(from, minAsduLen, maxAsduLen, timeout, Optional.empty());
+	private byte[] waitForResponse(final IndividualAddress from, final int serviceType, final int minAsduLen,
+		final int maxAsduLen, final long start, final long timeout)
+				throws KNXInvalidResponseException, KNXTimeoutException, InterruptedException {
+		return waitForResponses(serviceType, minAsduLen, maxAsduLen, start, timeout,
+				(source, apdu) -> source.equals(from) ? Optional.of(apdu) : Optional.empty(), true).get(0);
 	}
 
 	// timeout in milliseconds
 	// min + max ASDU len are *not* including any field that contains ACPI
-	private byte[] waitForResponse(final IndividualAddress from, final int minAsduLen, final int maxAsduLen,
-		final long timeout, final Optional<List<IndividualAddress>> responders)
-			throws KNXInvalidResponseException, KNXTimeoutException, InterruptedException
-	{
+	private List<byte[]> waitForResponses(final int serviceType, final int minAsduLen, final int maxAsduLen,
+		final long start, final long timeout, final BiFunction<IndividualAddress, byte[], Optional<byte[]>> responseFilter,
+		final boolean oneOnly) throws KNXInvalidResponseException, KNXTimeoutException, InterruptedException {
+
 		long remaining = timeout;
-		final long end = System.currentTimeMillis() + remaining;
+		final long end = start / 1_000_000L + remaining;
+		final var responses = new ArrayList<byte[]>();
 		synchronized (indications) {
 			while (remaining > 0) {
-				while (indications.size() > 0) {
-					final CEMI frame = indications.remove().getFrame();
-					final byte[] apdu = frame.getPayload();
-					if (svcResponse != DataUnitBuilder.getAPDUService(apdu))
+				for (final Iterator<FrameEvent> i = indications.iterator(); i.hasNext(); ) {
+					final var event = i.next();
+					// purge outdated events
+					if (start > event.id() + responseTimeout * 1_000_000L) {
+						i.remove();
 						continue;
-					// broadcasts set parameter from to null; we then accept every sender address
-					if (from != null) {
-						if (!((CEMILData) frame).getSource().equals(from))
-							continue;
 					}
+					// causality
+					if (start > event.id())
+						continue;
+					final CEMI frame = event.getFrame();
+					final byte[] apdu = frame.getPayload();
+					if (serviceType != DataUnitBuilder.getAPDUService(apdu))
+						continue;
+
+					final IndividualAddress source = ((CEMILData) frame).getSource();
 					if (apdu.length < minAsduLen + 2 || apdu.length > maxAsduLen + 2) {
 						final String s = "invalid ASDU response length " + (apdu.length - 2)
 								+ " bytes, expected " + minAsduLen + " to " + maxAsduLen;
-						logger.error("received response with " + s);
-						throw new KNXInvalidResponseException(s);
+						logger.warn("received response from " + source + " with " + s);
+						if (oneOnly)
+							throw new KNXInvalidResponseException(s);
 					}
-					if (svcResponse == IND_ADDR_RESPONSE || svcResponse == IND_ADDR_SN_RESPONSE)
-						return ((CEMILData) frame).getSource().toByteArray();
-					indications.clear();
-					responders.ifPresent((l) -> l.add(((CEMILData) frame).getSource()));
-					return apdu;
+					responseFilter.apply(source, apdu).ifPresent(response -> {
+						responses.add(response);
+						i.remove();
+					});
+					if (!responses.isEmpty() && oneOnly)
+						return responses;
 				}
 				indications.wait(remaining);
-				remaining = end - System.currentTimeMillis();
+				remaining = end - System.nanoTime() / 1_000_000L;
 			}
 		}
-		throw new KNXTimeoutException("timeout occurred while waiting for data response");
+		if (responses.isEmpty())
+			throw new KNXTimeoutException("timeout waiting for data response");
+		return responses;
 	}
 
-	private List<byte[]> waitForResponses(final IndividualAddress from, final Priority p,
-		final int minAsduLen, final int maxAsduLen, final boolean oneOnly)
-		throws KNXInvalidResponseException, InterruptedException
-	{
-		final List<byte[]> l = new ArrayList<>();
-		try {
-			long wait = responseTimeout;
-			final long end = System.currentTimeMillis() + wait;
-			while (wait > 0) {
-				l.add(waitForResponse(from, minAsduLen, maxAsduLen, wait));
-				if (oneOnly)
-					break;
-				wait = end - System.currentTimeMillis();
-			}
-		}
-		catch (final KNXTimeoutException e) {}
-		return l;
-	}
-
-	private List<byte[]> waitForResponses(final int minAsduLen, final int maxAsduLen,
-		final BiPredicate<IndividualAddress, byte[]> test, final Duration waitTime, final boolean oneOnly)
-			throws KNXInvalidResponseException, InterruptedException {
-		final List<byte[]> l = new ArrayList<>();
-		try {
-			long remaining = waitTime.toMillis();
-			final long end = System.nanoTime() / 1_000_000 + remaining;
-			while (remaining > 0) {
-				final List<IndividualAddress> responder = new ArrayList<>();
-				final byte[] res = waitForResponse(null, minAsduLen, maxAsduLen, remaining, Optional.of(responder));
-				if (test.test(responder.get(0), res)) {
-					l.add(res);
-					if (oneOnly)
-						break;
-				}
-				remaining = end - System.nanoTime() / 1_000_000;
-			}
-		}
-		catch (final KNXTimeoutException e) {}
-		return l;
-	}
-
-	private void waitForResponses(final IndividualAddress from, final Priority p, final int minAsduLen,
-		final int maxAsduLen, final Predicate<byte[]> response)
-		throws KNXInvalidResponseException, InterruptedException, KNXTimeoutException
-	{
-		long wait = responseTimeout * 1_000_000L;
-		final long end = System.nanoTime() + wait;
-		while (wait > 0) {
-			if (response.test(waitForResponse(from, minAsduLen, maxAsduLen, wait / 1_000_000)))
-				break;
-			wait = end - System.nanoTime();
-		}
-	}
-
-	private void waitForResponses(final IndividualAddress from, final Priority p, final int minAsduLen,
-		final int maxAsduLen, final boolean oneOnly, final BiConsumer<IndividualAddress, byte[]> callback)
-			throws KNXInvalidResponseException, InterruptedException
-	{
-		try {
-			long wait = responseTimeout;
-			final long end = System.currentTimeMillis() + wait;
-			while (wait > 0) {
-				final Optional<List<IndividualAddress>> src = Optional.of(new ArrayList<>());
-				final byte[] response = waitForResponse(from, minAsduLen, maxAsduLen, wait, src);
-				callback.accept(src.get().get(0), Arrays.copyOfRange(response, 2, response.length));
-				if (oneOnly)
-					break;
-				wait = end - System.currentTimeMillis();
-			}
-		}
-		catch (final KNXTimeoutException e) {}
-	}
-
-	private synchronized List<byte[]> readBroadcast(final Priority p, final byte[] apdu,
+	private List<byte[]> readBroadcast(final Priority p, final byte[] apdu,
 		final int response, final int minAsduLen, final int maxAsduLen, final boolean oneOnly)
 		throws KNXLinkClosedException, KNXInvalidResponseException, KNXTimeoutException,
 		InterruptedException
 	{
-		try {
-			svcResponse = response;
-			tl.broadcast(true, p, apdu);
-			final List<byte[]> l = waitForResponses(null, p, minAsduLen, maxAsduLen, oneOnly);
-			if (l.isEmpty())
-				throw new KNXTimeoutException("timeout waiting for responses");
-			return l;
-		}
-		finally {
-			svcResponse = 0;
-		}
-	}
-
-	private synchronized void readBroadcast(final Priority p, final byte[] apdu, final int response,
-		final int minAsduLen, final int maxAsduLen, final boolean oneOnly,
-		final BiConsumer<IndividualAddress, byte[]> callback)
-			throws KNXLinkClosedException, KNXInvalidResponseException, KNXTimeoutException, InterruptedException
-	{
-		try {
-			svcResponse = response;
-			tl.broadcast(true, p, apdu);
-			waitForResponses(null, p, minAsduLen, maxAsduLen, oneOnly, callback);
-		}
-		finally {
-			svcResponse = 0;
-		}
+		final long start = registerActiveService(response);
+		tl.broadcast(true, p, apdu);
+		return waitForResponses(response, minAsduLen, maxAsduLen, start, responseTimeout,
+				(source, apdu1) -> Optional.of(apdu1), oneOnly);
 	}
 
 	// cut domain addresses out of APDUs
