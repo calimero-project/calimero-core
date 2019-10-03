@@ -203,6 +203,7 @@ public class ManagementClientImpl implements ManagementClient
 	private volatile int responseTimeout = 5000; // [ms]
 	private final Deque<FrameEvent> indications = new ArrayDeque<>();
 	private volatile int svcResponse;
+	private volatile boolean detachTransportLayer;
 	private volatile boolean detached;
 	private final Logger logger;
 
@@ -220,6 +221,7 @@ public class ManagementClientImpl implements ManagementClient
 	public ManagementClientImpl(final KNXNetworkLink link) throws KNXLinkClosedException
 	{
 		this(link, new TransportLayerImpl(link));
+		detachTransportLayer = true;
 	}
 
 	protected ManagementClientImpl(final KNXNetworkLink link, final TransportLayer transportLayer)
@@ -1022,7 +1024,8 @@ public class ManagementClientImpl implements ManagementClient
 	@Override
 	public KNXNetworkLink detach()
 	{
-		final KNXNetworkLink lnk = tl.detach();
+		tl.removeTransportListener(tlListener);
+		final KNXNetworkLink lnk = detachTransportLayer ? tl.detach() : null;
 		if (lnk != null) {
 			logger.debug("detached from {}", lnk);
 		}
