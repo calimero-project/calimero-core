@@ -193,7 +193,7 @@ abstract class ClientConnection extends ConnectionBase
 			}
 
 			final var lsa = localSocketAddress();
-			logger.info("establish connection from {} to {} ({})", lsa, ctrlEndpt, tcp ? "tcp" : "udp");
+			logger.debug("establish connection from {} to {} ({})", lsa, ctrlEndpt, tcp ? "tcp" : "udp");
 			// HPAI throws if wildcard local address (0.0.0.0) is supplied
 			final var hpai = tcp ? HPAI.Tcp : new HPAI(HPAI.IPV4_UDP, useNat ? null : lsa);
 			final byte[] buf = PacketHelper.toPacket(new ConnectRequest(cri, hpai, hpai));

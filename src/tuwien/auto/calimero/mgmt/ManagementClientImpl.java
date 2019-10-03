@@ -80,7 +80,7 @@ import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
 /**
  * Implementation of management client.
  * <p>
- * Uses {@link TransportLayer} internally for communication. <br>
+ * Uses {@link TransportLayer} internally for communication.
  * All management service methods invoked after a detach of the network link are allowed
  * to throw {@link IllegalStateException}.
  *
@@ -142,8 +142,7 @@ public class ManagementClientImpl implements ManagementClient
 
 	private class TLListener implements TransportListener
 	{
-		TLListener()
-		{}
+		TLListener() {}
 
 		@Override
 		public void broadcast(final FrameEvent e)
@@ -191,7 +190,6 @@ public class ManagementClientImpl implements ManagementClient
 			listeners.fire(c -> c.accept(e));
 		}
 	};
-
 
 	private static final boolean extMemoryServices = true;
 
@@ -300,8 +298,7 @@ public class ManagementClientImpl implements ManagementClient
 
 	@Override
 	public IndividualAddress[] readAddress(final boolean oneAddressOnly)
-		throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException,
-		InterruptedException
+		throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException, InterruptedException
 	{
 		final long start = registerActiveService(IND_ADDR_RESPONSE);
 		tl.broadcast(false, Priority.SYSTEM, DataUnitBuilder.createLengthOptimizedAPDU(IND_ADDR_READ, null));
@@ -310,7 +307,7 @@ public class ManagementClientImpl implements ManagementClient
 			l.add(source);
 			return Optional.of(source.toByteArray());
 		}, oneAddressOnly);
-		return l.toArray(new IndividualAddress[l.size()]);
+		return l.toArray(IndividualAddress[]::new);
 	}
 
 	@Override
@@ -535,8 +532,7 @@ public class ManagementClientImpl implements ManagementClient
 		try {
 			restart(true, dst, 0, 0);
 		}
-		catch (final KNXRemoteException ignore) { }
-		catch (final KNXDisconnectException ignore) { }
+		catch (KNXRemoteException | KNXDisconnectException ignore) {}
 	}
 
 	@Override
@@ -611,11 +607,9 @@ public class ManagementClientImpl implements ManagementClient
 		return readProperty(dst, objIndex, propertyId, start, elements, true).get(0);
 	}
 
-	List<byte[]> readProperty(final Destination dst, final int objIndex, final int propertyId,
-		final int start, final int elements, final boolean oneResponseOnly)
-		throws KNXTimeoutException, KNXRemoteException, KNXDisconnectException,
-		KNXLinkClosedException, InterruptedException
-	{
+	List<byte[]> readProperty(final Destination dst, final int objIndex, final int propertyId, final int start,
+		final int elements, final boolean oneResponseOnly) throws KNXTimeoutException, KNXRemoteException,
+			KNXDisconnectException, KNXLinkClosedException, InterruptedException {
 		if (objIndex < 0 || objIndex > 255 || propertyId < 0 || propertyId > 255
 			|| start < 0 || start > 0xFFF || elements < 0 || elements > 15)
 			throw new KNXIllegalArgumentException(String.format("argument value out of range: "
@@ -659,11 +653,9 @@ public class ManagementClientImpl implements ManagementClient
 	}
 
 	@Override
-	public void writeProperty(final Destination dst, final int objIndex,
-		final int propertyId, final int start, final int elements, final byte[] data)
-		throws KNXTimeoutException, KNXRemoteException, KNXDisconnectException,
-		KNXLinkClosedException, InterruptedException
-	{
+	public void writeProperty(final Destination dst, final int objIndex, final int propertyId, final int start,
+		final int elements, final byte[] data) throws KNXTimeoutException, KNXRemoteException, KNXDisconnectException,
+			KNXLinkClosedException, InterruptedException {
 		if (objIndex < 0 || objIndex > 255 || propertyId < 0 || propertyId > 255 || start < 0
 				|| start > 0xFFF || data.length == 0 || elements < 0 || elements > 15)
 			throw new KNXIllegalArgumentException("argument value out of range");
@@ -778,11 +770,9 @@ public class ManagementClientImpl implements ManagementClient
 	private static final boolean useExtPropertyServices = false;
 
 	@Override
-	public byte[] readPropertyDesc(final Destination dst, final int objIndex,
-		final int propertyId, final int propIndex) throws KNXTimeoutException,
-		KNXRemoteException, KNXDisconnectException, KNXLinkClosedException,
-		InterruptedException
-	{
+	public byte[] readPropertyDesc(final Destination dst, final int objIndex, final int propertyId, final int propIndex)
+		throws KNXTimeoutException, KNXRemoteException, KNXDisconnectException, KNXLinkClosedException,
+			InterruptedException {
 		if (useExtPropertyServices) {
 			final var desc = readPropertyExtDescription(dst, objIndex, propertyId, propIndex);
 			if (desc != null)

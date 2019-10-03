@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2011, 2018 B. Malinowsky
+    Copyright (c) 2011, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ import tuwien.auto.calimero.link.medium.TPSettings;
  * @author B. Malinowsky
  */
 @KnxnetIP
-public class ManagementProceduresImplTest
+class ManagementProceduresImplTest
 {
 	private ManagementProcedures mp;
 	private KNXNetworkLink link;
@@ -83,24 +83,12 @@ public class ManagementProceduresImplTest
 			link.close();
 	}
 
-	/**
-	 * Test method for
-	 * {@link ManagementProceduresImpl#ManagementProceduresImpl(tuwien.auto.calimero.link.KNXNetworkLink)}.
-	 *
-	 * @throws KNXLinkClosedException
-	 */
 	@Test
 	void testManagementProceduresImpl() throws KNXLinkClosedException
 	{
 		try (ManagementProcedures test = new ManagementProceduresImpl(link)) {};
 	}
 
-	/**
-	 * Test method for {@link ManagementProceduresImpl#readAddress()}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testReadAddress() throws KNXException, InterruptedException
 	{
@@ -112,12 +100,6 @@ public class ManagementProceduresImplTest
 		mp.setProgrammingMode(Util.getKnxDevice(), true);
 	}
 
-	/**
-	 * Test method for {@link ManagementProceduresImpl#writeAddress(IndividualAddress)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	@Slow
 	void testWriteAddress() throws KNXException, InterruptedException
@@ -137,12 +119,6 @@ public class ManagementProceduresImplTest
 		assertTrue(write);
 	}
 
-	/**
-	 * Test method for {@link ManagementProceduresImpl#resetAddress()}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testResetAddress() throws KNXException, InterruptedException
 	{
@@ -154,12 +130,6 @@ public class ManagementProceduresImplTest
 		mp.writeAddress(deviceInProgMode);
 	}
 
-	/**
-	 * Test method for {@link ManagementProceduresImpl#isAddressOccupied(IndividualAddress)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testIsAddressOccupied() throws KNXException, InterruptedException
 	{
@@ -167,12 +137,6 @@ public class ManagementProceduresImplTest
 		assertFalse(mp.isAddressOccupied(nonexist));
 	}
 
-	/**
-	 * Test method for {@link ManagementProceduresImpl#readAddress(byte[])}.
-	 *
-	 * @throws InterruptedException on interrupted thread
-	 * @throws KNXException
-	 */
 	@Test
 	void testReadAddressByte() throws KNXException, InterruptedException
 	{
@@ -180,12 +144,6 @@ public class ManagementProceduresImplTest
 		mp.readAddress(serialNo);
 	}
 
-	/**
-	 * Test method for {@link ManagementProceduresImpl#writeAddress(byte[], IndividualAddress)}.
-	 *
-	 * @throws InterruptedException on interrupted thread
-	 * @throws KNXException
-	 */
 	@Test
 	void testWriteAddressByteArrayIndividualAddress() throws KNXException, InterruptedException
 	{
@@ -193,13 +151,6 @@ public class ManagementProceduresImplTest
 		mp.writeAddress(serialNo, new IndividualAddress(1, 1, 5));
 	}
 
-	/**
-	 * Test method for {@link ManagementProceduresImpl#scanNetworkRouters()}.
-	 *
-	 * @throws InterruptedException on interrupted thread
-	 * @throws KNXLinkClosedException
-	 * @throws KNXTimeoutException
-	 */
 	@Test
 	@Slow
 	void testScanNetworkRouters() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
@@ -210,13 +161,6 @@ public class ManagementProceduresImplTest
 		System.out.println("scanNetworkRouters found " + i + " devices");
 	}
 
-	/**
-	 * Test method for {@link ManagementProceduresImpl#scanNetworkDevices(int, int)}.
-	 *
-	 * @throws InterruptedException on interrupted thread
-	 * @throws KNXLinkClosedException
-	 * @throws KNXTimeoutException
-	 */
 	@Test
 	@Slow
 	void testScanNetworkDevices() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
@@ -253,12 +197,6 @@ public class ManagementProceduresImplTest
 		assertEquals(0, list2.length);
 	}
 
-	/**
-	 * Test method for {@link ManagementProceduresImpl#setProgrammingMode(IndividualAddress, boolean)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testSetProgrammingMode() throws KNXException, InterruptedException
 	{
@@ -266,12 +204,6 @@ public class ManagementProceduresImplTest
 		mp.setProgrammingMode(device, false);
 	}
 
-	/**
-	 * Test method for {@link ManagementProceduresImpl#writeMemory(IndividualAddress, long, byte[], boolean, boolean)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testWriteMemoryShort() throws KNXException, InterruptedException
 	{
@@ -284,12 +216,6 @@ public class ManagementProceduresImplTest
 		mp.writeMemory(device, 0x10, data, false, true);
 	}
 
-	/**
-	 * Test method for {@link ManagementProceduresImpl#writeMemory(IndividualAddress, long, byte[], boolean, boolean)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testWriteMemoryLong() throws KNXException, InterruptedException
 	{
@@ -302,24 +228,12 @@ public class ManagementProceduresImplTest
 		mp.writeMemory(device, 0x10, data, false, true);
 	}
 
-	/**
-	 * Test method for {@link ManagementProceduresImpl#readMemory(tuwien.auto.calimero.IndividualAddress, long, int)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testReadMemoryShort() throws KNXException, InterruptedException
 	{
 		/*final byte[] data =*/ mp.readMemory(device, 0x10, 8);
 	}
 
-	/**
-	 * Test method for {@link ManagementProceduresImpl#readMemory(IndividualAddress, long, int)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	void testReadMemoryLong() throws KNXException, InterruptedException
 	{

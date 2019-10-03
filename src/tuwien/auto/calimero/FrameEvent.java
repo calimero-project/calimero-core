@@ -89,7 +89,6 @@ public class FrameEvent extends EventObject
 
 	/**
 	 * Creates a new frame event for <code>frame</code>.
-	 * <p>
 	 *
 	 * @param source the creator of this event
 	 * @param frame EMI2 L-data frame
@@ -105,7 +104,6 @@ public class FrameEvent extends EventObject
 
 	/**
 	 * Returns the cEMI frame, if supplied at event creation.
-	 * <p>
 	 *
 	 * @return cEMI frame object, or <code>null</code>
 	 */
@@ -116,7 +114,6 @@ public class FrameEvent extends EventObject
 
 	/**
 	 * Returns the frame as byte array, if supplied at event creation.
-	 * <p>
 	 *
 	 * @return copy of frame as byte array, or <code>null</code>
 	 */
