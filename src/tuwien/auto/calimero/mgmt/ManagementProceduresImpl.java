@@ -89,8 +89,8 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	// procedures should synchronize on mc (this also prevents unwanted modifications of
 	// procedure timeouts set in mc)
 	private final ManagementClient mc;
-	private final boolean detachMgmtClient;
 	private final TransportLayer tl;
+	private final boolean detachMgmtAndTransportLayer;
 
 	private final Logger logger = LogService.getLogger("calimero.mgmt.MgmtProc");
 
@@ -170,7 +170,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	{
 		tl = new TransportLayerImpl(link);
 		mc = new ManagementClientImpl(link, tl);
-		detachMgmtClient = true;
+		detachMgmtAndTransportLayer = true;
 	}
 
 	/**
@@ -188,7 +188,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		if (!mc.isOpen())
 			throw new IllegalStateException("management client not in open state");
 		tl = transportLayer;
-		detachMgmtClient = false;
+		detachMgmtAndTransportLayer = false;
 	}
 
 	@Override
@@ -530,8 +530,10 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	@Override
 	public void detach()
 	{
-		if (detachMgmtClient)
+		if (detachMgmtAndTransportLayer) {
 			mc.detach();
+			tl.detach();
+		}
 	}
 
 	// work around for implementation in TL, which unconditionally throws if dst exists
