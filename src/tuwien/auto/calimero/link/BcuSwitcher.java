@@ -365,15 +365,37 @@ final class BcuSwitcher
 		logger = null;
 	}
 
-	void normalMode(final boolean cEMI) throws KNXAckTimeoutException, KNXPortClosedException, InterruptedException {
+	void normalMode(final boolean cEMI) throws KNXAckTimeoutException, KNXPortClosedException, KNXLinkClosedException {
 		final byte[] switchNormal = { (byte) peiSwitch_req, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
-		conn.send(cEMI ? commModeRequest(NoLayer) : switchNormal, true);
+		switchLayer(cEMI, NoLayer, switchNormal);
 	}
 
 	void linkLayerMode(final boolean cEMI) throws KNXException {
 		final byte[] switchLinkLayer = { (byte) peiSwitch_req, 0x00, 0x18, 0x34, 0x56, 0x78, 0x0A, };
+		switchLayer(cEMI, DataLinkLayer, switchLinkLayer);
+	}
+
+	void baosMode(final boolean cEMI) throws KNXException {
+		// for baos modules, normal mode is baos enabled
+		final byte[] normalMode = { (byte) peiSwitch_req, 0x00, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
+		switchLayer(cEMI, BaosMode, normalMode);
+	}
+
+	void enterBusmonitor(final boolean cEMI)
+			throws KNXAckTimeoutException, KNXPortClosedException, KNXLinkClosedException {
+		final byte[] switchBusmon = { (byte) peiSwitch_req, (byte) 0x90, 0x18, 0x34, 0x56, 0x78, 0x0A, };
+		switchLayer(cEMI, Busmonitor, switchBusmon);
+	}
+
+	void leaveBusmonitor(final boolean cEMI)
+			throws KNXAckTimeoutException, KNXPortClosedException, KNXLinkClosedException {
+		normalMode(cEMI);
+	}
+
+	private void switchLayer(final boolean cEMI, final int cemiCommMode, final byte[] peiSwitch)
+			throws KNXAckTimeoutException, KNXPortClosedException, KNXLinkClosedException {
 		try {
-			conn.send(cEMI ? commModeRequest(DataLinkLayer) : switchLinkLayer, true);
+			conn.send(cEMI ? commModeRequest(cemiCommMode) : peiSwitch, true);
 			// TODO check .con for error case
 		}
 		catch (final InterruptedException e) {
@@ -385,27 +407,5 @@ final class BcuSwitcher
 			conn.close();
 			throw e;
 		}
-	}
-
-	void enterBusmonitor(final boolean cEMI)
-			throws KNXAckTimeoutException, KNXPortClosedException, KNXLinkClosedException {
-		try {
-			final byte[] switchBusmon = { (byte) peiSwitch_req, (byte) 0x90, 0x18, 0x34, 0x56, 0x78, 0x0A, };
-			conn.send(cEMI? commModeRequest(Busmonitor) : switchBusmon, true);
-		}
-		catch (final InterruptedException e) {
-			conn.close();
-			Thread.currentThread().interrupt();
-			throw new KNXLinkClosedException(e.getMessage() != null ? e.getMessage() : "thread interrupted");
-		}
-		catch (final KNXAckTimeoutException e) {
-			conn.close();
-			throw e;
-		}
-	}
-
-	void leaveBusmonitor(final boolean cEMI)
-			throws KNXAckTimeoutException, KNXPortClosedException, InterruptedException {
-		normalMode(cEMI);
 	}
 }

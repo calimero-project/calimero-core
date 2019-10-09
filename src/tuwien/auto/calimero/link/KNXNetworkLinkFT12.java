@@ -155,7 +155,7 @@ public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 		new BcuSwitcher(conn).linkLayerMode(cEMI);
 	}
 
-	private void normalMode() throws KNXAckTimeoutException, KNXPortClosedException, InterruptedException {
+	private void normalMode() throws KNXAckTimeoutException, KNXPortClosedException, KNXLinkClosedException {
 		new BcuSwitcher(conn).normalMode(cEMI);
 	}
 }

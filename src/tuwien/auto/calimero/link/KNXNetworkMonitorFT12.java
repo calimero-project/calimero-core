@@ -130,11 +130,11 @@ public class KNXNetworkMonitorFT12 extends AbstractMonitor<FT12Connection>
 	}
 
 	@Override
-	protected void leaveBusmonitor() throws InterruptedException
+	protected void leaveBusmonitor()
 	{
 		try {
 			new BcuSwitcher(conn).leaveBusmonitor(cEMI);
 		}
-		catch (KNXAckTimeoutException | KNXPortClosedException e) {}
+		catch (KNXAckTimeoutException | KNXPortClosedException | KNXLinkClosedException e) {}
 	}
 }
