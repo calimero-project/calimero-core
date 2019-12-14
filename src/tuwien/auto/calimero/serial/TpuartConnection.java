@@ -51,6 +51,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
@@ -428,6 +429,20 @@ public class TpuartConnection implements AutoCloseable
 
 	// Stores the currently used max. inter-byte delay, to also be available for subsequent tpuart connections.
 	private static AtomicInteger maxInterByteDelay = new AtomicInteger(5200); // 50 bit times [us]
+	static {
+		final var key = "calimero.serial.tpuart.maxInterByteDelay";
+		try {
+			final var delay = System.getProperty(key);
+			if (delay != null) {
+				final int value = Integer.parseUnsignedInt(delay);
+				maxInterByteDelay.set(value);
+				LoggerFactory.getLogger("calimero.serial.tpuart").info("using {} of {} us", key, value);
+			}
+		}
+		catch (final RuntimeException e) {
+			LoggerFactory.getLogger("calimero.serial.tpuart").warn("on checking property {}", key, e);
+		}
+	}
 
 	private final class Receiver extends Thread
 	{
@@ -540,7 +555,7 @@ public class TpuartConnection implements AutoCloseable
 		{
 			// cond: consecutively losing 4 frames (1 msg w/ 1 .ind + 2 .ind repetitions, and 1st .ind of next msg)
 			if (consecutiveFrameDrops >= 3) {
-				maxDelay = maxInterByteDelay.accumulateAndGet(Math.min(maxDelay + 500, 10_000), Math::max);
+				maxDelay = maxInterByteDelay.accumulateAndGet(Math.min(maxDelay + 500, 20_000), Math::max);
 				logger.warn("{} partial frames discarded, increase max. inter-byte delay to {} us",
 						consecutiveFrameDrops + 1, maxDelay);
 				consecutiveFrameDrops = -1;
