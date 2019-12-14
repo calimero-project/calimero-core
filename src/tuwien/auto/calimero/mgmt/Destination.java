@@ -363,18 +363,20 @@ public class Destination implements AutoCloseable
 	 * {@link TransportLayer#destroyDestination(Destination)}. <br>
 	 * On an already destroyed destination, no action is performed.
 	 */
-	public synchronized void destroy()
+	public void destroy()
 	{
-		if (state == Destroyed)
-			return;
-		if (state != Disconnected)
-			try {
-				tl.disconnect(this);
-			}
-			catch (final KNXLinkClosedException e) {
-				// we already should've been destroyed on catching this exception
-			}
-		setState(Destroyed, null);
+		synchronized (this) {
+			if (state == Destroyed)
+				return;
+			if (state != Disconnected)
+				try {
+					tl.disconnect(this);
+				}
+				catch (final KNXLinkClosedException e) {
+					// we already should've been destroyed on catching this exception
+				}
+			setState(Destroyed, null);
+		}
 		tl.destroyDestination(this);
 	}
 
