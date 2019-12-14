@@ -448,6 +448,9 @@
         <property pid="52" pidName="PID_EXT_GRPOBJREFERENCE" name="Extended Group Object Reference" pdt="24" rw="R" writeEnabled="0">
             <usage>Extended Group Object Reference</usage>
         </property>
+        <property pid="66" pidName="PID_GO_DIAGNOSTICS" name="Group object diagnostics" pdt="62" rw="3/3" writeEnabled="1">
+            <usage>Set or read GO value, request transmission or reading of the GO value on the bus</usage>
+        </property>
     </object>
     <object type="10">
         <property pid="51" pidName="PID_POLLING_STATE" name="Polling State" pdt="-" rw="" writeEnabled="">
