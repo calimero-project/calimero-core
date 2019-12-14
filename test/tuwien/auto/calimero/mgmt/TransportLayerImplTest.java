@@ -91,7 +91,7 @@ class TransportLayerImplTest
 
 	private final class TLListener implements TransportListener
 	{
-		final BlockingQueue<CEMI> broad = new ArrayBlockingQueue<>(10);
+		final BlockingQueue<CEMI> broad = new ArrayBlockingQueue<>(100);
 		final BlockingQueue<CEMI> conn = new ArrayBlockingQueue<>(10);
 		final BlockingQueue<CEMI> ind = new ArrayBlockingQueue<>(10);
 		final List<CEMI> group = new Vector<>();
