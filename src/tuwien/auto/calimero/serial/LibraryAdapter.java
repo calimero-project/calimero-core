@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -141,7 +141,7 @@ public abstract class LibraryAdapter implements Closeable
 				conn = new SerialComAdapter(logger, portId);
 				conn.setBaudRate(baudrate);
 				//final int idleTimeout = idleTimeout(conn.getBaudRate());
-				conn.setTimeouts(new SerialComAdapter.Timeouts(idleTimeout, 0, 250, 0, 0));
+				conn.setTimeouts(new SerialComAdapter.Timeouts(idleTimeout, 0, 5, 0, 0));
 				conn.setParity(SerialComAdapter.PARITY_EVEN);
 				conn.setControl(SerialComAdapter.STOPBITS, SerialComAdapter.ONE_STOPBIT);
 				conn.setControl(SerialComAdapter.DATABITS, 8);

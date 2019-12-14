@@ -472,7 +472,7 @@ public class TpuartConnection implements AutoCloseable
 			while (!quit) {
 				try {
 					final long start = System.nanoTime();
-					final int c = is.available() > 0 || idle ? is.read() : -1;
+					final int c = is.read();
 
 					if (c == -1) {
 						if (lastUartState + UartStateReadInterval < System.currentTimeMillis())
@@ -507,8 +507,8 @@ public class TpuartConnection implements AutoCloseable
 					else if (c == Reset_ind)
 						logger.debug("TP-UART reset.ind");
 
-//					final long loop = System.nanoTime() - start;
-//					logger.trace("loop time = {} us", loop / 1000);
+					final long loop = System.nanoTime() - start;
+					logger.trace("loop time = {} us", loop / 1000);
 				}
 				catch (final RuntimeException e) {
 					logger.warn("continue after internal error in receiver loop", e);
@@ -620,6 +620,15 @@ public class TpuartConnection implements AutoCloseable
 				in.reset();
 				in.write(c);
 				frameAcked = false;
+				final byte[] minBytes = new byte[extFrame ? 6 : 5];
+				final int read = is.read(minBytes);
+				final long initialMinBytes = (System.nanoTime() / 1000 - lastRead);
+				if (read > 0) {
+					in.write(minBytes, 0, read - 1);
+					lastRead = System.nanoTime() / 1000;
+					parseFrame(minBytes[read - 1]);
+				}
+				logger.trace("finished reading {} bytes {} us", read, initialMinBytes);
 			}
 			// busmon mode only: short acks
 			else if (c == Ack || c == Nak || c == Busy)
@@ -687,8 +696,8 @@ public class TpuartConnection implements AutoCloseable
 				return false;
 			final boolean start = (c & 0xd0) == StdFrameFormat || (c & 0xd0) == ExtFrameFormat;
 			if (start) {
-				final boolean repeated = (c & RepeatFlag) == 0;
-				logger.trace("start of frame 0x{}, repeated = {}", Integer.toHexString(c), repeated);
+//				final boolean repeated = (c & RepeatFlag) == 0;
+//				logger.trace("start of frame 0x{}, repeated = {}", Integer.toHexString(c), repeated);
 				extFrame = (c & 0xd0) == ExtFrameFormat;
 			}
 			return start;
