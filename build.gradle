@@ -92,7 +92,8 @@ test {
 		excludeTags 'ft12', 'slow'
 //		excludeTags 'knxnetip'
 		testLogging {
-			exceptionFormat "full"
+//			exceptionFormat "full"
+//			showStandardStreams true
 		}
 	}
 }
