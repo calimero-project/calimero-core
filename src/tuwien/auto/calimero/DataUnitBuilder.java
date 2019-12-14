@@ -457,6 +457,8 @@ public final class DataUnitBuilder
 		case 0b0111010110:
 			return "A_FunctionPropertyExtState.response";
 
+		case 0x3f1:
+			return "S-A_Data";
 		default:
 			return "APCI 0x" + Integer.toHexString(apci);
 		}
