@@ -323,7 +323,7 @@ class KNXnetIPRouterTest
 			Thread.sleep(12);
 		}
 		Assertions.assertTimeout(timeout, () -> {
-			while (routingBusy.get() != messages)
+			while (routingBusy.get() < messages)
 				Thread.sleep(50);
 		}, "wrong number of routing busy notification");
 		assertEquals(messages, routingBusy.get());
@@ -338,7 +338,7 @@ class KNXnetIPRouterTest
 			r.send(new RoutingBusy(1, 20, 0));
 		}
 		Assertions.assertTimeout(timeout, () -> {
-			while (routingBusy.get() != messages)
+			while (routingBusy.get() < messages)
 				Thread.sleep(50);
 		}, "wrong number of routing busy notification");
 		assertEquals(messages, routingBusy.get());
