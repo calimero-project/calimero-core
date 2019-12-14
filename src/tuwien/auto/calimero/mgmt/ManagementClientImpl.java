@@ -301,7 +301,7 @@ public class ManagementClientImpl implements ManagementClient
 		throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException, InterruptedException
 	{
 		final long start = registerActiveService(IND_ADDR_RESPONSE);
-		tl.broadcast(false, Priority.SYSTEM, DataUnitBuilder.createLengthOptimizedAPDU(IND_ADDR_READ, null));
+		tl.broadcast(false, Priority.SYSTEM, DataUnitBuilder.createLengthOptimizedAPDU(IND_ADDR_READ));
 		final List<IndividualAddress> l = new ArrayList<>();
 		waitForResponses(IND_ADDR_RESPONSE, 0, 0, start, responseTimeout, (source, data) -> {
 			l.add(source);
@@ -353,7 +353,7 @@ public class ManagementClientImpl implements ManagementClient
 		InterruptedException
 	{
 		// we allow 6 bytes ASDU for RF domains
-		return makeDOAs(readBroadcast(priority, DataUnitBuilder.createLengthOptimizedAPDU(DOA_READ, null), DOA_RESPONSE,
+		return makeDOAs(readBroadcast(priority, DataUnitBuilder.createLengthOptimizedAPDU(DOA_READ), DOA_RESPONSE,
 				2, 6, oneDomainOnly));
 	}
 
@@ -362,7 +362,7 @@ public class ManagementClientImpl implements ManagementClient
 		throws KNXLinkClosedException, KNXInvalidResponseException, KNXTimeoutException, InterruptedException
 	{
 		final long start = registerActiveService(DOA_RESPONSE);
-		tl.broadcast(true, priority, DataUnitBuilder.createLengthOptimizedAPDU(DOA_READ, null));
+		tl.broadcast(true, priority, DataUnitBuilder.createLengthOptimizedAPDU(DOA_READ));
 		try {
 			// we allow 6 bytes ASDU for RF domains
 			waitForResponses(DOA_RESPONSE, 2, 6, start, responseTimeout, (source, apdu1) -> {
@@ -550,7 +550,7 @@ public class ManagementClientImpl implements ManagementClient
 	{
 		int time = 0;
 		if (basic) {
-			send(dst, priority, DataUnitBuilder.createLengthOptimizedAPDU(RESTART, null), 0);
+			send(dst, priority, DataUnitBuilder.createLengthOptimizedAPDU(RESTART), 0);
 		}
 		else {
 			final byte[] sdu = new byte[] { 0x01, (byte) eraseCode, (byte) channel, };

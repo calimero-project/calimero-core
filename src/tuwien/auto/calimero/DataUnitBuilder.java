@@ -178,8 +178,7 @@ public final class DataUnitBuilder
 	 * APDU shall not contain any ASDU information, <code>asdu</code> can be left <code>null</code>.
 	 *
 	 * @param service application layer service code
-	 * @param asdu application layer service data unit, <code>asdu.length</code> &lt; 255; or
-	 *        <code>null</code> for no ASDU
+	 * @param asdu application layer service data unit, <code>asdu.length</code> &lt; 255
 	 * @return APDU as byte array
 	 */
 	public static byte[] createLengthOptimizedAPDU(final int service, final byte... asdu)
