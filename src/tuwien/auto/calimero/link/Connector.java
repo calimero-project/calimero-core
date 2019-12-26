@@ -407,9 +407,13 @@ public final class Connector
 					connect();
 				}
 				catch (KNXException | RuntimeException | InterruptedException e) {
-					final Throwable cause = e.getCause();
-					final String detail = cause != null && cause.getMessage() != null ? " (" + cause.getMessage() + ")" : "";
-					logger().warn("connection attempt {}: {}{}", attempt, e.getMessage(), detail);
+					if (attempt == 1)
+						logger().warn("connection attempt {}", attempt, e);
+					else {
+						final Throwable cause = e.getCause();
+						final String detail = cause != null && cause.getMessage() != null ? " (" + cause.getMessage() + ")" : "";
+						logger().warn("connection attempt {}: {}{}", attempt, e.getMessage(), detail);
+					}
 					scheduleConnect(remaining);
 				}
 			};
