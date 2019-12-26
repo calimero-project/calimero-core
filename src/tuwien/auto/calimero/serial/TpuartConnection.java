@@ -69,6 +69,7 @@ import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.internal.EventListeners;
 import tuwien.auto.calimero.log.LogService;
+import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
  * Provides a connection with a TP-UART-IC controller for transparent communication with a KNX TP1 network. The
@@ -128,8 +129,8 @@ public class TpuartConnection implements AutoCloseable
 //	private static int MaxSendAttempts = 1; //3;
 	// XXX tune, includes receive timeout of 2-2.5 ms to detect end of packet
 	private static final long ExchangeTimeout = 50;
-	// time interval to check on TP UART state [ms]
-	private static final long UartStateReadInterval = 10000;
+	// time interval to check on TP UART state
+	private static final long UartStateReadInterval = 5_000_000; // [us]
 
 	private final String portId;
 	private final LibraryAdapter adapter;
@@ -184,9 +185,32 @@ public class TpuartConnection implements AutoCloseable
 			reset();
 		}
 		catch (final IOException e) {
-			close();
+			closeResources();
 			throw new KNXPortClosedException("on resetting TP-UART controller", portId, e);
 		}
+		if (!waitForInitialUartState()) {
+			closeResources();
+			throw new KNXPortClosedException("timeout waiting for initial TP-UART state", portId);
+		}
+	}
+
+	private boolean waitForInitialUartState() {
+		logger.trace("wait for initial TP-UART state");
+		long now = System.nanoTime();
+		final long end = now + 1_000_000_000L;
+		try {
+			while (now < end) {
+				if (receiver.lastUartState != 0)
+					return true;
+
+				Thread.sleep(10);
+				now = System.nanoTime();
+			};
+		}
+		catch (final InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+		return false;
 	}
 
 	/**
@@ -314,9 +338,13 @@ public class TpuartConnection implements AutoCloseable
 			Thread.currentThread().interrupt();
 		}
 		catch (final IOException ignore) {}
+		closeResources();
+		fireConnectionClosed(origin, reason);
+	}
+
+	private void closeResources() {
 		receiver.quit();
 		adapter.close();
-		fireConnectionClosed(origin, reason);
 	}
 
 	private void fireConnectionClosed(final int origin, final String reason)
@@ -454,7 +482,7 @@ public class TpuartConnection implements AutoCloseable
 		private boolean frameAcked;
 
 		private byte[] lastReceived = new byte[0];
-		private long lastUartState = System.currentTimeMillis();
+		volatile long lastUartState; // [us]
 		private boolean uartStatePending;
 
 		private int maxDelay = maxInterByteDelay.get();
@@ -490,11 +518,10 @@ public class TpuartConnection implements AutoCloseable
 					final int c = is.read();
 
 					if (c == -1) {
-						if (lastUartState + UartStateReadInterval < System.currentTimeMillis())
-							readUartState();
+						checkUartState();
 
 						// we transition to idle state after some time of inactivity, and notify a waiting sender
-						final long inactivity = 10000; // [us]
+						final long inactivity = 10_000; // [us]
 						if (enterIdleTimestamp == 0)
 							enterIdleTimestamp = start;
 						else if (coolDownUntil > start) {
@@ -519,8 +546,10 @@ public class TpuartConnection implements AutoCloseable
 
 					if (parseFrame(c) || isLDataCon(c) || isUartStateInd(c))
 						; // nothing to do
-					else if (c == Reset_ind)
+					else if (c == Reset_ind) {
+						uartStatePending = false;
 						logger.debug("TP-UART reset.ind");
+					}
 
 					final long loop = System.nanoTime() - start;
 					logger.trace("loop time = {} us", loop / 1000);
@@ -531,7 +560,7 @@ public class TpuartConnection implements AutoCloseable
 				catch (final InterruptedException e) {}
 				catch (final IOException e) {
 					if (!quit)
-						close(CloseEvent.INTERNAL, "receiver communication failure");
+						close(CloseEvent.INTERNAL, "receiver communication failure, " + e.toString());
 					break;
 				}
 			}
@@ -662,8 +691,20 @@ public class TpuartConnection implements AutoCloseable
 			consecutiveFrameDrops++;
 		}
 
+		private void checkUartState() throws IOException {
+			final long now = System.nanoTime() / 1000;
+			if (lastUartState + UartStateReadInterval < now) {
+				if (lastUartState != 0 && now > lastUartState + 2 * UartStateReadInterval + 100_000)
+					close(CloseEvent.INTERNAL, "communication not possible, TP1 medium not connected?");
+				else
+					readUartState();
+			}
+		}
+
 		private void readUartState() throws IOException
 		{
+			if (uartStatePending)
+				return;
 			uartStatePending = true;
 			os.write(State_req);
 		}
@@ -676,16 +717,19 @@ public class TpuartConnection implements AutoCloseable
 			if (!ind)
 				return false;
 			uartStatePending = false;
-			lastUartState = System.currentTimeMillis();
+			lastUartState = System.nanoTime() / 1000;
 			final boolean slaveCollision = (c & 0x80) == 0x80;
 			final boolean rxError = (c & 0x40) == 0x40; // checksum, parity, bit error
 			final boolean txError = (c & 0x20) == 0x20; // send 0, receive 1
 			final boolean protError = (c & 0x10) == 0x10; // illegal ctrl byte
 			final boolean tempWarning = (c & 0x08) == 0x08; // too hot
-			if (slaveCollision || rxError || txError || protError || tempWarning)
-				logger.debug("TP-UART status update: {}Temp. {}, Errors: Rx={} Tx={} Prot={}",
-						slaveCollision ? "slave collision, " : "", tempWarning ? "warning" : "OK", rxError, txError,
-						protError);
+
+			final boolean info = slaveCollision || rxError || txError || protError || tempWarning;
+			LogService.log(logger, info ? LogLevel.INFO : LogLevel.TRACE, "TP-UART status: Temp. {}{}{}{}{}",
+					tempWarning ? "warning" : "OK", slaveCollision ? ", slave collision" : "",
+					rxError ? ", receive error" : "", txError ? ", transmit error" : "",
+					protError ? ", protocol error" : "");
+
 			if (tempWarning) {
 				coolDownUntil = System.nanoTime() + 1_000_000_000;
 				logger.warn("TP-UART high temperature warning! Sending is paused for 1 second ...");
