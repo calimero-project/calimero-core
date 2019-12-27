@@ -52,7 +52,7 @@ public abstract class KNXAddress implements Comparable<KNXAddress>
 	private static final String ATTR_TYPE = "type";
 	private static final String TAG_ADDRESS = "knxAddress";
 
-	int address;
+	final int address;
 
 	/**
 	 * Creates a KNX address from a 16 Bit address value.
@@ -61,7 +61,9 @@ public abstract class KNXAddress implements Comparable<KNXAddress>
 	 */
 	KNXAddress(final int address)
 	{
-		init(address);
+		if (address < 0 || address > 0xffff)
+			throw new KNXIllegalArgumentException("address out of range [0..0xFFFF]");
+		this.address = address;
 	}
 
 	/**
@@ -80,34 +82,24 @@ public abstract class KNXAddress implements Comparable<KNXAddress>
 	}
 
 	/**
-	 * Creates a KNX address from its XML representation.
+	 * Reads the KNX address element text from its XML representation.
 	 * <p>
 	 * If the current XML element position is no start tag, the next element tag is read. The KNX address element is
 	 * then expected to be the current element in the reader.
 	 *
 	 * @param r a XML reader
+	 * @param type address type
 	 * @throws KNXMLException if the XML element represents no KNX address or the address couldn't be read correctly
 	 */
-	KNXAddress(final XmlReader r) throws KNXMLException
-	{
+	static String address(final XmlReader r, final String type) {
 		if (r.getEventType() != XmlReader.START_ELEMENT)
 			r.nextTag();
+		final String typeAttr = r.getAttributeValue(null, ATTR_TYPE);
 		if (r.getEventType() != XmlReader.START_ELEMENT || !r.getLocalName().equals(TAG_ADDRESS)
-				|| !getType().equals(r.getAttributeValue(null, ATTR_TYPE)))
-			throw new KNXMLException("XML element represents no KNX " + getType() + " address", r);
-		try {
-			init(r.getElementText());
-		}
-		catch (final KNXFormatException kfe) {
-			throw new KNXMLException("malformed KNX address value, " + kfe.getMessage(), r);
-		}
+				|| (typeAttr != null && !type.equals(typeAttr)))
+			throw new KNXMLException("XML element represents no KNX " + type + " address", r);
+		return r.getElementText();
 	}
-
-	/**
-	 * Creates KNX address 0 (reserved address).
-	 */
-	KNXAddress()
-	{}
 
 	/**
 	 * Creates a KNX address from xml input, the KNX address element is expected to be the current or next element from
@@ -224,14 +216,5 @@ public abstract class KNXAddress implements Comparable<KNXAddress>
 			return new String[] { t.nextToken(), t.nextToken(), t.nextToken(), };
 		else
 			throw new KNXFormatException("wrong KNX address syntax with " + count + " levels", address);
-	}
-
-	abstract void init(String address) throws KNXFormatException;
-
-	void init(final int address)
-	{
-		if (address < 0 || address > 0xffff)
-			throw new KNXIllegalArgumentException("address out of range [0..0xFFFF]");
-		this.address = address;
 	}
 }

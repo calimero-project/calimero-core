@@ -85,7 +85,7 @@ public class GroupAddress extends KNXAddress
 	 */
 	public GroupAddress(final int mainGroup, final int middleGroup, final int subGroup)
 	{
-		init(mainGroup, middleGroup, subGroup);
+		super(address(mainGroup, middleGroup, subGroup));
 	}
 
 	/**
@@ -96,7 +96,7 @@ public class GroupAddress extends KNXAddress
 	 */
 	public GroupAddress(final int mainGroup, final int subGroup)
 	{
-		init(mainGroup, subGroup);
+		super(address(mainGroup, subGroup));
 	}
 
 	/**
@@ -125,7 +125,7 @@ public class GroupAddress extends KNXAddress
 	 */
 	public GroupAddress(final String address) throws KNXFormatException
 	{
-		init(address);
+		super(parse(address));
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class GroupAddress extends KNXAddress
 	 */
 	public GroupAddress(final XmlReader r) throws KNXMLException
 	{
-		super(r);
+		super(parse(r));
 	}
 
 	/**
@@ -258,35 +258,48 @@ public class GroupAddress extends KNXAddress
 		return address;
 	}
 
-	@Override
-	void init(final String address) throws KNXFormatException
-	{
+	private static int parse(final XmlReader r) {
+		try {
+			return parse(address(r, ATTR_GROUP));
+		}
+		catch (final KNXFormatException e) {
+			throw new KNXMLException(e.getMessage(), r);
+		}
+	}
+
+	private static int parse(final String address) throws KNXFormatException {
 		final String[] tokens = parse(address, true);
 		try {
+			int value;
 			if (tokens.length == 1)
-				init(Integer.decode(tokens[0]));
+				value = Integer.decode(tokens[0]);
 			else if (tokens.length == 2)
-				init(Byte.parseByte(tokens[0]), Short.parseShort(tokens[1]));
+				value = address(Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1]));
 			else if (tokens.length == 3)
-				init(Byte.parseByte(tokens[0]), Byte.parseByte(tokens[1]),
-						Short.parseShort(tokens[2]));
+				value = address(Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
+			else
+				throw new KNXFormatException("wrong group address syntax with " + tokens.length + " levels", address);
+
+			if (value < 0 || value > 0xffff)
+				throw new KNXFormatException("group address out of range [0..0xffff]", value);
+			return value;
 		}
 		catch (NumberFormatException | KNXIllegalArgumentException e) {
 			throw new KNXFormatException("invalid group address", address, e);
 		}
 	}
 
-	private void init(final int main, final int middle, final int sub)
+	private static int address(final int main, final int middle, final int sub)
 	{
 		if ((main & ~0x1F) != 0 || (middle & ~0x7) != 0 || (sub & ~0xFF) != 0)
 			throw new KNXIllegalArgumentException("address group out of range");
-		address = main << 11 | middle << 8 | sub;
+		return main << 11 | middle << 8 | sub;
 	}
 
-	private void init(final int main, final int sub)
+	private static int address(final int main, final int sub)
 	{
 		if ((main & ~0x1F) != 0 || (sub & ~0x7FF) != 0)
 			throw new KNXIllegalArgumentException("address group out of range");
-		address = main << 11 | sub;
+		return main << 11 | sub;
 	}
 }

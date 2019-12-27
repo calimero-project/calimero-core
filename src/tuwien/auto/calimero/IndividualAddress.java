@@ -60,7 +60,6 @@ public class IndividualAddress extends KNXAddress
 
 	/**
 	 * Creates a KNX individual address from a 16 Bit address value.
-	 * <p>
 	 *
 	 * @param address the address value in the range 0 &le; value &le; 0xFFFF
 	 */
@@ -70,9 +69,7 @@ public class IndividualAddress extends KNXAddress
 	}
 
 	/**
-	 * Creates a KNX individual address from the 3-level notation area-, line- and
-	 * device-address.
-	 * <p>
+	 * Creates a KNX individual address from the 3-level notation area-, line-, and device-address.
 	 *
 	 * @param area area address value, in the range 0 &le; value &le; 0xF
 	 * @param line line address value, in the range 0 &le; value &le; 0xF
@@ -80,7 +77,7 @@ public class IndividualAddress extends KNXAddress
 	 */
 	public IndividualAddress(final int area, final int line, final int device)
 	{
-		init(area, line, device);
+		super(address(area, line, device));
 	}
 
 	/**
@@ -109,7 +106,7 @@ public class IndividualAddress extends KNXAddress
 	 */
 	public IndividualAddress(final String address) throws KNXFormatException
 	{
-		init(address);
+		super(parse(address));
 	}
 
 	/**
@@ -124,13 +121,11 @@ public class IndividualAddress extends KNXAddress
 	 */
 	public IndividualAddress(final XmlReader r) throws KNXMLException
 	{
-		super(r);
+		super(parse(r));
 	}
 
 	/**
-	 * Returns the area address.
-	 * <p>
-	 * The area address consists of the 4 most significant Bits in the address field.
+	 * Returns the area address, consisting of the 4 most significant Bits in the address field.
 	 *
 	 * @return the area value (high nibble of the address high byte)
 	 */
@@ -140,10 +135,7 @@ public class IndividualAddress extends KNXAddress
 	}
 
 	/**
-	 * Returns the line address.
-	 * <p>
-	 * The line address consists of 4 bits, starting with bit 8 to 11 in the address
-	 * field.
+	 * Returns the line address, consisting of 4 bits, starting with bit 8 to 11 in the address field.
 	 *
 	 * @return the line value (low nibble of the address high byte)
 	 */
@@ -153,9 +145,7 @@ public class IndividualAddress extends KNXAddress
 	}
 
 	/**
-	 * Returns the device address.
-	 * <p>
-	 * The device address consists of the low byte of the 16 Bit address field.
+	 * Returns the device address, consisting of the low byte of the 16 Bit address field.
 	 *
 	 * @return the device value (8 least significant bits)
 	 */
@@ -164,9 +154,6 @@ public class IndividualAddress extends KNXAddress
 		return address & 0xFF;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.KNXAddress#getType()
-	 */
 	@Override
 	public final String getType()
 	{
@@ -175,7 +162,6 @@ public class IndividualAddress extends KNXAddress
 
 	/**
 	 * Returns the address as a string using the 3-level "area.line.device" notation.
-	 * <p>
 	 *
 	 * @return the address string
 	 */
@@ -187,7 +173,6 @@ public class IndividualAddress extends KNXAddress
 
 	/**
 	 * Returns whether <code>obj</code> is equal to this KNX address type.
-	 * <p>
 	 *
 	 * @param obj knx address object
 	 * @return <code>true</code> iff <code>obj</code> is of this type and contains the
@@ -201,9 +186,6 @@ public class IndividualAddress extends KNXAddress
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode()
 	{
@@ -212,29 +194,40 @@ public class IndividualAddress extends KNXAddress
 		return offset ^ address;
 	}
 
-	@Override
-	void init(final String address) throws KNXFormatException
-	{
-		final String[] tokens = parse(address, false);
+	private static int parse(final XmlReader r) {
 		try {
-			if (tokens.length == 1) {
-				init(Integer.decode(tokens[0]));
-				return;
-			}
-			if (tokens.length != 3)
-				throw new KNXFormatException("wrong individual address syntax with "
-						+ tokens.length + " levels", address);
-			init(Byte.parseByte(tokens[0]), Byte.parseByte(tokens[1]), Short.parseShort(tokens[2]));
+			return parse(address(r, ATTR_IND));
+		}
+		catch (final KNXFormatException e) {
+			throw new KNXMLException(e.getMessage(), r);
+		}
+	}
+
+	private static int parse(final String address) throws KNXFormatException {
+		final var tokens = parse(address, false);
+		try {
+			int value;
+			if (tokens.length == 1)
+				value = Integer.decode(tokens[0]);
+			else if (tokens.length == 3)
+				value = address(Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
+			else
+				throw new KNXFormatException("wrong individual address syntax with " + tokens.length + " levels",
+						address);
+
+			if (value < 0 || value > 0xffff)
+				throw new KNXFormatException("individual address out of range [0..0xffff]", value);
+			return value;
 		}
 		catch (final NumberFormatException | KNXIllegalArgumentException e) {
 			throw new KNXFormatException("invalid individual address", address, e);
 		}
 	}
 
-	private void init(final int area, final int line, final int device)
+	private static int address(final int area, final int line, final int device)
 	{
 		if ((area & ~0xF) != 0 || (line & ~0xF) != 0 || (device & ~0xFF) != 0)
 			throw new KNXIllegalArgumentException("address value out of range");
-		address = area << 12 | line << 8 | device;
+		return area << 12 | line << 8 | device;
 	}
 }
