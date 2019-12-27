@@ -136,6 +136,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 			}
 			catch (final KNXTimeoutException expected) {}
 
+			conn.addConnectionListener(notifier);
 			linkLayerMode();
 		}
 		catch (final KNXException e) {
@@ -143,7 +144,6 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 			conn.close();
 			throw e;
 		}
-		conn.addConnectionListener(notifier);
 		cEMI = emiTypes.contains(EmiType.CEmi);
 		sendCEmiAsByteArray = true;
 
