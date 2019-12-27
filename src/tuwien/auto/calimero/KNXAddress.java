@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -125,8 +125,15 @@ public abstract class KNXAddress implements Comparable<KNXAddress>
 			final String type = r.getAttributeValue(null, ATTR_TYPE);
 			if (GroupAddress.ATTR_GROUP.equals(type))
 				return new GroupAddress(r);
-			else if (IndividualAddress.ATTR_IND.equals(type))
+			if (IndividualAddress.ATTR_IND.equals(type))
 				return new IndividualAddress(r);
+
+			try {
+				return create(r.getElementText());
+			}
+			catch (final KNXFormatException e) {
+				throw new KNXMLException(e.getMessage(), r);
+			}
 		}
 		throw new KNXMLException("not a KNX address", r);
 	}
@@ -144,9 +151,9 @@ public abstract class KNXAddress implements Comparable<KNXAddress>
 	 */
 	public static KNXAddress create(final String address) throws KNXFormatException
 	{
-		if (address.indexOf('.') != -1)
+		if (address.contains("."))
 			return new IndividualAddress(address);
-		if (address.indexOf('/') != -1)
+		if (address.contains("/"))
 			return new GroupAddress(address);
 		throw new KNXFormatException("could not detect address type of " + address);
 	}
@@ -200,12 +207,12 @@ public abstract class KNXAddress implements Comparable<KNXAddress>
 		return address - other.address;
 	}
 
-	static String[] parse(final String address) throws KNXFormatException
+	static String[] parse(final String address, final boolean groupAddress) throws KNXFormatException
 	{
 		StringTokenizer t = null;
-		if (address.indexOf('/') > -1)
+		if (groupAddress && address.indexOf('/') > -1)
 			t = new StringTokenizer(address, "/");
-		else if (address.indexOf('.') > -1)
+		else if (!groupAddress && address.indexOf('.') > -1)
 			t = new StringTokenizer(address, ".");
 		else
 			return new String[] { address };

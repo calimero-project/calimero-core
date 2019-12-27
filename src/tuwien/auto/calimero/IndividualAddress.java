@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ import tuwien.auto.calimero.xml.XmlReader;
  * <i>device</i>. The address structure consists of a 16 bit address, consisting of
  * (starting from the most significant bit): area (4 bits), line (4 bits), and device (8
  * bits). The individual address KNX notation follows <i>area.line.device</i>, with the
- * recommended separator of type '.', or alternatively, '/' (area/line/device).<br>
+ * required separator of type '.'.<br>
  * <br>
  * The combined address levels <i>area</i> and <i>line</i> are referred to as subnetwork
  * address, i.e., and described by the higher 8 bits of the address value.<br>
@@ -215,7 +215,7 @@ public class IndividualAddress extends KNXAddress
 	@Override
 	void init(final String address) throws KNXFormatException
 	{
-		final String[] tokens = parse(address);
+		final String[] tokens = parse(address, false);
 		try {
 			if (tokens.length == 1) {
 				init(Integer.decode(tokens[0]));

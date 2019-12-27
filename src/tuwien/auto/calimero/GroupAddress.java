@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -261,7 +261,7 @@ public class GroupAddress extends KNXAddress
 	@Override
 	void init(final String address) throws KNXFormatException
 	{
-		final String[] tokens = parse(address);
+		final String[] tokens = parse(address, true);
 		try {
 			if (tokens.length == 1)
 				init(Integer.decode(tokens[0]));

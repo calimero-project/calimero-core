@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -69,29 +69,24 @@ public class LDataObjectQueueTest extends TestCase
 	@Override
 	protected void setUp() throws Exception
 	{
-		var = new LDataObjectQueue(new GroupAddress("10.4.10"));
-		fix = new LDataObjectQueue(new GroupAddress("10.4.10"), false, 4, false, l);
-		ring = new LDataObjectQueue(new GroupAddress("10.4.10"), true, 2, true, l);
-		one = new LDataObjectQueue(new GroupAddress("10.4.10"), true, 1, false, l);
+		final var groupAddress = new GroupAddress("10/4/10");
+		var = new LDataObjectQueue(groupAddress);
+		fix = new LDataObjectQueue(groupAddress, false, 4, false, l);
+		ring = new LDataObjectQueue(groupAddress, true, 2, true, l);
+		one = new LDataObjectQueue(groupAddress, true, 1, false, l);
 
-		frame1 =
-			new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0),
-				new GroupAddress("10.4.10"), new byte[] { 1, }, Priority.NORMAL);
-		frame2 =
-			new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0),
-				new GroupAddress("10.4.10"), new byte[] { 2, }, Priority.NORMAL);
-		frame3 =
-			new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0),
-				new GroupAddress("10.4.10"), new byte[] { 3, }, Priority.NORMAL);
-		frame4 =
-			new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0),
-				new GroupAddress("10.4.10"), new byte[] { 4, }, Priority.NORMAL);
-		frame5 =
-			new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0),
-				new GroupAddress("10.4.10"), new byte[] { 5, }, Priority.NORMAL);
-		diff =
-			new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0),
-				new GroupAddress("5.5.5"), new byte[] { 6, }, Priority.NORMAL);
+		frame1 = new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0), groupAddress, new byte[] { 1, },
+				Priority.NORMAL);
+		frame2 = new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0), groupAddress, new byte[] { 2, },
+				Priority.NORMAL);
+		frame3 = new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0), groupAddress, new byte[] { 3, },
+				Priority.NORMAL);
+		frame4 = new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0), groupAddress, new byte[] { 4, },
+				Priority.NORMAL);
+		frame5 = new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0), groupAddress, new byte[] { 5, },
+				Priority.NORMAL);
+		diff = new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0), new GroupAddress("5/5/5"),
+				new byte[] { 6, }, Priority.NORMAL);
 	}
 
 	@Override
@@ -246,18 +241,19 @@ public class LDataObjectQueueTest extends TestCase
 		throws KNXFormatException
 	{
 		var = null;
+		final var groupAddress = new GroupAddress("1/1/1");
 		try {
-			var = new LDataObjectQueue(new GroupAddress("1.1.1"), false, -1, false, null);
+			var = new LDataObjectQueue(groupAddress, false, -1, false, null);
 		}
 		catch (final RuntimeException e) {}
 		assertNull(var);
 		try {
-			var = new LDataObjectQueue(new GroupAddress("1.1.1"), false, 0, false, null);
+			var = new LDataObjectQueue(groupAddress, false, 0, false, null);
 		}
 		catch (final KNXIllegalArgumentException e) {}
 		assertNull(var);
 		try {
-			var = new LDataObjectQueue(new GroupAddress("1.1.1"), false, 1, false, null);
+			var = new LDataObjectQueue(groupAddress, false, 1, false, null);
 		}
 		catch (final KNXIllegalArgumentException e) {
 			fail("correct ctor, should not fail");

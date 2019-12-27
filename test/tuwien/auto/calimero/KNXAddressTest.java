@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2014 B. Malinowsky
+    Copyright (c) 2014, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,47 +36,23 @@
 
 package tuwien.auto.calimero;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
-/**
- * @author B. Malinowsky
- */
-public class KNXAddressTest extends TestCase
-{
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
-	/**
-	 * @param name
-	 */
-	public KNXAddressTest(final String name)
-	{
-		super(name);
-	}
+import org.junit.jupiter.api.Test;
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-	}
+import tuwien.auto.calimero.xml.KNXMLException;
+import tuwien.auto.calimero.xml.XmlInputFactory;
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
-	{
-		super.tearDown();
-	}
+class KNXAddressTest {
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.KNXAddress#create(java.lang.String)}.
-	 * 
-	 * @throws KNXFormatException
-	 */
-	public void testCreateString() throws KNXFormatException
-	{
+	@Test
+	void createFromString() throws KNXFormatException {
 		KNXAddress.create("1/2/3");
 		KNXAddress.create("3.6.9");
 		try {
@@ -86,5 +62,47 @@ public class KNXAddressTest extends TestCase
 		catch (final KNXFormatException e) {
 			// fine, we can't create from raw addresses in base class
 		}
+	}
+
+	@Test
+	void createGroupAddressFromXmlWithoutGroupAttribute() {
+		final var is = newInputStream("<knxAddress>1/1/3</knxAddress>");
+		final var reader = XmlInputFactory.newInstance().createXMLStreamReader(is);
+		final var address = KNXAddress.create(reader);
+		assertEquals(GroupAddress.class, address.getClass());
+	}
+
+	@Test
+	void createGroupAddressFromXmlWithWrongAttribute() {
+		final var is = newInputStream("<knxAddress type=\"individual\">1/1/3</knxAddress>");
+		final var reader = XmlInputFactory.newInstance().createXMLStreamReader(is);
+		assertThrows(KNXMLException.class, () -> KNXAddress.create(reader), "address attribute has wrong type");
+	}
+
+	@Test
+	void createIndividualAddressFromXmlWithoutIndividualAttribute() {
+
+		final var is = newInputStream("<knxAddress>1.1.4</knxAddress>");
+		final var reader = XmlInputFactory.newInstance().createXMLStreamReader(is);
+		final var address = KNXAddress.create(reader);
+		assertEquals(IndividualAddress.class, address.getClass());
+	}
+
+	@Test
+	void createIndividualAddressFromXmlWithWrongAttribute() {
+		final var is = newInputStream("<knxAddress type=\"group\">1.1.4</knxAddress>");
+		final var reader = XmlInputFactory.newInstance().createXMLStreamReader(is);
+		assertThrows(KNXMLException.class, () -> KNXAddress.create(reader), "address attribute has wrong type");
+	}
+
+	@Test
+	void createInvalidAddressFromXmlWithoutAnyAttribute() {
+		final var is = newInputStream("<knxAddress>1234</knxAddress>");
+		final var reader = XmlInputFactory.newInstance().createXMLStreamReader(is);
+		assertThrows(KNXMLException.class, () -> KNXAddress.create(reader), "element should not contain valid address");
+	}
+
+	private InputStream newInputStream(final String s) {
+		return new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8));
 	}
 }

@@ -67,7 +67,7 @@ public class LDataObjectTest extends TestCase
 	{
 		frame =
 			new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0),
-				new GroupAddress("1.1.1"), new byte[] { 1, 2, 3, }, Priority.NORMAL);
+				new GroupAddress("1/1/1"), new byte[] { 1, 2, 3, }, Priority.NORMAL);
 	}
 
 	/* (non-Javadoc)
@@ -91,7 +91,7 @@ public class LDataObjectTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.buffer.LDataObject#getFrame()}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public void testGetFrame() throws KNXFormatException
@@ -100,7 +100,7 @@ public class LDataObjectTest extends TestCase
 		assertEquals(frame, o.getFrame());
 		final CEMILData frame2 =
 			new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0),
-				new GroupAddress("1.1.1"), new byte[] { 1, 2, 3, }, Priority.NORMAL);
+				new GroupAddress("1/1/1"), new byte[] { 1, 2, 3, }, Priority.NORMAL);
 		o.setFrame(frame2);
 		assertEquals(frame2, o.getFrame());
 	}
@@ -116,7 +116,7 @@ public class LDataObjectTest extends TestCase
 
 	/**
 	 * Test method for {@link tuwien.auto.calimero.buffer.LDataObject#setFrame(CEMILData)}.
-	 * 
+	 *
 	 * @throws KNXFormatException
 	 */
 	public void testSet() throws KNXFormatException
@@ -124,7 +124,7 @@ public class LDataObjectTest extends TestCase
 		final LDataObject o = new LDataObject(frame);
 		final CEMILData frame2 =
 			new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0),
-				new GroupAddress("1.1.2"), new byte[] { 1, 2, 3, }, Priority.NORMAL);
+				new GroupAddress("1/1/2"), new byte[] { 1, 2, 3, }, Priority.NORMAL);
 		boolean failed = false;
 		try {
 			o.setFrame(frame2);
@@ -136,7 +136,7 @@ public class LDataObjectTest extends TestCase
 
 		final CEMILData frame3 =
 			new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0),
-				new GroupAddress("1.1.1"), new byte[] { 1, 2, 3, }, Priority.NORMAL);
+				new GroupAddress("1/1/1"), new byte[] { 1, 2, 3, }, Priority.NORMAL);
 		failed = false;
 		try {
 			o.setFrame(frame3);
