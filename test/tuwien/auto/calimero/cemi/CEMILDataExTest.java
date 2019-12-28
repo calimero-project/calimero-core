@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,7 +46,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,7 +54,6 @@ import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Priority;
-import tuwien.auto.calimero.cemi.CEMILDataEx.AddInfo;
 
 /**
  * @author B. Malinowsky
@@ -74,16 +72,16 @@ class CEMILDataExTest
 	void init() throws Exception
 	{
 		f = new CEMILDataEx(CEMILData.MC_LDATA_REQ, src, dst, tpdu, Priority.LOW);
-		f.additionalInfo().add(new AddInfo(CEMILDataEx.ADDINFO_PLMEDIUM, plinfo));
-		f.additionalInfo().add(new AddInfo(CEMILDataEx.ADDINFO_TIMESTAMP_EXT, extts));
+		f.additionalInfo().add(AdditionalInfo.of(AdditionalInfo.PlMedium, plinfo));
+		f.additionalInfo().add(AdditionalInfo.of(AdditionalInfo.ExtendedTimestamp, extts));
 	}
 
 	@Test
 	void testGetStructLength()
 	{
 		assertEquals(11 + 2 + 2 + 2 + 4, f.getStructLength());
-		f.additionalInfo().removeIf(info -> info.getType() == CEMILDataEx.ADDINFO_PLMEDIUM);
-		f.additionalInfo().removeIf(info -> info.getType() == CEMILDataEx.ADDINFO_TIMESTAMP_EXT);
+		f.additionalInfo().removeIf(info -> info.type() == AdditionalInfo.PlMedium);
+		f.additionalInfo().removeIf(info -> info.type() == AdditionalInfo.ExtendedTimestamp);
 		assertEquals(11, f.getStructLength());
 	}
 
@@ -124,20 +122,20 @@ class CEMILDataExTest
 	@Test
 	void addAdditionalInfo()
 	{
-		assertThrows(KNXIllegalArgumentException.class, () -> new AddInfo(CEMILDataEx.ADDINFO_PLMEDIUM, new byte[] { 1 }), "wrong length");
+		assertThrows(KNXIllegalArgumentException.class, () -> AdditionalInfo.of(AdditionalInfo.PlMedium, new byte[] { 1 }), "wrong length");
 
-		final byte[] getPL = f.getAdditionalInfo(CEMILDataEx.ADDINFO_PLMEDIUM);
+		final byte[] getPL = f.getAdditionalInfo(AdditionalInfo.PlMedium);
 		assertTrue(Arrays.equals(plinfo, getPL));
-		f.additionalInfo().removeIf(info -> info.getType() == CEMILDataEx.ADDINFO_TIMESTAMP_EXT);
-		f.additionalInfo().add(new AddInfo(CEMILDataEx.ADDINFO_TIMESTAMP_EXT, new byte[] { 4, 4, 4, 4 }));
-		final byte[] getTS = f.getAdditionalInfo(CEMILDataEx.ADDINFO_TIMESTAMP_EXT);
+		f.additionalInfo().removeIf(info -> info.type() == AdditionalInfo.ExtendedTimestamp);
+		f.additionalInfo().add(AdditionalInfo.of(AdditionalInfo.ExtendedTimestamp, new byte[] { 4, 4, 4, 4 }));
+		final byte[] getTS = f.getAdditionalInfo(AdditionalInfo.ExtendedTimestamp);
 		assertTrue(Arrays.equals(new byte[] { 4, 4, 4, 4 }, getTS));
 	}
 
 	@Test
 	void testGetAdditionalInfoInt()
 	{
-		assertNull(f.getAdditionalInfo(CEMILDataEx.ADDINFO_RFMEDIUM));
+		assertNull(f.getAdditionalInfo(AdditionalInfo.RfMedium));
 	}
 
 	@Test
@@ -154,11 +152,11 @@ class CEMILDataExTest
 	{
 		final CEMILDataEx clone = f.clone();
 		assertArrayEquals(f.toByteArray(), clone.toByteArray());
-		final List<AddInfo> l = f.additionalInfo();
-		final List<AddInfo> l2 = clone.additionalInfo();
+		final var l = f.additionalInfo();
+		final var l2 = clone.additionalInfo();
 		for (int i = 0; i < l.size(); ++i) {
-			assertEquals(l.get(i).getType(), l2.get(i).getType());
-			assertNotSame(l.get(i).getInfo(), l2.get(i).getInfo());
+			assertEquals(l.get(i).type(), l2.get(i).type());
+			assertNotSame(l.get(i).info(), l2.get(i).info());
 		}
 	}
 }

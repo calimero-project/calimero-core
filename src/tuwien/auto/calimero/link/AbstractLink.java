@@ -52,12 +52,12 @@ import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
+import tuwien.auto.calimero.cemi.AdditionalInfo;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.cemi.CEMILDataEx;
-import tuwien.auto.calimero.cemi.CEMILDataEx.AddInfo;
 import tuwien.auto.calimero.cemi.RFMediumInfo;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.link.medium.PLSettings;
@@ -495,16 +495,15 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		String s = "";
 		if (medium instanceof PLSettings) {
 			final CEMILDataEx f = (CEMILDataEx) msg;
-			if (f.getAdditionalInfo(CEMILDataEx.ADDINFO_PLMEDIUM) == null)
-				f.additionalInfo().add(new AddInfo(CEMILDataEx.ADDINFO_PLMEDIUM, ((PLSettings) medium).getDomainAddress()));
+			if (f.getAdditionalInfo(AdditionalInfo.PlMedium) == null)
+				f.additionalInfo().add(AdditionalInfo.of(AdditionalInfo.PlMedium, ((PLSettings) medium).getDomainAddress()));
 		}
 		else if (medium.getMedium() == KNXMediumSettings.MEDIUM_RF) {
 			final CEMILDataEx f = (CEMILDataEx) msg;
-			if (f.getAdditionalInfo(CEMILDataEx.ADDINFO_RFMEDIUM) == null) {
+			if (f.getAdditionalInfo(AdditionalInfo.RfMedium) == null) {
 				final RFSettings rf = (RFSettings) medium;
 				final byte[] sn = f.isDomainBroadcast() ? rf.getDomainAddress() : rf.getSerialNumber();
-				final byte[] ai = new RFMediumInfo(true, rf.isUnidirectional(), sn, 255).getInfo();
-				f.additionalInfo().add(new AddInfo(CEMILDataEx.ADDINFO_RFMEDIUM, ai));
+				f.additionalInfo().add(new RFMediumInfo(true, rf.isUnidirectional(), sn, 255));
 				s = f.isDomainBroadcast() ? "(using domain address)" : "(using device SN)";
 			}
 		}

@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXFormatException;
@@ -60,19 +59,15 @@ import tuwien.auto.calimero.Priority;
 public class CEMILDataEx extends CEMILData implements Cloneable
 {
 	/**
-	 * Holds an additional info type with corresponding information data.
+	 * @deprecated Use {@link AdditionalInfo}
 	 */
+	@Deprecated
 	public static class AddInfo extends AdditionalInfo
 	{
-		private final int type;
-		private final byte[] data;
-
 		/**
-		 * Creates new cEMI additional information using the type ID and a copy of the supplied info data.
-		 *
-		 * @param infoType additional information type ID
-		 * @param info information data
+		 * @deprecated Use {@link AdditionalInfo#of}
 		 */
+		@Deprecated
 		public AddInfo(final int infoType, final byte[] info)
 		{
 			super(infoType, info);
@@ -83,8 +78,6 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 			if (infoType < ADDINFO_LENGTHS.length && info.length != ADDINFO_LENGTHS[infoType])
 				throw new KNXIllegalArgumentException(
 						"invalid length " + info.length + " for cEMI additional info type " + infoType);
-			type = infoType;
-			data = info.clone();
 		}
 
 		/**
@@ -94,7 +87,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		 */
 		public final byte[] getInfo()
 		{
-			return data.clone();
+			return info();
 		}
 
 		/**
@@ -104,68 +97,52 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		 */
 		public final int getType()
 		{
-			return type;
+			return type();
 		}
 
 		@Override
 		public String toString() {
-			switch (type) {
-			case ADDINFO_PLMEDIUM:
-				return "PL DoA " + (Integer.toHexString((data[0] & 0xff) << 8 | (data[1] & 0xff)));
+			switch (type()) {
 			case ADDINFO_RFMEDIUM:
-				return new RFMediumInfo(data, false).toString(); // we default to domain broadcast
-			case ADDINFO_TIMESTAMP:
-				return "timestamp " + ((data[0] & 0xff) << 8 | (data[1] & 0xff));
-			case ADDINFO_TIMEDELAY:
-				return "timedelay " + toLong(data);
-			case ADDINFO_TIMESTAMP_EXT:
-				return "ext.timestamp " + toLong(data);
-			case ADDINFO_BIBAT:
-				return "BiBat 0x" + DataUnitBuilder.toHex(data, " ");
+				return new RFMediumInfo(info(), false).toString(); // we default to domain broadcast
 			default:
-				return "type " + type + " = 0x" + DataUnitBuilder.toHex(data, "");
+				return super.toString();
 			}
 		}
 	}
 
 	// public static final int ADDINFO_RESERVED = 0x00;
 
-	/**
-	 * Additional information type for PL medium information.
-	 */
+	/** @deprecated Use {@link AdditionalInfo}. */
+	@Deprecated
 	public static final int ADDINFO_PLMEDIUM = 0x01;
 
-	/**
-	 * Additional information type for RF medium information.
-	 */
+	/** @deprecated Use {@link AdditionalInfo}. */
+	@Deprecated
 	public static final int ADDINFO_RFMEDIUM = 0x02;
 	// public static final int ADDINFO_BUSMON = 0x03;
 
-	/**
-	 * Additional information type for relative timestamp information.
-	 */
+	/** @deprecated Use {@link AdditionalInfo}. */
+	@Deprecated
 	public static final int ADDINFO_TIMESTAMP = 0x04;
 
-	/**
-	 * Additional information type for time delay until sending information.
-	 */
+	/** @deprecated Use {@link AdditionalInfo}. */
+	@Deprecated
 	public static final int ADDINFO_TIMEDELAY = 0x05;
 
-	/**
-	 * Additional information type for extended relative timestamp information.
-	 */
+	/** @deprecated Use {@link AdditionalInfo}. */
+	@Deprecated
 	public static final int ADDINFO_TIMESTAMP_EXT = 0x06;
 
-	/**
-	 * Additional information type for BiBat information.
-	 */
+	/** @deprecated Use {@link AdditionalInfo}. */
+	@Deprecated
 	public static final int ADDINFO_BIBAT = 0x07;
 
 	private static final int ADDINFO_ESC = 0xFF;
 
 	private static final int[] ADDINFO_LENGTHS = { 0, 2, 8, 1, 2, 4, 4, 2, 4, 3 };
 
-	private final List<AddInfo> addInfo = Collections.synchronizedList(new ArrayList<>());
+	private final List<AdditionalInfo> addInfo = Collections.synchronizedList(new ArrayList<>());
 
 	/**
 	 * Creates a new L-Data message from a byte stream.
@@ -306,13 +283,13 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 				!rhs.isSystemBroadcast(), rhs.isAckRequested(), rhs.getHopCount());
 		ctrl1 = rhs.ctrl1;
 		ctrl2 |= rhs.ctrl2 & 0x0f;
-		rhs.additionalInfo().forEach(info -> addInfo.add(new AddInfo(info.type, info.data)));
+		rhs.additionalInfo().forEach(info -> addInfo.add(AdditionalInfo.of(info.type(), info.info())));
 	}
 
 	/**
 	 * @return mutable list with cEMI additional info, empty list if no additional info
 	 */
-	public List<AddInfo> additionalInfo() {
+	public List<AdditionalInfo> additionalInfo() {
 		return addInfo;
 	}
 
@@ -336,7 +313,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 * @return a List with {@link AddInfo} objects
 	 */
 	@Deprecated
-	public synchronized List<AddInfo> getAdditionalInfo()
+	public synchronized List<? extends AdditionalInfo> getAdditionalInfo()
 	{
 		return new ArrayList<>(addInfo);
 	}
@@ -350,9 +327,9 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 */
 	public synchronized byte[] getAdditionalInfo(final int infoType)
 	{
-		for (final AddInfo info : addInfo) {
-			if (info.type == infoType)
-				return info.getInfo();
+		for (final var info : addInfo) {
+			if (info.type() == infoType)
+				return info.info();
 		}
 		return null;
 	}
@@ -407,7 +384,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	@Deprecated
 	public synchronized void removeAdditionalInfo(final int infoType)
 	{
-		addInfo.removeIf(info -> info.type == infoType);
+		addInfo.removeIf(info -> info.type() == infoType);
 	}
 
 	@Override
@@ -444,12 +421,9 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		final int split = s.indexOf(',');
 		buf.append(s.substring(svcStart, split + 1));
 
-		for (final AddInfo addInfo : addInfo) {
+		for (final var infoField : addInfo) {
 			buf.append(" ");
-			if (addInfo.type == ADDINFO_RFMEDIUM)
-				buf.append(new RFMediumInfo(addInfo.data, !isDomainBroadcast()));
-			else
-				buf.append(addInfo);
+			buf.append(infoField);
 			buf.append(",");
 		}
 		buf.append(s.substring(split + 1));
@@ -558,11 +532,12 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	{
 		synchronized (addInfo) {
 			os.write(getAddInfoLength());
-			addInfo.sort((lhs, rhs) -> lhs.type - rhs.type);
-			for (final AddInfo info : addInfo) {
-				os.write(info.type);
-				os.write(info.data.length);
-				os.write(info.data, 0, info.data.length);
+			addInfo.sort((lhs, rhs) -> lhs.type() - rhs.type());
+			for (final var infoField : addInfo) {
+				os.write(infoField.type());
+				final byte[] info = infoField.info();
+				os.write(info.length);
+				os.write(info, 0, info.length);
 			}
 		}
 	}
@@ -571,7 +546,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	void writePayload(final ByteArrayOutputStream os)
 	{
 		// RF frames don't use NPDU length field
-		final boolean rf = addInfo.stream().anyMatch(info -> info.type == ADDINFO_RFMEDIUM);
+		final boolean rf = addInfo.stream().anyMatch(info -> info.type() == AdditionalInfo.RfMedium);
 		os.write(rf ? 0 : data.length - 1);
 		os.write(data, 0, data.length);
 	}
@@ -597,15 +572,9 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	{
 		int len = 0;
 		synchronized (addInfo) {
-			for (final AddInfo info : addInfo)
-				len += 2 + info.data.length;
+			for (final var field : addInfo)
+				len += 2 + field.info().length;
 		}
 		return len;
-	}
-
-	private static long toLong(final byte[] data)
-	{
-		final long l = (long) (data[0] & 0xff) << 8 | (data[1] & 0xff);
-		return l << 16 | (data[2] & 0xff) << 8 | (data[3] & 0xff);
 	}
 }

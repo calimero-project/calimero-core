@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2018 B. Malinowsky
+    Copyright (c) 2015, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@ import java.util.Arrays;
 
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.cemi.CEMILDataEx.AddInfo;
 
 /**
  * RF medium information, with data link layer additional information mandatory for communication
@@ -48,7 +47,7 @@ import tuwien.auto.calimero.cemi.CEMILDataEx.AddInfo;
  *
  * @author B. Malinowsky
  */
-public final class RFMediumInfo extends AddInfo
+public final class RFMediumInfo extends AdditionalInfo
 {
 	// for .req: if dst is individual address, use RF domain address (AET is set to 1)
 	// for .req: if dst is group address == 0x0000, use RF domain address (AET is set to 1)
@@ -82,7 +81,7 @@ public final class RFMediumInfo extends AddInfo
 	 *
 	 * @param info RF medium info data
 	 */
-	public RFMediumInfo(final byte[] info)
+	RFMediumInfo(final byte[] info)
 	{
 		this(info, false);
 	}
@@ -96,7 +95,7 @@ public final class RFMediumInfo extends AddInfo
 	 */
 	public RFMediumInfo(final byte[] info, final boolean systemBroadcast)
 	{
-		super(CEMILDataEx.ADDINFO_RFMEDIUM, info);
+		super(RfMedium, info);
 		sysBcast = systemBroadcast;
 	}
 
@@ -125,9 +124,7 @@ public final class RFMediumInfo extends AddInfo
 	 * @param lfn link-layer frame number, 0 &le; lfn &le; 7, or 0xff (the cEMI server shall insert
 	 *        the value for LFN)
 	 */
-	public RFMediumInfo(final boolean batteryOk, final boolean transmitOnlyDevice,
-		final byte[] doA, final int lfn)
-	{
+	public RFMediumInfo(final boolean batteryOk, final boolean transmitOnlyDevice, final byte[] doA, final int lfn)	{
 		this(RSS.Void, RSS.Void, batteryOk, transmitOnlyDevice, doA, lfn);
 	}
 
@@ -147,8 +144,7 @@ public final class RFMediumInfo extends AddInfo
 	public RFMediumInfo(final RSS sender, final RSS retransmitter, final boolean batteryOk,
 		final boolean transmitOnlyDevice, final byte[] doA, final int lfn)
 	{
-		super(CEMILDataEx.ADDINFO_RFMEDIUM, toByteArray(sender, retransmitter, batteryOk,
-				transmitOnlyDevice, doA, lfn));
+		super(RfMedium, toByteArray(sender, retransmitter, batteryOk, transmitOnlyDevice, doA, lfn));
 		sysBcast = false;
 	}
 
@@ -160,7 +156,7 @@ public final class RFMediumInfo extends AddInfo
 
 	public RSS getRSS()
 	{
-		final int rfInfo = getInfo()[0] & 0xff;
+		final int rfInfo = info()[0] & 0xff;
 		final int rss = (rfInfo >> 4) & 0x03;
 		return RSS.values()[rss];
 	}
@@ -171,21 +167,21 @@ public final class RFMediumInfo extends AddInfo
 	 */
 	public RSS getRetransmitterRSS()
 	{
-		final int rfInfo = getInfo()[0] & 0xff;
+		final int rfInfo = info()[0] & 0xff;
 		final int rss = (rfInfo >> 2) & 0x03;
 		return RSS.values()[rss];
 	}
 
 	public boolean isBatteryOk()
 	{
-		final int rfInfo = getInfo()[0] & 0xff;
+		final int rfInfo = info()[0] & 0xff;
 		final boolean ok = ((rfInfo >> 1) & 0x01) == 0x01;
 		return ok;
 	}
 
 	public boolean isTransmitOnlyDevice()
 	{
-		final int rfInfo = getInfo()[0] & 0xff;
+		final int rfInfo = info()[0] & 0xff;
 		final boolean uni = (rfInfo & 0x01) == 0x01;
 		return uni;
 	}
@@ -195,7 +191,7 @@ public final class RFMediumInfo extends AddInfo
 	// ??? maybe make two methods with dedicated names
 	public byte[] getDoAorSN()
 	{
-		return Arrays.copyOfRange(getInfo(), 1, 1 + 6);
+		return Arrays.copyOfRange(info(), 1, 1 + 6);
 	}
 
 	// Link layer Frame Number (LFN)
@@ -203,7 +199,7 @@ public final class RFMediumInfo extends AddInfo
 	// L_Data.req : if 255 then cEMI server shall insert the value for LFN
 	public int getFrameNumber()
 	{
-		final int lfn = getInfo()[7] & 0xff;
+		final int lfn = info()[7] & 0xff;
 		return lfn;
 	}
 

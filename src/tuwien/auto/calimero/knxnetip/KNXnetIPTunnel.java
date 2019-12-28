@@ -46,7 +46,6 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -61,11 +60,11 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.cemi.AdditionalInfo;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIBusMon;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.cemi.CEMILDataEx;
-import tuwien.auto.calimero.cemi.CEMILDataEx.AddInfo;
 import tuwien.auto.calimero.knxnetip.servicetype.ErrorCodes;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
@@ -428,7 +427,7 @@ public class KNXnetIPTunnel extends ClientConnection
 	{
 		if (ldata instanceof CEMILDataEx) {
 			final CEMILDataEx ext = (CEMILDataEx) ldata;
-			return ext.additionalInfo().stream().map(AddInfo::getType).collect(Collectors.toList());
+			return ext.additionalInfo().stream().map(AdditionalInfo::type).collect(Collectors.toList());
 		}
 		return Collections.emptyList();
 	}
@@ -440,11 +439,11 @@ public class KNXnetIPTunnel extends ClientConnection
 		final byte[] data;
 		if (ldata instanceof CEMILDataEx) {
 			final CEMILDataEx ext = ((CEMILDataEx) ldata);
-			final List<AddInfo> additionalInfo = ext.additionalInfo();
+			final var additionalInfo = ext.additionalInfo();
 			synchronized (additionalInfo) {
-				for (final Iterator<AddInfo> i = additionalInfo.iterator(); i.hasNext();) {
-					final AddInfo info = i.next();
-					if (!types.contains(info.getType())) {
+				for (final var i = additionalInfo.iterator(); i.hasNext();) {
+					final AdditionalInfo info = i.next();
+					if (!types.contains(info.type())) {
 						logger.warn("remove L-Data additional info {}", info);
 						i.remove();
 					}
