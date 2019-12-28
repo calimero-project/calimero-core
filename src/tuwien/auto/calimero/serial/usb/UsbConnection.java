@@ -985,7 +985,7 @@ public class UsbConnection implements AutoCloseable
 		else
 			list.removeIf(i -> i.toLowerCase().indexOf(name.toLowerCase()) == -1);
 		if (list.isEmpty())
-			throw new KNXException("no USB device found with name matching '" + name + "'");
+			throw new KNXException("no KNX USB device found" + (name.isEmpty() ? "" : " with name matching '" + name + "'"));
 
 		final String desc = list.get(0);
 		final String id = desc.substring(desc.indexOf("ID") + 3, desc.indexOf("\n"));
