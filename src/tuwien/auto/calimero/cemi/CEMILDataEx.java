@@ -62,7 +62,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/**
 	 * Holds an additional info type with corresponding information data.
 	 */
-	public static class AddInfo
+	public static class AddInfo extends AdditionalInfo
 	{
 		private final int type;
 		private final byte[] data;
@@ -75,6 +75,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		 */
 		public AddInfo(final int infoType, final byte[] info)
 		{
+			super(infoType, info);
 			if (infoType < 0 || infoType >= ADDINFO_ESC)
 				throw new KNXIllegalArgumentException("cEMI additional info type " + infoType + " out of range [0..254]");
 			if (info.length > 255)
