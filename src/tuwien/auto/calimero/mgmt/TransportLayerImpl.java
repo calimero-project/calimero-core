@@ -62,6 +62,7 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.cemi.CemiTData;
 import tuwien.auto.calimero.internal.EventListeners;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
@@ -94,7 +95,14 @@ public class TransportLayerImpl implements TransportLayer
 		@Override
 		public void indication(final FrameEvent e)
 		{
-			final CEMILData f = (CEMILData) e.getFrame();
+			final var cemi = e.getFrame();
+			if (cemi instanceof CemiTData) {
+				final int type = cemi.getMessageCode() == CemiTData.ConnectedIndication ? 3 : 2;
+				fireFrameType(cemi, type);
+				return;
+			}
+
+			final CEMILData f = (CEMILData) cemi;
 			final int ctrl = f.getPayload()[0] & 0xfc;
 			if (ctrl == 0) {
 				final KNXAddress dst = f.getDestination();

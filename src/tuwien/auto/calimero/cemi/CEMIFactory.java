@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -95,6 +95,11 @@ public final class CEMIFactory
 			return new CEMIDevMgmt(data, offset, length);
 		case CEMIBusMon.MC_BUSMON_IND:
 			return new CEMIBusMon(data, offset, length);
+		case CemiTData.IndividualRequest:
+		case CemiTData.IndividualIndication:
+		case CemiTData.ConnectedRequest:
+		case CemiTData.ConnectedIndication:
+			return new CemiTData(data, offset, length);
 		default:
 			throw new KNXFormatException("unsupported cEMI msg code", mc);
 		}
