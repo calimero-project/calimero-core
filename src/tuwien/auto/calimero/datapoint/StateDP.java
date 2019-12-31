@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,7 +39,6 @@ package tuwien.auto.calimero.datapoint;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import tuwien.auto.calimero.GroupAddress;
@@ -310,21 +309,25 @@ public class StateDP extends Datapoint
 	@Override
 	void doSave(final XmlWriter w) throws KNXMLException
 	{
-		// <expiration timeout=int />
-		w.writeEmptyElement(TAG_EXPIRATION);
-		w.writeAttribute(ATTR_TIMEOUT, Integer.toString(timeout));
-		w.writeStartElement(TAG_UPDATING);
-		synchronized (updating) {
-			for (final Iterator<GroupAddress> i = updating.iterator(); i.hasNext();)
-				i.next().save(w);
+		if (timeout > 0) {
+			// <expiration timeout=int />
+			w.writeEmptyElement(TAG_EXPIRATION);
+			w.writeAttribute(ATTR_TIMEOUT, Integer.toString(timeout));
 		}
-		w.writeEndElement();
-		w.writeStartElement(TAG_INVALIDATING);
-		synchronized (invalidating) {
-			for (final Iterator<GroupAddress> i = invalidating.iterator(); i.hasNext();)
-				i.next().save(w);
+		writeList(w, true);
+		writeList(w, false);
+	}
+
+	private void writeList(final XmlWriter w, final boolean updatingList) {
+		final var list = updatingList ? updating : invalidating;
+		synchronized (list) {
+			if (list.isEmpty())
+				return;
+			w.writeStartElement(updatingList ? TAG_UPDATING : TAG_INVALIDATING);
+			for (final GroupAddress address : list)
+				address.save(w);
+			w.writeEndElement();
 		}
-		w.writeEndElement();
 	}
 
 	public List<String> locations()
