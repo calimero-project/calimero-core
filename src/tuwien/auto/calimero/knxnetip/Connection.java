@@ -120,56 +120,8 @@ public final class Connection implements Closeable {
 	private volatile SecureSession inSessionRequestStage;
 
 
-	// we have to keep the following session stuff here, because session is a non-static class
 
-	// timeout session.req -> session.res, and session.auth -> session.status
-	private static final int sessionSetupTimeout = 10_000; // [ms]
-
-	private static final Duration keepAliveInvterval = Duration.ofSeconds(30);
-	private static final ScheduledThreadPoolExecutor keepAliveSender = new ScheduledThreadPoolExecutor(1, r -> {
-		final Thread t = new Thread(r);
-		t.setName("KNX IP Secure session keep-alive");
-		t.setDaemon(true);
-		return t;
-	});
-	static {
-		// remove idle threads after a while
-		keepAliveSender.setKeepAliveTime(90, TimeUnit.SECONDS);
-		keepAliveSender.allowCoreThreadTimeOut(true);
-	}
-
-	private static final byte[] emptyUserPwdHash = { (byte) 0xe9, (byte) 0xc3, 0x04, (byte) 0xb9, 0x14, (byte) 0xa3,
-		0x51, 0x75, (byte) 0xfd, 0x7d, 0x1c, 0x67, 0x3a, (byte) 0xb5, 0x2f, (byte) 0xe1 };
-
-	private static KeyPair generateKeyPair() throws NoSuchAlgorithmException {
-		final KeyPairGenerator gen = KeyPairGenerator.getInstance("X25519");
-		return gen.generateKeyPair();
-	}
-
-	private static byte[] deriveSerialNumber(final InetSocketAddress localEP) {
-		try {
-			if (localEP != null)
-				return deriveSerialNumber(NetworkInterface.getByInetAddress(localEP.getAddress()));
-		}
-		catch (final SocketException ignore) {}
-		return new byte[6];
-	}
-
-	private static byte[] deriveSerialNumber(final NetworkInterface netif) {
-		try {
-			if (netif != null) {
-				final byte[] hardwareAddress = netif.getHardwareAddress();
-				if (hardwareAddress != null)
-					return Arrays.copyOf(hardwareAddress, 6);
-			}
-		}
-		catch (final SocketException ignore) {}
-		return new byte[6];
-	}
-
-	private enum SessionState { Idle, Unauthenticated, Authenticated }
-
-	public final class SecureSession implements AutoCloseable {
+	public static final class SecureSession implements AutoCloseable {
 
 		// service codes
 		private static final int SecureWrapper = 0x0950;
@@ -191,7 +143,30 @@ public final class Connection implements Closeable {
 		private static final int macSize = 16; // [bytes]
 
 
+		// timeout session.req -> session.res, and session.auth -> session.status
+		private static final int sessionSetupTimeout = 10_000; // [ms]
 
+		private static final Duration keepAliveInvterval = Duration.ofSeconds(30);
+		private static final ScheduledThreadPoolExecutor keepAliveSender = new ScheduledThreadPoolExecutor(1, r -> {
+			final Thread t = new Thread(r);
+			t.setName("KNX IP Secure session keep-alive");
+			t.setDaemon(true);
+			return t;
+		});
+		static {
+			// remove idle threads after a while
+			keepAliveSender.setKeepAliveTime(90, TimeUnit.SECONDS);
+			keepAliveSender.allowCoreThreadTimeOut(true);
+		}
+
+		private static final byte[] emptyUserPwdHash = { (byte) 0xe9, (byte) 0xc3, 0x04, (byte) 0xb9, 0x14, (byte) 0xa3,
+			0x51, 0x75, (byte) 0xfd, 0x7d, 0x1c, 0x67, 0x3a, (byte) 0xb5, 0x2f, (byte) 0xe1 };
+
+
+		private enum SessionState { Idle, Unauthenticated, Authenticated }
+
+
+		private final Connection conn;
 		private final int user;
 		private final SecretKey userKey;
 		private final SecretKey deviceAuthKey;
@@ -220,7 +195,9 @@ public final class Connection implements Closeable {
 		private final Logger logger;
 
 
-		private SecureSession(final int user, final byte[] userKey, final byte[] deviceAuthCode) {
+		private SecureSession(final Connection connection, final int user, final byte[] userKey,
+			final byte[] deviceAuthCode) {
+			this.conn = connection;
 			this.user = user;
 
 			final byte[] key = userKey.length == 0 ? emptyUserPwdHash.clone() : userKey;
@@ -229,9 +206,9 @@ public final class Connection implements Closeable {
 			final var authCode = deviceAuthCode.length == 0 ? new byte[16] : deviceAuthCode;
 			this.deviceAuthKey = SecureConnection.createSecretKey(authCode);
 
-			sno = deriveSerialNumber((InetSocketAddress) socket.getLocalSocketAddress());
+			sno = deriveSerialNumber(conn.localEndpoint());
 
-			logger = LoggerFactory.getLogger("calimero.knxnetip." + secureSymbol + " Session " + addressPort(server));
+			logger = LoggerFactory.getLogger("calimero.knxnetip." + secureSymbol + " Session " + addressPort(conn.server));
 		}
 
 		public int id() { return sessionId; }
@@ -242,7 +219,7 @@ public final class Connection implements Closeable {
 
 		public byte[] serialNumber() { return sno.clone(); }
 
-		public Connection connection() { return Connection.this; }
+		public Connection connection() { return conn; }
 
 		@Override
 		public void close() {
@@ -253,12 +230,12 @@ public final class Connection implements Closeable {
 			keepAliveFuture.cancel(false);
 			securedConnections.values().forEach(ClientConnection::close);
 			securedConnections.clear();
-			sessions.remove(sessionId);
+			conn.sessions.remove(sessionId);
 
-			if (socket.isClosed())
+			if (conn.socket.isClosed())
 				return;
 			try {
-				send(newStatusInfo(sessionId, nextSendSeq(), Close));
+				conn.send(newStatusInfo(sessionId, nextSendSeq(), Close));
 			}
 			catch (final IOException e) {
 				logger.info("I/O error closing secure session {}", sessionId, e);
@@ -292,20 +269,20 @@ public final class Connection implements Closeable {
 
 		private void setupSecureSession()
 				throws KNXTimeoutException, KNXConnectionClosedException, InterruptedException {
-			sessionRequestLock.lock();
+			conn.sessionRequestLock.lock();
 			try {
 				if (sessionState == SessionState.Authenticated)
 					return;
 				sessionState = SessionState.Idle;
 				sessionStatus = Setup;
-				inSessionRequestStage = this;
+				conn.inSessionRequestStage = this;
 
-				logger.debug("setup secure session with {}", server);
+				logger.debug("setup secure session with {}", conn.server);
 
 				initKeys();
-				connect();
+				conn.connect();
 				final byte[] sessionReq = PacketHelper.newChannelRequest(HPAI.Tcp, publicKey);
-				send(sessionReq);
+				conn.send(sessionReq);
 				awaitAuthenticationStatus();
 
 				if (sessionState == SessionState.Unauthenticated || sessionStatus != AuthSuccess) {
@@ -313,27 +290,27 @@ public final class Connection implements Closeable {
 					throw new KnxSecureException("secure session " + SecureConnection.statusMsg(sessionStatus));
 				}
 				if (sessionState == SessionState.Idle)
-					throw new KNXTimeoutException("timeout establishing secure session with " + server);
+					throw new KNXTimeoutException("timeout establishing secure session with " + conn.server);
 
 				final var delay = keepAliveInvterval.toMillis();
 				keepAliveFuture = keepAliveSender.scheduleWithFixedDelay(this::sendKeepAlive, delay, delay,
 						TimeUnit.MILLISECONDS);
 			}
 			catch (final GeneralSecurityException e) {
-				throw new KnxSecureException("error creating key pair for " + server, e);
+				throw new KnxSecureException("error creating key pair for " + conn.server, e);
 			}
 			catch (final SocketTimeoutException e) {
 				Thread.currentThread().interrupt();
 				throw new InterruptedException(
-						"interrupted I/O establishing secure session with " + server + ": " + e.getMessage());
+						"interrupted I/O establishing secure session with " + conn.server + ": " + e.getMessage());
 			}
 			catch (final IOException e) {
 				close();
-				Connection.this.close();
-				throw new KNXConnectionClosedException("I/O error establishing secure session with " + server, e);
+				conn.close();
+				throw new KNXConnectionClosedException("I/O error establishing secure session with " + conn.server, e);
 			}
 			finally {
-				sessionRequestLock.unlock();
+				conn.sessionRequestLock.unlock();
 				Arrays.fill(publicKey, (byte) 0);
 			}
 		}
@@ -365,7 +342,7 @@ public final class Connection implements Closeable {
 				}
 			}
 			if (remaining <= 0)
-				throw new KNXTimeoutException("timeout establishing secure session with " + addressPort(server));
+				throw new KNXTimeoutException("timeout establishing secure session with " + addressPort(conn.server));
 		}
 
 		private boolean acceptServiceType(final KNXnetIPHeader h, final byte[] data, final int offset, final int length)
@@ -384,12 +361,12 @@ public final class Connection implements Closeable {
 					return true;
 				}
 				try {
-					final byte[] serverPublicKey = parseSessionResponse(h, data, offset, server);
+					final byte[] serverPublicKey = parseSessionResponse(h, data, offset, conn.server);
 					final byte[] auth = newSessionAuth(serverPublicKey);
 					sessionState = SessionState.Unauthenticated;
 					final byte[] packet = wrap(auth);
 					logger.debug("secure session {}, request access for user {}", sessionId, user);
-					send(packet);
+					conn.send(packet);
 				}
 				catch (IOException | RuntimeException e) {
 					sessionStatus = AuthFailed;
@@ -446,7 +423,7 @@ public final class Connection implements Closeable {
 
 			try {
 				if (connection != null) {
-					connection.handleServiceType(header, data, offset, server.getAddress(), server.getPort());
+					connection.handleServiceType(header, data, offset, conn.server.getAddress(), conn.server.getPort());
 					if (header.getServiceType() == KNXnetIPHeader.DISCONNECT_RES) {
 						logger.trace("remove connection {}", connection);
 						securedConnections.remove(channelId);
@@ -464,13 +441,13 @@ public final class Connection implements Closeable {
 		private void sendKeepAlive() {
 			try {
 				logger.trace("sending keep-alive");
-				send(newStatusInfo(sessionId, nextSendSeq(), KeepAlive));
+				conn.send(newStatusInfo(sessionId, nextSendSeq(), KeepAlive));
 			}
 			catch (final IOException e) {
-				if (sessionState == SessionState.Authenticated && !socket.isClosed()) {
+				if (sessionState == SessionState.Authenticated && !conn.socket.isClosed()) {
 					logger.warn("error sending keep-alive: {}", e.getMessage());
 					close();
-					Connection.this.close();
+					conn.close();
 				}
 			}
 		}
@@ -524,8 +501,8 @@ public final class Connection implements Closeable {
 				secretKey = SecureConnection.createSecretKey(sessionKey);
 			}
 
-			sessions.put(sessionId, this);
-			inSessionRequestStage = null;
+			conn.sessions.put(sessionId, this);
+			conn.inSessionRequestStage = null;
 
 			final boolean skipDeviceAuth = Arrays.equals(deviceAuthKey.getEncoded(), new byte[16]);
 			if (skipDeviceAuth) {
@@ -602,6 +579,32 @@ public final class Connection implements Closeable {
 				throw new KnxSecureException("calculating CBC-MAC of " + toHex(log, " "), e);
 			}
 		}
+
+		private static KeyPair generateKeyPair() throws NoSuchAlgorithmException {
+			final KeyPairGenerator gen = KeyPairGenerator.getInstance("X25519");
+			return gen.generateKeyPair();
+		}
+
+		private static byte[] deriveSerialNumber(final InetSocketAddress localEP) {
+			try {
+				if (localEP != null)
+					return deriveSerialNumber(NetworkInterface.getByInetAddress(localEP.getAddress()));
+			}
+			catch (final SocketException ignore) {}
+			return new byte[6];
+		}
+
+		private static byte[] deriveSerialNumber(final NetworkInterface netif) {
+			try {
+				if (netif != null) {
+					final byte[] hardwareAddress = netif.getHardwareAddress();
+					if (hardwareAddress != null)
+						return Arrays.copyOf(hardwareAddress, 6);
+				}
+			}
+			catch (final SocketException ignore) {}
+			return new byte[6];
+		}
 	}
 
 	public static Connection newTcpConnection(final InetSocketAddress local, final InetSocketAddress server) {
@@ -642,7 +645,7 @@ public final class Connection implements Closeable {
 	}
 
 	public SecureSession newSecureSession(final int user, final byte[] userKey, final byte[] deviceAuthCode) {
-		return new SecureSession(user, userKey, deviceAuthCode);
+		return new SecureSession(this, user, userKey, deviceAuthCode);
 	}
 
 	public InetSocketAddress localEndpoint() { return localEndpoint; }
