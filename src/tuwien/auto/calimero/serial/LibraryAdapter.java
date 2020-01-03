@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,7 +46,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
@@ -78,12 +77,6 @@ public abstract class LibraryAdapter implements Closeable
 	/** @return all available serial communication port identifiers. */
 	public static List<String> getPortIdentifiers()
 	{
-		try {
-			final String ports = System.getProperty("microedition.commports");
-			if (ports != null)
-				return Arrays.asList(ports.split(",")).stream().collect(Collectors.toList());
-		}
-		catch (final SecurityException e) {}
 		if (SerialComAdapter.isAvailable()) {
 			final List<String> ports = new ArrayList<>();
 			Arrays.asList(defaultPortPrefixes()).forEach(p -> IntStream.range(0, 20)
@@ -120,17 +113,6 @@ public abstract class LibraryAdapter implements Closeable
 		final int idleTimeout) throws KNXException
 	{
 		Throwable t = null;
-		// check for Java ME Embedded platform and available serial communication port,
-		// protocol support for communication ports is optional
-		if (CommConnectionAdapter.isAvailable()) {
-			logger.debug("open Java ME serial port connection (CommConnection) for {}", portId);
-			try {
-				return new CommConnectionAdapter(logger, portId, baudrate);
-			}
-			catch (final KNXException e) {
-				t = e;
-			}
-		}
 		// check internal support for serial port access
 		// protocol support available for Win 32/64 platforms
 		// (so we provide serial port access at least on platforms with ETS)

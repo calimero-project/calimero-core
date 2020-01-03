@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,14 +55,6 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("checkstyle:finalparameters")
 class SerialComAdapter extends LibraryAdapter
 {
-	// Notes:
-	// Using CDC ME connector/comm interfaces and subtype them in Calimero 2 prevents
-	// usage on J2SE platforms, which would be a serious drawback.
-	// Taking the SE comm interfaces would require availability of the comm API
-	// packages which isn't preferable either.
-	// So we use this internal interface similar to the one of the ME platform,
-	// to provide library internal access to serial ports.
-
 	// ctrl identifiers
 	static final int BAUDRATE = 1;
 	static final int PARITY = 2;

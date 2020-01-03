@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,7 +42,6 @@ import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import org.slf4j.Logger;
 
@@ -124,7 +123,6 @@ public class FT12Connection implements AutoCloseable
 	private final Logger logger;
 
 	// adapter for the used serial I/O connection:
-	// - on ME CDC platforms with CommConnection available, CommConnectionAdapter is used
 	// - for Calimero 2 native I/O, SerialComAdapter is used
 	// - with rx/tx available, RxtxAdapter is used
 	// - or some external serial I/O library adapter
@@ -221,8 +219,7 @@ public class FT12Connection implements AutoCloseable
 	/**
 	 * Attempts to gets the available serial communication ports on the host.
 	 * <p>
-	 * At first, the Java system property "microedition.commports" is queried. If there is no
-	 * property with that key, and the Calimero library has access to serial ports, the lowest 10
+	 * If Calimero has access to serial ports, the lowest 10
 	 * port numbers of each of the default system name prefixes are checked if present.<br>
 	 * The empty array is returned if no ports are discovered.
 	 *
@@ -230,18 +227,6 @@ public class FT12Connection implements AutoCloseable
 	 */
 	public static String[] getPortIdentifiers()
 	{
-		String ports = null;
-		try {
-			ports = System.getProperty("microedition.commports");
-		}
-		catch (final SecurityException e) {}
-		if (ports != null) {
-			final StringTokenizer st = new StringTokenizer(ports, ",");
-			final String[] portIds = new String[st.countTokens()];
-			for (int i = 0; i < portIds.length; ++i)
-				portIds[i] = st.nextToken();
-			return portIds;
-		}
 		if (SerialComAdapter.isAvailable()) {
 			final String[] prefixes = defaultPortPrefixes();
 			final List<String> l = new ArrayList<>(10);
