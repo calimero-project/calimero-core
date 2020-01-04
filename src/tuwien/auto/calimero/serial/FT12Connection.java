@@ -40,18 +40,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.slf4j.Logger;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.FrameEvent;
+import tuwien.auto.calimero.GroupAddress;
+import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAckTimeoutException;
+import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXListener;
+import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.internal.EventListeners;
 import tuwien.auto.calimero.log.LogService;
 
@@ -84,6 +92,11 @@ public class FT12Connection implements AutoCloseable
 	 * ready to send.
 	 */
 	public static final int ACK_PENDING = 2;
+
+	/**
+	 * Status code of communication: waiting for .con after send, no error, not ready to send.
+	 */
+	public static final int CON_PENDING = 3;
 
 	// default used baud rate for BAU
 	private static final int DEFAULT_BAUDRATE = 19200;
@@ -126,15 +139,21 @@ public class FT12Connection implements AutoCloseable
 	// - for Calimero 2 native I/O, SerialComAdapter is used
 	// - with rx/tx available, RxtxAdapter is used
 	// - or some external serial I/O library adapter
-	private LibraryAdapter adapter;
+	private final LibraryAdapter adapter;
 
-	private String port;
-	private InputStream is;
-	private OutputStream os;
+	private final String port;
+	private final InputStream is;
+	private final OutputStream os;
 	private volatile int state = CLOSED;
 
-	private Receiver receiver;
-	private final Object lock = new Object();
+	private final Receiver receiver;
+	private final ReentrantLock sendLock = new ReentrantLock(true);
+	private final Condition readyToSend = sendLock.newCondition();
+	private final Condition ack = sendLock.newCondition();
+	private final Condition con = sendLock.newCondition();
+
+	private volatile KNXAddress keepForCon;
+
 	private int sendFrameCount;
 	private int rcvFrameCount;
 	private int exchangeTimeout;
@@ -206,7 +225,15 @@ public class FT12Connection implements AutoCloseable
 	private FT12Connection(final String originalPortId, final String portId, final int baudrate) throws KNXException
 	{
 		logger = LogService.getLogger("calimero.serial.ft12:" + originalPortId);
-		open(portId, baudrate);
+		calcTimeouts(baudrate);
+		adapter = LibraryAdapter.open(logger, portId, baudrate, idleTimeout);
+		calcTimeouts(adapter.getBaudRate()); // TODO recalculation necessary?
+		port = portId;
+		is = adapter.getInputStream();
+		os = adapter.getOutputStream();
+		receiver = new Receiver();
+		receiver.start();
+		state = OK;
 		try {
 			sendReset();
 		}
@@ -330,6 +357,8 @@ public class FT12Connection implements AutoCloseable
 	 *        <code>false</code> to immediately return after send
 	 * @throws KNXAckTimeoutException in <code>blocking</code> mode, if a timeout
 	 *         regarding the frame acknowledgment message was encountered
+	 * @throws KNXTimeoutException in <code>blocking</code> mode, if a timeout
+	 *         regarding the frame confirmation message was encountered
 	 * @throws KNXPortClosedException if no communication was established in the first
 	 *         place or communication was closed
 	 * @throws InterruptedException on thread interruption during sending the frame; the
@@ -338,21 +367,42 @@ public class FT12Connection implements AutoCloseable
 	public void send(final byte[] frame, final boolean blocking)
 		throws KNXAckTimeoutException, KNXPortClosedException, InterruptedException
 	{
-		boolean ack = false;
+		sendLock.lockInterruptibly();
 		try {
+			while (state != OK) {
+				if (state == CLOSED)
+					throw new KNXPortClosedException("waiting to send", port);
+				readyToSend.await();
+			}
+
+			boolean ack = false;
+			boolean con = false;
 			for (int i = 0; i <= REPEAT_LIMIT; ++i) {
 				logger.trace("sending FT1.2 frame, {}blocking, attempt {}", (blocking ? "" : "non-"), (i + 1));
+
+				// setup for EMI1 / EMI2 L-Data.con
+				final boolean isLDataReq = (frame[0] & 0xff) == CEMILData.MC_LDATA_REQ;
+				keepForCon = isLDataReq ? ldataDestination(frame) : new IndividualAddress(0);
+
 				sendData(frame);
-				if (!blocking || waitForAck()) {
+				if (!blocking) {
 					ack = true;
+					con = true;
+					break;
+				}
+				if (waitForAck()) {
+					ack = true;
+					if (!isLDataReq || waitForCon())
+						con = true;
 					break;
 				}
 			}
 			sendFrameCount ^= FRAMECOUNT_BIT;
-			if (state == ACK_PENDING)
-				state = OK;
 			if (!ack)
 				throw new KNXAckTimeoutException("no acknowledge reply received");
+			if (!con)
+//				throw new KNXTimeoutException("no confirmation reply received for " + keepForCon); // TODO use this ex
+				throw new KNXAckTimeoutException("no confirmation reply received for " + keepForCon);
 		}
 		catch (final InterruptedIOException e) {
 			throw new InterruptedException(e.getMessage());
@@ -360,6 +410,12 @@ public class FT12Connection implements AutoCloseable
 		catch (final IOException e) {
 			close(false, e.getMessage());
 			throw new KNXPortClosedException(e.getMessage(), port, e);
+		}
+		finally {
+			if (state == ACK_PENDING || state == CON_PENDING)
+				state = OK;
+			readyToSend.signal();
+			sendLock.unlock();
 		}
 	}
 
@@ -382,9 +438,21 @@ public class FT12Connection implements AutoCloseable
 		if (state == CLOSED)
 			return;
 		logger.info("close serial port " + port + " - " + reason);
-		state = CLOSED;
+
+		sendLock.lock();
+		try {
+			state = CLOSED;
+			ack.signalAll();
+			con.signalAll();
+			readyToSend.signalAll();
+		}
+		finally {
+			sendLock.unlock();
+		}
+
 		if (receiver != null)
 			receiver.quit();
+
 		try {
 			is.close();
 			os.close();
@@ -393,21 +461,8 @@ public class FT12Connection implements AutoCloseable
 		catch (final Exception e) {
 			logger.warn("failed to close all serial I/O resources", e);
 		}
-		fireConnectionClosed(user, reason);
-	}
 
-	private void open(final String portId, final int baudrate) throws KNXException
-	{
-		calcTimeouts(baudrate);
-		adapter = LibraryAdapter.open(logger, portId, baudrate, idleTimeout);
-		port = portId;
-		is = adapter.getInputStream();
-		os = adapter.getOutputStream();
-		calcTimeouts(adapter.getBaudRate());
-		receiver = new Receiver();
-		receiver.start();
-		state = OK;
-		logger.info("access supported, opened serial port " + portId);
+		fireConnectionClosed(user, reason);
 	}
 
 	private void sendReset() throws KNXPortClosedException, KNXAckTimeoutException
@@ -468,17 +523,19 @@ public class FT12Connection implements AutoCloseable
 		os.flush();
 	}
 
-	private boolean waitForAck() throws InterruptedException
-	{
-		long remaining = exchangeTimeout;
-		final long now = System.currentTimeMillis();
-		final long end = now + remaining;
-		synchronized (lock) {
-			while (state == ACK_PENDING && remaining > 0) {
-				lock.wait(remaining);
-				remaining = end - System.currentTimeMillis();
-			}
-		}
+	// pre: sendLock is held
+	private boolean waitForAck() throws InterruptedException {
+		long remaining = Duration.ofMillis(exchangeTimeout).toNanos();
+		while (state == ACK_PENDING && remaining > 0)
+			remaining = ack.awaitNanos(remaining);
+		return remaining > 0;
+	}
+
+	// pre: sendLock is held
+	private boolean waitForCon() throws InterruptedException {
+		long remaining = Duration.ofSeconds(1).toNanos();
+		while (state == CON_PENDING && remaining > 0)
+			remaining = con.awaitNanos(remaining);
 		return remaining > 0;
 	}
 
@@ -514,6 +571,15 @@ public class FT12Connection implements AutoCloseable
 				? new String[]{ "\\\\.\\COM" } : new String[]{ "/dev/ttyS", "/dev/ttyUSB", "/dev/ttyACM" };
 	}
 
+	private static KNXAddress ldataDestination(final byte[] ldata) {
+		if (ldata.length >= 6) {
+			final int addr = (ldata[4] & 0xff) << 8 | ldata[5] & 0xff;
+			final boolean group = (ldata[6] & 0x80) == 0x80;
+			return group ? new GroupAddress(addr) : new IndividualAddress(addr);
+		}
+		return new IndividualAddress(0);
+	}
+
 	private final class Receiver extends Thread
 	{
 		private volatile boolean quit;
@@ -532,13 +598,8 @@ public class FT12Connection implements AutoCloseable
 				while (!quit) {
 					final int c = is.read();
 					if (c > -1) {
-						if (c == ACK) {
-							if (state == ACK_PENDING)
-								synchronized (lock) {
-									state = OK;
-									lock.notify();
-								}
-						}
+						if (c == ACK)
+							signalAck();
 						else if (c == START)
 							readFrame();
 						else if (c == START_FIXED)
@@ -548,7 +609,7 @@ public class FT12Connection implements AutoCloseable
 					}
 				}
 			}
-			catch (final IOException e) {
+			catch (final IOException | InterruptedException e) {
 				if (!quit)
 					close(false, "receiver communication failure");
 			}
@@ -582,7 +643,7 @@ public class FT12Connection implements AutoCloseable
 			return false;
 		}
 
-		private boolean readFrame() throws IOException
+		private boolean readFrame() throws IOException, InterruptedException
 		{
 			final int len = is.read();
 			final byte[] buf = new byte[len + 4];
@@ -604,6 +665,14 @@ public class FT12Connection implements AutoCloseable
 						ldata[i] = buf[3 + i];
 
 					fireFrameReceived(ldata);
+
+					final boolean isCon = (ldata[0] & 0xff) == CEMILData.MC_LDATA_CON;
+					final boolean posCon = (ldata[1] & 0x01) == 0;
+					if (isCon && posCon) {
+						final var dst = ldataDestination(ldata);
+						if (dst.equals(keepForCon))
+							signalCon();
+					}
 					return true;
 				}
 			}
@@ -633,6 +702,32 @@ public class FT12Connection implements AutoCloseable
 			if ((c & 0x0f) == USER_DATA && (c & FRAMECOUNT_VALID) == 0)
 				return false;
 			return true;
+		}
+
+		private void signalAck() throws InterruptedException {
+			sendLock.lockInterruptibly();
+			try {
+				if (state == ACK_PENDING) {
+					state = CON_PENDING;
+					ack.signal();
+				}
+			}
+			finally {
+				sendLock.unlock();
+			}
+		}
+
+		private void signalCon() throws InterruptedException {
+			sendLock.lockInterruptibly();
+			try {
+				if (state == CON_PENDING) {
+					state = OK;
+					con.signal();
+				}
+			}
+			finally {
+				sendLock.unlock();
+			}
 		}
 
 		/**
