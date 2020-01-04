@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2019 B. Malinowsky
+    Copyright (c) 2015, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,10 +40,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -176,11 +174,10 @@ public final class Connector
 
 		private final TSupplier<? extends T> creator;
 
-		private static final ThreadFactory tf = Executors.defaultThreadFactory();
 		// we should replace this with a scheduled _cached_ thread pool executor implementation,
 		// this one is a fixed sized pool, with thread time-out enabled
 		private static ScheduledThreadPoolExecutor reconnect = new ScheduledThreadPoolExecutor(4, runnable -> {
-			final Thread t = tf.newThread(runnable);
+			final Thread t = new Thread(runnable);
 			t.setName("Calimero Connector " + t.getId());
 			t.setDaemon(true);
 			return t;
