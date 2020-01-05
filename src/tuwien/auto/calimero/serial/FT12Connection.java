@@ -462,8 +462,10 @@ public class FT12Connection implements AutoCloseable
 				state = ACK_PENDING;
 				os.write(reset);
 				os.flush();
-				if (waitForAck())
+				if (waitForAck()) {
+					state = OK;
 					return;
+				}
 			}
 			throw new KNXAckTimeoutException("resetting BCU failed (no acknowledge reply received)");
 		}
@@ -521,7 +523,7 @@ public class FT12Connection implements AutoCloseable
 
 	// pre: sendLock is held
 	private boolean waitForCon() throws InterruptedException {
-		long remaining = Duration.ofSeconds(1).toNanos();
+		long remaining = Duration.ofMillis(300).toNanos();
 		while (state == CON_PENDING && remaining > 0)
 			remaining = con.awaitNanos(remaining);
 		return remaining > 0;
@@ -554,9 +556,14 @@ public class FT12Connection implements AutoCloseable
 	}
 
 	private static KNXAddress ldataDestination(final byte[] ldata) {
-		if (ldata.length >= 6) {
-			final int addr = (ldata[4] & 0xff) << 8 | ldata[5] & 0xff;
-			final boolean group = (ldata[6] & 0x80) == 0x80;
+		if (ldata.length >= 8) {
+			final int svc = ldata[0] & 0xff;
+			final boolean cemi = (svc == CEMILData.MC_LDATA_REQ || svc == CEMILData.MC_LDATA_CON) && (ldata[1] & 0xff) == 0;
+			final int dstOffset = cemi ? 6 : 4;
+			final int addressTypeOffset = cemi ? 3 : 6;
+
+			final int addr = (ldata[dstOffset] & 0xff) << 8 | ldata[dstOffset + 1] & 0xff;
+			final boolean group = (ldata[addressTypeOffset] & 0x80) == 0x80;
 			return group ? new GroupAddress(addr) : new IndividualAddress(addr);
 		}
 		return new IndividualAddress(0);
@@ -648,8 +655,14 @@ public class FT12Connection implements AutoCloseable
 
 					fireFrameReceived(ldata);
 
-					final boolean isCon = (ldata[0] & 0xff) == CEMILData.MC_LDATA_CON;
-					final boolean posCon = (ldata[1] & 0x01) == 0;
+					final int emi1LDataCon = 0x4e;
+					final int svc = ldata[0] & 0xff;
+					final boolean isCon = svc == CEMILData.MC_LDATA_CON || svc == emi1LDataCon;
+					// workaround for cEMI detection: check at offset 1 -> additional info length field = 0
+					// TODO cEMI setting should be passed in during connection setup (by the network link)
+					final boolean cemi = svc == CEMILData.MC_LDATA_CON && (ldata[1] & 0xff) == 0;
+					final int ctrl1Offset = cemi ? 2 : 1;
+					final boolean posCon = (ldata[ctrl1Offset] & 0x01) == 0;
 					if (isCon && posCon) {
 						final var dst = ldataDestination(ldata);
 						if (dst.equals(keepForCon))
