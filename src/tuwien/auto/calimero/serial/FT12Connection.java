@@ -166,11 +166,8 @@ public class FT12Connection implements AutoCloseable
 	 * {@link FT12Connection#FT12Connection(String)}.<br>
 	 * The baud rate is set to 19200.<br>
 	 * The associated log service to which the created instance will output logging events
-	 * is named "FT1.2 <code>portNumber</code>", with <code>portNumber</code> being the
-	 * supplied port parameter value. If a log writer wants to receive all log events
-	 * created during establishment of this FT1.2 connection, use
-	 * {@link LogService#getLogger(String)} before invoking this constructor and add
-	 * the writer.
+	 * is named "calimero.serial.ft12:<code>portId</code>", with <code>portId</code> being the
+	 * port identifier created from {@code portNumber}.
 	 *
 	 * @param portNumber port number of the serial communication port to use; mapped to
 	 *        the default port identifier using this number (device and platform specific)
@@ -188,11 +185,8 @@ public class FT12Connection implements AutoCloseable
 	 * <p>
 	 * The baud rate is set to 19200.<br>
 	 * The associated log service to which the created instance will output logging events
-	 * is named "calimero.serial.ft12.<code>portId</code>", with <code>portId</code> being the supplied
-	 * port identifier. If a log writer wants to receive all log events created during
-	 * establishment of this FT1.2 connection, use
-	 * {@link LogService#getLogger(String)} before invoking this constructor and add
-	 * the writer.
+	 * is named "calimero.serial.ft12:<code>portId</code>", with <code>portId</code> being the supplied
+	 * port identifier.
 	 *
 	 * @param portId port identifier of the serial communication port to use
 	 * @throws KNXException on port not found or access error, initializing port settings
@@ -418,7 +412,7 @@ public class FT12Connection implements AutoCloseable
 	 * <p>
 	 * The BCU is always switched back into normal mode.<br>
 	 * All registered event listeners get notified. The close event is the last event the
-	 * listeners receive. <br>
+	 * listeners receive.
 	 * If this connection endpoint is already closed, no action is performed.
 	 */
 	@Override
