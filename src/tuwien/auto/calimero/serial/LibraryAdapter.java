@@ -96,7 +96,7 @@ public abstract class LibraryAdapter implements Closeable
 	private static String[] defaultPortPrefixes()
 	{
 		return System.getProperty("os.name").toLowerCase().indexOf("windows") > -1 ? new String[] { "\\\\.\\COM" }
-				: new String[] { "/dev/ttyS", "/dev/ttyACM", "/dev/ttyUSB" };
+				: new String[] { "/dev/ttyS", "/dev/ttyACM", "/dev/ttyUSB", "/dev/ttyAMA" };
 	}
 
 	/**
