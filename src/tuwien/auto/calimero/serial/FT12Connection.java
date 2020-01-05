@@ -234,12 +234,17 @@ public class FT12Connection implements AutoCloseable
 		receiver = new Receiver();
 		receiver.start();
 		state = OK;
+
+		sendLock.lock(); // TODO make it interruptibly, throw
 		try {
 			sendReset();
 		}
 		catch (final KNXAckTimeoutException e) {
 			close(false, "acknowledgment timeout on sending reset");
 			throw e;
+		}
+		finally {
+			sendLock.unlock();
 		}
 	}
 
