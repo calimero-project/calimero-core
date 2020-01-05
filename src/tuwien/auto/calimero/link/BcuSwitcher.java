@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2019 B. Malinowsky
+    Copyright (c) 2015, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,7 +45,6 @@ import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.IndividualAddress;
-import tuwien.auto.calimero.KNXAckTimeoutException;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -365,7 +364,7 @@ final class BcuSwitcher
 		logger = null;
 	}
 
-	void normalMode(final boolean cEMI) throws KNXAckTimeoutException, KNXPortClosedException, KNXLinkClosedException {
+	void normalMode(final boolean cEMI) throws KNXTimeoutException, KNXPortClosedException, KNXLinkClosedException {
 		final byte[] switchNormal = { (byte) peiSwitch_req, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
 		switchLayer(cEMI, NoLayer, switchNormal);
 	}
@@ -382,18 +381,18 @@ final class BcuSwitcher
 	}
 
 	void enterBusmonitor(final boolean cEMI)
-			throws KNXAckTimeoutException, KNXPortClosedException, KNXLinkClosedException {
+			throws KNXTimeoutException, KNXPortClosedException, KNXLinkClosedException {
 		final byte[] switchBusmon = { (byte) peiSwitch_req, (byte) 0x90, 0x18, 0x34, 0x56, 0x78, 0x0A, };
 		switchLayer(cEMI, Busmonitor, switchBusmon);
 	}
 
 	void leaveBusmonitor(final boolean cEMI)
-			throws KNXAckTimeoutException, KNXPortClosedException, KNXLinkClosedException {
+			throws KNXTimeoutException, KNXPortClosedException, KNXLinkClosedException {
 		normalMode(cEMI);
 	}
 
 	private void switchLayer(final boolean cEMI, final int cemiCommMode, final byte[] peiSwitch)
-			throws KNXAckTimeoutException, KNXPortClosedException, KNXLinkClosedException {
+			throws KNXTimeoutException, KNXPortClosedException, KNXLinkClosedException {
 		try {
 			conn.send(cEMI ? commModeRequest(cemiCommMode) : peiSwitch, true);
 			// TODO check .con for error case
@@ -403,7 +402,7 @@ final class BcuSwitcher
 			Thread.currentThread().interrupt();
 			throw new KNXLinkClosedException(e.getMessage() != null ? e.getMessage() : "thread interrupted");
 		}
-		catch (final KNXAckTimeoutException e) {
+		catch (final KNXTimeoutException e) {
 			conn.close();
 			throw e;
 		}

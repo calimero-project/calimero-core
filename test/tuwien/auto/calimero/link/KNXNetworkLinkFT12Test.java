@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,7 +51,6 @@ import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
-import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXTimeoutException;
@@ -62,13 +61,8 @@ import tuwien.auto.calimero.knxnetip.Debug;
 import tuwien.auto.calimero.link.medium.PLSettings;
 import tuwien.auto.calimero.link.medium.TPSettings;
 
-/**
- * Test for KNXNetworkLinkFT12.
- *
- * @author B. Malinowsky
- */
 @FT12
-public class KNXNetworkLinkFT12Test
+class KNXNetworkLinkFT12Test
 {
 	private KNXNetworkLink lnk;
 	private NLListenerImpl nll;
@@ -146,26 +140,16 @@ public class KNXNetworkLinkFT12Test
 			lnk.close();
 	}
 
-	/**
-	 * Test method for
-	 * {@link KNXNetworkLinkFT12#KNXNetworkLinkFT12(String, tuwien.auto.calimero.link.medium.KNXMediumSettings)}.
-	 *
-	 * @throws KNXException
-	 */
 	@Test
-	public final void testKNXNetworkLinkFT12StringKNXMediumSettings() throws KNXException
+	void testKNXNetworkLinkFT12StringKNXMediumSettings() throws KNXException, InterruptedException
 	{
 		lnk.close();
 		lnk = new KNXNetworkLinkFT12(Util.getSerialPortID(), TPSettings.TP1);
 		lnk.close();
 	}
 
-	/**
-	 * Test method for
-	 * {@link KNXNetworkLinkFT12#KNXNetworkLinkFT12(int, tuwien.auto.calimero.link.medium.KNXMediumSettings)}.
-	 */
 	@Test
-	public final void testKNXNetworkLinkFT12IntKNXMediumSettings()
+	void testKNXNetworkLinkFT12IntKNXMediumSettings() throws InterruptedException
 	{
 		try {
 			lnk = new KNXNetworkLinkFT12(1055, TPSettings.TP1);
@@ -176,11 +160,8 @@ public class KNXNetworkLinkFT12Test
 		}
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkLinkFT12#setKNXMedium(tuwien.auto.calimero.link.medium.KNXMediumSettings)}.
-	 */
 	@Test
-	public final void testSetKNXMedium()
+	void testSetKNXMedium()
 	{
 		try {
 			lnk.setKNXMedium(new PLSettings());
@@ -203,31 +184,22 @@ public class KNXNetworkLinkFT12Test
 		assertEquals(200, lnk.getKNXMedium().getDeviceAddress().getRawAddress());
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkLinkFT12#getKNXMedium()}.
-	 */
 	@Test
-	public final void testGetKNXMedium()
+	void testGetKNXMedium()
 	{
 		assertTrue(lnk.getKNXMedium() instanceof TPSettings);
 		assertEquals(0, lnk.getKNXMedium().getDeviceAddress().getRawAddress());
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkLinkFT12#addLinkListener(tuwien.auto.calimero.link.NetworkLinkListener)}.
-	 */
 	@Test
-	public final void testAddLinkListener()
+	void testAddLinkListener()
 	{
 		lnk.addLinkListener(nll);
 		lnk.addLinkListener(nll);
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkLinkFT12#removeLinkListener(tuwien.auto.calimero.link.NetworkLinkListener)}.
-	 */
 	@Test
-	public final void testRemoveLinkListener()
+	void testRemoveLinkListener()
 	{
 		lnk.removeLinkListener(nll);
 		lnk.removeLinkListener(nll);
@@ -235,11 +207,8 @@ public class KNXNetworkLinkFT12Test
 		lnk.removeLinkListener(nll);
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkLinkFT12#getHopCount()}.
-	 */
 	@Test
-	public final void testGetHopCount()
+	void testGetHopCount()
 	{
 		assertEquals(6, lnk.getHopCount());
 		lnk.setHopCount(7);
@@ -256,15 +225,8 @@ public class KNXNetworkLinkFT12Test
 		catch (final KNXIllegalArgumentException e) {}
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkLinkFT12#sendRequest(KNXAddress, tuwien.auto.calimero.Priority, byte[])}.
-	 *
-	 * @throws KNXLinkClosedException
-	 * @throws KNXTimeoutException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testSendRequest() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
+	void testSendRequest() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		doSend(new byte[] { 0, (byte) (0x80 | 1) });
 		doSend(new byte[] { 0, (byte) (0x80 | 0) });
@@ -287,14 +249,8 @@ public class KNXNetworkLinkFT12Test
 		assertNotNull(nll.con);
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkLinkFT12#sendRequestWait(KNXAddress, tuwien.auto.calimero.Priority, byte[])}.
-	 *
-	 * @throws KNXTimeoutException
-	 * @throws KNXLinkClosedException
-	 */
 	@Test
-	public final void testSendRequestWait() throws KNXLinkClosedException, KNXTimeoutException
+	void testSendRequestWait() throws KNXLinkClosedException, KNXTimeoutException
 	{
 		doSendWait(new byte[] { 0, (byte) (0x80 | 1) });
 		doSendWait(new byte[] { 0, (byte) (0x80 | 0) });
@@ -314,14 +270,8 @@ public class KNXNetworkLinkFT12Test
 		assertNotNull(nll.con);
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkLinkFT12#send(tuwien.auto.calimero.cemi.CEMILData, boolean)}.
-	 *
-	 * @throws KNXLinkClosedException
-	 * @throws KNXTimeoutException
-	 */
 	@Test
-	public final void testSend() throws KNXTimeoutException, KNXLinkClosedException
+	void testSend() throws KNXTimeoutException, KNXLinkClosedException
 	{
 		nll.con = null;
 		lnk.send(frame2, false);
@@ -343,11 +293,8 @@ public class KNXNetworkLinkFT12Test
 		catch (final InterruptedException e) {}
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkLinkFT12#getName()}.
-	 */
 	@Test
-	public final void testGetName()
+	void testGetName()
 	{
 		String n = lnk.getName();
 		assertTrue(n.indexOf(Util.getSerialPortID()) > -1, Util.getSerialPortID());
@@ -358,23 +305,14 @@ public class KNXNetworkLinkFT12Test
 		assertTrue(n.indexOf("link") > -1);
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkLinkFT12#isOpen()}.
-	 */
 	@Test
-	public final void testIsOpen()
+	void testIsOpen()
 	{
 		assertTrue(lnk.isOpen());
 		lnk.close();
 		assertFalse(lnk.isOpen());
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkLinkFT12#close()}.
-	 *
-	 * @throws InterruptedException on interrupted thread
-	 * @throws KNXTimeoutException
-	 */
 	@Test
 	void testClose() throws InterruptedException, KNXTimeoutException
 	{

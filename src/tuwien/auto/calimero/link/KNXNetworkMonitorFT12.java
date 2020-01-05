@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,8 +36,8 @@
 
 package tuwien.auto.calimero.link;
 
-import tuwien.auto.calimero.KNXAckTimeoutException;
 import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.serial.FT12Connection;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
@@ -54,7 +54,7 @@ public class KNXNetworkMonitorFT12 extends AbstractMonitor<FT12Connection>
 	private final boolean cEMI;
 
 	public static KNXNetworkMonitorFT12 newCemiMonitor(final String portId, final KNXMediumSettings settings)
-			throws KNXException {
+			throws KNXException, InterruptedException {
 		return new KNXNetworkMonitorFT12(new FT12Connection(portId), settings, true);
 	}
 
@@ -68,9 +68,10 @@ public class KNXNetworkMonitorFT12 extends AbstractMonitor<FT12Connection>
 	 * @param settings medium settings defining the specific KNX medium needed for decoding raw
 	 *        frames received from the KNX network
 	 * @throws KNXException on error creating FT1.2 connection or entering busmonitor mode
+	 * @throws InterruptedException on thread interrupt creating the FT1.2 connection
 	 */
 	public KNXNetworkMonitorFT12(final String portID, final KNXMediumSettings settings)
-		throws KNXException
+			throws KNXException, InterruptedException
 	{
 		this(new FT12Connection(portID), settings);
 	}
@@ -85,8 +86,10 @@ public class KNXNetworkMonitorFT12 extends AbstractMonitor<FT12Connection>
 	 * @param settings medium settings defining the specific KNX medium needed for decoding raw
 	 *        frames received from the KNX network
 	 * @throws KNXException on error creating FT1.2 connection or entering busmonitor mode
+	 * @throws InterruptedException on thread interrupt creating the FT1.2 connection
 	 */
-	public KNXNetworkMonitorFT12(final int portNumber, final KNXMediumSettings settings) throws KNXException
+	public KNXNetworkMonitorFT12(final int portNumber, final KNXMediumSettings settings)
+			throws KNXException, InterruptedException
 	{
 		this(new FT12Connection(portNumber), settings);
 	}
@@ -125,7 +128,7 @@ public class KNXNetworkMonitorFT12 extends AbstractMonitor<FT12Connection>
 		conn.addConnectionListener(notifier);
 	}
 
-	private void enterBusmonitor() throws KNXAckTimeoutException, KNXPortClosedException, KNXLinkClosedException {
+	private void enterBusmonitor() throws KNXTimeoutException, KNXPortClosedException, KNXLinkClosedException {
 		new BcuSwitcher(conn).enterBusmonitor(cEMI);
 	}
 
@@ -135,6 +138,6 @@ public class KNXNetworkMonitorFT12 extends AbstractMonitor<FT12Connection>
 		try {
 			new BcuSwitcher(conn).leaveBusmonitor(cEMI);
 		}
-		catch (KNXAckTimeoutException | KNXPortClosedException | KNXLinkClosedException e) {}
+		catch (KNXTimeoutException | KNXPortClosedException | KNXLinkClosedException e) {}
 	}
 }

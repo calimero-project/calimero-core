@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@
 package tuwien.auto.calimero.link;
 
 import tuwien.auto.calimero.DataUnitBuilder;
-import tuwien.auto.calimero.KNXAckTimeoutException;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXTimeoutException;
@@ -54,7 +53,7 @@ import tuwien.auto.calimero.serial.KNXPortClosedException;
 public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 {
 	public static KNXNetworkLinkFT12 newCemiLink(final String portId, final KNXMediumSettings settings)
-			throws KNXException {
+			throws KNXException, InterruptedException {
 		return new KNXNetworkLinkFT12(new FT12Connection(portId), settings, true);
 	}
 
@@ -66,10 +65,11 @@ public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 	 *
 	 * @param portID identifier of the serial communication port to use
 	 * @param settings medium settings defining device and medium specifics needed for communication
-	 * @throws KNXException on error creating FT1.2 connection, timeout, or interrupt switching to link layer mode
+	 * @throws KNXException on error creating FT1.2 connection, or timeout switching to link layer mode
+	 * @throws InterruptedException on thread interrupt creating the FT1.2 connection
 	 */
-	public KNXNetworkLinkFT12(final String portID, final KNXMediumSettings settings) throws KNXException
-	{
+	public KNXNetworkLinkFT12(final String portID, final KNXMediumSettings settings)
+			throws KNXException, InterruptedException {
 		this(new FT12Connection(portID), settings);
 	}
 
@@ -81,10 +81,11 @@ public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 	 *
 	 * @param portNumber port number of the serial communication port to use
 	 * @param settings medium settings defining device and medium specifics needed for communication
-	 * @throws KNXException on error creating FT1.2 connection, timeout, or interrupt switching to link layer mode
+	 * @throws KNXException on error creating FT1.2 connection, or timeout switching to link layer mode
+	 * @throws InterruptedException on thread interrupt creating the FT1.2 connection
 	 */
-	public KNXNetworkLinkFT12(final int portNumber, final KNXMediumSettings settings) throws KNXException
-	{
+	public KNXNetworkLinkFT12(final int portNumber, final KNXMediumSettings settings)
+			throws KNXException, InterruptedException {
 		this(new FT12Connection(portNumber), settings);
 	}
 
@@ -155,7 +156,7 @@ public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 		new BcuSwitcher(conn).linkLayerMode(cEMI);
 	}
 
-	private void normalMode() throws KNXAckTimeoutException, KNXPortClosedException, KNXLinkClosedException {
+	private void normalMode() throws KNXTimeoutException, KNXPortClosedException, KNXLinkClosedException {
 		new BcuSwitcher(conn).normalMode(cEMI);
 	}
 }

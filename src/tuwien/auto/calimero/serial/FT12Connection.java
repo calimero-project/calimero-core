@@ -176,8 +176,9 @@ public class FT12Connection implements AutoCloseable
 	 *        the default port identifier using this number (device and platform specific)
 	 * @throws KNXException on port not found or access error, initializing port settings
 	 *         failed, if reset of BCU2 failed
+	 * @throws InterruptedException on interrupted thread while creating the FT1.2 connection
 	 */
-	public FT12Connection(final int portNumber) throws KNXException
+	public FT12Connection(final int portNumber) throws KNXException, InterruptedException
 	{
 		this(Integer.toString(portNumber), LibraryAdapter.defaultPortPrefixes()[0] + portNumber, DEFAULT_BAUDRATE);
 	}
@@ -196,8 +197,9 @@ public class FT12Connection implements AutoCloseable
 	 * @param portId port identifier of the serial communication port to use
 	 * @throws KNXException on port not found or access error, initializing port settings
 	 *         failed, if reset of BCU2 failed
+	 * @throws InterruptedException on interrupted thread while creating the FT1.2 connection
 	 */
-	public FT12Connection(final String portId) throws KNXException
+	public FT12Connection(final String portId) throws KNXException, InterruptedException
 	{
 		this(portId, portId, DEFAULT_BAUDRATE);
 	}
@@ -214,13 +216,15 @@ public class FT12Connection implements AutoCloseable
 	 * @param baudrate baud rate to use for communication, 0 &lt; baud rate
 	 * @throws KNXException on port not found or access error, initializing port settings
 	 *         failed, if reset of BCU2 failed
+	 * @throws InterruptedException on interrupted thread while creating the FT1.2 connection
 	 */
-	public FT12Connection(final String portId, final int baudrate) throws KNXException
+	public FT12Connection(final String portId, final int baudrate) throws KNXException, InterruptedException
 	{
 		this(portId, portId, baudrate);
 	}
 
-	private FT12Connection(final String originalPortId, final String portId, final int baudrate) throws KNXException
+	private FT12Connection(final String originalPortId, final String portId, final int baudrate)
+			throws KNXException, InterruptedException
 	{
 		logger = LogService.getLogger("calimero.serial.ft12:" + originalPortId);
 		calcTimeouts(baudrate);
@@ -233,7 +237,7 @@ public class FT12Connection implements AutoCloseable
 		receiver.start();
 		state = OK;
 
-		sendLock.lock(); // TODO make it interruptibly, throw
+		sendLock.lockInterruptibly();
 		try {
 			sendReset();
 		}
@@ -356,7 +360,7 @@ public class FT12Connection implements AutoCloseable
 	 *         connection is not closed because of the interruption
 	 */
 	public void send(final byte[] frame, final boolean blocking)
-		throws KNXAckTimeoutException, KNXPortClosedException, InterruptedException
+		throws KNXTimeoutException, KNXPortClosedException, InterruptedException
 	{
 		sendLock.lockInterruptibly();
 		try {
@@ -392,8 +396,7 @@ public class FT12Connection implements AutoCloseable
 			if (!ack)
 				throw new KNXAckTimeoutException("no acknowledge reply received");
 			if (!con)
-//				throw new KNXTimeoutException("no confirmation reply received for " + keepForCon); // TODO use this ex
-				throw new KNXAckTimeoutException("no confirmation reply received for " + keepForCon);
+				throw new KNXTimeoutException("no confirmation reply received for " + keepForCon);
 		}
 		catch (final InterruptedIOException e) {
 			throw new InterruptedException(e.getMessage());

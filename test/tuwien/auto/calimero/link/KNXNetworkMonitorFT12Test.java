@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -60,13 +60,8 @@ import tuwien.auto.calimero.link.medium.PLSettings;
 import tuwien.auto.calimero.link.medium.RawFrame;
 import tuwien.auto.calimero.link.medium.TPSettings;
 
-/**
- * Test for KNXNetworkMonitorFT12.
- *
- * @author B. Malinowsky
- */
 @FT12
-public class KNXNetworkMonitorFT12Test
+class KNXNetworkMonitorFT12Test
 {
 	private KNXNetworkMonitor mon;
 	private MonListener lmon;
@@ -128,23 +123,15 @@ public class KNXNetworkMonitorFT12Test
 			mon.close();
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkMonitorFT12#KNXNetworkMonitorFT12(java.lang.String, medium.KNXMediumSettings)}.
-	 *
-	 * @throws KNXException
-	 */
 	@Test
-	public final void testKNXNetworkMonitorFT12StringKNXMediumSettings() throws KNXException
+	void testKNXNetworkMonitorFT12StringKNXMediumSettings() throws KNXException, InterruptedException
 	{
 		mon.close();
 		mon = new KNXNetworkMonitorFT12(Util.getSerialPortID(), TPSettings.TP1);
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkMonitorFT12#KNXNetworkMonitorFT12(int, medium.KNXMediumSettings)}.
-	 */
 	@Test
-	public final void testKNXNetworkMonitorFT12IntKNXMediumSettings()
+	void testKNXNetworkMonitorFT12IntKNXMediumSettings() throws InterruptedException
 	{
 		mon.close();
 		try {
@@ -156,11 +143,8 @@ public class KNXNetworkMonitorFT12Test
 		}
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkMonitorFT12#setKNXMedium(medium.KNXMediumSettings)}.
-	 */
 	@Test
-	public final void testSetKNXMedium()
+	void testSetKNXMedium()
 	{
 		try {
 			mon.setKNXMedium(new PLSettings());
@@ -183,13 +167,8 @@ public class KNXNetworkMonitorFT12Test
 		assertEquals(200, mon.getKNXMedium().getDeviceAddress().getRawAddress());
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkMonitorFT12#setDecodeRawFrames(boolean)}.
-	 *
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testSetDecodeRawFrames() throws InterruptedException
+	void testSetDecodeRawFrames() throws InterruptedException
 	{
 		mon.setDecodeRawFrames(true);
 		lmon.raw = null;
@@ -202,11 +181,8 @@ public class KNXNetworkMonitorFT12Test
 		assertNull(lmon.raw);
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkMonitorFT12#getName()}.
-	 */
 	@Test
-	public final void testGetName()
+	void testGetName()
 	{
 		String n = mon.getName();
 		final String port = Util.getSerialPortID();
@@ -218,13 +194,8 @@ public class KNXNetworkMonitorFT12Test
 		assertTrue(n.indexOf("monitor") > -1);
 	}
 
-	/**
-	 * Test method for {@link KNXNetworkMonitorFT12#close()}.
-	 *
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testClose() throws InterruptedException
+	void testClose() throws InterruptedException
 	{
 		System.out.println(mon.toString());
 		assertTrue(mon.isOpen());
