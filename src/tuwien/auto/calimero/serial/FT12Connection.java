@@ -41,8 +41,6 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -181,7 +179,7 @@ public class FT12Connection implements AutoCloseable
 	 */
 	public FT12Connection(final int portNumber) throws KNXException
 	{
-		this(Integer.toString(portNumber), defaultPortPrefixes()[0] + portNumber, DEFAULT_BAUDRATE);
+		this(Integer.toString(portNumber), LibraryAdapter.defaultPortPrefixes()[0] + portNumber, DEFAULT_BAUDRATE);
 	}
 
 	/**
@@ -251,7 +249,7 @@ public class FT12Connection implements AutoCloseable
 	/**
 	 * Attempts to gets the available serial communication ports on the host.
 	 * <p>
-	 * If Calimero has access to serial ports, the lowest 10
+	 * If Calimero has access to serial ports, the lowest 20
 	 * port numbers of each of the default system name prefixes are checked if present.<br>
 	 * The empty array is returned if no ports are discovered.
 	 *
@@ -259,19 +257,7 @@ public class FT12Connection implements AutoCloseable
 	 */
 	public static String[] getPortIdentifiers()
 	{
-		if (SerialComAdapter.isAvailable()) {
-			final String[] prefixes = defaultPortPrefixes();
-			final List<String> l = new ArrayList<>(10);
-			for (int k = 0; k < prefixes.length; k++) {
-				final String prefix = prefixes[k];
-				for (int i = 0; i < 10; ++i)
-					if (SerialComAdapter.portExists(prefix + i))
-						l.add(prefix + i);
-			}
-			return l.toArray(new String[l.size()]);
-		}
-		// skip other possible adapters for now, and return empty list...
-		return new String[0];
+		return LibraryAdapter.getPortIdentifiers().toArray(String[]::new);
 	}
 
 	/**
@@ -568,12 +554,6 @@ public class FT12Connection implements AutoCloseable
 		for (int i = 0; i < length; ++i)
 			chk += data[offset + i];
 		return chk;
-	}
-
-	private static String[] defaultPortPrefixes()
-	{
-		return System.getProperty("os.name").toLowerCase().indexOf("windows") > -1
-				? new String[]{ "\\\\.\\COM" } : new String[]{ "/dev/ttyS", "/dev/ttyUSB", "/dev/ttyACM" };
 	}
 
 	private static KNXAddress ldataDestination(final byte[] ldata) {

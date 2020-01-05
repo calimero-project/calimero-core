@@ -93,7 +93,7 @@ public abstract class LibraryAdapter implements Closeable
 		return Collections.emptyList();
 	}
 
-	private static String[] defaultPortPrefixes()
+	static String[] defaultPortPrefixes()
 	{
 		return System.getProperty("os.name").toLowerCase().indexOf("windows") > -1 ? new String[] { "\\\\.\\COM" }
 				: new String[] { "/dev/ttyS", "/dev/ttyACM", "/dev/ttyUSB", "/dev/ttyAMA" };
