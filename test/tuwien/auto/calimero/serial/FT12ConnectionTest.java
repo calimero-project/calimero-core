@@ -39,129 +39,202 @@ package tuwien.auto.calimero.serial;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-
-import java.util.Arrays;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import tag.FT12;
+import tuwien.auto.calimero.GroupAddress;
+import tuwien.auto.calimero.IndividualAddress;
+import tuwien.auto.calimero.KNXAckTimeoutException;
 import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.Util;
+import tuwien.auto.calimero.cemi.CEMIFactory;
+import tuwien.auto.calimero.cemi.CEMILData;
 
-@FT12
-class FT12ConnectionTest
-{
+class FT12ConnectionTest {
 	private static int usePort = Util.getSerialPort();
 	private static String portID;
 	private FT12Connection c;
+	private final BauFt12Emulator emulator = new BauFt12Emulator();
 
-	@BeforeEach
-	void init() throws KNXException, InterruptedException {
-		c = new FT12Connection(usePort);
-	}
+	private static final GroupAddress dst = new GroupAddress(2, 3, 7);
+
+	private static final CEMILData cemiLDataReq = new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0), dst,
+			new byte[] { 9, 9, 9 }, Priority.LOW);
+	private static final byte[] emi2LDataReq = CEMIFactory.toEmi(cemiLDataReq);
 
 	@AfterEach
-	void tearDown() throws Exception
-	{
+	void tearDown() throws Exception {
 		if (c != null)
 			c.close();
 	}
 
 	@Test
-	void testFT12ConnectionInt() throws InterruptedException
-	{
-		portID = c.getPortID();
-		try {
-			final FT12Connection c2 = new FT12Connection(usePort);
-			c2.close();
-			fail("no sharing");
-		}
-		catch (final KNXException e) {}
-		try {
-			final FT12Connection c3 = new FT12Connection(2);
-			c3.close();
-		}
-		catch (final KNXException e) {}
-		c.close();
-	}
-
-	@Test
-	void testFT12ConnectionStringInt() throws KNXException, InterruptedException
-	{
-		c.close();
-		c = new FT12Connection(portID, 19200);
-		c.close();
-		try {
-			final FT12Connection c2 = new FT12Connection(portID, 56000);
-			c2.close();
-			fail("this baud rate should not work with BCU");
-		}
-		catch (final KNXException e) {}
-	}
-
-	@Test
-	void testGetPortIdentifiers()
-	{
+	void testGetPortIdentifiers() {
 		assertNotNull(FT12Connection.getPortIdentifiers());
-		System.out.println(Arrays.asList(FT12Connection.getPortIdentifiers()));
 	}
 
 	@Test
-	void testClose() throws KNXException, InterruptedException
-	{
-		assertEquals(FT12Connection.OK, c.getState());
-		c.close();
-		assertEquals(FT12Connection.CLOSED, c.getState());
-		c.close();
-		assertEquals("", c.getPortID());
-		try {
-			c.send(new byte[] { 1, 2, }, true);
-			fail("closed");
+	void noAckForReset() {
+		emulator.replyWithAck = false;
+		assertThrows(KNXAckTimeoutException.class, () -> new FT12Connection(emulator, "emulator", false),
+				"reset got ACKed");
+	}
+
+	@Nested
+	@FT12
+	class InitWithPhysicalConnection {
+		@BeforeEach
+		void init() throws KNXException, InterruptedException {
+			c = new FT12Connection(usePort);
 		}
-		catch (final KNXPortClosedException e) {}
-		assertEquals(FT12Connection.CLOSED, c.getState());
+
+		@Test
+		void testFT12ConnectionInt() throws InterruptedException {
+			portID = c.getPortID();
+			try {
+				final FT12Connection c2 = new FT12Connection(usePort);
+				c2.close();
+				fail("no sharing");
+			}
+			catch (final KNXException e) {
+			}
+			try {
+				final FT12Connection c3 = new FT12Connection(2);
+				c3.close();
+			}
+			catch (final KNXException e) {
+			}
+			c.close();
+		}
+
+		@Test
+		void testFT12ConnectionStringInt() throws KNXException, InterruptedException {
+			c.close();
+			c = new FT12Connection(portID, 19200);
+			c.close();
+			try {
+				final FT12Connection c2 = new FT12Connection(portID, 56000);
+				c2.close();
+				fail("this baud rate should not work with BCU");
+			}
+			catch (final KNXException e) {
+			}
+		}
+
+		@Test
+		void testClose() throws KNXException, InterruptedException {
+			assertEquals(FT12Connection.OK, c.getState());
+			c.close();
+			assertEquals(FT12Connection.CLOSED, c.getState());
+			c.close();
+			assertEquals("", c.getPortID());
+			try {
+				c.send(new byte[] { 1, 2, }, true);
+				fail("closed");
+			}
+			catch (final KNXPortClosedException e) {
+			}
+			assertEquals(FT12Connection.CLOSED, c.getState());
+		}
+
+		@Test
+		void testGetSetBaudRate() {
+			assertEquals(19200, c.getBaudRate());
+			c.setBaudrate(9600);
+			assertEquals(9600, c.getBaudRate());
+			c.setBaudrate(0);
+			assertFalse(0 == c.getBaudRate());
+			c.close();
+			c.setBaudrate(9600);
+		}
+
+		@Test
+		void testGetState() throws KNXException, InterruptedException {
+			assertEquals(FT12Connection.OK, c.getState());
+			final byte[] switchNormal = { (byte) 0xA9, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
+			c.send(switchNormal, true);
+			assertEquals(FT12Connection.OK, c.getState());
+			c.send(switchNormal, true);
+			assertEquals(FT12Connection.OK, c.getState());
+
+			c.send(switchNormal, false);
+			assertEquals(FT12Connection.ACK_PENDING, c.getState());
+			Thread.sleep(150);
+			assertEquals(FT12Connection.OK, c.getState());
+			c.send(new byte[] { 1, 2, }, true);
+			assertEquals(FT12Connection.OK, c.getState());
+		}
+
+		@Test
+		void testSend() throws KNXException, InterruptedException {
+			c.send(new byte[] { 1, 2, }, true);
+			c.send(new byte[] { 1, 2, }, false);
+			c.send(new byte[] { 1, 2, }, true);
+			c.send(new byte[] { 1, 2, }, false);
+			c.close();
+		}
 	}
 
-	@Test
-	void testGetSetBaudRate()
-	{
-		assertEquals(19200, c.getBaudRate());
-		c.setBaudrate(9600);
-		assertEquals(9600, c.getBaudRate());
-		c.setBaudrate(0);
-		assertFalse(0 == c.getBaudRate());
-		c.close();
-		c.setBaudrate(9600);
-	}
+	@Nested
+	class InitWithEmulator {
+		@BeforeEach
+		void init() throws KNXException, InterruptedException {
+			c = new FT12Connection(emulator, "emulator", false);
+		}
 
-	@Test
-	void testGetState() throws KNXException, InterruptedException
-	{
-		assertEquals(FT12Connection.OK, c.getState());
-		final byte[] switchNormal = { (byte) 0xA9, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
-		c.send(switchNormal, true);
-		assertEquals(FT12Connection.OK, c.getState());
-		c.send(switchNormal, true);
-		assertEquals(FT12Connection.OK, c.getState());
+		@Test
+		void stateOk() {
+			assertTrue(c.getState() == FT12Connection.OK);
+		}
 
-		c.send(switchNormal, false);
-		assertEquals(FT12Connection.ACK_PENDING, c.getState());
-		Thread.sleep(150);
-		assertEquals(FT12Connection.OK, c.getState());
-		c.send(new byte[] { 1, 2, }, true);
-		assertEquals(FT12Connection.OK, c.getState());
-	}
+		@Test
+		void stateOkAfterSendingNoLDataBlocking()
+			throws KNXTimeoutException, KNXPortClosedException, InterruptedException {
+			c.send(new byte[10], true);
+			assertTrue(c.getState() == FT12Connection.OK);
+		}
 
-	@Test
-	void testSend() throws KNXException, InterruptedException
-	{
-		c.send(new byte[] { 1, 2, }, true);
-		c.send(new byte[] { 1, 2, }, false);
-		c.send(new byte[] { 1, 2, }, true);
-		c.send(new byte[] { 1, 2, }, false);
-		c.close();
+		@Test
+		void stateOkAfterSendingCemiLDataBlocking()
+			throws KNXTimeoutException, KNXPortClosedException, InterruptedException {
+			c.send(cemiLDataReq.toByteArray(), true);
+			assertTrue(c.getState() == FT12Connection.OK);
+		}
+
+		@Test
+		void stateOkAfterSendingEmi2LDataBlocking()
+			throws KNXTimeoutException, KNXPortClosedException, InterruptedException {
+			c.send(emi2LDataReq, true);
+			assertTrue(c.getState() == FT12Connection.OK);
+		}
+
+		@Test
+		void noAckForSend() {
+			emulator.replyWithAck = false;
+			assertThrows(KNXAckTimeoutException.class, () -> c.send(new byte[2], true), "send got ACKed");
+			assertTrue(c.getState() == FT12Connection.OK);
+		}
+
+		@Test
+		void noConForSend() {
+			emulator.replyWithCon = false;
+			assertThrows(KNXTimeoutException.class, () -> c.send(cemiLDataReq.toByteArray(), true), "received .con");
+			assertTrue(c.getState() == FT12Connection.OK);
+		}
+
+		@Test
+		void stateClosed() {
+			c.close();
+			assertTrue(c.getState() == FT12Connection.CLOSED);
+		}
 	}
 }

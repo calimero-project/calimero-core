@@ -100,13 +100,13 @@ public class FT12Connection implements AutoCloseable
 	private static final int DEFAULT_BAUDRATE = 19200;
 
 	// primary station control field
-	private static final int DIR_FROM_BAU = 0x80;
-	private static final int INITIATOR = 0x40;
+	static final int DIR_FROM_BAU = 0x80;
+	static final int INITIATOR = 0x40;
 	private static final int FRAMECOUNT_BIT = 0x20;
 
 	// frame count valid is always set on sending user data
 	private static final int FRAMECOUNT_VALID = 0x10;
-	private static final int ACK = 0xE5;
+	static final int ACK = 0xE5;
 	// primary station service codes
 	private static final int RESET = 0x00;
 	private static final int USER_DATA = 0x03;
@@ -127,8 +127,8 @@ public class FT12Connection implements AutoCloseable
 	private static final int IDLE_TIMEOUT = 33;
 
 	// frame delimiter characters
-	private static final int START = 0x68;
-	private static final int START_FIXED = 0x10;
+	static final int START = 0x68;
+	static final int START_FIXED = 0x10;
 	private static final int END = 0x16;
 
 	private final Logger logger;
@@ -140,6 +140,8 @@ public class FT12Connection implements AutoCloseable
 	private final LibraryAdapter adapter;
 
 	private final String port;
+	private final int exchangeTimeout;
+	private final boolean cemi;
 	private final InputStream is;
 	private final OutputStream os;
 	private volatile int state = CLOSED;
@@ -154,8 +156,6 @@ public class FT12Connection implements AutoCloseable
 
 	private int sendFrameCount;
 	private int rcvFrameCount;
-	private int exchangeTimeout;
-	private int idleTimeout;
 
 	private final EventListeners<KNXListener> listeners = new EventListeners<>();
 
@@ -177,7 +177,7 @@ public class FT12Connection implements AutoCloseable
 	 */
 	public FT12Connection(final int portNumber) throws KNXException, InterruptedException
 	{
-		this(Integer.toString(portNumber), LibraryAdapter.defaultPortPrefixes()[0] + portNumber, DEFAULT_BAUDRATE);
+		this(LibraryAdapter.defaultPortPrefixes()[0] + portNumber, DEFAULT_BAUDRATE, false);
 	}
 
 	/**
@@ -195,7 +195,7 @@ public class FT12Connection implements AutoCloseable
 	 */
 	public FT12Connection(final String portId) throws KNXException, InterruptedException
 	{
-		this(portId, portId, DEFAULT_BAUDRATE);
+		this(portId, DEFAULT_BAUDRATE, false);
 	}
 
 	/**
@@ -214,17 +214,37 @@ public class FT12Connection implements AutoCloseable
 	 */
 	public FT12Connection(final String portId, final int baudrate) throws KNXException, InterruptedException
 	{
-		this(portId, portId, baudrate);
+		this(portId, baudrate, false);
 	}
 
-	private FT12Connection(final String originalPortId, final String portId, final int baudrate)
-			throws KNXException, InterruptedException
-	{
-		logger = LogService.getLogger("calimero.serial.ft12:" + originalPortId);
-		calcTimeouts(baudrate);
-		adapter = LibraryAdapter.open(logger, portId, baudrate, idleTimeout);
-		calcTimeouts(adapter.getBaudRate()); // TODO recalculation necessary?
+	/**
+	 * Creates a new connection to a BCU2 using the FT1.2 protocol with specified baud rate and EMI setting
+	 * for communication.
+	 * <p>
+	 * If the requested baud rate is not supported, it may get substituted with a valid
+	 * baud rate by default.<br>
+	 * For access to the log service, see {@link #FT12Connection(String)}.
+	 *
+	 * @param portId port identifier of the serial communication port to use
+	 * @param baudrate baud rate to use for communication, 0 &lt; baud rate
+	 * @param cemi <code>true</code> if connection uses cEMI frames, <code>false</code> otherwise
+	 * @throws KNXException on port not found or access error, initializing port settings
+	 *         failed, if reset of BCU2 failed
+	 * @throws InterruptedException on interrupted thread while creating the FT1.2 connection
+	 */
+	public FT12Connection(final String portId, final int baudrate, final boolean cemi)
+			throws KNXException, InterruptedException {
+		this(LibraryAdapter.open(LogService.getLogger("calimero.serial.ft12:" + portId), portId, baudrate,
+				idleTimeout(baudrate)), portId, cemi);
+	}
+
+	FT12Connection(final LibraryAdapter connection, final String portId, final boolean cemi)
+			throws KNXException, InterruptedException {
+		logger = LogService.getLogger("calimero.serial.ft12:" + portId);
+		adapter = connection;
 		port = portId;
+		exchangeTimeout = exchangeTimeout(adapter.getBaudRate());
+		this.cemi = cemi;
 		is = adapter.getInputStream();
 		os = adapter.getOutputStream();
 		receiver = new Receiver();
@@ -536,15 +556,20 @@ public class FT12Connection implements AutoCloseable
 		listeners.fire(l -> l.connectionClosed(ce));
 	}
 
-	private void calcTimeouts(final int baudrate)
-	{
+	private static int exchangeTimeout(final int baudrate) {
 		// with some serial driver/BCU/OS combinations, the calculated
 		// timeouts are just too short, so add some milliseconds just as it fits
 		// this little extra time usually doesn't hurt
 		final int xTolerance = 5;
+		return Math.round(1000f * EXCHANGE_TIMEOUT / baudrate) + xTolerance;
+	}
+
+	private static int idleTimeout(final int baudrate) {
+		// with some serial driver/BCU/OS combinations, the calculated
+		// timeouts are just too short, so add some milliseconds just as it fits
+		// this little extra time usually doesn't hurt
 		final int iTolerance = 15;
-		exchangeTimeout = Math.round(1000f * EXCHANGE_TIMEOUT / baudrate) + xTolerance;
-		idleTimeout = Math.round(1000f * IDLE_TIMEOUT / baudrate) + iTolerance;
+		return Math.round(1000f * IDLE_TIMEOUT / baudrate) + iTolerance;
 	}
 
 	private static byte checksum(final byte[] data, final int offset, final int length)
