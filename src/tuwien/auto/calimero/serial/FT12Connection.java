@@ -153,6 +153,7 @@ public class FT12Connection implements AutoCloseable
 	private final Condition con = sendLock.newCondition();
 
 	private volatile KNXAddress keepForCon;
+	private static final IndividualAddress NoLDataAddress = new IndividualAddress(0xffff);
 
 	private int sendFrameCount;
 	private int rcvFrameCount;
@@ -379,9 +380,9 @@ public class FT12Connection implements AutoCloseable
 			for (int i = 0; i <= REPEAT_LIMIT; ++i) {
 				logger.trace("sending FT1.2 frame, {}blocking, attempt {}", (blocking ? "" : "non-"), (i + 1));
 
-				// setup for EMI1 / EMI2 L-Data.con
+				// setup for L-Data.con
 				final boolean isLDataReq = (frame[0] & 0xff) == CEMILData.MC_LDATA_REQ;
-				keepForCon = isLDataReq ? ldataDestination(frame) : new IndividualAddress(0);
+				keepForCon = isLDataReq ? ldataDestination(frame) : NoLDataAddress;
 
 				sendData(frame);
 				if (!blocking) {
@@ -412,6 +413,7 @@ public class FT12Connection implements AutoCloseable
 		finally {
 			if (state == ACK_PENDING || state == CON_PENDING)
 				state = OK;
+			keepForCon = NoLDataAddress;
 			readyToSend.signal();
 			sendLock.unlock();
 		}
@@ -589,10 +591,8 @@ public class FT12Connection implements AutoCloseable
 		return chk;
 	}
 
-	private static KNXAddress ldataDestination(final byte[] ldata) {
+	private KNXAddress ldataDestination(final byte[] ldata) {
 		if (ldata.length >= 8) {
-			final int svc = ldata[0] & 0xff;
-			final boolean cemi = (svc == CEMILData.MC_LDATA_REQ || svc == CEMILData.MC_LDATA_CON) && (ldata[1] & 0xff) == 0;
 			final int dstOffset = cemi ? 6 : 4;
 			final int addressTypeOffset = cemi ? 3 : 6;
 
@@ -600,7 +600,7 @@ public class FT12Connection implements AutoCloseable
 			final boolean group = (ldata[addressTypeOffset] & 0x80) == 0x80;
 			return group ? new GroupAddress(addr) : new IndividualAddress(addr);
 		}
-		return new IndividualAddress(0);
+		return NoLDataAddress;
 	}
 
 	private final class Receiver extends Thread
@@ -689,19 +689,7 @@ public class FT12Connection implements AutoCloseable
 
 					fireFrameReceived(ldata);
 
-					final int emi1LDataCon = 0x4e;
-					final int svc = ldata[0] & 0xff;
-					final boolean isCon = svc == CEMILData.MC_LDATA_CON || svc == emi1LDataCon;
-					// workaround for cEMI detection: check at offset 1 -> additional info length field = 0
-					// TODO cEMI setting should be passed in during connection setup (by the network link)
-					final boolean cemi = svc == CEMILData.MC_LDATA_CON && (ldata[1] & 0xff) == 0;
-					final int ctrl1Offset = cemi ? 2 : 1;
-					final boolean posCon = (ldata[ctrl1Offset] & 0x01) == 0;
-					if (isCon && posCon) {
-						final var dst = ldataDestination(ldata);
-						if (dst.equals(keepForCon))
-							signalCon();
-					}
+					checkLDataCon(ldata);
 					return true;
 				}
 			}
@@ -731,6 +719,19 @@ public class FT12Connection implements AutoCloseable
 			if ((c & 0x0f) == USER_DATA && (c & FRAMECOUNT_VALID) == 0)
 				return false;
 			return true;
+		}
+
+		private void checkLDataCon(final byte[] ldata) throws InterruptedException {
+			final int emi1LDataCon = 0x4e;
+			final int svc = ldata[0] & 0xff;
+			final boolean isLDataCon = svc == CEMILData.MC_LDATA_CON || svc == emi1LDataCon;
+			final int ctrl1Offset = cemi ? 2 : 1;
+			final boolean posCon = (ldata[ctrl1Offset] & 0x01) == 0;
+			if (isLDataCon && posCon) {
+				final var dst = ldataDestination(ldata);
+				if (dst.equals(keepForCon))
+					signalCon();
+			}
 		}
 
 		private void signalAck() throws InterruptedException {
