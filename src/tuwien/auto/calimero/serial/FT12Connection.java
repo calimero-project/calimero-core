@@ -251,17 +251,7 @@ public class FT12Connection implements AutoCloseable
 		receiver.start();
 		state = OK;
 
-		sendLock.lockInterruptibly();
-		try {
-			sendReset();
-		}
-		catch (final KNXAckTimeoutException e) {
-			close(false, "acknowledgment timeout on sending reset");
-			throw e;
-		}
-		finally {
-			sendLock.unlock();
-		}
+		reset();
 	}
 
 	/**
@@ -473,6 +463,20 @@ public class FT12Connection implements AutoCloseable
 		fireConnectionClosed(user, reason);
 	}
 
+	private void reset() throws InterruptedException, KNXPortClosedException, KNXAckTimeoutException {
+		sendLock.lockInterruptibly();
+		try {
+			sendReset();
+		}
+		catch (final KNXAckTimeoutException e) {
+			close(false, "acknowledgment timeout on sending reset");
+			throw e;
+		}
+		finally {
+			sendLock.unlock();
+		}
+	}
+
 	private void sendReset() throws KNXPortClosedException, KNXAckTimeoutException
 	{
 		try {
@@ -482,7 +486,7 @@ public class FT12Connection implements AutoCloseable
 				state = ACK_PENDING;
 				os.write(reset);
 				os.flush();
-				if (waitForAck()) {
+				if (waitForAck(Duration.ofMillis(150))) {
 					state = OK;
 					return;
 				}
@@ -535,7 +539,12 @@ public class FT12Connection implements AutoCloseable
 
 	// pre: sendLock is held
 	private boolean waitForAck() throws InterruptedException {
-		long remaining = Duration.ofMillis(exchangeTimeout).toNanos();
+		return waitForAck(Duration.ofMillis(exchangeTimeout));
+	}
+
+	// pre: sendLock is held
+	private boolean waitForAck(final Duration timeout) throws InterruptedException {
+		long remaining = timeout.toNanos();
 		while (state == ACK_PENDING && remaining > 0)
 			remaining = ack.awaitNanos(remaining);
 		return remaining > 0;
