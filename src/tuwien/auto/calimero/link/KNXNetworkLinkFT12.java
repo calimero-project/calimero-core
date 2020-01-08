@@ -54,7 +54,7 @@ public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 {
 	public static KNXNetworkLinkFT12 newCemiLink(final String portId, final KNXMediumSettings settings)
 			throws KNXException, InterruptedException {
-		return new KNXNetworkLinkFT12(new FT12Connection(portId), settings, true);
+		return new KNXNetworkLinkFT12(new FT12Connection(portId, 19200, true), settings, true);
 	}
 
 	/**
