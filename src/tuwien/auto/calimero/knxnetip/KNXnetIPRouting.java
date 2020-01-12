@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@ import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.StandardSocketOptions;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -284,9 +285,9 @@ public class KNXnetIPRouting extends ConnectionBase
 	public final boolean usesMulticastLoopback()
 	{
 		try {
-			return !((MulticastSocket) socket).getLoopbackMode();
+			return socket.getOption(StandardSocketOptions.IP_MULTICAST_LOOP);
 		}
-		catch (final SocketException e) {
+		catch (final IOException e) {
 			// if we can't access loopback mode, we assume that we also couldn't set it
 			// during initialization; therefore, return socket defaults
 			return true;
@@ -336,31 +337,16 @@ public class KNXnetIPRouting extends ConnectionBase
 			if (!multicast.equals(systemBroadcast))
 				sysBcastSocket = new MulticastSocket(DEFAULT_PORT);
 
-			if (netIf != null) {
+			if (netIf != null) { // TODO make netIf always non null
 				s.setNetworkInterface(netIf);
-				// port number is not used in join group
-				s.joinGroup(new InetSocketAddress(multicast, 0), netIf);
-				if (sysBcastSocket != null)
-					sysBcastSocket.joinGroup(new InetSocketAddress(systemBroadcast, 0), netIf);
-
 				logger.info("using network interface {}", netIf.getName());
 			}
-			else {
-				try {
-					// On OSX, joinGroup(multicast) is likely to fail if no network interface was
-					// set. With the following being the first join call, it will not fail, even
-					// if no network interface was set
-					s.joinGroup(new InetSocketAddress(multicast, 0), null);
-					if (sysBcastSocket != null)
-						sysBcastSocket.joinGroup(new InetSocketAddress(systemBroadcast, 0), null);
-				}
-				catch (final IOException e) {
-					// Try the simple call as backup, as it works without problem on Linux/Windows
-					s.joinGroup(multicast);
-					if (sysBcastSocket != null)
-						sysBcastSocket.joinGroup(systemBroadcast);
-				}
-			}
+
+			// port number is not used in join group
+			s.joinGroup(new InetSocketAddress(multicast, 0), netIf);
+			if (sysBcastSocket != null)
+				sysBcastSocket.joinGroup(new InetSocketAddress(systemBroadcast, 0), netIf);
+
 			// send out beyond local network
 			s.setTimeToLive(64);
 		}
@@ -370,17 +356,17 @@ public class KNXnetIPRouting extends ConnectionBase
 			throw new KNXException(
 					"initializing multicast socket (group " + multicast.getHostAddress() + "): " + e.getMessage(), e);
 		}
+		socket = s;
 		try {
 			if (!useMulticastLoopback)
-				s.setLoopbackMode(true);
-			loopbackEnabled = !s.getLoopbackMode();
+				socket.setOption(StandardSocketOptions.IP_MULTICAST_LOOP, false);
+			loopbackEnabled = usesMulticastLoopback();
 			logger.info("multicast loopback mode " + (loopbackEnabled ? "enabled" : "disabled"));
 		}
-		catch (final SocketException e) {
+		catch (final IOException e) {
 			logger.warn("failed to access multicast loopback mode, " + e.getMessage());
 		}
 
-		socket = s;
 		if (startReceiver)
 			startReceiver();
 		if (sysBcastSocket != null) {
@@ -467,8 +453,9 @@ public class KNXnetIPRouting extends ConnectionBase
 		}
 
 		LogService.log(logger, level, "close connection - " + reason, t);
+		final var netIf = networkInterface();
 		try {
-			((MulticastSocket) socket).leaveGroup(multicast);
+			((MulticastSocket) socket).leaveGroup(dataEndpt, netIf);
 		}
 		catch (final IOException e) {
 			logger.debug("problem leaving multicast group {} ({})", multicast.getHostAddress(), e.toString());
@@ -481,7 +468,7 @@ public class KNXnetIPRouting extends ConnectionBase
 
 		if (sysBcastSocket != null) {
 			try {
-				sysBcastSocket.leaveGroup(systemBroadcast);
+				sysBcastSocket.leaveGroup(new InetSocketAddress(systemBroadcast, 0), netIf);
 			}
 			catch (final IOException ignore) {}
 			finally {

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -422,7 +422,7 @@ public class Discoverer
 		// use any assigned (IPv4) address of netif, otherwise, use host
 		final InetAddress addr = l.stream().filter(ia -> nat || ia instanceof Inet4Address).findFirst().orElse(host(null));
 
-		final CompletableFuture<Void> cf = search(addr, localPort, ni, Duration.ofSeconds(timeout));
+		final CompletableFuture<Void> cf = search(addr, localPort, ni, Duration.ofSeconds(timeout)); // TODO ni might be null
 		if (wait) {
 			try {
 				cf.get();
@@ -738,10 +738,7 @@ public class Discoverer
 		}
 		if (mcastResponse) {
 			try {
-				if (ni != null)
-					s.joinGroup(new InetSocketAddress(SYSTEM_SETUP_MULTICAST, 0), ni);
-				else
-					s.joinGroup(SYSTEM_SETUP_MULTICAST);
+				s.joinGroup(new InetSocketAddress(SYSTEM_SETUP_MULTICAST, 0), ni);
 
 				// For some reasons, OS X sends IGMP membership reports with a delay
 				if (osx)
