@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,8 +50,6 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,7 +57,6 @@ import org.junit.jupiter.api.Test;
 
 import tag.KnxSecure;
 import tag.KnxnetIP;
-import tag.KnxnetIPSequential;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.GroupAddress;
@@ -397,27 +394,6 @@ public class KNXNetworkLinkIPTest
 		n = rtr.getName();
 		assertNotNull(n);
 		assertTrue(n.indexOf(KNXnetIPRouting.DEFAULT_MULTICAST) > -1);
-	}
-
-	@Test
-	@KnxnetIPSequential
-	void runNotifierOnlyAfterEstablishingConnection()
-	{
-		// create some links that fail during construction
-		final InetSocketAddress sa = new InetSocketAddress(0);
-		assertThrows(KNXException.class, () -> KNXNetworkLinkIP.newTunnelingLink(sa, sa, false, new TPSettings()),
-				"no KNXnet/IP server with wildcard IP");
-		assertThrows(KNXException.class, () -> KNXNetworkLinkIP.newTunnelingLink(sa,
-				new InetSocketAddress("1.0.0.1", 3671), false, new TPSettings()), "no KNXnet/IP server with that IP");
-
-		final Thread[] threads = new Thread[Thread.activeCount() + 10];
-		final int active = Thread.enumerate(threads);
-		assertTrue(active <= threads.length);
-
-		final List<Thread> list = Arrays.asList(threads).subList(0, active);
-		final long cnt = list.stream().map(Thread::getName).filter(s -> s.equals("Calimero link notifier")).count();
-		// we should only have our two initial link notifiers running, not the failed ones
-		assertEquals(2, cnt, "running notifiers");
 	}
 
 	@Test

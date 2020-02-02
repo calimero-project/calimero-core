@@ -236,7 +236,6 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		logger = LogService.getLogger("calimero.link." + getName());
 		notifier = new LinkNotifier();
 		setKNXMedium(settings);
-		notifier.start();
 	}
 
 	/**

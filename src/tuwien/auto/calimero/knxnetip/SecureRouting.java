@@ -53,7 +53,6 @@ import java.util.Arrays;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -63,6 +62,7 @@ import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.SerialNumber;
+import tuwien.auto.calimero.internal.Executor;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.log.LogService.LogLevel;
 import tuwien.auto.calimero.secure.KnxSecureException;
@@ -104,19 +104,6 @@ public final class SecureRouting extends KNXnetIPRouting {
 	// assign dummy to have it initialized
 	private Future<?> groupSync = CompletableFuture.completedFuture(Void.TYPE);
 
-	private static final ScheduledThreadPoolExecutor groupSyncSender = new ScheduledThreadPoolExecutor(1, r -> {
-		final Thread t = new Thread(r);
-		t.setName("KNX/IP secure group sync");
-		t.setDaemon(true);
-		return t;
-	});
-
-	static {
-		// remove idle threads after a while
-		groupSyncSender.setKeepAliveTime(30, TimeUnit.SECONDS);
-		groupSyncSender.allowCoreThreadTimeOut(true);
-		groupSyncSender.setRemoveOnCancelPolicy(true);
-	}
 
 	SecureRouting(final NetworkInterface netif, final InetAddress mcGroup, final byte[] groupKey,
 			final Duration latencyTolerance) throws KNXException {
@@ -331,11 +318,12 @@ public final class SecureRouting extends KNXnetIPRouting {
 	private void scheduleGroupSync(final long initialDelay) {
 		logger.trace("schedule group sync (initial delay {} ms)", initialDelay);
 		groupSync.cancel(false);
-		groupSync = groupSyncSender.scheduleWithFixedDelay(this::sendGroupSync, initialDelay, syncQueryInterval,
-				TimeUnit.MILLISECONDS);
+		groupSync = Executor.scheduledExecutor().scheduleWithFixedDelay(this::sendGroupSync, initialDelay,
+				syncQueryInterval, TimeUnit.MILLISECONDS);
 	}
 
 	private void sendGroupSync() {
+		Thread.currentThread().setName("KNX/IP secure group sync");
 		try {
 			final long timestamp = timestamp();
 			final byte[] sync = newGroupSync(timestamp);

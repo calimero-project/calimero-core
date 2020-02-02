@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.github.calimero</groupId>
-		<artifactId>calimero-parent</artifactId>
+		<artifactId>calimero-parent-loom</artifactId>
 		<version>2.6-SNAPSHOT</version>
 	</parent>
-	<artifactId>calimero-core</artifactId>
-	<name>Calimero-core Library</name>
+	<artifactId>calimero-core-loom</artifactId>
+	<name>Calimero core Library (Loom)</name>
 	<description>Calimero, a free KNX network library</description>
 	<scm>
 		<url>https://github.com/calimero-project/calimero-core.git</url>

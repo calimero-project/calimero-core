@@ -36,14 +36,12 @@
 
 package tuwien.auto.calimero.log;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.internal.Executor;
 
 /**
  * LogService provides access to slf4j logging.
@@ -71,16 +69,7 @@ public final class LogService
 		TRACE
 	}
 
-	private static final String loggerThreadName = "Calimero Async Logging";
-	private static final ExecutorService dispatcher = Executors.newFixedThreadPool(1, (r) -> {
-		final Thread t = Executors.defaultThreadFactory().newThread(r);
-		t.setName(loggerThreadName);
-		t.setDaemon(true);
-		return t;
-	});
-
-	private LogService()
-	{}
+	private LogService() {}
 
 	/**
 	 * Returns an slf4j logger identified by {@code name}.
@@ -127,13 +116,7 @@ public final class LogService
 	{
 		if (!isEnabled(l, level))
 			return;
-		final Thread thread = Thread.currentThread();
-		dispatcher.execute(() -> {
-			final Thread logger = Thread.currentThread();
-			logger.setName(thread.getName());
-			log(l, level, m, format, o);
-			logger.setName(loggerThreadName);
-		});
+		Executor.execute(() -> log(l, level, m, format, o), Thread.currentThread().getName());
 	}
 
 	/**

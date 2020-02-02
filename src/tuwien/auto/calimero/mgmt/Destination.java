@@ -45,10 +45,11 @@ import static tuwien.auto.calimero.mgmt.Destination.State.OpenWait;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import tuwien.auto.calimero.IndividualAddress;
+import tuwien.auto.calimero.internal.Executor;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 
 /**
@@ -113,7 +114,6 @@ public class Destination implements AutoCloseable
 
 		/**
 		 * Returns the receive sequence number of the connection.
-		 * <p>
 		 *
 		 * @return sequence number, 0 &lt;= number &lt;= 15
 		 */
@@ -135,7 +135,6 @@ public class Destination implements AutoCloseable
 
 		/**
 		 * Returns the send sequence number of the connection.
-		 * <p>
 		 *
 		 * @return sequence number, 0 &lt;= number &lt;= 15
 		 */
@@ -210,8 +209,6 @@ public class Destination implements AutoCloseable
 	// idle timeout for a connection in milliseconds
 	private static final int TIMEOUT = 6000;
 
-	// scheduled disconnects for all active destination objects
-	private static final ScheduledThreadPoolExecutor disconnect = new ScheduledThreadPoolExecutor(0);
 
 	/** Destination state. */
 	public enum State {
@@ -254,6 +251,8 @@ public class Destination implements AutoCloseable
 
 	// see 03/05/01 Resources: Verify Mode Control
 	private final boolean verify;
+
+	private final ReentrantLock lock = new ReentrantLock(true);
 
 	/**
 	 * Creates a new destination, verify mode defaults to false and keep alive is not used.
@@ -365,7 +364,8 @@ public class Destination implements AutoCloseable
 	 */
 	public void destroy()
 	{
-		synchronized (this) {
+		lock.lock();
+		try {
 			if (state == Destroyed)
 				return;
 			if (state != Disconnected)
@@ -376,6 +376,9 @@ public class Destination implements AutoCloseable
 					// we already should've been destroyed on catching this exception
 				}
 			setState(Destroyed, null);
+		}
+		finally {
+			lock.unlock();
 		}
 		tl.destroyDestination(this);
 	}
@@ -430,38 +433,49 @@ public class Destination implements AutoCloseable
 		return state.name();
 	}
 
-	private synchronized void setState(final State newState, final Runnable notify)
+	private void setState(final State newState, final AggregatorProxy notify)
 	{
-		if (state == Destroyed)
-			return;
-		state = newState;
-		if (state == Connecting) {
-			seqSend = 0;
-			seqRcv = 0;
+		lock.lock();
+		try {
+			if (state == Destroyed)
+				return;
+			state = newState;
+			if (state == Connecting) {
+				seqSend = 0;
+				seqRcv = 0;
+			}
+			else if (state == OpenIdle)
+				restartTimer(notify);
+			else if (state == OpenWait)
+				restartTimer(notify);
+			else if (state == Disconnected) {
+				remove(notify);
+				// required for server-side, otherwise server would expect old sequence and return NAK
+				seqSend = 0;
+				seqRcv = 0;
+			}
+			else if (state == Destroyed && notify != null) // destroy() calls us with notify = null, skip it
+				remove(notify);
 		}
-		else if (state == OpenIdle)
-			restartTimer(notify);
-		else if (state == OpenWait)
-			restartTimer(notify);
-		else if (state == Disconnected) {
-			remove(notify);
-			// required for server-side, otherwise server would expect old sequence and return NAK
-			seqSend = 0;
-			seqRcv = 0;
+		finally {
+			lock.unlock();
 		}
-		else if (state == Destroyed && notify != null) // destroy() calls us with notify = null, skip it
-			remove(notify);
 	}
 
-	private synchronized void restartTimer(final Runnable notify)
+	private void restartTimer(final AggregatorProxy notify)
 	{
 		if (!co)
 			throw new IllegalStateException("no timer if not connection oriented");
-		if (state == Destroyed)
-			return;
-
-		remove(notify);
-		((AggregatorProxy) notify).future = disconnect.schedule(notify, TIMEOUT, TimeUnit.MILLISECONDS);
+		lock.lock();
+		try {
+			if (state == Destroyed)
+				return;
+			remove(notify);
+			notify.future = Executor.scheduledExecutor().schedule(notify, TIMEOUT, TimeUnit.MILLISECONDS);
+		}
+		finally {
+			lock.unlock();
+		}
 	}
 
 	private static void remove(final Runnable notify)

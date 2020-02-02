@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,8 +36,6 @@
 
 package tuwien.auto.calimero.link;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
@@ -46,64 +44,25 @@ import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.internal.EventListeners;
+import tuwien.auto.calimero.internal.Executor;
 
 /**
  * Threaded event notifier for network link and monitor.
  *
  * @author B. Malinowsky
  */
-public abstract class EventNotifier<T extends LinkListener> extends Thread implements KNXListener
+public abstract class EventNotifier<T extends LinkListener> implements KNXListener
 {
 	final Logger logger;
 	final Object source;
 
 	private final EventListeners<T> listeners;
 
-	private final Deque<Consumer<? super T>> events = new ArrayDeque<>();
-	private volatile boolean running = true;
-
 	EventNotifier(final Object source, final Logger logger)
 	{
-		super("Calimero link notifier");
 		this.logger = logger;
 		this.source = source;
 		listeners = new EventListeners<>(logger, LinkEvent.class);
-		setDaemon(true);
-	}
-
-	@Override
-	public final void run()
-	{
-		try {
-			while (running) {
-				final Consumer<? super T> c;
-				synchronized (events) {
-					while (events.isEmpty())
-						events.wait();
-					c = events.remove();
-				}
-				if (c instanceof CustomEventConsumer)
-					fireCustomEvent(c);
-				else
-					fire(c);
-			}
-		}
-		catch (final InterruptedException e) {}
-		finally {
-			drainEvents();
-		}
-	}
-
-	private void drainEvents() {
-		while (true) {
-			final Consumer<? super T> c;
-			synchronized (events) {
-				if (events.isEmpty())
-					return;
-				c = events.remove();
-			}
-			fire(c);
-		}
 	}
 
 	@Override
@@ -134,10 +93,11 @@ public abstract class EventNotifier<T extends LinkListener> extends Thread imple
 
 	final void addEvent(final Consumer<? super T> c)
 	{
-		synchronized (events) {
-			events.add(c);
-			events.notify();
-		}
+		final var name = "Calimero link notifier";
+		if (c instanceof CustomEventConsumer)
+			Executor.execute(() -> fireCustomEvent(c), name);
+		else
+			Executor.execute(() -> fire(c), name);
 	}
 
 	final void addListener(final T l)
@@ -150,19 +110,7 @@ public abstract class EventNotifier<T extends LinkListener> extends Thread imple
 		listeners.remove(l);
 	}
 
-	final void quit()
-	{
-		running = false;
-		interrupt();
-		if (currentThread() != this) {
-			try {
-				join();
-			}
-			catch (final InterruptedException e) {
-				Thread.currentThread().interrupt();
-			}
-		}
-	}
+	final void quit() {}
 
 	private void fire(final Consumer<? super T> c)
 	{

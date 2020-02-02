@@ -48,7 +48,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +73,7 @@ import tuwien.auto.calimero.cemi.CEMIBusMon;
 import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.internal.EventListeners;
+import tuwien.auto.calimero.internal.Executor;
 import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.log.LogService.LogLevel;
 import tuwien.auto.calimero.serial.spi.SerialCom;
@@ -126,9 +130,6 @@ public class TpuartConnection implements Connection<byte[]>
 
 	// TP-UART send
 
-	private static final int OK = 0;
-	private static final int ConPending = 1;
-
 	// time interval to check on TP UART state
 	private static final long UartStateReadInterval = 5_000_000; // [us]
 
@@ -146,15 +147,16 @@ public class TpuartConnection implements Connection<byte[]>
 	private final OutputStream os;
 	private final InputStream is;
 
-	private final Receiver receiver;
-	private final Object lock = new Object();
+	private final Receiver receiver = new Receiver();
+
+	private final ReentrantLock lock = new ReentrantLock();
+	private final Condition con = lock.newCondition();
+	private final Condition enterIdle = lock.newCondition();
 
 	private volatile boolean idle;
-	private final Object enterIdleLock = new Object();
 
 	// NYI compare to received frame for .con, or just remove
 	private volatile byte[] req;
-	private volatile int state;
 
 	private volatile boolean busmon;
 	private volatile int busmonSequence;
@@ -188,8 +190,7 @@ public class TpuartConnection implements Connection<byte[]>
 		addresses.add(GroupAddress.Broadcast);
 		addresses.addAll(acknowledge);
 
-		receiver = new Receiver();
-		receiver.start();
+		Executor.execute(receiver, "Calimero TP-UART receiver");
 		try {
 			reset();
 		}
@@ -324,20 +325,29 @@ public class TpuartConnection implements Connection<byte[]>
 				sending.put(new GroupAddress(new byte[] { frame[6], frame[7] }), start);
 
 			final boolean logReadyForSending = !idle;
-			synchronized (enterIdleLock) {
-				while (!idle)
-					enterIdleLock.wait();
+			lock.lock();
+			try {
+				if (!idle)
+					enterIdle.await();
+			}
+			finally {
+				lock.unlock();
 			}
 			if (logReadyForSending)
 				logger.trace("UART ready for sending after {} us", (System.nanoTime() - start) / 1000);
-
 			logger.debug("write UART services, {}", (waitForCon ? "waiting for .con" : "non-blocking"));
-			os.write(data);
-			state = ConPending;
-			if (!waitForCon)
-				return;
-			if (waitForCon(tp1Frame.length))
-				return;
+
+			lock.lock();
+			try {
+				os.write(data);
+				if (!waitForCon)
+					return;
+				if (waitForCon(tp1Frame.length))
+					return;
+			}
+			finally {
+				lock.unlock();
+			}
 			throw new KNXAckTimeoutException("no ACK for L-Data.con");
 		}
 		catch (final InterruptedIOException e) {
@@ -465,20 +475,13 @@ public class TpuartConnection implements Connection<byte[]>
 		final int bitTimes_15 = 15 * OneBitTime; // [us]
 		final int maxExchangeTimeout = MaxSendAttempts * (BitTimes_50 + frameLen * innerFrameChar + 2 * bitTimes_15) / 1000;
 
-		long remaining = maxExchangeTimeout;
-		final long start = System.currentTimeMillis();
-		final long end = start + remaining;
-		synchronized (lock) {
-			while (state == ConPending && remaining > 0) {
-				lock.wait(remaining);
-				remaining = end - System.currentTimeMillis();
-			}
-		}
-		final boolean rcvdCon = state == OK;
+		final long start = System.nanoTime();
+		final boolean rcvdCon = con.await(maxExchangeTimeout, TimeUnit.MILLISECONDS);
+		final long wait = (System.nanoTime() - start) / 1_000_000;
 		if (rcvdCon)
-			logger.trace("ACK received after {} ms", maxExchangeTimeout - remaining);
+			logger.trace("ACK received after {} ms", wait);
 		else
-			logger.debug("no ACK received after {} ms", System.currentTimeMillis() - start);
+			logger.debug("no ACK received after {} ms", wait);
 		return rcvdCon;
 	}
 
@@ -520,9 +523,10 @@ public class TpuartConnection implements Connection<byte[]>
 		}
 	}
 
-	private final class Receiver extends Thread
+	private final class Receiver implements Runnable
 	{
 		private volatile boolean quit;
+		private volatile Thread thread;
 
 		private final ByteArrayOutputStream in = new ByteArrayOutputStream();
 		private long lastRead;
@@ -538,17 +542,12 @@ public class TpuartConnection implements Connection<byte[]>
 
 		private long coolDownUntil;
 
-		Receiver()
-		{
-			super("Calimero TP-UART receiver");
-			setDaemon(true);
-			// more or less useless on Linux (requires root with UseThreadPriorities flag)
-			setPriority(Thread.MAX_PRIORITY);
-		}
 
 		@Override
 		public void run()
 		{
+			thread = Thread.currentThread();
+
 			// at first drain rx queue of any old frames
 			// most likely, flushes out the reset.ind corresponding to our init reset, but that's ok
 			int drained = 0;
@@ -578,9 +577,13 @@ public class TpuartConnection implements Connection<byte[]>
 							Thread.sleep(1);
 						}
 						else if ((start - enterIdleTimestamp) / 1000 > inactivity) {
-							synchronized (enterIdleLock) {
+							lock.lock();
+							try {
 								idle = true;
-								enterIdleLock.notify();
+								enterIdle.signal();
+							}
+							finally {
+								lock.unlock();
 							}
 						}
 						continue;
@@ -617,11 +620,14 @@ public class TpuartConnection implements Connection<byte[]>
 		void quit()
 		{
 			quit = true;
-			interrupt();
-			if (currentThread() == this)
+			final var t = thread;
+			if (t == null)
+				return;
+			t.interrupt();
+			if (Thread.currentThread() == t)
 				return;
 			try {
-				join(50);
+				t.join(50);
 			}
 			catch (final InterruptedException e) {
 				Thread.currentThread().interrupt();
@@ -861,9 +867,12 @@ public class TpuartConnection implements Connection<byte[]>
 				// set confirm bit to error
 				frame[2] |= 0x01;
 			}
-			synchronized (lock) {
-				state = OK;
-				lock.notifyAll();
+			lock.lock();
+			try {
+				con.signalAll();
+			}
+			finally {
+				lock.unlock();
 			}
 			fireFrameReceived(frame);
 		}

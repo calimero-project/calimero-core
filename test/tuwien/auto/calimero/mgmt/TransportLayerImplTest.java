@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -47,6 +48,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.AfterEach;
@@ -66,6 +68,7 @@ import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.internal.Executor;
 import tuwien.auto.calimero.knxnetip.Debug;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
@@ -395,30 +398,10 @@ class TransportLayerImplTest
 	}
 
 	@Test
-	void testSendDataDetach() throws KNXLinkClosedException, InterruptedException
+	void testSendDataDetach() throws InterruptedException, ExecutionException
 	{
-		try {
-			final Thread detacher = new Thread() {
-				@Override
-				public void run()
-				{
-					tl.detach();
-					synchronized (this) {
-						this.notify();
-					}
-				}
-			};
-			synchronized (detacher) {
-				detacher.start();
-				detacher.wait();
-			}
-			try {
-				tl.sendData(dco, p, tsduDescRead);
-				fail("we got detached");
-			}
-			catch (final IllegalStateException expected) {}
-		}
-		catch (final KNXDisconnectException e) {}
+		Executor.scheduledExecutor().schedule((Runnable) tl::detach, 0, TimeUnit.SECONDS).get();
+		assertThrows(IllegalStateException.class, () -> tl.sendData(dco, p, tsduDescRead));
 		// for TL listener to process remaining indications
 		Thread.sleep(500);
 	}
@@ -444,5 +427,10 @@ class TransportLayerImplTest
 		tl.sendData(Util.getKnxDevice(), p, tsdu);
 		final CEMILData ldata = (CEMILData) ltl.ind.poll(3, TimeUnit.SECONDS);
 		assertNotNull(ldata, "no property response received");
+	}
+
+	@Test
+	void destroyDestination() {
+		tl.destroyDestination(dco);
 	}
 }

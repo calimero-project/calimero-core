@@ -18,13 +18,15 @@ apply plugin:'application'
 group = 'com.github.calimero'
 version = '2.6-SNAPSHOT'
 
-sourceCompatibility = 11
-targetCompatibility = 11
+sourceCompatibility = 19
+targetCompatibility = 19
 
 java {
     withSourcesJar()
     withJavadocJar()
 }
+
+tasks.withType(JavaExec) { jvmArgs += "--enable-preview" }
 
 tasks.withType(Jar) {
 	from("${projectDir}") {
@@ -44,10 +46,9 @@ javadoc.options.encoding = 'UTF-8'
 
 
 compileJava.options*.compilerArgs = [
-	'-Xlint:all',
-	'-Xlint:-options',
-//	'-Werror'
-	"--limit-modules", "java.base,java.xml"
+	'-Xlint:all,-serial',
+	"--limit-modules", "java.base,java.xml",
+	"--enable-preview"
 ]
 
 compileTestJava.options*.compilerArgs = [
@@ -72,6 +73,8 @@ sourceSets {
 
 tasks.withType(Javadoc) {
     options.addStringOption("Xdoclint:-missing", '-quiet')
+    options.addBooleanOption('-enable-preview', true)
+	options.addStringOption("-release", "${targetCompatibility}")
 }
 
 jar {
@@ -89,6 +92,7 @@ test {
 //			showStandardStreams true
 		}
 	}
+	jvmArgs(['--enable-preview'])
 }
 
 publishing {
@@ -97,7 +101,7 @@ publishing {
             artifactId = rootProject.name
             from components.java
             pom {
-                name = 'Calimero core library'
+                name = 'Calimero core library (Loom)'
                 description = 'Calimero, a free KNX network library'
                 url = 'https://github.com/calimero-project/calimero-core'
                 inceptionYear = '2006'

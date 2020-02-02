@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,10 +46,13 @@ import static tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.LinkLa
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.AfterEach;
@@ -74,6 +77,7 @@ import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIBusMon;
 import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.internal.Executor;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode;
 import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature;
 import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature.InterfaceFeature;
@@ -219,7 +223,7 @@ class KNXnetIPTunnelTest
 	}
 
 	@Test
-	void testFIFOSend() throws KNXException, InterruptedException
+	void testFIFOSend() throws KNXException, InterruptedException, ExecutionException
 	{
 		final int sends = 10;
 		final List<CEMILData> frames = new Vector<>();
@@ -227,43 +231,20 @@ class KNXnetIPTunnelTest
 			frames.add(new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(i + 1), new GroupAddress(2, 2, 2),
 					new byte[] { 0, (byte) (0x80 | (i % 2)) }, Priority.LOW));
 		}
-		class Sender extends Thread
-		{
-			Sender(final String name)
-			{
-				super(name);
-			}
 
-			@Override
-			public void run()
-			{
-				try {
-					final CEMILData f = frames.remove(0);
-					synchronized (this) {
-						notify();
-					}
-					t.send(f, con);
-				}
-				catch (KNXTimeoutException | KNXConnectionClosedException | InterruptedException e) {
-					fail("send fifo message in " + Thread.currentThread().getName());
-				}
-			}
-		}
+		final Callable<Void> sender = () -> {
+			final CEMILData f = frames.remove(0);
+			t.send(f, con);
+			return null;
+		};
 
 		newTunnel();
-		final Thread[] threads = new Thread[sends];
-		for (int i = 0; i < sends; i++) {
-			threads[i] = new Sender("sender " + (i + 1));
-		}
-		for (int i = 0; i < threads.length; i++) {
-			synchronized (threads[i]) {
-				threads[i].start();
-				threads[i].wait();
-			}
-		}
-		for (int i = 0; i < threads.length; i++) {
-			threads[i].join();
-		}
+
+		final var tasks = Collections.nCopies(sends, sender);
+		final var all = Executor.scheduledExecutor().invokeAll(tasks);
+		for (final var f : all)
+			f.get();
+
 		final int size = l.fifoReceived.size();
 		assertTrue(sends >= size, "sends = " + sends + ", received = " + size);
 

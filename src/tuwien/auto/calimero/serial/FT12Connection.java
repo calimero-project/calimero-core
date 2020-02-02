@@ -60,6 +60,7 @@ import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.internal.EventListeners;
+import tuwien.auto.calimero.internal.Executor;
 import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.serial.spi.SerialCom;
 import tuwien.auto.calimero.serial.spi.SerialCom.Parity;
@@ -261,7 +262,7 @@ public class FT12Connection implements Connection<byte[]>
 		is = adapter.inputStream();
 		os = adapter.outputStream();
 		receiver = new Receiver();
-		receiver.start();
+		Executor.execute(receiver, "Calimero FT1.2 receiver");
 		state = OK;
 
 		reset();
@@ -631,20 +632,17 @@ public class FT12Connection implements Connection<byte[]>
 		return NoLDataAddress;
 	}
 
-	private final class Receiver extends Thread
+	private final class Receiver implements Runnable
 	{
 		private volatile boolean quit;
-		private int lastChecksum;
+		private volatile Thread thread;
 
-		Receiver()
-		{
-			super("Calimero FT1.2 receiver");
-			setDaemon(true);
-		}
+		private int lastChecksum;
 
 		@Override
 		public void run()
 		{
+			thread = Thread.currentThread();
 			try {
 				while (!quit) {
 					final int c = is.read();
@@ -671,13 +669,18 @@ public class FT12Connection implements Connection<byte[]>
 		void quit()
 		{
 			quit = true;
-			interrupt();
-			if (currentThread() == this)
+			final var t = thread;
+			if (t == null)
+				return;
+			t.interrupt();
+			if (Thread.currentThread() == t)
 				return;
 			try {
-				join(50);
+				t.join(50);
 			}
-			catch (final InterruptedException e) {}
+			catch (final InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
 		}
 
 		private boolean readShortFrame() throws IOException

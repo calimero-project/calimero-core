@@ -40,13 +40,17 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
+import tuwien.auto.calimero.internal.Executor;
 
 /**
  * Implements a cache expiring mechanism for {@link CacheObject}s.
  * <p>
  * A time span is specified for how long a value is considered valid. After that time for
  * expiring, the cache object is removed on the next call of {@link #removeExpired()} by
- * an internal {@link CacheSweeper}. If a cache with expiring cache objects is not used
+ * an internal cache sweeper. If a cache with expiring cache objects is not used
  * anymore, invoke {@link Cache#clear()} to quit the running cache sweeping mechanism.<br>
  * The timestamp of {@link CacheObject#getTimestamp()} is used to determine if a cache
  * object value has expired.<br>
@@ -59,13 +63,13 @@ import java.util.Map;
 public abstract class ExpiringCache implements Cache
 {
 	/**
-	 * Default sweep interval in seconds used for a {@link CacheSweeper}
+	 * Default sweep interval in seconds used for a cache sweeper
 	 * ({@value defaultSweepInterval} seconds).
 	 */
 	protected static final int defaultSweepInterval = 60;
 
 	/**
-	 * Sweep interval in seconds used for the {@link CacheSweeper}.
+	 * Sweep interval in seconds used for the cache sweeper.
 	 * <p>
 	 * It defaults to {@value #defaultSweepInterval} seconds. For a new value to take
 	 * effect, it has to be assigned either before the first {@link #startSweeper()} call,
@@ -80,7 +84,7 @@ public abstract class ExpiringCache implements Cache
 	 * cache object (this).
 	 */
 	protected Map<Object, CacheObject> map;
-	private CacheSweeper sweeper;
+	private ScheduledFuture<?> sweeper;
 	private final int timeToExpire;
 
 	/**
@@ -136,29 +140,35 @@ public abstract class ExpiringCache implements Cache
 	 *
 	 * @param obj removed {@link CacheObject}
 	 */
-	protected void notifyRemoved(final CacheObject obj)
-	{}
+	protected void notifyRemoved(final CacheObject obj) {}
 
 	/**
-	 * Starts a new {@link CacheSweeper}, if not already running, and if an expiring time
+	 * Starts a new cache sweeper, if not already running, and if an expiring time
 	 * for {@link CacheObject} was specified.<br>
 	 * If the methods {@code startSweeper} and {@code stopSweeper} are invoked
 	 * by different threads, they need to be synchronized.
 	 */
 	protected final void startSweeper()
 	{
-		if (timeToExpire > 0 && sweeper == null)
-			(sweeper = new CacheSweeper(this, sweepInterval)).start();
+		if (timeToExpire > 0 && sweeper == null) {
+			final Runnable task = () -> {
+				Thread.currentThread().setName("Calimero cache sweeper");
+				removeExpired();
+			};
+
+			final int delay = sweepInterval;
+			sweeper = Executor.scheduledExecutor().scheduleWithFixedDelay(task, delay, delay, TimeUnit.SECONDS);
+		}
 	}
 
 	/**
-	 * Stops the {@link CacheSweeper}, if any.
+	 * Stops the cache sweeper, if any.
 	 */
 	protected final void stopSweeper()
 	{
-		final CacheSweeper s = sweeper;
+		final var s = sweeper;
 		if (s != null) {
-			s.stopSweeper();
+			s.cancel(true);
 			sweeper = null;
 		}
 	}

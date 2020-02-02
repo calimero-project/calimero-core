@@ -65,7 +65,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -77,6 +76,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.KnxRuntimeException;
+import tuwien.auto.calimero.internal.Executor;
 import tuwien.auto.calimero.internal.UdpSocketLooper;
 import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.knxnetip.servicetype.DescriptionRequest;
@@ -736,11 +736,7 @@ public class Discoverer
 		}
 	}
 
-	private static ExecutorService executor = Executors.newCachedThreadPool(runnable -> {
-		final Thread t = new Thread(runnable);
-		t.setDaemon(true);
-		return t;
-	});
+	private static ExecutorService executor = Executor.scheduledExecutor();
 
 	private CompletableFuture<Void> receiveAsync(final DatagramChannel dc, final InetSocketAddress localEndpoint,
 		final Duration timeout, final String name, final Consumer< Result<SearchResponse>> notifyResponse) throws IOException
@@ -848,7 +844,6 @@ public class Discoverer
 			}
 			finally {
 				logger.trace("stopped on " + id);
-				Thread.currentThread().setName("Discoverer (idle)");
 				receivers.remove(this);
 			}
 		}
