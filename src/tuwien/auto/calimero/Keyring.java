@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019 B. Malinowsky
+    Copyright (c) 2019, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -172,6 +172,13 @@ public final class Keyring {
 		 * @return byte array containing (empty) encrypted authentication code
 		 */
 		public byte[] authentication() { return auth.clone(); }
+
+		/**
+		 * Returns the last known valid sequence number received by this device.
+		 *
+		 * @return sequence number as unsigned 6 byte
+		 */
+		public long sequenceNumber() { return sequence; }
 
 		@Override
 		public String toString() {
