@@ -63,6 +63,7 @@ import tuwien.auto.calimero.DetachEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXRemoteException;
@@ -70,8 +71,11 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.ReturnCode;
 import tuwien.auto.calimero.cemi.CEMI;
+import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.internal.EventListeners;
+import tuwien.auto.calimero.internal.SecureApplicationLayer;
+import tuwien.auto.calimero.internal.Security;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.log.LogService;
@@ -178,13 +182,33 @@ public class ManagementClientImpl implements ManagementClient
 		}
 
 		private void checkResponse(final FrameEvent e) {
-			if (isActiveService(e)) {
-				synchronized (indications) {
-					indications.add(e);
-					indications.notifyAll();
+			final var ldata = (CEMILData) e.getFrame();
+			try {
+				final var plainApdu = sal.extractApdu(ldata);
+				if (plainApdu == null)
+					return;
+				final FrameEvent event;
+				if (SecureApplicationLayer.isSecuredService(ldata)) {
+					final var plain = CEMIFactory.create(ldata.getMessageCode(), plainApdu, ldata);
+					event = new FrameEvent(e.getSource(), plain, e.systemBroadcast());
 				}
+				else
+					event = e;
+
+				if (isActiveService(event)) {
+					synchronized (indications) {
+						indications.add(event);
+						indications.notifyAll();
+					}
+				}
+				listeners.fire(c -> c.accept(event));
 			}
-			listeners.fire(c -> c.accept(e));
+			catch (final KNXFormatException kfe) {
+				logger.warn("creating plain L-Data frame event from {}", ldata, kfe);
+			}
+			catch (final RuntimeException rte) {
+				logger.warn("on indication from {}", ldata.getDestination(), rte);
+			}
 		}
 	};
 
@@ -192,6 +216,10 @@ public class ManagementClientImpl implements ManagementClient
 
 	private final TransportLayer tl;
 	private final TLListener tlListener = new TLListener();
+	private final SecureManagement sal;
+	private final boolean toolAccess = true;
+
+	private final IndividualAddress src;
 	private volatile Priority priority = Priority.LOW;
 	private volatile int responseTimeout = 5000; // [ms]
 	private final Deque<FrameEvent> indications = new ArrayDeque<>();
@@ -222,6 +250,8 @@ public class ManagementClientImpl implements ManagementClient
 		tl = transportLayer;
 		tl.addTransportListener(tlListener);
 		logger = LogService.getLogger("calimero.mgmt.MC " + link.getName());
+		sal = new SecureManagement(tl, Security.deviceToolKeys());
+		src = link.getKNXMedium().getDeviceAddress();
 		listeners = new EventListeners<>(logger);
 	}
 
@@ -984,6 +1014,7 @@ public class ManagementClientImpl implements ManagementClient
 			logger.debug("detached from {}", lnk);
 		}
 		listeners.removeAll();
+		sal.close();
 		detached = true;
 		return lnk;
 	}
@@ -1006,15 +1037,16 @@ public class ManagementClientImpl implements ManagementClient
 
 	// helper which sets the expected svc response, and sends in CO or CL mode
 	private long send(final Destination d, final Priority p, final byte[] apdu, final int response)
-		throws KNXTimeoutException, KNXDisconnectException, KNXLinkClosedException
+		throws KNXTimeoutException, KNXDisconnectException, KNXLinkClosedException, InterruptedException
 	{
 		final long start = registerActiveService(response);
+		final var sapdu = sal.secureData(src, d.getAddress(), apdu, toolAccess, true).orElse(apdu);
 		if (d.isConnectionOriented()) {
 			tl.connect(d);
-			tl.sendData(d, p, apdu);
+			tl.sendData(d, p, sapdu);
 		}
 		else
-			tl.sendData(d.getAddress(), p, apdu);
+			tl.sendData(d.getAddress(), p, sapdu);
 		return start;
 	}
 
@@ -1024,7 +1056,8 @@ public class ManagementClientImpl implements ManagementClient
 		KNXLinkClosedException, InterruptedException
 	{
 		final long start = registerActiveService(response);
-		tl.sendData(d, p, apdu);
+		final var sapdu = sal.secureData(src, d.getAddress(), apdu, toolAccess, true).orElse(apdu);
+		tl.sendData(d, p, sapdu);
 		return waitForResponse(d.getAddress(), response, minAsduLen, maxAsduLen, start, responseTimeout);
 	}
 

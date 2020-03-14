@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ package tuwien.auto.calimero.process;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -55,6 +56,7 @@ import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
+import tuwien.auto.calimero.ReturnCode;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.datapoint.Datapoint;
@@ -68,6 +70,8 @@ import tuwien.auto.calimero.dptxlator.DPTXlatorBoolean;
 import tuwien.auto.calimero.dptxlator.DPTXlatorString;
 import tuwien.auto.calimero.dptxlator.TranslatorTypes;
 import tuwien.auto.calimero.internal.EventListeners;
+import tuwien.auto.calimero.internal.SecureApplicationLayer;
+import tuwien.auto.calimero.internal.Security;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.NetworkLinkListener;
@@ -89,20 +93,20 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		public void indication(final FrameEvent e)
 		{
 			final CEMILData f = (CEMILData) e.getFrame();
-			final byte[] apdu = f.getPayload();
-			// can't be a process communication indication if too short
-			if (apdu.length < 2)
-				return;
-			final int svc = DataUnitBuilder.getAPDUService(apdu);
-			// Note: even if this is a read response we have waited for,
-			// we nevertheless notify the listeners about it (we do *not* discard it)
-			if (svc == GROUP_RESPONSE) {
-				synchronized (indications) {
-					if (indications.replace((GroupAddress) f.getDestination(), e) != null)
-						indications.notifyAll();
-				}
-			}
 			try {
+				final var apdu = sal.extractApdu(f);
+				// can't be a process communication indication if too short
+				if (apdu == null || apdu.length < 2)
+					return;
+				final int svc = DataUnitBuilder.getAPDUService(apdu);
+				// Note: even if this is a read response we have waited for,
+				// we nevertheless notify the listeners about it (we do *not* discard it)
+				if (svc == GROUP_RESPONSE) {
+					synchronized (indications) {
+						if (indications.replace((GroupAddress) f.getDestination(), e) != null)
+							indications.notifyAll();
+					}
+				}
 				// notify listeners
 				if (svc == GROUP_READ)
 					fireGroupReadWrite(f, new byte[0], svc, false);
@@ -145,6 +149,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 
 	private final KNXNetworkLink lnk;
 	private final NetworkLinkListener lnkListener = new NLListener();
+	private final SecureApplicationLayer sal;
 	private final EventListeners<ProcessListener> listeners;
 
 	private final Map<GroupAddress, FrameEvent> indications = new HashMap<>();
@@ -173,6 +178,8 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 					"cannot initialize process communication using closed link " + link.getName());
 		logger = LogService.getLogger("calimero.process.communication " + link.getName());
 		lnk = link;
+		sal = new SecureApplicationLayer(lnk, Security.groupKeys(), Security.groupSenders(), Security.deviceToolKeys());
+
 		listeners = new EventListeners<>(logger);
 		lnk.addLinkListener(lnkListener);
 	}
@@ -384,6 +391,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 			detached = true;
 		}
 		lnk.removeLinkListener(lnkListener);
+		sal.close();
 		fireDetached();
 		logger.debug("detached from link {}", lnk.getName());
 		return lnk;
@@ -394,8 +402,14 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	{
 		if (detached)
 			throw new IllegalStateException("process communicator detached");
-		lnk.sendRequestWait(dst, p, createGroupAPDU(GROUP_WRITE, t));
-		logger.trace("group write to {} succeeded", dst);
+		try {
+			send(dst, p, GROUP_WRITE, t);
+			logger.trace("group write to {} succeeded", dst);
+		}
+		catch (final InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new KNXTimeoutException("interrupted", e);
+		}
 	}
 
 	private byte[] readFromGroup(final GroupAddress dst, final Priority p,
@@ -409,8 +423,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 				readers.computeIfAbsent(dst, v -> new AtomicInteger()).incrementAndGet();
 				indications.putIfAbsent(dst, NoResponse);
 			}
-
-			lnk.sendRequestWait(dst, p, DataUnitBuilder.createLengthOptimizedAPDU(GROUP_READ));
+			send(dst, p, GROUP_READ, null);
 			logger.trace("sent group read request to {}", dst);
 			return waitForResponse(dst, minASDULen + 2, maxASDULen + 2);
 		}
@@ -420,6 +433,28 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 				readers.compute(dst, (k, v) -> none ? null : v);
 				indications.compute(dst, (k, v) -> none ? null : v);
 			}
+		}
+	}
+
+	private void send(final GroupAddress dst, final Priority p, final int service, final DPTXlator t)
+			throws KNXTimeoutException, KNXLinkClosedException, InterruptedException {
+		final boolean useGoDiagnostics = Security.groupKeys().containsKey(dst);
+		if (useGoDiagnostics) {
+			try {
+				final var future = sal.writeGroupObjectDiagnostics(dst, t == null ? new byte[0] : t.getData());
+				final var returnCode = future.get();
+				if (returnCode != ReturnCode.Success)
+					logger.warn("{} {}", dst, returnCode);
+			}
+			catch (final ExecutionException e) {
+				logger.warn("waiting for GO diagnostics", e.getCause());
+			}
+		}
+		else {
+			final var src = lnk.getKNXMedium().getDeviceAddress();
+			final var plainApdu = createGroupAPDU(service, t);
+			final byte[] apdu = sal.secureGroupObject(src, dst, plainApdu).orElse(plainApdu);
+			lnk.sendRequestWait(dst, p, apdu);
 		}
 	}
 

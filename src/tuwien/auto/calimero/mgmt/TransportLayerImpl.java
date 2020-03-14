@@ -409,6 +409,10 @@ public class TransportLayerImpl implements TransportLayer
 		return lnk;
 	}
 
+	Map<IndividualAddress, AggregatorProxy> proxies() { return proxies; }
+
+	KNXNetworkLink link() { return lnk; }
+
 	private AggregatorProxy getProxy(final Destination d)
 	{
 		if (detached)
