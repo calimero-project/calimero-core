@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,8 +54,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 
 	private final String work = "-workday-";
 	private final String dst = "(dst)";
-	private final String insync = ",in sync ";
-	private final String nosync = ",no sync ";
+	private final String insync = " (sync)";
+	private final String nosync = "";
 
 	private final String time = "12.45.33";
 	private final String date = "7/22";
@@ -129,8 +129,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 		checkTime(12, 45, 33);
 		v = t.getAllValues();
 		final String item = v[4].toLowerCase();
-		assertFind(item, new String[] { "2007", "tue", "6", "5", "23", "22", "0", "dst",
-			"workday", "no", "sync" });
+		assertFind(item, new String[] { "2007", "tue", "6", "5", "23", "22", "0", "dst", "workday" });
 	}
 
 	/**
@@ -274,8 +273,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 	public final void testUseValueFormat() throws KNXFormatException
 	{
 		t.setValue(value);
-		assertFind(t.getValue(), new String[] { "wed", "8", "27", "2007", "workday",
-			"dst", "in", "sync", });
+		assertFind(t.getValue(), new String[] { "wed", "8", "27", "2007", "workday", "dst", "sync", });
 		t.useValueFormat(false);
 		assertFind(t.getValue(), new String[] { "8", "27", "2007" });
 		assertFindNot(t.getValue(), new String[] { "workday", "dst", "in", "sync", });
@@ -720,7 +718,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertTrue(t.validate());
 
 		if (useDaylightTime)
-			t.setValues(new String[] { "2002/12/31 23:59:59", "Sat, 2007/5/12 24:00:00 DST ", "2007/2/28 in sync" });
+			t.setValues(new String[] { "2002/12/31 23:59:59", "Sat, 2007/5/12 24:00:00 DST ", "2007/2/28 sync" });
 		else
 			t.setValues(new String[] { "2002/12/31 23:59:59", "Sat, 2007/5/12 24:00:00 ", "2007/2/28 in sync" });
 		assertTrue(t.validate());

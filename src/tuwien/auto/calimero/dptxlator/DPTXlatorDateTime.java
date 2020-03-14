@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -387,7 +387,7 @@ public class DPTXlatorDateTime extends DPTXlator
 			final int dow = c.get(Calendar.DAY_OF_WEEK);
 			set(data, 0, DOW, dow == Calendar.SUNDAY ? 7 : dow - 1);
 			setBit(0, DST, c.get(Calendar.DST_OFFSET) != 0);
-			data[6] &= ~(NO_YEAR | NO_DATE | NO_TIME | NO_DOW);
+			data[6] |= NO_WD;
 		}
 	}
 
@@ -690,8 +690,8 @@ public class DPTXlatorDateTime extends DPTXlator
 			if (extFormat && isBitSet(index, DST))
 				sb.append(' ').append(DAYLIGHT_SIGN);
 		}
-		if (extFormat)
-			sb.append(isBitSetEx(index, QUALITY) ? ", in " : ", no ").append(SYNC_SIGN);
+		if (extFormat && isBitSetEx(index, QUALITY))
+			sb.append(" (" + SYNC_SIGN + ")");
 		return sb.toString();
 	}
 
@@ -832,12 +832,10 @@ public class DPTXlatorDateTime extends DPTXlator
 					setBit(dst, index, NO_WD, false);
 					setBit(dst, index, WD, true);
 				}
-				else if (s.equalsIgnoreCase("no") || s.equalsIgnoreCase("in")) {
-					if (++sync > 1 || !t.hasMoreTokens() || !t.nextToken().equalsIgnoreCase(SYNC_SIGN))
-						throw newException(s + ": '" + SYNC_SIGN + "' expected", s);
-					// check sync'd or not sync'd
-					if (s.charAt(0) == 'i' || s.charAt(0) == 'I')
-						setBitEx(dst, index, QUALITY, true);
+				else if (s.equalsIgnoreCase(SYNC_SIGN)) {
+					if (++sync > 1)
+						throw newException("duplicate flag", s);
+					setBitEx(dst, index, QUALITY, true);
 				}
 				else if (s.length() == 3 && ++day == 1) {
 					final String prefix = s.toLowerCase();
