@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -163,16 +163,13 @@ public class ManagementClientImpl implements ManagementClient
 		}
 
 		@Override
-		public void disconnected(final Destination d)
-		{}
+		public void disconnected(final Destination d) {}
 
 		@Override
-		public void group(final FrameEvent e)
-		{}
+		public void group(final FrameEvent e) {}
 
 		@Override
-		public void detached(final DetachEvent e)
-		{}
+		public void detached(final DetachEvent e) {}
 
 		@Override
 		public void linkClosed(final CloseEvent e)

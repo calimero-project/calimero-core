@@ -385,7 +385,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		}
 		lnk.removeLinkListener(lnkListener);
 		fireDetached();
-		logger.info("detached from link {}", lnk.getName());
+		logger.debug("detached from link {}", lnk.getName());
 		return lnk;
 	}
 
@@ -477,10 +477,10 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	private static byte[] createGroupAPDU(final int service, final DPTXlator t)
 	{
 		// check for group read
-		if (service == 0x00)
+		if (service == GROUP_READ)
 			return new byte[2];
 		// only group response and group write are allowed
-		if (service != 0x40 && service != 0x80)
+		if (service != GROUP_RESPONSE && service != GROUP_WRITE)
 			throw new KNXIllegalArgumentException("not an APDU group service");
 		// determine if data starts at byte offset 1 (optimized) or 2 (default)
 		final int offset = t.getItems() == 1 && t.getTypeSize() == 0 ? 1 : 2;

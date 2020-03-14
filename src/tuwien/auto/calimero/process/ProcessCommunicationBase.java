@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2018 B. Malinowsky
+    Copyright (c) 2010, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,24 +48,20 @@ import tuwien.auto.calimero.link.KNXNetworkLink;
 
 /**
  * Process communication interface for writing to a KNX network.
- * <p>
  *
  * @author B. Malinowsky
  */
 public interface ProcessCommunicationBase extends AutoCloseable
 {
 	/**
-	 * Represents "on" of datapoint type <b>Switch</b> (DPT ID 1.001), value =
-	 * {@value #BOOL_ON}.
+	 * Represents "on" of datapoint type <b>Switch</b> (DPT ID 1.001), value = {@value #BOOL_ON}.
 	 *
 	 * @see #write(GroupAddress, boolean)
-	 * @see #write(GroupAddress, boolean, int)
-	 */
+	 * @see #write(GroupAddress, boolean, int) */
 	boolean BOOL_ON = true;
 
 	/**
-	 * Represents "off" of datapoint type <b>Switch</b> (DPT ID 1.001), value =
-	 * {@value #BOOL_OFF}.
+	 * Represents "off" of datapoint type <b>Switch</b> (DPT ID 1.001), value = {@value #BOOL_OFF}.
 	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
@@ -73,8 +69,7 @@ public interface ProcessCommunicationBase extends AutoCloseable
 	boolean BOOL_OFF = false;
 
 	/**
-	 * Represents "up" of datapoint type <b>Up/Down</b> (DPT ID 1.008), value =
-	 * {@value #BOOL_UP}.
+	 * Represents "up" of datapoint type <b>Up/Down</b> (DPT ID 1.008), value = {@value #BOOL_UP}.
 	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
@@ -82,8 +77,7 @@ public interface ProcessCommunicationBase extends AutoCloseable
 	boolean BOOL_UP = false;
 
 	/**
-	 * Represents "down" of datapoint type <b>Up/Down</b> (DPT ID 1.008), value =
-	 * {@value #BOOL_DOWN}.
+	 * Represents "down" of datapoint type <b>Up/Down</b> (DPT ID 1.008), value = {@value #BOOL_DOWN}.
 	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
@@ -91,8 +85,7 @@ public interface ProcessCommunicationBase extends AutoCloseable
 	boolean BOOL_DOWN = true;
 
 	/**
-	 * Represents "start" of datapoint type <b>Start</b> (DPT ID 1.010), value =
-	 * {@value #BOOL_START}.
+	 * Represents "start" of datapoint type <b>Start</b> (DPT ID 1.010), value = {@value #BOOL_START}.
 	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
@@ -100,8 +93,7 @@ public interface ProcessCommunicationBase extends AutoCloseable
 	boolean BOOL_START = true;
 
 	/**
-	 * Represents "stop" of datapoint type <b>Start</b> (DPT ID 1.010), value =
-	 * {@value #BOOL_STOP}.
+	 * Represents "stop" of datapoint type <b>Start</b> (DPT ID 1.010), value = {@value #BOOL_STOP}.
 	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
@@ -109,8 +101,7 @@ public interface ProcessCommunicationBase extends AutoCloseable
 	boolean BOOL_STOP = false;
 
 	/**
-	 * Represents "increase" of datapoint type <b>Step</b> (DPT ID 1.007), value =
-	 * {@value #BOOL_INCREASE}.
+	 * Represents "increase" of datapoint type <b>Step</b> (DPT ID 1.007), value = {@value #BOOL_INCREASE}.
 	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
@@ -118,8 +109,7 @@ public interface ProcessCommunicationBase extends AutoCloseable
 	boolean BOOL_INCREASE = true;
 
 	/**
-	 * Represents "decrease" of datapoint type <b>Step</b> (DPT ID 1.007), value =
-	 * {@value #BOOL_DECREASE}.
+	 * Represents "decrease" of datapoint type <b>Step</b> (DPT ID 1.007), value = {@value #BOOL_DECREASE}.
 	 *
 	 * @see #write(GroupAddress, boolean)
 	 * @see #write(GroupAddress, boolean, int)
@@ -127,9 +117,8 @@ public interface ProcessCommunicationBase extends AutoCloseable
 	boolean BOOL_DECREASE = false;
 
 	/**
-	 * Represents the scaling format of datapoint type <b>Scaling</b> (DPT ID 5.001).
-	 * <p>
-	 * This format scales the 8 Bit unsigned value range from 0 to 100.
+	 * Represents the scaling format of datapoint type <b>Scaling</b> (DPT ID 5.001), which scales the 8 Bit unsigned
+	 * value range from 0 to 100.
 	 *
 	 * @see #write(GroupAddress, int, String)
 	 */
@@ -144,9 +133,8 @@ public interface ProcessCommunicationBase extends AutoCloseable
 	String UNSCALED = "5.010";
 
 	/**
-	 * Represents the scaling format of datapoint type <b>Angle</b> (DPT ID 5.003).
-	 * <p>
-	 * This format scales the 8 Bit unsigned value range from 0 to 360.
+	 * Represents the scaling format of datapoint type <b>Angle</b> (DPT ID 5.003), which scales the 8 Bit unsigned
+	 * value range from 0 to 360.
 	 *
 	 * @see #write(GroupAddress, int, String)
 	 */
@@ -163,7 +151,6 @@ public interface ProcessCommunicationBase extends AutoCloseable
 
 	/**
 	 * Returns the currently used KNX message priority for KNX messages.
-	 * <p>
 	 *
 	 * @return message Priority
 	 */
@@ -278,33 +265,30 @@ public interface ProcessCommunicationBase extends AutoCloseable
 	void write(GroupAddress dst, DPTXlator value) throws KNXException;
 
 	/**
-	 * Writes a datapoint value to a group destination.
-	 * <p>
-	 * The used KNX message priority is according the supplied datapoint priority.
+	 * Writes a datapoint value to a group destination, using a message priority according the supplied datapoint
+	 * priority.
 	 *
 	 * @param dp the datapoint for write
-	 * @param value datapoint value in textual representation according the datapoint its
-	 *        type
+	 * @param value datapoint value in textual representation according the datapoint its type
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXFormatException on translation problem of the supplied datapoint value
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
-	 * @throws KNXException if no appropriate DPT translator for the datapoint type is
-	 *         available
+	 * @throws KNXException if no appropriate DPT translator for the datapoint type is available
 	 */
 	void write(Datapoint dp, String value) throws KNXException;
 
 	/**
-	 * Detaches the network link from this process communicator.
+	 * Detaches the network link from this process communicator; the network link is not closed.
 	 * <p>
 	 * If no network link is attached, no action is performed.
-	 * <p>
-	 * Note that a detach does not trigger a close of the used network link.
 	 *
-	 * @return the formerly attached KNX network link, or <code>null</code> if already
-	 *         detached
+	 * @return the formerly attached KNX network link, or <code>null</code> if already detached
 	 */
 	KNXNetworkLink detach();
 
+	/**
+	 * See {@link #detach()}.
+	 */
 	@Override
 	default void close() { detach(); }
 }

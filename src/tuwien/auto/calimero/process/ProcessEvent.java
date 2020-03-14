@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,12 +38,12 @@ package tuwien.auto.calimero.process;
 
 import java.util.EventObject;
 
+import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 
 /**
  * Contains information about a process message event.
- * <p>
  *
  * @author B. Malinowsky
  * @see ProcessCommunicator
@@ -88,7 +88,6 @@ public class ProcessEvent extends EventObject
 
 	/**
 	 * Returns the KNX individual source address.
-	 * <p>
 	 *
 	 * @return address as IndividualAddress
 	 */
@@ -99,7 +98,6 @@ public class ProcessEvent extends EventObject
 
 	/**
 	 * Returns the KNX destination group address.
-	 * <p>
 	 *
 	 * @return address as GroupAddress
 	 */
@@ -110,7 +108,6 @@ public class ProcessEvent extends EventObject
 
 	/**
 	 * Returns the application layer service data unit (ASDU).
-	 * <p>
 	 *
 	 * @return copy of ASDU as byte array
 	 */
@@ -121,7 +118,6 @@ public class ProcessEvent extends EventObject
 
 	/**
 	 * Returns the process communication service code.
-	 * <p>
 	 *
 	 * @return the service code, indicating either a group read, group write, or group response
 	 */
@@ -132,12 +128,16 @@ public class ProcessEvent extends EventObject
 
 	/**
 	 * Returns whether the APDU is length-optimized, i.e., contains &le; 6 Bits data.
-	 * <p>
 	 *
 	 * @return <code>true</code> if optimized, <code>false</code> otherwise
 	 */
 	public final boolean isLengthOptimizedAPDU()
 	{
 		return optimized;
+	}
+
+	@Override
+	public String toString() {
+		return src + "->" + dst + " " + DataUnitBuilder.decodeAPCI(svcCode) + " " + DataUnitBuilder.toHex(asdu, "");
 	}
 }

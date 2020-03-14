@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -142,7 +142,7 @@ public class TransportLayerImpl implements TransportLayer
 		@Override
 		public void linkClosed(final CloseEvent e)
 		{
-			logger.info("attached link was closed");
+			logger.debug("attached link was closed");
 			closeDestinations(true);
 			fireLinkClosed(e);
 		}
@@ -211,8 +211,8 @@ public class TransportLayerImpl implements TransportLayer
 			throw new KNXLinkClosedException(
 					"cannot initialize transport layer using closed link " + link.getName());
 		lnk = link;
-		lnk.addLinkListener(lnkListener);
 		logger = LogService.getLogger("calimero.mgmt." + getName());
+		lnk.addLinkListener(lnkListener);
 		listeners = new EventListeners<>(logger);
 		serverSide = serverEndpoint;
 	}
