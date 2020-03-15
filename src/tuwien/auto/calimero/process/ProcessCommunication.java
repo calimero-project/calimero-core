@@ -51,7 +51,7 @@ import tuwien.auto.calimero.link.KNXNetworkLink;
  *
  * @author B. Malinowsky
  */
-public interface ProcessCommunicationBase extends AutoCloseable
+public interface ProcessCommunication extends AutoCloseable
 {
 	/**
 	 * Represents "on" of datapoint type <b>Switch</b> (DPT ID 1.001), value = {@value #BOOL_ON}.

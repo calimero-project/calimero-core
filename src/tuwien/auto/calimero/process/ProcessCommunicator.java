@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ import tuwien.auto.calimero.link.KNXNetworkLink;
  *
  * @author B. Malinowsky
  */
-public interface ProcessCommunicator extends ProcessCommunicationBase
+public interface ProcessCommunicator extends ProcessCommunication
 {
 	// Implementation note: responding to read indications is done the same way as
 	// all the writing stuff just with different service, so no magic here...

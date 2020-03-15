@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -288,16 +288,16 @@ class ProcessCommunicatorTest
 	void testReadUnsigned() throws KNXException, InterruptedException
 	{
 		// read from same address
-		pc.readUnsigned(dpUnsigned1, ProcessCommunicationBase.SCALING);
+		pc.readUnsigned(dpUnsigned1, ProcessCommunication.SCALING);
 	}
 
 	@Test
 	void testWriteGroupAddressIntString() throws KNXException, InterruptedException
 	{
 		final int v = 80;
-		pc.write(dpUnsigned1, v, ProcessCommunicationBase.SCALING);
+		pc.write(dpUnsigned1, v, ProcessCommunication.SCALING);
 		Thread.sleep(100);
-		final int i = pc.readUnsigned(dpUnsigned1, ProcessCommunicationBase.SCALING);
+		final int i = pc.readUnsigned(dpUnsigned1, ProcessCommunication.SCALING);
 		assertEquals(v, i);
 	}
 
