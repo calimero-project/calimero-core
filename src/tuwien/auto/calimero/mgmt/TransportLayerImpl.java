@@ -330,13 +330,13 @@ public class TransportLayerImpl implements TransportLayer
 	public void sendData(final Destination d, final Priority p, final byte[] tsdu)
 		throws KNXDisconnectException, KNXLinkClosedException
 	{
-		final AggregatorProxy ap = getProxy(d);
-		if (d.getState() == Disconnected) {
-			final KNXDisconnectException e = new KNXDisconnectException("no connection opened for "
-					+ d.getAddress(), d);
-			logger.warn("send failed", e);
-			throw e;
+		try {
+			connect(d);
 		}
+		catch (final KNXTimeoutException e) {
+			throw new KNXDisconnectException("no connection opened for " + d.getAddress() + " (timeout)", d);
+		}
+		final AggregatorProxy ap = getProxy(d);
 		tsdu[0] = (byte) (tsdu[0] & 0x03 | DATA_CONNECTED | ap.getSeqSend() << 2);
 		// the entry lock guards between send and return (only one at a time)
 		synchronized (lock) {

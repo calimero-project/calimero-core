@@ -61,7 +61,6 @@ class SecureManagement extends SecureApplicationLayer {
 			throws KNXTimeoutException, KNXLinkClosedException {
 		final var destination = transportLayer.getDestination(remote);
 		if (destination != null && destination.isConnectionOriented()) {
-			transportLayer.connect(destination);
 			try {
 				transportLayer.sendData(destination, Priority.SYSTEM, secureApdu);
 			}

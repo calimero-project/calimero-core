@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -363,27 +363,14 @@ class TransportLayerImplTest
 
 	@Test
 	void testSendDataDestinationPriorityByteArray()
-		throws KNXDisconnectException, KNXTimeoutException, KNXLinkClosedException, InterruptedException
+		throws KNXDisconnectException, KNXLinkClosedException, InterruptedException
 	{
-		try {
-			tl.sendData(dco, p, tsduDescRead);
-			fail("disconnected");
-		}
-		catch (final KNXDisconnectException e) {}
-
-		tl.connect(dco);
 		tl.sendData(dco, p, tsduDescRead);
 		assertNotNull(ltl.conn.poll(3, TimeUnit.SECONDS));
 		// second time
 		tl.sendData(dco, p, tsduDescRead);
 		assertNotNull(ltl.conn.poll(3, TimeUnit.SECONDS));
 		tl.disconnect(dco);
-
-		try {
-			tl.sendData(dco, p, tsduDescRead);
-			fail("disconnected");
-		}
-		catch (final KNXDisconnectException e) {}
 
 		final TransportLayer tl2 = new TransportLayerImpl(nl);
 		final Destination d2 = tl2.createDestination(new IndividualAddress(3, 1, 1), true);
@@ -396,11 +383,10 @@ class TransportLayerImplTest
 
 	@Test
 	void testSendDataNonExistingAddress()
-		throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
+		throws KNXLinkClosedException, InterruptedException
 	{
 		// not existing device address
 		final Destination dunknown = tl.createDestination(Util.getNonExistingKnxDevice(), true);
-		tl.connect(dunknown);
 		try {
 			tl.sendData(dunknown, p, tsduDescRead);
 			tl.disconnect(dunknown);
@@ -412,23 +398,17 @@ class TransportLayerImplTest
 	}
 
 	@Test
-	void testSendDataDetach() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
+	void testSendDataDetach() throws KNXLinkClosedException, InterruptedException
 	{
-		// do a detach while waiting for L4 ack
-		tl.connect(dco);
 		try {
 			final Thread detacher = new Thread() {
 				@Override
 				public void run()
 				{
+					tl.detach();
 					synchronized (this) {
 						this.notify();
 					}
-					try {
-						sleep(0);
-					}
-					catch (final InterruptedException e) {}
-					tl.detach();
 				}
 			};
 			synchronized (detacher) {
@@ -448,10 +428,9 @@ class TransportLayerImplTest
 
 	@Test
 	void testSendDataLinkClose()
-		throws KNXTimeoutException, KNXLinkClosedException, KNXDisconnectException, InterruptedException
+		throws KNXLinkClosedException, KNXDisconnectException, InterruptedException
 	{
 		// do a link closed while waiting for L4 response
-		tl.connect(dco);
 		tl.sendData(dco, p, tsduDescRead);
 		Thread.sleep(10);
 		nl.close();
