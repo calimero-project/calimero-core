@@ -221,7 +221,7 @@ public class ManagementClientImpl implements ManagementClient
 
 	private final IndividualAddress src;
 	private volatile Priority priority = Priority.LOW;
-	private volatile int responseTimeout = 5000; // [ms]
+	private volatile Duration responseTimeout = Duration.ofSeconds(5);
 	private final Deque<FrameEvent> indications = new ArrayDeque<>();
 	private final ConcurrentHashMap<Integer, Long> activeServiceResponses = new ConcurrentHashMap<>();
 	private volatile boolean detachTransportLayer;
@@ -278,15 +278,25 @@ public class ManagementClientImpl implements ManagementClient
 	@Override
 	public void setResponseTimeout(final int timeout)
 	{
-		if (timeout <= 0)
-			throw new KNXIllegalArgumentException("timeout not > 0");
-		responseTimeout = timeout * 1000;
+		responseTimeout(Duration.ofSeconds(timeout));
 	}
 
 	@Override
 	public int getResponseTimeout()
 	{
-		return responseTimeout / 1000;
+		return (int) responseTimeout.toSeconds();
+	}
+
+	@Override
+	public Duration responseTimeout() {
+		return responseTimeout;
+	}
+
+	@Override
+	public void responseTimeout(final Duration timeout) {
+		if (timeout.isNegative() || timeout.isZero())
+			throw new KNXIllegalArgumentException("timeout <= 0");
+		responseTimeout = timeout;
 	}
 
 	@Override
@@ -511,7 +521,7 @@ public class ManagementClientImpl implements ManagementClient
 
 		try {
 			final List<byte[]> responders = waitForResponses(SystemNetworkParamResponse, 4, 12, start,
-					waitTime.toMillis(), testParamType, false);
+					waitTime, testParamType, false);
 			final int prefix = 2 + 4 + 1 + additionalTestInfo.length;
 			return responders.stream().map(r -> Arrays.copyOfRange(r, prefix, r.length)).collect(toList());
 		}
@@ -1011,7 +1021,7 @@ public class ManagementClientImpl implements ManagementClient
 
 	private long registerActiveService(final int serviceType) {
 		final long now = System.nanoTime();
-		activeServiceResponses.merge(serviceType, now + responseTimeout * 1_000_000L,
+		activeServiceResponses.merge(serviceType, now + responseTimeout.toNanos(),
 				(oldValue, value) -> oldValue < value ? value : oldValue);
 		return now;
 	}
@@ -1058,22 +1068,20 @@ public class ManagementClientImpl implements ManagementClient
 		return waitForResponse(d.getAddress(), response, minAsduLen, maxAsduLen, start, responseTimeout);
 	}
 
-	// timeout in milliseconds
 	// min + max ASDU len are *not* including any field that contains ACPI
 	private byte[] waitForResponse(final IndividualAddress from, final int serviceType, final int minAsduLen,
-		final int maxAsduLen, final long start, final long timeout)
+		final int maxAsduLen, final long start, final Duration timeout)
 				throws KNXInvalidResponseException, KNXTimeoutException, InterruptedException {
 		return waitForResponses(serviceType, minAsduLen, maxAsduLen, start, timeout,
 				(source, apdu) -> source.equals(from) ? Optional.of(apdu) : Optional.empty(), true).get(0);
 	}
 
-	// timeout in milliseconds
 	// min + max ASDU len are *not* including any field that contains ACPI
 	private List<byte[]> waitForResponses(final int serviceType, final int minAsduLen, final int maxAsduLen,
-		final long start, final long timeout, final BiFunction<IndividualAddress, byte[], Optional<byte[]>> responseFilter,
+		final long start, final Duration timeout, final BiFunction<IndividualAddress, byte[], Optional<byte[]>> responseFilter,
 		final boolean oneOnly) throws KNXInvalidResponseException, KNXTimeoutException, InterruptedException {
 
-		long remaining = timeout;
+		long remaining = timeout.toMillis();
 		final long end = start / 1_000_000L + remaining;
 		final var responses = new ArrayList<byte[]>();
 		synchronized (indications) {
@@ -1081,7 +1089,7 @@ public class ManagementClientImpl implements ManagementClient
 				for (final Iterator<FrameEvent> i = indications.iterator(); i.hasNext(); ) {
 					final var event = i.next();
 					// purge outdated events
-					if (start > event.id() + responseTimeout * 1_000_000L) {
+					if (start > event.id() + responseTimeout.toNanos()) {
 						i.remove();
 						continue;
 					}

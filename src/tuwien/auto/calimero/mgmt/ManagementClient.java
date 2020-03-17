@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@
 
 package tuwien.auto.calimero.mgmt;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -58,21 +59,34 @@ import tuwien.auto.calimero.link.KNXNetworkLink;
 public interface ManagementClient extends AutoCloseable
 {
 	/**
-	 * Sets the response timeout to wait for a KNX response message to arrive to complete
-	 * a message exchange.
+	 * @deprecated Use {@link #responseTimeout(Duration)}
 	 *
 	 * @param timeout time in seconds, <code>timeout &gt; 0</code>
 	 */
+	@Deprecated
 	void setResponseTimeout(int timeout);
 
 	/**
-	 * Returns the response timeout used when waiting for a KNX response message to
-	 * arrive.
-	 * <p>
+	 * @deprecated Use {@link #responseTimeout()}
 	 *
 	 * @return timeout in seconds
 	 */
+	@Deprecated
 	int getResponseTimeout();
+
+	/**
+	 * Returns the response timeout used when waiting for a KNX response message to arrive.
+	 *
+	 * @return response timeout
+	 */
+	Duration responseTimeout();
+
+	/**
+	 * Sets the response timeout to wait for a KNX response message to arrive to complete a message exchange.
+	 *
+	 * @param timeout <code>timeout &gt; 0</code>
+	 */
+	void responseTimeout(Duration timeout);
 
 	/**
 	 * Sets the KNX message priority for KNX messages to send.

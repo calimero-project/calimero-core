@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2019 B. Malinowsky
+    Copyright (c) 2010, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@
 
 package tuwien.auto.calimero.mgmt;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -195,8 +196,8 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	public IndividualAddress[] readAddress() throws KNXException, InterruptedException
 	{
 		synchronized (mc) {
-			final int oldTimeout = mc.getResponseTimeout();
-			mc.setResponseTimeout(3);
+			final var oldTimeout = mc.responseTimeout();
+			mc.responseTimeout(Duration.ofSeconds(3));
 			try {
 				return mc.readAddress(false);
 			}
@@ -205,7 +206,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 				return new IndividualAddress[0];
 			}
 			finally {
-				mc.setResponseTimeout(oldTimeout);
+				mc.responseTimeout(oldTimeout);
 			}
 		}
 	}
@@ -215,14 +216,14 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		throws KNXException, InterruptedException
 	{
 		synchronized (mc) {
-			final int oldTimeout = mc.getResponseTimeout();
-			mc.setResponseTimeout(3);
+			final var oldTimeout = mc.responseTimeout();
+			mc.responseTimeout(Duration.ofSeconds(3));
 			try {
 				mc.readDomainAddress(device);
 			}
 			catch (final KNXTimeoutException e) {}
 			finally {
-				mc.setResponseTimeout(oldTimeout);
+				mc.responseTimeout(oldTimeout);
 			}
 		}
 	}
@@ -245,9 +246,9 @@ public class ManagementProceduresImpl implements ManagementProcedures
 
 		boolean setAddr = false;
 		synchronized (mc) {
-			final int oldTimeout = mc.getResponseTimeout();
+			final var oldTimeout = mc.responseTimeout();
 			try (Destination verify = mc.createDestination(newAddress, true)) {
-				mc.setResponseTimeout(1);
+				mc.responseTimeout(Duration.ofSeconds(1));
 				// ??? this does not conform to spec, where no max. attempts are given
 				// the problem is that we potentially loop forever (which would be correct)
 				int attempts = 20;
@@ -277,7 +278,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 				mc.restart(verify);
 			}
 			finally {
-				mc.setResponseTimeout(oldTimeout);
+				mc.responseTimeout(oldTimeout);
 			}
 		}
 		return true;
@@ -391,16 +392,16 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	public List<byte[]> scanSerialNumbers(final int medium) throws KNXException, InterruptedException
 	{
 		synchronized (mc) {
-			final int oldTimeout = mc.getResponseTimeout();
+			final var oldTimeout = mc.responseTimeout();
 			try (Destination dst = mc.createDestination(new IndividualAddress(0, medium, 0xff), true)) {
-				mc.setResponseTimeout(7);
+				mc.responseTimeout(Duration.ofSeconds(7));
 				return ((ManagementClientImpl) mc).readProperty(dst, 0, PropertyAccess.PID.SERIAL_NUMBER, 1, 1, false);
 			}
 			catch (final KNXTimeoutException e) {
 				// no response is fine
 			}
 			finally {
-				mc.setResponseTimeout(oldTimeout);
+				mc.responseTimeout(oldTimeout);
 			}
 		}
 		return Collections.emptyList();

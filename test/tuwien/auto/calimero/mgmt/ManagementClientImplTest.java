@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -190,7 +191,7 @@ class ManagementClientImplTest
 
 		final long start = System.currentTimeMillis();
 		ias = mc.readAddress(false);
-		assertTrue(System.currentTimeMillis() - start >= mc.getResponseTimeout() * 1000);
+		assertTrue(System.currentTimeMillis() - start >= mc.responseTimeout().toMillis());
 	}
 
 	@Test
@@ -452,11 +453,12 @@ class ManagementClientImplTest
 	}
 
 	@Test
-	void testGetResponseTimeout()
+	void getSetResponseTimeout()
 	{
-		assertEquals(5, mc.getResponseTimeout());
-		mc.setResponseTimeout(10);
-		assertEquals(10, mc.getResponseTimeout());
+		assertEquals(Duration.ofSeconds(5), mc.responseTimeout());
+		final var ten = Duration.ofSeconds(10);
+		mc.responseTimeout(ten);
+		assertEquals(ten, mc.responseTimeout());
 	}
 
 	@Test

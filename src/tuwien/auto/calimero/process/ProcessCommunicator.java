@@ -36,6 +36,8 @@
 
 package tuwien.auto.calimero.process;
 
+import java.time.Duration;
+
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
@@ -61,21 +63,34 @@ public interface ProcessCommunicator extends ProcessCommunication
 	// all the writing stuff just with different service, so no magic here...
 
 	/**
-	 * Sets the response timeout to wait for a KNX response message to arrive to complete
-	 * a message exchange.
+	 * @deprecated Use {@link #responseTimeout(Duration)}
 	 *
 	 * @param timeout time in seconds, <code>timeout &gt; 0</code>
 	 */
+	@Deprecated
 	void setResponseTimeout(int timeout);
 
 	/**
-	 * Returns the response timeout used when waiting for a KNX response message to
-	 * arrive.
-	 * <p>
+	 * @deprecated Use {@link #responseTimeout()}
 	 *
 	 * @return timeout in seconds
 	 */
+	@Deprecated
 	int getResponseTimeout();
+
+	/**
+	 * Returns the response timeout used when waiting for a KNX response message to arrive.
+	 *
+	 * @return response timeout
+	 */
+	Duration responseTimeout();
+
+	/**
+	 * Sets the response timeout to wait for a KNX response message to arrive to complete a message exchange.
+	 *
+	 * @param timeout <code>timeout &gt; 0</code>
+	 */
+	void responseTimeout(Duration timeout);
 
 	/**
 	 * Reads a boolean datapoint value from a group destination.

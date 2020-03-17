@@ -36,6 +36,7 @@
 
 package tuwien.auto.calimero.process;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -157,8 +158,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	private final Map<GroupAddress, AtomicInteger> readers = new HashMap<>();
 
 	private volatile Priority priority = Priority.LOW;
-	// maximum wait time in seconds for a response message
-	private volatile int responseTimeout = 5;
+	private volatile Duration responseTimeout = Duration.ofSeconds(5);
 	private volatile boolean detached;
 	private final Logger logger;
 
@@ -187,15 +187,25 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	@Override
 	public void setResponseTimeout(final int timeout)
 	{
-		if (timeout <= 0)
-			throw new KNXIllegalArgumentException("timeout <= 0");
-		responseTimeout = timeout;
+		responseTimeout(Duration.ofSeconds(timeout));
 	}
 
 	@Override
 	public int getResponseTimeout()
 	{
+		return (int) responseTimeout.toSeconds();
+	}
+
+	@Override
+	public Duration responseTimeout() {
 		return responseTimeout;
+	}
+
+	@Override
+	public void responseTimeout(final Duration timeout) {
+		if (timeout.isNegative() || timeout.isZero())
+			throw new KNXIllegalArgumentException("timeout <= 0");
+		responseTimeout = timeout;
 	}
 
 	@Override
@@ -461,7 +471,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	private byte[] waitForResponse(final GroupAddress from, final int minAPDU, final int maxAPDU)
 		throws KNXInvalidResponseException, KNXTimeoutException, InterruptedException
 	{
-		long remaining = responseTimeout * 1000L;
+		long remaining = responseTimeout.toMillis();
 		final long end = System.currentTimeMillis() + remaining;
 		synchronized (indications) {
 			while (remaining > 0) {

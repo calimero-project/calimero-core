@@ -38,11 +38,13 @@ package tuwien.auto.calimero.process;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -125,24 +127,22 @@ class ProcessCommunicatorTest
 	@Test
 	void testSetResponseTimeout()
 	{
-		pc.setResponseTimeout(2);
-		assertEquals(2, pc.getResponseTimeout());
-		try {
-			pc.setResponseTimeout(0);
-			fail("shouldn't work");
-		}
-		catch (final KNXIllegalArgumentException ok) {}
-		assertEquals(2, pc.getResponseTimeout());
+		final var two = Duration.ofSeconds(2);
+		pc.responseTimeout(two);
+		assertEquals(two, pc.responseTimeout());
+		assertThrows(KNXIllegalArgumentException.class, () -> pc.responseTimeout(Duration.ZERO));
+		assertEquals(two, pc.responseTimeout());
 
-		pc.setResponseTimeout(5);
-		assertEquals(5, pc.getResponseTimeout());
+		final var five = Duration.ofSeconds(5);
+		pc.responseTimeout(five);
+		assertEquals(five, pc.responseTimeout());
 	}
 
 	@Test
-	void testGetResponseTimeout()
+	void defaultResponseTimeout()
 	{
 		// test for correct standard timeout
-		assertEquals(5, pc.getResponseTimeout());
+		assertEquals(5, pc.responseTimeout().toSeconds());
 	}
 
 	@Test
@@ -444,9 +444,9 @@ class ProcessCommunicatorTest
 		});
 		assertEquals(0, count.get());
 		final LocalTime now = LocalTime.now();
-		final int timeout = pc2.getResponseTimeout();
-		assertTrue(now.isAfter(start.plusSeconds(timeout)));
-		assertTrue(now.isBefore(start.plusSeconds(timeout + 2)));
+		final var timeout = pc2.responseTimeout();
+		assertTrue(now.isAfter(start.plus(timeout)));
+		assertTrue(now.isBefore(start.plus(timeout).plusSeconds(2)));
 	}
 
 	@Test
