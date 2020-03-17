@@ -135,13 +135,8 @@ class ManagementClientImplTest
 	}
 
 	@Test
-	void testAuthorizeCL() throws KNXException, InterruptedException
-	{
-		try {
-			/*final int level =*/ mc.authorize(dcl, new byte[] { 0x10, 0x10, 0x10, 0x10 });
-			fail("connection less");
-		}
-		catch (final KNXDisconnectException e) {}
+	void authorizeCLThrows() {
+		assertThrows(KNXIllegalArgumentException.class, () -> mc.authorize(dcl, new byte[] { 0x10, 0x10, 0x10, 0x10 }));
 	}
 
 	@Test
@@ -173,13 +168,8 @@ class ManagementClientImplTest
 	}
 
 	@Test
-	void testReadADCCL() throws KNXException, InterruptedException
-	{
-		try {
-			/*final int adc =*/ mc.readADC(dcl, 1, 1);
-			fail("connection less");
-		}
-		catch (final KNXDisconnectException e) {}
+	void readADCCLThrows() {
+		assertThrows(KNXIllegalArgumentException.class, () -> mc.readADC(dcl, 1, 1));
 	}
 
 	@Test
@@ -239,13 +229,8 @@ class ManagementClientImplTest
 	}
 
 	@Test
-	void testReadMemoryCL() throws KNXException, InterruptedException
-	{
-		try {
-			/*final byte[] mem =*/ mc.readMemory(dcl, 0x105, 2);
-			fail("connection less");
-		}
-		catch (final KNXDisconnectException e) {}
+	void readMemoryCLThrows() {
+		assertThrows(KNXIllegalArgumentException.class, () -> mc.readMemory(dcl, 0x105, 2));
 	}
 
 	@Test

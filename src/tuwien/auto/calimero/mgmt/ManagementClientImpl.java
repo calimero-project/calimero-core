@@ -849,7 +849,7 @@ public class ManagementClientImpl implements ManagementClient
 		if (channel < 0 || channel > 63 || repeat < 0 || repeat > 255)
 			throw new KNXIllegalArgumentException("ADC arguments out of range");
 		if (!dst.isConnectionOriented())
-			logger.error("read ADC in connectionless mode, " + dst.toString());
+			throw new KNXIllegalArgumentException("read ADC requires connection-oriented mode: " + dst);
 		final byte[] apdu = sendWait(dst, priority,
 				DataUnitBuilder.createLengthOptimizedAPDU(ADC_READ, new byte[] { (byte) channel,
 					(byte) repeat }), ADC_RESPONSE, 3, 3);
@@ -868,7 +868,7 @@ public class ManagementClientImpl implements ManagementClient
 		if (startAddr < 0 || startAddr > maxStartAddress || bytes < 1 || bytes > maxBytes)
 			throw new KNXIllegalArgumentException("argument value out of range");
 		if (!dst.isConnectionOriented())
-			logger.error("read memory in connectionless mode, " + dst.toString());
+			throw new KNXIllegalArgumentException("read memory requires connection-oriented mode: " + dst);
 
 		// use extended read service for memory access above 65 K
 		if (startAddr > 0xffff) {
@@ -907,7 +907,7 @@ public class ManagementClientImpl implements ManagementClient
 			throw new KNXIllegalArgumentException("argument value out of range");
 
 		if (!dst.isConnectionOriented())
-			logger.error("write memory in connectionless mode, " + dst.toString());
+			throw new KNXIllegalArgumentException("write memory requires connection-oriented mode: " + dst);
 
 		// use extended write service for memory access above 65 K
 		if (startAddr > 0xffff) {
@@ -972,7 +972,7 @@ public class ManagementClientImpl implements ManagementClient
 		if (key.length != 4)
 			throw new KNXIllegalArgumentException("length of authorize key not 4 bytes");
 		if (!dst.isConnectionOriented())
-			logger.error("authorize in connectionless mode, " + dst.toString());
+			throw new KNXIllegalArgumentException("authorize requires connection-oriented mode: " + dst);
 		final byte[] asdu = new byte[] { 0, key[0], key[1], key[2], key[3] };
 		final byte[] apdu = sendWait(dst, priority,
 			DataUnitBuilder.createAPDU(AUTHORIZE_READ, asdu), AUTHORIZE_RESPONSE, 1, 1);
@@ -991,7 +991,7 @@ public class ManagementClientImpl implements ManagementClient
 		if (level < 0 || level > 254 || key.length != 4)
 			throw new KNXIllegalArgumentException("level out of range or key length not 4 bytes");
 		if (!dst.isConnectionOriented())
-			logger.error("write key in connectionless mode, " + dst.toString());
+			throw new KNXIllegalArgumentException("write key requires connection-oriented mode: " + dst);
 		final byte[] apdu = sendWait(dst, priority,
 			DataUnitBuilder.createAPDU(KEY_WRITE, new byte[] { (byte) level, key[0],
 				key[1], key[2], key[3] }), KEY_RESPONSE, 1, 1);
