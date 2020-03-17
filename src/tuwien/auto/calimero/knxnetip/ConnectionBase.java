@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2019 B. Malinowsky
+    Copyright (c) 2010, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -265,7 +265,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 			}
 			catch (final IOException e) {
 				close(CloseEvent.INTERNAL, "communication failure", LogLevel.ERROR, e);
-				throw new KNXConnectionClosedException("connection closed");
+				throw new KNXConnectionClosedException("connection closed", e);
 			}
 			finally {
 				updateState = true;

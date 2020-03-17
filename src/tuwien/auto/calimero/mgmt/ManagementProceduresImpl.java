@@ -377,7 +377,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 
 	@Override
 	public void scanNetworkDevices(final int area, final int line, final Consumer<IndividualAddress> device)
-		throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
+		throws KNXLinkClosedException, InterruptedException
 	{
 		if (area < 0 || area > 0xf)
 			throw new KNXIllegalArgumentException("area out of range [0..0xf]");

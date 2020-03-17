@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -65,6 +65,7 @@ public class LocalDeviceManagementIp extends LocalDeviceManagement {
 	 *
 	 * @param connection the TCP connection to the server
 	 * @param adapterClosed receives the notification if the adapter got closed
+	 * @return a new local device management connection
 	 * @throws KNXException on failure establishing local device management connection or failure while initializing the
 	 *         property adapter
 	 * @throws InterruptedException on interrupted thread while initializing the adapter
@@ -92,6 +93,7 @@ public class LocalDeviceManagementIp extends LocalDeviceManagement {
 	 * @param queryWriteEnable <code>true</code> to check whether a property is write-enabled or read-only,
 	 *        <code>false</code> to skip the check
 	 * @param adapterClosed receives the notification if the adapter got closed
+	 * @return a new local device management connection
 	 * @throws KNXException on failure establishing local device management connection or failure while initializing the
 	 *         property adapter
 	 * @throws InterruptedException on interrupted thread while initializing the adapter

@@ -658,7 +658,7 @@ public class Discoverer
 		// return the wildcard address for loopback or default host address; but port
 		// is necessarily queried from socket since in a it might be 0 (for ephemeral port)
 		final String nifName = ni != null ? ni.getName() + " " : "";
-		logger.info("search on " + nifName + new InetSocketAddress(localAddr, s.getLocalPort()));
+		logger.debug("search on " + nifName + new InetSocketAddress(localAddr, s.getLocalPort()));
 		try {
 			// send out beyond local network
 			s.setTimeToLive(64);

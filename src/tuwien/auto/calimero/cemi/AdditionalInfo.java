@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019 B. Malinowsky
+    Copyright (c) 2019, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -137,6 +137,7 @@ public class AdditionalInfo {
 	 *
 	 * @param type additional information type ID
 	 * @param info information data
+	 * @return cEMI additional information
 	 */
 	public static AdditionalInfo of(final int type, final byte[] info) {
 		if (type < 0 || type >= Escape)

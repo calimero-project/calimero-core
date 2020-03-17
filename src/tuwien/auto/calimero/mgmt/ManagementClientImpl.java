@@ -1053,9 +1053,7 @@ public class ManagementClientImpl implements ManagementClient
 		throws KNXDisconnectException, KNXTimeoutException, KNXInvalidResponseException,
 		KNXLinkClosedException, InterruptedException
 	{
-		final long start = registerActiveService(response);
-		final var sapdu = sal.secureData(src, d.getAddress(), apdu, toolAccess, true).orElse(apdu);
-		tl.sendData(d, p, sapdu);
+		final long start = send(d, p, apdu, response);
 		return waitForResponse(d.getAddress(), response, minAsduLen, maxAsduLen, start, responseTimeout);
 	}
 
