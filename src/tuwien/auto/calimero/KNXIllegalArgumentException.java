@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,29 +38,18 @@ package tuwien.auto.calimero;
 
 /**
  * Thrown to indicate that a method has been passed an illegal or inappropriate argument.
- * <p>
- * 
+ *
  * @author B. Malinowsky
  */
-public class KNXIllegalArgumentException extends RuntimeException
+public class KNXIllegalArgumentException extends KnxRuntimeException
 {
 	private static final long serialVersionUID = 1L;
 
 	private final String arg;
 
 	/**
-	 * Constructs a new <code>KNXIllegalArgumentException</code> without a detail message.
-	 */
-	public KNXIllegalArgumentException()
-	{
-		arg = null;
-	}
-
-	/**
-	 * Constructs a new <code>KNXIllegalArgumentException</code> with the specified detail
-	 * message.
-	 * <p>
-	 * 
+	 * Constructs a new <code>KNXIllegalArgumentException</code> with the specified detail message.
+	 *
 	 * @param s the detail message
 	 */
 	public KNXIllegalArgumentException(final String s)
@@ -70,13 +59,10 @@ public class KNXIllegalArgumentException extends RuntimeException
 	}
 
 	/**
-	 * Constructs a new <code>KNXIllegalArgumentException</code> with the specified detail
-	 * message and cause.
-	 * <p>
-	 * 
+	 * Constructs a new <code>KNXIllegalArgumentException</code> with the specified detail message and cause.
+	 *
 	 * @param s the detail message
-	 * @param cause the cause (which is saved for later retrieval by the
-	 *        {@link #getCause()} method).
+	 * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method).
 	 */
 	public KNXIllegalArgumentException(final String s, final Throwable cause)
 	{
@@ -86,8 +72,7 @@ public class KNXIllegalArgumentException extends RuntimeException
 
 	/**
 	 * Returns the argument which caused the exception.
-	 * <p>
-	 * 
+	 *
 	 * @return argument as string, or <code>null</code> if no argument was set
 	 */
 	public final String getArgument()
