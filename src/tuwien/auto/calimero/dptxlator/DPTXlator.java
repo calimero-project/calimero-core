@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -496,7 +496,7 @@ public abstract class DPTXlator
 		return value.trim();
 	}
 
-	final static short ubyte(final int value)
+	static final short ubyte(final int value)
 	{
 		return (short) (value & 0xff);
 	}

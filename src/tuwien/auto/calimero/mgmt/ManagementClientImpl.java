@@ -1084,7 +1084,7 @@ public class ManagementClientImpl implements ManagementClient
 		final var responses = new ArrayList<byte[]>();
 		synchronized (indications) {
 			while (remaining > 0) {
-				for (final Iterator<FrameEvent> i = indications.iterator(); i.hasNext(); ) {
+				for (final Iterator<FrameEvent> i = indications.iterator(); i.hasNext();) {
 					final var event = i.next();
 					// purge outdated events
 					if (start > event.id() + responseTimeout.toNanos()) {

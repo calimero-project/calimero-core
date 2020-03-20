@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -264,7 +264,7 @@ public class KNXnetIPTunnel extends ClientConnection
 					break;
 			}
 			if (attempt == maxSendAttempts) {
-				final KNXAckTimeoutException e = new KNXAckTimeoutException("maximum send attempts, no service acknowledgment received");
+				final var e = new KNXAckTimeoutException("maximum send attempts, no service acknowledgment received");
 				close(CloseEvent.INTERNAL, "maximum send attempts", LogLevel.ERROR, e);
 				throw e;
 			}

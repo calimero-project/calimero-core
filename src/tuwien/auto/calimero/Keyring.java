@@ -153,7 +153,7 @@ public final class Keyring {
 		}
 
 		/**
-		 * Returns the encrypted tool key of this device,
+		 * Returns the encrypted tool key of this device, or key filled with 0 if no tool key was set.
 		 *
 		 * @return tool key byte array of length 32
 		 */
@@ -242,7 +242,7 @@ public final class Keyring {
 
 	void load() {
 		int line = 0;
-		try (final var reader = XmlInputFactory.newInstance().createXMLReader(keyringUri)) {
+		try (var reader = XmlInputFactory.newInstance().createXMLReader(keyringUri)) {
 			// call nextTag() to dive straight into first element, so we can check the keyring namespace
 			reader.nextTag();
 
@@ -462,7 +462,7 @@ public final class Keyring {
 			final byte[] pwdData = extractPassword(aes128Cbc(input, keyringPwdHash, createdHash));
 			final var chars = new char[pwdData.length];
 			for (int i = 0; i < pwdData.length; i++)
-				chars[i] = (char)(pwdData[i] & 0xff);
+				chars[i] = (char) (pwdData[i] & 0xff);
 			Arrays.fill(pwdData, (byte) 0);
 			return chars;
 		}

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2019 K.Heimrich
+    Copyright (c) 2018, 2020 K.Heimrich
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ public final class Srp
 
 		private final int type;
 
-		private final int getValue() {
+		private int getValue() {
 			return type;
 		}
 
@@ -236,7 +236,7 @@ public final class Srp
 	 *
 	 * @return structure length as unsigned byte
 	 */
-	public final int getStructLength() {
+	public int getStructLength() {
 		return size;
 	}
 
@@ -248,7 +248,7 @@ public final class Srp
 	 *
 	 * @return search request parameter type (see {@link Type})
 	 */
-	public final Srp.Type getType() {
+	public Srp.Type getType() {
 		return type;
 	}
 
@@ -257,7 +257,7 @@ public final class Srp
 	 *
 	 * @return <code>true</code> if the mandatory bit is set, <code>false</code> otherwise
 	 */
-	public final boolean isMandatory() {
+	public boolean isMandatory() {
 		return mandatory;
 	}
 
@@ -268,7 +268,7 @@ public final class Srp
 	 *
 	 * @return byte array with SRP data, can be empty
 	 */
-	public final byte[] getData() {
+	public byte[] getData() {
 		return data.clone();
 	}
 
@@ -277,7 +277,7 @@ public final class Srp
 	 *
 	 * @return byte array containing the SRP structure
 	 */
-	public final byte[] toByteArray() {
+	public byte[] toByteArray() {
 		final byte[] buf = new byte[size];
 		buf[0] = (byte) size;
 		buf[1] = (byte) (mandatory ? 0x80 : 0x00);

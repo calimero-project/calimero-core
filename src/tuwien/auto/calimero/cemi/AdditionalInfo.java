@@ -88,12 +88,12 @@ public class AdditionalInfo {
 	public static final int PreamblePostamble = 0x09;
 
 	/**
-	 * Status and information about each expected number of Fast Ack
+	 * Status and information about each expected number of Fast Ack.
 	 */
 	public static final int RfFastAck = 0x0a;
 
 	/**
-	 * Manufacturer-specific data, including manufacturer ID (2 bytes) and subfunction ID (1 byte)
+	 * Manufacturer-specific data, including manufacturer ID (2 bytes) and subfunction ID (1 byte).
 	 */
 	public static final int ManufacturerSpecific = 0xfe;
 
