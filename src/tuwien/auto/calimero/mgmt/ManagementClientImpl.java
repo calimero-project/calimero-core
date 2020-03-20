@@ -42,6 +42,7 @@ import static java.util.stream.Collectors.toList;
 import static tuwien.auto.calimero.DataUnitBuilder.createAPDU;
 import static tuwien.auto.calimero.DataUnitBuilder.createLengthOptimizedAPDU;
 
+import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -127,6 +128,10 @@ public class ManagementClientImpl implements ManagementClient
 	private static final int PROPERTY_READ = 0x03D5;
 	private static final int PROPERTY_RESPONSE = 0x03D6;
 	private static final int PROPERTY_WRITE = 0x03D7;
+
+	private static final int FunctionPropertyExtCommand = 0b0111010100;
+	private static final int FunctionPropertyExtStateRead =     0b0111010101;
+	private static final int FunctionPropertyExtStateResponse = 0b0111010110;
 
 	private static final int SystemNetworkParamRead = 0b0111001000;
 	private static final int SystemNetworkParamResponse = 0b0111001001;
@@ -839,6 +844,60 @@ public class ManagementClientImpl implements ManagementClient
 					apdu[4] & 0xff);
 		}
 		throw new KNXTimeoutException("timeout occurred while waiting for data response");
+	}
+
+	@Override
+	public byte[] callFunctionProperty(final Destination dst, final int objectType, final int objInstance,
+			final int propertyId, final int serviceId, final byte... serviceInfo)
+			throws KNXException, InterruptedException {
+		return functionProperty(FunctionPropertyExtCommand, dst, objectType, objInstance, propertyId, serviceId,
+				serviceInfo);
+	}
+
+	@Override
+	public byte[] readFunctionPropertyState(final Destination dst, final int objectType, final int objInstance,
+			final int propertyId, final int serviceId, final byte... serviceInfo)
+			throws KNXException, InterruptedException {
+		return functionProperty(FunctionPropertyExtStateRead, dst, objectType, objInstance, propertyId, serviceId,
+				serviceInfo);
+	}
+
+	private byte[] functionProperty(final int cmd, final Destination dst, final int objectType, final int objInstance,
+			final int propertyId, final int service, final byte... info)
+			throws KNXLinkClosedException, KNXDisconnectException, KNXTimeoutException, KNXInvalidResponseException,
+			KNXRemoteException, InterruptedException {
+
+		if (objectType < 0 || objectType > 0xffff || objInstance < 0 || objInstance > 0xfff || propertyId < 0
+				|| propertyId > 0xfff || service < 0 || service > 0xff)
+			throw new KNXIllegalArgumentException("argument value out of range");
+
+		final var asdu = ByteBuffer.allocate(7 + info.length).putShort((short) objectType)
+				.put((byte) (objInstance >> 4)).put((byte) (((objInstance & 0xf) << 4) | (propertyId >> 8)))
+				.put((byte) propertyId).put((byte) 0).put((byte) service).put(info);
+
+		final long startSend = send(dst, priority, createAPDU(cmd, asdu.array()), FunctionPropertyExtStateResponse);
+		final var responses = waitForResponses(FunctionPropertyExtStateResponse, 6, 252, startSend, responseTimeout,
+				(source, apdu) -> {
+					if (source.equals(dst.getAddress()))
+						return extractFunctionPropertyExtData(objectType, objInstance, propertyId, apdu);
+					return Optional.empty();
+				}, true);
+
+		final byte[] response = responses.get(0);
+		final var returnCode = ReturnCode.of(response[0] & 0xff);
+		if (returnCode != ReturnCode.Success)
+			throw new KNXRemoteException(format("function property response for %d(%d)|%d service %d: %s",
+					objectType, objInstance, propertyId, service, returnCode.description()));
+		return response;
+	}
+
+	private static Optional<byte[]> extractFunctionPropertyExtData(final int objectType, final int oinstance,
+			final int propertyId, final byte[] apdu) {
+		final int receivedIot = (apdu[2] & 0xff) << 8 | (apdu[3] & 0xff);
+		final int receivedOinst = (apdu[4] & 0xff) << 4 | (apdu[5] & 0xf0) >> 4;
+		final int receivedPid = (apdu[5] & 0x0f) << 8 | (apdu[6] & 0xff);
+		return receivedIot == objectType && receivedOinst == oinstance && receivedPid == propertyId
+				? Optional.of(Arrays.copyOfRange(apdu, 7, apdu.length)) : Optional.empty();
 	}
 
 	@Override

@@ -543,6 +543,56 @@ public interface ManagementClient extends AutoCloseable
 		throws KNXException, InterruptedException;
 
 	/**
+	 * Calls a function property of an interface object of a communication partner.
+	 * <p>
+	 * This service uses point-to-point connectionless or connection-oriented communication mode. Note that interface
+	 * objects with active access protection are only accessible over connection-oriented communication.
+	 *
+	 * @param dst destination for which to call function property
+	 * @param objectType interface object type
+	 * @param objInstance object instance, {@code objInstance > 0}
+	 * @param propertyId property identifier
+	 * @param serviceId service identifier for call service
+	 * @param serviceInfo service info
+	 * @return byte array containing the function result
+	 * @throws KNXTimeoutException on send or service timeout
+	 * @throws KNXRemoteException if accessing a non-existing property or forbidden property access (not
+	 *         sufficient access rights)
+	 * @throws KNXInvalidResponseException if received response has invalid length
+	 * @throws KNXDisconnectException on disconnect in connection-oriented mode
+	 * @throws KNXLinkClosedException if network link to KNX network is closed
+	 * @throws KNXException on other read error
+	 * @throws InterruptedException on interrupted thread
+	 */
+	byte[] callFunctionProperty(Destination dst, int objectType, int objInstance, int propertyId, int serviceId,
+			byte... serviceInfo) throws KNXException, InterruptedException;
+
+	/**
+	 * Reads the state of a function property of an interface object of a communication partner.
+	 * <p>
+	 * This service uses point-to-point connectionless or connection-oriented communication mode. Note that interface
+	 * objects with active access protection are only accessible over connection-oriented communication.
+	 *
+	 * @param dst destination to read from
+	 * @param objectType interface object type
+	 * @param objInstance object instance, {@code objInstance > 0}
+	 * @param propertyId property identifier
+	 * @param serviceId service identifier for read service
+	 * @param serviceInfo service info
+	 * @return byte array containing the function property state
+	 * @throws KNXTimeoutException on send or service timeout
+	 * @throws KNXRemoteException if accessing a non-existing property or forbidden property access (not
+	 *         sufficient access rights)
+	 * @throws KNXInvalidResponseException if received response has invalid length
+	 * @throws KNXDisconnectException on disconnect in connection-oriented mode
+	 * @throws KNXLinkClosedException if network link to KNX network is closed
+	 * @throws KNXException on other read error
+	 * @throws InterruptedException on interrupted thread
+	 */
+	byte[] readFunctionPropertyState(Destination dst, int objectType, int objInstance, int propertyId, int serviceId,
+			byte... serviceInfo) throws KNXException, InterruptedException;
+
+	/**
 	 * Reads the value of the A/D converter of a communication partner.
 	 * <p>
 	 * This service uses point-to-point connection-oriented communication mode.<br>
