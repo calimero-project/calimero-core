@@ -4,12 +4,11 @@ Calimero-core [![Build Status](https://travis-ci.org/calimero-project/calimero-c
 git clone https://github.com/calimero-project/calimero-core.git
 ~~~
 
-Calimero-core provides KNX communication protocols, KNX datapoint & property access, and management functionality. [Java SE 11](https://jdk.java.net/11/)<sup>1</sup> (_java.base_) is the minimum required runtime environment.
+Calimero-core provides (secure) KNX communication protocols, KNX datapoint & property access, and management functionality. [Java SE 11](https://jdk.java.net/archive/) (_java.base_) is the minimum required runtime environment.
 Calimero was developed with a focus on applications that run on embedded devices and require a small footprint.
 
 Code examples for using this library are shown in the [introduction](https://github.com/calimero-project/introduction).
 
-<sup>1</sup> Java 9 (used during development) reached end-of-life, Java 11 is the current LTS version.
 
 Supported Features
 --------
@@ -37,6 +36,7 @@ Supported Features
 * DPT encoding/decoding of Java/KNX data types
 * Process Communicator client
 * Group Monitor
+* KNX Data Secure
 
 #### Supported Datapoint Types (DPTs)
 * 1.x - Boolean, e.g., Switch, Alarm
@@ -76,6 +76,7 @@ Access via KNXnet/IP, KNX USB, KNX RF USB, TP-UART, and FT1.2
 * KNX Management Layer
 * KNX Management Procedures
 * cEMI Local Device Management
+* KNX Data Secure
 
 ### EMI Support
 * cEMI standard and extend L-Data
