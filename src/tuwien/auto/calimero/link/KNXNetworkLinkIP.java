@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -294,6 +294,8 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 					if (valid(feature)) {
 						if (feature.featureId() == InterfaceFeature.MaxApduLength)
 							getKNXMedium().setMaxApduLength(unsigned(feature.featureValue().get()));
+						if (feature.featureId() == InterfaceFeature.IndividualAddress)
+							setTunnelingAddress(feature);
 					}
 				}
 
@@ -309,7 +311,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 							logger.warn("no connection to subnet");
 					}
 					if (feature.featureId() == InterfaceFeature.IndividualAddress)
-						getKNXMedium().setDeviceAddress(new IndividualAddress(feature.featureValue().get()));
+						setTunnelingAddress(feature);
 				}
 
 				private boolean valid(final TunnelingFeature feature) {
@@ -324,6 +326,10 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 
 				@Override
 				public void connectionClosed(final CloseEvent e) {}
+
+				private void setTunnelingAddress(final TunnelingFeature feature) {
+					getKNXMedium().setDeviceAddress(new IndividualAddress(feature.featureValue().get()));
+				}
 			});
 			tunnel.send(InterfaceFeature.EnableFeatureInfoService, (byte) 1);
 			tunnel.send(InterfaceFeature.IndividualAddress);
