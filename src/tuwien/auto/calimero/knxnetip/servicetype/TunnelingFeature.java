@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2019 B. Malinowsky
+    Copyright (c) 2018, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -53,8 +53,6 @@ import tuwien.auto.calimero.ReturnCode;
  */
 public final class TunnelingFeature extends ServiceType {
 
-	// TODO list of features is reused from the USB Bus Access Server Feature protocol
-//	HidReport.BusAccessServerFeature featureId;
 	public enum InterfaceFeature {
 		SupportedEmiTypes,
 		DeviceDescriptorType0,
@@ -67,7 +65,10 @@ public final class TunnelingFeature extends ServiceType {
 
 		int id() { return ordinal() + 1; }
 
-		String friendly() { return name().replaceAll("(\\p{Lower})\\B([A-Z])", "$1 $2").toLowerCase(); }
+		@Override
+		public String toString() { return friendly(); }
+
+		private String friendly() { return name().replaceAll("(\\p{Lower})\\B([A-Z0])", "$1 $2").toLowerCase(); }
 	}
 
 	/**
@@ -180,7 +181,7 @@ public final class TunnelingFeature extends ServiceType {
 		featureId = InterfaceFeature.values()[id - 1];
 		status = ReturnCode.of(bb.get() & 0xff);
 		if (status.code() > 0xf0)
-			logger.warn("channel {} feature {} responded with '{}'", channelId, featureId.friendly(), status.friendly());
+			logger.warn("channel {} feature {} responded with '{}'", channelId, featureId, status);
 		data = new byte[bb.remaining()];
 		bb.get(data);
 		validateFeatureValueLength();
@@ -210,7 +211,7 @@ public final class TunnelingFeature extends ServiceType {
 		}
 		if (data.length != length)
 			throw new KNXIllegalArgumentException(String.format("%s %s value %s with invalid length %d, expected %d",
-					KNXnetIPHeader.getSvcName(svcType), featureId.friendly(), DataUnitBuilder.toHex(data, ""), data.length, length));
+					KNXnetIPHeader.getSvcName(svcType), featureId, DataUnitBuilder.toHex(data, ""), data.length, length));
 	}
 
 	public int channelId() {
@@ -235,8 +236,8 @@ public final class TunnelingFeature extends ServiceType {
 
 	@Override
 	public String toString() {
-		final String s = status == Success ? DataUnitBuilder.toHex(featureValue().orElse(new byte[0]), "") : status.friendly();
-		return String.format("%s (channel %d) %s %s", KNXnetIPHeader.getSvcName(svcType), channelId, featureId.friendly(), s);
+		final var s = status == Success ? DataUnitBuilder.toHex(featureValue().orElse(new byte[0]), "") : status;
+		return String.format("%s (channel %d) %s %s", KNXnetIPHeader.getSvcName(svcType), channelId, featureId, s);
 	}
 
 	@Override
