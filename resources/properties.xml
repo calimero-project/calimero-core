@@ -68,7 +68,7 @@
         <property pid="22" pidName="PID_FILE" name="" pdt="-" rw="" writeEnabled="">
             <usage></usage>
         </property>
-        <property pid="23" pidName="PID_TABLE" name="Address Table Format 0" pdt="4" rw="R/W" writeEnabled="1">
+        <property pid="23" pidName="PID_TABLE" name="Address/Association Table" pdt="18" rw="R/W" writeEnabled="1">
             <usage>Group Address Table, Association Table</usage>
         </property>
         <property pid="24" pidName="PID_ENROL" name="Interface Object Link" pdt="62" rw="" writeEnabled="">
@@ -80,7 +80,7 @@
         <property pid="26" pidName="PID_GROUP_OBJECT_LINK" name="Group Address Assignment" pdt="62" rw="&lt;tbd&gt;" writeEnabled="">
             <usage>Group Address Assignment</usage>
         </property>
-        <property pid="27" pidName="PID_MCB_TABLE" name="Memory Control Table" pdt="23" rw="R/W" writeEnabled="1">
+        <property pid="27" pidName="PID_MCB_TABLE" name="Memory Control Table" pdt="24" rw="R/W" writeEnabled="1">
             <usage>subsegmentation of memory space and checksum</usage>
         </property>
         <property pid="28" pidName="PID_ERROR_CODE" name="Error code" pdt="17" rw="R" writeEnabled="0">
@@ -602,7 +602,7 @@
         <property pid="53" pidName="PID_GRP_KEY_TABLE" name="Group Key Table" pdt="34" rw="2/2" writeEnabled="1" accessPolicy="00C/00C">
             <usage>Security keys used for securing standard mode group communication</usage>
         </property>
-        <property pid="54" pidName="PID_SECURITY_INDIVIDUAL_ADDRESS_TABLE" name="Security Individual Address Table" pdt="24" rw="2/2" writeEnabled=""
+        <property pid="54" pidName="PID_SECURITY_INDIVIDUAL_ADDRESS_TABLE" name="Security Individual Address Table" pdt="24" rw="2/2" writeEnabled="1"
             accessPolicy="00C/00C">
             <usage>IAs and last valid sequence numbers of communication partners with secure links</usage>
         </property>
