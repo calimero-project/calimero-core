@@ -441,6 +441,10 @@ public class TransportLayerImpl implements TransportLayer
 
 		if (ctrl == CONNECT) {
 			if (serverSide) {
+				final var device = lnk.getKNXMedium().getDeviceAddress();
+				if (!frame.getDestination().equals(device))
+					return;
+
 				AggregatorProxy proxy = p;
 				// if we receive a new connect, but an old destination is still
 				// here configured as connection-less, we get a problem with setting
