@@ -490,7 +490,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 				if (!isGroupDst)
 					checkGoDiagnosticsResponse(src, (IndividualAddress) dst, plainService, plainApdu);
 
-				if (isGroupDst && !checkGroupObjectAccess((GroupAddress) dst, plainApdu, authOnly))
+				if (!checkAccess(dst, plainService, toolAccess, authOnly))
 					accessAndRoleErrors.updateAndGet(saturatingIncrement);
 			}
 			if (syncReq || syncRes)
@@ -512,10 +512,6 @@ public class SecureApplicationLayer implements AutoCloseable {
 
 	@Override
 	public void close() {}
-
-	protected final Logger logger() { return logger; }
-
-	protected boolean isSecurityModeEnabled() { return true; }
 
 	protected byte[] toolKey(final IndividualAddress device) { return toolKeys.get(device); }
 
@@ -556,8 +552,9 @@ public class SecureApplicationLayer implements AutoCloseable {
 			lastValidSequence.put(remote, seqNo);
 	}
 
-	protected boolean checkGroupObjectAccess(final GroupAddress dst, final byte[] plainApdu, final boolean authOnly) {
-		return false;
+	protected boolean checkAccess(final KNXAddress dst, final int service, final boolean toolAccess,
+			final boolean authOnly) {
+		return true;
 	}
 
 	protected int groupObjectSecurity(final GroupAddress group) {
