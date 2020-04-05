@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,6 +35,8 @@
 */
 
 package tuwien.auto.calimero.dptxlator;
+
+import static java.util.Map.entry;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -335,8 +337,54 @@ public final class PropertyTypes
 		pt.put(PDT_SCALING, new DPTID(TranslatorTypes.TYPE_8BIT_UNSIGNED, "5.001"));
 	}
 
-	private PropertyTypes()
-	{}
+	// @formatter:off
+	private static final Map<Integer, Integer> typeSize = Map.ofEntries(
+			entry(PDT_CHAR, 8),
+			entry(PDT_UNSIGNED_CHAR, 8),
+			entry(PDT_INT, 16),
+			entry(PDT_UNSIGNED_INT, 16),
+			entry(PDT_KNX_FLOAT, 16),
+			entry(PDT_DATE, 24),
+			entry(PDT_TIME, 24),
+			entry(PDT_LONG, 32),
+			entry(PDT_UNSIGNED_LONG, 32),
+			entry(PDT_FLOAT, 32),
+			entry(PDT_DOUBLE, 64),
+			entry(PDT_CHAR_BLOCK, 80),
+			entry(PDT_POLL_GROUP_SETTINGS, 24),
+			entry(PDT_SHORT_CHAR_BLOCK, 40),
+			entry(PDT_DATE_TIME, 64),
+			entry(PDT_GENERIC_01, 1 * 8),
+			entry(PDT_GENERIC_02, 2 * 8),
+			entry(PDT_GENERIC_03, 3 * 8),
+			entry(PDT_GENERIC_04, 4 * 8),
+			entry(PDT_GENERIC_05, 5 * 8),
+			entry(PDT_GENERIC_06, 6 * 8),
+			entry(PDT_GENERIC_07, 7 * 8),
+			entry(PDT_GENERIC_08, 8 * 8),
+			entry(PDT_GENERIC_09, 9 * 8),
+			entry(PDT_GENERIC_10, 10 * 8),
+			entry(PDT_GENERIC_11, 11 * 8),
+			entry(PDT_GENERIC_12, 12 * 8),
+			entry(PDT_GENERIC_13, 13 * 8),
+			entry(PDT_GENERIC_14, 14 * 8),
+			entry(PDT_GENERIC_15, 15 * 8),
+			entry(PDT_GENERIC_16, 16 * 8),
+			entry(PDT_GENERIC_17, 17 * 8),
+			entry(PDT_GENERIC_18, 18 * 8),
+			entry(PDT_GENERIC_19, 19 * 8),
+			entry(PDT_GENERIC_20, 20 * 8),
+			entry(PDT_VERSION, 16),
+			entry(PDT_ALARM_INFO, 6 * 8),
+			entry(PDT_BINARY_INFORMATION, 1),
+			entry(PDT_BITSET8, 8),
+			entry(PDT_BITSET16, 16),
+			entry(PDT_ENUM8, 8),
+			entry(PDT_SCALING, 8)
+	);
+	// @formatter:on
+
+	private PropertyTypes() {}
 
 	/**
 	 * Returns all property types which have an associated (but not necessarily
@@ -349,6 +397,16 @@ public final class PropertyTypes
 	public static Map<Integer, DPTID> getAllPropertyTypes()
 	{
 		return pt;
+	}
+
+	/**
+	 * Returns the bit size of the specified property data type.
+	 *
+	 * @param dataType property data type
+	 * @return type size in bits
+	 */
+	public static int bitSize(final int dataType) {
+		return typeSize.get(dataType);
 	}
 
 	/**
