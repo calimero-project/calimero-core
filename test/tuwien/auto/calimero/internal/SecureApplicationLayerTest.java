@@ -137,8 +137,8 @@ class SecureApplicationLayerTest {
 			}
 
 			@Override
-			void receivedSyncRequest(final IndividualAddress source, final boolean toolAccess, final byte[] seq,
-					final long challenge) {
+			void receivedSyncRequest(final IndividualAddress source, final KNXAddress dst, final boolean toolAccess,
+				final byte[] seq, final long challenge) {
 				receivedSyncRegChallenge = challenge;
 			}
 

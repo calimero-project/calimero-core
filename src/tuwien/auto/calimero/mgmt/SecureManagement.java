@@ -57,9 +57,10 @@ class SecureManagement extends SecureApplicationLayer {
 	}
 
 	@Override
-	protected void send(final IndividualAddress remote, final byte[] secureApdu)
+	protected void send(final KNXAddress remote, final byte[] secureApdu)
 			throws KNXTimeoutException, KNXLinkClosedException {
-		final var destination = transportLayer.getDestination(remote);
+		final var destination = remote instanceof IndividualAddress
+				? transportLayer.getDestination((IndividualAddress) remote) : null;
 		if (destination != null && destination.isConnectionOriented()) {
 			try {
 				transportLayer.sendData(destination, Priority.SYSTEM, secureApdu);

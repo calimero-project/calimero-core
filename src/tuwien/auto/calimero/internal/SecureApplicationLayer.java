@@ -118,7 +118,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 	// device address -> { challenge, Instant, Future }
 	// NYI key w/ serial number for broadcasts
 	final Map<IndividualAddress, Object[]> pendingSyncRequests = new ConcurrentHashMap<>();
-
+	private boolean syncReqBroadcast;
 
 	private static final int FunctionPropertyExtCommand = 0b0111010100;
 	private static final int FunctionPropertyExtStateResponse = 0b0111010110;
@@ -263,11 +263,11 @@ public class SecureApplicationLayer implements AutoCloseable {
 		if (toolAccess) {
 			if (!confidentiality)
 				throw new KNXIllegalArgumentException("tool access requires auth+conf security");
-			if (dst instanceof GroupAddress)
+			if (dst instanceof GroupAddress && dst.getRawAddress() != 0)
 				throw new KNXIllegalArgumentException("tool access requires individual address");
 		}
 
-		final byte[] key = toolAccess ? toolKey((IndividualAddress) dst) : securityKey(dst);
+		final byte[] key = toolAccess ? toolKey(syncReqBroadcast ? address() : (IndividualAddress) dst) : securityKey(dst);
 		if (key == null)
 			return Optional.empty();
 
@@ -472,7 +472,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 				return null;
 
 			if (syncReq)
-				receivedSyncRequest(src, toolAccess, seq, toLong(plainApdu));
+				receivedSyncRequest(src, dst, toolAccess, seq, toLong(plainApdu));
 			else if (syncRes)
 				receivedSyncResponse(src, toolAccess, plainApdu);
 			else {
@@ -569,33 +569,31 @@ public class SecureApplicationLayer implements AutoCloseable {
 	protected int tpci(final KNXAddress dst) { return 0; }
 
 	// implicitly system priority
-	protected void send(final IndividualAddress remote, final byte[] secureApdu)
+	protected void send(final KNXAddress remote, final byte[] secureApdu)
 			throws KNXTimeoutException, KNXLinkClosedException {
 		link.sendRequestWait(remote, Priority.SYSTEM, secureApdu);
 	}
 
-	void receivedSyncRequest(final IndividualAddress src, final boolean toolAccess, final byte[] seq,
+	void receivedSyncRequest(final IndividualAddress src, final KNXAddress dst, final boolean toolAccess, final byte[] seq,
 			final long challenge) {
 		final long nextRemoteSeq = toLong(seq);
-		long nextSeq = 1 + (toolAccess ? nextSequenceNumber(toolAccess) : lastValidSequenceNumber(false, src));
+		long nextSeq = 1 + lastValidSequenceNumber(toolAccess, src);
 		final String tool = toolAccess ? "tool " : "";
 		if (nextRemoteSeq > nextSeq) {
-			if (toolAccess)
-				updateSequenceNumber(true, nextRemoteSeq - 1);
-			else {
-				updateLastValidSequence(false, src, nextRemoteSeq - 1);
-			}
+			updateLastValidSequence(toolAccess, src, nextRemoteSeq - 1);
 			nextSeq = nextRemoteSeq;
 		}
-		logger.debug("sync.req from {}, {}seq {} (next {}), challenge {}", src, tool, nextRemoteSeq, nextSeq,
+		logger.debug("{}->{} sync.req with {}seq {} (next {}), challenge {}", src, dst, tool, nextRemoteSeq, nextSeq,
 				challenge);
 		// the returned completable future here is not important
 		stashSyncRequest(src, challenge);
+		syncReqBroadcast = dst.equals(new GroupAddress(0));
+		final var to = syncReqBroadcast ? dst : src;
 		try {
-			sendSyncResponse(src, toolAccess, nextSeq);
+			sendSyncResponse(to, toolAccess, nextSeq);
 		}
 		catch (final KNXException e) {
-			logger.warn("error sending sync.res {}->{}", address(), src, e);
+			logger.warn("error sending sync.res {}->{}", address(), to, e);
 		}
 	}
 
@@ -628,7 +626,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 		syncRequestCompleted(request);
 	}
 
-	private void sendSyncResponse(final IndividualAddress dst, final boolean toolAccess, final long remoteNextSeq)
+	private void sendSyncResponse(final KNXAddress dst, final boolean toolAccess, final long remoteNextSeq)
 			throws KNXTimeoutException, KNXLinkClosedException {
 		final var ourNextSeq = nextSequenceNumber(toolAccess);
 		final var asdu = ByteBuffer.allocate(12).put(sixBytes(ourNextSeq)).put(sixBytes(remoteNextSeq));
