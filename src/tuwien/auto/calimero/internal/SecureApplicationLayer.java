@@ -340,11 +340,16 @@ public class SecureApplicationLayer implements AutoCloseable {
 
 	public byte[] extractApdu(final CEMILData ldata) {
 		final byte[] payload = ldata.getPayload();
-		if (payload.length < 14) // TPCI + APCI + SCF + seq + 1 byte APDU + MAC
+		if (payload.length < 2)
 			return payload;
 		final int service = DataUnitBuilder.getAPDUService(payload);
-		if (!isSecurityModeEnabled() || service != SecureService)
+		if (service != SecureService)
 			return payload;
+		// TPCI + APCI + SCF + seq + 1 byte APDU + MAC
+		if (payload.length < 14) {
+			cryptoErrors.updateAndGet(saturatingIncrement);
+			throw new KnxSecureException("frame length " + payload.length + " too short for a secure frame");
+		}
 		return extractApdu(ldata.getSource(), ldata.getDestination(), payload);
 	}
 
