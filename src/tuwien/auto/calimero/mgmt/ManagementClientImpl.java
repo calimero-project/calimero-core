@@ -42,6 +42,7 @@ import static java.util.stream.Collectors.toList;
 import static tuwien.auto.calimero.DataUnitBuilder.createAPDU;
 import static tuwien.auto.calimero.DataUnitBuilder.createLengthOptimizedAPDU;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.ArrayDeque;
@@ -74,6 +75,7 @@ import tuwien.auto.calimero.ReturnCode;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.dptxlator.PropertyTypes;
 import tuwien.auto.calimero.internal.EventListeners;
 import tuwien.auto.calimero.internal.SecureApplicationLayer;
 import tuwien.auto.calimero.internal.Security;
@@ -657,30 +659,45 @@ public class ManagementClientImpl implements ManagementClient
 			throw new KNXIllegalArgumentException(String.format("argument value out of range: "
 					+ "OI 0 < %d < 256, PID 0 < %d < 256, start 0 < %d < 256, elems 0 < %d < 16",
 					objIndex, propertyId, start, elements));
-		final byte[] asdu = new byte[4];
-		asdu[0] = (byte) objIndex;
-		asdu[1] = (byte) propertyId;
-		asdu[2] = (byte) ((elements << 4) | ((start >>> 8) & 0xF));
-		asdu[3] = (byte) start;
+
+		final int maxAsduLength = maxAsduLength(dst);
+
+		int elemsInAsdu = elements;
+		if (elements > 1) {
+			final var data = readPropertyDesc(dst, objIndex, propertyId, 0);
+			final var desc = new Description(0, data);
+			final int typeSize = Math.max(8, PropertyTypes.bitSize(desc.getPDT())) / 8;
+			elemsInAsdu = (maxAsduLength - 4) / typeSize;
+		}
 
 		final List<byte[]> responses = new ArrayList<>();
 		final List<KNXRemoteException> exceptions = new ArrayList<>();
-		final long startSend = send(dst, priority, DataUnitBuilder.createAPDU(PROPERTY_READ, asdu), PROPERTY_RESPONSE);
-		waitForResponses(PROPERTY_RESPONSE, 4, 14, startSend, responseTimeout, (source, apdu) -> {
-			try {
-				if (source.equals(dst.getAddress())) {
-					responses.add(extractPropertyElements(apdu, objIndex, propertyId, elements));
-					return Optional.of(apdu);
+
+		for (int i = 0; i < elements; i += elemsInAsdu) {
+			final byte[] asdu = new byte[4];
+			asdu[0] = (byte) objIndex;
+			asdu[1] = (byte) propertyId;
+			final int queryElements = Math.min(elemsInAsdu, elements - i);
+			asdu[2] = (byte) ((queryElements << 4) | (((start + i) >>> 8) & 0xF));
+			asdu[3] = (byte) (start + i);
+
+			final long startSend = send(dst, priority, DataUnitBuilder.createAPDU(PROPERTY_READ, asdu), PROPERTY_RESPONSE);
+			waitForResponses(PROPERTY_RESPONSE, 4, maxAsduLength, startSend, responseTimeout, (source, apdu) -> {
+				try {
+					if (source.equals(dst.getAddress())) {
+						responses.add(extractPropertyElements(apdu, objIndex, propertyId, queryElements));
+						return Optional.of(apdu);
+					}
 				}
-			}
-			catch (final KNXInvalidResponseException e) {
-				logger.debug("skip invalid property read response: {}", e.getMessage());
-			}
-			catch (final KNXRemoteException e) {
-				exceptions.add(e);
-			}
-			return Optional.empty();
-		}, oneResponseOnly);
+				catch (final KNXInvalidResponseException e) {
+					logger.debug("skip invalid property read response: {}", e.getMessage());
+				}
+				catch (final KNXRemoteException e) {
+					exceptions.add(e);
+				}
+				return Optional.empty();
+			}, oneResponseOnly);
+		}
 
 		if (responses.isEmpty()) {
 			if (exceptions.size() == 1)
@@ -690,6 +707,11 @@ public class ManagementClientImpl implements ManagementClient
 			if (exceptions.size() > 0)
 				exceptions.forEach(e::addSuppressed);
 			throw e;
+		}
+		if (oneResponseOnly) {
+			final var baos = new ByteArrayOutputStream();
+			responses.forEach(baos::writeBytes);
+			return List.of(baos.toByteArray());
 		}
 		return responses;
 	}
@@ -709,7 +731,7 @@ public class ManagementClientImpl implements ManagementClient
 		for (int i = 0; i < data.length; ++i)
 			asdu[4 + i] = data[i];
 		final byte[] send = DataUnitBuilder.createAPDU(PROPERTY_WRITE, asdu);
-		final byte[] apdu = sendWait2(dst, priority, send, PROPERTY_RESPONSE, 4, 14);
+		final byte[] apdu = sendWait2(dst, priority, send, PROPERTY_RESPONSE, 4, maxAsduLength(dst));
 		// if number of elements is 0, remote app had problems
 		final int elems = (apdu[4] & 0xFF) >> 4;
 		if (elems == 0)
@@ -1076,6 +1098,35 @@ public class ManagementClientImpl implements ManagementClient
 		sal.close();
 		detached = true;
 		return lnk;
+	}
+
+	private int maxApduLength(final Destination dst) throws KNXLinkClosedException, InterruptedException {
+		final Optional<Integer> max = dst.maxApduLength();
+		if (max.isPresent())
+			return max.get();
+
+		final var link = ((TransportLayerImpl) tl).link();
+		final int maxLinkApdu = link.getKNXMedium().maxApduLength();
+
+		int maxDeviceApdu = 15;
+		// always set a default to avoid multiple queries
+		dst.maxApduLength(maxDeviceApdu);
+		if (maxLinkApdu > maxDeviceApdu) {
+			try {
+				// note, this read property call already requires a default minimum apdu to be set
+				final var data = readProperty(dst, 0, PID.MAX_APDULENGTH, 1, 1);
+				maxDeviceApdu = (data[0] & 0xff) << 8 | data[1] & 0xff;
+				dst.maxApduLength(Math.min(maxLinkApdu, maxDeviceApdu));
+			}
+			catch (KNXTimeoutException | KNXRemoteException | KNXDisconnectException e) {
+				logger.debug("use max. APDU length of 15 bytes for {}", dst.getAddress());
+			}
+		}
+		return dst.maxApduLength().get();
+	}
+
+	private int maxAsduLength(final Destination dst) throws KNXLinkClosedException, InterruptedException {
+		return maxApduLength(dst) - 1;
 	}
 
 	private long registerActiveService(final int serviceType) {

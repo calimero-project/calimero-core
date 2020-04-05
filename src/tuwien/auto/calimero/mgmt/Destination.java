@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -410,6 +410,15 @@ public class Destination implements AutoCloseable
 	}
 
 	void setInterfaceObjectList(final int[] ioList) { interfaceObjectList = ioList.clone(); }
+
+	private volatile int maxApduLength;
+
+	final Optional<Integer> maxApduLength() {
+		final int max = maxApduLength;
+		return max == 0 ? Optional.empty() : Optional.of(max);
+	}
+
+	final void maxApduLength(final int max) { maxApduLength = max; }
 
 	int getDisconnectedBy()
 	{
