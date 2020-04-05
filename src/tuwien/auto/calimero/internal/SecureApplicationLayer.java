@@ -218,9 +218,9 @@ public class SecureApplicationLayer implements AutoCloseable {
 		return future.whenComplete((__, ___) -> pendingGoDiagnostics.remove(surrogate));
 	}
 
-	private void checkGoDiagnosticsResponse(final IndividualAddress src, final IndividualAddress dst,
+	private void checkGoDiagnosticsResponse(final IndividualAddress src, final IndividualAddress dst, final int service,
 			final byte[] apdu) {
-		if (DataUnitBuilder.getAPDUService(apdu) != FunctionPropertyExtStateResponse || apdu.length < 9)
+		if (service != FunctionPropertyExtStateResponse || apdu.length < 9)
 			return;
 		final var data = ByteBuffer.wrap(apdu, 2, apdu.length - 2);
 		final int ot = data.getShort() & 0xffff;
@@ -234,8 +234,8 @@ public class SecureApplicationLayer implements AutoCloseable {
 		if (pid != pidGoDiagnostics)
 			return;
 		final var returnCode = ReturnCode.of(data.get() & 0xff);
-		final int service = data.get() & 0xff;
-		logger.trace("{}->{} GO diagnostics {} {}", src, dst, service, returnCode);
+		final int goService = data.get() & 0xff;
+		logger.trace("{}->{} GO diagnostics {} {}", src, dst, goService, returnCode);
 
 		final var future = pendingGoDiagnostics.get(src);
 		if (future != null)
@@ -481,8 +481,9 @@ public class SecureApplicationLayer implements AutoCloseable {
 					updateLastValidSequence(toolAccess, src, receivedSeq);
 				}
 
+				final int plainService = DataUnitBuilder.getAPDUService(plainApdu);
 				if (!isGroupDst)
-					checkGoDiagnosticsResponse(src, (IndividualAddress) dst, plainApdu);
+					checkGoDiagnosticsResponse(src, (IndividualAddress) dst, plainService, plainApdu);
 
 				if (isGroupDst && !checkGroupObjectAccess((GroupAddress) dst, plainApdu, authOnly))
 					accessAndRoleErrors.updateAndGet(saturatingIncrement);
