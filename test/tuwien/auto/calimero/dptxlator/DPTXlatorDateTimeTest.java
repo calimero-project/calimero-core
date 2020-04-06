@@ -772,7 +772,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 		if (useDaylightTime)
 			t.setValues(new String[] { "2002/12/31 23:59:59", "Sat, 2007/5/12 24:00:00 DST ", "2007/2/28 sync" });
 		else
-			t.setValues(new String[] { "2002/12/31 23:59:59", "Sat, 2007/5/12 24:00:00 ", "2007/2/28 in sync" });
+			t.setValues(new String[] { "2002/12/31 23:59:59", "Sat, 2007/5/12 24:00:00 ", "2007/2/28 sync" });
 		assertTrue(t.validate());
 		t.setValues(new String[] { "2002/12/31 23:59:59", "Sat, 2007/5/12 24:00:00 DST ", "2007/2/29" });
 		assertFalse(t.validate());
