@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2019 B. Malinowsky
+    Copyright (c) 2018, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -674,8 +674,8 @@ public final class SecureConnection extends KNXnetIPRouting {
 	// session.req -> session.res -> auth.req -> session-status
 	private void setupSecureSession(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP) throws KNXException {
 
-		logger = LoggerFactory.getLogger("calimero.knxnetip.KNX/IP " + secureSymbol + " Session " + serverCtrlEP.getAddress().getHostAddress() + ":"
-				+ serverCtrlEP.getPort());
+		logger = LoggerFactory.getLogger("calimero.knxnetip.KNX/IP " + secureSymbol + " Session "
+				+ serverCtrlEP.getAddress().getHostAddress() + ":" + serverCtrlEP.getPort());
 
 		logger.debug("setup secure session with {}", serverCtrlEP);
 		try {

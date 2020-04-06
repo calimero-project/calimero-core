@@ -477,11 +477,11 @@ public class SecureApplicationLayer implements AutoCloseable {
 				receivedSyncResponse(src, toolAccess, plainApdu);
 			else {
 				if (src.equals(address())) {
-					logger.debug("update next {}seq -> {}", toolAccess ? "tool access " : "", receivedSeq);
+					logger.trace("update next {}seq -> {}", toolAccess ? "tool access " : "", receivedSeq);
 					updateSequenceNumber(toolAccess, receivedSeq + 1);
 				}
 				else {
-					logger.debug("update last valid {}seq of {} -> {}", toolAccess ? "tool access " : "", src,
+					logger.trace("update last valid {}seq of {} -> {}", toolAccess ? "tool access " : "", src,
 							receivedSeq);
 					updateLastValidSequence(toolAccess, src, receivedSeq);
 				}
