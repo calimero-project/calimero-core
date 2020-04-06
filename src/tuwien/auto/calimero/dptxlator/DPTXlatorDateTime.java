@@ -46,28 +46,32 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 /**
  * Translator for KNX DPTs with main number 19, type <b>date with time</b>.
- * <p>
- * The KNX data type width is 8 bytes.<br>
- * The type contains date information (month, day of month, day of week), time information (hour, minute, second),
- * additional time information (work-day, daylight saving time (DST)) and clock information (faulty clock, external
- * clock synchronization signal). The field usage of work-day, year, date, time, day of week field is optional. <br>
+ * The KNX data type width is 8 bytes, and contains
+ * <ul>
+ * <li> date information: month, day of month, day of week</li>
+ * <li>time information: hour, minute, second</li>
+ * <li>additional time information: working day, daylight saving time (DST), and</li>
+ * <li>clock information: faulty clock, external clock synchronization signal.</li>
+ * </ul>
+ * The field usage of working day, year, date, time, and day of week is optional.<br>
  * By default, on setting date/time information, only general range checks are performed, no check is done whether the
  * information corresponds to a valid calendar time (see {@link #validate()}. All field-methods behave in non-lenient
  * time value mode, i.e., no value overflow is allowed and values are not normalized or adjusted using the next, larger
- * field. For example, February 29th will not result in March 1st on no leap year.<br>
+ * field. For example, February 29<sup>th</sup> will not result in March 1<sup>st</sup> on no leap year.<br>
  * This type permits the hour set to 24 (with minute and second only valid if 0), representing midnight of the old day,
  * to handle time information used in schedule programs.
  * <p>
  * The default return value after creation is the calendar value equal to <code>1900/1/1 00:00:00</code> (year/month/day
  * hh:mm:ss), no clock fault, not in daylight saving time, no external clock synchronization signal, day of week and
- * work day fields are not used.
+ * working day fields are not used.
  * <p>
  * The methods {@link #setValue(String)} and {@link #setValues(String[])} support the following information in
  * addition to date/time information:
  * <ul>
- * <li>external clock synchronization: use "in sync" or "no sync" (defaults to no external clock synchronization)</li>
- * <li>daylight saving time: use "DST" to indicate daylight saving time (defaults to no DST)</li>
- * <li>workday: use "workday" to mark date as workday (by default, workday information is not used)</li>
+ * <li>indicate external clock synchronization: use "sync"; the default is no external clock synchronization</li>
+ * <li>daylight saving time: use "DST" to indicate daylight saving time; the default is no DST</li>
+ * <li>working day or holiday (no working day): use "workday" to mark date as working day, and "holiday" to mark date as
+ * (bank) holiday; by default, working day information is not used</li>
  * </ul>
  *
  * @author B. Malinowsky
@@ -119,9 +123,10 @@ public class DPTXlatorDateTime extends DPTXlator
 	public static final int DAY_OF_WEEK = 3;
 
 	/**
-	 * Field number for <code>get</code> and <code>set</code> indicating whether the work-day field is used.
+	 * Field number for <code>get</code> and <code>set</code> indicating whether the working day field is used.
 	 * <p>
-	 * The work-day information can be specified in string values by using "workday" to denote a working day.
+	 * Working day information can be specified in string values by using "workday" to denote a working day, or
+	 * "holiday" to denote a (bank) holiday (no working day).
 	 *
 	 * @see #setValidField(int, boolean)
 	 * @see #isValidField(int)
@@ -161,6 +166,7 @@ public class DPTXlatorDateTime extends DPTXlator
 
 	private static final String DAYLIGHT_SIGN = "DST";
 	private static final String WORKDAY_SIGN = "workday";
+	private static final String HOLIDAY_SIGN = "holiday";
 	private static final String SYNC_SIGN = "sync";
 
 	private static final String[] DAYS = { "Any day", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
@@ -471,17 +477,19 @@ public class DPTXlatorDateTime extends DPTXlator
 	}
 
 	/**
-	 * Sets workday information for the first date/time item.
+	 * Sets working day information for the first date/time item.
 	 *
-	 * @param workday <code>true</code> to mark date as workday, <code>false</code> otherwise
+	 * @param workday <code>true</code> to mark date as working day, <code>false</code> for holiday (no working day)
 	 */
 	public final void setWorkday(final boolean workday)
 	{
+		setValidField(WORKDAY, true);
 		setBit(0, WD, workday);
 	}
 
 	/**
-	 * @return <code>true</code> if date/time information is marked as working day, <code>false</code> otherwise
+	 * @return <code>true</code> if date/time information is marked as working day, <code>false</code> for holiday (no
+	 * working day)
 	 */
 	public final boolean isWorkday()
 	{
@@ -618,9 +626,9 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * the translator.
 	 * <p>
 	 * A string in extended format contains all valid information of the date/time type.
-	 * In extended format, additionally the day of week, daylight time, work-day and clock
-	 * synchronization signal information is considered in the output format. Otherwise
-	 * this fields are always ignored, i.e only clock fault, year, month, day, hour,
+	 * In extended format, additionally the day of week, daylight time, working day and clock
+	 * synchronization signal information is considered in the output format. Otherwise,
+	 * these fields are always ignored, i.e, only clock fault, year, month, day, hour,
 	 * minute and second will get used, if valid.
 	 * <p>
 	 * The used format is extended by default.
@@ -680,7 +688,7 @@ public class DPTXlatorDateTime extends DPTXlator
 			if (!isBitSet(index, NO_DOW))
 				sb.append(", ").append(DAYS[data[i + 3] >> 5]);
 			if (!isBitSet(index, NO_WD))
-				sb.append(isBitSet(index, WD) ? " (" : " (no ").append(WORKDAY_SIGN).append(')');
+				sb.append(" (").append(isBitSet(index, WD) ? WORKDAY_SIGN : HOLIDAY_SIGN).append(')');
 		}
 		if (!isBitSet(index, NO_TIME)) {
 			// hr:min:sec
@@ -807,6 +815,7 @@ public class DPTXlatorDateTime extends DPTXlator
 
 		int sync = 0;
 		int day = 0;
+		int workingDay = 0;
 		final int maxTokens = 10;
 		final short[] numbers = new short[maxTokens];
 		int count = 0;
@@ -828,9 +837,14 @@ public class DPTXlatorDateTime extends DPTXlator
 				// parse number failed, check for word token
 				if (s.equalsIgnoreCase(DAYLIGHT_SIGN))
 					setBit(dst, index, DST, true);
-				else if (s.equalsIgnoreCase(WORKDAY_SIGN)) {
+				else if (s.equalsIgnoreCase(WORKDAY_SIGN) || s.equalsIgnoreCase(HOLIDAY_SIGN)) {
+					if (++workingDay > 1) {
+						final boolean wd = (dst[k + 6] & WD) != 0;
+						throw newException("working day information already set to "
+								+ (wd ? "'working day'" : ("'" + HOLIDAY_SIGN + "'")), s);
+					}
 					setBit(dst, index, NO_WD, false);
-					setBit(dst, index, WD, true);
+					setBit(dst, index, WD, s.equalsIgnoreCase(WORKDAY_SIGN));
 				}
 				else if (s.equalsIgnoreCase(SYNC_SIGN)) {
 					if (++sync > 1)

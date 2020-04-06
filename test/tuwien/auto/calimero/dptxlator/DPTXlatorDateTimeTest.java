@@ -36,6 +36,8 @@
 
 package tuwien.auto.calimero.dptxlator;
 
+import static org.junit.Assert.assertThrows;
+
 import java.util.Calendar;
 
 import junit.framework.TestCase;
@@ -691,6 +693,56 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertTrue(t.isWorkday());
 		t.setWorkday(false);
 		assertFalse(t.isWorkday());
+	}
+
+	public void testIsHoliday() throws KNXFormatException {
+		final var value = t.getValue();
+		assertFalse(t.isValidField(DPTXlatorDateTime.WORKDAY));
+
+		t.setWorkday(false);
+		assertTrue(t.isValidField(DPTXlatorDateTime.WORKDAY));
+		assertFalse(t.isWorkday());
+
+		final var parser = new DPTXlatorDateTime(DPTXlatorDateTime.DPT_DATE_TIME);
+		assertFalse(parser.isValidField(DPTXlatorDateTime.WORKDAY));
+		parser.setValue(value + " (holiday)");
+		assertTrue(parser.isValidField(DPTXlatorDateTime.WORKDAY));
+		assertFalse(parser.isWorkday());
+		assertTrue(parser.getValue().contains("holiday"));
+	}
+
+	public void testHolidayAndWorkingDay() throws KNXFormatException {
+		final var value = t.getValue() + " holiday, workday";
+		final var parser = new DPTXlatorDateTime(DPTXlatorDateTime.DPT_DATE_TIME);
+		assertFalse(parser.isValidField(DPTXlatorDateTime.WORKDAY));
+		assertThrows(KNXFormatException.class, () -> parser.setValue(value));
+		assertFalse(parser.isValidField(DPTXlatorDateTime.WORKDAY));
+	}
+
+	public void testWorkingDayAndHoliday() throws KNXFormatException {
+		final var value = t.getValue() + " workday, holiday";
+		final var parser = new DPTXlatorDateTime(DPTXlatorDateTime.DPT_DATE_TIME);
+		assertFalse(parser.isValidField(DPTXlatorDateTime.WORKDAY));
+		assertThrows(KNXFormatException.class, () -> parser.setValue(value));
+		assertFalse(parser.isValidField(DPTXlatorDateTime.WORKDAY));
+	}
+
+	public void testDuplicateHoliday() throws KNXFormatException {
+		final var value = t.getValue() + " holiday (holiday)";
+		final var parser = new DPTXlatorDateTime(DPTXlatorDateTime.DPT_DATE_TIME);
+		assertFalse(parser.isValidField(DPTXlatorDateTime.WORKDAY));
+		assertThrows(KNXFormatException.class, () -> parser.setValue(value));
+		assertFalse(parser.isValidField(DPTXlatorDateTime.WORKDAY));
+	}
+
+	public void testUseAllFlags() throws KNXFormatException {
+		t.setFaultyClock(false); // needs to be false
+		t.setWorkday(false);
+		t.setClockSync(true);
+		t.setDst(true);
+
+		final var parser = new DPTXlatorDateTime(DPTXlatorDateTime.DPT_DATE_TIME);
+		parser.setValue(t.getValue());
 	}
 
 	/**
