@@ -571,6 +571,21 @@ public class SecureApplicationLayer implements AutoCloseable {
 		link.sendRequestWait(remote, Priority.SYSTEM, secureApdu);
 	}
 
+	private static final int InvalidScf = 1;
+	private static final int SeqNoError = 2;
+	private static final int CryptoError = 3;
+	private static final int AccessAndRoleError = 4;
+
+	protected final int failureCounter(final int errorType) {
+		switch (errorType) {
+			case InvalidScf: return scfErrors.get();
+			case SeqNoError: return seqErrors.get();
+			case CryptoError: return cryptoErrors.get();
+			case AccessAndRoleError: return accessAndRoleErrors.get();
+			default: throw new IllegalArgumentException("failure counter error type " + errorType);
+		}
+	}
+
 	void receivedSyncRequest(final IndividualAddress src, final KNXAddress dst, final boolean toolAccess, final byte[] seq,
 			final long challenge) {
 		final long nextRemoteSeq = toLong(seq);
