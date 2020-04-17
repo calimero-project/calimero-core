@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2019 B. Malinowsky
+    Copyright (c) 2015, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -152,6 +152,8 @@ public class UsbConnection implements AutoCloseable
 	};
 
 	private static final int[] productIds = {
+		// zennio (uses 0x28c2 vendor)
+		0x0002,
 		// uses Insta
 		0x0020, 0x0021, 0x0022, 0x0023, 0x0024, 0x0025, 0x0026,
 		// uses Siemens
