@@ -118,8 +118,8 @@
         <property pid="58" pidName="PID_DEVICE_ADDR" name="Device Address" pdt="2" rw="R" writeEnabled="0">
             <usage>DeviceAddress, Low octet of Individual Address</usage>
         </property>
-        <property pid="59" pidName="PID_PB_CONFIG" name="PID_Config_Link" pdt="20" rw="" writeEnabled="">
-            <usage>PushbuttonConf., Pushbutton Configuration</usage>
+        <property pid="59" pidName="PID_PB_CONFIG" name="Config Link" pdt="20" rw="" writeEnabled="">
+            <usage>Pushbutton Configuration</usage>
         </property>
         <property pid="60" pidName="PID_ADDR_REPORT" name="Address report" pdt="22" rw="" writeEnabled="">
             <usage>AddressReport</usage>
