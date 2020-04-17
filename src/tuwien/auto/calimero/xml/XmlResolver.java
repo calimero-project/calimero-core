@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,6 +44,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
@@ -78,11 +79,10 @@ public final class XmlResolver
 	/**
 	 * Creates a new entity resolver.
 	 */
-	public XmlResolver()
-	{}
+	public XmlResolver() {}
 
 	public Object resolveEntity(final String publicID, final String systemID, final String baseURI,
-		final String namespace) throws KNXMLException
+		final String namespace)
 	{
 		try {
 			try {
@@ -95,11 +95,11 @@ public final class XmlResolver
 			}
 		}
 		catch (final IOException e) {
-			throw new KNXMLException("error opening " + baseURI + ", " + e.getMessage());
+			throw new UncheckedIOException("error opening " + baseURI, e);
 		}
 	}
 
-	OutputStream resolveOutput(final String systemID) throws KNXMLException
+	OutputStream resolveOutput(final String systemID)
 	{
 		try {
 			try {
@@ -111,7 +111,7 @@ public final class XmlResolver
 			}
 		}
 		catch (final IOException e) {
-			throw new KNXMLException("error opening " + systemID + ", " + e.getMessage());
+			throw new UncheckedIOException("error opening " + systemID, e);
 		}
 	}
 
