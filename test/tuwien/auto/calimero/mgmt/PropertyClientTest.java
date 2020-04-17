@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -56,8 +56,6 @@ import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned;
-import tuwien.auto.calimero.dptxlator.DPTXlator8BitUnsigned;
-import tuwien.auto.calimero.dptxlator.PropertyTypes;
 import tuwien.auto.calimero.knxnetip.Debug;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.KNXNetworkLinkIP;
@@ -283,10 +281,11 @@ class PropertyClientTest
 	@Test
 	void testGetPropertyTranslated() throws KNXException, InterruptedException
 	{
-		final DPTXlator2ByteUnsigned t = (DPTXlator2ByteUnsigned) rem.getPropertyTranslated(0, 56, 1, 1);
+		final DPTXlator2ByteUnsigned t = (DPTXlator2ByteUnsigned) rem.getPropertyTranslated(0, PID.MAX_APDULENGTH, 1, 1);
 		assertEquals(15, t.getValueUnsigned());
-		final DPTXlator2ByteUnsigned t2 = (DPTXlator2ByteUnsigned) local.getPropertyTranslated(0, 56, 1, 1);
-		assertTrue(15 == t2.getValueUnsigned() || 254 == t2.getValueUnsigned());
+		final DPTXlator2ByteUnsigned t2 = (DPTXlator2ByteUnsigned) local.getPropertyTranslated(0, PID.MAX_APDULENGTH, 1, 1);
+		assertTrue(15 <= t2.getValueUnsigned());
+		assertTrue(254 >= t2.getValueUnsigned());
 	}
 
 	/**
@@ -333,7 +332,7 @@ class PropertyClientTest
 	void testSetPropertyIntIntIntIntByteArray() throws KNXException, InterruptedException
 	{
 		final int pidProgramVersion = 13;
-		byte[] data = new byte[1];
+		byte[] data = new byte[5];
 		try {
 			data = rem.getProperty(0, pidProgramVersion, 1, 1);
 		}
@@ -355,21 +354,13 @@ class PropertyClientTest
 	@Test
 	void testSetPropertyIntIntIntString() throws KNXException, InterruptedException
 	{
-		final int pidProgramVersion = 13;
-		// make sure we have a translator for the program version required PDT 21 (PDT_GENERIC_17)
-		PropertyTypes.getAllPropertyTypes().put(21,
-				new PropertyTypes.DPTID(5, DPTXlator8BitUnsigned.DPT_VALUE_1_UCOUNT.getID()));
-
-		String s = "0";
-		try {
-			s = rem.getProperty(0, pidProgramVersion);
-		}
-		catch (final KNXException ignore) {}
-		final int v = Integer.parseInt(new String(new char[] { s.charAt(0) }));
-		rem.setProperty(0, pidProgramVersion, 1, "3");
-		final String s2 = rem.getProperty(0, pidProgramVersion);
+		final int knxParamsIndex = 8;
+		final int pidProjectId = PID.PROJECT_INSTALLATION_ID;
+		final String s = rem.getProperty(knxParamsIndex, pidProjectId);
+		rem.setProperty(knxParamsIndex, pidProjectId, 1, "3");
+		final String s2 = rem.getProperty(knxParamsIndex, pidProjectId);
 		assertTrue(s2.startsWith("3"));
-		rem.setProperty(0, pidProgramVersion, 1, Integer.toString(v));
+		rem.setProperty(knxParamsIndex, pidProjectId, 1, s);
 	}
 
 	private void printDesc(final Description d)

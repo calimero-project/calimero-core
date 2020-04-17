@@ -131,7 +131,7 @@ class ManagementClientImplTest
 
 		level = mc.authorize(dco, defaultKey);
 		// 3/15 is selected on the KNX test device as max. unauthorized access level
-		assertTrue(15 == level || 3 == level);
+		assertEquals(0, level);
 	}
 
 	@Test
@@ -414,14 +414,15 @@ class ManagementClientImplTest
 	{
 		final int pidProgramVersion = 13;
 
-		byte[] read = new byte[1];
+		byte[] read = new byte[5];
 		try {
 			read = mc.readProperty(dco2, 0, pidProgramVersion, 1, 1);
 		}
 		catch (final KNXException ignore) {}
-		mc.writeProperty(dco2, 0, pidProgramVersion, 1, 1, new byte[] { 7 });
+		final byte[] write = new byte[] { 7, 7, 7, 7, 7 };
+		mc.writeProperty(dco2, 0, pidProgramVersion, 1, 1, write);
 		final byte[] read2 = mc.readProperty(dco2, 0, pidProgramVersion, 1, 1);
-		assertTrue(Arrays.equals(new byte[] { 7 }, read2));
+		assertTrue(Arrays.equals(write, read2));
 		mc.writeProperty(dco2, 0, pidProgramVersion, 1, 1, read);
 	}
 
