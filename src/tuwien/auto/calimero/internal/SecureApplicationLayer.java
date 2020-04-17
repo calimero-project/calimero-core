@@ -84,6 +84,11 @@ public class SecureApplicationLayer implements AutoCloseable {
 
 	public static final int SecureService = 0b1111110001;
 
+	protected static final int InvalidScf = 1;
+	protected static final int SeqNoError = 2;
+	protected static final int CryptoError = 3;
+	protected static final int AccessAndRoleError = 4;
+
 	static boolean test;
 
 	static final int SecureDataPdu = 0;
@@ -331,7 +336,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 			}
 		}
 		catch (final GeneralSecurityException e) {
-			cryptoErrors.updateAndGet(saturatingIncrement);
+			securityFailure(CryptoError, src, dst, seqSend);
 			throw new KnxSecureException(format("securing %s->%s", src, dst), e);
 		}
 
@@ -347,7 +352,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 			return payload;
 		// TPCI + APCI + SCF + seq + 1 byte APDU + MAC
 		if (payload.length < 14) {
-			cryptoErrors.updateAndGet(saturatingIncrement);
+			securityFailure(CryptoError, ldata.getSource(), ldata.getDestination(), 0);
 			throw new KnxSecureException("frame length " + payload.length + " too short for a secure frame");
 		}
 		return extractApdu(ldata.getSource(), ldata.getDestination(), payload);
@@ -367,7 +372,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 	public byte[] decrypt(final IndividualAddress src, final KNXAddress dst, final int tpci, final byte[] secureAsdu) {
 		final ByteBuffer asdu = ByteBuffer.wrap(secureAsdu, 0, secureAsdu.length);
 		final int scf = asdu.get() & 0xff;
-		final Object[] flags = parseSecurityCtrlField(scf);
+		final Object[] flags = parseSecurityCtrlField(scf, src, dst, 0);
 		final boolean toolAccess = (Boolean) flags[0];
 		final boolean authOnly = (Boolean) flags[1];
 		final boolean systemBcast = (Boolean) flags[2];
@@ -377,7 +382,6 @@ public class SecureApplicationLayer implements AutoCloseable {
 		final boolean syncRes = service == SecureSyncResponse;
 
 		final boolean isGroupDst = dst instanceof GroupAddress;
-		// XXX in device: if we're decrypting a tool access mg to us, we need to use our own tool key
 		final var key = toolAccess ? toolKey(src.equals(address()) ? (IndividualAddress) dst : src)
 				: securityKey(isGroupDst ? dst : src);
 		if (key == null)
@@ -391,7 +395,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 		if (service == SecureDataPdu) {
 			final long expectedSeq = lastValidSequenceNumber(toolAccess, src) + 1;
 			if (receivedSeq < expectedSeq) {
-				seqErrors.updateAndGet(saturatingIncrement);
+				securityFailure(SeqNoError, src, dst, receivedSeq);
 				throw new KnxSecureException(format("%s->%s received sequence number %d < %d (expected)", src, dst,
 						receivedSeq, expectedSeq));
 			}
@@ -442,7 +446,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 				decrypted = decrypt(input.array(), key, ctr0);
 			}
 			catch (final GeneralSecurityException e) {
-				cryptoErrors.updateAndGet(saturatingIncrement);
+				securityFailure(CryptoError, src, dst, receivedSeq);
 				throw new KnxSecureException(format("decrypting %s->%s", src, dst), e);
 			}
 
@@ -457,12 +461,12 @@ public class SecureApplicationLayer implements AutoCloseable {
 
 				final byte[] calculated = confMac(associatedData.array(), plainApdu, key, iv);
 				if (!Arrays.equals(calculated, decryptedMac)) {
-					cryptoErrors.updateAndGet(saturatingIncrement);
+					securityFailure(CryptoError, src, dst, receivedSeq);
 					throw new KnxSecureException(format("MAC mismatch %s->%s", src, dst));
 				}
 			}
 			catch (final GeneralSecurityException e) {
-				cryptoErrors.updateAndGet(saturatingIncrement);
+				securityFailure(CryptoError, src, dst, receivedSeq);
 				throw new KnxSecureException(format("calculating MAC %s->%s", src, dst), e);
 			}
 
@@ -490,8 +494,12 @@ public class SecureApplicationLayer implements AutoCloseable {
 				if (!isGroupDst)
 					checkGoDiagnosticsResponse(src, (IndividualAddress) dst, plainService, plainApdu);
 
-				if (!checkAccess(dst, plainService, toolAccess, authOnly))
-					accessAndRoleErrors.updateAndGet(saturatingIncrement);
+				if (!checkAccess(dst, plainService, toolAccess, authOnly)) {
+					securityFailure(AccessAndRoleError, src, dst, receivedSeq);
+					throw new KnxSecureException(format("%s->%s denied access for {} ({})", src, dst,
+							DataUnitBuilder.decodeAPCI(plainService),
+							toolAccess ? "tool access" : authOnly ? "auth-only" : "auth+conf"));
+				}
 			}
 			if (syncReq || syncRes)
 				return null;
@@ -571,11 +579,6 @@ public class SecureApplicationLayer implements AutoCloseable {
 		link.sendRequestWait(remote, Priority.SYSTEM, secureApdu);
 	}
 
-	private static final int InvalidScf = 1;
-	private static final int SeqNoError = 2;
-	private static final int CryptoError = 3;
-	private static final int AccessAndRoleError = 4;
-
 	protected final int failureCounter(final int errorType) {
 		switch (errorType) {
 			case InvalidScf: return scfErrors.get();
@@ -584,6 +587,20 @@ public class SecureApplicationLayer implements AutoCloseable {
 			case AccessAndRoleError: return accessAndRoleErrors.get();
 			default: throw new IllegalArgumentException("failure counter error type " + errorType);
 		}
+	}
+
+	protected void securityFailure(final int errorType, final IntUnaryOperator updateFunction,
+			final IndividualAddress src, final KNXAddress dst, final int ctrlExtended, final long seqNo) {
+		final AtomicInteger[] counters = { null, scfErrors, seqErrors, cryptoErrors, accessAndRoleErrors };
+		if (errorType > 4)
+			throw new IllegalArgumentException("failure counter error type " + errorType);
+		counters[errorType].updateAndGet(updateFunction);
+	}
+
+	private void securityFailure(final int errorType, final IndividualAddress src, final KNXAddress dst,
+			final long seqNo) {
+		final int ctrlExtended = dst instanceof GroupAddress ? 0x80 : 0x0;
+		securityFailure(errorType, saturatingIncrement, src, dst, ctrlExtended, seqNo);
 	}
 
 	void receivedSyncRequest(final IndividualAddress src, final KNXAddress dst, final boolean toolAccess, final byte[] seq,
@@ -683,18 +700,19 @@ public class SecureApplicationLayer implements AutoCloseable {
 		return link.getKNXMedium().getDeviceAddress();
 	}
 
-	private Object[] parseSecurityCtrlField(final int scf) {
+	private Object[] parseSecurityCtrlField(final int scf, final IndividualAddress src, final KNXAddress dst,
+			final long receivedSeq) {
 		final boolean toolAccess = (scf & 128) == 128;
 		final int algorithmId = (scf >> 4) & 0x7;
 		if (algorithmId > 1) {
-			scfErrors.updateAndGet(saturatingIncrement);
+			securityFailure(InvalidScf, src, dst, receivedSeq);
 			throw new KnxSecureException("unsupported secure algorithm ID " + algorithmId);
 		}
 		final boolean authOnly = algorithmId == 0;
 		final boolean systemBroadcast = (scf & 0x8) == 0x8;
 		final int service = scf & 0x7;
 		if (service == 1 || service > 3) {
-			scfErrors.updateAndGet(saturatingIncrement);
+			securityFailure(InvalidScf, src, dst, receivedSeq);
 			throw new KnxSecureException("unsupported secure AL service " + service);
 		}
 		return new Object[] { toolAccess, authOnly, systemBroadcast, service };
