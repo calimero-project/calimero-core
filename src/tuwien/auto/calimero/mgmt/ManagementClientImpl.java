@@ -666,7 +666,7 @@ public class ManagementClientImpl implements ManagementClient
 		if (elements > 1) {
 			final var data = readPropertyDesc(dst, objIndex, propertyId, 0);
 			final var desc = new Description(0, data);
-			final int typeSize = Math.max(8, PropertyTypes.bitSize(desc.getPDT())) / 8;
+			final int typeSize = Math.max(8, PropertyTypes.bitSize(desc.getPDT()).orElse(8)) / 8;
 			elemsInAsdu = (maxAsduLength - 4) / typeSize;
 		}
 

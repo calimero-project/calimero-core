@@ -41,6 +41,7 @@ import static java.util.Map.entry;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.dptxlator.TranslatorTypes.MainType;
@@ -400,13 +401,13 @@ public final class PropertyTypes
 	}
 
 	/**
-	 * Returns the bit size of the specified property data type.
+	 * Returns the bit size of the supplied property data type, if a size is specified for that type.
 	 *
 	 * @param dataType property data type
 	 * @return type size in bits
 	 */
-	public static int bitSize(final int dataType) {
-		return typeSize.get(dataType);
+	public static Optional<Integer> bitSize(final int dataType) {
+		return Optional.ofNullable(typeSize.get(dataType));
 	}
 
 	/**
