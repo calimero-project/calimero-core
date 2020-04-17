@@ -164,21 +164,31 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 
 	/**
 	 * Creates a new process communicator attached to the supplied KNX network link.
-	 * <p>
-	 * The log service used by this process communicator is named "process " +
-	 * <code>link.getName()</code>.
 	 *
 	 * @param link network link used for communication with a KNX network
 	 * @throws KNXLinkClosedException if the network link is closed
 	 */
-	public ProcessCommunicatorImpl(final KNXNetworkLink link) throws KNXLinkClosedException
-	{
+	public ProcessCommunicatorImpl(final KNXNetworkLink link) throws KNXLinkClosedException {
+		this(link, new SecureApplicationLayer(link, Security.groupKeys(), Security.groupSenders(),
+				Security.deviceToolKeys()));
+	}
+
+	/**
+	 * Creates a new process communicator using the supplied secure application layer, attached to the supplied KNX
+	 * network link.
+	 *
+	 * @param link network link used for communication with a KNX network
+	 * @param sal secure application layer
+	 * @throws KNXLinkClosedException if the network link is closed
+	 */
+	public ProcessCommunicatorImpl(final KNXNetworkLink link, final SecureApplicationLayer sal)
+			throws KNXLinkClosedException {
 		if (!link.isOpen())
 			throw new KNXLinkClosedException(
 					"cannot initialize process communication using closed link " + link.getName());
 		logger = LogService.getLogger("calimero.process.communication " + link.getName());
 		lnk = link;
-		sal = new SecureApplicationLayer(lnk, Security.groupKeys(), Security.groupSenders(), Security.deviceToolKeys());
+		this.sal = sal;
 
 		listeners = new EventListeners<>(logger);
 		lnk.addLinkListener(lnkListener);
