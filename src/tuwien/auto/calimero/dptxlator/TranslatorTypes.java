@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -565,7 +565,7 @@ public final class TranslatorTypes
 		try {
 			main = getMainNumber(mainNumber, dptId);
 		}
-		catch (final NumberFormatException e) {}
+		catch (final NumberFormatException | IndexOutOfBoundsException e) {}
 		final MainType type = map.get(main);
 		if (type == null)
 			throw new KNXException("no DPT translator available for main number " + main + " (ID " + dptId + ")");
