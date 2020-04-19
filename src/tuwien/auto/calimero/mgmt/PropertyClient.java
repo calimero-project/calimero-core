@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
@@ -395,15 +396,18 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		}
 
 		/**
-		 * Returns the datapoint type ID used for the property elements.
-		 * <p>
-		 *
-		 * @return the DPT ID as string, or <code>null</code> if no DPT was set
+		 * @deprecated Use {@link #dpt()}
 		 */
+		@Deprecated
 		public final String getDPT()
 		{
 			return dpt;
 		}
+
+		/**
+		 * @return the datapoint type ID used for the property elements, or an empty optional if no DPT was set
+		 */
+		public final Optional<String> dpt() { return Optional.ofNullable(dpt); }
 
 		/**
 		 * Returns the property friendly name, a more readable name of the property.
