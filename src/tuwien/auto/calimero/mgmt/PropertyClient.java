@@ -448,6 +448,19 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		 * @return access policy for security modes off/on, or 0 if no policy is set
 		 */
 		final int accessPolicy() { return accessPolicy; }
+
+		@Override
+		public String toString() {
+			return name + " (" + id + ") '" + propName + "'" + (objType == -1 ? "" : " OT " + objType) + " PDT " + pdt
+					+ dpt().map(s -> " DPT " + s).orElse("") + " r/w " + read + "/" + (readOnly() ? "-" : write)
+					+ accessPolicyString();
+		}
+
+		private String accessPolicyString() {
+			if (accessPolicy == 0)
+				return "";
+			return String.format(" %03x/%03x", accessPolicy >> 10, accessPolicy & 0x3ff);
+		}
 	}
 
 	// mapping of object type numbers to the associated object type names
@@ -499,7 +512,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	}
 
 	/**
-	 * Returns the object type name associated to the requested object type.
+	 * Returns the object type name of the requested object type.
 	 *
 	 * @param objType object type to get name for
 	 * @return object type name as string
