@@ -113,6 +113,8 @@ public abstract class DPTXlator
 	 */
 	protected final int typeSize;
 
+	private final int bitSize;
+
 	/**
 	 * Behavior regarding appending a DPT engineering unit.
 	 * <p>
@@ -123,6 +125,12 @@ public abstract class DPTXlator
 	 */
 	protected boolean appendUnit = true;
 
+	DPTXlator(final boolean reserved, final int bitSize) {
+		this.bitSize = bitSize;
+		typeSize = bitSize / 8;
+		data = new short[typeSize == 0 ? 1 : typeSize];
+	}
+
 	/**
 	 * Creates the new translator and initializes the data type size.
 	 *
@@ -131,8 +139,7 @@ public abstract class DPTXlator
 	 */
 	public DPTXlator(final int dataTypeSize)
 	{
-		typeSize = dataTypeSize;
-		data = new short[typeSize == 0 ? 1 : typeSize];
+		this(false, dataTypeSize * 8);
 	}
 
 	/**
@@ -364,6 +371,15 @@ public abstract class DPTXlator
 	 *         type {@link DPT}
 	 */
 	public abstract Map<String, DPT> getSubTypes();
+
+	/**
+	 * Returns the KNX data type size in bits for one value item.
+	 *
+	 * @return type size in bits
+	 */
+	public int bitSize() {
+		return bitSize;
+	}
 
 	/**
 	 * Returns the KNX data type size in bytes for one value item.
