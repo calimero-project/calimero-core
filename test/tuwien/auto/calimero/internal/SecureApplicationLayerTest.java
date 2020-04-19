@@ -107,7 +107,7 @@ class SecureApplicationLayerTest {
 		final Map<IndividualAddress, byte[]> deviceToolKeys = Map.of();
 		sal = new SecureApplicationLayer(link, groupKeys, Map.of(), deviceToolKeys) {
 			@Override
-			protected long nextSequenceNumber(final boolean toolAccess) {
+			long nextSequenceNumber(final boolean toolAccess) {
 				if (toolAccess)
 					return sequenceNumberToolAccess;
 				return 0;

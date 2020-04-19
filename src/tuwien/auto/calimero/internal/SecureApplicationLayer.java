@@ -535,7 +535,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 	}
 
 	// returns next outgoing sequence number for secure communication
-	protected long nextSequenceNumber(final boolean toolAccess) {
+	long nextSequenceNumber(final boolean toolAccess) {
 		return toolAccess ? sequenceNumberToolAccess : sequenceNumber;
 	}
 
@@ -630,13 +630,6 @@ public class SecureApplicationLayer implements AutoCloseable {
 		final var request = pendingSyncRequests.get(remote);
 		if (request == null)
 			return;
-//		final var startedAt = (Instant) request[1];
-		// if response is outdated, ignore
-//		final var remaining = Duration.between(Instant.now(), startedAt.plus(SyncTimeout));
-//		if (remaining.isNegative()) {
-//			logger.info("received {}->sync.res is late by {} s, ignore", remote, -remaining.toSeconds());
-//			return;
-//		}
 
 		final var remoteSeq = toLong(Arrays.copyOfRange(plainApdu, 0, SeqSize));
 		final var localSeq = toLong(Arrays.copyOfRange(plainApdu, SeqSize, SeqSize + SeqSize));
