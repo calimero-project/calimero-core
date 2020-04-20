@@ -104,6 +104,8 @@ public final class XmlResolver
 		try {
 			try {
 				final URL loc = new URL(systemID);
+				if ("file".equals(loc.getProtocol()))
+					return new FileOutputStream(loc.getPath());
 				return loc.openConnection().getOutputStream();
 			}
 			catch (final MalformedURLException e) {
