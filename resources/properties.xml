@@ -2,10 +2,10 @@
 <!-- Calimero 2 KNX property definitions -->
 <propertyDefinitions>
     <object type="global">
-        <property pid="1" pidName="PID_OBJECT_TYPE" name="Interface Object Type" pdt="4" dpt="7.010" rw="R" writeEnabled="0">
+        <property pid="1" pidName="PID_OBJECT_TYPE" name="Interface Object Type" pdt="4" dpt="7.010" rw="R" writeEnabled="0" accessPolicy="155/155">
             <usage>Object type of the interface object</usage>
         </property>
-        <property pid="2" pidName="PID_OBJECT_NAME" name="Interface Object Name" pdt="2" rw="R(/W)" writeEnabled="0/1">
+        <property pid="2" pidName="PID_OBJECT_NAME" name="Interface Object Name" pdt="2" rw="R(/W)" writeEnabled="0/1" accessPolicy="155/155">
             <usage>Name of the Interface Object</usage>
         </property>
         <property pid="3" pidName="PID_SEMAPHOR" name="Semaphor" pdt="-" rw="" writeEnabled="">
@@ -14,13 +14,13 @@
         <property pid="4" pidName="PID_GROUP_OBJECT_REFERENCE" name="Group Object Reference" pdt="-" rw="" writeEnabled="">
             <usage></usage>
         </property>
-        <property pid="5" pidName="PID_LOAD_STATE_CONTROL" name="Load State Control" pdt="0" rw="R/W" writeEnabled="1">
+        <property pid="5" pidName="PID_LOAD_STATE_CONTROL" name="Load State Control" pdt="0" rw="3/2" writeEnabled="1" accessPolicy="15F/15F">
             <usage>Access to load state machines</usage>
         </property>
         <property pid="6" pidName="PID_RUN_STATE_CONTROL" name="Run Control" pdt="0" rw="R(/W)" writeEnabled="1">
             <usage>Access to run state machines</usage>
         </property>
-        <property pid="7" pidName="PID_TABLE_REFERENCE" name="Table Reference" pdt="9" rw="" writeEnabled="">
+        <property pid="7" pidName="PID_TABLE_REFERENCE" name="Table Reference" pdt="9" rw="R" writeEnabled="">
             <usage></usage>
         </property>
         <property pid="8" pidName="PID_SERVICE_CONTROL" name="Service Control" pdt="4" rw="R(/W)" writeEnabled="0/1">
@@ -68,7 +68,7 @@
         <property pid="22" pidName="PID_FILE" name="" pdt="-" rw="" writeEnabled="">
             <usage></usage>
         </property>
-        <property pid="23" pidName="PID_TABLE" name="Address/Association Table" pdt="18" rw="R/W" writeEnabled="1">
+        <property pid="23" pidName="PID_TABLE" name="Address/Association Table" pdt="18" rw="R/W" writeEnabled="1" accessPolicy="15D/15D">
             <usage>Group Address Table, Association Table</usage>
         </property>
         <property pid="24" pidName="PID_ENROL" name="Interface Object Link" pdt="62" rw="" writeEnabled="">
@@ -155,7 +155,7 @@
             <usage>Domain Address of a device</usage>
         </property>
         <property pid="71" pidName="PID_IO_LIST" name="Interface Object List" pdt="4" rw="R/W" writeEnabled="1">
-            <usage>cEMI</usage>
+            <usage>Array with the interface object types implemented in the device</usage>
         </property>
         <property pid="72" pidName="PID_MGT_DESCRIPTOR_01" name="Management Descriptor 1" pdt="26" rw="R" writeEnabled="0">
             <usage>Descriptor for exteded device descriptor for mask version 0100 (so far only allowed for this mask, shall not be used for other masks)</usage>
@@ -196,10 +196,10 @@
         <property pid="84" pidName="PID_METERING_FILTER_TABLE" name="Metering Filter Table" pdt="24" rw="R/W" writeEnabled="1">
             <usage>Metering Filter Table for RF M-Bus Repeater and for the M-Bus Data Collector</usage>
         </property>
-        <property pid="85" pidName="PID_GROUP_TELEGR_RATE_LIMIT_TIME_BASE" name="group telegram rate limitation time base" pdt="4" rw="R/W" writeEnabled="1">
+        <property pid="85" pidName="PID_GROUP_TELEGR_RATE_LIMIT_TIME_BASE" name="Group telegram rate limitation time base" pdt="4" rw="R/W" writeEnabled="1">
             <usage>Telegram rate limitation time base</usage>
         </property>
-        <property pid="86" pidName="PID_GROUP_TELEGR_RATE_LIMIT_NO_OF_TELEGR" name="group telegram rate limitation number of telegrams" pdt="4" rw="R/W" writeEnabled="1">
+        <property pid="86" pidName="PID_GROUP_TELEGR_RATE_LIMIT_NO_OF_TELEGR" name="Group telegram rate limitation number of telegrams" pdt="4" rw="R/W" writeEnabled="1">
             <usage>Telegram rate limitation number</usage>
         </property>
         <property pid="89" pidName="PID_FEATURES_SUPPORTED" name="Supported Features" pdt="26" rw="3/1" writeEnabled="0">
