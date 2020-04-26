@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -106,7 +106,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	 * DPT ID 7.010, Interface object property ID; values from <b>0</b> to <b>65535</b>.
 	 */
 	public static final DPT DPT_PROP_DATATYPE =
-		new DPT("7.010", "Interface object property ID", "0", "65535", "");
+		new DPT("7.010", "Interface object type", "0", "65535", "");
 
 	/**
 	 * DPT ID 7.011, Length in millimeters; values from <b>0</b> to <b>65535</b>, resolution 1.

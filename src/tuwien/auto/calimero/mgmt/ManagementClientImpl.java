@@ -801,9 +801,11 @@ public class ManagementClientImpl implements ManagementClient
 			final int rcvPropDescType = (apdu[7] >> 4) & 0xf;
 			final int rcvPropertyIdx = (((apdu[7] & 0xf) << 8) | (apdu[8] & 0xff));
 
+			final int rcvObjectType = (apdu[2] & 0xff) << 8 | apdu[3] & 0xff;
 			// make sure the response contains the requested description
-			final boolean objTypeOk = objType == ((apdu[2] & 0xff) << 8 | apdu[3] & 0xff);
-			final boolean oiOk = objInstance == ((apdu[4] & 0xff) << 4 | (apdu[5] & 0xf0) >> 4);
+			final boolean objTypeOk = objType == rcvObjectType;
+			final int rcvObjInstance = (apdu[4] & 0xff) << 4 | (apdu[5] & 0xf0) >> 4;
+			final boolean oiOk = objInstance == rcvObjInstance;
 			final boolean pidOk = propertyId == 0 || propertyId == rcvPropertyId;
 			final boolean pidxOk = propertyId != 0 || propIndex == rcvPropertyIdx;
 
@@ -825,8 +827,8 @@ public class ManagementClientImpl implements ManagementClient
 			if (objTypeOk && oiOk && pidOk && pidxOk)
 				return Description.of(objIndex, Arrays.copyOfRange(apdu, 2, apdu.length));
 
-			logger.warn("wrong description response: OI {} PID {} prop idx {}", apdu[2] & 0xff, apdu[3] & 0xff,
-					apdu[4] & 0xff);
+			logger.warn("wrong description response for OI {} PID {} prop idx {} (got {}({})|{} (idx {}))", objIndex,
+					propertyId, propIndex, rcvObjectType, rcvObjInstance, rcvPropertyId, rcvPropertyIdx);
 		}
 		throw new KNXTimeoutException("timeout occurred while waiting for data response");
 	}
@@ -862,8 +864,8 @@ public class ManagementClientImpl implements ManagementClient
 				return new byte[] { apdu[2], apdu[3], apdu[4], apdu[5], apdu[6], apdu[7], apdu[8] };
 			}
 
-			logger.warn("wrong description response: OI {} PID {} prop idx {}", apdu[2] & 0xff, apdu[3] & 0xff,
-					apdu[4] & 0xff);
+			logger.warn("wrong description response for OI {} PID {} prop idx {} (got {}|{} (idx {}))", objIndex,
+					propertyId, propIndex, apdu[2] & 0xff, apdu[3] & 0xff, apdu[4] & 0xff);
 		}
 		throw new KNXTimeoutException("timeout occurred while waiting for data response");
 	}

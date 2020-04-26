@@ -568,7 +568,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 				destinations.add(d);
 				tl.connect(d);
 				// increased from 100 (the default) to minimize chance of overflow over FT1.2
-				Thread.sleep(115);
+				waitFor(115);
 			}
 			// we wait in total (115 + 6000 + 1000 + 100) ms for a possible T-disconnect, taking
 			// into account the KNXnet/IP tunneling.req retransmit timeout plus some network delay
@@ -605,7 +605,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 					logger.info("connect timeout during address scan for {}", d);
 				}
 				// increased from 100 (the default) to minimize chance of overflow over FT1.2
-				Thread.sleep(115);
+				waitFor(115);
 			}
 			// we wait in total (115 + 6000 + 1000 + 100) ms for a possible T-disconnect, taking
 			// into account the KNXnet/IP tunneling.req retransmit timeout plus some network delay

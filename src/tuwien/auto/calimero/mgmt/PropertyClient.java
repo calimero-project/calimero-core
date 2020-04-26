@@ -763,7 +763,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		int pdt = -1;
 		Property p = properties.get(new PropertyKey(ot, pid));
 		// if no property found, lookup global pid
-		if (p == null && pid < 50)
+		if (p == null && pid <= 50)
 			p = properties.get(new PropertyKey(pid));
 		if (p != null) {
 			if (p.dpt != null)
