@@ -382,14 +382,21 @@ public class SecureApplicationLayer implements AutoCloseable {
 		final boolean syncRes = service == SecureSyncResponse;
 
 		final boolean isGroupDst = dst instanceof GroupAddress;
-		final var key = toolAccess ? toolKey(src.equals(address()) ? (IndividualAddress) dst : src)
-				: securityKey(isGroupDst ? dst : src);
+		// if we have a group service, check group key table first
+		final var key = isGroupDst ? securityKey(dst)
+				: toolAccess ? toolKey(src.equals(address()) ? (IndividualAddress) dst : src) : securityKey(src);
 		if (key == null)
 			return null;
 
 		byte[] seq = new byte[6];
 		asdu.get(seq);
 		final long receivedSeq = toLong(seq);
+
+		// using tool access for group service where a group key is available is considered an attack
+		if (isGroupDst && toolAccess) {
+			securityFailure(AccessAndRoleError, src, dst, receivedSeq);
+			throw new KnxSecureException(format("%s->%s group service with tool access", src, dst));
+		}
 
 		final byte[] sno = new byte[6];
 		if (service == SecureDataPdu) {
