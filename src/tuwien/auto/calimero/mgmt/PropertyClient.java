@@ -447,7 +447,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		/**
 		 * @return access policy for security modes off/on, or 0 if no policy is set
 		 */
-		final int accessPolicy() { return accessPolicy; }
+		public final int accessPolicy() { return accessPolicy; }
 
 		@Override
 		public String toString() {
