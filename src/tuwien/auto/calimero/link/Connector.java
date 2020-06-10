@@ -364,6 +364,12 @@ public final class Connector
 		public void confirmation(final FrameEvent e)
 		{}
 
+		@Override
+		public String toString() {
+			final var v = impl;
+			return v != null ? v.toString() : "link connecting...";
+		}
+
 		// only called for network link send
 		private KNXNetworkLink link() throws KNXLinkClosedException
 		{
