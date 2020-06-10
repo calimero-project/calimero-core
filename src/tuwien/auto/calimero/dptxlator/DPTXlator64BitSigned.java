@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2019 B. Malinowsky
+    Copyright (c) 2015, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -65,14 +65,14 @@ public class DPTXlator64BitSigned extends DPTXlator
 			"-9223372036854775808", "9223372036854775807", "Wh");
 
 	/**
-	 * DPT ID 29.011, Apparent energy; values from <b>-9223372036854775808</b> to <b>2147483647</b>
+	 * DPT ID 29.011, Apparent energy; values from <b>-9223372036854775808</b> to <b>9223372036854775807</b>
 	 * VAh, resolution 1 VAh.
 	 */
 	public static final DPT DPT_APPARENT_ENERGY = new DPT("29.011", "Apparent energy",
 			"-9223372036854775808", "9223372036854775807", "VAh");
 
 	/**
-	 * DPT ID 29.012, Reactive energy; values from <b>-9223372036854775808</b> to <b>2147483647</b>
+	 * DPT ID 29.012, Reactive energy; values from <b>-9223372036854775808</b> to <b>9223372036854775807</b>
 	 * VARh, resolution 1 VARh.
 	 */
 	public static final DPT DPT_REACTIVE_ENERGY = new DPT("29.012", "Reactive energy",
