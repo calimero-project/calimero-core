@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2014, 2019 B. Malinowsky
+    Copyright (c) 2014, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -62,6 +62,7 @@ import tuwien.auto.calimero.KNXAckTimeoutException;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIBusMon;
@@ -270,11 +271,10 @@ public class TpuartConnection implements AutoCloseable
 
 	/**
 	 * Sends a cEMI L-Data frame, either waiting for confirmation or non-blocking. Sending is not-permitted in
-	 * busmonitor mode. A cEMI frame for TP1 does not require any additional information, therefore is assumed to not
-	 * contain any, i.e., the field with additional information length is 0.
+	 * busmonitor mode. A cEMI frame for TP1 does not require any additional information, any additional information is
+	 * ignored.
 	 *
-	 * @param frame cEMI L-Data msg as byte array, <code>msg</code> cannot contain additional information types
-	 *        (additional information length field equals 0)
+	 * @param frame cEMI L-Data msg as byte array
 	 * @param waitForCon wait for L_Data.con (blocking) or not (non-blocking)
 	 * @throws KNXPortClosedException on closed communication port
 	 * @throws KNXAckTimeoutException on send/receive timeout (or if no ACK from the bus was received)
@@ -366,38 +366,46 @@ public class TpuartConnection implements AutoCloseable
 	{
 		// set frame type to std/ext
 		final int stdMaxApdu = 15;
-		final int cEmiPrefix = 10;
-		final boolean std = frame.length <= cEmiPrefix + stdMaxApdu;
+		// skip 1 byte mc + 1 byte add.info length + any add.info
+		final int skipToCtrl1 = 2 + frame[1] & 0xff;
+		final int cemiPrefix = skipToCtrl1 + 8;
+		final boolean std = frame.length <= cemiPrefix + stdMaxApdu;
 
 		final byte[] tp1;
 		if (std) {
-			tp1 = new byte[frame.length - 2];
+			// total length = frame length - skipToCtrl1 - ctrl2 + 1 byte checksum
+			tp1 = new byte[frame.length - skipToCtrl1];
 			int i = 0;
 			// set upper 6 bits of ctrl1 field, ensure not repeated std frame
-			tp1[i++] = (byte) ((frame[2] & 0xfc) | StdFrameFormat | RepeatFlag);
+			tp1[i++] = (byte) ((frame[skipToCtrl1] & 0xfc) | StdFrameFormat | RepeatFlag);
 			// src
-			tp1[i++] = frame[4];
-			tp1[i++] = frame[5];
+			tp1[i++] = frame[skipToCtrl1 + 2];
+			tp1[i++] = frame[skipToCtrl1 + 3];
 			// dst
-			tp1[i++] = frame[6];
-			tp1[i++] = frame[7];
+			tp1[i++] = frame[skipToCtrl1 + 4];
+			tp1[i++] = frame[skipToCtrl1 + 5];
 			// address type, npci, length
-			final int len = frame[8];
-			tp1[i++] = (byte) ((frame[3] & 0xf0) | len);
+			final int len = frame[skipToCtrl1 + 6];
+			tp1[i++] = (byte) ((frame[skipToCtrl1 + 1] & 0xf0) | len);
 			// tpci
-			tp1[i++] = frame[9];
+			tp1[i++] = frame[skipToCtrl1 + 7];
 			// apdu
 			for (int k = 0; k < len; k++)
-				tp1[i++] = frame[10 + k];
+				tp1[i++] = frame[cemiPrefix + k];
 		}
 		else {
-			// total length = frame length - 1 byte mc + 1 byte checksum
-			tp1 = new byte[frame.length];
-			for (int i = 1; i < frame.length; i++)
-				tp1[i - 1] = frame[i];
+			// total length = frame length - skipToCtrl1 + 1 byte checksum
+			final int length = frame.length - skipToCtrl1 + 1;
+			if (length > 64)
+				throw new KNXIllegalArgumentException("L-Data frame length " + length + " > max. 64 bytes for TP-UART");
+
+			tp1 = new byte[length];
+			for (int i = skipToCtrl1; i < frame.length; i++)
+				tp1[i - skipToCtrl1] = frame[i];
 
 			// ensure not repeated ext frame
-			tp1[0] |= (byte) (frame[0] | ExtFrameFormat | RepeatFlag);
+			tp1[0] &= ~StdFrameFormat;
+			tp1[0] |= ExtFrameFormat | RepeatFlag;
 		}
 		// last byte is checksum
 		tp1[tp1.length - 1] = (byte) checksum(tp1);
