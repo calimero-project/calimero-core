@@ -694,6 +694,7 @@ public class ManagementClientImpl implements ManagementClient
 				}
 				catch (final KNXRemoteException e) {
 					exceptions.add(e);
+					return Optional.of(new byte[0]); // return empty token to exit waitForResponses
 				}
 				return Optional.empty();
 			}, oneResponseOnly);

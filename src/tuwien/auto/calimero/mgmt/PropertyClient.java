@@ -724,9 +724,6 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		catch (final KNXRemoteException e) {
 			logger.warn("failed to get current number of elements for OI {} PID {}: {}", oi, pid, e.getMessage());
 		}
-		catch (final KNXTimeoutException e) {
-			logger.info("access failure reading current elements of {}|{} ({})", oi, pid, e.getMessage());
-		}
 		final Description d = new Description(getObjectType(oi, true), Description.parseCurrentElements(data), desc);
 		// workaround for PDT on local DM
 		if (local)
