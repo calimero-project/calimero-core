@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2017, 2018 B. Malinowsky
+    Copyright (c) 2017, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,11 +51,11 @@ import org.junit.jupiter.api.Test;
 
 import tuwien.auto.calimero.KNXFormatException;
 
-/**
- * @author B. Malinowsky
- */
-public class DptXlatorMeteringValueTest
+class DptXlatorMeteringValueTest
 {
+	private static final String fault = DptXlator8BitSet.GeneralStatus.Fault.name().toLowerCase();
+	private static final String outOfService = "out of service";
+
 	private DptXlatorMeteringValue t;
 
 	private final String e1 = "1.2 GJ";
@@ -116,7 +116,7 @@ public class DptXlatorMeteringValueTest
 	{
 		// coding 'mass' kg with nnn = 2, i.e., exponent = 2 - 3 = 1
 		t.setData(new byte[] { 0, 1, 0, 0, 0b00011010, 0b00011111 });
-		assertEquals("AlarmUnAck InAlarm Overridden Fault OutOfService 6553.6 kg", t.getValue());
+		assertEquals("alarm un ack, in alarm, overridden, " + fault + ", " + outOfService + ", 6553.6 kg", t.getValue());
 	}
 
 	@Test
@@ -171,7 +171,7 @@ public class DptXlatorMeteringValueTest
 		}
 		catch (final KNXFormatException expected) {}
 		try {
-			t.setValue("Fault Wh");
+			t.setValue(fault + " Wh");
 			fail("no number");
 		}
 		catch (final KNXFormatException expected) {}
@@ -186,22 +186,20 @@ public class DptXlatorMeteringValueTest
 	void setStringValueWithStatus() throws KNXFormatException
 	{
 		t.setValue("OutOfService 555.123 kJ/h");
-		final String[] split = t.getValue().split(" ", -1);
-		assertEquals("OutOfService", split[0]);
-		assertEquals("555123.0", split[1]);
-		assertEquals("J/h", split[2]);
+		final String[] split = t.getValue().split(",", -1);
+		assertEquals(outOfService, split[0]);
+		assertEquals("555123.0 J/h", split[1].trim());
 		assertEquals(555123.0, t.getNumericValue());
 	}
 
 	@Test
 	void setStringValueWithMultiStatus() throws KNXFormatException
 	{
-		t.setValue("OutOfService Fault 555.123 kJ/h");
-		final String[] split = t.getValue().split(" ", -1);
-		assertEquals("Fault", split[0]);
-		assertEquals("OutOfService", split[1]);
-		assertEquals("555123.0", split[2]);
-		assertEquals("J/h", split[3]);
+		t.setValue(outOfService + ", Fault 555.123 kJ/h");
+		final String[] split = t.getValue().split(",", -1);
+		assertEquals(fault, split[0]);
+		assertEquals(outOfService, split[1].trim());
+		assertEquals("555123.0 J/h", split[2].trim());
 		assertEquals(555123.0, t.getNumericValue());
 	}
 
@@ -250,7 +248,7 @@ public class DptXlatorMeteringValueTest
 		catch (final Exception expected) {}
 
 		t.setData(e2Data);
-		assertEquals("Fault 1234.0 Wh", t.getValue());
+		assertEquals(fault + ", 1234.0 Wh", t.getValue());
 
 		t.setData(e3Data);
 		assertEquals("1.6777216E8 m³", t.getValue());
@@ -261,7 +259,7 @@ public class DptXlatorMeteringValueTest
 
 		final byte[] allset = { (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, 0, 31 };
 		t.setData(allset);
-		assertEquals("AlarmUnAck InAlarm Overridden Fault OutOfService -0.001 Wh", t.getValue());
+		assertEquals("alarm un ack, in alarm, overridden, " + fault + ", " + outOfService + ", -0.001 Wh", t.getValue());
 
 		final byte[] reserved = { 0, 0, 0, 0, (byte) 0b11101110, 0 };
 		// TODO no data input validation for reserved codings
@@ -292,7 +290,7 @@ public class DptXlatorMeteringValueTest
 		t.setData(e1Data, 0);
 		assertEquals(0, t.status().getNumericValue());
 		t.setData(e2Data, 0);
-		assertEquals(DptXlator8BitSet.GeneralStatus.Fault.name(), t.status().getValue());
+		assertEquals(fault, t.status().getValue());
 	}
 
 	@Test

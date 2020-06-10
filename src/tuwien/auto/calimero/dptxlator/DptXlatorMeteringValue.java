@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2017, 2018 B. Malinowsky
+    Copyright (c) 2017, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -209,7 +209,8 @@ public class DptXlatorMeteringValue extends DPTXlator
 	{
 		final int i = 6 * index;
 		status.setData(new byte[] { (byte) data[i + 5] });
-		return (status.getValue() + " " + fromDpt(index) + appendUnit()).trim();
+		final String s = status.getValue();
+		return ((s.isEmpty() ? "" : s + ", ") + fromDpt(index) + appendUnit()).trim();
 	}
 
 	private String appendUnit()

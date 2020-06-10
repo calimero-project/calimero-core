@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2017, 2019 B. Malinowsky
+    Copyright (c) 2017, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ package tuwien.auto.calimero.dptxlator;
 
 import java.util.EnumSet;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -103,7 +104,7 @@ public class DptXlator8BitSet extends DPTXlator
 		private T find(final String description)
 		{
 			for (final T e : EnumSet.allOf(elements))
-				if (e.name().equals(description))
+				if (e.name().equals(description) || friendly(e.name()).equalsIgnoreCase(description))
 					return e;
 			return null;
 		}
@@ -112,10 +113,12 @@ public class DptXlator8BitSet extends DPTXlator
 		{
 			final T e = find(element);
 			if (e != null)
-				return e.name();
+				return friendly(e.name());
 			throw new KNXIllegalArgumentException(
 					getID() + " " + elements.getSimpleName() + " has no element " + element + " specified");
 		}
+
+		private static String friendly(final String name) { return name.replaceAll("\\B([A-Z])", " $1").toLowerCase(); }
 	}
 
 	// Common use domain
@@ -290,44 +293,47 @@ public class DptXlator8BitSet extends DPTXlator
 
 	private String textOf(final int index)
 	{
-		final StringBuilder s = new StringBuilder();
+		final var joiner = new StringJoiner(", ");
 		final int d = data[index];
 		for (int i = 0x80; i > 0; i >>= 1)
 			if ((d & i) == i)
-				s.append(((EnumDpt<?>) dpt).textOf(i) + " ");
-		return s.toString().trim();
+				joiner.add(((EnumDpt<?>) dpt).textOf(i));
+		return joiner.toString();
 	}
 
 	@Override
 	protected void toDPT(final String value, final short[] dst, final int index) throws KNXFormatException
 	{
-		int result = 0;
 		try {
 			// try single dec/hex/octal number
-			result = toDpt(Integer.decode(value));
+			dst[index] = toDpt(Integer.decode(value));
 		}
 		catch (final NumberFormatException nfe) {
-			// try as sequence
-			final String[] split = value.split(" ");
-			for (int i = 0; i < split.length; i++) {
-				final String s = split[split.length - 1 - i];
-
-				// try bit flag
+			int result = 0;
+			boolean tryNames = false;
+			// try as bit sequence
+			for (final var s : value.split(" ")) {
 				final int bit = "1".equals(s) || "true".equalsIgnoreCase(s) ? 1
 						: "0".equals(s) || "false".equalsIgnoreCase(s) ? 0 : -1;
-				if (bit == 1)
-					result |= bit << i;
-				else if (bit == -1) {
-					// try enum element name
+				if (bit == -1) {
+					tryNames = true;
+					break;
+				}
+				result = (result << 1) | bit;
+			}
+			if (tryNames) {
+				// try as sequence of names
+				result = 0;
+				for (final var s : value.split(",")) {
 					final EnumDpt<?> enumDpt = (EnumDpt<?>) dpt;
-					final Enum<?> e = enumDpt.find(s);
+					final Enum<?> e = enumDpt.find(s.trim());
 					if (e == null)
 						throw newException("value is no element of " + enumDpt.elements.getSimpleName(), value);
 					result |= 1 << e.ordinal();
 				}
 			}
+			dst[index] = (short) result;
 		}
-		dst[index] = (short) result;
 	}
 
 	private static short toDpt(final EnumSet<?> elements)

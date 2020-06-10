@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2017, 2019 B. Malinowsky
+    Copyright (c) 2017, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,18 +55,15 @@ import org.junit.jupiter.api.Test;
 
 import tuwien.auto.calimero.KNXFormatException;
 
-/**
- * @author B. Malinowsky
- */
-public class DptXlator8BitSetTest
+class DptXlator8BitSetTest
 {
 	private DptXlator8BitSet t;
 
-	private final String e1 = "Overridden";
+	private final String e1 = "overridden";
 	private final String e2 = "0x08";
-	private final String e3 = "OutOfService";
+	private final String e3 = "out of service";
 	private final String[] strValues = new String[] { e1, e2, e3 };
-	private final String[] elements = new String[] { e1, "InAlarm", e3 };
+	private final String[] elements = new String[] { e1, "in alarm", e3 };
 
 	private final byte[] e1Data = { 4, };
 	private final byte[] e2Data = { 8 };
@@ -94,7 +91,7 @@ public class DptXlator8BitSetTest
 	{
 		t.setValue("1 1 0 1");
 		assertEquals(13, t.getNumericValue());
-		assertEquals("InAlarm Overridden OutOfService", t.getValue());
+		assertEquals("in alarm, overridden, out of service", t.getValue());
 	}
 
 	@Test
@@ -102,7 +99,7 @@ public class DptXlator8BitSetTest
 	{
 		assertEquals("", t.getValue());
 		t.setValue(1);
-		assertTrue(OutOfService.name().equals(t.getValue()));
+		assertTrue(e3.equals(t.getValue()));
 
 		final DptXlator8BitSet x = new DptXlator8BitSet(DptXlator8BitSet.DptDeviceControl);
 		final int v = (int) x.getNumericValue();
