@@ -62,19 +62,26 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.slf4j.Logger;
 
+import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
+import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.KnxSecureException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.ReturnCode;
+import tuwien.auto.calimero.SecurityControl;
+import tuwien.auto.calimero.SecurityControl.DataSecurity;
+import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
+import tuwien.auto.calimero.link.NetworkLinkListener;
 import tuwien.auto.calimero.log.LogService;
 
 /**
@@ -141,6 +148,33 @@ public class SecureApplicationLayer implements AutoCloseable {
 	private final AtomicInteger cryptoErrors = new AtomicInteger();
 	private final AtomicInteger accessAndRoleErrors = new AtomicInteger();
 
+	private final EventListeners<NetworkLinkListener> listeners = new EventListeners<>();
+
+	private final NetworkLinkListener linkListener = new NetworkLinkListener() {
+		@Override
+		public void indication(final FrameEvent e) { extract(e).ifPresent(SecureApplicationLayer.this::dispatchLinkEvent); }
+
+		@Override
+		public void confirmation(final FrameEvent e) { extract(e).ifPresent(SecureApplicationLayer.this::dispatchLinkEvent); }
+
+		@Override
+		public void linkClosed(final CloseEvent e) { listeners.fire(ll -> ll.linkClosed(e)); }
+	};
+
+
+	public final class SalService {
+		private final SecurityControl ctrl;
+		private final byte[] apdu;
+
+		SalService(final SecurityControl ctrl, final byte[] apdu) {
+			this.apdu = apdu;
+			this.ctrl = ctrl;
+		}
+
+		public final SecurityControl security() { return ctrl; }
+
+		public final byte[] apdu() { return apdu.clone(); }
+	}
 
 
 	public static final boolean isSecuredService(final CEMILData ldata) {
@@ -153,6 +187,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 			final Map<GroupAddress, Set<IndividualAddress>> groupSenders,
 			final Map<IndividualAddress, byte[]> deviceToolKeys) {
 		this(link, new byte[6], 0, deviceToolKeys, groupKeys, groupSenders);
+		link.addLinkListener(linkListener);
 	}
 
 	protected SecureApplicationLayer(final KNXNetworkLink link, final byte[] serialNumber, final long sequenceNumber,
@@ -179,6 +214,10 @@ public class SecureApplicationLayer implements AutoCloseable {
 		sequenceNumberToolAccess = 1;
 	}
 
+	public void addListener(final NetworkLinkListener l) { listeners.add(l); }
+
+	public void removeListener(final NetworkLinkListener l) { listeners.remove(l); }
+
 	public Optional<byte[]> secureGroupObject(final IndividualAddress src, final GroupAddress dst, final byte[] apdu)
 			throws InterruptedException {
 		final int flags = groupObjectSecurity(dst);
@@ -187,7 +226,8 @@ public class SecureApplicationLayer implements AutoCloseable {
 		if (!conf && !auth)
 			return Optional.empty();
 		final boolean toolAccess = sequenceNumber == 0;
-		return secureData(src, dst, apdu, toolAccess, conf);
+		final var security = conf ? DataSecurity.AuthConf : DataSecurity.Auth;
+		return secureData(src, dst, apdu, SecurityControl.of(security, toolAccess));
 	}
 
 	public CompletableFuture<ReturnCode> writeGroupObjectDiagnostics(final GroupAddress group, final byte[] value)
@@ -214,7 +254,8 @@ public class SecureApplicationLayer implements AutoCloseable {
 		final var apdu = DataUnitBuilder.createAPDU(FunctionPropertyExtCommand, asdu.array());
 
 		final var surrogate = surrogate(group);
-		final var secureApdu = secureData(address(), surrogate, apdu, true, true).get();
+		final var secCtrl = SecurityControl.of(DataSecurity.AuthConf, true);
+		final var secureApdu = secureData(address(), surrogate, apdu, secCtrl).get();
 		logger.trace("{}->{} GO diagnostics {} {}", address(), surrogate, service, DataUnitBuilder.toHex(value, " "));
 		send(surrogate, secureApdu);
 
@@ -248,8 +289,11 @@ public class SecureApplicationLayer implements AutoCloseable {
 	}
 
 	public Optional<byte[]> secureData(final IndividualAddress src, final KNXAddress dst, final byte[] apdu,
-			final boolean toolAccess, final boolean confidentiality) throws InterruptedException {
+			final SecurityControl securityCtrl) throws InterruptedException {
+		if (securityCtrl == SecurityControl.Plain)
+			return Optional.of(apdu);
 
+		final boolean toolAccess = securityCtrl.toolAccess();
 		final byte[] key = toolAccess ? toolKey((IndividualAddress) dst) : securityKey(dst);
 		if (key == null)
 			return Optional.empty();
@@ -258,15 +302,16 @@ public class SecureApplicationLayer implements AutoCloseable {
 		if (seqTool <= 1)
 			syncWith(dst, toolAccess);
 
-		final var sapdu = secure(SecureDataPdu, src, dst, apdu, toolAccess, confidentiality);
+		final var sapdu = secure(SecureDataPdu, src, dst, apdu, securityCtrl);
 		updateSequenceNumber(toolAccess, nextSequenceNumber(toolAccess) + 1);
 		return sapdu;
 	}
 
 	Optional<byte[]> secure(final int service, final IndividualAddress src, final KNXAddress dst, final byte[] apdu,
-			final boolean toolAccess, final boolean confidentiality) {
+			final SecurityControl secCtrl) {
+		final boolean toolAccess = secCtrl.toolAccess();
 		if (toolAccess) {
-			if (!confidentiality)
+			if (secCtrl.security() != DataSecurity.AuthConf)
 				throw new KNXIllegalArgumentException("tool access requires auth+conf security");
 			if (dst instanceof GroupAddress && dst.getRawAddress() != 0)
 				throw new KNXIllegalArgumentException("tool access requires individual address");
@@ -288,7 +333,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 		// NYI system broadcast option
 		final boolean systemBcast = false;
 
-		final int scf = toSecurityCtrlField(service, toolAccess, confidentiality, systemBcast);
+		final int scf = toSecurityCtrlField(service, secCtrl, systemBcast);
 		secureApdu.put((byte) scf);
 
 		final long seqSend = nextSequenceNumber(toolAccess);
@@ -322,7 +367,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 		final var ctr0 = blockCtr0(seqOrRand, src, dst);
 
 		try {
-			if (confidentiality) {
+			if (secCtrl.security() == DataSecurity.AuthConf) {
 				final byte[] mac = confMac(associatedData.array(), apdu, key, iv);
 				final byte[] input = ByteBuffer.allocate(MacSize + apdu.length).put(mac).put(apdu).array();
 				final byte[] encrypted = encrypt(input, key, ctr0);
@@ -343,22 +388,22 @@ public class SecureApplicationLayer implements AutoCloseable {
 		return Optional.of(secureApdu.array());
 	}
 
-	public byte[] extractApdu(final CEMILData ldata) {
+	public SalService extract(final CEMILData ldata) {
 		final byte[] payload = ldata.getPayload();
 		if (payload.length < 2)
-			return payload;
+			return new SalService(SecurityControl.Plain, payload);
 		final int service = DataUnitBuilder.getAPDUService(payload);
 		if (service != SecureService)
-			return payload;
+			return new SalService(SecurityControl.Plain, payload);
 		// TPCI + APCI + SCF + seq + 1 byte APDU + MAC
 		if (payload.length < 14) {
 			securityFailure(CryptoError, ldata.getSource(), ldata.getDestination(), 0);
 			throw new KnxSecureException("frame length " + payload.length + " too short for a secure frame");
 		}
-		return extractApdu(ldata.getSource(), ldata.getDestination(), payload);
+		return extract(ldata.getSource(), ldata.getDestination(), payload);
 	}
 
-	byte[] extractApdu(final IndividualAddress src, final KNXAddress dst, final byte[] secureApdu) {
+	SalService extract(final IndividualAddress src, final KNXAddress dst, final byte[] secureApdu) {
 		final int service = DataUnitBuilder.getAPDUService(secureApdu);
 		if (service != SecureService)
 			throw new KNXIllegalArgumentException(
@@ -369,14 +414,41 @@ public class SecureApplicationLayer implements AutoCloseable {
 		return decrypt(src, dst, tpci, secureAsdu);
 	}
 
-	public byte[] decrypt(final IndividualAddress src, final KNXAddress dst, final int tpci, final byte[] secureAsdu) {
+	protected Optional<FrameEvent> extract(final FrameEvent e) {
+		final var cemi = e.getFrame();
+		if (cemi instanceof CEMILData) {
+			final CEMILData ldata = (CEMILData) cemi;
+			try {
+				final var salData = extract(ldata);
+				if (salData.apdu().length == 0)
+					return Optional.empty();
+				if (salData.security() == SecurityControl.Plain)
+					return Optional.of(e);
+
+				final var plain = CEMIFactory.create(cemi.getMessageCode(), salData.apdu(), cemi);
+				final var extracted = new FrameEvent(e.getSource(), plain, e.systemBroadcast(),
+						salData.security());
+				return Optional.of(extracted);
+			}
+			catch (final KnxSecureException kse) {
+				logger.info(kse.toString());
+			}
+			catch (KNXFormatException | RuntimeException ex) {
+				logger.warn(ex.toString());
+			}
+			return Optional.empty();
+		}
+		return Optional.of(e);
+	}
+
+	public SalService decrypt(final IndividualAddress src, final KNXAddress dst, final int tpci, final byte[] secureAsdu) {
 		final ByteBuffer asdu = ByteBuffer.wrap(secureAsdu, 0, secureAsdu.length);
 		final int scf = asdu.get() & 0xff;
 		final Object[] flags = parseSecurityCtrlField(scf, src, dst, 0);
-		final boolean toolAccess = (Boolean) flags[0];
-		final boolean authOnly = (Boolean) flags[1];
-		final boolean systemBcast = (Boolean) flags[2];
-		final int service = (Integer) flags[3];
+		final var securityCtrl = (SecurityControl) flags[0];
+		final boolean toolAccess = securityCtrl.toolAccess();
+		final boolean systemBcast = (Boolean) flags[1];
+		final int service = (Integer) flags[2];
 
 		final boolean syncReq = service == SecureSyncRequest;
 		final boolean syncRes = service == SecureSyncResponse;
@@ -386,7 +458,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 		final var key = isGroupDst ? securityKey(dst)
 				: toolAccess ? toolKey(src.equals(address()) ? (IndividualAddress) dst : src) : securityKey(src);
 		if (key == null)
-			return null;
+			return new SalService(securityCtrl, new byte[0]);
 
 		byte[] seq = new byte[6];
 		asdu.get(seq);
@@ -412,16 +484,16 @@ public class SecureApplicationLayer implements AutoCloseable {
 			// ignore sync.reqs not addressed to us
 			if (!Arrays.equals(sno, serialNumber)) {
 				if (systemBcast || !dst.equals(address()) || !Arrays.equals(sno, new byte[6]))
-					return null;
+					return new SalService(securityCtrl, new byte[0]);
 			}
 			// if responded to another request within the last 1 second, ignore
 			if (Instant.now().minusSeconds(1).isBefore(lastSyncRes))
-				return null;
+				return new SalService(securityCtrl, new byte[0]);
 		}
 		else if (syncRes) {
 			final var request = pendingSyncRequests.get(src);
 			if (request == null)
-				return null;
+				return new SalService(securityCtrl, new byte[0]);
 
 			// in a sync.res, seq actually contains our challenge from sync.req xored with a random value
 			// extract the random value and store it in seq to use it for block0 and ctr0
@@ -433,15 +505,14 @@ public class SecureApplicationLayer implements AutoCloseable {
 
 		final var s = service == SecureSyncRequest ? "sync.req"
 				: service == SecureSyncResponse ? "sync.res" : "S-A_Data";
-		logger.debug("{}->{} decrypt {} ({})", src, dst, s,
-				toolAccess ? "tool access" : authOnly ? "auth-only" : "auth+conf");
+		logger.debug("{}->{} decrypt {} ({})", src, dst, s, securityCtrl);
 
 		final byte[] apdu = new byte[asdu.remaining() - MacSize];
 		asdu.get(apdu);
 
 		final var ctr0 = blockCtr0(seq, src, dst);
 
-		if (authOnly) {
+		if (securityCtrl.security() == DataSecurity.Auth) {
 
 		}
 		else {
@@ -480,53 +551,63 @@ public class SecureApplicationLayer implements AutoCloseable {
 			// prevent a sync.req sent by us to trigger sync notification, this happens if we provide our own tool key
 			// for decryption above
 			if (syncReq && src.equals(address()))
-				return null;
+				return new SalService(securityCtrl, new byte[0]);
 
-			if (syncReq)
+			if (syncReq) {
 				receivedSyncRequest(src, dst, toolAccess, seq, toLong(plainApdu));
-			else if (syncRes)
-				receivedSyncResponse(src, toolAccess, plainApdu);
-			else {
-				if (src.equals(address())) {
-					logger.trace("update next {}seq -> {}", toolAccess ? "tool access " : "", receivedSeq);
-					updateSequenceNumber(toolAccess, receivedSeq + 1);
-				}
-				else {
-					logger.trace("update last valid {}seq of {} -> {}", toolAccess ? "tool access " : "", src,
-							receivedSeq);
-					updateLastValidSequence(toolAccess, src, receivedSeq);
-				}
-
-				final int plainService = DataUnitBuilder.getAPDUService(plainApdu);
-				if (!isGroupDst)
-					checkGoDiagnosticsResponse(src, (IndividualAddress) dst, plainService, plainApdu);
-
-				if (!checkAccess(dst, plainService, toolAccess, authOnly)) {
-					securityFailure(AccessAndRoleError, src, dst, receivedSeq);
-					throw new KnxSecureException(format("%s->%s denied access for {} ({})", src, dst,
-							DataUnitBuilder.decodeAPCI(plainService),
-							toolAccess ? "tool access" : authOnly ? "auth-only" : "auth+conf"));
-				}
+				return new SalService(securityCtrl, new byte[0]);
 			}
-			if (syncReq || syncRes)
-				return null;
-			return plainApdu;
+
+			if (syncRes) {
+				receivedSyncResponse(src, toolAccess, plainApdu);
+				return new SalService(securityCtrl, new byte[0]);
+			}
+
+			if (src.equals(address())) {
+				logger.trace("update next {}seq -> {}", toolAccess ? "tool access " : "", receivedSeq);
+				updateSequenceNumber(toolAccess, receivedSeq + 1);
+			}
+			else {
+				logger.trace("update last valid {}seq of {} -> {}", toolAccess ? "tool access " : "", src, receivedSeq);
+				updateLastValidSequence(toolAccess, src, receivedSeq);
+			}
+
+			final int plainService = DataUnitBuilder.getAPDUService(plainApdu);
+			if (!isGroupDst)
+				checkGoDiagnosticsResponse(src, (IndividualAddress) dst, plainService, plainApdu);
+
+			if (!checkAccess(dst, plainService, securityCtrl)) {
+				securityFailure(AccessAndRoleError, src, dst, receivedSeq);
+				throw new KnxSecureException(format("%s->%s denied access for %s (%s)", src, dst,
+						DataUnitBuilder.decodeAPCI(plainService), securityCtrl));
+			}
+			return new SalService(securityCtrl, plainApdu);
 		}
-		return apdu;
+		return new SalService(securityCtrl, apdu);
 	}
 
 	public CompletableFuture<Void> sendSyncRequest(final IndividualAddress remote, final boolean toolAccess)
 			throws KNXTimeoutException, KNXLinkClosedException {
 		final var challenge = ThreadLocalRandom.current().nextLong();
-		final byte[] secureApdu = secure(SecureSyncRequest, address(), remote, sixBytes(challenge).array(), toolAccess,
-				true).get();
+		final byte[] secureApdu = secure(SecureSyncRequest, address(), remote, sixBytes(challenge).array(),
+				SecurityControl.of(DataSecurity.AuthConf, toolAccess)).get();
 		logger.debug("sync {} seq with {}", toolAccess ? "tool access" : "p2p", remote);
 		send(remote, secureApdu);
 		return stashSyncRequest(remote, challenge);
 	}
 
 	@Override
-	public void close() {}
+	public void close() {
+		link.removeLinkListener(linkListener);
+	}
+
+	protected void dispatchLinkEvent(final FrameEvent e) {
+		final var cemi = e.getFrame();
+		if (cemi.getMessageCode() == CEMILData.MC_LDATA_IND)
+			listeners.fire(ll -> ll.indication(e));
+		else if (cemi.getMessageCode() == CEMILData.MC_LDATA_CON)
+			listeners.fire(ll -> ll.confirmation(e));
+	}
 
 	protected byte[] toolKey(final IndividualAddress device) { return toolKeys.get(device); }
 
@@ -567,8 +648,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 			lastValidSequence.put(remote, seqNo);
 	}
 
-	protected boolean checkAccess(final KNXAddress dst, final int service, final boolean toolAccess,
-			final boolean authOnly) {
+	protected boolean checkAccess(final KNXAddress dst, final int service, final SecurityControl securityCtrl) {
 		return true;
 	}
 
@@ -659,7 +739,8 @@ public class SecureApplicationLayer implements AutoCloseable {
 			throws KNXTimeoutException, KNXLinkClosedException {
 		final var ourNextSeq = nextSequenceNumber(toolAccess);
 		final var asdu = ByteBuffer.allocate(12).put(sixBytes(ourNextSeq)).put(sixBytes(remoteNextSeq));
-		final var response = secure(SecureSyncResponse, address(), dst, asdu.array(), toolAccess, true).get();
+		final var response = secure(SecureSyncResponse, address(), dst, asdu.array(),
+				SecurityControl.of(DataSecurity.AuthConf, toolAccess)).get();
 
 		lastSyncRes = Instant.now();
 		send(dst, response);
@@ -715,14 +796,14 @@ public class SecureApplicationLayer implements AutoCloseable {
 			securityFailure(InvalidScf, src, dst, receivedSeq);
 			throw new KnxSecureException("unsupported secure AL service " + service);
 		}
-		return new Object[] { toolAccess, authOnly, systemBroadcast, service };
+		final var ctrl = SecurityControl.of(authOnly ? DataSecurity.Auth : DataSecurity.AuthConf, toolAccess);
+		return new Object[] { ctrl, systemBroadcast, service };
 	}
 
-	private static int toSecurityCtrlField(final int service, final boolean toolAccess, final boolean confidentiality,
-			final boolean systemBcast) {
+	private static int toSecurityCtrlField(final int service, final SecurityControl secCtrl, final boolean systemBcast) {
 		int scf = service;
-		scf |= toolAccess ? 0x80 : 0;
-		scf |= confidentiality ? 0x10 : 0;
+		scf |= secCtrl.toolAccess() ? 0x80 : 0;
+		scf |= secCtrl.security() == DataSecurity.AuthConf ? 0x10 : 0;
 		scf |= systemBcast ? 0x8 : 0;
 		return scf;
 	}

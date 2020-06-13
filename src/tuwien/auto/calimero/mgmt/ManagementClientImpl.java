@@ -65,19 +65,18 @@ import tuwien.auto.calimero.DetachEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
-import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.ReturnCode;
+import tuwien.auto.calimero.SecurityControl;
+import tuwien.auto.calimero.SecurityControl.DataSecurity;
 import tuwien.auto.calimero.cemi.CEMI;
-import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.dptxlator.PropertyTypes;
 import tuwien.auto.calimero.internal.EventListeners;
-import tuwien.auto.calimero.internal.SecureApplicationLayer;
 import tuwien.auto.calimero.internal.Security;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
@@ -191,27 +190,13 @@ public class ManagementClientImpl implements ManagementClient
 		private void checkResponse(final FrameEvent e) {
 			final var ldata = (CEMILData) e.getFrame();
 			try {
-				final var plainApdu = sal.extractApdu(ldata);
-				if (plainApdu == null)
-					return;
-				final FrameEvent event;
-				if (SecureApplicationLayer.isSecuredService(ldata)) {
-					final var plain = CEMIFactory.create(ldata.getMessageCode(), plainApdu, ldata);
-					event = new FrameEvent(e.getSource(), plain, e.systemBroadcast());
-				}
-				else
-					event = e;
-
-				if (isActiveService(event)) {
+				if (isActiveService(e)) {
 					synchronized (indications) {
-						indications.add(event);
+						indications.add(e);
 						indications.notifyAll();
 					}
 				}
-				listeners.fire(c -> c.accept(event));
-			}
-			catch (final KNXFormatException kfe) {
-				logger.warn("creating plain L-Data frame event from {}", ldata, kfe);
+				listeners.fire(c -> c.accept(e));
 			}
 			catch (final RuntimeException rte) {
 				logger.warn("on indication from {}", ldata.getDestination(), rte);
@@ -255,11 +240,11 @@ public class ManagementClientImpl implements ManagementClient
 	protected ManagementClientImpl(final KNXNetworkLink link, final TransportLayer transportLayer)
 	{
 		tl = transportLayer;
-		tl.addTransportListener(tlListener);
 		logger = LogService.getLogger("calimero.mgmt.MC " + link.getName());
-		sal = new SecureManagement(tl, Security.deviceToolKeys());
 		src = link.getKNXMedium().getDeviceAddress();
 		listeners = new EventListeners<>(logger);
+		sal = new SecureManagement(tl, Security.deviceToolKeys());
+		sal.addListener(tlListener);
 	}
 
 	/**
@@ -1153,7 +1138,8 @@ public class ManagementClientImpl implements ManagementClient
 		throws KNXTimeoutException, KNXDisconnectException, KNXLinkClosedException, InterruptedException
 	{
 		final long start = registerActiveService(response);
-		final var sapdu = sal.secureData(src, d.getAddress(), apdu, toolAccess, true).orElse(apdu);
+		final var secCtrl = SecurityControl.of(DataSecurity.AuthConf, toolAccess);
+		final var sapdu = sal.secureData(src, d.getAddress(), apdu, secCtrl).orElse(apdu);
 		if (d.isConnectionOriented())
 			tl.sendData(d, p, sapdu);
 		else

@@ -36,7 +36,6 @@
 
 package tuwien.auto.calimero.internal;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static tuwien.auto.calimero.DataUnitBuilder.fromHex;
@@ -53,6 +52,8 @@ import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.SecurityControl;
+import tuwien.auto.calimero.SecurityControl.DataSecurity;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.link.AbstractLink;
 import tuwien.auto.calimero.link.KNXNetworkLink;
@@ -156,7 +157,8 @@ class SecureApplicationLayerTest {
 	}
 
 	private byte[] secure(final int service, final IndividualAddress src, final KNXAddress dst, final byte[] data) {
-		return sal.secure(service, src, dst, data, true, true).get();
+		final var secCtrl = SecurityControl.of(DataSecurity.AuthConf, true);
+		return sal.secure(service, src, dst, data, secCtrl).get();
 	}
 
 	@Test
@@ -177,7 +179,8 @@ class SecureApplicationLayerTest {
 	void decryptPropertyWrite() {
 		assertEquals(SecureApplicationLayer.SecureService, DataUnitBuilder.getAPDUService(encryptedPropertyWrite));
 
-		final var plainApdu = sal.extractApdu(local, remote, encryptedPropertyWrite);
+		final var salData = sal.extract(local, remote, encryptedPropertyWrite);
+		final var plainApdu = salData.apdu();
 		assertEquals(PropertyWrite, DataUnitBuilder.getAPDUService(plainApdu));
 
 		final var plainAsdu = DataUnitBuilder.extractASDU(plainApdu);
@@ -213,7 +216,8 @@ class SecureApplicationLayerTest {
 		assertEquals(SecureApplicationLayer.SecureService, DataUnitBuilder.getAPDUService(encryptedPropertyResponse));
 
 		sequenceNumberToolAccess = 3;
-		final var plainApdu = sal.extractApdu(remote, local, encryptedPropertyResponse);
+		final var salData = sal.extract(remote, local, encryptedPropertyResponse);
+		final var plainApdu = salData.apdu();
 		assertEquals(PropertyResponse, DataUnitBuilder.getAPDUService(plainApdu));
 
 		final var plainAsdu = DataUnitBuilder.extractASDU(plainApdu);
@@ -257,8 +261,8 @@ class SecureApplicationLayerTest {
 		assertEquals(SecureApplicationLayer.SecureService, DataUnitBuilder.getAPDUService(encryptedSyncReq));
 
 		transportLayer.createDestination(local, true);
-		final var result = sal.extractApdu(local, remote, encryptedSyncReq);
-		assertNull(result);
+		final var salData = sal.extract(local, remote, encryptedSyncReq);
+		assertEquals(0, salData.apdu().length);
 		final long expected = 3;
 		assertEquals(expected, receivedSyncRegChallenge);
 	}
@@ -283,8 +287,8 @@ class SecureApplicationLayerTest {
 		assertEquals(SecureApplicationLayer.SecureService, DataUnitBuilder.getAPDUService(encryptedSyncRes));
 
 		sal.stashSyncRequest(remote, 3);
-		final var result = sal.extractApdu(remote, local, encryptedSyncRes);
-		assertNull(result);
+		final var salData = sal.extract(remote, local, encryptedSyncRes);
+		assertEquals(0, salData.apdu().length);
 		// seq remote = 3, seq local = 4
 		final byte[] expected = { 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 4 };
 		assertArrayEquals(expected, remoteAndLocalSeq);

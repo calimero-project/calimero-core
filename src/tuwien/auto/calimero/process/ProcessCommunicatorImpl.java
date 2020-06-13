@@ -94,11 +94,11 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		public void indication(final FrameEvent e)
 		{
 			final CEMILData f = (CEMILData) e.getFrame();
+			final var apdu = f.getPayload();
+			// can't be a process communication indication if too short
+			if (apdu.length < 2)
+				return;
 			try {
-				final var apdu = sal.extractApdu(f);
-				// can't be a process communication indication if too short
-				if (apdu == null || apdu.length < 2)
-					return;
 				final int svc = DataUnitBuilder.getAPDUService(apdu);
 				// Note: even if this is a read response we have waited for,
 				// we nevertheless notify the listeners about it (we do *not* discard it)
@@ -115,7 +115,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 					fireGroupReadWrite(f, DataUnitBuilder.extractASDU(apdu), svc, apdu.length <= 2);
 			}
 			catch (final RuntimeException rte) {
-				logger.error("on group indication from {}", f.getDestination(), rte);
+				logger.error("on group indication from {}", f.getSource(), rte);
 			}
 		}
 
@@ -191,7 +191,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		this.sal = sal;
 
 		listeners = new EventListeners<>(logger);
-		lnk.addLinkListener(lnkListener);
+		sal.addListener(lnkListener);
 	}
 
 	@Override

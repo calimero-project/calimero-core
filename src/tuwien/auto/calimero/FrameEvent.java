@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 package tuwien.auto.calimero;
 
 import java.util.EventObject;
+import java.util.Optional;
 
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIFactory;
@@ -59,6 +60,7 @@ public class FrameEvent extends EventObject
 	private final byte[] b;
 
 	private final boolean systemBroadcast;
+	private final SecurityControl securityCtrl;
 
 	/**
 	 * Creates a new frame event for <code>frame</code>.
@@ -80,11 +82,26 @@ public class FrameEvent extends EventObject
 	 */
 	public FrameEvent(final Object source, final CEMI frame, final boolean systemBroadcast)
 	{
+		this(source, frame, systemBroadcast, null);
+	}
+
+	/**
+	 * Creates a new frame event for <code>frame</code>.
+	 *
+	 * @param source the creator of this event
+	 * @param frame cEMI frame
+	 * @param systemBroadcast <code>true</code> if the cEMI frame was received as IP system broadcast,
+	 *        <code>false</code> otherwise
+	 * @param securityCtrl data security control
+	 */
+	public FrameEvent(final Object source, final CEMI frame, final boolean systemBroadcast,
+			final SecurityControl securityCtrl) {
 		super(source);
 		id = System.nanoTime();
 		c = frame;
 		b = null;
 		this.systemBroadcast = systemBroadcast;
+		this.securityCtrl = securityCtrl;
 	}
 
 	/**
@@ -100,6 +117,7 @@ public class FrameEvent extends EventObject
 		b = frame;
 		c = null;
 		systemBroadcast = false;
+		securityCtrl = null;
 	}
 
 	/**
@@ -125,4 +143,6 @@ public class FrameEvent extends EventObject
 	public final long id() { return id; }
 
 	public final boolean systemBroadcast() { return systemBroadcast; }
+
+	public final Optional<SecurityControl> security() { return Optional.ofNullable(securityCtrl); }
 }

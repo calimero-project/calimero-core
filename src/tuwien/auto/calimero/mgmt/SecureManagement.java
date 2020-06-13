@@ -38,22 +38,73 @@ package tuwien.auto.calimero.mgmt;
 
 import java.util.Map;
 
+import tuwien.auto.calimero.CloseEvent;
+import tuwien.auto.calimero.DetachEvent;
+import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
+import tuwien.auto.calimero.internal.EventListeners;
 import tuwien.auto.calimero.internal.SecureApplicationLayer;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 
-class SecureManagement extends SecureApplicationLayer {
+public class SecureManagement extends SecureApplicationLayer {
 
 	private static final int DataConnected = 0x40;
 
 	private final TransportLayerImpl transportLayer;
+	private final EventListeners<TransportListener> listeners;
+
+	private final TransportListener transportListener = new TransportListener() {
+		@Override
+		public void group(final FrameEvent e) {
+			extract(e).ifPresent(e2 -> {
+				listeners.fire(tl -> tl.group(e2));
+				dispatchLinkEvent(e2);
+			});
+		}
+
+		@Override
+		public void broadcast(final FrameEvent e) { extract(e).ifPresent(e2 -> listeners.fire(tl -> tl.broadcast(e2))); }
+
+		@Override
+		public void dataIndividual(final FrameEvent e) { extract(e).ifPresent(e2 -> listeners.fire(tl -> tl.dataIndividual(e2))); }
+
+		@Override
+		public void dataConnected(final FrameEvent e) { extract(e).ifPresent(e2 -> listeners.fire(tl -> tl.dataConnected(e2))); }
+
+		@Override
+		public void disconnected(final Destination d) { listeners.fire(tl -> tl.disconnected(d)); }
+
+		@Override
+		public void detached(final DetachEvent e) { listeners.fire(tl -> tl.detached(e)); }
+
+		@Override
+		public void linkClosed(final CloseEvent e) { listeners.fire(tl -> tl.linkClosed(e)); }
+	};
+
+
+	protected SecureManagement(final TransportLayerImpl transportLayer, final byte[] serialNumber,
+			final long sequenceNumber, final Map<IndividualAddress, byte[]> deviceToolKeys) {
+		super(transportLayer.link(), serialNumber, sequenceNumber, deviceToolKeys);
+		this.transportLayer = transportLayer;
+		listeners = new EventListeners<>();
+		transportLayer.addTransportListener(transportListener);
+	}
 
 	SecureManagement(final TransportLayer transportLayer, final Map<IndividualAddress, byte[]> deviceToolKeys) {
-		super(((TransportLayerImpl) transportLayer).link(), new byte[6], 0, deviceToolKeys);
-		this.transportLayer = (TransportLayerImpl) transportLayer;
+		this((TransportLayerImpl) transportLayer, new byte[6], 0, deviceToolKeys);
+	}
+
+	public void addListener(final TransportListener l) { listeners.add(l); }
+
+	public void removeListener(final TransportListener l) { listeners.remove(l); }
+
+	@Override
+	public void close() {
+		transportLayer.removeTransportListener(transportListener);
+		super.close();
 	}
 
 	@Override
