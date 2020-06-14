@@ -46,6 +46,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.time.Duration;
+import java.util.concurrent.ConcurrentHashMap;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
@@ -69,6 +70,9 @@ import tuwien.auto.calimero.knxnetip.KNXnetIPDevMgmt;
 import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
+import tuwien.auto.calimero.knxnetip.LostMessageEvent;
+import tuwien.auto.calimero.knxnetip.RoutingBusyEvent;
+import tuwien.auto.calimero.knxnetip.RoutingListener;
 import tuwien.auto.calimero.knxnetip.SecureConnection;
 import tuwien.auto.calimero.knxnetip.TunnelingListener;
 import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature;
@@ -151,7 +155,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 
 	public static KNXNetworkLinkIP newTunnelingLink(final Connection connection, final KNXMediumSettings settings)
 			throws KNXException, InterruptedException {
-		return new KNXNetworkLinkIP(TUNNELING, KNXnetIPTunnel.newTcpTunnel(TunnelingLayer.LinkLayer, connection,
+		return new KNXNetworkLinkIP(TunnelingV2, KNXnetIPTunnel.newTcpTunnel(TunnelingLayer.LinkLayer, connection,
 				settings.getDeviceAddress()), settings);
 	}
 
@@ -287,6 +291,8 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 		mode = serviceMode;
 		conn.addConnectionListener(notifier);
 		if (c instanceof KNXnetIPTunnel && mode == TunnelingV2) {
+			customEvents.put(TunnelingFeature.class, ConcurrentHashMap.newKeySet());
+
 			final var tunnel = (KNXnetIPTunnel) c;
 			tunnel.addConnectionListener(new TunnelingListener() {
 				@Override
@@ -297,6 +303,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 						if (feature.featureId() == InterfaceFeature.IndividualAddress)
 							setTunnelingAddress(feature);
 					}
+					dispatchCustomEvent(feature);
 				}
 
 				@Override
@@ -312,6 +319,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 					}
 					if (feature.featureId() == InterfaceFeature.IndividualAddress)
 						setTunnelingAddress(feature);
+					dispatchCustomEvent(feature);
 				}
 
 				private boolean valid(final TunnelingFeature feature) {
@@ -335,6 +343,28 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 			tunnel.send(InterfaceFeature.IndividualAddress);
 			tunnel.send(InterfaceFeature.MaxApduLength);
 			tunnel.send(InterfaceFeature.DeviceDescriptorType0);
+		}
+		else if (c instanceof KNXnetIPRouting) {
+			customEvents.put(LostMessageEvent.class, ConcurrentHashMap.newKeySet());
+			customEvents.put(RoutingBusyEvent.class, ConcurrentHashMap.newKeySet());
+
+			c.addConnectionListener(new RoutingListener() {
+				@Override
+				public void frameReceived(final FrameEvent e) {}
+
+				@Override
+				public void connectionClosed(final CloseEvent e) {}
+
+				@Override
+				public void routingBusy(final RoutingBusyEvent e) {
+					dispatchCustomEvent(e);
+				}
+
+				@Override
+				public void lostMessage(final LostMessageEvent e) {
+					dispatchCustomEvent(e);
+				}
+			});
 		}
 	}
 

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2019 B. Malinowsky
+    Copyright (c) 2015, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,8 +36,15 @@
 
 package tuwien.auto.calimero.link;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.StringJoiner;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 
@@ -116,6 +123,10 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 
 	private CEMIDevMgmt devMgmt;
 
+	final Map<Class<?>, Set<MethodHandle>> customEvents = new ConcurrentHashMap<>();
+
+
+
 	private final class LinkNotifier extends EventNotifier<NetworkLinkListener>
 	{
 		LinkNotifier()
@@ -127,11 +138,13 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		public void frameReceived(final FrameEvent e)
 		{
 			try {
-				// with EMI1 frames, there is the possibility we receive some left-over Get-Value responses
-				// from BCU switching during link setup, silently discard them
-				final byte[] emi1 = e.getFrameBytes();
-				if (emi1 != null && BcuSwitcher.isEmi1GetValue(emi1[0] & 0xff))
-					return;
+				final byte[] frame = e.getFrameBytes();
+				if (frame != null) {
+					// with EMI1 frames, there is the possibility we receive some left-over Get-Value responses
+					// from BCU switching during link setup, silently discard them
+					if (BcuSwitcher.isEmi1GetValue(frame[0] & 0xff))
+						return;
+				}
 
 				final CEMI cemi = onReceive(e);
 				if (cemi instanceof CEMIDevMgmt)
@@ -140,19 +153,19 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 				// from this point on, we are only dealing with L_Data
 				if (!(cemi instanceof CEMILData))
 					return;
-				final CEMILData f = (CEMILData) cemi;
+				final CEMILData ldata = (CEMILData) cemi;
 				final int mc = cemi.getMessageCode();
 				if (mc == CEMILData.MC_LDATA_IND) {
-					addEvent(l -> l.indication(new FrameEvent(source, f)));
-					logger.debug("indication {}", f);
+					addEvent(l -> l.indication(new FrameEvent(source, ldata)));
+					logger.debug("indication {}", ldata);
 				}
 				else if (mc == CEMILData.MC_LDATA_CON) {
-					addEvent(l -> l.confirmation(new FrameEvent(source, f)));
-					if (f.isPositiveConfirmation())
-						logger.debug("confirmation of {}", f.getDestination());
+					addEvent(l -> l.confirmation(new FrameEvent(source, ldata)));
+					if (ldata.isPositiveConfirmation())
+						logger.debug("confirmation of {}", ldata.getDestination());
 					else
-						logger.warn("negative confirmation of {}: {}", f.getDestination(),
-								DataUnitBuilder.toHex(f.toByteArray(), " "));
+						logger.warn("negative confirmation of {}: {}", ldata.getDestination(),
+								DataUnitBuilder.toHex(ldata.toByteArray(), " "));
 				}
 				else
 					logger.warn("unspecified frame event - ignored, msg code = 0x" + Integer.toHexString(mc));
@@ -223,6 +236,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	public void addLinkListener(final NetworkLinkListener l)
 	{
 		notifier.addListener(l);
+		registerCustomEvents(l);
 	}
 
 	@Override
@@ -565,5 +579,53 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 			return false; // we send broadcasts always as system broadcast
 		}
 		return true;
+	}
+
+	// TODO we currently register events multiple times if method also exists as annotated default method on interface
+	private void registerCustomEvents(final NetworkLinkListener listener) {
+		// check default methods on implemented interfaces
+		for (final var iface : listener.getClass().getInterfaces())
+			for (final var method : iface.getDeclaredMethods())
+				inspectMethodForLinkEvent(method, listener);
+		// check normal methods on classes
+		for (final var method : listener.getClass().getDeclaredMethods())
+			inspectMethodForLinkEvent(method, listener);
+	}
+
+	private static final Lookup lookup = MethodHandles.lookup();
+
+	private void inspectMethodForLinkEvent(final Method method, final NetworkLinkListener listener) {
+		if (method.getAnnotation(LinkEvent.class) == null)
+			return;
+		final var paramTypes = method.getParameterTypes();
+		if (paramTypes.length != 1) {
+			logger.warn("cannot register {}: parameter count not 1", method);
+			return;
+		}
+		final var paramType = paramTypes[0];
+		if (!customEvents.containsKey(paramType)) {
+			logger.warn("unsupported event type {}", method);
+			return;
+		}
+		try {
+			final var privateLookup = MethodHandles.privateLookupIn(listener.getClass(), lookup);
+			final var boundMethod = privateLookup.unreflect(method).bindTo(listener);
+			customEvents.get(paramType).add(boundMethod);
+			logger.debug("registered {} for {}s", method, paramType.getSimpleName());
+		}
+		catch (final Exception e) {
+			logger.warn("failed to register {}", method, e);
+		}
+	}
+
+	void dispatchCustomEvent(final Object event) {
+		customEvents.get(event.getClass()).forEach(mh -> {
+			try {
+				mh.invoke(event);
+			}
+			catch (final Throwable e) {
+				e.printStackTrace();
+			}
+		});
 	}
 }

@@ -70,8 +70,16 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.knxnetip.Connection;
 import tuwien.auto.calimero.knxnetip.Debug;
+import tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode;
 import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
+import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
+import tuwien.auto.calimero.knxnetip.LostMessageEvent;
+import tuwien.auto.calimero.knxnetip.RoutingBusyEvent;
+import tuwien.auto.calimero.knxnetip.servicetype.RoutingLostMessage;
+import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature;
+import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature.InterfaceFeature;
 import tuwien.auto.calimero.link.medium.PLSettings;
 import tuwien.auto.calimero.link.medium.TPSettings;
 
@@ -428,5 +436,96 @@ public class KNXNetworkLinkIPTest
 		final byte[] groupKey = new byte[10];
 		assertThrows(KNXIllegalArgumentException.class, () -> KNXNetworkLinkIP.newSecureRoutingLink(netif,
 				KNXNetworkLinkIP.DefaultMulticast, groupKey, Duration.ofMillis(2000), TPSettings.TP1));
+	}
+
+	private static interface DefaultNetworkLinkListener extends NetworkLinkListener {
+		@Override
+		default void linkClosed(final CloseEvent e) {}
+
+		@Override
+		default void indication(final FrameEvent e) {}
+
+		@Override
+		default void confirmation(final FrameEvent e) {}
+	}
+
+	private static interface DefaultMethodEvent extends DefaultNetworkLinkListener {
+		@LinkEvent
+		default void tunnelingFeature(final TunnelingFeature feature) { System.out.println("default method event " + feature); }
+	}
+
+	@Test
+	void registerTunnelingFeatureEvents() throws KNXException, InterruptedException {
+		final var listener = new DefaultNetworkLinkListener() {
+			@LinkEvent
+			void receivedTunnelingFeature(final TunnelingFeature feature) {
+				System.out.println("received " + feature);
+			}
+		};
+		final var connection = Connection.newTcpConnection(new InetSocketAddress(0), Util.getServer());
+		try (final var link = KNXNetworkLinkIP.newTunnelingLink(connection, TPSettings.TP1)) {
+			link.addLinkListener(listener);
+
+			((KNXnetIPTunnel) link.conn).send(InterfaceFeature.ConnectionStatus);
+			((KNXnetIPTunnel) link.conn).send(InterfaceFeature.IndividualAddress);
+		}
+	}
+
+	@Test
+	void registerRoutingEvents() throws KNXException, InterruptedException, SocketException {
+		try (final var link = KNXNetworkLinkIP.newRoutingLink(Util.localInterface(), KNXNetworkLinkIP.DefaultMulticast, TPSettings.TP1)) {
+			final var listener = new DefaultNetworkLinkListener() {
+				@LinkEvent
+				void lostMessage(final LostMessageEvent lostMessage) { System.out.println(lostMessage); }
+
+				@LinkEvent
+				void routingBusy(final RoutingBusyEvent busy) { System.out.println(busy); }
+			};
+			link.addLinkListener(listener);
+
+			int i = 0;
+			while (i++ < 1000) {
+				link.conn.send(frameInd, BlockingMode.NonBlocking);
+			}
+		}
+	}
+
+	@Test
+	void registerUnsupportedEventType() throws KNXException, SocketException {
+		try (final var link = KNXNetworkLinkIP.newRoutingLink(Util.localInterface(), KNXNetworkLinkIP.DefaultMulticast, TPSettings.TP1)) {
+			link.addLinkListener(new DefaultNetworkLinkListener() {
+				@LinkEvent
+				void unsupportedEventType(final RoutingLostMessage lostMessage) { fail("unsupported event type"); }
+			});
+		}
+	}
+
+	@Test
+	void registerDefaultMethodEvent() throws KNXException, InterruptedException {
+		final var connection = Connection.newTcpConnection(new InetSocketAddress(0), Util.getServer());
+		try (final var link = KNXNetworkLinkIP.newTunnelingLink(connection, TPSettings.TP1)) {
+			link.addLinkListener(new DefaultMethodEvent() {});
+
+			((KNXnetIPTunnel) link.conn).send(InterfaceFeature.ConnectionStatus);
+			((KNXnetIPTunnel) link.conn).send(InterfaceFeature.IndividualAddress);
+		}
+	}
+
+	@Test
+	void registerConcreteMethodOverridingDefaultMethod() throws KNXException, InterruptedException {
+		final var connection = Connection.newTcpConnection(new InetSocketAddress(0), Util.getServer());
+		try (final var link = KNXNetworkLinkIP.newTunnelingLink(connection, TPSettings.TP1)) {
+			final var concreteEvent = new DefaultMethodEvent() {
+				@Override
+				@LinkEvent
+				public void tunnelingFeature(final TunnelingFeature feature) {
+					System.out.println("concrete method event " + feature);
+				}
+			};
+			link.addLinkListener(concreteEvent);
+
+			((KNXnetIPTunnel) link.conn).send(InterfaceFeature.ConnectionStatus);
+			((KNXnetIPTunnel) link.conn).send(InterfaceFeature.IndividualAddress);
+		}
 	}
 }
