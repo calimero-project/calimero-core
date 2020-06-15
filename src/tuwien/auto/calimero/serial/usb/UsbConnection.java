@@ -800,8 +800,13 @@ public class UsbConnection implements AutoCloseable
 	private void fireFrameReceived(final KnxTunnelEmi emiType, final byte[] frame) throws KNXFormatException
 	{
 		logger.debug("received {} frame {}", emiType, DataUnitBuilder.toHex(frame, ""));
-		final FrameEvent fe = emiType == KnxTunnelEmi.CEmi
-				? new FrameEvent(this, CEMIFactory.create(frame, 0, frame.length)) : new FrameEvent(this, frame);
+		final FrameEvent fe ;
+		// check baos main service and forward frame as raw bytes
+		if ((frame[0] & 0xff) == 0xf0)
+			fe = new FrameEvent(this, frame);
+		else
+			fe = emiType == KnxTunnelEmi.CEmi ? new FrameEvent(this, CEMIFactory.create(frame, 0, frame.length))
+					: new FrameEvent(this, frame);
 		listeners.fire(l -> l.frameReceived(fe));
 	}
 

@@ -40,6 +40,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -59,6 +60,7 @@ import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
+import tuwien.auto.calimero.baos.BaosService;
 import tuwien.auto.calimero.cemi.AdditionalInfo;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
@@ -144,6 +146,23 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 					// from BCU switching during link setup, silently discard them
 					if (BcuSwitcher.isEmi1GetValue(frame[0] & 0xff))
 						return;
+
+					final int PeiIdentifyCon = 0xa8;
+					if ((frame[0] & 0xff) == PeiIdentifyCon) {
+						logger.info("PEI identify {}", DataUnitBuilder.toHex(frame, " "));
+						final int manufacturer = unsigned(frame[3], frame[4]);
+						if (manufacturer == 0xc5) {
+							logger.info("link connected to weinzierl device");
+						}
+					}
+
+					// intercept BAOS services (ObjectServer protocol)
+					final int BaosMainService = 0xf0;
+					if ((frame[0] & 0xff) == BaosMainService) {
+						final var baosEvent = BaosService.from(ByteBuffer.wrap(frame));
+						dispatchCustomEvent(baosEvent);
+						return;
+					}
 				}
 
 				final CEMI cemi = onReceive(e);
@@ -453,6 +472,38 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	Optional<Integer> maxApduLength() throws KNXException, InterruptedException {
 		final int pidMaxApduLength = 56;
 		return read(0, pidMaxApduLength).map(AbstractLink::unsigned);
+	}
+
+	void baosMode() throws KNXException, InterruptedException {
+		final IndividualAddress dst = KNXMediumSettings.BackboneRouter;
+		if (cEMI) {
+			final int pidBaosSupport = 201;
+			final var check = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, cemiServerObject, 1, pidBaosSupport, 1, 1);
+			onSend(check);
+			final boolean supported = responseFor(CEMIDevMgmt.MC_PROPREAD_CON, pidBaosSupport).isPresent();
+			if (!supported)
+				throw new KNXException("device does not support BAOS mode");
+
+			final var frame = BcuSwitcher.commModeRequest(BcuSwitcher.BaosMode);
+			onSend(dst, frame, true);
+			responseFor(CEMIDevMgmt.MC_PROPWRITE_CON, BcuSwitcher.pidCommMode);
+
+			final var recheck = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, cemiServerObject, 1,
+					BcuSwitcher.pidCommMode, 1, 1);
+			onSend(recheck);
+			responseFor(CEMIDevMgmt.MC_PROPREAD_CON, BcuSwitcher.pidCommMode)
+					.ifPresent(mode -> logger.info("read comm mode {}", DataUnitBuilder.toHex(mode, "")));
+		}
+		// ??? check baos support ahead
+//		else if (activeEmi == EmiType.Emi1) {
+			// NYI EMI1
+//		}
+		else {
+			// NYI EMI2
+			final int PeiIdentifyReq = 0xa7;
+//			final int PeiIdentifyCon = 0xa8;
+			onSend(dst, new byte[] { (byte) PeiIdentifyReq }, true);
+		}
 	}
 
 	Optional<byte[]> read(final int objectType, final int pid) throws KNXException, InterruptedException {
