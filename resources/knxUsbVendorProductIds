@@ -1,0 +1,81 @@
+# KNX USB interfaces by Vendor ID
+# Created 2020-06-20
+0111
+	1022	# Makel Elektrik
+# Future Technology Devices International Limited
+0403
+	6898	# Tokka
+# b+b
+04cc
+	0301	# b+b Automations- und Steuerungstechnik
+# Siemens OCI700 interface (Synco family)
+0681
+	0014	# Siemens HVAC
+# Siemens Automation & Drives
+0908
+	02DD	# Siemens
+	02DC	# Siemens HVAC
+	02E6	# Schrack Technik GmbH
+# Weinzierl Engineering GmbH
+0e77
+	0111, 0112	# Siemens
+	6910	# Busch-Jaeger Elektro
+	0104	# GEWISS
+	0104	# Somfy
+	0115	# CONTROLtronic
+	0102, 0103, 0104, 2001	# Weinzierl Engineering GmbH
+	0121	# Gustav Hensel GmbH & Co. KG
+	0141	# Schneider Electric (MG)
+# Insta
+135e
+	0023, 0123, 0323	# Albrecht Jung
+	0021	# Berker
+	0022, 0122, 0322	# GIRA Giersiepen
+	0025	# Hager Electro
+	0020, 0320	# Insta GmbH
+	0024	# Merten
+	0026, 0326	# Feller
+	0028	# Glamox AS
+	0027	# Panasonic
+	0329	# B.E.G.
+# Busch-Jaeger
+145c
+	1330, 1490	# Busch-Jaeger Elektro
+# ABB STOTZ‐KONTAKT GmbH
+147b
+	2200, 5120	# ABB
+# MCS Electronics ‐ OBSOLETE
+16d0
+	0490	# TAPKO Technologies
+	0491	# MDT technologies
+	0492	# preussen automation
+# SATEL Ltd.
+24d5
+	0106	# Satel sp. z o.o.
+# Tapko Technologies GmbH
+28c2
+	001A	# VIMAR
+	0002	# Zennio
+	0004, 0008	# TAPKO Technologies
+	0006	# HDL
+	0007	# Niko-Zublin
+	000C	# ESYLUX
+	0010	# Video-Star
+	0015	# Bes – Ingenium
+	000E, 000F	# APRICUM
+	0005	# Philips Controls
+	0003	# Ekinex S.p.A.
+	0011, 0012	# Griesser AG
+	000B, 000D	# VIVO
+	0017	# Interra
+	0013	# MEAN WELL Enterprises Co. Ltd.
+	0014	# Ergo3 Sarl
+# ise GmbH
+2a07
+	0001	# ise GmbH
+	0002	# Elsner Elektronik GmbH
+# DOGAWIST ‐ Investment GmbH
+2d72
+	0002	# PEAKnx a DOGAWIST company 
+7660
+	0002	# KNX Association

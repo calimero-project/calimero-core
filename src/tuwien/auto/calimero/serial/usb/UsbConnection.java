@@ -36,20 +36,30 @@
 
 package tuwien.auto.calimero.serial.usb;
 
+import static java.util.stream.Collectors.flatMapping;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toUnmodifiableList;
+
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import javax.usb.UsbClaimException;
@@ -141,37 +151,6 @@ public class UsbConnection implements AutoCloseable
 		}
 	};
 
-	private static final int[] vendorIds = {
-		0x135e, // Insta: also used in Hager, Jung, Merten, Berker, Gira
-		0x0e77, // Siemens: also used in Weinzierl, Merlin, Hensel
-		0x145c, // Busch-Jaeger
-		0x147b, // ABB stotz-kontakt
-		0x16D0, 0x28c2, // Tapko and others
-		0x0681, // Siemens OCI700 interface (Synco family)
-		0x04cc, // b+b
-	};
-
-	private static final int[] productIds = {
-		// zennio (uses 0x28c2 vendor)
-		0x0002,
-		// uses Insta
-		0x0020, 0x0021, 0x0022, 0x0023, 0x0024, 0x0025, 0x0026,
-		// uses Siemens
-		0x0102, 0x0104, 0x0111, 0x0112, 0x0121, 0x0141, 0x2001,
-		// uses BJ
-		0x1330, // BJ flush-mounted
-		0x1490, // BJ surface-mounted
-		// uses ABB
-		0x5120,
-		// uses Tapko
-		0x0008, 0x0490, 0x0491, 0x0492,
-		// uses OCI
-		0x0014,
-		// uses b+b, EIBWeiche USB
-		0x0301,
-	};
-
-
 	// KNX interfaces that use a USB to ? adapter (e.g., USB to serial adapter)
 	// this allows us to at least list those devices, although we cannot tell the
 	// actual communication port (e.g., /dev/ttyACM0)
@@ -190,6 +169,28 @@ public class UsbConnection implements AutoCloseable
 	private static final Logger slogger = LoggerFactory.getLogger(logPrefix);
 	private final Logger logger;
 	private final String name;
+
+
+	private static final Map<Integer, List<Integer>> vendorProductIds = loadKnxUsbVendorProductIds();
+
+	private static Map<Integer, List<Integer>> loadKnxUsbVendorProductIds() {
+		try (final var is = UsbConnection.class.getResourceAsStream("/knxUsbVendorProductIds")) {
+			final var lines = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8)).lines();
+			final int[] currentVendor = new int[1];
+			return Map.copyOf(lines.filter(s -> !s.startsWith("#") && !s.isBlank())
+					.collect(groupingBy(line ->
+									line.startsWith("\t") ? currentVendor[0] : (currentVendor[0] = fromHex(line)),
+							 flatMapping(UsbConnection::productsIds, toUnmodifiableList()))));
+		}
+		catch (final IOException | RuntimeException e) {
+			slogger.warn("failed loading KNX USB vendor:product IDs, autodetection of USB devices won't work", e);
+		}
+		return Map.of();
+	}
+
+	private static Stream<Integer> productsIds(final String line) {
+		return line.startsWith("\t") ? List.of(line.split("#")[0].split(",")).stream().map(s -> fromHex(s)) : Stream.of();
+	}
 
 	private final EventListeners<KNXListener> listeners = new EventListeners<>();
 
@@ -350,10 +351,10 @@ public class UsbConnection implements AutoCloseable
 	{
 		final List<UsbDevice> knx = new ArrayList<>();
 		for (final UsbDevice d : getDevices()) {
-			final int vendor = d.getUsbDeviceDescriptor().idVendor() & 0xffff;
-			for (final int v : vendorIds)
-				if (v == vendor)
-					knx.add(d);
+			final var descriptor = d.getUsbDeviceDescriptor();
+			final int vendor = descriptor.idVendor() & 0xffff;
+			if (vendorProductIds.getOrDefault(vendor, List.of()).contains(descriptor.idProduct() & 0xffff))
+				knx.add(d);
 		}
 		return knx;
 	}
@@ -854,8 +855,8 @@ public class UsbConnection implements AutoCloseable
 			final String[] split = device.split(":", -1);
 			if (split.length == 2) {
 				try {
-					final int vendorId = Integer.parseInt(split[0], 16);
-					final int productId = Integer.parseInt(split[1], 16);
+					final int vendorId = fromHex(split[0]);
+					final int productId = fromHex(split[1]);
 					return findDevice(getRootHub(), vendorId, productId);
 				}
 				catch (final NumberFormatException expected) {}
@@ -966,19 +967,14 @@ public class UsbConnection implements AutoCloseable
 	// pre: device = vendorId:productId
 	private static boolean isKnxInterfaceId(final String device)
 	{
-		boolean knownVendor = false;
-		boolean knownProduct = false;
 		final String[] split = device.split(":", -1);
 		try {
-			final int vend = Integer.parseInt(split[0], 16);
-			final int prod = Integer.parseInt(split[1], 16);
-			for (final int v : vendorIds)
-				knownVendor |= v == vend;
-			for (final int p : productIds)
-				knownProduct |= p == prod;
+			final int vend = fromHex(split[0]);
+			final int prod = fromHex(split[1]);
+			return vendorProductIds.getOrDefault(vend, List.of()).contains(prod);
 		}
 		catch (final NumberFormatException ignore) {}
-		return knownVendor && knownProduct;
+		return false;
 	}
 
 	// Cross-platform way to do name lookup for USB devices, using the low-level API.
@@ -988,7 +984,7 @@ public class UsbConnection implements AutoCloseable
 	{
 		final List<String> list = getDeviceDescriptionsLowLevel();
 		if (name.isEmpty())
-			list.removeIf(i -> !isKnxInterfaceId(i.substring(i.indexOf("ID") + 3, i.indexOf("\n"))));
+			list.removeIf(i -> !isKnxInterfaceId(i.split("ID |\n")[1]));
 		else
 			list.removeIf(i -> i.toLowerCase().indexOf(name.toLowerCase()) == -1);
 		if (list.isEmpty())
@@ -1181,4 +1177,6 @@ public class UsbConnection implements AutoCloseable
 			return (long) (data[0] & 0xff) << 8 | (data[1] & 0xff);
 		return (long) (data[0] & 0xff) << 24 | (data[1] & 0xff) << 16 | (data[2] & 0xff) << 8 | (data[3] & 0xff);
 	}
+
+	private static int fromHex(final String hex) { return Integer.valueOf(hex.strip(), 16); }
 }
