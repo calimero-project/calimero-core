@@ -37,7 +37,6 @@
 package tuwien.auto.calimero.baos;
 
 import java.time.ZonedDateTime;
-import java.util.Map;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,8 +49,11 @@ import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.baos.Baos.KnxBaosLink;
+import tuwien.auto.calimero.baos.BaosService.DatapointCommand;
+import tuwien.auto.calimero.baos.BaosService.Item;
 import tuwien.auto.calimero.baos.BaosService.Property;
 import tuwien.auto.calimero.baos.BaosService.Timer;
+import tuwien.auto.calimero.baos.BaosService.ValueFilter;
 import tuwien.auto.calimero.link.KNXNetworkLinkUsb;
 import tuwien.auto.calimero.link.LinkEvent;
 import tuwien.auto.calimero.link.NetworkLinkListener;
@@ -115,10 +117,10 @@ class KnxBaosLinkUsbTest {
 
 	@Test
 	void readWriteDatapoint() throws KNXException {
-		final var setDp = BaosService.setDatapointValue(Map.of(1, new byte[] { 1 }));
+		final var setDp = BaosService.setDatapointValue(Item.datapoint(1, DatapointCommand.SetValue, new byte[] { 1 }));
 		link.send(setDp);
 
-		final var getDp = BaosService.getDatapointValue(1, 1, 0);
+		final var getDp = BaosService.getDatapointValue(1, 1, ValueFilter.All);
 		link.send(getDp);
 	}
 

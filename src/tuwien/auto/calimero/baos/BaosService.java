@@ -36,17 +36,18 @@
 
 package tuwien.auto.calimero.baos;
 
+import static java.lang.String.format;
+import static java.nio.ByteBuffer.allocate;
+
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import tuwien.auto.calimero.DataUnitBuilder;
@@ -58,7 +59,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  */
 public class BaosService {
 
-	enum ErrorCode {
+	public enum ErrorCode {
 		NoError,
 		InternalError,
 		NoElementFound,
@@ -115,7 +116,7 @@ public class BaosService {
 		BaosRestEnabled(true, 1),
 		HttpFileEnabled(true, 1),
 		SearchRequestEnabled(true, 1),
-		IsStructured(true, 1), // ??? DatabaseIsStructured
+		StructuredDatabase(true, 1),
 		MaxManagementClients(true, 1),
 		ConnectedManagementClients(true, 1),
 		MaxTunnelingClients(true, 1),
@@ -152,32 +153,92 @@ public class BaosService {
 		public int id() { return ordinal(); }
 	}
 
-	enum DatapointCommand {
+	public enum ValueFilter {
+		All, ValidOnly, UpdatedOnly;
+
+		public static ValueFilter of(final int id) { return values()[id]; }
+	}
+
+	public enum DatapointCommand {
 		NoCommand,
 		SetValue,
 		SendValueOnBus,
 		SetValueAndSendOnBus,
 		ReadValueViaBus,
-		ClearDatapointTransmissionState;
+		ClearTransmissionState;
 
 		public static DatapointCommand of(final int command) { return DatapointCommand.values()[command]; }
 	};
 
-	enum HistoryCommand {
+	public enum HistoryCommand {
 		None,
 		Clear,
 		Start,
-		ClearAndStart,
+		ClearStart,
 		Stop,
-		StopAndClear
+		StopClear;
+
+		public static HistoryCommand of(final String command) {
+			for (final var v : values())
+				if (v.name().equalsIgnoreCase(command))
+					return v;
+			throw new KNXIllegalArgumentException("invalid history command '" + command + "'");
+		}
 	};
+
+	public static final class Item<T> {
+		public static Item<Void> property(final Property p, final byte[] data) {
+			return new Item<>(p.id(), null, data);
+		}
+
+		public static Item<DatapointCommand> datapoint(final int dpId, final DatapointCommand cmd, final byte[] data) {
+			return new Item<>(dpId, cmd, data);
+		}
+
+		private final int id;
+		private final T info;
+		private final byte[] data;
+
+		private Item(final int id, final T info, final byte[] data) {
+			this.id = id;
+			this.info = info;
+			this.data = data.clone();
+		}
+
+		public final int id() { return id; }
+
+		public final T info() { return info; }
+
+		public final byte[] data() { return data.clone(); }
+
+		int size() {
+			if (info instanceof Timer)
+				return data.length;
+			if (info instanceof Instant)
+				return 2 + 4 + 1 + data.length;
+			if (info instanceof DatapointCommand)
+				return 2 + 1 + 1 + data.length;
+			return 2 + 1 + data.length;
+		}
+
+		byte[] toByteArray() {
+			if (info instanceof Timer)
+				return data;
+			final var buf = allocate(size()).putShort((short) id);
+			if (info instanceof Instant)
+				buf.putInt((int) ((Instant) info).getEpochSecond());
+			else if (info instanceof DatapointCommand)
+				buf.put((byte) ((DatapointCommand) info).ordinal());
+			return buf.put((byte) data.length).put(data).array();
+		}
+	}
 
 	public static final class Timer {
 		public static Timer delete(final int timerId) { return new Timer(timerId, 0, new byte[0], new byte[0], ""); }
 
 		public static Timer oneShot(final int timerId, final ZonedDateTime dateTime, final byte[] job,
 				final String description) {
-			final var triggerParams = ByteBuffer.allocate(4).putInt((int) dateTime.toEpochSecond()).array();
+			final var triggerParams = allocate(4).putInt((int) dateTime.toEpochSecond()).array();
 			return new Timer(timerId, 1, triggerParams, job, description);
 		}
 
@@ -186,7 +247,7 @@ public class BaosService {
 			if (end.isBefore(start))
 				throw new KNXIllegalArgumentException("end " + end + " is before start " + start);
 
-			final var triggerParams = ByteBuffer.allocate(14);
+			final var triggerParams = allocate(14);
 			// date/time range
 			triggerParams.putInt((int) start.toEpochSecond()).putInt((int) end.toEpochSecond());
 			// interval parts
@@ -201,8 +262,7 @@ public class BaosService {
 		}
 
 		public static Timer from(final ByteBuffer buf) throws KNXFormatException {
-			if (buf.remaining() < TimerSize)
-				throw new KNXFormatException("");
+			ensureMinSize(0, TimerSize, buf.remaining());
 
 			final int id = buf.getShort() & 0xffff;
 			final var trigger = buf.get() & 0xff;
@@ -211,7 +271,7 @@ public class BaosService {
 
 			final int job = buf.get() & 0xff;
 			if (job != JobSetDatapointValue)
-				throw new KNXFormatException("");
+				throw new KNXFormatException("unsupported timer job type", job);
 			final var jobParams = getWithLengthPrefix(buf);
 
 			final var desc = getWithLengthPrefix(buf);
@@ -251,7 +311,7 @@ public class BaosService {
 
 		public byte[] toByteArray() {
 			final int capacity = 4 + triggerParams.length + 2 + jobParams.length + 2 + desc.length(); // XXX utf8?
-			final ByteBuffer buf = ByteBuffer.allocate(capacity);
+			final ByteBuffer buf = allocate(capacity);
 			// trigger
 			buf.putShort((short) id).put((byte) trigger).put((byte) triggerParams.length).put(triggerParams);
 			// job
@@ -293,7 +353,7 @@ public class BaosService {
 	private static final int GetServerItem              = 0x01;
 	private static final int SetServerItem              = 0x02;
 	private static final int GetDatapointDescription    = 0x03;
-	private static final int GetDescriptionString       = 0x04; // ??? add Datapoint
+	private static final int GetDatapointDescriptionString = 0x04;
 	private static final int GetDatapointValue          = 0x05;
 	private static final int SetDatapointValue          = 0x06;
 	private static final int GetParameterByte           = 0x07;
@@ -307,21 +367,21 @@ public class BaosService {
 	private static final int ServerItemIndication		= 0xC2;
 
 	private static String subServiceString(final int subService) {
-		switch (subService) {
+		switch (subService & ~ResponseFlag) {
 		case GetServerItem             : return "GetServerItem";
 		case SetServerItem             : return "SetServerItem";
 		case GetDatapointDescription   : return "GetDatapointDescription";
-		case GetDescriptionString      : return "GetDescriptionString";
+		case GetDatapointDescriptionString: return "GetDescriptionString";
 		case GetDatapointValue         : return "GetDatapointValue";
 		case SetDatapointValue         : return "SetDatapointValue";
 		case GetParameterByte          : return "GetParameterByte";
-		case SetDatapointHistoryCommand: return "SetDatapointHistoryComma";
+		case SetDatapointHistoryCommand: return "SetDatapointHistoryCommand";
 		case GetDatapointHistoryState  : return "GetDatapointHistoryState";
 		case GetDatapointHistory       : return "GetDatapointHistory";
 		case GetTimer                  : return "GetTimer";
 		case SetTimer                  : return "SetTimer";
 		case DatapointValueIndication  : return "DatapointValueIndication";
-		case ServerItemIndication	   : return "ServerItemIndication";
+		case ServerItemIndication      : return "ServerItemIndication";
 		default: return "" + subService;
 		}
 	}
@@ -333,10 +393,10 @@ public class BaosService {
 
 	private final int subService;
 	private final int start;
-	private final int items;
+	private final int count;
 
 	private final byte[] data;
-	private final Map<Integer, byte[]> dataById;
+	private final List<Item<?>> items;
 
 
 	private static boolean isSupportedService(final int subService) {
@@ -353,9 +413,9 @@ public class BaosService {
 		return new BaosService(GetServerItem, startItem.id(), items);
 	}
 
-	public static BaosService setServerItem(final Map<Property, byte[]> items) {
-		final var map = items.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().id(), Entry::getValue));
-		return new BaosService(SetServerItem, map);
+	@SafeVarargs
+	public static BaosService setServerItem(final Item<Void>... items) {
+		return new BaosService(SetServerItem, items);
 	}
 
 	public static BaosService getDatapointDescription(final int startDatapointId, final int datapoints) {
@@ -363,14 +423,16 @@ public class BaosService {
 	}
 
 	public static BaosService getDatapointDescriptionString(final int startDatapointId, final int datapoints) {
-		return new BaosService(GetDescriptionString, startDatapointId, datapoints);
+		return new BaosService(GetDatapointDescriptionString, startDatapointId, datapoints);
 	}
 
-	public static BaosService getDatapointValue(final int startDatapointId, final int datapoints, final int filter) {
-		return new BaosService(GetDatapointValue, startDatapointId, datapoints, (byte) filter);
+	public static BaosService getDatapointValue(final int startDatapointId, final int datapoints,
+			final ValueFilter filter) {
+		return new BaosService(GetDatapointValue, startDatapointId, datapoints, (byte) filter.ordinal());
 	}
 
-	public static BaosService setDatapointValue(final Map<Integer, byte[]> items) {
+	@SafeVarargs
+	public static BaosService setDatapointValue(final Item<DatapointCommand>... items) {
 		return new BaosService(SetDatapointValue, items);
 	}
 
@@ -410,13 +472,13 @@ public class BaosService {
 
 	public static BaosService from(final ByteBuffer data) throws KNXFormatException {
 		final int size = data.remaining();
-		if (size < MinimumFrameSize)
-			throw new KNXFormatException("");
-		if ((data.get() & 0xff) != MainService)
-			throw new KNXFormatException("");
+		ensureMinSize(0, MinimumFrameSize, size);
+		final int mainService = data.get() & 0xff;
+		if (mainService != MainService)
+			throw new KNXFormatException("no BAOS service", mainService);
 		final int subService = data.get() & 0xff;
 		if (!isSupportedService(subService))
-			throw new KNXFormatException("unsupported service", subService);
+			throw new KNXFormatException("unsupported BAOS service", subService);
 
 		final int start = data.getShort() & 0xffff;
 		final int items = data.getShort() & 0xffff;
@@ -427,8 +489,7 @@ public class BaosService {
 		}
 
 		if (subService == GetParameterByte) {
-			if (MinimumFrameSize + items > size)
-				throw new KNXFormatException("");
+			ensureMinSize(GetParameterByte, MinimumFrameSize + items, size);
 			final byte[] bytes = new byte[items];
 			data.get(bytes);
 			return new BaosService(subService, start, items, bytes);
@@ -439,42 +500,44 @@ public class BaosService {
 	private BaosService(final int service, final int startItem, final int items, final byte... additionalData) {
 		subService = service;
 		start = startItem;
-		this.items = items;
+		this.count = items;
 		this.data = additionalData;
-		dataById = Map.of();
+		this.items = List.of();
 	}
 
-	private BaosService(final int service, final Map<Integer, byte[]> dataById) {
+	private BaosService(final int service, final Item<?>... items) {
+		if (items.length == 0)
+			throw new KNXIllegalArgumentException("no item supplied");
 		subService = service;
-		start = Collections.min(dataById.keySet());
-		this.items = dataById.size();
+		start = items[0].id();
+		this.count = items.length;
 		this.data = new byte[0];
-		this.dataById = dataById;
+		this.items = List.of(items);
 	}
 
 	private BaosService(final int service, final int start, final int items, final ByteBuffer buf)
 			throws KNXFormatException {
 		subService = service;
 		this.start = start;
-		this.items = items;
+		this.count = items;
 		this.data = new byte[0];
-		this.dataById = parseItems(buf);
+		this.items = List.copyOf(parseItems(buf));
 	}
 
 	public final int subService() { return subService; }
 
+	public final ErrorCode error() { return count == 0 ? ErrorCode.of(data[0]) : ErrorCode.NoError; }
+
+	public final List<Item<?>> items() { return items; }
+
 	public byte[] toByteArray() {
-
-		final int collectionSize = dataById.values().stream().mapToInt(data -> 3 + data.length).sum();
+		final int collectionSize = items.stream().mapToInt(Item::size).sum();
 		final int capacity = 6 + data.length + collectionSize;
-		final var frame = ByteBuffer.allocate(capacity);
+		final var frame = allocate(capacity);
 
-		frame.put((byte) MainService).put((byte) subService).putShort((short) start).putShort((short) items);
+		frame.put((byte) MainService).put((byte) subService).putShort((short) start).putShort((short) count);
 		frame.put(data);
-		dataById.keySet().stream().sorted().forEach(id -> {
-			final var d = dataById.get(id);
-			frame.putShort((short) (int) id).put((byte) d.length).put(d);
-		});
+		items.stream().map(Item::toByteArray).forEach(frame::put);
 
 		return frame.array();
 	}
@@ -482,81 +545,82 @@ public class BaosService {
 	@Override
 	public String toString() {
 		final String response = (subService & ResponseFlag) != 0 ? ".res" : "";
-		final String svc = subServiceString(subService & ~ResponseFlag);
-		if (items == 0)
+		final String svc = subServiceString(subService);
+		if (count == 0)
 			return svc + response + " item " + start + " (" + ErrorCode.of(data[0] & 0xff) + ")";
 
-		final var s = svc + response + " start " + start + " items " + items;
-		if (data.length > 0 || !dataById.isEmpty()) {
-			return s + ", " + DataUnitBuilder.toHex(data, " ") + dataById.entrySet().stream()
-					.map(entry -> ((subService & 0x7f) == GetServerItem ? Property.of(entry.getKey()) : entry.getKey())
-							+ "=" + DataUnitBuilder.toHex(entry.getValue(), ""))
+		final var s = svc + response + " start " + start + " items " + count;
+		if (data.length > 0 || !items.isEmpty()) {
+			return s + ", " + DataUnitBuilder.toHex(data, " ") + items.stream()
+					.map(item -> ((subService & 0x7f) == GetServerItem ? Property.of(item.id()) : item.id())
+							+ "=" + DataUnitBuilder.toHex(item.data, ""))
 					.collect(Collectors.joining(", "));
 		}
 		return s;
 	}
 
-	private Map<Integer, byte[]> parseItems(final ByteBuffer buf) throws KNXFormatException {
-		final var dataById = new HashMap<Integer, byte[]>();
-		for (int item = 0; item < items; item++) {
+	private List<Item<?>> parseItems(final ByteBuffer buf) throws KNXFormatException {
+		final var list = new ArrayList<Item<?>>();
+		for (int item = 0; item < count; item++) {
 			final int remaining = buf.remaining();
-			if (remaining < 4)
-				throw new KNXFormatException("");
+			ensureMinSize(subService, 4, remaining);
 
 			// get the timer beast out of the way
 			if (subService == GetTimer || subService == SetTimer) {
 				final var timer = Timer.from(buf);
-				dataById.put(timer.id(), timer.toByteArray());
+				list.add(timer.id(), new Item<>(timer.id(), timer, timer.toByteArray()));
 				continue;
 			}
 
 			final int id;
 			// description response does not provide id per item
-			if (subService == GetDescriptionString)
+			if (subService == GetDatapointDescriptionString)
 				id = start + item; // ??? is id always incrementing by 1 or not
 			else
 				id = buf.getShort() & 0xffff;
 
-			if (subService == GetDatapointValue || subService == DatapointValueIndication || subService == GetDatapointHistoryState) {
+			Object info = null;
+			if (subService == GetDatapointValue || subService == DatapointValueIndication
+					|| subService == GetDatapointHistoryState) {
 				final int dpState = buf.get() & 0xff;
+				info = dpState;
 			}
 			if (subService == SetDatapointValue) {
 				final var command = DatapointCommand.of(buf.get() & 0xff);
+				info = command;
 			}
 
-			final int length;
-			// datapoint description does not provide length
-			if (subService == GetDatapointDescription)
-				length = 3;
-			else if (subService == GetDatapointHistoryState)
-				length = 4; // 4 byte field containing number of history items
-			else if (subService == GetDatapointHistory) {
-				final long timestamp = buf.getInt() & 0xffffffffL;
-				length = buf.get() & 0xff;
+			// datapoint description and history state don't have length field
+			if (subService == GetDatapointDescription || subService == GetDatapointHistoryState) {
+				final int length = subService == GetDatapointDescription ? 3 : 4;
+				final byte[] data = new byte[length];
+				buf.get(data);
+				list.add(new Item<>(id, info, data));
 			}
 			else {
-				// TODO use getWithLengthPrefix
-				length = buf.get() & 0xff;
-				if (remaining < 3 + length)
-					throw new KNXFormatException("");
+				if (subService == GetDatapointHistory) { // parse extra timestamp field
+					final long timestamp = buf.getInt() & 0xffff_ffffL;
+					info = Instant.ofEpochSecond(timestamp);
+				}
+
+				final byte[] data = getWithLengthPrefix(buf);
+				list.add(new Item<>(id, info, data));
 			}
 
-			final byte[] data = new byte[length];
-			buf.get(data);
-			dataById.put(id, data);
 		}
 		if (buf.remaining() > 0)
-			throw new KNXFormatException("");
-		if (dataById.size() != items)
-			throw new KNXFormatException("");
+			throw new KNXFormatException(
+					format("%s invalid structure, %d leftover bytes", subServiceString(subService), buf.remaining()));
+		if (list.size() != count)
+			throw new KNXFormatException(
+					format("%s expected %d items, got %d", subServiceString(subService), count, list.size()));
 
-		return dataById;
+		return list;
 	}
 
 	private static byte[] getWithLengthPrefix(final ByteBuffer buf) throws KNXFormatException {
 		final int length = buf.get() & 0xff;
-		if (buf.remaining() < length)
-			throw new KNXFormatException("");
+		ensureMinSize(0, length, buf.remaining());
 
 		final var data = new byte[length];
 		buf.get(data);
@@ -568,5 +632,14 @@ public class BaosService {
 		for (final var timer : timers)
 			os.writeBytes(timer.toByteArray());
 		return os.toByteArray();
+	}
+
+	private static void ensureMinSize(final int subService, final int expected, final int actual)
+			throws KNXFormatException {
+		if (expected > actual) {
+			final String svc = subService != 0 ? subServiceString(subService) : "BAOS";
+			throw new KNXFormatException(
+					format("invalid %s structure, remaining length %d < %d (expected)", svc, actual, expected));
+		}
 	}
 }
