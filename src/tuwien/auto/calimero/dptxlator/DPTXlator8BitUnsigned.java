@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -102,6 +102,12 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	 */
 	public static final DPT DPT_VALUE_1_UCOUNT = new DPT("5.010", "Unsigned count", "0", "255",
 			"counter pulses");
+
+	/**
+	 * DPT ID 5.100, fan stage; values from <b>0</b> to <b>255</b> fan stage.
+	 */
+	public static final DPT DptFanStage = new DPT("5.100", "fan stage", "0", "255", "fan stage");
+
 
 	private static final Map<String, DPT> types = loadDatapointTypes(DPTXlator8BitUnsigned.class);
 

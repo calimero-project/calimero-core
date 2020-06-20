@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -178,6 +178,18 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	 */
 	public static final DPT DPT_WIND_SPEED_KMH = new DPT("9.028", "Wind speed", "0", "670760.96",
 			"km/h");
+
+	/**
+	 * DPT ID 9.029, absolute humidity in g/m³; values from <b>0</b> to <b>670760.96</b> g/m³, resolution 0.01.
+	 */
+	public static final DPT DptAbsoluteHumidity = new DPT("9.029", "absolute humidity", "0", "670760.96", "g/m³");
+
+	/**
+	 * DPT ID 9.030, concentration in µg/m³; values from <b>0</b> to <b>670760.96</b> µg/m³, resolution 0.01.
+	 */
+	public static final DPT DptConcentration = new DPT("9.030", "concentration", "0", "670760.96", "µg/m³");
+
+
 
 	private static final Map<String, DPT> types = loadDatapointTypes(DPTXlator2ByteFloat.class);
 

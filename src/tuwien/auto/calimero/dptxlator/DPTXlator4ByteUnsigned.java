@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -63,6 +63,17 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 	 */
 	public static final DPT DPT_VALUE_4_UCOUNT = new DPT("12.001", "Unsigned count", "0",
 			"4294967295", "counter pulses");
+
+	/** DPT ID 12.100, counter time [s]; values from <b>0</b> to <b>4294967295</b> s. */
+	public static final DPT DptTimePeriodSec = new DPT("12.100", "counter time [s]", "0", "4294967295", "s");
+
+	/** DPT ID 12.101, counter time [min]; values from <b>0</b> to <b>4294967295</b> min. */
+	public static final DPT DptTimePeriodMin = new DPT("12.101", "counter time [min]", "0", "4294967295", "min");
+
+	/** DPT ID 12.102, counter time [h]; values from <b>0</b> to <b>4294967295</b> h. */
+	public static final DPT DptTimePeriodHours = new DPT("12.102", "counter time [h]", "0", "4294967295", "h");
+
+
 
 	private static final Map<String, DPT> types;
 

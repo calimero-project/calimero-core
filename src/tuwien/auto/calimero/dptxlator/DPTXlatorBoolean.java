@@ -172,6 +172,11 @@ public class DPTXlatorBoolean extends DPTXlator
 			"only move up/down", "move up/down + step-stop");
 
 	/**
+	 * DPT ID 1.024, day/night; values <b>day</b>, <b>night</b>.
+	 */
+	public static final DPT DptDayNight = new DPT("1.024", "day/night", "day", "night");
+
+	/**
 	 * DPT ID 1.100, HVAC Heat/Cool; values <b>cooling</b>, <b>heating</b>.
 	 */
 	public static final DPT DPT_HEAT_COOL = new DPT("1.100", "Heat/Cool", "cooling", "heating");

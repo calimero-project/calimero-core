@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -79,7 +79,8 @@ public class DPTXlator2ByteFloatTest extends TestCase
 		DPTXlator2ByteFloat.DPT_POWERDENSITY, DPTXlator2ByteFloat.DPT_KELVIN_PER_PERCENT,
 		DPTXlator2ByteFloat.DPT_POWER, DPTXlator2ByteFloat.DPT_VOLUME_FLOW,
 		DPTXlator2ByteFloat.DPT_RAIN_AMOUNT, DPTXlator2ByteFloat.DPT_TEMP_F,
-		DPTXlator2ByteFloat.DPT_WIND_SPEED_KMH };
+		DPTXlator2ByteFloat.DPT_WIND_SPEED_KMH, DPTXlator2ByteFloat.DptAbsoluteHumidity,
+		DPTXlator2ByteFloat.DptConcentration };
 
 	/**
 	 * @param name name of test case
