@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -74,7 +74,7 @@ public class DPTXlator8BitUnsignedTest extends TestCase
 		DPTXlator8BitUnsigned.DPT_SCALING, DPTXlator8BitUnsigned.DPT_ANGLE,
 		DPTXlator8BitUnsigned.DPT_PERCENT_U8,
 		DPTXlator8BitUnsigned.DPT_DECIMALFACTOR, DPTXlator8BitUnsigned.DPT_TARIFF,
-		DPTXlator8BitUnsigned.DPT_VALUE_1_UCOUNT };
+		DPTXlator8BitUnsigned.DPT_VALUE_1_UCOUNT, DPTXlator8BitUnsigned.DptFanStage };
 
 	/**
 	 * @param name name of test case
@@ -446,7 +446,7 @@ public class DPTXlator8BitUnsignedTest extends TestCase
 		}
 		final double scaled = (Math.round(12.345d * 255 / 100)) * 100d / 255;
 		final double angle = (Math.round(12.345d * 255 / 360)) * 360d / 255;
-		final double[] values = { scaled, angle, 12, 12, 12, 12 };
+		final double[] values = { scaled, angle, 12, 12, 12, 12, 12 };
 		for (int i = 0; i < dpts.length; i++) {
 			final DPTXlator x = new DPTXlator8BitUnsigned(dpts[i]);
 			x.setValue("12.345");
