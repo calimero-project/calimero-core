@@ -57,7 +57,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 /**
  * Implementation of the ObjectServer protocol service data structure, based on BAOS Binary Protocol v2.1.
  */
-public class BaosService {
+public final class BaosService {
 
 	public enum ErrorCode {
 		NoError,
@@ -97,10 +97,10 @@ public class BaosService {
 		SerialNumber(true, 6),
 		TimeSinceReset(true, 4),
 		ConnectionState(true, 1),
-		MaxBufferSize(false, 2),
+		MaxBufferSize(true, 2),
 		LengthOfDescriptionString(true, 2),
 		Baudrate(false, 1),
-		CurrentBufferSize(true, 2),
+		CurrentBufferSize(false, 2),
 		ProgrammingMode(false, 1),
 		ProtocolVersionBinary(true, 1),
 		IndicationSending(false, 1),
@@ -108,14 +108,14 @@ public class BaosService {
 		// from here on optional properties, supported only in some devices
 		ProtocolVersionWeb(true, 1),
 		ProtocolVersionRest(true, 1),
-		IndividualAddress(true, 2),
+		IndividualAddress(false, 2),
 		MacAddress(true, 6),
-		TunnelingEnabled(true, 1),
-		BaosBinaryEnabled(true, 1),
-		BaosWebEnabled(true, 1),
-		BaosRestEnabled(true, 1),
-		HttpFileEnabled(true, 1),
-		SearchRequestEnabled(true, 1),
+		TunnelingEnabled(false, 1),
+		BaosBinaryEnabled(false, 1),
+		BaosWebEnabled(false, 1),
+		BaosRestEnabled(false, 1),
+		HttpFileEnabled(false, 1),
+		SearchRequestEnabled(false, 1),
 		StructuredDatabase(true, 1),
 		MaxManagementClients(true, 1),
 		ConnectedManagementClients(true, 1),
@@ -125,19 +125,19 @@ public class BaosService {
 		ConnectedBaosUdpClients(true, 1),
 		MaxBaosTcpClients(true, 1),
 		ConnectedBaosTcpClients(true, 1),
-		DeviceFriendlyName(true, 30),
+		DeviceFriendlyName(false, 30),
 		MaxDatapoints(true, 2),
 		ConfiguredDatapoints(true, 2),
 		MaxParameterBytes(true, 2),
 		DownloadCounter(true, 2),
-		IPAssignment(true, 1), // ??? which: configured, current?
-		IPAddress(true, 4),
-		SubnetMask(true, 4),
-		DefaultGateway(true, 4),
-		TimeSinceResetUnit(true, 1),
-		SystemTime(true, -1),
-		SystemTimezoneOffset(true, 1),
-		MenuEnabled(true, 1),
+		IpAssignment(false, 1), // ??? which: configured, current?
+		IpAddress(false, 4),
+		SubnetMask(false, 4),
+		DefaultGateway(false, 4),
+		TimeSinceResetUnit(false, 1),
+		SystemTime(false, -1),
+		SystemTimezoneOffset(false, 1),
+		MenuEnabled(false, 1),
 		EnableSuspend(false, 1);
 
 
@@ -146,11 +146,13 @@ public class BaosService {
 
 		private final boolean readOnly;
 
-		private Property(final boolean readOnly, final int size) { this.readOnly = readOnly; }
-
-		public boolean readOnly() { return readOnly; }
+		Property(final boolean readOnly, final int size) { this.readOnly = readOnly; }
 
 		public int id() { return ordinal(); }
+
+		public String friendlyName() { return name().replaceAll("([A-Z])", " $1").trim(); }
+
+		public boolean readOnly() { return readOnly; }
 	}
 
 	public enum ValueFilter {
@@ -187,8 +189,8 @@ public class BaosService {
 	};
 
 	public static final class Item<T> {
-		public static Item<Void> property(final Property p, final byte[] data) {
-			return new Item<>(p.id(), null, data);
+		public static Item<Property> property(final Property p, final byte[] data) {
+			return new Item<>(p.id(), p, data);
 		}
 
 		public static Item<DatapointCommand> datapoint(final int dpId, final DatapointCommand cmd, final byte[] data) {
@@ -205,11 +207,11 @@ public class BaosService {
 			this.data = data.clone();
 		}
 
-		public final int id() { return id; }
+		public int id() { return id; }
 
-		public final T info() { return info; }
+		public T info() { return info; }
 
-		public final byte[] data() { return data.clone(); }
+		public byte[] data() { return data.clone(); }
 
 		int size() {
 			if (info instanceof Timer)
@@ -305,9 +307,9 @@ public class BaosService {
 			this.desc = description;
 		}
 
-		public final int id() { return id; }
+		public int id() { return id; }
 
-		public final String description() { return desc; }
+		public String description() { return desc; }
 
 		public byte[] toByteArray() {
 			final int capacity = 4 + triggerParams.length + 2 + jobParams.length + 2 + desc.length(); // XXX utf8?
@@ -350,21 +352,21 @@ public class BaosService {
 
 	// sub services
 
-	private static final int GetServerItem              = 0x01;
-	private static final int SetServerItem              = 0x02;
-	private static final int GetDatapointDescription    = 0x03;
-	private static final int GetDatapointDescriptionString = 0x04;
-	private static final int GetDatapointValue          = 0x05;
-	private static final int SetDatapointValue          = 0x06;
-	private static final int GetParameterByte           = 0x07;
-	private static final int SetDatapointHistoryCommand = 0x08;
-	private static final int GetDatapointHistoryState   = 0x09;
-	private static final int GetDatapointHistory        = 0x0a;
-	private static final int GetTimer                   = 0x0b;
-	private static final int SetTimer                   = 0x0c;
+	public static final int GetServerItem                 = 0x01;
+	public static final int SetServerItem                 = 0x02;
+	public static final int GetDatapointDescription       = 0x03;
+	public static final int GetDatapointDescriptionString = 0x04;
+	public static final int GetDatapointValue             = 0x05;
+	public static final int SetDatapointValue             = 0x06;
+	public static final int GetParameterByte              = 0x07;
+	public static final int SetDatapointHistoryCommand    = 0x08;
+	public static final int GetDatapointHistoryState      = 0x09;
+	public static final int GetDatapointHistory           = 0x0a;
+	public static final int GetTimer                      = 0x0b;
+	public static final int SetTimer                      = 0x0c;
 
-	private static final int DatapointValueIndication	= 0xC1;
-	private static final int ServerItemIndication		= 0xC2;
+	public static final int DatapointValueIndication     = 0xC1;
+	public static final int ServerItemIndication         = 0xC2;
 
 	private static String subServiceString(final int subService) {
 		switch (subService & ~ResponseFlag) {
@@ -399,22 +401,12 @@ public class BaosService {
 	private final List<Item<?>> items;
 
 
-	private static boolean isSupportedService(final int subService) {
-		if (subService == DatapointValueIndication || subService == ServerItemIndication)
-			return true;
-		final int svc = subService & ~ResponseFlag;
-		if (svc == 0 || svc > SetTimer)
-			return false;
-		return true;
-	}
-
-
 	public static BaosService getServerItem(final Property startItem, final int items) {
 		return new BaosService(GetServerItem, startItem.id(), items);
 	}
 
 	@SafeVarargs
-	public static BaosService setServerItem(final Item<Void>... items) {
+	public static BaosService setServerItem(final Item<Property>... items) {
 		return new BaosService(SetServerItem, items);
 	}
 
@@ -476,14 +468,14 @@ public class BaosService {
 		final int mainService = data.get() & 0xff;
 		if (mainService != MainService)
 			throw new KNXFormatException("no BAOS service", mainService);
-		final int subService = data.get() & 0xff;
-		if (!isSupportedService(subService))
-			throw new KNXFormatException("unsupported BAOS service", subService);
+		final int i = data.get() & 0xff;
+		final int subService = extractSubService(i);
+		final boolean response = (i & 0xc0) == 0x80;
 
 		final int start = data.getShort() & 0xffff;
 		final int items = data.getShort() & 0xffff;
 		// check error response
-		if (size == (MinimumFrameSize + 1) && items == 0) {
+		if (response && size == (MinimumFrameSize + 1) && items == 0) {
 			final var error = ErrorCode.of(data.get() & 0xff);
 			return errorResponse(subService, start, error);
 		}
@@ -524,11 +516,11 @@ public class BaosService {
 		this.items = List.copyOf(parseItems(buf));
 	}
 
-	public final int subService() { return subService; }
+	public int subService() { return subService; }
 
-	public final ErrorCode error() { return count == 0 ? ErrorCode.of(data[0]) : ErrorCode.NoError; }
+	public ErrorCode error() { return count == 0 ? ErrorCode.of(data[0]) : ErrorCode.NoError; }
 
-	public final List<Item<?>> items() { return items; }
+	public List<Item<?>> items() { return items; }
 
 	public byte[] toByteArray() {
 		final int collectionSize = items.stream().mapToInt(Item::size).sum();
@@ -585,10 +577,12 @@ public class BaosService {
 				final int dpState = buf.get() & 0xff;
 				info = dpState;
 			}
-			if (subService == SetDatapointValue) {
+			else if (subService == SetDatapointValue) {
 				final var command = DatapointCommand.of(buf.get() & 0xff);
 				info = command;
 			}
+			else if (subService == GetServerItem || subService == SetServerItem)
+				info = Property.of(id);
 
 			// datapoint description and history state don't have length field
 			if (subService == GetDatapointDescription || subService == GetDatapointHistoryState) {
@@ -641,5 +635,14 @@ public class BaosService {
 			throw new KNXFormatException(
 					format("invalid %s structure, remaining length %d < %d (expected)", svc, actual, expected));
 		}
+	}
+
+	private static int extractSubService(final int subService) throws KNXFormatException {
+		if (subService == DatapointValueIndication || subService == ServerItemIndication)
+			return subService;
+		final int svc = subService & ~ResponseFlag;
+		if (svc == 0 || svc > SetTimer)
+			throw new KNXFormatException("unsupported BAOS service", subService);
+		return svc;
 	}
 }

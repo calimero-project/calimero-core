@@ -492,7 +492,8 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 					BcuSwitcher.pidCommMode, 1, 1);
 			onSend(recheck);
 			responseFor(CEMIDevMgmt.MC_PROPREAD_CON, BcuSwitcher.pidCommMode)
-					.ifPresent(mode -> logger.info("read comm mode {}", DataUnitBuilder.toHex(mode, "")));
+					.ifPresent(mode -> logger.debug("comm mode {}",
+							(mode[0] & 0xff) == 0xf0 ? "BAOS" : DataUnitBuilder.toHex(mode, "")));
 		}
 		// ??? check baos support ahead
 //		else if (activeEmi == EmiType.Emi1) {
