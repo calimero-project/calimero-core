@@ -113,7 +113,7 @@ public class DestinationTest
 	@BeforeEach
 	void init() throws Exception
 	{
-		lnk = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false, TPSettings.TP1);
+		lnk = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false, new TPSettings());
 		tl = new TransportLayerImpl(lnk);
 		dst = tl.createDestination(new IndividualAddress("2.2.2"), true, false, false);
 		tll = new TLListener();

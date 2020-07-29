@@ -116,7 +116,7 @@ class KNXNetworkLinkFT12Test
 		try {
 			// prevents access problems with a just previously closed port
 			Thread.sleep(50);
-			lnk = new KNXNetworkLinkFT12(Util.getSerialPort(), TPSettings.TP1);
+			lnk = new KNXNetworkLinkFT12(Util.getSerialPort(), new TPSettings());
 		}
 		catch (final Exception e) {
 			Util.tearDownLogging();
@@ -144,7 +144,7 @@ class KNXNetworkLinkFT12Test
 	void testKNXNetworkLinkFT12StringKNXMediumSettings() throws KNXException, InterruptedException
 	{
 		lnk.close();
-		lnk = new KNXNetworkLinkFT12(Util.getSerialPortID(), TPSettings.TP1);
+		lnk = new KNXNetworkLinkFT12(Util.getSerialPortID(), new TPSettings());
 		lnk.close();
 	}
 
@@ -152,7 +152,7 @@ class KNXNetworkLinkFT12Test
 	void testKNXNetworkLinkFT12IntKNXMediumSettings() throws InterruptedException
 	{
 		try {
-			lnk = new KNXNetworkLinkFT12(1055, TPSettings.TP1);
+			lnk = new KNXNetworkLinkFT12(1055, new TPSettings());
 			fail("should fail");
 		}
 		catch (final KNXException e) {

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2011, 2019 B. Malinowsky
+    Copyright (c) 2011, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ class ManagementProceduresImplTest
 	@BeforeEach
 	void init() throws Exception
 	{
-		link = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false, TPSettings.TP1);
+		link = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false, new TPSettings());
 		mp = new ManagementProceduresImpl(link);
 		nonexist = Util.getNonExistingKnxDevice();
 	}

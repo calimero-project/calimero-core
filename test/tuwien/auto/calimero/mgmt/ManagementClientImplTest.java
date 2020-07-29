@@ -82,7 +82,7 @@ class ManagementClientImplTest
 	@BeforeEach
 	void init() throws Exception
 	{
-		lnk = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false, TPSettings.TP1);
+		lnk = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false, new TPSettings());
 		mc = new ManagementClientImpl(lnk);
 		dco2 = mc.createDestination(Util.getKnxDeviceCO(), true);
 		dco = dco2;

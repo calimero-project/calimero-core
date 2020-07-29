@@ -94,7 +94,7 @@ class PropertyClientTest
 		remote = Util.getKnxDeviceCO();
 		closed = false;
 		try {
-			lnk = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false, TPSettings.TP1);
+			lnk = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false, new TPSettings());
 			remAdpt = new RemotePropertyServiceAdapter(lnk, remote, null, true);
 			rem = new PropertyClient(remAdpt);
 			localAdpt = LocalDeviceManagementIp.newAdapter(new InetSocketAddress(0), Util.getServer(), false,

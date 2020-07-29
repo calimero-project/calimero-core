@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,8 +46,9 @@ import tuwien.auto.calimero.IndividualAddress;
 public class TPSettings extends KNXMediumSettings
 {
 	/**
-	 * Default setting for TP1, device address is 0.0.0.
+	 * @deprecated
 	 */
+	@Deprecated
 	public static final TPSettings TP1 = new TPSettings();
 
 	/**

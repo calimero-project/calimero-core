@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -139,10 +139,10 @@ public class KNXNetworkLinkIPTest
 	@BeforeEach
 	void init() throws Exception
 	{
-		tnl = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false, TPSettings.TP1);
+		tnl = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false, new TPSettings());
 		rtr = new KNXNetworkLinkIP(KNXNetworkLinkIP.ROUTING, Util.getLocalHost(),
 				new InetSocketAddress(InetAddress.getByName(KNXnetIPRouting.DEFAULT_MULTICAST), 0), false,
-				TPSettings.TP1);
+				new TPSettings());
 		ltnl = new NLListenerImpl();
 		lrtr = new NLListenerImpl();
 		tnl.addLinkListener(ltnl);
@@ -170,12 +170,12 @@ public class KNXNetworkLinkIPTest
 	{
 		tnl.close();
 		try (KNXNetworkLink l = new KNXNetworkLinkIP(100, new InetSocketAddress(0), Util.getServer(), false,
-				TPSettings.TP1)) {
+				new TPSettings())) {
 			fail("illegal arg");
 		}
 		catch (final KNXIllegalArgumentException e) {}
 		try (KNXNetworkLink l = KNXNetworkLinkIP.newTunnelingLink(new InetSocketAddress(0), Util.getServer(), false,
-				TPSettings.TP1)) {}
+				new TPSettings())) {}
 		catch (final KNXIllegalArgumentException e) {}
 	}
 
@@ -183,19 +183,19 @@ public class KNXNetworkLinkIPTest
 	void tunnelingLinkFactoryMethod() throws KNXException, InterruptedException
 	{
 		try (KNXNetworkLink link = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false,
-				TPSettings.TP1)) {}
+				new TPSettings())) {}
 
 		if (!Util.TEST_NAT)
 			return;
 		try (KNXNetworkLink link = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), true,
-				TPSettings.TP1)) {}
+				new TPSettings())) {}
 	}
 
 	@Test
 	void newRoutingLink() throws UnknownHostException, KNXException
 	{
 		try (KNXNetworkLinkIP link = KNXNetworkLinkIP.newRoutingLink((NetworkInterface) null,
-				InetAddress.getByName("224.0.23.14"), TPSettings.TP1)) {}
+				InetAddress.getByName("224.0.23.14"), new TPSettings())) {}
 	}
 
 	@Test
@@ -405,10 +405,10 @@ public class KNXNetworkLinkIPTest
 	{
 		// create some links that fail during construction
 		final InetSocketAddress sa = new InetSocketAddress(0);
-		assertThrows(KNXException.class, () -> KNXNetworkLinkIP.newTunnelingLink(sa, sa, false, TPSettings.TP1),
+		assertThrows(KNXException.class, () -> KNXNetworkLinkIP.newTunnelingLink(sa, sa, false, new TPSettings()),
 				"no KNXnet/IP server with wildcard IP");
 		assertThrows(KNXException.class, () -> KNXNetworkLinkIP.newTunnelingLink(sa,
-				new InetSocketAddress("1.0.0.1", 3671), false, TPSettings.TP1), "no KNXnet/IP server with that IP");
+				new InetSocketAddress("1.0.0.1", 3671), false, new TPSettings()), "no KNXnet/IP server with that IP");
 
 		final Thread[] threads = new Thread[Thread.activeCount() + 10];
 		final int active = Thread.enumerate(threads);
@@ -426,7 +426,7 @@ public class KNXNetworkLinkIPTest
 		final NetworkInterface netif = Util.localInterface();
 		final byte[] groupKey = new byte[16];
 		try (KNXNetworkLink link = KNXNetworkLinkIP.newSecureRoutingLink(netif, KNXNetworkLinkIP.DefaultMulticast, groupKey,
-				Duration.ofMillis(2000), TPSettings.TP1)) {}
+				Duration.ofMillis(2000), new TPSettings())) {}
 	}
 
 	@Test
@@ -435,7 +435,7 @@ public class KNXNetworkLinkIPTest
 		final NetworkInterface netif = Util.localInterface();
 		final byte[] groupKey = new byte[10];
 		assertThrows(KNXIllegalArgumentException.class, () -> KNXNetworkLinkIP.newSecureRoutingLink(netif,
-				KNXNetworkLinkIP.DefaultMulticast, groupKey, Duration.ofMillis(2000), TPSettings.TP1));
+				KNXNetworkLinkIP.DefaultMulticast, groupKey, Duration.ofMillis(2000), new TPSettings()));
 	}
 
 	private static interface DefaultNetworkLinkListener extends NetworkLinkListener {
@@ -463,7 +463,7 @@ public class KNXNetworkLinkIPTest
 			}
 		};
 		final var connection = Connection.newTcpConnection(new InetSocketAddress(0), Util.getServer());
-		try (final var link = KNXNetworkLinkIP.newTunnelingLink(connection, TPSettings.TP1)) {
+		try (final var link = KNXNetworkLinkIP.newTunnelingLink(connection, new TPSettings())) {
 			link.addLinkListener(listener);
 
 			((KNXnetIPTunnel) link.conn).send(InterfaceFeature.ConnectionStatus);
@@ -473,7 +473,7 @@ public class KNXNetworkLinkIPTest
 
 	@Test
 	void registerRoutingEvents() throws KNXException, InterruptedException, SocketException {
-		try (final var link = KNXNetworkLinkIP.newRoutingLink(Util.localInterface(), KNXNetworkLinkIP.DefaultMulticast, TPSettings.TP1)) {
+		try (final var link = KNXNetworkLinkIP.newRoutingLink(Util.localInterface(), KNXNetworkLinkIP.DefaultMulticast, new TPSettings())) {
 			final var listener = new DefaultNetworkLinkListener() {
 				@LinkEvent
 				void lostMessage(final LostMessageEvent lostMessage) { System.out.println(lostMessage); }
@@ -492,7 +492,7 @@ public class KNXNetworkLinkIPTest
 
 	@Test
 	void registerUnsupportedEventType() throws KNXException, SocketException {
-		try (final var link = KNXNetworkLinkIP.newRoutingLink(Util.localInterface(), KNXNetworkLinkIP.DefaultMulticast, TPSettings.TP1)) {
+		try (final var link = KNXNetworkLinkIP.newRoutingLink(Util.localInterface(), KNXNetworkLinkIP.DefaultMulticast, new TPSettings())) {
 			link.addLinkListener(new DefaultNetworkLinkListener() {
 				@LinkEvent
 				void unsupportedEventType(final RoutingLostMessage lostMessage) { fail("unsupported event type"); }
@@ -503,7 +503,7 @@ public class KNXNetworkLinkIPTest
 	@Test
 	void registerDefaultMethodEvent() throws KNXException, InterruptedException {
 		final var connection = Connection.newTcpConnection(new InetSocketAddress(0), Util.getServer());
-		try (final var link = KNXNetworkLinkIP.newTunnelingLink(connection, TPSettings.TP1)) {
+		try (final var link = KNXNetworkLinkIP.newTunnelingLink(connection, new TPSettings())) {
 			link.addLinkListener(new DefaultMethodEvent() {});
 
 			((KNXnetIPTunnel) link.conn).send(InterfaceFeature.ConnectionStatus);
@@ -514,7 +514,7 @@ public class KNXNetworkLinkIPTest
 	@Test
 	void registerConcreteMethodOverridingDefaultMethod() throws KNXException, InterruptedException {
 		final var connection = Connection.newTcpConnection(new InetSocketAddress(0), Util.getServer());
-		try (final var link = KNXNetworkLinkIP.newTunnelingLink(connection, TPSettings.TP1)) {
+		try (final var link = KNXNetworkLinkIP.newTunnelingLink(connection, new TPSettings())) {
 			final var concreteEvent = new DefaultMethodEvent() {
 				@Override
 				@LinkEvent

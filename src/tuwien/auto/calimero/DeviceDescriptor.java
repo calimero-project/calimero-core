@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2018 B. Malinowsky
+    Copyright (c) 2015, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -230,7 +230,7 @@ public interface DeviceDescriptor
 			final int type = mediumType();
 			switch (type) {
 			case 0:
-				return TPSettings.TP1;
+				return new TPSettings();
 			case 1:
 				return new PLSettings();
 			case 2:
