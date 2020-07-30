@@ -356,7 +356,10 @@ public class DPTXlator3BitControlled extends DPTXlator
 		final int steps = stepcode(index);
 		if (steps == 0)
 			return sb.append("break").toString();
-		return sb.append(steps).append(" steps").toString();
+		sb.append(steps);
+		if (appendUnit)
+			sb.append(" steps");
+		return sb.toString();
 	}
 
 	@Override
