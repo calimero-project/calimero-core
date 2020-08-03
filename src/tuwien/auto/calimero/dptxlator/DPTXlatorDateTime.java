@@ -185,6 +185,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	private static final int FAULT = 0x80;
 	// extended field bit masks
 	private static final int QUALITY = 0x80;
+	private static final int SyncSourceReliability = 0x40;
 
 	private static final int[] FIELD_MASKS = { NO_YEAR, NO_DATE, NO_TIME, NO_DOW, NO_WD };
 
@@ -477,6 +478,14 @@ public class DPTXlatorDateTime extends DPTXlator
 	}
 
 	/**
+	 * Returns the synchronization source reliability of the clock.
+	 *
+	 * @return <code>true</code> if clock uses a reliable synchronisation source (radio, Internet), <code>false</code>
+	 *         for unreliable synchronisation source (mains, local quartz)
+	 */
+	public final boolean reliableSyncSource() { return isBitSetEx(0, SyncSourceReliability); }
+
+	/**
 	 * Sets working day information for the first date/time item.
 	 *
 	 * @param workday <code>true</code> to mark date as working day, <code>false</code> for holiday (no working day)
@@ -598,7 +607,7 @@ public class DPTXlatorDateTime extends DPTXlator
 			throw new KNXIllegalArgumentException("DPT " + dpt.getID() + " " + dpt.getDescription() + ": data length "
 					+ (data.length - offset) + " < required datapoint type width " + Math.max(1, getTypeSize()));
 		final short[] buf = new short[size];
-		final int[] mask = { 0xFF, 0x0F, 0x1F, 0xFF, 0x3F, 0x3F, 0xFF, 0x80 };
+		final int[] mask = { 0xFF, 0x0F, 0x1F, 0xFF, 0x3F, 0x3F, 0xFF, 0xc0 };
 		for (int i = 0; i < size; ++i) {
 			final int field = i & 0x07;
 			buf[i] = (short) (data[offset + i] & mask[field]);

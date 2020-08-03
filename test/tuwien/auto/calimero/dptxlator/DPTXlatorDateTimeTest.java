@@ -37,19 +37,22 @@
 package tuwien.auto.calimero.dptxlator;
 
 import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Calendar;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Util;
 
-/**
- * @author B. Malinowsky
- */
-public class DPTXlatorDateTimeTest extends TestCase
-{
+class DPTXlatorDateTimeTest {
 	private DPTXlatorDateTime t;
 
 	private String def;
@@ -76,35 +79,16 @@ public class DPTXlatorDateTimeTest extends TestCase
 	// if we're in a time zone without DST, date/time values with a set DST field will fail
 	private final boolean useDaylightTime = Calendar.getInstance().getTimeZone().useDaylightTime();
 
-	/**
-	 * @param name name of test case
-	 */
-	public DPTXlatorDateTimeTest(final String name)
-	{
-		super(name);
-	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
+	@BeforeEach
+	void setUp() throws Exception {
 		Util.setupLogging("DPTXlator");
 		t = new DPTXlatorDateTime(DPTXlatorDateTime.DPT_DATE_TIME.getID());
 		def = t.getValue();
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDateTime#setValues
-	 * (java.lang.String[])}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testSetValues() throws KNXFormatException
-	{
+	@Test
+	void testSetValues() throws KNXFormatException {
 		t.setValues(new String[0]);
 		assertTrue(t.getItems() == 1);
 		assertTrue(t.getValue().equals(def));
@@ -116,14 +100,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		t.setValues(new String[] { t.getValue(), t.getValue() });
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDateTime#getAllValues()}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testGetAllValues() throws KNXFormatException
-	{
+	@Test
+	void testGetAllValues() throws KNXFormatException {
 		String[] v = new String[] { time, date, dateday, value, value2, value3 };
 		t.setValues(v);
 		assertEquals(v.length, t.getItems());
@@ -134,25 +112,15 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertFind(item, new String[] { "2007", "tue", "6", "5", "23", "22", "0", "dst", "workday" });
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDateTime#setValue(java.lang.String)}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testSetValue() throws KNXFormatException
-	{
+	@Test
+	void testSetValue() throws KNXFormatException {
 		t.setValue(dateday);
 		assertEquals(t.getItems(), 1);
 		assertFalse(t.getValue().equals(def));
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDateTime#setData(byte[], int)}.
-	 */
-	public final void testSetDataByteArrayInt()
-	{
+	@Test
+	void testSetDataByteArrayInt() {
 		t.setData(data);
 		assertEquals(2007, t.getYear());
 		assertEquals(8, t.getMonth());
@@ -171,8 +139,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 		dataHelperThrow(new byte[] { 107, 9, 30, (byte) ((5 << 5) | 22), 1 << 6 | 62, 40, 0x41, (byte) 0x80 });
 	}
 
-	private void dataHelperThrow(final byte[] data)
-	{
+	private void dataHelperThrow(final byte[] data) {
 		try {
 			t.setData(data);
 			fail("invalid data");
@@ -180,23 +147,15 @@ public class DPTXlatorDateTimeTest extends TestCase
 		catch (final KNXIllegalArgumentException e) {}
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDateTime#getData(byte[], int)}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testGetDataByteArrayInt() throws KNXFormatException
-	{
+	@Test
+	void testGetDataByteArrayInt() throws KNXFormatException {
 		testGetByteArrayHelper(value, data);
 		testGetByteArrayHelper(value2, data2);
 		testGetByteArrayHelper(value3, data3);
 		testGetByteArrayHelper(value4, data4);
 	}
 
-	private void testGetByteArrayHelper(final String test, final byte[] cmp)
-		throws KNXFormatException
-	{
+	private void testGetByteArrayHelper(final String test, final byte[] cmp) throws KNXFormatException {
 		final int offset = 2;
 		final byte[] dst = new byte[offset + 10];
 		t.setValue(test);
@@ -210,12 +169,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertEquals(std, t.getValue());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDateTime#getSubTypes()}.
-	 */
-	public final void testGetSubTypes()
-	{
+	@Test
+	void testGetSubTypes() {
 		assertEquals(1, t.getSubTypes().size());
 		assertEquals(DPTXlatorDateTime.DPT_DATE_TIME, t.getSubTypes().values().iterator()
 			.next());
@@ -228,14 +183,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 			.next());
 	}
 
-	/**
-	 * Test method for {@link DPTXlatorDateTime#setValue(String)},
-	 * {@link DPTXlatorDateTime#setData(byte[])}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testSetValueAndData() throws KNXFormatException
-	{
+	@Test
+	void testSetValueAndData() throws KNXFormatException {
 		t.setValue("24:00:00");
 		t.setValue("00:00:00");
 		t.setValue("13.56.43");
@@ -266,14 +215,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		t.setData(new byte[] { 0, 0, 0, 23, 0, 1, 0x3c, 0 });
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDateTime#useValueFormat(boolean)}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testUseValueFormat() throws KNXFormatException
-	{
+	@Test
+	void testUseValueFormat() throws KNXFormatException {
 		t.setValue(value);
 		assertFind(t.getValue(), new String[] { "wed", "8", "27", "2007", "workday", "dst", "sync", });
 		t.useValueFormat(false);
@@ -287,14 +230,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertFind(t.getValue(), new String[] { "any", "day", "workday", });
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDateTime#getValueMilliseconds()}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testGetValueMilliseconds() throws KNXFormatException
-	{
+	@Test
+	void testGetValueMilliseconds() throws KNXFormatException {
 		long ms;
 		t.setValue(time);
 		try {
@@ -342,11 +279,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertTrue(t.validate());
 	}
 
-	/**
-	 * Test method for setWorkday.
-	 */
-	public final void testSetWorkday()
-	{
+	@Test
+	void testSetWorkday() {
 		assertFalse(t.isValidField(DPTXlatorDateTime.WORKDAY));
 		assertFalse(t.isWorkday());
 		t.setWorkday(true);
@@ -359,11 +293,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertFalse(t.isWorkday());
 	}
 
-	/**
-	 * Test method for setDayOfWeek.
-	 */
-	public final void testSetDayOfWeek()
-	{
+	@Test
+	void testSetDayOfWeek() {
 		assertFalse(t.isValidField(DPTXlatorDateTime.DAY_OF_WEEK));
 		assertEquals(0, t.getDayOfWeek());
 		t.setDayOfWeek(0);
@@ -376,11 +307,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertEquals(5, t.getDayOfWeek());
 	}
 
-	/**
-	 * Test method for setYear.
-	 */
-	public final void testSetYear()
-	{
+	@Test
+	void testSetYear() {
 		yearHelper(1900, 0);
 		yearHelper(2155, 255);
 		yearHelper(2007, 107);
@@ -391,16 +319,14 @@ public class DPTXlatorDateTimeTest extends TestCase
 		yearHelperThrow(2200);
 	}
 
-	private void yearHelper(final int yr, final int data)
-	{
+	private void yearHelper(final int yr, final int data) {
 		t.setDate(yr, 1, 1);
 		assertTrue(t.isValidField(DPTXlatorDateTime.YEAR));
 		assertEquals(yr, t.getYear());
 		assertEquals((byte) data, t.getData()[0]);
 	}
 
-	private void yearHelperThrow(final int yr)
-	{
+	private void yearHelperThrow(final int yr) {
 		try {
 			yearHelper(yr, 0);
 			fail("should throw");
@@ -408,11 +334,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		catch (final KNXIllegalArgumentException e) {}
 	}
 
-	/**
-	 * Test method for setDate.
-	 */
-	public final void testSetDate()
-	{
+	@Test
+	void testSetDate() {
 		dateHelper(1, 1, 1, 1);
 		dateHelper(12, 31, 12, 31);
 		dateHelper(7, 25, 7, 25);
@@ -427,8 +350,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 		dateHelperThrow(11, -15);
 	}
 
-	private void dateHelper(final int mth, final int day, final int dataMth, final int dataDay)
-	{
+	private void dateHelper(final int mth, final int day, final int dataMth, final int dataDay) {
 		t.setValidField(DPTXlatorDateTime.DATE, true);
 		t.setDate(2000, mth, day);
 		assertTrue(t.isValidField(DPTXlatorDateTime.DATE));
@@ -444,8 +366,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertEquals((byte) dataDay, t.getData()[2]);
 	}
 
-	private void dateHelperThrow(final int mth, final int day)
-	{
+	private void dateHelperThrow(final int mth, final int day) {
 		try {
 			dateHelper(mth, day, 0, 0);
 			fail("should throw");
@@ -453,11 +374,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		catch (final KNXIllegalArgumentException e) {}
 	}
 
-	/**
-	 * Test method for setTime.
-	 */
-	public final void testSetTime()
-	{
+	@Test
+	void testSetTime() {
 		timeHelper(0, 0, 0, 0, 0, 0);
 		timeHelper(24, 0, 0, 24, 0, 0);
 		timeHelper(12, 59, 59, 12, 59, 59);
@@ -477,8 +395,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 	}
 
 	private void timeHelper(final int hr, final int min, final int sec, final int dataHr, final int dataMin,
-		final int dataSec)
-	{
+			final int dataSec) {
 		t.setTime(hr, min, sec);
 		t.setValidField(DPTXlatorDateTime.TIME, true);
 		assertTrue(t.isValidField(DPTXlatorDateTime.TIME));
@@ -500,8 +417,7 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertEquals((byte) dataSec, t.getData()[5]);
 	}
 
-	private void timeHelperThrow(final int hr, final int min, final int sec)
-	{
+	private void timeHelperThrow(final int hr, final int min, final int sec) {
 		try {
 			timeHelper(hr, min, sec, 0, 0, 0);
 			fail("should throw");
@@ -509,11 +425,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		catch (final KNXIllegalArgumentException e) {}
 	}
 
-	/**
-	 * Test method for setDaylightTime.
-	 */
-	public final void testSetDaylightTime()
-	{
+	@Test
+	void testSetDaylightTime() {
 		assertFalse(t.isDst());
 		t.setDst(true);
 		assertTrue(t.isDst());
@@ -521,11 +434,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertFalse(t.isDst());
 	}
 
-	/**
-	 * Test method for setQualityOfClock.
-	 */
-	public final void testSetQualityOfClock()
-	{
+	@Test
+	void testSetQualityOfClock() {
 		assertFalse(t.isSyncClock());
 		t.setClockSync(true);
 		assertTrue(t.isSyncClock());
@@ -533,13 +443,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertFalse(t.isSyncClock());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDateTime#setValue(long)}.
-	 * @throws KNXFormatException
-	 */
-	public final void testSetValueMilliseconds() throws KNXFormatException
-	{
+	@Test
+	void testSetValueMilliseconds() throws KNXFormatException {
 		final Calendar c = Calendar.getInstance();
 		c.clear();
 		c.set(2007, 7, 15, 20, 30, 10);
@@ -557,16 +462,11 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertEquals(c.get(Calendar.YEAR), t.getYear());
 		assertEquals(c.get(Calendar.MONTH) + 1, t.getMonth());
 		assertEquals(c.get(Calendar.DAY_OF_MONTH), t.getDay());
-		checkTime(c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), c
-			.get(Calendar.SECOND));
+		checkTime(c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), c.get(Calendar.SECOND));
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorDateTime#isFaultyClock()}.
-	 */
-	public final void testIsFaultyClock()
-	{
+	@Test
+	void testIsFaultyClock() {
 		assertFalse(t.isFaultyClock());
 		assertEquals(t.getData()[6] & 0x80, 0x00);
 		t.setFaultyClock(true);
@@ -574,11 +474,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertEquals(t.getData()[6] & 0x80, 0x80);
 	}
 
-	/**
-	 * Test method for isWorkdaySet.
-	 */
-	public final void testIsWorkdaySet()
-	{
+	@Test
+	void testIsWorkdaySet() {
 		assertFalse(t.isValidField(DPTXlatorDateTime.WORKDAY));
 		assertEquals(t.getData()[6] & 0x20, 0x20);
 		t.setValidField(DPTXlatorDateTime.WORKDAY, true);
@@ -589,11 +486,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertEquals(t.getData()[6] & 0x20, 0x20);
 	}
 
-	/**
-	 * Test method for isYearSet.
-	 */
-	public final void testIsYearSet()
-	{
+	@Test
+	void testIsYearSet() {
 		assertTrue(t.isValidField(DPTXlatorDateTime.YEAR));
 		assertEquals(t.getData()[6] & 0x10, 0x00);
 		t.setValidField(DPTXlatorDateTime.YEAR, false);
@@ -604,11 +498,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertEquals(t.getData()[6] & 0x10, 0x00);
 	}
 
-	/**
-	 * Test method for isDateSet.
-	 */
-	public final void testIsDateSet()
-	{
+	@Test
+	void testIsDateSet() {
 		assertTrue(t.isValidField(DPTXlatorDateTime.DATE));
 		assertEquals(t.getData()[6] & 0x08, 0x00);
 		t.setValidField(DPTXlatorDateTime.DATE, false);
@@ -619,11 +510,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertEquals(t.getData()[6] & 0x08, 0x00);
 	}
 
-	/**
-	 * Test method for isDayOfWeekSet.
-	 */
-	public final void testIsDayOfWeekSet()
-	{
+	@Test
+	void testIsDayOfWeekSet() {
 		assertFalse(t.isValidField(DPTXlatorDateTime.DAY_OF_WEEK));
 		assertEquals(t.getData()[6] & 0x04, 0x04);
 		t.setValidField(DPTXlatorDateTime.DAY_OF_WEEK, true);
@@ -634,11 +522,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertEquals(t.getData()[6] & 0x04, 0x04);
 	}
 
-	/**
-	 * Test method for isTimeSet.
-	 */
-	public final void testIsTimeSet()
-	{
+	@Test
+	void testIsTimeSet() {
 		assertTrue(t.isValidField(DPTXlatorDateTime.TIME));
 		assertEquals(t.getData()[6] & 0x02, 0x00);
 		t.setValidField(DPTXlatorDateTime.TIME, false);
@@ -649,13 +534,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertEquals(t.getData()[6] & 0x02, 0x00);
 	}
 
-	/**
-	 * Test method for inDaylightTime.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testInDaylightTime() throws KNXFormatException
-	{
+	@Test
+	void testInDaylightTime() throws KNXFormatException {
 		t.setValue(value);
 		assertTrue(t.isDst());
 		t.setData(data2);
@@ -664,13 +544,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertFalse(t.isDst());
 	}
 
-	/**
-	 * Test method for hasExternalSyncSignal.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testHasExternalSyncSignal() throws KNXFormatException
-	{
+	@Test
+	void testHasExternalSyncSignal() throws KNXFormatException {
 		t.setValue(value);
 		assertTrue(t.isSyncClock());
 		t.setData(data);
@@ -681,11 +556,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertFalse(t.isSyncClock());
 	}
 
-	/**
-	 * Test method for isWorkday.
-	 */
-	public final void testIsWorkday()
-	{
+	@Test
+	void testIsWorkday() {
 		assertFalse(t.isWorkday());
 		t.setWorkday(true);
 		assertTrue(t.isWorkday());
@@ -695,7 +567,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertFalse(t.isWorkday());
 	}
 
-	public void testIsHoliday() throws KNXFormatException {
+	@Test
+	void testIsHoliday() throws KNXFormatException {
 		final var value = t.getValue();
 		assertFalse(t.isValidField(DPTXlatorDateTime.WORKDAY));
 
@@ -711,7 +584,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertTrue(parser.getValue().contains("holiday"));
 	}
 
-	public void testHolidayAndWorkingDay() throws KNXFormatException {
+	@Test
+	void testHolidayAndWorkingDay() throws KNXFormatException {
 		final var value = t.getValue() + " holiday, workday";
 		final var parser = new DPTXlatorDateTime(DPTXlatorDateTime.DPT_DATE_TIME);
 		assertFalse(parser.isValidField(DPTXlatorDateTime.WORKDAY));
@@ -719,7 +593,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertFalse(parser.isValidField(DPTXlatorDateTime.WORKDAY));
 	}
 
-	public void testWorkingDayAndHoliday() throws KNXFormatException {
+	@Test
+	void testWorkingDayAndHoliday() throws KNXFormatException {
 		final var value = t.getValue() + " workday, holiday";
 		final var parser = new DPTXlatorDateTime(DPTXlatorDateTime.DPT_DATE_TIME);
 		assertFalse(parser.isValidField(DPTXlatorDateTime.WORKDAY));
@@ -727,7 +602,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertFalse(parser.isValidField(DPTXlatorDateTime.WORKDAY));
 	}
 
-	public void testDuplicateHoliday() throws KNXFormatException {
+	@Test
+	void testDuplicateHoliday() throws KNXFormatException {
 		final var value = t.getValue() + " holiday (holiday)";
 		final var parser = new DPTXlatorDateTime(DPTXlatorDateTime.DPT_DATE_TIME);
 		assertFalse(parser.isValidField(DPTXlatorDateTime.WORKDAY));
@@ -735,7 +611,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertFalse(parser.isValidField(DPTXlatorDateTime.WORKDAY));
 	}
 
-	public void testUseAllFlags() throws KNXFormatException {
+	@Test
+	void testUseAllFlags() throws KNXFormatException {
 		t.setFaultyClock(false); // needs to be false
 		t.setWorkday(false);
 		t.setClockSync(true);
@@ -745,13 +622,8 @@ public class DPTXlatorDateTimeTest extends TestCase
 		parser.setValue(t.getValue());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorDateTime#validate()}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testValidate() throws KNXFormatException
-	{
+	@Test
+	void testValidate() throws KNXFormatException {
 		final Calendar c = Calendar.getInstance();
 		t.setValue(c.getTimeInMillis());
 		assertTrue(t.validate());
@@ -778,21 +650,28 @@ public class DPTXlatorDateTimeTest extends TestCase
 		assertFalse(t.validate());
 	}
 
-	private void checkTime(final int hr, final int min, final int sec)
-	{
+	@Test
+	void reliableSyncSource() {
+		t.setData(data);
+		assertFalse(t.reliableSyncSource());
+
+		final byte[] withReliableSyncSource = { 107, 8, 27, 108, 45, 33, 0x41, (byte) 0xc0 };
+		t.setData(withReliableSyncSource);
+		assertTrue(t.reliableSyncSource());
+	}
+
+	private void checkTime(final int hr, final int min, final int sec) {
 		assertEquals(hr, t.getHour());
 		assertEquals(min, t.getMinute());
 		assertEquals(sec, t.getSecond());
 	}
 
-	private void assertFind(final String text, final String[] find)
-	{
+	private void assertFind(final String text, final String[] find) {
 		for (int i = 0; i < find.length; ++i)
 			assertTrue(text.toLowerCase().indexOf(find[i].toLowerCase()) >= 0);
 	}
 
-	private void assertFindNot(final String text, final String[] find)
-	{
+	private void assertFindNot(final String text, final String[] find) {
 		for (int i = 0; i < find.length; ++i)
 			assertTrue(text.toLowerCase().indexOf(find[i].toLowerCase()) == -1);
 	}
