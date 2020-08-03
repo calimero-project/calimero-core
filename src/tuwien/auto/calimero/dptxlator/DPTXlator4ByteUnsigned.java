@@ -36,7 +36,6 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
@@ -73,18 +72,26 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 	/** DPT ID 12.102, counter time [h]; values from <b>0</b> to <b>4294967295</b> h. */
 	public static final DPT DptTimePeriodHours = new DPT("12.102", "counter time [h]", "0", "4294967295", "h");
 
+	// metering
+
+	/**
+	 * DPT ID 12.1200, volume liquid [liter] for water/heat meter total consumption; values from <b>0</b> to
+	 * <b>4294967295</b> liter.
+	 */
+	public static final DPT DptVolumeLiquid = new DPT("12.1200", "volume liquid [liter]", "0", "4294967295", "liter");
+
+	/**
+	 * DPT ID 12.1201, volume [m³] for gas/water/heat meter total consumption; values from <b>0</b> to
+	 * <b>4294967295</b> m³.
+	 */
+	public static final DPT DptVolume = new DPT("12.1201", "volume [m³]", "0", "4294967295", "m³");
 
 
-	private static final Map<String, DPT> types;
+	private static final Map<String, DPT> types = loadDatapointTypes(DPTXlator4ByteUnsigned.class);
 
-	static {
-		types = new HashMap<>(2);
-		types.put(DPT_VALUE_4_UCOUNT.getID(), DPT_VALUE_4_UCOUNT);
-	}
 
 	/**
 	 * Creates a translator for the given datapoint type.
-	 * <p>
 	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
@@ -96,7 +103,6 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 
 	/**
 	 * Creates a translator for the given datapoint type ID.
-	 * <p>
 	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
@@ -111,7 +117,6 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 
 	/**
 	 * Sets the value of the first translation item.
-	 * <p>
 	 *
 	 * @param value unsigned value, 0 &lt;= value &lt;= 0xFFFFFFFF
 	 * @throws KNXFormatException on input value out of range for DPT
@@ -124,7 +129,6 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 
 	/**
 	 * Returns the first translation item as unsigned 32 Bit value.
-	 * <p>
 	 *
 	 * @return unsigned 32 Bit value using type long
 	 * @see #getType()
@@ -147,18 +151,12 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 		return getValueUnsigned();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getValue()
-	 */
 	@Override
 	public String getValue()
 	{
 		return makeString(0);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getAllValues()
-	 */
 	@Override
 	public String[] getAllValues()
 	{
@@ -168,9 +166,6 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 		return s;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
-	 */
 	@Override
 	public final Map<String, DPT> getSubTypes()
 	{
