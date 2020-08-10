@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2019 B. Malinowsky
+    Copyright (c) 2015, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,21 +36,23 @@
 
 package tuwien.auto.calimero.dptxlator;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.dptxlator.DPTXlator8BitEnum.ApplicationArea;
 import tuwien.auto.calimero.dptxlator.DPTXlator8BitEnum.OccupancyMode;
 
-/**
- * @author B. Malinowsky
- */
-public class DPTXlator8BitEnumTest extends TestCase
-{
+class DPTXlator8BitEnumTest {
 	private DPTXlator8BitEnum t;
 
 	private final String e1 = "no fault";
@@ -76,22 +78,16 @@ public class DPTXlator8BitEnumTest extends TestCase
 	private final byte[] outOfRangeMaxData = { 51 };
 	private final byte[] eAllData = { e1Data[0], e2Data[0], e3Data[0] };
 
-	public DPTXlator8BitEnumTest(final String name)
-	{
-		super(name);
-	}
 
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
+	@BeforeEach
+	void setUp() throws Exception {
 		Util.setupLogging("DPTXlator");
 		TranslatorTypes.createTranslator(0, "20.003");
 		t = new DPTXlator8BitEnum(DPTXlator8BitEnum.DptApplicationArea.getID());
 	}
 
-	public final void testGetAllValues() throws KNXFormatException
-	{
+	@Test
+	void testGetAllValues() throws KNXFormatException {
 		assertEquals(1, t.getAllValues().length);
 		assertEquals("no fault", t.getAllValues()[0]);
 
@@ -99,12 +95,12 @@ public class DPTXlator8BitEnumTest extends TestCase
 		assertArrayEquals(stringsDesc, t.getAllValues());
 	}
 
-	public final void testGetValue() throws KNXFormatException
-	{
+	@Test
+	void testGetValue() throws KNXFormatException {
 		// translator specific
 		assertEquals("no fault", t.getValue());
 		t.setValue(1);
-		assertFalse("should not equal \"no fault\"", "no fault".equals(t.getValue()));
+		assertFalse("no fault".equals(t.getValue()), "should not equal \"no fault\"");
 
 		// try a enum with no 0 element
 		final DPTXlator8BitEnum x = new DPTXlator8BitEnum(DPTXlator8BitEnum.DptAlarmClassType);
@@ -115,14 +111,14 @@ public class DPTXlator8BitEnumTest extends TestCase
 		assertEquals(element, x.getValueUnsigned());
 	}
 
-	public final void testGetSubTypes()
-	{
+	@Test
+	void testGetSubTypes() {
 		final Map<String, DPT> subTypes = t.getSubTypes();
-		assertEquals(54, subTypes.size());
+		assertEquals(56, subTypes.size());
 	}
 
-	public final void testSetValueInt() throws KNXFormatException
-	{
+	@Test
+	void testSetValueInt() throws KNXFormatException {
 		t.setValue(OccupancyMode.Occupied.value());
 		t.setValue(e2);
 		try {
@@ -144,8 +140,8 @@ public class DPTXlator8BitEnumTest extends TestCase
 		}
 	}
 
-	public final void testGetValueUnsigned() throws KNXFormatException
-	{
+	@Test
+	void testGetValueUnsigned() throws KNXFormatException {
 		final Map<String, DPT> subTypes = DPTXlator8BitEnum.getSubTypesStatic();
 		final Set<String> keySet = subTypes.keySet();
 		for (final String s : keySet) {
@@ -156,8 +152,8 @@ public class DPTXlator8BitEnumTest extends TestCase
 		}
 	}
 
-	public final void testSetValues() throws KNXFormatException
-	{
+	@Test
+	void testSetValues() throws KNXFormatException {
 		t.setValues(strings);
 		t.setValues(stringsDesc);
 		t.setValues(stringsName);
@@ -171,8 +167,8 @@ public class DPTXlator8BitEnumTest extends TestCase
 		catch (final KNXFormatException expected) {}
 	}
 
-	public final void testSetDataByteArrayInt() throws KNXFormatException
-	{
+	@Test
+	void testSetDataByteArrayInt() throws KNXFormatException {
 		t.setData(e1Data, 0);
 		assertEquals(0, t.getValueUnsigned());
 
@@ -196,8 +192,8 @@ public class DPTXlator8BitEnumTest extends TestCase
 		catch (final KNXFormatException expected) {}
 	}
 
-	public final void testGetDataByteArrayInt() throws KNXFormatException
-	{
+	@Test
+	void testGetDataByteArrayInt() throws KNXFormatException {
 		t.setValue(e1);
 		assertArrayEquals(e1Data, t.getData());
 		t.setData(eAllData);
@@ -214,20 +210,18 @@ public class DPTXlator8BitEnumTest extends TestCase
 		assertEquals(-1, data[5]);
 	}
 
-	public final void testGetTypeSize()
-	{
+	@Test
+	void testGetTypeSize() {
 		assertEquals(1, t.getTypeSize());
 	}
 
-	private void assertArrayEquals(final byte[] exp, final byte[] actual)
-	{
+	private void assertArrayEquals(final byte[] exp, final byte[] actual) {
 		assertEquals(exp.length, actual.length);
 		for (int i = 0; i < exp.length; ++i)
 			assertEquals(exp[i], actual[i]);
 	}
 
-	private void assertArrayEquals(final String[] exp, final String[] actual)
-	{
+	private void assertArrayEquals(final String[] exp, final String[] actual) {
 		assertEquals(exp.length, actual.length);
 		for (int i = 0; i < exp.length; ++i)
 			assertEquals(exp[i], actual[i]);

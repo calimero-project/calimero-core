@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2016 B. Malinowsky
+    Copyright (c) 2009, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,18 +36,20 @@
 
 package tuwien.auto.calimero.dptxlator;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.Arrays;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Util;
 
-/**
- * @author B. Malinowsky
- */
-public class DPTXlator4ByteSignedTest extends TestCase
-{
+class DPTXlator4ByteSignedTest {
 	private DPTXlator4ByteSigned t;
 
 	private final String min = "-2147483648";
@@ -68,30 +70,14 @@ public class DPTXlator4ByteSignedTest extends TestCase
 		(byte) 0x00, (byte) 0x00, (byte) 0x00, 0, 0, 1, (byte) 0x9c, (byte) 0x4D, (byte) 0x2F,
 		(byte) 0x89, (byte) 0xD7 };
 
-	/**
-	 * @param name
-	 */
-	public DPTXlator4ByteSignedTest(final String name)
-	{
-		super(name);
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
+	@BeforeEach
+	void setUp() throws Exception {
 		Util.setupLogging("DPTXlator");
 		t = new DPTXlator4ByteSigned(DPTXlator4ByteSigned.DPT_COUNT);
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator4ByteSigned#getAllValues()}.
-	 */
-	public void testGetAllValues()
-	{
+	@Test
+	void testGetAllValues() {
 		assertEquals(1, t.getItems());
 		Helper.assertSimilar("0", t.getAllValues()[0]);
 
@@ -109,14 +95,8 @@ public class DPTXlator4ByteSignedTest extends TestCase
 		Helper.assertSimilar(value1, t.getAllValues()[0]);
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator#setValues(java.lang.String[])}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public void testSetValues() throws KNXFormatException
-	{
+	@Test
+	void testSetValues() throws KNXFormatException {
 		t.setValues(strings);
 		assertEquals(strings.length, t.getItems());
 		Helper.assertSimilar(strings, t.getAllValues());
@@ -133,13 +113,8 @@ public class DPTXlator4ByteSignedTest extends TestCase
 		t.setValues(new String[] { t.getValue(), t.getValue() });
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#setValue(java.lang.String)}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public void testSetValueString() throws KNXFormatException
-	{
+	@Test
+	void testSetValueString() throws KNXFormatException {
 		t.setValue(value2);
 		Helper.assertSimilar(value2, t.getValue());
 		String s = t.getValue();
@@ -155,13 +130,8 @@ public class DPTXlator4ByteSignedTest extends TestCase
 		assertEquals(s, t.getValue());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator4ByteSigned#getValue()}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public void testGetValue() throws KNXFormatException
-	{
+	@Test
+	void testGetValue() throws KNXFormatException {
 		Helper.assertSimilar("0", t.getValue());
 		t.setValues(new String[0]);
 		Helper.assertSimilar("0", t.getValue());
@@ -173,11 +143,8 @@ public class DPTXlator4ByteSignedTest extends TestCase
 		Helper.assertSimilar(max, t.getValue());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#setData(byte[], int)}.
-	 */
-	public void testSetDataByteArrayInt()
-	{
+	@Test
+	void testSetDataByteArrayInt() {
 		t.setData(dataMin, 0);
 		try {
 			t.setData(new byte[] {}, 0);
@@ -205,11 +172,8 @@ public class DPTXlator4ByteSignedTest extends TestCase
 		Helper.assertSimilar(strings, t.getAllValues());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#getData(byte[], int)}.
-	 */
-	public void testGetDataByteArrayInt()
-	{
+	@Test
+	void testGetDataByteArrayInt() {
 		byte[] d = new byte[5];
 		Arrays.fill(d, (byte) 0xAA);
 		assertEquals(5, t.getData(d, 1).length);
@@ -240,21 +204,13 @@ public class DPTXlator4ByteSignedTest extends TestCase
 		}
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator4ByteSigned#getSubTypes()}.
-	 */
-	public void testGetSubTypes()
-	{
-		assertEquals(9, t.getSubTypes().size());
+	@Test
+	void testGetSubTypes() {
+		assertEquals(10, t.getSubTypes().size());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator4ByteSigned#getValueSigned()}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public void testGetValueSigned() throws KNXFormatException
-	{
+	@Test
+	void testGetValueSigned() throws KNXFormatException {
 		assertEquals(0, t.getValueSigned());
 
 		for (int i = 0; i < ints.length - 1; i++) {
@@ -270,11 +226,8 @@ public class DPTXlator4ByteSignedTest extends TestCase
 		}
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator4ByteSigned#setValue(int)}.
-	 */
-	public void testSetValueInt()
-	{
+	@Test
+	void testSetValueInt() {
 		for (int i = 0; i < ints.length; i++) {
 			t.setValue(ints[i]);
 			assertEquals(ints[i], t.getValueSigned());
