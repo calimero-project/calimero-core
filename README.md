@@ -62,6 +62,12 @@ Supported Features
 * 29.x - 64 Bit signed value, e.g., Active Energy, Apparent energy
 * 229.001 - M-Bus metering value, with the various M-Bus VIF/VIFE codings
 * 232.x - RGB color value
+* 242.600 - xyY color
+* 249.600 - brightness & color temperature transition
+* 250.600 - brightness & color temperature control
+* 251.600 - RGBW color 
+* 252.600 - relative control RGBW
+* 254.600 - relative control RGB
 
 ### Network Monitor / Busmonitor
 Access via KNXnet/IP, KNX USB, KNX RF USB, TP-UART, and FT1.2
