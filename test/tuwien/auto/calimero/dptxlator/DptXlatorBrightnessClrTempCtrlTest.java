@@ -117,7 +117,7 @@ class DptXlatorBrightnessClrTempCtrlTest {
 	@Test
 	void getData() {
 		assertArrayEquals(new byte[3], t.getData());
-		final byte[] data = { 0, 0b1111, 25, 50, 30, 40 };
+		final byte[] data = { 25, 50, 0b11 };
 		t.setData(data);
 		assertArrayEquals(data, t.getData());
 	}
