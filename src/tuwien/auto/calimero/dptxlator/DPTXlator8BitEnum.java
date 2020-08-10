@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2019 B. Malinowsky
+    Copyright (c) 2015, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -827,6 +827,82 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
+	// 20.1004
+	public enum Medium implements EnumBase<Medium> {
+		TP1(0, "KNX TP1"),
+		PL110(1, "KNX PL110"),
+		RF(2, "KNX RF"),
+		IP(5, "KNX IP");
+
+		Medium(final int element, final String description)
+		{ //RP2
+			init(element, description);
+		} //RP1
+	}
+
+	// 20.1005
+	public enum PbFunction implements EnumBase<PbFunction> {
+		DefaultAction(1, ""),
+		On(2, ""),
+		Off(3, ""),
+		Toggle(4, ""),
+		DimmingUpDown(5, ""),
+		DimmingUp(6, ""),
+		DimmingDown(7, ""),
+		OnOff(8, ""),
+		TimedOnOff(9, ""),
+		ForcedOn(10, ""),
+		ForcedOff(11, ""),
+		ShutterUp(12, ""),
+		ShutterDown(13, ""),
+		ShutterUpDown(14, ""),
+		ForcedUp(16, ""),
+		ForcedDown(17, ""),
+		WindAlarm(18, ""),
+		RainAlarm(19, ""),
+		HvacModeComfortEconomy(20, ""),
+		HvacModeComfort(21, ""),
+		HvacModeEconomy(22, ""),
+		HvacModeBuildingProtectionAuto(23, ""),
+		ShutterStop(24, ""),
+		TimedComfortStandby(25, ""),
+		ForcedComfort(26, ""),
+		ForcedBuildingProtection(27, ""),
+		Scene1(28, ""),
+		Scene2(29, ""),
+		Scene3(30, ""),
+		Scene4(31, ""),
+		Scene5(32, ""),
+		Scene6(33, ""),
+		Scene7(34, ""),
+		Scene8(35, ""),
+		AbsoluteDimming25(36, ""),
+		AbsoluteDimming50(37, ""),
+		AbsoluteDimming75(38, ""),
+		AbsoluteDimming100(39, ""),
+		ShutterUpSwitch(40, ""),
+		ShutterDownSwitch(41, ""),
+		ShutterUpDownSwitch(42, ""),
+		ShutterDownUpSwitch(43, ""),
+		LightSensor(44, ""),
+		SystemClock(45, ""),
+		BatteryStatus(46, ""),
+		HvacModeStandby(47, ""),
+		HvacModeAuto(48, ""),
+		HvacModeComfortStandby(49, ""),
+		HvacModeBuildingProtection(50, ""),
+		TimedToggle(51, ""),
+		DimmingAbsoluteSwitch(52, ""),
+		SceneSwitch(53, ""),
+		SmokeAlarm(54, ""),
+		SubDetector(55, "");
+
+		PbFunction(final int element, final String description)
+		{ //RP2
+			init(element, name().replaceAll("([A-Z]|[0-9]+)", " $1").toLowerCase().trim());
+		} //RP1
+	}
+
 	// 20.1200
 	public enum MBusBreakerValveState implements EnumBase<MBusBreakerValveState> {
 		Closed(0, "Breaker/Valve is closed"),
@@ -1027,6 +1103,14 @@ public class DPTXlator8BitEnum extends DPTXlator
 			"RF Mode Select", RFModeSelect.class, "0", "2");
 	public static final EnumDpt<RFFilterSelect> DptRFFilterSelect = new EnumDpt<>("20.1003",
 			"RF Filter Select", RFFilterSelect.class, "0", "3");
+
+
+	public static final EnumDpt<Medium> DptMedium = new EnumDpt<>("20.1004",
+			"KNX medium", Medium.class, "0", "5");
+
+	/** Configuration of action of push button in PB mode. */
+	public static final EnumDpt<PbFunction> DptPbFunction = new EnumDpt<>("20.1005", "PB function", PbFunction.class,
+			"1", "55");
 
 	// Metering domain
 

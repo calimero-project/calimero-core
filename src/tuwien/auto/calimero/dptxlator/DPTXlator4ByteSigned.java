@@ -110,6 +110,11 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	public static final DPT DPT_REACTIVE_ENERGY_KVARH = new DPT("13.015",
 			"Reactive energy in kVARh", "-2147483648", "2147483647", "kVARh");
 
+	/** DPT ID 13.016, Active energy in MWh; values from <b>-2147483648</b> to <b>2147483647</b> MWh. */
+	public static final DPT DptActiveEnergyMWh = new DPT("13.016",
+			"Active energy in MWh", "-2147483648", "2147483647", "MWh");
+
+
 	/**
 	 * DPT ID 13.100, time lag in seconds; values from <b>-2147483648</b> to <b>2147483647</b> s.
 	 */
