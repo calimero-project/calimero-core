@@ -367,10 +367,17 @@ public class DPTXlator3BitControlled extends DPTXlator
 		throws KNXFormatException
 	{
 		final StringTokenizer token = new StringTokenizer(value);
-		if (token.countTokens() < 2)
+		if (token.countTokens() == 0)
+			throw newException("wrong value format", value);
+
+		String s = token.nextToken();
+		if ("break".equals(s)) {
+			dst[index] = 0;
+			return;
+		}
+		if (token.countTokens() < 1)
 			throw newException("wrong value format", value);
 		int ctrl = 0;
-		String s = token.nextToken();
 		final DPT dptCtrl = ((DPT3BitControlled) dpt).getControlDPT();
 		if (s.equalsIgnoreCase(dptCtrl.getUpperValue()))
 			ctrl = 0x08;
