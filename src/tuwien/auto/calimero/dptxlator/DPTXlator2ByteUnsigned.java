@@ -36,6 +36,8 @@
 
 package tuwien.auto.calimero.dptxlator;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
@@ -69,29 +71,25 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 		new DPT("7.002", "Time period in ms", "0", "65535", "ms");
 
 	/**
-	 * DPT ID 7.003, Time period (resolution 10 ms); values from <b>0</b> to <b>655350</b>
-	 * ms.
+	 * DPT ID 7.003, Time period (resolution 10 ms); values from <b>0</b> to <b>655.35</b> s.
 	 */
 	public static final DPT DPT_TIMEPERIOD_10 =
-		new DPT("7.003", "Time period (resolution 10 ms)", "0", "655350", "ms");
+		new DPT("7.003", "Time period (resolution 10 ms)", "0", "655.35", "s");
 
 	/**
-	 * DPT ID 7.004, Time period (resolution 100 ms); values from <b>0</b> to <b>6553500</b>
-	 * ms.
+	 * DPT ID 7.004, Time period (resolution 100 ms); values from <b>0</b> to <b>6553.5</b> s.
 	 */
 	public static final DPT DPT_TIMEPERIOD_100 =
-		new DPT("7.004", "Time period (resolution 100 ms)", "0", "6553500", "ms");
+		new DPT("7.004", "Time period (resolution 100 ms)", "0", "6553.5", "s");
 
 	/**
-	 * DPT ID 7.005, Time period in seconds; values from <b>0</b> to <b>65535</b> s
-	 * (~18,2 hours).
+	 * DPT ID 7.005, Time period in seconds; values from <b>0</b> to <b>65535</b> s (~18,2 hours).
 	 */
 	public static final DPT DPT_TIMEPERIOD_SEC =
 		new DPT("7.005", "Time period in seconds", "0", "65535", "s");
 
 	/**
-	 * DPT ID 7.006, Time period in minutes; values from <b>0</b> to <b>65535</b> min
-	 * (~45,5 days).
+	 * DPT ID 7.006, Time period in minutes; values from <b>0</b> to <b>65535</b> min (~45,5 days).
 	 */
 	public static final DPT DPT_TIMEPERIOD_MIN =
 		new DPT("7.006", "Time period in minutes", "0", "65535", "min");
@@ -138,8 +136,10 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 
 	private static final Map<String, DPT> types  = loadDatapointTypes(DPTXlator2ByteUnsigned.class);
 
-	private final int min;
-	private final int max;
+
+	private final NumberFormat formatter = NumberFormat.getNumberInstance();
+
+	private final double max;
 
 	/**
 	 * Creates a translator for the given datapoint type.
@@ -165,14 +165,13 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	{
 		super(2);
 		setTypeID(types, dptID);
-		min = getLimit(dpt.getLowerValue());
 		max = getLimit(dpt.getUpperValue());
 		data = new short[2];
+		formatter.setMinimumFractionDigits(0);
+		formatter.setMaximumFractionDigits(2);
+		formatter.setParseIntegerOnly(dpt.equals(DPT_TIMEPERIOD_10) || dpt.equals(DPT_TIMEPERIOD_100) ? false : true);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getValue()
-	 */
 	@Override
 	public String getValue()
 	{
@@ -199,6 +198,14 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	 */
 	public final void setValue(final int value) throws KNXFormatException
 	{
+		if (dpt.equals(DPT_TIMEPERIOD_10) || dpt.equals(DPT_TIMEPERIOD_100))
+			setValue(value / 1000d);
+		else
+			setValue((double) value);
+	}
+
+	public final void setValue(final double value) throws KNXFormatException
+	{
 		final short[] buf = new short[2];
 		toDPT(value, buf, 0);
 		data = buf;
@@ -217,7 +224,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	 */
 	public final int getValueUnsigned()
 	{
-		return fromDPT(0);
+		return (int) fromDPT(0, true);
 	}
 
 	/**
@@ -238,9 +245,6 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 		return getValueUnsigned();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getAllValues()
-	 */
 	@Override
 	public String[] getAllValues()
 	{
@@ -269,9 +273,6 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 		data = toDPT(milliseconds);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
-	 */
 	@Override
 	public final Map<String, DPT> getSubTypes()
 	{
@@ -287,29 +288,40 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 		return types;
 	}
 
-	private int fromDPT(final int index)
+	private double fromDPT(final int index, final boolean timeperiodMillis)
 	{
 		final int v = (data[2 * index] << 8) | data[2 * index + 1];
 		if (dpt.equals(DPT_TIMEPERIOD_10))
-			return v * 10;
+			return timeperiodMillis ? v * 10 : v / 100d;
 		else if (dpt.equals(DPT_TIMEPERIOD_100))
-			return v * 100;
+			return timeperiodMillis ? v * 100 : v / 10d;
 		return v;
 	}
 
 	private String makeString(final int index)
 	{
-		return appendUnit(String.valueOf(fromDPT(index)));
+		return appendUnit(formatter.format(fromDPT(index, false)));
 	}
 
 	@Override
-	protected void toDPT(final String value, final short[] dst, final int index)
-		throws KNXFormatException
+	protected void toDPT(final String value, final short[] dst, final int index) throws KNXFormatException
 	{
 		try {
-			toDPT(Integer.decode(removeUnit(value)).intValue(), dst, index);
+			final String s = removeUnit(value);
+			double v;
+			if (dpt.equals(DPT_TIMEPERIOD_10) || dpt.equals(DPT_TIMEPERIOD_100))
+				v = formatter.parse(s).doubleValue();
+			else {
+				try {
+					v = Integer.decode(s).intValue();
+				}
+				catch (final NumberFormatException e) {
+					v = formatter.parse(s).longValue();
+				}
+			}
+			toDPT(v, dst, index);
 		}
-		catch (final NumberFormatException e) {
+		catch (NumberFormatException | ParseException e) {
 			throw newException("wrong value format", value);
 		}
 	}
@@ -319,40 +331,45 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 		// prevent round up to 0 from negative milliseconds
 		if (ms < 0)
 			throw newException("negative input value", Long.toString(ms));
-		long v = ms;
-		if (dpt.equals(DPT_TIMEPERIOD_SEC))
+		double v = ms;
+
+		if (dpt.equals(DPT_TIMEPERIOD_10) || dpt.equals(DPT_TIMEPERIOD_100))
+			v = ms / 1000.0;
+		else if (dpt.equals(DPT_TIMEPERIOD_SEC))
 			v = Math.round(ms / 1000.0);
 		else if (dpt.equals(DPT_TIMEPERIOD_MIN))
 			v = Math.round(ms / 1000.0 / 60.0);
 		else if (dpt.equals(DPT_TIMEPERIOD_HOURS))
 			v = Math.round(ms / 1000.0 / 60.0 / 60.0);
 		final short[] buf = new short[2];
-		toDPT((int) v, buf, 0);
+		toDPT(v, buf, 0);
 		return buf;
 	}
 
-	private void toDPT(final int value, final short[] dst, final int index) throws KNXFormatException
+	private void toDPT(final double value, final short[] dst, final int index) throws KNXFormatException
 	{
-		if (value < min || value > max)
+		if (value < 0 || value > max)
 			throw newException("translation error, input value out of range ["
-							+ dpt.getLowerValue() + ".." + dpt.getUpperValue() + "]", Integer.toString(value));
-		int v = value;
+							+ dpt.getLowerValue() + ".." + dpt.getUpperValue() + "]", Double.toString(value));
+		final int v;
 		if (dpt.equals(DPT_TIMEPERIOD_10))
-			v = Math.round(value / 10.0f);
+			v = (int) Math.round(value * 100);
 		else if (dpt.equals(DPT_TIMEPERIOD_100))
-			v = Math.round(value / 100.0f);
+			v = (int) Math.round(value * 10);
+		else
+			v = (int) value;
 		dst[2 * index] = ubyte(v >> 8);
 		dst[2 * index + 1] = ubyte(v);
 	}
 
-	private int getLimit(final String limit) throws KNXFormatException
+	private double getLimit(final String limit) throws KNXFormatException
 	{
 		try {
-			final int i = Integer.parseInt(limit);
-			final int upper = dpt.equals(DPT_TIMEPERIOD_10) ? 655350 : dpt
-					.equals(DPT_TIMEPERIOD_100) ? 6553500 : 65535;
-			if (i >= 0 && i <= upper)
-				return i;
+			final double d = Double.parseDouble(limit);
+			final double upper = dpt.equals(DPT_TIMEPERIOD_10) ? 655.35d : dpt
+					.equals(DPT_TIMEPERIOD_100) ? 6553.5d : 65535;
+			if (d >= 0 && d <= upper)
+				return d;
 		}
 		catch (final NumberFormatException e) {}
 		throw newException("limit not in valid DPT range", limit);
