@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -148,9 +148,9 @@ public class TranslatorTypesTest extends TestCase
 		ofBitSize = TranslatorTypes.ofBitSize(4);
 		assertEquals(1, ofBitSize.size());
 		ofBitSize = TranslatorTypes.ofBitSize(32);
-		assertEquals(3, ofBitSize.size());
+		assertEquals(4, ofBitSize.size());
 		ofBitSize = TranslatorTypes.ofBitSize(64);
-		assertEquals(2, ofBitSize.size());
+		assertEquals(3, ofBitSize.size());
 		ofBitSize = TranslatorTypes.ofBitSize(123);
 		assertEquals(0, ofBitSize.size());
 	}
