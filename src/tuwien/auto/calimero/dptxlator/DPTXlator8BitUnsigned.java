@@ -81,11 +81,8 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 
 	/**
 	 * DPT ID 5.005, Decimal factor; values from <b>0</b> to <b>255</b> ratio.
-	 * <p>
-	 * <b>This is a preliminary datapoint type, still in state "to be defined".</b>
 	 */
-	public static final DPT DPT_DECIMALFACTOR = new DPT("5.005", "Decimal factor", "0", "255",
-			"ratio");
+	public static final DPT DPT_DECIMALFACTOR = new DPT("5.005", "Decimal factor", "0", "255", "ratio");
 
 	/**
 	 * DPT ID 5.006, Tariff information; values from <b>0</b> to <b>254</b>.
@@ -137,9 +134,6 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 		setSubType(dptID);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getValue()
-	 */
 	@Override
 	public String getValue()
 	{
@@ -147,13 +141,11 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	}
 
 	/**
-	 * Sets one new translation item from a scaled unsigned value, replacing any old
-	 * items.
-	 * <p>
+	 * Sets one new translation item from a scaled unsigned value, replacing any old items.
 	 * The scale of the input value is according to the current DPT.
 	 *
 	 * @param scaled scaled unsigned value, the dimension is determined by the set DPT, 0
-	 *        &lt;= scaled value &lt;= defined maximum of DPT
+	 *        &le; scaled value &le; defined maximum of DPT
 	 * @throws KNXFormatException on wrong scaled value, if input doesn't conform to
 	 *         subtype dimension
 	 * @see #getType()
@@ -164,9 +156,7 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	}
 
 	/**
-	 * Returns the first translation item, the value scaled conforming to the range of the
-	 * set DPT.
-	 * <p>
+	 * Returns the first translation item, the value scaled conforming to the range of the set DPT.
 	 *
 	 * @return scaled representation as unsigned 8 Bit using type short
 	 * @see #getType()
@@ -216,9 +206,6 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 		return data[0];
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getAllValues()
-	 */
 	@Override
 	public String[] getAllValues()
 	{
@@ -228,9 +215,6 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 		return s;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
-	 */
 	@Override
 	public final Map<String, DPT> getSubTypes()
 	{

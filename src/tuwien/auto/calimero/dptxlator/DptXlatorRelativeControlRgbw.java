@@ -105,13 +105,13 @@ public class DptXlatorRelativeControlRgbw extends DPTXlator {
 	 * Sets one new translation item, replacing any old items.
 	 *
 	 * @param increaseRed increase or decrease value
-	 * @param redStepcode stepcode, <code>0 &le; clrTempStepcode &le; 7</code>
+	 * @param redStepcode stepcode, <code>0 &le; redStepcode &le; 7</code>
 	 * @param increaseGreen increase or decrease value
-	 * @param greenStepcode stepcode, <code>0 &le; clrTempStepcode &le; 7</code>
+	 * @param greenStepcode stepcode, <code>0 &le; greenStepcode &le; 7</code>
 	 * @param increaseBlue increase or decrease value
-	 * @param blueStepcode stepcode, <code>0 &le; clrTempStepcode &le; 7</code>
+	 * @param blueStepcode stepcode, <code>0 &le; blueStepcode &le; 7</code>
 	 * @param increaseWhite increase or decrease value
-	 * @param whiteStepcode stepcode, <code>0 &le; clrTempStepcode &le; 7</code>
+	 * @param whiteStepcode stepcode, <code>0 &le; whiteStepcode &le; 7</code>
 	 */
 	public final void setValue(final boolean increaseRed, final int redStepcode, final boolean increaseGreen,
 			final int greenStepcode, final boolean increaseBlue, final int blueStepcode, final boolean increaseWhite,

@@ -38,7 +38,6 @@ package tuwien.auto.calimero.dptxlator;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -59,12 +58,7 @@ public class DptXlatorXyY extends DPTXlator {
 	 */
 	public static final DPT DptXyY = new DPT("242.600", "color xyY", "(0 0) 0", "(1 1) 100", "%");
 
-	private static final Map<String, DPT> types;
-
-	static {
-		types = new HashMap<>();
-		types.put(DptXyY.getID(), DptXyY);
-	}
+	private static final Map<String, DPT> types = loadDatapointTypes(DptXlatorXyY.class);
 
 	private final NumberFormat formatter = NumberFormat.getNumberInstance();
 
@@ -97,7 +91,7 @@ public class DptXlatorXyY extends DPTXlator {
 	public DptXlatorXyY(final String dptId) throws KNXFormatException {
 		super(6);
 		setTypeID(types, dptId);
-		data = new short[6];
+		data = new short[typeSize];
 		formatter.setMinimumFractionDigits(0);
 		formatter.setMaximumFractionDigits(4);
 	}
@@ -174,11 +168,11 @@ public class DptXlatorXyY extends DPTXlator {
 	}
 
 	private double[] fromDptDouble(final int index) {
-		int offset = index * 6;
+		int offset = index * typeSize;
 
 		final double x = ((data[offset++] << 8) | data[offset++]) / 65_535d;
 		final double y = ((data[offset++] << 8) | data[offset++]) / 65_535d;
-		final double brightness = data[offset++] * 100d / 255; // ??? scaling might be wrong
+		final double brightness = data[offset++] * 100d / 255;
 
 		final int valid = data[offset++];
 		final boolean clrValid = (valid & 2) == 2;
@@ -251,7 +245,7 @@ public class DptXlatorXyY extends DPTXlator {
 			(short) Math.round(brightness * 255 / 100), valid };
 	}
 
-	private void rangeCheck(final double x, final double y, final double brightness) {
+	private static void rangeCheck(final double x, final double y, final double brightness) {
 		if (x < 0 || x > 1)
 			throw new KNXIllegalArgumentException("x " + x + " out of range [0..1]");
 		if (y < 0 || y > 1)
