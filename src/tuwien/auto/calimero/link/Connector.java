@@ -44,6 +44,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +83,9 @@ public final class Connector
 
 	// runs out earliest after (2^63-1)/1000/3600/24/365 ~ 3×10^8 years. Safe bet KNX got canned by then
 	public static final long NoMaxAttempts = Long.MAX_VALUE;
-	private long maxAttempts = 10;
+	private long maxAttempts = NoMaxAttempts;
+
+	private Consumer<Boolean> connectionStatusChanged = __ -> {};
 
 	public Connector() {}
 
@@ -95,6 +98,7 @@ public final class Connector
 		this.serverError = rhs.serverError;
 		this.internalError = rhs.internalError;
 		this.maxAttempts = rhs.maxAttempts;
+		this.connectionStatusChanged = rhs.connectionStatusChanged;
 	}
 
 	// on successful connection, the attempts are reset to maxAttempts
@@ -130,6 +134,11 @@ public final class Connector
 		initialError = errorOnCreation;
 		serverError = serverDisconnect;
 		internalError = internalDisconnect;
+		return this;
+	}
+
+	public Connector connectionStatusNotifier(final Consumer<Boolean> notifiable) {
+		connectionStatusChanged = notifiable;
 		return this;
 	}
 
@@ -351,6 +360,7 @@ public final class Connector
 		@Override
 		public void linkClosed(final CloseEvent e)
 		{
+			connector.connectionStatusChanged.accept(false);
 			if ((e.getInitiator() == CloseEvent.INTERNAL && connector.internalError)
 					|| (e.getInitiator() == CloseEvent.SERVER_REQUEST && connector.serverError))
 				scheduleConnect(connector.maxAttempts);
@@ -462,6 +472,7 @@ public final class Connector
 						lock.notifyAll();
 					}
 				}
+				connector.connectionStatusChanged.accept(true);
 			}
 			else {
 				// if a connection attempt is active, we use that one
