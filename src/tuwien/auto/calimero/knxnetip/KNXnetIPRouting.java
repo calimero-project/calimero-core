@@ -390,14 +390,16 @@ public class KNXnetIPRouting extends ConnectionBase
 				}
 			};
 
-			new Thread(() -> {
+			final var t = new Thread(() -> {
 				try {
 					sysBcastLooper.loop();
 				}
 				catch (final IOException e) {
 					close(CloseEvent.INTERNAL, "receiver communication failure", LogLevel.ERROR, e);
 				}
-			}, "KNX IP system broadcast receiver").start();
+			}, "KNX IP system broadcast receiver");
+			t.setDaemon(true);
+			t.start();
 		}
 		setState(OK);
 	}
