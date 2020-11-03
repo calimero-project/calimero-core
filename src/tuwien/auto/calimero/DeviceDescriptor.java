@@ -57,7 +57,7 @@ public interface DeviceDescriptor
 	int TYPE_SIZE = 2;
 	int TYPE2_SIZE = 14;
 
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	static DeviceDescriptor fromType(final byte[] data) throws KNXFormatException
 	{
 		return from(data);

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -61,13 +61,13 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/**
 	 * @deprecated Use {@link AdditionalInfo}
 	 */
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	public static class AddInfo extends AdditionalInfo
 	{
 		/**
 		 * @deprecated Use {@link AdditionalInfo#of}
 		 */
-		@Deprecated
+		@Deprecated(forRemoval = true)
 		public AddInfo(final int infoType, final byte[] info)
 		{
 			super(infoType, info);
@@ -114,28 +114,28 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	// public static final int ADDINFO_RESERVED = 0x00;
 
 	/** @deprecated Use {@link AdditionalInfo}. */
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	public static final int ADDINFO_PLMEDIUM = 0x01;
 
 	/** @deprecated Use {@link AdditionalInfo}. */
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	public static final int ADDINFO_RFMEDIUM = 0x02;
 	// public static final int ADDINFO_BUSMON = 0x03;
 
 	/** @deprecated Use {@link AdditionalInfo}. */
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	public static final int ADDINFO_TIMESTAMP = 0x04;
 
 	/** @deprecated Use {@link AdditionalInfo}. */
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	public static final int ADDINFO_TIMEDELAY = 0x05;
 
 	/** @deprecated Use {@link AdditionalInfo}. */
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	public static final int ADDINFO_TIMESTAMP_EXT = 0x06;
 
 	/** @deprecated Use {@link AdditionalInfo}. */
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	public static final int ADDINFO_BIBAT = 0x07;
 
 	private static final int ADDINFO_ESC = 0xFF;
@@ -298,7 +298,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 * @param infoType type ID of additional information
 	 * @param info additional information data
 	 */
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	public synchronized void addAdditionalInfo(final int infoType, final byte[] info)
 	{
 		if (infoType < 0 || infoType >= ADDINFO_ESC)
@@ -312,7 +312,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 * @deprecated Use {@link #additionalInfo()}.
 	 * @return a List with {@link AddInfo} objects
 	 */
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	public synchronized List<? extends AdditionalInfo> getAdditionalInfo()
 	{
 		return new ArrayList<>(addInfo);
@@ -381,7 +381,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 * @deprecated Use {@link #additionalInfo()}.removeIf(info -&gt; info.type == infoType).
 	 * @param infoType type ID of additional information to remove
 	 */
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	public synchronized void removeAdditionalInfo(final int infoType)
 	{
 		addInfo.removeIf(info -> info.type() == infoType);

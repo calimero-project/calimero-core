@@ -63,7 +63,7 @@ public interface ManagementClient extends AutoCloseable
 	 *
 	 * @param timeout time in seconds, <code>timeout &gt; 0</code>
 	 */
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	void setResponseTimeout(int timeout);
 
 	/**
@@ -71,7 +71,7 @@ public interface ManagementClient extends AutoCloseable
 	 *
 	 * @return timeout in seconds
 	 */
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	int getResponseTimeout();
 
 	/**

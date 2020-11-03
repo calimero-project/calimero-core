@@ -67,7 +67,7 @@ public interface ProcessCommunicator extends ProcessCommunication
 	 *
 	 * @param timeout time in seconds, <code>timeout &gt; 0</code>
 	 */
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	void setResponseTimeout(int timeout);
 
 	/**
@@ -75,7 +75,7 @@ public interface ProcessCommunicator extends ProcessCommunication
 	 *
 	 * @return timeout in seconds
 	 */
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	int getResponseTimeout();
 
 	/**
@@ -162,7 +162,7 @@ public interface ProcessCommunicator extends ProcessCommunication
 	 * @throws KNXException on other read problems
 	 * @throws InterruptedException on interrupt during read
 	 */
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	default double readFloat(final GroupAddress dst, final boolean is4ByteFloat) throws KNXException,
 		InterruptedException {
 		return readFloat(dst);

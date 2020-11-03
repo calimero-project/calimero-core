@@ -313,7 +313,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		return pbkdf2WithHmacSha256(password, salt);
 	}
 
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	public static byte[] hashDeviceAuthenticationCode(final char[] authCode) {
 		final byte[] salt = "device-authentication-code.1.secure.ip.knx.org".getBytes(StandardCharsets.US_ASCII);
 		return pbkdf2WithHmacSha256(authCode, salt);

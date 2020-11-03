@@ -48,7 +48,7 @@ public class TPSettings extends KNXMediumSettings
 	/**
 	 * @deprecated
 	 */
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	public static final TPSettings TP1 = new TPSettings();
 
 	/**
