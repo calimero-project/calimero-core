@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,11 +54,8 @@ public final class Settings
 
 	private static final String tuwien = "Vienna University of Technology";
 	private static final String group = "Automation Systems Group";
-	private static final String copyright = "Copyright \u00A9 2006-2019";
+	private static final String copyright = "Copyright \u00A9 2006-2020";
 
-	// aligns the bundle package name following the friendly name,
-	// works for friendly name with max length of 20 chars
-	private static final String bundleAlignment = "                      ";
 	// just use newline, it's easier to deal with
 	private static final String sep = "\n";
 
@@ -104,30 +101,6 @@ public final class Settings
 	}
 
 	/**
-	 * @deprecated No replacement.
-	 * @return the bundle listing as string
-	 */
-	@Deprecated
-	public static String getBundleListing()
-	{
-		final StringBuilder buf = new StringBuilder();
-		buf.append(getBundle("cEMI", "tuwien.auto.calimero.cemi.CEMI", 1)).append(sep);
-		buf.append(getBundle("KNXnet/IP", "tuwien.auto.calimero.knxnetip.KNXnetIPConnection", 1)).append(sep);
-		buf.append(getBundle("FT1.2", "tuwien.auto.calimero.serial.FT12Connection", 1)).append(sep);
-		buf.append(getBundle("TP-Uart", "tuwien.auto.calimero.serial.TpuartConnection", 1)).append(sep);
-		buf.append(getBundle("USB", "tuwien.auto.calimero.serial.usb.UsbConnection", 1)).append(sep);
-		buf.append(getBundle("KNX network link", "tuwien.auto.calimero.link.KNXNetworkLink", 1)).append(sep);
-		buf.append(getBundle("DPT translators", "tuwien.auto.calimero.dptxlator.DPTXlator", 1)).append(sep);
-		buf.append(getBundle("Datapoints", "tuwien.auto.calimero.datapoint.Datapoint", 1)).append(sep);
-		buf.append(getBundle("Network buffer", "tuwien.auto.calimero.buffer.NetworkBuffer", 1)).append(sep);
-		buf.append(getBundle("Process communication", "tuwien.auto.calimero.process." + "ProcessCommunicator", 1))
-				.append(sep);
-		buf.append(getBundle("Management", "tuwien.auto.calimero.mgmt.ManagementClient", 1)).append(sep);
-		buf.append(getBundle("XML", "tuwien.auto.calimero.xml.DefaultXmlReader", 1));
-		return buf.toString();
-	}
-
-	/**
 	 * This entry routine of the library prints information to the standard
 	 * output stream (System.out), mainly for user information.
 	 * <p>
@@ -166,29 +139,6 @@ public final class Settings
 		}
 		catch (ClassNotFoundException | NoClassDefFoundError ignored) {}
 		return false;
-	}
-
-	// for now, this works by loading one class as representative from a bundle
-	// to check availability, then class name is truncated to bundle id
-	private static String getBundle(final String friendlyName, final String className, final int truncate)
-	{
-		try {
-			final ClassLoader cl = Settings.class.getClassLoader();
-			cl.loadClass(className);
-			int start = className.length();
-			for (int i = 0; i < truncate; ++i)
-				start = className.lastIndexOf('.', start - 1);
-			final String bundle = className.substring(0, start);
-			return "+ " + friendlyName + align(friendlyName) + "- " + bundle;
-		}
-		catch (final ClassNotFoundException e) {}
-		catch (final NoClassDefFoundError e) {}
-		return "- " + friendlyName + align(friendlyName) + "- not available";
-	}
-
-	private static String align(final String friendlyName)
-	{
-		return bundleAlignment.substring(friendlyName.length());
 	}
 
 	private static void out(final String s)

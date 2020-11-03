@@ -116,13 +116,6 @@ public final class Connector
 		return this;
 	}
 
-	@Deprecated
-	public Connector reconnectWait(final long wait, final TimeUnit unit)
-	{
-		reconnectDelay = unit.toMillis(wait);
-		return this;
-	}
-
 	public Connector reconnectDelay(final Duration delay) {
 		reconnectDelay = delay.toMillis();
 		return this;
