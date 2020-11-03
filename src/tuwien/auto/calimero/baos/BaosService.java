@@ -48,6 +48,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import tuwien.auto.calimero.DataUnitBuilder;
@@ -170,7 +171,53 @@ public final class BaosService {
 		ClearTransmissionState;
 
 		public static DatapointCommand of(final int command) { return DatapointCommand.values()[command]; }
-	};
+	}
+
+	/**
+	 * Datapoint state used with GetDatapointValue.res and DatapointValue.ind service.
+	 */
+	public static final class DatapointState {
+		private final int state;
+
+		DatapointState(final int state) throws KNXFormatException {
+			if ((state & ~0x1f) != 0)
+				throw new KNXFormatException("invalid datapoint state", state);
+			this.state = state;
+		}
+
+		/**
+		 * @return <code>true</code> if datapoint value has already been received, <code>false</code> if value is unknown
+		 */
+		public boolean valid() { return (state & 0b10000) != 0; }
+
+		/**
+		 * @return <code>true</code> if datapoint value got updated from the bus, <code>false</code> if value was not updated
+		 */
+		public boolean updated() { return (state & 0b01000) != 0; }
+
+		/**
+		 * @return <code>true</code> if read request should be sent, <code>false</code> if write request should be sent
+		 */
+		public boolean readRequest() { return (state & 0b00100) != 0; }
+
+		/**
+		 * Datapoint transmission status.
+		 */
+		public enum TransmissionStatus { IdleOk, IdleError, InProgress, Request }
+
+		public TransmissionStatus transmissionStatus() { return TransmissionStatus.values()[state & 0b00011]; }
+
+		@Override
+		public String toString() {
+			final var joiner = new StringJoiner(" ");
+			if (valid())
+				joiner.add("valid");
+			if (updated())
+				joiner.add("updated");
+			joiner.add("tx=" + transmissionStatus());
+			return joiner.toString();
+		}
+	}
 
 	public enum HistoryCommand {
 		None,
@@ -572,8 +619,9 @@ public final class BaosService {
 				id = buf.getShort() & 0xffff;
 
 			Object info = null;
-			if (subService == GetDatapointValue || subService == DatapointValueIndication
-					|| subService == GetDatapointHistoryState) {
+			if (subService == GetDatapointValue || subService == DatapointValueIndication)
+				info = new DatapointState(buf.get() & 0xff);
+			else if (subService == GetDatapointHistoryState) {
 				final int dpState = buf.get() & 0xff;
 				info = dpState;
 			}
