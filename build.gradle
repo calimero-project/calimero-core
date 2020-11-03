@@ -5,7 +5,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.29.0'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.34.0'
     }
 }
 
@@ -14,7 +14,7 @@ repositories {
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 
-ext.junitJupiterVersion = '5.6.0'
+ext.junitJupiterVersion = '5.7.0'
 ext.desc = 'Calimero, a free KNX network library'
 
 apply plugin: 'java-library'
@@ -116,6 +116,6 @@ dependencies {
     api 'org.usb4java:usb4java-javax:1.3.0'
 
 	testImplementation "org.junit.jupiter:junit-jupiter:${junitJupiterVersion}"
-	testCompileOnly 'junit:junit:4.13'
+	testCompileOnly 'junit:junit:4.13.1'
 	testRuntimeOnly "org.junit.vintage:junit-vintage-engine:${junitJupiterVersion}"
 }
