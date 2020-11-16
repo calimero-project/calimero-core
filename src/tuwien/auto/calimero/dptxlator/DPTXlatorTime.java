@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -120,6 +120,14 @@ public class DPTXlatorTime extends DPTXlator
 	}
 
 	/**
+	 * Creates a translator for DPT ID 10.001, time of day.
+	 */
+	public DPTXlatorTime() {
+		super(3);
+		dpt = DPT_TIMEOFDAY;
+	}
+
+	/**
 	 * Creates a translator for the given datapoint type.
 	 *
 	 * @param dpt the requested datapoint type
@@ -140,7 +148,6 @@ public class DPTXlatorTime extends DPTXlator
 	{
 		super(3);
 		setTypeID(types, dptId);
-		data = new short[3];
 	}
 
 	/**

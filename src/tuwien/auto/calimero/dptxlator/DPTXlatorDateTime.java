@@ -192,14 +192,24 @@ public class DPTXlatorDateTime extends DPTXlator
 	// fault, workday, DST, quality
 	private static final int[] FLAG_MASKS = { WD, DST, FAULT, QUALITY };
 
+	private static final short[] defaultData = { 0, 1, 1, 0, 0, 0, NO_WD | NO_DOW, 0 };
+
 	private static Calendar c;
 	private static final Map<String, DPT> types;
-
-	private boolean extFormat = true;
-
 	static {
 		types = new HashMap<>(3);
 		types.put(DPT_DATE_TIME.getID(), DPT_DATE_TIME);
+	}
+
+	private boolean extFormat = true;
+
+	/**
+	 * Creates a translator for DPT ID 19.001, date with time.
+	 */
+	public DPTXlatorDateTime() {
+		super(8);
+		dpt = DPT_DATE_TIME;
+		data = defaultData.clone();
 	}
 
 	/**
@@ -223,7 +233,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	{
 		super(8);
 		setTypeID(types, dptID);
-		data = new short[] { 0, 1, 1, 0, 0, 0, NO_WD | NO_DOW, 0 };
+		data = defaultData.clone();
 	}
 
 	@Override
@@ -483,7 +493,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * @return <code>true</code> if clock uses a reliable synchronisation source (radio, Internet), <code>false</code>
 	 *         for unreliable synchronisation source (mains, local quartz)
 	 */
-	public final boolean reliableSyncSource() { return isBitSetEx(0, SyncSourceReliability); }
+	public final boolean isReliableSyncSource() { return isBitSetEx(0, SyncSourceReliability); }
 
 	/**
 	 * Sets working day information for the first date/time item.

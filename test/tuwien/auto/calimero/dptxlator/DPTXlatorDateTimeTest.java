@@ -88,6 +88,18 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
+	void defaultConstructor() {
+		final var dateTime = new DPTXlatorDateTime();
+		assertEquals(1900, dateTime.getYear());
+		assertEquals(1, dateTime.getMonth());
+		assertEquals(1, dateTime.getDay());
+		assertEquals(0, dateTime.getHour());
+		assertEquals(0, dateTime.getMinute());
+		assertEquals(0, dateTime.getSecond());
+		assertEquals(0, dateTime.getDayOfWeek());
+	}
+
+	@Test
 	void testSetValues() throws KNXFormatException {
 		t.setValues(new String[0]);
 		assertTrue(t.getItems() == 1);
@@ -653,11 +665,11 @@ class DPTXlatorDateTimeTest {
 	@Test
 	void reliableSyncSource() {
 		t.setData(data);
-		assertFalse(t.reliableSyncSource());
+		assertFalse(t.isReliableSyncSource());
 
 		final byte[] withReliableSyncSource = { 107, 8, 27, 108, 45, 33, 0x41, (byte) 0xc0 };
 		t.setData(withReliableSyncSource);
-		assertTrue(t.reliableSyncSource());
+		assertTrue(t.isReliableSyncSource());
 	}
 
 	private void checkTime(final int hr, final int min, final int sec) {

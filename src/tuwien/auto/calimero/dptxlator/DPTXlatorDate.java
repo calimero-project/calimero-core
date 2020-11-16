@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -82,6 +82,15 @@ public class DPTXlatorDate extends DPTXlator
 	static {
 		types = new HashMap<>(3);
 		types.put(DPT_DATE.getID(), DPT_DATE);
+	}
+
+	/**
+	 * Creates a translator for DPT ID 11.001, date.
+	 */
+	public DPTXlatorDate() {
+		super(3);
+		dpt = DPT_DATE;
+		data = new short[] { 1, 1, 0 };
 	}
 
 	/**

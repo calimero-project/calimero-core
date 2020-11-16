@@ -74,6 +74,15 @@ class DPTXlatorTimeTest
 	}
 
 	@Test
+	void defaultConstructor() {
+		final var time = new DPTXlatorTime();
+		assertEquals(0, time.getHour());
+		assertEquals(0, time.getMinute());
+		assertEquals(0, time.getSecond());
+		assertEquals(0, time.getDayOfWeek());
+	}
+
+	@Test
 	void testSetValues() throws KNXFormatException
 	{
 		t.setValues(values);

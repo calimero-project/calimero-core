@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -74,6 +74,14 @@ class DPTXlatorDateTest
 		final DateTimeFormatter dtf = DateTimeFormatter.ISO_LOCAL_DATE
 				.withResolverStyle(DPTXlatorDate.defaultResolverStyle);
 		DPTXlatorDate.useValueFormat(dtf);
+	}
+
+	@Test
+	void defaultConstructor() {
+		final var date = new DPTXlatorDate();
+		assertEquals(2000, date.getYear());
+		assertEquals(1, date.getMonth());
+		assertEquals(1, date.getDay());
 	}
 
 	@Test
