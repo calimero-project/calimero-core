@@ -458,8 +458,9 @@ public class TransportLayerImpl implements TransportLayer
 				// allow incoming connect requests (server)
 				if (proxy == null) {
 					proxy = new AggregatorProxy(this);
-					// constructor of destination assigns itself to ap
-					new Destination(proxy, sender, true);
+					// constructor of destination assigns itself to proxy
+					@SuppressWarnings({ "resource", "unused" })
+					final var client = new Destination(proxy, sender, true);
 					incomingProxies.put(sender, proxy);
 					proxies.put(sender, proxy);
 					proxy.setState(OpenIdle);
