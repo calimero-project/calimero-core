@@ -55,7 +55,8 @@ public final class Security {
 
 	public static void useKeyring(final Keyring keyring, final char[] password) {
 		final var devices = keyring.devices();
-		devices.forEach((addr, device) -> deviceToolKeys.put(addr, keyring.decryptKey(device.toolKey(), password)));
+		devices.forEach((addr, device) -> device.toolKey().ifPresent(
+				toolkey -> deviceToolKeys.put(addr, keyring.decryptKey(toolkey, password))));
 
 		keyring.groups().forEach((addr, key) -> groupKeys.put(addr, keyring.decryptKey(key, password)));
 

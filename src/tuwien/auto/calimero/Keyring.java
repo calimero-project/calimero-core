@@ -54,6 +54,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -90,7 +91,7 @@ public final class Keyring {
 		private volatile Map<GroupAddress, Set<IndividualAddress>> groups = Map.of();
 
 		Interface(final String type, final IndividualAddress addr, final int user, final byte[] pwd,
-			final byte[] auth) {
+				final byte[] auth) {
 			this.type = type;
 			this.addr = addr;
 			this.user = user;
@@ -108,20 +109,18 @@ public final class Keyring {
 		public int user() { return user; }
 
 		/**
-		 * Returns the encrypted user password required to use this interface, or array of {@code length = 0} if no
-		 * password was set.
+		 * Returns the optional encrypted user password required to use this interface.
 		 *
-		 * @return encrypted password as byte array
+		 * @return optional encrypted password as byte array
 		 */
-		public byte[] password() { return pwd.clone(); }
+		public Optional<byte[]> password() { return optional(pwd); }
 
 		/**
-		 * Returns the encrypted device authentication code of this interface, or array of {@code length = 0} if no code
-		 * was set.
+		 * Returns the optional encrypted device authentication code of this interface.
 		 *
-		 * @return encrypted authentication code as byte array
+		 * @return optional encrypted authentication code as byte array
 		 */
-		public byte[] authentication() { return auth.clone(); }
+		public Optional<byte[]> authentication() { return optional(auth); }
 
 		/**
 		 * Returns the groups specified for this interface, each with its set of senders.
@@ -153,25 +152,25 @@ public final class Keyring {
 		}
 
 		/**
-		 * Returns the encrypted tool key of this device, or key filled with 0 if no tool key was set.
+		 * Returns the optional encrypted tool key of this device.
 		 *
-		 * @return tool key byte array of length 32
+		 * @return optional tool key byte array of length 32
 		 */
-		public byte[] toolKey() { return toolkey.clone(); }
+		public Optional<byte[]> toolKey() { return optional(toolkey); }
 
 		/**
-		 * Returns the encrypted management password of this device, or array of {@code length = 0} if no password was set.
+		 * Returns optional the encrypted management password of this device.
 		 *
-		 * @return byte array containing (empty) encrypted password
+		 * @return optional byte array containing encrypted password
 		 */
-		public byte[] password() { return pwd.clone(); }
+		public Optional<byte[]> password() { return optional(pwd); }
 
 		/**
-		 * Returns the encrypted authentication code of this device, or array of {@code length = 0} if no code was set.
+		 * Returns the optional encrypted authentication code of this device.
 		 *
-		 * @return byte array containing (empty) encrypted authentication code
+		 * @return optional byte array containing encrypted authentication code
 		 */
-		public byte[] authentication() { return auth.clone(); }
+		public Optional<byte[]> authentication() { return optional(auth); }
 
 		/**
 		 * Returns the last known valid sequence number received by this device.
@@ -181,16 +180,15 @@ public final class Keyring {
 		public long sequenceNumber() { return sequence; }
 
 		@Override
-		public String toString() {
-			return "device " + addr + " (seq " + sequence + ")";
-		}
+		public String toString() { return "device " + addr + " (seq " + sequence + ")"; }
 	};
+
+	private static Optional<byte[]> optional(final byte[] ba) { return Optional.ofNullable(ba).map(byte[]::clone); }
 
 
 	private static final String keyringNamespace = "http://knx.org/xml/keyring/1";
 	private static final byte[] keyringSalt = utf8Bytes("1.keyring.ets.knx.org");
 
-	private static final byte[] zeroKey = new byte[16];
 	private static final byte[] emptyPwd = new byte[0];
 
 	private static final Logger logger = LoggerFactory.getLogger("calimero.keyring");
@@ -203,10 +201,10 @@ public final class Keyring {
 
 	private byte[] signature;
 
+
 	// mappings:
 	// InetAddress mcast group -> group key
 	// "latencyTolerance" -> Duration
-	// IndividualAddress host -> map : IndividualAddress interface addr -> Interface
 	private final Map<Object, Object> config = new HashMap<>();
 
 	// TODO clarify the use of optional field 'host' for interface types Backbone/USB
@@ -316,8 +314,8 @@ public final class Keyring {
 					attr = reader.getAttributeValue(null, "IndividualAddress");
 					final var addr = attr != null ? new IndividualAddress(attr) : KNXMediumSettings.BackboneRouter;
 					final var user = readAttribute(reader, "UserID", Integer::parseInt, 0);
-					final var pwd = readAttribute(reader, "Password", Keyring::decode, emptyPwd);
-					final var auth = readAttribute(reader, "Authentication", Keyring::decode, emptyPwd);
+					final var pwd = readAttribute(reader, "Password", Keyring::decode, null);
+					final var auth = readAttribute(reader, "Authentication", Keyring::decode, null);
 
 					iface = new Interface(type, addr, user, pwd, auth);
 					interfaces.computeIfAbsent(host, key -> new ArrayList<>()).add(iface);
@@ -342,10 +340,10 @@ public final class Keyring {
 				else if (inDevices && "Device".equals(name)) { // [0, *]
 					final var addr = new IndividualAddress(reader.getAttributeValue(null, "IndividualAddress"));
 					// rest is optional
-					final var toolkey = readAttribute(reader, "ToolKey", Keyring::decode, zeroKey);
+					final var toolkey = readAttribute(reader, "ToolKey", Keyring::decode, null);
 					final var seq = readAttribute(reader, "SequenceNumber", Long::parseLong, (long) 0);
-					final var pwd = readAttribute(reader, "ManagementPassword", Keyring::decode, emptyPwd);
-					final var auth = readAttribute(reader, "Authentication", Keyring::decode, emptyPwd);
+					final var pwd = readAttribute(reader, "ManagementPassword", Keyring::decode, null);
+					final var auth = readAttribute(reader, "Authentication", Keyring::decode, null);
 
 					final var device = new Device(addr, toolkey, pwd, auth, seq);
 					devices.put(addr, device);
@@ -364,9 +362,7 @@ public final class Keyring {
 			}
 
 			this.interfaces = Map.copyOf(interfaces);
-			config.putAll(interfaces);
 			this.groups = Map.copyOf(groups);
-			config.putAll(this.groups);
 			this.devices = Map.copyOf(devices);
 		}
 		catch (KNXFormatException | UnknownHostException e) {

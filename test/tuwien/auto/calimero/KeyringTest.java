@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019 B. Malinowsky
+    Copyright (c) 2019, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -92,7 +92,7 @@ class KeyringTest {
 		assertEquals(16, backboneKey.length);
 
 		for (final var device : keyring.devices().values())
-			assertEquals(16, device.toolKey().length);
+			assertEquals(16, device.toolKey().get().length);
 
 		final byte[] groupKey = keyring.groups().get(new GroupAddress(1, 1, 1));
 		assertEquals(16, groupKey.length);
@@ -103,16 +103,14 @@ class KeyringTest {
 		final var keyring = Keyring.load(keyringUri);
 
 		for (final var device : keyring.devices().values()) {
-			if (device.password().length > 0)
-				assertEquals(32, device.password().length);
-			if (device.authentication().length > 0)
-				assertEquals(32, device.authentication().length);
+			device.password().ifPresent(password ->  assertEquals(32, password.length));
+			device.authentication().ifPresent(auth -> assertEquals(32, auth.length));
 		}
 
 		final var interfaces = keyring.interfaces().get(host);
 		for (final var iface : interfaces) {
-			assertEquals(32, iface.password().length);
-			assertEquals(32, iface.authentication().length);
+			iface.password().ifPresent(password ->  assertEquals(32, password.length));
+			iface.authentication().ifPresent(auth -> assertEquals(32, auth.length));
 		}
 	}
 
@@ -130,11 +128,11 @@ class KeyringTest {
 		final var interfaces = keyring.interfaces().get(host);
 		for (final var iface : interfaces) {
 			if (iface.address().getDevice() == user) {
-				final byte[] pwd = iface.password();
+				final byte[] pwd = iface.password().get();
 				assertEquals(32, pwd.length);
 				assertArrayEquals(("user" + user).toCharArray(), keyring.decryptPassword(pwd, keyringPwd));
 
-				final byte[] authCode = iface.authentication();
+				final byte[] authCode = iface.authentication().get();
 				assertEquals(32, authCode.length);
 				assertArrayEquals("dev".toCharArray(), keyring.decryptPassword(authCode, keyringPwd));
 				return;
@@ -149,7 +147,7 @@ class KeyringTest {
 
 		final var device = keyring.devices().get(host);
 		final byte[] toolkey = fromHex("AEAC47C4653ED0B25249B4AB3F474479");
-		assertArrayEquals(toolkey, keyring.decryptKey(device.toolKey(), keyringPwd));
+		assertArrayEquals(toolkey, keyring.decryptKey(device.toolKey().get(), keyringPwd));
 	}
 
 	@Test
@@ -157,8 +155,8 @@ class KeyringTest {
 		final var keyring = Keyring.load(keyringUri);
 
 		final var device = keyring.devices().get(host);
-		assertArrayEquals("dev".toCharArray(), keyring.decryptPassword(device.authentication(), keyringPwd));
-		assertArrayEquals("router1".toCharArray(), keyring.decryptPassword(device.password(), keyringPwd));
+		assertArrayEquals("dev".toCharArray(), keyring.decryptPassword(device.authentication().get(), keyringPwd));
+		assertArrayEquals("router1".toCharArray(), keyring.decryptPassword(device.password().get(), keyringPwd));
 	}
 
 	@Test
