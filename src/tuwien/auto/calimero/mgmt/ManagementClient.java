@@ -50,9 +50,7 @@ import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 
 /**
- * Application layer services providing management related tasks in a KNX network for a
- * client.
- * <p>
+ * Application layer services providing management related tasks in a KNX network for a client.
  *
  * @author B. Malinowsky
  */
@@ -64,7 +62,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @param timeout time in seconds, <code>timeout &gt; 0</code>
 	 */
 	@Deprecated(forRemoval = true)
-	void setResponseTimeout(int timeout);
+	default void setResponseTimeout(final int timeout) { responseTimeout(Duration.ofSeconds(timeout)); }
 
 	/**
 	 * @deprecated Use {@link #responseTimeout()}
@@ -72,7 +70,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @return timeout in seconds
 	 */
 	@Deprecated(forRemoval = true)
-	int getResponseTimeout();
+	default int getResponseTimeout() { return (int) responseTimeout().toSeconds(); }
 
 	/**
 	 * Returns the response timeout used when waiting for a KNX response message to arrive.

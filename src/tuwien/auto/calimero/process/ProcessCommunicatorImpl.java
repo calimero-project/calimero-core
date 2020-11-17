@@ -195,18 +195,6 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	}
 
 	@Override
-	public void setResponseTimeout(final int timeout)
-	{
-		responseTimeout(Duration.ofSeconds(timeout));
-	}
-
-	@Override
-	public int getResponseTimeout()
-	{
-		return (int) responseTimeout.toSeconds();
-	}
-
-	@Override
 	public Duration responseTimeout() {
 		return responseTimeout;
 	}

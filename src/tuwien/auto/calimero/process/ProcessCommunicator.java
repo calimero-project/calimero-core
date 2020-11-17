@@ -68,7 +68,7 @@ public interface ProcessCommunicator extends ProcessCommunication
 	 * @param timeout time in seconds, <code>timeout &gt; 0</code>
 	 */
 	@Deprecated(forRemoval = true)
-	void setResponseTimeout(int timeout);
+	default void setResponseTimeout(final int timeout) { responseTimeout(Duration.ofSeconds(timeout)); }
 
 	/**
 	 * @deprecated Use {@link #responseTimeout()}
@@ -76,7 +76,7 @@ public interface ProcessCommunicator extends ProcessCommunication
 	 * @return timeout in seconds
 	 */
 	@Deprecated(forRemoval = true)
-	int getResponseTimeout();
+	default int getResponseTimeout() { return (int) responseTimeout().toSeconds(); }
 
 	/**
 	 * Returns the response timeout used when waiting for a KNX response message to arrive.
