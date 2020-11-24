@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -182,7 +182,6 @@ public class HPAI
 
 	/**
 	 * Returns the host protocol of this HPAI.
-	 * <p>
 	 *
 	 * @return host protocol code as unsigned byte
 	 */
@@ -201,8 +200,14 @@ public class HPAI
 	}
 
 	/**
+	 * Returns the IP address and port number information.
+	 *
+	 * @return IP address and port number as InetSocketAddress
+	 */
+	public final InetSocketAddress endpoint() { return new InetSocketAddress(getAddress(), port); }
+
+	/**
 	 * Returns the raw IP network address.
-	 * <p>
 	 *
 	 * @return byte array with IP address in network byte order
 	 */
@@ -228,7 +233,6 @@ public class HPAI
 
 	/**
 	 * Returns the port number of this HPAI.
-	 * <p>
 	 *
 	 * @return port as unsigned 16 bit value
 	 */
@@ -239,7 +243,6 @@ public class HPAI
 
 	/**
 	 * Returns the structure length of this HPAI in bytes.
-	 * <p>
 	 *
 	 * @return structure length as unsigned byte
 	 */
@@ -250,7 +253,6 @@ public class HPAI
 
 	/**
 	 * Returns the byte representation of the whole HPAI structure.
-	 * <p>
 	 *
 	 * @return byte array containing structure
 	 */
@@ -267,7 +269,6 @@ public class HPAI
 
 	/**
 	 * Returns this HPAI representation in textual format.
-	 * <p>
 	 *
 	 * @return a string representation of the HPAI object
 	 */
