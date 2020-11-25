@@ -179,6 +179,8 @@ public class SecureApplicationLayer implements AutoCloseable {
 
 	public static final boolean isSecuredService(final CEMILData ldata) {
 		final byte[] payload = ldata.getPayload();
+		if (payload.length < 2)
+			return false;
 		final int service = DataUnitBuilder.getAPDUService(payload);
 		return service == SecureService;
 	}
