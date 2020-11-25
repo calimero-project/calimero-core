@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2019 B. Malinowsky
+    Copyright (c) 2010, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -310,11 +310,8 @@ abstract class ClientConnection extends ConnectionBase
 			final HPAI ep = res.getDataEndpoint();
 			if (res.getStatus() == ErrorCodes.NO_ERROR && !(tcp ^ (ep.getHostProtocol() == HPAI.IPV4_TCP))) {
 				channelId = res.getChannelID();
-				final InetAddress ip = ep.getAddress();
-
 				if (tcp) {
-					final boolean dataRouteBack = ep.getAddress().isAnyLocalAddress() && ep.getPort() == 0;
-					if (!dataRouteBack) {
+					if (!ep.isRouteBack()) {
 						final String msg = "connect response from " + src + ":" + port
 								+ " does not contain route-back data endpoint";
 						close(CloseEvent.INTERNAL, msg, LogLevel.ERROR, null);
@@ -322,13 +319,13 @@ abstract class ClientConnection extends ConnectionBase
 					}
 					dataEndpt = new InetSocketAddress(src, port);
 				}
-				else if (useNat && (ip == null || ip.isAnyLocalAddress() || ep.getPort() == 0)) {
+				else if (useNat && (ep.getAddress().isAnyLocalAddress() || ep.getPort() == 0)) {
 					// in NAT aware mode, if the data EP is incomplete or left
 					// empty, we fall back to the IP address and port of the sender
 					dataEndpt = new InetSocketAddress(src, port);
 				}
 				else {
-					dataEndpt = new InetSocketAddress(ip, ep.getPort());
+					dataEndpt = ep.endpoint();
 				}
 
 				if (res.getCRD() instanceof TunnelCRD)
