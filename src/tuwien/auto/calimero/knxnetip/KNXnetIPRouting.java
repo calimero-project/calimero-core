@@ -111,6 +111,11 @@ public class KNXnetIPRouting extends ConnectionBase
 	 */
 	public static final String DEFAULT_MULTICAST = Discoverer.SEARCH_MULTICAST;
 
+	/**
+	 * Address of the default multicast group assigned to KNX IP routers.
+	 */
+	public static final InetAddress DefaultMulticast = Discoverer.SYSTEM_SETUP_MULTICAST;
+
 	private static final InetAddress systemBroadcast = Discoverer.SYSTEM_SETUP_MULTICAST;
 
 	// newer Gira servers have a "reliable communication" option, which uses the
@@ -139,13 +144,13 @@ public class KNXnetIPRouting extends ConnectionBase
 	 * system setup multicast address ({@value #DEFAULT_MULTICAST}) for each KNX
 	 * installation, by default this offset is 0 (i.e., only one used installation).
 	 *
-	 * @param netIf specifies the local network interface used to join the multicast group
-	 *        and send outgoing multicast data, use <code>null</code> to use the default
-	 *        interface; useful for multi-homed hosts
-	 * @param mcGroup address of the multicast group this router is joined to, or
-	 *        <code>null</code> to use the default multicast ({@value #DEFAULT_MULTICAST}
-	 *        ); value of <code>mcGroup &ge; </code>{@value #DEFAULT_MULTICAST}
-	 * @throws KNXException on socket error, or if joining to group failed
+	 * @param netIf specifies the local network interface used to send outgoing multicast datagrams,
+	 *        and join the multicast group to receive multicast datagrams,
+	 *        use <code>null</code> for the default interface;
+	 * @param mcGroup IP multicast address specifying the multicast group this connection shall join,
+	 *        use {@link #DefaultMulticast} for the default multicast group;
+	 *        value of <code>mcGroup &ge; </code>{@value #DEFAULT_MULTICAST}
+	 * @throws KNXException on socket error, or if joining the multicast group failed
 	 */
 	public KNXnetIPRouting(final NetworkInterface netIf, final InetAddress mcGroup) throws KNXException
 	{
