@@ -161,7 +161,6 @@ public class KNXnetIPRouting extends ConnectionBase
 	/**
 	 * Use this constructor in case initialization is called separately at a later point
 	 * (using {@link #init(NetworkInterface, boolean, boolean)}).
-	 * <p>
 	 *
 	 * @param mcGroup see {@link #KNXnetIPRouting(NetworkInterface, InetAddress)}
 	 */
@@ -301,11 +300,9 @@ public class KNXnetIPRouting extends ConnectionBase
 
 	/**
 	 * Checks whether the supplied IP address is a valid KNX routing multicast address.
-	 * <p>
 	 *
 	 * @param address the IP address to check
-	 * @return <code>true</code> if address qualifies as KNX multicast, <code>false</code>
-	 *         otherwise
+	 * @return <code>true</code> if address qualifies as KNX multicast, <code>false</code> otherwise
 	 */
 	public static boolean isValidRoutingMulticast(final InetAddress address)
 	{
@@ -342,15 +339,16 @@ public class KNXnetIPRouting extends ConnectionBase
 			if (!multicast.equals(systemBroadcast))
 				sysBcastSocket = new MulticastSocket(DEFAULT_PORT);
 
-			if (netIf != null) { // TODO make netIf always non null
+			if (netIf != null)
 				s.setNetworkInterface(netIf);
-				logger.info("using network interface {}", netIf.getName());
-			}
+
+			final var setNetif = s.getNetworkInterface();
+			logger.debug("join multicast group {} on {}", multicast.getHostAddress(), setNetif);
 
 			// port number is not used in join group
-			s.joinGroup(new InetSocketAddress(multicast, 0), netIf);
+			s.joinGroup(new InetSocketAddress(multicast, 0), setNetif);
 			if (sysBcastSocket != null)
-				sysBcastSocket.joinGroup(new InetSocketAddress(systemBroadcast, 0), netIf);
+				sysBcastSocket.joinGroup(new InetSocketAddress(systemBroadcast, 0), setNetif);
 
 			// send out beyond local network
 			s.setTimeToLive(64);
@@ -462,10 +460,10 @@ public class KNXnetIPRouting extends ConnectionBase
 		LogService.log(logger, level, "close connection - " + reason, t);
 		final var netIf = networkInterface();
 		try {
-			((MulticastSocket) socket).leaveGroup(dataEndpt, netIf);
+			((MulticastSocket) socket).leaveGroup(new InetSocketAddress(multicast, 0), netIf);
 		}
 		catch (final IOException e) {
-			logger.debug("problem leaving multicast group {} ({})", multicast.getHostAddress(), e.toString());
+			logger.debug("problem leaving multicast group {} on {} ({})", multicast.getHostAddress(), netIf, e.getMessage());
 		}
 		finally {
 			stopReceiver();
