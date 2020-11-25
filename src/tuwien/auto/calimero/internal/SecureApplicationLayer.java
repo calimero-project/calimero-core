@@ -183,6 +183,10 @@ public class SecureApplicationLayer implements AutoCloseable {
 		return service == SecureService;
 	}
 
+	public SecureApplicationLayer(final KNXNetworkLink link, final Security security) {
+		this(link, security.groupKeys(), security.groupSenders(), security.deviceToolKeys());
+	}
+
 	public SecureApplicationLayer(final KNXNetworkLink link, final Map<GroupAddress, byte[]> groupKeys,
 			final Map<GroupAddress, Set<IndividualAddress>> groupSenders,
 			final Map<IndividualAddress, byte[]> deviceToolKeys) {

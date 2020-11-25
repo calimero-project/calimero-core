@@ -169,8 +169,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	 * @throws KNXLinkClosedException if the network link is closed
 	 */
 	public ProcessCommunicatorImpl(final KNXNetworkLink link) throws KNXLinkClosedException {
-		this(link, new SecureApplicationLayer(link, Security.groupKeys(), Security.groupSenders(),
-				Security.deviceToolKeys()));
+		this(link, new SecureApplicationLayer(link, Security.defaultInstallation()));
 	}
 
 	/**
@@ -446,7 +445,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 
 	private void send(final GroupAddress dst, final Priority p, final int service, final DPTXlator t)
 			throws KNXTimeoutException, KNXLinkClosedException, InterruptedException {
-		final boolean useGoDiagnostics = Security.groupKeys().containsKey(dst);
+		final boolean useGoDiagnostics = Security.defaultInstallation().groupKeys().containsKey(dst);
 		if (useGoDiagnostics) {
 			try {
 				final var future = sal.writeGroupObjectDiagnostics(dst, t == null ? new byte[0] : t.getData());

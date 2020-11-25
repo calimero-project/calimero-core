@@ -47,13 +47,23 @@ import tuwien.auto.calimero.Keyring;
 
 public final class Security {
 
-	private static Map<IndividualAddress, byte[]> deviceToolKeys = new ConcurrentHashMap<>();
-	private static Map<GroupAddress, byte[]> groupKeys = new ConcurrentHashMap<>();
-	private static Map<GroupAddress, Set<IndividualAddress>> groupSenders = new ConcurrentHashMap<>();
+	private static final Security defInst = new Security();
+
+	private final Map<IndividualAddress, byte[]> deviceToolKeys = new ConcurrentHashMap<>();
+	private final Map<GroupAddress, byte[]> groupKeys = new ConcurrentHashMap<>();
+	private final Map<GroupAddress, Set<IndividualAddress>> groupSenders = new ConcurrentHashMap<>();
 
 	private Security() {}
 
-	public static void useKeyring(final Keyring keyring, final char[] password) {
+	/**
+	 * Returns the security object for the default KNX installation.
+	 *
+	 * @return instance used for default KNX installation
+	 */
+	// ??? naming: knx installation id is linked to project id and not stored in keyring nor in many interfaces
+	public static final Security defaultInstallation() { return defInst; }
+
+	public void useKeyring(final Keyring keyring, final char[] password) {
 		final var devices = keyring.devices();
 		devices.forEach((addr, device) -> device.toolKey().ifPresent(
 				toolkey -> deviceToolKeys.put(addr, keyring.decryptKey(toolkey, password))));
@@ -76,15 +86,15 @@ public final class Security {
 		return set;
 	}
 
-	public static Map<IndividualAddress, byte[]> deviceToolKeys() {
+	public Map<IndividualAddress, byte[]> deviceToolKeys() {
 		return deviceToolKeys;
 	}
 
-	public static Map<GroupAddress, byte[]> groupKeys() {
+	public Map<GroupAddress, byte[]> groupKeys() {
 		return groupKeys;
 	}
 
-	public static Map<GroupAddress, Set<IndividualAddress>> groupSenders() {
+	public Map<GroupAddress, Set<IndividualAddress>> groupSenders() {
 		return groupSenders;
 	}
 }

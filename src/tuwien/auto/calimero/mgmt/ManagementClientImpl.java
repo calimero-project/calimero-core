@@ -243,7 +243,7 @@ public class ManagementClientImpl implements ManagementClient
 		logger = LogService.getLogger("calimero.mgmt.MC " + link.getName());
 		src = link.getKNXMedium().getDeviceAddress();
 		listeners = new EventListeners<>(logger);
-		sal = new SecureManagement(tl, Security.deviceToolKeys());
+		sal = new SecureManagement(tl, Security.defaultInstallation().deviceToolKeys());
 		sal.addListener(tlListener);
 	}
 
