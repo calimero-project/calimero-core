@@ -40,12 +40,15 @@ import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static tuwien.auto.calimero.DataUnitBuilder.fromHex;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -74,22 +77,20 @@ class KeyringTest {
 	}
 
 	@Test
-	void decryptBackboneKey() throws UnknownHostException {
+	void decryptBackboneKey() {
 		final var keyring = Keyring.load(keyringUri);
-		final var config = keyring.configuration();
+		final var backbone = keyring.backbone().orElseThrow();
 
-		final byte[] backboneKey = (byte[]) config.get(InetAddress.getByName("224.0.23.12"));
 		final byte[] decrypted = fromHex("96F034FCCF510760CBD63DA0F70D4A9D");
-		assertArrayEquals(decrypted, keyring.decryptKey(backboneKey, keyringPwd));
+		assertArrayEquals(decrypted, keyring.decryptKey(backbone.groupKey(), keyringPwd));
 	}
 
 	@Test
-	void allEncryptedKeysHaveExpectedLength() throws UnknownHostException {
+	void allEncryptedKeysHaveExpectedLength() {
 		final var keyring = Keyring.load(keyringUri);
-		final var config = keyring.configuration();
+		final var backbone = keyring.backbone().orElseThrow();
 
-		final byte[] backboneKey = (byte[]) config.get(InetAddress.getByName("224.0.23.12"));
-		assertEquals(16, backboneKey.length);
+		assertEquals(16, backbone.groupKey().length);
 
 		for (final var device : keyring.devices().values())
 			assertEquals(16, device.toolKey().get().length);
@@ -198,4 +199,32 @@ class KeyringTest {
 	void keyringWithoutKeyringElement() {
 		assertThrows(KNXMLException.class, () -> Keyring.load("test/resources/NoKeyringElement.knxkeys"));
 	}
+
+	@Test
+	void backbonesAreEqual() throws UnknownHostException {
+		final var bb1 = new Keyring.Backbone(multicastGroup(), groupKey(), Duration.ofSeconds(2));
+		final var bb2 = new Keyring.Backbone(multicastGroup(), groupKey(), Duration.ofSeconds(2));
+		assertEquals(bb1, bb2);
+	}
+
+	@Test
+	void backbonesAreNotEqual() throws UnknownHostException {
+		var bb1 = new Keyring.Backbone(multicastGroup(), groupKey(), Duration.ofSeconds(2));
+		var bb2 = new Keyring.Backbone(InetAddress.getByName("224.0.23.13"), groupKey(), Duration.ofSeconds(2));
+		assertNotEquals(bb1, bb2);
+
+		bb1 = new Keyring.Backbone(multicastGroup(), groupKey(), Duration.ofSeconds(2));
+		bb2 = new Keyring.Backbone(multicastGroup(), Arrays.copyOf(new byte[] { 2 }, 16), Duration.ofSeconds(2));
+		assertNotEquals(bb1, bb2);
+
+		bb1 = new Keyring.Backbone(multicastGroup(), groupKey(), Duration.ofSeconds(1));
+		bb2 = new Keyring.Backbone(multicastGroup(), groupKey(), Duration.ofSeconds(2));
+		assertNotEquals(bb1, bb2);
+	}
+
+	private static InetAddress multicastGroup() throws UnknownHostException {
+		return InetAddress.getByName("224.0.23.12");
+	}
+
+	private static byte[] groupKey() { return Arrays.copyOf(new byte[] { 1 }, 16); }
 }

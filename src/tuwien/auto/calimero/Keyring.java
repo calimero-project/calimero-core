@@ -50,10 +50,10 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -133,7 +133,7 @@ public final class Keyring {
 		public String toString() {
 			return type + " interface " + addr + ", user " + user + ", groups " + groups.keySet();
 		}
-	};
+	}
 
 	public static final class Device {
 		private final IndividualAddress addr;
@@ -181,7 +181,39 @@ public final class Keyring {
 
 		@Override
 		public String toString() { return "device " + addr + " (seq " + sequence + ")"; }
-	};
+	}
+
+	public static final class Backbone {
+		private final InetAddress mcGroup;
+		private final byte[] groupKey;
+		private final Duration latency;
+
+		Backbone(final InetAddress multicastGroup, final byte[] groupKey, final Duration latency) {
+			this.mcGroup = multicastGroup;
+			this.groupKey = groupKey.clone();
+			this.latency = latency;
+		}
+
+		public InetAddress multicastGroup() { return mcGroup; }
+
+		public byte[] groupKey() { return groupKey.clone(); }
+
+		public Duration latencyTolerance() { return latency; }
+
+		@Override
+		public int hashCode() { return Objects.hash(mcGroup, Arrays.hashCode(groupKey), latency); }
+
+		@Override
+		public boolean equals(final Object obj) {
+			if (this == obj)
+				return true;
+			if (!(obj instanceof Backbone))
+				return false;
+			final Backbone other = (Backbone) obj;
+			return Objects.equals(mcGroup, other.mcGroup) && Objects.equals(latency, other.latency)
+					&& Arrays.equals(groupKey, other.groupKey);
+		}
+	}
 
 	private static Optional<byte[]> optional(final byte[] ba) { return Optional.ofNullable(ba).map(byte[]::clone); }
 
@@ -201,12 +233,7 @@ public final class Keyring {
 
 	private byte[] signature;
 
-
-	// mappings:
-	// InetAddress mcast group -> group key
-	// "latencyTolerance" -> Duration
-	private final Map<Object, Object> config = new HashMap<>();
-
+	private volatile Backbone backbone;
 	// TODO clarify the use of optional field 'host' for interface types Backbone/USB
 	// this mapping works for tunneling interfaces: host -> Interface
 	private volatile Map<IndividualAddress, List<Interface>> interfaces = Map.of();
@@ -293,7 +320,7 @@ public final class Keyring {
 
 				final var name = reader.getLocalName();
 				line = reader.getLocation().getLineNumber();
-				if ("Backbone".equals(name)) {
+				if ("Backbone".equals(name)) { // [0, 1]
 					final var mcastGroup = InetAddress.getByName(reader.getAttributeValue(null, "MulticastAddress"));
 					if (!KNXnetIPRouting.isValidRoutingMulticast(mcastGroup))
 						throw new KNXMLException("loading keyring '" + keyringUri + "': " + mcastGroup.getHostAddress()
@@ -301,8 +328,7 @@ public final class Keyring {
 					final var groupKey = decode(reader.getAttributeValue(null, "Key"));
 					final var latency = Duration.ofMillis(Integer.parseInt(reader.getAttributeValue(null, "Latency")));
 
-					config.put(mcastGroup, groupKey);
-					config.put("latencyTolerance", latency);
+					backbone = new Backbone(mcastGroup, groupKey, latency);
 				}
 				else if ("Interface".equals(name)) { // [0, *]
 					inGroupAddresses = false;
@@ -396,8 +422,7 @@ public final class Keyring {
 		}
 	}
 
-	// ??? interim accessor
-	public Map<?, ?> configuration() { return Collections.unmodifiableMap(config); }
+	public Optional<Backbone> backbone() { return Optional.ofNullable(backbone); }
 
 	public Map<IndividualAddress, List<Interface>> interfaces() { return interfaces; }
 
