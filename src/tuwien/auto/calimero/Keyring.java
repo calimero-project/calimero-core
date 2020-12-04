@@ -213,6 +213,11 @@ public final class Keyring {
 			return Objects.equals(mcGroup, other.mcGroup) && Objects.equals(latency, other.latency)
 					&& Arrays.equals(groupKey, other.groupKey);
 		}
+
+		@Override
+		public String toString() {
+			return multicastGroup().getHostAddress() + " (latency tolerance " + latency.toMillis() + " ms)";
+		}
 	}
 
 	private static Optional<byte[]> optional(final byte[] ba) { return Optional.ofNullable(ba).map(byte[]::clone); }
