@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -164,6 +164,11 @@ public class SearchResponse extends ServiceType
 	public final Collection<DIB> description() {
 		return desc.getDescription();
 	}
+
+	/**
+	 * @return {@code true} if this is a KNXnet/IP v2 search response, {@code false} otherwise
+	 */
+	public final boolean v2() { return svcType == KNXnetIPHeader.SearchResponse; }
 
 	@Override
 	public boolean equals(final Object obj)
