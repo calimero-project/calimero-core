@@ -518,12 +518,26 @@ public class SecureApplicationLayer implements AutoCloseable {
 
 		final var ctr0 = blockCtr0(seq, src, dst);
 
-		if (securityCtrl.security() == DataSecurity.Auth) {
+		final var mac = new byte[MacSize];
+		asdu.get(mac);
 
+		final int extendedFrameFormat = 0;
+		final byte[] iv = block0(seq, src, dst, extendedFrameFormat, tpci, SecureService, apdu.length);
+
+		final byte[] plainApdu;
+		if (securityCtrl.security() == DataSecurity.Auth) {
+			plainApdu = apdu;
+
+			try {
+				final byte[] calculated = mac(plainApdu, key, iv, ctr0);
+				verifyMac(mac, calculated, src, dst, receivedSeq);
+			}
+			catch (final GeneralSecurityException e) {
+				securityFailure(CryptoError, src, dst, receivedSeq);
+				throw new KnxSecureException(format("calculating MAC %s->%s", src, dst), e);
+			}
 		}
-		else {
-			final var mac = new byte[MacSize];
-			asdu.get(mac);
+		else { // auth+conf
 			final var input = ByteBuffer.allocate(MacSize + apdu.length).put(mac).put(apdu);
 			final byte[] decrypted;
 			try {
@@ -535,19 +549,14 @@ public class SecureApplicationLayer implements AutoCloseable {
 			}
 
 			final var decryptedMac = Arrays.copyOfRange(decrypted, 0, MacSize);
-			final var plainApdu = Arrays.copyOfRange(decrypted, MacSize, decrypted.length);
-			final int extendedFrameFormat = 0;
-			final byte[] iv = block0(seq, src, dst, extendedFrameFormat, tpci, SecureService, plainApdu.length);
-			try {
-				final var associatedData = ByteBuffer.allocate(syncReq ? 7 : 1).put((byte) scf);
-				if (syncReq)
-					associatedData.put(sno);
+			plainApdu = Arrays.copyOfRange(decrypted, MacSize, decrypted.length);
 
+			final var associatedData = ByteBuffer.allocate(syncReq ? 7 : 1).put((byte) scf);
+			if (syncReq)
+				associatedData.put(sno);
+			try {
 				final byte[] calculated = confMac(associatedData.array(), plainApdu, key, iv);
-				if (!Arrays.equals(calculated, decryptedMac)) {
-					securityFailure(CryptoError, src, dst, receivedSeq);
-					throw new KnxSecureException(format("MAC mismatch %s->%s", src, dst));
-				}
+				verifyMac(decryptedMac, calculated, src, dst, receivedSeq);
 			}
 			catch (final GeneralSecurityException e) {
 				securityFailure(CryptoError, src, dst, receivedSeq);
@@ -568,28 +577,35 @@ public class SecureApplicationLayer implements AutoCloseable {
 				receivedSyncResponse(src, toolAccess, plainApdu);
 				return new SalService(securityCtrl, new byte[0]);
 			}
-
-			if (src.equals(address())) {
-				logger.trace("update next {}seq -> {}", toolAccess ? "tool access " : "", receivedSeq);
-				updateSequenceNumber(toolAccess, receivedSeq + 1);
-			}
-			else {
-				logger.trace("update last valid {}seq of {} -> {}", toolAccess ? "tool access " : "", src, receivedSeq);
-				updateLastValidSequence(toolAccess, src, receivedSeq);
-			}
-
-			final int plainService = DataUnitBuilder.getAPDUService(plainApdu);
-			if (!isGroupDst)
-				checkGoDiagnosticsResponse(src, (IndividualAddress) dst, plainService, plainApdu);
-
-			if (!checkAccess(dst, plainService, securityCtrl)) {
-				securityFailure(AccessAndRoleError, src, dst, receivedSeq);
-				throw new KnxSecureException(format("%s->%s denied access for %s (%s)", src, dst,
-						DataUnitBuilder.decodeAPCI(plainService), securityCtrl));
-			}
-			return new SalService(securityCtrl, plainApdu);
 		}
-		return new SalService(securityCtrl, apdu);
+
+		if (src.equals(address())) {
+			logger.trace("update next {}seq -> {}", toolAccess ? "tool access " : "", receivedSeq);
+			updateSequenceNumber(toolAccess, receivedSeq + 1);
+		}
+		else {
+			logger.trace("update last valid {}seq of {} -> {}", toolAccess ? "tool access " : "", src, receivedSeq);
+			updateLastValidSequence(toolAccess, src, receivedSeq);
+		}
+
+		final int plainService = DataUnitBuilder.getAPDUService(plainApdu);
+		if (!isGroupDst)
+			checkGoDiagnosticsResponse(src, (IndividualAddress) dst, plainService, plainApdu);
+
+		if (!checkAccess(dst, plainService, securityCtrl)) {
+			securityFailure(AccessAndRoleError, src, dst, receivedSeq);
+			throw new KnxSecureException(format("%s->%s denied access for %s (%s)", src, dst,
+					DataUnitBuilder.decodeAPCI(plainService), securityCtrl));
+		}
+		return new SalService(securityCtrl, plainApdu);
+	}
+
+	private void verifyMac(final byte[] mac, final byte[] calculated, final IndividualAddress src,
+			final KNXAddress dst, final long receivedSeq) {
+		if (!Arrays.equals(calculated, mac)) {
+			securityFailure(CryptoError, src, dst, receivedSeq);
+			throw new KnxSecureException(format("MAC mismatch %s->%s", src, dst));
+		}
 	}
 
 	public CompletableFuture<Void> sendSyncRequest(final IndividualAddress remote, final boolean toolAccess)
