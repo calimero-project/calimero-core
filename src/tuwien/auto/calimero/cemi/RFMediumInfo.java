@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2019 B. Malinowsky
+    Copyright (c) 2015, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -58,20 +58,16 @@ public final class RFMediumInfo extends AdditionalInfo
 	 */
 	public enum RSS {
 		/** RSS = void / no measurement. */
-		Void("void"),
+		Void,
 		/** RSS = weak. */
-		Weak("weak"),
+		Weak,
 		/** RSS = medium. */
-		Medium("medium"),
+		Medium,
 		/** RSS = strong. */
-		Strong("strong");
-
-		private final String v;
-
-		RSS(final String value) { v = value; }
+		Strong;
 
 		@Override
-		public String toString() { return v; }
+		public String toString() { return name().toLowerCase(); }
 	}
 
 	private final boolean sysBcast;
