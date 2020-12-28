@@ -42,8 +42,7 @@ import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 /**
- * RF medium information, with data link layer additional information mandatory for communication
- * over RF medium.
+ * RF medium information, with data link layer additional information mandatory for communication over RF medium.
  *
  * @author B. Malinowsky
  */
@@ -121,7 +120,24 @@ public final class RFMediumInfo extends AdditionalInfo
 	 *        the value for LFN)
 	 */
 	public RFMediumInfo(final boolean batteryOk, final boolean transmitOnlyDevice, final byte[] doA, final int lfn)	{
-		this(RSS.Void, RSS.Void, batteryOk, transmitOnlyDevice, doA, lfn);
+		this(batteryOk, transmitOnlyDevice, doA, lfn, false);
+	}
+
+	/**
+	 * Constructs RF medium info for use in a cEMI .req or .con message, setting the system broadcast behavior. Note,
+	 * that system broadcast behavior is not used in the additional information structure for RF.
+	 *
+	 * @param batteryOk battery of sender device is OK (<code>true</code>), or weak (<code>false</code>)
+	 * @param transmitOnlyDevice is sender a transmit-only (unidirectional) or not (bidirectional) device
+	 * @param doA RF domain address, <code>doA.length = 6</code>
+	 * @param lfn link-layer frame number, 0 &le; lfn &le; 7, or 0xff (the cEMI server shall insert
+	 *        the value for LFN)
+	 * @param systemBroadcast {@code true} for system broadcast, {@code false} for domain broadcast
+	 */
+	public RFMediumInfo(final boolean batteryOk, final boolean transmitOnlyDevice, final byte[] doA, final int lfn,
+			final boolean systemBroadcast)	{
+		super(RfMedium, toByteArray(RSS.Void, RSS.Void, batteryOk, transmitOnlyDevice, doA, lfn));
+		sysBcast = systemBroadcast;
 	}
 
 	/**

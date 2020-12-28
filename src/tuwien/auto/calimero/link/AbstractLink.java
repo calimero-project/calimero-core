@@ -569,7 +569,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 			if (f.getAdditionalInfo(AdditionalInfo.RfMedium) == null) {
 				final RFSettings rf = (RFSettings) medium;
 				final byte[] sn = f.isDomainBroadcast() ? rf.getDomainAddress() : rf.getSerialNumber();
-				f.additionalInfo().add(new RFMediumInfo(true, rf.isUnidirectional(), sn, 255));
+				f.additionalInfo().add(new RFMediumInfo(true, rf.isUnidirectional(), sn, 255, f.isSystemBroadcast()));
 				s = f.isDomainBroadcast() ? "(using domain address)" : "(using device SN)";
 			}
 		}
