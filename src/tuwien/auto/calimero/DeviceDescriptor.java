@@ -87,6 +87,7 @@ public interface DeviceDescriptor
 	 */
 	enum DD0 implements DeviceDescriptor
 	{
+		Dummy(0x0001, "Dummy"),
 		/** */
 		TYPE_0010(0x0010, "System 1 (BCU 1)"),
 		/** */
@@ -120,6 +121,8 @@ public interface DeviceDescriptor
 		/** */
 		TYPE_0811(0x0811, "IR-Decoder"),
 		/** */
+		TYPE_0900(0x0900, "Coupler 0900"),
+		/** */
 		TYPE_0910(0x0910, "Coupler 1.0"),
 		/** */
 		TYPE_0911(0x0911, "Coupler 1.1"),
@@ -131,6 +134,8 @@ public interface DeviceDescriptor
 		TYPE_0AFD(0x0AFD, "none"),
 		/** */
 		TYPE_0AFE(0x0AFE, "none"),
+		/** */
+		TYPE_1011(0x1011, "1.1"),
 		/** */
 		TYPE_1012(0x1012, "BCU 1"),
 		/** */
@@ -150,11 +155,19 @@ public interface DeviceDescriptor
 		/** */
 		TYPE_2311(0x2311, "RF USB interface v2"),
 		/** */
+		TYPE_2705(0x2705, "RF 7.5"),
+		/** */
+		TYPE_27B0(0x27B0, "RF System B"),
+		/** */
+		TYPE_2920(0x2920, "TP1/RF Media Coupler 2.0"), // System B
+		/** */
 		TYPE_3012(0x3012, "BCU 1"),
 		/** */
 		TYPE_4012(0x4012, "BCU 1"),
 		/** */
-		TYPE_5705(0x5705, "System 7");
+		TYPE_5705(0x5705, "System 7"), // limited to 255 group objects
+		/** */
+		TYPE_57B0(0x57B0, "System B IP");
 
 
 		private final int mv;
