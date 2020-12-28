@@ -103,6 +103,9 @@ public class TransportLayerImpl implements TransportLayer
 			}
 
 			final CEMILData f = (CEMILData) cemi;
+			if (f.getSource().equals(link().getKNXMedium().getDeviceAddress()))
+				return;
+
 			final int ctrl = f.getPayload()[0] & 0xfc;
 			if (ctrl == 0) {
 				final KNXAddress dst = f.getDestination();
