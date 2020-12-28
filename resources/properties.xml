@@ -633,6 +633,95 @@
             <usage>Role table</usage>
         </property>
     </object>
+   <object type="19">
+        <property pid="51" pidName="PID_RF_MULTI_TYPE" name="RF Multi type" pdt="0x33" rw="3/2" writeEnabled="1">
+            <usage>Sets the KNX RF type to Ready or Multi</usage>
+        </property>
+        <property pid="52" pidName="PID_RF_MULTI_PHYSICAL_FEATURES" name="RF Multi physical features" pdt="0x33" rw="3/0" writeEnabled="0">
+            <usage>Supported features of KNX RF Multi</usage>
+        </property>
+        <property pid="53" pidName="PID_RF_MULTI_CALL_CHANNEL" name="RF Multi call channel" pdt="" rw="0x11" writeEnabled="1">
+            <usage>Call channel for KNX RF Multi fast and slow frequencies</usage>
+        </property>
+        <property pid="54" pidName="PID_RF_MULTI_OBJECT_LINK" name="RF Multi object link" pdt="0x3E" rw="3/3" writeEnabled="1">
+            <usage>Group address management of the KNXRF Multi-specific features</usage>
+        </property>
+        <property pid="55" pidName="PID_RF_MULTI_EXT_GA_REPEATED" name="RF Multi extended group address repeated" pdt="0x3E" rw="" writeEnabled="1">
+            <usage>Managament of repeated KNX RF Multi group address (obsolete)</usage>
+        </property>
+        <property pid="56" pidName="PID_RF_DOMAIN_ADDRESS" name="RF domain address" pdt="0x16" rw="3/2" writeEnabled="1">
+            <usage>RF domain address</usage>
+        </property>
+        <property pid="57" pidName="PID_RF_RETRANSMITTER" name="Retransmitter mode" dpt="1.003" pdt="0x32" rw="3/2" writeEnabled="1">
+            <usage>Controls whether the RF retransmitter function is active</usage>
+        </property>
+        <property pid="58" pidName="PID_RF_FILTERING_MODE_SUPPORT" name="Supported RF filtering modes" pdt="0x33" rw="3/2" writeEnabled="1">
+            <usage></usage>
+        </property>
+        <property pid="59" pidName="PID_RF_FILTERING_MODE_SELECT" name="RF filtering mode selection" pdt="0x35" rw="3/2" writeEnabled="1">
+            <usage></usage>
+        </property>
+        <property pid="60" pidName="PID_RF_BIDIR_TIMEOUT" name="Bidirectional mode time-out" pdt="0x3E" rw="" writeEnabled="1">
+            <usage>Allows to retrigger the time-out for the bidirectional mode to keep the bidirectional mode active</usage>
+        </property>
+        <property pid="61" pidName="PID_RF_DIAG_SA_FILTER_TABLE" name="RF diagnose source address filter table" pdt="0x13" rw="3/2" writeEnabled="1">
+            <usage>Individual addresses of the RF devices for which the device shall measure the link budget</usage>
+        </property>
+        <property pid="62" pidName="PID_RF_DIAG_BUDGET_TABLE" name="RF diagnose budget table" pdt="0x14" rw="3/x" writeEnabled="0">
+            <usage>Contains for each source address the calculated link budget information based on the received and filtered telegrams</usage>
+        </property>
+        <property pid="63" pidName="PID_RF_DIAG_PROBE" name="RF diagnose probe" pdt="0x3E" rw="" writeEnabled="1">
+            <usage>Allows to trigger transmission of this property state to the network, so other devices can measure the signal strength and calculate the link budget</usage>
+        </property>
+        <property pid="70" pidName="PID_TRANSMISSION_MODE" name="Transmission mode" pdt="0x35" rw="" writeEnabled="1">
+            <usage>KNX RF Multi transmission mode of the physical layer</usage>
+        </property>
+        <property pid="71" pidName="PID_RECEPTION_MODE" name="Reception mode" pdt="0x35" rw="" writeEnabled="1">
+            <usage>KNX RF Multi reception mode of the physical layer</usage>
+        </property>
+        <property pid="72" pidName="PID_TEST_SIGNAL" name="Test signal" pdt="0x12" rw="" writeEnabled="1">
+            <usage>Control frequency and form of a test signal for transmission</usage>
+        </property>
+        <property pid="73" pidName="PID_FAST_ACK" name="Fast ack" pdt="0x12" rw="" writeEnabled="1">
+            <usage>Fast ack in reception</usage>
+        </property>
+        <property pid="74" pidName="PID_FAST_ACK_ACTIVATE" name="Fast ack activate" pdt="0x32" rw="" writeEnabled="1">
+            <usage>Activate or deactivate fast ack in reception</usage>
+        </property>
+        <property pid="76" pidName="PID_GRP_TX_MULTI_INFO_TABLE" name="Group Tx Multi information table" pdt="0x1B" rw="2/2" writeEnabled="1" accessPolicy="3FF/05C">
+            <usage>Contains the RF Multi information that the MaS shall use for sending group objects using RF Multi communication (A_GroupValue_Write service in transmission)</usage>
+        </property>
+        <property pid="77" pidName="PID_GRP_RX_MULTI_INFO_TABLE" name="Group Rx Multi information table" pdt="0x13" rw="2/2" writeEnabled="1" accessPolicy="3FF/05C">
+            <usage>Contains the RF Multi information that the MaS shall use for receiving group object values using RF Multi communication (A_GroupValue_Write service in reception or A_GroupValue_Read in transmission)</usage>
+        </property>
+        <property pid="78" pidName="PID_RF_MULTI_MEDIA_COUPLER_TYPE" name="RF Multi media coupler type" pdt="0x11" rw="2/2" writeEnabled="1" accessPolicy="3FF/00C">
+            <usage>Contains the current type of RF Multi media coupler</usage>
+        </property>
+        <property pid="79" pidName="PID_RF_MULTI_UNICAST_CONTROL" name="RF Multi unicast communication control" pdt="0x3E" rw="2/2" writeEnabled="1" accessPolicy="3FF/00C">
+            <usage>Defines the behaviour of the media coupler concerning which RF channel to be used (ready, fast, slow) for unicast communication</usage>
+        </property>
+        <property pid="80" pidName="PID_RF_MULTI_BROADCAST_CONTROL" name="RF Multi broadcast communication control" pdt="0x3E" rw="2/2" writeEnabled="1" accessPolicy="3FF/00C">
+            <usage>Defines the behaviour of the media coupler concerning which RF channel to be used (ready, fast, slow) for broadcast communication</usage>
+        </property>
+        <property pid="81" pidName="PID_RF_SMART_RETRANSMITTER" name="RF smart retransmitter" pdt="0x1B" rw="2/2" writeEnabled="1" accessPolicy="3FF/0FC">
+            <usage>Configures the behaviour of the retransmitter using rules that use range of IA, GA, RF link quality, and an associated action</usage>
+        </property>
+        <property pid="82" pidName="PID_GRP_TP_RF_MULTICAST_TABLE" name="Group TP1 RF multicast table" pdt="0x1B" rw="2/2" writeEnabled="1" accessPolicy="3FF/05C">
+            <usage>Contains the RF Multi/Ready information that the MaS shall use for sending group objects from TP to RF using RF Multi communication</usage>
+        </property>
+        <property pid="83" pidName="PID_GRP_RF_TP_MULTICAST_TABLE" name="Group RF TP multicast table" pdt="0x13" rw="2/2" writeEnabled="1" accessPolicy="3FF/05C">
+            <usage>Contains the RF Multi information (use of fast ack) that the MaS shall use when receiving group objects from RF using RF Multi communication</usage>
+        </property>
+        <property pid="84" pidName="PID_RF_MULTI_FAST_SLOW_COMM" name="RF Multi fast/slow communication" pdt="0x3E" rw="2/2" writeEnabled="1" accessPolicy="3FF/05C">
+            <usage></usage>
+        </property>
+        <property pid="85" pidName="PID_RF_MULTI_FAST_MC_IA" name="RF Multi fast media coupler individual address" pdt="0x04" rw="2/2" writeEnabled="1" accessPolicy="3FF/05C">
+            <usage>Contains the individual address of the fast media coupler</usage>
+        </property>
+        <property pid="86" pidName="PID_RF_MULTI_SLOW_EXTENDER_IA" name="RF Multi slow extender individual address" pdt="0x04" rw="2/2" writeEnabled="1" accessPolicy="3FF/05C">
+            <usage>Contains the individual address of the slow extender</usage>
+        </property>
+    </object>
     <!-- Enertex-specific -->
     <object type="50001" name="Enertex device">
         <property pid="209" pidName="PID_ENX_BLOCKFILTER" name="Block group filters" pdt="0x32" dpt="1.001" rw="3/3" writeEnabled="1">
