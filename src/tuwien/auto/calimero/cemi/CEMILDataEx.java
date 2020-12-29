@@ -546,8 +546,9 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	void writePayload(final ByteArrayOutputStream os)
 	{
 		// RF frames don't use NPDU length field
-		final boolean rf = addInfo.stream().anyMatch(info -> info.type() == AdditionalInfo.RfMedium);
-		os.write(rf ? 0 : data.length - 1);
+//		final boolean rf = addInfo.stream().anyMatch(info -> info.type() == AdditionalInfo.RfMedium);
+//		os.write(rf ? 0 : data.length - 1);
+		os.write(data.length - 1);
 		os.write(data, 0, data.length);
 	}
 
