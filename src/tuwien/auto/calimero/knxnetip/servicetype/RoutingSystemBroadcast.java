@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019 B. Malinowsky
+    Copyright (c) 2019, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ package tuwien.auto.calimero.knxnetip.servicetype;
 
 import java.io.ByteArrayOutputStream;
 
+import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXFormatException;
@@ -100,12 +101,44 @@ public class RoutingSystemBroadcast extends ServiceType {
 		return os.toByteArray();
 	}
 
-	// with a secure APDU or sync.req/res, the SBC currently has to be checked at an upper layer
+	private static final int SystemNetworkParamRead = 0b0111001000;
+	private static final int DoASerialNumberWrite = 0b1111101110;
+	private static final int SecureService = 0b1111110001;
+
+	private static final int SecureDataPdu = 0;
+	private static final int SecureSyncRequest = 2;
+
 	public static boolean isSystemBroadcast(final CEMI frame) {
-		if (frame.getMessageCode() == CEMILData.MC_LDATA_IND && frame instanceof CEMILData) {
-			final CEMILData ldata = (CEMILData) frame;
-			final KNXAddress dst = ldata.getDestination();
-			return ldata.isSystemBroadcast() && dst instanceof GroupAddress && dst.getRawAddress() == 0;
+		if (frame.getMessageCode() != CEMILData.MC_LDATA_IND || !(frame instanceof CEMILData))
+			return false;
+
+		final CEMILData ldata = (CEMILData) frame;
+		final KNXAddress dst = ldata.getDestination();
+		// L-Data system bcast check is not mandated, it could cause false negatives
+		if (dst instanceof GroupAddress && dst.getRawAddress() == 0) {
+			final byte[] tpdu = ldata.getPayload();
+			if (tpdu.length < 2)
+				return false;
+
+			final int svc = DataUnitBuilder.getAPDUService(tpdu);
+			switch (svc) {
+			case SystemNetworkParamRead:
+				// pdu: 2 bytes APCI + 2 bytes obj type + 2 bytes PID + 1 byte operand
+				return tpdu.length == 7 && tpdu[2] == 0 && tpdu[3] == 0 && tpdu[4] == 0 && (tpdu[5] & 0xff) == (11 << 4)
+						&& tpdu[6] == 1;
+
+			case DoASerialNumberWrite: // DoA serial number write service with IP domain
+				return tpdu.length == 2 + 6 + 4; // APCI + SNo + mcast group
+
+			case SecureService: // we look for secure data or sync request, and require tool access, system broadcast, A+C
+				final int scf = tpdu[2] & 0xff;
+				final boolean toolAccess = (scf & 128) == 128;
+				final int algorithmId = (scf >> 4) & 0x7;
+				final boolean systemBroadcast = (scf & 0x8) == 0x8;
+				final int service = scf & 0x3;
+				if (service == SecureDataPdu || service == SecureSyncRequest)
+					return toolAccess && systemBroadcast && algorithmId == 1;
+			}
 		}
 		return false;
 	}
