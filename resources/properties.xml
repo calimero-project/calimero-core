@@ -509,7 +509,7 @@
         <property pid="65" pidName="PID_SYSTEM_SETUP_MULTICAST_ADDRESS" name="System Setup Multicast Address" pdt="9" rw="R" writeEnabled="0">
             <usage>KNXnet/IP system set-up multicast address. Value is fixed to 224.0.23.12</usage>
         </property>
-        <property pid="66" pidName="PID_ROUTING_MULTICAST_ADDRESS" name="Routing Multicast Address" pdt="9" rw="R/W" writeEnabled="0">
+        <property pid="66" pidName="PID_ROUTING_MULTICAST_ADDRESS" name="Routing Multicast Address" pdt="9" rw="R/W" writeEnabled="1">
             <usage>Routing multicast address</usage>
         </property>
         <property pid="67" pidName="PID_TTL" name="Time To Live" pdt="2" rw="R/W" writeEnabled="1">
