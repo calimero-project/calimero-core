@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -289,7 +289,8 @@ public class KNXnetIPRouting extends ConnectionBase
 	public final boolean usesMulticastLoopback()
 	{
 		try {
-			return socket.getOption(StandardSocketOptions.IP_MULTICAST_LOOP);
+			final boolean opt = socket.getOption(StandardSocketOptions.IP_MULTICAST_LOOP);
+			return Runtime.version().feature() < 14 ? !opt : opt;
 		}
 		catch (final IOException e) {
 			// if we can't access loopback mode, we assume that we also couldn't set it
@@ -361,8 +362,8 @@ public class KNXnetIPRouting extends ConnectionBase
 		}
 		socket = s;
 		try {
-			if (!useMulticastLoopback)
-				socket.setOption(StandardSocketOptions.IP_MULTICAST_LOOP, false);
+			final boolean opt = Runtime.version().feature() < 14 ? !useMulticastLoopback : useMulticastLoopback;
+			socket.setOption(StandardSocketOptions.IP_MULTICAST_LOOP, opt);
 			loopbackEnabled = usesMulticastLoopback();
 			logger.info("multicast loopback mode " + (loopbackEnabled ? "enabled" : "disabled"));
 		}
