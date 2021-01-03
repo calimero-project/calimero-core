@@ -1,6 +1,6 @@
 /*
     Calimero - A library for KNX network access
-    Copyright (c) 2019, 2020 B. Malinowsky
+    Copyright (c) 2019, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -725,7 +725,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 				challenge);
 		// the returned completable future here is not important
 		stashSyncRequest(src, challenge);
-		syncReqBroadcast = dst.equals(new GroupAddress(0));
+		syncReqBroadcast = dst.equals(GroupAddress.Broadcast);
 		final var to = syncReqBroadcast ? dst : src;
 		try {
 			sendSyncResponse(to, toolAccess, nextSeq);

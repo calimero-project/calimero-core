@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -163,7 +163,6 @@ public class TransportLayerImpl implements TransportLayer
 	// maximum repetitions of send in connected mode
 	private static final int MAX_REPEAT = 3;
 
-	private static final GroupAddress broadcast = new GroupAddress(0);
 	// used as default on incoming conn.oriented messages from unknown remote devices
 	private final Destination unknownPartner = new Destination(new AggregatorProxy(this),
 		new IndividualAddress(0), true);
@@ -386,7 +385,7 @@ public class TransportLayerImpl implements TransportLayer
 	public void broadcast(final boolean system, final Priority p, final byte[] tsdu)
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
-		sendData(system ? null : broadcast, p, tsdu);
+		sendData(system ? null : GroupAddress.Broadcast, p, tsdu);
 	}
 
 	/**

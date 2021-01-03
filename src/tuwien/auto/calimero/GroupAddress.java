@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -57,6 +57,11 @@ import tuwien.auto.calimero.xml.XmlReader;
  */
 public class GroupAddress extends KNXAddress
 {
+	/**
+	 * The KNX address used for broadcasts.
+	 */
+	public static final GroupAddress Broadcast = new GroupAddress(0);
+
 	static final String ATTR_GROUP = "group";
 
 	/** Supported address styles for group address presentation. */

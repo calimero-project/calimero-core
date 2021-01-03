@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2017 B. Malinowsky
+    Copyright (c) 2015, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -166,7 +166,7 @@ public class RFLDataTest
 		Assert.assertEquals(false, f.isSystemBroadcast());
 
 		f = new RFLData(batteryOk, transmitOnlyDevice, frameType, frameNumber, doa, src,
-				new GroupAddress(0), tpdu);
+				GroupAddress.Broadcast, tpdu);
 		Assert.assertEquals(false, f.isSystemBroadcast());
 	}
 

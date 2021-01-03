@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2014, 2020 B. Malinowsky
+    Copyright (c) 2014, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -177,7 +177,7 @@ public class TpuartConnection implements AutoCloseable
 		os = adapter.getOutputStream();
 		is = adapter.getInputStream();
 
-		addresses.add(new GroupAddress(0));
+		addresses.add(GroupAddress.Broadcast);
 		addresses.addAll(acknowledge);
 
 		receiver = new Receiver();

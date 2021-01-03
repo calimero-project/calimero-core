@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -99,16 +99,13 @@ class TransportLayerImplTest
 		volatile boolean closed;
 		volatile boolean detached;
 
-		TLListener()
-		{}
-
 		@Override
 		public void broadcast(final FrameEvent e)
 		{
 			assertNotNull(e, "broadcast frame event");
 			broad.add(e.getFrame());
 			final CEMILData f = (CEMILData) e.getFrame();
-			assertEquals(new GroupAddress(0), f.getDestination());
+			assertEquals(GroupAddress.Broadcast, f.getDestination());
 			Debug.printLData("broadcast: ", f);
 		}
 
