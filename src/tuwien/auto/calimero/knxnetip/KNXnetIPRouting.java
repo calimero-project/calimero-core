@@ -350,8 +350,10 @@ public class KNXnetIPRouting extends ConnectionBase
 
 			// port number is not used in join group
 			s.joinGroup(new InetSocketAddress(multicast, 0), setNetif);
-			if (sysBcastSocket != null)
+			if (sysBcastSocket != null) {
 				sysBcastSocket.joinGroup(new InetSocketAddress(systemBroadcast, 0), setNetif);
+				sysBcastSocket.setTimeToLive(64);
+			}
 
 			// send out beyond local network
 			s.setTimeToLive(64);
