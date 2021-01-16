@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@ import java.util.function.BiConsumer;
 
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
@@ -408,21 +409,76 @@ public interface ManagementClient extends AutoCloseable
 	void restart(Destination dst) throws KNXTimeoutException, KNXLinkClosedException, InterruptedException;
 
 	/**
+	 * Erase codes used with a master reset restart service.
+	 */
+	enum EraseCode {
+		/** Confirmed alternative to the unconfirmed basic restart. */
+		ConfirmedRestart,
+		/** Reset the device to its ex-factory state. */
+		FactoryReset,
+		/** Reset the device address to the medium-specific default address. */
+		ResetIndividualAddress,
+		/** Reset the application program memory to the default application. */
+		ResetApplicationProgram,
+		/** Reset the application parameter memory to its default value. */
+		ResetApplicationParameters,
+		/**
+		 * Reset link information for group objects (Group Address Table, Group Object Association Table) to its
+		 * default state.
+		 */
+		ResetLinks,
+		/** Reset the device to its ex-factory state, the device address(es) shall not be reset. */
+		FactoryResetWithoutIndividualAddress;
+
+		public static EraseCode of(final int eraseCode) {
+			if (eraseCode > 0 && eraseCode <= values().length)
+				return values()[eraseCode - 1];
+			throw new KNXIllegalArgumentException("unsupported erase code " + eraseCode);
+		}
+
+		public int code() { return ordinal() + 1; }
+	}
+
+	/**
 	 * Initiates a master reset of the controller of a communication partner.
 	 * <p>
-	 * A master reset clears link information in the group address table and group object
-	 * association table, resets application parameters, resets the application to the default
-	 * application, resets the device individual address to the (medium-dependent) default address,
-	 * and subsequently performs a basic restart.<br>
-	 * If the requested master reset exceeds a processing time of 5 seconds, this is indicated by
-	 * the KNX device using a worst-case process time, which is returned by this method. Otherwise,
-	 * the process time indication might be left to its default of 0 by the remote endpoint.
+	 * Depending on the erase code, a master reset clears link information in the group address table and group object
+	 * association table, resets application parameters, resets the application to the default application, resets the
+	 * device individual address to the (medium-dependent) default address, and subsequently performs a basic
+	 * restart.<br>
+	 * The {@code channel} parameter is used with erase codes {@link EraseCode#FactoryReset},
+	 * {@link EraseCode#ResetApplicationParameters}, {@link EraseCode#ResetLinks}, and
+	 * {@link EraseCode#FactoryResetWithoutIndividualAddress}. For erase codes {@link EraseCode#ConfirmedRestart},
+	 * {@link EraseCode#ResetIndividualAddress}, and {@link EraseCode#ResetApplicationProgram}, {@code channel} should
+	 * be 0.<br>
+	 * If the requested master reset exceeds a processing time of 5 seconds, this is indicated by the KNX device using a
+	 * worst-case process time, which is returned by this method. Otherwise, the process time indication might be left
+	 * at its default value of 0 by the remote endpoint.
 	 * <p>
 	 * This service uses point-to-point connectionless or connection-oriented communication mode.<br>
-	 * Invoking this method may result in a termination of the transport layer connection (i.e.,
-	 * state transition into disconnected for the supplied destination).
+	 * Invoking this method may result in a termination of the transport layer connection (i.e., transition to
+	 * disconnected state for the supplied destination).
+	 *
+	 * @param dst destination to reset
+	 * @param eraseCode specifies the resources that shall be reset prior to restarting the device
+	 * @param channel the number of the application channel that shall be reset and the application parameters set to
+	 *        default values, use 0 to clear all link information in the group address table and group object
+	 *        association table and reset all application parameters
+	 * @return the worst case execution time of the device for the requested master reset or a default of 0, with time
+	 *         &ge; 0
+	 * @throws KNXTimeoutException on a timeout during send
+	 * @throws KNXRemoteException on error to restart the communication partner
+	 * @throws KNXDisconnectException on transport layer disconnect in connection-oriented mode
+	 * @throws KNXLinkClosedException if network link to KNX network is closed
+	 * @throws InterruptedException on interrupted thread
+	 */
+	Duration restart(final Destination dst, final EraseCode eraseCode, final int channel) throws KNXTimeoutException,
+			KNXRemoteException, KNXDisconnectException, KNXLinkClosedException, InterruptedException;
+
+	/**
+	 * Initiates a master reset of the controller of a communication partner.
 	 * <p>
-	 * Available Erase Codes:
+	 * Available erase codes:
 	 * <ul>
 	 * <li>1: confirmed restart (basic restart with confirmation)</li>
 	 * <li>2: factory reset (used together with <code>channel</code>)</li>
@@ -430,12 +486,11 @@ public interface ManagementClient extends AutoCloseable
 	 * <li>4: reset application program memory to default application</li>
 	 * <li>5: reset application parameter memory (used together with <code>channel</code>)</li>
 	 * <li>6: reset links (used together with <code>channel</code></li>
-	 * <li>7: factory reset without resetting the device individual address (used together with
-	 * <code>channel</code>)</li>
+	 * <li>7: factory reset without resetting the device individual address (used together with <code>channel</code>)</li>
 	 * </ul>
 	 *
 	 * @param dst destination to reset
-	 * @param eraseCode specifies the resources that shall be reset prior to resetting the device
+	 * @param eraseCode specifies the resources that shall be reset prior to restarting the device
 	 * @param channel the number of the application channel that shall be reset and the application
 	 *        parameters set to default values, use 0 to clear all link information in the group
 	 *        address table and group object association table and reset all application parameters
@@ -447,9 +502,12 @@ public interface ManagementClient extends AutoCloseable
 	 * @throws KNXDisconnectException on transport layer disconnect in connection-oriented mode
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws InterruptedException on interrupted thread
+	 * @see {@link #restart(Destination, EraseCode, int)} for details on restart behavior
 	 */
-	int restart(Destination dst, int eraseCode, int channel) throws KNXTimeoutException,
-		KNXRemoteException, KNXDisconnectException, KNXLinkClosedException, InterruptedException;
+	default int restart(final Destination dst, final int eraseCode, final int channel) throws KNXTimeoutException,
+			KNXRemoteException, KNXDisconnectException, KNXLinkClosedException, InterruptedException {
+		return (int) restart(dst, EraseCode.of(eraseCode), channel).toSeconds();
+	}
 
 	/**
 	 * Reads the value of a property of an interface object of a communication partner.

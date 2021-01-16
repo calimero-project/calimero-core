@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -547,30 +547,28 @@ public class ManagementClientImpl implements ManagementClient
 	public void restart(final Destination dst) throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		try {
-			restart(true, dst, 0, 0);
+			restart(true, dst, null, 0);
 		}
 		catch (KNXRemoteException | KNXDisconnectException ignore) {}
 	}
 
 	@Override
-	public int restart(final Destination dst, final int eraseCode, final int channel)
-		throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException,
-		KNXDisconnectException, InterruptedException
-	{
+	public Duration restart(final Destination dst, final EraseCode eraseCode, final int channel) throws KNXTimeoutException,
+			KNXRemoteException, KNXDisconnectException, KNXLinkClosedException, InterruptedException {
 		return restart(false, dst, eraseCode, channel);
 	}
 
 	// for erase codes 1,3,4 the channel should be 0
-	private int restart(final boolean basic, final Destination dst, final int eraseCode,
-		final int channel) throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException,
-		KNXDisconnectException, InterruptedException
+	private Duration restart(final boolean basic, final Destination dst, final EraseCode eraseCode,
+		final int channel) throws KNXTimeoutException, KNXRemoteException, KNXDisconnectException,
+		KNXLinkClosedException, InterruptedException
 	{
 		int time = 0;
 		if (basic) {
 			send(dst, priority, DataUnitBuilder.createLengthOptimizedAPDU(RESTART), 0);
 		}
 		else {
-			final byte[] sdu = new byte[] { 0x01, (byte) eraseCode, (byte) channel, };
+			final byte[] sdu = new byte[] { 0x01, (byte) eraseCode.code(), (byte) channel, };
 			final byte[] send = DataUnitBuilder.createLengthOptimizedAPDU(RESTART, sdu);
 			final byte[] apdu = sendWait2(dst, priority, send, RESTART, 3, 3);
 			// check we get a restart response
@@ -613,7 +611,7 @@ public class ManagementClientImpl implements ManagementClient
 			// always force a disconnect from our side
 			tl.disconnect(dst);
 		}
-		return time;
+		return Duration.ofSeconds(time);
 	}
 
 	@Override
