@@ -74,6 +74,7 @@ import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.Util;
@@ -382,13 +383,19 @@ class KNXnetIPRouterTest
 
 			sender.send(sysBcast, BlockingMode.NonBlocking);
 
-			final byte[] buf = new byte[512];
-			final DatagramPacket p = new DatagramPacket(buf, buf.length);
-			verify.receive(p);
-			final KNXnetIPHeader header = new KNXnetIPHeader(buf, 0);
-			final RoutingSystemBroadcast ind = new RoutingSystemBroadcast(buf, header.getStructLength(),
-					header.getTotalLength() - header.getStructLength());
-			assertSystemBroadcast(sysBcast, (CEMILData) ind.cemi());
+			for (int i = 0; i < 5; i++) {
+				final byte[] buf = new byte[512];
+				final DatagramPacket p = new DatagramPacket(buf, buf.length);
+				verify.receive(p);
+				final KNXnetIPHeader header = new KNXnetIPHeader(buf, 0);
+				try {
+					final var ind = new RoutingSystemBroadcast(buf, header.getStructLength(),
+							header.getTotalLength() - header.getStructLength());
+					assertSystemBroadcast(sysBcast, (CEMILData) ind.cemi());
+					break;
+				}
+				catch (final KNXFormatException ignore) {}
+			}
 		}
 		assertSystemBroadcast(sysBcast, (CEMILData) l.received.poll(2, TimeUnit.SECONDS));
 	}

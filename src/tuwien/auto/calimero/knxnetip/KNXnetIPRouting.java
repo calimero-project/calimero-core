@@ -196,9 +196,10 @@ public class KNXnetIPRouting extends ConnectionBase
 				logger.trace("add to multicast loopback frame buffer: {}", frame);
 			}
 			// filter IP system broadcasts and always send them unsecured
-			if (RoutingSystemBroadcast.isSystemBroadcast(frame)) {
+			if (RoutingSystemBroadcast.validSystemBroadcast(frame)) {
 				final byte[] buf = PacketHelper.toPacket(new RoutingSystemBroadcast(frame));
 				final DatagramPacket p = new DatagramPacket(buf, buf.length, systemBroadcast, DEFAULT_PORT);
+				logger.trace("sending cEMI frame, SBC {} {}", NonBlocking, DataUnitBuilder.toHex(buf, " "));
 				if (sysBcastSocket != null)
 					sysBcastSocket.send(p);
 				else
@@ -206,6 +207,7 @@ public class KNXnetIPRouting extends ConnectionBase
 			}
 			else
 				super.send(frame, NonBlocking);
+
 			// we always succeed...
 			setState(OK);
 		}
