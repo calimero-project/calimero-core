@@ -109,7 +109,7 @@ public interface ManagementClient extends AutoCloseable
 	 * A management client will use the transport layer for creating the destination.
 	 *
 	 * @param remote destination KNX individual address
-	 * @param connectionOriented <code>true</code> for connection oriented mode,
+	 * @param connectionOriented <code>true</code> for connection-oriented mode,
 	 *        <code>false</code> for connectionless mode
 	 * @return destination representing the logical connection
 	 */
@@ -122,10 +122,10 @@ public interface ManagementClient extends AutoCloseable
 	 * A management client will use the transport layer for creating the destination.
 	 *
 	 * @param remote destination KNX individual address
-	 * @param connectionOriented <code>true</code> for connection oriented mode,
+	 * @param connectionOriented <code>true</code> for connection-oriented mode,
 	 *        <code>false</code> for connectionless mode
 	 * @param keepAlive <code>true</code> to prevent a timing out of the logical
-	 *        connection in connection oriented mode, <code>false</code> to use default
+	 *        connection in connection-oriented mode, <code>false</code> to use default
 	 *        connection timeout
 	 * @param verifyMode <code>true</code> to indicate the destination has verify mode
 	 *        enabled, <code>false</code> otherwise
@@ -212,18 +212,16 @@ public interface ManagementClient extends AutoCloseable
 	}
 
 	/**
-	 * Modifies the domain address of a communication partner in the KNX network.
+	 * Modifies the domain address of a communication partner in the KNX network which is in programming mode.
 	 * <p>
-	 * This service uses system broadcast communication mode.<br>
-	 * The communication partner is a device in programming mode.
+	 * This service uses system broadcast communication mode.
 	 *
 	 * @param domain byte array with domain address, <code>domain.length</code> = 2 (on
 	 *        powerline medium) or <code>domain.length</code> = 6 (on RF medium)
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 */
-	void writeDomainAddress(byte[] domain) throws KNXTimeoutException,
-		KNXLinkClosedException;
+	void writeDomainAddress(byte[] domain) throws KNXTimeoutException, KNXLinkClosedException;
 
 	/**
 	 * Modifies the domain address of the communication partner with the specified serial number in the KNX network.
@@ -406,7 +404,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @return byte array containing device descriptor information
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXInvalidResponseException on invalid read response message
-	 * @throws KNXDisconnectException on disconnect in connection oriented mode
+	 * @throws KNXDisconnectException on disconnect in connection-oriented mode
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other read device descriptor errors
 	 * @throws InterruptedException on interrupted thread
@@ -492,7 +490,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws InterruptedException on interrupted thread
 	 */
-	Duration restart(final Destination dst, final EraseCode eraseCode, final int channel) throws KNXTimeoutException,
+	Duration restart(Destination dst, EraseCode eraseCode, int channel) throws KNXTimeoutException,
 			KNXRemoteException, KNXDisconnectException, KNXLinkClosedException, InterruptedException;
 
 	/**
@@ -522,7 +520,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @throws KNXDisconnectException on transport layer disconnect in connection-oriented mode
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws InterruptedException on interrupted thread
-	 * @see {@link #restart(Destination, EraseCode, int)} for details on restart behavior
+	 * @see restart(Destination, EraseCode, int) details on restart behavior
 	 */
 	default int restart(final Destination dst, final int eraseCode, final int channel) throws KNXTimeoutException,
 			KNXRemoteException, KNXDisconnectException, KNXLinkClosedException, InterruptedException {
@@ -540,7 +538,7 @@ public interface ManagementClient extends AutoCloseable
 	 * index <code>i</code> (zero based) is calculated the following way:<br>
 	 * <code>offset = (data.length / elements) * i</code>.<br>
 	 * Note that interface objects with active access protection are only accessible over
-	 * connection oriented communication.
+	 * connection-oriented communication.
 	 *
 	 * @param dst destination to read from
 	 * @param objIndex interface object index
@@ -552,7 +550,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @throws KNXRemoteException if tried to access a non existing property or forbidden
 	 *         property access (not sufficient access rights)
 	 * @throws KNXInvalidResponseException if received number of elements differ
-	 * @throws KNXDisconnectException on disconnect in connection oriented mode
+	 * @throws KNXDisconnectException on disconnect in connection-oriented mode
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other read property error
 	 * @throws InterruptedException on interrupted thread
@@ -567,7 +565,7 @@ public interface ManagementClient extends AutoCloseable
 	 * communication mode.<br>
 	 * The value of the written property is explicitly read back after writing.<br>
 	 * Note that interface objects with active access protection are only accessible over
-	 * connection oriented communication.
+	 * connection-oriented communication.
 	 *
 	 * @param dst destination to write to
 	 * @param objIndex interface object index
@@ -581,7 +579,7 @@ public interface ManagementClient extends AutoCloseable
 	 *         was written
 	 * @throws KNXInvalidResponseException if received number of elements differ or the
 	 *         data length read back differs from the written data length
-	 * @throws KNXDisconnectException on disconnect in connection oriented mode
+	 * @throws KNXDisconnectException on disconnect in connection-oriented mode
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other read property error
 	 * @throws InterruptedException on interrupted thread
@@ -636,7 +634,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXRemoteException if the response contains no description (e.g. if tried
 	 *         to access a non existing property)
-	 * @throws KNXDisconnectException on disconnect in connection oriented mode
+	 * @throws KNXDisconnectException on disconnect in connection-oriented mode
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other read property description error
 	 * @throws InterruptedException on interrupted thread
