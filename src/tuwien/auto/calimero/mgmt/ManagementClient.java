@@ -171,6 +171,9 @@ public interface ManagementClient extends AutoCloseable
 	 */
 	IndividualAddress[] readAddress(boolean oneAddressOnly) throws KNXException, InterruptedException;
 
+	void writeAddress(SerialNumber serialNo, IndividualAddress newAddress) throws KNXTimeoutException,
+			KNXLinkClosedException;
+
 	/**
 	 * Modifies the individual address of a communication partner identified using an
 	 * unique serial number in the KNX network.
@@ -182,8 +185,12 @@ public interface ManagementClient extends AutoCloseable
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 */
-	void writeAddress(byte[] serialNo, IndividualAddress newAddress)
-		throws KNXTimeoutException, KNXLinkClosedException;
+	default void writeAddress(final byte[] serialNo, final IndividualAddress newAddress) throws KNXTimeoutException,
+			KNXLinkClosedException {
+		writeAddress(SerialNumber.from(serialNo), newAddress);
+	}
+
+	IndividualAddress readAddress(SerialNumber serialNumber) throws KNXException, InterruptedException;
 
 	/**
 	 * Reads the individual address of a communication partner identified using an unique
@@ -200,8 +207,9 @@ public interface ManagementClient extends AutoCloseable
 	 * @throws KNXException on other read address errors
 	 * @throws InterruptedException on interrupted thread
 	 */
-	IndividualAddress readAddress(byte[] serialNo) throws KNXException,
-		InterruptedException;
+	default IndividualAddress readAddress(final byte[] serialNo) throws KNXException, InterruptedException {
+		return readAddress(SerialNumber.from(serialNo));
+	}
 
 	/**
 	 * Modifies the domain address of a communication partner in the KNX network.
@@ -216,6 +224,18 @@ public interface ManagementClient extends AutoCloseable
 	 */
 	void writeDomainAddress(byte[] domain) throws KNXTimeoutException,
 		KNXLinkClosedException;
+
+	/**
+	 * Modifies the domain address of the communication partner with the specified serial number in the KNX network.
+	 * This service uses system broadcast communication mode.
+	 *
+	 * @param serialNumber device serial number
+	 * @param domain byte array with domain address, <code>domain.length</code> = 2 on
+	 *        powerline medium, <code>domain.length</code> = 6 on RF medium, {@code domain.length = 4 or 21} on IP medium
+	 * @throws KNXTimeoutException on a timeout during send
+	 * @throws KNXLinkClosedException if network link to KNX network is closed
+	 */
+	void writeDomainAddress(SerialNumber serialNumber, byte[] domain) throws KNXTimeoutException, KNXLinkClosedException;
 
 	/**
 	 * Reads the domain address of a communication partner in the KNX network.

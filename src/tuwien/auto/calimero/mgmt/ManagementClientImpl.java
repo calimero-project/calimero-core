@@ -63,12 +63,14 @@ import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.DetachEvent;
 import tuwien.auto.calimero.FrameEvent;
+import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.KnxSecureException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.ReturnCode;
 import tuwien.auto.calimero.SecurityControl;
@@ -146,6 +148,8 @@ public class ManagementClientImpl implements ManagementClient
 	private static final int MemoryExtendedWriteResponse = 0b0111111100;
 	private static final int MemoryExtendedRead = 0b0111111101;
 	private static final int MemoryExtendedReadResponse = 0b0111111110;
+
+	private static final int DomainAddressSerialNumberWrite = 0b1111101110;
 
 	// serves as both req and res
 	private static final int RESTART = 0x0380;
@@ -328,30 +332,21 @@ public class ManagementClientImpl implements ManagementClient
 	}
 
 	@Override
-	public void writeAddress(final byte[] serialNo, final IndividualAddress newAddress)
-		throws KNXTimeoutException, KNXLinkClosedException
-	{
-		if (serialNo.length != 6)
-			throw new KNXIllegalArgumentException("length of serial number not 6 bytes");
-		final byte[] asdu = new byte[12];
-		for (int i = 0; i < 6; ++i)
-			asdu[i] = serialNo[i];
-		asdu[6] = (byte) (newAddress.getRawAddress() >>> 8);
-		asdu[7] = (byte) newAddress.getRawAddress();
-		tl.broadcast(false, Priority.SYSTEM, DataUnitBuilder.createAPDU(IND_ADDR_SN_WRITE, asdu));
+	public void writeAddress(final SerialNumber serialNo, final IndividualAddress newAddress)
+			throws KNXTimeoutException, KNXLinkClosedException {
+		final byte[] apdu = DataUnitBuilder.apdu(IND_ADDR_SN_WRITE).put(serialNo.array()).put(newAddress.toByteArray())
+				.putShort(0).putShort(0).build();
+		broadcast(false, Priority.SYSTEM, apdu, false);
 	}
 
 	@Override
-	public IndividualAddress readAddress(final byte[] serialNo)
-		throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException, InterruptedException
-	{
-		if (serialNo.length != 6)
-			throw new KNXIllegalArgumentException("length of serial number not 6 bytes");
+	public IndividualAddress readAddress(final SerialNumber serialNumber)
+			throws KNXTimeoutException, KNXRemoteException, KNXLinkClosedException, InterruptedException {
 		final long start = registerActiveService(IND_ADDR_SN_RESPONSE);
-		tl.broadcast(false, Priority.SYSTEM, DataUnitBuilder.createAPDU(IND_ADDR_SN_READ, serialNo));
+		tl.broadcast(false, Priority.SYSTEM, createAPDU(IND_ADDR_SN_READ, serialNumber.array()));
 		final byte[] address = waitForResponses(IND_ADDR_SN_RESPONSE, 10, 10, start, responseTimeout, (source,
-			apdu) -> Arrays.equals(serialNo, 0, 6, apdu, 2, 8) ? Optional.of(source.toByteArray()) : Optional.empty(),
-				true).get(0);
+			apdu) -> Arrays.equals(serialNumber.array(), 0, 6, apdu, 2, 8) ? Optional.of(source.toByteArray())
+					: Optional.empty(), true).get(0);
 		return new IndividualAddress(address);
 	}
 
@@ -362,6 +357,33 @@ public class ManagementClientImpl implements ManagementClient
 		if (domain.length != 2 && domain.length != 6)
 			throw new KNXIllegalArgumentException("invalid length of domain address");
 		tl.broadcast(true, priority, DataUnitBuilder.createAPDU(DOA_WRITE, domain));
+	}
+
+	@Override
+	public void writeDomainAddress(final SerialNumber serialNumber, final byte[] domain)
+			throws KNXTimeoutException, KNXLinkClosedException {
+		if (domain.length != 2 && domain.length != 4 && domain.length != 6 && domain.length != 21)
+			throw new KNXIllegalArgumentException("domain address with invalid length " + domain.length);
+		final var apdu = DataUnitBuilder.apdu(DomainAddressSerialNumberWrite).put(serialNumber.array()).put(domain).build();
+		final boolean requireSecure = domain.length == 21;
+		broadcast(true, priority, apdu, requireSecure);
+	}
+
+	private void broadcast(final boolean systemBcast, final Priority p, final byte[] apdu, final boolean requireSecure)
+			throws KNXTimeoutException, KNXLinkClosedException {
+		try {
+			final var tsdu = sal
+					.secureData(src, GroupAddress.Broadcast, apdu, SecurityControl.of(DataSecurity.AuthConf, true))
+					.orElseGet(() -> {
+						if (requireSecure)
+							throw new KnxSecureException("broadcast requires data security");
+						return apdu;
+					});
+			tl.broadcast(systemBcast, p, tsdu);
+		}
+		catch (final InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
 	}
 
 	@Override
