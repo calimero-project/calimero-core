@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2020 B. Malinowsky
+    Copyright (c) 2019, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,6 +47,7 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.internal.EventListeners;
 import tuwien.auto.calimero.internal.SecureApplicationLayer;
+import tuwien.auto.calimero.internal.Security;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 
 public class SecureManagement extends SecureApplicationLayer {
@@ -139,4 +140,7 @@ public class SecureManagement extends SecureApplicationLayer {
 		final int tpci = tlMode | seqSend << 2;
 		return tpci;
 	}
+
+	@Override
+	protected Security security() { return super.security(); };
 }

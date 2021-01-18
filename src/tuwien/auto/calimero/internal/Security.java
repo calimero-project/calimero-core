@@ -1,6 +1,6 @@
 /*
     Calimero - A library for KNX network access
-    Copyright (c) 2019, 2020 B. Malinowsky
+    Copyright (c) 2019, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,6 +54,15 @@ public final class Security {
 	private final Map<GroupAddress, Set<IndividualAddress>> groupSenders = new ConcurrentHashMap<>();
 
 	private Security() {}
+
+	static Security withKeys(final Map<IndividualAddress, byte[]> deviceToolKeys,
+			final Map<GroupAddress, byte[]> groupKeys, final Map<GroupAddress, Set<IndividualAddress>> groupSenders) {
+		final var s = new Security();
+		s.deviceToolKeys.putAll(deviceToolKeys);
+		s.groupKeys.putAll(groupKeys);
+		s.groupSenders.putAll(groupSenders);
+		return s;
+	}
 
 	/**
 	 * Returns the security object for the default KNX installation.

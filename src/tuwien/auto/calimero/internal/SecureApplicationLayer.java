@@ -119,9 +119,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 	private final Map<IndividualAddress, Long> lastValidSequence = new ConcurrentHashMap<>();
 	private final Map<IndividualAddress, Long> lastValidSequenceToolAccess = new ConcurrentHashMap<>();
 
-	private final Map<GroupAddress, byte[]> groupKeys;
-	private final Map<IndividualAddress, byte[]> toolKeys;
-	private final Map<GroupAddress, Set<IndividualAddress>> groupSenders;
+	private final Security security;
 
 
 	private static final Duration SyncTimeout = Duration.ofSeconds(6);
@@ -186,24 +184,24 @@ public class SecureApplicationLayer implements AutoCloseable {
 	}
 
 	public SecureApplicationLayer(final KNXNetworkLink link, final Security security) {
-		this(link, security.groupKeys(), security.groupSenders(), security.deviceToolKeys());
+		this(link, new byte[6], 0, security);
+		link.addLinkListener(linkListener);
 	}
 
 	public SecureApplicationLayer(final KNXNetworkLink link, final Map<GroupAddress, byte[]> groupKeys,
 			final Map<GroupAddress, Set<IndividualAddress>> groupSenders,
 			final Map<IndividualAddress, byte[]> deviceToolKeys) {
-		this(link, new byte[6], 0, deviceToolKeys, groupKeys, groupSenders);
+		this(link, new byte[6], 0, Security.withKeys(deviceToolKeys, groupKeys, groupSenders));
 		link.addLinkListener(linkListener);
 	}
 
 	protected SecureApplicationLayer(final KNXNetworkLink link, final byte[] serialNumber, final long sequenceNumber,
 			final Map<IndividualAddress, byte[]> deviceToolKeys) {
-		this(link, serialNumber, sequenceNumber, deviceToolKeys, Map.of(), Map.of());
+		this(link, serialNumber, sequenceNumber, Security.withKeys(deviceToolKeys, Map.of(), Map.of()));
 	}
 
 	private SecureApplicationLayer(final KNXNetworkLink link, final byte[] serialNumber, final long sequenceNumber,
-			final Map<IndividualAddress, byte[]> deviceToolKeys, final Map<GroupAddress, byte[]> groupKeys,
-			final Map<GroupAddress, Set<IndividualAddress>> groupSenders) {
+			final Security security) {
 		this.link = link;
 
 		if (serialNumber.length != 6)
@@ -212,10 +210,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 
 		this.logger = LogService.getLogger("calimero." + secureSymbol + "-AL " + link.getName());
 
-		this.groupKeys = Map.copyOf(groupKeys);
-		this.toolKeys = Map.copyOf(deviceToolKeys);
-		this.groupSenders = Map.copyOf(groupSenders);
-
+		this.security = security;
 		this.sequenceNumber = sequenceNumber;
 		sequenceNumberToolAccess = 1;
 	}
@@ -623,6 +618,8 @@ public class SecureApplicationLayer implements AutoCloseable {
 		link.removeLinkListener(linkListener);
 	}
 
+	protected Security security() { return security; }
+
 	protected void dispatchLinkEvent(final FrameEvent e) {
 		final var cemi = e.getFrame();
 		if (cemi.getMessageCode() == CEMILData.MC_LDATA_IND)
@@ -631,12 +628,12 @@ public class SecureApplicationLayer implements AutoCloseable {
 			listeners.fire(ll -> ll.confirmation(e));
 	}
 
-	protected byte[] toolKey(final IndividualAddress device) { return toolKeys.get(device); }
+	protected byte[] toolKey(final IndividualAddress device) { return security.deviceToolKeys().get(device); }
 
 	protected byte[] securityKey(final KNXAddress addr) {
 		if (addr instanceof GroupAddress) {
 			final var group = (GroupAddress) addr;
-			final var key = groupKeys.get(group);
+			final var key = security.groupKeys().get(group);
 			if (key == null)
 				throw new KnxSecureException("no group key for " + group);
 			return key;
@@ -675,7 +672,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 	}
 
 	protected int groupObjectSecurity(final GroupAddress group) {
-		if (groupKeys.containsKey(group))
+		if (security.groupKeys().containsKey(group))
 			return 3;
 		return 0;
 	}
@@ -794,7 +791,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 	}
 
 	private IndividualAddress surrogate(final GroupAddress group) {
-		final var surrogate = groupSenders.getOrDefault(group, Set.of()).stream().findAny()
+		final var surrogate = security.groupSenders().getOrDefault(group, Set.of()).stream().findAny()
 				.orElseThrow(() -> new KnxSecureException(group + " does not have a surrogate specified"));
 		return surrogate;
 	}
