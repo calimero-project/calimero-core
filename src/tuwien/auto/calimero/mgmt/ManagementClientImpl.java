@@ -719,6 +719,75 @@ public class ManagementClientImpl implements ManagementClient
 				throw new KNXRemoteException("read back failed (erroneous property data)");
 	}
 
+	private static final int PropertyExtWrite = 0b0111001110;
+	private static final int PropertyExtWriteResponse = 0b0111001111;
+
+	@Override
+	public void writeProperty(final Destination dst, final int objectType, final int objectInstance,
+			final int propertyId, final int start, final int elements, final byte[] data) throws KNXException,
+			InterruptedException {
+
+		final long startSend = sendProperty(PropertyExtWrite, PropertyExtWriteResponse, dst, objectType, objectInstance,
+				propertyId, start, elements, data);
+
+		final BiFunction<IndividualAddress, byte[], Optional<byte[]>> responseFilter = (responder, apdu) -> {
+			if (!responder.equals(dst.getAddress()) || apdu.length != 11)
+				return Optional.empty();
+			final int receivedIot = (apdu[2] & 0xff) << 8 | (apdu[3] & 0xff);
+			final int receivedObjInst = (apdu[4] & 0xff) << 4 | (apdu[5] & 0xf0) >> 4;
+			final int receivedPid = (apdu[5] & 0xf) << 8 | apdu[6] & 0xff;
+			final int receivedStart = (apdu[8] & 0xff) << 8 | apdu[9] & 0xff;
+			return receivedIot == objectType && receivedObjInst == objectInstance && receivedPid == propertyId
+					&& receivedStart == start ? Optional.of(apdu) : Optional.empty();
+		};
+
+		final var response = waitForResponses(PropertyExtWriteResponse, 9, 9, startSend, responseTimeout,
+				responseFilter, true);
+		final var returnCode = ReturnCode.of(response.get(0)[8] & 0xff);
+		if (returnCode != ReturnCode.Success)
+			throw new KNXRemoteException(format("write property response for %d(%d)|%d: %s",
+					objectType, objectInstance, propertyId, returnCode.friendly()));
+	}
+
+	private long sendProperty(final int svc, final int svcRes, final Destination dst, final int objectType,
+			final int objectInstance, final int propertyId, final int start, final int elements, final byte[] data)
+			throws KNXTimeoutException, KNXDisconnectException, KNXLinkClosedException, InterruptedException {
+
+		if (objectType < 0 || objectType > 0xffff || propertyId < 0 || propertyId > 0xfff || start < 0 || start > 0xffff
+				|| elements < 0 || elements > 255 || data.length == 0)
+			throw new KNXIllegalArgumentException("argument value out of range");
+
+		final int securityObjectType = 17;
+		final int pidToolKey = 56;
+		final var deviceToolKeys = sal.security().deviceToolKeys();
+		byte[] updateToolKey = null;
+		byte[] oldToolKey = null;
+		if (objectType == securityObjectType && objectInstance == 1 && propertyId == pidToolKey) {
+			updateToolKey = data.clone();
+			oldToolKey = deviceToolKeys.get(dst.getAddress());
+		}
+
+		final var apdu = DataUnitBuilder.apdu(svc).putShort(objectType)
+				.putShort((objectInstance << 4) | propertyId >> 8).put(propertyId).put(elements).putShort(start)
+				.put(data).build();
+		try {
+			final long s = send(dst, priority, apdu, svcRes, updateToolKey);
+			updateToolKey = oldToolKey;
+			return s;
+		}
+		catch (KNXException | InterruptedException | RuntimeException e) {
+			if (updateToolKey != null) {
+				final var toolKey = oldToolKey;
+				deviceToolKeys.compute(dst.getAddress(), (__, ___) -> toolKey);
+			}
+			throw e;
+		}
+		finally {
+			if (updateToolKey != null)
+				Arrays.fill(updateToolKey, (byte) 0);
+		}
+	}
+
 	private static final int PropertyExtDescRead = 0b0111010010;
 	private static final int PropertyExtDescResponse = 0b0111010011;
 
@@ -1121,11 +1190,22 @@ public class ManagementClientImpl implements ManagementClient
 
 	// helper which sets the expected svc response, and sends in CO or CL mode
 	private long send(final Destination d, final Priority p, final byte[] apdu, final int response)
-		throws KNXTimeoutException, KNXDisconnectException, KNXLinkClosedException, InterruptedException
-	{
+			throws KNXTimeoutException, KNXDisconnectException, KNXLinkClosedException, InterruptedException {
+		return send(d, p, apdu, response, null);
+	}
+
+	private long send(final Destination d, final Priority p, final byte[] apdu, final int response,
+			final byte[] updateToolKey) throws KNXTimeoutException, KNXDisconnectException, KNXLinkClosedException,
+			InterruptedException {
 		final long start = registerActiveService(response);
 		final var secCtrl = SecurityControl.of(DataSecurity.AuthConf, toolAccess);
 		final var sapdu = sal.secureData(src, d.getAddress(), apdu, secCtrl).orElse(apdu);
+
+		if (updateToolKey != null) {
+			sal.security().deviceToolKeys().put(d.getAddress(), updateToolKey);
+			logger.info("update device toolkey for {}", d.getAddress());
+		}
+
 		if (d.isConnectionOriented())
 			tl.sendData(d, p, sapdu);
 		else

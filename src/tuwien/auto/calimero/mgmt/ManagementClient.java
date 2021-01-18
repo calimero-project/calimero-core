@@ -570,6 +570,32 @@ public interface ManagementClient extends AutoCloseable
 		byte[] data) throws KNXException, InterruptedException;
 
 	/**
+	 * Modifies the value of a property of an interface object of a communication partner.
+	 * <p>
+	 * This service uses point-to-point connectionless or connection-oriented communication mode. Interface objects with
+	 * active access protection are only accessible over connection-oriented communication.
+	 *
+	 * @param dst destination to write to
+	 * @param objectType interface object type
+	 * @param objectInstance interface object instance
+	 * @param propertyId property identifier
+	 * @param start start index in the property value to start writing to
+	 * @param elements number of elements to write
+	 * @param data byte array containing property value data to write
+	 * @throws KNXTimeoutException on a timeout during send
+	 * @throws KNXRemoteException if tried to access a non existing property or forbidden property access (not
+	 *         sufficient access rights) or erroneous property data was written
+	 * @throws KNXInvalidResponseException if received number of elements differ or the data length read back differs
+	 *         from the written data length
+	 * @throws KNXDisconnectException on disconnect in connection-oriented mode
+	 * @throws KNXLinkClosedException if network link to KNX network is closed
+	 * @throws KNXException on other read property error
+	 * @throws InterruptedException on interrupted thread
+	 */
+	void writeProperty(Destination dst, int objectType, int objectInstance, int propertyId, int start, int elements,
+			byte[] data) throws KNXException, InterruptedException;
+
+	/**
 	 * Reads the description of a property of an interface object of a communication
 	 * partner.
 	 * <p>

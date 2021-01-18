@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,6 +35,8 @@
 */
 
 package tuwien.auto.calimero;
+
+import java.io.ByteArrayOutputStream;
 
 import org.slf4j.Logger;
 
@@ -506,4 +508,20 @@ public final class DataUnitBuilder
 			data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
 		return data;
 	}
+
+	public static final class Builder {
+		private final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+		private Builder() {}
+
+		public Builder put(final int oneByte) { baos.write(oneByte); return this; }
+
+		public Builder putShort(final int twoBytes) { return put(twoBytes >> 8).put(twoBytes); }
+
+		public Builder put(final byte[] bytes) { baos.writeBytes(bytes); return this; }
+
+		public byte[] build() { return baos.toByteArray(); }
+	}
+
+	public static Builder apdu(final int service) { return new Builder().putShort(service & 0x03ff); }
 }
