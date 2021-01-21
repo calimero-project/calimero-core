@@ -44,6 +44,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.Keyring;
+import tuwien.auto.calimero.mgmt.SerialNumber;
 
 public final class Security {
 
@@ -52,6 +53,7 @@ public final class Security {
 	private final Map<IndividualAddress, byte[]> deviceToolKeys = new ConcurrentHashMap<>();
 	private final Map<GroupAddress, byte[]> groupKeys = new ConcurrentHashMap<>();
 	private final Map<GroupAddress, Set<IndividualAddress>> groupSenders = new ConcurrentHashMap<>();
+	private final Map<SerialNumber, byte[]> broadcastToolKeys = new ConcurrentHashMap<>();
 
 	private Security() {}
 
@@ -106,4 +108,6 @@ public final class Security {
 	public Map<GroupAddress, Set<IndividualAddress>> groupSenders() {
 		return groupSenders;
 	}
+
+	Map<SerialNumber, byte[]> broadcastToolKeys() { return broadcastToolKeys; }
 }
