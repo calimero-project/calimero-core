@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2020 B. Malinowsky
+    Copyright (c) 2019, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,8 +48,11 @@ public final class SecurityControl {
 
 	private final DataSecurity security;
 	private final boolean toolAccess;
+	private final boolean systemBroadcast;
 
 	public static final SecurityControl Plain = new SecurityControl(DataSecurity.None);
+
+	public static final SecurityControl SystemBroadcast = new SecurityControl(DataSecurity.AuthConf, true, true);
 
 	public static SecurityControl of(final DataSecurity security, final boolean toolAccess) {
 		if (security == DataSecurity.None) {
@@ -57,19 +60,22 @@ public final class SecurityControl {
 				throw new IllegalArgumentException("tool access requires security");
 			return Plain;
 		}
-		return new SecurityControl(security, toolAccess);
+		return new SecurityControl(security, toolAccess, false);
 	}
 
-	private SecurityControl(final DataSecurity security) { this(security, false); }
+	private SecurityControl(final DataSecurity security) { this(security, false, false); }
 
-	private SecurityControl(final DataSecurity security, final boolean toolAccess) {
+	private SecurityControl(final DataSecurity security, final boolean toolAccess, final boolean systemBroadcast) {
 		this.security = security;
 		this.toolAccess = toolAccess;
+		this.systemBroadcast = systemBroadcast;
 	}
 
 	public DataSecurity security() { return security; }
 
 	public boolean toolAccess() { return toolAccess; }
+
+	public boolean systemBroadcast() { return systemBroadcast; }
 
 	@Override
 	public int hashCode() { return Objects.hash(security, toolAccess); }
