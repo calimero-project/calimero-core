@@ -1,6 +1,6 @@
 /*
     Calimero - A library for KNX network access
-    Copyright (c) 2019, 2020 B. Malinowsky
+    Copyright (c) 2019, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,10 +38,13 @@ package tuwien.auto.calimero.internal;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static tuwien.auto.calimero.DataUnitBuilder.fromHex;
 
 import java.nio.ByteBuffer;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,6 +61,7 @@ import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.link.AbstractLink;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.medium.TPSettings;
+import tuwien.auto.calimero.mgmt.SerialNumber;
 import tuwien.auto.calimero.mgmt.TransportLayer;
 import tuwien.auto.calimero.mgmt.TransportLayerImpl;
 
@@ -111,7 +115,7 @@ class SecureApplicationLayerTest {
 			long nextSequenceNumber(final boolean toolAccess) {
 				if (toolAccess)
 					return sequenceNumberToolAccess;
-				return 0;
+				return 5;
 			};
 
 			@Override
@@ -139,7 +143,7 @@ class SecureApplicationLayerTest {
 
 			@Override
 			void receivedSyncRequest(final IndividualAddress source, final KNXAddress dst, final boolean toolAccess,
-				final byte[] seq, final long challenge) {
+					final boolean sysBcast, final byte[] seq, final long challenge) {
 				receivedSyncRegChallenge = challenge;
 			}
 
@@ -156,7 +160,7 @@ class SecureApplicationLayerTest {
 		sal.close();
 	}
 
-	private byte[] secure(final int service, final IndividualAddress src, final KNXAddress dst, final byte[] data) {
+	private byte[] secure(final int service, final IndividualAddress src, final IndividualAddress dst, final byte[] data) {
 		final var secCtrl = SecurityControl.of(DataSecurity.AuthConf, true);
 		return sal.secure(service, src, dst, data, secCtrl).get();
 	}
@@ -276,7 +280,7 @@ class SecureApplicationLayerTest {
 				.putShort((short) (seqRemote >> 32)).putInt((int) seqRemote).array();
 		transportLayer.createDestination(local, true);
 		sequenceNumberToolAccess = 4;
-		sal.stashSyncRequest(local, 3);
+		sal.syncChallenge.set(3L);
 		// A+C
 		final byte[] secureApdu = secure(SecureApplicationLayer.SecureSyncResponse, remote, local, apdu);
 		assertArrayEquals(encryptedSyncRes, secureApdu);
@@ -292,5 +296,31 @@ class SecureApplicationLayerTest {
 		// seq remote = 3, seq local = 4
 		final byte[] expected = { 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 4 };
 		assertArrayEquals(expected, remoteAndLocalSeq);
+	}
+
+	private static final byte[] p2pKey = { (byte) 0xff, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (byte) 0xff };
+	private static final SerialNumber nonExistingSerialNo = SerialNumber.of(0x010203040506L);
+
+	@Test
+	void broadcastSyncRequest() {
+		final var e = assertThrows(ExecutionException.class,
+				() -> sal.broadcastSyncRequest(nonExistingSerialNo, p2pKey, false, false).get());
+		assertEquals(TimeoutException.class, e.getCause().getClass());
+	}
+
+	@Test
+	void systemBroadcastSyncRequest() {
+		sequenceNumberToolAccess = 1;
+		final var e = assertThrows(ExecutionException.class,
+				() -> sal.broadcastSyncRequest(nonExistingSerialNo, p2pKey, true, true).get());
+		assertEquals(TimeoutException.class, e.getCause().getClass());
+	}
+
+	@Test
+	void broadcastSyncRequestToolAccess() {
+		sequenceNumberToolAccess = 10;
+		final var e = assertThrows(ExecutionException.class,
+				() -> sal.broadcastSyncRequest(nonExistingSerialNo, toolKey, true, false).get());
+		assertEquals(TimeoutException.class, e.getCause().getClass());
 	}
 }
