@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2020 B. Malinowsky
+    Copyright (c) 2019, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -91,7 +91,7 @@ public final class Baos {
 				BAOS_MODE.invoke(link);
 			}
 			catch (final Throwable e) {
-				new KnxRuntimeException("adding custom BAOS event", e);
+				throw new KnxRuntimeException("adding custom BAOS event", e);
 			}
 		}
 
@@ -155,4 +155,6 @@ public final class Baos {
 	}
 
 	public static KnxBaosLink asBaosLink(final KNXNetworkLink link) { return new KnxBaosLink(link); }
+
+	private Baos() {}
 }

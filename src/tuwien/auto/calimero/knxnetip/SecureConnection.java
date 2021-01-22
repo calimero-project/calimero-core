@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2020 B. Malinowsky
+    Copyright (c) 2018, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -392,9 +392,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 		tunnel = new KNXnetIPTunnel(knxLayer, localEP, serverCtrlEP, useNat, tunnelingAddress) {
 			@Override
-			public String getName() {
-				return "KNX/IP " + secureSymbol + " Tunneling " + ctrlEndpt.getAddress().getHostAddress() + ":" + ctrlEndpt.getPort();
-			}
+			public String getName() { return "KNX/IP " + secureSymbol + " Tunneling " + hostPort(ctrlEndpt); }
 
 			@Override
 			protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset, final InetAddress src,
@@ -464,9 +462,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 		tunnel = new KNXnetIPDevMgmt(localEP, serverCtrlEP, useNat) {
 			@Override
-			public String getName() {
-				return "KNX/IP " + secureSymbol + " Management " + ctrlEndpt.getAddress().getHostAddress() + ":" + ctrlEndpt.getPort();
-			}
+			public String getName() { return "KNX/IP " + secureSymbol + " Management " + hostPort(ctrlEndpt); }
 
 			@Override
 			protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
@@ -537,6 +533,10 @@ public final class SecureConnection extends KNXnetIPRouting {
 		return new byte[6];
 	}
 
+	private static String hostPort(final InetSocketAddress addr) {
+		return addr.getAddress().getHostAddress() + ":" + addr.getPort();
+	}
+
 	@Override
 	public void addConnectionListener(final KNXListener l) {
 		if (tunnel != null)
@@ -600,16 +600,17 @@ public final class SecureConnection extends KNXnetIPRouting {
 			return true;
 		}
 
+		final var source = new InetSocketAddress(src, port);
 		if (svc == SecureSessionResponse) {
 			try {
-				final Object[] res = newSessionResponse(h, data, offset, src, port);
+				final Object[] res = newSessionResponse(h, data, offset, source);
 
 				final byte[] serverPublicKey = (byte[]) res[1];
 				final byte[] auth = newSessionAuth(serverPublicKey);
 				final byte[] packet = newSecurePacket(session.nextSendSeq(), 0, auth);
 				logger.debug("secure session {}, request access for user {}", sessionId, session.user());
 				if (localSocket != null)
-					localSocket.send(new DatagramPacket(packet, packet.length, src, port));
+					localSocket.send(new DatagramPacket(packet, packet.length, source));
 				else
 					session.connection().send(packet);
 			}
@@ -633,8 +634,8 @@ public final class SecureConnection extends KNXnetIPRouting {
 			final Object[] fields = unwrap(h, data, offset);
 			final long timestamp = (long) fields[1];
 			if (sessionId == 0 && !withinTolerance(src, timestamp, (byte[]) fields[2], (int) fields[3])) {
-				logger.warn("{}:{} timestamp {} outside latency tolerance of {} ms (local {}) - ignore", src,
-						port, timestamp, mcastLatencyTolerance, timestamp());
+				logger.warn("{} timestamp {} outside latency tolerance of {} ms (local {}) - ignore", hostPort(source),
+						timestamp, mcastLatencyTolerance, timestamp());
 				return true;
 			}
 
@@ -673,9 +674,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 	// unicast session
 	// session.req -> session.res -> auth.req -> session-status
 	private void setupSecureSession(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP) throws KNXException {
-
-		logger = LoggerFactory.getLogger("calimero.knxnetip.KNX/IP " + secureSymbol + " Session "
-				+ serverCtrlEP.getAddress().getHostAddress() + ":" + serverCtrlEP.getPort());
+		logger = LoggerFactory.getLogger("calimero.knxnetip.KNX/IP " + secureSymbol + " Session " + hostPort(serverCtrlEP));
 
 		logger.debug("setup secure session with {}", serverCtrlEP);
 		try {
@@ -734,9 +733,9 @@ public final class SecureConnection extends KNXnetIPRouting {
 			if (tag != sentGroupSyncTag || !isLocalIpAddress(src))
 				syncedWithGroup(byTimerNotify, sn, tag);
 		}
-		else if (timestamp > (local - mcastLatencyTolerance)) {
+//		else if (timestamp > (local - mcastLatencyTolerance)) {
 			// received old timestamp within tolerance, do nothing
-		}
+//		}
 		else if (timestamp <= (local - mcastLatencyTolerance)) {
 			// received outdated timestamp, schedule group sync if we haven't done so already ...
 			if (periodicSchedule) {
@@ -833,7 +832,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 			// schedule next sync before send to maintain happens-before with sync rcv
 			becomeTimeKeeper();
 			scheduleGroupSync(periodicNotifyDelay());
-			socket.send(new DatagramPacket(sync, sync.length, dataEndpt.getAddress(), dataEndpt.getPort()));
+			socket.send(new DatagramPacket(sync, sync.length, dataEndpt));
 		}
 		catch (IOException | RuntimeException e) {
 			if (socket.isClosed()) {
@@ -972,8 +971,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 	}
 
 	private Object[] newSessionResponse(final KNXnetIPHeader h, final byte[] data, final int offset,
-			final InetAddress src, final int port)
-		throws KNXFormatException {
+			final InetSocketAddress src) throws KNXFormatException {
 
 		if (h.getServiceType() != SecureSessionResponse)
 			throw new IllegalArgumentException("no secure channel response");
@@ -995,7 +993,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 		final boolean skipDeviceAuth = Arrays.equals(session.deviceAuthKey().getEncoded(), new byte[16]);
 		if (skipDeviceAuth) {
-			logger.warn("skipping device authentication of {}:{} (no device key)", src.getHostAddress(), port);
+			logger.warn("skipping device authentication of {} (no device key)", hostPort(src));
 		}
 		else {
 			final ByteBuffer mac = decrypt(buffer, session.deviceAuthKey(), securityInfo(new byte[16], 0, 0xff00));

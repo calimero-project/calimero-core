@@ -520,7 +520,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @throws KNXDisconnectException on transport layer disconnect in connection-oriented mode
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws InterruptedException on interrupted thread
-	 * @see restart(Destination, EraseCode, int) details on restart behavior
+	 * @see #restart(Destination, EraseCode, int)
 	 */
 	default int restart(final Destination dst, final int eraseCode, final int channel) throws KNXTimeoutException,
 			KNXRemoteException, KNXDisconnectException, KNXLinkClosedException, InterruptedException {

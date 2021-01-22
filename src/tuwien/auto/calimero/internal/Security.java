@@ -72,7 +72,7 @@ public final class Security {
 	 * @return instance used for default KNX installation
 	 */
 	// ??? naming: knx installation id is linked to project id and not stored in keyring nor in many interfaces
-	public static final Security defaultInstallation() { return defInst; }
+	public static Security defaultInstallation() { return defInst; }
 
 	public void useKeyring(final Keyring keyring, final char[] password) {
 		final var devices = keyring.devices();

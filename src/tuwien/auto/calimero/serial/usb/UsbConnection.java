@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2020 B. Malinowsky
+    Copyright (c) 2015, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -174,7 +174,7 @@ public class UsbConnection implements AutoCloseable
 	private static final Map<Integer, List<Integer>> vendorProductIds = loadKnxUsbVendorProductIds();
 
 	private static Map<Integer, List<Integer>> loadKnxUsbVendorProductIds() {
-		try (final var is = UsbConnection.class.getResourceAsStream("/knxUsbVendorProductIds")) {
+		try (var is = UsbConnection.class.getResourceAsStream("/knxUsbVendorProductIds")) {
 			final var lines = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8)).lines();
 			final int[] currentVendor = new int[1];
 			return Map.copyOf(lines.filter(s -> !s.startsWith("#") && !s.isBlank())
@@ -801,7 +801,7 @@ public class UsbConnection implements AutoCloseable
 	private void fireFrameReceived(final KnxTunnelEmi emiType, final byte[] frame) throws KNXFormatException
 	{
 		logger.debug("received {} frame {}", emiType, DataUnitBuilder.toHex(frame, ""));
-		final FrameEvent fe ;
+		final FrameEvent fe;
 		// check baos main service and forward frame as raw bytes
 		if ((frame[0] & 0xff) == 0xf0)
 			fe = new FrameEvent(this, frame);
@@ -1102,7 +1102,7 @@ public class UsbConnection implements AutoCloseable
 			slogger.error("LibUsb initialization error {}: {}", -err, LibUsb.strError(err));
 			return null;
 		}
-		try {
+//		try {
 			final DeviceList list = new DeviceList();
 			final int res = LibUsb.getDeviceList(ctx, list);
 			if (res < 0) {
@@ -1126,11 +1126,11 @@ public class UsbConnection implements AutoCloseable
 			finally {
 				LibUsb.freeDeviceList(list, true);
 			}
-		}
-		finally {
+//		}
+//		finally {
 			// we can't call exit here, as we return a Device for subsequent usage
 //			LibUsb.exit(ctx);
-		}
+//		}
 		return null;
 	}
 

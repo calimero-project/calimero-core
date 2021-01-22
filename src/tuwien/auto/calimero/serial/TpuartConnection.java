@@ -645,7 +645,8 @@ public class TpuartConnection implements AutoCloseable
 							else {
 								// check repetition of a directly preceding correctly received frame
 								final boolean repeated = (data[0] & RepeatFlag) == 0;
-								if (repeated && Arrays.equals(lastReceived, 0, lastReceived.length - 2, frame, 0, data.length - 2)) {
+								if (repeated && Arrays.equals(lastReceived, 0, lastReceived.length - 2, frame, 0,
+										data.length - 2)) {
 									logger.debug("ignore repetition of directly preceding correctly received frame");
 								}
 								else {

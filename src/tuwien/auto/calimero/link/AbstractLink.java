@@ -128,11 +128,12 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	final Map<Class<?>, Set<MethodHandle>> customEvents = new ConcurrentHashMap<>();
 
 
-
 	private final class LinkNotifier extends EventNotifier<NetworkLinkListener>
 	{
-		LinkNotifier()
-		{
+		private static final int PeiIdentifyCon = 0xa8;
+		private static final int BaosMainService = 0xf0;
+
+		LinkNotifier() {
 			super(AbstractLink.this, AbstractLink.this.logger);
 		}
 
@@ -147,7 +148,6 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 					if (BcuSwitcher.isEmi1GetValue(frame[0] & 0xff))
 						return;
 
-					final int PeiIdentifyCon = 0xa8;
 					if ((frame[0] & 0xff) == PeiIdentifyCon) {
 						logger.info("PEI identify {}", DataUnitBuilder.toHex(frame, " "));
 						final int manufacturer = unsigned(frame[3], frame[4]);
@@ -157,7 +157,6 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 					}
 
 					// intercept BAOS services (ObjectServer protocol)
-					final int BaosMainService = 0xf0;
 					if ((frame[0] & 0xff) == BaosMainService) {
 						final var baosEvent = BaosService.from(ByteBuffer.wrap(frame));
 						dispatchCustomEvent(baosEvent);
