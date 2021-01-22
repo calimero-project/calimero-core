@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2020 B. Malinowsky
+    Copyright (c) 2010, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,7 +52,6 @@ import java.util.stream.IntStream;
 import org.slf4j.Logger;
 
 import tuwien.auto.calimero.CloseEvent;
-import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.DetachEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.IndividualAddress;
@@ -322,30 +321,19 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	}
 
 	@Override
-	public IndividualAddress readAddress(final byte[] serialNo) throws KNXException,
-		InterruptedException
-	{
+	public IndividualAddress readAddress(final SerialNumber serialNo) throws KNXException, InterruptedException {
 		return mc.readAddress(serialNo);
 	}
 
 	@Override
-	public boolean writeAddress(final byte[] serialNo, final IndividualAddress newAddress)
-		throws KNXException, InterruptedException
-	{
+	public boolean writeAddress(final SerialNumber serialNo, final IndividualAddress newAddress)
+			throws KNXException, InterruptedException {
 		mc.writeAddress(serialNo, newAddress);
 		final IndividualAddress chk = mc.readAddress(serialNo);
 		final boolean equals = chk.equals(newAddress);
-		final String s = " on device [s/n] " + DataUnitBuilder.toHex(serialNo, "");
-		if (equals)
-			logger.info("wrote device address " + newAddress + s);
-		else
-			logger.error("write device address reported " + chk + ", not " + newAddress + s);
+		if (!equals)
+			logger.warn("write device address {}/{} reported back {}", serialNo, newAddress, chk);
 		return equals;
-		// old code threw generic exception (with no return value),
-		// don't think that's the way to go
-		//if (!equals)
-		//	throw new KNXException("Device address is " + chk + " instead of "
-		//		+ newAddress);
 	}
 
 	@Override
