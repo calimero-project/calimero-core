@@ -31,6 +31,7 @@ Supported Features
 * KNX USB
 * KNX FT1.2 protocol (serial connections using EMI2 or cEMI)
 * TP-UART (access TP1 networks over serial connections)
+* BAOS (Bus Access und Object Server)
 
 ### Process Communication
 * DPT encoding/decoding of Java/KNX data types
@@ -114,9 +115,9 @@ More Features, Tools, Examples
 ------------------------------
 
 * [introduction](https://github.com/calimero-project/introduction) provides code examples for programming with Calimero.
-* [calimero-tools](https://github.com/calimero-project/calimero-tools) offers command-line tools for KNX process communication, monitoring, and management.
-* [calimero-gui](https://github.com/calimero-project/calimero-gui) provides a graphical user interface (based on SWT) for process communication, monitoring, and management.
-* [calimero-server](https://github.com/calimero-project/calimero-server) is the Calimero KNXnet/IP Server and provides KNXnet/IP access to KNX networks.
+* [calimero-tools](https://github.com/calimero-project/calimero-tools) offers command-line tools for (secure) KNX process communication, monitoring, and management, BAOS communication, and ETS 5 datapoint impport.
+* [calimero-gui](https://github.com/calimero-project/calimero-gui) provides a graphical user interface (based on SWT) for (secure) process communication, monitoring, and management.
+* [calimero-server](https://github.com/calimero-project/calimero-server) is the Calimero KNXnet/IP Server and provides KNXnet/IP (Secure) access to KNX networks.
 * [calimero-device](https://github.com/calimero-project/calimero-device) is the communication stack to implement a KNX device.
 * [serial-native](https://github.com/calimero-project/serial-native) provides native libraries for serial port access (using JNI) on Windows, Linux, and MacOS.
-* [import-ets-xml](https://github.com/calimero-project/import-ets-xml) imports ETS XML KNX datapoints for use with Calimero.
+* [import-ets-xml](https://github.com/calimero-project/import-ets-xml) imports ETS XML KNX datapoints for use with Calimero (ETS 5.7 and later is not supported, use [calimero-tools](https://github.com/calimero-project/calimero-tools)).
