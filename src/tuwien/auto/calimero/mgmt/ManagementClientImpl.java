@@ -63,7 +63,6 @@ import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.DetachEvent;
 import tuwien.auto.calimero.FrameEvent;
-import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -226,6 +225,8 @@ public class ManagementClientImpl implements ManagementClient
 
 	private final EventListeners<Consumer<FrameEvent>> listeners;
 
+	SecureManagement secureApplicationLayer() { return sal; }
+
 	/**
 	 * Creates a new management client attached to the supplied KNX network link.
 	 * <p>
@@ -335,7 +336,7 @@ public class ManagementClientImpl implements ManagementClient
 			throws KNXTimeoutException, KNXLinkClosedException {
 		final byte[] apdu = DataUnitBuilder.apdu(IND_ADDR_SN_WRITE).put(serialNo.array()).put(newAddress.toByteArray())
 				.putShort(0).putShort(0).build();
-		broadcast(false, Priority.SYSTEM, apdu, false);
+		broadcast(serialNo, new IndividualAddress(0), false, Priority.SYSTEM, apdu, false);
 	}
 
 	@Override
@@ -353,7 +354,7 @@ public class ManagementClientImpl implements ManagementClient
 	public void writeDomainAddress(final byte[] domain) throws KNXTimeoutException, KNXLinkClosedException {
 		if (domain.length != 2 && domain.length != 6)
 			throw new KNXIllegalArgumentException("invalid length of domain address");
-		broadcast(true, priority, createAPDU(DOA_WRITE, domain), false);
+		broadcast(SerialNumber.of(0), new IndividualAddress(0), true, priority, createAPDU(DOA_WRITE, domain), false);
 	}
 
 	@Override
@@ -363,19 +364,20 @@ public class ManagementClientImpl implements ManagementClient
 			throw new KNXIllegalArgumentException("domain address with invalid length " + domain.length);
 		final var apdu = DataUnitBuilder.apdu(DomainAddressSerialNumberWrite).put(serialNumber.array()).put(domain).build();
 		final boolean requireSecure = domain.length == 21;
-		broadcast(true, priority, apdu, requireSecure);
+		broadcast(serialNumber, new IndividualAddress(0), true, priority, apdu, requireSecure);
 	}
 
-	private void broadcast(final boolean systemBcast, final Priority p, final byte[] apdu, final boolean requireSecure)
+	private void broadcast(final SerialNumber serialNumber, final IndividualAddress dst, final boolean systemBcast,
+			final Priority p, final byte[] apdu, final boolean requireSecure)
 			throws KNXTimeoutException, KNXLinkClosedException {
 		try {
-			final var tsdu = sal
-					.secureData(src, GroupAddress.Broadcast, apdu, SecurityControl.of(DataSecurity.AuthConf, true))
-					.orElseGet(() -> {
-						if (requireSecure)
-							throw new KnxSecureException("broadcast requires data security");
-						return apdu;
-					});
+			final var securityCtrl = systemBcast ? SecurityControl.SystemBroadcast
+					: SecurityControl.of(DataSecurity.AuthConf, true);
+			final var tsdu = sal.secureBroadcastData(src, serialNumber, dst, apdu, securityCtrl).orElseGet(() -> {
+				if (requireSecure)
+					throw new KnxSecureException("broadcast requires data security");
+				return apdu;
+			});
 			tl.broadcast(systemBcast, p, tsdu);
 		}
 		catch (final InterruptedException e) {

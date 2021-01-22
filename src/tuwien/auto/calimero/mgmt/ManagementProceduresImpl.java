@@ -37,6 +37,7 @@
 package tuwien.auto.calimero.mgmt;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,6 +45,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -59,9 +62,12 @@ import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.internal.SecureApplicationLayer;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
+import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.log.LogService;
+import tuwien.auto.calimero.mgmt.ManagementClient.EraseCode;
 
 /**
  * An implementation of {@link ManagementProcedures}.
@@ -223,6 +229,52 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			catch (final KNXTimeoutException e) {}
 			finally {
 				mc.responseTimeout(oldTimeout);
+			}
+		}
+	}
+
+	private static final int routerObjectType = 6;
+	private static final int pidIpSbcControl = 120;
+
+	public void writeDomainAddress(final SerialNumber serialNumber, final byte[] domainAddress,
+			final List<IndividualAddress> knxipRouters) throws KNXException, InterruptedException {
+
+		final var ipSbcEnabled = new ArrayList<Destination>();
+		for (final var router : knxipRouters) {
+			final var dst = getOrCreateDestination(router);
+			try {
+				mc.callFunctionProperty(dst, routerObjectType, 1, pidIpSbcControl, (byte) 0, (byte) 1);
+				ipSbcEnabled.add(dst);
+			}
+			catch (KNXDisconnectException | KNXRemoteException e) {
+				logger.warn("failed to enable IP system broadcast on {}, {}", router, e.getMessage());
+			}
+		}
+
+		try {
+			for (int i = 0; i < 2; ++i) {
+				mc.writeDomainAddress(serialNumber, domainAddress);
+				Thread.sleep(1000);
+
+				if (domainAddress.length == 4 || domainAddress.length == 21) {
+					final int maxRoutingTimerSync = 25_700;
+					Thread.sleep(maxRoutingTimerSync);
+				}
+				try {
+					mc.readAddress(serialNumber);
+					break;
+				}
+				catch (final KNXTimeoutException e) {
+					Thread.sleep(1000);
+				}
+			}
+		}
+		finally {
+			for (final var dst : ipSbcEnabled) {
+				try {
+					mc.callFunctionProperty(dst, routerObjectType, 1, pidIpSbcControl, (byte) 0, (byte) 0);
+				}
+				catch (KNXDisconnectException | KNXRemoteException ignore) {}
 			}
 		}
 	}
@@ -514,6 +566,84 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			System.arraycopy(range, 0, read, i, range.length);
 		}
 		return read;
+	}
+
+	public void assignDomainAndDeviceAddress(final byte[] domainAddress, final IndividualAddress deviceAddress,
+			final byte[] fdsk, final byte[] toolKey, final Duration maxLookup) throws KNXException, InterruptedException {
+
+		final var deadline = Instant.now().plus(maxLookup);
+		var list = List.<byte[]>of();
+		while (Instant.now().isBefore(deadline) && list.isEmpty())
+			list = mc.readSystemNetworkParameter(0, PropertyAccess.PID.SERIAL_NUMBER, 1);
+		if (list.size() != 1)
+			throw new KNXRemoteException("" + (list.isEmpty() ? "no" : list.size()) + " devices in programming mode");
+		final var sno = SerialNumber.from(list.get(0));
+
+		final int medium = ((TransportLayerImpl) tl).link().getKNXMedium().getMedium();
+		final boolean openMedium = medium == KNXMediumSettings.MEDIUM_PL110 || medium == KNXMediumSettings.MEDIUM_RF;
+		final boolean sysBcast = openMedium;
+		final SecureManagement sal  = ((ManagementClientImpl) mc).secureApplicationLayer();
+
+		final var result = broadacstSync(sal, sysBcast, sno, fdsk, toolKey);
+		final boolean usesFdsk = (boolean) result[0];
+		final AutoCloseable removeableKey = (AutoCloseable) result[1];
+
+		if (openMedium) {
+			writeDomainAddress(sno, domainAddress, List.of());
+		}
+		writeAddress(sno, deviceAddress);
+
+		try {
+			removeableKey.close();
+		}
+		catch (final Exception ignore) {}
+
+		sal.security().deviceToolKeys().put(deviceAddress, usesFdsk ? fdsk : toolKey);
+
+		final var dst = getOrCreateDestination(deviceAddress);
+		final int pidSecurityMode = 51;
+		final int securityObjectType = 17;
+		mc.callFunctionProperty(dst, securityObjectType, 1, pidSecurityMode, (byte) 0, (byte) 1);
+
+		if (usesFdsk) {
+			final int pidToolKey = 56;
+			// mgmt client will update map of device toolkeys to use this toolkey
+			mc.writeProperty(dst, securityObjectType, 1, pidToolKey, 1, 1, toolKey);
+		}
+
+		// NYI KNX IP Secure setup
+
+		mc.restart(dst, EraseCode.ConfirmedRestart, 0);
+	}
+
+	private Object[] broadacstSync(final SecureApplicationLayer sal, final boolean systemBroadcast,
+			final SerialNumber serialNo, final byte[] fdsk, final byte[] toolKey) throws KNXException,
+			InterruptedException {
+
+		final String errMsg = String.format("sync.req with device S/N %s failed", serialNo);
+		final boolean toolAccess = true;
+		if (fdsk.length != 0) {
+			try {
+				final var request = sal.broadcastSyncRequest(serialNo, fdsk, toolAccess, systemBroadcast);
+				final var broadcastKey = request.get();
+				return new Object[] { true, broadcastKey };
+			}
+			catch (final ExecutionException e) {
+				if (!(e.getCause() instanceof TimeoutException))
+					throw new KNXException(errMsg + ", device not using FDSK", e.getCause());
+			}
+		}
+
+		try {
+			final var request = sal.broadcastSyncRequest(serialNo, toolKey, toolAccess, systemBroadcast);
+			final var broadcastKey = request.get();
+			return new Object[] { false, broadcastKey };
+		}
+		catch (final ExecutionException e) {
+			if (e.getCause() instanceof TimeoutException)
+				throw new KNXTimeoutException(errMsg + ", device with unknown key or in ex-factory state");
+			throw new KNXException(errMsg, e.getCause());
+		}
 	}
 
 	@Override
