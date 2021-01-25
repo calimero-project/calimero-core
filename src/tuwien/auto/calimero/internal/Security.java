@@ -44,7 +44,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.Keyring;
-import tuwien.auto.calimero.mgmt.SerialNumber;
+import tuwien.auto.calimero.SerialNumber;
 
 public final class Security {
 

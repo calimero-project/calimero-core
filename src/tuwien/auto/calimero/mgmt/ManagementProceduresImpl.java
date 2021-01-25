@@ -62,6 +62,7 @@ import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.SerialNumber;
 import tuwien.auto.calimero.internal.SecureApplicationLayer;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;

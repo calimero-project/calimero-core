@@ -34,11 +34,9 @@
     version.
 */
 
-package tuwien.auto.calimero.mgmt;
+package tuwien.auto.calimero;
 
 import java.nio.ByteBuffer;
-
-import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 /**
  * Represents a KNX serial number.

@@ -56,12 +56,12 @@ import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.SecurityControl;
+import tuwien.auto.calimero.SerialNumber;
 import tuwien.auto.calimero.SecurityControl.DataSecurity;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.link.AbstractLink;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.medium.TPSettings;
-import tuwien.auto.calimero.mgmt.SerialNumber;
 import tuwien.auto.calimero.mgmt.TransportLayer;
 import tuwien.auto.calimero.mgmt.TransportLayerImpl;
 

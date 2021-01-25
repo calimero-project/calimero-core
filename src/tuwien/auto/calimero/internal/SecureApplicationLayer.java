@@ -78,6 +78,7 @@ import tuwien.auto.calimero.KnxSecureException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.ReturnCode;
 import tuwien.auto.calimero.SecurityControl;
+import tuwien.auto.calimero.SerialNumber;
 import tuwien.auto.calimero.SecurityControl.DataSecurity;
 import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.cemi.CEMILData;
@@ -85,7 +86,6 @@ import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.NetworkLinkListener;
 import tuwien.auto.calimero.log.LogService;
-import tuwien.auto.calimero.mgmt.SerialNumber;
 
 /**
  * Secure application layer for KNX data security.

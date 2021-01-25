@@ -73,6 +73,7 @@ import tuwien.auto.calimero.KnxSecureException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.ReturnCode;
 import tuwien.auto.calimero.SecurityControl;
+import tuwien.auto.calimero.SerialNumber;
 import tuwien.auto.calimero.SecurityControl.DataSecurity;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMILData;
