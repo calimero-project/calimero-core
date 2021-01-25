@@ -46,6 +46,9 @@ public final class SerialNumber {
 	/** Size of a KNX serial number in bytes. */
 	public static final int Size = 6;
 
+	/** Serial number 0. */
+	public static final SerialNumber Zero = SerialNumber.of(0);
+
 	private final long sno;
 
 	private SerialNumber(final long serialNumber) { sno = serialNumber & 0xffff_ffff_ffffL; }

@@ -112,7 +112,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 
 
 	private final KNXNetworkLink link;
-	private final byte[] serialNumber;
+	private final SerialNumber serialNumber;
 	private final Logger logger;
 
 	// local sequences
@@ -205,29 +205,26 @@ public class SecureApplicationLayer implements AutoCloseable {
 	}
 
 	public SecureApplicationLayer(final KNXNetworkLink link, final Security security) {
-		this(link, new byte[6], 0, security);
+		this(link, SerialNumber.Zero, 0, security);
 		link.addLinkListener(linkListener);
 	}
 
 	public SecureApplicationLayer(final KNXNetworkLink link, final Map<GroupAddress, byte[]> groupKeys,
 			final Map<GroupAddress, Set<IndividualAddress>> groupSenders,
 			final Map<IndividualAddress, byte[]> deviceToolKeys) {
-		this(link, new byte[6], 0, Security.withKeys(deviceToolKeys, groupKeys, groupSenders));
+		this(link, SerialNumber.Zero, 0, Security.withKeys(deviceToolKeys, groupKeys, groupSenders));
 		link.addLinkListener(linkListener);
 	}
 
-	protected SecureApplicationLayer(final KNXNetworkLink link, final byte[] serialNumber, final long sequenceNumber,
-			final Map<IndividualAddress, byte[]> deviceToolKeys) {
+	protected SecureApplicationLayer(final KNXNetworkLink link, final SerialNumber serialNumber,
+			final long sequenceNumber, final Map<IndividualAddress, byte[]> deviceToolKeys) {
 		this(link, serialNumber, sequenceNumber, Security.withKeys(deviceToolKeys, Map.of(), Map.of()));
 	}
 
-	private SecureApplicationLayer(final KNXNetworkLink link, final byte[] serialNumber, final long sequenceNumber,
+	private SecureApplicationLayer(final KNXNetworkLink link, final SerialNumber serialNumber, final long sequenceNumber,
 			final Security security) {
 		this.link = link;
-
-		if (serialNumber.length != 6)
-			throw new KNXIllegalArgumentException("serial number not 6 bytes");
-		this.serialNumber = serialNumber.clone();
+		this.serialNumber = serialNumber;
 
 		this.logger = LogService.getLogger("calimero." + secureSymbol + "-AL " + link.getName());
 
@@ -369,7 +366,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 
 	private Optional<byte[]> secure(final int service, final IndividualAddress src, final KNXAddress dst,
 			final byte[] apdu, final SecurityControl secCtrl, final byte[] key) {
-		return secure(service, src, SerialNumber.of(0), dst, apdu, secCtrl, key);
+		return secure(service, src, SerialNumber.Zero, dst, apdu, secCtrl, key);
 	}
 
 	private Optional<byte[]> secure(final int service, final IndividualAddress src, final SerialNumber dstSno,
@@ -567,7 +564,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 		else if (syncReq) {
 			asdu.get(sno);
 			// ignore sync.reqs not addressed to us
-			if (!Arrays.equals(sno, serialNumber)) {
+			if (!serialNumber.equals(SerialNumber.from(sno))) {
 				if (securityCtrl.systemBroadcast() || !dst.equals(address()) || !Arrays.equals(sno, new byte[6]))
 					return new SalService(securityCtrl, new byte[0]);
 			}

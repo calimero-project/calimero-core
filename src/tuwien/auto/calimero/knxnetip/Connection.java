@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019 B. Malinowsky
+    Copyright (c) 2019, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -86,6 +86,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.KnxRuntimeException;
 import tuwien.auto.calimero.KnxSecureException;
+import tuwien.auto.calimero.SerialNumber;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
@@ -174,7 +175,7 @@ public final class Connection implements Closeable {
 		private PrivateKey privateKey;
 		private final byte[] publicKey = new byte[keyLength];
 
-		private final byte[] sno;
+		private final SerialNumber sno;
 
 		private int sessionId;
 		private volatile SessionState sessionState = SessionState.Idle;
@@ -217,7 +218,7 @@ public final class Connection implements Closeable {
 
 		public SecretKey userKey() { return userKey; }
 
-		public byte[] serialNumber() { return sno.clone(); }
+		public SerialNumber serialNumber() { return sno; }
 
 		public Connection connection() { return conn; }
 
@@ -377,9 +378,7 @@ public final class Connection implements Closeable {
 				}
 			}
 			else if (svc == SecureWrapper) {
-				final Object[] fields = unwrap(h, data, offset);
-
-				final byte[] packet = (byte[]) fields[1];
+				final byte[] packet = unwrap(h, data, offset);
 				final var plainHeader = new KNXnetIPHeader(packet, 0);
 				final var hdrLen = plainHeader.getStructLength();
 
@@ -456,7 +455,7 @@ public final class Connection implements Closeable {
 			return SecureConnection.newSecurePacket(sessionId, nextSendSeq(), sno, 0, plainPacket, secretKey);
 		}
 
-		private Object[] unwrap(final KNXnetIPHeader h, final byte[] data, final int offset) throws KNXFormatException {
+		private byte[] unwrap(final KNXnetIPHeader h, final byte[] data, final int offset) throws KNXFormatException {
 			final Object[] fields = SecureConnection.unwrap(h, data, offset, secretKey);
 
 			final int sid = (int) fields[0];
@@ -468,14 +467,13 @@ public final class Connection implements Closeable {
 				throw new KnxSecureException("received secure packet with sequence " + seq + " < expected " + rcvSeq);
 			rcvSeq.incrementAndGet();
 
-			final long snLong = (long) fields[2];
-			final byte[] sn = ByteBuffer.allocate(6).putShort((short) (snLong >> 32)).putInt((int) snLong).array();
+			final var sn = (SerialNumber) fields[2];
 			final int tag = (int) fields[3];
 			if (tag != 0)
 				throw new KnxSecureException("expected message tag 0, received " + tag);
 			final byte[] knxipPacket = (byte[]) fields[4];
-			logger.trace("received (seq {} S/N {}) {}", seq, toHex(sn, ""), toHex(knxipPacket, " "));
-			return new Object[] { sn, fields[4] };
+			logger.trace("received (seq {} S/N {}) {}", seq, sn, toHex(knxipPacket, " "));
+			return knxipPacket;
 		}
 
 		private byte[] parseSessionResponse(final KNXnetIPHeader h, final byte[] data, final int offset,
@@ -585,25 +583,25 @@ public final class Connection implements Closeable {
 			return gen.generateKeyPair();
 		}
 
-		private static byte[] deriveSerialNumber(final InetSocketAddress localEP) {
+		private static SerialNumber deriveSerialNumber(final InetSocketAddress localEP) {
 			try {
 				if (localEP != null)
 					return deriveSerialNumber(NetworkInterface.getByInetAddress(localEP.getAddress()));
 			}
 			catch (final SocketException ignore) {}
-			return new byte[6];
+			return SerialNumber.Zero;
 		}
 
-		private static byte[] deriveSerialNumber(final NetworkInterface netif) {
+		private static SerialNumber deriveSerialNumber(final NetworkInterface netif) {
 			try {
 				if (netif != null) {
 					final byte[] hardwareAddress = netif.getHardwareAddress();
 					if (hardwareAddress != null)
-						return Arrays.copyOf(hardwareAddress, 6);
+						return SerialNumber.from(Arrays.copyOf(hardwareAddress, 6));
 				}
 			}
 			catch (final SocketException ignore) {}
-			return new byte[6];
+			return SerialNumber.Zero;
 		}
 	}
 

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ package tuwien.auto.calimero.link.medium;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.SerialNumber;
 
 /**
  * Provides settings necessary for communication on RF medium.
@@ -50,7 +51,7 @@ public class RFSettings extends KNXMediumSettings
 	private static final byte[] broadcastDomain = new byte[6];
 
 	private byte[] doa;
-	private byte[] sno;
+	private final SerialNumber sno;
 	private final boolean unidir;
 
 	/**
@@ -65,7 +66,7 @@ public class RFSettings extends KNXMediumSettings
 	{
 		super(device);
 		doa = broadcastDomain;
-		sno = new byte[6];
+		sno = SerialNumber.Zero;
 		unidir = false;
 	}
 
@@ -75,16 +76,24 @@ public class RFSettings extends KNXMediumSettings
 	 * @param device device individual device address to use as source address in KNX messages
 	 * @param domain byte array containing the domain address to use in KNX messages, address is given in network byte
 	 *        order, <code>domain.length</code> = 6, supplying <code>null</code> defaults to the broadcast domain
-	 * @param serialNumber serial number of the device, <code>serialNumber.length</code> = 6
+	 * @param serialNumber serial number of the device
 	 * @param unidirectional <code>true</code> to indicate an unidirectional device, <code>false</code> otherwise
 	 */
-	public RFSettings(final IndividualAddress device, final byte[] domain,
-		final byte[] serialNumber, final boolean unidirectional)
-	{
+	public RFSettings(final IndividualAddress device, final byte[] domain, final SerialNumber serialNumber,
+			final boolean unidirectional) {
 		super(device);
 		setDomainAddress(domain);
-		setSerial(serialNumber);
+		sno = serialNumber;
 		unidir = unidirectional;
+	}
+
+	/**
+	 * @deprecated Use {@link #RFSettings(IndividualAddress, byte[], SerialNumber, boolean)}
+	 */
+	@Deprecated
+	public RFSettings(final IndividualAddress device, final byte[] domain,
+			final byte[] serialNumber, final boolean unidirectional) {
+		this(device, domain, SerialNumber.from(serialNumber), unidirectional);
 	}
 
 	/**
@@ -115,14 +124,20 @@ public class RFSettings extends KNXMediumSettings
 	}
 
 	/**
-	 * Returns the serial number of the device.
-	 *
-	 * @return serial number as byte array of length = 6
+	 * @deprecated Use {@link #serialNumber()}
 	 */
+	@Deprecated
 	public final byte[] getSerialNumber()
 	{
-		return sno.clone();
+		return sno.array();
 	}
+
+	/**
+	 * Returns the serial number.
+	 *
+	 * @return serial number
+	 */
+	public final SerialNumber serialNumber() { return sno; }
 
 	/**
 	 * Returns whether unidirectional device is set.
@@ -143,19 +158,7 @@ public class RFSettings extends KNXMediumSettings
 	@Override
 	public String toString()
 	{
-		return super.toString() + " domain 0x" + DataUnitBuilder.toHex(doa, null) + " s/n 0x"
-				+ DataUnitBuilder.toHex(sno, null) + (unidir ? " unidirectional" : "");
-	}
-
-	/**
-	 * Sets a new serial number.
-	 *
-	 * @param serial serial number of the device, <code>serial.length</code> = 6,
-	 */
-	private void setSerial(final byte[] serial)
-	{
-		if (serial.length != 6)
-			throw new KNXIllegalArgumentException("invalid length of serial number");
-		sno = serial.clone();
+		return super.toString() + " domain 0x" + DataUnitBuilder.toHex(doa, null) + " s/n "
+				+ sno + (unidir ? " unidirectional" : "");
 	}
 }

@@ -560,21 +560,22 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		String s = "";
 		if (medium instanceof PLSettings) {
 			final CEMILDataEx f = (CEMILDataEx) msg;
-			if (f.getAdditionalInfo(AdditionalInfo.PlMedium) == null)
-				f.additionalInfo().add(AdditionalInfo.of(AdditionalInfo.PlMedium, ((PLSettings) medium).getDomainAddress()));
+			if (f.getAdditionalInfo(AdditionalInfo.PlMedium) != null)
+				return;
+			f.additionalInfo().add(AdditionalInfo.of(AdditionalInfo.PlMedium, ((PLSettings) medium).getDomainAddress()));
 		}
 		else if (medium.getMedium() == KNXMediumSettings.MEDIUM_RF) {
 			final CEMILDataEx f = (CEMILDataEx) msg;
-			if (f.getAdditionalInfo(AdditionalInfo.RfMedium) == null) {
-				final RFSettings rf = (RFSettings) medium;
-				final byte[] sn = f.isDomainBroadcast() ? rf.getDomainAddress() : rf.getSerialNumber();
-				f.additionalInfo().add(new RFMediumInfo(true, rf.isUnidirectional(), sn, 255, f.isSystemBroadcast()));
-				s = f.isDomainBroadcast() ? "(using domain address)" : "(using device SN)";
-			}
+			if (f.getAdditionalInfo(AdditionalInfo.RfMedium) != null)
+				return;
+			final RFSettings rf = (RFSettings) medium;
+			final byte[] sn = f.isDomainBroadcast() ? rf.getDomainAddress() : rf.serialNumber().array();
+			f.additionalInfo().add(new RFMediumInfo(true, rf.isUnidirectional(), sn, 255, f.isSystemBroadcast()));
+			s = f.isDomainBroadcast() ? " (using domain address)" : " (using device SN)";
 		}
 		else
 			return;
-		logger.trace("add cEMI additional info for {} {}", medium.getMediumString(), s);
+		logger.trace("add cEMI additional info for {}{}", medium.getMediumString(), s);
 	}
 
 	// Creates the target EMI format using L-Data message parameters

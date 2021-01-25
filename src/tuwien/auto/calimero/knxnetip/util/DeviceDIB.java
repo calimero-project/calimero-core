@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 package tuwien.auto.calimero.knxnetip.util;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -48,6 +49,7 @@ import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.SerialNumber;
 
 /**
  * Represents a device description information block. Objects of this type are immutable.
@@ -82,11 +84,11 @@ public class DeviceDIB extends DIB
 
 	private final int status;
 	private final int knxmedium;
-	private final byte[] serial = new byte[6];
+	private final SerialNumber serial;
 	private final int installationId;
 	private final IndividualAddress address;
 	private final byte[] mcast;
-	private final byte[] mac = new byte[6];
+	private final byte[] mac;
 	private final String name;
 
 	/**
@@ -106,13 +108,16 @@ public class DeviceDIB extends DIB
 		final ByteArrayInputStream is = new ByteArrayInputStream(data, offset + 2, data.length - offset - 2);
 		knxmedium = is.read();
 		status = is.read();
-		address = new IndividualAddress(
-			new byte[] { (byte) is.read(), (byte) is.read(), });
+		address = new IndividualAddress(new byte[] { (byte) is.read(), (byte) is.read() });
 		installationId = (is.read() << 8) | is.read();
-		is.read(serial, 0, serial.length);
-		mcast = new byte[4];
-		is.read(mcast, 0, mcast.length);
-		is.read(mac, 0, mac.length);
+		try {
+			serial = SerialNumber.from(is.readNBytes(SerialNumber.Size));
+			mcast = is.readNBytes(4);
+			mac = is.readNBytes(6);
+		}
+		catch (final IOException e) {
+			throw new KNXFormatException("device DIB initialization", e);
+		}
 
 		// device friendly name is optional
 		final StringBuilder sbuf = new StringBuilder(30);
@@ -147,7 +152,7 @@ public class DeviceDIB extends DIB
 	 */
 	public DeviceDIB(final String friendlyName, final int deviceStatus,
 		final int projectInstallationId, final int knxMedium, final IndividualAddress knxAddress,
-		final byte[] serialNumber, final InetAddress routingMulticast, final byte[] macAddress)
+		final SerialNumber serialNumber, final InetAddress routingMulticast, final byte[] macAddress)
 	{
 		super(DIB_SIZE, DEVICE_INFO);
 
@@ -173,10 +178,7 @@ public class DeviceDIB extends DIB
 			throw new KNXIllegalArgumentException("KNX medium not supported");
 		knxmedium = knxMedium;
 
-		if (serialNumber.length != serial.length)
-			throw new KNXIllegalArgumentException("serial number length not equal to " + serial.length + " bytes");
-		for (int i = 0; i < serial.length; i++)
-			serial[i] = serialNumber[i];
+		serial = serialNumber;
 
 		if (projectInstallationId < 0 || projectInstallationId > 0xffff)
 			throw new KNXIllegalArgumentException("project installation ID out of range [0..0xffff");
@@ -189,10 +191,20 @@ public class DeviceDIB extends DIB
 			throw new KNXIllegalArgumentException(routingMulticast.toString() + " is not an IPv4 multicast address");
 		mcast = routingMulticast.getAddress();
 
-		if (macAddress.length != mac.length)
-			throw new KNXIllegalArgumentException("MAC address length not equal to " + mac.length + " bytes");
-		for (int i = 0; i < mac.length; i++)
-			mac[i] = macAddress[i];
+		if (macAddress.length != 6)
+			throw new KNXIllegalArgumentException("MAC address length not equal to 6 bytes");
+		mac = macAddress.clone();
+	}
+
+	/**
+	 * @deprecated Use {@link #DeviceDIB(String, int, int, int, IndividualAddress, SerialNumber, InetAddress, byte[])}
+	 */
+	@Deprecated
+	public DeviceDIB(final String friendlyName, final int deviceStatus, final int projectInstallationId,
+			final int knxMedium, final IndividualAddress knxAddress, final byte[] serialNumber,
+			final InetAddress routingMulticast, final byte[] macAddress) {
+		this(friendlyName, deviceStatus, projectInstallationId, knxMedium, knxAddress, SerialNumber.from(serialNumber),
+				routingMulticast, macAddress);
 	}
 
 	/**
@@ -320,24 +332,28 @@ public class DeviceDIB extends DIB
 	}
 
 	/**
-	 * Returns the KNX serial number of the device, which uniquely identifies a device.
-	 *
-	 * @return byte array with serial number
+	 * @deprecated Use {@link #serialNumber()}
 	 */
+	@Deprecated(forRemoval = true)
 	public final byte[] getSerialNumber()
 	{
-		return serial.clone();
+		return serial.array();
 	}
 
 	/**
-	 * Returns a textual representation of the device KNX serial number.
+	 * Returns the KNX serial number of the device, which uniquely identifies a device.
 	 *
-	 * @return serial number as string
+	 * @return serial number
 	 */
+	public final SerialNumber serialNumber() { return serial; }
+
+	/**
+	 * @deprecated No replacement
+	 */
+	@Deprecated(forRemoval = true)
 	public final String getSerialNumberString()
 	{
-		final var sn = DataUnitBuilder.toHex(serial, "");
-		return sn.substring(0, 4) + ":" + sn.substring(4);
+		return serial.toString();
 	}
 
 	/**
@@ -385,8 +401,9 @@ public class DeviceDIB extends DIB
 		buf[i++] = addr[1];
 		buf[i++] = (byte) (installationId >> 8);
 		buf[i++] = (byte) installationId;
+		final byte[] sno = serial.array();
 		for (int k = 0; k < 6; ++k)
-			buf[i++] = serial[k];
+			buf[i++] = sno[k];
 		for (int k = 0; k < 4; ++k)
 			buf[i++] = mcast[k];
 		for (int k = 0; k < 6; ++k)
@@ -401,7 +418,7 @@ public class DeviceDIB extends DIB
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + Objects.hash(status, knxmedium, installationId, address, name);
-		result = prime * result + Arrays.hashCode(serial);
+		result = prime * result + serial.hashCode();
 		result = prime * result + Arrays.hashCode(mcast);
 		result = prime * result + Arrays.hashCode(mac);
 		return result;
@@ -415,7 +432,7 @@ public class DeviceDIB extends DIB
 			return false;
 		final DeviceDIB other = (DeviceDIB) obj;
 		return address.equals(other.address) && name.equals(other.name) && status == other.status
-				&& knxmedium == other.knxmedium && Arrays.equals(serial, other.serial)
+				&& knxmedium == other.knxmedium && serial.equals(other.serial)
 				&& installationId == other.installationId && Arrays.equals(mcast, other.mcast)
 				&& Arrays.equals(mac, other.mac) && name.equals(other.name);
 	}

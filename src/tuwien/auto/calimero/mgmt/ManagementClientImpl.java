@@ -355,7 +355,7 @@ public class ManagementClientImpl implements ManagementClient
 	public void writeDomainAddress(final byte[] domain) throws KNXTimeoutException, KNXLinkClosedException {
 		if (domain.length != 2 && domain.length != 6)
 			throw new KNXIllegalArgumentException("invalid length of domain address");
-		broadcast(SerialNumber.of(0), new IndividualAddress(0), true, priority, createAPDU(DOA_WRITE, domain), false);
+		broadcast(SerialNumber.Zero, new IndividualAddress(0), true, priority, createAPDU(DOA_WRITE, domain), false);
 	}
 
 	@Override

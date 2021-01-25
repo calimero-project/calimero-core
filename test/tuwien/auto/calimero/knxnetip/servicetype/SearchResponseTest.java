@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2019 B. Malinowsky
+    Copyright (c) 2018, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,6 +51,7 @@ import org.junit.jupiter.api.Test;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.SerialNumber;
 import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
 import tuwien.auto.calimero.knxnetip.util.DIB;
 import tuwien.auto.calimero.knxnetip.util.DeviceDIB;
@@ -68,7 +69,7 @@ class SearchResponseTest {
 
 	@BeforeEach
 	void init() throws UnknownHostException {
-		device = new DeviceDIB("test", 0, 0, DeviceDIB.MEDIUM_TP1, new IndividualAddress(1234), new byte[6],
+		device = new DeviceDIB("test", 0, 0, DeviceDIB.MEDIUM_TP1, new IndividualAddress(1234), SerialNumber.Zero,
 				InetAddress.getByName(KNXnetIPRouting.DEFAULT_MULTICAST), new byte[6]);
 	}
 

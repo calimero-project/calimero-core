@@ -94,6 +94,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.KnxSecureException;
+import tuwien.auto.calimero.SerialNumber;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.knxnetip.Connection.SecureSession;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
@@ -121,7 +122,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 	static final String secureSymbol = new String(Character.toChars(0x1F512));
 
-	private final byte[] sno;
+	private final SerialNumber sno;
 	private Key secretKey;
 	private int sessionId;
 
@@ -168,7 +169,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 	private volatile boolean periodicSchedule = true;
 
 	// info for scheduled outgoing group sync
-	private byte[] timerNotifySN;
+	private SerialNumber timerNotifySN;
 	private int timerNotifyTag;
 
 	// assign dummy to have it initialized
@@ -521,16 +522,16 @@ public final class SecureConnection extends KNXnetIPRouting {
 		return Optional.empty();
 	}
 
-	private static byte[] deriveSerialNumber(final NetworkInterface netif) {
+	private static SerialNumber deriveSerialNumber(final NetworkInterface netif) {
 		try {
 			if (netif != null) {
 				final byte[] hardwareAddress = netif.getHardwareAddress();
 				if (hardwareAddress != null)
-					return Arrays.copyOf(hardwareAddress, 6);
+					return SerialNumber.from(Arrays.copyOf(hardwareAddress, 6));
 			}
 		}
 		catch (final SocketException ignore) {}
-		return new byte[6];
+		return SerialNumber.Zero;
 	}
 
 	private static String hostPort(final InetSocketAddress addr) {
@@ -623,7 +624,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		else if (svc == SecureGroupSync) {
 			try {
 				final Object[] fields = newGroupSync(h, data, offset);
-				onGroupSync(src, (long) fields[0], true, (byte[]) fields[1], (int) fields[2]);
+				onGroupSync(src, (long) fields[0], true, (SerialNumber) fields[1], (int) fields[2]);
 			}
 			catch (final KnxSecureException e) {
 				logger.debug("group sync {}", e.getMessage());
@@ -633,7 +634,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		else if (svc == SecureSvc) {
 			final Object[] fields = unwrap(h, data, offset);
 			final long timestamp = (long) fields[1];
-			if (sessionId == 0 && !withinTolerance(src, timestamp, (byte[]) fields[2], (int) fields[3])) {
+			if (sessionId == 0 && !withinTolerance(src, timestamp, (SerialNumber) fields[2], (int) fields[3])) {
 				logger.warn("{} timestamp {} outside latency tolerance of {} ms (local {}) - ignore", hostPort(source),
 						timestamp, mcastLatencyTolerance, timestamp());
 				return true;
@@ -714,14 +715,14 @@ public final class SecureConnection extends KNXnetIPRouting {
 		}
 	}
 
-	private boolean withinTolerance(final InetAddress src, final long timestamp, final byte[] sn, final int tag) {
+	private boolean withinTolerance(final InetAddress src, final long timestamp, final SerialNumber sn, final int tag) {
 		onGroupSync(src, timestamp, false, sn, tag);
 		final long diff = timestamp() - timestamp;
 		return diff <= mcastLatencyTolerance;
 	}
 
-	private void onGroupSync(final InetAddress src, final long timestamp, final boolean byTimerNotify, final byte[] sn,
-		final int tag) {
+	private void onGroupSync(final InetAddress src, final long timestamp, final boolean byTimerNotify,
+			final SerialNumber sn, final int tag) {
 		final long local = timestamp();
 		if (timestamp > local) {
 			logger.debug("sync timestamp +{} ms", timestamp - local);
@@ -774,12 +775,12 @@ public final class SecureConnection extends KNXnetIPRouting {
 		maxDelayPeriodicNotify = maxDelayTimeKeeperPeriodicNotify;
 	}
 
-	private void syncedWithGroup(final boolean byTimerNotify, final byte[] sn, final int tag) {
+	private void syncedWithGroup(final boolean byTimerNotify, final SerialNumber sn, final int tag) {
 		if (byTimerNotify)
 			becomeTimeFollower();
 
 		scheduleGroupSync(periodicNotifyDelay());
-		if (!syncedWithGroup && tag == sentGroupSyncTag && Arrays.equals(sno, sn)) {
+		if (!syncedWithGroup && tag == sentGroupSyncTag && sno.equals(sn)) {
 			logger.info("synchronized with group {}", getRemoteAddress().getAddress().getHostAddress());
 			syncedWithGroup = true;
 			synchronized (this) {
@@ -826,7 +827,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 			final long timestamp = timestamp();
 			final byte[] sync = newGroupSync(timestamp);
 			logger.debug("sending group sync timestamp {} ms (S/N {}, tag {})", timestamp,
-					toHex(periodicSchedule ? sno : timerNotifySN, ""),
+					periodicSchedule ? sno : timerNotifySN,
 					periodicSchedule ? sentGroupSyncTag : timerNotifyTag);
 
 			// schedule next sync before send to maintain happens-before with sync rcv
@@ -876,7 +877,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		buffer.putShort((short) sessionId);
 		buffer.putShort((short) (seq >> 32));
 		buffer.putInt((int) seq);
-		buffer.put(sno);
+		buffer.put(sno.array());
 		buffer.putShort((short) msgTag);
 		buffer.put(knxipPacket);
 
@@ -887,7 +888,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		return buffer.array();
 	}
 
-	public static byte[] newSecurePacket(final long sessionId, final long seq, final byte[] sno, final int msgTag,
+	public static byte[] newSecurePacket(final long sessionId, final long seq, final SerialNumber sno, final int msgTag,
 		final byte[] knxipPacket, final Key secretKey) {
 		if (seq < 0 || seq > 0xffff_ffff_ffffL)
 			throw new KNXIllegalArgumentException(
@@ -903,7 +904,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		buffer.putShort((short) sessionId);
 		buffer.putShort((short) (seq >> 32));
 		buffer.putInt((int) seq);
-		buffer.put(sno);
+		buffer.put(sno.array());
 		buffer.putShort((short) msgTag);
 		buffer.put(knxipPacket);
 
@@ -929,12 +930,10 @@ public final class SecureConnection extends KNXnetIPRouting {
 				throw new KnxSecureException("received secure packet with sequence " + seq + " < expected " + rcvSeq);
 		}
 
-		final long snLong = (long) fields[2];
-		final byte[] sn = ByteBuffer.allocate(6).putShort((short) (snLong >> 32)).putInt((int) snLong).array();
+		final var sn = (SerialNumber) fields[2];
 		final int tag = (int) fields[3];
 		final byte[] knxipPacket = (byte[]) fields[4];
-		logger.trace("received {} (session {} seq {} S/N {} tag {})", toHex(knxipPacket, " "), sid, seq, toHex(sn, ""),
-				tag);
+		logger.trace("received {} (session {} seq {} S/N {} tag {})", toHex(knxipPacket, " "), sid, seq, sn, tag);
 		return new Object[] { fields[0], fields[1], sn, fields[3], fields[4] };
 	}
 
@@ -953,7 +952,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 		final int sid = buffer.getShort() & 0xffff;
 		final long seq = uint48(buffer);
-		final long sno = uint48(buffer);
+		final var sno = SerialNumber.of(uint48(buffer));
 		final int tag = buffer.getShort() & 0xffff;
 
 		final ByteBuffer dec = decrypt(buffer, secretKey, securityInfo(data, offset + 2, 0xff00));
@@ -1067,10 +1066,10 @@ public final class SecureConnection extends KNXnetIPRouting {
 		buffer.putShort((short) (timestamp >> 32)).putInt((int) timestamp);
 		if (periodicSchedule) {
 			sentGroupSyncTag = randomClosedRange(1, 0xffff);
-			buffer.put(sno).putShort((short) sentGroupSyncTag);
+			buffer.put(sno.array()).putShort((short) sentGroupSyncTag);
 		}
 		else
-			buffer.put(timerNotifySN).putShort((short) timerNotifyTag);
+			buffer.put(timerNotifySN.array()).putShort((short) timerNotifyTag);
 
 		final byte[] mac = cbcMac(buffer.array(), 0, header.getStructLength() + 6 + 6 + 2, securityInfo(buffer.array(), 6, 0));
 		final byte[] secInfo = securityInfo(buffer.array(), 6, 0xff00);
@@ -1095,7 +1094,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		final byte[] secInfo = securityInfo(buffer.array(), 6, 0);
 		cbcMacVerify(data, offset - h.getStructLength(), h.getTotalLength() - macSize, secretKey, secInfo, mac.array());
 		logger.trace("received group sync timestamp {} ms (S/N {}, tag {})", timestamp, toHex(sn, ""), msgTag);
-		return new Object[] { timestamp, sn, msgTag };
+		return new Object[] { timestamp, SerialNumber.from(sn), msgTag };
 	}
 
 	private void encrypt(final byte[] data, final int offset, final byte[] secInfo) {
