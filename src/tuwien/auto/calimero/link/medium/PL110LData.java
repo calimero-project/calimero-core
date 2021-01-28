@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -96,7 +96,7 @@ public class PL110LData extends RawFrameBase
 	public String toString()
 	{
 		return super.toString()
-				+ (skipDoA ? "" : " domain 0x" + Integer.toHexString(doa[1] & 0xff)) + ", tpdu "
+				+ (skipDoA ? "" : " DoA 0x" + Integer.toHexString(doa[1] & 0xff)) + ", tpdu "
 				+ DataUnitBuilder.toHex(tpdu, " ");
 	}
 }

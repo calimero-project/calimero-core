@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,8 +40,7 @@ import tuwien.auto.calimero.KNXFormatException;
 
 /**
  * Raw acknowledgment frame on TP1 communication medium.
- * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public class TP1Ack extends RawAckBase
@@ -50,7 +49,7 @@ public class TP1Ack extends RawAckBase
 	 * Acknowledge type busy.
 	 * <p>
 	 * The remote data link layer does not have resources to process the request.
-	 * 
+	 *
 	 * @see #getAckType()
 	 */
 	public static final int BUSY = 0xC0;
@@ -59,18 +58,16 @@ public class TP1Ack extends RawAckBase
 	 * Acknowledge type {@link RawAckBase#NAK} and {@link TP1Ack#BUSY}.
 	 * <p>
 	 * An acknowledgment frame of this type shall be handled as acknowledge type 'busy'.
-	 * 
+	 *
 	 * @see #getAckType()
 	 */
 	public static final int NAK_BUSY = 0x00;
 
 	/**
 	 * Creates a new TP1 acknowledgment frame out of a byte array.
-	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing the acknowledgment frame structure
-	 * @param offset start offset of frame structure in <code>data</code>, offset &gt;=
-	 *        0
+	 * @param offset start offset of frame structure in <code>data</code>, offset &gt;= 0
 	 * @throws KNXFormatException if no valid acknowledgment frame was found
 	 */
 	public TP1Ack(final byte[] data, final int offset) throws KNXFormatException
@@ -90,9 +87,6 @@ public class TP1Ack extends RawAckBase
 			throw new KNXFormatException("no valid acknowledge type", ctrl);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.medium.RawAckBase#toString()
-	 */
 	@Override
 	public String toString()
 	{
