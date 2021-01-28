@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -460,7 +460,10 @@ public class CEMILData implements CEMI
 		buf.append(mc == MC_LDATA_IND ? ".ind" : mc == MC_LDATA_REQ ? ".req" : ".con");
 		if (mc == MC_LDATA_CON)
 			buf.append(isPositiveConfirmation() ? " (pos)" : " (neg)");
-		buf.append(", ").append(p).append(" priority");
+		buf.append(", ");
+		if (isSystemBroadcast())
+			buf.append("system broadcast ");
+		buf.append(p).append(" priority");
 		buf.append(" hop count ").append(getHopCount());
 		if (mc != MC_LDATA_CON) {
 			if (isAckRequested())
