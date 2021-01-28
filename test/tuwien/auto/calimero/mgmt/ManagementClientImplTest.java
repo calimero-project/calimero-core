@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -562,7 +562,7 @@ class ManagementClientImplTest
 		final byte maxWaitSeconds = 2;
 		List<byte[]> l = mc.readSystemNetworkParameter(0, PID.SERIAL_NUMBER, 3, maxWaitSeconds);
 		assertTrue(!l.isEmpty(), "devices should respond once");
-		assertEquals(2, l.size(), "2 test devices, each should respond once");
+		assertEquals(3, l.size(), "2 test devices + router, each should respond once");
 		l.forEach(sn -> assertEquals(6, sn.length));
 
 		l = mc.readSystemNetworkParameter(0, PID.SERIAL_NUMBER, 3, maxWaitSeconds);
