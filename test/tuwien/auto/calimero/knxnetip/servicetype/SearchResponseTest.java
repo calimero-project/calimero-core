@@ -44,6 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,6 +58,7 @@ import tuwien.auto.calimero.knxnetip.util.DIB;
 import tuwien.auto.calimero.knxnetip.util.DeviceDIB;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
 import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB;
+import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB.ServiceFamily;
 import tuwien.auto.calimero.knxnetip.util.TunnelingDib;
 
 class SearchResponseTest {
@@ -64,7 +66,10 @@ class SearchResponseTest {
 
 	private DeviceDIB device;
 	private final ServiceFamiliesDIB svcFamilies = new ServiceFamiliesDIB(new int[] { 2, 3, 4 }, new int[] { 1, 1, 1 });
-	private final ServiceFamiliesDIB secureFamilies = ServiceFamiliesDIB.newSecureServiceFamilies(new int[] { 3, 4 }, new int[] { 1, 1 });
+
+	private static final Map<ServiceFamily, Integer> families = Map.of(ServiceFamily.DeviceManagement, 1, ServiceFamily.Tunneling, 1);
+	private final ServiceFamiliesDIB secureFamilies = ServiceFamiliesDIB.newSecureServiceFamilies(families);
+
 	private final TunnelingDib tunneling = new TunnelingDib(List.of(new IndividualAddress(1, 2, 3)), new int[] { 1 });
 
 	@BeforeEach
