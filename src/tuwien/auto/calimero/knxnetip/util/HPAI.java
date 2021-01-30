@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,10 +37,12 @@
 package tuwien.auto.calimero.knxnetip.util;
 
 import java.io.ByteArrayOutputStream;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.Objects;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -69,24 +71,21 @@ public class HPAI
 	 */
 	public static final int IPV4_TCP = 0x02;
 
+	/** Host protocol address information for TCP, set to route back endpoint. */
+	public static final HPAI Tcp = new HPAI(IPV4_TCP, null);
+
 	private static final int HPAI_SIZE = 8;
 
 	private final int length;
 	private final int hostprot;
-	private final byte[] address;
-	private final int port;
-
-
-	/** Host protocol address information for TCP, set to route back endpoint. */
-	public static final HPAI Tcp = new HPAI(IPV4_TCP, null);
+	private final InetSocketAddress addr;
 
 	/**
 	 * Creates a HPAI out of a byte array.
 	 *
 	 * @param data byte array containing the HPAI structure
 	 * @param offset start offset of HPAI in <code>data</code>
-	 * @throws KNXFormatException if no HPAI found, invalid structure or unknown host
-	 *         protocol
+	 * @throws KNXFormatException if no HPAI found, invalid structure or unknown host protocol
 	 */
 	public HPAI(final byte[] data, final int offset) throws KNXFormatException
 	{
@@ -100,19 +99,17 @@ public class HPAI
 		if (hostprot != IPV4_UDP && hostprot != IPV4_TCP)
 			throw new KNXFormatException("unknown host protocol", hostprot);
 
-		address = new byte[4];
-		address[0] = data[i++];
-		address[1] = data[i++];
-		address[2] = data[i++];
-		address[3] = data[i++];
+		final byte[] address = Arrays.copyOfRange(data, i, i += 4);
+		final int port = ((data[i++] & 0xFF) << 8) | data[i] & 0xFF;
+		try {
+			addr = new InetSocketAddress(InetAddress.getByAddress(address), port);
+		}
+		catch (final UnknownHostException e) {
+			throw new KNXFormatException("invalid IPv4 address", e);
+		}
 
-		int p = (data[i++] & 0xFF) << 8;
-		p |= data[i] & 0xFF;
-		port = p;
-
-		if (hostprot == IPV4_TCP && (port != 0 || !Arrays.equals(address, new byte[4])))
-			throw new KNXFormatException("HPAI for TCP does not contain route back endpoint",
-					getAddress().getHostAddress() + ":" + port);
+		if (hostprot == IPV4_TCP && !isRouteBack())
+			throw new KNXFormatException("HPAI for TCP does not contain route back endpoint", hostPort());
 	}
 
 	/**
@@ -164,19 +161,16 @@ public class HPAI
 			final InetAddress a = addr.getAddress();
 			if (a == null)
 				throw new KNXIllegalArgumentException(addr + " is an unresolved IP address");
-			address = a.getAddress();
-			port = addr.getPort();
-			if (a.isAnyLocalAddress() && port != 0)
-				throw new KNXIllegalArgumentException(a + " is a wildcard IP address");
-			if (hostprot == IPV4_TCP && !(a.isAnyLocalAddress() && port == 0))
-				throw new KNXIllegalArgumentException("HPAI for TCP does not contain route back endpoint: "
-						+ getAddress().getHostAddress() + ":" + port);
-			if (address.length != 4)
+			if (!(a instanceof Inet4Address))
 				throw new KNXIllegalArgumentException(a + " is not an IPv4 address");
+			if (a.isAnyLocalAddress() && addr.getPort() != 0)
+				throw new KNXIllegalArgumentException(a + " is a wildcard IP address");
+			this.addr = addr;
+			if (hostprot == IPV4_TCP && !isRouteBack())
+				throw new KNXIllegalArgumentException("HPAI for TCP does not contain route back endpoint: " + hostPort());
 		}
 		else {
-			address = new byte[4];
-			port = 0;
+			this.addr = new InetSocketAddress(0);
 		}
 	}
 
@@ -196,7 +190,7 @@ public class HPAI
 	 * @return <code>true</code> if this HPAI is a route back HPAI, <code>false</code> otherwise
 	 */
 	public final boolean isRouteBack() {
-		return port == 0 && Arrays.equals(address, new byte[4]);
+		return addr.getAddress().isAnyLocalAddress() && addr.getPort() == 0;
 	}
 
 	/**
@@ -204,16 +198,17 @@ public class HPAI
 	 *
 	 * @return IP address and port number as InetSocketAddress
 	 */
-	public final InetSocketAddress endpoint() { return new InetSocketAddress(getAddress(), port); }
+	public final InetSocketAddress endpoint() { return addr; }
 
 	/**
-	 * Returns the raw IP network address.
+	 * @deprecated No replacement.
 	 *
 	 * @return byte array with IP address in network byte order
 	 */
+	@Deprecated
 	public final byte[] getRawAddress()
 	{
-		return address.clone();
+		return addr.getAddress().getAddress();
 	}
 
 	/**
@@ -223,12 +218,7 @@ public class HPAI
 	 */
 	public final InetAddress getAddress()
 	{
-		try {
-			return InetAddress.getByAddress(address);
-		}
-		catch (final UnknownHostException e) {
-			throw new IllegalStateException(e);
-		}
+		return addr.getAddress();
 	}
 
 	/**
@@ -238,7 +228,7 @@ public class HPAI
 	 */
 	public final int getPort()
 	{
-		return port;
+		return addr.getPort();
 	}
 
 	/**
@@ -261,9 +251,9 @@ public class HPAI
 		final ByteArrayOutputStream os = new ByteArrayOutputStream(HPAI_SIZE);
 		os.write(length);
 		os.write(hostprot);
-		os.write(address, 0, address.length);
-		os.write(port >> 8);
-		os.write(port);
+		os.write(addr.getAddress().getAddress(), 0, 4);
+		os.write(addr.getPort() >> 8);
+		os.write(addr.getPort());
 		return os.toByteArray();
 	}
 
@@ -273,9 +263,8 @@ public class HPAI
 	 * @return a string representation of the HPAI object
 	 */
 	@Override
-	public String toString()
-	{
-		return getAddressString() + ":" + port + " (IPv4 " + (hostprot == IPV4_UDP ? "UDP" : "TCP") + ")";
+	public String toString() {
+		return hostPort() + " (IPv4 " + (hostprot == IPV4_UDP ? "UDP" : "TCP") + ")";
 	}
 
 	@Override
@@ -286,22 +275,16 @@ public class HPAI
 		if (!(obj instanceof HPAI))
 			return false;
 		final HPAI other = (HPAI) obj;
-		return length == other.length && port == other.port && hostprot == other.hostprot
-				&& Arrays.hashCode(address) == Arrays.hashCode(other.address);
+		return length == other.length && hostprot == other.hostprot && addr.equals(other.addr);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		final int prime = 17;
-		return prime * (prime * (prime * Arrays.hashCode(address) + hostprot) + port) + length;
+		return Objects.hash(length, hostprot, addr);
 	}
 
-	private String getAddressString()
-	{
-		return (address[0] & 0xFF) + "." + (address[1] & 0xFF) + "." + (address[2] & 0xFF) + "."
-				+ (address[3] & 0xFF);
-	}
+	private String hostPort() { return addr.getAddress().getHostAddress() + ":" + addr.getPort(); }
 
 	private static InetAddress addrOrDefault(final InetAddress addr)
 	{
