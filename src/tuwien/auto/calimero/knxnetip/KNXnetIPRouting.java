@@ -168,7 +168,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	{
 		super(KNXnetIPHeader.ROUTING_IND, 0, 1, 0);
 		if (mcGroup == null)
-			multicast = Discoverer.SYSTEM_SETUP_MULTICAST;
+			multicast = DefaultMulticast;
 		else if (!isValidRoutingMulticast(mcGroup))
 			throw new KNXIllegalArgumentException("non-valid routing multicast " + mcGroup);
 		else

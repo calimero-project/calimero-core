@@ -370,7 +370,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 	private SecureConnection(final TunnelingLayer knxLayer, final InetSocketAddress localEP,
 		final InetSocketAddress serverCtrlEP, final boolean useNat, final byte[] deviceAuthCode, final int userId,
 		final byte[] userKey, final IndividualAddress tunnelingAddress) throws KNXException, InterruptedException {
-		super(null);
+		super(DefaultMulticast);
 
 		InetSocketAddress local = localEP;
 		if (local.isUnresolved())
@@ -441,7 +441,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 	private SecureConnection(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP, final boolean useNat,
 		final byte[] deviceAuthCode, final byte[] userKey) throws KNXException, InterruptedException {
-		super(null);
+		super(DefaultMulticast);
 
 		InetSocketAddress local = localEP;
 		if (local.isUnresolved())

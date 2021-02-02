@@ -347,7 +347,7 @@ class KNXnetIPRouterTest
 
 	private void newRouter() throws KNXException
 	{
-		r = new KNXnetIPRouting(null, null);
+		r = new KNXnetIPRouting(null, KNXnetIPRouting.DefaultMulticast);
 		r.addConnectionListener(l);
 	}
 
