@@ -534,10 +534,6 @@ public final class SecureConnection extends KNXnetIPRouting {
 		return SerialNumber.Zero;
 	}
 
-	private static String hostPort(final InetSocketAddress addr) {
-		return addr.getAddress().getHostAddress() + ":" + addr.getPort();
-	}
-
 	@Override
 	public void addConnectionListener(final KNXListener l) {
 		if (tunnel != null)

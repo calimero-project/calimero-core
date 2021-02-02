@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2020 B. Malinowsky
+    Copyright (c) 2010, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -306,7 +306,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		// only the control endpoint is set when our logger is initialized (the data
 		// endpoint gets assigned later in connect)
 		// to keep the name short, avoid a prepended host name as done by InetAddress
-		return ctrlEndpt.getAddress().getHostAddress() + ":" + ctrlEndpt.getPort();
+		return hostPort(ctrlEndpt);
 	}
 
 	@Override
@@ -588,6 +588,10 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	{
 		final CloseEvent ce = new CloseEvent(this, initiator, reason);
 		listeners.fire(l -> l.connectionClosed(ce));
+	}
+
+	static String hostPort(final InetSocketAddress addr) {
+		return addr.getAddress().getHostAddress() + ":" + addr.getPort();
 	}
 
 	// a semaphore with fair use behavior (FIFO)
