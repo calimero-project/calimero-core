@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@
 
 package tuwien.auto.calimero.mgmt;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import tuwien.auto.calimero.CloseEvent;
@@ -89,7 +90,7 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 	{
 		mc = new ManagementClientImpl(link);
 		dst = mc.createDestination(remote, connOriented);
-		this.adapterClosed = adapterClosed;
+		this.adapterClosed = Objects.requireNonNull(adapterClosed);
 		link.addLinkListener(nll);
 		key = null;
 		accessLevel = 15;

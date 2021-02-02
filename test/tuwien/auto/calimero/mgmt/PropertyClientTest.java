@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -95,7 +95,7 @@ class PropertyClientTest
 		closed = false;
 		try {
 			lnk = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false, new TPSettings());
-			remAdpt = new RemotePropertyServiceAdapter(lnk, remote, null, true);
+			remAdpt = new RemotePropertyServiceAdapter(lnk, remote, event -> {}, true);
 			rem = new PropertyClient(remAdpt);
 			localAdpt = LocalDeviceManagementIp.newAdapter(new InetSocketAddress(0), Util.getServer(), false,
 					true, adapterClosed);
@@ -133,12 +133,12 @@ class PropertyClientTest
 	{
 		rem.close();
 		remAdpt = null;
-		remAdpt = new RemotePropertyServiceAdapter(lnk, remote, null, true);
+		remAdpt = new RemotePropertyServiceAdapter(lnk, remote, event -> {}, true);
 		remAdpt.close();
 		remAdpt = null;
 		try {
 			final byte[] key = new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff };
-			remAdpt = new RemotePropertyServiceAdapter(lnk, remote, null, key);
+			remAdpt = new RemotePropertyServiceAdapter(lnk, remote, event -> {}, key);
 		}
 		catch (final KNXTimeoutException e) {
 			// authorize doesn't work on all devices, so ignore a response timeout
@@ -146,7 +146,7 @@ class PropertyClientTest
 		// check link is not closed
 		rem.close();
 		remAdpt = null;
-		remAdpt = new RemotePropertyServiceAdapter(lnk, remote, null, true);
+		remAdpt = new RemotePropertyServiceAdapter(lnk, remote, event -> {}, true);
 		remAdpt.close();
 		assertTrue(lnk.isOpen());
 
