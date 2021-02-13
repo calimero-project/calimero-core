@@ -44,6 +44,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.Keyring;
+import tuwien.auto.calimero.KnxSecureException;
 import tuwien.auto.calimero.SerialNumber;
 
 public final class Security {
@@ -75,6 +76,9 @@ public final class Security {
 	public static Security defaultInstallation() { return defInst; }
 
 	public void useKeyring(final Keyring keyring, final char[] password) {
+		if (!keyring.verifySignature(password))
+			throw new KnxSecureException("keyring signature mismatch (invalid keyring or wrong password)");
+
 		final var devices = keyring.devices();
 		devices.forEach((addr, device) -> device.toolKey().ifPresent(
 				toolkey -> deviceToolKeys.put(addr, keyring.decryptKey(toolkey, password))));
