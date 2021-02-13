@@ -261,11 +261,9 @@ public class ServiceFamiliesDIB extends DIB
 		if (type == SecureServiceFamilies && families.isEmpty())
 			return "KNX IP Secure n/a";
 		final var buf = new StringJoiner(", ");
-		for (final var entry : families.entrySet()) {
-			final String s = type == SecureServiceFamilies ? "Secure "
-					: "" + entry.getKey() + " (v" + entry.getValue() + ")";
-			buf.add(s);
-		}
+		final String prefix = type == SecureServiceFamilies ? "Secure " : "";
+		for (final var entry : families.entrySet())
+			buf.add(prefix + entry.getKey() + " (v" + entry.getValue() + ")");
 		return buf.toString();
 	}
 

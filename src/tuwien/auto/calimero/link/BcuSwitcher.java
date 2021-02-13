@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2020 B. Malinowsky
+    Copyright (c) 2015, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -280,7 +280,7 @@ final class BcuSwitcher
 		final long now = System.currentTimeMillis();
 		final long wait = txInterframeSpacing - now + tsLastTx;
 		if (wait > 0) {
-			System.out.println("enforce transmission interframe spacing, wait " + wait + " ms");
+			logger.trace("enforce transmission interframe spacing, wait {} ms", wait);
 			Thread.sleep(wait);
 		}
 		tsLastTx = now;
