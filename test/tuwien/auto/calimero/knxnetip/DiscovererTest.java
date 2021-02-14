@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -359,6 +359,8 @@ class DiscovererTest
 	void testIsSearching() throws KNXException, InterruptedException
 	{
 		ddef.startSearch(timeout, false);
+		// XXX temp workaround: avoid race condition with receiver thread::run
+		Thread.sleep(100);
 		assertTrue(ddef.isSearching());
 		while (ddef.isSearching())
 			Thread.sleep(200);
