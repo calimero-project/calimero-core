@@ -46,9 +46,9 @@ import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.StandardSocketOptions;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -583,8 +583,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 	protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
 		final int tag = routingCount.getAndIncrement() % 0x10000;
 		final byte[] wrapped = newSecurePacket(timestamp(), tag, packet);
-		final DatagramPacket p = new DatagramPacket(wrapped, wrapped.length, dst);
-		socket.send(p);
+		channel().send(ByteBuffer.wrap(wrapped), dst);
 		scheduleGroupSync(periodicNotifyDelay());
 	}
 
@@ -803,11 +802,14 @@ public final class SecureConnection extends KNXnetIPRouting {
 	private boolean isLocalIpAddress(final InetAddress addr) {
 		Stream<NetworkInterface> netifs = Stream.empty();
 		try {
-			final NetworkInterface ni = ((MulticastSocket) socket).getNetworkInterface();
-			final boolean noneSet = ni.getInetAddresses().nextElement().isAnyLocalAddress();
+			final var local = ((InetSocketAddress) channel().getLocalAddress()).getAddress();
+			if (addr.equals(local))
+				return true;
+			final NetworkInterface ni = channel().getOption(StandardSocketOptions.IP_MULTICAST_IF);
+			final boolean noneSet = ni == null || ni.getInetAddresses().nextElement().isAnyLocalAddress();
 			netifs = noneSet ? NetworkInterface.networkInterfaces() : Stream.of(ni);
 		}
-		catch (final SocketException e) {}
+		catch (final IOException e) {}
 		return netifs.flatMap(ni -> ni.inetAddresses()).anyMatch(addr::equals);
 	}
 
@@ -829,10 +831,10 @@ public final class SecureConnection extends KNXnetIPRouting {
 			// schedule next sync before send to maintain happens-before with sync rcv
 			becomeTimeKeeper();
 			scheduleGroupSync(periodicNotifyDelay());
-			socket.send(new DatagramPacket(sync, sync.length, dataEndpt));
+			channel().send(ByteBuffer.wrap(sync), dataEndpt);
 		}
 		catch (IOException | RuntimeException e) {
-			if (socket.isClosed()) {
+			if (!channel().isOpen()) {
 				groupSync.cancel(true);
 				throw new CancellationException("stop group sync for " + this);
 			}
