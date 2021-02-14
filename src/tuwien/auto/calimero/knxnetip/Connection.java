@@ -37,6 +37,7 @@
 package tuwien.auto.calimero.knxnetip;
 
 import static tuwien.auto.calimero.DataUnitBuilder.toHex;
+import static tuwien.auto.calimero.knxnetip.ConnectionBase.hostPort;
 import static tuwien.auto.calimero.knxnetip.SecureConnection.secureSymbol;
 
 import java.io.Closeable;
@@ -209,7 +210,7 @@ public final class Connection implements Closeable {
 
 			sno = deriveSerialNumber(conn.localEndpoint());
 
-			logger = LoggerFactory.getLogger("calimero.knxnetip." + secureSymbol + " Session " + addressPort(conn.server));
+			logger = LoggerFactory.getLogger("calimero.knxnetip." + secureSymbol + " Session " + hostPort(conn.server));
 		}
 
 		public int id() { return sessionId; }
@@ -343,7 +344,7 @@ public final class Connection implements Closeable {
 				}
 			}
 			if (remaining <= 0)
-				throw new KNXTimeoutException("timeout establishing secure session with " + addressPort(conn.server));
+				throw new KNXTimeoutException("timeout establishing secure session with " + hostPort(conn.server));
 		}
 
 		private boolean acceptServiceType(final KNXnetIPHeader h, final byte[] data, final int offset, final int length)
@@ -504,7 +505,7 @@ public final class Connection implements Closeable {
 
 			final boolean skipDeviceAuth = Arrays.equals(deviceAuthKey.getEncoded(), new byte[16]);
 			if (skipDeviceAuth) {
-				logger.warn("skipping device authentication of {} (no device key)", addressPort(remote));
+				logger.warn("skipping device authentication of {} (no device key)", hostPort(remote));
 			}
 			else {
 				final ByteBuffer mac = SecureConnection.decrypt(buffer, deviceAuthKey,
@@ -612,7 +613,7 @@ public final class Connection implements Closeable {
 	private Connection(final InetSocketAddress server) {
 		this.server = server;
 		socket = new Socket();
-		logger = LoggerFactory.getLogger("calimero.knxnetip.tcp " + addressPort(server));
+		logger = LoggerFactory.getLogger("calimero.knxnetip.tcp " + hostPort(server));
 	}
 
 	protected Connection(final InetSocketAddress local, final InetSocketAddress server) {
@@ -674,7 +675,7 @@ public final class Connection implements Closeable {
 	@Override
 	public String toString() {
 		final var state = socket.isClosed() ? "closed" : socket.isConnected() ? "connected" : "bound";
-		return addressPort(localEndpoint()) + " " + addressPort(server) + " (" + state +")";
+		return hostPort(localEndpoint()) + " " + hostPort(server) + " (" + state +")";
 	}
 
 	Socket socket() { return socket; }
@@ -693,11 +694,6 @@ public final class Connection implements Closeable {
 			unsecuredConnections.put(c.channelId, c);
 	}
 
-	// InetSocketAddress::toString always prepends a '/' even if there is no host name
-	static String addressPort(final InetSocketAddress addr) {
-		return addr.getAddress().getHostAddress() + ":" + addr.getPort();
-	}
-
 	synchronized void connect() throws IOException {
 		if (!socket.isConnected()) {
 			socket.connect(server, (int) connectionTimeout.toMillis());
@@ -706,7 +702,7 @@ public final class Connection implements Closeable {
 	}
 
 	private void startTcpReceiver() {
-		final Thread t = new Thread(this::runReceiveLoop, "KNXnet/IP tcp receiver " + addressPort(server));
+		final Thread t = new Thread(this::runReceiveLoop, "KNXnet/IP tcp receiver " + hostPort(server));
 		t.setDaemon(true);
 		t.start();
 	}

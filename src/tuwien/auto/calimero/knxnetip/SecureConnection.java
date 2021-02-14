@@ -207,7 +207,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		final var tunnel = new KNXnetIPTunnel(knxLayer, session.connection(), tunnelingAddress) {
 			@Override
 			public String getName() {
-				return "KNX IP " + secureSymbol + " Tunneling " + Connection.addressPort(ctrlEndpt);
+				return "KNX IP " + secureSymbol + " Tunneling " + ConnectionBase.hostPort(ctrlEndpt);
 			}
 
 			@Override
@@ -262,7 +262,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		final var tunnel = new KNXnetIPDevMgmt(session.connection()) {
 			@Override
 			public String getName() {
-				return "KNX IP " + secureSymbol + " Management " + Connection.addressPort(ctrlEndpt);
+				return "KNX IP " + secureSymbol + " Management " + ConnectionBase.hostPort(ctrlEndpt);
 			}
 
 			@Override
