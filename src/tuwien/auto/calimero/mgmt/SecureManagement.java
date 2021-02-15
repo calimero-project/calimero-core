@@ -47,9 +47,9 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.SerialNumber;
 import tuwien.auto.calimero.internal.EventListeners;
-import tuwien.auto.calimero.internal.SecureApplicationLayer;
-import tuwien.auto.calimero.internal.Security;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
+import tuwien.auto.calimero.secure.SecureApplicationLayer;
+import tuwien.auto.calimero.secure.Security;
 
 public class SecureManagement extends SecureApplicationLayer {
 

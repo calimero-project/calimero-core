@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2020 B. Malinowsky
+    Copyright (c) 2019, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@
     version.
 */
 
-package tuwien.auto.calimero;
+package tuwien.auto.calimero.secure;
 
 import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -53,7 +53,11 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import tuwien.auto.calimero.Keyring.Interface;
+import tuwien.auto.calimero.GroupAddress;
+import tuwien.auto.calimero.IndividualAddress;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.secure.Keyring;
+import tuwien.auto.calimero.secure.Keyring.Interface;
 import tuwien.auto.calimero.xml.KNXMLException;
 
 class KeyringTest {

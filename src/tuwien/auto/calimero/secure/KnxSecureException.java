@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2020 B. Malinowsky
+    Copyright (c) 2018, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,7 +34,9 @@
     version.
 */
 
-package tuwien.auto.calimero;
+package tuwien.auto.calimero.secure;
+
+import tuwien.auto.calimero.KnxRuntimeException;
 
 public class KnxSecureException extends KnxRuntimeException {
 	private static final long serialVersionUID = 1;

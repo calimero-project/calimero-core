@@ -34,7 +34,7 @@
     version.
 */
 
-package tuwien.auto.calimero;
+package tuwien.auto.calimero.secure;
 
 import java.util.Objects;
 
