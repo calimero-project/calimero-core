@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -207,8 +207,9 @@ public class Discoverer
 		}
 
 		/**
-		 * @return the local IP address used for the discovery or description request
+		 * @deprecated No replacement.
 		 */
+		@Deprecated
 		public InetAddress getAddress()
 		{
 			return local.getAddress();
@@ -240,7 +241,7 @@ public class Discoverer
 				return false;
 			final Result<?> other = (Result<?>) obj;
 			return getNetworkInterface().equals(other.getNetworkInterface())
-					&& getAddress().equals(other.getAddress())
+					&& localEndpoint().equals(other.localEndpoint())
 					&& getResponse().equals(other.getResponse()) && remote.equals(other.remote);
 		}
 
@@ -248,7 +249,7 @@ public class Discoverer
 		public int hashCode()
 		{
 			final int prime = 17;
-			return prime * (prime * (prime * getNetworkInterface().hashCode() + getAddress().hashCode())
+			return prime * (prime * (prime * getNetworkInterface().hashCode() + localEndpoint().hashCode())
 					+ getResponse().hashCode()) + remote.hashCode();
 		}
 	}
