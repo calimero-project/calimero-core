@@ -1,12 +1,5 @@
-buildscript {
-    repositories {
-        mavenCentral()
-        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.36.0'
-    }
+plugins {
+  id "com.github.ben-manes.versions" version "0.36.0"
 }
 
 repositories {
@@ -20,7 +13,6 @@ ext.desc = 'Calimero, a free KNX network library'
 apply plugin: 'java-library'
 apply plugin: 'maven-publish'
 apply plugin:'application'
-apply plugin: 'com.github.ben-manes.versions'
 
 group = 'com.github.calimero'
 version = '2.5-SNAPSHOT'
