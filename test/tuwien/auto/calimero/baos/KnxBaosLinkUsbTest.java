@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2020 B. Malinowsky
+    Copyright (c) 2019, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,6 +35,8 @@
 */
 
 package tuwien.auto.calimero.baos;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.ZonedDateTime;
 
@@ -140,5 +142,11 @@ class KnxBaosLinkUsbTest {
 	void parameterByte() throws KNXException {
 		final var getParameters = BaosService.getParameter(0, 5);
 		link.send(getParameters);
+	}
+
+	@Test
+	void detachLink() {
+		final var llLink = link.detach();
+		assertTrue(llLink.isOpen());
 	}
 }

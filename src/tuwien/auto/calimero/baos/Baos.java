@@ -70,7 +70,7 @@ public final class Baos {
 				final var privateLookup = MethodHandles.privateLookupIn(AbstractLink.class, MethodHandles.lookup());
 				CUSTOM_EVENTS = privateLookup.findGetter(AbstractLink.class, "customEvents", Map.class);
 
-				final var baosModeType = MethodType.methodType(void.class);
+				final var baosModeType = MethodType.methodType(void.class, boolean.class);
 				BAOS_MODE = privateLookup.findVirtual(AbstractLink.class, "baosMode", baosModeType);
 
 				final var onSendType = MethodType.methodType(void.class, List.of(KNXAddress.class, byte[].class, boolean.class));
@@ -88,11 +88,11 @@ public final class Baos {
 			try {
 				final var map = (Map<Class<?>, Set<MethodHandle>>) CUSTOM_EVENTS.invoke(link);
 				map.put(BaosService.class, ConcurrentHashMap.newKeySet());
-				BAOS_MODE.invoke(link);
 			}
 			catch (final Throwable e) {
 				throw new KnxRuntimeException("adding custom BAOS event", e);
 			}
+			baosMode(true);
 		}
 
 		@Override
@@ -134,13 +134,13 @@ public final class Baos {
 
 		@Override
 		public void sendRequestWait(final KNXAddress dst, final Priority p, final byte[] nsdu)
-			throws KNXTimeoutException, KNXLinkClosedException {
+				throws KNXTimeoutException, KNXLinkClosedException {
 			link.sendRequestWait(dst, p, nsdu);
 		}
 
 		@Override
 		public void send(final CEMILData msg, final boolean waitForCon)
-			throws KNXTimeoutException, KNXLinkClosedException {
+				throws KNXTimeoutException, KNXLinkClosedException {
 			link.send(msg, waitForCon);
 		}
 
@@ -150,8 +150,22 @@ public final class Baos {
 		@Override
 		public boolean isOpen() { return link.isOpen(); }
 
+		public KNXNetworkLink detach() {
+			baosMode(false);
+			return link;
+		}
+
 		@Override
 		public void close() { link.close(); }
+
+		private void baosMode(final boolean enable) {
+			try {
+				BAOS_MODE.invoke(link, enable);
+			}
+			catch (final Throwable e) {
+				throw new KnxRuntimeException("switching BAOS mode", e);
+			}
+		}
 	}
 
 	public static KnxBaosLink asBaosLink(final KNXNetworkLink link) { return new KnxBaosLink(link); }

@@ -473,7 +473,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		return read(0, pidMaxApduLength).map(AbstractLink::unsigned);
 	}
 
-	void baosMode() throws KNXException, InterruptedException {
+	void baosMode(final boolean enable) throws KNXException, InterruptedException {
 		final IndividualAddress dst = KNXMediumSettings.BackboneRouter;
 		if (cEMI) {
 			final int pidBaosSupport = 201;
@@ -483,7 +483,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 			if (!supported)
 				throw new KNXException("device does not support BAOS mode");
 
-			final var frame = BcuSwitcher.commModeRequest(BcuSwitcher.BaosMode);
+			final var frame = BcuSwitcher.commModeRequest(enable ? BcuSwitcher.BaosMode : BcuSwitcher.DataLinkLayer);
 			onSend(dst, frame, true);
 			responseFor(CEMIDevMgmt.MC_PROPWRITE_CON, BcuSwitcher.pidCommMode);
 
