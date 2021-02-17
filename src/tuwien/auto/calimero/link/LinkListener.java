@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,25 +43,22 @@ import tuwien.auto.calimero.FrameEvent;
 
 /**
  * Base listener interface for getting events from a KNX link (network or monitor link).
- * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public interface LinkListener extends EventListener
 {
 	/**
 	 * Invoked on arrival of a new KNX indication message from the KNX network.
-	 * <p>
-	 * 
+	 *
 	 * @param e frame event object
 	 */
-	void indication(FrameEvent e);
+	default void indication(final FrameEvent e) {}
 
 	/**
 	 * Invoked after close of the link.
-	 * <p>
-	 * 
+	 *
 	 * @param e close event object
 	 */
-	void linkClosed(CloseEvent e);
+	default void linkClosed(final CloseEvent e) {}
 }

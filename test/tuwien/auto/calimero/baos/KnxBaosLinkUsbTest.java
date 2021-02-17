@@ -47,7 +47,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
-import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.baos.Baos.KnxBaosLink;
@@ -68,9 +67,6 @@ class KnxBaosLinkUsbTest {
 	private KnxBaosLink link;
 
 	private final NetworkLinkListener l = new NetworkLinkListener() {
-		@Override
-		public void linkClosed(final CloseEvent e) {}
-
 		@Override
 		public void indication(final FrameEvent e) {
 			System.out.println(e.getFrame());

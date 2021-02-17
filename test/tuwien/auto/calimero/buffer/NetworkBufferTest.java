@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,7 +54,6 @@ import org.junit.jupiter.api.Test;
 
 import tag.KnxnetIP;
 import tag.KnxnetIPSequential;
-import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.KNXAddress;
@@ -95,14 +94,6 @@ public class NetworkBufferTest
 	private static final long WaitForUpdate = 1000;
 
 	private final NetworkLinkListener linkListener = new NetworkLinkListener() {
-		@Override
-		public void linkClosed(final CloseEvent e)
-		{}
-
-		@Override
-		public void indication(final FrameEvent e)
-		{}
-
 		@Override
 		public void confirmation(final FrameEvent e)
 		{
