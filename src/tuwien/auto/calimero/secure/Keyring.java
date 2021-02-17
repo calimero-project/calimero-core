@@ -74,8 +74,6 @@ import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
-import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.xml.KNXMLException;
 import tuwien.auto.calimero.xml.XmlInputFactory;
 import tuwien.auto.calimero.xml.XmlReader;
@@ -331,7 +329,7 @@ public final class Keyring {
 				line = reader.getLocation().getLineNumber();
 				if ("Backbone".equals(name)) { // [0, 1]
 					final var mcastGroup = InetAddress.getByName(reader.getAttributeValue(null, "MulticastAddress"));
-					if (!KNXnetIPRouting.isValidRoutingMulticast(mcastGroup))
+					if (!validRoutingMulticast(mcastGroup))
 						throw new KNXMLException("loading keyring '" + keyringUri + "': " + mcastGroup.getHostAddress()
 								+ " is not a valid KNX multicast address");
 					final var groupKey = decode(reader.getAttributeValue(null, "Key"));
@@ -345,9 +343,9 @@ public final class Keyring {
 					final var type = reader.getAttributeValue(null, "Type"); // { Backbone, Tunneling, USB }
 					// rest is optional
 					String attr = reader.getAttributeValue(null, "Host");
-					final var host = attr != null ? new IndividualAddress(attr) : KNXMediumSettings.BackboneRouter;
+					final var host = attr != null ? new IndividualAddress(attr) : new IndividualAddress(0);
 					attr = reader.getAttributeValue(null, "IndividualAddress");
-					final var addr = attr != null ? new IndividualAddress(attr) : KNXMediumSettings.BackboneRouter;
+					final var addr = attr != null ? new IndividualAddress(attr) : new IndividualAddress(0);
 					final var user = readAttribute(reader, "UserID", Integer::parseInt, 0);
 					final var pwd = readAttribute(reader, "Password", Keyring::decode, null);
 					final var auth = readAttribute(reader, "Authentication", Keyring::decode, null);
@@ -502,6 +500,19 @@ public final class Keyring {
 		finally {
 			Arrays.fill(keyringPwdHash, (byte) 0);
 		}
+	}
+
+	private static final long DefaultMulticast = unsigned(new byte[] { (byte) 224, 0, 23, 12 });
+
+	private static boolean validRoutingMulticast(final InetAddress address) {
+		return address != null && address.isMulticastAddress() && unsigned(address.getAddress()) >= DefaultMulticast;
+	}
+
+	private static long unsigned(final byte[] data) {
+		long l = 0;
+		for (final byte b : data)
+			l = l << 8 | (b & 0xff);
+		return l;
 	}
 
 	private static <R> R readAttribute(final XmlReader reader, final String attribute, final Function<String, R> parser,
