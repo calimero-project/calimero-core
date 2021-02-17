@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -438,25 +438,14 @@ public class KNXNetworkLinkIPTest
 				KNXNetworkLinkIP.DefaultMulticast, groupKey, Duration.ofMillis(2000), new TPSettings()));
 	}
 
-	private static interface DefaultNetworkLinkListener extends NetworkLinkListener {
-		@Override
-		default void linkClosed(final CloseEvent e) {}
-
-		@Override
-		default void indication(final FrameEvent e) {}
-
-		@Override
-		default void confirmation(final FrameEvent e) {}
-	}
-
-	private static interface DefaultMethodEvent extends DefaultNetworkLinkListener {
+	private static interface DefaultMethodEvent extends NetworkLinkListener {
 		@LinkEvent
 		default void tunnelingFeature(final TunnelingFeature feature) { System.out.println("default method event " + feature); }
 	}
 
 	@Test
 	void registerTunnelingFeatureEvents() throws KNXException, InterruptedException {
-		final var listener = new DefaultNetworkLinkListener() {
+		final var listener = new NetworkLinkListener() {
 			@LinkEvent
 			void receivedTunnelingFeature(final TunnelingFeature feature) {
 				System.out.println("received " + feature);
@@ -474,7 +463,7 @@ public class KNXNetworkLinkIPTest
 	@Test
 	void registerRoutingEvents() throws KNXException, InterruptedException, SocketException {
 		try (final var link = KNXNetworkLinkIP.newRoutingLink(Util.localInterface(), KNXNetworkLinkIP.DefaultMulticast, new TPSettings())) {
-			final var listener = new DefaultNetworkLinkListener() {
+			final var listener = new NetworkLinkListener() {
 				@LinkEvent
 				void lostMessage(final LostMessageEvent lostMessage) { System.out.println(lostMessage); }
 
@@ -493,7 +482,7 @@ public class KNXNetworkLinkIPTest
 	@Test
 	void registerUnsupportedEventType() throws KNXException, SocketException {
 		try (final var link = KNXNetworkLinkIP.newRoutingLink(Util.localInterface(), KNXNetworkLinkIP.DefaultMulticast, new TPSettings())) {
-			link.addLinkListener(new DefaultNetworkLinkListener() {
+			link.addLinkListener(new NetworkLinkListener() {
 				@LinkEvent
 				void unsupportedEventType(final RoutingLostMessage lostMessage) { fail("unsupported event type"); }
 			});

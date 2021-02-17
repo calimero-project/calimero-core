@@ -90,9 +90,6 @@ public class TransportLayerImpl implements TransportLayer
 	private final class NLListener implements NetworkLinkListener
 	{
 		@Override
-		public void confirmation(final FrameEvent e) {}
-
-		@Override
 		public void indication(final FrameEvent e)
 		{
 			final var cemi = e.getFrame();

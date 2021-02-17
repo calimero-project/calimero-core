@@ -134,9 +134,6 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		}
 
 		@Override
-		public void confirmation(final FrameEvent e) {}
-
-		@Override
 		public void linkClosed(final CloseEvent e)
 		{
 			logger.info("attached link was closed ({})", e.getReason());

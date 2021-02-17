@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2020 B. Malinowsky
+    Copyright (c) 2015, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,7 +50,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import tuwien.auto.calimero.CloseEvent;
-import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -358,14 +357,6 @@ public final class Connector
 					|| (e.getInitiator() == CloseEvent.SERVER_REQUEST && connector.serverError))
 				scheduleConnect(connector.maxAttempts);
 		}
-
-		@Override
-		public void indication(final FrameEvent e)
-		{}
-
-		@Override
-		public void confirmation(final FrameEvent e)
-		{}
 
 		@Override
 		public String toString() {

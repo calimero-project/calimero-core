@@ -40,7 +40,6 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 import tuwien.auto.calimero.CloseEvent;
-import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
@@ -62,12 +61,6 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 	private final Consumer<CloseEvent> adapterClosed;
 
 	private final class NLListener implements NetworkLinkListener {
-		@Override
-		public void confirmation(final FrameEvent e) {}
-
-		@Override
-		public void indication(final FrameEvent e) {}
-
 		@Override
 		public void linkClosed(final CloseEvent e) {
 			adapterClosed.accept(new CloseEvent(RemotePropertyServiceAdapter.this, e.getInitiator(), e.getReason()));
