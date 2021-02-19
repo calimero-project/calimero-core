@@ -45,6 +45,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
@@ -55,14 +57,18 @@ import java.util.stream.IntStream;
 import org.slf4j.Logger;
 
 import tuwien.auto.calimero.CloseEvent;
+import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.DetachEvent;
+import tuwien.auto.calimero.DeviceDescriptor.DD0;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.SerialNumber;
+import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
@@ -87,6 +93,9 @@ public class ManagementProceduresImpl implements ManagementProcedures
 {
 	private static final int DEVICE_OBJECT_INDEX = 0;
 
+	private static final int DEVICE_DESC_READ = 0x300;
+	private static final int DEVICE_DESC_RESPONSE = 0x340;
+
 	// device memory address for programming mode
 	private static final int memAddrProgMode = 0x60;
 	private static final int defaultApduLength = 15;
@@ -99,39 +108,55 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	private final TransportLayer tl;
 	private final boolean detachMgmtAndTransportLayer;
 
-	private final Logger logger = LogService.getLogger("calimero.mgmt.MgmtProc");
+	private static final Logger logger = LogService.getLogger("calimero.mgmt.MgmtProc");
 
 	private static final class TLListener implements TransportListener
 	{
 		private final Set<IndividualAddress> devices;
 		private final Consumer<IndividualAddress> disconnect;
+		private final BiConsumer<IndividualAddress, DD0> dd0;
 		private final boolean routers;
 
 		private TLListener(final Set<IndividualAddress> scanResult, final boolean scanRouters)
 		{
 			devices = scanResult;
 			disconnect = null;
+			dd0 = (__, ___) -> {};
 			routers = scanRouters;
 		}
 
-		private TLListener(final Consumer<IndividualAddress> onDisconnect, final boolean scanRouters)
+		private TLListener(final Consumer<IndividualAddress> onDisconnect,
+				final BiConsumer<IndividualAddress, DD0> onDD0, final boolean scanRouters)
 		{
 			disconnect = onDisconnect;
+			dd0 = onDD0;
 			devices = null;
 			routers = scanRouters;
 		}
 
 		@Override
-		public void broadcast(final FrameEvent e)
-		{}
+		public void broadcast(final FrameEvent e) {}
 
 		@Override
-		public void dataConnected(final FrameEvent e)
-		{}
+		public void dataConnected(final FrameEvent e) {
+			final var frame = e.getFrame();
+			if (frame instanceof CEMILData) {
+				final byte[] apdu = frame.getPayload();
+				final var source = ((CEMILData) frame).getSource();
+				if (DataUnitBuilder.getAPDUService(apdu) == DEVICE_DESC_RESPONSE) {
+					try {
+						final var dd = DD0.from(Arrays.copyOfRange(apdu, 2, 4));
+						dd0.accept(source, dd);
+					}
+					catch (final RuntimeException rte) { // KNXIllegalArgumentException for unknown DD0
+						logger.info("{} device descriptor 0 response", source, rte);
+					}
+				}
+			}
+		}
 
 		@Override
-		public void dataIndividual(final FrameEvent e)
-		{}
+		public void dataIndividual(final FrameEvent e) {}
 
 		@Override
 		public void disconnected(final Destination d)
@@ -417,8 +442,9 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	}
 
 	@Override
-	public void scanNetworkDevices(final int area, final int line, final Consumer<IndividualAddress> device)
-		throws KNXLinkClosedException, InterruptedException
+	public void scanNetworkDevices(final int area, final int line, final Consumer<IndividualAddress> device,
+			final BiConsumer<IndividualAddress, DD0> deviceWithDescriptor) throws KNXLinkClosedException,
+			InterruptedException
 	{
 		if (area < 0 || area > 0xf)
 			throw new KNXIllegalArgumentException("area out of range [0..0xf]");
@@ -426,7 +452,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			throw new KNXIllegalArgumentException("line out of range [0..0xf]");
 		final List<IndividualAddress> addresses = IntStream.rangeClosed(0, 0xff)
 				.mapToObj((i) -> new IndividualAddress(area, line, i)).collect(Collectors.toList());
-		scanAddresses(addresses, false, device);
+		scanAddresses(addresses, false, device, deviceWithDescriptor);
 	}
 
 	@Override
@@ -659,8 +685,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	// work around for implementation in TL, which unconditionally throws if dst exists
 	private Destination getOrCreateDestination(final IndividualAddress device)
 	{
-		final Destination d = ((TransportLayerImpl) tl).getDestination(device);
-		return d != null ? d : tl.createDestination(device, true);
+		return getOrCreateDestination(device, false, false);
 	}
 
 	// work around for implementation in TL, which unconditionally throws if dst exists
@@ -706,17 +731,34 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	}
 
 	private void scanAddresses(final List<IndividualAddress> addresses, final boolean routers,
-		final Consumer<IndividualAddress> response)
-			throws KNXLinkClosedException, InterruptedException
-	{
-		final TransportListener tll = new TLListener(response, routers);
+			final Consumer<IndividualAddress> response, final BiConsumer<IndividualAddress, DD0> deviceWithDescriptor)
+			throws KNXLinkClosedException, InterruptedException {
+
+		final var connected = new ConcurrentHashMap<IndividualAddress, Destination>();
+		final var disconnectedByRemote = new ConcurrentLinkedQueue<IndividualAddress>();
+		final Consumer<IndividualAddress> onDisconnect = remote -> {
+			if (connected.remove(remote) != null) {
+				disconnectedByRemote.add(remote);
+				response.accept(remote);
+			}
+		};
+
+		final var dd0Requests = new ConcurrentHashMap<IndividualAddress, Destination>();
+		final BiConsumer<IndividualAddress, DD0> onDD0 = (remote, dd0) -> {
+			final var dst = dd0Requests.remove(remote);
+			if (dst != null) {
+				dst.close();
+				deviceWithDescriptor.accept(remote, dd0);
+			}
+		};
+
+		final TransportListener tll = new TLListener(onDisconnect, onDD0, routers);
 		tl.addTransportListener(tll);
 
-		final List<Destination> dst = new ArrayList<>();
 		try {
 			for (final var address : addresses) {
 				final var d = getOrCreateDestination(address, true, false);
-				dst.add(d);
+				connected.put(address, d);
 				try {
 					tl.connect(d);
 				}
@@ -725,6 +767,13 @@ public class ManagementProceduresImpl implements ManagementProcedures
 				}
 				// increased from 100 (the default) to minimize chance of overflow over FT1.2
 				waitFor(115);
+
+				while (!disconnectedByRemote.isEmpty()) {
+					final var ia = disconnectedByRemote.remove();
+					final Destination dd0Req = getOrCreateDestination(ia);
+					dd0Requests.put(ia, dd0Req);
+					sendDD0Read(dd0Req);
+				}
 			}
 			// we wait in total (115 + 6000 + 1000 + 100) ms for a possible T-disconnect, taking
 			// into account the KNXnet/IP tunneling.req retransmit timeout plus some network delay
@@ -733,8 +782,16 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		finally {
 			tl.removeTransportListener(tll);
 			// TODO this is not sufficient in the case getOrCreateDestination throws
-			dst.forEach(Destination::destroy);
+			connected.values().forEach(Destination::destroy);
 		}
+	}
+
+	private void sendDD0Read(final Destination dst) throws KNXLinkClosedException {
+		final byte[] apdu = DataUnitBuilder.createLengthOptimizedAPDU(DEVICE_DESC_READ, (byte) 0);
+		try {
+			tl.sendData(dst, Priority.LOW, apdu);
+		}
+		catch (final KNXDisconnectException ignore) {}
 	}
 
 	private int readMaxAsduLength(final Destination d) throws InterruptedException
