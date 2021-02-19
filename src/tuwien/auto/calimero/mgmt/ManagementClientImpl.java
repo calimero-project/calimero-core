@@ -188,7 +188,7 @@ public class ManagementClientImpl implements ManagementClient
 		@Override
 		public void linkClosed(final CloseEvent e)
 		{
-			logger.info("attached link was closed");
+			logger.debug("attached link was closed");
 		}
 
 		private void checkResponse(final FrameEvent e) {

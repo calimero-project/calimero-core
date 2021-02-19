@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -413,11 +413,14 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 			conn.send(msg, waitForCon ? WaitForCon : WaitForAck);
 			logger.trace("send {}->{} succeeded", msg.getSource(), msg.getDestination());
 		}
-		catch (InterruptedException | KNXConnectionClosedException e) {
+		catch (final InterruptedException e) {
+			close();
+			Thread.currentThread().interrupt();
+			throw new KNXLinkClosedException("link closed (interrupted)");
+		}
+		catch (final KNXConnectionClosedException e) {
 			logger.error("send error, closing link", e);
 			close();
-			if (e instanceof InterruptedException)
-				Thread.currentThread().interrupt();
 			throw new KNXLinkClosedException("link closed, " + e.getMessage());
 		}
 	}

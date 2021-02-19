@@ -198,7 +198,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		{
 			AbstractLink.this.closed = true;
 			super.connectionClosed(e);
-			logger.info("link closed");
+			logger.debug("link closed");
 		}
 	};
 
