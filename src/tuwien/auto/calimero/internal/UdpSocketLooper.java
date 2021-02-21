@@ -38,6 +38,7 @@ package tuwien.auto.calimero.internal;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.io.UncheckedIOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
@@ -146,7 +147,7 @@ public abstract class UdpSocketLooper
 			Thread.currentThread().interrupt();
 		}
 		catch (final ClosedChannelException ignore) {}
-		catch (final IOException e) {
+		catch (IOException | UncheckedIOException e) {
 			if (!quit)
 				throw e;
 		}
