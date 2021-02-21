@@ -39,23 +39,26 @@ package tuwien.auto.calimero.knxnetip;
 import static tuwien.auto.calimero.knxnetip.util.Srp.withDeviceDescription;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.StandardProtocolFamily;
+import java.net.StandardSocketOptions;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CancellationException;
@@ -72,6 +75,7 @@ import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.KnxRuntimeException;
 import tuwien.auto.calimero.internal.UdpSocketLooper;
 import tuwien.auto.calimero.knxnetip.servicetype.DescriptionRequest;
 import tuwien.auto.calimero.knxnetip.servicetype.DescriptionResponse;
@@ -141,20 +145,6 @@ public class Discoverer
 			logger.error("on resolving system setup multicast " + SEARCH_MULTICAST, e);
 		}
 		SYSTEM_SETUP_MULTICAST = a;
-	}
-
-	private static boolean win7_OrLater;
-	private static boolean osx;
-	static {
-		// find out if we're on Windows 7 or later
-		final String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
-		if (os.indexOf("windows") >= 0) {
-			// minor: 0 = vista, 1 = win 7, 2 = win 8, 3 = win 8.1, 4 = win 10,  ...
-			final String ver = System.getProperty("os.version", "generic");
-			win7_OrLater = Double.parseDouble(ver) >= 6.1;
-		}
-		if (os.indexOf("mac os x") >= 0)
-			osx = true;
 	}
 
 	// local host/port
@@ -328,26 +318,51 @@ public class Discoverer
 
 	// extended unicast search to server control endpoint
 	public CompletableFuture<Result<SearchResponse>> search(final InetSocketAddress serverControlEndpoint,
-		final Srp... searchParameters) throws KNXException {
+			final Srp... searchParameters) throws KNXException {
 
-		final InetAddress addr = host(host);
-		final MulticastSocket s = createSocket(true, addr, port, null, false);
-		// create a new socket address with host, since the socket might
-		// return the wildcard address for loopback or default host address; but port
-		// is necessarily queried from socket since it might have been 0 before (for ephemeral port)
-		final InetSocketAddress local = new InetSocketAddress(addr, s.getLocalPort());
-		logger.debug("search {} -> server control endpoint {}", local, serverControlEndpoint);
+		final InetAddress addr = nat ? host : host != null ? host
+				: onSameSubnet(serverControlEndpoint.getAddress()).orElseGet(Discoverer::localHost);
 		try {
+			final var dc = newChannel(new InetSocketAddress(addr, port));
+			// create a new socket address with host, since the socket might
+			// return the wildcard address for loopback or default host address; but port
+			// is necessarily queried from socket since it might have been 0 before (for ephemeral port)
+			final InetSocketAddress local = (InetSocketAddress) dc.getLocalAddress();
+			logger.debug("search {} -> server control endpoint {}", ConnectionBase.hostPort(local),
+					serverControlEndpoint);
 			final boolean tcp = false;
 			final InetSocketAddress res = tcp || nat ? new InetSocketAddress(0) : local;
 
 			final byte[] request = PacketHelper.toPacket(new SearchRequest(res, searchParameters));
-			s.send(new DatagramPacket(request, request.length, serverControlEndpoint));
-			return receiveAsync(s, serverControlEndpoint, Duration.ofSeconds(10));
+			dc.send(ByteBuffer.wrap(request), serverControlEndpoint);
+			return receiveAsync(dc, serverControlEndpoint, Duration.ofSeconds(10));
 		}
 		catch (final IOException e) {
-			s.close();
-			throw new KNXException("search request to " + serverControlEndpoint + " failed on " + local, e);
+			throw new KNXException("search request to " + serverControlEndpoint + " failed on " + addr, e);
+		}
+	}
+
+	// finds a local IPv4 address with its network prefix "matching" the remote address
+	private Optional<InetAddress> onSameSubnet(final InetAddress remote) {
+		try {
+			return Collections.list(NetworkInterface.getNetworkInterfaces()).stream()
+					.flatMap(ni -> ni.getInterfaceAddresses().stream())
+					.filter(ia -> ia.getAddress() instanceof Inet4Address)
+					.peek(ia -> logger.trace("match local address {}/{} to {}", ia.getAddress(),
+							ia.getNetworkPrefixLength(), remote))
+					.filter(ia -> ClientConnection.matchesPrefix(ia.getAddress(), ia.getNetworkPrefixLength(), remote))
+					.map(ia -> ia.getAddress()).findFirst();
+		}
+		catch (final SocketException ignore) {}
+		return Optional.empty();
+	}
+
+	private static InetAddress localHost() {
+		try {
+			return InetAddress.getLocalHost();
+		}
+		catch (final UnknownHostException e) {
+			throw new KnxRuntimeException("local IP required, but getting local host failed");
 		}
 	}
 
@@ -374,7 +389,6 @@ public class Discoverer
 	 * @throws InterruptedException if search was interrupted in blocking mode before the
 	 *         specified timeout was reached; the search is stopped before passing this
 	 *         exception back to the caller
-	 * @see MulticastSocket
 	 * @see NetworkInterface
 	 */
 	public void startSearch(final NetworkInterface ni, final int timeout, final boolean wait)
@@ -406,7 +420,6 @@ public class Discoverer
 	 * @throws InterruptedException if search was interrupted in blocking mode before the
 	 *         specified timeout was reached; the search is stopped before passing this
 	 *         exception back to the caller
-	 * @see MulticastSocket
 	 * @see NetworkInterface
 	 */
 	public void startSearch(final int localPort, final NetworkInterface ni, final int timeout,
@@ -613,13 +626,11 @@ public class Discoverer
 	{
 		if (timeout <= 0 || timeout >= Integer.MAX_VALUE / 1000)
 			throw new KNXIllegalArgumentException("timeout out of range");
-		final DatagramSocket s = createSocket(true, host(server.getAddress()), port, null, false);
-		final var local = (InetSocketAddress) s.getLocalSocketAddress();
-		try {
-			final byte[] buf = PacketHelper.toPacket(new DescriptionRequest(nat ? null
-					: (InetSocketAddress) s.getLocalSocketAddress()));
-			s.send(new DatagramPacket(buf, buf.length, server));
-			final ReceiverLoop looper = new ReceiverLoop(s, 512, timeout * 1000, server);
+		try (final var dc = newChannel(new InetSocketAddress(host(server.getAddress()), port))) {
+			final var local = (InetSocketAddress) dc.getLocalAddress();
+			final byte[] buf = PacketHelper.toPacket(new DescriptionRequest(nat ? null : local));
+			dc.send(ByteBuffer.wrap(buf), server);
+			final ReceiverLoop looper = new ReceiverLoop(dc, 512, timeout * 1000, server);
 			looper.loop();
 			if (looper.thrown != null)
 				throw looper.thrown;
@@ -631,9 +642,6 @@ public class Discoverer
 			final String msg = "network failure on getting description from " + server;
 			logger.error(msg, e);
 			throw new KNXException(msg, e);
-		}
-		finally {
-			s.close();
 		}
 		final String msg = "timeout, no description response received from " + server;
 		logger.warn(msg);
@@ -654,107 +662,52 @@ public class Discoverer
 	private CompletableFuture<Void> search(final InetAddress localAddr, final int localPort,
 		final NetworkInterface ni, final Duration timeout) throws KNXException
 	{
-		final MulticastSocket s = createSocket(false, localAddr, localPort, ni, mcast);
-		// create a new socket address with the address from a, since the socket might
-		// return the wildcard address for loopback or default host address; but port
-		// is necessarily queried from socket since in a it might be 0 (for ephemeral port)
-		final String nifName = ni != null ? ni.getName() + " " : "";
-		logger.debug("search on " + nifName + new InetSocketAddress(localAddr, s.getLocalPort()));
+		final var bind = mcast ? new InetSocketAddress(SEARCH_PORT) : new InetSocketAddress(localAddr, localPort);
 		try {
-			// send out beyond local network
-			s.setTimeToLive(64);
+			final var channel = newChannel(bind);
+			if (ni != null)
+				channel.setOption(StandardSocketOptions.IP_MULTICAST_IF, ni);
+			if (mcast)
+				channel.join(SYSTEM_SETUP_MULTICAST, ni);
 
-			// leave loopback behavior on while sending datagrams, because:
-			// - some sockets don't support this option at all
-			// - IP_MULTICAST_LOOP option applies to the datagram receive path on Windows,
-			// but to the send path on unix platforms.
-			// I love those platform dependencies... ;)
-			//try {
-			//	s.setLoopbackMode(true);
-			//}
-			//catch (SocketException ignore) {}
+			// create a new socket address with the address from a, since the socket might
+			// return the wildcard address for loopback or default host address; but port
+			// is necessarily queried from socket since in a it might be 0 (for ephemeral port)
+			final String nifName = ni != null ? ni.getName() + " " : "";
+			final int realLocalPort = ((InetSocketAddress) channel.getLocalAddress()).getPort();
+			logger.debug("search on " + nifName + new InetSocketAddress(localAddr, realLocalPort));
 
 			// IP multicast responses MUST be forwarded by NAT without
 			// modifications to IP/port, hence, we can safely state them in our HPAI
-			final InetSocketAddress res = mcast ? new InetSocketAddress(SYSTEM_SETUP_MULTICAST, s.getLocalPort())
-					: nat ? new InetSocketAddress(0) : new InetSocketAddress(localAddr, s.getLocalPort());
+			final InetSocketAddress res = mcast ? new InetSocketAddress(SYSTEM_SETUP_MULTICAST, realLocalPort)
+					: nat ? new InetSocketAddress(0) : new InetSocketAddress(localAddr, realLocalPort);
+
+			final var dst = new InetSocketAddress(SYSTEM_SETUP_MULTICAST, SEARCH_PORT);
 
 			// send search request with additional DIBs
 			final byte[] extraDibs = PacketHelper.toPacket(new SearchRequest(res,
 				withDeviceDescription(DIB.DEVICE_INFO, DIB.SUPP_SVC_FAMILIES, DIB.AdditionalDeviceInfo,
 					DIB.SecureServiceFamilies, DIB.TunnelingInfo)));
-			s.send(new DatagramPacket(extraDibs, extraDibs.length, SYSTEM_SETUP_MULTICAST, SEARCH_PORT));
+			channel.send(ByteBuffer.wrap(extraDibs), dst);
 
 			// send standard search request
 			final byte[] std = PacketHelper.toPacket(new SearchRequest(res));
-			s.send(new DatagramPacket(std, std.length, SYSTEM_SETUP_MULTICAST, SEARCH_PORT));
+			channel.send(ByteBuffer.wrap(std), dst);
 
-			return receiveAsync(s, localAddr, timeout, nifName + localAddr.getHostAddress());
+			return receiveAsync(channel, localAddr, timeout, nifName + localAddr.getHostAddress());
 		}
-		catch (final IOException e) {
-			if (mcast)
-				try {
-					s.leaveGroup(new InetSocketAddress(SYSTEM_SETUP_MULTICAST, 0), null);
-				}
-				catch (final IOException ignore) {}
-			s.close();
+		catch (IOException | RuntimeException e) {
 			throw new KNXException("search request to " + SYSTEM_SETUP_MULTICAST + " failed on "
 					+ localAddr + ":" + localPort, e);
 		}
 	}
 
-	// ni can be null to use default interface
-	private static MulticastSocket createSocket(final boolean unicast, final InetAddress bindAddr,
-		final int bindPort, final NetworkInterface ni, final boolean mcastResponse)
-		throws KNXException
-	{
-		MulticastSocket s = null;
-		try {
-			if (unicast)
-				return new MulticastSocket(new InetSocketAddress(bindAddr, bindPort));
-			s = new MulticastSocket(null);
-			if (mcastResponse)
-				s.bind(new InetSocketAddress(SEARCH_PORT));
-			else
-				s.bind(new InetSocketAddress(bindAddr, bindPort));
-			try {
-				// Under Windows >=7 (still the same on Win 8.1), setting the interface might
-				// throw with WSAENOTSOCK. This is due to IPv6 handling, see also bug JDK-6458027.
-				// Solution: set java.net.preferIPv4Stack=true or uncheck
-				// Internet Protocol Version 6 (TCP/IPv6) in Windows network connections
-				if (ni != null)
-					s.setNetworkInterface(ni);
-			}
-			catch (final IOException e) {
-				if (!win7_OrLater)
-					throw e;
-				logger.warn("setting outgoing network interface " + ni.getName() + " failed, using system default."
-						+ " Either disable IPv6 or set java.net.preferIPv4Stack=true.");
-			}
-		}
-		catch (final IOException e) {
-			final String msg = "failed to create socket on " + bindAddr + ":" + bindPort;
-			logger.warn(msg, e);
-			throw new KNXException(msg, e);
-		}
-		if (mcastResponse) {
-			try {
-				s.joinGroup(new InetSocketAddress(SYSTEM_SETUP_MULTICAST, 0), ni);
-
-				// For some reasons, OS X sends IGMP membership reports with a delay
-				if (osx)
-					Thread.sleep(500);
-			}
-			catch (final IOException e) {
-				s.close();
-				throw new KNXException("failed to join multicast group " + SYSTEM_SETUP_MULTICAST
-						+ (ni == null ? "" : " at " + ni.getName()), e);
-			}
-			catch (final InterruptedException e) {
-				Thread.currentThread().interrupt();
-			}
-		}
-		return s;
+	private static DatagramChannel newChannel(final InetSocketAddress bind) throws IOException {
+		return (DatagramChannel) DatagramChannel.open(StandardProtocolFamily.INET)
+				.setOption(StandardSocketOptions.SO_REUSEADDR, true)
+				.bind(bind)
+				.setOption(StandardSocketOptions.IP_MULTICAST_TTL, 64)
+				.configureBlocking(false);
 	}
 
 	private synchronized InetAddress host(final InetAddress remote) throws KNXException
@@ -777,11 +730,11 @@ public class Discoverer
 		return t;
 	});
 
-	private CompletableFuture<Void> receiveAsync(final MulticastSocket socket, final InetAddress addrOnNetIf,
-		final Duration timeout, final String name)
+	private CompletableFuture<Void> receiveAsync(final DatagramChannel dc, final InetAddress addrOnNetIf,
+		final Duration timeout, final String name) throws IOException
 	{
-		final ReceiverLoop looper = new ReceiverLoop(socket, addrOnNetIf, 512, timeout, name
-				+ ":" + socket.getLocalPort());
+		final ReceiverLoop looper = new ReceiverLoop(dc, addrOnNetIf, 512, timeout, name
+				+ ":" + ((InetSocketAddress) dc.getLocalAddress()).getPort());
 		final CompletableFuture<Void> cf = CompletableFuture.runAsync(looper, executor);
 		cf.exceptionally(t -> {
 			looper.quit();
@@ -790,12 +743,12 @@ public class Discoverer
 		return cf;
 	}
 
-	private CompletableFuture<Result<SearchResponse>> receiveAsync(final MulticastSocket socket,
-		final InetSocketAddress serverCtrlEndpoint, final Duration timeout) throws SocketException {
+	private CompletableFuture<Result<SearchResponse>> receiveAsync(final DatagramChannel dc,
+		final InetSocketAddress serverCtrlEndpoint, final Duration timeout) throws IOException {
 
-		final NetworkInterface nif = socket.getNetworkInterface();
-		final InetSocketAddress local = (InetSocketAddress) socket.getLocalSocketAddress();
-		final ReceiverLoop looper = new ReceiverLoop(socket, 512, 0, serverCtrlEndpoint);
+		final NetworkInterface nif = dc.getOption(StandardSocketOptions.IP_MULTICAST_IF);
+		final InetSocketAddress local = (InetSocketAddress) dc.getLocalAddress();
+		final ReceiverLoop looper = new ReceiverLoop(dc, 512, (int) timeout.toMillis() + 1000, serverCtrlEndpoint);
 		final CompletableFuture<Result<SearchResponse>> cf = CompletableFuture.runAsync(looper, executor)
 				.thenApply(__ -> new Result<>(looper.sr, nif, local, serverCtrlEndpoint))
 				.orTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS);
@@ -810,7 +763,7 @@ public class Discoverer
 	{
 		private final boolean multicast;
 		private final InetSocketAddress server;
-		private NetworkInterface nif;
+		private final NetworkInterface nif;
 
 		// we want this address to return it in a search result even if the socket was not bound
 		private final InetAddress addrOnNetif;
@@ -821,43 +774,43 @@ public class Discoverer
 		private KNXInvalidResponseException thrown;
 		private final String id;
 
+		private final Selector selector;
+		private final Duration timeout;
+
+
 		// use for search looper
 		// timeout in milliseconds
-		ReceiverLoop(final MulticastSocket socket, final InetAddress addrOnNetIf,
-			final int receiveBufferSize, final Duration timeout, final String name)
-		{
-			super(socket, true, receiveBufferSize, 0, (int) timeout.toMillis());
-			try {
-				nif = socket.getNetworkInterface();
-			}
-			catch (final SocketException e) {
-				throw new KNXIllegalArgumentException("getting network interface of socket " + socket, e);
-			}
+		ReceiverLoop(final DatagramChannel dc, final InetAddress addrOnNetIf, final int receiveBufferSize,
+				final Duration timeout, final String name) throws IOException {
+			super(null, false, receiveBufferSize, 0, (int) timeout.toMillis());
+
+			nif = dc.getOption(StandardSocketOptions.IP_MULTICAST_IF);
 			this.addrOnNetif = addrOnNetIf;
 			multicast = true;
 			server = null;
 			id = name;
+
+			selector = Selector.open();
+			dc.register(selector, SelectionKey.OP_READ);
+
+			this.timeout = timeout;
 		}
 
 		// use for description looper
 		// timeout in milliseconds
-		ReceiverLoop(final DatagramSocket socket, final int receiveBufferSize, final int timeout,
-			final InetSocketAddress queriedServer)
-		{
-			super(socket, true, receiveBufferSize, 0, timeout);
+		ReceiverLoop(final DatagramChannel dc, final int receiveBufferSize, final int timeout,
+				final InetSocketAddress queriedServer) throws IOException {
+			super(null, true, receiveBufferSize, 0, timeout);
+			nif = null;
 			addrOnNetif = null;
 			multicast = false;
 			server = queriedServer;
-			id = "" + socket.getLocalSocketAddress();
-		}
+			id = "" + dc.getLocalAddress();
 
-		ReceiverLoop(final DatagramSocket socket, final int receiveBufferSize, final Duration timeout,
-			final InetSocketAddress serverCtrlEndpoint) {
-			super(socket, true, receiveBufferSize, 0, (int) timeout.toMillis());
-			addrOnNetif = null;
-			multicast = false;
-			server = serverCtrlEndpoint;
-			id = "" + serverCtrlEndpoint;
+			selector = Selector.open();
+			dc.register(selector, SelectionKey.OP_READ);
+
+			this.timeout = Duration.ofMillis(timeout);
 		}
 
 		@Override
@@ -877,18 +830,6 @@ public class Discoverer
 				Thread.currentThread().setName("Discoverer (idle)");
 				receivers.remove(this);
 			}
-		}
-
-		@Override
-		public void quit()
-		{
-			if (multicast) {
-				try {
-					((MulticastSocket) s).leaveGroup(new InetSocketAddress(SYSTEM_SETUP_MULTICAST, 0), null);
-				}
-				catch (final IOException ignore) {}
-			}
-			super.quit();
 		}
 
 		@Override
@@ -946,6 +887,27 @@ public class Discoverer
 			}
 			catch (final RuntimeException e) {
 				logger.error("error parsing received packet from {}", source, e);
+			}
+		}
+
+		@Override
+		protected void receive(final byte[] buf) throws IOException {
+			var remaining = timeout;
+			final var end = Instant.now().plus(remaining);
+			while (remaining.toMillis() > 0) {
+				if (selector.select(remaining.toMillis()) > 0) {
+					for (final var i = selector.selectedKeys().iterator(); i.hasNext();) {
+						final var key = i.next();
+						final var channel = key.channel();
+						final ByteBuffer buffer = ByteBuffer.wrap(buf);
+						final var source = ((DatagramChannel) channel).receive(buffer);
+						buffer.flip();
+						onReceive((InetSocketAddress) source, buf, buffer.position(), buffer.remaining());
+						i.remove();
+					}
+					return;
+				}
+				remaining = Duration.between(Instant.now(), end);
 			}
 		}
 	}
