@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -245,7 +245,6 @@ public class KNXnetIPHeader
 
 	/**
 	 * Returns the service type identifier.
-	 * <p>
 	 *
 	 * @return service type as unsigned 16 bit value
 	 */
@@ -256,7 +255,6 @@ public class KNXnetIPHeader
 
 	/**
 	 * Returns the KNXnet/IP protocol version of the frame.
-	 * <p>
 	 *
 	 * @return protocol version as unsigned 8 bit value
 	 */
@@ -267,7 +265,6 @@ public class KNXnetIPHeader
 
 	/**
 	 * Returns the length of the KNXnet/IP header structure.
-	 * <p>
 	 *
 	 * @return the length in bytes
 	 */
@@ -291,7 +288,6 @@ public class KNXnetIPHeader
 
 	/**
 	 * Returns the byte representation of the KNXnet/IP header structure.
-	 * <p>
 	 *
 	 * @return byte array containing structure
 	 */
@@ -309,7 +305,6 @@ public class KNXnetIPHeader
 
 	/**
 	 * Returns a textual representation of this KNXnet/IP header.
-	 * <p>
 	 *
 	 * @return a string representation of the object
 	 */

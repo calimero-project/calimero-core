@@ -355,7 +355,7 @@ public class KNXnetIPRouting extends ConnectionBase
 			else
 				setNetif = defaultNetif;
 
-			logger.debug("join multicast group {} on {}", multicast.getHostAddress(), setNetif);
+			logger.debug("join multicast group {} on {}", multicast.getHostAddress(), setNetif.getName());
 			dc.join(multicast, setNetif);
 			if (dcSysBcast != null)
 				dcSysBcast.join(systemBroadcast, setNetif);

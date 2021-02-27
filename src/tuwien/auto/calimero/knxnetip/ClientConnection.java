@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2020 B. Malinowsky
+    Copyright (c) 2010, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -193,7 +193,7 @@ abstract class ClientConnection extends ConnectionBase
 			}
 
 			final var lsa = localSocketAddress();
-			logger.debug("establish connection from {} to {} ({})", lsa, ctrlEndpt, tcp ? "tcp" : "udp");
+			logger.debug("establish connection from {} to {} ({})", hostPort(lsa), hostPort(ctrlEndpt), tcp ? "tcp" : "udp");
 			// HPAI throws if wildcard local address (0.0.0.0) is supplied
 			final var hpai = tcp ? HPAI.Tcp : new HPAI(HPAI.IPV4_UDP, useNat ? null : lsa);
 			final byte[] buf = PacketHelper.toPacket(new ConnectRequest(cri, hpai, hpai));
@@ -208,10 +208,10 @@ abstract class ClientConnection extends ConnectionBase
 			if (local.getAddress().isLoopbackAddress())
 				logger.warn("local endpoint uses loopback address ({}), try with a different IP address",
 						local.getAddress());
-			throw new KNXException("connecting from " + local + " to " + serverCtrlEP + ": " + e.getMessage());
+			throw new KNXException("connecting from " + hostPort(local) + " to " + hostPort(ctrlEndpt) + ": " + e.getMessage());
 		}
 
-		logger.debug("wait for connect response from " + ctrlEndpt + " ...");
+		logger.debug("wait for connect response from {} ...", hostPort(ctrlEndpt));
 		if (!tcp)
 			startReceiver();
 		try {

@@ -213,13 +213,11 @@ public class Discoverer
 		/**
 		 * @return address of the remote endpoint which sent the response
 		 */
-		public InetSocketAddress remoteEndpoint() {
-			return remote;
-		}
+		public InetSocketAddress remoteEndpoint() { return remote; }
 
 		@Override
 		public String toString() {
-			return local + " (" + ni.getName() + ") <- " + response;
+			return ConnectionBase.hostPort(local) + " (" + ni.getName() + ") <- " + response;
 		}
 
 		@Override

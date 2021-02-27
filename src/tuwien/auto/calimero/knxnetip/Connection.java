@@ -272,6 +272,7 @@ public final class Connection implements Closeable {
 		private void setupSecureSession()
 				throws KNXTimeoutException, KNXConnectionClosedException, InterruptedException {
 			conn.sessionRequestLock.lock();
+			final var hostPort = hostPort(conn.server);
 			try {
 				if (sessionState == SessionState.Authenticated)
 					return;
@@ -279,7 +280,7 @@ public final class Connection implements Closeable {
 				sessionStatus = Setup;
 				conn.inSessionRequestStage = this;
 
-				logger.debug("setup secure session with {}", conn.server);
+				logger.debug("setup secure session with {}", hostPort);
 
 				initKeys();
 				conn.connect();
@@ -292,24 +293,24 @@ public final class Connection implements Closeable {
 					throw new KnxSecureException("secure session " + SecureConnection.statusMsg(sessionStatus));
 				}
 				if (sessionState == SessionState.Idle)
-					throw new KNXTimeoutException("timeout establishing secure session with " + conn.server);
+					throw new KNXTimeoutException("timeout establishing secure session with " + hostPort);
 
 				final var delay = keepAliveInvterval.toMillis();
 				keepAliveFuture = keepAliveSender.scheduleWithFixedDelay(this::sendKeepAlive, delay, delay,
 						TimeUnit.MILLISECONDS);
 			}
 			catch (final GeneralSecurityException e) {
-				throw new KnxSecureException("error creating key pair for " + conn.server, e);
+				throw new KnxSecureException("error creating key pair for " + hostPort, e);
 			}
 			catch (final SocketTimeoutException e) {
 				Thread.currentThread().interrupt();
 				throw new InterruptedException(
-						"interrupted I/O establishing secure session with " + conn.server + ": " + e.getMessage());
+						"interrupted I/O establishing secure session with " + hostPort + ": " + e.getMessage());
 			}
 			catch (final IOException e) {
 				close();
 				conn.close();
-				throw new KNXConnectionClosedException("I/O error establishing secure session with " + conn.server, e);
+				throw new KNXConnectionClosedException("I/O error establishing secure session with " + hostPort, e);
 			}
 			finally {
 				conn.sessionRequestLock.unlock();
@@ -756,7 +757,8 @@ public final class Connection implements Closeable {
 			Thread.currentThread().interrupt();
 		}
 		catch (IOException | RuntimeException e) {
-			logger.error("receiver communication failure", e);
+			if (!socket.isClosed())
+				logger.error("receiver communication failure", e);
 		}
 		finally {
 			close();
