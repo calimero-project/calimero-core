@@ -43,6 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static tuwien.auto.calimero.knxnetip.util.Srp.withDeviceDescription;
 import static tuwien.auto.calimero.knxnetip.util.Srp.withService;
 
 import java.net.InetSocketAddress;
@@ -74,6 +75,7 @@ import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.knxnetip.Discoverer.Result;
 import tuwien.auto.calimero.knxnetip.servicetype.DescriptionResponse;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
+import tuwien.auto.calimero.knxnetip.util.DIB;
 import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB;
 
 /**
@@ -469,5 +471,17 @@ class DiscovererTest
 		final CompletableFuture<Result<SearchResponse>> search = ddef.search(server,
 				withService(ServiceFamiliesDIB.CORE, 2));
 		assertThrows(ExecutionException.class, search::get);
+	}
+
+	@Test
+	void tcpEndpointSearch() throws KNXException, InterruptedException, ExecutionException {
+		final InetSocketAddress server = Util.getServer();
+		try (var c = Connection.newTcpConnection(new InetSocketAddress(0), server)) {
+			final var result = Discoverer.tcp(c).search(new InetSocketAddress(0),
+					withDeviceDescription(DIB.DEVICE_INFO, DIB.SUPP_SVC_FAMILIES, DIB.AdditionalDeviceInfo,
+							DIB.SecureServiceFamilies, DIB.TunnelingInfo));
+			final var response = result.get();
+			assertEquals(server, response.remoteEndpoint());
+		}
 	}
 }

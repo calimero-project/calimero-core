@@ -1,7 +1,7 @@
 /*
     Calimero 2 - A library for KNX network access
     Copyright (c) 2005 B. Erb
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
     Copyright (c) 2018 Karsten Heimrich
 
     This program is free software; you can redistribute it and/or modify
@@ -87,6 +87,17 @@ public class SearchRequest extends ServiceType
 		if (svcType != KNXnetIPHeader.SEARCH_REQ && svcType != KNXnetIPHeader.SearchRequest)
 			throw new KNXIllegalArgumentException("not a search request");
 		return new SearchRequest(svcType, data, offset, h.getTotalLength() - h.getStructLength());
+	}
+
+	public static SearchRequest newTcpRequest(final Srp... searchParameters) {
+		return new SearchRequest(searchParameters);
+	}
+
+	private SearchRequest(final Srp... searchParameters) {
+		super(KNXnetIPHeader.SearchRequest);
+		endpoint = HPAI.Tcp;
+		for (final Srp searchParameter : searchParameters)
+			srps.add(searchParameter);
 	}
 
 	/**

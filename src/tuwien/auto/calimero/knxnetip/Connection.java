@@ -413,6 +413,25 @@ public final class Connection implements Closeable {
 
 		private void dispatchToConnection(final KNXnetIPHeader header, final byte[] data, final int offset,
 				final int length) {
+
+			final int svcType = header.getServiceType();
+			if (svcType == KNXnetIPHeader.SearchResponse || svcType == KNXnetIPHeader.DESCRIPTION_RES) {
+				for (final var client : securedConnections.values())
+					try {
+						client.handleServiceType(header, data, offset, conn.server.getAddress(), conn.server.getPort());
+					}
+					catch (final KNXFormatException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					catch (final IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				return;
+			}
+
+
 			final var channelId = channelId(header, data, offset);
 			var connection = securedConnections.get(channelId);
 			if (connection == null) {
@@ -783,6 +802,13 @@ public final class Connection implements Closeable {
 
 	private void dispatchToConnection(final KNXnetIPHeader header, final byte[] data, final int offset)
 			throws IOException, KNXFormatException {
+		final int svcType = header.getServiceType();
+		if (svcType == KNXnetIPHeader.SearchResponse || svcType == KNXnetIPHeader.DESCRIPTION_RES) {
+			for (final var client : unsecuredConnections.values())
+				client.handleServiceType(header, data, offset, server.getAddress(), server.getPort());
+			return;
+		}
+
 		final var channelId = channelId(header, data, offset);
 		var connection = unsecuredConnections.get(channelId);
 		if (connection == null) {
@@ -794,7 +820,7 @@ public final class Connection implements Closeable {
 
 		if (connection != null) {
 			connection.handleServiceType(header, data, offset, server.getAddress(), server.getPort());
-			if (header.getServiceType() == KNXnetIPHeader.DISCONNECT_RES)
+			if (svcType == KNXnetIPHeader.DISCONNECT_RES)
 				unsecuredConnections.remove(channelId);
 		}
 		else
