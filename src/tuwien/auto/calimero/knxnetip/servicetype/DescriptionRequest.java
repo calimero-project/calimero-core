@@ -1,7 +1,7 @@
 /*
     Calimero 2 - A library for KNX network access
     Copyright (c) 2005 B. Erb
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,20 +52,23 @@ import tuwien.auto.calimero.knxnetip.util.HPAI;
  * counterpart to this request is the description response.
  * <p>
  * Objects of this type are immutable.
- * 
+ *
  * @author Bernhard Erb
  * @author B. Malinowsky
  * @see tuwien.auto.calimero.knxnetip.servicetype.DescriptionResponse
  * @see tuwien.auto.calimero.knxnetip.Discoverer
  */
-public class DescriptionRequest extends ServiceType
-{
+public class DescriptionRequest extends ServiceType {
+	private static final DescriptionRequest tcpRequest = new DescriptionRequest(HPAI.Tcp);
+
 	private final HPAI endpoint;
+
+
+	public static DescriptionRequest tcpRequest() { return tcpRequest; }
 
 	/**
 	 * Creates a description request out of a byte array.
-	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing a description request structure
 	 * @param offset start offset of request in <code>data</code>
 	 * @throws KNXFormatException if no description request was found or invalid structure
@@ -77,10 +80,8 @@ public class DescriptionRequest extends ServiceType
 	}
 
 	/**
-	 * Creates a new description request with the given client control endpoint for a
-	 * description response.
-	 * <p>
-	 * 
+	 * Creates a new description request with the given client control endpoint for a description response.
+	 *
 	 * @param ctrlEndpoint client control endpoint used for response
 	 */
 	public DescriptionRequest(final HPAI ctrlEndpoint)
@@ -90,11 +91,8 @@ public class DescriptionRequest extends ServiceType
 	}
 
 	/**
-	 * Creates a new description request with the client address used for a description
-	 * response.
-	 * <p>
-	 * This request uses the UDP transport protocol.
-	 * 
+	 * Creates a new UDP description request with the supplied address used for a description response.
+	 *
 	 * @param responseAddr address of client control endpoint used for response, use
 	 *        <code>null</code> if NAT is used on the IP network
 	 */
@@ -107,7 +105,7 @@ public class DescriptionRequest extends ServiceType
 	/**
 	 * Convenience constructor to create a new description request using the UDP transport
 	 * protocol and the system default local host with the supplied client port.
-	 * 
+	 *
 	 * @param responsePort port number of the client control endpoint used for response, 0
 	 *        &lt;= port &lt;= 0xFFFF
 	 */
@@ -119,8 +117,7 @@ public class DescriptionRequest extends ServiceType
 
 	/**
 	 * Returns the client control endpoint.
-	 * <p>
-	 * 
+	 *
 	 * @return control endpoint in a HPAI
 	 */
 	public final HPAI getEndpoint()
@@ -128,19 +125,12 @@ public class DescriptionRequest extends ServiceType
 		return endpoint;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceType#getStructLength()
-	 */
 	@Override
 	int getStructLength()
 	{
 		return endpoint.getStructLength();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceType#toByteArray
-	 *      (java.io.ByteArrayOutputStream)
-	 */
 	@Override
 	byte[] toByteArray(final ByteArrayOutputStream os)
 	{

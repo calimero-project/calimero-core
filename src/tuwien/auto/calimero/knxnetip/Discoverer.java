@@ -90,7 +90,6 @@ import tuwien.auto.calimero.knxnetip.servicetype.SearchRequest;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
 import tuwien.auto.calimero.knxnetip.util.CRI;
 import tuwien.auto.calimero.knxnetip.util.DIB;
-import tuwien.auto.calimero.knxnetip.util.HPAI;
 import tuwien.auto.calimero.knxnetip.util.Srp;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.log.LogService;
@@ -791,7 +790,7 @@ public class Discoverer
 	}
 
 	private CompletableFuture<Result<DescriptionResponse>> tcpDescription() throws KNXException {
-		final byte[] request = PacketHelper.toPacket(new DescriptionRequest(HPAI.Tcp));
+		final byte[] request = PacketHelper.toPacket(DescriptionRequest.tcpRequest());
 		return tcpSend(request);
 	}
 
