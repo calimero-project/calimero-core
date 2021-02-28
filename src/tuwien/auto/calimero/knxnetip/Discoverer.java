@@ -231,7 +231,7 @@ public class Discoverer
 
 		@Override
 		public String toString() {
-			return ConnectionBase.hostPort(local) + " (" + ni.getName() + ") <- " + response;
+			return hostPort(local) + " (" + ni.getName() + ") <- " + response;
 		}
 
 		@Override
@@ -373,8 +373,7 @@ public class Discoverer
 			// return the wildcard address for loopback or default host address; but port
 			// is necessarily queried from socket since it might have been 0 before (for ephemeral port)
 			final InetSocketAddress local = (InetSocketAddress) dc.getLocalAddress();
-			logger.debug("search {} -> server control endpoint {}", ConnectionBase.hostPort(local),
-					ConnectionBase.hostPort(serverControlEndpoint));
+			logger.debug("search {} -> server control endpoint {}", hostPort(local), hostPort(serverControlEndpoint));
 
 			final boolean tcp = false;
 			final InetSocketAddress res = tcp || nat ? new InetSocketAddress(0) : local;
@@ -384,8 +383,7 @@ public class Discoverer
 			return receiveAsync(dc, serverControlEndpoint, Optional.ofNullable(timeout).orElse(Duration.ofSeconds(10)));
 		}
 		catch (final IOException e) {
-			throw new KNXException("search request to " +
-					ConnectionBase.hostPort(serverControlEndpoint) + " failed on " + addr, e);
+			throw new KNXException("search request to " + hostPort(serverControlEndpoint) + " failed on " + addr, e);
 		}
 	}
 
@@ -784,17 +782,12 @@ public class Discoverer
 			if (looper.thrown != null)
 				throw looper.thrown;
 			if (looper.res != null)
-				return new Result<>(looper.res, NetworkInterface.getByInetAddress(host(server.getAddress())),
-						local, server);
+				return new Result<>(looper.res, NetworkInterface.getByInetAddress(local.getAddress()), local, server);
 		}
 		catch (final IOException e) {
-			final String msg = "network failure on getting description from " + server;
-			logger.error(msg, e);
-			throw new KNXException(msg, e);
+			throw new KNXException("network failure on getting description from " + hostPort(server), e);
 		}
-		final String msg = "timeout, no description response received from " + server;
-		logger.warn(msg);
-		throw new KNXTimeoutException(msg);
+		throw new KNXTimeoutException("timeout, no description response received from " + hostPort(server));
 	}
 
 	private CompletableFuture<Result<DescriptionResponse>> tcpDescription() throws KNXException {
@@ -987,7 +980,6 @@ public class Discoverer
 		{
 			Thread.currentThread().setName("Discoverer " + id);
 			receivers.add(this);
-			logger.trace("started on " + id);
 			try {
 				loop();
 			}
@@ -1029,8 +1021,8 @@ public class Discoverer
 							res = new DescriptionResponse(data, offset + h.getStructLength(), bodyLen);
 						}
 						catch (final KNXFormatException e) {
-							logger.error("invalid description response", e);
-							thrown = new KNXInvalidResponseException("description response from " + source, e);
+							thrown = new KNXInvalidResponseException(
+									"invalid description response from " + hostPort(source), e);
 						}
 						finally {
 							quit();
@@ -1043,7 +1035,8 @@ public class Discoverer
 							sr = SearchResponse.from(h, data, offset + h.getStructLength());
 						}
 						catch (final KNXFormatException e) {
-							thrown = new KNXInvalidResponseException("search response from " + source, e);
+							thrown = new KNXInvalidResponseException("invalid search response from " + hostPort(source),
+									e);
 						}
 						finally {
 							quit();
@@ -1055,7 +1048,7 @@ public class Discoverer
 				logger.info("ignore received packet from {}, {}", source, e.getMessage());
 			}
 			catch (final RuntimeException e) {
-				logger.error("error parsing received packet from {}", source, e);
+				logger.warn("error parsing received packet from {}", source, e);
 			}
 		}
 
