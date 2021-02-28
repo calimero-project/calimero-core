@@ -401,7 +401,7 @@ class DiscovererTest
 	@Test
 	void searchAsync() throws InterruptedException, ExecutionException, TimeoutException {
 		final Duration timeout = Duration.ofSeconds(this.timeout);
-		final CompletableFuture<List<Result<SearchResponse>>> search = ddef.search(timeout);
+		final CompletableFuture<List<Result<SearchResponse>>> search = ddef.timeout(timeout).search();
 		final List<Result<SearchResponse>> result = search.get(timeout.toMillis() + 200, TimeUnit.MILLISECONDS);
 		assertTrue(!result.isEmpty());
 	}
@@ -409,7 +409,7 @@ class DiscovererTest
 	@Test
 	void searchAsyncTimeout() {
 		final Duration timeout = Duration.ofSeconds(10);
-		final CompletableFuture<List<Result<SearchResponse>>> search = ddef.search(timeout);
+		final CompletableFuture<List<Result<SearchResponse>>> search = ddef.timeout(timeout).search();
 		assertThrows(TimeoutException.class, () -> search.get(1000, TimeUnit.MILLISECONDS));
 		assertFalse(search.isCompletedExceptionally());
 		assertFalse(search.isDone());
@@ -435,7 +435,7 @@ class DiscovererTest
 		allReceiverThreadsIdle();
 
 		final Duration timeout = Duration.ofSeconds(10);
-		final CompletableFuture<List<Result<SearchResponse>>> search = d.search(timeout);
+		final CompletableFuture<List<Result<SearchResponse>>> search = d.timeout(timeout).search();
 		Thread.sleep(1000);
 		search.cancel(false);
 		assertThrows(CancellationException.class, () -> search.get());

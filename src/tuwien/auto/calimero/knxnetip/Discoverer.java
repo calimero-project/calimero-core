@@ -348,9 +348,21 @@ public class Discoverer
 		return this;
 	}
 
-	CompletableFuture<List<Result<SearchResponse>>> search(final Duration timeout) {
+	private CompletableFuture<List<Result<SearchResponse>>> search(final Duration timeout) {
 		try {
 			return searchAsync(timeout);
+		}
+		catch (final KNXException e) {
+			return CompletableFuture.failedFuture(e);
+		}
+	}
+
+	public CompletableFuture<List<Result<SearchResponse>>> search(final Srp... searchParameters) {
+		if (connection != null)
+			return tcpSearch(searchParameters).thenApply(List::of);
+
+		try {
+			return searchAsync(timeout, searchParameters);
 		}
 		catch (final KNXException e) {
 			return CompletableFuture.failedFuture(e);
@@ -476,20 +488,21 @@ public class Discoverer
 		}
 	}
 
-	private CompletableFuture<Result<SearchResponse>> tcpSearch(final Srp... searchParameters) throws KNXException {
+	private CompletableFuture<Result<SearchResponse>> tcpSearch(final Srp... searchParameters) {
 		final SearchRequest req = SearchRequest.newTcpRequest(searchParameters);
 		return tcpSend(PacketHelper.toPacket(req));
 	}
 
-	private <T> CompletableFuture<Result<T>> tcpSend(final byte[] packet) throws KNXException {
+	private <T> CompletableFuture<Result<T>> tcpSend(final byte[] packet) {
 		try {
 			final var cf = new CompletableFuture<Result<T>>();
 			final var tunnel = new Tunnel<>(TunnelingLayer.LinkLayer, connection, KNXMediumSettings.BackboneRouter, cf);
 			tunnel.send(packet);
 			final long millis = timeout != null ? timeout.toMillis() : 10_000;
+			cf.whenComplete((_1, _2) -> tunnel.close());
 			return cf.orTimeout(millis, TimeUnit.MILLISECONDS);
 		}
-		catch (IOException | InterruptedException e) {
+		catch (KNXException | IOException | InterruptedException e) {
 			return CompletableFuture.failedFuture(e);
 		}
 	}
@@ -613,7 +626,8 @@ public class Discoverer
 		}
 	}
 
-	private CompletableFuture<List<Result<SearchResponse>>> searchAsync(final Duration timeout) throws KNXException {
+	private CompletableFuture<List<Result<SearchResponse>>> searchAsync(final Duration timeout,
+			final Srp... searchParameters) throws KNXException {
 		if (timeout.isNegative())
 			throw new KNXIllegalArgumentException("timeout has to be >= 0");
 		final NetworkInterface[] nifs;
@@ -637,7 +651,7 @@ public class Discoverer
 				else
 					try {
 						if (!(lo && a.isLoopbackAddress())) {
-							cfs.add(search(a, port, ni, timeout));
+							cfs.add(search(a, port, ni, timeout, searchParameters));
 						}
 						if (a.isLoopbackAddress()) {
 							lo = true;
@@ -789,7 +803,7 @@ public class Discoverer
 		throw new KNXTimeoutException("timeout, no description response received from " + hostPort(server));
 	}
 
-	private CompletableFuture<Result<DescriptionResponse>> tcpDescription() throws KNXException {
+	private CompletableFuture<Result<DescriptionResponse>> tcpDescription() {
 		final byte[] request = PacketHelper.toPacket(DescriptionRequest.tcpRequest());
 		return tcpSend(request);
 	}
@@ -805,9 +819,8 @@ public class Discoverer
 	 * @return the receiver thread for the search started
 	 * @throws KNXException
 	 */
-	private CompletableFuture<Void> search(final InetAddress localAddr, final int localPort,
-		final NetworkInterface ni, final Duration timeout) throws KNXException
-	{
+	private CompletableFuture<Void> search(final InetAddress localAddr, final int localPort, final NetworkInterface ni,
+			final Duration timeout, final Srp... searchParameters) throws KNXException {
 		final var bind = mcast ? new InetSocketAddress(SEARCH_PORT) : new InetSocketAddress(localAddr, localPort);
 		try {
 			final var channel = newChannel(bind);
@@ -830,15 +843,20 @@ public class Discoverer
 
 			final var dst = new InetSocketAddress(SYSTEM_SETUP_MULTICAST, SEARCH_PORT);
 
-			// send search request with additional DIBs
-			final byte[] extraDibs = PacketHelper.toPacket(new SearchRequest(res,
-				withDeviceDescription(DIB.DEVICE_INFO, DIB.SUPP_SVC_FAMILIES, DIB.AdditionalDeviceInfo,
-					DIB.SecureServiceFamilies, DIB.TunnelingInfo)));
-			channel.send(ByteBuffer.wrap(extraDibs), dst);
+			// send extended search request with search params or additional DIBs
+			final SearchRequest req;
+			if (searchParameters.length > 0)
+				req = new SearchRequest(res, searchParameters);
+			else
+				req = new SearchRequest(res, withDeviceDescription(DIB.DEVICE_INFO, DIB.SUPP_SVC_FAMILIES,
+						DIB.AdditionalDeviceInfo, DIB.SecureServiceFamilies, DIB.TunnelingInfo));
+			channel.send(ByteBuffer.wrap(PacketHelper.toPacket(req)), dst);
 
-			// send standard search request
-			final byte[] std = PacketHelper.toPacket(new SearchRequest(res));
-			channel.send(ByteBuffer.wrap(std), dst);
+			// only send standard search request if there are no extended search params
+			if (searchParameters.length == 0) {
+				final byte[] std = PacketHelper.toPacket(new SearchRequest(res));
+				channel.send(ByteBuffer.wrap(std), dst);
+			}
 
 			return receiveAsync(channel, localAddr, timeout, nifName + localAddr.getHostAddress());
 		}
