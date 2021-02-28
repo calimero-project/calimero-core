@@ -56,7 +56,6 @@ import org.junit.jupiter.api.Test;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.secure.Keyring;
 import tuwien.auto.calimero.secure.Keyring.Interface;
 import tuwien.auto.calimero.xml.KNXMLException;
 
