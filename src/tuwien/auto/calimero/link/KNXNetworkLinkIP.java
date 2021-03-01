@@ -426,31 +426,50 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	}
 
 	@Override
+	void baosMode(final boolean enable) throws KNXException, InterruptedException {
+		try (var mgmt = newMgmt(mgmtLocalEp, mgmtRemoteEp, mgmtNat)) {
+			super.baosMode(enable);
+		}
+	}
+
+	@Override
 	void onSend(final CEMIDevMgmt frame)
-		throws KNXTimeoutException, KNXConnectionClosedException, InterruptedException {
+			throws KNXTimeoutException, KNXConnectionClosedException, InterruptedException {
 		mgmt.send(frame, WaitForCon);
 	}
 
+	// need to store mgmt config for baos mode switch
+	private InetSocketAddress mgmtLocalEp;
+	private InetSocketAddress mgmtRemoteEp;
+	private boolean mgmtNat;
+
 	private void configureWithServerSettings(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP,
-		final boolean useNat) throws InterruptedException {
-		try (KNXnetIPDevMgmt mgmt = new KNXnetIPDevMgmt(new InetSocketAddress(localEP.getAddress(), 0), serverCtrlEP, useNat)) {
-			this.mgmt = mgmt;
-			mgmt.addConnectionListener(new KNXListener() {
-				@Override
-				public void frameReceived(final FrameEvent e) {
-					onDevMgmt((CEMIDevMgmt) e.getFrame());
-				}
-
-				@Override
-				public void connectionClosed(final CloseEvent e) {}
-			});
-
+			final boolean useNat) throws InterruptedException {
+		mgmtLocalEp = localEP;
+		mgmtRemoteEp = serverCtrlEP;
+		mgmtNat = useNat;
+		try (var mgmt = newMgmt(localEP, serverCtrlEP, useNat)) {
 			mediumType();
 			setMaxApduLength();
 		}
 		catch (KNXException | RuntimeException e) {
 			logger.warn("skip link configuration (use defaults)", e);
 		}
+	}
+
+	private KNXnetIPDevMgmt newMgmt(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP,
+			final boolean useNat) throws KNXException, InterruptedException {
+		mgmt = new KNXnetIPDevMgmt(new InetSocketAddress(localEP.getAddress(), 0), serverCtrlEP, useNat);
+		mgmt.addConnectionListener(new KNXListener() {
+			@Override
+			public void frameReceived(final FrameEvent e) {
+				onDevMgmt((CEMIDevMgmt) e.getFrame());
+			}
+
+			@Override
+			public void connectionClosed(final CloseEvent e) {}
+		});
+		return mgmt;
 	}
 
 	private static KNXnetIPConnection newConnection(final int serviceMode, final InetSocketAddress localEP,
