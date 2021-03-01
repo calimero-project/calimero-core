@@ -362,7 +362,7 @@ public class Discoverer
 			return tcpSearch(searchParameters).thenApply(List::of);
 
 		try {
-			return searchAsync(timeout, searchParameters);
+			return searchAsync(timeoutOrDefault(), searchParameters);
 		}
 		catch (final KNXException e) {
 			return CompletableFuture.failedFuture(e);
@@ -391,7 +391,7 @@ public class Discoverer
 
 			final byte[] request = PacketHelper.toPacket(new SearchRequest(res, searchParameters));
 			dc.send(ByteBuffer.wrap(request), serverControlEndpoint);
-			return receiveAsync(dc, serverControlEndpoint, Optional.ofNullable(timeout).orElse(Duration.ofSeconds(10)));
+			return receiveAsync(dc, serverControlEndpoint, timeoutOrDefault());
 		}
 		catch (final IOException e) {
 			throw new KNXException("search request to " + hostPort(serverControlEndpoint) + " failed on " + addr, e);
@@ -443,12 +443,15 @@ public class Discoverer
 				final var result = new Result<>(sr,
 						NetworkInterface.getByInetAddress(connection.localEndpoint().getAddress()),
 						connection.localEndpoint(), connection.server());
-				cf.complete((Result<T>) result);
 				close();
+				complete(result);
 				return true;
 			}
 			return super.handleServiceType(h, data, offset, src, port);
 		}
+
+		@SuppressWarnings("unchecked")
+		private void complete(final Result<?> result) { cf.complete((Result<T>) result); }
 
 		@Override
 		public String getName() {
@@ -498,14 +501,15 @@ public class Discoverer
 			final var cf = new CompletableFuture<Result<T>>();
 			final var tunnel = new Tunnel<>(TunnelingLayer.LinkLayer, connection, KNXMediumSettings.BackboneRouter, cf);
 			tunnel.send(packet);
-			final long millis = timeout != null ? timeout.toMillis() : 10_000;
 			cf.whenComplete((_1, _2) -> tunnel.close());
-			return cf.orTimeout(millis, TimeUnit.MILLISECONDS);
+			return cf.orTimeout(timeoutOrDefault().toMillis(), TimeUnit.MILLISECONDS);
 		}
 		catch (KNXException | IOException | InterruptedException e) {
 			return CompletableFuture.failedFuture(e);
 		}
 	}
+
+	private Duration timeoutOrDefault() { return timeout != null ? timeout : Duration.ofSeconds(10); }
 
 	/**
 	 * Starts a new search for KNXnet/IP discovery, the network interface can be
@@ -577,7 +581,7 @@ public class Discoverer
 		// use any assigned (IPv4) address of netif, otherwise, use host
 		final InetAddress addr = l.stream().filter(ia -> nat || ia instanceof Inet4Address).findFirst().orElse(host(null));
 
-		final CompletableFuture<Void> cf = search(addr, localPort, ni, Duration.ofSeconds(timeout)); // TODO ni might be null
+		final CompletableFuture<Void> cf = search(addr, localPort, ni, Duration.ofSeconds(timeout));
 		if (wait) {
 			try {
 				cf.get();

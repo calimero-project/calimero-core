@@ -483,8 +483,8 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 			if (!supported)
 				throw new KNXException("device does not support BAOS mode");
 
-			final var frame = BcuSwitcher.commModeRequest(enable ? BcuSwitcher.BaosMode : BcuSwitcher.DataLinkLayer);
-			onSend(dst, frame, true);
+			final var frame = BcuSwitcher.cemiCommModeRequest(enable ? BcuSwitcher.BaosMode : BcuSwitcher.DataLinkLayer);
+			onSend(frame);
 			responseFor(CEMIDevMgmt.MC_PROPWRITE_CON, BcuSwitcher.pidCommMode);
 
 			final var recheck = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, cemiServerObject, 1,

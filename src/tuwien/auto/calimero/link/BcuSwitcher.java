@@ -50,7 +50,6 @@ import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
-import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.serial.FT12Connection;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
@@ -349,10 +348,13 @@ final class BcuSwitcher
 	static final int BaosMode = 0xf0; // manufacturer-specific use for BAOS modules
 	static final int NoLayer = 0xff;
 
-	static byte[] commModeRequest(final int commMode) {
-		final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, cemiServerObjectType, objectInstance,
+	static CEMIDevMgmt cemiCommModeRequest(final int commMode) {
+		return new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, cemiServerObjectType, objectInstance,
 				pidCommMode, 1, 1, new byte[] { (byte) commMode });
-		return frame.toByteArray();
+	}
+
+	static byte[] commModeRequest(final int commMode) {
+		return cemiCommModeRequest(commMode).toByteArray();
 	}
 
 	private final FT12Connection conn;
