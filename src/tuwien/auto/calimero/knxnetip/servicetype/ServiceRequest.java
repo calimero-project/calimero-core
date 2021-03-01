@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -133,7 +133,6 @@ public class ServiceRequest extends ServiceType
 
 	/**
 	 * Returns the service type identifier of the request.
-	 * <p>
 	 *
 	 * @return service type as unsigned 16 bit value
 	 */
@@ -144,7 +143,6 @@ public class ServiceRequest extends ServiceType
 
 	/**
 	 * Returns the communication channel identifier associated with the request.
-	 * <p>
 	 *
 	 * @return communication channel ID as unsigned byte
 	 */
@@ -155,7 +153,6 @@ public class ServiceRequest extends ServiceType
 
 	/**
 	 * Returns the sequence number of the sending endpoint.
-	 * <p>
 	 *
 	 * @return sequence number as unsigned byte
 	 */
@@ -166,7 +163,6 @@ public class ServiceRequest extends ServiceType
 
 	/**
 	 * Returns the cEMI frame carried by the request.
-	 * <p>
 	 *
 	 * @return a cEMI type
 	 */
@@ -175,19 +171,12 @@ public class ServiceRequest extends ServiceType
 		return CEMIFactory.copy(cemi);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceType#getStructLength()
-	 */
 	@Override
 	int getStructLength()
 	{
 		return CONN_HEADER_SIZE + (cemi != null ? cemi.getStructLength() : 0);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceType#toByteArray
-	 *      (java.io.ByteArrayOutputStream)
-	 */
 	@Override
 	byte[] toByteArray(final ByteArrayOutputStream os)
 	{

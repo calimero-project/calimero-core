@@ -413,7 +413,7 @@ public class KNXnetIPRouting extends ConnectionBase
 				.setOption(StandardSocketOptions.IP_MULTICAST_TTL, 64);
 	}
 
-	private final void startChannelReceiver(final ReceiverLoop looper, final String name) {
+	private void startChannelReceiver(final ReceiverLoop looper, final String name) {
 		final Thread t = new Thread(looper, name);
 		t.setDaemon(true);
 		t.start();

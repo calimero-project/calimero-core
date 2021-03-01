@@ -790,7 +790,7 @@ public class Discoverer
 
 		final var localhost = host(server.getAddress());
 		final var bind = new InetSocketAddress(nat ? null : onSameSubnet(server.getAddress()).orElse(localhost), port);
-		try (final var dc = newChannel(bind)) {
+		try (var dc = newChannel(bind)) {
 			final var local = (InetSocketAddress) dc.getLocalAddress();
 			final byte[] buf = PacketHelper.toPacket(new DescriptionRequest(nat ? null : local));
 			dc.send(ByteBuffer.wrap(buf), server);

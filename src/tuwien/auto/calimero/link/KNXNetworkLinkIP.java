@@ -427,7 +427,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 
 	@Override
 	void baosMode(final boolean enable) throws KNXException, InterruptedException {
-		try (var mgmt = newMgmt(mgmtLocalEp, mgmtRemoteEp, mgmtNat)) {
+		try (var __ = newMgmt(mgmtLocalEp, mgmtRemoteEp, mgmtNat)) {
 			super.baosMode(enable);
 		}
 	}
@@ -448,7 +448,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 		mgmtLocalEp = localEP;
 		mgmtRemoteEp = serverCtrlEP;
 		mgmtNat = useNat;
-		try (var mgmt = newMgmt(localEP, serverCtrlEP, useNat)) {
+		try (var __ = newMgmt(localEP, serverCtrlEP, useNat)) {
 			mediumType();
 			setMaxApduLength();
 		}
