@@ -54,7 +54,11 @@ public final class Security {
 	private final Map<GroupAddress, Set<IndividualAddress>> groupSenders = new ConcurrentHashMap<>();
 	private final Map<SerialNumber, byte[]> broadcastToolKeys = new ConcurrentHashMap<>();
 
-	private Security() {}
+
+	/**
+	 * Creates a new security object, mainly for use with KNX installations other than the {@link #defaultInstallation()}.
+	 */
+	public Security() {}
 
 	static Security withKeys(final Map<IndividualAddress, byte[]> deviceToolKeys,
 			final Map<GroupAddress, byte[]> groupKeys, final Map<GroupAddress, Set<IndividualAddress>> groupSenders) {
