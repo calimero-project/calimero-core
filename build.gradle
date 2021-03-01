@@ -15,7 +15,7 @@ apply plugin: 'maven-publish'
 apply plugin:'application'
 
 group = 'com.github.calimero'
-version = '2.5-SNAPSHOT'
+version = '2.5-M1'
 
 sourceCompatibility = 11
 targetCompatibility = 11
