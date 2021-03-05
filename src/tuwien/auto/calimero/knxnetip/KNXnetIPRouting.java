@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.BiFunction;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
@@ -70,6 +71,8 @@ import tuwien.auto.calimero.knxnetip.servicetype.RoutingBusy;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingIndication;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingLostMessage;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingSystemBroadcast;
+import tuwien.auto.calimero.knxnetip.servicetype.SearchRequest;
+import tuwien.auto.calimero.knxnetip.util.HPAI;
 import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.log.LogService.LogLevel;
 
@@ -146,6 +149,8 @@ public class KNXnetIPRouting extends ConnectionBase
 			throw new ExceptionInInitializerError();
 		}
 	}
+
+	private volatile BiFunction<KNXnetIPHeader, ByteBuffer, byte[]> searchRequestCallback;
 
 	/**
 	 * Creates a new KNXnet/IP routing service.
@@ -393,10 +398,13 @@ public class KNXnetIPRouting extends ConnectionBase
 							logger.warn("received frame length " + length + " for " + h + " - ignored");
 						else if (h.getVersion() != KNXNETIP_VERSION_10)
 							close(CloseEvent.INTERNAL, "protocol version changed", LogLevel.ERROR, null);
+						else if (h.getServiceType() == KNXnetIPHeader.SEARCH_REQ
+								|| h.getServiceType() == KNXnetIPHeader.SearchRequest)
+							searchRequest(source, h, data, offset + h.getStructLength());
 						else
 							systemBroadcast(h, data, offset + h.getStructLength());
 					}
-					catch (KNXFormatException | RuntimeException e) {
+					catch (KNXFormatException | IOException | RuntimeException e) {
 						logger.warn("received invalid frame", e);
 					}
 				}
@@ -443,9 +451,7 @@ public class KNXnetIPRouting extends ConnectionBase
 
 	@Override
 	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data,
-		final int offset, final InetAddress src, final int port)
-		throws KNXFormatException, IOException
-	{
+			final int offset, final InetAddress src, final int port) throws KNXFormatException, IOException {
 		final int svc = h.getServiceType();
 		if (h.getVersion() != KNXNETIP_VERSION_10)
 			close(CloseEvent.INTERNAL, "protocol version changed", LogLevel.ERROR, null);
@@ -468,6 +474,8 @@ public class KNXnetIPRouting extends ConnectionBase
 		else if (svc == KNXnetIPHeader.RoutingSystemBroadcast && multicast.equals(systemBroadcast)) {
 			return systemBroadcast(h, data, offset);
 		}
+		else if (svc == KNXnetIPHeader.SEARCH_REQ || svc == KNXnetIPHeader.SearchRequest)
+			searchRequest(new InetSocketAddress(src, port), h, data, offset);
 		else if (svc == GiraUnsupportedSvcType) {
 			if (!loggedGiraUnsupportedSvcType)
 				logger.warn("received unsupported Gira-specific service type 0x538, will be silently ignored: {}",
@@ -475,10 +483,34 @@ public class KNXnetIPRouting extends ConnectionBase
 			loggedGiraUnsupportedSvcType = true;
 		}
 		// skip multicast packets from searches & secure services, to avoid logged warnings about unknown frames
-		else if (!h.isSecure() && svc != KNXnetIPHeader.SEARCH_REQ && svc != KNXnetIPHeader.SEARCH_RES
-				&& svc != KNXnetIPHeader.SearchRequest && svc != KNXnetIPHeader.SearchResponse)
+		else if (!h.isSecure() && svc != KNXnetIPHeader.SEARCH_RES && svc != KNXnetIPHeader.SearchResponse)
 			return super.handleServiceType(h, data, offset, src, port);
 		return true;
+	}
+
+	private void searchRequest(final InetSocketAddress source, final KNXnetIPHeader h, final byte[] data,
+			final int offset) throws KNXFormatException, IOException {
+		final var callback = searchRequestCallback;
+		if (callback == null)
+			return;
+		final HPAI endpoint = SearchRequest.from(h, data, offset).getEndpoint();
+		if (endpoint.getHostProtocol() != HPAI.IPV4_UDP) {
+			logger.warn("KNX IP has protocol support for UDP/IP only");
+			return;
+		}
+		final byte[] response = callback.apply(h, ByteBuffer.wrap(data).position(offset));
+		if (response != null) {
+			@SuppressWarnings("resource")
+			final var channel = dcSysBcast != null ? dcSysBcast : dc;
+			channel.send(ByteBuffer.wrap(response), createResponseAddress(endpoint, source));
+		}
+	}
+
+	private static InetSocketAddress createResponseAddress(final HPAI endpoint, final InetSocketAddress sender) {
+		// NAT: if the data EP is incomplete or left empty, we fall back to the IP address and port of the sender.
+		if (endpoint.getAddress().isAnyLocalAddress() || endpoint.getPort() == 0)
+			return sender;
+		return new InetSocketAddress(endpoint.getAddress(), endpoint.getPort());
 	}
 
 	@Override
