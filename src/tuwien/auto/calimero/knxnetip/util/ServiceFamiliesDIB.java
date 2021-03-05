@@ -59,6 +59,9 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  */
 public class ServiceFamiliesDIB extends DIB
 {
+	/**
+	 * KNXnet/IP service family identifiers.
+	 */
 	public enum ServiceFamily {
 		Core,
 		DeviceManagement,
@@ -187,7 +190,8 @@ public class ServiceFamiliesDIB extends DIB
 	/**
 	 * Creates a service families DIB using the provided service family entries.
 	 *
-	 * @param families map containing the supported service families, with the value being the supported version
+	 * @param families map containing the supported service families, with the value being the supported version in the
+	 * range [0..255]
 	 */
 	public ServiceFamiliesDIB(final Map<ServiceFamily, Integer> families)
 	{

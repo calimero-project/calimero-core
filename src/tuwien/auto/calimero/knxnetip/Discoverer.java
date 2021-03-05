@@ -255,10 +255,23 @@ public class Discoverer
 		}
 	}
 
+
+	/**
+	 * Returns a discoverer which uses the supplied TCP connection for discovery &amp; description requests.
+	 *
+	 * @param c, the connection to use, ownership is not transferred to the discoverer
+	 * @return a discoverer
+	 */
 	public static Discoverer tcp(final Connection c) {
 		return new Discoverer(c);
 	}
 
+	/**
+	 * Returns a discoverer which uses the supplied secure session for discovery &amp; description requests.
+	 *
+	 * @param session, the secure session to use, ownership is not transferred to the discoverer
+	 * @return a discoverer
+	 */
 	public static Discoverer secure(final SecureSession session) {
 		return new Discoverer(session);
 	}

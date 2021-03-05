@@ -426,6 +426,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	}
 
 	@Override
+	@SuppressWarnings("try")
 	void baosMode(final boolean enable) throws KNXException, InterruptedException {
 		try (var __ = newMgmt(mgmtLocalEp, mgmtRemoteEp, mgmtNat)) {
 			super.baosMode(enable);
@@ -443,6 +444,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	private InetSocketAddress mgmtRemoteEp;
 	private boolean mgmtNat;
 
+	@SuppressWarnings("try")
 	private void configureWithServerSettings(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP,
 			final boolean useNat) throws InterruptedException {
 		mgmtLocalEp = localEP;

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,7 +45,6 @@ import tuwien.auto.calimero.log.LogService;
 
 /**
  * Common base for the different service type structures.
- * <p>
  *
  * @author B. Malinowsky
  */
@@ -64,7 +63,6 @@ abstract class ServiceType
 
 	/**
 	 * Returns the service type structure formatted into a byte array.
-	 * <p>
 	 *
 	 * @return service type structure as byte array
 	 * @see PacketHelper
@@ -76,7 +74,6 @@ abstract class ServiceType
 
 	/**
 	 * Returns the service type name of this service type.
-	 * <p>
 	 *
 	 * @return service type as string
 	 */

@@ -144,8 +144,7 @@ public class DeviceDIB extends DIB
 	 *        (MSB) contain the project number.
 	 * @param knxMedium KNX medium, one of the predefined KNX medium code constants of this class
 	 * @param knxAddress KNX individual address
-	 * @param serialNumber KNX serial number of the device, used to identify the device,
-	 *        <code>serialNumber.length == 6</code>
+	 * @param serialNumber KNX serial number of the device, used to identify the device
 	 * @param routingMulticast KNXnet/IP IPv4 routing multicast address for a routing device, use IPv4 <code>0.0.0.0</code>
 	 *        if the device does not support routing
 	 * @param macAddress device Ethernet MAC address, <code>macAddress.length == 6</code>

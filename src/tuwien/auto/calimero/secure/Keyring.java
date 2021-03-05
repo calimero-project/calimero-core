@@ -85,7 +85,7 @@ import tuwien.auto.calimero.xml.XmlReader;
 public final class Keyring {
 
 	public static final class Interface {
-		private final String type;
+		private final String type; // TODO candidate for subtyping via sealed interface
 		private final IndividualAddress addr;
 		private final int user;
 		private final byte[] pwd;
