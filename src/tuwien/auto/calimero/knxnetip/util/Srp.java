@@ -245,7 +245,7 @@ public final class Srp
 	 *
 	 * @return structure length as unsigned byte
 	 */
-	public int getStructLength() {
+	public int structLength() {
 		return size;
 	}
 
@@ -257,7 +257,7 @@ public final class Srp
 	 *
 	 * @return search request parameter type (see {@link Type})
 	 */
-	public Srp.Type getType() {
+	public Srp.Type type() {
 		return type;
 	}
 
@@ -277,7 +277,7 @@ public final class Srp
 	 *
 	 * @return byte array with SRP data, can be empty
 	 */
-	public byte[] getData() {
+	public byte[] data() {
 		return data.clone();
 	}
 

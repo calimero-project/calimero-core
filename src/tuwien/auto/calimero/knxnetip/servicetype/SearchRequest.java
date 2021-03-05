@@ -123,7 +123,7 @@ public class SearchRequest extends ServiceType
 			while (index < length) {
 				final Srp srp = new Srp(data, offset + index);
 				srps.add(srp);
-				index += srp.getStructLength();
+				index += srp.structLength();
 			}
 		}
 	}
@@ -208,7 +208,7 @@ public class SearchRequest extends ServiceType
 
 	private int searchParametersSize() {
 		if (svcType == KNXnetIPHeader.SearchRequest)
-			return srps.stream().map(Srp::getStructLength).mapToInt(Integer::intValue).sum();
+			return srps.stream().map(Srp::structLength).mapToInt(Integer::intValue).sum();
 		return 0;
 	}
 }

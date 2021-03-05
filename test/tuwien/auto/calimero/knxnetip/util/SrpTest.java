@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019 B. Malinowsky
+    Copyright (c) 2019, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ class SrpTest {
 	void containsMacAddress() {
 		final byte[] mac = new byte[] { 0, 1, 2, 3, 4, 5 };
 		final Srp srp = Srp.withMacAddress(mac);
-		assertEquals(Srp.Type.SelectByMacAddress, srp.getType());
-		assertArrayEquals(mac, srp.getData());
+		assertEquals(Srp.Type.SelectByMacAddress, srp.type());
+		assertArrayEquals(mac, srp.data());
 	}
 }

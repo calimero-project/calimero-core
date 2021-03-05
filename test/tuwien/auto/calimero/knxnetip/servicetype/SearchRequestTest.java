@@ -74,7 +74,7 @@ class SearchRequestTest {
 		assertEquals(KNXnetIPHeader.SearchRequest, h.getServiceType());
 
 		final SearchRequest req = SearchRequest.from(h, packet, h.getStructLength());
-		assertArrayEquals(dibBytes, req.searchParameters().get(0).getData(), "SRP mismatch");
+		assertArrayEquals(dibBytes, req.searchParameters().get(0).data(), "SRP mismatch");
 	}
 
 	@Test
@@ -87,7 +87,7 @@ class SearchRequestTest {
 		assertEquals(KNXnetIPHeader.SearchRequest, h.getServiceType());
 
 		final SearchRequest req = SearchRequest.from(h, data, offset + h.getStructLength());
-		assertArrayEquals(dibBytes, req.searchParameters().get(0).getData(), "SRP mismatch");
+		assertArrayEquals(dibBytes, req.searchParameters().get(0).data(), "SRP mismatch");
 	}
 
 	@Test
@@ -109,11 +109,11 @@ class SearchRequestTest {
 	@Test
 	void newRequestWithSrps() {
 		final SearchRequest req = new SearchRequest(responseAddr, dib);
-		assertArrayEquals(dibBytes, req.searchParameters().get(0).getData(), "SRP mismatch");
+		assertArrayEquals(dibBytes, req.searchParameters().get(0).data(), "SRP mismatch");
 
 		final byte[] dib = {0x01, 0x02};
 		final SearchRequest shortReq = new SearchRequest(responseAddr, new Srp(Srp.Type.RequestDibs, false, dib));
-		assertArrayEquals(dib, shortReq.searchParameters().get(0).getData(), "SRP mismatch");
+		assertArrayEquals(dib, shortReq.searchParameters().get(0).data(), "SRP mismatch");
 	}
 
 	@Test
@@ -141,6 +141,6 @@ class SearchRequestTest {
 		assertArrayEquals(pm2Bytes, srps.get(1).toByteArray(), "SRP mismatch");
 		assertArrayEquals(macBytes, srps.get(2).toByteArray(), "SRP mismatch");
 		assertArrayEquals(sbsBytes, srps.get(3).toByteArray(), "SRP mismatch");
-		assertArrayEquals(dibBytes, srps.get(4).getData(), "SRP mismatch");
+		assertArrayEquals(dibBytes, srps.get(4).data(), "SRP mismatch");
 	}
 }
