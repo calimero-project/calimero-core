@@ -287,7 +287,8 @@ public class KNXnetIPRouting extends ConnectionBase
 
 	public final NetworkInterface networkInterface() {
 		try {
-			return dc.getOption(StandardSocketOptions.IP_MULTICAST_IF);
+			final NetworkInterface netif = dc.getOption(StandardSocketOptions.IP_MULTICAST_IF);
+			return netif == null ? defaultNetif : netif;
 		}
 		catch (final IOException e) {
 			throw new KnxRuntimeException("socket error getting network interface", e);
