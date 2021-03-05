@@ -848,12 +848,13 @@ public class Discoverer
 			// is necessarily queried from socket since in a it might be 0 (for ephemeral port)
 			final String nifName = ni != null ? ni.getName() + " " : "";
 			final int realLocalPort = ((InetSocketAddress) channel.getLocalAddress()).getPort();
-			logger.debug("search on " + nifName + new InetSocketAddress(localAddr, realLocalPort));
+			final var localEndpoint = new InetSocketAddress(localAddr, realLocalPort);
+			logger.debug("search on " + nifName + localEndpoint);
 
 			// IP multicast responses MUST be forwarded by NAT without
 			// modifications to IP/port, hence, we can safely state them in our HPAI
 			final InetSocketAddress res = mcast ? new InetSocketAddress(SYSTEM_SETUP_MULTICAST, realLocalPort)
-					: nat ? new InetSocketAddress(0) : new InetSocketAddress(localAddr, realLocalPort);
+					: nat ? new InetSocketAddress(0) : localEndpoint;
 
 			final var dst = new InetSocketAddress(SYSTEM_SETUP_MULTICAST, SEARCH_PORT);
 
@@ -872,7 +873,7 @@ public class Discoverer
 				channel.send(ByteBuffer.wrap(std), dst);
 			}
 
-			return receiveAsync(channel, localAddr, timeout, nifName + localAddr.getHostAddress());
+			return receiveAsync(channel, localEndpoint, timeout, nifName + localAddr.getHostAddress());
 		}
 		catch (IOException | RuntimeException e) {
 			throw new KNXException("search request to " + SYSTEM_SETUP_MULTICAST + " failed on "
@@ -908,10 +909,10 @@ public class Discoverer
 		return t;
 	});
 
-	private CompletableFuture<Void> receiveAsync(final DatagramChannel dc, final InetAddress addrOnNetIf,
+	private CompletableFuture<Void> receiveAsync(final DatagramChannel dc, final InetSocketAddress localEndpoint,
 		final Duration timeout, final String name) throws IOException
 	{
-		final ReceiverLoop looper = new ReceiverLoop(dc, addrOnNetIf, 512, timeout, name
+		final ReceiverLoop looper = new ReceiverLoop(dc, localEndpoint, 512, timeout, name
 				+ ":" + ((InetSocketAddress) dc.getLocalAddress()).getPort());
 		final CompletableFuture<Void> cf = CompletableFuture.runAsync(looper, executor);
 		cf.exceptionally(t -> {
@@ -959,7 +960,7 @@ public class Discoverer
 		private final NetworkInterface nif;
 
 		// we want this address to return it in a search result even if the socket was not bound
-		private final InetAddress addrOnNetif;
+		private final InetSocketAddress localEndpoint;
 
 		// used for description looper
 		private DescriptionResponse res;
@@ -973,12 +974,12 @@ public class Discoverer
 
 		// use for search looper
 		// timeout in milliseconds
-		ReceiverLoop(final DatagramChannel dc, final InetAddress addrOnNetIf, final int receiveBufferSize,
+		ReceiverLoop(final DatagramChannel dc, final InetSocketAddress localEndpoint, final int receiveBufferSize,
 				final Duration timeout, final String name) throws IOException {
 			super(null, false, receiveBufferSize, 0, (int) timeout.toMillis());
 
 			nif = dc.getOption(StandardSocketOptions.IP_MULTICAST_IF);
-			this.addrOnNetif = addrOnNetIf;
+			this.localEndpoint = localEndpoint;
 			multicast = true;
 			server = null;
 			id = name;
@@ -995,7 +996,7 @@ public class Discoverer
 				final InetSocketAddress queriedServer) throws IOException {
 			super(null, true, receiveBufferSize, 0, timeout);
 			nif = null;
-			addrOnNetif = null;
+			localEndpoint = null;
 			multicast = false;
 			server = queriedServer;
 			id = "" + dc.getLocalAddress();
@@ -1039,8 +1040,7 @@ public class Discoverer
 					synchronized (receivers) {
 						if (receivers.contains(this)) {
 							final var response = SearchResponse.from(h, data, offset + h.getStructLength());
-							final Result<SearchResponse> r = new Result<>(response, nif,
-									new InetSocketAddress(addrOnNetif, 0), source);
+							final Result<SearchResponse> r = new Result<>(response, nif, localEndpoint, source);
 							if (!responses.contains(r))
 								responses.add(r);
 						}
