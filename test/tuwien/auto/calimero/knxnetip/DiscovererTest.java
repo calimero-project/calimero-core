@@ -76,7 +76,7 @@ import tuwien.auto.calimero.knxnetip.Discoverer.Result;
 import tuwien.auto.calimero.knxnetip.servicetype.DescriptionResponse;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
 import tuwien.auto.calimero.knxnetip.util.DIB;
-import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB;
+import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB.ServiceFamily;
 
 /**
  * @author B. Malinowsky
@@ -460,7 +460,7 @@ class DiscovererTest
 	void searchControlEndpoint() throws KNXException, InterruptedException, ExecutionException {
 		final InetSocketAddress server = Util.getServer();
 		final CompletableFuture<Result<SearchResponse>> search = ddef.search(server,
-				withService(ServiceFamiliesDIB.CORE, 2));
+				withService(ServiceFamily.Core, 2));
 		assertEquals(server, search.get().remoteEndpoint());
 	}
 
@@ -469,7 +469,7 @@ class DiscovererTest
 	void searchNonExistingControlEndpoint() throws KNXException {
 		final InetSocketAddress server = new InetSocketAddress(Util.getServer().getAddress(), 5000);
 		final CompletableFuture<Result<SearchResponse>> search = ddef.search(server,
-				withService(ServiceFamiliesDIB.CORE, 2));
+				withService(ServiceFamily.Core, 2));
 		assertThrows(ExecutionException.class, search::get);
 	}
 

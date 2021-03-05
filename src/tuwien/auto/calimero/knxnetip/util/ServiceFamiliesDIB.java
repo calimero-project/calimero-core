@@ -88,45 +88,51 @@ public class ServiceFamiliesDIB extends DIB
 	}
 
 	/**
-	 * Service family identifier representing the service type 'KNXnet/IP Core'.
+	 * @deprecated
 	 */
+	@Deprecated
 	public static final int CORE = 0x02;
 
 	/**
-	 * Service family identifier representing the service type 'KNXnet/IP Device
-	 * Management'.
+	 * @deprecated
 	 */
+	@Deprecated
 	public static final int DEVICE_MANAGEMENT = 0x03;
 
 	/**
-	 * Service family identifier representing the service type 'KNXnet/IP Tunneling'.
+	 * @deprecated
 	 */
+	@Deprecated
 	public static final int TUNNELING = 0x04;
 
 	/**
-	 * Service family identifier representing the service type 'KNXnet/IP Routing'.
+	 * @deprecated
 	 */
+	@Deprecated
 	public static final int ROUTING = 0x05;
 
 	/**
-	 * Service family identifier representing the service type 'KNXnet/IP Remote Logging'.
+	 * @deprecated
 	 */
+	@Deprecated
 	public static final int REMOTE_LOGGING = 0x06;
 
 	/**
-	 * Service family identifier representing the service type 'KNXnet/IP Remote
-	 * Configuration and Diagnosis'.
+	 * @deprecated
 	 */
+	@Deprecated
 	public static final int REMOTE_CONFIGURATION_DIAGNOSIS = 0x07;
 
 	/**
-	 * Service family identifier representing the service type 'KNXnet/IP Object Server'.
+	 * @deprecated
 	 */
+	@Deprecated
 	public static final int OBJECT_SERVER = 0x08;
 
 	/**
-	 * Service family identifier representing the service type 'Security'.
+	 * @deprecated
 	 */
+	@Deprecated
 	public static final int Security = 0x09;
 
 
@@ -163,25 +169,9 @@ public class ServiceFamiliesDIB extends DIB
 	}
 
 	/**
-	 * Creates a service families DIB using the provided service families and versions
-	 * arrays.
-	 * <p>
-	 * The service families are added to the DIB in the same order they are listed in the
-	 * service family array <code>familyIDs</code>, accessed by increasing index. The two
-	 * arrays <code>familyIDs</code> and <code>familyVersions</code> have to be of same
-	 * length, <code>familyIDs.length == familyVersions.length</code>. A service family ID
-	 * shall be contained only once in <code>familyIDs</code>. Otherwise, all but the last
-	 * of that specific service family ID are ignored (as well as their version number).
-	 *
-	 * @param familyIDs array containing the supported service family identifiers, use the
-	 *        service family identifier constants as provided by this class;
-	 *        <code>0 &le; familyIDs[i] &le; 255</code>, for all i with
-	 *        <code>0 &le; i &lt; familyIDs.length</code>
-	 * @param familyVersions array containing the version of the corresponding items
-	 *        listed in the <code>familyIDs</code> parameter with the same index;
-	 *        <code>0 &le; familyVersions[i] &le; 255</code>, for all i with
-	 *        <code>0 &le; i &lt; familyVersions.length</code>
+	 * @deprecated Use {@link #ServiceFamiliesDIB(Map)}
 	 */
+	@Deprecated
 	public ServiceFamiliesDIB(final int[] familyIDs, final int[] familyVersions)
 	{
 		this(false, toEnumMap(familyIDs, familyVersions));

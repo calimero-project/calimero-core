@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2020 K.Heimrich
+    Copyright (c) 2018, 2021 K.Heimrich
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ import java.nio.ByteBuffer;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB.ServiceFamily;
 
 /**
  * Search Request Parameter Block (SRP).
@@ -202,16 +203,24 @@ public final class Srp
 	}
 
 	/**
-	 * Creates a search request parameter block to limit the extended search request to KNXnet/IP router
-	 * or server devices with the given service family and corresponding family version. The mandatory flag
-	 * of the SRP is not set.
-	 *
-	 * @param familyId the family ID used in the in the search request parameter block
-	 * @param familyVersion the family version used in the in the search request parameter block
-	 * @return search request parameter block for devices with a given service family and version
+	 * @deprecated Use {@link #withService(ServiceFamily, int)}.
 	 */
+	@Deprecated
 	public static Srp withService(final int familyId, final int familyVersion) {
 		return new Srp(Type.SelectByService, true, (byte) familyId, (byte) familyVersion);
+	}
+
+	/**
+	 * Creates a search request parameter block to limit the extended search request to KNXnet/IP router
+	 * or server devices with the given service family and corresponding family version. The mandatory flag
+	 * of the SRP is set.
+	 *
+	 * @param family the service family used in the search request parameter block
+	 * @param familyVersion the family version used in the search request parameter block
+	 * @return search request parameter block for devices with a given service family and version
+	 */
+	public static Srp withService(final ServiceFamily family, final int familyVersion) {
+		return new Srp(Type.SelectByService, true, (byte) family.id(), (byte) familyVersion);
 	}
 
 	/**

@@ -65,7 +65,8 @@ class SearchResponseTest {
 	private final HPAI hpai = new HPAI((InetAddress) null, 0);
 
 	private DeviceDIB device;
-	private final ServiceFamiliesDIB svcFamilies = new ServiceFamiliesDIB(new int[] { 2, 3, 4 }, new int[] { 1, 1, 1 });
+	private final ServiceFamiliesDIB svcFamilies = new ServiceFamiliesDIB(
+			Map.of(ServiceFamily.Core, 1, ServiceFamily.DeviceManagement, 1, ServiceFamily.Tunneling, 1));
 
 	private static final Map<ServiceFamily, Integer> families = Map.of(ServiceFamily.DeviceManagement, 1, ServiceFamily.Tunneling, 1);
 	private final ServiceFamiliesDIB secureFamilies = ServiceFamiliesDIB.newSecureServiceFamilies(families);

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2019 B. Malinowsky
+    Copyright (c) 2018, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import tuwien.auto.calimero.KNXFormatException;
-import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB;
+import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB.ServiceFamily;
 import tuwien.auto.calimero.knxnetip.util.Srp;
 
 class SearchRequestTest {
@@ -130,7 +130,7 @@ class SearchRequestTest {
 			(byte) 0x66, (byte) 0x90, (byte) 0xf9);
 
 		final byte[] sbsBytes = {0x04, (byte) 0x83, 0x09, 0x01};
-		final Srp sbs = new Srp(Srp.Type.SelectByService, true, (byte) ServiceFamiliesDIB.Security, (byte) 0x01);
+		final Srp sbs = new Srp(Srp.Type.SelectByService, true, (byte) ServiceFamily.Security.id(), (byte) 0x01);
 
 		final SearchRequest req = new SearchRequest(responseAddr, pm, pm2, mac, sbs, dib);
 
