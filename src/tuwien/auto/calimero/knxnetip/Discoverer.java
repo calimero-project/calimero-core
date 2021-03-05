@@ -294,9 +294,8 @@ public class Discoverer
 	 *        subsequent discoverer operations due to operating system dependencies.
 	 * @param natAware <code>true</code> to use a NAT (network address translation) aware
 	 *        discovery/description mechanism, <code>false</code> to use the default way
-	 * @throws KNXException on error getting usable local host
 	 */
-	public Discoverer(final int localPort, final boolean natAware) throws KNXException
+	public Discoverer(final int localPort, final boolean natAware)
 	{
 		this(null, localPort, natAware, false);
 	}
@@ -306,8 +305,8 @@ public class Discoverer
 	 * <p>
 	 * See {@link Discoverer#Discoverer(int, boolean)} for additional description.<br>
 	 * The <code>localHost</code> is used to specify a particular local host address, used
-	 * as response destination address when doing discovery / description. By default, the
-	 * local host is used as obtained by {@link InetAddress#getLocalHost()}. The returned
+	 * as response destination address when doing discovery / description. By default, subnet matching or the
+	 * local host as obtained by {@link InetAddress#getLocalHost()} is used (in that order). The returned
 	 * address is quite system dependent and might not always be useful in some
 	 * situations. So it can be overruled specifying a local host address using this
 	 * constructor.
@@ -323,10 +322,9 @@ public class Discoverer
 	 * @param mcastResponse set <code>true</code> to use multicasting for search responses
 	 *        in KNXnet/IP discovery, <code>false</code> to use unicast for search
 	 *        responses to this local host and port address
-	 * @throws KNXException if local host can't be used
 	 */
 	public Discoverer(final InetAddress localHost, final int localPort, final boolean natAware,
-		final boolean mcastResponse) throws KNXException
+		final boolean mcastResponse)
 	{
 		if (localPort < 0 || localPort > 0xFFFF)
 			throw new KNXIllegalArgumentException("port out of range [0..0xFFFF]");
@@ -336,7 +334,7 @@ public class Discoverer
 		mcast = mcastResponse;
 
 		if (host != null && host.getAddress().length != 4 && !nat)
-			throw new KNXException("IPv4 address required if NAT is not used (supplied " + host.getHostAddress() + ")");
+			throw new KNXIllegalArgumentException("IPv4 address required if NAT is not used (supplied " + host.getHostAddress() + ")");
 	}
 
 	private Discoverer(final Connection c) {

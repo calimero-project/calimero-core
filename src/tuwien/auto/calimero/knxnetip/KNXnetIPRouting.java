@@ -72,6 +72,7 @@ import tuwien.auto.calimero.knxnetip.servicetype.RoutingIndication;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingLostMessage;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingSystemBroadcast;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchRequest;
+import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
 import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.log.LogService.LogLevel;
@@ -150,7 +151,7 @@ public class KNXnetIPRouting extends ConnectionBase
 		}
 	}
 
-	private volatile BiFunction<KNXnetIPHeader, ByteBuffer, byte[]> searchRequestCallback;
+	private volatile BiFunction<KNXnetIPHeader, ByteBuffer, SearchResponse> searchRequestCallback;
 
 	/**
 	 * Creates a new KNXnet/IP routing service.
@@ -499,11 +500,11 @@ public class KNXnetIPRouting extends ConnectionBase
 			logger.warn("KNX IP has protocol support for UDP/IP only");
 			return;
 		}
-		final byte[] response = callback.apply(h, ByteBuffer.wrap(data).position(offset));
+		final var response = callback.apply(h, ByteBuffer.wrap(data).position(offset));
 		if (response != null) {
 			@SuppressWarnings("resource")
 			final var channel = dcSysBcast != null ? dcSysBcast : dc;
-			channel.send(ByteBuffer.wrap(response), createResponseAddress(endpoint, source));
+			channel.send(ByteBuffer.wrap(PacketHelper.toPacket(response)), createResponseAddress(endpoint, source));
 		}
 	}
 
