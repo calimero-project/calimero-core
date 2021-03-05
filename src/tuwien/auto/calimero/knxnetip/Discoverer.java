@@ -454,7 +454,6 @@ public class Discoverer
 				final var result = new Result<>(sr,
 						NetworkInterface.getByInetAddress(connection.localEndpoint().getAddress()),
 						connection.localEndpoint(), connection.server());
-				close();
 				complete(result);
 				return true;
 			}
@@ -512,7 +511,7 @@ public class Discoverer
 			final var cf = new CompletableFuture<Result<T>>();
 			final var tunnel = new Tunnel<>(TunnelingLayer.LinkLayer, connection, KNXMediumSettings.BackboneRouter, cf);
 			tunnel.send(packet);
-			cf.whenComplete((_1, _2) -> tunnel.close());
+			cf.whenCompleteAsync((_1, _2) -> tunnel.close());
 			return cf.orTimeout(timeoutOrDefault().toMillis(), TimeUnit.MILLISECONDS);
 		}
 		catch (KNXException | IOException | InterruptedException e) {
