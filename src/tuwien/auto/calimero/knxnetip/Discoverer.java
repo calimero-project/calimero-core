@@ -355,6 +355,8 @@ public class Discoverer
 	}
 
 	public Discoverer timeout(final Duration timeout) {
+		if (timeout.isNegative() || timeout.isZero())
+			throw new KNXIllegalArgumentException("timeout <= 0");
 		this.timeout = timeout;
 		return this;
 	}

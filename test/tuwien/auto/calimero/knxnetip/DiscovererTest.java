@@ -290,8 +290,14 @@ class DiscovererTest
 		doStartSearch(dmcast, true);
 	}
 
-	private void doStartSearch(final Discoverer d, final boolean usesMulticast) throws KNXException, InterruptedException
-	{
+	@Test
+	void invalidTimeout() {
+		assertThrows(KNXIllegalArgumentException.class, () -> ddef.timeout(Duration.ofNanos(-1)));
+		assertThrows(KNXIllegalArgumentException.class, () -> ddef.timeout(Duration.ZERO));
+	}
+
+	private void doStartSearch(final Discoverer d, final boolean usesMulticast)
+			throws KNXException, InterruptedException {
 		try {
 			d.startSearch(-1, true);
 			fail("negative timeout");
