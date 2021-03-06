@@ -201,7 +201,7 @@ class DiscovererTest
 			final SearchResponse response = result.getResponse();
 			assertNotNull(response);
 			assertNotNull(result.localEndpoint().getAddress());
-			assertEquals(0, result.localEndpoint().getPort());
+			assertNotEquals(0, result.localEndpoint().getPort());
 		}
 	}
 
@@ -257,26 +257,29 @@ class DiscovererTest
 		d.startSearch(30001, Util.localInterface(), timeout, false);
 		while (d.isSearching())
 			Thread.sleep(200);
-		final int expected = responses;
+		final int expected = 2 * responses;
 		final int actual = d.getSearchResponses().size();
-		assertEquals(expected, actual, "expected = " + expected + ", actual = " + actual);
+		if (d == dmcast)
+			assertTrue(actual >= expected, "multicast responses should be >= expected ones");
+		else
+			assertEquals(expected, actual);
 	}
 
 	@Test
-	void testStartSearchIntBoolean() throws KNXException, InterruptedException
+	void testStartSearchIntBoolean() throws KNXException, InterruptedException, ExecutionException
 	{
-		doStartSearch(ddef, false);
+		doSearch(ddef, false);
 	}
 
 	@Test
-	void testNATStartSearchIntBoolean() throws KNXException, InterruptedException
+	void testNATStartSearchIntBoolean() throws KNXException, InterruptedException, ExecutionException
 	{
 		if (!Util.TEST_NAT) {
 			System.out.println("\n==== skip testNATStartSearchIntBoolean ====\n");
 			return;
 		}
 		try {
-			doStartSearch(dnat, false);
+			doSearch(dnat, false);
 		}
 		catch (final AssertionFailedError e) {
 			fail("Probably no NAT support on router, " + e.getMessage());
@@ -284,9 +287,9 @@ class DiscovererTest
 	}
 
 	@Test
-	void testMcastStartSearchIntBoolean() throws KNXException, InterruptedException
+	void testMcastStartSearchIntBoolean() throws KNXException, InterruptedException, ExecutionException
 	{
-		doStartSearch(dmcast, true);
+		doSearch(dmcast, true);
 	}
 
 	@Test
@@ -295,32 +298,25 @@ class DiscovererTest
 		assertThrows(KNXIllegalArgumentException.class, () -> ddef.timeout(Duration.ZERO));
 	}
 
-	private void doStartSearch(final Discoverer d, final boolean usesMulticast)
-			throws KNXException, InterruptedException {
+	private void doSearch(final Discoverer d, final boolean usesMulticast)
+			throws KNXException, InterruptedException, ExecutionException {
 		try {
 			d.startSearch(-1, true);
 			fail("negative timeout");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-		d.startSearch(timeout, false);
-		while (d.isSearching())
-			Thread.sleep(100);
-		assertTrue(d.getSearchResponses().size() > 0);
+		final var result = d.timeout(Duration.ofSeconds(timeout)).search().get();
+		assertTrue(result.size() > 0);
 		assertFalse(d.isSearching());
-		final int responses = d.getSearchResponses().size();
-		d.clearSearchResponses();
+		final int responses = result.size();
 
 		// do two searches same time
-		d.startSearch(timeout, false);
-		d.startSearch(timeout, false);
-		while (d.isSearching())
-			Thread.sleep(100);
+		final var search1 = d.timeout(Duration.ofSeconds(timeout)).search();
+		final var search2 = d.timeout(Duration.ofSeconds(timeout)).search();
+		CompletableFuture.allOf(search1, search2);
 
-		// multicasts are not only received on sending IF
-		// the number of responses can vary based on network setup
-		final int expected = responses;
-		final int actual = d.getSearchResponses().size();
-		assertEquals(expected, actual, "expected = " + expected + ", actual = " + actual);
+		assertEquals(responses, search1.get().size());
+		assertEquals(responses, search2.get().size());
 	}
 
 	@Test
