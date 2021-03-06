@@ -90,8 +90,7 @@ class ReceiverLoop extends UdpSocketLooper implements Runnable
 			else if (h.getServiceType() == 0)
 				// check service type for 0 (invalid type), so unused service types of us can stay 0 by default
 				logger.warn("received frame with service type 0x0 - ignored");
-			else if (!conn.handleServiceType(h, data, offset + h.getStructLength(),
-					source.getAddress(), source.getPort()))
+			else if (!conn.handleServiceType(h, data, offset + h.getStructLength(), source))
 				logger.info("received unknown frame with service type 0x"
 						+ Integer.toHexString(h.getServiceType()) + " - ignored");
 		}

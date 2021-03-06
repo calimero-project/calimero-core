@@ -368,6 +368,11 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		listeners.fire(l -> l.frameReceived(fe));
 	}
 
+	boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset,
+			final InetSocketAddress source) throws KNXFormatException, IOException {
+		return handleServiceType(h, data, offset, source.getAddress(), source.getPort());
+	}
+
 	/**
 	 * This stub always returns false.
 	 *

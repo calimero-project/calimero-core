@@ -111,7 +111,7 @@ class DiscovererTest
 	}
 
 	@Test
-	void testDiscoverer() throws KNXException
+	void testDiscoverer()
 	{
 		try {
 			ddef = new Discoverer(-1, false);
@@ -232,7 +232,6 @@ class DiscovererTest
 	}
 
 	@Test
-	@DisabledIfEnvironmentVariable(named="TRAVIS", matches=".*")
 	void testMcastStartSearchIntNetworkInterfaceIntBoolean()
 		throws SocketException, KNXException, InterruptedException
 	{

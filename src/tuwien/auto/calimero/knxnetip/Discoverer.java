@@ -59,9 +59,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
@@ -715,7 +713,6 @@ public class Discoverer
 
 	/**
 	 * Returns <code>true</code> if a search is currently running.
-	 * <p>
 	 *
 	 * @return a <code>boolean</code> showing the search state
 	 */
@@ -736,28 +733,6 @@ public class Discoverer
 	public final List<Result<SearchResponse>> getSearchResponses()
 	{
 		return Collections.unmodifiableList(responses);
-	}
-
-	/**
-	 * Returns all search responses received by ongoing searches so far, mapped to the local
-	 * network interface the response was received on.
-	 * <p>
-	 * The map contains a key for every network interface a search was started on. As long as a
-	 * search is executing, new responses might be added to the map's value. If there is no
-	 * reachable or responding KNXnet/IP router on a particular network interface, the corresponding
-	 * value (of type <code>List&lt;SearchResponse&gt;</code>) will be an empty list.
-	 *
-	 * @return map of {@link NetworkInterface}s, with the value holding the received search
-	 *         responses
-	 * @see #stopSearch()
-	 */
-	final Map<NetworkInterface, List<Result<SearchResponse>>> getSearchResponsesByInterface()
-	{
-		final Map<NetworkInterface, List<Result<SearchResponse>>> map = new HashMap<>();
-		responses.forEach(r -> map.putIfAbsent(r.getNetworkInterface(),
-				new ArrayList<Discoverer.Result<SearchResponse>>()));
-		responses.forEach(r -> map.get(r.getNetworkInterface()).add(r));
-		return map;
 	}
 
 	/**
@@ -782,9 +757,8 @@ public class Discoverer
 	 * @throws KNXInvalidResponseException if a received message from <code>server</code>
 	 *         does not match the expected response
 	 */
-	public Result<DescriptionResponse> getDescription(final InetSocketAddress server,
-		final int timeout) throws KNXException
-	{
+	public Result<DescriptionResponse> getDescription(final InetSocketAddress server, final int timeout)
+			throws KNXException {
 		if (timeout <= 0 || timeout >= Integer.MAX_VALUE / 1000)
 			throw new KNXIllegalArgumentException("timeout out of range");
 
@@ -834,7 +808,9 @@ public class Discoverer
 	 * @param localPort local port to send search request from
 	 * @param ni {@link NetworkInterface} used to send outgoing multicast, or
 	 *        <code>null</code> to use the default multicast interface
-	 * @param timeout timeout in seconds, timeout &ge; 0, 0 for an infinite time window
+	 * @param timeout search timeout, timeout &ge; 0, 0 for an infinite time window
+	 * @param notifyResponse consumer for responses
+	 * @param searchParameters optional search parameters for extended search
 	 * @return the receiver thread for the search started
 	 * @throws KNXException
 	 */
@@ -999,8 +975,7 @@ public class Discoverer
 			this.notifyResponse = notifyResponse;
 		}
 
-		// use for description looper
-		// timeout in milliseconds
+		// unicast search to specific server endpoint, and descrption request
 		ReceiverLoop(final DatagramChannel dc, final int receiveBufferSize, final Duration timeout,
 				final InetSocketAddress queriedServer) throws IOException {
 			super(null, true, receiveBufferSize, 0, (int) timeout.toMillis());
