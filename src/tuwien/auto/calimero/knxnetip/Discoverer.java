@@ -809,7 +809,7 @@ public class Discoverer
 			final var local = (InetSocketAddress) dc.getLocalAddress();
 			final byte[] buf = PacketHelper.toPacket(new DescriptionRequest(nat ? null : local));
 			dc.send(ByteBuffer.wrap(buf), server);
-			final ReceiverLoop looper = new ReceiverLoop(dc, 512, timeout * 1000, server);
+			final ReceiverLoop looper = new ReceiverLoop(dc, 512, Duration.ofSeconds(timeout), server);
 			looper.loop();
 			if (looper.thrown != null)
 				throw looper.thrown;
@@ -941,7 +941,7 @@ public class Discoverer
 	private CompletableFuture<Result<SearchResponse>> receiveAsync(final DatagramChannel dc,
 			final InetSocketAddress serverCtrlEndpoint, final Duration timeout) throws IOException {
 
-		final ReceiverLoop looper = new ReceiverLoop(dc, 512, (int) timeout.toMillis() + 1000, serverCtrlEndpoint);
+		final ReceiverLoop looper = new ReceiverLoop(dc, 512, timeout.plusSeconds(1), serverCtrlEndpoint);
 		final InetSocketAddress local = (InetSocketAddress) dc.getLocalAddress();
 		final NetworkInterface netif;
 		if (local.getAddress().isAnyLocalAddress())
@@ -1001,9 +1001,9 @@ public class Discoverer
 
 		// use for description looper
 		// timeout in milliseconds
-		ReceiverLoop(final DatagramChannel dc, final int receiveBufferSize, final int timeout,
+		ReceiverLoop(final DatagramChannel dc, final int receiveBufferSize, final Duration timeout,
 				final InetSocketAddress queriedServer) throws IOException {
-			super(null, true, receiveBufferSize, 0, timeout);
+			super(null, true, receiveBufferSize, 0, (int) timeout.toMillis());
 			nif = null;
 			localEndpoint = null;
 			multicast = false;
@@ -1013,7 +1013,7 @@ public class Discoverer
 			selector = Selector.open();
 			dc.register(selector, SelectionKey.OP_READ);
 
-			this.timeout = Duration.ofMillis(timeout);
+			this.timeout = timeout;
 
 			notifyResponse = null;
 		}
