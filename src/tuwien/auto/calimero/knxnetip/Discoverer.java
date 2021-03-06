@@ -65,10 +65,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 
@@ -593,7 +595,7 @@ public class Discoverer
 		// use any assigned (IPv4) address of netif, otherwise, use host
 		final InetAddress addr = l.stream().filter(ia -> nat || ia instanceof Inet4Address).findFirst().orElse(host(null));
 
-		final CompletableFuture<Void> cf = search(addr, localPort, ni, Duration.ofSeconds(timeout));
+		final CompletableFuture<Void> cf = search(addr, localPort, ni, Duration.ofSeconds(timeout), responses::add);
 		if (wait) {
 			try {
 				cf.get();
@@ -657,6 +659,7 @@ public class Discoverer
 		// loopback flag, so we start at most one local search
 		boolean lo = false;
 		final List<CompletableFuture<Void>> cfs = new ArrayList<>();
+		final var responses = Collections.<Result<SearchResponse>>newSetFromMap(new ConcurrentHashMap<>());
 		for (final NetworkInterface ni : nifs) {
 			// find one IP address we can use for our search on this interface
 			for (final Enumeration<InetAddress> ea = ni.getInetAddresses(); ea.hasMoreElements();) {
@@ -667,7 +670,7 @@ public class Discoverer
 				else
 					try {
 						if (!(lo && a.isLoopbackAddress())) {
-							cfs.add(search(a, port, ni, timeout, searchParameters));
+							cfs.add(search(a, port, ni, timeout, responses::add, searchParameters));
 						}
 						if (a.isLoopbackAddress()) {
 							lo = true;
@@ -685,8 +688,8 @@ public class Discoverer
 		if (cfs.size() == 0)
 			throw new KNXException("search could not be started on any network interface");
 
-		final CompletableFuture<List<Result<SearchResponse>>> search = CompletableFuture.allOf(cfs.toArray(new CompletableFuture<?>[0]))
-				.thenApply(__ -> getSearchResponses());
+		final CompletableFuture<List<Result<SearchResponse>>> search = CompletableFuture
+				.allOf(cfs.toArray(new CompletableFuture<?>[0])).thenApply(__ -> List.copyOf(responses));
 		search.exceptionally(t -> {
 			cfs.forEach(cf -> cf.cancel(false));
 			return null;
@@ -836,7 +839,8 @@ public class Discoverer
 	 * @throws KNXException
 	 */
 	private CompletableFuture<Void> search(final InetAddress localAddr, final int localPort, final NetworkInterface ni,
-			final Duration timeout, final Srp... searchParameters) throws KNXException {
+			final Duration timeout, final Consumer< Result<SearchResponse>> notifyResponse,
+			final Srp... searchParameters) throws KNXException {
 		final var bind = mcast ? new InetSocketAddress(SEARCH_PORT) : new InetSocketAddress(localAddr, localPort);
 		try {
 			final var channel = newChannel(bind);
@@ -875,7 +879,7 @@ public class Discoverer
 				channel.send(ByteBuffer.wrap(std), dst);
 			}
 
-			return receiveAsync(channel, localEndpoint, timeout, nifName + localAddr.getHostAddress());
+			return receiveAsync(channel, localEndpoint, timeout, nifName + localAddr.getHostAddress(), notifyResponse);
 		}
 		catch (IOException | RuntimeException e) {
 			throw new KNXException("search request to " + SYSTEM_SETUP_MULTICAST + " failed on "
@@ -912,10 +916,10 @@ public class Discoverer
 	});
 
 	private CompletableFuture<Void> receiveAsync(final DatagramChannel dc, final InetSocketAddress localEndpoint,
-		final Duration timeout, final String name) throws IOException
+		final Duration timeout, final String name, final Consumer< Result<SearchResponse>> notifyResponse) throws IOException
 	{
 		final ReceiverLoop looper = new ReceiverLoop(dc, localEndpoint, 512, timeout, name
-				+ ":" + ((InetSocketAddress) dc.getLocalAddress()).getPort());
+				+ ":" + ((InetSocketAddress) dc.getLocalAddress()).getPort(), notifyResponse);
 		final CompletableFuture<Void> cf = CompletableFuture.runAsync(looper, executor);
 		cf.exceptionally(t -> {
 			looper.quit();
@@ -973,11 +977,13 @@ public class Discoverer
 		private final Selector selector;
 		private final Duration timeout;
 
+		private final Consumer<Result<SearchResponse>> notifyResponse;
 
 		// use for search looper
 		// timeout in milliseconds
 		ReceiverLoop(final DatagramChannel dc, final InetSocketAddress localEndpoint, final int receiveBufferSize,
-				final Duration timeout, final String name) throws IOException {
+				final Duration timeout, final String name, final Consumer< Result<SearchResponse>> notifyResponse)
+						throws IOException {
 			super(null, false, receiveBufferSize, 0, (int) timeout.toMillis());
 
 			nif = dc.getOption(StandardSocketOptions.IP_MULTICAST_IF);
@@ -990,6 +996,7 @@ public class Discoverer
 			dc.register(selector, SelectionKey.OP_READ);
 
 			this.timeout = timeout;
+			this.notifyResponse = notifyResponse;
 		}
 
 		// use for description looper
@@ -1007,6 +1014,8 @@ public class Discoverer
 			dc.register(selector, SelectionKey.OP_READ);
 
 			this.timeout = Duration.ofMillis(timeout);
+
+			notifyResponse = null;
 		}
 
 		@Override
@@ -1043,6 +1052,7 @@ public class Discoverer
 						if (receivers.contains(this)) {
 							final var response = SearchResponse.from(h, data, offset + h.getStructLength());
 							final Result<SearchResponse> r = new Result<>(response, nif, localEndpoint, source);
+							notifyResponse.accept(r);
 							if (!responses.contains(r))
 								responses.add(r);
 						}
