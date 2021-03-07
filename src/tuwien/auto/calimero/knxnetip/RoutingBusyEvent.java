@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2016 B. Malinowsky
+    Copyright (c) 2016, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 package tuwien.auto.calimero.knxnetip;
 
 import java.net.InetSocketAddress;
+import java.time.Duration;
 import java.util.EventObject;
 
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingBusy;
@@ -60,9 +61,9 @@ public class RoutingBusyEvent extends EventObject
 		return from;
 	}
 
-	public final int waitTime()
+	public final Duration waitTime()
 	{
-		return busy.getWaitTime();
+		return busy.waitTime();
 	}
 
 	public final RoutingBusy get()

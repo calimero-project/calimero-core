@@ -306,7 +306,7 @@ class KNXnetIPRouterTest
 	void sendRoutingBusy() throws KNXException
 	{
 		newRouter();
-		r.send(new RoutingBusy(0, 100, 0));
+		r.send(new RoutingBusy(0, Duration.ofMillis(100), 0));
 		Assertions.assertTimeout(timeout, () -> {
 			while (routingBusy.get() == 0)
 				Thread.sleep(50);
@@ -320,7 +320,7 @@ class KNXnetIPRouterTest
 		newRouter();
 		final int messages = 5;
 		for (int i = 0; i < messages; i++) {
-			r.send(new RoutingBusy(1, 20, 0));
+			r.send(new RoutingBusy(1, Duration.ofMillis(20), 0));
 			Thread.sleep(12);
 		}
 		Assertions.assertTimeout(timeout, () -> {
@@ -336,7 +336,7 @@ class KNXnetIPRouterTest
 		newRouter();
 		final int messages = 40;
 		for (int i = 0; i < messages; i++) {
-			r.send(new RoutingBusy(1, 20, 0));
+			r.send(new RoutingBusy(1, Duration.ofMillis(20), 0));
 		}
 		Assertions.assertTimeout(timeout, () -> {
 			while (routingBusy.get() < messages)

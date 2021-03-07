@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2019 B. Malinowsky
+    Copyright (c) 2015, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 package tuwien.auto.calimero.knxnetip.servicetype;
 
 import java.io.ByteArrayOutputStream;
+import java.time.Duration;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -62,7 +63,7 @@ public class RoutingBusy extends ServiceType
 	private static final int typeSize = 6;
 
 	private final int state;
-	private final int waitTime; // ms
+	private final Duration waitTime;
 	private final int ctrl;
 
 	/**
@@ -82,7 +83,7 @@ public class RoutingBusy extends ServiceType
 		if (size != typeSize)
 			throw new KNXFormatException("wrong size for routing busy indication", size);
 		state = data[offset + 1] & 0xFF;
-		waitTime = (data[offset + 2] & 0xFF) << 8 | (data[offset + 3] & 0xFF);
+		waitTime = Duration.ofMillis((data[offset + 2] & 0xFF) << 8 | (data[offset + 3] & 0xFF));
 		ctrl = (data[offset + 4] & 0xFF) << 8 | (data[offset + 5] & 0xFF);
 	}
 
@@ -92,14 +93,14 @@ public class RoutingBusy extends ServiceType
 	 * @param deviceState router device state, this router states are defined by the KNX property ID
 	 *        69 in object type 11 of the KNX property definitions (with the state maintained by the
 	 *        corresponding property value)
-	 * @param waitTime time required to empty the affected receive queue, in milliseconds,
+	 * @param waitTime time required to empty the affected receive queue,
 	 *        <code>waitTime</code> shall be at least 20 ms and shall not exceed 100 ms
 	 * @param control routing busy indication control field, default value is 0x0
 	 */
-	public RoutingBusy(final int deviceState, final int waitTime, final int control)
+	public RoutingBusy(final int deviceState, final Duration waitTime, final int control)
 	{
 		super(KNXnetIPHeader.ROUTING_BUSY);
-		if (waitTime < 20 || waitTime > 100)
+		if (waitTime.toMillis() < 20 || waitTime.toMillis() > 100)
 			throw new KNXIllegalArgumentException("wait time out of range [20..100] ms");
 		if (deviceState < 0 || deviceState > 0xFF)
 			throw new KNXIllegalArgumentException("device state field out of range [0..0xFF]");
@@ -137,33 +138,38 @@ public class RoutingBusy extends ServiceType
 	}
 
 	/**
+	 * @deprecated Use {@link #waitTime()}.
+	 */
+	@Deprecated
+	public final int getWaitTime()
+	{
+		return (int) waitTime.toMillis();
+	}
+
+	/**
 	 * Returns the time required to empty the affected receive queue.
 	 * <p>
 	 * If 1) {@link #getControl()} returns 0x0, or 2) {@link #getControl()} returns not 0x0 and the
 	 * value is not interpreted by the receiving device, the receiving KNXnet/IP router or KNX IP
-	 * device shall stop sending further routing indications for a time of {@link #getWaitTime()}.
+	 * device shall stop sending further routing indications for a time of {@link #waitTime()}.
 	 * The following flow control mechanism applies:<br>
 	 * The total timeout after which a KNX device is permitted to resume sending is calculated as
-	 * <code>totalTime = {@link #getWaitTime()} + rand(0..1) * N * 50 ms</code>.<br>The factor
-	 * <code>N</code> is calculated as follows:
+	 * <code>totalTime = {@link #waitTime()} + rand(0..1) * N * 50 ms</code>.<br>
+	 * The factor <code>N</code> is calculated as follows:
 	 * <ul>
 	 * <li>Increment <code>N</code> by one for each new routing busy indication received &ge; 10 ms
 	 * have passed since the last routing busy indication.</li>
-	 * <li>Decrement <code>N</code> by one every 5 ms after <code>t_slowduration</code> has elapsed.
-	 * </li>
+	 * <li>Decrement <code>N</code> by one every 5 ms after <code>t_slowduration</code> has elapsed.</li>
 	 * <li><code>t_slowduration</code> = N * 100 ms.</li>
 	 * </ul>
-	 * <p>
+	 *
 	 * The wait time value used by the indicating device is also stored in the KNX property
 	 * <code>ROUTING_BUSY_WAIT_TIME</code> with the <code>PID = 78</code>.
 	 *
-	 * @return time in milliseconds required to empty the affected receive queue, value shall be in
+	 * @return time required to empty the affected receive queue, value shall be in
 	 *         the range of <code>20 ms &le; time &le; 100 ms</code>
 	 */
-	public final int getWaitTime()
-	{
-		return waitTime;
-	}
+	public final Duration waitTime() { return waitTime; }
 
 	/**
 	 * Returns the routing busy control field.
@@ -195,8 +201,8 @@ public class RoutingBusy extends ServiceType
 	{
 		os.write(typeSize);
 		os.write(state);
-		os.write(waitTime >> 8);
-		os.write(waitTime);
+		os.write((int) (waitTime.toMillis() >> 8));
+		os.write((int) waitTime.toMillis());
 		os.write(ctrl >> 8);
 		os.write(ctrl);
 		return os.toByteArray();
