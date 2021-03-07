@@ -362,8 +362,6 @@ class DiscovererTest
 	void testIsSearching() throws KNXException, InterruptedException
 	{
 		ddef.startSearch(timeout, false);
-		// XXX temp workaround: avoid race condition with receiver thread::run
-		Thread.sleep(100);
 		assertTrue(ddef.isSearching());
 		while (ddef.isSearching())
 			Thread.sleep(200);

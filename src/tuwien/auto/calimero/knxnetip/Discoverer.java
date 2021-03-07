@@ -948,6 +948,8 @@ public class Discoverer
 
 			this.timeout = timeout;
 			this.notifyResponse = notifyResponse;
+
+			receivers.add(this);
 		}
 
 		// unicast search to specific server endpoint, and descrption request
@@ -972,7 +974,6 @@ public class Discoverer
 		public void run()
 		{
 			Thread.currentThread().setName("Discoverer " + id);
-			receivers.add(this);
 			try {
 				loop();
 			}
