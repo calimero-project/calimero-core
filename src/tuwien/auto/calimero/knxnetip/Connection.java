@@ -37,7 +37,7 @@
 package tuwien.auto.calimero.knxnetip;
 
 import static tuwien.auto.calimero.DataUnitBuilder.toHex;
-import static tuwien.auto.calimero.knxnetip.ConnectionBase.hostPort;
+import static tuwien.auto.calimero.knxnetip.Net.hostPort;
 import static tuwien.auto.calimero.knxnetip.SecureConnection.secureSymbol;
 
 import java.io.Closeable;
@@ -645,7 +645,7 @@ public final class Connection implements Closeable {
 		if (local.getAddress().isAnyLocalAddress()) {
 			try {
 				final InetAddress addr = Optional.ofNullable(server.getAddress())
-						.flatMap(SecureConnection::onSameSubnet).orElse(InetAddress.getLocalHost());
+						.flatMap(Net::onSameSubnet).orElse(InetAddress.getLocalHost());
 				bind = new InetSocketAddress(addr, local.getPort());
 			}
 			catch (final UnknownHostException e) {

@@ -37,13 +37,13 @@
 package tuwien.auto.calimero.knxnetip;
 
 import static tuwien.auto.calimero.DataUnitBuilder.toHex;
+import static tuwien.auto.calimero.knxnetip.Net.hostPort;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
@@ -207,7 +207,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		final var tunnel = new KNXnetIPTunnel(knxLayer, session.connection(), tunnelingAddress) {
 			@Override
 			public String getName() {
-				return "KNX IP " + secureSymbol + " Tunneling " + ConnectionBase.hostPort(ctrlEndpt);
+				return "KNX IP " + secureSymbol + " Tunneling " + hostPort(ctrlEndpt);
 			}
 
 			@Override
@@ -262,7 +262,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		final var tunnel = new KNXnetIPDevMgmt(session.connection()) {
 			@Override
 			public String getName() {
-				return "KNX IP " + secureSymbol + " Management " + ConnectionBase.hostPort(ctrlEndpt);
+				return "KNX IP " + secureSymbol + " Management " + hostPort(ctrlEndpt);
 			}
 
 			@Override
@@ -378,7 +378,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		if (local.getAddress().isAnyLocalAddress()) {
 			try {
 				final InetAddress addr = useNat ? null : Optional.ofNullable(serverCtrlEP.getAddress())
-						.flatMap(SecureConnection::onSameSubnet).orElse(InetAddress.getLocalHost());
+						.flatMap(Net::onSameSubnet).orElse(InetAddress.getLocalHost());
 				local = new InetSocketAddress(addr, localEP.getPort());
 			}
 			catch (final UnknownHostException e) {
@@ -449,7 +449,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		if (local.getAddress().isAnyLocalAddress()) {
 			try {
 				final InetAddress addr = useNat ? null : Optional.ofNullable(serverCtrlEP.getAddress())
-						.flatMap(SecureConnection::onSameSubnet).orElse(InetAddress.getLocalHost());
+						.flatMap(Net::onSameSubnet).orElse(InetAddress.getLocalHost());
 				local = new InetSocketAddress(addr, localEP.getPort());
 			}
 			catch (final UnknownHostException e) {
@@ -507,19 +507,6 @@ public final class SecureConnection extends KNXnetIPRouting {
 		// unused
 		mcastLatencyTolerance = 0;
 		syncLatencyTolerance = 0;
-	}
-
-	// finds a local IPv4 address with its network prefix "matching" the remote address
-	static Optional<InetAddress> onSameSubnet(final InetAddress remote) {
-		try {
-			return NetworkInterface.networkInterfaces().flatMap(ni -> ni.getInterfaceAddresses().stream())
-					.filter(ia -> ia.getAddress() instanceof Inet4Address)
-//					.peek(ia -> logger.trace("match local address {}/{} to {}", ia.getAddress(), ia.getNetworkPrefixLength(), remote))
-					.filter(ia -> ClientConnection.matchesPrefix(ia.getAddress(), ia.getNetworkPrefixLength(), remote))
-					.map(ia -> ia.getAddress()).findFirst();
-		}
-		catch (final SocketException ignore) {}
-		return Optional.empty();
 	}
 
 	private static SerialNumber deriveSerialNumber(final NetworkInterface netif) {

@@ -306,7 +306,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		// only the control endpoint is set when our logger is initialized (the data
 		// endpoint gets assigned later in connect)
 		// to keep the name short, avoid a prepended host name as done by InetAddress
-		return hostPort(ctrlEndpt);
+		return Net.hostPort(ctrlEndpt);
 	}
 
 	@Override
@@ -593,10 +593,6 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	{
 		final CloseEvent ce = new CloseEvent(this, initiator, reason);
 		listeners.fire(l -> l.connectionClosed(ce));
-	}
-
-	static String hostPort(final InetSocketAddress addr) {
-		return addr.getAddress().getHostAddress() + ":" + addr.getPort();
 	}
 
 	// a semaphore with fair use behavior (FIFO)

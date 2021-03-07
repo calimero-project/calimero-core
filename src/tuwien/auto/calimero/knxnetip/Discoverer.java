@@ -36,14 +36,13 @@
 
 package tuwien.auto.calimero.knxnetip;
 
-import static tuwien.auto.calimero.knxnetip.ConnectionBase.hostPort;
+import static tuwien.auto.calimero.knxnetip.Net.hostPort;
 import static tuwien.auto.calimero.knxnetip.util.Srp.withDeviceDescription;
 
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.StandardProtocolFamily;
@@ -259,7 +258,7 @@ public class Discoverer
 	/**
 	 * Returns a discoverer which uses the supplied TCP connection for discovery &amp; description requests.
 	 *
-	 * @param c, the connection to use, ownership is not transferred to the discoverer
+	 * @param c the connection to use, ownership is not transferred to the discoverer
 	 * @return a discoverer
 	 */
 	public static Discoverer tcp(final Connection c) {
@@ -269,7 +268,7 @@ public class Discoverer
 	/**
 	 * Returns a discoverer which uses the supplied secure session for discovery &amp; description requests.
 	 *
-	 * @param session, the secure session to use, ownership is not transferred to the discoverer
+	 * @param session the secure session to use, ownership is not transferred to the discoverer
 	 * @return a discoverer
 	 */
 	public static Discoverer secure(final SecureSession session) {
@@ -390,7 +389,7 @@ public class Discoverer
 			return tcpSearch(searchParameters);
 
 		final InetAddress addr = nat ? host : host != null ? host
-				: onSameSubnet(serverControlEndpoint.getAddress()).orElseGet(Discoverer::localHost);
+				: Net.onSameSubnet(serverControlEndpoint.getAddress()).orElseGet(Discoverer::localHost);
 		try {
 			final var dc = newChannel(new InetSocketAddress(addr, port));
 			// create a new socket address with host, since the socket might
@@ -409,21 +408,6 @@ public class Discoverer
 		catch (final IOException e) {
 			throw new KNXException("search request to " + hostPort(serverControlEndpoint) + " failed on " + addr, e);
 		}
-	}
-
-	// finds a local IPv4 address with its network prefix "matching" the remote address
-	private Optional<InetAddress> onSameSubnet(final InetAddress remote) {
-		try {
-			return Collections.list(NetworkInterface.getNetworkInterfaces()).stream()
-					.flatMap(ni -> ni.getInterfaceAddresses().stream())
-					.filter(ia -> ia.getAddress() instanceof Inet4Address)
-					.peek(ia -> logger.trace("match local address {}/{} to {}", ia.getAddress(),
-							ia.getNetworkPrefixLength(), remote))
-					.filter(ia -> ClientConnection.matchesPrefix(ia.getAddress(), ia.getNetworkPrefixLength(), remote))
-					.map(ia -> ia.getAddress()).findFirst();
-		}
-		catch (final SocketException ignore) {}
-		return Optional.empty();
 	}
 
 	private static InetAddress localHost() {
@@ -778,7 +762,8 @@ public class Discoverer
 			}
 
 		final var localhost = host(server.getAddress());
-		final var bind = new InetSocketAddress(nat ? null : onSameSubnet(server.getAddress()).orElse(localhost), port);
+		final var bind = new InetSocketAddress(nat ? null : Net.onSameSubnet(server.getAddress()).orElse(localhost),
+				port);
 		try (var dc = newChannel(bind)) {
 			final var local = (InetSocketAddress) dc.getLocalAddress();
 			final byte[] buf = PacketHelper.toPacket(new DescriptionRequest(nat ? null : local));
@@ -904,16 +889,6 @@ public class Discoverer
 		return cf;
 	}
 
-	private static final NetworkInterface defaultNetif;
-	static {
-		try (var s = new MulticastSocket()) {
-			defaultNetif = s.getNetworkInterface();
-		}
-		catch (final IOException e) {
-			throw new ExceptionInInitializerError();
-		}
-	}
-
 	private CompletableFuture<Result<SearchResponse>> receiveAsync(final DatagramChannel dc,
 			final InetSocketAddress serverCtrlEndpoint, final Duration timeout) throws IOException {
 
@@ -921,7 +896,7 @@ public class Discoverer
 		final InetSocketAddress local = (InetSocketAddress) dc.getLocalAddress();
 		final NetworkInterface netif;
 		if (local.getAddress().isAnyLocalAddress())
-			netif = defaultNetif;
+			netif = Net.defaultNetif;
 		else
 			netif = NetworkInterface.getByInetAddress(local.getAddress());
 

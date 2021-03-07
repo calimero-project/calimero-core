@@ -36,16 +36,14 @@
 
 package tuwien.auto.calimero.knxnetip;
 
+import static tuwien.auto.calimero.knxnetip.Net.hostPort;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.Collections;
 import java.util.Optional;
 
 import tuwien.auto.calimero.CloseEvent;
@@ -182,7 +180,7 @@ abstract class ClientConnection extends ConnectionBase
 				throw new KNXIllegalArgumentException("unresolved address " + local);
 			if (local.getAddress().isAnyLocalAddress()) {
 				final InetAddress addr = useNAT ? null
-					: Optional.ofNullable(serverCtrlEP.getAddress()).flatMap(this::onSameSubnet)
+					: Optional.ofNullable(serverCtrlEP.getAddress()).flatMap(Net::onSameSubnet)
 							.orElse(InetAddress.getLocalHost());
 				local = new InetSocketAddress(addr, localEP.getPort());
 			}
@@ -456,35 +454,6 @@ abstract class ClientConnection extends ConnectionBase
 	private void closeSocket() {
 		if (socket != null)
 			socket.close();
-	}
-
-	// finds a local IPv4 address with its network prefix "matching" the remote address
-	private Optional<InetAddress> onSameSubnet(final InetAddress remote)
-	{
-		try {
-			return Collections.list(NetworkInterface.getNetworkInterfaces()).stream()
-					.flatMap(ni -> ni.getInterfaceAddresses().stream())
-					.filter(ia -> ia.getAddress() instanceof Inet4Address)
-					.peek(ia -> logger.trace("match local address {}/{} to {}", ia.getAddress(),
-							ia.getNetworkPrefixLength(), remote))
-					.filter(ia -> matchesPrefix(ia.getAddress(), ia.getNetworkPrefixLength(), remote))
-					.map(ia -> ia.getAddress()).findFirst();
-		}
-		catch (final SocketException ignore) {}
-		return Optional.empty();
-	}
-
-	static boolean matchesPrefix(final InetAddress local, final int maskLength, final InetAddress remote)
-	{
-		final byte[] a1 = local.getAddress();
-		final byte[] a2 = remote.getAddress();
-		final long mask = (0xffffffffL >> maskLength) ^ 0xffffffffL;
-		for (int i = 0; i < a1.length; i++) {
-			final int byteMask = (int) ((mask >> (24 - 8 * i)) & 0xff);
-			if ((a1[i] & byteMask) != (a2[i] & byteMask))
-				return false;
-		}
-		return true;
 	}
 
 	private final class HeartbeatMonitor extends Thread

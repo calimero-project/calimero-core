@@ -141,16 +141,6 @@ public class KNXnetIPRouting extends ConnectionBase
 	private final List<CEMILData> loopbackFrames = new ArrayList<>();
 	private static final int maxLoopbackQueueSize = 20;
 
-	private static final NetworkInterface defaultNetif;
-	static {
-		try (var s = new MulticastSocket()) {
-			defaultNetif = s.getNetworkInterface();
-		}
-		catch (final IOException e) {
-			throw new ExceptionInInitializerError();
-		}
-	}
-
 	private volatile BiFunction<KNXnetIPHeader, ByteBuffer, SearchResponse> searchRequestCallback;
 
 	/**
@@ -289,7 +279,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	public final NetworkInterface networkInterface() {
 		try {
 			final NetworkInterface netif = dc.getOption(StandardSocketOptions.IP_MULTICAST_IF);
-			return netif == null ? defaultNetif : netif;
+			return netif == null ? Net.defaultNetif : netif;
 		}
 		catch (final IOException e) {
 			throw new KnxRuntimeException("socket error getting network interface", e);
@@ -360,7 +350,7 @@ public class KNXnetIPRouting extends ConnectionBase
 					dcSysBcast.setOption(StandardSocketOptions.IP_MULTICAST_IF, setNetif);
 			}
 			else
-				setNetif = defaultNetif;
+				setNetif = Net.defaultNetif;
 
 			logger.debug("join multicast group {} on {}", multicast.getHostAddress(), setNetif.getName());
 			dc.join(multicast, setNetif);

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018 B. Malinowsky
+    Copyright (c) 2018, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ class ClientConnectionTest {
 	void inSameSubnet(final int prefixLength, final String addr1, final String addr2) throws UnknownHostException {
 		final InetAddress local = InetAddress.getByName(addr1);
 		final InetAddress remote = InetAddress.getByName(addr2);
-		assertTrue(ClientConnection.matchesPrefix(local, prefixLength, remote));
+		assertTrue(Net.matchesPrefix(local, prefixLength, remote));
 	}
 
 	@Test
@@ -60,17 +60,17 @@ class ClientConnectionTest {
 		for (int prefixLen = 0; prefixLen < 24; prefixLen++) {
 			final InetAddress local = InetAddress.getByName("10.10.10.1");
 			final InetAddress remote = InetAddress.getByName("10.10.10.254");
-			assertTrue(ClientConnection.matchesPrefix(local, prefixLen, remote), "for prefix length " + prefixLen);
+			assertTrue(Net.matchesPrefix(local, prefixLen, remote), "for prefix length " + prefixLen);
 		}
 		for (int prefixLen = 0; prefixLen < 28; prefixLen++) {
 			final InetAddress local = InetAddress.getByName("10.10.10.1");
 			final InetAddress remote = InetAddress.getByName("10.10.10.15");
-			assertTrue(ClientConnection.matchesPrefix(local, prefixLen, remote), "for prefix length " + prefixLen);
+			assertTrue(Net.matchesPrefix(local, prefixLen, remote), "for prefix length " + prefixLen);
 		}
 		for (int prefixLen = 0; prefixLen < 16; prefixLen++) {
 			final InetAddress local = InetAddress.getByName("10.10.254.254");
 			final InetAddress remote = InetAddress.getByName("10.10.0.1");
-			assertTrue(ClientConnection.matchesPrefix(local, prefixLen, remote), "for prefix length " + prefixLen);
+			assertTrue(Net.matchesPrefix(local, prefixLen, remote), "for prefix length " + prefixLen);
 		}
 	}
 }
