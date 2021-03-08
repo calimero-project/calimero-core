@@ -1,0 +1,65 @@
+name: CI with Gradle
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        java: [11, 15]
+    name: Java ${{ matrix.java }} sample
+
+    steps:
+    - name: Checkout calimero-core
+      uses: actions/checkout@v2
+      with:
+        repository: calimero-project/calimero-core
+        path: calimero-core
+    - name: Checkout calimero-device
+      uses: actions/checkout@v2
+      with:
+        repository: calimero-project/calimero-device
+        path: calimero-device
+    - name: Checkout calimero-rxtx
+      uses: actions/checkout@v2
+      with:
+        repository: calimero-project/calimero-rxtx
+        path: calimero-rxtx
+    - name: Checkout calimero-server
+      uses: actions/checkout@v2
+      with:
+        repository: calimero-project/calimero-server
+        path: calimero-server
+    - name: Checkout calimero-testnetwork
+      uses: actions/checkout@v2
+      with:
+        repository: calimero-project/calimero-testnetwork
+        path: calimero-testnetwork
+    - name: Checkout calimero-core
+      uses: actions/checkout@v2
+      with:
+        path: calimero-core
+    - name: setup
+      uses: actions/setup-java@v1
+      with:
+        java-version: ${{ matrix.java }}
+    - name: Grant execute permission for gradlew
+      run: |
+        chmod +x calimero-testnetwork/gradlew
+        chmod +x calimero-core/gradlew
+    - name: Start testnetwork
+      run: |
+        cd calimero-testnetwork
+        ./gradlew build
+        ./gradlew run ../calimero-core/test/testnetwork-launcher/server-config.xml &
+    - name: Build with Gradle
+      run: |
+        cd calimero-core
+        ./gradlew build
