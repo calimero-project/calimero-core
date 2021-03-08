@@ -58,7 +58,7 @@ jobs:
       run: |
         cd calimero-testnetwork
         ./gradlew build
-        ./gradlew run ../calimero-core/test/testnetwork-launcher/server-config.xml &
+        ./gradlew run --args "../calimero-core/test/testnetwork-launcher/server-config.xml" &
     - name: Build with Gradle
       run: |
         cd calimero-core
