@@ -1,4 +1,4 @@
-Calimero-core [![Build Status](https://travis-ci.org/calimero-project/calimero-core.svg?branch=master)](https://travis-ci.org/calimero-project/calimero-core)
+Calimero-core [![CI with Gradle](https://github.com/calimero-project/calimero-core/actions/workflows/gradle.yml/badge.svg)](https://github.com/calimero-project/calimero-core/actions/workflows/gradle.yml)
 =============
 ~~~ sh
 git clone https://github.com/calimero-project/calimero-core.git
