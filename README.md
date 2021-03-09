@@ -17,7 +17,7 @@ Supported Features
 * KNX IP Secure
     * Discovery and Self-description
     * Tunneling
-    * Multicast ([example](https://github.com/calimero-project/introduction/blob/master/2.5/src/main/java/KnxipSecure.java) of creating a secure network link)
+    * Multicast ([example](https://github.com/calimero-project/introduction/blob/master/src/main/java/KnxipSecure.java) of creating a secure network link)
     * Busmonitor
     * Device Management
 * KNXnet/IP
@@ -99,7 +99,7 @@ Access via KNXnet/IP, KNX USB, KNX RF USB, TP-UART, and FT1.2
 Logging
 -------
 
-Calimero uses the [Simple Logging Facade for Java (slf4j)](http://www.slf4j.org/). Users can bind any desired logging frameworks. The default maven dependency is the [Simple Logger](http://www.slf4j.org/api/org/slf4j/impl/SimpleLogger.html). The simple logger logs everything to standard output, and can be configured via the file `simplelogger.properties`, JVM system properties, or `java` command line options, e.g., `-Dorg.slf4j.simpleLogger.defaultLogLevel=warn`.
+Calimero uses the [Simple Logging Facade for Java (slf4j)](http://www.slf4j.org/). Users can bind any desired logging frameworks. The default dependency is the [Simple Logger](http://www.slf4j.org/api/org/slf4j/impl/SimpleLogger.html). The simple logger logs everything to standard output, and can be configured via the file `simplelogger.properties`, JVM system properties, or `java` command line options, e.g., `-Dorg.slf4j.simpleLogger.defaultLogLevel=trace`.
 
 Testing
 -------
