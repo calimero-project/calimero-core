@@ -43,6 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
@@ -60,6 +61,7 @@ import tuwien.auto.calimero.knxnetip.util.HPAI;
 import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB;
 import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB.ServiceFamily;
 import tuwien.auto.calimero.knxnetip.util.TunnelingDib;
+import tuwien.auto.calimero.knxnetip.util.TunnelingDib.Status;
 
 class SearchResponseTest {
 	private final HPAI hpai = new HPAI((InetAddress) null, 0);
@@ -71,7 +73,8 @@ class SearchResponseTest {
 	private static final Map<ServiceFamily, Integer> families = Map.of(ServiceFamily.DeviceManagement, 1, ServiceFamily.Tunneling, 1);
 	private final ServiceFamiliesDIB secureFamilies = ServiceFamiliesDIB.newSecureServiceFamilies(families);
 
-	private final TunnelingDib tunneling = new TunnelingDib(List.of(new IndividualAddress(1, 2, 3)), new int[] { 1 });
+	private final TunnelingDib tunneling = new TunnelingDib(
+			Map.of(new IndividualAddress(1, 2, 3), EnumSet.of(Status.Free)));
 
 	@BeforeEach
 	void init() throws UnknownHostException {
@@ -154,7 +157,7 @@ class SearchResponseTest {
 		byte[] bytes = new byte[]{(byte) 0x08, (byte) 0x07, (byte) 0x00, (byte) 0xfe, (byte) 0x12, (byte) 0x03, (byte) 0xff, (byte) 0xf9};
 		assertArrayEquals(bytes, dib.toByteArray());
 
-		dib = new TunnelingDib(List.of(new IndividualAddress(1, 2, 3)), new int[] { 7 });
+		dib = new TunnelingDib(Map.of(new IndividualAddress(1, 2, 3), EnumSet.allOf(Status.class)));
 		bytes = new byte[]{(byte) 0x08, (byte) 0x07, (byte) 0x00, (byte) 0xfe, (byte) 0x12, (byte) 0x03, (byte) 0xff, (byte) 0xff};
 		assertArrayEquals(bytes, dib.toByteArray());
 	}

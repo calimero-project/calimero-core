@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2019 B. Malinowsky
+    Copyright (c) 2018, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,9 +37,11 @@
 package tuwien.auto.calimero.knxnetip.util;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -48,21 +50,77 @@ import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 /**
- * Tunneling DIB. Objects of this type are immutable.
+ * Tunneling DIB, containing the maximum supported APDU length and tunneling slot information of the tunneling interface.
+ * The tunneling slot information indicates how many tunneling connections the interface can serve, which individual
+ * addresses will be used for those connections, and the current tunneling slot status.<br>
+ * Objects of this type are immutable.
  */
 public class TunnelingDib extends DIB {
-	private final short maxApduLength;
-	private final IndividualAddress[] addresses;
-	// Each address comes with a status, being a bit field:
-	// Bit 0: Free, slot is not occupied
-	// Bit 1: Authorized, client requires authorization for this slot
-	// Bit 2: Usable, slot is currently usable
-	private final int[] status;
 
+	/**
+	 * Tunneling slot status.
+	 */
+	public enum Status {
+		/**
+		 * Indicates whether a tunneling slot is currently free or not (occupied).
+		 */
+		Free,
+
+		/**
+		 * Indicates the authorization of a tunneling slot. The interpretation is as follows:
+		 * <ul>
+		 * <li>Within a KNX IP Secure session: set if the client would be authorized to use that slot, cleared otherwise</li>
+		 * <li>Outside a KNX IP Secure session: indicates whether the slot requires authorization or not; set if no
+		 * authorization is required, cleared otherwise</li>
+		 * </ul>
+		 */
+		Authorized,
+
+		/**
+		 * Indicates whether a tunneling slot is currently usable or not.
+		 * A tunneling slot might not be usable due to, e.g., otherwise used address of the tunneling slot's address,
+		 * disrupted connection to the KNX medium, or implementation-specific criteria.
+		 */
+		Usable;
+
+		public int value() { return (int) Math.pow(2, ordinal()); }
+
+		public static Status of(final int value) {
+			switch (value) {
+				case 1: return Free;
+				case 2: return Authorized;
+				case 4: return Usable;
+			}
+			throw new KNXIllegalArgumentException(value + " is not a valid status value");
+		}
+	}
+
+	private final int maxApduLength;
+	private final Map<IndividualAddress, EnumSet<Status>> slots;
+
+
+	public TunnelingDib(final Map<IndividualAddress, EnumSet<Status>> tunnelingSlots) {
+		this((short) 0xfe, tunnelingSlots);
+	}
+
+	public TunnelingDib(final int maxApduLength, final Map<IndividualAddress, EnumSet<Status>> tunnelingSlots) {
+		super(2 + 2 + 4 * tunnelingSlots.size(), DIB.TunnelingInfo);
+
+		if (tunnelingSlots.isEmpty())
+			throw new KNXIllegalArgumentException("at least one address must be given");
+		if (2 + 2 + 4 * tunnelingSlots.size() > 254)
+			throw new KNXIllegalArgumentException(tunnelingSlots.size() + " slots exceed DIB size limit");
+
+		this.maxApduLength = maxApduLength;
+		slots = deepCopy(tunnelingSlots);
+	}
+
+	@Deprecated
 	public TunnelingDib(final List<IndividualAddress> addresses, final int[] status) {
 		this((short) 0xfe, addresses, status);
 	}
 
+	@Deprecated
 	public TunnelingDib(final short maxApduLength, final List<IndividualAddress> addresses, final int[] status) {
 		super(2 + 2 + 4 * addresses.size(), DIB.TunnelingInfo);
 
@@ -72,8 +130,10 @@ public class TunnelingDib extends DIB {
 			throw new KNXIllegalArgumentException("list sizes of addresses and status must be equal");
 
 		this.maxApduLength = maxApduLength;
-		this.addresses = addresses.toArray(new IndividualAddress[0]);
-		this.status = status.clone();
+
+		slots = new HashMap<>();
+		for (int i = 0; i < addresses.size(); i++)
+			slots.put(addresses.get(i), toStatusSet(status[i]));
 	}
 
 	public TunnelingDib(final byte[] data, final int offset, final int length) throws KNXFormatException {
@@ -83,59 +143,56 @@ public class TunnelingDib extends DIB {
 			throw new KNXFormatException("not a tunneling DIB", type);
 		if (length < 8)
 			throw new KNXFormatException("tunneling DIB too short", length);
+		if (length > 254)
+			throw new KNXFormatException("tunneling DIB exceeds max size", length);
 
 		final ByteBuffer buf = ByteBuffer.wrap(data, offset + 2, length - 2);
-		maxApduLength = buf.getShort();
+		maxApduLength = buf.getShort() & 0xffff;
 
+		slots = new LinkedHashMap<>();
 		final int entries = buf.remaining() / 4;
-		addresses = new IndividualAddress[entries];
-		status = new int[entries];
 		for (int i = 0; i < entries; i++) {
-			addresses[i] = new IndividualAddress(buf.getShort() & 0xffff);
+			final var address = new IndividualAddress(buf.getShort() & 0xffff);
 			buf.get(); // reserved
-			status[i] = buf.get() & 0x07;
+			final int status = buf.get() & 0x07;
+			slots.put(address, toStatusSet(status));
 		}
 	}
 
-	private static String formatStatus(final int status) {
-		final List<String> l = new ArrayList<>();
-		l.add((status & 1) == 1 ? "free" : "occupied");
-		if ((status & 2) == 2)
-			l.add("authorized");
-		if ((status & 4) == 4)
-			l.add("usable");
-		return l.stream().collect(Collectors.joining(", "));
+	/**
+	 * @return the maximum supported APDU length of the tunneling interface for KNX network access
+	 */
+	public int maxApduLength() { return maxApduLength; }
+
+	/**
+	 * @return tunneling slot information
+	 */
+	public final Map<IndividualAddress, EnumSet<Status>> slots() {
+		return deepCopy(slots);
 	}
 
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append("maximum APDU length: " + maxApduLength + ", addresses ");
-		for (int i = 0; i < addresses.length; i++)
-			sb.append(addresses[i] + " (" + formatStatus(status[i]) + ") ");
-		return sb.toString();
+		final var joiner = Collectors.joining(", ", "maximum APDU length: " + maxApduLength + ", tunneling slots: ", "");
+		return slots.entrySet().stream().map(slot -> slot.getKey() + " " + slot.getValue()).collect(joiner);
 	}
 
 	@Override
 	public byte[] toByteArray() {
 		final ByteBuffer buf = ByteBuffer.wrap(super.toByteArray()).position(2);
-		buf.putShort(maxApduLength);
-		for (int k = 0; k < addresses.length; k++) {
-			buf.put(addresses[k].toByteArray());
+		buf.putShort((short) maxApduLength);
+		for (final var slot : slots.entrySet()) {
+			buf.put(slot.getKey().toByteArray());
 			buf.put((byte) 0xff); // reserved
-			buf.put((byte) (status[k] | 0xf8));
+			final int status = slot.getValue().stream().mapToInt(Status::value).sum();
+			buf.put((byte) (status | 0xf8));
 		}
 		return buf.array();
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + Objects.hash(maxApduLength);
-		result = prime * result + Arrays.hashCode(addresses);
-		result = prime * result + Arrays.hashCode(status);
-		return result;
+		return Objects.hash(maxApduLength, slots);
 	}
 
 	@Override
@@ -145,7 +202,20 @@ public class TunnelingDib extends DIB {
 		if (!(obj instanceof TunnelingDib))
 			return false;
 		final TunnelingDib other = (TunnelingDib) obj;
-		return maxApduLength == other.maxApduLength && Arrays.equals(addresses, other.addresses)
-				&& Arrays.equals(status, other.status);
+		return maxApduLength == other.maxApduLength && slots.equals(other.slots);
+	}
+
+	private static EnumSet<Status> toStatusSet(final int status) {
+		final var set = EnumSet.noneOf(Status.class);
+		for (final var v : Status.values())
+			if (((status >> v.ordinal()) & 1) == 1)
+				set.add(v);
+		return set;
+	}
+
+	private static Map<IndividualAddress, EnumSet<Status>> deepCopy(final Map<IndividualAddress, EnumSet<Status>> map) {
+		final var copy = new LinkedHashMap<>(map);
+		copy.replaceAll((__, set) -> set.clone());
+		return copy;
 	}
 }
