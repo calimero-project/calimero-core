@@ -460,6 +460,43 @@ public class ManagementClientImpl implements ManagementClient
 	}
 
 	@Override
+	public List<TestResult> readNetworkParameter(final int objectType, final int pid, final byte... testInfo)
+			throws KNXLinkClosedException, KNXTimeoutException, KNXInvalidResponseException, InterruptedException	{
+		final long start = registerActiveService(NetworkParamResponse);
+		sendNetworkParameter(NetworkParamRead, null, objectType, pid, testInfo);
+
+		var responses = new ArrayList<TestResult>();
+		final BiFunction<IndividualAddress, byte[], Optional<byte[]>> testResponse = (responder, apdu) -> {
+			if (apdu.length < 5)
+				return Optional.empty();
+
+			final int receivedIot = (apdu[2] & 0xff) << 8 | (apdu[3] & 0xff);
+			final int receivedPid = apdu[4] & 0xff;
+			if (apdu.length == 5) {
+				final String s = receivedPid == 0xff ? receivedIot == 0xffff ? "object type" : "PID" : "response";
+				logger.info("network parameter read response from {} for interface object type {} "
+						+ "PID {}: unsupported {}", responder, objectType, pid, s);
+				return Optional.empty();
+			}
+			if (receivedIot == objectType && receivedPid == pid) {
+				final int prefix = 2 + 3 + testInfo.length;
+				byte[] testResult = Arrays.copyOfRange(apdu, prefix, apdu.length);
+				responses.add(new TestResult(responder, testResult));
+				return Optional.of(apdu);
+			}
+			return Optional.empty();
+		};
+
+		try {
+			waitForResponses(NetworkParamResponse, 3, 14, start, responseTimeout, testResponse, false);
+			return responses;
+		}
+		catch (final KNXTimeoutException e) {
+			return List.of();
+		}
+	}
+
+	@Override
 	public void writeNetworkParameter(final IndividualAddress remote, final int objectType, final int pid,
 		final byte... value) throws KNXLinkClosedException, KNXTimeoutException
 	{

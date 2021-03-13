@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2011, 2020 B. Malinowsky
+    Copyright (c) 2011, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,6 +47,7 @@ import org.junit.jupiter.api.Test;
 
 import tag.KnxnetIP;
 import tag.Slow;
+import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXTimeoutException;
@@ -195,6 +196,20 @@ class ManagementProceduresImplTest
 		System.out.println("start scanNetworkDevices on 0.0.x, takes a while ...");
 		final IndividualAddress[] list2 = mp.scanNetworkDevices(0, 0);
 		assertEquals(0, list2.length);
+	}
+
+	@Test
+	void scanExistingGroupAddresses() throws KNXException, InterruptedException {
+		final ManagementProceduresImpl impl = (ManagementProceduresImpl) mp;
+		// test 1/0/1 and 1/0/2
+		assertFalse(impl.scanGroupAddresses(new GroupAddress(1, 0, 1), 2).isEmpty(), "addresses exist");
+	}
+
+	@Test
+	void scanFreeGroupAddresses() throws KNXException, InterruptedException {
+		final ManagementProceduresImpl impl = (ManagementProceduresImpl) mp;
+		// test 3/0/1 and 3/0/2
+		assertTrue(impl.scanGroupAddresses(new GroupAddress(3, 0, 1), 2).isEmpty());
 	}
 
 	@Test

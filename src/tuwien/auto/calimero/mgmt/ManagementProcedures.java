@@ -41,6 +41,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import tuwien.auto.calimero.DeviceDescriptor.DD0;
+import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
@@ -335,7 +336,20 @@ public interface ManagementProcedures extends AutoCloseable
 	// ??? can we automatically detect the medium in this procedure?
 	List<byte[]> scanSerialNumbers(int medium) throws KNXException, InterruptedException;
 
-	// mode querying/setting procedures
+	/**
+	 * Tests whether a group address is in use within the range {@code startAddress} to
+	 * {@code startAddress + range - 1}. This method corresponds to the KNX <i>NM_GroupAddress_Scan</i> procedure.
+	 *
+	 * @param startAddress start address of group addresses to check
+	 * @param range test addresses in the range {@code startAddress + range - 1}, with {@code 0 < range < 256}; use 1 to
+	 *        test for a single group address
+	 * @return address list of responding devices which have assigned 1 or more addresses in the specfied range, empty
+	 *         list on no resopnse
+	 * @throws KNXException on network or reading error during the address check
+	 * @throws InterruptedException on interrupted thread
+	 */
+	List<IndividualAddress> scanGroupAddresses(final GroupAddress startAddress, final int range)
+		throws KNXException, InterruptedException;
 
 	/**
 	 * Sets the programming mode of a KNX network device.

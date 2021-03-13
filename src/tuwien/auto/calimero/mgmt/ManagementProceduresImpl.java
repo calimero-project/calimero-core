@@ -61,6 +61,7 @@ import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.DetachEvent;
 import tuwien.auto.calimero.DeviceDescriptor.DD0;
 import tuwien.auto.calimero.FrameEvent;
+import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -74,6 +75,8 @@ import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.mgmt.ManagementClient.EraseCode;
+import tuwien.auto.calimero.mgmt.ManagementClient.TestResult;
+import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
 import tuwien.auto.calimero.secure.SecureApplicationLayer;
 
 /**
@@ -472,6 +475,20 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			}
 		}
 		return Collections.emptyList();
+	}
+
+	@Override
+	public List<IndividualAddress> scanGroupAddresses(final GroupAddress startAddress, final int range)
+			throws KNXException, InterruptedException {
+		if (range < 1 || range > 255)
+			throw new KNXIllegalArgumentException("range " + range + " not in [1..255]");
+
+		final int addressTableObject = 1;
+		final byte[] ga = startAddress.toByteArray();
+		final byte[] testInfo = { (byte) range, ga[0], ga[1] };
+		final var responses = mc.readNetworkParameter(addressTableObject, PID.TABLE, testInfo);
+		return responses.stream().filter(r -> Arrays.equals(testInfo, r.result())).map(TestResult::remote)
+				.collect(Collectors.toList());
 	}
 
 	@Override

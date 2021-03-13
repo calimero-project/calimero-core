@@ -309,15 +309,13 @@ public interface ManagementClient extends AutoCloseable
 		throws KNXException, InterruptedException;
 
 	/**
-	 * Reads the current configuration of a network parameter from a {@code remote} endpoint. In broadcast communication
-	 * mode, the remote endpoint will ignore a network parameter read request on 1) reading a network parameter that is
-	 * not supported by the remote endpoint in question, or 2) on a negative check with respect to the supplied
-	 * parameters against the test information {@code testInfo}.<br>
-	 * In point-to-point communication mode, the remote endpoint will answer with a negative response if 1) the
+	 * Reads the current configuration of a network parameter in point-to-point communication mode from a {@code remote}
+	 * endpoint.
+	 * The remote endpoint will answer with a negative response if 1) the
 	 * interface object type is not supported, 2) the PID is not supported, or 3) on a negative check of the
 	 * investigated parameters against the test information.
 	 *
-	 * @param remote address of remote endpoint, or <code>null</code> to use broadcast communication mode
+	 * @param remote address of remote endpoint
 	 * @param objectType interface object type, <code>0 &le; objectType &lt; 0xffff</code>
 	 * @param pid KNX property identifier, <code>0 &le; pid &lt; 0xff</code>
 	 * @param testInfo test information, <code>0 &lt; testInfo.length &lt; </code> parameter-specific
@@ -329,6 +327,45 @@ public interface ManagementClient extends AutoCloseable
 	 */
 	List<byte[]> readNetworkParameter(IndividualAddress remote, int objectType, int pid, byte... testInfo)
 		throws KNXException, InterruptedException;
+
+	final class TestResult {
+		private final IndividualAddress remote;
+		private final byte[] response;
+
+		TestResult(final IndividualAddress remote, final byte[] response) {
+			this.remote = remote;
+			this.response = response;
+		}
+
+		public IndividualAddress remote() {
+			return remote;
+		}
+
+		/**
+		 * @return byte array with response, <code>length &gt; 0</code>
+		 */
+		public byte[] result() {
+			return response;
+		}
+	}
+
+	/**
+	 * Reads the current configuration of a network parameter using broadcast communication mode.
+	 * The remote endpoint will ignore a network parameter read request if 1) reading a network parameter that is
+	 * not supported by the remote endpoint in question, or 2) on a negative check with respect to the supplied
+	 * parameters against the test information {@code testInfo}.
+	 *
+	 * @param objectType interface object type, <code>0 &le; objectType &lt; 0xffff</code>
+	 * @param pid KNX property identifier, <code>0 &le; pid &lt; 0xff</code>
+	 * @param testInfo test information, <code>0 &lt; testInfo.length &lt; </code> parameter-specific
+	 * @return received responses with test results as (empty) list
+	 * @throws KNXLinkClosedException if network link to KNX network is closed
+	 * @throws KNXTimeoutException on timeout during send or waiting for a response
+	 * @throws KNXInvalidResponseException on invalid read response message
+	 * @throws InterruptedException on interrupted thread
+	 */
+	List<TestResult> readNetworkParameter(int objectType, int pid, byte... testInfo)
+			throws KNXException, InterruptedException;
 
 	/**
 	 * Writes a network parameter to a {@code remote} endpoint. The remote endpoint will neglect unknown parameter types
