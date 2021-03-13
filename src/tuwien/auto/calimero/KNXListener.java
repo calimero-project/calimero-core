@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,24 +39,22 @@ package tuwien.auto.calimero;
 import java.util.EventListener;
 
 /**
- * The base listener interface to receive events of the communication with a KNX
- * network.
+ * The base listener interface to receive events of the communication with a KNX network.
  */
+@FunctionalInterface
 public interface KNXListener extends EventListener
 {
 	/**
 	 * Arrival of a new KNX message frame.
-	 * <p>
-	 * 
+	 *
 	 * @param e frame event object
 	 */
 	void frameReceived(FrameEvent e);
 
 	/**
 	 * The connection has been closed.
-	 * <p>
-	 * 
+	 *
 	 * @param e connection close event object
 	 */
-	void connectionClosed(CloseEvent e);
+	default void connectionClosed(final CloseEvent e) {}
 }
