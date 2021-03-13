@@ -69,14 +69,20 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import junit.framework.AssertionFailedError;
 import tag.KnxnetIP;
 import tag.Slow;
+import tuwien.auto.calimero.CloseEvent;
+import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.Util;
+import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.knxnetip.Discoverer.Result;
+import tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode;
 import tuwien.auto.calimero.knxnetip.servicetype.DescriptionResponse;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
 import tuwien.auto.calimero.knxnetip.util.DIB;
 import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB.ServiceFamily;
+import tuwien.auto.calimero.knxnetip.util.Srp;
 
 /**
  * @author B. Malinowsky
@@ -476,11 +482,107 @@ class DiscovererTest
 	void tcpEndpointSearch() throws KNXException, InterruptedException, ExecutionException {
 		final InetSocketAddress server = Util.getServer();
 		try (var c = Connection.newTcpConnection(new InetSocketAddress(0), server)) {
-			final var result = Discoverer.tcp(c).search(new InetSocketAddress(0),
+			final var result = Discoverer.tcp(c).search(
 					withDeviceDescription(DIB.DEVICE_INFO, DIB.SUPP_SVC_FAMILIES, DIB.AdditionalDeviceInfo,
 							DIB.SecureServiceFamilies, DIB.TunnelingInfo));
-			final var response = result.get();
+			final var response = result.get().get(0);
 			assertEquals(server, response.remoteEndpoint());
+		}
+	}
+
+	@Test
+	void searchInProgrammingMode() throws KNXException, InterruptedException, ExecutionException {
+		final InetSocketAddress server = Util.getServer();
+		final int pidProgMode = 54;
+		try (var c = Connection.newTcpConnection(new InetSocketAddress(0), server); var mgmt = new KNXnetIPDevMgmt(c)) {
+
+			final var progModeOn = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, 0, 1, pidProgMode, 1, 1, new byte[] { 1 });
+			mgmt.send(progModeOn, BlockingMode.WaitForCon);
+
+			try {
+				final var result = Discoverer.tcp(c).search(Srp.withProgrammingMode());
+				final var response = result.get().get(0);
+				assertEquals(server, response.remoteEndpoint());
+			}
+			finally {
+				final var progModeOff = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, 0, 1, pidProgMode, 1, 1,
+						new byte[] { 0 });
+				mgmt.send(progModeOff, BlockingMode.WaitForCon);
+			}
+		}
+	}
+
+	@Test
+	void searchDeviceNotInProgrammingMode() throws KNXException {
+		try (var connection = Connection.newTcpConnection(Util.getLocalHost(), Util.getServer())) {
+			final var future = Discoverer.tcp(connection).search(Srp.withProgrammingMode());
+			assertThrows(ExecutionException.class, () -> future.get());
+		}
+	}
+
+	@Test
+	void searchWithMacAddress() throws KNXException, InterruptedException, ExecutionException {
+		final InetSocketAddress server = Util.getServer();
+		try (var c = Connection.newTcpConnection(new InetSocketAddress(0), server); var mgmt = new KNXnetIPDevMgmt(c)) {
+			final byte[] macAddress = new byte[6];
+			mgmt.addConnectionListener(new KNXListener() {
+				@Override
+				public void frameReceived(final FrameEvent e) {
+					final byte[] data = ((CEMIDevMgmt) e.getFrame()).getPayload();
+					System.arraycopy(data, 0, macAddress, 0, 6);
+				}
+
+				@Override
+				public void connectionClosed(final CloseEvent e) {}
+			});
+			final int pidMacAddress = 64;
+			final var cemi = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, 11, 1, pidMacAddress, 1, 1);
+			mgmt.send(cemi, BlockingMode.WaitForCon);
+
+			final var result = Discoverer.tcp(c).search(Srp.withMacAddress(macAddress));
+			final var response = result.get().get(0);
+			assertEquals(server, response.remoteEndpoint());
+		}
+	}
+
+	@Test
+	void searchUsingTcp() throws KNXException, InterruptedException, ExecutionException {
+		try (var connection = Connection.newTcpConnection(Util.getLocalHost(), Util.getServer())) {
+			final var future = Discoverer.tcp(connection).search();
+			final var result = future.get();
+			assertTrue(result.size() > 0);
+		}
+	}
+
+	@Test
+	void searchUsingSecureSession() throws KNXException, InterruptedException, ExecutionException {
+		final var pwdHash = SecureConnection.hashUserPassword("user1".toCharArray());
+		try (var connection = Connection.newTcpConnection(Util.getLocalHost(), Util.getServer());
+			 var session = connection.newSecureSession(1, pwdHash, new byte[16])) {
+
+			final var future = Discoverer.secure(session).search();
+			final var result = future.get();
+			assertTrue(result.size() > 0);
+		}
+	}
+
+	@Test
+	void descriptionUsingTcp() throws KNXException {
+		try (var connection = Connection.newTcpConnection(Util.getLocalHost(), Util.getServer())) {
+			final var discoverer = Discoverer.tcp(connection);
+			final var result = discoverer.getDescription(Util.getServer(), 30);
+			assertEquals(Util.getServer(), result.remoteEndpoint());
+		}
+	}
+
+	@Test
+	void descriptionUsingSecureSession() throws KNXException {
+		final var pwdHash = SecureConnection.hashUserPassword("user1".toCharArray());
+		try (var connection = Connection.newTcpConnection(Util.getLocalHost(), Util.getServer());
+				var session = connection.newSecureSession(1, pwdHash, new byte[16])) {
+			final var discoverer = Discoverer.secure(session);
+			final var result = discoverer.getDescription(Util.getServer(), 30);
+			assertEquals(Util.getServer(), result.remoteEndpoint());
 		}
 	}
 }
