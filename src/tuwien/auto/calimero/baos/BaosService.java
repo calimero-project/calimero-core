@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2020 B. Malinowsky
+    Copyright (c) 2019, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -441,6 +441,7 @@ public final class BaosService {
 	private static final int MinimumFrameSize = 6;
 
 	private final int subService;
+	private final boolean response;
 	private final int start;
 	private final int count;
 
@@ -533,11 +534,12 @@ public final class BaosService {
 			data.get(bytes);
 			return new BaosService(subService, start, items, bytes);
 		}
-		return new BaosService(subService, start, items, data);
+		return new BaosService(subService, response, start, items, data);
 	}
 
 	private BaosService(final int service, final int startItem, final int items, final byte... additionalData) {
 		subService = service;
+		response = false;
 		start = startItem;
 		this.count = items;
 		this.data = additionalData;
@@ -548,22 +550,26 @@ public final class BaosService {
 		if (items.length == 0)
 			throw new KNXIllegalArgumentException("no item supplied");
 		subService = service;
+		response = false;
 		start = items[0].id();
 		this.count = items.length;
 		this.data = new byte[0];
 		this.items = List.of(items);
 	}
 
-	private BaosService(final int service, final int start, final int items, final ByteBuffer buf)
+	private BaosService(final int service, final boolean response, final int start, final int items, final ByteBuffer buf)
 			throws KNXFormatException {
 		subService = service;
+		this.response = response;
 		this.start = start;
 		this.count = items;
 		this.data = new byte[0];
-		this.items = List.copyOf(parseItems(buf));
+		this.items = response ? List.copyOf(parseItems(buf)) : List.of();
 	}
 
 	public int subService() { return subService; }
+
+	public boolean isResponse() { return response; }
 
 	public ErrorCode error() { return count == 0 ? ErrorCode.of(data[0]) : ErrorCode.NoError; }
 
