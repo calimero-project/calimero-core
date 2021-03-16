@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -107,12 +107,10 @@ public class TunnelCRI extends CRI
 	}
 
 	/**
-	 * Returns the KNX tunneling layer.
-	 * <p>
-	 *
+	 * @deprecated Use {@link #tunnelingLayer()}.
 	 * @return layer value as unsigned byte
 	 */
-	// TODO maybe deprecate in favor of the enum version
+	@Deprecated
 	public final int getKNXLayer()
 	{
 		return opt[0] & 0xFF;
@@ -125,7 +123,7 @@ public class TunnelCRI extends CRI
 	 */
 	public final TunnelingLayer tunnelingLayer()
 	{
-		return TunnelingLayer.from(getKNXLayer());
+		return TunnelingLayer.from(opt[0] & 0xFF);
 	}
 
 	public final Optional<IndividualAddress> tunnelingAddress() {
@@ -142,7 +140,7 @@ public class TunnelCRI extends CRI
 	@Override
 	public String toString()
 	{
-		return "tunneling CRI, KNX layer " + getKNXLayer();
+		return "tunneling CRI, KNX " + tunnelingLayer();
 	}
 
 	private boolean validLength() {
