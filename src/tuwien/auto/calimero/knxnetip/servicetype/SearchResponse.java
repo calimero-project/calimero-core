@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -125,10 +125,9 @@ public class SearchResponse extends ServiceType
 	public SearchResponse(final boolean ext, final HPAI ctrlEndpoint, final List<DIB> dibs) {
 		super(ext ? KNXnetIPHeader.SearchResponse : KNXnetIPHeader.SEARCH_RES);
 		endpt = ctrlEndpoint;
-		if (dibs.size() < 2)
+		if (!ext && dibs.size() < 2)
 			throw new KNXIllegalArgumentException("search response shall contain device & service families DIB");
-		desc = new DescriptionResponse((DeviceDIB) dibs.get(0), (ServiceFamiliesDIB) dibs.get(1),
-				dibs.subList(2, dibs.size()).toArray(new DIB[0]));
+		desc = new DescriptionResponse(dibs);
 	}
 
 	/**
