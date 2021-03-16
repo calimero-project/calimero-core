@@ -836,6 +836,8 @@ public final class Connection implements Closeable {
 		case KNXnetIPHeader.DEVICE_CONFIGURATION_REQ:
 		case KNXnetIPHeader.TunnelingFeatureResponse:
 		case KNXnetIPHeader.TunnelingFeatureInfo:
+		case KNXnetIPHeader.ObjectServerRequest:
+		case KNXnetIPHeader.ObjectServerAck:
 			channelIdOffset = offset + 1;
 		}
 		final var channelId = data[channelIdOffset] & 0xff;

@@ -70,9 +70,14 @@ public class ServiceFamiliesDIB extends DIB
 		RemoteLogging,
 		RemoteConfigurationDiagnosis,
 		ObjectServer,
-		Security;
+		Security,
+		Baos;
 
-		public int id() { return ordinal() + 2; }
+		public int id() {
+			if (this == Baos)
+				return 0xf0;
+			return ordinal() + 2;
+		}
 
 		@Override
 		public String toString() {
@@ -81,8 +86,11 @@ public class ServiceFamiliesDIB extends DIB
 		}
 
 		public static ServiceFamily of(final int familyId) {
-			if (familyId < CORE || familyId > ServiceFamiliesDIB.Security)
+			if (familyId == Baos.id())
+				return Baos;
+			if (familyId < Core.id() || familyId > Security.id())
 				throw new KNXIllegalArgumentException(familyId + " is not a supported service family");
+
 			return values()[familyId - 2];
 		}
 	}

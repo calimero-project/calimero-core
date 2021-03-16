@@ -181,6 +181,11 @@ public class KNXnetIPHeader
 	public static final int TunnelingFeatureSet = 0x0424;
 	public static final int TunnelingFeatureInfo = 0x0425;
 
+	// BAOS ObjectServer
+
+	public static final int ObjectServerRequest = 0xf080;
+	public static final int ObjectServerAck = 0xf081;
+
 
 	private static final int HEADER_SIZE_10 = 0x06;
 
@@ -214,10 +219,10 @@ public class KNXnetIPHeader
 
 		if (headersize != HEADER_SIZE_10)
 			throw new KNXFormatException("unsupported header size, expected " + HEADER_SIZE_10, headersize);
-		if (version != KNXNETIP_VERSION_10)
+		final int expectedVersion = version(service);
+		if (version != expectedVersion)
 			throw new KNXFormatException(
-					String.format("unsupported KNXnet/IP protocol version, expected 0x%1h", KNXNETIP_VERSION_10),
-					version);
+					String.format("unsupported KNXnet/IP protocol version, expected 0x%1h", expectedVersion), version);
 	}
 
 	/**
@@ -235,7 +240,7 @@ public class KNXnetIPHeader
 			throw new KNXIllegalArgumentException("service type out of range [0..0xFFFF]");
 		headersize = HEADER_SIZE_10;
 		service = serviceType;
-		version = KNXNETIP_VERSION_10;
+		version = version(serviceType);
 		totalsize = headersize + serviceLength;
 	}
 
@@ -369,5 +374,9 @@ public class KNXnetIPHeader
 		default:
 			return "unknown service";
 		}
+	}
+
+	private static int version(final int serviceType) {
+		return serviceType == ObjectServerRequest || serviceType == ObjectServerAck ? 0x20 : KNXNETIP_VERSION_10;
 	}
 }
