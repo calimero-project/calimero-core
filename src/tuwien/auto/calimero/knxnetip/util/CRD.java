@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -59,7 +59,6 @@ public class CRD extends CRBase
 {
 	/**
 	 * Creates a new CRD out of a byte array.
-	 * <p>
 	 *
 	 * @param data byte array containing a CRD structure
 	 * @param offset start offset of CRD in <code>data</code>
@@ -108,17 +107,16 @@ public class CRD extends CRBase
 	 * <p>
 	 * If possible, a matching, more specific, CRD subtype is returned. Note, that CRD for
 	 * specific communication types might expect certain characteristics on
-	 * <code>optionalData</code> (regarding length and/or content).<br>
+	 * <code>optionalData</code> (regarding length and/or content).
 	 *
 	 * @param connectionType connection type this CRD is used for, e.g., a tunneling
 	 *        connection
 	 * @param optionalData byte array containing optional host protocol independent and
 	 *        dependent data, this information is located starting at offset 2 in the CRD
-	 *        structure, <code>optionalData.length</code> &lt; 254, may be <code>null</code>
-	 *        for no optional data
+	 *        structure, <code>optionalData.length</code> &lt; 254
 	 * @return the new CRD object
 	 */
-	public static CRD createResponse(final int connectionType, final byte[] optionalData)
+	public static CRD createResponse(final int connectionType, final byte... optionalData)
 	{
 		return (CRD) create(false, connectionType, optionalData);
 	}

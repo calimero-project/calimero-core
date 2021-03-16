@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -90,14 +90,14 @@ public class KNXnetIPDevMgmt extends ClientConnection
 	{
 		super(KNXnetIPHeader.DEVICE_CONFIGURATION_REQ, KNXnetIPHeader.DEVICE_CONFIGURATION_ACK, 4,
 				CONFIGURATION_REQ_TIMEOUT);
-		final CRI cri = CRI.createRequest(DEVICE_MGMT_CONNECTION, null);
+		final CRI cri = CRI.createRequest(DEVICE_MGMT_CONNECTION);
 		connect(localEP, serverCtrlEP, cri, useNAT);
 	}
 
 	public KNXnetIPDevMgmt(final Connection connection) throws KNXException, InterruptedException {
 		super(KNXnetIPHeader.DEVICE_CONFIGURATION_REQ, KNXnetIPHeader.DEVICE_CONFIGURATION_ACK, 4,
 				CONFIGURATION_REQ_TIMEOUT, connection);
-		final CRI cri = CRI.createRequest(DEVICE_MGMT_CONNECTION, null);
+		final CRI cri = CRI.createRequest(DEVICE_MGMT_CONNECTION);
 		connect(connection, cri);
 	}
 

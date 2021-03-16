@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -58,7 +58,6 @@ public class CRI extends CRBase
 {
 	/**
 	 * Creates a new CRI out of a byte array.
-	 * <p>
 	 *
 	 * @param data byte array containing a CRI structure
 	 * @param offset start offset of CRI in <code>data</code>
@@ -113,11 +112,10 @@ public class CRI extends CRBase
 	 *        connection
 	 * @param optionalData byte array containing optional host protocol independent and
 	 *        dependent data, this information is located starting at offset 2 in the CRI
-	 *        structure, <code>optionalData.length</code> &lt; 254, may be <code>null</code>
-	 *        for no optional data
+	 *        structure, <code>optionalData.length</code> &lt; 254
 	 * @return the new CRI object
 	 */
-	public static CRI createRequest(final int connectionType, final byte[] optionalData)
+	public static CRI createRequest(final int connectionType, final byte... optionalData)
 	{
 		return (CRI) create(true, connectionType, optionalData);
 	}
