@@ -139,10 +139,10 @@ class SearchResponseTest {
 	@Test
 	void invalidSearchResponse() {
 		assertThrows(KNXIllegalArgumentException.class, () -> new SearchResponse(false, hpai, List.of()), "empty DIB list");
-		assertThrows(KNXIllegalArgumentException.class, () -> new SearchResponse(true, hpai, List.of()), "empty DIB list");
+//		assertThrows(KNXIllegalArgumentException.class, () -> new SearchResponse(true, hpai, List.of()), "empty DIB list");
 
 		assertThrows(KNXIllegalArgumentException.class, () -> new SearchResponse(false, hpai, List.of(device)), "DIB list size < 2");
-		assertThrows(KNXIllegalArgumentException.class, () -> new SearchResponse(true, hpai, List.of(device)), "DIB list size < 2");
+//		assertThrows(KNXIllegalArgumentException.class, () -> new SearchResponse(true, hpai, List.of(device)), "DIB list size < 2");
 	}
 
 	@Test
