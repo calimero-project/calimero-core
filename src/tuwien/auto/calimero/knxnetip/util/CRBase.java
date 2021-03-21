@@ -111,8 +111,7 @@ class CRBase
 		if (type == KNXnetIPTunnel.TUNNEL_CONNECTION)
 			return request ? (CRBase) new TunnelCRI(data, offset) : new TunnelCRD(data, offset);
 		if (type != KNXnetIPDevMgmt.DEVICE_MGMT_CONNECTION)
-			logger.warn("unknown connection type 0x" + Integer.toHexString(type)
-					+ ", create default CRI/CRD");
+			logger.warn("unknown connection type 0x" + Integer.toHexString(type) + ", create default CRI/CRD");
 		return request ? (CRBase) new CRI(data, offset) : new CRD(data, offset);
 	}
 
@@ -123,10 +122,8 @@ class CRBase
 		if (type == KNXnetIPTunnel.TUNNEL_CONNECTION)
 			return request ? (CRBase) new TunnelCRI(opt) : new TunnelCRD(opt);
 		if (type != KNXnetIPDevMgmt.DEVICE_MGMT_CONNECTION)
-			logger.warn("unknown connection type 0x" + Integer.toHexString(type)
-					+ ", create default CRI/CRD");
-		return request ? (CRBase) new CRI(type, opt.clone()) : new CRD(type,
-				opt.clone());
+			logger.warn("unknown connection type 0x" + Integer.toHexString(type) + ", create default CRI/CRD");
+		return request ? (CRBase) new CRI(type, opt.clone()) : new CRD(type, opt.clone());
 	}
 
 	/**

@@ -465,7 +465,7 @@ public class ManagementClientImpl implements ManagementClient
 		final long start = registerActiveService(NetworkParamResponse);
 		sendNetworkParameter(NetworkParamRead, null, objectType, pid, testInfo);
 
-		var responses = new ArrayList<TestResult>();
+		final var responses = new ArrayList<TestResult>();
 		final BiFunction<IndividualAddress, byte[], Optional<byte[]>> testResponse = (responder, apdu) -> {
 			if (apdu.length < 5)
 				return Optional.empty();
@@ -480,7 +480,7 @@ public class ManagementClientImpl implements ManagementClient
 			}
 			if (receivedIot == objectType && receivedPid == pid) {
 				final int prefix = 2 + 3 + testInfo.length;
-				byte[] testResult = Arrays.copyOfRange(apdu, prefix, apdu.length);
+				final byte[] testResult = Arrays.copyOfRange(apdu, prefix, apdu.length);
 				responses.add(new TestResult(responder, testResult));
 				return Optional.of(apdu);
 			}
