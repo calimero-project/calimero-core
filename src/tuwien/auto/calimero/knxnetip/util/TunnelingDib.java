@@ -60,7 +60,7 @@ public class TunnelingDib extends DIB {
 	/**
 	 * Tunneling slot status.
 	 */
-	public enum Status {
+	public enum SlotStatus {
 		/**
 		 * Indicates whether a tunneling slot is currently free or not (occupied).
 		 */
@@ -85,7 +85,7 @@ public class TunnelingDib extends DIB {
 
 		public int value() { return (int) Math.pow(2, ordinal()); }
 
-		public static Status of(final int value) {
+		public static SlotStatus of(final int value) {
 			switch (value) {
 				case 1: return Free;
 				case 2: return Authorized;
@@ -96,14 +96,14 @@ public class TunnelingDib extends DIB {
 	}
 
 	private final int maxApduLength;
-	private final Map<IndividualAddress, EnumSet<Status>> slots;
+	private final Map<IndividualAddress, EnumSet<SlotStatus>> slots;
 
 
-	public TunnelingDib(final Map<IndividualAddress, EnumSet<Status>> tunnelingSlots) {
+	public TunnelingDib(final Map<IndividualAddress, EnumSet<SlotStatus>> tunnelingSlots) {
 		this((short) 0xfe, tunnelingSlots);
 	}
 
-	public TunnelingDib(final int maxApduLength, final Map<IndividualAddress, EnumSet<Status>> tunnelingSlots) {
+	public TunnelingDib(final int maxApduLength, final Map<IndividualAddress, EnumSet<SlotStatus>> tunnelingSlots) {
 		super(2 + 2 + 4 * tunnelingSlots.size(), DIB.TunnelingInfo);
 
 		if (tunnelingSlots.isEmpty())
@@ -167,7 +167,7 @@ public class TunnelingDib extends DIB {
 	/**
 	 * @return tunneling slot information
 	 */
-	public final Map<IndividualAddress, EnumSet<Status>> slots() {
+	public final Map<IndividualAddress, EnumSet<SlotStatus>> slots() {
 		return deepCopy(slots);
 	}
 
@@ -184,7 +184,7 @@ public class TunnelingDib extends DIB {
 		for (final var slot : slots.entrySet()) {
 			buf.put(slot.getKey().toByteArray());
 			buf.put((byte) 0xff); // reserved
-			final int status = slot.getValue().stream().mapToInt(Status::value).sum();
+			final int status = slot.getValue().stream().mapToInt(SlotStatus::value).sum();
 			buf.put((byte) (status | 0xf8));
 		}
 		return buf.array();
@@ -205,15 +205,15 @@ public class TunnelingDib extends DIB {
 		return maxApduLength == other.maxApduLength && slots.equals(other.slots);
 	}
 
-	private static EnumSet<Status> toStatusSet(final int status) {
-		final var set = EnumSet.noneOf(Status.class);
-		for (final var v : Status.values())
+	private static EnumSet<SlotStatus> toStatusSet(final int status) {
+		final var set = EnumSet.noneOf(SlotStatus.class);
+		for (final var v : SlotStatus.values())
 			if (((status >> v.ordinal()) & 1) == 1)
 				set.add(v);
 		return set;
 	}
 
-	private static Map<IndividualAddress, EnumSet<Status>> deepCopy(final Map<IndividualAddress, EnumSet<Status>> map) {
+	private static Map<IndividualAddress, EnumSet<SlotStatus>> deepCopy(final Map<IndividualAddress, EnumSet<SlotStatus>> map) {
 		final var copy = new LinkedHashMap<>(map);
 		copy.replaceAll((__, set) -> set.clone());
 		return copy;

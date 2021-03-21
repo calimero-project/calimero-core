@@ -48,30 +48,30 @@ import org.junit.jupiter.api.Test;
 
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXFormatException;
-import tuwien.auto.calimero.knxnetip.util.TunnelingDib.Status;
+import tuwien.auto.calimero.knxnetip.util.TunnelingDib.SlotStatus;
 
 class TunnelingDibTest {
-	private final EnumSet<Status> status = EnumSet.allOf(Status.class);
-	private final Map<IndividualAddress, EnumSet<Status>> slots = Map.of(new IndividualAddress(5), status);
+	private final EnumSet<SlotStatus> status = EnumSet.allOf(SlotStatus.class);
+	private final Map<IndividualAddress, EnumSet<SlotStatus>> slots = Map.of(new IndividualAddress(5), status);
 
 	@Test
 	void status() {
-		assertEquals(1, Status.Free.value());
-		assertEquals(2, Status.Authorized.value());
-		assertEquals(4, Status.Usable.value());
+		assertEquals(1, SlotStatus.Free.value());
+		assertEquals(2, SlotStatus.Authorized.value());
+		assertEquals(4, SlotStatus.Usable.value());
 	}
 
 	@Test
 	void statusOfValue() {
-		assertEquals(Status.Free, Status.of(1));
-		assertEquals(Status.Authorized, Status.of(2));
-		assertEquals(Status.Usable, Status.of(4));
+		assertEquals(SlotStatus.Free, SlotStatus.of(1));
+		assertEquals(SlotStatus.Authorized, SlotStatus.of(2));
+		assertEquals(SlotStatus.Usable, SlotStatus.of(4));
 	}
 
 	@Test
 	void deepCopy() {
 		var dib = new TunnelingDib(slots);
-		EnumSet<Status> copy = dib.slots().values().iterator().next();
+		EnumSet<SlotStatus> copy = dib.slots().values().iterator().next();
 		assertNotSame(status, copy);
 		assertEquals(status, copy);
 	}
@@ -79,16 +79,16 @@ class TunnelingDibTest {
 	@Test
 	void immutableSlots() {
 		var dib = new TunnelingDib(slots);
-		EnumSet<Status> copy = dib.slots().values().iterator().next();
+		EnumSet<SlotStatus> copy = dib.slots().values().iterator().next();
 
-		copy.removeAll(EnumSet.allOf(Status.class));
+		copy.removeAll(EnumSet.allOf(SlotStatus.class));
 		assertTrue(copy.isEmpty());
 		assertNotEquals(copy, dib.slots().values().iterator().next());
 	}
 
 	@Test
 	void emptyStatus() {
-		EnumSet<Status> clear = EnumSet.noneOf(Status.class);
+		EnumSet<SlotStatus> clear = EnumSet.noneOf(SlotStatus.class);
 		var dib = new TunnelingDib(Map.of(new IndividualAddress(1, 1, 4), clear));
 		assertEquals(clear, dib.slots().values().iterator().next());
 	}
@@ -96,9 +96,9 @@ class TunnelingDibTest {
 	@Test
 	void tunnelingSlots() {
 		var three = Map.of(
-				new IndividualAddress(1, 1, 1), EnumSet.of(Status.Free),
-				new IndividualAddress(1, 1, 2), EnumSet.of(Status.Authorized),
-				new IndividualAddress(1, 1, 3), EnumSet.of(Status.Free));
+				new IndividualAddress(1, 1, 1), EnumSet.of(SlotStatus.Free),
+				new IndividualAddress(1, 1, 2), EnumSet.of(SlotStatus.Authorized),
+				new IndividualAddress(1, 1, 3), EnumSet.of(SlotStatus.Free));
 		var dib = new TunnelingDib(three);
 		assertEquals(three, dib.slots());
 	}
