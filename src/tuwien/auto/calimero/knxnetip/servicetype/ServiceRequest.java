@@ -36,11 +36,15 @@
 
 package tuwien.auto.calimero.knxnetip.servicetype;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KnxRuntimeException;
+import tuwien.auto.calimero.ServiceType;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIFactory;
 
@@ -54,54 +58,102 @@ import tuwien.auto.calimero.cemi.CEMIFactory;
  *
  * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceAck
  */
-public class ServiceRequest extends ServiceType
+public class ServiceRequest<T extends ServiceType> extends tuwien.auto.calimero.knxnetip.servicetype.ServiceType
 {
 	private static final int CONN_HEADER_SIZE = 4;
 	private final int channelid;
 	private final int seq;
-	private CEMI cemi;
+	private final Supplier<T> svcSupplier;
+	private volatile T svc;
+
+	private static Function<ByteBuffer, CEMI> cemiParser = buf -> {
+		try {
+			return CEMIFactory.create(buf.array(), buf.position(), buf.remaining());
+		}
+		catch (final KNXFormatException e) {
+			throw new KnxRuntimeException("parsing cEMI", e);
+		}
+	};
+
+	private static Function<ByteBuffer, TunnelingFeature> tunnelingFeatureParser = buf -> {
+		try {
+			return TunnelingFeature.from(buf);
+		}
+		catch (final KNXFormatException e) {
+			throw new KnxRuntimeException("parsing tunneling feature", e);
+		}
+	};
+
+
+	// XXX service also provides tunneling feature, not just cEMI
+	public static ServiceRequest<CEMI> from(final KNXnetIPHeader h, final byte[] data, final int offset)
+			throws KNXFormatException {
+		return new ServiceRequest<>(h.getServiceType(), data, offset, h.getTotalLength() - h.getStructLength());
+	}
+
+	public static <U extends ServiceType> ServiceRequest<U> from(final KNXnetIPHeader h, final byte[] data,
+			final int offset, final Function<ByteBuffer, U> svcParser) throws KNXFormatException {
+		return from(h, ByteBuffer.wrap(data, h.getStructLength(), h.getTotalLength() - h.getStructLength()), svcParser);
+	}
+
+	private static <U extends ServiceType> ServiceRequest<U> from(final KNXnetIPHeader h, final ByteBuffer buf,
+			final Function<ByteBuffer, U> svcParser) throws KNXFormatException {
+		return new ServiceRequest<>(h.getServiceType(), buf, svcParser);
+	}
 
 	/**
 	 * Creates a new service request out of a byte array.
-	 * <p>
 	 *
 	 * @param serviceType service request type identifier describing the request in
 	 *        <code>data</code>, 0 &lt;= type &lt;= 0xFFFF
 	 * @param data byte array containing a service request structure
 	 * @param offset start offset in bytes of request in <code>data</code>
-	 * @param length the length in bytes of the whole request contained in
-	 *        <code>data</code>
+	 * @param length the length in bytes of the whole request contained in <code>data</code>
 	 * @throws KNXFormatException if buffer is too short for request, on unsupported
 	 *         service type or connection header structure
 	 */
-	public ServiceRequest(final int serviceType, final byte[] data, final int offset,
-		final int length) throws KNXFormatException
-	{
-		this(serviceType, data, offset, length, null);
-		if (svcType == KNXnetIPHeader.TUNNELING_REQ)
-			cemi = CEMIFactory.create(data, offset + CONN_HEADER_SIZE, length - CONN_HEADER_SIZE);
-		else if (svcType == KNXnetIPHeader.DEVICE_CONFIGURATION_REQ)
-			cemi = CEMIFactory.create(data, offset + CONN_HEADER_SIZE, length - CONN_HEADER_SIZE);
-		else if (svcType == KNXnetIPHeader.TunnelingFeatureGet || svcType == KNXnetIPHeader.TunnelingFeatureResponse
-				|| svcType == KNXnetIPHeader.TunnelingFeatureSet || svcType == KNXnetIPHeader.TunnelingFeatureInfo)
-			cemi = null;
-		else
-			throw new KNXIllegalArgumentException("unsupported service request type");
+	public ServiceRequest(final int serviceType, final byte[] data, final int offset, final int length) throws
+			KNXFormatException {
+		this(serviceType, ByteBuffer.wrap(data, offset, length), parser(serviceType));
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> Function<ByteBuffer, T> parser(final int serviceType) throws KNXFormatException {
+		if (serviceType == KNXnetIPHeader.TUNNELING_REQ || serviceType == KNXnetIPHeader.DEVICE_CONFIGURATION_REQ)
+			return (Function<ByteBuffer, T>) cemiParser;
+
+		if (serviceType == KNXnetIPHeader.TunnelingFeatureGet || serviceType == KNXnetIPHeader.TunnelingFeatureResponse
+				|| serviceType == KNXnetIPHeader.TunnelingFeatureSet
+				|| serviceType == KNXnetIPHeader.TunnelingFeatureInfo)
+			return (Function<ByteBuffer, T>) tunnelingFeatureParser;
+
+		throw new KNXFormatException("unsupported service type " + Integer.toHexString(serviceType));
+	}
+
+	private ServiceRequest(final int serviceType, final ByteBuffer buf,
+			final Function<ByteBuffer, T> svcParser) throws KNXFormatException {
+		super(serviceType);
+		if (buf.remaining() < CONN_HEADER_SIZE)
+			throw new KNXFormatException("buffer too short for service request");
+		if ((buf.get() & 0xff) != CONN_HEADER_SIZE)
+			throw new KNXFormatException("unsupported connection header");
+		channelid = buf.get() & 0xff;
+		seq = buf.get() & 0xff;
+		/* final int reserved = */buf.get();
+		svcSupplier = () -> svcParser.apply(buf);
 	}
 
 	/**
 	 * Creates a new service request.
-	 * <p>
 	 *
 	 * @param serviceType service request type identifier, 0 &lt;= type &lt;= 0xFFFF
 	 * @param channelID channel ID of communication this request belongs to, 0 &lt;= id
 	 *        &lt;= 255
 	 * @param seqNumber the sending sequence number of the communication channel, 0 &lt;=
 	 *        number &lt;= 255
-	 * @param frame cEMI frame carried with the request
+	 * @param service service type carried with the request
 	 */
-	public ServiceRequest(final int serviceType, final int channelID, final int seqNumber,
-		final CEMI frame)
+	public ServiceRequest(final int serviceType, final int channelID, final int seqNumber, final T service)
 	{
 		super(serviceType);
 		if (serviceType < 0 || serviceType > 0xffff)
@@ -112,23 +164,9 @@ public class ServiceRequest extends ServiceType
 			throw new KNXIllegalArgumentException("sequence number out of range [0..0xff]");
 		channelid = channelID;
 		seq = seqNumber;
-		cemi = CEMIFactory.copy(frame);
-	}
 
-	// frame might be null, toByteArray will throw NPE then
-	ServiceRequest(final int serviceType, final byte[] data, final int offset, final int length,
-		final CEMI frame) throws KNXFormatException
-	{
-		super(serviceType);
-		if (length < CONN_HEADER_SIZE)
-			throw new KNXFormatException("buffer too short for service request");
-		final ByteArrayInputStream is = new ByteArrayInputStream(data, offset, length);
-		if (is.read() != CONN_HEADER_SIZE)
-			throw new KNXFormatException("unsupported connection header");
-		channelid = is.read();
-		seq = is.read();
-		/* final int reserved = */is.read();
-		cemi = frame;
+		svc = service instanceof CEMI ? (T) CEMIFactory.copy((CEMI) service) : service;
+		svcSupplier = null;
 	}
 
 	/**
@@ -161,20 +199,28 @@ public class ServiceRequest extends ServiceType
 		return seq;
 	}
 
+	public final T service() {
+		if (svc == null)
+			svc = svcSupplier.get();
+		return svc;
+	}
+
 	/**
+	 * @deprecated
 	 * Returns the cEMI frame carried by the request.
 	 *
 	 * @return a cEMI type
 	 */
+	@Deprecated
 	public final CEMI getCEMI()
 	{
-		return CEMIFactory.copy(cemi);
+		return CEMIFactory.copy((CEMI) svc);
 	}
 
 	@Override
 	int getStructLength()
 	{
-		return CONN_HEADER_SIZE + (cemi != null ? cemi.getStructLength() : 0);
+		return CONN_HEADER_SIZE + service().length();
 	}
 
 	@Override
@@ -184,7 +230,7 @@ public class ServiceRequest extends ServiceType
 		os.write(channelid);
 		os.write(seq);
 		os.write(0);
-		final byte[] buf = cemi.toByteArray();
+		final byte[] buf = service().toByteArray();
 		os.write(buf, 0, buf.length);
 		return os.toByteArray();
 	}

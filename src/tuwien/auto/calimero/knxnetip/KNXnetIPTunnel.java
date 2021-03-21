@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -297,7 +297,7 @@ public class KNXnetIPTunnel extends ClientConnection
 		if (svc < serviceRequest || svc > KNXnetIPHeader.TunnelingFeatureInfo)
 			return false;
 
-		final ServiceRequest req = getServiceRequest(h, data, offset);
+		final var req = ServiceRequest.from(h, data, offset);
 		if (!checkChannelId(req.getChannelID(), "request"))
 			return true;
 
@@ -356,11 +356,7 @@ public class KNXnetIPTunnel extends ClientConnection
 			return true;
 		}
 
-		final CEMI cemi = req.getCEMI();
-		// leave if we are working with an empty (broken) service request
-		if (cemi == null)
-			return true;
-
+		final CEMI cemi = req.service();
 		final int mc = cemi.getMessageCode();
 		if (mc == CEMILData.MC_LDATA_IND || mc == CEMIBusMon.MC_BUSMON_IND) {
 			logger.trace("received request seq {} (channel {}) cEMI {}", req.getSequenceNumber(), channelId,

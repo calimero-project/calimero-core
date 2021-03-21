@@ -131,7 +131,7 @@ public class KNXnetIPDevMgmt extends ClientConnection
 		if (svc != serviceRequest)
 			return false;
 
-		final ServiceRequest req = getServiceRequest(h, data, offset);
+		final ServiceRequest<CEMI> req = ServiceRequest.from(h, data, offset);
 		if (!checkChannelId(req.getChannelID(), "request"))
 			return true;
 
@@ -152,10 +152,7 @@ public class KNXnetIPDevMgmt extends ClientConnection
 			close(CloseEvent.INTERNAL, "protocol version changed", LogLevel.ERROR, null);
 			return true;
 		}
-		final CEMI cemi = req.getCEMI();
-		// leave if we are working with an empty (broken) service request
-		if (cemi == null)
-			return true;
+		final CEMI cemi = req.service();
 		final int mc = cemi.getMessageCode();
 		if (mc == CEMIDevMgmt.MC_PROPINFO_IND || mc == CEMIDevMgmt.MC_RESET_IND)
 			fireFrameReceived(cemi);

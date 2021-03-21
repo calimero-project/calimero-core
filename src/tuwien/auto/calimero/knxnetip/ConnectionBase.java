@@ -45,7 +45,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.util.Arrays;
 
 import org.slf4j.Logger;
 
@@ -220,7 +219,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 				if (serviceRequest == KNXnetIPHeader.ROUTING_IND)
 					buf = PacketHelper.toPacket(new RoutingIndication(frame));
 				else
-					buf = PacketHelper.toPacket(new ServiceRequest(serviceRequest, channelId, getSeqSend(), frame));
+					buf = PacketHelper.toPacket(new ServiceRequest<>(serviceRequest, channelId, getSeqSend(), frame));
 				keepForCon = frame;
 				int attempt = 0;
 				for (; attempt < maxSendAttempts; ++attempt) {
@@ -512,29 +511,13 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	}
 
 	/**
-	 * Extracts the service request out of the supplied packet data.
-	 *
-	 * @param h packet KNXnet/IP header
-	 * @param data contains the data following the KNXnet/IP header
-	 * @param offset offset into <code>data</code> to message structure past KNXnet/IP header
-	 * @return the service request
-	 * @throws KNXFormatException on failure to extract (even an empty) service request
+	 * @deprecated No replacement. Use {@link ServiceRequest#from(KNXnetIPHeader, byte[], int)}.
 	 */
-	protected ServiceRequest getServiceRequest(final KNXnetIPHeader h, final byte[] data, final int offset)
+	@Deprecated
+	protected ServiceRequest<CEMI> getServiceRequest(final KNXnetIPHeader h, final byte[] data, final int offset)
 		throws KNXFormatException
 	{
-		try {
-			return PacketHelper.getServiceRequest(h, data, offset);
-		}
-		catch (final KNXFormatException e) {
-			// check if at least the connection header of the service request
-			// is correct and try to get its values
-			final ServiceRequest req = PacketHelper.getEmptyServiceRequest(h, data, offset);
-			logger.warn("received request with unknown cEMI data " + DataUnitBuilder.toHex(
-					Arrays.copyOfRange(data, offset + 4, offset + h.getTotalLength() - h.getStructLength()),
-					" "), e);
-			return req;
-		}
+		return ServiceRequest.from(h, data, offset);
 	}
 
 	final void startReceiver()

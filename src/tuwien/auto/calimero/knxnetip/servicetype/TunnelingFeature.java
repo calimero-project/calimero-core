@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2020 B. Malinowsky
+    Copyright (c) 2018, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -140,6 +140,10 @@ public final class TunnelingFeature extends ServiceType {
 		return new TunnelingFeature(svcType, buffer);
 	}
 
+	public static TunnelingFeature from(final ByteBuffer buffer) throws KNXFormatException {
+		return new TunnelingFeature(buffer);
+	}
+
 	private static final int MinServiceSize = 6;
 	private static final int ConnHeaderSize = 4;
 
@@ -182,6 +186,27 @@ public final class TunnelingFeature extends ServiceType {
 		status = ReturnCode.of(bb.get() & 0xff);
 		if (status.code() > 0xf0)
 			logger.warn("channel {} feature {} responded with '{}'", channelId, featureId, status);
+		data = new byte[bb.remaining()];
+		bb.get(data);
+		validateFeatureValueLength();
+	}
+
+	private TunnelingFeature(final ByteBuffer bb) throws KNXFormatException {
+		super(0);
+
+		if (bb.remaining() < MinServiceSize - ConnHeaderSize)
+			throw new KNXFormatException("buffer too short for tunneling feature service");
+
+		channelId = 0;
+		seq = 0;
+
+		final int id = bb.get() & 0xff;
+		if (id > InterfaceFeature.values().length)
+			throw new KNXFormatException(ReturnCode.AddressVoid.description(), id);
+		featureId = InterfaceFeature.values()[id - 1];
+		status = ReturnCode.of(bb.get() & 0xff);
+		if (status.code() > 0xf0)
+			logger.warn("feature {} responded with '{}'", featureId, status);
 		data = new byte[bb.remaining()];
 		bb.get(data);
 		validateFeatureValueLength();
