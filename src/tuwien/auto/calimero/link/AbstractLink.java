@@ -342,6 +342,8 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		return "link" + (closed ? " (closed) " : " ") + getName() + " " + medium + ", hopcount " + hopCount;
 	}
 
+	protected final Map<Class<?>, Set<MethodHandle>> customEvents() { return customEvents; }
+
 	/**
 	 * Prepares the message in the required EMI format, using the supplied message parameters, and
 	 * calls {@link #onSend(CEMILData, boolean)} and {@link #onSend(KNXAddress, byte[], boolean)}.

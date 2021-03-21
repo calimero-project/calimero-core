@@ -710,11 +710,15 @@ public final class Connection implements Closeable {
 
 	void unregisterConnectRequest(final ClientConnection c) {
 		ongoingConnectRequests.remove(c);
+		registerConnection(c);
+	}
+
+	public void registerConnection(final ClientConnection c) {
 		if (c.getState() == KNXnetIPConnection.OK)
 			unsecuredConnections.put(c.channelId, c);
 	}
 
-	synchronized void connect() throws IOException {
+	public synchronized void connect() throws IOException {
 		if (!socket.isConnected()) {
 			socket.connect(server, (int) connectionTimeout.toMillis());
 			startTcpReceiver();

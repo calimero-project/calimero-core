@@ -50,6 +50,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.KNXFormatException;
@@ -505,6 +506,12 @@ public final class BaosService implements ServiceType {
 		if (timers.length == 0)
 			throw new IllegalArgumentException("no timer supplied");
 		return new BaosService(SetTimer, timers[0].id(), timers.length, timerByteArray(timers));
+	}
+
+	static BaosService response(final int subService, final int startItem, final Item<?>... items) {
+		final byte[] itemData = Stream.of(items).map(Item<?>::toByteArray).collect(ByteArrayOutputStream::new,
+				ByteArrayOutputStream::writeBytes, (c1, c2) -> c1.writeBytes(c2.toByteArray())).toByteArray();
+		return new BaosService(subService | ResponseFlag, startItem, items.length, itemData);
 	}
 
 	static BaosService errorResponse(final int subService, final int startItem, final ErrorCode error) {

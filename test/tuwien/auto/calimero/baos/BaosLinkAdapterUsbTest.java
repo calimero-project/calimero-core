@@ -49,7 +49,6 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXException;
-import tuwien.auto.calimero.baos.Baos.KnxBaosLink;
 import tuwien.auto.calimero.baos.BaosService.DatapointCommand;
 import tuwien.auto.calimero.baos.BaosService.Item;
 import tuwien.auto.calimero.baos.BaosService.Property;
@@ -62,9 +61,9 @@ import tuwien.auto.calimero.link.medium.TPSettings;
 
 @Disabled
 @Execution(ExecutionMode.SAME_THREAD)
-class KnxBaosLinkUsbTest {
+class BaosLinkAdapterUsbTest {
 
-	private KnxBaosLink link;
+	private BaosLinkAdapter link;
 
 	private final NetworkLinkListener l = new NetworkLinkListener() {
 		@Override

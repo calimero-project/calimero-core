@@ -36,139 +36,63 @@
 
 package tuwien.auto.calimero.baos;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 
-import tuwien.auto.calimero.IndividualAddress;
-import tuwien.auto.calimero.KNXAddress;
-import tuwien.auto.calimero.KNXTimeoutException;
-import tuwien.auto.calimero.KnxRuntimeException;
-import tuwien.auto.calimero.Priority;
-import tuwien.auto.calimero.cemi.CEMILData;
-import tuwien.auto.calimero.link.AbstractLink;
-import tuwien.auto.calimero.link.KNXLinkClosedException;
+import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.knxnetip.Connection;
+import tuwien.auto.calimero.knxnetip.Discoverer;
+import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
+import tuwien.auto.calimero.knxnetip.util.ManufacturerDIB;
 import tuwien.auto.calimero.link.KNXNetworkLink;
-import tuwien.auto.calimero.link.NetworkLinkListener;
-import tuwien.auto.calimero.link.medium.KNXMediumSettings;
+import tuwien.auto.calimero.link.KNXNetworkLinkFT12;
+import tuwien.auto.calimero.link.KNXNetworkLinkUsb;
 
 /**
  * Implementation of the ObjectServer protocol, based on BAOS Binary Protocol v2.1.
  */
 public final class Baos {
 
-	public static final class KnxBaosLink implements KNXNetworkLink {
-		static final MethodHandle CUSTOM_EVENTS;
-		static final MethodHandle BAOS_MODE;
-		static final MethodHandle ON_SEND;
-		static {
-			try {
-				final var privateLookup = MethodHandles.privateLookupIn(AbstractLink.class, MethodHandles.lookup());
-				CUSTOM_EVENTS = privateLookup.findGetter(AbstractLink.class, "customEvents", Map.class);
+	static final int ObjectServerProtocol = 0xf0;
+	private static final int WeinzierlMfrId = 0x00c5;
+	private static final int Version = 0x20;
 
-				final var baosModeType = MethodType.methodType(void.class, boolean.class);
-				BAOS_MODE = privateLookup.findVirtual(AbstractLink.class, "baosMode", baosModeType);
 
-				final var onSendType = MethodType.methodType(void.class, List.of(KNXAddress.class, byte[].class, boolean.class));
-				ON_SEND = privateLookup.findVirtual(AbstractLink.class, "onSend", onSendType);
-			}
-			catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException e) {
-				throw new ExceptionInInitializerError(e);
-			}
-		}
+	static boolean supportsBaos(final Discoverer.Result<SearchResponse> result) {
+		final var mfrDib = result.getResponse().description().stream().filter(ManufacturerDIB.class::isInstance)
+				.map(ManufacturerDIB.class::cast).filter(dib -> dib.getStructLength() == 8).findFirst();
+		if (mfrDib.isEmpty())
+			return false;
 
-		private final KNXNetworkLink link;
-
-		KnxBaosLink(final KNXNetworkLink link) {
-			this.link = link;
-			try {
-				final var map = (Map<Class<?>, Set<MethodHandle>>) CUSTOM_EVENTS.invoke(link);
-				map.put(BaosService.class, ConcurrentHashMap.newKeySet());
-			}
-			catch (final Throwable e) {
-				throw new KnxRuntimeException("adding custom BAOS event", e);
-			}
-			baosMode(true);
-		}
-
-		@Override
-		public void setKNXMedium(final KNXMediumSettings settings) { link.setKNXMedium(settings); }
-
-		@Override
-		public KNXMediumSettings getKNXMedium() { return link.getKNXMedium(); }
-
-		@Override
-		public void addLinkListener(final NetworkLinkListener l) { link.addLinkListener(l); }
-
-		@Override
-		public void removeLinkListener(final NetworkLinkListener l) { link.removeLinkListener(l); }
-
-		@Override
-		public void setHopCount(final int count) { link.setHopCount(count); }
-
-		@Override
-		public int getHopCount() { return link.getHopCount(); }
-
-		public void send(final BaosService service) throws KNXTimeoutException, KNXLinkClosedException {
-			final var none = new IndividualAddress(0);
-			try {
-				ON_SEND.invoke(link, none, service.toByteArray(), true);
-			}
-			catch (KNXTimeoutException | KNXLinkClosedException e) {
-				throw e;
-			}
-			catch (final Throwable e) {
-				e.printStackTrace();
-			}
-		}
-
-		@Override
-		public void sendRequest(final KNXAddress dst, final Priority p, final byte[] nsdu)
-				throws KNXTimeoutException, KNXLinkClosedException {
-			link.sendRequest(dst, p, nsdu);
-		}
-
-		@Override
-		public void sendRequestWait(final KNXAddress dst, final Priority p, final byte[] nsdu)
-				throws KNXTimeoutException, KNXLinkClosedException {
-			link.sendRequestWait(dst, p, nsdu);
-		}
-
-		@Override
-		public void send(final CEMILData msg, final boolean waitForCon)
-				throws KNXTimeoutException, KNXLinkClosedException {
-			link.send(msg, waitForCon);
-		}
-
-		@Override
-		public String getName() { return link.getName(); }
-
-		@Override
-		public boolean isOpen() { return link.isOpen(); }
-
-		public KNXNetworkLink detach() {
-			baosMode(false);
-			return link;
-		}
-
-		@Override
-		public void close() { link.close(); }
-
-		private void baosMode(final boolean enable) {
-			try {
-				BAOS_MODE.invoke(link, enable);
-			}
-			catch (final Throwable e) {
-				throw new KnxRuntimeException("switching BAOS mode", e);
-			}
-		}
+		final var buf = ByteBuffer.wrap(mfrDib.get().getData());
+		return buf.getShort() == WeinzierlMfrId && buf.get() == 0x01 && buf.get() == 0x04
+				&& (buf.get() & 0xff) == ObjectServerProtocol && buf.get() == Version;
 	}
 
-	public static KnxBaosLink asBaosLink(final KNXNetworkLink link) { return new KnxBaosLink(link); }
+
+	/**
+	 * Returns an adapter for subsequent communication with a BAOS-cabable server.
+	 * If BAOS mode is not required anymore, it is possible to keep the underlying link open (and switched back to
+	 * link-layer mode) by calling {@link BaosLinkAdapter#detach()}.
+	 *
+	 * @param link the network link to put into BAOS mode, supported are USB and FT1.2 network links
+	 * @return link adapter for BAOS communication
+	 * @see KNXNetworkLinkUsb
+	 * @see KNXNetworkLinkFT12
+	 */
+	public static BaosLinkAdapter asBaosLink(final KNXNetworkLink link) { return new BaosLinkAdapter(link); }
+
+	public static BaosLink newUdpLink(final InetSocketAddress localEp, final InetSocketAddress serverCtrlEp)
+			throws KNXException, InterruptedException {
+		final var c = new ObjectServerConnection(localEp, serverCtrlEp);
+		return new BaosLinkIp(c);
+	}
+
+	public static BaosLink newTcpLink(final Connection connection) throws KNXException {
+		final var c = new ObjectServerConnection(connection);
+		return new BaosLinkIp(c);
+	}
+
 
 	private Baos() {}
 }

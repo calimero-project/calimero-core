@@ -78,7 +78,7 @@ import tuwien.auto.calimero.log.LogService.LogLevel;
  *
  * @author B. Malinowsky
  */
-abstract class ClientConnection extends ConnectionBase
+public abstract class ClientConnection extends ConnectionBase
 {
 	// IMPLEMENTATION NOTE: on MS Windows platforms, interruptible I/O is not supported,
 	// i.e., a blocked I/O method remains blocked after interrupt of the thread.
@@ -112,14 +112,14 @@ abstract class ClientConnection extends ConnectionBase
 	private final Connection connection;
 
 	// logger is initialized in connect, when name of connection is available
-	ClientConnection(final int serviceRequest, final int serviceAck, final int maxSendAttempts,
+	protected ClientConnection(final int serviceRequest, final int serviceAck, final int maxSendAttempts,
 			final int responseTimeout, final Connection connection) {
 		super(serviceRequest, serviceAck, maxSendAttempts, responseTimeout);
 		tcp = connection != Connection.Udp;
 		this.connection = connection;
 	}
 
-	ClientConnection(final int serviceRequest, final int serviceAck, final int maxSendAttempts,
+	protected ClientConnection(final int serviceRequest, final int serviceAck, final int maxSendAttempts,
 			final int responseTimeout) {
 		this(serviceRequest, serviceAck, maxSendAttempts, responseTimeout, Connection.Udp);
 	}
