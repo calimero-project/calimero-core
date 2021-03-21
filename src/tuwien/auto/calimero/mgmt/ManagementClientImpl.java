@@ -871,23 +871,19 @@ public class ManagementClientImpl implements ManagementClient
 		return i;
 	}
 
-	private Description readPropertyExtDescription(final Destination dst, final int objIndex, final int propertyId,
-			final int propIndex) throws KNXTimeoutException, KNXRemoteException, KNXDisconnectException,
-			KNXLinkClosedException, InterruptedException {
-		if (objIndex < 0 || objIndex > 0xfff || propertyId < 0 || propertyId > 0xfff || propIndex < 0 || propIndex > 0xfff)
+	@Override
+	public Description readPropertyDescription(final Destination dst, final int objectType, final int objInstance,
+			final int propertyId, final int propertyIndex) throws KNXTimeoutException, KNXRemoteException,
+			KNXDisconnectException, KNXLinkClosedException, InterruptedException {
+
+		if (objectType < 0 || objectType > 0xffff || objInstance < 0 || objInstance > 0xfff || propertyId < 0
+				|| propertyId > 0xfff || propertyIndex < 0 || propertyIndex > 0xfff)
 			throw new KNXIllegalArgumentException("argument value out of range");
 
-		final var ioList = getOrQueryInterfaceObjectList(dst);
-		if (!(ioList.length > objIndex))
-			return null;
-
-		final int objType = ioList[objIndex];
-		final int objInstance = 1;
 		final int propDescType = 0;
-		final byte[] send = createAPDU(PropertyExtDescRead,
-				new byte[] { (byte) (objType >> 8), (byte) objType, (byte) (objInstance >> 4),
-					(byte) (((objInstance & 0xf) << 4) | (propertyId >> 8)), (byte) propertyId,
-					(byte) ((propDescType << 4) | (propIndex >> 8)), (byte) (propertyId == 0 ? propIndex : 0) });
+		final int pidx = propertyId != 0 ? 0 : propertyIndex;
+		final byte[] send = DataUnitBuilder.apdu(PropertyExtDescRead).putShort(objectType).put(objInstance >> 4)
+				.putShort(((objInstance & 0xf) << 12) | propertyId).putShort((propDescType << 12) | pidx).build();
 
 		for (int i = 0; i < 2; i++) {
 			final byte[] apdu = sendWait2(dst, priority, send, PropertyExtDescResponse, 15, 15);
@@ -897,11 +893,11 @@ public class ManagementClientImpl implements ManagementClient
 
 			final int rcvObjectType = (apdu[2] & 0xff) << 8 | apdu[3] & 0xff;
 			// make sure the response contains the requested description
-			final boolean objTypeOk = objType == rcvObjectType;
+			final boolean objTypeOk = objectType == rcvObjectType;
 			final int rcvObjInstance = (apdu[4] & 0xff) << 4 | (apdu[5] & 0xf0) >> 4;
 			final boolean oiOk = objInstance == rcvObjInstance;
 			final boolean pidOk = propertyId == 0 || propertyId == rcvPropertyId;
-			final boolean pidxOk = propertyId != 0 || propIndex == rcvPropertyIdx;
+			final boolean pidxOk = propertyId != 0 || propertyIndex == rcvPropertyIdx;
 
 			final int dptMain = (apdu[9] & 0xff) << 8 | apdu[10] & 0xff;
 			final int dptSub = (apdu[11] & 0xff) << 8 | apdu[12] & 0xff;
@@ -919,12 +915,28 @@ public class ManagementClientImpl implements ManagementClient
 				throw new KNXRemoteException("property description type " + rcvPropDescType + " not supported");
 
 			if (objTypeOk && oiOk && pidOk && pidxOk)
-				return Description.of(objIndex, Arrays.copyOfRange(apdu, 2, apdu.length));
+				return Description.of(0, Arrays.copyOfRange(apdu, 2, apdu.length));
 
-			logger.warn("wrong description response for OI {} PID {} prop idx {} (got {}({})|{} (idx {}))", objIndex,
-					propertyId, propIndex, rcvObjectType, rcvObjInstance, rcvPropertyId, rcvPropertyIdx);
+			logger.warn("wrong description response for {}({})|{} prop idx {} (got {}({})|{} (idx {}))", objectType,
+					objInstance, propertyId, propertyIndex, rcvObjectType, rcvObjInstance, rcvPropertyId, rcvPropertyIdx);
 		}
 		throw new KNXTimeoutException("timeout occurred while waiting for data response");
+	}
+
+	private Description readPropertyExtDescription(final Destination dst, final int objIndex, final int propertyId,
+			final int propIndex) throws KNXTimeoutException, KNXRemoteException, KNXDisconnectException,
+			KNXLinkClosedException, InterruptedException {
+		if (objIndex < 0 || objIndex > 0xfff || propertyId < 0 || propertyId > 0xfff || propIndex < 0 || propIndex > 0xfff)
+			throw new KNXIllegalArgumentException("argument value out of range");
+
+		final var ioList = getOrQueryInterfaceObjectList(dst);
+		if (!(ioList.length > objIndex))
+			return null;
+
+		final int objType = ioList[objIndex];
+		final int objInstance = 1;
+
+		return readPropertyDescription(dst, objType, objInstance, propertyId, propIndex);
 	}
 
 	private static final boolean useExtPropertyServices = false;

@@ -652,6 +652,64 @@ public interface ManagementClient extends AutoCloseable
 			byte[] data) throws KNXException, InterruptedException;
 
 	/**
+	 * Reads the description of a property of an interface object of a communication partner. The interface object
+	 * is specified using its object type and object instance.
+	 * <p>
+	 * This service corresponds to A_PropertyExtDescription_Read and uses point-to-point connectionless or
+	 * connection-oriented communication mode.<br>
+	 * The property of the object is addressed either with the <code>propertyId</code>
+	 * or with the <code>propertyIndex</code>. The property index is only used if the property
+	 * identifier is 0, otherwise the index is ignored.
+	 * When using the property ID for access, the property index in the returned
+	 * description is either the correct property index of the addressed property or 0.
+	 *
+	 * @param dst destination to read from
+	 * @param objectType interface object type
+	 * @param objInstance interface object instance
+	 * @param propertyId property identifier, specify 0 to use the property index
+	 * @param propertyIndex property index, starts with index 0 for the first property
+	 * @return the property description
+	 * @throws KNXTimeoutException on a timeout during send
+	 * @throws KNXRemoteException if the response contains no description (e.g. if tried
+	 *         to access a non existing property)
+	 * @throws KNXDisconnectException on disconnect in connection-oriented mode
+	 * @throws KNXLinkClosedException if network link to KNX network is closed
+	 * @throws KNXException on other read property description error
+	 * @throws InterruptedException on interrupted thread
+	 */
+	Description readPropertyDescription(Destination dst, int objectType, int objInstance, int propertyId,
+			int propertyIndex) throws KNXTimeoutException, KNXRemoteException, KNXDisconnectException,
+			KNXLinkClosedException, InterruptedException;
+
+	/**
+	 * Reads the description of a property of an interface object of a communication partner.
+	 * <p>
+	 * This service uses point-to-point connectionless or connection-oriented
+	 * communication mode.<br>
+	 * The property of the object is addressed either with a the <code>propertyId</code>
+	 * or with the <code>propIndex</code>. The property index is only used if the property
+	 * identifier is 0, otherwise the index is ignored. When using the property ID for access, the property index in
+	 * the returned description is either the correct property index of the addressed property or 0.
+	 *
+	 * @param dst destination to read from
+	 * @param objIndex interface object index
+	 * @param propertyId property identifier, specify 0 to use the property index
+	 * @param propertyIndex property index, starts with index 0 for the first property
+	 * @return the property description
+	 * @throws KNXTimeoutException on a timeout during send
+	 * @throws KNXRemoteException if the response contains no description (e.g. if tried
+	 *         to access a non existing property)
+	 * @throws KNXDisconnectException on disconnect in connection-oriented mode
+	 * @throws KNXLinkClosedException if network link to KNX network is closed
+	 * @throws KNXException on other read property description error
+	 * @throws InterruptedException on interrupted thread
+	 */
+	default Description readPropertyDescription(final Destination dst, final int objIndex, final int propertyId,
+			final int propertyIndex) throws KNXException, InterruptedException {
+		return new Description(0, readPropertyDesc(dst, objIndex, propertyId, propertyIndex));
+	}
+
+	/**
 	 * Reads the description of a property of an interface object of a communication
 	 * partner.
 	 * <p>
@@ -676,6 +734,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other read property description error
 	 * @throws InterruptedException on interrupted thread
+	 * @see #readPropertyDescription(Destination, int, int, int)
 	 */
 	byte[] readPropertyDesc(Destination dst, int objIndex, int propertyId, int propIndex)
 		throws KNXException, InterruptedException;
