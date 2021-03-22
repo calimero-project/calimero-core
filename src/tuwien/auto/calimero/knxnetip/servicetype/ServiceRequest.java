@@ -38,6 +38,7 @@ package tuwien.auto.calimero.knxnetip.servicetype;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -75,9 +76,9 @@ public class ServiceRequest<T extends ServiceType> extends tuwien.auto.calimero.
 		}
 	};
 
-	private static Function<ByteBuffer, TunnelingFeature> tunnelingFeatureParser = buf -> {
+	private static BiFunction<Integer, ByteBuffer, TunnelingFeature> tunnelingFeatureParser = (svc, buf) -> {
 		try {
-			return TunnelingFeature.from(buf);
+			return TunnelingFeature.from(svc, buf);
 		}
 		catch (final KNXFormatException e) {
 			throw new KnxRuntimeException("parsing tunneling feature", e);
@@ -85,8 +86,7 @@ public class ServiceRequest<T extends ServiceType> extends tuwien.auto.calimero.
 	};
 
 
-	// XXX service also provides tunneling feature, not just cEMI
-	public static ServiceRequest<CEMI> from(final KNXnetIPHeader h, final byte[] data, final int offset)
+	public static ServiceRequest<ServiceType> from(final KNXnetIPHeader h, final byte[] data, final int offset)
 			throws KNXFormatException {
 		return new ServiceRequest<>(h.getServiceType(), data, offset, h.getTotalLength() - h.getStructLength());
 	}
@@ -124,9 +124,10 @@ public class ServiceRequest<T extends ServiceType> extends tuwien.auto.calimero.
 
 		if (serviceType == KNXnetIPHeader.TunnelingFeatureGet || serviceType == KNXnetIPHeader.TunnelingFeatureResponse
 				|| serviceType == KNXnetIPHeader.TunnelingFeatureSet
-				|| serviceType == KNXnetIPHeader.TunnelingFeatureInfo)
-			return (Function<ByteBuffer, T>) tunnelingFeatureParser;
-
+				|| serviceType == KNXnetIPHeader.TunnelingFeatureInfo) {
+			final Function<ByteBuffer, TunnelingFeature> parse = buf -> tunnelingFeatureParser.apply(serviceType, buf);
+			return (Function<ByteBuffer, T>) parse;
+		}
 		throw new KNXFormatException("unsupported service type " + Integer.toHexString(serviceType));
 	}
 
@@ -199,10 +200,10 @@ public class ServiceRequest<T extends ServiceType> extends tuwien.auto.calimero.
 		return seq;
 	}
 
-	public final T service() {
+	public final <R extends T> R service() {
 		if (svc == null)
 			svc = svcSupplier.get();
-		return svc;
+		return (R) svc;
 	}
 
 	/**

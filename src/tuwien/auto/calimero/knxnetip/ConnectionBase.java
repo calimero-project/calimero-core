@@ -55,6 +55,7 @@ import tuwien.auto.calimero.KNXAckTimeoutException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.ServiceType;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.internal.EventListeners;
 import tuwien.auto.calimero.knxnetip.servicetype.DisconnectRequest;
@@ -514,7 +515,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	 * @deprecated No replacement. Use {@link ServiceRequest#from(KNXnetIPHeader, byte[], int)}.
 	 */
 	@Deprecated
-	protected ServiceRequest<CEMI> getServiceRequest(final KNXnetIPHeader h, final byte[] data, final int offset)
+	protected ServiceRequest<ServiceType> getServiceRequest(final KNXnetIPHeader h, final byte[] data, final int offset)
 		throws KNXFormatException
 	{
 		return ServiceRequest.from(h, data, offset);

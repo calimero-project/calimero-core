@@ -43,7 +43,6 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -214,7 +213,7 @@ public class KNXnetIPTunnel extends ClientConnection
 	// sendFeature / getFeature?
 	public void send(final InterfaceFeature feature) throws KNXConnectionClosedException, KNXAckTimeoutException, InterruptedException {
 		synchronized (lock) {
-			final TunnelingFeature get = TunnelingFeature.newGet(channelId, getSeqSend(), feature);
+			final TunnelingFeature get = TunnelingFeature.newGet(feature);
 			send(get);
 		}
 	}
@@ -224,7 +223,7 @@ public class KNXnetIPTunnel extends ClientConnection
 	public void send(final InterfaceFeature feature, final byte... featureValue)
 		throws KNXConnectionClosedException, KNXAckTimeoutException, InterruptedException {
 		synchronized (lock) {
-			final TunnelingFeature set = TunnelingFeature.newSet(channelId, getSeqSend(), feature, featureValue);
+			final TunnelingFeature set = TunnelingFeature.newSet(feature, featureValue);
 			send(set);
 		}
 	}
@@ -241,7 +240,9 @@ public class KNXnetIPTunnel extends ClientConnection
 			throw new KNXConnectionClosedException("send attempt on closed connection");
 
 //		sendWaitQueue.acquire(true);
-		final byte[] buf = PacketHelper.toPacket(tunnelingFeature);
+
+		final var req = new ServiceRequest<>(tunnelingFeature.type(), channelId, getSeqSend(), tunnelingFeature);
+		final byte[] buf = PacketHelper.toPacket(req);
 		try {
 			int attempt = 0;
 			for (; attempt < maxSendAttempts; ++attempt) {
@@ -347,8 +348,7 @@ public class KNXnetIPTunnel extends ClientConnection
 		}
 
 		if (svc >= KNXnetIPHeader.TunnelingFeatureGet && svc <= KNXnetIPHeader.TunnelingFeatureInfo) {
-			final ByteBuffer buffer = ByteBuffer.wrap(data, offset, h.getTotalLength() - h.getStructLength());
-			final TunnelingFeature feature = TunnelingFeature.from(svc, buffer);
+			final TunnelingFeature feature = req.service();
 			logger.trace("received {}", feature);
 
 			listeners.listeners().stream().filter(TunnelingListener.class::isInstance)

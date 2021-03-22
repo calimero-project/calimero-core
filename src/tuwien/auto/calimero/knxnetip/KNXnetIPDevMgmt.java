@@ -47,6 +47,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.ServiceType;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.knxnetip.servicetype.ErrorCodes;
@@ -131,7 +132,7 @@ public class KNXnetIPDevMgmt extends ClientConnection
 		if (svc != serviceRequest)
 			return false;
 
-		final ServiceRequest<CEMI> req = ServiceRequest.from(h, data, offset);
+		final ServiceRequest<ServiceType> req = ServiceRequest.from(h, data, offset);
 		if (!checkChannelId(req.getChannelID(), "request"))
 			return true;
 
