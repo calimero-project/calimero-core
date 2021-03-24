@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
 final class Net {
 	private Net() {}
 
-	private static final Logger logger = LoggerFactory.getLogger("Net");
+	private static final Logger logger = LoggerFactory.getLogger("calimero.knxnetip.Net");
 
 
 	static final NetworkInterface defaultNetif;
@@ -69,8 +69,8 @@ final class Net {
 		try {
 			return NetworkInterface.networkInterfaces().flatMap(ni -> ni.getInterfaceAddresses().stream())
 					.filter(ia -> ia.getAddress() instanceof Inet4Address)
-					.peek(ia -> logger.trace("match local address {}/{} to {}", ia.getAddress(),
-							ia.getNetworkPrefixLength(), remote))
+					.peek(ia -> logger.trace("match local address {}/{} to {}", ia.getAddress().getHostAddress(),
+							ia.getNetworkPrefixLength(), remote.getHostAddress()))
 					.filter(ia -> matchesPrefix(ia.getAddress(), ia.getNetworkPrefixLength(), remote))
 					.map(ia -> ia.getAddress()).findFirst();
 		}

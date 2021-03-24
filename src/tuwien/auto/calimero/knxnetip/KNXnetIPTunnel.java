@@ -80,9 +80,7 @@ import tuwien.auto.calimero.log.LogService.LogLevel;
  * KNXnet/IP connection for KNX tunneling.
  * <p>
  * The tunneling protocol specifies a point-to-point exchange of KNX frames over an IP
- * network connection between two KNXnet/IP devices - client and server.<br>
- * Up to now, only the client side is implemented.<br>
- * The communication on OSI layer 4 is done using UDP.<br>
+ * network connection between two KNXnet/IP devices - client and server. Communication on OSI layer 4 uses UDP or TCP.
  *
  * @author B. Malinowsky
  */
