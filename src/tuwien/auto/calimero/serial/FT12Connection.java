@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -725,9 +725,9 @@ public class FT12Connection implements AutoCloseable
 			final int emi1LDataCon = 0x4e;
 			final int svc = ldata[0] & 0xff;
 			final boolean isLDataCon = svc == CEMILData.MC_LDATA_CON || svc == emi1LDataCon;
-			final int ctrl1Offset = cemi ? 2 : 1;
-			final boolean posCon = (ldata[ctrl1Offset] & 0x01) == 0;
-			if (isLDataCon && posCon) {
+//			final int ctrl1Offset = cemi ? 2 : 1;
+//			final boolean posCon = (ldata[ctrl1Offset] & 0x01) == 0;
+			if (isLDataCon) {
 				final var dst = ldataDestination(ldata);
 				if (dst.equals(keepForCon))
 					signalCon();
