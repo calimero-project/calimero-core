@@ -47,6 +47,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.ServiceType;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.knxnetip.servicetype.ErrorCodes;
@@ -131,7 +132,7 @@ public class KNXnetIPDevMgmt extends ClientConnection
 		if (svc != serviceRequest)
 			return false;
 
-		final ServiceRequest req = getServiceRequest(h, data, offset);
+		final ServiceRequest<ServiceType> req = ServiceRequest.from(h, data, offset);
 		if (!checkChannelId(req.getChannelID(), "request"))
 			return true;
 
@@ -152,10 +153,7 @@ public class KNXnetIPDevMgmt extends ClientConnection
 			close(CloseEvent.INTERNAL, "protocol version changed", LogLevel.ERROR, null);
 			return true;
 		}
-		final CEMI cemi = req.getCEMI();
-		// leave if we are working with an empty (broken) service request
-		if (cemi == null)
-			return true;
+		final CEMI cemi = req.service();
 		final int mc = cemi.getMessageCode();
 		if (mc == CEMIDevMgmt.MC_PROPINFO_IND || mc == CEMIDevMgmt.MC_RESET_IND)
 			fireFrameReceived(cemi);

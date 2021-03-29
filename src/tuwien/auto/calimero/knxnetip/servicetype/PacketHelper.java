@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -69,46 +69,23 @@ public final class PacketHelper
 	}
 
 	/**
-	 * Creates a new service request using the <code>data</code> byte array and
-	 * information from the KNXnet/IP header.
-	 *
-	 * @param h KNXnet/IP header associated with <code>data</code>
-	 * @param data byte array containing the data following the KNXnet/IP header in the
-	 *        message structure
-	 * @param offset offset into <code>data</code> pointing at the begin of usable data
-	 * @return the new service request
-	 * @throws KNXFormatException on failure creating request, for example if data buffer
-	 *         is too short for the request, on unsupported service type or connection
-	 *         header structure
+	 * @deprecated No replacement.
 	 */
-	public static ServiceRequest getServiceRequest(final KNXnetIPHeader h, final byte[] data,
+	@Deprecated
+	public static ServiceRequest<?> getServiceRequest(final KNXnetIPHeader h, final byte[] data,
 		final int offset) throws KNXFormatException
 	{
-		return new ServiceRequest(h.getServiceType(), data, offset, h.getTotalLength() - h.getStructLength());
+		return new ServiceRequest<>(h.getServiceType(), data, offset, h.getTotalLength() - h.getStructLength());
 	}
 
 	/**
-	 * Internal use only.
-	 * <p>
-	 * Creates a new service request using the <code>data</code> byte array and
-	 * information from the KNXnet/IP header, but leaves out the cEMI part.<br>
-	 * This helper will not try to create the cEMI structure contained in the data part,
-	 * i.e., the returned service request is incomplete and {@link ServiceRequest#getCEMI()}
-	 * returns <code>null</code>. The service request must not be used for the creation
-	 * of KNXnet/IP packets.
-	 *
-	 * @param h KNXnet/IP header associated with <code>data</code>
-	 * @param data byte array containing the data following the KNXnet/IP header in the
-	 *        message structure
-	 * @param offset offset into <code>data</code> pointing at the begin of usable data
-	 * @return the new empty service request
-	 * @throws KNXFormatException if the data buffer is too short for the request or
-	 *         unsupported connection header structure
+	 * @deprecated No replacement.
 	 */
-	public static ServiceRequest getEmptyServiceRequest(final KNXnetIPHeader h, final byte[] data,
+	@Deprecated
+	public static ServiceRequest<?> getEmptyServiceRequest(final KNXnetIPHeader h, final byte[] data,
 		final int offset) throws KNXFormatException
 	{
-		return new ServiceRequest(h.getServiceType(), data, offset, h.getTotalLength() - h.getStructLength(), null);
+		return ServiceRequest.from(h, data, offset);
 	}
 
 	private static final int SecureSessionRequest = 0x0951;

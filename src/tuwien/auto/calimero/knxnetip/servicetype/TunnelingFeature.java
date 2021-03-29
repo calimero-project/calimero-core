@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2020 B. Malinowsky
+    Copyright (c) 2018, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ import tuwien.auto.calimero.ReturnCode;
  * Provides minimal management services over a KNXnet/IP tunneling connection (similar to the KNX USB Bus Access Server
  * Feature protocol).
  */
-public final class TunnelingFeature extends ServiceType {
+public final class TunnelingFeature implements tuwien.auto.calimero.ServiceType {
 
 	public enum InterfaceFeature {
 		SupportedEmiTypes,
@@ -74,57 +74,46 @@ public final class TunnelingFeature extends ServiceType {
 	/**
 	 * Creates a new tunneling feature-get service.
 	 *
-	 * @param channelId tunneling connection channel identifier
-	 * @param seq tunneling connection send sequence number
 	 * @param featureId the requested interface feature
 	 * @return new tunneling feature-get service
 	 */
-	public static TunnelingFeature newGet(final int channelId, final int seq, final InterfaceFeature featureId) {
-		return new TunnelingFeature(KNXnetIPHeader.TunnelingFeatureGet, channelId, seq, featureId, Success);
+	public static TunnelingFeature newGet(final InterfaceFeature featureId) {
+		return new TunnelingFeature(KNXnetIPHeader.TunnelingFeatureGet, featureId, Success);
 	}
 
 	/**
 	 * Creates a new tunneling feature-response service.
 	 *
-	 * @param channelId tunneling connection channel identifier
-	 * @param seq tunneling connection send sequence number
 	 * @param featureId interface feature to respond to
 	 * @param result result of processing the corresponding tunneling feature-get/set service
 	 * @param featureValue feature value sent with a response (optional, depdending on {@code result})
 	 * @return new tunneling feature-response service
 	 */
-	public static TunnelingFeature newResponse(final int channelId, final int seq, final InterfaceFeature featureId,
-		final ReturnCode result, final byte... featureValue) {
-		return new TunnelingFeature(KNXnetIPHeader.TunnelingFeatureResponse, channelId, seq, featureId, result,
-				featureValue);
+	public static TunnelingFeature newResponse(final InterfaceFeature featureId, final ReturnCode result,
+			final byte... featureValue) {
+		return new TunnelingFeature(KNXnetIPHeader.TunnelingFeatureResponse, featureId, result, featureValue);
 	}
 
 	/**
 	 * Creates a new tunneling feature-set service.
 	 *
-	 * @param channelId tunneling connection channel identifier
-	 * @param seq tunneling connection send sequence number
 	 * @param featureId interface feature which value should be set
 	 * @param featureValue feature value to set
 	 * @return new tunneling feature-set service
 	 */
-	public static TunnelingFeature newSet(final int channelId, final int seq, final InterfaceFeature featureId,
-		final byte... featureValue) {
-		return new TunnelingFeature(KNXnetIPHeader.TunnelingFeatureSet, channelId, seq, featureId, Success, featureValue);
+	public static TunnelingFeature newSet(final InterfaceFeature featureId, final byte... featureValue) {
+		return new TunnelingFeature(KNXnetIPHeader.TunnelingFeatureSet, featureId, Success, featureValue);
 	}
 
 	/**
 	 * Creates a new tunneling feature-info service.
 	 *
-	 * @param channelId tunneling connection channel identifier
-	 * @param seq tunneling connection send sequence number
 	 * @param featureId interface feature which should be announced
 	 * @param featureValue feature value to announce
 	 * @return new tunneling feature-info service
 	 */
-	public static TunnelingFeature newInfo(final int channelId, final int seq, final InterfaceFeature featureId,
-		final byte... featureValue) {
-		return new TunnelingFeature(KNXnetIPHeader.TunnelingFeatureInfo, channelId, seq, featureId, Success, featureValue);
+	public static TunnelingFeature newInfo(final InterfaceFeature featureId, final byte... featureValue) {
+		return new TunnelingFeature(KNXnetIPHeader.TunnelingFeatureInfo, featureId, Success, featureValue);
 	}
 
 	/**
@@ -140,23 +129,17 @@ public final class TunnelingFeature extends ServiceType {
 		return new TunnelingFeature(svcType, buffer);
 	}
 
-	private static final int MinServiceSize = 6;
-	private static final int ConnHeaderSize = 4;
 
-	// connection header
-	private final int channelId;
-	private final int seq;
+	private static final int MinServiceSize = 2;
 
+	private final int svcType;
 	private final InterfaceFeature featureId;
 	private final ReturnCode status;
 	private final byte[] data;
 
-	private TunnelingFeature(final int serviceType, final int channelId, final int seq, final InterfaceFeature featureId,
-		final ReturnCode status, final byte... data) {
-		super(serviceType);
-
-		this.channelId = channelId;
-		this.seq = seq;
+	private TunnelingFeature(final int serviceType, final InterfaceFeature featureId, final ReturnCode status,
+			final byte... data) {
+		this.svcType = serviceType;
 		this.featureId = featureId;
 		this.status = status;
 		this.data = data.clone();
@@ -164,24 +147,18 @@ public final class TunnelingFeature extends ServiceType {
 	}
 
 	private TunnelingFeature(final int svcType, final ByteBuffer bb) throws KNXFormatException {
-		super(svcType);
-
 		if (bb.remaining() < MinServiceSize)
 			throw new KNXFormatException("buffer too short for tunneling feature service");
-		final int connHeaderSize = bb.get() & 0xff;
-		if (connHeaderSize != ConnHeaderSize)
-			throw new KNXFormatException("tunneling feature connection header has wrong size", connHeaderSize);
-		channelId = bb.get() & 0xff;
-		seq = bb.get() & 0xff;
-		/* int reserved = */ bb.get();
 
 		final int id = bb.get() & 0xff;
 		if (id > InterfaceFeature.values().length)
 			throw new KNXFormatException(ReturnCode.AddressVoid.description(), id);
+
+		this.svcType = svcType;
 		featureId = InterfaceFeature.values()[id - 1];
 		status = ReturnCode.of(bb.get() & 0xff);
 		if (status.code() > 0xf0)
-			logger.warn("channel {} feature {} responded with '{}'", channelId, featureId, status);
+			ServiceType.logger.warn("feature {} responded with '{}'", featureId, status);
 		data = new byte[bb.remaining()];
 		bb.get(data);
 		validateFeatureValueLength();
@@ -214,13 +191,7 @@ public final class TunnelingFeature extends ServiceType {
 					KNXnetIPHeader.getSvcName(svcType), featureId, DataUnitBuilder.toHex(data, ""), data.length, length));
 	}
 
-	public int channelId() {
-		return channelId;
-	}
-
-	public int sequenceNumber() {
-		return seq;
-	}
+	public int type() { return svcType; }
 
 	public InterfaceFeature featureId() {
 		return featureId;
@@ -237,21 +208,17 @@ public final class TunnelingFeature extends ServiceType {
 	@Override
 	public String toString() {
 		final var s = status == Success ? DataUnitBuilder.toHex(featureValue().orElse(new byte[0]), "") : status;
-		return String.format("%s (channel %d) %s %s", KNXnetIPHeader.getSvcName(svcType), channelId, featureId, s);
+		return String.format("%s %s %s", KNXnetIPHeader.getSvcName(svcType), featureId, s);
 	}
 
 	@Override
-	int getStructLength() {
+	public int length() {
 		return MinServiceSize + data.length;
 	}
 
 	@Override
-	byte[] toByteArray(final ByteArrayOutputStream os) {
-		os.write(ConnHeaderSize);
-		os.write(channelId);
-		os.write(seq);
-		os.write(0);
-
+	public byte[] toByteArray() {
+		final var os = new ByteArrayOutputStream();
 		os.write(featureId.id());
 		os.write(status.code());
 		os.write(data, 0, data.length);

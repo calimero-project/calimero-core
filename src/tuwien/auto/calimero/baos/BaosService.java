@@ -54,11 +54,12 @@ import java.util.stream.Collectors;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.ServiceType;
 
 /**
  * Implementation of the ObjectServer protocol service data structure, based on BAOS Binary Protocol v2.1.
  */
-public final class BaosService {
+public final class BaosService implements ServiceType {
 
 	public enum ErrorCode {
 		NoError,
@@ -575,10 +576,16 @@ public final class BaosService {
 
 	public List<Item<?>> items() { return items; }
 
-	public byte[] toByteArray() {
+	@Override
+	public int length() {
 		final int collectionSize = items.stream().mapToInt(Item::size).sum();
 		final int capacity = 6 + data.length + collectionSize;
-		final var frame = allocate(capacity);
+		return capacity;
+	}
+
+	@Override
+	public byte[] toByteArray() {
+		final var frame = allocate(length());
 
 		frame.put((byte) MainService).put((byte) subService).putShort((short) start).putShort((short) count);
 		frame.put(data);

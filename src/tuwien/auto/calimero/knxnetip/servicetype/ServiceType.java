@@ -48,7 +48,7 @@ import tuwien.auto.calimero.log.LogService;
  *
  * @author B. Malinowsky
  */
-abstract class ServiceType
+abstract class ServiceType implements tuwien.auto.calimero.ServiceType
 {
 	static final Logger logger = LogService.getLogger("KNXnet/IP service");
 
@@ -61,12 +61,18 @@ abstract class ServiceType
 		svcType = serviceType;
 	}
 
+	@Override
+	public int length() {
+		return getStructLength();
+	}
+
 	/**
 	 * Returns the service type structure formatted into a byte array.
 	 *
 	 * @return service type structure as byte array
 	 * @see PacketHelper
 	 */
+	@Override
 	public final byte[] toByteArray()
 	{
 		return toByteArray(new ByteArrayOutputStream(50));
