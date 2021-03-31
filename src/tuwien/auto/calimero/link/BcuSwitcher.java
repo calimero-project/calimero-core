@@ -41,7 +41,6 @@ import java.util.EnumSet;
 
 import org.slf4j.Logger;
 
-import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.IndividualAddress;
@@ -142,13 +141,7 @@ final class BcuSwitcher
 	void enter(final BcuMode mode) throws KNXFormatException, KNXPortClosedException,
 		KNXTimeoutException, InterruptedException
 	{
-		final KNXListener l = new KNXListener() {
-			@Override
-			public void frameReceived(final FrameEvent e) { setResponse(e.getFrameBytes()); }
-
-			@Override
-			public void connectionClosed(final CloseEvent e) {}
-		};
+		final KNXListener l = (final FrameEvent e) -> setResponse(e.getFrameBytes());
 		c.addConnectionListener(l);
 		try {
 			byte[] data = read(createGetValue(AddrExpectedPeiType, 1));

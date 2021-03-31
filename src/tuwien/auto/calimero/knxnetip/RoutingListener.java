@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,7 +55,6 @@ public interface RoutingListener extends KNXListener
 {
 	/**
 	 * Informs about the loss of messages in the KNXnet/IP router.
-	 * <p>
 	 *
 	 * @param e event with lost message information
 	 */

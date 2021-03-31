@@ -48,14 +48,12 @@ import java.net.UnknownHostException;
 import java.time.Duration;
 import java.util.concurrent.ConcurrentHashMap;
 
-import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAckTimeoutException;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.KnxRuntimeException;
 import tuwien.auto.calimero.Priority;
@@ -332,9 +330,6 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 				@Override
 				public void frameReceived(final FrameEvent e) {}
 
-				@Override
-				public void connectionClosed(final CloseEvent e) {}
-
 				private void setTunnelingAddress(final TunnelingFeature feature) {
 					getKNXMedium().setDeviceAddress(new IndividualAddress(feature.featureValue().get()));
 				}
@@ -351,9 +346,6 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 			c.addConnectionListener(new RoutingListener() {
 				@Override
 				public void frameReceived(final FrameEvent e) {}
-
-				@Override
-				public void connectionClosed(final CloseEvent e) {}
 
 				@Override
 				public void routingBusy(final RoutingBusyEvent e) {
@@ -462,15 +454,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	private KNXnetIPDevMgmt newMgmt(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP,
 			final boolean useNat) throws KNXException, InterruptedException {
 		mgmt = new KNXnetIPDevMgmt(new InetSocketAddress(localEP.getAddress(), 0), serverCtrlEP, useNat);
-		mgmt.addConnectionListener(new KNXListener() {
-			@Override
-			public void frameReceived(final FrameEvent e) {
-				onDevMgmt((CEMIDevMgmt) e.getFrame());
-			}
-
-			@Override
-			public void connectionClosed(final CloseEvent e) {}
-		});
+		mgmt.addConnectionListener(e -> onDevMgmt((CEMIDevMgmt) e.getFrame()));
 		return mgmt;
 	}
 

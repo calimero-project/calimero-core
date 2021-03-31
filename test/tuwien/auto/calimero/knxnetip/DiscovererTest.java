@@ -69,11 +69,9 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import junit.framework.AssertionFailedError;
 import tag.KnxnetIP;
 import tag.Slow;
-import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.knxnetip.Discoverer.Result;
@@ -525,16 +523,10 @@ class DiscovererTest
 		final InetSocketAddress server = Util.getServer();
 		try (var c = Connection.newTcpConnection(new InetSocketAddress(0), server); var mgmt = new KNXnetIPDevMgmt(c)) {
 			final byte[] macAddress = new byte[6];
-			mgmt.addConnectionListener(new KNXListener() {
-				@Override
-				public void frameReceived(final FrameEvent e) {
+			mgmt.addConnectionListener((final FrameEvent e) -> {
 					final byte[] data = ((CEMIDevMgmt) e.getFrame()).getPayload();
 					System.arraycopy(data, 0, macAddress, 0, 6);
-				}
-
-				@Override
-				public void connectionClosed(final CloseEvent e) {}
-			});
+				});
 			final int pidMacAddress = 64;
 			final var cemi = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, 11, 1, pidMacAddress, 1, 1);
 			mgmt.send(cemi, BlockingMode.WaitForCon);
