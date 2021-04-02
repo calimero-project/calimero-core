@@ -85,6 +85,20 @@ import tuwien.auto.calimero.xml.XmlReader;
 public final class Keyring {
 
 	public static final class Interface {
+		public enum Type {
+			Backbone, Tunneling, Usb;
+
+			// parse value from xsd Type enumeration
+			static Type from(final String type) {
+				switch (type) {
+					case "Backbone": return Backbone;
+					case "Tunneling": return Tunneling;
+					case "USB": return Usb; // important: USB is specified upper-case
+				}
+				throw new KNXIllegalArgumentException("unknown interface type " + type);
+			}
+		}
+
 		private final String type; // TODO candidate for subtyping via sealed interface
 		private final IndividualAddress addr;
 		private final int user;
@@ -100,6 +114,8 @@ public final class Keyring {
 			this.pwd = pwd;
 			this.auth = auth;
 		}
+
+		public Type type() { return Type.from(type); }
 
 		public IndividualAddress address() { return addr; }
 

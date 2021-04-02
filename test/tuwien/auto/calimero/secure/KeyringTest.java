@@ -52,6 +52,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
@@ -230,4 +232,16 @@ class KeyringTest {
 	}
 
 	private static byte[] groupKey() { return Arrays.copyOf(new byte[] { 1 }, 16); }
+
+	@ParameterizedTest
+	@ValueSource(strings = {"Backbone", "Tunneling", "USB"})
+	void validInterfaceType(final String type) {
+		Interface.Type.from(type);
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = {"BackBone", "Tunnelling", "Usb", "blah"})
+	void invalidInterfaceType(final String type) {
+		assertThrows(KNXIllegalArgumentException.class, () -> Interface.Type.from(type));
+	}
 }
