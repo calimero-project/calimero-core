@@ -61,6 +61,8 @@ import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.KNXNetworkLinkIP;
 import tuwien.auto.calimero.link.medium.TPSettings;
 import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
+import tuwien.auto.calimero.mgmt.PropertyClient.XmlPropertyDefinitions;
+import tuwien.auto.calimero.xml.XmlInputFactory;
 
 /**
  * @author B. Malinowsky
@@ -68,8 +70,6 @@ import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
 @KnxnetIP
 class PropertyClientTest
 {
-	private static final String PIDResource = Util.getPath() + "properties.xml";
-
 	private KNXNetworkLink lnk;
 	private PropertyClient rem;
 	private PropertyClient local;
@@ -101,8 +101,13 @@ class PropertyClientTest
 					true, adapterClosed);
 			local = new PropertyClient(localAdpt);
 
-			rem.addDefinitions(new PropertyClient.XmlPropertyDefinitions().load(PIDResource));
-			local.addDefinitions(new PropertyClient.XmlPropertyDefinitions().load(PIDResource));
+			final String resource = "/properties.xml";
+			try (var is = PropertyClient.class.getResourceAsStream(resource);
+				 var r = XmlInputFactory.newInstance().createXMLStreamReader(is)) {
+				final var definitions = new XmlPropertyDefinitions().load(r);
+				rem.addDefinitions(definitions);
+				local.addDefinitions(definitions);
+			}
 		}
 		catch (final RuntimeException e) {
 			tearDown();
