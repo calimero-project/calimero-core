@@ -40,6 +40,11 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import tuwien.auto.calimero.CloseEvent;
@@ -49,6 +54,7 @@ import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KnxRuntimeException;
+import tuwien.auto.calimero.baos.BaosService.Property;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.knxnetip.ClientConnection;
 import tuwien.auto.calimero.knxnetip.Connection;
@@ -82,11 +88,15 @@ class ObjectServerConnection extends ClientConnection {
 	private static final int ReqTimeout = 1;
 
 	private final boolean tcp;
+	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+	private final Future<?> keepAlive;
+
 
 	public ObjectServerConnection(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP)
 			throws KNXException, InterruptedException {
 		super(KNXnetIPHeader.ObjectServerRequest, KNXnetIPHeader.ObjectServerAck, 2, ReqTimeout);
 		tcp = false;
+		keepAlive = CompletableFuture.completedFuture(Void.TYPE);
 		connect(localEP, serverCtrlEP, CRI.createRequest(Baos.ObjectServerProtocol), false);
 	}
 
@@ -102,6 +112,7 @@ class ObjectServerConnection extends ClientConnection {
 			throw new KNXException("connecting " + c, e);
 		}
 		setState(OK);
+		keepAlive = scheduler.scheduleAtFixedRate(this::sendKeepAlive, 2, 60, TimeUnit.SECONDS);
 		c.registerConnection(this);
 	}
 
@@ -215,6 +226,8 @@ class ObjectServerConnection extends ClientConnection {
 		if (tcp) {
 //			closing = 2; // XXX needed?
 			cleanup(initiator, reason, level, t);
+			keepAlive.cancel(true);
+			scheduler.shutdown();
 		}
 		else
 			super.close(initiator, reason, level, t);
@@ -223,5 +236,12 @@ class ObjectServerConnection extends ClientConnection {
 	private void fireFrameReceived(final BaosService objSvrService) {
 		listeners.listeners().stream().filter(ObjectServerListener.class::isInstance)
 				.map(ObjectServerListener.class::cast).forEach(l -> l.baosService(objSvrService));
+	}
+
+	private void sendKeepAlive() {
+		try {
+			send(BaosService.getServerItem(Property.TimeSinceReset, 1), BlockingMode.NonBlocking);
+		}
+		catch (final KNXConnectionClosedException ignore) {}
 	}
 }
