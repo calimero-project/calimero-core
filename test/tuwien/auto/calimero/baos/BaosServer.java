@@ -41,6 +41,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.function.Function;
 
 import tuwien.auto.calimero.DataUnitBuilder;
@@ -56,8 +58,16 @@ class BaosServer implements Runnable, AutoCloseable {
 
 	private volatile Socket socket;
 
+	public static void main(final String[] args) {
+		try (var server = new BaosServer()) {
+			server.run();
+		}
+	}
+
 	@Override
 	public void run() {
+		final Instant start = Instant.now();
+
 		try (var serverSocket = new ServerSocket(port)) {
 			while (true) {
 				socket = serverSocket.accept();
@@ -86,8 +96,11 @@ class BaosServer implements Runnable, AutoCloseable {
 							System.out.println(svc);
 							baos.reset();
 
+							final long timeSinceReset = Duration.between(start, Instant.now()).toMillis();
+							final byte[] timeData = ByteBuffer.allocate(4).putInt((int) timeSinceReset).array();
+
 							final var res = BaosService.response(BaosService.GetServerItem, 9,
-									Item.property(Property.TimeSinceReset, new byte[4]));
+									Item.property(Property.TimeSinceReset, timeData));
 							System.out.println(res);
 
 							final var out = socket.getOutputStream();
