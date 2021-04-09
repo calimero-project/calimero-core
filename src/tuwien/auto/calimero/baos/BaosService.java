@@ -511,11 +511,11 @@ public final class BaosService implements ServiceType {
 	static BaosService response(final int subService, final int startItem, final Item<?>... items) {
 		final byte[] itemData = Stream.of(items).map(Item<?>::toByteArray).collect(ByteArrayOutputStream::new,
 				ByteArrayOutputStream::writeBytes, (c1, c2) -> c1.writeBytes(c2.toByteArray())).toByteArray();
-		return new BaosService(subService | ResponseFlag, startItem, items.length, itemData);
+		return new BaosService(subService, true, startItem, items.length, itemData);
 	}
 
 	static BaosService errorResponse(final int subService, final int startItem, final ErrorCode error) {
-		return new BaosService(subService, startItem, 0, (byte) error.code());
+		return new BaosService(subService, true, startItem, 0, (byte) error.code());
 	}
 
 	public static BaosService from(final ByteBuffer data) throws KNXFormatException {
@@ -536,18 +536,22 @@ public final class BaosService implements ServiceType {
 			return errorResponse(subService, start, error);
 		}
 
-		if (subService == GetParameterByte) {
+		if (subService == GetParameterByte && response) {
 			ensureMinSize(GetParameterByte, MinimumFrameSize + items, size);
 			final byte[] bytes = new byte[items];
 			data.get(bytes);
-			return new BaosService(subService, start, items, bytes);
+			return new BaosService(subService, response, start, items, bytes);
 		}
 		return new BaosService(subService, response, start, items, data);
 	}
 
 	private BaosService(final int service, final int startItem, final int items, final byte... additionalData) {
+		this(service, false, startItem, items, additionalData);
+	}
+
+	private BaosService(final int service, final boolean response, final int startItem, final int items, final byte... additionalData) {
 		subService = service;
-		response = false;
+		this.response = response;
 		start = startItem;
 		this.count = items;
 		this.data = additionalData;
@@ -572,7 +576,7 @@ public final class BaosService implements ServiceType {
 		this.start = start;
 		this.count = items;
 		this.data = new byte[0];
-		this.items = response ? List.copyOf(parseItems(buf)) : List.of();
+		this.items = response || buf.hasRemaining() ? List.copyOf(parseItems(buf)) : List.of();
 	}
 
 	public int subService() { return subService; }
@@ -594,7 +598,8 @@ public final class BaosService implements ServiceType {
 	public byte[] toByteArray() {
 		final var frame = allocate(length());
 
-		frame.put((byte) MainService).put((byte) subService).putShort((short) start).putShort((short) count);
+		final int svcField = response ? subService | 0x80 : subService;
+		frame.put((byte) MainService).put((byte) svcField).putShort((short) start).putShort((short) count);
 		frame.put(data);
 		items.stream().map(Item::toByteArray).forEach(frame::put);
 
@@ -603,7 +608,7 @@ public final class BaosService implements ServiceType {
 
 	@Override
 	public String toString() {
-		final String response = (subService & ResponseFlag) != 0 ? ".res" : "";
+		final String response = this.response ? ".res" : "";
 		final String svc = subServiceString(subService);
 		if (count == 0)
 			return svc + response + " item " + start + " (" + ErrorCode.of(data[0] & 0xff) + ")";
