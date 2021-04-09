@@ -422,6 +422,8 @@ public abstract class ClientConnection extends ConnectionBase
 		}
 	}
 
+	protected int protocolVersion() { return KNXNETIP_VERSION_10; }
+
 	/**
 	 * Checks for supported protocol version in KNX header.
 	 * <p>
@@ -433,7 +435,7 @@ public abstract class ClientConnection extends ConnectionBase
 	 */
 	private boolean checkVersion(final KNXnetIPHeader h)
 	{
-		if (h.getVersion() != KNXNETIP_VERSION_10) {
+		if (h.getVersion() != protocolVersion()) {
 			status = "protocol version changed";
 			close(CloseEvent.INTERNAL, "protocol version changed", LogLevel.ERROR, null);
 			return false;

@@ -233,6 +233,9 @@ class ObjectServerConnection extends ClientConnection {
 			super.close(initiator, reason, level, t);
 	}
 
+	@Override
+	protected int protocolVersion() { return 0x20; }
+
 	private void fireFrameReceived(final BaosService objSvrService) {
 		listeners.listeners().stream().filter(ObjectServerListener.class::isInstance)
 				.map(ObjectServerListener.class::cast).forEach(l -> l.baosService(objSvrService));
