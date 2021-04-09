@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -218,6 +218,11 @@ public class ConnectResponse extends ServiceType
 		default:
 			return "unknown status";
 		}
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + " (" + getStatusString() + ")";
 	}
 
 	@Override

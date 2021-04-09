@@ -1,7 +1,7 @@
 /*
     Calimero 2 - A library for KNX network access
     Copyright (c) 2005 B. Erb
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * the closing sequence, indicating success or failure.
  * <p>
  * Objects of this type are immutable.
- * 
+ *
  * @author Bernhard Erb
  * @author B. Malinowsky
  * @see tuwien.auto.calimero.knxnetip.servicetype.DisconnectRequest
@@ -62,8 +62,7 @@ public class DisconnectResponse extends ServiceType
 
 	/**
 	 * Creates a disconnect response out of a byte array.
-	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing a disconnect response structure
 	 * @param offset start offset of response in <code>data</code>
 	 * @throws KNXFormatException if found structure is too short
@@ -78,10 +77,8 @@ public class DisconnectResponse extends ServiceType
 	}
 
 	/**
-	 * Creates a new disconnect response for the terminating connection with the given
-	 * channel ID.
-	 * <p>
-	 * 
+	 * Creates a new disconnect response for the terminating connection with the given channel ID.
+	 *
 	 * @param channelID communication channel ID passed in the disconnect request, 0 &lt;=
 	 *        id &lt;= 255
 	 * @param status status code giving information of the final state, 0 &lt;= status
@@ -101,8 +98,7 @@ public class DisconnectResponse extends ServiceType
 	/**
 	 * Returns the communication channel identifier, matching the ID in the corresponding
 	 * disconnect request for closing the connection.
-	 * <p>
-	 * 
+	 *
 	 * @return communication channel ID as unsigned byte
 	 */
 	public final int getChannelID()
@@ -112,8 +108,7 @@ public class DisconnectResponse extends ServiceType
 
 	/**
 	 * Returns the status code, signaling the final state.
-	 * <p>
-	 * 
+	 *
 	 * @return status code as unsigned byte
 	 */
 	public final int getStatus()
@@ -121,19 +116,12 @@ public class DisconnectResponse extends ServiceType
 		return status;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceType#getStructLength()
-	 */
 	@Override
 	int getStructLength()
 	{
 		return 2;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceType#toByteArray
-	 *      (java.io.ByteArrayOutputStream)
-	 */
 	@Override
 	byte[] toByteArray(final ByteArrayOutputStream os)
 	{

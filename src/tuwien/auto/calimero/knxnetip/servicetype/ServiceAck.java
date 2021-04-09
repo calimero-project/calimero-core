@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * A service acknowledgment is done in reply to a service request, to confirm the
  * reception of the request over the IP communication channel. Note, an IP acknowledgment
  * does not indicate any delivery on KNX networks.
- * 
+ *
  * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceRequest
  */
 public class ServiceAck extends ServiceType
@@ -60,8 +60,7 @@ public class ServiceAck extends ServiceType
 
 	/**
 	 * Creates a new service acknowledgment out of a byte array.
-	 * <p>
-	 * 
+	 *
 	 * @param serviceType service type identifier describing the service to acknowledge in
 	 *        <code>data</code>, 0 &lt;= type &lt;= 0xFFFF
 	 * @param data byte array containing a service acknowledgment structure
@@ -85,8 +84,7 @@ public class ServiceAck extends ServiceType
 
 	/**
 	 * Creates a new service acknowledgment.
-	 * <p>
-	 * 
+	 *
 	 * @param serviceType service type identifier, 0 &lt;= type &lt;= 0xFFFF
 	 * @param channelId channel identifier of the communication channel this service
 	 *        acknowledgment belongs to, 0 &lt;= id &lt;= 255
@@ -115,8 +113,7 @@ public class ServiceAck extends ServiceType
 
 	/**
 	 * Returns the service type identifier of this acknowledgment.
-	 * <p>
-	 * 
+	 *
 	 * @return service type as unsigned 16 bit value
 	 */
 	public final int getServiceType()
@@ -125,10 +122,8 @@ public class ServiceAck extends ServiceType
 	}
 
 	/**
-	 * Returns the communication channel identifier of the communication channel this
-	 * service acknowledgment belongs to.
-	 * <p>
-	 * 
+	 * Returns the communication channel identifier of the communication channel this service acknowledgment belongs to.
+	 *
 	 * @return communication channel identifier as unsigned byte
 	 */
 	public final int getChannelID()
@@ -138,7 +133,7 @@ public class ServiceAck extends ServiceType
 
 	/**
 	 * Returns the sequence number.
-	 * 
+	 *
 	 * @return sequence number as unsigned byte
 	 */
 	public final int getSequenceNumber()
@@ -147,10 +142,8 @@ public class ServiceAck extends ServiceType
 	}
 
 	/**
-	 * Returns the status code of this acknowledgment, regarding the corresponding
-	 * request.
-	 * <p>
-	 * 
+	 * Returns the status code of this acknowledgment, regarding the corresponding request.
+	 *
 	 * @return status code as unsigned byte
 	 */
 	public final int getStatus()
@@ -160,8 +153,7 @@ public class ServiceAck extends ServiceType
 
 	/**
 	 * Returns a textual representation of the status code.
-	 * <p>
-	 * 
+	 *
 	 * @return short description of status as string, not <code>null</code>
 	 */
 	public String getStatusString()
@@ -169,19 +161,12 @@ public class ServiceAck extends ServiceType
 		return ErrorCodes.getErrorMessage(status);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceType#getStructLength()
-	 */
 	@Override
 	int getStructLength()
 	{
 		return CONN_HEADER_SIZE;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.knxnetip.servicetype.ServiceType#toByteArray
-	 *      (java.io.ByteArrayOutputStream)
-	 */
 	@Override
 	byte[] toByteArray(final ByteArrayOutputStream os)
 	{
