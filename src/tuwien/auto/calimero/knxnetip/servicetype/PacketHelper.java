@@ -68,6 +68,13 @@ public final class PacketHelper
 		return type.toByteArray(os);
 	}
 
+	public static byte[] toPacket(final int version, final ServiceType type) {
+		final KNXnetIPHeader h = new KNXnetIPHeader(type.svcType, version, type.getStructLength());
+		final ByteArrayOutputStream os = new ByteArrayOutputStream(h.getTotalLength());
+		os.write(h.toByteArray(), 0, h.getStructLength());
+		return type.toByteArray(os);
+	}
+
 	/**
 	 * @deprecated No replacement.
 	 */

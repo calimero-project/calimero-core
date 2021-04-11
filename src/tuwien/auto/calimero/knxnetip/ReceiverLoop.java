@@ -84,7 +84,7 @@ class ReceiverLoop extends UdpSocketLooper implements Runnable
 		final int offset, final int length) throws IOException
 	{
 		try {
-			final KNXnetIPHeader h = new KNXnetIPHeader(data, offset);
+			final KNXnetIPHeader h = KNXnetIPHeader.from(data, offset);
 			if (h.getTotalLength() > length)
 				logger.warn("received frame length " + length + " for " + h + " - ignored");
 			else if (h.getServiceType() == 0)

@@ -194,7 +194,7 @@ public abstract class ClientConnection extends ConnectionBase
 			logger.debug("establish connection from {} to {} ({})", hostPort(lsa), hostPort(ctrlEndpt), tcp ? "tcp" : "udp");
 			// HPAI throws if wildcard local address (0.0.0.0) is supplied
 			final var hpai = tcp ? HPAI.Tcp : new HPAI(HPAI.IPV4_UDP, useNat ? null : lsa);
-			final byte[] buf = PacketHelper.toPacket(new ConnectRequest(cri, hpai, hpai));
+			final byte[] buf = PacketHelper.toPacket(protocolVersion(), new ConnectRequest(cri, hpai, hpai));
 			send(buf, ctrlEndpt);
 		}
 		catch (final UnknownHostException e) {
@@ -476,7 +476,7 @@ public abstract class ClientConnection extends ConnectionBase
 		public void run()
 		{
 			final var hpai = tcp ? HPAI.Tcp : new HPAI(HPAI.IPV4_UDP, useNat ? null : localSocketAddress());
-			final byte[] buf = PacketHelper.toPacket(new ConnectionstateRequest(channelId, hpai));
+			final byte[] buf = PacketHelper.toPacket(protocolVersion(), new ConnectionstateRequest(channelId, hpai));
 			try {
 				while (true) {
 					Thread.sleep(HEARTBEAT_INTERVAL * 1000);

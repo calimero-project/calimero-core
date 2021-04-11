@@ -37,6 +37,7 @@
 package tuwien.auto.calimero.knxnetip.servicetype;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -194,6 +195,22 @@ public class KNXnetIPHeader
 	private final int totalsize;
 	private final int version;
 
+
+	public static KNXnetIPHeader from(final byte[] frame, final int offset) throws KNXFormatException {
+		final var buf = ByteBuffer.wrap(frame, offset, frame.length);
+		if (buf.remaining() < HEADER_SIZE_10)
+			throw new KNXFormatException("buffer too short for KNXnet/IP header");
+
+		final int headersize = buf.get() & 0xFF;
+		if (headersize != HEADER_SIZE_10)
+			throw new KNXFormatException("unsupported header size, expected " + HEADER_SIZE_10, headersize);
+
+		final int version = buf.get() & 0xFF;
+		final int service = buf.getShort() & 0xffff;
+		final int totalsize = buf.getShort() & 0xffff;
+		return new KNXnetIPHeader(service, version, totalsize - HEADER_SIZE_10);
+	}
+
 	/**
 	 * Creates a new KNXnet/IP header by reading in the header of a KNXnet/IP frame.
 	 *
@@ -234,13 +251,27 @@ public class KNXnetIPHeader
 	 */
 	public KNXnetIPHeader(final int serviceType, final int serviceLength)
 	{
-		if (serviceLength < 0)
-			throw new IllegalArgumentException("negative length of message body");
+		this(serviceType, version(serviceType), serviceLength);
+	}
+
+	/**
+	 * Creates a new KNXnet/IP header for the given service.
+	 *
+	 * @param serviceType service type identifier specifying the service followed after
+	 *        the header, 0 &lt;= type &lt;= 0xFFFF
+	 * @param version protocol version, 0x10 &le; version &le; 0xff
+	 * @param serviceLength length of the service structure in bytes
+	 */
+	public KNXnetIPHeader(final int serviceType, final int version, final int serviceLength) {
 		if (serviceType < 0 || serviceType > 0xFFFF)
 			throw new KNXIllegalArgumentException("service type out of range [0..0xFFFF]");
+		if (version < 0x10 || version > 0xff)
+			throw new KNXIllegalArgumentException("version out of range [0x10..0xFF]");
+		if (serviceLength < 0)
+			throw new IllegalArgumentException("negative length of message body");
 		headersize = HEADER_SIZE_10;
 		service = serviceType;
-		version = version(serviceType);
+		this.version = version;
 		totalsize = headersize + serviceLength;
 	}
 
