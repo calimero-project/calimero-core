@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -99,6 +99,8 @@ public abstract class LibraryAdapter implements Closeable
 				: new String[] { "/dev/ttyS", "/dev/ttyACM", "/dev/ttyUSB", "/dev/ttyAMA" };
 	}
 
+	private static volatile boolean lookupRxtx = true;
+
 	/**
 	 * Factory method to open a serial connection using one of the available library adapters.
 	 *
@@ -140,18 +142,21 @@ public abstract class LibraryAdapter implements Closeable
 				t = e;
 			}
 		}
-		try {
-			final Class<?> c = Class.forName("tuwien.auto.calimero.serial.RxtxAdapter");
-			logger.debug("using rxtx library for serial port access");
-			final Class<? extends LibraryAdapter> adapter = LibraryAdapter.class;
-			return adapter.cast(c.getConstructors()[0]
-					.newInstance(new Object[] { logger, portId, Integer.valueOf(baudrate) }));
-		}
-		catch (final ClassNotFoundException e) {
-			logger.warn("no rxtx library adapter found");
-		}
-		catch (final Exception | NoClassDefFoundError e) {
-			t = e instanceof InvocationTargetException ? e.getCause() : e;
+		if (lookupRxtx) {
+			try {
+				final Class<?> c = Class.forName("tuwien.auto.calimero.serial.RxtxAdapter");
+				logger.debug("using rxtx library for serial port access");
+				final Class<? extends LibraryAdapter> adapter = LibraryAdapter.class;
+				return adapter.cast(
+						c.getConstructors()[0].newInstance(new Object[] { logger, portId, Integer.valueOf(baudrate) }));
+			}
+			catch (final ClassNotFoundException | NoClassDefFoundError e) {
+				logger.warn("no rxtx library adapter found");
+				lookupRxtx = false;
+			}
+			catch (final Exception e) {
+				t = e instanceof InvocationTargetException ? e.getCause() : e;
+			}
 		}
 
 		if (t instanceof KNXException)
