@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,6 @@
 
 package tuwien.auto.calimero.link;
 
-import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.link.medium.RawFrame;
 import tuwien.auto.calimero.log.LogService;
@@ -52,7 +51,7 @@ import tuwien.auto.calimero.log.LogService;
  * messaging in the KNX network.
  * <p>
  * A KNX monitor link relies on an underlying intermediate connection technology and
- * protocol (e.g. KNXnet/IP, {@link KNXnetIPConnection}) to access KNX networks, the
+ * protocol (e.g. KNXnet/IP) to access KNX networks, the
  * necessary access options are specified at creation of a dedicated monitor.
  * <p>
  * The name returned by {@link #getName()} is used by a link as name of its log service.

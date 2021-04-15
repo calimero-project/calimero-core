@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@ import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.cemi.CEMILData;
-import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 
 /**
@@ -54,8 +53,8 @@ import tuwien.auto.calimero.link.medium.KNXMediumSettings;
  * Before sending a message, message parts that are not present nor supplied, but which are necessary for communication,
  * are added using the settings of {@link KNXMediumSettings}.
  * <p>
- * A KNX network link relies on an underlying intermediate connection technology and protocol, e.g., IP and KNXnet/IP
- * {@link KNXnetIPConnection}, to access KNX networks. The necessary access settings are specified at creation of a
+ * A KNX network link relies on an underlying intermediate connection technology and protocol, e.g., KNXnet/IP,
+ * to access KNX networks. The necessary access settings are specified at creation of a
  * dedicated network link.
  * <p>
  * The name returned by {@link #getName()} is used by a link as name of its log service.
