@@ -51,7 +51,6 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.cemi.CEMILData;
-import tuwien.auto.calimero.knxnetip.KNXConnectionClosedException;
 import tuwien.auto.calimero.link.BcuSwitcher.BcuMode;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
@@ -122,11 +121,11 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 		super(c, c.getName(), settings);
 		try {
 			if (!conn.isKnxConnectionActive())
-				throw new KNXConnectionClosedException("USB interface is not connected to KNX network");
+				throw new KNXLinkClosedException("USB interface is not connected to KNX network");
 
 			emiTypes = conn.getSupportedEmiTypes();
 			if (!trySetActiveEmi(EmiType.CEmi) && !trySetActiveEmi(EmiType.Emi2) && !trySetActiveEmi(EmiType.Emi1)) {
-				throw new KNXConnectionClosedException("failed to set active any supported EMI type");
+				throw new KNXLinkClosedException("failed to set active any supported EMI type");
 			}
 			try {
 				// report device descriptor before switching to link layer mode
