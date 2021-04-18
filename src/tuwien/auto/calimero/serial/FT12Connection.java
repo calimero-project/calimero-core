@@ -239,7 +239,7 @@ public class FT12Connection implements AutoCloseable
 				idleTimeout(baudrate)), portId, cemi);
 	}
 
-	FT12Connection(final LibraryAdapter connection, final String portId, final boolean cemi)
+	protected FT12Connection(final LibraryAdapter connection, final String portId, final boolean cemi)
 			throws KNXException, InterruptedException {
 		logger = LogService.getLogger("calimero.serial.ft12:" + portId);
 		adapter = connection;
