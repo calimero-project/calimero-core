@@ -633,8 +633,10 @@ public class FT12Connection implements AutoCloseable
 				}
 			}
 			catch (final IOException | InterruptedException e) {
-				if (!quit)
+				if (!quit) {
+					logger.warn("I/O error in FT1.2 receiver", e);
 					close(false, "receiver communication failure");
+				}
 			}
 		}
 
@@ -668,16 +670,33 @@ public class FT12Connection implements AutoCloseable
 
 		private boolean readFrame() throws IOException, InterruptedException
 		{
-			final int len = is.read();
-			final byte[] buf = new byte[len + 4];
+			final byte[] header = is.readNBytes(3);
+			// check end of stream
+			if (header.length != 3)
+				return false;
+
+			final int len = header[0] & 0xff;
+			final int lenCheck = header[1] & 0xff;
+			if (len != lenCheck) {
+				logger.debug("invalid frame header, length fields mismatch {} != {}", len, lenCheck);
+				return false;
+			}
+			final int startMarker = header[2] & 0xff;
+			if (startMarker != START) {
+				logger.debug("invalid frame header, expected START: {}", Integer.toHexString(startMarker));
+				return false;
+			}
+
+			final int total = len + 2;
 			// read rest of frame, check header, ctrl, and end tag
-			final int read = is.read(buf);
-			if (read == len + 4 && (buf[0] & 0xff) == len && (buf[1] & 0xff) == START && (buf[len + 3] & 0xff) == END) {
+			final byte[] buf = is.readNBytes(total);
+			final int read = buf.length;
+			if (read == total && (buf[len + 1] & 0xff) == END) {
 				final byte chk = buf[buf.length - 2];
-				if (!checkCtrlField(buf[2] & 0xff, chk))
+				if (!checkCtrlField(buf[0] & 0xff, chk))
 					return false;
 
-				if (checksum(buf, 2, len) != chk)
+				if (checksum(buf, 0, len) != chk)
 					logger.warn("invalid checksum in frame " + DataUnitBuilder.toHex(buf, " "));
 				else {
 					sendAck();
@@ -685,7 +704,7 @@ public class FT12Connection implements AutoCloseable
 					rcvFrameCount ^= FRAMECOUNT_BIT;
 					final byte[] ldata = new byte[len - 1];
 					for (int i = 0; i < ldata.length; ++i)
-						ldata[i] = buf[3 + i];
+						ldata[i] = buf[1 + i];
 
 					fireFrameReceived(ldata);
 
