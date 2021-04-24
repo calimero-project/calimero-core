@@ -86,7 +86,7 @@ class BaosLinkAdapterUsbTest {
 	void init() throws KNXException, InterruptedException {
 		final var usbLink = new KNXNetworkLinkUsb("weinzierl", new TPSettings());
 		try {
-			link = Baos.asBaosLink(usbLink);
+			link = BaosLinkAdapter.asBaosLink(usbLink);
 			link.addLinkListener(l);
 		}
 		catch (final Exception e) {

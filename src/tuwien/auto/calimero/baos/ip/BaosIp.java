@@ -34,31 +34,21 @@
     version.
 */
 
-package tuwien.auto.calimero.baos;
+package tuwien.auto.calimero.baos.ip;
 
-import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
-import tuwien.auto.calimero.KNXException;
-import tuwien.auto.calimero.knxnetip.Connection;
 import tuwien.auto.calimero.knxnetip.Discoverer;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
 import tuwien.auto.calimero.knxnetip.util.ManufacturerDIB;
-import tuwien.auto.calimero.link.KNXNetworkLink;
-import tuwien.auto.calimero.link.KNXNetworkLinkFT12;
-import tuwien.auto.calimero.link.KNXNetworkLinkUsb;
 
-/**
- * Implementation of the ObjectServer protocol, based on BAOS Binary Protocol v2.1.
- */
-public final class Baos {
-
-	static final int ObjectServerProtocol = 0xf0;
+public final class BaosIp {
+	private static final int ObjectServerProtocol = 0xf0;
 	private static final int WeinzierlMfrId = 0x00c5;
 	private static final int Version = 0x20;
 
 
-	static boolean supportsBaos(final Discoverer.Result<SearchResponse> result) {
+	public static boolean supportsBaos(final Discoverer.Result<SearchResponse> result) {
 		final var mfrDib = result.getResponse().description().stream().filter(ManufacturerDIB.class::isInstance)
 				.map(ManufacturerDIB.class::cast).filter(dib -> dib.getStructLength() == 8).findFirst();
 		if (mfrDib.isEmpty())
@@ -69,30 +59,5 @@ public final class Baos {
 				&& (buf.get() & 0xff) == ObjectServerProtocol && buf.get() == Version;
 	}
 
-
-	/**
-	 * Returns an adapter for subsequent communication with a BAOS-cabable server.
-	 * If BAOS mode is not required anymore, it is possible to keep the underlying link open (and switched back to
-	 * link-layer mode) by calling {@link BaosLinkAdapter#detach()}.
-	 *
-	 * @param link the network link to put into BAOS mode, supported are USB and FT1.2 network links
-	 * @return link adapter for BAOS communication
-	 * @see KNXNetworkLinkUsb
-	 * @see KNXNetworkLinkFT12
-	 */
-	public static BaosLinkAdapter asBaosLink(final KNXNetworkLink link) { return new BaosLinkAdapter(link); }
-
-	public static BaosLink newUdpLink(final InetSocketAddress localEp, final InetSocketAddress serverCtrlEp)
-			throws KNXException, InterruptedException {
-		final var c = new ObjectServerConnection(localEp, serverCtrlEp);
-		return new BaosLinkIp(c);
-	}
-
-	public static BaosLink newTcpLink(final Connection connection) throws KNXException {
-		final var c = new ObjectServerConnection(connection);
-		return new BaosLinkIp(c);
-	}
-
-
-	private Baos() {}
+	private BaosIp() {}
 }

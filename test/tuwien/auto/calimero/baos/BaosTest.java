@@ -56,6 +56,8 @@ import org.junit.jupiter.api.Test;
 
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.baos.BaosService.Property;
+import tuwien.auto.calimero.baos.ip.BaosIp;
+import tuwien.auto.calimero.baos.ip.BaosLinkIp;
 import tuwien.auto.calimero.knxnetip.Connection;
 import tuwien.auto.calimero.knxnetip.Discoverer;
 import tuwien.auto.calimero.knxnetip.Discoverer.Result;
@@ -81,13 +83,13 @@ class BaosTest {
 	@Disabled
 	void supportsBaos() {
 		final Result<SearchResponse> result = list.get(0);
-		assertTrue(Baos.supportsBaos(result));
+		assertTrue(BaosIp.supportsBaos(result));
 	}
 
 	@Test
 	void doesNotSupportsBaos() {
 		final Result<SearchResponse> result = list.get(0);
-		assertFalse(Baos.supportsBaos(result));
+		assertFalse(BaosIp.supportsBaos(result));
 	}
 
 	@Test
@@ -98,7 +100,7 @@ class BaosTest {
 		final var server = new BaosServer();
 		CompletableFuture.runAsync(server);
 		Thread.sleep(500);
-		try (var link = Baos.newTcpLink(Connection.newTcpConnection(new InetSocketAddress(0), objectServer))) {
+		try (var link = BaosLinkIp.newTcpLink(Connection.newTcpConnection(new InetSocketAddress(0), objectServer))) {
 			final var rcv = new LinkedBlockingQueue<>();
 			link.addLinkListener(new NetworkLinkListener() {
 				@LinkEvent

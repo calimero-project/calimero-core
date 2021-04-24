@@ -34,7 +34,7 @@
     version.
 */
 
-package tuwien.auto.calimero.baos;
+package tuwien.auto.calimero.baos.ip;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -54,6 +54,7 @@ import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KnxRuntimeException;
+import tuwien.auto.calimero.baos.BaosService;
 import tuwien.auto.calimero.baos.BaosService.Property;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.knxnetip.ClientConnection;
@@ -82,6 +83,7 @@ class ObjectServerConnection extends ClientConnection {
 		default void frameReceived(final FrameEvent e) {}
 	}
 
+	private static final int ObjectServerProtocol = 0xf0;
 	private static final int ProtocolVersion = 0x20;
 
 	// client SHALL wait 1 second for acknowledgment response to a object server request from server
@@ -97,7 +99,7 @@ class ObjectServerConnection extends ClientConnection {
 		super(KNXnetIPHeader.ObjectServerRequest, KNXnetIPHeader.ObjectServerAck, 2, ReqTimeout);
 		tcp = false;
 		keepAlive = CompletableFuture.completedFuture(Void.TYPE);
-		connect(localEP, serverCtrlEP, CRI.createRequest(Baos.ObjectServerProtocol), false);
+		connect(localEP, serverCtrlEP, CRI.createRequest(ObjectServerProtocol), false);
 	}
 
 	public ObjectServerConnection(final Connection c) throws KNXException {

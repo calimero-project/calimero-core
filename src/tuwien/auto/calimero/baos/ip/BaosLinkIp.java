@@ -34,22 +34,39 @@
     version.
 */
 
-package tuwien.auto.calimero.baos;
+package tuwien.auto.calimero.baos.ip;
 
 import java.lang.invoke.MethodHandle;
+import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
 
 import tuwien.auto.calimero.KNXAddress;
+import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.baos.BaosLink;
+import tuwien.auto.calimero.baos.BaosService;
 import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.knxnetip.Connection;
 import tuwien.auto.calimero.knxnetip.KNXConnectionClosedException;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode;
 import tuwien.auto.calimero.link.AbstractLink;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.medium.TPSettings;
 
-final class BaosLinkIp extends AbstractLink<ObjectServerConnection> implements BaosLink {
+public final class BaosLinkIp extends AbstractLink<ObjectServerConnection> implements BaosLink {
 	private final ObjectServerConnection c;
+
+	public static BaosLink newUdpLink(final InetSocketAddress localEp, final InetSocketAddress serverCtrlEp)
+			throws KNXException, InterruptedException {
+		final var c = new ObjectServerConnection(localEp, serverCtrlEp);
+		return new BaosLinkIp(c);
+	}
+
+	public static BaosLink newTcpLink(final Connection connection) throws KNXException {
+		final var c = new ObjectServerConnection(connection);
+		return new BaosLinkIp(c);
+	}
+
 
 	BaosLinkIp(final ObjectServerConnection c) {
 		super(c, c.getName(), new TPSettings());

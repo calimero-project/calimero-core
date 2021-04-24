@@ -53,6 +53,8 @@ import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.link.AbstractLink;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
+import tuwien.auto.calimero.link.KNXNetworkLinkFT12;
+import tuwien.auto.calimero.link.KNXNetworkLinkUsb;
 import tuwien.auto.calimero.link.NetworkLinkListener;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 
@@ -77,6 +79,19 @@ public final class BaosLinkAdapter implements BaosLink {
 	}
 
 	private final KNXNetworkLink link;
+
+	/**
+	 * Returns an adapter for subsequent communication with a BAOS-cabable server.
+	 * If BAOS mode is not required anymore, it is possible to keep the underlying link open (and switched back to
+	 * link-layer mode) by calling {@link BaosLinkAdapter#detach()}.
+	 *
+	 * @param link the network link to put into BAOS mode, supported are USB and FT1.2 network links
+	 * @return link adapter for BAOS communication
+	 * @see KNXNetworkLinkUsb
+	 * @see KNXNetworkLinkFT12
+	 */
+	public static BaosLinkAdapter asBaosLink(final KNXNetworkLink link) { return new BaosLinkAdapter(link); }
+
 
 	BaosLinkAdapter(final KNXNetworkLink link) {
 		this.link = link;
