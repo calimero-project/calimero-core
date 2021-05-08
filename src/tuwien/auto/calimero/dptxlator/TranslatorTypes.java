@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,20 +38,9 @@ package tuwien.auto.calimero.dptxlator;
 
 import static java.util.Collections.emptyList;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URI;
-import java.net.URL;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystemNotFoundException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -230,7 +219,6 @@ public final class TranslatorTypes
 
 		/**
 		 * Returns the data type main number.
-		 * <p>
 		 *
 		 * @return main number as int
 		 */
@@ -342,62 +330,52 @@ public final class TranslatorTypes
 
 	private static final Map<Integer, MainType> map = Collections.synchronizedMap(new HashMap<>());
 
+	private static final String[] builtinXlators = {
+			"DptXlator16BitSet",
+			"DPTXlator1BitControlled",
+			"DPTXlator2ByteFloat",
+			"DPTXlator2ByteUnsigned",
+			"DPTXlator3BitControlled",
+			"DPTXlator4ByteFloat",
+			"DPTXlator4ByteSigned",
+			"DPTXlator4ByteUnsigned",
+			"DPTXlator64BitSigned",
+			"DPTXlator8BitEnum",
+			"DptXlator8BitSet",
+			"DPTXlator8BitSigned",
+			"DPTXlator8BitUnsigned",
+			"DPTXlatorBoolean",
+			"DptXlatorBrightnessClrTempCtrl",
+			"DptXlatorBrightnessClrTempTrans",
+			"DPTXlatorDate",
+			"DPTXlatorDateTime",
+			"DptXlatorMeteringValue",
+			"DptXlatorRelativeControlRgb",
+			"DptXlatorRelativeControlRgbw",
+			"DptXlatorRelativeControlXyY",
+			"DPTXlatorRGB",
+			"DptXlatorRgbw",
+			"DPTXlatorSceneControl",
+			"DPTXlatorSceneNumber",
+			"DPTXlatorString",
+			"DPTXlatorTime",
+			"DPTXlatorUtf8",
+			"DptXlatorXyY",
+			"DptXlatorXyYTransition",
+	};
+
 	static {
 		try {
-			loadTranslators("tuwien.auto.calimero.dptxlator");
+			for (final var x : builtinXlators)
+				addTranslator("tuwien.auto.calimero.dptxlator." + x);
 		}
 		catch (final Exception e) {
 			DPTXlator.logger.error("failed to initialize list of available DPT translators", e);
 		}
 	}
 
-	private TranslatorTypes()
-	{}
+	private TranslatorTypes() {}
 
-	private static void loadTranslators(final String inPackage) throws Exception
-	{
-		final ClassLoader cl = TranslatorTypes.class.getClassLoader();
-		final String name = inPackage.replace('.', '/');
-		for (final URL r : Collections.list(cl.getResources(name))) {
-			final URI uri = r.toURI();
-			try {
-				loadTranslators(inPackage, Paths.get(uri));
-			}
-			catch (final FileSystemNotFoundException e) {
-				try (FileSystem fs = FileSystems.newFileSystem(uri, Collections.emptyMap())) {
-					loadTranslators(inPackage, fs.provider().getPath(uri));
-				}
-				catch (final Exception ex) {
-					if (!"bundle".equals(uri.getScheme()) && !"bundleresource".equals(uri.getScheme()))
-						throw ex;
-
-					DPTXlator.logger.info("using osgi bundle wiring for {}", uri);
-					final String pkg = "org.osgi.framework.";
-					final Method getBundle = Class.forName(pkg + "FrameworkUtil").getMethod("getBundle", Class.class);
-					final Object bundleImpl = getBundle.invoke(null, TranslatorTypes.class);
-					DPTXlator.logger.debug("obtained bundle {}", bundleImpl);
-
-					final Method adapt = Class.forName(pkg + "Bundle").getMethod("adapt", Class.class);
-					final Class<?> wiring = Class.forName(pkg + "wiring.BundleWiring");
-					final Object wiringImpl = adapt.invoke(bundleImpl, wiring);
-
-					final Method listResources = wiring.getMethod("listResources", String.class, String.class,
-							int.class);
-					@SuppressWarnings("unchecked")
-					final Collection<String> classes = (Collection<String>) listResources.invoke(wiringImpl,
-							uri.getPath(), "*.class", 0);
-					classes.forEach(s -> addTranslator(s.replace('/', '.').replace(".class", "")));
-				}
-			}
-		}
-	}
-
-	private static void loadTranslators(final String inPackage, final Path path) throws IOException
-	{
-		DPTXlator.logger.trace("loading DPT translators contained in {} ({})", inPackage, path);
-		Files.list(path).map(f -> f.getFileName().toString()).filter(s -> s.endsWith(".class"))
-				.map(s -> s.replace(".class", "")).forEach(s -> addTranslator(inPackage + "." + s));
-	}
 
 	private static void addTranslator(final String className)
 	{
@@ -420,7 +398,7 @@ public final class TranslatorTypes
 		}
 		catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
-			DPTXlator.logger.error("adding DPT translator class {}", className, e);
+			DPTXlator.logger.warn("lookup DPT translator class {}", className, e);
 		}
 	}
 
