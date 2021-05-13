@@ -49,8 +49,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 /**
  * Proxies the XML stream writer interface {@link XMLStreamWriter} with the derived Calimero stream
- * writer interface. This avoids a direct dependency on javax.xml.stream when using the Java SE
- * compact1 profile, or on Java ME Embedded.
+ * writer interface. This avoids a direct dependency on the java.xml module.
  *
  * @author B. Malinowsky
  */

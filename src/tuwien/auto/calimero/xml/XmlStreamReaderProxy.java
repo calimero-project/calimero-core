@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2017 B. Malinowsky
+    Copyright (c) 2015, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,8 +48,7 @@ import javax.xml.stream.XMLStreamReader;
 
 /**
  * Proxies the XML stream reader interface {@link XMLStreamReader} with the derived Calimero stream
- * reader interface. This avoids a direct dependency on javax.xml.stream when using the Java SE
- * compact1 profile, or on Java ME Embedded.
+ * reader interface. This avoids a direct dependency on the java.xml module.
  *
  * @author B. Malinowsky
  */
