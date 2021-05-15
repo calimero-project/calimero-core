@@ -674,7 +674,6 @@ public interface ManagementClient extends AutoCloseable
 	 *         to access a non existing property)
 	 * @throws KNXDisconnectException on disconnect in connection-oriented mode
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
-	 * @throws KNXException on other read property description error
 	 * @throws InterruptedException on interrupted thread
 	 */
 	Description readPropertyDescription(Destination dst, int objectType, int objInstance, int propertyId,
