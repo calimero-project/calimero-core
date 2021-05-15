@@ -1,5 +1,7 @@
 plugins {
   id "com.github.ben-manes.versions" version "0.38.0"
+  id 'maven-publish'
+  id 'signing'
 }
 
 repositories {
@@ -11,7 +13,6 @@ ext.junitJupiterVersion = '5.8.0-M1'
 ext.desc = 'Calimero, a free KNX network library'
 
 apply plugin: 'java-library'
-apply plugin: 'maven-publish'
 apply plugin:'application'
 
 group = 'com.github.calimero'
@@ -19,6 +20,23 @@ version = '2.5-M1'
 
 sourceCompatibility = 11
 targetCompatibility = 11
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+tasks.withType(Jar) {
+	from("${projectDir}") {
+        include 'LICENSE.txt'
+        into "META-INF"
+    }
+    if (name.equals('sourcesJar')) {
+    	from("${projectDir}") {
+		    include 'README.md'
+        }
+    }
+}
 
 compileJava.options.encoding = 'UTF-8'
 compileTestJava.options.encoding = 'UTF-8'
@@ -50,29 +68,6 @@ sourceSets {
     }
 }
 
-task testJar(type: Jar) {
-    classifier = 'tests'
-    from sourceSets.test.output
-    from("${projectDir}") {
-        include 'LICENSE*'
-        into "META-INF"
-    }
-}
-
-task testSourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'testSources'
-    from sourceSets.test.allSource
-    from("${projectDir}") {
-        include 'LICENSE*'
-        into "META-INF"
-    }
-}
-
-artifacts {
-    archives testJar
-    archives testSourcesJar
-}
-
 jar {
 	manifest {
 		attributes 'Main-Class': mainClassName
@@ -92,15 +87,46 @@ test {
 
 publishing {
     publications {
-        maven(MavenPublication) {
-            artifact testJar {
-                classifier "tests"
-            }
-            artifact testSourcesJar {
-                classifier "test-sources"
+        mavenJava(MavenPublication) {
+            artifactId = rootProject.name
+            from components.java
+            pom {
+                name = 'Calimero core library'
+                description = 'Calimero, a free KNX network library'
+                url = 'https://github.com/calimero-project/calimero-core'
+                inceptionYear = '2006'
+                licenses {
+                    license {
+                        name = "GNU General Public License, version 2, with the Classpath Exception"
+                        url = 'LICENSE'
+                    }
+                }
+                developers {
+                    developer {
+                        name = "Boris Malinowsky"
+                        email = "b.malinowsky@gmail.com"
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com:calimero-project/calimero-core.git'
+                    url = 'https://github.com/calimero-project/calimero-core.git'
+                }
             }
         }
     }
+    repositories {
+        maven {
+            name 'maven'
+            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            credentials(PasswordCredentials)
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
 }
 
 dependencies {
