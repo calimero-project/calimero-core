@@ -959,10 +959,11 @@ public class DPTXlator8BitEnum extends DPTXlator
 		{
 			final EnumSet<T> set = EnumSet.allOf(elements);
 			for (final T e : set) {
-				// the enum constant we can compare case sensitive
-				if (e.name().equals(description))
+				if (e.name().equalsIgnoreCase(description))
 					return e;
 				if (e.description().equalsIgnoreCase(description))
+					return e;
+				if (friendly(e.name()).equalsIgnoreCase(description))
 					return e;
 			}
 			return null;
@@ -990,6 +991,8 @@ public class DPTXlator8BitEnum extends DPTXlator
 			sb.append(getLowerValue()).append("..").append(getUpperValue()).append("]");
 			return sb.toString();
 		}
+
+		private static String friendly(final String name) { return name.replaceAll("\\B([A-Z])", " $1").toLowerCase(); }
 	}
 
 	public static final EnumDpt<SystemClockMode> DptSystemClockMode = new EnumDpt<>("20.001", "System Clock Mode",
