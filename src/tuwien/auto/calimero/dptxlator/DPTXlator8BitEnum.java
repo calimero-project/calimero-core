@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2020 B. Malinowsky
+    Copyright (c) 2015, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -649,23 +649,23 @@ public class DPTXlator8BitEnum extends DPTXlator
 		} //RP1
 	}
 
-	public enum SwitchPBModel implements EnumBase<SwitchPBModel> {
-		OnePB(1, "one PB/binary input mode"),
-		TwoPBs(2, "two PBs/binary inputs mode");
+	public enum SwitchPushbuttonModel implements EnumBase<SwitchPushbuttonModel> {
+		OnePushbutton(1, "one PB/binary input mode"),
+		TwoPushbuttons(2, "two PBs/binary inputs mode");
 
-		SwitchPBModel(final int element, final String description)
+		SwitchPushbuttonModel(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
 	}
 
-	public enum SwitchPBAction implements EnumBase<SwitchPBAction> {
+	public enum SwitchPushbuttonAction implements EnumBase<SwitchPushbuttonAction> {
 		Inactive(0, "inactive (no message sent)"),
 		SwitchOffSent(1, "Switch-Off message sent"),
 		SwitchOnSent(2, "Switch-On message sent"),
 		InfoOnOff(3, "inverse value of Info On/Off is sent");
 
-		SwitchPBAction(final int element, final String description)
+		SwitchPushbuttonAction(final int element, final String description)
 		{ //RP2
 			init(element, description);
 		} //RP1
@@ -841,7 +841,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 	}
 
 	// 20.1005
-	public enum PbFunction implements EnumBase<PbFunction> {
+	public enum PushbuttonFunction implements EnumBase<PushbuttonFunction> {
 		DefaultAction(1, ""),
 		On(2, ""),
 		Off(3, ""),
@@ -897,7 +897,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		SmokeAlarm(54, ""),
 		SubDetector(55, "");
 
-		PbFunction(final int element, final String description)
+		PushbuttonFunction(final int element, final String description)
 		{ //RP2
 			init(element, name().replaceAll("([A-Z]|[0-9]+)", " $1").toLowerCase().trim());
 		} //RP1
@@ -1069,11 +1069,11 @@ public class DPTXlator8BitEnum extends DPTXlator
 			"Blinking Mode", BlinkingMode.class, "0", "2");
 	public static final EnumDpt<LightControlMode> DptLightControlMode = new EnumDpt<>("20.604",
 			"Light Control Mode", LightControlMode.class, "0", "1");
-	public static final EnumDpt<SwitchPBModel> DptSwitchPBModel = new EnumDpt<>("20.605",
-			"Switch PB Model", SwitchPBModel.class, "1", "2");
-	public static final EnumDpt<SwitchPBAction> DptSwitchPBAction = new EnumDpt<>("20.606",
-			"PB Action", SwitchPBAction.class, "0", "3");
-	public static final EnumDpt<LdsbMode> DptDimmPBModel = new EnumDpt<>("20.607", "Dimm PB Model",
+	public static final EnumDpt<SwitchPushbuttonModel> DptSwitchPushbuttonModel = new EnumDpt<>("20.605",
+			"Switch PB Model", SwitchPushbuttonModel.class, "1", "2");
+	public static final EnumDpt<SwitchPushbuttonAction> DptSwitchPushbuttonAction = new EnumDpt<>("20.606",
+			"PB Action", SwitchPushbuttonAction.class, "0", "3");
+	public static final EnumDpt<LdsbMode> DptDimmPushbuttonModel = new EnumDpt<>("20.607", "Dimm PB Model",
 			LdsbMode.class, "1", "4");
 	public static final EnumDpt<SwitchOnMode> DptSwitchOnMode = new EnumDpt<>("20.608",
 			"Switch On Mode", SwitchOnMode.class, "0", "2");
@@ -1109,8 +1109,8 @@ public class DPTXlator8BitEnum extends DPTXlator
 			"KNX medium", Medium.class, "0", "5");
 
 	/** Configuration of action of push button in PB mode. */
-	public static final EnumDpt<PbFunction> DptPbFunction = new EnumDpt<>("20.1005", "PB function", PbFunction.class,
-			"1", "55");
+	public static final EnumDpt<PushbuttonFunction> DptPushbuttonFunction = new EnumDpt<>("20.1005", "PB function",
+			PushbuttonFunction.class, "1", "55");
 
 	// Metering domain
 
