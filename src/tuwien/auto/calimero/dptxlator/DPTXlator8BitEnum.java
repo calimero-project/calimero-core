@@ -81,6 +81,8 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Map<EnumBase<?>, Integer> values = new HashMap<>();
 		Map<EnumBase<?>, String> descriptions = new HashMap<>();
 
+		default void init(final int element) { init(element, split(this.toString())); }
+
 		default void init(final int element, final String description)
 		{
 			values.put(this, element);
@@ -96,6 +98,8 @@ public class DPTXlator8BitEnum extends DPTXlator
 		{
 			return descriptions.get(this);
 		}
+
+		private static String split(final String name) { return name.replaceAll("\\B([A-Z])", " $1").toLowerCase(); }
 	}
 
 	//
@@ -103,62 +107,44 @@ public class DPTXlator8BitEnum extends DPTXlator
 	//
 
 	public enum SystemClockMode implements EnumBase<SystemClockMode> {
-		Autonomous(0, "autonomous"),
-		Slave(1, "slave"),
-		Master(2, "master");
+		Autonomous(0),
+		Slave(1),
+		Master(2);
 
-		SystemClockMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		SystemClockMode(final int element) { init(element); }
 	}
 
 	public enum BuildingMode implements EnumBase<BuildingMode> {
-		BuildingInUse(0, "Building in use"),
-		BuildingNotUsed(1, "Building not used"),
-		BuildingProtection(2, "Building protection");
+		BuildingInUse(0),
+		BuildingNotUsed(1),
+		BuildingProtection(2);
 
-		BuildingMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		BuildingMode(final int element) { init(element); }
 	}
 
 	public enum OccupancyMode implements EnumBase<OccupancyMode> {
-		Occupied(0, "occupied"),
-		Standby(1, "standby"),
-		NotOccupied(2, "not occupied");
+		Occupied(0),
+		Standby(1),
+		NotOccupied(2);
 
-		OccupancyMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		}
-		//RP1
+		OccupancyMode(final int element) { init(element); }
 	}
 
 	public enum Priority implements EnumBase<Priority> {
-		High(0, "High"),
-		Medium(1, "Medium"),
-		Low(2, "Low"),
-		Void(3, "void");
+		High(0),
+		Medium(1),
+		Low(2),
+		Void(3);
 
-		Priority(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		}
-		//RP1
+		Priority(final int element) { init(element); }
 	}
 
 	public enum LightApplicationMode implements EnumBase<LightApplicationMode> {
-		Normal(0, "normal"),
-		PresenceSimulation(1, "presence simulation"),
-		NightRound(2, "night round");
+		Normal(0),
+		PresenceSimulation(1),
+		NightRound(2);
 
-		LightApplicationMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		}
-		//RP1
+		LightApplicationMode(final int element) { init(element); }
 	}
 
 	public enum ApplicationArea implements EnumBase<ApplicationArea> {
@@ -174,22 +160,15 @@ public class DPTXlator8BitEnum extends DPTXlator
 		LoadManagement(40, "Load Management"),
 		ShuttersAndBlinds(50, "Shutters and blinds");
 
-		ApplicationArea(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		}
-		//RP1
+		ApplicationArea(final int element, final String description) { init(element, description); }
 	}
 
 	public enum AlarmClassType implements EnumBase<AlarmClassType> {
-		SimpleAlarm(1, "simple alarm"),
-		BasicAlarm(2, "basic alarm"),
-		ExtendedAlarm(3, "extended alarm");
+		SimpleAlarm(1),
+		BasicAlarm(2),
+		ExtendedAlarm(3);
 
-		AlarmClassType(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		AlarmClassType(final int element) { init(element); }
 	}
 
 	public enum PsuMode implements EnumBase<PsuMode> {
@@ -197,10 +176,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Enabled(1, "enabled (PSU/DPSU fixed on)"),
 		Auto(2, "auto (PSU/DPSU automatic on/off)");
 
-		PsuMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		PsuMode(final int element, final String description) { init(element, description); }
 	}
 
 	public enum ErrorClassSystem implements EnumBase<ErrorClassSystem> {
@@ -224,10 +200,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		InvalidGroupObject(17, "invalid Group Object number (ASAP)"),
 		GroupObjectTypeExceedsLength(18, "Group Object Type exceeds (PID_MAX_APDU_LENGTH – 2)");
 
-		ErrorClassSystem(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		ErrorClassSystem(final int element, final String description) { init(element, description); }
 	}
 
 	public enum ErrorClassHvac implements EnumBase<ErrorClassHvac> {
@@ -237,10 +210,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		ActuatorFault(3, "actuator fault"),
 		OtherFault(4, "other fault");
 
-		ErrorClassHvac(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		ErrorClassHvac(final int element, final String description) { init(element, description); }
 	}
 
 	public enum TimeDelay implements EnumBase<TimeDelay> {
@@ -271,10 +241,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Delay12h(24, "12 h"),
 		Delay24h(25, "24 h");
 
-		TimeDelay(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		TimeDelay(final int element, final String description) { init(element, description); }
 	}
 
 	public enum BeaufortWindForceScale implements EnumBase<BeaufortWindForceScale> {
@@ -292,10 +259,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		ViolentStorm(11, "violent storm (102.4–117.4 km/h)"),
 		Hurricane(12, "hurricane (≥ 117.4 km/h)");
 
-		BeaufortWindForceScale(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		BeaufortWindForceScale(final int element, final String description) { init(element, description); }
 	}
 
 	public enum SensorSelect implements EnumBase<SensorSelect> {
@@ -305,20 +269,14 @@ public class DPTXlator8BitEnum extends DPTXlator
 		AnalogInput(3, "analog input, 0 % to 100 %"),
 		TemperatureSensorInput(4, "temperature sensor input");
 
-		SensorSelect(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		SensorSelect(final int element, final String description) { init(element, description); }
 	}
 
 	public enum ActuatorConnectType implements EnumBase<ActuatorConnectType> {
-		SensorConnection(1, "Sensor Connection"),
-		ControllerConnection(2, "Controller Connection");
+		SensorConnection(1),
+		ControllerConnection(2);
 
-		ActuatorConnectType(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		ActuatorConnectType(final int element) { init(element); }
 	}
 
 	public enum CloudCover implements EnumBase<CloudCover> {
@@ -337,15 +295,12 @@ public class DPTXlator8BitEnum extends DPTXlator
 	}
 
 	public enum FuelType implements EnumBase<FuelType> {
-		Auto(0, "auto"),
-		Oil(1, "oil"),
-		Gas(2, "gas"),
-		SolidStateFuel(3, "solid state fuel");
+		Auto(0),
+		Oil(1),
+		Gas(2),
+		SolidStateFuel(3);
 
-		FuelType(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		FuelType(final int element) { init(element); }
 	}
 
 	public enum BurnerType implements EnumBase<BurnerType> {
@@ -353,23 +308,17 @@ public class DPTXlator8BitEnum extends DPTXlator
 		TwoStage(2, "2 stage"),
 		Modulating(3, "modulating");
 
-		BurnerType(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		BurnerType(final int element, final String description) { init(element, description); }
 	}
 
 	public enum HvacMode implements EnumBase<HvacMode> {
-		Auto(0, "Auto"),
-		Comfort(1, "Comfort"),
-		Standby(2, "Standby"),
-		Economy(3, "Economy"),
-		BuildingProtection(4, "Building Protection");
+		Auto(0),
+		Comfort(1),
+		Standby(2),
+		Economy(3),
+		BuildingProtection(4);
 
-		HvacMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		HvacMode(final int element) { init(element); }
 	}
 
 	/** Domestic Hot Water Mode. */
@@ -380,21 +329,15 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Reduced(3, "Reduced"),
 		OffOrFrostProtect(4, "Off / Frost Protect");
 
-		DomesticHotWaterMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		DomesticHotWaterMode(final int element, final String description) { init(element, description); }
 	}
 
 	public enum LoadPriority implements EnumBase<LoadPriority> {
-		None(0, "None"),
-		ShiftLoadPriority(1, "Shift load priority"),
-		AbsoluteLoadPriority(2, "Absolute load priority");
+		None(0),
+		ShiftLoadPriority(1),
+		AbsoluteLoadPriority(2);
 
-		LoadPriority(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		LoadPriority(final int element) { init(element); }
 	}
 
 	public enum HvacControlMode implements EnumBase<HvacControlMode> {
@@ -418,10 +361,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		EmergencySteamMode(17, "Emergency Steam Mode"),
 		NoDem(20, "NoDem");
 
-		HvacControlMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		HvacControlMode(final int element, final String description) { init(element, description); }
 	}
 
 	public enum HvacEmergencyMode implements EnumBase<HvacEmergencyMode> {
@@ -432,21 +372,15 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Shutdown(4, "Emergency Shutdown"),
 		Fire(5, "Emergency Fire");
 
-		HvacEmergencyMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		HvacEmergencyMode(final int element, final String description) { init(element, description); }
 	}
 
 	public enum ChangeoverMode implements EnumBase<ChangeoverMode> {
-		Auto(0, "Auto"),
-		CoolingOnly(1, "Cooling Only"),
-		HeatingOnly(2, "Heating Only");
+		Auto(0),
+		CoolingOnly(1),
+		HeatingOnly(2);
 
-		ChangeoverMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		ChangeoverMode(final int element) { init(element); }
 	}
 
 	public enum ValveMode implements EnumBase<ValveMode> {
@@ -456,10 +390,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		CoolStageB(4, "Cool stage B for cooling with two stages (A + B)"),
 		HeatCool(5, "Heat/Cool for changeover applications");
 
-		ValveMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		ValveMode(final int element, final String description) { init(element, description); }
 	}
 
 	public enum DamperMode implements EnumBase<DamperMode> {
@@ -468,10 +399,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		ExtractAir(3, "Extract Air, e.g. Variable Air Volume (VAV)"),
 		ExtractAir2(4, "Extract Air, e.g. Variable Air Volume (VAV)");
 
-		DamperMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		DamperMode(final int element, final String description) { init(element, description); }
 	}
 
 	public enum HeaterMode implements EnumBase<HeaterMode> {
@@ -479,10 +407,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		HeatStageAProportional(2, "Heat Stage A Proportional"),
 		HeatStageBProportional(3, "Heat Stage B Proportional");
 
-		HeaterMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		HeaterMode(final int element, final String description) { init(element, description); }
 	}
 
 	public enum FanMode implements EnumBase<FanMode> {
@@ -490,21 +415,15 @@ public class DPTXlator8BitEnum extends DPTXlator
 		PermanentlyRunning(1, "permanently running"),
 		Intervals(2, "running in intervals");
 
-		FanMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		FanMode(final int element, final String description) { init(element, description); }
 	}
 
 	public enum MasterSlaveMode implements EnumBase<MasterSlaveMode> {
-		Autonomous(0, "autonomous"),
-		Master(1, "master"),
-		Slave(2, "slave");
+		Autonomous(0),
+		Master(1),
+		Slave(2);
 
-		MasterSlaveMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		MasterSlaveMode(final int element) { init(element); }
 	}
 
 	public enum StatusRoomSetpoint implements EnumBase<StatusRoomSetpoint> {
@@ -512,10 +431,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Alternative(1, "alternative setpoint"),
 		BuildingProtection(2, "building protection setpoint");
 
-		StatusRoomSetpoint(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		StatusRoomSetpoint(final int element, final String description) { init(element, description); }
 	}
 
 	public enum MeteringDeviceType implements EnumBase<MeteringDeviceType> {
@@ -538,42 +454,30 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Garbage(41, "garbage"),
 		VoidDeviceType(255, "void device type");
 
-		MeteringDeviceType(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		MeteringDeviceType(final int element, final String description) { init(element, description); }
 	}
 
 	public enum AirDamperActuatorType implements EnumBase<AirDamperActuatorType> {
 
-		AirDamper(1, "Air Damper"),
-		Vav(2, "Variable Air Volume");
+		AirDamper(1),
+		VariableAirVolume(2);
 
-		AirDamperActuatorType(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		AirDamperActuatorType(final int element) { init(element); }
 	}
 
 	public enum BackupMode implements EnumBase<BackupMode> {
-		BackupValue(0, "Backup Value"),
-		KeepLastState(1, "Keep Last State");
+		BackupValue(0),
+		KeepLastState(1);
 
-		BackupMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		BackupMode(final int element) { init(element); }
 	}
 
 	public enum StartSynchronization implements EnumBase<StartSynchronization> {
-		PositionUnchanged(0, "Position unchanged"),
-		SingleClose(1, "Single close"),
-		SingleOpen(2, "Single open");
+		PositionUnchanged(0),
+		SingleClose(1),
+		SingleOpen(2);
 
-		StartSynchronization(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		StartSynchronization(final int element) { init(element); }
 	}
 
 	public enum BehaviorLockUnlock implements EnumBase<BehaviorLockUnlock> {
@@ -585,10 +489,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		UpdatedValue(5, "updated value"),
 		ValueBeforeLocking(6, "value before locking");
 
-		BehaviorLockUnlock(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		BehaviorLockUnlock(final int element, final String description) { init(element, description); }
 	}
 
 	public enum BehaviorBusPowerUpDown implements EnumBase<BehaviorBusPowerUpDown> {
@@ -598,10 +499,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		AdditionalParameter(3, "value according additional parameter"),
 		Last(4, "last (value before bus power down)");
 
-		BehaviorBusPowerUpDown(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		BehaviorBusPowerUpDown(final int element, final String description) { init(element, description); }
 	}
 
 	public enum DaliFadeTime implements EnumBase<DaliFadeTime> {
@@ -622,10 +520,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Fade64s(14, "64,0 s"),
 		Fade90_5s(15, "90,5 s");
 
-		DaliFadeTime(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		DaliFadeTime(final int element, final String description) { init(element, description); }
 	}
 
 	public enum BlinkingMode implements EnumBase<BlinkingMode> {
@@ -633,30 +528,21 @@ public class DPTXlator8BitEnum extends DPTXlator
 		WithoutAcknowledge(1, "Without Acknowledge"),
 		WithAcknowledge(2, "Blinking With Acknowledge ");
 
-		BlinkingMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		BlinkingMode(final int element, final String description) { init(element, description); }
 	}
 
 	public enum LightControlMode implements EnumBase<LightControlMode> {
 		Automatic(0, "automatic light control"),
 		Manual(1, "manual light control");
 
-		LightControlMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		LightControlMode(final int element, final String description) { init(element, description); }
 	}
 
 	public enum SwitchPushbuttonModel implements EnumBase<SwitchPushbuttonModel> {
 		OnePushbutton(1, "one PB/binary input mode"),
 		TwoPushbuttons(2, "two PBs/binary inputs mode");
 
-		SwitchPushbuttonModel(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		SwitchPushbuttonModel(final int element, final String description) { init(element, description); }
 	}
 
 	public enum SwitchPushbuttonAction implements EnumBase<SwitchPushbuttonAction> {
@@ -665,10 +551,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		SwitchOnSent(2, "Switch-On message sent"),
 		InfoOnOff(3, "inverse value of Info On/Off is sent");
 
-		SwitchPushbuttonAction(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		SwitchPushbuttonAction(final int element, final String description) { init(element, description); }
 	}
 
 	/** Light Dimming Sensor Basic Mode. */
@@ -678,10 +561,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		OnePushButtonDimDown(3, "one push-button/binary input, Off/Dim-Down message sent"),
 		TwoPushButtons(4, "two push-buttons/binary inputs mode");
 
-		LdsbMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		LdsbMode(final int element, final String description) { init(element, description); }
 	}
 
 	public enum SwitchOnMode implements EnumBase<SwitchOnMode> {
@@ -689,10 +569,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		AdditionalParameter(1, "value according additional parameter"),
 		LastReceivedSetvalue(2, "last received absolute setvalue");
 
-		SwitchOnMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		SwitchOnMode(final int element, final String description) { init(element, description); }
 	}
 
 	public enum LoadTypeSet implements EnumBase<LoadTypeSet> {
@@ -700,10 +577,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		LeadingEdge(1, "leading edge (inductive load)"),
 		TrailingEdge(2, "trailing edge (capacitive load)");
 
-		LoadTypeSet(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		LoadTypeSet(final int element, final String description) { init(element, description); }
 	}
 
 	public enum LoadTypeDetected implements EnumBase<LoadTypeDetected> {
@@ -712,10 +586,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		TrailingEdge(2, "trailing edge (capacitive load)"),
 		DetectionNotPossible(3, "detection not possible or error");
 
-		LoadTypeDetected(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		LoadTypeDetected(final int element, final String description) { init(element, description); }
 	}
 
 	/** Sunblind Actuator Basic Exception Behavior. */
@@ -726,10 +597,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		AdditionalParameter(3, "value according additional parameter"),
 		Stop(4, "stop");
 
-		SabExceptBehavior(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		SabExceptBehavior(final int element, final String description) { init(element, description); }
 	}
 
 	/** Sunblind Actuator Basic Behavior. */
@@ -742,10 +610,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		UpdatedValue(5, "updated value"),
 		ValueBeforeLocking(6, "value before locking");
 
-		SabBehaviorLockUnlock(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		SabBehaviorLockUnlock(final int element, final String description) { init(element, description); }
 	}
 
 	/** Sunblind Sensor Basic Mode. */
@@ -755,20 +620,14 @@ public class DPTXlator8BitEnum extends DPTXlator
 		OnePushButtonDown(3, "one push button/binary input: Move-Down/Step-Down message sent"),
 		TwoPushButtons(4, "two push buttons/binary inputs mode");
 
-		SssbMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		SssbMode(final int element, final String description) { init(element, description); }
 	}
 
 	public enum BlindsControlMode implements EnumBase<BlindsControlMode> {
 		AutomaticControl(0, "Automatic Control"),
 		ManualControl(1, "Manual Control");
 
-		BlindsControlMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		BlindsControlMode(final int element, final String description) { init(element); }
 	}
 
 	// 20.1000
@@ -779,10 +638,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		cEmiTransportLayer(6, "cEMI transport layer"),
 		NoLayer(0xff, "no layer");
 
-		CommMode(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		CommMode(final int element, final String description) { init(element, description); }
 	}
 
 	// 20.1001
@@ -796,10 +652,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		ExtRelativeTimestamp(6, "Extended relative timestamp"),
 		BiBat(7, "BiBat information");
 
-		AddInfoType(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		AddInfoType(final int element, final String description) { init(element, description); }
 	}
 
 	// 20.1002
@@ -808,10 +661,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		BiBatMaster(1, "Asynchronous + BiBat master"),
 		BiBatSlave(2, "Asynchronous + BiBat slave");
 
-		RFModeSelect(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		RFModeSelect(final int element, final String description) { init(element, description); }
 	}
 
 	// 20.1003
@@ -821,10 +671,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		SerialNumber(2, "filtering by KNX serial number table"),
 		DoAAndSN(3, "filtering by DoA and S/N table");
 
-		RFFilterSelect(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		RFFilterSelect(final int element, final String description) { init(element, description); }
 	}
 
 	// 20.1004
@@ -834,73 +681,67 @@ public class DPTXlator8BitEnum extends DPTXlator
 		RF(2, "KNX RF"),
 		IP(5, "KNX IP");
 
-		Medium(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		Medium(final int element, final String description) { init(element, description); }
 	}
 
 	// 20.1005
 	public enum PushbuttonFunction implements EnumBase<PushbuttonFunction> {
-		DefaultAction(1, ""),
-		On(2, ""),
-		Off(3, ""),
-		Toggle(4, ""),
-		DimmingUpDown(5, ""),
-		DimmingUp(6, ""),
-		DimmingDown(7, ""),
-		OnOff(8, ""),
-		TimedOnOff(9, ""),
-		ForcedOn(10, ""),
-		ForcedOff(11, ""),
-		ShutterUp(12, ""),
-		ShutterDown(13, ""),
-		ShutterUpDown(14, ""),
-		ForcedUp(16, ""),
-		ForcedDown(17, ""),
-		WindAlarm(18, ""),
-		RainAlarm(19, ""),
-		HvacModeComfortEconomy(20, ""),
-		HvacModeComfort(21, ""),
-		HvacModeEconomy(22, ""),
-		HvacModeBuildingProtectionAuto(23, ""),
-		ShutterStop(24, ""),
-		TimedComfortStandby(25, ""),
-		ForcedComfort(26, ""),
-		ForcedBuildingProtection(27, ""),
-		Scene1(28, ""),
-		Scene2(29, ""),
-		Scene3(30, ""),
-		Scene4(31, ""),
-		Scene5(32, ""),
-		Scene6(33, ""),
-		Scene7(34, ""),
-		Scene8(35, ""),
-		AbsoluteDimming25(36, ""),
-		AbsoluteDimming50(37, ""),
-		AbsoluteDimming75(38, ""),
-		AbsoluteDimming100(39, ""),
-		ShutterUpSwitch(40, ""),
-		ShutterDownSwitch(41, ""),
-		ShutterUpDownSwitch(42, ""),
-		ShutterDownUpSwitch(43, ""),
-		LightSensor(44, ""),
-		SystemClock(45, ""),
-		BatteryStatus(46, ""),
-		HvacModeStandby(47, ""),
-		HvacModeAuto(48, ""),
-		HvacModeComfortStandby(49, ""),
-		HvacModeBuildingProtection(50, ""),
-		TimedToggle(51, ""),
-		DimmingAbsoluteSwitch(52, ""),
-		SceneSwitch(53, ""),
-		SmokeAlarm(54, ""),
-		SubDetector(55, "");
+		DefaultAction(1),
+		On(2),
+		Off(3),
+		Toggle(4),
+		DimmingUpDown(5),
+		DimmingUp(6),
+		DimmingDown(7),
+		OnOff(8),
+		TimedOnOff(9),
+		ForcedOn(10),
+		ForcedOff(11),
+		ShutterUp(12),
+		ShutterDown(13),
+		ShutterUpDown(14),
+		ForcedUp(16),
+		ForcedDown(17),
+		WindAlarm(18),
+		RainAlarm(19),
+		HvacModeComfortEconomy(20),
+		HvacModeComfort(21),
+		HvacModeEconomy(22),
+		HvacModeBuildingProtectionAuto(23),
+		ShutterStop(24),
+		TimedComfortStandby(25),
+		ForcedComfort(26),
+		ForcedBuildingProtection(27),
+		Scene1(28),
+		Scene2(29),
+		Scene3(30),
+		Scene4(31),
+		Scene5(32),
+		Scene6(33),
+		Scene7(34),
+		Scene8(35),
+		AbsoluteDimming25(36),
+		AbsoluteDimming50(37),
+		AbsoluteDimming75(38),
+		AbsoluteDimming100(39),
+		ShutterUpSwitch(40),
+		ShutterDownSwitch(41),
+		ShutterUpDownSwitch(42),
+		ShutterDownUpSwitch(43),
+		LightSensor(44),
+		SystemClock(45),
+		BatteryStatus(46),
+		HvacModeStandby(47),
+		HvacModeAuto(48),
+		HvacModeComfortStandby(49),
+		HvacModeBuildingProtection(50),
+		TimedToggle(51),
+		DimmingAbsoluteSwitch(52),
+		SceneSwitch(53),
+		SmokeAlarm(54),
+		SubDetector(55);
 
-		PushbuttonFunction(final int element, final String description)
-		{ //RP2
-			init(element, name().replaceAll("([A-Z]|[0-9]+)", " $1").toLowerCase().trim());
-		} //RP1
+		PushbuttonFunction(final int element) { init(element); }
 	}
 
 	// 20.1200
@@ -910,10 +751,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		Released(2, "Break/Valve is released"),
 		Invalid(255, "invalid");
 
-		MBusBreakerValveState(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		MBusBreakerValveState(final int element, final String description) { init(element, description); }
 	}
 
 	// 20.1202
@@ -923,10 +761,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 		BaseCondition(2, "at base condition"),
 		MeasurementCondition(3, "at measurement condition");
 
-		GasMeasurementCondition(final int element, final String description)
-		{ //RP2
-			init(element, description);
-		} //RP1
+		GasMeasurementCondition(final int element, final String description) { init(element, description); }
 	}
 
 	//
@@ -937,6 +772,10 @@ public class DPTXlator8BitEnum extends DPTXlator
 	{
 		// using a class reference here, we only instantiate the enum when actually queried
 		private final Class<T> elements;
+
+		public EnumDpt(final String typeID, final Class<T> elements, final String lower, final String upper) {
+			this(typeID, elements.getSimpleName().replaceAll("\\B([A-Z])", " $1"), elements, lower, upper);
+		}
 
 		public EnumDpt(final String typeID, final String description, final Class<T> elements,
 			final String lower, final String upper)
@@ -995,72 +834,64 @@ public class DPTXlator8BitEnum extends DPTXlator
 		private static String friendly(final String name) { return name.replaceAll("\\B([A-Z])", " $1").toLowerCase(); }
 	}
 
-	public static final EnumDpt<SystemClockMode> DptSystemClockMode = new EnumDpt<>("20.001", "System Clock Mode",
+	public static final EnumDpt<SystemClockMode> DptSystemClockMode = new EnumDpt<>("20.001",
 			SystemClockMode.class, "0", "2");
 	public static final EnumDpt<BuildingMode> DptBuildingMode = new EnumDpt<>("20.002",
-			"Building Mode", BuildingMode.class, "0", "2");
+			BuildingMode.class, "0", "2");
 	public static final EnumDpt<OccupancyMode> DptOccupancyMode = new EnumDpt<>("20.003",
-			"Occupancy Mode", OccupancyMode.class, "0", "2");
+			OccupancyMode.class, "0", "2");
 	public static final EnumDpt<Priority> DptPriority = new EnumDpt<>("20.004", "Priority",
 			Priority.class, "0", "3");
 	public static final EnumDpt<LightApplicationMode> DptLightApplicationMode = new EnumDpt<>(
-			"20.005", "Light Application Mode", LightApplicationMode.class, "0", "2");
+			"20.005", LightApplicationMode.class, "0", "2");
 	public static final EnumDpt<ApplicationArea> DptApplicationArea = new EnumDpt<>("20.006",
-			"Application Area", ApplicationArea.class, "0", "14");
+			ApplicationArea.class, "0", "14");
 	public static final EnumDpt<AlarmClassType> DptAlarmClassType = new EnumDpt<>("20.007",
-			"Alarm Class Type", AlarmClassType.class, "0", "3");
+			AlarmClassType.class, "0", "3");
 	public static final EnumDpt<PsuMode> DptPsuMode = new EnumDpt<>("20.008", "PSU Mode",
 			PsuMode.class, "0", "2");
 	public static final EnumDpt<ErrorClassSystem> DptErrorClassSystem = new EnumDpt<>("20.011",
-			"Error Class System", ErrorClassSystem.class, "0", "18");
+			ErrorClassSystem.class, "0", "18");
 	public static final EnumDpt<ErrorClassHvac> DptErrorClassHvac = new EnumDpt<>("20.012",
 			"Error Class HVAC", ErrorClassHvac.class, "0", "4");
-	public static final EnumDpt<TimeDelay> DptTimeDelay = new EnumDpt<>("20.013", "Time Delay",
-			TimeDelay.class, "0", "25");
+	public static final EnumDpt<TimeDelay> DptTimeDelay = new EnumDpt<>("20.013", TimeDelay.class, "0", "25");
 	public static final EnumDpt<BeaufortWindForceScale> DptBeaufortWindForceScale = new EnumDpt<>(
-			"20.014", "Beaufort Wind Force Scale", BeaufortWindForceScale.class, "0", "12");
+			"20.014", BeaufortWindForceScale.class, "0", "12");
 	public static final EnumDpt<SensorSelect> DptSensorSelect = new EnumDpt<>("20.017",
-			"Sensor Select", SensorSelect.class, "0", "4");
+			SensorSelect.class, "0", "4");
 	public static final EnumDpt<ActuatorConnectType> DptActuatorConnectType = new EnumDpt<>(
-			"20.020", "Actuator Connect Type", ActuatorConnectType.class, "1", "2");
-	public static final EnumDpt<CloudCover> DptCloudCover = new EnumDpt<>("20.021", "Cloud Cover", CloudCover.class,
+			"20.020", ActuatorConnectType.class, "1", "2");
+	public static final EnumDpt<CloudCover> DptCloudCover = new EnumDpt<>("20.021", CloudCover.class,
 			"0", "9");
-	public static final EnumDpt<FuelType> DptFuelType = new EnumDpt<>("20.100", "Fuel Type",
-			FuelType.class, "0", "3");
-	public static final EnumDpt<BurnerType> DptBurnerType = new EnumDpt<>("20.101", "Burner Type",
-			BurnerType.class, "0", "3");
+	public static final EnumDpt<FuelType> DptFuelType = new EnumDpt<>("20.100", FuelType.class, "0", "3");
+	public static final EnumDpt<BurnerType> DptBurnerType = new EnumDpt<>("20.101", BurnerType.class, "0", "3");
 	public static final EnumDpt<HvacMode> DptHvacMode = new EnumDpt<>("20.102", "HVAC Mode",
 			HvacMode.class, "0", "4");
 	public static final EnumDpt<DomesticHotWaterMode> DptDomesticHotWaterMode = new EnumDpt<>("20.103", "DHW Mode",
 			DomesticHotWaterMode.class, "0", "4");
 	public static final EnumDpt<LoadPriority> DptLoadPriority = new EnumDpt<>("20.104",
-			"Load Priority", LoadPriority.class, "0", "2");
+			LoadPriority.class, "0", "2");
 	public static final EnumDpt<HvacControlMode> DptHvacControlMode = new EnumDpt<>("20.105",
 			"HVAC Control Mode", HvacControlMode.class, "0", "20");
 	public static final EnumDpt<HvacEmergencyMode> DptHvacEmergencyMode = new EnumDpt<>("20.106",
 			"HVAC Emergency Mode", HvacEmergencyMode.class, "0", "5");
 	public static final EnumDpt<ChangeoverMode> DptChangeoverMode = new EnumDpt<>("20.107",
-			"Changeover Mode", ChangeoverMode.class, "0", "2");
-	public static final EnumDpt<ValveMode> DptValveMode = new EnumDpt<>("20.108", "Valve Mode",
-			ValveMode.class, "1", "5");
-	public static final EnumDpt<DamperMode> DptDamperMode = new EnumDpt<>("20.109", "Damper Mode",
-			DamperMode.class, "1", "4");
-	public static final EnumDpt<HeaterMode> DptHeaterMode = new EnumDpt<>("20.110", "Heater Mode",
-			HeaterMode.class, "1", "3");
-	public static final EnumDpt<FanMode> DptFanMode = new EnumDpt<>("20.111", "Fan Mode",
-			FanMode.class, "0", "2");
+			ChangeoverMode.class, "0", "2");
+	public static final EnumDpt<ValveMode> DptValveMode = new EnumDpt<>("20.108", ValveMode.class, "1", "5");
+	public static final EnumDpt<DamperMode> DptDamperMode = new EnumDpt<>("20.109", DamperMode.class, "1", "4");
+	public static final EnumDpt<HeaterMode> DptHeaterMode = new EnumDpt<>("20.110", HeaterMode.class, "1", "3");
+	public static final EnumDpt<FanMode> DptFanMode = new EnumDpt<>("20.111", FanMode.class, "0", "2");
 	public static final EnumDpt<MasterSlaveMode> DptMasterSlaveMode = new EnumDpt<>("20.112",
 			"Master/Slave Mode", MasterSlaveMode.class, "0", "2");
 	public static final EnumDpt<StatusRoomSetpoint> DptStatusRoomSetpoint = new EnumDpt<>("20.113",
-			"Status Room Setpoint", StatusRoomSetpoint.class, "0", "2");
+			StatusRoomSetpoint.class, "0", "2");
 	public static final EnumDpt<MeteringDeviceType> DptMeteringDeviceType = new EnumDpt<>("20.114",
-			"Metering Device Type", MeteringDeviceType.class, "0", "41/255");
+			MeteringDeviceType.class, "0", "41/255");
 	public static final EnumDpt<AirDamperActuatorType> DptAirDamperActuatorType = new EnumDpt<>("20.120",
-			"Air Damper Actuator Type", AirDamperActuatorType.class, "1", "2");
-	public static final EnumDpt<BackupMode> DptBackupMode = new EnumDpt<>("20.121", "Backup Mode",
-			BackupMode.class, "0", "1");
+			AirDamperActuatorType.class, "1", "2");
+	public static final EnumDpt<BackupMode> DptBackupMode = new EnumDpt<>("20.121", BackupMode.class, "0", "1");
 	public static final EnumDpt<StartSynchronization> DptStartSynchronization = new EnumDpt<>(
-			"20.122", "Start Synchronization", StartSynchronization.class, "0", "2");
+			"20.122", StartSynchronization.class, "0", "2");
 	public static final EnumDpt<BehaviorLockUnlock> DptBehaviorLockUnlock = new EnumDpt<>(
 			"20.600", "Behavior Lock/Unlock", BehaviorLockUnlock.class, "0", "6");
 	public static final EnumDpt<BehaviorBusPowerUpDown> DptBehaviorBusPowerUpDown = new EnumDpt<>(
@@ -1069,9 +900,9 @@ public class DPTXlator8BitEnum extends DPTXlator
 	public static final EnumDpt<DaliFadeTime> DptDaliFadeTime = new EnumDpt<>("20.602",
 			"DALI Fade Time", DaliFadeTime.class, "0", "15");
 	public static final EnumDpt<BlinkingMode> DptBlinkingMode = new EnumDpt<>("20.603",
-			"Blinking Mode", BlinkingMode.class, "0", "2");
+			BlinkingMode.class, "0", "2");
 	public static final EnumDpt<LightControlMode> DptLightControlMode = new EnumDpt<>("20.604",
-			"Light Control Mode", LightControlMode.class, "0", "1");
+			LightControlMode.class, "0", "1");
 	public static final EnumDpt<SwitchPushbuttonModel> DptSwitchPushbuttonModel = new EnumDpt<>("20.605",
 			"Switch PB Model", SwitchPushbuttonModel.class, "1", "2");
 	public static final EnumDpt<SwitchPushbuttonAction> DptSwitchPushbuttonAction = new EnumDpt<>("20.606",
@@ -1079,11 +910,11 @@ public class DPTXlator8BitEnum extends DPTXlator
 	public static final EnumDpt<LdsbMode> DptDimmPushbuttonModel = new EnumDpt<>("20.607", "Dimm PB Model",
 			LdsbMode.class, "1", "4");
 	public static final EnumDpt<SwitchOnMode> DptSwitchOnMode = new EnumDpt<>("20.608",
-			"Switch On Mode", SwitchOnMode.class, "0", "2");
+			SwitchOnMode.class, "0", "2");
 	public static final EnumDpt<LoadTypeSet> DptLoadTypeSet = new EnumDpt<>("20.609",
-			"Load Type Set", LoadTypeSet.class, "0", "2");
+			LoadTypeSet.class, "0", "2");
 	public static final EnumDpt<LoadTypeDetected> DptLoadTypeDetected = new EnumDpt<>("20.610",
-			"Load Type Detected", LoadTypeDetected.class, "0", "3");
+			LoadTypeDetected.class, "0", "3");
 	/** DPT Sunblind Actuator Basic Exception Behavior. */
 	public static final EnumDpt<SabExceptBehavior> DptSabExceptBehavior = new EnumDpt<>("20.801",
 			"SAB Except Behavior", SabExceptBehavior.class, "0", "4");
@@ -1094,12 +925,11 @@ public class DPTXlator8BitEnum extends DPTXlator
 	public static final EnumDpt<SssbMode> DptSssbMode = new EnumDpt<>("20.803", "SSSB Mode",
 			SssbMode.class, "1", "4");
 	public static final EnumDpt<BlindsControlMode> DptBlindsControlMode = new EnumDpt<>("20.804",
-			"Blinds Control Mode", BlindsControlMode.class, "0", "1");
+			BlindsControlMode.class, "0", "1");
 
 	// System domain
 
-	public static final EnumDpt<CommMode> DptCommMode = new EnumDpt<>("20.1000", "Comm Mode",
-			CommMode.class, "0", "255");
+	public static final EnumDpt<CommMode> DptCommMode = new EnumDpt<>("20.1000", CommMode.class, "0", "255");
 	public static final EnumDpt<AddInfoType> DptAddInfoType = new EnumDpt<>("20.1001",
 			"Additional Info Type", AddInfoType.class, "0", "7");
 	public static final EnumDpt<RFModeSelect> DptRFModeSelect = new EnumDpt<>("20.1002",
@@ -1120,7 +950,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 	public static final EnumDpt<MBusBreakerValveState> DptMBusBreakerValveState = new EnumDpt<>(
 			"20.1200", "M-Bus Breaker/Valve State", MBusBreakerValveState.class, "0", "255");
 	public static final EnumDpt<GasMeasurementCondition> DptGasMeasurementCondition = new EnumDpt<>(
-			"20.1202", "Gas Measurement Condition", GasMeasurementCondition.class, "0", "3");
+			"20.1202", GasMeasurementCondition.class, "0", "3");
 
 	private static final Map<String, DPT> types = loadDatapointTypes(DPTXlator8BitEnum.class);
 
