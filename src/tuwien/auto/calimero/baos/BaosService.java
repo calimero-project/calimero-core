@@ -431,6 +431,8 @@ public final class BaosService implements ServiceType {
 		case GetDatapointHistory       : return "GetDatapointHistory";
 		case GetTimer                  : return "GetTimer";
 		case SetTimer                  : return "SetTimer";
+		}
+		switch (subService) {
 		case DatapointValueIndication  : return "DatapointValueIndication";
 		case ServerItemIndication      : return "ServerItemIndication";
 		default: return "" + subService;
