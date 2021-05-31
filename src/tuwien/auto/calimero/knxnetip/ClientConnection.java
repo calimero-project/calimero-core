@@ -228,11 +228,11 @@ public abstract class ClientConnection extends ConnectionBase
 			}
 			final KNXException e;
 			if (!changed)
-				e = new KNXTimeoutException("timeout connecting to control endpoint " + ctrlEndpt);
+				e = new KNXTimeoutException("timeout connecting to control endpoint " + hostPort(ctrlEndpt));
 			else if (state == ACK_ERROR)
-				e = new KNXRemoteException("error response from control endpoint " + ctrlEndpt + ": " + status);
+				e = new KNXRemoteException("error response from control endpoint " + hostPort(ctrlEndpt) + ": " + status);
 			else
-				e = new KNXInvalidResponseException("invalid connect response from " + ctrlEndpt);
+				e = new KNXInvalidResponseException("invalid connect response from " + hostPort(ctrlEndpt));
 			// quit, cleanup and notify user
 			connectCleanup(e);
 			throw e;

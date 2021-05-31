@@ -661,8 +661,10 @@ public class Discoverer
 					catch (KNXException | RuntimeException e) {
 						// we continue on exception, but print a warning for user information
 						String causeMsg = "";
-						for (Throwable t = e.getCause(); t != null && t != t.getCause(); t = t.getCause())
-							causeMsg = " (" + t.getMessage() + ")";
+						for (Throwable t = e.getCause(); t != null && t != t.getCause(); t = t.getCause()) {
+							final String msg = t.getMessage();
+							causeMsg = " (" + (msg != null ? msg : t.toString()) + ")";
+						}
 						logger.warn("using {} at {}: {}{}", a, ni.getName(), e.getMessage(), causeMsg);
 					}
 			}
@@ -843,7 +845,7 @@ public class Discoverer
 			return receiveAsync(channel, localEndpoint, timeout, nifName + localAddr.getHostAddress(), notifyResponse);
 		}
 		catch (IOException | RuntimeException e) {
-			throw new KNXException("search request to " + SYSTEM_SETUP_MULTICAST + " failed on "
+			throw new KNXException("search request to " + SYSTEM_SETUP_MULTICAST.getHostAddress() + " failed on "
 					+ localAddr + ":" + localPort, e);
 		}
 	}
