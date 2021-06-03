@@ -59,9 +59,9 @@ import tuwien.auto.calimero.link.NetworkLinkListener;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 
 public final class BaosLinkAdapter implements BaosLink {
-	static final MethodHandle CUSTOM_EVENTS;
-	static final MethodHandle BAOS_MODE;
-	static final MethodHandle ON_SEND;
+	private static final MethodHandle CUSTOM_EVENTS;
+	private static final MethodHandle BAOS_MODE;
+	private static final MethodHandle ON_SEND;
 	static {
 		try {
 			final var privateLookup = MethodHandles.privateLookupIn(AbstractLink.class, MethodHandles.lookup());
