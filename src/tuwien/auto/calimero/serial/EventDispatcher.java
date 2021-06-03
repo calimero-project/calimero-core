@@ -1,0 +1,110 @@
+/*
+    Calimero 2 - A library for KNX network access
+    Copyright (c) 2021, 2021 B. Malinowsky
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    Linking this library statically or dynamically with other modules is
+    making a combined work based on this library. Thus, the terms and
+    conditions of the GNU General Public License cover the whole
+    combination.
+
+    As a special exception, the copyright holders of this library give you
+    permission to link this library with independent modules to produce an
+    executable, regardless of the license terms of these independent
+    modules, and to copy and distribute the resulting executable under terms
+    of your choice, provided that you also meet, for each linked independent
+    module, the terms and conditions of the license of that module. An
+    independent module is a module which is not derived from or based on
+    this library. If you modify this library, you may extend this exception
+    to your version of the library, but you are not obligated to do so. If
+    you do not wish to do so, delete this exception statement from your
+    version.
+*/
+
+package tuwien.auto.calimero.serial;
+
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.slf4j.Logger;
+
+import tuwien.auto.calimero.KNXListener;
+
+class EventDispatcher {
+	private static final Lookup lookup = MethodHandles.lookup();
+
+	private final Map<Class<?>, Set<MethodHandle>> customEvents = new ConcurrentHashMap<>();
+	private final Logger logger;
+
+	EventDispatcher(final Logger logger) {
+		this.logger = logger;
+	}
+
+	void register(final Class<?> eventType) {
+		customEvents.put(eventType, ConcurrentHashMap.newKeySet());
+	}
+
+	// TODO we currently register events multiple times if method also exists as annotated default method on interface
+	void registerCustomEvents(final KNXListener listener) {
+		// check default methods on implemented interfaces
+		for (final var iface : listener.getClass().getInterfaces())
+			for (final var method : iface.getDeclaredMethods())
+				inspectMethodForLinkEvent(method, listener);
+		// check normal methods on classes
+		for (final var method : listener.getClass().getDeclaredMethods())
+			inspectMethodForLinkEvent(method, listener);
+	}
+
+	private void inspectMethodForLinkEvent(final Method method, final KNXListener listener) {
+		if (method.getAnnotation(ConnectionEvent.class) == null)
+			return;
+		final var paramTypes = method.getParameterTypes();
+		if (paramTypes.length != 1) {
+			logger.warn("cannot register {}: parameter count not 1", method);
+			return;
+		}
+		final var paramType = paramTypes[0];
+		if (!customEvents.containsKey(paramType)) {
+			logger.warn("unsupported event type {}", method);
+			return;
+		}
+		try {
+			final var privateLookup = MethodHandles.privateLookupIn(listener.getClass(), lookup);
+			final var boundMethod = privateLookup.unreflect(method).bindTo(listener);
+			customEvents.get(paramType).add(boundMethod);
+			logger.trace("registered {}", method);
+		}
+		catch (final Exception e) {
+			logger.warn("failed to register {}", method, e);
+		}
+	}
+
+	void dispatchCustomEvent(final Object event) {
+		customEvents.getOrDefault(event.getClass(), Set.of()).forEach(mh -> {
+			try {
+				mh.invoke(event);
+			}
+			catch (final Throwable e) {
+				logger.warn("invoking custom event", e);
+			}
+		});
+	}
+}

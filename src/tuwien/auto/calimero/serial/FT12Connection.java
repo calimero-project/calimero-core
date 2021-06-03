@@ -155,10 +155,11 @@ public class FT12Connection implements AutoCloseable
 	private volatile KNXAddress keepForCon;
 	private static final IndividualAddress NoLDataAddress = new IndividualAddress(0xffff);
 
-	private int sendFrameCount;
-	private int rcvFrameCount;
+	private volatile int sendFrameCount;
+	private volatile int rcvFrameCount;
 
 	private final EventListeners<KNXListener> listeners = new EventListeners<>();
+	private final EventDispatcher customEvents;
 
 	/**
 	 * Creates a new connection to a BCU2 using the FT1.2 protocol.
@@ -242,6 +243,8 @@ public class FT12Connection implements AutoCloseable
 	protected FT12Connection(final LibraryAdapter connection, final String portId, final boolean cemi)
 			throws KNXException, InterruptedException {
 		logger = LogService.getLogger("calimero.serial.ft12:" + portId);
+		customEvents = new EventDispatcher(logger);
+		customEvents.register(ConnectionStatus.class);
 		adapter = connection;
 		port = portId;
 		exchangeTimeout = exchangeTimeout(adapter.getBaudRate());
@@ -280,6 +283,7 @@ public class FT12Connection implements AutoCloseable
 	public void addConnectionListener(final KNXListener l)
 	{
 		listeners.add(l);
+		customEvents.registerCustomEvents(l);
 	}
 
 	/**
@@ -662,10 +666,20 @@ public class FT12Connection implements AutoCloseable
 					final int fc = buf[0] & 0x0f;
 					logger.trace("received " + (fc == RESET ? "reset" : fc == REQ_STATUS
 							? "status" : "unknown function code "));
+					if (fc == RESET) {
+						sendFrameCount = FRAMECOUNT_BIT;
+						rcvFrameCount = FRAMECOUNT_BIT;
+						notifyReset();
+					}
+
 					return true;
 				}
 			}
 			return false;
+		}
+
+		private void notifyReset() {
+			customEvents.dispatchCustomEvent(ConnectionStatus.Reset);
 		}
 
 		private boolean readFrame() throws IOException, InterruptedException

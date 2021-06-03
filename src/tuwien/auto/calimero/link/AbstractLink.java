@@ -496,6 +496,8 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		return read(0, pidMaxApduLength).map(AbstractLink::unsigned);
 	}
 
+	volatile boolean baosMode;
+
 	void baosMode(final boolean enable) throws KNXException, InterruptedException {
 		final IndividualAddress dst = KNXMediumSettings.BackboneRouter;
 		if (cEMI) {
@@ -516,6 +518,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 			responseFor(CEMIDevMgmt.MC_PROPREAD_CON, BcuSwitcher.pidCommMode)
 					.ifPresent(mode -> logger.debug("comm mode {}",
 							(mode[0] & 0xff) == 0xf0 ? "BAOS" : DataUnitBuilder.toHex(mode, "")));
+			baosMode = enable;
 		}
 		// ??? check baos support ahead
 //		else if (activeEmi == EmiType.Emi1) {
@@ -694,7 +697,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	}
 
 	void dispatchCustomEvent(final Object event) {
-		customEvents.get(event.getClass()).forEach(mh -> {
+		customEvents.getOrDefault(event.getClass(), Set.of()).forEach(mh -> {
 			try {
 				mh.invoke(event);
 			}
