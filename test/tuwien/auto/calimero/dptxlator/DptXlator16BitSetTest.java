@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2019 B. Malinowsky
+    Copyright (c) 2018, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -63,9 +63,9 @@ class DptXlator16BitSetTest {
 
 	private final String e1 = "LimitFlowTemperature";
 	private final String e2 = "0x08";
-	private final String e3 = "Fault";
+	private final String e3 = "fault";
 	private final String[] strValues = new String[] { e1, e2, e3 };
-	private final String[] elements = new String[] { "Limit Flow Temperature", "Limit Return Temperature", e3 };
+	private final String[] elements = new String[] { "limit flow temperature", "limit return temperature", e3 };
 
 	private final byte[] e1Data = { 0, 4, };
 	private final byte[] e2Data = { 0, 8 };
@@ -90,14 +90,14 @@ class DptXlator16BitSetTest {
 	void setMultipleElements() throws KNXFormatException {
 		t.setValue("1 1 0 1");
 		assertEquals(13, t.getNumericValue());
-		assertEquals("Limit Return Temperature, Limit Flow Temperature, Fault", t.getValue());
+		assertEquals("limit return temperature, limit flow temperature, fault", t.getValue());
 	}
 
 	@Test
 	void getValue() throws KNXFormatException {
 		assertEquals("Cooling Mode", t.getValue());
 		t.setValue(1);
-		assertTrue(Fault.name().equals(t.getValue()));
+		assertTrue(Fault.name().toLowerCase().equals(t.getValue()));
 
 		final DptXlator16BitSet x = new DptXlator16BitSet(DptXlator16BitSet.DptRhccStatus);
 		final int v = (int) x.getNumericValue();
@@ -236,7 +236,7 @@ class DptXlator16BitSetTest {
 	void mediumNames() throws KNXFormatException {
 		t = new DptXlator16BitSet(DptXlator16BitSet.DptMedia);
 		t.setValue("1 1 0 1 1 0");
-		assertEquals("Knxip, RF, PL110, TP1", t.getValue());
+		assertEquals("KNX IP, RF, PL110, TP1", t.getValue());
 	}
 
 	@Test

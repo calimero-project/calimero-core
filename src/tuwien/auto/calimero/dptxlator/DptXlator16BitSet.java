@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2019 B. Malinowsky
+    Copyright (c) 2018, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,6 @@ import java.util.Map;
 import java.util.StringJoiner;
 
 import tuwien.auto.calimero.KNXFormatException;
-import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 /**
  * Translator for KNX DPTs with main number 22, type <b>Bit Array of Length 16 (B16)</b>. It provides DPTs for the
@@ -66,48 +65,12 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  */
 @SuppressWarnings("checkstyle:javadocvariable")
 public class DptXlator16BitSet extends DPTXlator {
-	private interface EnumBase<E extends Enum<E> & EnumBase<E>> {
-		@SuppressWarnings("unchecked")
-		default int value() {
-			return 1 << ((Enum<E>) this).ordinal();
-		}
-	}
 
-	public static class EnumDpt<T extends Enum<T> & EnumBase<T>> extends DPT {
-		private final Class<T> elements;
+	private interface EnumBase<E extends Enum<E> & EnumBase<E>> extends EnumDptBase.EnumBase<E> {}
 
-		public EnumDpt(final String typeId, final Class<T> elements) {
-			this(typeId, elements.getSimpleName().replaceAll("\\B([A-Z])", " $1"), elements);
-		}
-
-		private EnumDpt(final String typeId, final String description, final Class<T> elements) {
-			super(typeId, description, "0", Integer.toString(maxValue(elements)));
-			this.elements = elements;
-		}
-
-		private T find(final int element) {
-			for (final T e : EnumSet.allOf(elements))
-				if (e.value() == element)
-					return e;
-			return null;
-		}
-
-		private T find(final String description) {
-			for (final T e : EnumSet.allOf(elements))
-				if (e.name().equals(description) || friendly(e.value()).equals(description))
-					return e;
-			return null;
-		}
-
-		private String textOf(final int element) {
-			final T e = find(element);
-			if (e != null)
-				return e.name();
-			throw new KNXIllegalArgumentException(getID() + " " + elements.getSimpleName() + " has no element " + element + " specified");
-		}
-
-		private String friendly(final int element) {
-			return textOf(element).replaceAll("(\\p{Lower})\\B([A-Z])", "$1 $2");
+	public static class EnumDpt<T extends Enum<T> & EnumBase<T>> extends EnumDptBase<T> {
+		EnumDpt(final String typeId, final Class<T> elements) {
+			super(typeId, elements, "0", Integer.toString(maxValue(elements)));
 		}
 	}
 
@@ -123,6 +86,18 @@ public class DptXlator16BitSet extends DPTXlator {
 
 	public enum Medium implements EnumBase<Medium> {
 		_0, TP1, PL110, _3, RF, Knxip;
+
+		@Override
+		public String description() {
+			switch (this.ordinal()) {
+				case 1: return "TP1";
+				case 2: return "PL110";
+				case 4: return "RF";
+				case 5: return "KNX IP";
+				default: return "undefined";
+			}
+		};
+
 	}
 	public static final EnumDpt<Medium> DptMedia = new EnumDpt<>("22.1000", Medium.class);
 
@@ -209,7 +184,7 @@ public class DptXlator16BitSet extends DPTXlator {
 		final StringJoiner joiner = new StringJoiner(", ");
 		for (int i = 0x4000; i > 0; i >>= 1)
 			if ((d & i) == i)
-				joiner.add(((EnumDpt<?>) dpt).friendly(i));
+				joiner.add(((EnumDpt<?>) dpt).textOf(i));
 		// RHCC status special case: controller is cooling if HeatingMode = false and CoolingDisabled = false
 		// show cooling mode in case no other bit is set
 		if (dpt.equals(DptRhccStatus) && joiner.length() == 0)

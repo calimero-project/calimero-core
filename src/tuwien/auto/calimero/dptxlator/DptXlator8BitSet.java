@@ -41,7 +41,6 @@ import java.util.Map;
 import java.util.StringJoiner;
 
 import tuwien.auto.calimero.KNXFormatException;
-import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 /**
  * Translator for KNX DPTs with main number 21, type <b>Bit Array of Length 8 (B8)</b>. It provides DPTs for the
@@ -69,56 +68,12 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 @SuppressWarnings("checkstyle:javadocvariable")
 public class DptXlator8BitSet extends DPTXlator
 {
-	private interface EnumBase<E extends Enum<E> & EnumBase<E>>
-	{
-		@SuppressWarnings("unchecked")
-		default int value()
-		{
-			return 1 << ((Enum<E>) this).ordinal();
+	private interface EnumBase<E extends Enum<E> & EnumBase<E>> extends EnumDptBase.EnumBase<E> {}
+
+	public static class EnumDpt<T extends Enum<T> & EnumBase<T>> extends EnumDptBase<T> {
+		public EnumDpt(final String typeId, final Class<T> elements) {
+			super(typeId, elements, "0", Integer.toString(maxValue(elements)));
 		}
-	}
-
-	public static class EnumDpt<T extends Enum<T> & EnumBase<T>> extends DPT
-	{
-		private final Class<T> elements;
-
-		public EnumDpt(final String typeId, final Class<T> elements)
-		{
-			this(typeId, elements.getSimpleName().replaceAll("\\B([A-Z])", " $1"), elements);
-		}
-
-		private EnumDpt(final String typeId, final String description, final Class<T> elements)
-		{
-			super(typeId, description, "0", Integer.toString(maxValue(elements)));
-			this.elements = elements;
-		}
-
-		private T find(final int element)
-		{
-			for (final T e : EnumSet.allOf(elements))
-				if (e.value() == element)
-					return e;
-			return null;
-		}
-
-		private T find(final String description)
-		{
-			for (final T e : EnumSet.allOf(elements))
-				if (e.name().equalsIgnoreCase(description) || friendly(e.name()).equalsIgnoreCase(description))
-					return e;
-			return null;
-		}
-
-		private String textOf(final int element)
-		{
-			final T e = find(element);
-			if (e != null)
-				return friendly(e.name());
-			throw new KNXIllegalArgumentException(
-					getID() + " " + elements.getSimpleName() + " has no element " + element + " specified");
-		}
-
-		private static String friendly(final String name) { return name.replaceAll("\\B([A-Z])", " $1").toLowerCase(); }
 	}
 
 	// Common use domain
@@ -328,7 +283,7 @@ public class DptXlator8BitSet extends DPTXlator
 					final EnumDpt<?> enumDpt = (EnumDpt<?>) dpt;
 					final Enum<?> e = enumDpt.find(s.trim());
 					if (e == null)
-						throw newException("value is no element of " + enumDpt.elements.getSimpleName(), value);
+						throw newException("value is no element of " + enumDpt.name(), value);
 					result |= 1 << e.ordinal();
 				}
 			}

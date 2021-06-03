@@ -36,12 +36,10 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
-import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 /**
  * Translator for KNX DPTs with main number 20, type <b>8 Bit Enumeration (N8)</b>. It provides the
@@ -75,29 +73,22 @@ public class DPTXlator8BitEnum extends DPTXlator
 		NormalWrite, Override, Release, SetOutOfService, ResetOutOfService, AlarmAck, SetToDefault
 	}
 
-	// use a common base to store and access enumeration elements independent of specific type
-	private interface EnumBase<E extends EnumBase<E>>
-	{
-		Map<EnumBase<?>, Integer> values = new HashMap<>();
-		Map<EnumBase<?>, String> descriptions = new HashMap<>();
+	private interface EnumBase<E extends Enum<E> & EnumBase<E>> extends EnumDptBase.EnumBase<E> {
+		final Map<EnumBase<?>, Integer> values = new HashMap<>();
+		final Map<EnumBase<?>, String> descriptions = new HashMap<>();
 
 		default void init(final int element) { init(element, split(this.toString())); }
 
-		default void init(final int element, final String description)
-		{
+		default void init(final int element, final String description) {
 			values.put(this, element);
 			descriptions.put(this, description);
 		}
 
-		default int value()
-		{
-			return values.get(this);
-		}
+		@Override
+		default int value() { return values.get(this); }
 
-		default String description()
-		{
-			return descriptions.get(this);
-		}
+		@Override
+		default String description() { return descriptions.get(this); }
 
 		private static String split(final String name) { return name.replaceAll("\\B([A-Z])", " $1").toLowerCase(); }
 	}
@@ -668,7 +659,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 	public enum RFFilterSelect implements EnumBase<RFFilterSelect> {
 		None(0, "no filter"),
 		DomainAddress(1, "filtering by DoA"),
-		SerialNumber(2, "filtering by KNX serial number table"),
+		SerialNumber(2, "filtering by KNX S/N table"),
 		DoAAndSN(3, "filtering by DoA and S/N table");
 
 		RFFilterSelect(final int element, final String description) { init(element, description); }
@@ -768,70 +759,15 @@ public class DPTXlator8BitEnum extends DPTXlator
 	// End of enumerations
 	//
 
-	public static class EnumDpt<T extends Enum<T> & EnumBase<T>> extends DPT
-	{
-		// using a class reference here, we only instantiate the enum when actually queried
-		private final Class<T> elements;
-
+	public static class EnumDpt<T extends Enum<T> & EnumBase<T>> extends EnumDptBase<T> {
 		public EnumDpt(final String typeID, final Class<T> elements, final String lower, final String upper) {
-			this(typeID, elements.getSimpleName().replaceAll("\\B([A-Z])", " $1"), elements, lower, upper);
+			super(typeID, elements, lower, upper);
 		}
 
-		public EnumDpt(final String typeID, final String description, final Class<T> elements,
-			final String lower, final String upper)
-		{
-			super(typeID, description, lower, upper);
-			this.elements = elements;
+		public EnumDpt(final String typeID, final String description, final Class<T> elements, final String lower,
+			final String upper) {
+			super(typeID, description, elements, lower, upper);
 		}
-
-		private T find(final int element)
-		{
-			final EnumSet<T> set = EnumSet.allOf(elements);
-			for (final T e : set) {
-				if (e.value() == element)
-					return e;
-			}
-			return null;
-		}
-
-		private T find(final String description)
-		{
-			final EnumSet<T> set = EnumSet.allOf(elements);
-			for (final T e : set) {
-				if (e.name().equalsIgnoreCase(description))
-					return e;
-				if (e.description().equalsIgnoreCase(description))
-					return e;
-				if (friendly(e.name()).equalsIgnoreCase(description))
-					return e;
-			}
-			return null;
-		}
-
-		private boolean contains(final int element)
-		{
-			return find(element) != null;
-		}
-
-		private String textOf(final int element)
-		{
-			final T e = find(element);
-			if (e != null)
-				return e.description();
-			throw new KNXIllegalArgumentException(getID() + " " + elements.getSimpleName()
-					+ " has no element " + element + " specified");
-		}
-
-		@Override
-		public String toString()
-		{
-			final StringBuilder sb = new StringBuilder(30);
-			sb.append(getID()).append(": ").append(getDescription()).append(", enumeration [");
-			sb.append(getLowerValue()).append("..").append(getUpperValue()).append("]");
-			return sb.toString();
-		}
-
-		private static String friendly(final String name) { return name.replaceAll("\\B([A-Z])", " $1").toLowerCase(); }
 	}
 
 	public static final EnumDpt<SystemClockMode> DptSystemClockMode = new EnumDpt<>("20.001",
@@ -975,8 +911,8 @@ public class DPTXlator8BitEnum extends DPTXlator
 	{
 		super(1);
 		setTypeID(types, dptID);
-		final EnumSet<? extends EnumBase<?>> set = EnumSet.allOf(((EnumDpt<?>) dpt).elements);
-		data = new short[] { (short) set.iterator().next().value() };
+		final var values = ((EnumDpt<?>) dpt).values();
+		data = new short[] { (short) values[0].value() };
 	}
 
 	@Override
@@ -1070,7 +1006,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 			final EnumBase<?> e = ((EnumDpt<?>) dpt).find(value);
 			if (e == null)
 				throw newException("value is no element of "
-						+ ((EnumDpt<?>) dpt).elements.getSimpleName() + " enumeration", value);
+						+ ((EnumDpt<?>) dpt).name() + " enumeration", value);
 			dst[index] = (short) e.value();
 		}
 	}
@@ -1093,7 +1029,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 	{
 		final EnumDpt<?> enumDpt = (EnumDpt<?>) dpt;
 		if (!enumDpt.contains(value))
-			throw newException("value is no element of " + enumDpt.elements.getSimpleName()
+			throw newException("value is no element of " + enumDpt.name()
 					+ " enumeration", Integer.toString(value));
 	}
 }
