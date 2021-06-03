@@ -39,6 +39,7 @@ package tuwien.auto.calimero.link;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.util.Map;
@@ -60,7 +61,6 @@ import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
-import tuwien.auto.calimero.baos.BaosService;
 import tuwien.auto.calimero.cemi.AdditionalInfo;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
@@ -128,6 +128,19 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	final Map<Class<?>, Set<MethodHandle>> customEvents = new ConcurrentHashMap<>();
 
 
+	private static final MethodHandle baosServiceFactory_MH;
+	static {
+		MethodHandle mh = null;
+		try {
+			final var clazz = Class.forName("tuwien.auto.calimero.baos.BaosService");
+			final var lookup = MethodHandles.lookup();
+			final var baosModeType = MethodType.methodType(clazz, ByteBuffer.class);
+			mh = lookup.findStatic(clazz, "from", baosModeType);
+		}
+		catch (ClassNotFoundException | IllegalAccessException | NoSuchMethodException e) {}
+		baosServiceFactory_MH = mh;
+	}
+
 	private final class LinkNotifier extends EventNotifier<NetworkLinkListener>
 	{
 		private static final int PeiIdentifyCon = 0xa8;
@@ -157,9 +170,17 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 					}
 
 					// intercept BAOS services (ObjectServer protocol)
-					if ((frame[0] & 0xff) == BaosMainService) {
-						final var baosEvent = BaosService.from(ByteBuffer.wrap(frame));
-						dispatchCustomEvent(baosEvent);
+					if (baosServiceFactory_MH != null && (frame[0] & 0xff) == BaosMainService) {
+						try {
+							final var baosEvent = baosServiceFactory_MH.invoke(ByteBuffer.wrap(frame));
+							dispatchCustomEvent(baosEvent);
+						}
+						catch (KNXFormatException | RuntimeException ex) {
+							throw ex;
+						}
+						catch (final Throwable t) {
+							t.printStackTrace();
+						}
 						return;
 					}
 				}
