@@ -126,12 +126,18 @@ public class TpuartConnection implements AutoCloseable
 
 	private static final int OK = 0;
 	private static final int ConPending = 1;
-	// set to 3 if tpuart is told not to repeat frames
-//	private static int MaxSendAttempts = 1; //3;
-	// XXX tune, includes receive timeout of 2-2.5 ms to detect end of packet
-	private static final long ExchangeTimeout = 50;
+
 	// time interval to check on TP UART state
 	private static final long UartStateReadInterval = 5_000_000; // [us]
+
+	private static final int UartBaudRate = 19_200;
+	private static final int Tp1BaudRate = 9_600;
+
+	private static final int OneBitTime = (int) Math.ceil(1d / Tp1BaudRate * 1_000_000);
+	private static final int BitTimes_50 = 50 * OneBitTime; // [us]
+
+	private static final int MaxSendAttempts = 4;
+
 
 	private final String portId;
 	private final LibraryAdapter adapter;
@@ -173,7 +179,7 @@ public class TpuartConnection implements AutoCloseable
 	{
 		this.portId = portId;
 		logger = LogService.getAsyncLogger("calimero.serial.tpuart:" + portId);
-		adapter = LibraryAdapter.open(logger, portId, 19200, 0);
+		adapter = LibraryAdapter.open(logger, portId, UartBaudRate, 0);
 		os = adapter.getOutputStream();
 		is = adapter.getInputStream();
 
@@ -285,7 +291,8 @@ public class TpuartConnection implements AutoCloseable
 		throws KNXPortClosedException, KNXAckTimeoutException, InterruptedException
 	{
 		try {
-			final byte[] data = toUartServices(cEmiToTP1(frame));
+			final byte[] tp1Frame = cEmiToTP1(frame);
+			final byte[] data = toUartServices(tp1Frame);
 			if (logger.isTraceEnabled())
 				logger.trace("create UART services {}", DataUnitBuilder.toHex(data, " "));
 			req = frame.clone();
@@ -306,7 +313,7 @@ public class TpuartConnection implements AutoCloseable
 			state = ConPending;
 			if (!waitForCon)
 				return;
-			if (waitForCon())
+			if (waitForCon(tp1Frame.length))
 				return;
 			throw new KNXAckTimeoutException("no ACK for L-Data.con");
 		}
@@ -426,9 +433,14 @@ public class TpuartConnection implements AutoCloseable
 		return data.toByteArray();
 	}
 
-	private boolean waitForCon() throws InterruptedException
+	private boolean waitForCon(final int frameLen) throws InterruptedException
 	{
-		long remaining = ExchangeTimeout;
+		// time from start-bit to start-bit of inner frame consecutive characters, 13 bit times [us]
+		final int innerFrameChar = 13 * OneBitTime;
+		final int bitTimes_15 = 15 * OneBitTime; // [us]
+		final int maxExchangeTimeout = MaxSendAttempts * (BitTimes_50 + frameLen * innerFrameChar + 2 * bitTimes_15) / 1000;
+
+		long remaining = maxExchangeTimeout;
 		final long now = System.currentTimeMillis();
 		final long end = now + remaining;
 		synchronized (lock) {
@@ -439,7 +451,9 @@ public class TpuartConnection implements AutoCloseable
 		}
 		final boolean rcvdCon = remaining > 0;
 		if (rcvdCon)
-			logger.trace("ACK received after {} ms", ExchangeTimeout - remaining);
+			logger.trace("ACK received after {} ms", maxExchangeTimeout - remaining);
+		else
+			logger.debug("no ACK received after {} ms", maxExchangeTimeout);
 		return rcvdCon;
 	}
 
@@ -464,7 +478,8 @@ public class TpuartConnection implements AutoCloseable
 	}
 
 	// Stores the currently used max. inter-byte delay, to also be available for subsequent tpuart connections.
-	private static AtomicInteger maxInterByteDelay = new AtomicInteger(5200); // 50 bit times [us]
+	// Defaults to 50 bit times [us]
+	private static final AtomicInteger maxInterByteDelay = new AtomicInteger(BitTimes_50);
 	static {
 		final var key = "calimero.serial.tpuart.maxInterByteDelay";
 		try {
@@ -816,15 +831,15 @@ public class TpuartConnection implements AutoCloseable
 			if (pos) {
 				// set confirm bit to no error
 				frame[2] &= 0xfe;
-				// wake up one blocked sender, if any
-				synchronized (lock) {
-					state = OK;
-					lock.notify();
-				}
 			}
 			else {
 				// set confirm bit to error
 				frame[2] |= 0x01;
+			}
+			// wake up one blocked sender, if any
+			synchronized (lock) {
+				state = OK;
+				lock.notify();
 			}
 			fireFrameReceived(frame);
 		}
