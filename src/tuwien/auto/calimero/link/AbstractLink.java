@@ -162,7 +162,8 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 						}
 					}
 
-					// intercept BAOS services (ObjectServer protocol)
+					// intercept BAOS services (ObjectServer protocol), necessary because BaosLinkAdapter has no direct
+					// access to frame receive events
 					if (baosServiceFactory_MH != null && (frame[0] & 0xff) == BaosMainService) {
 						try {
 							final var baosEvent = baosServiceFactory_MH.invoke(ByteBuffer.wrap(frame));
