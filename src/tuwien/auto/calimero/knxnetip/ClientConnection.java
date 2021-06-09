@@ -39,7 +39,6 @@ package tuwien.auto.calimero.knxnetip;
 import static tuwien.auto.calimero.knxnetip.Net.hostPort;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -406,15 +405,12 @@ public abstract class ClientConnection extends ConnectionBase
 	{
 		// requests with wrong channel ID are ignored (conforming to spec)
 		if (req.getChannelID() == channelId) {
-			final byte[] buf = PacketHelper.toPacket(new DisconnectResponse(channelId,
-					ErrorCodes.NO_ERROR));
-			final DatagramPacket p = new DatagramPacket(buf, buf.length, ctrlEndpt.getAddress(),
-					ctrlEndpt.getPort());
+			final byte[] buf = PacketHelper.toPacket(new DisconnectResponse(channelId, ErrorCodes.NO_ERROR));
 			try {
-				ctrlSocket.send(p);
+				send(buf, ctrlEndpt);
 			}
 			catch (final IOException e) {
-				logger.error("communication failure", e);
+				logger.warn("communication failure", e);
 			}
 			finally {
 				cleanup(CloseEvent.SERVER_REQUEST, "server request", LogLevel.INFO, null);
