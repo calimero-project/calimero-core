@@ -167,19 +167,23 @@ public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 	}
 
 	private void connectionReset() {
-		try {
-			if (baosMode)
-				baosMode(true);
-			else
-				linkLayerMode();
-		}
-		catch (final KNXException e) {
-			close();
-		}
-		catch (final InterruptedException e) {
-			close();
-			Thread.currentThread().interrupt();
-		}
+		// don't run this in notification thread!
+		final Runnable modeSetter = () -> {
+			try {
+				if (baosMode)
+					baosMode(true);
+				else
+					linkLayerMode();
+			}
+			catch (final KNXException e) {
+				close();
+			}
+			catch (final InterruptedException e) {
+				close();
+				Thread.currentThread().interrupt();
+			}
+		};
+		new Thread(modeSetter, "FT1.2 connection reset mode switcher").start();
 	}
 
 	private void linkLayerMode() throws KNXException {
