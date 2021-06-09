@@ -46,7 +46,6 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.time.Duration;
-import java.util.concurrent.ConcurrentHashMap;
 
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.IndividualAddress;
@@ -289,7 +288,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 		mode = serviceMode;
 		conn.addConnectionListener(notifier);
 		if (c instanceof KNXnetIPTunnel && mode == TunnelingV2) {
-			customEvents.put(TunnelingFeature.class, ConcurrentHashMap.newKeySet());
+			notifier.registerEventType(TunnelingFeature.class);
 
 			final var tunnel = (KNXnetIPTunnel) c;
 			tunnel.addConnectionListener(new TunnelingListener() {
@@ -340,8 +339,8 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 			tunnel.send(InterfaceFeature.DeviceDescriptorType0);
 		}
 		else if (c instanceof KNXnetIPRouting) {
-			customEvents.put(LostMessageEvent.class, ConcurrentHashMap.newKeySet());
-			customEvents.put(RoutingBusyEvent.class, ConcurrentHashMap.newKeySet());
+			notifier.registerEventType(LostMessageEvent.class);
+			notifier.registerEventType(RoutingBusyEvent.class);
 
 			c.addConnectionListener(new RoutingListener() {
 				@Override

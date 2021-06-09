@@ -38,15 +38,10 @@ package tuwien.auto.calimero.link;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.StringJoiner;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 
@@ -124,8 +119,6 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	final T conn;
 
 	private CEMIDevMgmt devMgmt;
-
-	final Map<Class<?>, Set<MethodHandle>> customEvents = new ConcurrentHashMap<>();
 
 
 	private static final MethodHandle baosServiceFactory_MH;
@@ -275,7 +268,6 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	public void addLinkListener(final NetworkLinkListener l)
 	{
 		notifier.addListener(l);
-		registerCustomEvents(l);
 	}
 
 	@Override
@@ -362,8 +354,6 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	{
 		return "link" + (closed ? " (closed) " : " ") + getName() + " " + medium + ", hopcount " + hopCount;
 	}
-
-	protected final Map<Class<?>, Set<MethodHandle>> customEvents() { return customEvents; }
 
 	/**
 	 * Prepares the message in the required EMI format, using the supplied message parameters, and
@@ -659,51 +649,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		return true;
 	}
 
-	// TODO we currently register events multiple times if method also exists as annotated default method on interface
-	private void registerCustomEvents(final NetworkLinkListener listener) {
-		// check default methods on implemented interfaces
-		for (final var iface : listener.getClass().getInterfaces())
-			for (final var method : iface.getDeclaredMethods())
-				inspectMethodForLinkEvent(method, listener);
-		// check normal methods on classes
-		for (final var method : listener.getClass().getDeclaredMethods())
-			inspectMethodForLinkEvent(method, listener);
-	}
-
-	private static final Lookup lookup = MethodHandles.lookup();
-
-	private void inspectMethodForLinkEvent(final Method method, final NetworkLinkListener listener) {
-		if (method.getAnnotation(LinkEvent.class) == null)
-			return;
-		final var paramTypes = method.getParameterTypes();
-		if (paramTypes.length != 1) {
-			logger.warn("cannot register {}: parameter count not 1", method);
-			return;
-		}
-		final var paramType = paramTypes[0];
-		if (!customEvents.containsKey(paramType)) {
-			logger.warn("unsupported event type {}", method);
-			return;
-		}
-		try {
-			final var privateLookup = MethodHandles.privateLookupIn(listener.getClass(), lookup);
-			final var boundMethod = privateLookup.unreflect(method).bindTo(listener);
-			customEvents.get(paramType).add(boundMethod);
-			logger.debug("registered {} for {}s", method, paramType.getSimpleName());
-		}
-		catch (final Exception e) {
-			logger.warn("failed to register {}", method, e);
-		}
-	}
-
 	void dispatchCustomEvent(final Object event) {
-		customEvents.getOrDefault(event.getClass(), Set.of()).forEach(mh -> {
-			try {
-				mh.invoke(event);
-			}
-			catch (final Throwable e) {
-				e.printStackTrace();
-			}
-		});
+		notifier.dispatchCustomEvent(event);
 	}
 }

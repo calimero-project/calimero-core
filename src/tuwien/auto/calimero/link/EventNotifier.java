@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ public abstract class EventNotifier<T extends LinkListener> extends Thread imple
 		super("Calimero link notifier");
 		this.logger = logger;
 		this.source = source;
-		listeners = new EventListeners<>(logger);
+		listeners = new EventListeners<>(logger, LinkEvent.class);
 		setDaemon(true);
 	}
 
@@ -82,7 +82,10 @@ public abstract class EventNotifier<T extends LinkListener> extends Thread imple
 						events.wait();
 					c = events.remove();
 				}
-				fire(c);
+				if (c instanceof CustomEventConsumer)
+					fireCustomEvent(c);
+				else
+					fire(c);
 			}
 		}
 		catch (final InterruptedException e) {}
@@ -116,6 +119,17 @@ public abstract class EventNotifier<T extends LinkListener> extends Thread imple
 	public EventListeners<T> getListeners()
 	{
 		return listeners;
+	}
+
+	public void registerEventType(final Class<?> eventType) {
+		listeners.registerEventType(eventType);
+	}
+
+	private interface CustomEventConsumer<T> extends Consumer<T> {}
+
+	public void dispatchCustomEvent(final Object event) {
+		final CustomEventConsumer<T> cec = __ -> listeners.dispatchCustomEvent(event);
+		addEvent(cec);
 	}
 
 	final void addEvent(final Consumer<? super T> c)
@@ -154,4 +168,6 @@ public abstract class EventNotifier<T extends LinkListener> extends Thread imple
 	{
 		 listeners.fire(c);
 	}
+
+	private void fireCustomEvent(final Consumer<? super T> c) { c.accept(null); }
 }

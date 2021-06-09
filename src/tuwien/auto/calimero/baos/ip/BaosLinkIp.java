@@ -36,9 +36,7 @@
 
 package tuwien.auto.calimero.baos.ip;
 
-import java.lang.invoke.MethodHandle;
 import java.net.InetSocketAddress;
-import java.util.concurrent.ConcurrentHashMap;
 
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
@@ -72,7 +70,7 @@ public final class BaosLinkIp extends AbstractLink<ObjectServerConnection> imple
 		super(c, c.getName(), new TPSettings());
 		this.c = c;
 
-		customEvents().put(BaosService.class, ConcurrentHashMap.newKeySet());
+		notifier.registerEventType(BaosService.class);
 		c.addConnectionListener(notifier);
 		c.addConnectionListener((ObjectServerConnection.ObjectServerListener) this::dispatchCustomEvent);
 	}
@@ -98,15 +96,6 @@ public final class BaosLinkIp extends AbstractLink<ObjectServerConnection> imple
 	}
 
 	private void dispatchCustomEvent(final BaosService event) {
-		customEvents().get(event.getClass()).forEach(mh -> invokeWithEvent(mh, event));
-	}
-
-	private void invokeWithEvent(final MethodHandle mh, final BaosService event) {
-		try {
-			mh.invoke(event);
-		}
-		catch (final Throwable e) {
-			logger.info("dispatching baos event", e);
-		}
+		notifier.dispatchCustomEvent(event);
 	}
 }

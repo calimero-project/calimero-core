@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@
 
 package tuwien.auto.calimero.internal;
 
+import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -56,6 +57,7 @@ public class EventListeners<T>
 {
 	private final CopyOnWriteArrayList<T> listeners = new CopyOnWriteArrayList<>();
 	private final Logger logger;
+	private final EventDispatcher<?> customEvents;
 
 	/**
 	 * Creates a new event listeners container object.
@@ -65,6 +67,13 @@ public class EventListeners<T>
 	public EventListeners(final Logger logger)
 	{
 		this.logger = logger;
+		customEvents = new EventDispatcher<>(Annotation.class, logger);
+	}
+
+	public EventListeners(final Logger logger, final Class<? extends Annotation> eventAnnotation)
+	{
+		this.logger = logger;
+		customEvents = new EventDispatcher<>(eventAnnotation, logger);
 	}
 
 	/**
@@ -72,7 +81,7 @@ public class EventListeners<T>
 	 */
 	public EventListeners()
 	{
-		this.logger = LoggerFactory.getLogger("calimero");
+		this(LoggerFactory.getLogger("calimero"));
 	}
 
 	/**
@@ -84,7 +93,8 @@ public class EventListeners<T>
 	 */
 	public void add(final T l)
 	{
-		listeners.addIfAbsent(l);
+		if (listeners.addIfAbsent(l))
+			customEvents.registerCustomEvents(l);
 	}
 
 	/**
@@ -130,5 +140,13 @@ public class EventListeners<T>
 				logger.error("removed event listener", rte);
 			}
 		}
+	}
+
+	public void registerEventType(final Class<?> eventType) {
+		customEvents.register(eventType);
+	}
+
+	public void dispatchCustomEvent(final Object event) {
+		customEvents.dispatchCustomEvent(event);
 	}
 }

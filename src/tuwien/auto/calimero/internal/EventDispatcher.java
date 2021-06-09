@@ -34,8 +34,9 @@
     version.
 */
 
-package tuwien.auto.calimero.serial;
+package tuwien.auto.calimero.internal;
 
+import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
@@ -46,15 +47,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 
-import tuwien.auto.calimero.KNXListener;
-
-class EventDispatcher {
+class EventDispatcher<T extends Annotation> {
 	private static final Lookup lookup = MethodHandles.lookup();
 
 	private final Map<Class<?>, Set<MethodHandle>> customEvents = new ConcurrentHashMap<>();
+	private final Class<T> eventAnnotation;
 	private final Logger logger;
 
-	EventDispatcher(final Logger logger) {
+	EventDispatcher(final Class<T> eventAnnotation, final Logger logger) {
+		this.eventAnnotation = eventAnnotation;
 		this.logger = logger;
 	}
 
@@ -63,18 +64,18 @@ class EventDispatcher {
 	}
 
 	// TODO we currently register events multiple times if method also exists as annotated default method on interface
-	void registerCustomEvents(final KNXListener listener) {
+	void registerCustomEvents(final Object listener) {
 		// check default methods on implemented interfaces
 		for (final var iface : listener.getClass().getInterfaces())
 			for (final var method : iface.getDeclaredMethods())
-				inspectMethodForLinkEvent(method, listener);
+				inspectMethodForEvent(method, listener);
 		// check normal methods on classes
 		for (final var method : listener.getClass().getDeclaredMethods())
-			inspectMethodForLinkEvent(method, listener);
+			inspectMethodForEvent(method, listener);
 	}
 
-	private void inspectMethodForLinkEvent(final Method method, final KNXListener listener) {
-		if (method.getAnnotation(ConnectionEvent.class) == null)
+	private void inspectMethodForEvent(final Method method, final Object listener) {
+		if (method.getAnnotation(eventAnnotation) == null)
 			return;
 		final var paramTypes = method.getParameterTypes();
 		if (paramTypes.length != 1) {

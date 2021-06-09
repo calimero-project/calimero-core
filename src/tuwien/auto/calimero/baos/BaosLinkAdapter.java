@@ -39,10 +39,8 @@ package tuwien.auto.calimero.baos;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.invoke.VarHandle;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAddress;
@@ -51,6 +49,7 @@ import tuwien.auto.calimero.KnxRuntimeException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.link.AbstractLink;
+import tuwien.auto.calimero.link.EventNotifier;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.KNXNetworkLinkFT12;
@@ -59,13 +58,16 @@ import tuwien.auto.calimero.link.NetworkLinkListener;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 
 public final class BaosLinkAdapter implements BaosLink {
-	private static final MethodHandle CUSTOM_EVENTS;
+	private static final VarHandle NOTIFIER;
+	private static final MethodHandle REGISTER;
 	private static final MethodHandle BAOS_MODE;
 	private static final MethodHandle ON_SEND;
 	static {
 		try {
 			final var privateLookup = MethodHandles.privateLookupIn(AbstractLink.class, MethodHandles.lookup());
-			CUSTOM_EVENTS = privateLookup.findGetter(AbstractLink.class, "customEvents", Map.class);
+			NOTIFIER = privateLookup.findVarHandle(AbstractLink.class, "notifier", EventNotifier.class);
+			REGISTER = privateLookup.findVirtual(EventNotifier.class, "registerEventType",
+					MethodType.methodType(void.class, Class.class));
 
 			final var baosModeType = MethodType.methodType(void.class, boolean.class);
 			BAOS_MODE = privateLookup.findVirtual(AbstractLink.class, "baosMode", baosModeType);
@@ -96,8 +98,8 @@ public final class BaosLinkAdapter implements BaosLink {
 	BaosLinkAdapter(final KNXNetworkLink link) {
 		this.link = link;
 		try {
-			final var map = (Map<Class<?>, Set<MethodHandle>>) CUSTOM_EVENTS.invoke(link);
-			map.put(BaosService.class, ConcurrentHashMap.newKeySet());
+			final var notifier = NOTIFIER.get(link);
+			REGISTER.invoke(notifier, BaosService.class);
 		}
 		catch (final Throwable e) {
 			throw new KnxRuntimeException("adding custom BAOS event", e);
