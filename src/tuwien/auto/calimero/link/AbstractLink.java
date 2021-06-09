@@ -516,9 +516,9 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 //		}
 		else {
 			// NYI EMI2
-			final int PeiIdentifyReq = 0xa7;
+			final int peiIdentifyReq = 0xa7;
 //			final int PeiIdentifyCon = 0xa8;
-			onSend(dst, new byte[] { (byte) PeiIdentifyReq }, true);
+			onSend(dst, new byte[] { (byte) peiIdentifyReq }, true);
 		}
 	}
 

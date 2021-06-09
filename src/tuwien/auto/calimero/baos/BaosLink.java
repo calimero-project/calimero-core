@@ -40,5 +40,5 @@ import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 
 public interface BaosLink extends KNXNetworkLink {
-	void send(final BaosService service) throws KNXException;
+	void send(BaosService service) throws KNXException;
 }

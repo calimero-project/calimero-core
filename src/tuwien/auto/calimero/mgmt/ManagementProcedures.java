@@ -348,7 +348,7 @@ public interface ManagementProcedures extends AutoCloseable
 	 * @throws KNXException on network or reading error during the address check
 	 * @throws InterruptedException on interrupted thread
 	 */
-	List<IndividualAddress> scanGroupAddresses(final GroupAddress startAddress, final int range)
+	List<IndividualAddress> scanGroupAddresses(GroupAddress startAddress, int range)
 		throws KNXException, InterruptedException;
 
 	/**

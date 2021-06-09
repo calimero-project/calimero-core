@@ -100,7 +100,7 @@ import tuwien.auto.calimero.secure.KnxSecureException;
 public final class Connection implements Closeable {
 
 	// pseudo connection, so we can still run with udp
-	static Connection Udp = new Connection(new InetSocketAddress(0));
+	static final Connection Udp = new Connection(new InetSocketAddress(0));
 
 	private static final Duration connectionTimeout = Duration.ofMillis(5000);
 

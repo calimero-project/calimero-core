@@ -74,8 +74,8 @@ public class DPTXlator8BitEnum extends DPTXlator
 	}
 
 	private interface EnumBase<E extends Enum<E> & EnumBase<E>> extends EnumDptBase.EnumBase<E> {
-		final Map<EnumBase<?>, Integer> values = new HashMap<>();
-		final Map<EnumBase<?>, String> descriptions = new HashMap<>();
+		Map<EnumBase<?>, Integer> values = new HashMap<>();
+		Map<EnumBase<?>, String> descriptions = new HashMap<>();
 
 		default void init(final int element) { init(element, split(this.toString())); }
 

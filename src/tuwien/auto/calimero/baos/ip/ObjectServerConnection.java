@@ -94,7 +94,7 @@ class ObjectServerConnection extends ClientConnection {
 	private final Future<?> keepAlive;
 
 
-	public ObjectServerConnection(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP)
+	ObjectServerConnection(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP)
 			throws KNXException, InterruptedException {
 		super(KNXnetIPHeader.ObjectServerRequest, KNXnetIPHeader.ObjectServerAck, 2, ReqTimeout);
 		tcp = false;
@@ -102,7 +102,7 @@ class ObjectServerConnection extends ClientConnection {
 		connect(localEP, serverCtrlEP, CRI.createRequest(ObjectServerProtocol), false);
 	}
 
-	public ObjectServerConnection(final Connection c) throws KNXException {
+	ObjectServerConnection(final Connection c) throws KNXException {
 		super(KNXnetIPHeader.ObjectServerRequest, KNXnetIPHeader.ObjectServerAck, 1, ReqTimeout, c);
 		ctrlEndpt = c.server();
 		logger = LogService.getLogger("calimero.baos." + getName());

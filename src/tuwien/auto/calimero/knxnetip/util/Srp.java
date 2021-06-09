@@ -175,7 +175,8 @@ public final class Srp
 		if ((size - SrpHeaderSize) > 0) {
 			this.data = new byte[size - SrpHeaderSize];
 			System.arraycopy(data, offset + SrpHeaderSize, this.data, 0, size - SrpHeaderSize);
-		} else {
+		}
+		else {
 			this.data = new byte[0];
 		}
 	}
