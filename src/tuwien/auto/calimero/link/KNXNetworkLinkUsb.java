@@ -44,15 +44,19 @@ import java.util.stream.Stream;
 
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.DeviceDescriptor.DD0;
+import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.link.BcuSwitcher.BcuMode;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
+import tuwien.auto.calimero.serial.ConnectionEvent;
+import tuwien.auto.calimero.serial.ConnectionStatus;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
 import tuwien.auto.calimero.serial.usb.HidReport;
 import tuwien.auto.calimero.serial.usb.TransferProtocolHeader.KnxTunnelEmi;
@@ -136,6 +140,15 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 			catch (final KNXTimeoutException expected) {}
 
 			conn.addConnectionListener(notifier);
+			conn.addConnectionListener(new KNXListener() {
+				@Override
+				public void frameReceived(final FrameEvent e) {}
+
+				@ConnectionEvent
+				void connectionStatus(final ConnectionStatus status) { notifyConnectionStatus(status); }
+			});
+			notifier.registerEventType(ConnectionStatus.class);
+
 			linkLayerMode();
 		}
 		catch (final KNXException e) {
@@ -275,5 +288,9 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 		final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, objectType, objectInstance, pid, 1, 1, data);
 		logger.trace("write mgmt OT {} PID {} data 0x{}", objectType, pid, DataUnitBuilder.toHex(data, ""));
 		conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame.toByteArray()).get(0), true);
+	}
+
+	private void notifyConnectionStatus(final ConnectionStatus status) {
+		notifier.dispatchCustomEvent(status);
 	}
 }

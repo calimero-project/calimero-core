@@ -106,6 +106,7 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.KnxRuntimeException;
 import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.internal.EventListeners;
+import tuwien.auto.calimero.serial.ConnectionStatus;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
 import tuwien.auto.calimero.serial.usb.HidReport.BusAccessServerFeature;
 import tuwien.auto.calimero.serial.usb.HidReportHeader.PacketType;
@@ -192,7 +193,7 @@ public class UsbConnection implements AutoCloseable
 		return line.startsWith("\t") ? List.of(line.split("#")[0].split(",")).stream().map(s -> fromHex(s)) : Stream.of();
 	}
 
-	private final EventListeners<KNXListener> listeners = new EventListeners<>();
+	private final EventListeners<KNXListener> listeners;
 
 	private final UsbDevice dev;
 	private final UsbInterface knxUsbIf;
@@ -281,7 +282,12 @@ public class UsbConnection implements AutoCloseable
 						setResponse(r);
 					else if (tph.getService() == BusAccessServerService.Info) {
 						final BusAccessServerFeature feature = r.getFeatureId();
-						logger.info("{} {}", feature, DataUnitBuilder.toHex(r.getData(), ""));
+						logger.trace("{} {}", feature, DataUnitBuilder.toHex(r.getData(), ""));
+					}
+
+					if (r.getFeatureId() == BusAccessServerFeature.ConnectionStatus) {
+						final int status = r.getData()[0];
+						listeners.dispatchCustomEvent(status == 1 ? ConnectionStatus.Online : ConnectionStatus.Offline);
 					}
 				}
 				else
@@ -421,8 +427,11 @@ public class UsbConnection implements AutoCloseable
 	{
 		dev = device;
 		this.name = name.isEmpty() ? toDeviceId(device) : name;
+		logger = LoggerFactory.getLogger(logPrefix + "." + getName());
+		listeners = new EventListeners<>(logger);
+		listeners.registerEventType(ConnectionStatus.class);
+
 		try {
-			logger = LoggerFactory.getLogger(logPrefix + "." + getName());
 			final Object[] usbIfInOut = open(device);
 
 			knxUsbIf = (UsbInterface) usbIfInOut[0];
