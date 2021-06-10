@@ -40,6 +40,8 @@ tasks.withType(Jar) {
 
 compileJava.options.encoding = 'UTF-8'
 compileTestJava.options.encoding = 'UTF-8'
+javadoc.options.encoding = 'UTF-8'
+
 
 compileJava.options*.compilerArgs = [
 	'-Xlint:all',
@@ -66,6 +68,10 @@ sourceSets {
         java.exclude 'resources/', '**/.gradle'
         resources.srcDirs = ['test/resources']
     }
+}
+
+tasks.withType(Javadoc) {
+    options.addStringOption("Xdoclint:-missing", '-quiet')
 }
 
 jar {
