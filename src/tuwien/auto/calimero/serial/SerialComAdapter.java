@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -151,7 +151,7 @@ class SerialComAdapter extends LibraryAdapter
 			b = true;
 		}
 		catch (SecurityException | UnsatisfiedLinkError e) {
-			LoggerFactory.getLogger("calimero.serial").info(e.getMessage());
+			LoggerFactory.getLogger("calimero.serial").debug(e.getMessage());
 		}
 		loaded = b;
 	}

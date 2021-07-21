@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2018 B. Malinowsky
+    Copyright (c) 2015, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -125,7 +125,7 @@ public class KNXNetworkLinkTpuart extends AbstractLink<TpuartConnection>
 	{
 		try {
 			if (logger.isTraceEnabled())
-				logger.trace("cEMI {}", DataUnitBuilder.toHex(msg, " "));
+				logger.trace("send cEMI {}", DataUnitBuilder.toHex(msg, " "));
 			conn.send(msg, waitForCon);
 		}
 		catch (final InterruptedException | KNXPortClosedException e) {

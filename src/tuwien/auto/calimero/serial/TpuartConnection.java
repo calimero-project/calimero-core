@@ -302,10 +302,12 @@ public class TpuartConnection implements AutoCloseable
 			if (group)
 				sending.put(new GroupAddress(new byte[] { frame[6], frame[7] }), start);
 
+			final boolean logReadyForSending = !idle;
 			synchronized (enterIdleLock) {
 				while (!idle)
 					enterIdleLock.wait();
 			}
+			if (logReadyForSending)
 			logger.trace("UART ready for sending after {} us", (System.nanoTime() - start) / 1000);
 
 			logger.debug("write UART services, {}", (waitForCon ? "waiting for .con" : "non-blocking"));
@@ -441,8 +443,8 @@ public class TpuartConnection implements AutoCloseable
 		final int maxExchangeTimeout = MaxSendAttempts * (BitTimes_50 + frameLen * innerFrameChar + 2 * bitTimes_15) / 1000;
 
 		long remaining = maxExchangeTimeout;
-		final long now = System.currentTimeMillis();
-		final long end = now + remaining;
+		final long start = System.currentTimeMillis();
+		final long end = start + remaining;
 		synchronized (lock) {
 			while (state == ConPending && remaining > 0) {
 				lock.wait(remaining);
@@ -453,7 +455,7 @@ public class TpuartConnection implements AutoCloseable
 		if (rcvdCon)
 			logger.trace("ACK received after {} ms", maxExchangeTimeout - remaining);
 		else
-			logger.debug("no ACK received after {} ms", maxExchangeTimeout);
+			logger.debug("no ACK received after {} ms", System.currentTimeMillis() - start);
 		return rcvdCon;
 	}
 
@@ -696,7 +698,7 @@ public class TpuartConnection implements AutoCloseable
 					lastRead = System.nanoTime() / 1000;
 					parseFrame(minBytes[read - 1]);
 				}
-				logger.trace("finished reading {} bytes {} us", read, initialMinBytes);
+				logger.trace("finished reading {} bytes after {} us", read, initialMinBytes);
 			}
 			// busmon mode only: short acks
 			else if (c == Ack || c == Nak || c == Busy)
