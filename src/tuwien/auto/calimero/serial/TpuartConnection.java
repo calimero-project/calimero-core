@@ -296,8 +296,13 @@ public class TpuartConnection implements AutoCloseable
 			if (logger.isTraceEnabled())
 				logger.trace("create UART services {}", DataUnitBuilder.toHex(data, " "));
 			req = frame.clone();
-			final long start = System.nanoTime();
 
+			// force cool down period if we got a crispy chip
+			final long coolDownMillis = (receiver.coolDownUntil - System.nanoTime()) / 1_000_000;
+			if (coolDownMillis > 0)
+				Thread.sleep(coolDownMillis);
+
+			final long start = System.nanoTime();
 			final boolean group = (frame[3] & 0x80) == 0x80;
 			if (group)
 				sending.put(new GroupAddress(new byte[] { frame[6], frame[7] }), start);
