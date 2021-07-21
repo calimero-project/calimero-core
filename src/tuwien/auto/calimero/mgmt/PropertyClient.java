@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -702,8 +702,15 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 			}
 			// property with index 0 is description of object type
 			// rest are ordinary properties of the object
-			for (;; ++i)
-				consumer.accept(createDesc(objIndex, pa.getDescription(objIndex, 0, i)));
+			for (;; ++i) {
+				try {
+					consumer.accept(createDesc(objIndex, pa.getDescription(objIndex, 0, i)));
+				}
+				catch (final KNXTimeoutException e) {
+					// retry once on timeout so we don't immediately fail the whole scan
+					consumer.accept(createDesc(objIndex, pa.getDescription(objIndex, 0, i)));
+				}
+			}
 		}
 		catch (final KNXException e) {
 			if (!KNXRemoteException.class.equals(e.getClass()) && !KNXTimeoutException.class.equals(e.getClass())) {
