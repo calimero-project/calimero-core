@@ -313,7 +313,7 @@ public class TpuartConnection implements AutoCloseable
 					enterIdleLock.wait();
 			}
 			if (logReadyForSending)
-			logger.trace("UART ready for sending after {} us", (System.nanoTime() - start) / 1000);
+				logger.trace("UART ready for sending after {} us", (System.nanoTime() - start) / 1000);
 
 			logger.debug("write UART services, {}", (waitForCon ? "waiting for .con" : "non-blocking"));
 			os.write(data);
@@ -456,7 +456,7 @@ public class TpuartConnection implements AutoCloseable
 				remaining = end - System.currentTimeMillis();
 			}
 		}
-		final boolean rcvdCon = remaining > 0;
+		final boolean rcvdCon = state == OK;
 		if (rcvdCon)
 			logger.trace("ACK received after {} ms", maxExchangeTimeout - remaining);
 		else
@@ -773,9 +773,9 @@ public class TpuartConnection implements AutoCloseable
 			final boolean con = (c & 0x7f) == LData_con;
 			if (con) {
 				final boolean pos = (c & 0x80) == 0x80;
-				onConfirmation(pos);
 				final String status = pos ? "positive" : "negative";
 				logger.debug("{} L_Data.con", status);
+				onConfirmation(pos);
 			}
 			return con;
 		}
@@ -843,10 +843,9 @@ public class TpuartConnection implements AutoCloseable
 				// set confirm bit to error
 				frame[2] |= 0x01;
 			}
-			// wake up one blocked sender, if any
 			synchronized (lock) {
 				state = OK;
-				lock.notify();
+				lock.notifyAll();
 			}
 			fireFrameReceived(frame);
 		}
