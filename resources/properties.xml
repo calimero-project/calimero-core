@@ -158,7 +158,7 @@
             <usage>Array with the interface object types implemented in the device</usage>
         </property>
         <property pid="72" pidName="PID_MGT_DESCRIPTOR_01" name="Management Descriptor 1" pdt="26" rw="R" writeEnabled="0">
-            <usage>Descriptor for exteded device descriptor for mask version 0100 (so far only allowed for this mask, shall not be used for other masks)</usage>
+            <usage>Extended device descriptor</usage>
         </property>
         <property pid="73" pidName="PID_PL110_PARAM" name="PL110 Parameters" pdt="17" rw="R/W" writeEnabled="1">
             <usage>Frequency setting, Indication of whether a repeater is present, Indication of whether the device is a repeater or not</usage>
