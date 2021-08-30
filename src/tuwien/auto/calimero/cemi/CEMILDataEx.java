@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,10 +42,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.LteHeeTag;
 import tuwien.auto.calimero.Priority;
 
 /**
@@ -413,7 +415,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		buf.append(getSource()).append("->");
 		// check LTE for destination
 		if ((ctrl2 & 0x04) == 0x04)
-			buf.append(lteTag(ctrl2, getDestination())).append(" LTE");
+			buf.append(LteHeeTag.from(ctrl2, (GroupAddress) getDestination())).append(" LTE");
 		else
 			buf.append(getDestination());
 
@@ -428,49 +430,6 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 		}
 		buf.append(s.substring(split + 1));
 		return buf.toString();
-	}
-
-	private static String lteTag(final int extFormat, final KNXAddress dst) {
-		// LTE-HEE bits 1 and 0 contain the extension of the group address
-		final int ext = extFormat & 0b11;
-		final int rawAddress = dst.getRawAddress();
-		if (rawAddress == 0)
-			return "broadcast";
-
-		// geographical tags: Apartment/Room/...
-		if (ext <= 1) {
-			final int aptFloor = (ext << 6) | ((rawAddress & 0b1111110000000000) >> 10);
-			final int room = (rawAddress & 0b1111110000) >> 4;
-			final int subzone = rawAddress & 0b1111;
-			return (aptFloor == 0 ? "*" : aptFloor) + "/" + (room == 0 ? "*" : room) + "/"
-					+ (subzone == 0 ? "*" : subzone);
-		}
-		// application specific tags
-		if (ext == 2) {
-			final int domain = rawAddress & 0xf000;
-			if (domain == 0) {
-				// TODO improve output format for domain 0
-				final int mapping = (rawAddress >> 5);
-				final int producer = (rawAddress >> 5) & 0xf;
-				final int zone = rawAddress & 0x1f;
-				if (mapping < 7) {
-					// distribution (segments or zones)
-					final String[] zones = { "", "D HotWater", "D ColdWater", "D Vent", "DHW", "Outside", "Calendar" };
-					return zone + " (Z HVAC " + zones[mapping] + ")";
-				}
-				// producers and their zones
-				if ((mapping & 0x70) == 0x10)
-					return producer + "/" + zone + " (P/Z HVAC HotWater)";
-				if ((mapping & 0x70) == 0x20)
-					return producer + "/" + zone + " (P/Z HVAC ColdWater)";
-
-				final String s = String.format("%8s", Integer.toBinaryString(rawAddress & 0xfff)).replace(' ', '0');
-				return "0b" + s + " (HVAC)";
-			}
-			return domain + "/0x" + Integer.toHexString(rawAddress & 0xfff) + " (app)";
-		}
-		// ext = 3, unassigned (peripheral) tags & broadcast
-		return "0x" + Integer.toHexString(rawAddress & 0xfff) + " (?)";
 	}
 
 	@Override
