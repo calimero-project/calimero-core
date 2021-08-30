@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ public final class CEMIFactory
 		case CEMILData.MC_LDATA_REQ:
 		case CEMILData.MC_LDATA_CON:
 		case CEMILData.MC_LDATA_IND:
-			if (length < 26) {
+			if (length < 26 && !isLteFrame(data, offset, length)) {
 				try {
 					return new CEMILData(data, offset, length);
 				}
@@ -103,6 +103,16 @@ public final class CEMIFactory
 		default:
 			throw new KNXFormatException("unsupported cEMI msg code", mc);
 		}
+	}
+
+	private static boolean isLteFrame(final byte[] data, final int offset, final int length) {
+		if (length < 4)
+			return false;
+		final int addInfoLen = data[offset + 1] & 0xff;
+		if (length < 4 + addInfoLen)
+			return false;
+		final int ctrl2 = data[offset + 3 + addInfoLen] & 0xff;
+		return (ctrl2 & 0x04) != 0;
 	}
 
 	/**
