@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,8 @@
 
 package tuwien.auto.calimero.mgmt;
 
+import java.util.Optional;
+
 /**
  * Holds description information of a KNX interface object property.
  * <p>
@@ -63,6 +65,7 @@ public final class Description
 	private final int currElems;
 	// data type is set to -1 after object creation if not available
 	private int pdt;
+	private final Optional<String> dpt;
 	private final int rLevel;
 	private final int wLevel;
 	private final boolean write;
@@ -105,6 +108,7 @@ public final class Description
 		pindex = data[2] & 0xff;
 		write = (data[3] & 0x80) == 0x80 ? true : false;
 		pdt = data[3] & 0x3f;
+		dpt = Optional.empty();
 		maxElems = (data[4] & 0xff) << 8 | (data[5] & 0xff);
 		currElems = currentElements;
 		rLevel = (data[6] & 0xff) >> 4;
@@ -135,6 +139,7 @@ public final class Description
 		id = pid;
 		pindex = propIndex;
 		this.pdt = pdt;
+		dpt = Optional.empty();
 		write = writeEnabled;
 		currElems = currentElements;
 		maxElems = maxElements;
@@ -153,7 +158,7 @@ public final class Description
 
 		final int dptMain = (data[7] & 0xff) << 8 | data[8] & 0xff;
 		final int dptSub = (data[9] & 0xff) << 8 | data[10] & 0xff;
-		final String dpt = dptMain + "." + dptSub;
+		dpt = dptMain == 0 && dptSub == 0 ? Optional.empty() : Optional.of(dptMain + "." + dptSub);
 		write = (data[11] & 0x80) == 0x80;
 		pdt = data[11] & 0x2f;
 		maxElems = (data[12] & 0xff) << 8 | data[13] & 0xff;
@@ -185,6 +190,11 @@ public final class Description
 	{
 		return otype;
 	}
+
+	/**
+	 * @return the object instance when used with extended property description services, 0 otherwise
+	 */
+	public int objectInstance() { return objectInstance; }
 
 	/**
 	 * Returns the property index.
@@ -219,6 +229,12 @@ public final class Description
 	{
 		return pdt;
 	}
+
+	/**
+	 * @return the optional datapoint type (DPT) of the property when used with extended property description services,
+	 * otherwise always the empty optional
+	 */
+	public Optional<String> dpt() { return dpt; }
 
 	/**
 	 * Returns the current number of elements in the property.
@@ -279,15 +295,15 @@ public final class Description
 
 	/**
 	 * Returns the property description in textual representation.
-	 * <p>
 	 *
 	 * @return a string representation of the description
 	 */
 	@Override
 	public String toString()
 	{
+		final String dptString = dpt.isPresent() ? " DPT " + dpt.get() : "";
 		return "OT " + otype + " OI " + oindex + " PID " + id + " PI " + pindex + " PDT "
-				+ (pdt == -1 ? "-" : pdt) + ", " + currElems
+				+ (pdt == -1 ? "-" : pdt) + dptString + ", " + currElems
 				+ " elements (max " + maxElems + "), r/w access " + rLevel + "/" + (wLevel == -1 ? "-" : wLevel)
 				+ (write ? " write-enabled" : " read-only");
 	}
