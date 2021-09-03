@@ -254,6 +254,15 @@ public class Discoverer
 		}
 	}
 
+	/**
+	 * Returns a discoverer which uses UDP with unicast responses for discovery &amp; description requests.
+	 *
+	 * @param nat <code>true</code> to use network address translation (NAT) aware discovery, <code>false</code> otherwise
+	 * @return a discoverer
+	 */
+	public static Discoverer udp(final boolean nat) {
+		return new Discoverer(0, nat);
+	}
 
 	/**
 	 * Returns a discoverer which uses the supplied TCP connection for discovery &amp; description requests.
