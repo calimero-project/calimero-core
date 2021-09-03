@@ -84,7 +84,7 @@ class EventDispatcher<T extends Annotation> {
 		}
 		final var paramType = paramTypes[0];
 		if (!customEvents.containsKey(paramType)) {
-			logger.warn("unsupported event type {}", method);
+			logger.debug("unsupported event type {}", method);
 			return;
 		}
 		try {
