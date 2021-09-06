@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,8 +43,8 @@ import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
-import tuwien.auto.calimero.knxnetip.Connection;
-import tuwien.auto.calimero.knxnetip.Connection.SecureSession;
+import tuwien.auto.calimero.knxnetip.TcpConnection;
+import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.knxnetip.KNXConnectionClosedException;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode;
@@ -70,7 +70,7 @@ public class LocalDeviceManagementIp extends LocalDeviceManagement {
 	 *         property adapter
 	 * @throws InterruptedException on interrupted thread while initializing the adapter
 	 */
-	public static LocalDeviceManagementIp newAdapter(final Connection connection,
+	public static LocalDeviceManagementIp newAdapter(final TcpConnection connection,
 			final Consumer<CloseEvent> adapterClosed) throws KNXException, InterruptedException {
 		final var mgmt = new KNXnetIPDevMgmt(connection);
 		return new LocalDeviceManagementIp(mgmt, adapterClosed, false);

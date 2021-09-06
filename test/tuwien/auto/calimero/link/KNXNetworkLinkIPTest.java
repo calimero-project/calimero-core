@@ -70,7 +70,7 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.cemi.CEMILData;
-import tuwien.auto.calimero.knxnetip.Connection;
+import tuwien.auto.calimero.knxnetip.TcpConnection;
 import tuwien.auto.calimero.knxnetip.Debug;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode;
 import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
@@ -451,7 +451,7 @@ public class KNXNetworkLinkIPTest
 				System.out.println("received " + feature);
 			}
 		};
-		final var connection = Connection.newTcpConnection(new InetSocketAddress(0), Util.getServer());
+		final var connection = TcpConnection.newTcpConnection(new InetSocketAddress(0), Util.getServer());
 		try (final var link = KNXNetworkLinkIP.newTunnelingLink(connection, new TPSettings())) {
 			link.addLinkListener(listener);
 
@@ -491,7 +491,7 @@ public class KNXNetworkLinkIPTest
 
 	@Test
 	void registerDefaultMethodEvent() throws KNXException, InterruptedException {
-		final var connection = Connection.newTcpConnection(new InetSocketAddress(0), Util.getServer());
+		final var connection = TcpConnection.newTcpConnection(new InetSocketAddress(0), Util.getServer());
 		try (final var link = KNXNetworkLinkIP.newTunnelingLink(connection, new TPSettings())) {
 			link.addLinkListener(new DefaultMethodEvent() {});
 
@@ -502,7 +502,7 @@ public class KNXNetworkLinkIPTest
 
 	@Test
 	void registerConcreteMethodOverridingDefaultMethod() throws KNXException, InterruptedException {
-		final var connection = Connection.newTcpConnection(new InetSocketAddress(0), Util.getServer());
+		final var connection = TcpConnection.newTcpConnection(new InetSocketAddress(0), Util.getServer());
 		try (final var link = KNXNetworkLinkIP.newTunnelingLink(connection, new TPSettings())) {
 			final var concreteEvent = new DefaultMethodEvent() {
 				@Override

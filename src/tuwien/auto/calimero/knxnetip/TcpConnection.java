@@ -97,10 +97,10 @@ import tuwien.auto.calimero.secure.KnxSecureException;
 /**
  * Connection management for TCP connections to KNXnet/IP servers, and for KNX IP secure sessions.
  */
-public final class Connection implements Closeable {
+public final class TcpConnection implements Closeable {
 
 	// pseudo connection, so we can still run with udp
-	static final Connection Udp = new Connection(new InetSocketAddress(0));
+	static final TcpConnection Udp = new TcpConnection(new InetSocketAddress(0));
 
 	private static final Duration connectionTimeout = Duration.ofMillis(5000);
 
@@ -168,7 +168,7 @@ public final class Connection implements Closeable {
 		private enum SessionState { Idle, Unauthenticated, Authenticated }
 
 
-		private final Connection conn;
+		private final TcpConnection conn;
 		private final int user;
 		private final SecretKey userKey;
 		private final SecretKey deviceAuthKey;
@@ -197,7 +197,7 @@ public final class Connection implements Closeable {
 		private final Logger logger;
 
 
-		private SecureSession(final Connection connection, final int user, final byte[] userKey,
+		private SecureSession(final TcpConnection connection, final int user, final byte[] userKey,
 			final byte[] deviceAuthCode) {
 			this.conn = connection;
 			this.user = user;
@@ -221,7 +221,7 @@ public final class Connection implements Closeable {
 
 		public SerialNumber serialNumber() { return sno; }
 
-		public Connection connection() { return conn; }
+		public TcpConnection connection() { return conn; }
 
 		@Override
 		public void close() {
@@ -626,17 +626,17 @@ public final class Connection implements Closeable {
 		}
 	}
 
-	public static Connection newTcpConnection(final InetSocketAddress local, final InetSocketAddress server) {
-		return new Connection(local, server);
+	public static TcpConnection newTcpConnection(final InetSocketAddress local, final InetSocketAddress server) {
+		return new TcpConnection(local, server);
 	}
 
-	private Connection(final InetSocketAddress server) {
+	private TcpConnection(final InetSocketAddress server) {
 		this.server = server;
 		socket = new Socket();
 		logger = LoggerFactory.getLogger("calimero.knxnetip.tcp " + hostPort(server));
 	}
 
-	protected Connection(final InetSocketAddress local, final InetSocketAddress server) {
+	protected TcpConnection(final InetSocketAddress local, final InetSocketAddress server) {
 		this(server);
 		if (local.isUnresolved())
 			throw new KNXIllegalArgumentException("unresolved address " + local);

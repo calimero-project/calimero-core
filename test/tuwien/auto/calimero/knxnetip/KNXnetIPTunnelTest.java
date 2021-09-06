@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ class KNXnetIPTunnelTest
 	private static KNXnetIPConnection.BlockingMode ack = KNXnetIPConnection.BlockingMode.WaitForAck;
 	private static KNXnetIPConnection.BlockingMode con = KNXnetIPConnection.BlockingMode.WaitForCon;
 
-	private Connection connection;
+	private TcpConnection connection;
 
 	private KNXnetIPTunnel t;
 	private KNXnetIPTunnel tnat;
@@ -587,7 +587,7 @@ class KNXnetIPTunnelTest
 	}
 
 	private void newTcpTunnel() throws KNXException, InterruptedException {
-		connection = Connection.newTcpConnection(Util.localEndpoint(), Util.getServer());
+		connection = TcpConnection.newTcpConnection(Util.localEndpoint(), Util.getServer());
 		t = new KNXnetIPTunnel(LinkLayer, connection, KNXMediumSettings.BackboneRouter);
 		System.out.println(t);
 		t.addConnectionListener(l);

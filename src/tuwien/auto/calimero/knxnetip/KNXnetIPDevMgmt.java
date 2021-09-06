@@ -95,7 +95,7 @@ public class KNXnetIPDevMgmt extends ClientConnection
 		connect(localEP, serverCtrlEP, cri, useNAT);
 	}
 
-	public KNXnetIPDevMgmt(final Connection connection) throws KNXException, InterruptedException {
+	public KNXnetIPDevMgmt(final TcpConnection connection) throws KNXException, InterruptedException {
 		super(KNXnetIPHeader.DEVICE_CONFIGURATION_REQ, KNXnetIPHeader.DEVICE_CONFIGURATION_ACK, 4,
 				CONFIGURATION_REQ_TIMEOUT, connection);
 		final CRI cri = CRI.createRequest(DEVICE_MGMT_CONNECTION);

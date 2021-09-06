@@ -44,7 +44,7 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.baos.BaosLink;
 import tuwien.auto.calimero.baos.BaosService;
 import tuwien.auto.calimero.cemi.CEMILData;
-import tuwien.auto.calimero.knxnetip.Connection;
+import tuwien.auto.calimero.knxnetip.TcpConnection;
 import tuwien.auto.calimero.knxnetip.KNXConnectionClosedException;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode;
 import tuwien.auto.calimero.link.AbstractLink;
@@ -60,7 +60,7 @@ public final class BaosLinkIp extends AbstractLink<ObjectServerConnection> imple
 		return new BaosLinkIp(c);
 	}
 
-	public static BaosLink newTcpLink(final Connection connection) throws KNXException {
+	public static BaosLink newTcpLink(final TcpConnection connection) throws KNXException {
 		final var c = new ObjectServerConnection(connection);
 		return new BaosLinkIp(c);
 	}

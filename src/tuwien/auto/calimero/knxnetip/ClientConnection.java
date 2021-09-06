@@ -108,22 +108,22 @@ public abstract class ClientConnection extends ConnectionBase
 	private volatile boolean cleanup;
 
 	final boolean tcp;
-	private final Connection connection;
+	private final TcpConnection connection;
 
 	// logger is initialized in connect, when name of connection is available
 	protected ClientConnection(final int serviceRequest, final int serviceAck, final int maxSendAttempts,
-			final int responseTimeout, final Connection connection) {
+			final int responseTimeout, final TcpConnection connection) {
 		super(serviceRequest, serviceAck, maxSendAttempts, responseTimeout);
-		tcp = connection != Connection.Udp;
+		tcp = connection != TcpConnection.Udp;
 		this.connection = connection;
 	}
 
 	protected ClientConnection(final int serviceRequest, final int serviceAck, final int maxSendAttempts,
 			final int responseTimeout) {
-		this(serviceRequest, serviceAck, maxSendAttempts, responseTimeout, Connection.Udp);
+		this(serviceRequest, serviceAck, maxSendAttempts, responseTimeout, TcpConnection.Udp);
 	}
 
-	protected void connect(final Connection c, final CRI cri) throws KNXException, InterruptedException {
+	protected void connect(final TcpConnection c, final CRI cri) throws KNXException, InterruptedException {
 		try {
 			c.connect();
 			c.registerConnectRequest(this);

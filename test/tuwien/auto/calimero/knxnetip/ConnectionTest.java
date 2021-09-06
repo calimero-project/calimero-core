@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019 B. Malinowsky
+    Copyright (c) 2019, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,14 +46,14 @@ import tag.KnxnetIPSequential;
 import tag.Slow;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.Util;
-import tuwien.auto.calimero.knxnetip.Connection.SecureSession;
+import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 
 @KnxnetIPSequential
 class ConnectionTest {
 
-	private Connection conn;
+	private TcpConnection conn;
 
 	private final byte[] userKey1 = SecureConnection.hashUserPassword("user1".toCharArray());
 	private final byte[] userKey2 = SecureConnection.hashUserPassword("user2".toCharArray());
@@ -63,7 +63,7 @@ class ConnectionTest {
 
 	@BeforeEach
 	void init() throws KNXException {
-		conn = Connection.newTcpConnection(Util.getLocalHost(), Util.getServer());
+		conn = TcpConnection.newTcpConnection(Util.getLocalHost(), Util.getServer());
 	}
 
 	@AfterEach

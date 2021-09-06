@@ -59,8 +59,8 @@ import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.ReturnCode;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.cemi.CEMILData;
-import tuwien.auto.calimero.knxnetip.Connection;
-import tuwien.auto.calimero.knxnetip.Connection.SecureSession;
+import tuwien.auto.calimero.knxnetip.TcpConnection;
+import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.knxnetip.KNXConnectionClosedException;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.knxnetip.KNXnetIPDevMgmt;
@@ -150,7 +150,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 		return new KNXNetworkLinkIP(TUNNELING, localEP, remoteEP, useNAT, settings);
 	}
 
-	public static KNXNetworkLinkIP newTunnelingLink(final Connection connection, final KNXMediumSettings settings)
+	public static KNXNetworkLinkIP newTunnelingLink(final TcpConnection connection, final KNXMediumSettings settings)
 			throws KNXException, InterruptedException {
 		return new KNXNetworkLinkIP(TunnelingV2, KNXnetIPTunnel.newTcpTunnel(TunnelingLayer.LinkLayer, connection,
 				settings.getDeviceAddress()), settings);

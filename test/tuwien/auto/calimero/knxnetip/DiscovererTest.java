@@ -479,7 +479,7 @@ class DiscovererTest
 	@Test
 	void tcpEndpointSearch() throws KNXException, InterruptedException, ExecutionException {
 		final InetSocketAddress server = Util.getServer();
-		try (var c = Connection.newTcpConnection(new InetSocketAddress(0), server)) {
+		try (var c = TcpConnection.newTcpConnection(new InetSocketAddress(0), server)) {
 			final var result = Discoverer.tcp(c).search(
 					withDeviceDescription(DIB.DEVICE_INFO, DIB.SUPP_SVC_FAMILIES, DIB.AdditionalDeviceInfo,
 							DIB.SecureServiceFamilies, DIB.TunnelingInfo));
@@ -492,7 +492,7 @@ class DiscovererTest
 	void searchInProgrammingMode() throws KNXException, InterruptedException, ExecutionException {
 		final InetSocketAddress server = Util.getServer();
 		final int pidProgMode = 54;
-		try (var c = Connection.newTcpConnection(new InetSocketAddress(0), server); var mgmt = new KNXnetIPDevMgmt(c)) {
+		try (var c = TcpConnection.newTcpConnection(new InetSocketAddress(0), server); var mgmt = new KNXnetIPDevMgmt(c)) {
 
 			final var progModeOn = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, 0, 1, pidProgMode, 1, 1, new byte[] { 1 });
 			mgmt.send(progModeOn, BlockingMode.WaitForCon);
@@ -512,7 +512,7 @@ class DiscovererTest
 
 	@Test
 	void searchDeviceNotInProgrammingMode() throws KNXException {
-		try (var connection = Connection.newTcpConnection(Util.getLocalHost(), Util.getServer())) {
+		try (var connection = TcpConnection.newTcpConnection(Util.getLocalHost(), Util.getServer())) {
 			final var future = Discoverer.tcp(connection).search(Srp.withProgrammingMode());
 			assertThrows(ExecutionException.class, () -> future.get());
 		}
@@ -521,7 +521,7 @@ class DiscovererTest
 	@Test
 	void searchWithMacAddress() throws KNXException, InterruptedException, ExecutionException {
 		final InetSocketAddress server = Util.getServer();
-		try (var c = Connection.newTcpConnection(new InetSocketAddress(0), server); var mgmt = new KNXnetIPDevMgmt(c)) {
+		try (var c = TcpConnection.newTcpConnection(new InetSocketAddress(0), server); var mgmt = new KNXnetIPDevMgmt(c)) {
 			final byte[] macAddress = new byte[6];
 			mgmt.addConnectionListener((final FrameEvent e) -> {
 					final byte[] data = ((CEMIDevMgmt) e.getFrame()).getPayload();
@@ -539,7 +539,7 @@ class DiscovererTest
 
 	@Test
 	void searchUsingTcp() throws KNXException, InterruptedException, ExecutionException {
-		try (var connection = Connection.newTcpConnection(Util.getLocalHost(), Util.getServer())) {
+		try (var connection = TcpConnection.newTcpConnection(Util.getLocalHost(), Util.getServer())) {
 			final var future = Discoverer.tcp(connection).search();
 			final var result = future.get();
 			assertTrue(result.size() > 0);
@@ -549,7 +549,7 @@ class DiscovererTest
 	@Test
 	void searchUsingSecureSession() throws KNXException, InterruptedException, ExecutionException {
 		final var pwdHash = SecureConnection.hashUserPassword("user1".toCharArray());
-		try (var connection = Connection.newTcpConnection(Util.getLocalHost(), Util.getServer());
+		try (var connection = TcpConnection.newTcpConnection(Util.getLocalHost(), Util.getServer());
 			 var session = connection.newSecureSession(1, pwdHash, new byte[16])) {
 
 			final var future = Discoverer.secure(session).search();
@@ -560,7 +560,7 @@ class DiscovererTest
 
 	@Test
 	void descriptionUsingTcp() throws KNXException {
-		try (var connection = Connection.newTcpConnection(Util.getLocalHost(), Util.getServer())) {
+		try (var connection = TcpConnection.newTcpConnection(Util.getLocalHost(), Util.getServer())) {
 			final var discoverer = Discoverer.tcp(connection);
 			final var result = discoverer.getDescription(Util.getServer(), 30);
 			assertEquals(Util.getServer(), result.remoteEndpoint());
@@ -570,7 +570,7 @@ class DiscovererTest
 	@Test
 	void descriptionUsingSecureSession() throws KNXException {
 		final var pwdHash = SecureConnection.hashUserPassword("user1".toCharArray());
-		try (var connection = Connection.newTcpConnection(Util.getLocalHost(), Util.getServer());
+		try (var connection = TcpConnection.newTcpConnection(Util.getLocalHost(), Util.getServer());
 				var session = connection.newSecureSession(1, pwdHash, new byte[16])) {
 			final var discoverer = Discoverer.secure(session);
 			final var result = discoverer.getDescription(Util.getServer(), 30);

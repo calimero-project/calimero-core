@@ -58,7 +58,7 @@ import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.baos.BaosService.Property;
 import tuwien.auto.calimero.baos.ip.BaosIp;
 import tuwien.auto.calimero.baos.ip.BaosLinkIp;
-import tuwien.auto.calimero.knxnetip.Connection;
+import tuwien.auto.calimero.knxnetip.TcpConnection;
 import tuwien.auto.calimero.knxnetip.Discoverer;
 import tuwien.auto.calimero.knxnetip.Discoverer.Result;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
@@ -100,7 +100,7 @@ class BaosTest {
 		final var server = new BaosServer();
 		CompletableFuture.runAsync(server);
 		Thread.sleep(500);
-		try (var link = BaosLinkIp.newTcpLink(Connection.newTcpConnection(new InetSocketAddress(0), objectServer))) {
+		try (var link = BaosLinkIp.newTcpLink(TcpConnection.newTcpConnection(new InetSocketAddress(0), objectServer))) {
 			final var rcv = new LinkedBlockingQueue<>();
 			link.addLinkListener(new NetworkLinkListener() {
 				@LinkEvent

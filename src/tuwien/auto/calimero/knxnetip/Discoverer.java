@@ -79,7 +79,7 @@ import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.KnxRuntimeException;
 import tuwien.auto.calimero.internal.UdpSocketLooper;
-import tuwien.auto.calimero.knxnetip.Connection.SecureSession;
+import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
 import tuwien.auto.calimero.knxnetip.servicetype.DescriptionRequest;
 import tuwien.auto.calimero.knxnetip.servicetype.DescriptionResponse;
@@ -164,7 +164,7 @@ public class Discoverer
 	private final boolean mcast;
 
 	// tcp unicast search
-	private Connection connection;
+	private TcpConnection connection;
 	private SecureSession session;
 
 
@@ -270,7 +270,7 @@ public class Discoverer
 	 * @param c the connection to use, ownership is not transferred to the discoverer
 	 * @return a discoverer
 	 */
-	public static Discoverer tcp(final Connection c) {
+	public static Discoverer tcp(final TcpConnection c) {
 		return new Discoverer(c);
 	}
 
@@ -345,7 +345,7 @@ public class Discoverer
 			throw new KNXIllegalArgumentException("IPv4 address required if NAT is not used (supplied " + host.getHostAddress() + ")");
 	}
 
-	private Discoverer(final Connection c) {
+	private Discoverer(final TcpConnection c) {
 		host = null;
 		port = 0;
 		nat = false;
@@ -431,7 +431,7 @@ public class Discoverer
 	private final class Tunnel<T> extends KNXnetIPTunnel {
 		private final CompletableFuture<Result<T>> cf;
 
-		Tunnel(final TunnelingLayer knxLayer, final Connection connection,
+		Tunnel(final TunnelingLayer knxLayer, final TcpConnection connection,
 				final IndividualAddress tunnelingAddress, final CompletableFuture<Result<T>> cf) throws KNXException,
 				InterruptedException {
 			super(knxLayer, connection, tunnelingAddress);
@@ -466,7 +466,7 @@ public class Discoverer
 		}
 
 		@Override
-		protected void connect(final Connection c, final CRI cri) throws KNXException, InterruptedException {
+		protected void connect(final TcpConnection c, final CRI cri) throws KNXException, InterruptedException {
 			if (session == null) {
 				super.connect(c, cri);
 				return;

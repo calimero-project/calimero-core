@@ -58,7 +58,7 @@ import tuwien.auto.calimero.baos.BaosService;
 import tuwien.auto.calimero.baos.BaosService.Property;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.knxnetip.ClientConnection;
-import tuwien.auto.calimero.knxnetip.Connection;
+import tuwien.auto.calimero.knxnetip.TcpConnection;
 import tuwien.auto.calimero.knxnetip.KNXConnectionClosedException;
 import tuwien.auto.calimero.knxnetip.servicetype.ErrorCodes;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
@@ -102,7 +102,7 @@ class ObjectServerConnection extends ClientConnection {
 		connect(localEP, serverCtrlEP, CRI.createRequest(ObjectServerProtocol), false);
 	}
 
-	ObjectServerConnection(final Connection c) throws KNXException {
+	ObjectServerConnection(final TcpConnection c) throws KNXException {
 		super(KNXnetIPHeader.ObjectServerRequest, KNXnetIPHeader.ObjectServerAck, 1, ReqTimeout, c);
 		ctrlEndpt = c.server();
 		logger = LogService.getLogger("calimero.baos." + getName());

@@ -95,7 +95,7 @@ import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.SerialNumber;
 import tuwien.auto.calimero.cemi.CEMI;
-import tuwien.auto.calimero.knxnetip.Connection.SecureSession;
+import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
@@ -211,7 +211,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 			}
 
 			@Override
-			protected void connect(final Connection c, final CRI cri) throws KNXException, InterruptedException {
+			protected void connect(final TcpConnection c, final CRI cri) throws KNXException, InterruptedException {
 				session.registerConnectRequest(this);
 				try {
 					super.connect(c.localEndpoint(), c.server(), cri, false);
@@ -266,7 +266,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 			}
 
 			@Override
-			protected void connect(final Connection c, final CRI cri) throws KNXException, InterruptedException {
+			protected void connect(final TcpConnection c, final CRI cri) throws KNXException, InterruptedException {
 				session.registerConnectRequest(this);
 				try {
 					super.connect(c.localEndpoint(), c.server(), cri, false);
@@ -386,7 +386,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 			}
 		}
 
-		session = Connection.Udp.newSecureSession(userId, userKey, deviceAuthCode);
+		session = TcpConnection.Udp.newSecureSession(userId, userKey, deviceAuthCode);
 
 		sno = session.serialNumber();
 		setupSecureSession(local, serverCtrlEP);
@@ -457,7 +457,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 			}
 		}
 
-		session = Connection.Udp.newSecureSession(1, userKey, deviceAuthCode);
+		session = TcpConnection.Udp.newSecureSession(1, userKey, deviceAuthCode);
 		sno = session.serialNumber();
 		setupSecureSession(local, serverCtrlEP);
 
