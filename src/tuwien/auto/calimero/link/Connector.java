@@ -84,7 +84,7 @@ public final class Connector
 	public static final long NoMaxAttempts = Long.MAX_VALUE;
 	private long maxAttempts = NoMaxAttempts;
 
-	private Consumer<Boolean> connectionStatusChanged = __ -> {};
+	private volatile Consumer<Boolean> connectionStatusChanged = __ -> {};
 
 	public Connector() {}
 
