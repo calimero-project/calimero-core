@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2019 B. Malinowsky
+    Copyright (c) 2015, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -73,6 +73,7 @@ public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNet
 
 	final T conn;
 
+	volatile boolean wrappedByConnector;
 	private volatile boolean closed;
 	private KNXMediumSettings medium;
 	private final String name;
@@ -134,9 +135,15 @@ public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNet
 		@Override
 		public void connectionClosed(final CloseEvent e)
 		{
-			((AbstractMonitor<?>) source).closed = true;
-			super.connectionClosed(e);
+			final var monitor = (AbstractMonitor<?>) source;
+			monitor.closed = true;
 			logger.info("monitor closed");
+			if (monitor.wrappedByConnector) {
+				getListeners().listeners().stream().filter(Connector.Link.class::isInstance)
+						.forEach(l -> l.linkClosed(e));
+				return;
+			}
+			super.connectionClosed(e);
 		}
 	}
 

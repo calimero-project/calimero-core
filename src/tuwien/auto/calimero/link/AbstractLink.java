@@ -101,6 +101,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	 * protocol during initialization.
 	 */
 	protected final EventNotifier<NetworkLinkListener> notifier;
+	volatile boolean wrappedByConnector;
 
 	/** The message format to generate: cEMI or EMI1/EMI2. */
 	protected boolean cEMI = true;
@@ -212,8 +213,13 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		public void connectionClosed(final CloseEvent e)
 		{
 			AbstractLink.this.closed = true;
-			super.connectionClosed(e);
 			logger.debug("link closed");
+			if (wrappedByConnector) {
+				getListeners().listeners().stream().filter(Connector.Link.class::isInstance)
+					.forEach(l -> l.linkClosed(e));
+				return;
+			}
+			super.connectionClosed(e);
 		}
 	};
 

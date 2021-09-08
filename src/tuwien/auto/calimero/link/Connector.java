@@ -435,12 +435,20 @@ public final class Connector
 						link.setKNXMedium(settings);
 						link.setHopCount(hopCount);
 						link.addLinkListener(this);
+						if (link instanceof AbstractLink<?>) {
+							final var abstractLink = (AbstractLink<?>) link;
+							abstractLink.wrappedByConnector = true;
+						}
 						listeners.forEach(l -> link.addLinkListener((NetworkLinkListener) l));
 					}
 					else if (t instanceof KNXNetworkMonitor) {
 						final KNXNetworkMonitor monitor = (KNXNetworkMonitor) t;
 						monitor.setDecodeRawFrames(decodeRawFrames);
 						monitor.addMonitorListener(this);
+						if (monitor instanceof AbstractMonitor<?>) {
+							final var abstractLink = (AbstractLink<?>) monitor;
+							abstractLink.wrappedByConnector = true;
+						}
 						listeners.forEach(monitor::addMonitorListener);
 					}
 					impl = t;
