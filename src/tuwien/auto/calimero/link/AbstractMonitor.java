@@ -83,7 +83,7 @@ public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNet
 		volatile boolean decode;
 		private boolean extBusmon;
 
-		MonitorNotifier(final Object source, final Logger logger, final boolean extBusmon)
+		MonitorNotifier(final AbstractMonitor<?> source, final Logger logger, final boolean extBusmon)
 		{
 			super(source, logger);
 			this.extBusmon = extBusmon;
