@@ -187,7 +187,7 @@ public class RoutingBusy extends ServiceType
 	@Override
 	public String toString() {
 		return super.toString() + " 0x" + Integer.toHexString(ctrl) + (isKnxFault() ? " KNX network fault" : "")
-				+ ", wait " + waitTime + " ms";
+				+ ", wait " + waitTime.toMillis() + " ms";
 	}
 
 	@Override
