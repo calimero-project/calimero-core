@@ -74,7 +74,7 @@ public final class Connector
 	}
 
 	private boolean onSend = true;
-	private long reconnectDelay = 2000; // [ms]
+	private long reconnectDelay = 4000; // [ms]
 	// reconnect on disconnect caused by:
 	private boolean initialError;
 	private boolean serverError = true;
