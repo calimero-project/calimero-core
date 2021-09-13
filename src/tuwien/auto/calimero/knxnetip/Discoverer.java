@@ -79,8 +79,8 @@ import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.KnxRuntimeException;
 import tuwien.auto.calimero.internal.UdpSocketLooper;
-import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
+import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.knxnetip.servicetype.DescriptionRequest;
 import tuwien.auto.calimero.knxnetip.servicetype.DescriptionResponse;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
@@ -370,24 +370,14 @@ public class Discoverer
 	}
 
 	private CompletableFuture<List<Result<SearchResponse>>> search(final Duration timeout) {
-		try {
-			return searchAsync(timeout);
-		}
-		catch (final KNXException e) {
-			return CompletableFuture.failedFuture(e);
-		}
+		return searchAsync(timeout);
 	}
 
 	public CompletableFuture<List<Result<SearchResponse>>> search(final Srp... searchParameters) {
 		if (connection != null)
 			return tcpSearch(searchParameters).thenApply(List::of);
 
-		try {
-			return searchAsync(timeoutOrDefault(), searchParameters);
-		}
-		catch (final KNXException e) {
-			return CompletableFuture.failedFuture(e);
-		}
+		return searchAsync(timeoutOrDefault(), searchParameters);
 	}
 
 	// extended unicast search to server control endpoint
@@ -614,12 +604,11 @@ public class Discoverer
 	 *        get collected, timeout &ge; 0. If timeout is 0, no timeout is set, the search
 	 *        has to be stopped with <code>stopSearch</code>.
 	 * @param wait <code>true</code> to block until end of search before return
-	 * @throws KNXException on network I/O error
 	 * @throws InterruptedException if search was interrupted in blocking mode before the
 	 *         specified timeout was reached; the search is stopped before passing this
 	 *         exception back to the caller
 	 */
-	public void startSearch(final int timeout, final boolean wait) throws KNXException, InterruptedException
+	public void startSearch(final int timeout, final boolean wait) throws InterruptedException
 	{
 		final CompletableFuture<List<Result<SearchResponse>>> search = search(Duration.ofSeconds(timeout));
 		if (!wait)
@@ -636,7 +625,7 @@ public class Discoverer
 	}
 
 	private CompletableFuture<List<Result<SearchResponse>>> searchAsync(final Duration timeout,
-			final Srp... searchParameters) throws KNXException {
+			final Srp... searchParameters) {
 		if (timeout.isNegative())
 			throw new KNXIllegalArgumentException("timeout has to be >= 0");
 		final NetworkInterface[] nifs;
@@ -644,8 +633,7 @@ public class Discoverer
 			nifs = NetworkInterface.networkInterfaces().toArray(NetworkInterface[]::new);
 		}
 		catch (final SocketException e) {
-			logger.error("failed to get network interfaces", e);
-			throw new KNXException("network interface error: " + e.getMessage());
+			return CompletableFuture.failedFuture(e);
 		}
 		// loopback flag, so we start at most one local search
 		boolean lo = false;
@@ -679,7 +667,8 @@ public class Discoverer
 			}
 		}
 		if (cfs.size() == 0)
-			throw new KNXException("search could not be started on any network interface");
+			return CompletableFuture.failedFuture(
+					new KNXException("search could not be started on any network interface"));
 
 		final CompletableFuture<List<Result<SearchResponse>>> search = CompletableFuture
 				.allOf(cfs.toArray(new CompletableFuture<?>[0])).thenApply(__ -> List.copyOf(responses));

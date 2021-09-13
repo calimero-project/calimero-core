@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,7 +43,6 @@ import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -153,9 +152,6 @@ public final class Util
 					return null;
 				device = d.getSearchResponses().get(0).getResponse().getDevice().getAddress();
 			}
-			catch (final KNXException e) {
-				e.printStackTrace();
-			}
 			catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -210,17 +206,7 @@ public final class Util
 	 */
 	public static NetworkInterface localInterface() throws SocketException
 	{
-		try {
-			return NetworkInterface.getByInetAddress(onSameSubnet(getServer().getAddress()).get());
-		}
-		catch (final KNXException e) {
-			try {
-				return NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
-			}
-			catch (final UnknownHostException uhe) {
-				return null;
-			}
-		}
+		return NetworkInterface.getByInetAddress(onSameSubnet(getServer().getAddress()).get());
 	}
 
 	// finds a local IPv4 address with its network prefix "matching" the remote address
@@ -258,9 +244,8 @@ public final class Util
 	 * Returns the socket address of the KNXnet/IP router to use for testing.
 	 *
 	 * @return socket address
-	 * @throws KNXException if KNXnet/IP discovery failed
 	 */
-	public synchronized static InetSocketAddress getServer() throws KNXException
+	public synchronized static InetSocketAddress getServer()
 	{
 		// we try once to find our running test server, on failure subsequent calls will
 		// immediately return to speed up tests
