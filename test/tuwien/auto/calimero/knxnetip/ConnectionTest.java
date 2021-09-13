@@ -46,8 +46,8 @@ import tag.KnxnetIPSequential;
 import tag.Slow;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.Util;
-import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
+import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 
 @KnxnetIPSequential
@@ -62,7 +62,7 @@ class ConnectionTest {
 	private final byte[] deviceAuthCode = SecureConnection.hashDeviceAuthenticationPassword("dev".toCharArray());
 
 	@BeforeEach
-	void init() throws KNXException {
+	void init() {
 		conn = TcpConnection.newTcpConnection(Util.getLocalHost(), Util.getServer());
 	}
 

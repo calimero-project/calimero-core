@@ -131,7 +131,7 @@ class DiscovererTest
 	}
 
 	@Test
-	void testClearSearchResponses() throws KNXException, InterruptedException
+	void testClearSearchResponses() throws InterruptedException
 	{
 		ddef.startSearch(timeout, true);
 		assertTrue(ddef.getSearchResponses().size() > 0);
@@ -169,13 +169,13 @@ class DiscovererTest
 	}
 
 	@Test
-	void testGetSearchResponses() throws KNXException, InterruptedException
+	void testGetSearchResponses() throws InterruptedException
 	{
 		doGetSearchRes(ddef);
 	}
 
 	@Test
-	void testNATGetSearchResponses() throws KNXException, InterruptedException
+	void testNATGetSearchResponses() throws InterruptedException
 	{
 		if (!Util.TEST_NAT) {
 			System.out.println("\n==== skip testNATGetSearchResponses ====\n");
@@ -190,12 +190,12 @@ class DiscovererTest
 	}
 
 	@Test
-	void testMcastGetSearchResponses() throws KNXException, InterruptedException
+	void testMcastGetSearchResponses() throws InterruptedException
 	{
 		doGetSearchRes(dmcast);
 	}
 
-	private void doGetSearchRes(final Discoverer d) throws KNXException, InterruptedException
+	private void doGetSearchRes(final Discoverer d) throws InterruptedException
 	{
 		d.startSearch(timeout, true);
 		final List<Result<SearchResponse>> search = d.getSearchResponses();
@@ -270,13 +270,13 @@ class DiscovererTest
 	}
 
 	@Test
-	void testStartSearchIntBoolean() throws KNXException, InterruptedException, ExecutionException
+	void testStartSearchIntBoolean() throws InterruptedException, ExecutionException
 	{
 		doSearch(ddef, false);
 	}
 
 	@Test
-	void testNATStartSearchIntBoolean() throws KNXException, InterruptedException, ExecutionException
+	void testNATStartSearchIntBoolean() throws InterruptedException, ExecutionException
 	{
 		if (!Util.TEST_NAT) {
 			System.out.println("\n==== skip testNATStartSearchIntBoolean ====\n");
@@ -291,7 +291,7 @@ class DiscovererTest
 	}
 
 	@Test
-	void testMcastStartSearchIntBoolean() throws KNXException, InterruptedException, ExecutionException
+	void testMcastStartSearchIntBoolean() throws InterruptedException, ExecutionException
 	{
 		doSearch(dmcast, true);
 	}
@@ -303,7 +303,7 @@ class DiscovererTest
 	}
 
 	private void doSearch(final Discoverer d, final boolean usesMulticast)
-			throws KNXException, InterruptedException, ExecutionException {
+			throws InterruptedException, ExecutionException {
 		try {
 			d.startSearch(-1, true);
 			fail("negative timeout");
@@ -324,7 +324,7 @@ class DiscovererTest
 	}
 
 	@Test
-	void testStopSearch() throws InterruptedException, KNXException
+	void testStopSearch() throws InterruptedException
 	{
 		ddef.startSearch(timeout, false);
 		ddef.startSearch(timeout, false);
@@ -363,7 +363,7 @@ class DiscovererTest
 	}
 
 	@Test
-	void testIsSearching() throws KNXException, InterruptedException
+	void testIsSearching() throws InterruptedException
 	{
 		ddef.startSearch(timeout, false);
 		assertTrue(ddef.isSearching());
@@ -374,7 +374,7 @@ class DiscovererTest
 	}
 
 	@Test
-	void testStartSearchInterrupt() throws KNXException
+	void testStartSearchInterrupt()
 	{
 		final Thread t = Thread.currentThread();
 		try {
@@ -477,7 +477,7 @@ class DiscovererTest
 	}
 
 	@Test
-	void tcpEndpointSearch() throws KNXException, InterruptedException, ExecutionException {
+	void tcpEndpointSearch() throws InterruptedException, ExecutionException {
 		final InetSocketAddress server = Util.getServer();
 		try (var c = TcpConnection.newTcpConnection(new InetSocketAddress(0), server)) {
 			final var result = Discoverer.tcp(c).search(
@@ -511,7 +511,7 @@ class DiscovererTest
 	}
 
 	@Test
-	void searchDeviceNotInProgrammingMode() throws KNXException {
+	void searchDeviceNotInProgrammingMode() {
 		try (var connection = TcpConnection.newTcpConnection(Util.getLocalHost(), Util.getServer())) {
 			final var future = Discoverer.tcp(connection).search(Srp.withProgrammingMode());
 			assertThrows(ExecutionException.class, () -> future.get());
@@ -538,7 +538,7 @@ class DiscovererTest
 	}
 
 	@Test
-	void searchUsingTcp() throws KNXException, InterruptedException, ExecutionException {
+	void searchUsingTcp() throws InterruptedException, ExecutionException {
 		try (var connection = TcpConnection.newTcpConnection(Util.getLocalHost(), Util.getServer())) {
 			final var future = Discoverer.tcp(connection).search();
 			final var result = future.get();
@@ -547,7 +547,7 @@ class DiscovererTest
 	}
 
 	@Test
-	void searchUsingSecureSession() throws KNXException, InterruptedException, ExecutionException {
+	void searchUsingSecureSession() throws InterruptedException, ExecutionException {
 		final var pwdHash = SecureConnection.hashUserPassword("user1".toCharArray());
 		try (var connection = TcpConnection.newTcpConnection(Util.getLocalHost(), Util.getServer());
 			 var session = connection.newSecureSession(1, pwdHash, new byte[16])) {

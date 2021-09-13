@@ -70,13 +70,13 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.cemi.CEMILData;
-import tuwien.auto.calimero.knxnetip.TcpConnection;
 import tuwien.auto.calimero.knxnetip.Debug;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode;
 import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
 import tuwien.auto.calimero.knxnetip.LostMessageEvent;
 import tuwien.auto.calimero.knxnetip.RoutingBusyEvent;
+import tuwien.auto.calimero.knxnetip.TcpConnection;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingLostMessage;
 import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature;
 import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature.InterfaceFeature;
@@ -381,7 +381,7 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
-	void testGetName() throws KNXException
+	void testGetName()
 	{
 		String n = tnl.getName();
 		assertTrue(n.indexOf(Util.getServer().getAddress().getHostAddress()) > -1);
