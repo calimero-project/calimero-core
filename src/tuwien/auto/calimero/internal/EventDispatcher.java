@@ -50,7 +50,17 @@ import org.slf4j.Logger;
 class EventDispatcher<T extends Annotation> {
 	private static final Lookup lookup = MethodHandles.lookup();
 
-	private final Map<Class<?>, Set<MethodHandle>> customEvents = new ConcurrentHashMap<>();
+	private static final class ListenerMH {
+		private final Object listener;
+		private final MethodHandle mh;
+
+		ListenerMH(final Object listener, final MethodHandle mh) {
+			this.listener = listener;
+			this.mh = mh;
+		}
+	}
+
+	final Map<Class<?>, Set<ListenerMH>> customEvents = new ConcurrentHashMap<>();
 	private final Class<T> eventAnnotation;
 	private final Logger logger;
 
@@ -74,6 +84,12 @@ class EventDispatcher<T extends Annotation> {
 			inspectMethodForEvent(method, listener);
 	}
 
+	void unregisterCustomEvents(final Object listener) {
+		for (final var set : customEvents.values()) {
+			set.removeIf(lmh -> listener.equals(lmh.listener));
+		}
+	}
+
 	private void inspectMethodForEvent(final Method method, final Object listener) {
 		if (method.getAnnotation(eventAnnotation) == null)
 			return;
@@ -90,7 +106,7 @@ class EventDispatcher<T extends Annotation> {
 		try {
 			final var privateLookup = MethodHandles.privateLookupIn(listener.getClass(), lookup);
 			final var boundMethod = privateLookup.unreflect(method).bindTo(listener);
-			customEvents.get(paramType).add(boundMethod);
+			customEvents.get(paramType).add(new ListenerMH(listener, boundMethod));
 			logger.trace("registered {}", method);
 		}
 		catch (final Exception e) {
@@ -99,9 +115,9 @@ class EventDispatcher<T extends Annotation> {
 	}
 
 	void dispatchCustomEvent(final Object event) {
-		customEvents.getOrDefault(event.getClass(), Set.of()).forEach(mh -> {
+		customEvents.getOrDefault(event.getClass(), Set.of()).forEach(lmh -> {
 			try {
-				mh.invoke(event);
+				lmh.mh.invoke(event);
 			}
 			catch (final Throwable e) {
 				logger.warn("invoking custom event", e);

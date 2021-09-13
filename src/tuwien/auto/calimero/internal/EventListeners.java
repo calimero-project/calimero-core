@@ -91,7 +91,7 @@ public class EventListeners<T>
 	 *
 	 * @param l the listener to add
 	 */
-	public void add(final T l)
+	public synchronized void add(final T l)
 	{
 		if (listeners.addIfAbsent(l))
 			customEvents.registerCustomEvents(l);
@@ -104,9 +104,10 @@ public class EventListeners<T>
 	 *
 	 * @param l the listener to remove
 	 */
-	public void remove(final T l)
+	public synchronized void remove(final T l)
 	{
-		listeners.remove(l);
+		if (listeners.remove(l))
+			customEvents.unregisterCustomEvents(l);
 	}
 
 	/**
