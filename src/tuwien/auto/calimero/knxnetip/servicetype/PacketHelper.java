@@ -39,7 +39,6 @@ package tuwien.auto.calimero.knxnetip.servicetype;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 
-import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
 
@@ -73,26 +72,6 @@ public final class PacketHelper
 		final ByteArrayOutputStream os = new ByteArrayOutputStream(h.getTotalLength());
 		os.write(h.toByteArray(), 0, h.getStructLength());
 		return type.toByteArray(os);
-	}
-
-	/**
-	 * @deprecated No replacement.
-	 */
-	@Deprecated
-	public static ServiceRequest<?> getServiceRequest(final KNXnetIPHeader h, final byte[] data,
-		final int offset) throws KNXFormatException
-	{
-		return new ServiceRequest<>(h.getServiceType(), data, offset, h.getTotalLength() - h.getStructLength());
-	}
-
-	/**
-	 * @deprecated No replacement.
-	 */
-	@Deprecated
-	public static ServiceRequest<?> getEmptyServiceRequest(final KNXnetIPHeader h, final byte[] data,
-		final int offset) throws KNXFormatException
-	{
-		return ServiceRequest.from(h, data, offset);
 	}
 
 	private static final int SecureSessionRequest = 0x0951;

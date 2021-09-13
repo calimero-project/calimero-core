@@ -196,17 +196,6 @@ public class DeviceDIB extends DIB
 	}
 
 	/**
-	 * @deprecated Use {@link #DeviceDIB(String, int, int, int, IndividualAddress, SerialNumber, InetAddress, byte[])}
-	 */
-	@Deprecated
-	public DeviceDIB(final String friendlyName, final int deviceStatus, final int projectInstallationId,
-			final int knxMedium, final IndividualAddress knxAddress, final byte[] serialNumber,
-			final InetAddress routingMulticast, final byte[] macAddress) {
-		this(friendlyName, deviceStatus, projectInstallationId, knxMedium, knxAddress, SerialNumber.from(serialNumber),
-				routingMulticast, macAddress);
-	}
-
-	/**
 	 * Returns the device individual address.
 	 *
 	 * @return individual address as {@link IndividualAddress}
@@ -331,29 +320,11 @@ public class DeviceDIB extends DIB
 	}
 
 	/**
-	 * @deprecated Use {@link #serialNumber()}
-	 */
-	@Deprecated(forRemoval = true)
-	public final byte[] getSerialNumber()
-	{
-		return serial.array();
-	}
-
-	/**
 	 * Returns the KNX serial number of the device, which uniquely identifies a device.
 	 *
 	 * @return serial number
 	 */
 	public final SerialNumber serialNumber() { return serial; }
-
-	/**
-	 * @deprecated No replacement
-	 */
-	@Deprecated(forRemoval = true)
-	public final String getSerialNumberString()
-	{
-		return serial.toString();
-	}
 
 	/**
 	 * Returns the device friendly name.
@@ -385,7 +356,7 @@ public class DeviceDIB extends DIB
 				+ ", Installation " + getInstallation() + " - Project " + getProject()
 				+ " (ID " + installationId + ")"
 				+ ", KNX IP multicast address " + mc + ", MAC address " + getMACAddressString()
-				+ ", S/N " + getSerialNumberString();
+				+ ", S/N " + serial;
 	}
 
 	@Override

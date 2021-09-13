@@ -396,15 +396,6 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		}
 
 		/**
-		 * @deprecated Use {@link #dpt()}
-		 */
-		@Deprecated
-		public final String getDPT()
-		{
-			return dpt;
-		}
-
-		/**
 		 * @return the datapoint type ID used for the property elements, or an empty optional if no DPT was set
 		 */
 		public final Optional<String> dpt() { return Optional.ofNullable(dpt); }

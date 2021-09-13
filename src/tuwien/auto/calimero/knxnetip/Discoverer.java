@@ -209,15 +209,6 @@ public class Discoverer
 		}
 
 		/**
-		 * @deprecated No replacement.
-		 */
-		@Deprecated
-		public InetAddress getAddress()
-		{
-			return local.getAddress();
-		}
-
-		/**
 		 * @return local endpoint used for the discovery or description request
 		 */
 		public InetSocketAddress localEndpoint() { return local; }

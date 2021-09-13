@@ -88,15 +88,6 @@ public class RFSettings extends KNXMediumSettings
 	}
 
 	/**
-	 * @deprecated Use {@link #RFSettings(IndividualAddress, byte[], SerialNumber, boolean)}
-	 */
-	@Deprecated
-	public RFSettings(final IndividualAddress device, final byte[] domain,
-			final byte[] serialNumber, final boolean unidirectional) {
-		this(device, domain, SerialNumber.from(serialNumber), unidirectional);
-	}
-
-	/**
 	 * Sets a new domain address.
 	 *
 	 * @param domain byte array containing the domain address to use in KNX messages,
@@ -121,15 +112,6 @@ public class RFSettings extends KNXMediumSettings
 	public final synchronized byte[] getDomainAddress()
 	{
 		return doa.clone();
-	}
-
-	/**
-	 * @deprecated Use {@link #serialNumber()}
-	 */
-	@Deprecated
-	public final byte[] getSerialNumber()
-	{
-		return sno.array();
 	}
 
 	/**

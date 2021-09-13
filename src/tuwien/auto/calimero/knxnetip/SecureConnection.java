@@ -95,8 +95,8 @@ import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.SerialNumber;
 import tuwien.auto.calimero.cemi.CEMI;
-import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
+import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.util.CRI;
@@ -312,12 +312,6 @@ public final class SecureConnection extends KNXnetIPRouting {
 	public static byte[] hashDeviceAuthenticationPassword(final char[] password) {
 		final byte[] salt = "device-authentication-code.1.secure.ip.knx.org".getBytes(StandardCharsets.US_ASCII);
 		return pbkdf2WithHmacSha256(password, salt);
-	}
-
-	@Deprecated(forRemoval = true)
-	public static byte[] hashDeviceAuthenticationCode(final char[] authCode) {
-		final byte[] salt = "device-authentication-code.1.secure.ip.knx.org".getBytes(StandardCharsets.US_ASCII);
-		return pbkdf2WithHmacSha256(authCode, salt);
 	}
 
 	private static byte[] pbkdf2WithHmacSha256(final char[] password, final byte[] salt) {

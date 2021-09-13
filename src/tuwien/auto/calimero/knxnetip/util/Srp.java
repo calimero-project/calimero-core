@@ -203,14 +203,6 @@ public final class Srp
 	}
 
 	/**
-	 * @deprecated Use {@link #withService(ServiceFamily, int)}.
-	 */
-	@Deprecated
-	public static Srp withService(final int familyId, final int familyVersion) {
-		return new Srp(Type.SelectByService, true, (byte) familyId, (byte) familyVersion);
-	}
-
-	/**
 	 * Creates a search request parameter block to limit the extended search request to KNXnet/IP router
 	 * or server devices with the given service family and corresponding family version. The mandatory flag
 	 * of the SRP is set.

@@ -201,17 +201,6 @@ public class HPAI
 	public final InetSocketAddress endpoint() { return addr; }
 
 	/**
-	 * @deprecated No replacement.
-	 *
-	 * @return byte array with IP address in network byte order
-	 */
-	@Deprecated
-	public final byte[] getRawAddress()
-	{
-		return addr.getAddress().getAddress();
-	}
-
-	/**
 	 * Returns the IP network address as {@link InetAddress} representation.
 	 *
 	 * @return IP address as InetAddress object

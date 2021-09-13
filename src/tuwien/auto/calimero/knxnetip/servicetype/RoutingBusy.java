@@ -138,15 +138,6 @@ public class RoutingBusy extends ServiceType
 	}
 
 	/**
-	 * @deprecated Use {@link #waitTime()}.
-	 */
-	@Deprecated
-	public final int getWaitTime()
-	{
-		return (int) waitTime.toMillis();
-	}
-
-	/**
 	 * Returns the time required to empty the affected receive queue.
 	 * <p>
 	 * If 1) {@link #getControl()} returns 0x0, or 2) {@link #getControl()} returns not 0x0 and the

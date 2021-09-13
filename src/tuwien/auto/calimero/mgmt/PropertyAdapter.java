@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -111,8 +111,6 @@ public interface PropertyAdapter extends AutoCloseable
 	 * <p>
 	 * Depending on the adapter, necessary steps to terminate a connection might be done and owned resources will be
 	 * freed. A closed adapter can't be used for property access anymore.<br>
-	 * Currently, this method does not invoke
-	 * {@link PropertyAdapterListener#adapterClosed(tuwien.auto.calimero.CloseEvent)}.
 	 */
 	@Override
 	void close();

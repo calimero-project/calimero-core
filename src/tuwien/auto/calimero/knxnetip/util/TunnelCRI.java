@@ -107,16 +107,6 @@ public class TunnelCRI extends CRI
 	}
 
 	/**
-	 * @deprecated Use {@link #tunnelingLayer()}.
-	 * @return layer value as unsigned byte
-	 */
-	@Deprecated
-	public final int getKNXLayer()
-	{
-		return opt[0] & 0xFF;
-	}
-
-	/**
 	 * Returns the requested tunneling layer.
 	 *
 	 * @return tunneling layer

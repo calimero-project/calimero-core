@@ -177,15 +177,6 @@ public class ServiceFamiliesDIB extends DIB
 	}
 
 	/**
-	 * @deprecated Use {@link #ServiceFamiliesDIB(Map)}
-	 */
-	@Deprecated
-	public ServiceFamiliesDIB(final int[] familyIDs, final int[] familyVersions)
-	{
-		this(false, toEnumMap(familyIDs, familyVersions));
-	}
-
-	/**
 	 * Creates a service families DIB using the provided service family entries.
 	 *
 	 * @param families map containing the supported service families, with the value being the supported version in the
@@ -211,35 +202,6 @@ public class ServiceFamiliesDIB extends DIB
 	 * @return an unmodifiable map containing family-version mappings
 	 */
 	public final Map<ServiceFamily, Integer> families() { return Collections.unmodifiableMap(families); }
-
-	/**
-	 * @deprecated No replacement.
-	 * @return a new array containing the IDs of the supported service families, the array
-	 *         size reflects the number of supported service families
-	 */
-	@Deprecated(forRemoval = true)
-	public final int[] getFamilyIds()
-	{
-		return families.keySet().stream().mapToInt(ServiceFamily::id).toArray();
-	}
-
-	/**
-	 * @deprecated No replacement.
-	 *
-	 * @param familyId supported service family ID to lookup
-	 * @return version as unsigned byte, or 0
-	 */
-	@Deprecated(forRemoval = true)
-	public final int getVersion(final int familyId)
-	{
-		return families.getOrDefault(ServiceFamily.of(familyId), 0);
-	}
-
-	@Deprecated(forRemoval = true)
-	public final String getFamilyName(final int familyId)
-	{
-		return ServiceFamily.of(familyId).toString();
-	}
 
 	@Override
 	public byte[] toByteArray()
@@ -290,12 +252,5 @@ public class ServiceFamiliesDIB extends DIB
 			throw new KNXIllegalArgumentException("version out of range [0..255]");
 
 		families.put(familyId, familyVersion);
-	}
-
-	private static EnumMap<ServiceFamily, Integer> toEnumMap(final int[] familyIDs, final int[] familyVersions) {
-		final var map = new EnumMap<ServiceFamily, Integer>(ServiceFamily.class);
-		for (int i = 0; i < familyIDs.length; i++)
-			map.put(ServiceFamily.of(familyIDs[i]), familyVersions[i]);
-		return map;
 	}
 }

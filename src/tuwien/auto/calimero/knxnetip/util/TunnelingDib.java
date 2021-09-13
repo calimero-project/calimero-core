@@ -38,9 +38,7 @@ package tuwien.auto.calimero.knxnetip.util;
 
 import java.nio.ByteBuffer;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -113,27 +111,6 @@ public class TunnelingDib extends DIB {
 
 		this.maxApduLength = maxApduLength;
 		slots = deepCopy(tunnelingSlots);
-	}
-
-	@Deprecated
-	public TunnelingDib(final List<IndividualAddress> addresses, final int[] status) {
-		this((short) 0xfe, addresses, status);
-	}
-
-	@Deprecated
-	public TunnelingDib(final short maxApduLength, final List<IndividualAddress> addresses, final int[] status) {
-		super(2 + 2 + 4 * addresses.size(), DIB.TunnelingInfo);
-
-		if (addresses.isEmpty())
-			throw new KNXIllegalArgumentException("at least one address must be given");
-		if (addresses.size() != status.length)
-			throw new KNXIllegalArgumentException("list sizes of addresses and status must be equal");
-
-		this.maxApduLength = maxApduLength;
-
-		slots = new HashMap<>();
-		for (int i = 0; i < addresses.size(); i++)
-			slots.put(addresses.get(i), toStatusSet(status[i]));
 	}
 
 	public TunnelingDib(final byte[] data, final int offset, final int length) throws KNXFormatException {

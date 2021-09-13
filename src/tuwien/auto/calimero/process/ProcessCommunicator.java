@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -147,26 +147,6 @@ public interface ProcessCommunicator extends ProcessCommunication
 	 * @throws InterruptedException on interrupt during read
 	 */
 	int readControl(GroupAddress dst) throws KNXException, InterruptedException;
-
-	/**
-	 * @deprecated Use {@link #readFloat(GroupAddress)}.
-	 * @param dst group destination to read from
-	 * @param is4ByteFloat specifies the datapoint floating point type the datapoint is encoded with: either a 2-byte
-	 *        KNX float of DPT main number 9 (<code>false</code>), or a 4-byte float of DPT main number 14
-	 *        (<code>true</code>)
-	 * @return the read floating point value
-	 * @throws KNXTimeoutException on a timeout during send or no read response was received
-	 * @throws KNXInvalidResponseException on invalid read response message
-	 * @throws KNXLinkClosedException if network link to KNX network is closed
-	 * @throws KNXFormatException on translation problem of the response data
-	 * @throws KNXException on other read problems
-	 * @throws InterruptedException on interrupt during read
-	 */
-	@Deprecated(forRemoval = true)
-	default double readFloat(final GroupAddress dst, final boolean is4ByteFloat) throws KNXException,
-		InterruptedException {
-		return readFloat(dst);
-	}
 
 	/**
 	 * Reads a floating point datapoint value from a group destination.

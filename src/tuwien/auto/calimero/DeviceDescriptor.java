@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2020 B. Malinowsky
+    Copyright (c) 2015, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -56,12 +56,6 @@ public interface DeviceDescriptor
 {
 	int TYPE_SIZE = 2;
 	int TYPE2_SIZE = 14;
-
-	@Deprecated(forRemoval = true)
-	static DeviceDescriptor fromType(final byte[] data) throws KNXFormatException
-	{
-		return from(data);
-	}
 
 	/**
 	 * Construct a device descriptor by parsing raw data.
