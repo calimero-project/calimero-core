@@ -16,7 +16,7 @@ apply plugin: 'java-library'
 apply plugin:'application'
 
 group = 'com.github.calimero'
-version = '2.5-M1'
+version = '2.5-rc1'
 
 sourceCompatibility = 11
 targetCompatibility = 11
