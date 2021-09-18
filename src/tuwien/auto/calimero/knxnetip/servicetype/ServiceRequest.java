@@ -154,6 +154,7 @@ public class ServiceRequest<T extends ServiceType> extends tuwien.auto.calimero.
 	 *        number &lt;= 255
 	 * @param service service type carried with the request
 	 */
+	@SuppressWarnings("unchecked")
 	public ServiceRequest(final int serviceType, final int channelID, final int seqNumber, final T service)
 	{
 		super(serviceType);
@@ -200,6 +201,7 @@ public class ServiceRequest<T extends ServiceType> extends tuwien.auto.calimero.
 		return seq;
 	}
 
+	@SuppressWarnings("unchecked")
 	public final <R extends T> R service() {
 		if (svc == null)
 			svc = svcSupplier.get();

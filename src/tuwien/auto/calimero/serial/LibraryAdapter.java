@@ -154,8 +154,11 @@ public abstract class LibraryAdapter implements Closeable
 				logger.warn("no rxtx library adapter found");
 				lookupRxtx = false;
 			}
+			catch (final InvocationTargetException e) {
+				t = e.getCause();
+			}
 			catch (final Exception e) {
-				t = e instanceof InvocationTargetException ? e.getCause() : e;
+				t = e;
 			}
 		}
 
