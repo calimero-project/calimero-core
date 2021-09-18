@@ -446,7 +446,7 @@ public final class Connector
 						monitor.setDecodeRawFrames(decodeRawFrames);
 						monitor.addMonitorListener(this);
 						if (monitor instanceof AbstractMonitor<?>) {
-							final var abstractLink = (AbstractLink<?>) monitor;
+							final var abstractLink = (AbstractMonitor<?>) monitor;
 							abstractLink.wrappedByConnector = true;
 						}
 						listeners.forEach(monitor::addMonitorListener);
