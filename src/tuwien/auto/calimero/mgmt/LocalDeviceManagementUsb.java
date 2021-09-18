@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2020 B. Malinowsky
+    Copyright (c) 2015, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import tuwien.auto.calimero.CloseEvent;
+import tuwien.auto.calimero.Connection.BlockingMode;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXRemoteException;
@@ -57,14 +58,13 @@ import tuwien.auto.calimero.serial.usb.UsbConnection.EmiType;
  *
  * @author B. Malinowsky
  */
-public class LocalDeviceManagementUsb extends LocalDeviceManagement
+public class LocalDeviceManagementUsb extends LocalDeviceManagement<HidReport>
 {
 	private static final int cEmiServerObject = 8;
 	private static final int pidCommMode = 52;
 
 	private static final int responseTimeout = 1000;
 
-	private final UsbConnection conn;
 
 	/**
 	 * Creates a new property adapter for local device management. The cEMI server is specified by
@@ -90,11 +90,10 @@ public class LocalDeviceManagementUsb extends LocalDeviceManagement
 	{
 		super(c, adapterClosed, queryWriteEnable);
 
-		conn = c;
-		final EnumSet<EmiType> emiTypes = conn.getSupportedEmiTypes();
-		conn.addConnectionListener(new KNXListenerImpl());
+		final EnumSet<EmiType> emiTypes = c.getSupportedEmiTypes();
+		c.addConnectionListener(new KNXListenerImpl());
 		if (emiTypes.contains(EmiType.CEmi)) {
-			conn.setActiveEmiType(EmiType.CEmi);
+			c.setActiveEmiType(EmiType.CEmi);
 			final int objectInstance = 1;
 			setProperty(cEmiServerObject, objectInstance, pidCommMode, 1, 1, new byte[] { 0x00 });
 		}
@@ -120,8 +119,7 @@ public class LocalDeviceManagementUsb extends LocalDeviceManagement
 	 * @throws InterruptedException on interrupt
 	 */
 	public void setProperty(final int objectType, final int objectInstance, final int propertyId,
-		final int start, final int elements, final byte... data) throws KNXTimeoutException,
-		KNXRemoteException, KNXPortClosedException, InterruptedException
+		final int start, final int elements, final byte... data) throws KNXException, InterruptedException
 	{
 		final CEMIDevMgmt req = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, objectType, objectInstance, propertyId,
 				start, elements, data);
@@ -144,8 +142,7 @@ public class LocalDeviceManagementUsb extends LocalDeviceManagement
 	 * @throws InterruptedException on interrupt
 	 */
 	public byte[] getProperty(final int objectType, final int objectInstance, final int propertyId,
-		final int start, final int elements) throws KNXTimeoutException, KNXRemoteException,
-		KNXPortClosedException, InterruptedException
+		final int start, final int elements) throws KNXException, InterruptedException
 	{
 		final CEMIDevMgmt req = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, objectType, objectInstance, propertyId,
 				start, elements);
@@ -159,16 +156,14 @@ public class LocalDeviceManagementUsb extends LocalDeviceManagement
 	@Override
 	public String getName()
 	{
-		return "Local-DM " + conn.getName();
+		return "Local-DM " + c.name();
 	}
 
 	@Override
-	protected void send(final CEMIDevMgmt frame, final Object mode) throws KNXTimeoutException,
-		KNXPortClosedException
-	{
+	protected void send(final CEMIDevMgmt frame, final BlockingMode mode) throws KNXException, InterruptedException {
 		final List<HidReport> reports = HidReport.create(KnxTunnelEmi.CEmi, frame.toByteArray());
 		for (final HidReport r : reports)
-			conn.send(r, true);
+			c.send(r, mode);
 	}
 
 	@Override

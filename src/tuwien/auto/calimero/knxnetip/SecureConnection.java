@@ -206,7 +206,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		session.ensureOpen();
 		final var tunnel = new KNXnetIPTunnel(knxLayer, session.connection(), tunnelingAddress) {
 			@Override
-			public String getName() {
+			public String name() {
 				return "KNX IP " + secureSymbol + " Tunneling " + hostPort(ctrlEndpt);
 			}
 
@@ -261,7 +261,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		session.ensureOpen();
 		final var tunnel = new KNXnetIPDevMgmt(session.connection()) {
 			@Override
-			public String getName() {
+			public String name() {
 				return "KNX IP " + secureSymbol + " Management " + hostPort(ctrlEndpt);
 			}
 
@@ -387,7 +387,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 		tunnel = new KNXnetIPTunnel(knxLayer, localEP, serverCtrlEP, useNat, tunnelingAddress) {
 			@Override
-			public String getName() { return "KNX/IP " + secureSymbol + " Tunneling " + hostPort(ctrlEndpt); }
+			public String name() { return "KNX/IP " + secureSymbol + " Tunneling " + hostPort(ctrlEndpt); }
 
 			@Override
 			protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset, final InetAddress src,
@@ -457,7 +457,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 		tunnel = new KNXnetIPDevMgmt(localEP, serverCtrlEP, useNat) {
 			@Override
-			public String getName() { return "KNX/IP " + secureSymbol + " Management " + hostPort(ctrlEndpt); }
+			public String name() { return "KNX/IP " + secureSymbol + " Management " + hostPort(ctrlEndpt); }
 
 			@Override
 			protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
@@ -549,15 +549,15 @@ public final class SecureConnection extends KNXnetIPRouting {
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		if (tunnel != null)
-			return tunnel.getName();
+			return tunnel.name();
 		return "KNX/IP " + secureSymbol + " Routing " + ctrlEndpt.getAddress().getHostAddress();
 	}
 
 	@Override
 	public String toString() {
-		return getName();
+		return name();
 	}
 
 	@Override

@@ -36,6 +36,8 @@
 
 package tuwien.auto.calimero.link;
 
+import java.util.function.Function;
+
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
@@ -129,14 +131,14 @@ public class KNXNetworkMonitorFT12 extends AbstractMonitor<FT12Connection>
 	}
 
 	private void enterBusmonitor() throws KNXTimeoutException, KNXPortClosedException, KNXLinkClosedException {
-		new BcuSwitcher(conn).enterBusmonitor(cEMI);
+		new BcuSwitcher<>(conn, logger, Function.identity()).enterBusmonitor(cEMI);
 	}
 
 	@Override
 	protected void leaveBusmonitor()
 	{
 		try {
-			new BcuSwitcher(conn).leaveBusmonitor(cEMI);
+			new BcuSwitcher<>(conn, logger, Function.identity()).leaveBusmonitor(cEMI);
 		}
 		catch (KNXTimeoutException | KNXPortClosedException | KNXLinkClosedException e) {}
 	}

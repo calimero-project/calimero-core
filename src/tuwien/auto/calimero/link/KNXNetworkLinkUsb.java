@@ -122,7 +122,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 	protected KNXNetworkLinkUsb(final UsbConnection c, final KNXMediumSettings settings)
 		throws KNXException, InterruptedException
 	{
-		super(c, c.getName(), settings);
+		super(c, c.name(), settings);
 		try {
 			if (!conn.isKnxConnectionActive())
 				throw new KNXLinkClosedException("USB interface is not connected to KNX network");
@@ -224,7 +224,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 			responseFor(CEMIDevMgmt.MC_PROPWRITE_CON, BcuSwitcher.pidCommMode);
 		}
 		else if (activeEmi == EmiType.Emi1) {
-			new BcuSwitcher(conn, logger).enter(BcuMode.LinkLayer);
+			new BcuSwitcher<>(conn, logger, frame -> HidReport.create(KnxTunnelEmi.Emi1, frame).get(0)).enter(BcuMode.LinkLayer);
 		}
 		else {
 			final byte[] switchLinkLayer = { (byte) PEI_SWITCH, 0x00, 0x18, 0x34, 0x56, 0x78, 0x0A, };
@@ -239,7 +239,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 			conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame.toByteArray()).get(0), true);
 		}
 		else if (activeEmi == EmiType.Emi1) {
-			new BcuSwitcher(conn, logger).reset();
+			new BcuSwitcher<>(conn, logger, frame -> HidReport.create(KnxTunnelEmi.Emi1, frame).get(0)).reset();
 		}
 		else {
 			final byte[] switchNormal = { (byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };

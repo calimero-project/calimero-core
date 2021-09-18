@@ -95,6 +95,7 @@ import org.usb4java.DeviceList;
 import org.usb4java.LibUsb;
 
 import tuwien.auto.calimero.CloseEvent;
+import tuwien.auto.calimero.Connection;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.DeviceDescriptor.DD0;
 import tuwien.auto.calimero.FrameEvent;
@@ -120,7 +121,7 @@ import tuwien.auto.calimero.serial.usb.TransferProtocolHeader.Protocol;
  *
  * @author B. Malinowsky
  */
-public class UsbConnection implements AutoCloseable
+public class UsbConnection implements Connection<HidReport>
 {
 	/**
 	 * Available EMI types and their respective bit value representation.
@@ -427,7 +428,7 @@ public class UsbConnection implements AutoCloseable
 	{
 		dev = device;
 		this.name = name.isEmpty() ? toDeviceId(device) : name;
-		logger = LoggerFactory.getLogger(logPrefix + "." + getName());
+		logger = LoggerFactory.getLogger(logPrefix + "." + name());
 		listeners = new EventListeners<>(logger);
 		listeners.registerEventType(ConnectionStatus.class);
 
@@ -468,6 +469,7 @@ public class UsbConnection implements AutoCloseable
 	 *
 	 * @param l the listener to add
 	 */
+	@Override
 	public void addConnectionListener(final KNXListener l)
 	{
 		listeners.add(l);
@@ -479,9 +481,16 @@ public class UsbConnection implements AutoCloseable
 	 *
 	 * @param l the listener to remove
 	 */
+	@Override
 	public void removeConnectionListener(final KNXListener l)
 	{
 		listeners.remove(l);
+	}
+
+	@Override
+	public void send(final HidReport frame, final BlockingMode blockingMode)
+			throws KNXPortClosedException, KNXTimeoutException {
+		send(frame, blockingMode == BlockingMode.NonBlocking ? false : true);
 	}
 
 	@SuppressWarnings("unused")
@@ -586,7 +595,8 @@ public class UsbConnection implements AutoCloseable
 	/**
 	 * @return the name of this USB connection, usually in the format {@code <vendorID>:<productID>}
 	 */
-	public final String getName()
+	@Override
+	public final String name()
 	{
 		return name;
 	}

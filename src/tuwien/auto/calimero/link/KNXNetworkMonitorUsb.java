@@ -109,7 +109,7 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 	protected KNXNetworkMonitorUsb(final UsbConnection c, final KNXMediumSettings settings)
 		throws KNXException, InterruptedException
 	{
-		super(c, c.getName(), settings);
+		super(c, c.name(), settings);
 		try {
 			if (!conn.isKnxConnectionActive())
 				throw new KNXLinkClosedException("USB interface is not connected to KNX network");
@@ -158,7 +158,8 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 			//findFrame(CEMIDevMgmt.MC_PROPWRITE_CON);
 		}
 		else if (activeEmi == EmiType.Emi1) {
-			new BcuSwitcher(conn, logger).enter(extBusmon ? BcuMode.ExtBusmonitor : BcuMode.Busmonitor);
+			new BcuSwitcher<>(conn, logger, frame -> HidReport.create(KnxTunnelEmi.Emi1, frame).get(0))
+				.enter(extBusmon ? BcuMode.ExtBusmonitor : BcuMode.Busmonitor);
 		}
 		else {
 			final byte[] switchBusmon = { (byte) PEI_SWITCH, (byte) 0x90, 0x18, 0x34, 0x56, 0x78, 0x0A, };
@@ -182,7 +183,7 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 			conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame.toByteArray()).get(0), true);
 		}
 		else if (activeEmi == EmiType.Emi1) {
-			new BcuSwitcher(conn, logger).reset();
+			new BcuSwitcher<>(conn, logger, frame -> HidReport.create(KnxTunnelEmi.Emi1, frame).get(0)).reset();
 		}
 		else if (activeEmi == EmiType.Emi2) {
 			final byte[] switchNormal = { (byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };

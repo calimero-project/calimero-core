@@ -119,7 +119,7 @@ public class KNXnetIPDevMgmt extends ClientConnection
 	@Override
 	public String getName()
 	{
-		return "KNXnet/IP DevMgmt " + super.getName();
+		return "KNXnet/IP DevMgmt " + super.name();
 	}
 
 	@Override

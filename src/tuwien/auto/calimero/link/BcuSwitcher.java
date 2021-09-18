@@ -38,25 +38,25 @@ package tuwien.auto.calimero.link;
 
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 
+import tuwien.auto.calimero.Connection;
+import tuwien.auto.calimero.Connection.BlockingMode;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.IndividualAddress;
+import tuwien.auto.calimero.KNXAckTimeoutException;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
-import tuwien.auto.calimero.serial.FT12Connection;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
-import tuwien.auto.calimero.serial.usb.HidReport;
-import tuwien.auto.calimero.serial.usb.TransferProtocolHeader.KnxTunnelEmi;
-import tuwien.auto.calimero.serial.usb.UsbConnection;
 
-final class BcuSwitcher
+final class BcuSwitcher<T>
 {
 	// EMI1.x has PEI types 12, 16 or 20
 	// EMI2.0 has PEI-type 10
@@ -102,8 +102,7 @@ final class BcuSwitcher
 			for (final OperationMode v : EnumSet.allOf(OperationMode.class))
 				if (v.mode == mode)
 					return v;
-			throw new KNXIllegalArgumentException("invalid operation mode 0x"
-					+ Integer.toHexString(mode));
+			throw new KNXIllegalArgumentException("invalid operation mode 0x" + Integer.toHexString(mode));
 		}
 	}
 
@@ -122,17 +121,21 @@ final class BcuSwitcher
 	private static final int responseTimeout = 1000;
 	private byte[] response;
 
-	private final UsbConnection c;
+	private final Connection<T> c;
 	private final Logger logger;
+	private final Function<byte[], T> generator;
 
-	BcuSwitcher(final UsbConnection c, final Logger l)
+
+	BcuSwitcher(final Connection<T> c, final Logger l, final Function<byte[], T> frameGenerator)
 	{
 		this.c = c;
 		logger = l;
-		conn = null; // XXX
+		this.generator = frameGenerator;
+		c.addConnectionListener(e -> setResponse(e.getFrameBytes()));
 	}
 
 	enum BcuMode {
+		Normal,
 		LinkLayer,
 		Busmonitor,
 		ExtBusmonitor
@@ -173,31 +176,31 @@ final class BcuSwitcher
 		write(createSetValue(AddrSystemState, new byte[] { (byte) OperationMode.Reset.mode }));
 	}
 
-	static String print(final byte[] frame)
-	{
-		final StringBuilder sb = new StringBuilder();
-		switch (frame[0] & 0xff) {
-		case getValue_req:
-			sb.append("PC_Get_Value.req");
-			break;
-		case getValue_con:
-			sb.append("PC_Get_Value.con");
-			break;
-		case setValue_req:
-			sb.append("PC_Set_Value.req");
-			break;
-		default:
-			sb.append("unknown msg code");
-		}
-		sb.append(", length ").append(frame[1] & 0xff);
-		final int address = ((frame[2] & 0xff) << 8) | (frame[3] & 0xff);
-		sb.append(", address 0x").append(Integer.toHexString(address));
-
-		sb.append(", data = ");
-		for (int i = 4; i < frame.length; i++)
-			sb.append(String.format("%02x", frame[i] & 0xff));
-		return sb.toString();
-	}
+//	static String print(final byte[] frame)
+//	{
+//		final StringBuilder sb = new StringBuilder();
+//		switch (frame[0] & 0xff) {
+//		case getValue_req:
+//			sb.append("PC_Get_Value.req");
+//			break;
+//		case getValue_con:
+//			sb.append("PC_Get_Value.con");
+//			break;
+//		case setValue_req:
+//			sb.append("PC_Set_Value.req");
+//			break;
+//		default:
+//			sb.append("unknown msg code");
+//		}
+//		sb.append(", length ").append(frame[1] & 0xff);
+//		final int address = ((frame[2] & 0xff) << 8) | (frame[3] & 0xff);
+//		sb.append(", address 0x").append(Integer.toHexString(address));
+//
+//		sb.append(", data = ");
+//		for (int i = 4; i < frame.length; i++)
+//			sb.append(String.format("%02x", frame[i] & 0xff));
+//		return sb.toString();
+//	}
 
 	private static byte[] createSetValue(final int address, final byte[] data)
 	{
@@ -266,8 +269,7 @@ final class BcuSwitcher
 	private static final long txInterframeSpacing = 30;
 	private long tsLastTx;
 
-	private void write(final byte[] frame) throws KNXPortClosedException, KNXTimeoutException,
-		InterruptedException
+	private void write(final byte[] frame) throws KNXPortClosedException, KNXTimeoutException, InterruptedException
 	{
 		final long now = System.currentTimeMillis();
 		final long wait = txInterframeSpacing - now + tsLastTx;
@@ -276,12 +278,19 @@ final class BcuSwitcher
 			Thread.sleep(wait);
 		}
 		tsLastTx = now;
-		c.send(HidReport.create(KnxTunnelEmi.Emi1, frame).get(0), true);
+		try {
+			c.send(generator.apply(frame), BlockingMode.Confirmation);
+		}
+		catch (final KNXPortClosedException | KNXTimeoutException e) {
+			throw e;
+		}
+		catch (final KNXException notThrown) {
+			notThrown.printStackTrace();
+		}
 	}
 
 	private boolean writeVerify(final int address, final byte[] data)
-		throws KNXPortClosedException, KNXTimeoutException, KNXFormatException,
-		InterruptedException
+		throws KNXPortClosedException, KNXTimeoutException, KNXFormatException, InterruptedException
 	{
 		write(createSetValue(address, data));
 		final byte[] read = read(createGetValue(address, data.length));
@@ -301,7 +310,6 @@ final class BcuSwitcher
 			if (response != null) {
 				final byte[] r = response;
 				response = null;
-//				System.out.println("bcu switcher time remaining " + (remaining) + " ms");
 				return r;
 			}
 			wait(remaining);
@@ -323,7 +331,6 @@ final class BcuSwitcher
 	//
 	// EMI 2 stuff
 	//
-	// TODO align methods with EMI 1
 
 	// EMI 2 PEI switch
 	private static final int peiSwitch_req = 0xA9;
@@ -348,15 +355,6 @@ final class BcuSwitcher
 
 	static byte[] commModeRequest(final int commMode) {
 		return cemiCommModeRequest(commMode).toByteArray();
-	}
-
-	private final FT12Connection conn;
-
-	BcuSwitcher(final FT12Connection conn)
-	{
-		this.conn = conn;
-		c = null; // XXX
-		logger = null;
 	}
 
 	void normalMode(final boolean cEMI) throws KNXTimeoutException, KNXPortClosedException, KNXLinkClosedException {
@@ -389,17 +387,23 @@ final class BcuSwitcher
 	private void switchLayer(final boolean cEMI, final int cemiCommMode, final byte[] peiSwitch)
 			throws KNXTimeoutException, KNXPortClosedException, KNXLinkClosedException {
 		try {
-			conn.send(cEMI ? commModeRequest(cemiCommMode) : peiSwitch, true);
+			c.send(generator.apply(cEMI ? commModeRequest(cemiCommMode) : peiSwitch), BlockingMode.Confirmation);
 			// TODO check .con for error case
 		}
 		catch (final InterruptedException e) {
-			conn.close();
+			c.close();
 			Thread.currentThread().interrupt();
 			throw new KNXLinkClosedException(e.getMessage() != null ? e.getMessage() : "thread interrupted");
 		}
-		catch (final KNXTimeoutException e) {
-			conn.close();
+		catch (final KNXAckTimeoutException e) {
+			c.close();
 			throw e;
+		}
+		catch (KNXTimeoutException | KNXPortClosedException e) {
+			throw e;
+		}
+		catch (final KNXException notThrown) {
+			notThrown.printStackTrace();
 		}
 	}
 }

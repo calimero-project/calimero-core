@@ -744,7 +744,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	private int queryObjectType(final int objIndex) throws KNXException, InterruptedException
 	{
 		if (pa instanceof LocalDeviceManagement) {
-			final LocalDeviceManagement ldm = (LocalDeviceManagement) pa;
+			final LocalDeviceManagement<?> ldm = (LocalDeviceManagement<?>) pa;
 			final int ot = ldm.getObjectType(objIndex);
 			objectTypes.add(new Pair(objIndex, ot));
 			return ot;

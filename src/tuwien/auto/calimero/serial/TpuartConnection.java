@@ -54,6 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import tuwien.auto.calimero.CloseEvent;
+import tuwien.auto.calimero.Connection;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.GroupAddress;
@@ -82,7 +83,7 @@ import tuwien.auto.calimero.log.LogService.LogLevel;
  *
  * @author B. Malinowsky
  */
-public class TpuartConnection implements AutoCloseable
+public class TpuartConnection implements Connection<byte[]>
 {
 	// UART services
 
@@ -226,6 +227,7 @@ public class TpuartConnection implements AutoCloseable
 	 *
 	 * @param l the listener to add
 	 */
+	@Override
 	public final void addConnectionListener(final KNXListener l)
 	{
 		listeners.add(l);
@@ -237,9 +239,16 @@ public class TpuartConnection implements AutoCloseable
 	 *
 	 * @param l the listener to remove
 	 */
+	@Override
 	public final void removeConnectionListener(final KNXListener l)
 	{
 		listeners.remove(l);
+	}
+
+	@Override
+	public String name()
+	{
+		return portId;
 	}
 
 	/**
@@ -273,6 +282,12 @@ public class TpuartConnection implements AutoCloseable
 	public final void removeAddress(final KNXAddress ack)
 	{
 		addresses.remove(ack);
+	}
+
+	@Override
+	public void send(final byte[] frame, final BlockingMode blockingMode)
+			throws KNXPortClosedException, KNXAckTimeoutException, InterruptedException {
+		send(frame, blockingMode == BlockingMode.NonBlocking ? false : true);
 	}
 
 	/**

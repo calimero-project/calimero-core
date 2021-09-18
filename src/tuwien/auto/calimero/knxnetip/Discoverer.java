@@ -440,7 +440,7 @@ public class Discoverer
 		private void complete(final Result<?> result) { cf.complete((Result<T>) result); }
 
 		@Override
-		public String getName() {
+		public String name() {
 			final String lock = new String(Character.toChars(0x1F512));
 			final String secure = session != null ? (" " + lock) : "";
 			return "KNX IP" + secure + " Tunneling " + hostPort(ctrlEndpt);

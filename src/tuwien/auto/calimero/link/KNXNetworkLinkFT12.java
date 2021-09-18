@@ -36,6 +36,8 @@
 
 package tuwien.auto.calimero.link;
 
+import java.util.function.Function;
+
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXAddress;
@@ -187,10 +189,10 @@ public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 	}
 
 	private void linkLayerMode() throws KNXException {
-		new BcuSwitcher(conn).linkLayerMode(cEMI);
+		new BcuSwitcher<>(conn, logger, Function.identity()).linkLayerMode(cEMI);
 	}
 
 	private void normalMode() throws KNXTimeoutException, KNXPortClosedException, KNXLinkClosedException {
-		new BcuSwitcher(conn).normalMode(cEMI);
+		new BcuSwitcher<>(conn, logger, Function.identity()).normalMode(cEMI);
 	}
 }

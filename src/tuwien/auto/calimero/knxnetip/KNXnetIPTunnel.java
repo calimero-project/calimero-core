@@ -284,7 +284,7 @@ public class KNXnetIPTunnel extends ClientConnection
 	@Override
 	public String getName()
 	{
-		return "KNXnet/IP Tunneling " + super.getName();
+		return "KNXnet/IP Tunneling " + super.name();
 	}
 
 	@Override

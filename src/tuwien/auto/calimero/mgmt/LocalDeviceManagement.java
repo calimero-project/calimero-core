@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2020 B. Malinowsky
+    Copyright (c) 2015, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,8 +36,6 @@
 
 package tuwien.auto.calimero.mgmt;
 
-import static tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode.WaitForCon;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -45,6 +43,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import tuwien.auto.calimero.CloseEvent;
+import tuwien.auto.calimero.Connection;
+import tuwien.auto.calimero.Connection.BlockingMode;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
@@ -53,7 +53,7 @@ import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 
-abstract class LocalDeviceManagement implements PropertyAdapter
+abstract class LocalDeviceManagement<T> implements PropertyAdapter
 {
 	protected final class KNXListenerImpl implements KNXListener
 	{
@@ -79,7 +79,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 
 	private static final int DEVICE_OBJECT = 0;
 
-	protected final AutoCloseable c;
+	protected final Connection<T> c;
 	private final Consumer<CloseEvent> adapterClosed;
 
 	private final Deque<CEMI> frames = new ArrayDeque<>();
@@ -93,7 +93,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 	private int lastPropIndex;
 	private int lastPid;
 
-	LocalDeviceManagement(final AutoCloseable connection, final Consumer<CloseEvent> adapterClosed,
+	LocalDeviceManagement(final Connection<T> connection, final Consumer<CloseEvent> adapterClosed,
 		final boolean queryWriteEnable)
 	{
 		c = connection;
@@ -132,7 +132,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 		final int objectInstance = getObjectInstance(objIndex, objectType);
 		final CEMIDevMgmt req = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, objectType, objectInstance, pid, start,
 				elements, data);
-		send(req, WaitForCon);
+		send(req, BlockingMode.Confirmation);
 		findFrame(CEMIDevMgmt.MC_PROPWRITE_CON, req);
 	}
 
@@ -146,7 +146,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 		final int objectInstance = getObjectInstance(objIndex, objectType);
 		final CEMIDevMgmt req = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, objectType, objectInstance, pid, start,
 				elements);
-		send(req, WaitForCon);
+		send(req, BlockingMode.Confirmation);
 		return findFrame(CEMIDevMgmt.MC_PROPREAD_CON, req);
 	}
 
@@ -222,7 +222,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 		}
 	}
 
-	protected abstract void send(CEMIDevMgmt frame, Object mode) throws KNXException, InterruptedException;
+	protected abstract void send(CEMIDevMgmt frame, BlockingMode mode) throws KNXException, InterruptedException;
 
 	@SuppressWarnings("unused")
 	protected byte[] findFrame(final int messageCode, final CEMIDevMgmt request)
@@ -273,7 +273,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 	{
 		final CEMIDevMgmt req = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, DEVICE_OBJECT, 1,
 				PropertyAccess.PID.IO_LIST, 0, 1);
-		send(req, WaitForCon);
+		send(req, BlockingMode.Confirmation);
 		int objects = 0;
 		try {
 			final byte[] ret = findFrame(CEMIDevMgmt.MC_PROPREAD_CON, req);
@@ -287,7 +287,7 @@ abstract class LocalDeviceManagement implements PropertyAdapter
 		}
 		final CEMIDevMgmt req2 = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, DEVICE_OBJECT, 1,
 				PropertyAccess.PID.IO_LIST, 1, objects);
-		send(req2, WaitForCon);
+		send(req2, BlockingMode.Confirmation);
 		final byte[] ret = findFrame(CEMIDevMgmt.MC_PROPREAD_CON, req2);
 		for (int i = 0; i < objects; ++i) {
 			final int objType = (ret[2 * i] & 0xff) << 8 | (ret[2 * i + 1] & 0xff);

@@ -67,7 +67,7 @@ public final class BaosLinkIp extends AbstractLink<ObjectServerConnection> imple
 
 
 	BaosLinkIp(final ObjectServerConnection c) {
-		super(c, c.getName(), new TPSettings());
+		super(c, c.name(), new TPSettings());
 		this.c = c;
 
 		notifier.registerEventType(BaosService.class);

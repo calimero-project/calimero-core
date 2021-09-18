@@ -105,7 +105,7 @@ class ObjectServerConnection extends ClientConnection {
 	ObjectServerConnection(final TcpConnection c) throws KNXException {
 		super(KNXnetIPHeader.ObjectServerRequest, KNXnetIPHeader.ObjectServerAck, 1, ReqTimeout, c);
 		ctrlEndpt = c.server();
-		logger = LogService.getLogger("calimero.baos." + getName());
+		logger = LogService.getLogger("calimero.baos." + name());
 		tcp = true;
 		try {
 			c.connect();
@@ -154,7 +154,7 @@ class ObjectServerConnection extends ClientConnection {
 
 	@Override
 	public String getName() {
-		return "KNX IP ObjectServer " + super.getName();
+		return "KNX IP ObjectServer " + super.name();
 	}
 
 	@Override

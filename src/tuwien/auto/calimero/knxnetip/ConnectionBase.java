@@ -301,7 +301,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	}
 
 	@Override
-	public String getName()
+	public String name()
 	{
 		// only the control endpoint is set when our logger is initialized (the data
 		// endpoint gets assigned later in connect)
@@ -317,7 +317,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 
 	@Override
 	public String toString() {
-		return getName() + (channelId != 0 ? (" channel " + channelId) : "") + " (state " + connectionState() + ")";
+		return name() + (channelId != 0 ? (" channel " + channelId) : "") + " (state " + connectionState() + ")";
 	}
 
 	/**

@@ -47,6 +47,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 
 import tuwien.auto.calimero.CloseEvent;
+import tuwien.auto.calimero.Connection;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.GroupAddress;
@@ -73,7 +74,7 @@ import tuwien.auto.calimero.log.LogService;
  *
  * @author B. Malinowsky
  */
-public class FT12Connection implements AutoCloseable
+public class FT12Connection implements Connection<byte[]>
 {
 	/**
 	 * State of communication: in idle state, no error, ready to send.
@@ -280,6 +281,7 @@ public class FT12Connection implements AutoCloseable
 	 *
 	 * @param l the listener to add
 	 */
+	@Override
 	public void addConnectionListener(final KNXListener l)
 	{
 		listeners.add(l);
@@ -293,9 +295,16 @@ public class FT12Connection implements AutoCloseable
 	 *
 	 * @param l the listener to remove
 	 */
+	@Override
 	public void removeConnectionListener(final KNXListener l)
 	{
 		listeners.remove(l);
+	}
+
+	@Override
+	public String name()
+	{
+		return port;
 	}
 
 	/**
@@ -341,6 +350,12 @@ public class FT12Connection implements AutoCloseable
 	public final int getState()
 	{
 		return state;
+	}
+
+	@Override
+	public void send(final byte[] frame, final BlockingMode blockingMode)
+			throws KNXTimeoutException, KNXPortClosedException, InterruptedException {
+		send(frame, blockingMode == BlockingMode.NonBlocking ? false : true);
 	}
 
 	/**

@@ -40,14 +40,15 @@ import java.net.InetSocketAddress;
 import java.util.function.Consumer;
 
 import tuwien.auto.calimero.CloseEvent;
+import tuwien.auto.calimero.Connection.BlockingMode;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.knxnetip.TcpConnection;
 import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.knxnetip.KNXConnectionClosedException;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
-import tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode;
 import tuwien.auto.calimero.knxnetip.KNXnetIPDevMgmt;
 import tuwien.auto.calimero.knxnetip.SecureConnection;
 
@@ -56,9 +57,9 @@ import tuwien.auto.calimero.knxnetip.SecureConnection;
  *
  * @see KNXnetIPDevMgmt
  */
-public class LocalDeviceManagementIp extends LocalDeviceManagement {
+public class LocalDeviceManagementIp extends LocalDeviceManagement<CEMI> {
 
-	private final KNXnetIPConnection conn;
+	private final InetSocketAddress remote;
 
 	/**
 	 * Creates a new property service adapter for local device management of a KNXnet/IP server using TCP.
@@ -162,8 +163,8 @@ public class LocalDeviceManagementIp extends LocalDeviceManagement {
 	LocalDeviceManagementIp(final KNXnetIPConnection mgmt, final Consumer<CloseEvent> adapterClosed,
 		final boolean queryWriteEnable) throws KNXException, InterruptedException {
 		super(mgmt, adapterClosed, queryWriteEnable);
-		conn = mgmt;
-		conn.addConnectionListener(new KNXListenerImpl());
+		remote = mgmt.getRemoteAddress();
+		c.addConnectionListener(new KNXListenerImpl());
 		init();
 	}
 
@@ -175,8 +176,8 @@ public class LocalDeviceManagementIp extends LocalDeviceManagement {
 	 * @throws KNXTimeoutException if a timeout regarding a response message was encountered
 	 * @throws InterruptedException on thread interrupt
 	 */
-	public void reset() throws KNXConnectionClosedException, KNXTimeoutException, InterruptedException {
-		send(new CEMIDevMgmt(CEMIDevMgmt.MC_RESET_REQ), BlockingMode.WaitForAck);
+	public void reset() throws KNXException, InterruptedException {
+		send(new CEMIDevMgmt(CEMIDevMgmt.MC_RESET_REQ), BlockingMode.Ack);
 	}
 
 	/**
@@ -185,14 +186,13 @@ public class LocalDeviceManagementIp extends LocalDeviceManagement {
 	 */
 	@Override
 	public String getName() {
-		final InetSocketAddress remote = conn.getRemoteAddress();
 		return "Local-DM " + remote.getAddress().getHostAddress() + ":" + remote.getPort();
 	}
 
 	@Override
-	protected void send(final CEMIDevMgmt frame, final Object mode)
-			throws KNXTimeoutException, KNXConnectionClosedException, InterruptedException {
-		conn.send(frame, (BlockingMode) mode);
+	protected void send(final CEMIDevMgmt frame, final BlockingMode mode)
+			throws KNXException, InterruptedException {
+		c.send(frame, mode);
 	}
 
 	private static KNXnetIPDevMgmt create(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP,

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ package tuwien.auto.calimero.knxnetip;
 
 import java.net.InetSocketAddress;
 
+import tuwien.auto.calimero.Connection;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMI;
@@ -56,7 +57,7 @@ import tuwien.auto.calimero.cemi.CEMI;
  * repeated 3 times, and on no response the connection will be terminated.
  * <p>
  * Log information of this connection is provided using a logger in the namespace "calimero.knxnetip" and the name
- * obtained from {@link KNXnetIPConnection#getName()}.
+ * obtained from {@link KNXnetIPConnection#name()}.
  *
  * @author B. Malinowsky
  * @see KNXnetIPTunnel
@@ -65,7 +66,7 @@ import tuwien.auto.calimero.cemi.CEMI;
  * @see KNXListener
  * @see CEMI
  */
-public interface KNXnetIPConnection extends AutoCloseable
+public interface KNXnetIPConnection extends Connection<CEMI>
 {
 	/**
 	 * Identifier for KNXnet/IP protocol version 1.0.
@@ -126,6 +127,7 @@ public interface KNXnetIPConnection extends AutoCloseable
 	 *
 	 * @param l the listener to add
 	 */
+	@Override
 	void addConnectionListener(KNXListener l);
 
 	/**
@@ -136,7 +138,16 @@ public interface KNXnetIPConnection extends AutoCloseable
 	 *
 	 * @param l the listener to remove
 	 */
+	@Override
 	void removeConnectionListener(KNXListener l);
+
+	@Override
+	default void send(final CEMI frame, final Connection.BlockingMode blockingMode)
+			throws KNXTimeoutException, KNXConnectionClosedException, InterruptedException {
+		final var mode = blockingMode == Connection.BlockingMode.Confirmation ? BlockingMode.WaitForCon
+				: blockingMode == Connection.BlockingMode.Ack ? BlockingMode.WaitForAck : BlockingMode.NonBlocking;
+		send(frame, mode);
+	}
 
 	/**
 	 * Sends a cEMI frame to the remote server communicating with this endpoint.
@@ -198,7 +209,7 @@ public interface KNXnetIPConnection extends AutoCloseable
 	 *
 	 * @return name for this connection as string
 	 */
-	String getName();
+	default String getName() { return name(); }
 
 	/**
 	 * Ends communication with the remote server/client as specified by the used protocol.

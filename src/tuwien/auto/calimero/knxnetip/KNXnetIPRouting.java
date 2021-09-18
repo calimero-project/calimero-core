@@ -234,7 +234,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	@Override
 	public String getName()
 	{
-		return "KNXnet/IP Routing " + super.getName();
+		return "KNXnet/IP Routing " + super.name();
 	}
 
 	/**
@@ -337,7 +337,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	{
 		ctrlEndpt = new InetSocketAddress(multicast, DEFAULT_PORT);
 		dataEndpt = ctrlEndpt;
-		logger = LogService.getLogger("calimero.knxnetip." + getName());
+		logger = LogService.getLogger("calimero.knxnetip." + name());
 
 		try {
 			dc = newChannel();
