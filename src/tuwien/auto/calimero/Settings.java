@@ -36,11 +36,6 @@
 
 package tuwien.auto.calimero;
 
-import static java.util.stream.Collectors.joining;
-
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
 /**
  * General settings used in Calimero as well as library user information.
  *
@@ -90,7 +85,7 @@ public final class Settings
 	public static String getLibraryHeader(final boolean verbose)
 	{
 		if (!verbose)
-			return library + " version " + version;
+			return library + " " + version;
 		final StringBuilder buf = new StringBuilder();
 		buf.append(library).append(" version ").append(version).append(" - ");
 		buf.append(desc).append(sep);
@@ -116,29 +111,8 @@ public final class Settings
 	{
 		if (args.length > 0 && (args[0].equals("--version") || args[0].equals("-v")))
 			out(getLibraryHeader(false));
-		else {
+		else
 			out(getLibraryHeader(true));
-			out(sep + "Supported protocols: " + supportedProtocols().collect(joining(", ")));
-		}
-	}
-
-	private static Stream<String> supportedProtocols() {
-		final String[] proto = { "KNXnet/IP (Secure)", "KNX IP", "FT1.2", "TP-Uart", "KNX USB", "KNX RF USB", "BAOS" };
-		final String prefix = "tuwien.auto.calimero.";
-		final String[] check = { "knxnetip.KNXnetIPConnection", "knxnetip.KNXnetIPConnection", "serial.FT12Connection",
-			"serial.TpuartConnection", "serial.usb.UsbConnection", "serial.usb.UsbConnection", "baos.Baos" };
-
-		return IntStream.range(0, proto.length).filter(i -> loadable(prefix + check[i])).mapToObj(i -> proto[i]);
-	}
-
-	private static boolean loadable(final String className) {
-		try {
-			final ClassLoader cl = Settings.class.getClassLoader();
-			cl.loadClass(className);
-			return true;
-		}
-		catch (ClassNotFoundException | NoClassDefFoundError ignored) {}
-		return false;
 	}
 
 	private static void out(final String s)
