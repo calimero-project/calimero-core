@@ -41,7 +41,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.net.Inet4Address;
 import java.net.InetSocketAddress;
+import java.net.SocketException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,12 +57,13 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.baos.BaosService.Property;
 import tuwien.auto.calimero.baos.ip.BaosIp;
 import tuwien.auto.calimero.baos.ip.BaosLinkIp;
-import tuwien.auto.calimero.knxnetip.TcpConnection;
 import tuwien.auto.calimero.knxnetip.Discoverer;
 import tuwien.auto.calimero.knxnetip.Discoverer.Result;
+import tuwien.auto.calimero.knxnetip.TcpConnection;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
 import tuwien.auto.calimero.link.LinkEvent;
 import tuwien.auto.calimero.link.NetworkLinkListener;
@@ -93,9 +96,9 @@ class BaosTest {
 	}
 
 	@Test
-	void baosIpConnection() throws KNXException, InterruptedException {
-		final var serverEp = list.get(0).remoteEndpoint();
-		final var objectServer = new InetSocketAddress(serverEp.getAddress(), 12004);
+	void baosIpConnection() throws KNXException, InterruptedException, SocketException {
+		final var serverEp = Util.localInterface().inetAddresses().filter(Inet4Address.class::isInstance).findFirst().get();
+		final var objectServer = new InetSocketAddress(serverEp, 12004);
 
 		final var server = new BaosServer();
 		CompletableFuture.runAsync(server);
