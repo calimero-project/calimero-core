@@ -107,6 +107,7 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.KnxRuntimeException;
 import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.internal.EventListeners;
+import tuwien.auto.calimero.serial.ConnectionEvent;
 import tuwien.auto.calimero.serial.ConnectionStatus;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
 import tuwien.auto.calimero.serial.usb.HidReport.BusAccessServerFeature;
@@ -429,7 +430,7 @@ public class UsbConnection implements Connection<HidReport>
 		dev = device;
 		this.name = name.isEmpty() ? toDeviceId(device) : name;
 		logger = LoggerFactory.getLogger(logPrefix + "." + name());
-		listeners = new EventListeners<>(logger);
+		listeners = new EventListeners<>(logger, ConnectionEvent.class);
 		listeners.registerEventType(ConnectionStatus.class);
 
 		try {
