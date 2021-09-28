@@ -45,6 +45,8 @@ import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.knxnetip.util.CRI;
+import tuwien.auto.calimero.knxnetip.util.TunnelCRI;
+import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 
 final class SecureTunnel extends KNXnetIPTunnel {
 	private final SecureSession session;
@@ -53,6 +55,16 @@ final class SecureTunnel extends KNXnetIPTunnel {
 			final IndividualAddress tunnelingAddress) throws KNXException, InterruptedException {
 		super(knxLayer, session.connection(), tunnelingAddress);
 		this.session = session;
+
+		final var cri = tunnelingAddress.equals(KNXMediumSettings.BackboneRouter) ? new TunnelCRI(knxLayer)
+				: new TunnelCRI(knxLayer, tunnelingAddress);
+		session.registerConnectRequest(this);
+		try {
+			super.connect(session.connection().localEndpoint(), session.connection().server(), cri, false);
+		}
+		finally {
+			session.unregisterConnectRequest(this);
+		}
 	}
 
 	@Override
@@ -61,14 +73,8 @@ final class SecureTunnel extends KNXnetIPTunnel {
 	}
 
 	@Override
-	protected void connect(final TcpConnection c, final CRI cri) throws KNXException, InterruptedException {
-		session.registerConnectRequest(this);
-		try {
-			super.connect(c.localEndpoint(), c.server(), cri, false);
-		}
-		finally {
-			session.unregisterConnectRequest(this);
-		}
+	protected void connect(final TcpConnection c, final CRI cri) {
+		// we don't have session assigned yet, connect in ctor
 	}
 
 	@Override

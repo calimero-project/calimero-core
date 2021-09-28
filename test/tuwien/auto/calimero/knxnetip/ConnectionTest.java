@@ -101,6 +101,17 @@ class ConnectionTest {
 	}
 
 	@Test
+	void singleSecureDevMgmtConnection() throws KNXException, InterruptedException {
+		try (var session1 = conn.newSecureSession(1, userKey1, deviceAuthCode.clone())) {
+			try (var tunnel = SecureConnection.newDeviceManagement(session1)) {
+
+				assertEquals(1, conn.sessions.size());
+				assertEquals(1, session1.securedConnections.size());
+			}
+		}
+	}
+
+	@Test
 	void multipleSecureConnections() throws KNXException, InterruptedException {
 		try (var session1 = conn.newSecureSession(1, userKey1, deviceAuthCode.clone())) {
 			for (int i = 0; i < 8; i++)

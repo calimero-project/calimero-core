@@ -51,6 +51,15 @@ final class SecureDeviceManagement extends KNXnetIPDevMgmt {
 	SecureDeviceManagement(final SecureSession session) throws KNXException, InterruptedException {
 		super(session.connection());
 		this.session = session;
+
+		session.registerConnectRequest(this);
+		try {
+			final var cri = CRI.createRequest(DEVICE_MGMT_CONNECTION);
+			super.connect(session.connection().localEndpoint(), session.connection().server(), cri, false);
+		}
+		finally {
+			session.unregisterConnectRequest(this);
+		}
 	}
 
 	@Override
@@ -59,14 +68,8 @@ final class SecureDeviceManagement extends KNXnetIPDevMgmt {
 	}
 
 	@Override
-	protected void connect(final TcpConnection c, final CRI cri) throws KNXException, InterruptedException {
-		session.registerConnectRequest(this);
-		try {
-			super.connect(c.localEndpoint(), c.server(), cri, false);
-		}
-		finally {
-			session.unregisterConnectRequest(this);
-		}
+	protected void connect(final TcpConnection c, final CRI cri) {
+		// we don't have session assigned yet, connect in ctor
 	}
 
 	@Override
