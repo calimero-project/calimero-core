@@ -232,7 +232,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	}
 
 	@Override
-	public String getName()
+	public String name()
 	{
 		return "KNXnet/IP Routing " + super.name();
 	}

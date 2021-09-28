@@ -107,7 +107,7 @@ import tuwien.auto.calimero.log.LogService.LogLevel;
 import tuwien.auto.calimero.secure.KnxSecureException;
 
 /**
- * Provides KNX IP Secure routing and tunneling connections (experimental).
+ * Provides KNX IP Secure routing and tunneling connections.
  */
 public final class SecureConnection extends KNXnetIPRouting {
 

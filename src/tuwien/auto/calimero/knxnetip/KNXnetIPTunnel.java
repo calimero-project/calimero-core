@@ -282,7 +282,7 @@ public class KNXnetIPTunnel extends ClientConnection
 	}
 
 	@Override
-	public String getName()
+	public String name()
 	{
 		return "KNXnet/IP Tunneling " + super.name();
 	}
