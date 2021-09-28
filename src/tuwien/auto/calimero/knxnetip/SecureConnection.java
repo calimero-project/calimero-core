@@ -121,6 +121,105 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 	static final String secureSymbol = new String(Character.toChars(0x1F512));
 
+
+	private final class KnxipSecureTunnelUdp extends KNXnetIPTunnel {
+		private KnxipSecureTunnelUdp(final TunnelingLayer knxLayer, final InetSocketAddress localEP,
+				final InetSocketAddress serverCtrlEP, final boolean useNAT, final IndividualAddress tunnelingAddress)
+						throws KNXException, InterruptedException {
+			super(knxLayer, localEP, serverCtrlEP, useNAT, tunnelingAddress);
+		}
+
+		@Override
+		public String name() { return "KNX/IP " + secureSymbol + " Tunneling " + hostPort(ctrlEndpt); }
+
+		@Override
+		protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset,
+				final InetAddress src, final int port) throws KNXFormatException, IOException {
+
+			final int svc = h.getServiceType();
+			if (!h.isSecure()) {
+				logger.trace("received insecure service type 0x{} - ignore", Integer.toHexString(svc));
+				return true;
+			}
+			if (svc == SecureSvc) {
+				final Object[] fields = unwrap(h, data, offset);
+				final byte[] packet = (byte[]) fields[4];
+				final KNXnetIPHeader containedHeader = new KNXnetIPHeader(packet, 0);
+
+				if (containedHeader.getServiceType() == SecureSessionStatus) {
+					final int status = newChannelStatus(containedHeader, packet, containedHeader.getStructLength());
+					LogService.log(logger, status == 0 ? LogLevel.TRACE : LogLevel.ERROR, "{}", session);
+					setupLoop.quit();
+					sessionStatus = status;
+					if (status != 0) // XXX do we need this throw, its swallowed by the loop anyway?
+						throw new KnxSecureException("secure session " + statusMsg(status));
+				}
+				else {
+					// let base class handle decrypted knxip packet
+					return super.handleServiceType(containedHeader, packet, containedHeader.getStructLength(), src, port);
+				}
+			}
+			else
+				logger.warn("received unsupported secure service type 0x{} - ignore", Integer.toHexString(svc));
+			return true;
+		}
+
+		@Override
+		protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
+			final byte[] wrapped = newSecurePacket(session.nextSendSeq(), 0, packet);
+			super.send(wrapped, dst);
+		}
+	}
+
+	private final class KnxipSecureDevMgmtUdp extends KNXnetIPDevMgmt {
+		private KnxipSecureDevMgmtUdp(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP,
+				final boolean useNAT) throws KNXException, InterruptedException {
+			super(localEP, serverCtrlEP, useNAT);
+		}
+
+		@Override
+		public String name() { return "KNX/IP " + secureSymbol + " Management " + hostPort(ctrlEndpt); }
+
+		@Override
+		protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
+			final byte[] wrapped = newSecurePacket(session.nextSendSeq(), 0, packet);
+			super.send(wrapped, dst);
+		}
+
+		@Override
+		protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset, final InetAddress src,
+			final int port) throws KNXFormatException, IOException {
+
+			final int svc = h.getServiceType();
+			if (!h.isSecure()) {
+				logger.trace("received insecure service type 0x{} - ignore", Integer.toHexString(svc));
+				return true;
+			}
+			if (svc == SecureSvc) {
+				final Object[] fields = unwrap(h, data, offset);
+				final byte[] packet = (byte[]) fields[4];
+				final KNXnetIPHeader containedHeader = new KNXnetIPHeader(packet, 0);
+
+				if (containedHeader.getServiceType() == SecureSessionStatus) {
+					final int status = newChannelStatus(containedHeader, packet, containedHeader.getStructLength());
+					LogService.log(logger, status == 0 ? LogLevel.TRACE : LogLevel.ERROR, "{}", session);
+					setupLoop.quit();
+					sessionStatus = status;
+					if (status != 0) // XXX do we need this throw, its swallowed by the loop anyway?
+						throw new KnxSecureException("secure session " + statusMsg(status));
+				}
+				else {
+					// let base class handle decrypted knxip packet
+					return super.handleServiceType(containedHeader, packet, containedHeader.getStructLength(), src, port);
+				}
+			}
+			else
+				logger.warn("received unsupported secure service type 0x{} - ignore", Integer.toHexString(svc));
+			return true;
+		}
+	}
+
+
 	private final SerialNumber sno;
 	private Key secretKey;
 	private int sessionId;
@@ -287,7 +386,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 	}
 
 	private SecureConnection(final NetworkInterface netif, final InetAddress mcGroup, final byte[] groupKey,
-		final Duration latencyTolerance) throws KNXException {
+			final Duration latencyTolerance) throws KNXException {
 		super(mcGroup);
 
 		sno = deriveSerialNumber(netif);
@@ -333,48 +432,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		sno = session.serialNumber();
 		setupSecureSession(local, serverCtrlEP);
 
-		tunnel = new KNXnetIPTunnel(knxLayer, localEP, serverCtrlEP, useNat, tunnelingAddress) {
-			@Override
-			public String name() { return "KNX/IP " + secureSymbol + " Tunneling " + hostPort(ctrlEndpt); }
-
-			@Override
-			protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset, final InetAddress src,
-				final int port) throws KNXFormatException, IOException {
-
-				final int svc = h.getServiceType();
-				if (!h.isSecure()) {
-					logger.trace("received insecure service type 0x{} - ignore", Integer.toHexString(svc));
-					return true;
-				}
-				if (svc == SecureSvc) {
-					final Object[] fields = unwrap(h, data, offset);
-					final byte[] packet = (byte[]) fields[4];
-					final KNXnetIPHeader containedHeader = new KNXnetIPHeader(packet, 0);
-
-					if (containedHeader.getServiceType() == SecureSessionStatus) {
-						final int status = newChannelStatus(containedHeader, packet, containedHeader.getStructLength());
-						LogService.log(logger, status == 0 ? LogLevel.TRACE : LogLevel.ERROR, "{}", session);
-						setupLoop.quit();
-						sessionStatus = status;
-						if (status != 0) // XXX do we need this throw, its swallowed by the loop anyway?
-							throw new KnxSecureException("secure session " + statusMsg(status));
-					}
-					else {
-						// let base class handle decrypted knxip packet
-						return super.handleServiceType(containedHeader, packet, containedHeader.getStructLength(), src, port);
-					}
-				}
-				else
-					logger.warn("received unsupported secure service type 0x{} - ignore", Integer.toHexString(svc));
-				return true;
-			}
-
-			@Override
-			protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
-				final byte[] wrapped = newSecurePacket(session.nextSendSeq(), 0, packet);
-				super.send(wrapped, dst);
-			}
-		};
+		tunnel = new KnxipSecureTunnelUdp(knxLayer, localEP, serverCtrlEP, useNat, tunnelingAddress);
 
 		// unused
 		mcastLatencyTolerance = 0;
@@ -403,48 +461,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 		sno = session.serialNumber();
 		setupSecureSession(local, serverCtrlEP);
 
-		tunnel = new KNXnetIPDevMgmt(localEP, serverCtrlEP, useNat) {
-			@Override
-			public String name() { return "KNX/IP " + secureSymbol + " Management " + hostPort(ctrlEndpt); }
-
-			@Override
-			protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
-				final byte[] wrapped = newSecurePacket(session.nextSendSeq(), 0, packet);
-				super.send(wrapped, dst);
-			}
-
-			@Override
-			protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset, final InetAddress src,
-				final int port) throws KNXFormatException, IOException {
-
-				final int svc = h.getServiceType();
-				if (!h.isSecure()) {
-					logger.trace("received insecure service type 0x{} - ignore", Integer.toHexString(svc));
-					return true;
-				}
-				if (svc == SecureSvc) {
-					final Object[] fields = unwrap(h, data, offset);
-					final byte[] packet = (byte[]) fields[4];
-					final KNXnetIPHeader containedHeader = new KNXnetIPHeader(packet, 0);
-
-					if (containedHeader.getServiceType() == SecureSessionStatus) {
-						final int status = newChannelStatus(containedHeader, packet, containedHeader.getStructLength());
-						LogService.log(logger, status == 0 ? LogLevel.TRACE : LogLevel.ERROR, "{}", session);
-						setupLoop.quit();
-						sessionStatus = status;
-						if (status != 0) // XXX do we need this throw, its swallowed by the loop anyway?
-							throw new KnxSecureException("secure session " + statusMsg(status));
-					}
-					else {
-						// let base class handle decrypted knxip packet
-						return super.handleServiceType(containedHeader, packet, containedHeader.getStructLength(), src, port);
-					}
-				}
-				else
-					logger.warn("received unsupported secure service type 0x{} - ignore", Integer.toHexString(svc));
-				return true;
-			}
-		};
+		tunnel = new KnxipSecureDevMgmtUdp(localEP, serverCtrlEP, useNat);
 
 		// unused
 		mcastLatencyTolerance = 0;
