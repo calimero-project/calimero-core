@@ -99,7 +99,6 @@ import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
 import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
-import tuwien.auto.calimero.knxnetip.util.CRI;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.log.LogService;
@@ -202,33 +201,8 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 	public static KNXnetIPConnection newTunneling(final TunnelingLayer knxLayer, final SecureSession session,
 			final IndividualAddress tunnelingAddress) throws KNXException, InterruptedException {
-
 		session.ensureOpen();
-		final var tunnel = new KNXnetIPTunnel(knxLayer, session.connection(), tunnelingAddress) {
-			@Override
-			public String name() {
-				return "KNX IP " + secureSymbol + " Tunneling " + hostPort(ctrlEndpt);
-			}
-
-			@Override
-			protected void connect(final TcpConnection c, final CRI cri) throws KNXException, InterruptedException {
-				session.registerConnectRequest(this);
-				try {
-					super.connect(c.localEndpoint(), c.server(), cri, false);
-				}
-				finally {
-					session.unregisterConnectRequest(this);
-				}
-			}
-
-			@Override
-			protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
-				final byte[] wrapped = newSecurePacket(session.id(), session.nextSendSeq(), session.serialNumber(), 0,
-						packet, session.secretKey);
-				super.send(wrapped, dst);
-			}
-		};
-		return tunnel;
+		return new SecureTunnel(session, knxLayer, tunnelingAddress);
 	}
 
 	/**
@@ -257,34 +231,8 @@ public final class SecureConnection extends KNXnetIPRouting {
 
 	public static KNXnetIPConnection newDeviceManagement(final SecureSession session)
 			throws KNXException, InterruptedException {
-
 		session.ensureOpen();
-		final var tunnel = new KNXnetIPDevMgmt(session.connection()) {
-			@Override
-			public String name() {
-				return "KNX IP " + secureSymbol + " Management " + hostPort(ctrlEndpt);
-			}
-
-			@Override
-			protected void connect(final TcpConnection c, final CRI cri) throws KNXException, InterruptedException {
-				session.registerConnectRequest(this);
-				try {
-					super.connect(c.localEndpoint(), c.server(), cri, false);
-				}
-				finally {
-					session.unregisterConnectRequest(this);
-				}
-			}
-
-			@Override
-			protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
-				final byte[] wrapped = newSecurePacket(session.id(), session.nextSendSeq(), session.serialNumber(), 0,
-						packet, session.secretKey);
-				super.send(wrapped, dst);
-			}
-		};
-
-		return tunnel;
+		return new SecureDeviceManagement(session);
 	}
 
 	/**
