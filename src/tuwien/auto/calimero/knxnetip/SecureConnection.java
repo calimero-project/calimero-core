@@ -218,7 +218,7 @@ public final class SecureConnection extends KNXnetIPRouting {
 	 * @return new secure routing connection
 	 * @throws KNXException if creation or initialization of the multicast socket failed
 	 */
-	public static KNXnetIPConnection newRouting(final NetworkInterface netIf, final InetAddress mcGroup, final byte[] groupKey,
+	public static KNXnetIPRouting newRouting(final NetworkInterface netIf, final InetAddress mcGroup, final byte[] groupKey,
 		final Duration latencyTolerance) throws KNXException {
 		return new SecureConnection(netIf, mcGroup, groupKey, latencyTolerance);
 	}
