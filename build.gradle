@@ -9,7 +9,7 @@ repositories {
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 
-ext.junitJupiterVersion = '5.8.0'
+ext.junitJupiterVersion = '5.8.1'
 ext.desc = 'Calimero, a free KNX network library'
 
 apply plugin: 'java-library'
