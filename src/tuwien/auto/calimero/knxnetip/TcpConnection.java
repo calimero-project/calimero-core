@@ -267,6 +267,22 @@ public final class TcpConnection implements Closeable {
 
 		long nextReceiveSeq() { return rcvSeq.getAndIncrement(); }
 
+		static int newChannelStatus(final KNXnetIPHeader h, final byte[] data, final int offset)
+				throws KNXFormatException {
+
+			if (h.getServiceType() != SecureSessionStatus)
+				throw new KNXIllegalArgumentException("no secure channel status");
+			if (h.getTotalLength() != 8)
+				throw new KNXFormatException("invalid length " + h.getTotalLength() + " for a secure channel status");
+
+			// 0: auth success
+			// 1: auth failed
+			// 2: error unauthorized
+			// 3: timeout
+			final int status = data[offset] & 0xff;
+			return status;
+		}
+
 		private void setupSecureSession()
 				throws KNXTimeoutException, KNXConnectionClosedException, InterruptedException {
 			conn.sessionRequestLock.lock();
@@ -383,7 +399,7 @@ public final class TcpConnection implements Closeable {
 				final var hdrLen = plainHeader.getStructLength();
 
 				if (plainHeader.getServiceType() == SecureSessionStatus) {
-					sessionStatus = SecureConnection.newChannelStatus(plainHeader, packet, hdrLen);
+					sessionStatus = newChannelStatus(plainHeader, packet, hdrLen);
 
 					if (sessionState == SessionState.Unauthenticated) {
 						if (sessionStatus == AuthSuccess)
