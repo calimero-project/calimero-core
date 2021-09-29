@@ -89,8 +89,7 @@ public class KNXnetIPDevMgmt extends ClientConnection
 	public KNXnetIPDevMgmt(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP, final boolean useNAT)
 		throws KNXException, InterruptedException
 	{
-		super(KNXnetIPHeader.DEVICE_CONFIGURATION_REQ, KNXnetIPHeader.DEVICE_CONFIGURATION_ACK, 4,
-				CONFIGURATION_REQ_TIMEOUT);
+		this();
 		final CRI cri = CRI.createRequest(DEVICE_MGMT_CONNECTION);
 		connect(localEP, serverCtrlEP, cri, useNAT);
 	}
@@ -100,6 +99,11 @@ public class KNXnetIPDevMgmt extends ClientConnection
 				CONFIGURATION_REQ_TIMEOUT, connection);
 		final CRI cri = CRI.createRequest(DEVICE_MGMT_CONNECTION);
 		connect(connection, cri);
+	}
+
+	KNXnetIPDevMgmt() {
+		super(KNXnetIPHeader.DEVICE_CONFIGURATION_REQ, KNXnetIPHeader.DEVICE_CONFIGURATION_ACK, 4,
+				CONFIGURATION_REQ_TIMEOUT);
 	}
 
 	/**
