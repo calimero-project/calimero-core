@@ -43,10 +43,14 @@ import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 final class Net {
 	private Net() {}
@@ -93,5 +97,22 @@ final class Net {
 
 	static String hostPort(final InetSocketAddress addr) {
 		return addr.getAddress().getHostAddress() + ":" + addr.getPort();
+	}
+
+	static InetSocketAddress matchRemoteEndpoint(final InetSocketAddress localEp, final InetSocketAddress remoteEp,
+			final boolean useNat) throws KNXException {
+		if (localEp.isUnresolved())
+			throw new KNXIllegalArgumentException("unresolved address " + localEp);
+		if (!localEp.getAddress().isAnyLocalAddress())
+			return localEp;
+
+		try {
+			final InetAddress addr = useNat ? null : Optional.ofNullable(remoteEp.getAddress())
+					.flatMap(Net::onSameSubnet).orElse(InetAddress.getLocalHost());
+			return new InetSocketAddress(addr, localEp.getPort());
+		}
+		catch (final UnknownHostException e) {
+			throw new KNXException("no local host address available", e);
+		}
 	}
 }

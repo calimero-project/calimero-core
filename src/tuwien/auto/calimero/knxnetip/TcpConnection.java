@@ -44,13 +44,11 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.math.BigInteger;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.security.Key;
@@ -65,7 +63,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
@@ -82,6 +79,7 @@ import javax.crypto.spec.IvParameterSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXTimeoutException;
@@ -638,25 +636,15 @@ public final class TcpConnection implements Closeable {
 
 	protected TcpConnection(final InetSocketAddress local, final InetSocketAddress server) {
 		this(server);
-		if (local.isUnresolved())
-			throw new KNXIllegalArgumentException("unresolved address " + local);
-
-		var bind = local;
-		if (local.getAddress().isAnyLocalAddress()) {
-			try {
-				final InetAddress addr = Optional.ofNullable(server.getAddress())
-						.flatMap(Net::onSameSubnet).orElse(InetAddress.getLocalHost());
-				bind = new InetSocketAddress(addr, local.getPort());
-			}
-			catch (final UnknownHostException e) {
-				throw new KnxRuntimeException("no local host address available", e);
-			}
-		}
-
+		InetSocketAddress bind = null;
 		try {
+			bind = Net.matchRemoteEndpoint(local, server, false);
 			socket.bind(bind);
 			// socket returns any-local after socket is closed, so keep actual address after bind
 			localEndpoint = (InetSocketAddress) socket.getLocalSocketAddress();
+		}
+		catch (final KNXException e) {
+			throw new KnxRuntimeException("no local host address available", e.getCause());
 		}
 		catch (final IOException e) {
 			throw new KnxRuntimeException("binding to local address " + bind, e);

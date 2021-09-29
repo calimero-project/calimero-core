@@ -42,8 +42,6 @@ import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
-import java.util.Optional;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.IndividualAddress;
@@ -173,17 +171,8 @@ public abstract class ClientConnection extends ConnectionBase
 		// if we allow localEP to be null, we would create an unbound socket
 		if (localEP == null)
 			throw new KNXIllegalArgumentException("no local endpoint specified");
-		InetSocketAddress local = localEP;
+		final InetSocketAddress local = Net.matchRemoteEndpoint(localEP, serverCtrlEP, useNAT);
 		try {
-			if (local.isUnresolved())
-				throw new KNXIllegalArgumentException("unresolved address " + local);
-			if (local.getAddress().isAnyLocalAddress()) {
-				final InetAddress addr = useNAT ? null
-					: Optional.ofNullable(serverCtrlEP.getAddress()).flatMap(Net::onSameSubnet)
-							.orElse(InetAddress.getLocalHost());
-				local = new InetSocketAddress(addr, localEP.getPort());
-			}
-
 			if (!tcp) {
 				socket = new DatagramSocket(local);
 				ctrlSocket = socket;
@@ -195,9 +184,6 @@ public abstract class ClientConnection extends ConnectionBase
 			final var hpai = tcp ? HPAI.Tcp : new HPAI(HPAI.IPV4_UDP, useNat ? null : lsa);
 			final byte[] buf = PacketHelper.toPacket(protocolVersion(), new ConnectRequest(cri, hpai, hpai));
 			send(buf, ctrlEndpt);
-		}
-		catch (final UnknownHostException e) {
-			throw new KNXException("no local host address available", e);
 		}
 		catch (IOException | SecurityException e) {
 			closeSocket();
