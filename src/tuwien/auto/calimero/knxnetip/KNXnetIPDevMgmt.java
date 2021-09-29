@@ -56,6 +56,7 @@ import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.servicetype.ServiceAck;
 import tuwien.auto.calimero.knxnetip.servicetype.ServiceRequest;
 import tuwien.auto.calimero.knxnetip.util.CRI;
+import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
@@ -73,6 +74,8 @@ public class KNXnetIPDevMgmt extends ClientConnection
 	// client SHALL wait 10 seconds for a device config response from server
 	private static final int CONFIGURATION_REQ_TIMEOUT = 10;
 
+	static final CRI cri = CRI.createRequest(DEVICE_MGMT_CONNECTION);
+
 	/**
 	 * Creates a new KNXnet/IP device management connection to a remote device.
 	 *
@@ -89,21 +92,21 @@ public class KNXnetIPDevMgmt extends ClientConnection
 	public KNXnetIPDevMgmt(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP, final boolean useNAT)
 		throws KNXException, InterruptedException
 	{
-		this();
-		final CRI cri = CRI.createRequest(DEVICE_MGMT_CONNECTION);
+		this(serverCtrlEP);
 		connect(localEP, serverCtrlEP, cri, useNAT);
 	}
 
 	public KNXnetIPDevMgmt(final TcpConnection connection) throws KNXException, InterruptedException {
 		super(KNXnetIPHeader.DEVICE_CONFIGURATION_REQ, KNXnetIPHeader.DEVICE_CONFIGURATION_ACK, 4,
 				CONFIGURATION_REQ_TIMEOUT, connection);
-		final CRI cri = CRI.createRequest(DEVICE_MGMT_CONNECTION);
 		connect(connection, cri);
 	}
 
-	KNXnetIPDevMgmt() {
+	KNXnetIPDevMgmt(final InetSocketAddress serverCtrlEP) {
 		super(KNXnetIPHeader.DEVICE_CONFIGURATION_REQ, KNXnetIPHeader.DEVICE_CONFIGURATION_ACK, 4,
 				CONFIGURATION_REQ_TIMEOUT);
+		ctrlEndpt = serverCtrlEP;
+		logger = LogService.getLogger("calimero.knxnetip." + name());
 	}
 
 	/**

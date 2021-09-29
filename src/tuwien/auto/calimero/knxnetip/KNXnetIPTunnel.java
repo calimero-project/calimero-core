@@ -73,6 +73,7 @@ import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature;
 import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature.InterfaceFeature;
 import tuwien.auto.calimero.knxnetip.util.TunnelCRI;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
+import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.log.LogService.LogLevel;
 
 /**
@@ -159,14 +160,12 @@ public class KNXnetIPTunnel extends ClientConnection
 		final InetSocketAddress serverCtrlEP, final boolean useNAT) throws KNXException,
 		InterruptedException
 	{
-		this(knxLayer);
-		connect(localEP, serverCtrlEP, new TunnelCRI(knxLayer), useNAT);
+		this(knxLayer, localEP, serverCtrlEP, useNAT, KNXMediumSettings.BackboneRouter);
 	}
 
-	// TODO basically for link layer tunneling: newLinkLayerTunnel(...)
 	KNXnetIPTunnel(final TunnelingLayer knxLayer, final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP,
 		final boolean useNAT, final IndividualAddress tunnelingAddress) throws KNXException, InterruptedException {
-		this(knxLayer);
+		this(knxLayer, serverCtrlEP);
 		final var cri = tunnelingAddress.equals(KNXMediumSettings.BackboneRouter) ? new TunnelCRI(knxLayer)
 				: new TunnelCRI(knxLayer, tunnelingAddress);
 		connect(localEP, serverCtrlEP, cri, useNAT);
@@ -184,11 +183,13 @@ public class KNXnetIPTunnel extends ClientConnection
 		connect(connection, cri);
 	}
 
-	KNXnetIPTunnel(final TunnelingLayer knxLayer) {
+	KNXnetIPTunnel(final TunnelingLayer knxLayer, final InetSocketAddress serverCtrlEP) {
 		super(KNXnetIPHeader.TUNNELING_REQ, KNXnetIPHeader.TUNNELING_ACK, 2, TUNNELING_REQ_TIMEOUT);
 		layer = Objects.requireNonNull(knxLayer, "Tunneling Layer");
 		if (knxLayer == RawLayer)
 			throw new KNXIllegalArgumentException("Raw tunnel to KNX network not supported");
+		ctrlEndpt = serverCtrlEP;
+		logger = LogService.getLogger("calimero.knxnetip." + name());
 	}
 
 	/**

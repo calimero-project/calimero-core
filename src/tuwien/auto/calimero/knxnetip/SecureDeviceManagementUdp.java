@@ -55,18 +55,15 @@ final class SecureDeviceManagementUdp extends KNXnetIPDevMgmt {
 
 	SecureDeviceManagementUdp(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP,
 			final boolean useNAT, final SecureSessionUdp udp) throws KNXException, InterruptedException {
+		super(serverCtrlEP);
 		this.udp = udp;
 
-		connect(localEP, serverCtrlEP, CRI.createRequest(DEVICE_MGMT_CONNECTION), useNAT);
+		connect(localEP, serverCtrlEP, cri, useNAT);
 	}
 
 	@Override
 	protected void connect(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP, final CRI cri,
 			final boolean useNAT) throws KNXException, InterruptedException {
-		// logger is required by receiver loop during session setup
-		ctrlEndpt = serverCtrlEP;
-		logger = LogService.getLogger("calimero.knxnetip." + name());
-
 		final var local = Net.matchRemoteEndpoint(localEP, serverCtrlEP, useNAT);
 		udp.setupSecureSession(this, local, serverCtrlEP, useNAT);
 
@@ -104,7 +101,8 @@ final class SecureDeviceManagementUdp extends KNXnetIPDevMgmt {
 			if (containedHeader.getServiceType() == SecureConnection.SecureSessionStatus) {
 				final int status = TcpConnection.SecureSession.newChannelStatus(containedHeader, packet,
 						containedHeader.getStructLength());
-				LogService.log(logger, status == 0 ? LogLevel.TRACE : LogLevel.ERROR, "{}", udp.session());
+				LogService.log(logger, status == 0 ? LogLevel.TRACE : LogLevel.ERROR, "{}: {}", udp,
+						SecureConnection.statusMsg(status));
 				udp.quitSetupLoop();
 				udp.sessionStatus = status;
 				if (status != 0) // XXX do we need this throw, its swallowed by the loop anyway?

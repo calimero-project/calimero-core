@@ -38,6 +38,7 @@ package tuwien.auto.calimero.knxnetip;
 
 import static tuwien.auto.calimero.DataUnitBuilder.toHex;
 import static tuwien.auto.calimero.knxnetip.Net.hostPort;
+import static tuwien.auto.calimero.knxnetip.SecureConnection.secureSymbol;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -72,7 +73,11 @@ final class SecureSessionUdp {
 	// timeout session.req -> session.res, and session.auth -> session.status
 	private static final int sessionSetupTimeout = 10_000; // [ms]
 
-	private static final int SessionSetup = -1;
+	// session status codes
+	private static final int AuthSuccess = 0;
+	private static final int AuthFailed = 1;
+	// internal session status we use for initial setup
+	private static final int Setup = 6;
 
 
 	private final SecureSession session;
@@ -83,7 +88,7 @@ final class SecureSessionUdp {
 	private final byte[] publicKey = new byte[SecureConnection.keyLength];
 
 	private int sessionId;
-	volatile int sessionStatus = SessionSetup;
+	volatile int sessionStatus = Setup;
 
 	private DatagramSocket localSocket;
 	private ReceiverLoop setupLoop;
@@ -95,10 +100,6 @@ final class SecureSessionUdp {
 		this.logger = LoggerFactory.getLogger(
 				"calimero.knxnetip.KNX/IP " + SecureConnection.secureSymbol + " Session " + hostPort(serverCtrlEP));
 	}
-
-	int sessionId() { return sessionId; }
-
-	SecureSession session() { return session; }
 
 	// session.req -> session.res -> auth.req -> session-status
 	void setupSecureSession(final ClientConnection conn, final InetSocketAddress localEP,
@@ -126,9 +127,9 @@ final class SecureSessionUdp {
 
 			setupLoop = new ReceiverLoop(conn, local, 512, 0, sessionSetupTimeout);
 			setupLoop.run();
-			if (sessionStatus == SessionSetup)
+			if (sessionStatus == Setup)
 				throw new KNXTimeoutException("timeout establishing secure session with " + serverCtrlEP);
-			if (sessionStatus != 0)
+			if (sessionStatus != AuthSuccess)
 				throw new KnxSecureException("secure session " + SecureConnection.statusMsg(sessionStatus));
 		}
 		catch (final IOException e) {
@@ -152,11 +153,11 @@ final class SecureSessionUdp {
 			final byte[] serverPublicKey = (byte[]) res[1];
 			final byte[] auth = newSessionAuth(serverPublicKey);
 			final byte[] packet = newSecurePacket(auth);
-			logger.debug("secure session {}, request access for user {}", sessionId, session().user());
+			logger.debug("secure session {}, request access for user {}", sessionId, session.user());
 			localSocket.send(new DatagramPacket(packet, packet.length, source));
 		}
 		catch (final RuntimeException e) {
-			sessionStatus = 1;
+			sessionStatus = AuthFailed;
 			quitSetupLoop();
 			logger.error("negotiating session key failed", e);
 		}
@@ -258,6 +259,11 @@ final class SecureSessionUdp {
 	}
 
 	void quitSetupLoop() { setupLoop.quit(); }
+
+	@Override
+	public String toString() {
+		return secureSymbol + " session " + sessionId + " (user " + session.user() + ")";
+	}
 
 	private byte[] cbcMacSimple(final Key secretKey, final byte[] data, final int offset, final int length) {
 		final byte[] exact = Arrays.copyOfRange(data, offset, offset + length);

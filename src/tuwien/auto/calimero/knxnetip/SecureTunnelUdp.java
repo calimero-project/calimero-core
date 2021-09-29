@@ -59,7 +59,7 @@ final class SecureTunnelUdp extends KNXnetIPTunnel {
 	SecureTunnelUdp(final TunnelingLayer knxLayer, final InetSocketAddress localEP,
 			final InetSocketAddress serverCtrlEP, final boolean useNAT, final IndividualAddress tunnelingAddress,
 			final SecureSessionUdp udp) throws KNXException, InterruptedException {
-		super(knxLayer);
+		super(knxLayer, serverCtrlEP);
 		this.udp = udp;
 
 		final var cri = tunnelingAddress.equals(KNXMediumSettings.BackboneRouter) ? new TunnelCRI(knxLayer)
@@ -70,10 +70,6 @@ final class SecureTunnelUdp extends KNXnetIPTunnel {
 	@Override
 	protected void connect(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP, final CRI cri,
 			final boolean useNAT) throws KNXException, InterruptedException {
-		// logger is required by receiver loop during session setup
-		ctrlEndpt = serverCtrlEP;
-		logger = LogService.getLogger("calimero.knxnetip." + name());
-
 		final var local = Net.matchRemoteEndpoint(localEP, serverCtrlEP, useNAT);
 		udp.setupSecureSession(this, local, serverCtrlEP, useNAT);
 
@@ -111,7 +107,8 @@ final class SecureTunnelUdp extends KNXnetIPTunnel {
 			if (containedHeader.getServiceType() == SecureConnection.SecureSessionStatus) {
 				final int status = TcpConnection.SecureSession.newChannelStatus(containedHeader, packet,
 						containedHeader.getStructLength());
-				LogService.log(logger, status == 0 ? LogLevel.TRACE : LogLevel.ERROR, "{}", udp.session());
+				LogService.log(logger, status == 0 ? LogLevel.TRACE : LogLevel.ERROR, "{}: {}", udp,
+						SecureConnection.statusMsg(status));
 				udp.quitSetupLoop();
 				udp.sessionStatus = status;
 				if (status != 0) // XXX do we need this throw, its swallowed by the loop anyway?
