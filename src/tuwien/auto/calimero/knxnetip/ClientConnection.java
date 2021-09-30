@@ -364,7 +364,7 @@ public abstract class ClientConnection extends ConnectionBase
 				setStateNotify(res.getStatus() == ErrorCodes.NO_ERROR ? CEMI_CON_PENDING : ACK_ERROR);
 				if (logger.isTraceEnabled())
 					logger.trace("received service ack {} from {} (channel {})",
-							res.getSequenceNumber(), ctrlEndpt, channelId);
+							res.getSequenceNumber(), hostPort(ctrlEndpt), channelId);
 				if (internalState == ACK_ERROR)
 					logger.warn("received service acknowledgment status " + res.getStatusString());
 			}
