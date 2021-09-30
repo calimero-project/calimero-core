@@ -46,9 +46,6 @@ import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.util.CRI;
-import tuwien.auto.calimero.log.LogService;
-import tuwien.auto.calimero.log.LogService.LogLevel;
-import tuwien.auto.calimero.secure.KnxSecureException;
 
 final class SecureDeviceManagementUdp extends KNXnetIPDevMgmt {
 	private final SecureSessionUdp udp;
@@ -99,14 +96,7 @@ final class SecureDeviceManagementUdp extends KNXnetIPDevMgmt {
 			final KNXnetIPHeader containedHeader = new KNXnetIPHeader(packet, 0);
 
 			if (containedHeader.getServiceType() == SecureConnection.SecureSessionStatus) {
-				final int status = TcpConnection.SecureSession.newChannelStatus(containedHeader, packet,
-						containedHeader.getStructLength());
-				LogService.log(logger, status == 0 ? LogLevel.TRACE : LogLevel.ERROR, "{}: {}", udp,
-						SecureConnection.statusMsg(status));
-				udp.quitSetupLoop();
-				udp.sessionStatus = status;
-				if (status != 0) // XXX do we need this throw, its swallowed by the loop anyway?
-					throw new KnxSecureException("secure session " + SecureConnection.statusMsg(status));
+				udp.sessionStatus(packet, containedHeader);
 			}
 			else {
 				// let base class handle decrypted knxip packet

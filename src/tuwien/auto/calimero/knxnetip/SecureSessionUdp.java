@@ -67,6 +67,8 @@ import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
+import tuwien.auto.calimero.log.LogService;
+import tuwien.auto.calimero.log.LogService.LogLevel;
 import tuwien.auto.calimero.secure.KnxSecureException;
 
 final class SecureSessionUdp {
@@ -88,7 +90,7 @@ final class SecureSessionUdp {
 	private final byte[] publicKey = new byte[SecureConnection.keyLength];
 
 	private int sessionId;
-	volatile int sessionStatus = Setup;
+	private volatile int sessionStatus = Setup;
 
 	private DatagramSocket localSocket;
 	private ReceiverLoop setupLoop;
@@ -234,6 +236,15 @@ final class SecureSessionUdp {
 		return buffer.array();
 	}
 
+	void sessionStatus(final byte[] packet, final KNXnetIPHeader containedHeader) throws KNXFormatException {
+		final int status = TcpConnection.SecureSession.newChannelStatus(containedHeader, packet,
+				containedHeader.getStructLength());
+		LogService.log(logger, status == 0 ? LogLevel.TRACE : LogLevel.ERROR, "{}: {}", this,
+				SecureConnection.statusMsg(status));
+		quitSetupLoop();
+		sessionStatus = status;
+	}
+
 	byte[] newSecurePacket(final byte[] knxipPacket) {
 		return SecureConnection.newSecurePacket(sessionId, session.nextSendSeq(), session.serialNumber(), 0,
 				knxipPacket, secretKey);
@@ -258,12 +269,12 @@ final class SecureSessionUdp {
 		return new Object[] { fields[0], fields[1], sn, fields[3], fields[4] };
 	}
 
-	void quitSetupLoop() { setupLoop.quit(); }
-
 	@Override
 	public String toString() {
 		return secureSymbol + " session " + sessionId + " (user " + session.user() + ")";
 	}
+
+	private void quitSetupLoop() { setupLoop.quit(); }
 
 	private byte[] cbcMacSimple(final Key secretKey, final byte[] data, final int offset, final int length) {
 		final byte[] exact = Arrays.copyOfRange(data, offset, offset + length);
