@@ -61,7 +61,7 @@ public final class Security {
 	/**
 	 * Creates a new security object, mainly for use with KNX installations other than the {@link #defaultInstallation()}.
 	 */
-	public Security() {}
+	public static Security newSecurity() { return new Security(); }
 
 	static Security withKeys(final Map<IndividualAddress, byte[]> deviceToolKeys,
 			final Map<GroupAddress, byte[]> groupKeys, final Map<GroupAddress, Set<IndividualAddress>> groupSenders) {
@@ -79,6 +79,9 @@ public final class Security {
 	 */
 	// ??? naming: knx installation id is linked to project id and not stored in keyring nor in many interfaces
 	public static Security defaultInstallation() { return defInst; }
+
+
+	private Security() {}
 
 	/**
 	 * Adds KNX secure information of the supplied keyring to this security instance;
