@@ -213,7 +213,8 @@ public class KNXnetIPTunnel extends ClientConnection
 
 	// sends a tunneling feature-get service
 	// sendFeature / getFeature?
-	public void send(final InterfaceFeature feature) throws KNXConnectionClosedException, KNXAckTimeoutException, InterruptedException {
+	public void send(final InterfaceFeature feature) throws KNXConnectionClosedException, KNXTimeoutException,
+			InterruptedException {
 		synchronized (lock) {
 			final TunnelingFeature get = TunnelingFeature.newGet(feature);
 			send(get);
@@ -223,7 +224,7 @@ public class KNXnetIPTunnel extends ClientConnection
 	// sends a tunneling feature-set service
 	// sendFeature / setFeature?
 	public void send(final InterfaceFeature feature, final byte... featureValue)
-		throws KNXConnectionClosedException, KNXAckTimeoutException, InterruptedException {
+		throws KNXConnectionClosedException, KNXTimeoutException, InterruptedException {
 		synchronized (lock) {
 			final TunnelingFeature set = TunnelingFeature.newSet(feature, featureValue);
 			send(set);
@@ -233,7 +234,7 @@ public class KNXnetIPTunnel extends ClientConnection
 	// pre-cond: send lock hold
 	// pre-cond: there is no cEMI send in progress, cEMI frames use the ConnectionBase::sendWaitQueue
 	private void send(final TunnelingFeature tunnelingFeature)
-		throws KNXConnectionClosedException, KNXAckTimeoutException, InterruptedException {
+		throws KNXConnectionClosedException, KNXTimeoutException, InterruptedException {
 		if (layer == TunnelingLayer.BusMonitorLayer)
 			throw new IllegalStateException("send not permitted in busmonitor mode");
 		if (state < 0)
@@ -269,6 +270,9 @@ public class KNXnetIPTunnel extends ClientConnection
 				close(CloseEvent.INTERNAL, "maximum send attempts", LogLevel.ERROR, e);
 				throw e;
 			}
+			// always forward this state to user
+			state = internalState;
+			waitForTunnelingFeatureResponse(tunnelingFeature);
 		}
 		catch (final InterruptedIOException e) {
 			throw new InterruptedException("interrupted I/O, " + e);
@@ -280,6 +284,18 @@ public class KNXnetIPTunnel extends ClientConnection
 		finally {
 			updateState = true;
 			setState(OK);
+		}
+	}
+
+	private void waitForTunnelingFeatureResponse(final TunnelingFeature tf) throws KNXTimeoutException,
+			InterruptedException {
+		// wait for incoming request with feature response
+		waitForStateChange(ClientConnection.CEMI_CON_PENDING, 3);
+		// throw on no answer
+		if (internalState == ClientConnection.CEMI_CON_PENDING) {
+			logger.warn("response timeout waiting for response to {}", tf);
+			internalState = OK;
+			throw new KNXTimeoutException("no response received for " + tf);
 		}
 	}
 
@@ -352,6 +368,7 @@ public class KNXnetIPTunnel extends ClientConnection
 		if (svc >= KNXnetIPHeader.TunnelingFeatureGet && svc <= KNXnetIPHeader.TunnelingFeatureInfo) {
 			final TunnelingFeature feature = req.service();
 			logger.trace("received {}", feature);
+			setStateNotify(OK);
 
 			listeners.listeners().stream().filter(TunnelingListener.class::isInstance)
 					.map(TunnelingListener.class::cast).forEach(tl -> notifyFeatureReceived(tl, svc, feature));

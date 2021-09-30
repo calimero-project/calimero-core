@@ -59,8 +59,6 @@ import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.ReturnCode;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.cemi.CEMILData;
-import tuwien.auto.calimero.knxnetip.TcpConnection;
-import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.knxnetip.KNXConnectionClosedException;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.knxnetip.KNXnetIPDevMgmt;
@@ -71,6 +69,8 @@ import tuwien.auto.calimero.knxnetip.LostMessageEvent;
 import tuwien.auto.calimero.knxnetip.RoutingBusyEvent;
 import tuwien.auto.calimero.knxnetip.RoutingListener;
 import tuwien.auto.calimero.knxnetip.SecureConnection;
+import tuwien.auto.calimero.knxnetip.TcpConnection;
+import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.knxnetip.TunnelingListener;
 import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature;
 import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature.InterfaceFeature;
@@ -333,10 +333,16 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 					getKNXMedium().setDeviceAddress(new IndividualAddress(feature.featureValue().get()));
 				}
 			});
-			tunnel.send(InterfaceFeature.EnableFeatureInfoService, (byte) 1);
-			tunnel.send(InterfaceFeature.IndividualAddress);
-			tunnel.send(InterfaceFeature.MaxApduLength);
-			tunnel.send(InterfaceFeature.DeviceDescriptorType0);
+			try {
+				tunnel.send(InterfaceFeature.EnableFeatureInfoService, (byte) 1);
+			}
+			catch (final KNXAckTimeoutException e) {
+				throw e;
+			}
+			catch (final KNXTimeoutException ok) {}
+			getTunnelingFeature(tunnel, InterfaceFeature.IndividualAddress);
+			getTunnelingFeature(tunnel, InterfaceFeature.MaxApduLength);
+			getTunnelingFeature(tunnel, InterfaceFeature.DeviceDescriptorType0);
 		}
 		else if (c instanceof KNXnetIPRouting) {
 			notifier.registerEventType(LostMessageEvent.class);
@@ -356,6 +362,19 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 					dispatchCustomEvent(e);
 				}
 			});
+		}
+	}
+
+	private void getTunnelingFeature(final KNXnetIPTunnel tunnel, final InterfaceFeature feature)
+			throws KNXConnectionClosedException, KNXAckTimeoutException, InterruptedException {
+		try {
+			tunnel.send(feature);
+		}
+		catch (final KNXAckTimeoutException e) {
+			throw e;
+		}
+		catch (final KNXTimeoutException e) {
+			// no tunneling feature response, which is fine
 		}
 	}
 
