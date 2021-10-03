@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -127,7 +127,8 @@ public abstract class Datapoint
 			if (a != null)
 				mainNo = Integer.decode(a).intValue();
 			a = r.getAttributeValue(null, ATTR_PRIORITY);
-			priority = Priority.get(a);
+			if (a != null)
+				priority = Priority.get(a);
 		}
 		catch (final RuntimeException rte) {
 			throw new KNXMLException("malformed attribute, " + rte.getMessage(), r);
