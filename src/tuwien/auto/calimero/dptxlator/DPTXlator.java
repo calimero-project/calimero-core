@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -94,8 +94,7 @@ public abstract class DPTXlator
 	 * <p>
 	 * For every element entry, only the lower byte is allowed to be set. This way, it is
 	 * possible to store and access unsigned bytes.<br>
-	 * The length of the array indicates how much KNX data values are contained for
-	 * conversion.<br>
+	 * The length of the array indicates how much KNX data values are contained for conversion.
 	 */
 	protected short[] data;
 
@@ -120,7 +119,7 @@ public abstract class DPTXlator
 	 * <p>
 	 * Methods capable of returning an item value together the engineering unit of the
 	 * DPT, should append the unit on <code>true</code>, and omit any unit
-	 * representation on <code>false</code>; default setting is <code>true</code>.<br>
+	 * representation on <code>false</code>; default setting is <code>true</code>.
 	 * Only relevant for DPTs with an associated engineering unit.
 	 */
 	protected boolean appendUnit = true;
@@ -134,8 +133,7 @@ public abstract class DPTXlator
 	/**
 	 * Creates the new translator and initializes the data type size.
 	 *
-	 * @param dataTypeSize size in bytes of the KNX data type, use 0 if the type size
-	 *        &lt;= 6 bits
+	 * @param dataTypeSize size in bytes of the KNX data type, use 0 if the type size &lt;= 6 bits
 	 */
 	public DPTXlator(final int dataTypeSize)
 	{
@@ -270,7 +268,6 @@ public abstract class DPTXlator
 
 	/**
 	 * Returns a copy of all items stored by this translator translated into DPTs.
-	 * <p>
 	 *
 	 * @return byte array with KNX DPT value items
 	 */
@@ -328,7 +325,6 @@ public abstract class DPTXlator
 
 	/**
 	 * Returns the number of translation items currently in the translator.
-	 * <p>
 	 *
 	 * @return items number
 	 */
@@ -495,9 +491,7 @@ public abstract class DPTXlator
 	}
 
 	/**
-	 * Returns value with unit cut off at end of string, if current DPT has a unit
-	 * specified.
-	 * <p>
+	 * Returns value with unit cut off at end of string, if current DPT has a unit specified.
 	 * Whitespace are removed from both ends.
 	 *
 	 * @param value value string representation

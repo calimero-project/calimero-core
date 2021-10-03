@@ -617,8 +617,8 @@ public final class TranslatorTypes
 	/**
 	 * Creates a DPT translator for the given datapoint type ID.
 	 *
-	 * @param dptId datapoint type ID, formatted as <code>&lt;main number&gt;.&lt;sub number&gt;</code> with a sub
-	 *        number &lt; 100 zero-padded to 3 digits, e.g. "1.001"
+	 * @param dptId datapoint type ID, formatted as <code>&lt;main number&gt;.&lt;sub number&gt;</code> with sub
+	 *        numbers &lt; 100 zero-padded to 3 digits, e.g. "1.001"
 	 * @param data (optional) KNX datapoint data to set in the created translator for translation
 	 * @return the new {@link DPTXlator} object
 	 * @throws KNXException if no matching DPT translator is available or creation failed (see
