@@ -93,6 +93,18 @@ public class DPTXlator8BitEnum extends DPTXlator
 		private static String split(final String name) { return name.replaceAll("\\B([A-Z])", " $1").toLowerCase(); }
 	}
 
+
+	// Non-standard enum 'Enable heating/cooling stage' used by DPT 201.105
+	enum EnableHeatCoolStage implements EnumBase<EnableHeatCoolStage> {
+		Disabled(0),
+		EnableStageA(1),
+		EnableStageB(2),
+		EnableBothStages(3);
+
+		EnableHeatCoolStage(final int element) { init(element); }
+	}
+
+
 	//
 	// The specified enumerations for the DPTs of this translator
 	//
@@ -888,7 +900,20 @@ public class DPTXlator8BitEnum extends DPTXlator
 	public static final EnumDpt<GasMeasurementCondition> DptGasMeasurementCondition = new EnumDpt<>(
 			"20.1202", GasMeasurementCondition.class, "0", "3");
 
+	// LTE-HEE Mode
+
+	// not standardized, sub number 1105 does not exist
+	static final EnumDpt<EnableHeatCoolStage> DptEnableHeatCoolStage = new EnumDpt<>(
+			"20.1105", EnableHeatCoolStage.class, "0", "3");
+
+
+
 	private static final Map<String, DPT> types = loadDatapointTypes(DPTXlator8BitEnum.class);
+	static {
+		// we have to add it manually because loadDatapointTypes only loads public DPTs
+		types.put("20.1105", DptEnableHeatCoolStage);
+	}
+
 
 	/**
 	 * Creates a translator for the given datapoint type.
