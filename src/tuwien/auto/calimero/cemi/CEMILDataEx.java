@@ -146,6 +146,21 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 
 	private final List<AdditionalInfo> addInfo = Collections.synchronizedList(new ArrayList<>());
 
+
+	public static CEMILDataEx newLte(final int msgCode, final IndividualAddress src, final LteHeeTag tag,
+			final byte[] tpdu, final Priority p, final boolean repeat, final boolean domainBroadcast, final boolean ack,
+			final int hopCount) {
+		final var ldata = new CEMILDataEx(msgCode, src, tag.toGroupAddress(), tpdu, p, repeat, domainBroadcast, ack,
+				hopCount);
+		// LTE is always extended frame
+		ldata.ctrl1 &= ~0x80;
+		// adjust cEMI Ext Ctrl Field with frame format parameters for LTE
+		final int lteExtAddrType = 0x04; // LTE-HEE extended address type
+		ldata.ctrl2 |= lteExtAddrType;
+		ldata.ctrl2 |= tag.type().ordinal();
+		return ldata;
+	}
+
 	/**
 	 * Creates a new L-Data message from a byte stream.
 	 *
