@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,7 +54,6 @@ public class TP1LData extends RawFrameBase
 
 	/**
 	 * Creates a new L-data frame out of a byte array.
-	 * <p>
 	 *
 	 * @param data byte array containing the L-data frame
 	 * @param offset start offset of frame structure in <code>data</code>, offset &gt;=
@@ -76,9 +75,6 @@ public class TP1LData extends RawFrameBase
 		fcs = is.read();
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.medium.RawFrameBase#toString()
-	 */
 	@Override
 	public String toString()
 	{

@@ -116,7 +116,6 @@ public abstract class RawFrameBase implements RawFrame
 
 	/**
 	 * Returns the KNX individual source address.
-	 * <p>
 	 *
 	 * @return address of type IndividualAddress
 	 */
@@ -127,7 +126,6 @@ public abstract class RawFrameBase implements RawFrame
 
 	/**
 	 * Returns the KNX destination address.
-	 * <p>
 	 *
 	 * @return destination address of type KNXAddress
 	 */
@@ -138,7 +136,6 @@ public abstract class RawFrameBase implements RawFrame
 
 	/**
 	 * Returns the message priority used for this frame.
-	 * <p>
 	 *
 	 * @return the used Priority
 	 */
@@ -149,7 +146,6 @@ public abstract class RawFrameBase implements RawFrame
 
 	/**
 	 * Returns the hop count of this frame.
-	 * <p>
 	 *
 	 * @return hop count in the range 0 &lt;= count &lt;= 7
 	 */

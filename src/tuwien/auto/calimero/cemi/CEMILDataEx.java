@@ -456,7 +456,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 			final byte[] info = new byte[len];
 			is.read(info, 0, len);
 			try {
-				addInfo.add(new AddInfo(type, info));
+				addInfo.add(AdditionalInfo.of(type, info));
 			}
 			catch (final KNXIllegalArgumentException e) {
 				throw new KNXFormatException(e.getMessage());

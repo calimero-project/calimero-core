@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,8 +45,7 @@ import tuwien.auto.calimero.Priority;
 
 /**
  * L-polldata frame format on TP1 communication medium.
- * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public class TP1LPollData extends RawFrameBase
@@ -57,8 +56,7 @@ public class TP1LPollData extends RawFrameBase
 
 	/**
 	 * Creates a new L-polldata frame out of a byte array.
-	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing the L-polldata frame
 	 * @param offset start offset of frame structure in <code>data</code>, offset &gt;=
 	 *        0
@@ -90,8 +88,7 @@ public class TP1LPollData extends RawFrameBase
 
 	/**
 	 * Returns the length of expected poll data.
-	 * <p>
-	 * 
+	 *
 	 * @return length of expected polldata bytes, 1 &lt;= length &lt;= 15
 	 */
 	public final int getExpectedDataLength()
@@ -99,9 +96,6 @@ public class TP1LPollData extends RawFrameBase
 		return expData;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.link.medium.RawFrameBase#toString()
-	 */
 	@Override
 	public String toString()
 	{
