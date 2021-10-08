@@ -42,6 +42,7 @@ import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.LteHeeTag;
 import tuwien.auto.calimero.Priority;
 
 /**
@@ -107,6 +108,9 @@ public abstract class RawFrameBase implements RawFrame
 	 * In L-polldata frame tpdu is not used.
 	 */
 	protected byte[] tpdu;
+
+	private int eff; // extended frame format in extended ctrl field,
+
 
 	@Override
 	public final int getFrameType()
@@ -196,8 +200,12 @@ public abstract class RawFrameBase implements RawFrame
 	@Override
 	public String toString()
 	{
+		final int lteHeeExtAddrType = 0x04;
+		final boolean lte = ext && (eff & lteHeeExtAddrType) == lteHeeExtAddrType;
+		final var dstAddr = lte ? LteHeeTag.from(eff, (GroupAddress) dst) : dst;
+
 		final StringBuilder sb = new StringBuilder();
-		sb.append(src).append("->").append(dst);
+		sb.append(src).append("->").append(dstAddr);
 		sb.append(type == LDATA_FRAME ? " L-Data" : " L-Polldata").append(".req");
 		if (ext)
 			sb.append(" (ext)");
@@ -239,6 +247,7 @@ public abstract class RawFrameBase implements RawFrame
 		repetition = (ctrl & 0x20) == 0;
 		p = Priority.get((ctrl >> 2) & 0x3);
 		final int ctrle = ext ? readCtrlEx(is) : 0;
+		eff = ctrle & 0x0f;
 
 		if (parseDoA) {
 			doa = new byte[2];
@@ -267,11 +276,9 @@ public abstract class RawFrameBase implements RawFrame
 		dst = group ? (KNXAddress) new GroupAddress(addr) : new IndividualAddress(addr);
 	}
 
-	int readCtrlEx(final ByteArrayInputStream is) throws KNXFormatException
+	int readCtrlEx(final ByteArrayInputStream is)
 	{
 		final int ctrle = is.read();
-		if ((ctrle & 0xf) != 0)
-			throw new KNXFormatException("LTE-HEE frame not supported");
 		return ctrle;
 	}
 }
