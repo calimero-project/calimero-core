@@ -36,7 +36,10 @@
 
 package tuwien.auto.calimero;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Experimental.
@@ -44,6 +47,16 @@ import java.util.Map;
 public final class LteHeeTag {
 	private final Type type;
 	private final int tag;
+
+
+	// currently only geo tags with wildcards, broadcast, and unassigned (peripheral) in hex notation is supported
+	public static LteHeeTag from(final String tag) {
+		final String[] split = tag.replaceAll("\\*", "0").split("/", -1);
+		final List<Integer> levels = Arrays.stream(split).map(Integer::decode).collect(Collectors.toList());
+		if (levels.size() == 1)
+			return new LteHeeTag(0x04 | 3, new GroupAddress(levels.get(0)));
+		return geoTag(levels.get(0), levels.get(1), levels.get(2));
+	}
 
 	public static LteHeeTag from(final int eff, final GroupAddress addr) {
 		return new LteHeeTag(eff, addr);
