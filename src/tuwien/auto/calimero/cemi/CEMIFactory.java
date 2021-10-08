@@ -392,6 +392,8 @@ public final class CEMIFactory
 			final CEMILDataEx f = (CEMILDataEx) original;
 			final CEMILDataEx copy = new CEMILDataEx(mc, s, d, content, f.getPriority(), repeat,
 					f.isDomainBroadcast(), f.isAckRequested(), f.getHopCount());
+			if ((original.ctrl1 & 0x80) == 0)
+				copy.ctrl1 &= ~0x80;
 			copy.ctrl2 |= original.ctrl2 & 0x0f;
 			// copy additional info
 			copy.additionalInfo().addAll(f.additionalInfo());

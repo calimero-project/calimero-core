@@ -398,7 +398,9 @@ public class TpuartConnection implements Connection<byte[]>
 		// skip 1 byte mc + 1 byte add.info length + any add.info
 		final int skipToCtrl1 = 2 + frame[1] & 0xff;
 		final int cemiPrefix = skipToCtrl1 + 8;
-		final boolean std = frame.length <= cemiPrefix + stdMaxApdu;
+
+		final boolean extended = (frame[skipToCtrl1] & 0x80) == 0;
+		final boolean std = !extended && frame.length <= cemiPrefix + stdMaxApdu;
 
 		final byte[] tp1;
 		if (std) {
