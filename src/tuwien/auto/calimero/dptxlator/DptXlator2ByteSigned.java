@@ -69,13 +69,13 @@ public class DptXlator2ByteSigned extends DPTXlator
 	public static final DPT DptDeltaTime = new DPT("8.002", "delta time in ms", "-32768", "32767", "ms");
 
 	/**
-	 * DPT ID 8.003, delta time in ms (resolution 10 ms); values from <b>-327.68</b> to <b>327.67</b> s.
+	 * DPT ID 8.003, delta time in ms (resolution 10 ms); values from <b>-327680</b> to <b>327670</b> ms.
 	 */
 	public static final DPT DptDeltaTime10 = new DPT("8.003", "delta time in ms (resolution 10 ms)", "-327680",
 			"327670", "ms");
 
 	/**
-	 * DPT ID 8.004, delta time in ms (resolution 100 ms); values from <b>-3276.8</b> to <b>3276.7</b> s.
+	 * DPT ID 8.004, delta time in ms (resolution 100 ms); values from <b>-3276800</b> to <b>3276700</b> ms.
 	 */
 	public static final DPT DptDeltaTime100 = new DPT("8.004", "delta time in ms (resolution 100 ms)", "-3276800",
 			"3276700", "ms");
