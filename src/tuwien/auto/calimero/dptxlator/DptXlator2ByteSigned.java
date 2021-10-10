@@ -96,6 +96,11 @@ public class DptXlator2ByteSigned extends DPTXlator
 	public static final DPT DptDeltaTimeHours = new DPT("8.007", "delta time in hours", "-32768", "32767", "h");
 
 	/**
+	 * DPT ID 8.010, percent; values from <b>-327.68</b> to <b>327.67</b> %, resolution 0.01.
+	 */
+	public static final DPT DptPercent = new DPT("8.010", "percent", "-327.68", "327.67", "%");
+
+	/**
 	 * DPT ID 8.011, rotation angle in degrees; values from <b>-32768</b> to <b>32767</b> °, resolution 1.
 	 */
 	public static final DPT DptRotationAngle = new DPT("8.011", "rotation angle", "-32768", "32767", "°");
