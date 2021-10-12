@@ -75,6 +75,7 @@ class DptXlator2ByteSignedTests {
 		DptXlator2ByteSigned.DptDeltaTimeMin,
 		DptXlator2ByteSigned.DptDeltaTimeHours,
 		DptXlator2ByteSigned.DptRotationAngle,
+		DptXlator2ByteSigned.DptPercent,
 		DptXlator2ByteSigned.DptLength };
 
 	@BeforeEach
@@ -201,18 +202,24 @@ class DptXlator2ByteSignedTests {
 	void dptLimits() throws KNXFormatException {
 		checkDPTs(dpts, true);
 		for (int i = 0; i < dpts.length; i++) {
-			setValueFail(new DptXlator2ByteSigned(dpts[i]), Long.parseLong(dpts[i].getLowerValue()) - 1);
-			setValueFail(new DptXlator2ByteSigned(dpts[i]), Long.parseLong(dpts[i].getUpperValue()) + 1);
+			final var tr = new DptXlator2ByteSigned(dpts[i]);
+			if (dpts[i].equals(DptXlator2ByteSigned.DptPercent)) {
+				setValueFail(tr, Double.parseDouble(dpts[i].getLowerValue()) - 1);
+				setValueFail(tr, Double.parseDouble(dpts[i].getUpperValue()) + 1);
+			}
+			else {
+				setValueFail(tr, Long.parseLong(dpts[i].getLowerValue()) - 1);
+				setValueFail(tr, Long.parseLong(dpts[i].getUpperValue()) + 1);
+			}
 		}
 	}
 
-	private void setValueFail(final DptXlator2ByteSigned tr, final long v) {
+	private void setValueFail(final DptXlator2ByteSigned tr, final double v) {
 		try {
 			tr.setValue(v);
 			fail("set value should fail: " + v);
 		}
-		catch (final KNXFormatException e) {
-		}
+		catch (final KNXFormatException e) {}
 	}
 
 	@Test

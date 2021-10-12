@@ -145,7 +145,7 @@ public class DptXlator2ByteSigned extends DPTXlator
 		data = new short[2];
 		formatter.setMinimumFractionDigits(0);
 		formatter.setMaximumFractionDigits(2);
-		formatter.setParseIntegerOnly(true);
+		formatter.setParseIntegerOnly(dpt.equals(DptPercent) ? false : true);
 	}
 
 	@Override
@@ -166,17 +166,19 @@ public class DptXlator2ByteSigned extends DPTXlator
 	 *        <ul>
 	 *        <li>min = -327680 for DPT {@link #DptDeltaTime10}</li>
 	 *        <li>min = -3276800 for DPT {@link #DptDeltaTime100}</li>
+	 *        <li>min = -327.68 for DPT {@link #DptPercent}</li>
 	 *        <li>min = -32768 otherwise</li>
 	 *        </ul>
 	 *        <ul>
 	 *        <li>max = 327670 for DPT {@link #DptDeltaTime10}</li>
 	 *        <li>max = 3276700 for DPT {@link #DptDeltaTime100}</li>
+	 *        <li>max = 327.67 for DPT {@link #DptPercent}</li>
 	 *        <li>max = 32767 otherwise</li>
 	 *        </ul>
 	 * @throws KNXFormatException on input value out of range for DPT
 	 * @see #getType()
 	 */
-	public final void setValue(final long value) throws KNXFormatException
+	public final void setValue(final double value) throws KNXFormatException
 	{
 		final short[] buf = new short[2];
 		toDPT(value, buf, 0);
@@ -246,6 +248,8 @@ public class DptXlator2ByteSigned extends DPTXlator
 			return v * 10;
 		else if (dpt.equals(DptDeltaTime100))
 			return v * 100;
+		else if (dpt.equals(DptPercent))
+			return v / 100d;
 		return v;
 	}
 
@@ -258,11 +262,15 @@ public class DptXlator2ByteSigned extends DPTXlator
 		try {
 			final String s = removeUnit(value);
 			double v;
-			try {
-				v = Integer.decode(s).intValue();
-			}
-			catch (final NumberFormatException e) {
-				v = formatter.parse(s).longValue();
+			if (dpt.equals(DptPercent))
+				v = formatter.parse(s).doubleValue();
+			else {
+				try {
+					v = Integer.decode(s).intValue();
+				}
+				catch (final NumberFormatException e) {
+					v = formatter.parse(s).longValue();
+				}
 			}
 			toDPT(v, dst, index);
 		}
@@ -293,6 +301,8 @@ public class DptXlator2ByteSigned extends DPTXlator
 			v = (int) Math.round(value / 10);
 		else if (dpt.equals(DptDeltaTime100))
 			v = (int) Math.round(value / 100);
+		else if (dpt.equals(DptPercent))
+			v = (int) Math.round(value * 100);
 		else
 			v = (int) value;
 		dst[2 * index] = ubyte(v >> 8);
