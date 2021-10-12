@@ -45,6 +45,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.nio.channels.ClosedChannelException;
+import java.util.Arrays;
 
 /**
  * @author B. Malinowsky
@@ -167,8 +168,12 @@ public abstract class UdpSocketLooper
 	}
 
 	protected void receive(final byte[] buf) throws IOException {
+		Arrays.fill(buf, (byte) 0);
 		final DatagramPacket p = new DatagramPacket(buf, buf.length);
 		s.receive(p);
+		// weird jdk 17/18 behavior if socket got closed
+		if (p.getLength() == 0)
+			return;
 		onReceive((InetSocketAddress) p.getSocketAddress(), buf, p.getOffset(), p.getLength());
 	}
 
