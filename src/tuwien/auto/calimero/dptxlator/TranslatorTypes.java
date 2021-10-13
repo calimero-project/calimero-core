@@ -334,6 +334,7 @@ public final class TranslatorTypes
 			"DptXlator16BitSet",
 			"DPTXlator1BitControlled",
 			"DPTXlator2ByteFloat",
+			"DptXlator2ByteSigned",
 			"DPTXlator2ByteUnsigned",
 			"DptXlator2ByteSigned",
 			"DPTXlator3BitControlled",
