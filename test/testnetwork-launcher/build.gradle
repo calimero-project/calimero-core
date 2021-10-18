@@ -23,5 +23,5 @@ repositories {
 }
 
 dependencies {
-    compile group:group, name:'calimero-testnetwork', version:version
+    implementation  group:group, name:'calimero-testnetwork', version:version
 }
