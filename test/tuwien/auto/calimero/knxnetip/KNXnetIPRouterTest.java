@@ -66,6 +66,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import tag.KnxnetIP;
+import tag.KnxnetIPSequential;
 import tag.Slow;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DataUnitBuilder;
@@ -277,6 +278,7 @@ class KNXnetIPRouterTest
 	}
 
 	@Test
+	@KnxnetIPSequential
 	public void testLostMessageIndication() throws KNXException
 	{
 		newRouter();
@@ -331,6 +333,7 @@ class KNXnetIPRouterTest
 	}
 
 	@Test
+	@KnxnetIPSequential
 	void fastSendManyRoutingBusy() throws KNXException
 	{
 		newRouter();

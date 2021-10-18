@@ -44,6 +44,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Isolated;
 
 import tag.KnxnetIP;
 import tag.Slow;
@@ -61,6 +62,7 @@ import tuwien.auto.calimero.link.medium.TPSettings;
  * @author B. Malinowsky
  */
 @KnxnetIP
+@Isolated
 class ManagementProceduresImplTest
 {
 	private ManagementProcedures mp;

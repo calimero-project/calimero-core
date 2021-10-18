@@ -50,6 +50,7 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Isolated;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -72,6 +73,7 @@ import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
  * @author B. Malinowsky
  */
 @KnxnetIP
+@Isolated
 class ManagementClientImplTest
 {
 	private KNXNetworkLink lnk;
