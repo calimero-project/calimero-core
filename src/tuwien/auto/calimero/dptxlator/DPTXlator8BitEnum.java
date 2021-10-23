@@ -67,12 +67,6 @@ import tuwien.auto.calimero.KNXFormatException;
 @SuppressWarnings("checkstyle:javadocvariable")
 public class DPTXlator8BitEnum extends DPTXlator
 {
-
-	// HVAC Command field (Z8): 8 bit enumeration value in case of a write service
-	enum HvacCommand {
-		NormalWrite, Override, Release, SetOutOfService, ResetOutOfService, AlarmAck, SetToDefault
-	}
-
 	private interface EnumBase<E extends Enum<E> & EnumBase<E>> extends EnumDptBase.EnumBase<E> {
 		Map<EnumBase<?>, Integer> values = new HashMap<>();
 		Map<EnumBase<?>, String> descriptions = new HashMap<>();
@@ -93,6 +87,13 @@ public class DPTXlator8BitEnum extends DPTXlator
 		private static String split(final String name) { return name.replaceAll("\\B([A-Z])", " $1").toLowerCase(); }
 	}
 
+
+	// Non-standard enum HVAC Command field (Z8): 8 bit enumeration value in case of a HVAC property/group-property write service
+	enum HvacCommand implements EnumBase<HvacCommand> {
+		NormalWrite(0), Override(1), Release(2), SetOutOfService(3), ResetOutOfService(4), AlarmAck(5), SetToDefault(6);
+
+		HvacCommand(final int element) { init(element); }
+	}
 
 	// Non-standard enum 'Enable heating/cooling stage' used by DPT 201.105
 	enum EnableHeatCoolStage implements EnumBase<EnableHeatCoolStage> {
@@ -902,16 +903,21 @@ public class DPTXlator8BitEnum extends DPTXlator
 
 	// LTE-HEE Mode
 
-	// not standardized, sub number 1105 does not exist
+	// not standardized, sub number 60104 is mfr specific
+	static final EnumDpt<HvacCommand> DptHvacCommand = new EnumDpt<>(
+			"20.60104", HvacCommand.class, "0", "6");
+
+	// not standardized, sub number 60105 is mfr specific
 	static final EnumDpt<EnableHeatCoolStage> DptEnableHeatCoolStage = new EnumDpt<>(
-			"20.1105", EnableHeatCoolStage.class, "0", "3");
+			"20.60105", EnableHeatCoolStage.class, "0", "3");
 
 
 
 	private static final Map<String, DPT> types = loadDatapointTypes(DPTXlator8BitEnum.class);
 	static {
 		// we have to add it manually because loadDatapointTypes only loads public DPTs
-		types.put("20.1105", DptEnableHeatCoolStage);
+		types.put(DptHvacCommand.getID(), DptHvacCommand);
+		types.put(DptEnableHeatCoolStage.getID(), DptEnableHeatCoolStage);
 	}
 
 
