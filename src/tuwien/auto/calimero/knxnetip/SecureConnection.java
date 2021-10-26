@@ -80,7 +80,8 @@ import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.secure.KnxSecureException;
 
 /**
- * Provides KNX IP Secure routing and tunneling connections.
+ * Provides KNX IP Secure routing and tunneling connections. All methods involving cryptographic
+ * procedures might throw {@link KnxSecureException} in case of cryptographic setup/algorithm errors.
  */
 public final class SecureConnection {
 
@@ -107,6 +108,18 @@ public final class SecureConnection {
 		return new SecureTunnelUdp(knxLayer, localEP, serverCtrlEP, useNat, tunnelingAddress, udp);
 	}
 
+	/**
+	 * Creates a new KNX IP secure tunneling connection within {@code session}.
+	 *
+	 * @param knxLayer tunneling layer
+	 * @param session secure session with remote endpoint
+	 * @param tunnelingAddress KNX device address of local endpoint, the requested address needs to be an element of the
+	 *        set of additional addresses offered by the session's remote endpoint (server); use {@code 0.0.0} for any
+	 *        suitable address
+	 * @return new KNXnet/IP tunnel
+	 * @throws KNXException on errors setting up the session (if necessary) or establishing the tunnel
+	 * @throws InterruptedException on thread interrupt
+	 */
 	public static KNXnetIPTunnel newTunneling(final TunnelingLayer knxLayer, final SecureSession session,
 			final IndividualAddress tunnelingAddress) throws KNXException, InterruptedException {
 		session.ensureOpen();
@@ -114,6 +127,8 @@ public final class SecureConnection {
 	}
 
 	/**
+	 * Creates a new KNX IP secure routing connection.
+	 *
 	 * Implementation note: the connection acquires an authentic timer value after joining the requested multicast
 	 * group. For example, given a latency tolerance of 2 seconds, this adds a worst-case upper bound of 6.5 seconds,
 	 * before the connection can be used.
@@ -140,6 +155,15 @@ public final class SecureConnection {
 		return new SecureDeviceManagementUdp(localEP, serverCtrlEP, useNat, udp);
 	}
 
+	/**
+	 * Creates a new KNX IP secure device management connection within {@code session}.
+	 *
+	 * @param session secure session with remote endpoint
+	 * @return new KNXnet/IP device management connection
+	 *
+	 * @throws KNXException on errors setting up the session (if necessary) or establishing the connection
+	 * @throws InterruptedException on thread interrupt
+	 */
 	public static KNXnetIPDevMgmt newDeviceManagement(final SecureSession session)
 			throws KNXException, InterruptedException {
 		session.ensureOpen();
