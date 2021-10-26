@@ -121,6 +121,9 @@ public final class TcpConnection implements Closeable {
 
 
 
+	/**
+	 * A KNX IP secure session used over a TCP connection.
+	 */
 	public static final class SecureSession implements AutoCloseable {
 
 		// service codes
@@ -640,6 +643,13 @@ public final class TcpConnection implements Closeable {
 		}
 	}
 
+	/**
+	 * Creates a new TCP connection to a KNXnet/IP server.
+	 *
+	 * @param local local endpoint address
+	 * @param server remote endpoint address
+	 * @return a new TCP connection
+	 */
 	public static TcpConnection newTcpConnection(final InetSocketAddress local, final InetSocketAddress server) {
 		return new TcpConnection(local, server);
 	}
@@ -667,6 +677,15 @@ public final class TcpConnection implements Closeable {
 		}
 	}
 
+	/**
+	 * Creates a new secure session for this TCP connection.
+	 *
+	 * @param user user to authenticate for the session
+	 * @param userKey user key with {@code userKey.length == 16}
+	 * @param deviceAuthCode device authentication code with {@code deviceAuthCode.length == 16}, a
+	 *        {@code deviceAuthCode.length == 0} will skip device authentication
+	 * @return new secure session
+	 */
 	public SecureSession newSecureSession(final int user, final byte[] userKey, final byte[] deviceAuthCode) {
 		return new SecureSession(this, user, userKey, deviceAuthCode);
 	}
@@ -682,6 +701,9 @@ public final class TcpConnection implements Closeable {
 		return connected;
 	}
 
+	/**
+	 * Closes this connection and all its contained KNXnet/IP connections and secure sessions.
+	 */
 	@Override
 	public void close() {
 		unsecuredConnections.values().forEach(ClientConnection::close);
