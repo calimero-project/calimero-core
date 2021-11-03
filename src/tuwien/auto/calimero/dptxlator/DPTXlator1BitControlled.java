@@ -273,9 +273,16 @@ public class DPTXlator1BitControlled extends DPTXlator
 		return value(0);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#setData(byte[], int)
+	/**
+	 * Returns the numeric representation of both control and value bit.
+	 *
+	 * @return one of the values 0, 1, 2, or 3
 	 */
+	@Override
+	public double getNumericValue() {
+		return data[0] & 0x03;
+	}
+
 	@Override
 	public void setData(final byte[] data, final int offset)
 	{
