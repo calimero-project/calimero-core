@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ package tuwien.auto.calimero.dptxlator;
 import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;
@@ -185,6 +186,11 @@ public class DPTXlatorDate extends DPTXlator
 	{
 		return data[MONTH];
 	}
+
+	/**
+	 * @return month-of-year
+	 */
+	public final Month month() { return Month.of(getMonth()); }
 
 	/**
 	 * Returns the year information.
