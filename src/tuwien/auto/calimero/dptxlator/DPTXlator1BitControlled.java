@@ -209,9 +209,6 @@ public class DPTXlator1BitControlled extends DPTXlator
 		setValueBit(value);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getAllValues()
-	 */
 	@Override
 	public String[] getAllValues()
 	{
@@ -268,7 +265,6 @@ public class DPTXlator1BitControlled extends DPTXlator
 
 	/**
 	 * Returns the value field of the first translation item.
-	 * <p>
 	 *
 	 * @return value field
 	 */
@@ -289,9 +285,6 @@ public class DPTXlator1BitControlled extends DPTXlator
 			this.data[i] = (short) (this.data[i] & 0x03);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getData(byte[], int)
-	 */
 	@Override
 	public byte[] getData(final byte[] dst, final int offset)
 	{
@@ -301,9 +294,6 @@ public class DPTXlator1BitControlled extends DPTXlator
 		return dst;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
-	 */
 	@Override
 	public final Map<String, DPT> getSubTypes()
 	{

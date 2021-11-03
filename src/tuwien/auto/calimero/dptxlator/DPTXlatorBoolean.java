@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -243,18 +243,12 @@ public class DPTXlatorBoolean extends DPTXlator
 		return (data[0] & 0x01) != 0 ? true : false;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getValue()
-	 */
 	@Override
 	public String getValue()
 	{
 		return fromDPT(0);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getAllValues()
-	 */
 	@Override
 	public String[] getAllValues()
 	{
@@ -277,9 +271,6 @@ public class DPTXlatorBoolean extends DPTXlator
 		return getValueBoolean() ? 1 : 0;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#setData(byte[], int)
-	 */
 	@Override
 	public void setData(final byte[] data, final int offset)
 	{
@@ -294,9 +285,6 @@ public class DPTXlatorBoolean extends DPTXlator
 			this.data[i] = (short) (data[offset + i] & 0x01);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getData(byte[], int)
-	 */
 	@Override
 	public byte[] getData(final byte[] dst, final int offset)
 	{
@@ -309,9 +297,6 @@ public class DPTXlatorBoolean extends DPTXlator
 		return dst;
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
-	 */
 	@Override
 	public final Map<String, DPT> getSubTypes()
 	{

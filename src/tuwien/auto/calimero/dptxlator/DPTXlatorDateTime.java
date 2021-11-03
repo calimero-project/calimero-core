@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -263,7 +263,6 @@ public class DPTXlatorDateTime extends DPTXlator
 
 	/**
 	 * Returns the year information.
-	 * <p>
 	 *
 	 * @return year value, 0 &lt;= second &lt;= 59
 	 */
@@ -274,7 +273,6 @@ public class DPTXlatorDateTime extends DPTXlator
 
 	/**
 	 * Returns the month information.
-	 * <p>
 	 *
 	 * @return month value, 0 &lt; month &lt;= 12, might be 0 on unused field
 	 */
@@ -425,7 +423,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 *
 	 * @return the date/time in milliseconds as long,
 	 * @throws KNXFormatException on required, but not set fields, if date/time
-	 *         information does not represent a valid calendar time,
+	 *         information does not represent a valid calendar time
 	 */
 	public final long getValueMilliseconds() throws KNXFormatException
 	{

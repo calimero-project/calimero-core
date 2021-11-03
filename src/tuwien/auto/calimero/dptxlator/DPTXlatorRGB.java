@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -103,9 +103,6 @@ public class DPTXlatorRGB extends DPTXlator {
 		data = new short[] { 0, 0, 0 };
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getAllValues()
-	 */
 	@Override
 	public String[] getAllValues()
 	{
@@ -130,9 +127,6 @@ public class DPTXlatorRGB extends DPTXlator {
 		data = set(red, green, blue, new short[3], 0);
 	}
 
-	/* (non-Javadoc)
-	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getSubTypes()
-	 */
 	@Override
 	public Map<String, DPT> getSubTypes()
 	{
