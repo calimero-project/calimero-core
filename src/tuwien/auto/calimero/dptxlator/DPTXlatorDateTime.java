@@ -36,6 +36,13 @@
 
 package tuwien.auto.calimero.dptxlator;
 
+import java.time.DateTimeException;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Month;
+import java.time.MonthDay;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -282,6 +289,12 @@ public class DPTXlatorDateTime extends DPTXlator
 	}
 
 	/**
+	 * @return month-of-year if month information is available
+	 * @throws DateTimeException if month information is 0
+	 */
+	public final Month month() { return Month.of(getMonth()); }
+
+	/**
 	 * Returns the day of month information.
 	 * <p>
 	 * The first day of month equals 1.<br>
@@ -320,6 +333,18 @@ public class DPTXlatorDateTime extends DPTXlator
 	{
 		return data[3] >> 5;
 	}
+
+	/**
+	 * @return day of the week if day-of-week is set
+	 * @throws DateTimeException if day-of-week is "any day"
+	 */
+	public final DayOfWeek dayOfWeek() { return DayOfWeek.of(getDayOfWeek()); }
+
+	/**
+	 * @return the month-day if date information is available
+	 * @throws DateTimeException if day is 0 or day-of-month is invalid for the month
+	 */
+	public final MonthDay monthDay() { return MonthDay.of(getMonth(), getDay()); }
 
 	/**
 	 * Sets the hour, minute and second information for the first date/time item.
@@ -373,6 +398,25 @@ public class DPTXlatorDateTime extends DPTXlator
 	public final int getSecond()
 	{
 		return data[SECOND];
+	}
+
+	/**
+	 * Sets the year, date, time, and day-of-week information for the first date/time item.
+	 * Working day information is set to not valid ({@link #isValidField(int)} with {@link #WORKDAY} returns
+	 * <code>false</code>). Daylight saving time is always <code>false</code>.
+	 *
+	 * @param dateTime local date-time to set
+	 */
+	public void setValue(final LocalDateTime dateTime) {
+		data = new short[8];
+		set(data, 0, YEAR, dateTime.getYear());
+		set(data, 0, MONTH, dateTime.getMonthValue());
+		set(data, 0, DAY, dateTime.getDayOfMonth());
+		set(data, 0, HOUR, dateTime.getHour());
+		set(data, 0, MINUTE, dateTime.getMinute());
+		set(data, 0, SECOND, dateTime.getSecond());
+		set(data, 0, DOW, dateTime.getDayOfWeek().getValue());
+		data[6] |= NO_WD;
 	}
 
 	/**
@@ -430,6 +474,43 @@ public class DPTXlatorDateTime extends DPTXlator
 		return fromDPTMilliseconds(0);
 	}
 
+	/**
+	 * Returns the local date-time information of the first translation item if year, date, and optionally time
+	 * information is available.
+	 * Workday, day of week, and daylight saving time information is ignored.
+	 *
+	 * @return local date/time object
+	 * @throws KNXFormatException on faulty clock, missing year or date information
+	 * @throws DateTimeException on a problem calculating date-time
+	 */
+	public final LocalDateTime localDateTime() throws KNXFormatException {
+		return localDateTime(0);
+	}
+
+	private LocalDateTime localDateTime(final int index) throws KNXFormatException {
+		if (isBitSet(index, FAULT))
+			throw new KNXFormatException("faulty clock");
+		if (!isValidField(index, YEAR) || !isValidField(index, DATE))
+			throw new KNXFormatException("insufficient date information for local date-time");
+
+		final var ld = LocalDate.of(getYear(), getMonth(), getDay());
+		if (isValidField(index, TIME)) {
+			// we use LocalTime.MAX for 24:00:00
+			final boolean cheat = getHour() == 24;
+			final var lt = cheat ? LocalTime.MAX : LocalTime.of(getHour(), getMinute(), getSecond());
+			return LocalDateTime.of(ld, lt);
+		}
+		return LocalDateTime.of(ld, LocalTime.MIN);
+	}
+
+	/**
+	 * Returns the date and time information of the first translation item in UTC milliseconds.
+	 * This method uses the year, month, day, DST and, optionally, hour, minute, second and
+	 * day of week field for calculation.
+	 *
+	 * @throws KNXFormatException on required, but not set fields, if date/time
+	 *         information does not represent a valid calendar time
+	 */
 	@Override
 	public double getNumericValue() throws KNXFormatException
 	{

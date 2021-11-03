@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,6 +43,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.time.DateTimeException;
+import java.time.LocalTime;
 import java.util.Calendar;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -289,6 +291,48 @@ class DPTXlatorDateTimeTest {
 		assertEquals(0, t.getSecond());
 
 		assertTrue(t.validate());
+	}
+
+	@Test
+	void localDateTime() throws KNXFormatException {
+		t.setValue(time);
+		try {
+			t.localDateTime();
+			fail("invalid time");
+		}
+		catch (final KNXFormatException e) {}
+
+		if (useDaylightTime)
+			t.setValue(value2);
+		else
+			t.setValue(value2.replace("DST", ""));
+		final var ldt = t.localDateTime();
+
+		assertEquals(ldt.getYear(), t.getYear());
+		assertEquals(ldt.getMonth().getValue(), t.getMonth());
+		assertEquals(ldt.getDayOfMonth(), t.getDay());
+		assertEquals(ldt.getDayOfWeek().getValue(), t.getDayOfWeek());
+		assertEquals(ldt.getHour(), t.getHour());
+		assertEquals(ldt.getMinute(), t.getMinute());
+		assertEquals(ldt.getSecond(), t.getSecond());
+
+		t.setValue("2007/2/29 00:00:00"); // no leap year
+		assertThrows(DateTimeException.class, t::localDateTime);
+
+		t.setValue("2007/2/28 00:00:00");
+		final var zero = t.localDateTime();
+		assertEquals(zero.toLocalTime(), LocalTime.MIN);
+
+		t.setValue("2007/2/28 24:00:00");
+		final var cheat = t.localDateTime();
+		assertEquals(cheat.toLocalTime(), LocalTime.MAX);
+
+		t.setFaultyClock(true);
+		assertThrows(KNXFormatException.class, t::localDateTime);
+
+		final var noYear = new DPTXlatorDateTime();
+		noYear.setValue(dateday);
+		assertThrows(KNXFormatException.class, noYear::localDateTime);
 	}
 
 	@Test
