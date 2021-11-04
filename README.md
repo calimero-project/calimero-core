@@ -46,6 +46,7 @@ Supported Features
 * 5.x - 8 Bit unsigned value, e.g., Scaling, Tariff information
 * 6.x - 8 Bit signed value, e.g., Percent (8 Bit), Status with mode
 * 7.x - 2 octet unsigned value, e.g., Unsigned count, Time period
+* 8.x - 2 octet signed value, e.g., Percent, Delta time seconds
 * 9.x - 2 octet float value, e.g., Temperature, Humidity
 * 10.x - Time
 * 11.x - Date
@@ -64,10 +65,12 @@ Supported Features
 * 229.001 - M-Bus metering value, with the various M-Bus VIF/VIFE codings
 * 232.x - RGB color value
 * 242.600 - xyY color
+* 243.600 - color transition xyY
 * 249.600 - brightness & color temperature transition
 * 250.600 - brightness & color temperature control
 * 251.600 - RGBW color 
 * 252.600 - relative control RGBW
+* 253.600 - relative control xyY
 * 254.600 - relative control RGB
 
 ### Network Monitor / Busmonitor
