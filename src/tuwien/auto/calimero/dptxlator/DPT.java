@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -160,9 +160,13 @@ public class DPT
 	public String toString()
 	{
 		final StringBuilder sb = new StringBuilder(50);
-		sb.append(id).append(": ").append(desc).append(", values ").append(v1);
+		sb.append(id).append(": ").append(desc);
+		if (!v1.isEmpty())
+			sb.append(" [").append(v1);
 		if (v2.length() > 0)
 			sb.append("..").append(v2);
+		if (!v1.isEmpty())
+			sb.append("]");
 		if (unit.length() > 0)
 			sb.append(' ').append(unit);
 		return sb.toString();
