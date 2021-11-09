@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2020 B. Malinowsky
+    Copyright (c) 2018, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -124,7 +124,18 @@ public class DptXlatorXyY extends DPTXlator {
 	 * @param brightness absolute brightness <code>0 &le; brightness &le; 100 %</code>
 	 */
 	public final void setValue(final double x, final double y, final double brightness) {
-		data = toDpt(x, y, brightness);
+		toDpt(x, y, brightness);
+	}
+
+	public final void setChromaticity(final double x, final double y) {
+		rangeCheck(x, y, 0);
+		setColor(x, y);
+	}
+
+	public final void setBrightness(final double brightness) {
+		rangeCheck(0, 0, brightness);
+		data[4] = (short) Math.round(brightness * 255 / 100);
+		data[5] |= 0b01;
 	}
 
 	@Override
@@ -234,15 +245,22 @@ public class DptXlatorXyY extends DPTXlator {
 		dst[offset++] = (short) valid;
 	}
 
-	private short[] toDpt(final double x, final double y, final double brightness) {
+	private void toDpt(final double x, final double y, final double brightness) {
 		rangeCheck(x, y, brightness);
+		data = new short[6];
+		setColor(x, y);
+		setBrightness(brightness);
+	}
 
-		final int valid = 0b11;
+	private void setColor(final double x, final double y) {
 		final int xRaw = (int) Math.round(x * 65_535);
 		final int yRaw = (int) Math.round(y * 65_535);
 
-		return new short[] { (short) (xRaw >> 8), ubyte(xRaw), (short) (yRaw >> 8), ubyte(yRaw),
-			(short) Math.round(brightness * 255 / 100), valid };
+		data[0] = (short) (xRaw >> 8);
+		data[1] = ubyte(xRaw);
+		data[2] = (short) (yRaw >> 8);
+		data[3] = ubyte(yRaw);
+		data[5] |= 0b10;
 	}
 
 	private static void rangeCheck(final double x, final double y, final double brightness) {

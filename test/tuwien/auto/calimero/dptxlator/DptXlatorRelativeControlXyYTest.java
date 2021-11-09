@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2020 B. Malinowsky
+    Copyright (c) 2020, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,9 +39,14 @@ package tuwien.auto.calimero.dptxlator;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -104,6 +109,67 @@ class DptXlatorRelativeControlXyYTest {
 		assertEquals(2, t.getItems());
 		t.setAppendUnit(false);
 		assertEquals("x decrease 1 y decrease 3 Y increase 7", t.getAllValues()[1]);
+	}
+
+	@ParameterizedTest
+	@MethodSource("stepControlProvider")
+	void setx(final StepControl value) {
+		t.setX(value);
+		assertEquals(value, t.x().get());
+		assertTrue(t.y().isEmpty());
+		assertTrue(t.brightness().isEmpty());
+	}
+
+	@ParameterizedTest
+	@MethodSource("stepControlProvider")
+	void sety(final StepControl value) {
+		t.setY(value);
+		assertEquals(value, t.y().get());
+		assertTrue(t.x().isEmpty());
+		assertTrue(t.brightness().isEmpty());
+	}
+
+	@ParameterizedTest
+	@MethodSource("stepControlProvider")
+	void setBrightness(final StepControl value) {
+		t.setBrightness(value);
+		assertEquals(value, t.brightness().get());
+		assertTrue(t.x().isEmpty());
+		assertTrue(t.y().isEmpty());
+	}
+
+	private static Stream<StepControl> stepControlProvider() {
+		return Stream.of(StepControl.Break, StepControl.increase(1), StepControl.decrease(7));
+	}
+
+	@Test
+	void x() {
+		assertTrue(t.x().isEmpty());
+	}
+
+	@Test
+	void y() {
+		assertTrue(t.y().isEmpty());
+	}
+
+	@Test
+	void brightness() {
+		assertTrue(t.brightness().isEmpty());
+	}
+
+	@Test
+	void setAllComponents() {
+		final StepControl x = StepControl.increase(1);
+		final StepControl y = StepControl.increase(2);
+		final StepControl Y = StepControl.increase(3);
+
+		t.setX(x);
+		t.setY(y);
+		t.setBrightness(Y);
+
+		assertEquals(x, t.x().get());
+		assertEquals(y, t.y().get());
+		assertEquals(Y, t.brightness().get());
 	}
 
 	@Test

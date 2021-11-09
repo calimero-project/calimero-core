@@ -46,8 +46,8 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 /**
  * Translator for KNX DPTs with main number 232, type <b>rgb</b>.
  * <p>
- * The KNX data type width is 3 bytes.<br>
- * The type contains the color information red, green and blue, with a resolution of 1.<br>
+ * The KNX data type width is 3 bytes.
+ * The type contains the color information red, green and blue, with a resolution of 1.
  * <p>
  * The default return value after creation is <code>0 0 0</code>.
  * <p>
@@ -64,7 +64,7 @@ public class DPTXlatorRGB extends DPTXlator {
 	/**
 	 * DPT ID 232.600, RGB Color; values from <b>0 0 0</b> to <b>255 255 255</b>.
 	 */
-	public static final DPT DPT_RGB = new DPT("232.600", "RGB", "0 0 0", "255 255 255", "r g b");
+	public static final DPT DPT_RGB = new DPT("232.600", "RGB", "0 0 0", "255 255 255", "");
 
 	private static final int RED = 0;
 	private static final int GREEN = 1;
@@ -77,9 +77,12 @@ public class DPTXlatorRGB extends DPTXlator {
 		types.put(DPT_RGB.getID(), DPT_RGB);
 	}
 
+	public DPTXlatorRGB() throws KNXFormatException {
+		this(DPT_RGB);
+	}
+
 	/**
 	 * Creates a translator for the given datapoint type.
-	 * <p>
 	 *
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
@@ -91,7 +94,6 @@ public class DPTXlatorRGB extends DPTXlator {
 
 	/**
 	 * Creates a translator for the given datapoint type ID.
-	 * <p>
 	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptID</code>
@@ -110,6 +112,18 @@ public class DPTXlatorRGB extends DPTXlator {
 		for (int i = 0; i < buf.length; ++i)
 			buf[i] = fromDPT(i);
 		return buf;
+	}
+
+	public final int red() {
+		return data[RED];
+	}
+
+	public final int green() {
+		return data[GREEN];
+	}
+
+	public final int blue() {
+		return data[BLUE];
 	}
 
 	/**

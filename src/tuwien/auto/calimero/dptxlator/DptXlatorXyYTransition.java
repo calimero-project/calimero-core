@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2020 B. Malinowsky
+    Copyright (c) 2020, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -132,7 +132,17 @@ public class DptXlatorXyYTransition extends DPTXlator {
 	 * @param fadingTime fading time in 100 ms steps, <code>0 &le; duration &le; 6553.5 s</code>
 	 */
 	public final void setValue(final double x, final double y, final double brightness, final Duration fadingTime) {
-		data = toDpt(x, y, brightness, fadingTime);
+		toDpt(x, y, brightness, fadingTime);
+	}
+
+	public final void setChromaticity(final double x, final double y, final Duration fadingTime) {
+		setCoordinates(x, y);
+		setFadingTime(fadingTime);
+	}
+
+	public final void setBrightness(final double brightness, final Duration fadingTime) {
+		setBrightness(brightness);
+		setFadingTime(fadingTime);
 	}
 
 	@Override
@@ -266,29 +276,47 @@ public class DptXlatorXyYTransition extends DPTXlator {
 		dst[offset++] = (short) valid;
 	}
 
-	private short[] toDpt(final double x, final double y, final double brightness, final Duration fadingTime) {
+	private void toDpt(final double x, final double y, final double brightness, final Duration fadingTime) {
+		data = new short[8];
+		setFadingTime(fadingTime);
+		setCoordinates(x, y);
+		setBrightness(brightness);
+	}
+
+	private void setFadingTime(final Duration fadingTime) {
+		try {
+			t.setTimePeriod(fadingTime.toMillis());
+		}
+		catch (final KNXFormatException e) {
+			throw new KNXIllegalArgumentException(e.getMessage());
+		}
+		final var dur = t.getValueUnsigned() / 100;
+
+		data[0] = ubyte(dur >> 8);
+		data[1] = ubyte(dur);
+	}
+
+	private void setCoordinates(final double x, final double y) {
 		final int xUnscaled = unscaled(x);
 		final int yUnscaled = unscaled(y);
 
+		data[2] = ubyte(yUnscaled >> 8);
+		data[3] = ubyte(yUnscaled);
+		data[4] = ubyte(xUnscaled >> 8);
+		data[5] = ubyte(xUnscaled);
+		data[7] |= 0b10;
+	}
+
+	private void setBrightness(final double brightness) {
 		try {
-			scaled.setValue((int) brightness); // TODO setValue should accept fp number
+			scaled.setValue(brightness);
 		}
 		catch (final KNXFormatException e) {
 			throw new KNXIllegalArgumentException(e.getMessage());
 		}
 		final var bright = scaled.getValueUnscaled();
-
-		try {
-			t.setTimePeriod((int) fadingTime.toMillis());
-		}
-		catch (final KNXFormatException e) {
-			throw new KNXIllegalArgumentException(e.getMessage());
-		}
-		final var dur = t.getValueUnsigned();
-
-		final int valid = 3;
-		return new short[] { ubyte(dur >> 8), ubyte(dur), ubyte(yUnscaled >> 8), ubyte(yUnscaled),
-			ubyte(xUnscaled >> 8), ubyte(xUnscaled), ubyte(bright), valid };
+		data[6] = ubyte(bright);
+		data[7] |= 0b01;
 	}
 
 	private int unscaled(final double value) {

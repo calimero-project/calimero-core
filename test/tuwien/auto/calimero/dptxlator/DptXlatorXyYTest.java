@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2020 B. Malinowsky
+    Copyright (c) 2018, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,12 +39,17 @@ package tuwien.auto.calimero.dptxlator;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -107,6 +112,63 @@ class DptXlatorXyYTest {
 		t.setValues("0 0 0", "1 1 3 %", "0,30 0,30 0 %");
 		assertEquals(3, t.getItems());
 		assertEquals(format(0.30, 0.30, 0), t.getAllValues()[2]);
+	}
+
+	@ParameterizedTest
+	@CsvSource({ "0,0", "0.1, 0.2", "0.9,0.99", "1,1"})
+	void setColor(final double x, final double y) {
+		t.setChromaticity(x, y);
+		assertEquals(x, t.x().get(), 0.1);
+		assertEquals(y, t.y().get(), 0.1);
+		assertTrue(t.brightness().isEmpty());
+	}
+
+	@ParameterizedTest
+	@CsvSource({ "-0.1,0", "0.1, -0.2", "1.9,0.99", "1,1.1"})
+	void setColorOutOfRange(final double x, final double y) {
+		assertThrows(KNXIllegalArgumentException.class, () -> t.setChromaticity(x, y));
+	}
+
+	@ParameterizedTest
+	@MethodSource("brightnessProvider")
+	void setBrightness(final double value) {
+		t.setBrightness(value);
+		assertEquals(value, t.brightness().get(), 0.2);
+		assertTrue(t.x().isEmpty());
+		assertTrue(t.y().isEmpty());
+	}
+
+	private static Stream<Double> brightnessProvider() {
+		return Stream.of(0d, 100d, 12.34d, 99.9d, 50d);
+	}
+
+	@Test
+	void x() {
+		assertTrue(t.x().isEmpty());
+	}
+
+	@Test
+	void y() {
+		assertTrue(t.y().isEmpty());
+	}
+
+	@Test
+	void brightness() {
+		assertTrue(t.brightness().isEmpty());
+	}
+
+	@Test
+	void setAllComponents() {
+		final double x = 0.3;
+		final double y = 0.4;
+		final double brightness = 5;
+
+		t.setChromaticity(x, y);
+		t.setBrightness(brightness);
+
+		assertEquals(x, t.x().get(), 0.1);
+		assertEquals(y, t.y().get(), 0.1);
+		assertEquals(brightness, t.brightness().get(), 0.1);
 	}
 
 	@Test

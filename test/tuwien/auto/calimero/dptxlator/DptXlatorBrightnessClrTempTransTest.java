@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2020 B. Malinowsky
+    Copyright (c) 2018, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,12 +39,15 @@ package tuwien.auto.calimero.dptxlator;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.text.NumberFormat;
 import java.time.Duration;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -198,6 +201,74 @@ class DptXlatorBrightnessClrTempTransTest {
 		assertEquals("100 65535 " + localize(6553.5), t.getValue());
 		t.setValue(100, 65535, Duration.ofSeconds(6553, 500_000_000l));
 		assertEquals("100 65535 " + localize(6553.5), t.getValue());
+	}
+
+	@ParameterizedTest
+	@ValueSource(ints = { 0, 90, 3000 })
+	void setFadingTime(final int time) {
+		t.setFadingTime(Duration.ofMillis(time));
+		assertEquals(Math.round(time / 100d) * 100, t.fadingTime().get().toMillis());
+	}
+
+	@ParameterizedTest
+	@ValueSource(ints = { -10, 0xffff*100+1 })
+	void fadingTimeOutOfRange(final int time) {
+		assertThrows(KNXIllegalArgumentException.class, () -> t.setFadingTime(Duration.ofMillis(time)));
+	}
+
+	@Test
+	void fadingTime() {
+		assertTrue(t.fadingTime().isEmpty());
+	}
+
+	@ParameterizedTest
+	@ValueSource(doubles = { 0, 30.5, 100 })
+	void setBrightness(final double brightness) {
+		t.setBrightness(brightness);
+		assertEquals(brightness, t.brightness().get(), 0.1);
+	}
+
+	@ParameterizedTest
+	@ValueSource(doubles = { -1, 100.1 })
+	void brightnessOutOfRange(final double brightness) {
+		assertThrows(KNXIllegalArgumentException.class, () -> t.setBrightness(brightness));
+	}
+
+	@Test
+	void brightness() {
+		assertTrue(t.brightness().isEmpty());
+	}
+
+	@ParameterizedTest
+	@ValueSource(ints = { 0, 40000 })
+	void setColorTemp(final int colorTemp) {
+		t.setColorTemp(colorTemp);
+		assertEquals(colorTemp, t.colorTemp().get());
+	}
+
+	@ParameterizedTest
+	@ValueSource(ints = { -10, 0x10000 })
+	void colorTempOutOfRange(final int colorTemp) {
+		assertThrows(KNXIllegalArgumentException.class, () -> t.setColorTemp(colorTemp));
+	}
+
+	@Test
+	void colorTemp() {
+		assertTrue(t.colorTemp().isEmpty());
+	}
+
+	@Test
+	void setAllComponents() {
+		final double brightness = 22.2;
+		final int colorTemp = 333;
+		final var time = Duration.ofMillis(555);
+
+		t.setBrightness(brightness);
+		t.setColorTemp(colorTemp);
+		t.setFadingTime(time);
+		assertEquals(brightness, t.brightness().get(), 0.2);
+		assertEquals(colorTemp, t.colorTemp().get());
+		assertEquals(Math.round(time.toMillis() / 100d) * 100, t.fadingTime().get().toMillis());
 	}
 
 	private static String localize(final double v) {

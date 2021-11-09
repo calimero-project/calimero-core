@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2020 B. Malinowsky
+    Copyright (c) 2020, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -113,6 +113,36 @@ public class DptXlatorRelativeControlRgb extends DPTXlator {
 	public final void setValue(final boolean increaseRed, final int redStepcode, final boolean increaseGreen,
 			final int greenStepcode, final boolean increaseBlue, final int blueStepcode) {
 		data = toDpt(increaseRed, redStepcode, increaseGreen, greenStepcode, increaseBlue, blueStepcode);
+	}
+
+	public final void setRed(final StepControl value) {
+		t.setValue(value);
+		final short d = ubyte(t.getData()[0]);
+		data[0] = d;
+	}
+
+	public final void setGreen(final StepControl value) {
+		t.setValue(value);
+		final short d = ubyte(t.getData()[0]);
+		data[1] = d;
+	}
+
+	public final void setBlue(final StepControl value) {
+		t.setValue(value);
+		final short d = ubyte(t.getData()[0]);
+		data[2] = d;
+	}
+
+	public final StepControl red() {
+		return StepControl.from(data[0]);
+	}
+
+	public final StepControl green() {
+		return StepControl.from(data[1]);
+	}
+
+	public final StepControl blue() {
+		return StepControl.from(data[2]);
 	}
 
 	@Override

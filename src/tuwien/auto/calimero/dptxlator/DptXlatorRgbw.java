@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2020 B. Malinowsky
+    Copyright (c) 2018, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -115,6 +115,26 @@ public class DptXlatorRgbw extends DPTXlator {
 	 */
 	public final void setValue(final double red, final double green, final double blue, final double white) {
 		data = toDpt(red, green, blue, white);
+	}
+
+	public final void setRed(final double value) {
+		final short v = toDpt(value);
+		data[0] = v; data[5] |= 0b1000;
+	}
+
+	public final void setGreen(final double value) {
+		final short v = toDpt(value);
+		data[1] = v; data[5] |= 0b0100;
+	}
+
+	public final void setBlue(final double value) {
+		final short v = toDpt(value);
+		data[2] = v; data[5] |= 0b0010;
+	}
+
+	public final void setWhite(final double value) {
+		final short v = toDpt(value);
+		data[3] = v; data[5] |= 0b0001;
 	}
 
 	public final Optional<Double> red() {

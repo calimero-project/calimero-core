@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2020 B. Malinowsky
+    Copyright (c) 2020, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 package tuwien.auto.calimero.dptxlator;
 
 import java.util.Map;
+import java.util.Optional;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -62,6 +63,8 @@ public class DptXlatorRelativeControlRgbw extends DPTXlator {
 	private static final String Green = "G";
 	private static final String Blue = "B";
 	private static final String White = "W";
+
+	private enum Component { Red, Green, Blue, White }
 
 	private final DPTXlator3BitControlled t = new DPTXlator3BitControlled(DPTXlator3BitControlled.DPT_CONTROL_DIMMING);
 
@@ -101,6 +104,49 @@ public class DptXlatorRelativeControlRgbw extends DPTXlator {
 		return fromDpt(0);
 	}
 
+	public final Optional<StepControl> red() {
+		return component(Component.Red);
+	}
+
+	public final Optional<StepControl> green() {
+		return component(Component.Green);
+	}
+
+	public final Optional<StepControl> blue() {
+		return component(Component.Blue);
+	}
+
+	public final Optional<StepControl> white() {
+		return component(Component.White);
+	}
+
+	private Optional<StepControl> component(final Component what) {
+		int offset;
+		int validBit;
+		if (what == Component.Red) {
+			offset = 0;
+			validBit = 8;
+		}
+		else if (what == Component.Green) {
+			offset = 1;
+			validBit = 4;
+		}
+		else if (what == Component.Blue) {
+			offset = 2;
+			validBit = 2;
+		}
+		else if (what == Component.White) {
+			offset = 3;
+			validBit = 1;
+		}
+		else
+			throw new Error("illegal control value");
+
+		if ((data[4] & validBit) == 0)
+			return Optional.empty();
+		return Optional.of(StepControl.from(data[offset]));
+	}
+
 	/**
 	 * Sets one new translation item, replacing any old items.
 	 *
@@ -118,6 +164,46 @@ public class DptXlatorRelativeControlRgbw extends DPTXlator {
 			final int whiteStepcode) {
 		data = toDpt(increaseRed, redStepcode, increaseGreen, greenStepcode, increaseBlue, blueStepcode, increaseWhite,
 				whiteStepcode);
+	}
+
+	public final void setRed(final StepControl value) {
+		t.setValue(value);
+		final short d = ubyte(t.getData()[0]);
+
+		final int offset = 0;
+		final int validBit = 8;
+		data[offset] = d;
+		data[4] |= validBit;
+	}
+
+	public final void setGreen(final StepControl value) {
+		t.setValue(value);
+		final short d = ubyte(t.getData()[0]);
+
+		final int offset = 1;
+		final int validBit = 4;
+		data[offset] = d;
+		data[4] |= validBit;
+	}
+
+	public final void setBlue(final StepControl value) {
+		t.setValue(value);
+		final short d = ubyte(t.getData()[0]);
+
+		final int offset = 2;
+		final int validBit = 2;
+		data[offset] = d;
+		data[4] |= validBit;
+	}
+
+	public final void setWhite(final StepControl value) {
+		t.setValue(value);
+		final short d = ubyte(t.getData()[0]);
+
+		final int offset = 3;
+		final int validBit = 1;
+		data[offset] = d;
+		data[4] |= validBit;
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2020 B. Malinowsky
+    Copyright (c) 2020, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,9 +39,14 @@ package tuwien.auto.calimero.dptxlator;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -104,6 +109,88 @@ class DptXlatorRelativeControlRgbwTest {
 		assertEquals(2, t.getItems());
 		t.setAppendUnit(false);
 		assertEquals("R decrease 1 G decrease 3 B increase 7 W increase 7", t.getAllValues()[1]);
+	}
+
+	@ParameterizedTest
+	@MethodSource("stepControlProvider")
+	void setRed(final StepControl value) {
+		t.setRed(value);
+		assertEquals(value, t.red().get());
+		assertTrue(t.green().isEmpty());
+		assertTrue(t.blue().isEmpty());
+		assertTrue(t.white().isEmpty());
+	}
+
+	@ParameterizedTest
+	@MethodSource("stepControlProvider")
+	void setGreen(final StepControl value) {
+		t.setGreen(value);
+		assertEquals(value, t.green().get());
+		assertTrue(t.red().isEmpty());
+		assertTrue(t.blue().isEmpty());
+		assertTrue(t.white().isEmpty());
+	}
+
+	@ParameterizedTest
+	@MethodSource("stepControlProvider")
+	void setBlue(final StepControl value) {
+		t.setBlue(value);
+		assertEquals(value, t.blue().get());
+		assertTrue(t.red().isEmpty());
+		assertTrue(t.green().isEmpty());
+		assertTrue(t.white().isEmpty());
+	}
+
+	@ParameterizedTest
+	@MethodSource("stepControlProvider")
+	void setWhite(final StepControl value) {
+		t.setWhite(value);
+		assertEquals(value, t.white().get());
+		assertTrue(t.red().isEmpty());
+		assertTrue(t.green().isEmpty());
+		assertTrue(t.blue().isEmpty());
+	}
+
+	private static Stream<StepControl> stepControlProvider() {
+		return Stream.of(StepControl.Break, StepControl.increase(1), StepControl.decrease(7));
+	}
+
+	@Test
+	void red() {
+		assertTrue(t.red().isEmpty());
+	}
+
+	@Test
+	void green() {
+		assertTrue(t.green().isEmpty());
+	}
+
+	@Test
+	void blue() {
+		assertTrue(t.blue().isEmpty());
+	}
+
+	@Test
+	void white() {
+		assertTrue(t.white().isEmpty());
+	}
+
+	@Test
+	void setAllComponents() {
+		final StepControl red = StepControl.increase(1);
+		final StepControl green = StepControl.increase(2);
+		final StepControl blue = StepControl.increase(3);
+		final StepControl white = StepControl.increase(4);
+
+		t.setRed(red);
+		t.setGreen(green);
+		t.setBlue(blue);
+		t.setWhite(white);
+
+		assertEquals(red, t.red().get());
+		assertEquals(green, t.green().get());
+		assertEquals(blue, t.blue().get());
+		assertEquals(white, t.white().get());
 	}
 
 	@Test

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2020 B. Malinowsky
+    Copyright (c) 2018, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,6 +39,9 @@ package tuwien.auto.calimero.dptxlator;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static tuwien.auto.calimero.dptxlator.StepControl.decrease;
+import static tuwien.auto.calimero.dptxlator.StepControl.increase;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -84,6 +87,36 @@ class DptXlatorBrightnessClrTempCtrlTest {
 		t.setValue(true, 7, true, 7);
 		t.setValue(true, 3, false, 5);
 		t.setValue(false, 1, true, 6);
+	}
+
+	@Test
+	void setBrightness() {
+		t.setBrightness(decrease(5));
+		assertEquals(5, t.brightness().get().stepcode());
+		assertTrue(t.colorTemp().isEmpty());
+	}
+
+	@Test
+	void setColorTemp() {
+		t.setColorTemp(increase(3));
+		assertEquals(3, t.colorTemp().get().stepcode());
+		assertTrue(t.brightness().isEmpty());
+	}
+
+	@Test
+	void getBrightnessAndColorTemp() {
+		t.setBrightness(decrease(5));
+		t.setColorTemp(increase(3));
+		assertEquals(5, t.brightness().get().stepcode());
+		assertEquals(3, t.colorTemp().get().stepcode());
+	}
+
+	@Test
+	void setBrightnessAndColorTempBreak() {
+		t.setBrightness(StepControl.Break);
+		t.setColorTemp(StepControl.Break);
+		assertEquals(StepControl.Break, t.brightness().get());
+		assertEquals(StepControl.Break, t.colorTemp().get());
 	}
 
 	@Test

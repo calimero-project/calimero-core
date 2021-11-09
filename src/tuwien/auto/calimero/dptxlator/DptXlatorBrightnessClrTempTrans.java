@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2020 B. Malinowsky
+    Copyright (c) 2018, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ import java.text.ParseException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -60,7 +61,7 @@ public class DptXlatorBrightnessClrTempTrans extends DPTXlator {
 	 * K 6553.5 s</b>.
 	 */
 	public static final DPT DptBrightnessClrTempTrans = new DPT("249.600", "brightness & color temperature transition",
-			"0 0 0 0", "100 100 100 100", "%");
+			"0 0 0", "100 65535 6553.5", "% K s");
 
 	private static final Map<String, DPT> types;
 
@@ -110,15 +111,75 @@ public class DptXlatorBrightnessClrTempTrans extends DPTXlator {
 		return fromDpt(0);
 	}
 
+	public Optional<Double> brightness() {
+		final int valid = data[5];
+		if ((valid & 1) == 1) {
+			final int offset = 4;
+			final double brightness = data[offset] * 100d / 255;
+			return Optional.of(brightness);
+		}
+		return Optional.empty();
+	}
+
+	public Optional<Integer> colorTemp() {
+		final int valid = data[5];
+		if ((valid & 2) == 2) {
+			int offset = 2;
+			final int temperature = (data[offset++] << 8) | data[offset++];
+			return Optional.of(temperature);
+		}
+		return Optional.empty();
+	}
+
+	public Optional<Duration> fadingTime() {
+		final int valid = data[5];
+		if ((valid & 4) == 4) {
+			int offset = 0;
+			final long time = ((data[offset++] << 8) | data[offset++]) * 100;
+			return Optional.of(Duration.ofMillis(time));
+		}
+		return Optional.empty();
+	}
+
 	/**
 	 * Sets one new translation item, replacing any old items.
 	 *
 	 * @param brightness absolute brightness, <code>0 &le; brightness &le; 100 %</code>
 	 * @param clrTemperature absolute color temperature, <code>0 &le; temperature &le; 65535</code>
-	 * @param transition duration of transition <code>0 &le; transition &le; 6553500 ms</code> (100 ms resolution)
+	 * @param fadingTime duration of transition <code>0 &le; fadingTime &le; 6553500 ms</code> (100 ms resolution)
 	 */
-	public final void setValue(final double brightness, final int clrTemperature, final Duration transition) {
-		data = toDpt(brightness, clrTemperature, transition);
+	public final void setValue(final double brightness, final int clrTemperature, final Duration fadingTime) {
+		data = toDpt(brightness, clrTemperature, fadingTime);
+	}
+
+	public final void setBrightness(final double brightness) {
+		rangeCheck(brightness, 0, Duration.ZERO);
+
+		final int offset = 4;
+		final int validBit = 1;
+		data[offset] = (short) Math.round(brightness * 255 / 100);
+		data[5] |= validBit;
+	}
+
+	public final void setColorTemp(final int colorTemp) {
+		rangeCheck(0, colorTemp, Duration.ZERO);
+
+		final int offset = 2;
+		final int validBit = 2;
+		data[offset] = (short) (colorTemp >> 8);
+		data[offset + 1] = ubyte(colorTemp);
+		data[5] |= validBit;
+	}
+
+	public final void setFadingTime(final Duration fadingTime) {
+		rangeCheck(0, 0, fadingTime);
+
+		final int offset = 0;
+		final int validBit = 4;
+		final int time = (int) Math.round(fadingTime.toMillis() / 100d);
+		data[offset] = (short) (time >> 8);
+		data[offset + 1] = ubyte(time);
+		data[5] |= validBit;
 	}
 
 	@Override
@@ -162,7 +223,7 @@ public class DptXlatorBrightnessClrTempTrans extends DPTXlator {
 		final String[] fields = value.split(" ");
 		// either all fields have unit suffix, or none
 		if (fields.length != 6 && fields.length != 3)
-			throw newException("unsupported format for brightness, color temperature, transition", value);
+			throw newException("unsupported format for brightness & color temperature transition", value);
 
 		// set increment, to skip units if in fields
 		final int inc = fields.length / 3;
@@ -212,13 +273,13 @@ public class DptXlatorBrightnessClrTempTrans extends DPTXlator {
 			(short) Math.round(brightness * 255 / 100), valid };
 	}
 
-	private void rangeCheck(final double brightness, final int temperature, final Duration timePeriod) {
+	private static void rangeCheck(final double brightness, final int temperature, final Duration timePeriod) {
 		if (brightness < 0 || brightness > 100)
 			throw new KNXIllegalArgumentException("absolute brightness " + brightness + " out of range [0..100]");
 		if (temperature < 0 || temperature > 65535)
 			throw new KNXIllegalArgumentException("absolute color temperature " + temperature + " out of range [0..65535]");
 		if (timePeriod.isNegative() || timePeriod.toMillis() > 65535 * 100)
-			throw new KNXIllegalArgumentException("time period " + timePeriod + " out of range [0..6553500]");
+			throw new KNXIllegalArgumentException("time period " + timePeriod + " out of range [0..6553500] ms");
 	}
 
 	private double parse(final String value) throws KNXFormatException {

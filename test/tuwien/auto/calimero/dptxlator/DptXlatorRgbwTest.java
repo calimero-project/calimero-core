@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2020 B. Malinowsky
+    Copyright (c) 2018, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,11 +39,16 @@ package tuwien.auto.calimero.dptxlator;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.text.NumberFormat;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -98,8 +103,18 @@ class DptXlatorRgbwTest {
 	void setIllegalRgbwValue() {
 		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(100, 100, 100, 101));
 		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(-1, 100, 100, 100));
-		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(-100, 100, 100, 100));
+		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(100, -1, 100, 100));
+		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(0, 100, 101, 100));
 		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(0, 100, 100, -100));
+	}
+
+	@ParameterizedTest
+	@ValueSource(doubles = { -0.1, 100.1})
+	void setIllegalColorValue(final double value) {
+		assertThrows(KNXIllegalArgumentException.class, () -> t.setRed(value));
+		assertThrows(KNXIllegalArgumentException.class, () -> t.setGreen(value));
+		assertThrows(KNXIllegalArgumentException.class, () -> t.setBlue(value));
+		assertThrows(KNXIllegalArgumentException.class, () -> t.setWhite(value));
 	}
 
 	@Test
@@ -107,6 +122,88 @@ class DptXlatorRgbwTest {
 		t.setValues("0 0 0 0", "1 2 3 4 %", "30 30 30 0 %");
 		assertEquals(3, t.getItems());
 		assertEquals(format(30.2, 30.2, 30.2, 0d), t.getAllValues()[2]);
+	}
+
+	@ParameterizedTest
+	@MethodSource("colorValueProvider")
+	void setRed(final double value) {
+		t.setRed(value);
+		assertEquals(value, t.red().get(), 0.2);
+		assertTrue(t.green().isEmpty());
+		assertTrue(t.blue().isEmpty());
+		assertTrue(t.white().isEmpty());
+	}
+
+	@ParameterizedTest
+	@MethodSource("colorValueProvider")
+	void setGreen(final double value) {
+		t.setGreen(value);
+		assertEquals(value, t.green().get(), 0.2);
+		assertTrue(t.red().isEmpty());
+		assertTrue(t.blue().isEmpty());
+		assertTrue(t.white().isEmpty());
+	}
+
+	@ParameterizedTest
+	@MethodSource("colorValueProvider")
+	void setBlue(final double value) {
+		t.setBlue(value);
+		assertEquals(value, t.blue().get(), 0.2);
+		assertTrue(t.red().isEmpty());
+		assertTrue(t.green().isEmpty());
+		assertTrue(t.white().isEmpty());
+	}
+
+	@ParameterizedTest
+	@MethodSource("colorValueProvider")
+	void setWhite(final double value) {
+		t.setWhite(value);
+		assertEquals(value, t.white().get(), 0.2);
+		assertTrue(t.red().isEmpty());
+		assertTrue(t.green().isEmpty());
+		assertTrue(t.blue().isEmpty());
+	}
+
+	private static Stream<Double> colorValueProvider() {
+		return Stream.of(0d, 100d, 12.34d, 99.9d, 50d);
+	}
+
+	@Test
+	void red() {
+		assertTrue(t.red().isEmpty());
+	}
+
+	@Test
+	void green() {
+		assertTrue(t.green().isEmpty());
+	}
+
+	@Test
+	void blue() {
+		assertTrue(t.blue().isEmpty());
+	}
+
+	@Test
+	void white() {
+		assertTrue(t.white().isEmpty());
+	}
+
+	@Test
+	void setAllComponents() {
+		final double red = 3;
+		final double green = 4;
+		final double blue = 5;
+		final double white = 6;
+
+		t.setRed(red);
+		t.setGreen(green);
+		t.setBlue(blue);
+		t.setWhite(white);
+
+		assertEquals(red, t.red().get(), 0.2);
+		assertEquals(green, t.green().get(), 0.2);
+		assertEquals(blue, t.blue().get(), 0.2);
+		assertEquals(white, t.white().get(), 0.2);
 	}
 
 	@Test

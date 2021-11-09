@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2020 B. Malinowsky
+    Copyright (c) 2020, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,8 +40,12 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -104,6 +108,37 @@ class DptXlatorRelativeControlRgbTest {
 		assertEquals(2, t.getItems());
 		t.setAppendUnit(false);
 		assertEquals("R decrease 1 G decrease 3 B increase 7", t.getAllValues()[1]);
+	}
+
+	@ParameterizedTest
+	@MethodSource("stepControlProvider")
+	void setRed(final StepControl value) {
+		t.setRed(value);
+		assertEquals(value, t.red());
+		assertEquals(StepControl.Break, t.green());
+		assertEquals(StepControl.Break, t.blue());
+	}
+
+	@ParameterizedTest
+	@MethodSource("stepControlProvider")
+	void setGreen(final StepControl value) {
+		t.setGreen(value);
+		assertEquals(value, t.green());
+		assertEquals(StepControl.Break, t.red());
+		assertEquals(StepControl.Break, t.blue());
+	}
+
+	@ParameterizedTest
+	@MethodSource("stepControlProvider")
+	void setBlue(final StepControl value) {
+		t.setBlue(value);
+		assertEquals(value, t.blue());
+		assertEquals(StepControl.Break, t.red());
+		assertEquals(StepControl.Break, t.green());
+	}
+
+	private static Stream<StepControl> stepControlProvider() {
+		return Stream.of(StepControl.Break, StepControl.increase(1), StepControl.decrease(7));
 	}
 
 	@Test

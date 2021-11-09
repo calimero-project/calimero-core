@@ -37,6 +37,7 @@
 package tuwien.auto.calimero.dptxlator;
 
 import java.util.Map;
+import java.util.Optional;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -96,6 +97,32 @@ public class DptXlatorRelativeControlXyY extends DPTXlator {
 		return fromDpt(0);
 	}
 
+	public final Optional<StepControl> x() {
+		return component(x);
+	}
+
+	public final Optional<StepControl> y() {
+		return component(y);
+	}
+
+	public final Optional<StepControl> brightness() {
+		return component(Y);
+	}
+
+	// component id with shift for valid Bit field
+	private static final int x = 2;
+	private static final int y = 1;
+	private static final int Y = 0;
+
+	private Optional<StepControl> component(final int c) {
+		final int validBit = 1 << c;
+		if ((data[3] & validBit) == 0)
+			return Optional.empty();
+
+		final int offset = 2 - c;
+		return Optional.of(StepControl.from(data[offset]));
+	}
+
 	/**
 	 * Sets one new translation item, replacing any old items.
 	 *
@@ -109,6 +136,51 @@ public class DptXlatorRelativeControlXyY extends DPTXlator {
 	public final void setValue(final boolean increaseX, final int xStepcode, final boolean increaseY,
 			final int yStepcode, final boolean increaseBrightness, final int brightnessStepcode) {
 		data = toDpt(increaseX, xStepcode, increaseY, yStepcode, increaseBrightness, brightnessStepcode);
+	}
+
+	/**
+	 * Sets the step control for the x component of chromaticity.
+	 *
+	 * @param value step control of the x component
+	 */
+	public final void setX(final StepControl value) {
+		t.setValue(value);
+		final short d = ubyte(t.getData()[0]);
+
+		final int offset = 0;
+		final int validBit = 4;
+		data[offset] = d;
+		data[3] |= validBit;
+	}
+
+	/**
+	 * Sets the step control for the y component of chromaticity.
+	 *
+	 * @param value step control of the y component
+	 */
+	public final void setY(final StepControl value) {
+		t.setValue(value);
+		final short d = ubyte(t.getData()[0]);
+
+		final int offset = 1;
+		final int validBit = 2;
+		data[offset] = d;
+		data[3] |= validBit;
+	}
+
+	/**
+	 * Sets the step control for the Y component.
+	 *
+	 * @param value step control of the Y component
+	 */
+	public final void setBrightness(final StepControl value) {
+		t.setValue(value);
+		final short d = ubyte(t.getData()[0]);
+
+		final int offset = 2;
+		final int validBit = 1;
+		data[offset] = d;
+		data[3] |= validBit;
 	}
 
 	@Override

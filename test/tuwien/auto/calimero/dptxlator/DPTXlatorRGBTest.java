@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2014, 2016 B. Malinowsky
+    Copyright (c) 2014, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,130 +36,110 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import org.junit.Ignore;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import junit.framework.TestCase;
+import java.util.Arrays;
 
-/**
- * @author B. Malinowsky
- */
-@Ignore
-public class DPTXlatorRGBTest extends TestCase
-{
-	/**
-	 * @param name
-	 */
-	public DPTXlatorRGBTest(final String name)
-	{
-		super(name);
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
+import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
+
+class DPTXlatorRGBTest {
+	private DPTXlatorRGB t;
+
+	@BeforeEach
+	void init() throws KNXFormatException {
+		t = new DPTXlatorRGB();
 	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
+	@Test
+	void constructWithDptIdString() throws KNXFormatException {
+		new DPTXlatorRGB("232.600");
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorRGB#DPTXlatorRGB(
-	 * tuwien.auto.calimero.dptxlator.DPT)}.
-	 */
-	public final void testDPTXlatorRGBDPT()
-	{
-		fail("Not yet implemented");
+	@Test
+	void onlyOneSubtype() {
+		assertEquals(1, DPTXlatorRGB.getSubTypesStatic().size());
+		assertEquals(1, t.getSubTypes().size());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorRGB#DPTXlatorRGB(java.lang.String)}.
-	 */
-	public final void testDPTXlatorRGBString()
-	{
-		fail("Not yet implemented");
+	@ParameterizedTest
+	@CsvSource({"0,0,0", "20, 21, 22", "255, 255, 255"})
+	void setValue(final int red, final int green, final int blue) {
+		t.setValue(red, green, blue);
+		assertEquals(red, t.red());
+		assertEquals(green, t.green());
+		assertEquals(blue, t.blue());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorRGB#getSubTypes()}.
-	 */
-	public final void testGetSubTypes()
-	{
-		fail("Not yet implemented");
+	@ParameterizedTest
+	@CsvSource({"-1,0,0", "0,-1,0", "0,0,-1", "256, 0, 0", "0, 256, 0", "0, 0, 256"})
+	void setIllegalValue(final int red, final int green, final int blue) {
+		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(red, green, blue));
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorRGB#setValue(int, int, int)}.
-	 */
-	public final void testSetValueIntIntInt()
-	{
-		fail("Not yet implemented");
+	@Test
+	void red() {
+		assertEquals(0, t.red());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator#setValues(java.lang.String[])}.
-	 */
-	public final void testSetValues()
-	{
-		fail("Not yet implemented");
+	@Test
+	void green() {
+		assertEquals(0, t.green());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorRGB#getAllValues()}.
-	 */
-	public final void testGetAllValues()
-	{
-		fail("Not yet implemented");
+	@Test
+	void blue() {
+		assertEquals(0, t.blue());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#setValue(java.lang.String)}.
-	 */
-	public final void testSetValueString()
-	{
-		fail("Not yet implemented");
+	@Test
+	void getAllValues() throws KNXFormatException {
+		final String first = "r:1 g:2 b:3";
+		t.setValues(first, "4 5 6");
+		final String[] all = t.getAllValues();
+		assertEquals(first, all[0]);
+		assertEquals("r:4 g:5 b:6", all[1]);
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#setData(byte[])}.
-	 */
-	public final void testSetDataByteArray()
-	{
-		fail("Not yet implemented");
+	@Test
+	void setValueString() throws KNXFormatException {
+		t.setValue("1 2 3");
+		final String v = t.getValue();
+		assertEquals("r:1 g:2 b:3", v);
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#getData()}.
-	 */
-	public final void testGetData()
-	{
-		fail("Not yet implemented");
+	@Test
+	void setData() {
+		final byte[] data = { 1, 2, 3 };
+		t.setData(data);
+		assertArrayEquals(data, t.getData());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#setData(byte[], int)}.
-	 */
-	public final void testSetDataByteArrayInt()
-	{
-		fail("Not yet implemented");
+	@Test
+	void getData() {
+		assertArrayEquals(new byte[] { 0, 0, 0 }, t.getData());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#getData(byte[], int)}.
-	 */
-	public final void testGetDataByteArrayInt()
-	{
-		fail("Not yet implemented");
+	@Test
+	void setDataByteArrayInt() {
+		final byte[] data = { 0, 0, 1, 2, 3, 0 };
+		t.setData(data, 2);
+		assertArrayEquals(Arrays.copyOfRange(data, 2, 2 + 3), t.getData());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#setAppendUnit(boolean)}.
-	 */
-	public final void testSetAppendUnit()
-	{
-		fail("Not yet implemented");
+	@Test
+	void getDataByteArrayInt() {
+		final byte[] data = { 1, 2, 3 };
+		t.setData(data);
+		final byte[] dst = new byte[6];
+		t.getData(dst, 2);
+		assertArrayEquals(data, Arrays.copyOfRange(dst, 2, 2 + 3));
 	}
 }

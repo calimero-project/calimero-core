@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2020 B. Malinowsky
+    Copyright (c) 2020, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ package tuwien.auto.calimero.dptxlator;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -103,6 +104,39 @@ class DptXlatorXyYTransitionTest {
 		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(-1, 1, 100, dur));
 		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(1, -100, 100, dur));
 		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(0, 1, -100, dur));
+	}
+
+	@Test
+	void setChromaticity() {
+		t.setChromaticity(0.3, 0.4, dur);
+		assertEquals(0.3, t.x().get(), 0.01);
+		assertEquals(0.4, t.y().get(), 0.01);
+		assertEquals(dur, t.fadingTime());
+		assertTrue(t.brightness().isEmpty());
+	}
+
+	@Test
+	void setBrightness() {
+		t.setBrightness(75.6, dur);
+		assertEquals(75.6, t.brightness().get(), 0.1);
+		assertEquals(dur, t.fadingTime());
+		assertTrue(t.x().isEmpty());
+		assertTrue(t.y().isEmpty());
+	}
+
+	@Test
+	void x() {
+		assertTrue(t.x().isEmpty());
+	}
+
+	@Test
+	void y() {
+		assertTrue(t.y().isEmpty());
+	}
+
+	@Test
+	void brightness() {
+		assertTrue(t.brightness().isEmpty());
 	}
 
 	@Test
