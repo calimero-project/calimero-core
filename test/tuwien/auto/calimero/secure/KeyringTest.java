@@ -87,7 +87,7 @@ class KeyringTest {
 		final var backbone = keyring.backbone().orElseThrow();
 
 		final byte[] decrypted = fromHex("96F034FCCF510760CBD63DA0F70D4A9D");
-		assertArrayEquals(decrypted, keyring.decryptKey(backbone.groupKey(), keyringPwd));
+		assertArrayEquals(decrypted, keyring.decryptKey(backbone.groupKey().get(), keyringPwd));
 	}
 
 	@Test
@@ -95,7 +95,7 @@ class KeyringTest {
 		final var keyring = Keyring.load(keyringUri);
 		final var backbone = keyring.backbone().orElseThrow();
 
-		assertEquals(16, backbone.groupKey().length);
+		assertEquals(16, backbone.groupKey().get().length);
 
 		for (final var device : keyring.devices().values())
 			assertEquals(16, device.toolKey().get().length);

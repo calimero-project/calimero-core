@@ -208,13 +208,13 @@ public final class Keyring {
 
 		Backbone(final InetAddress multicastGroup, final byte[] groupKey, final Duration latency) {
 			this.mcGroup = multicastGroup;
-			this.groupKey = groupKey.clone();
+			this.groupKey = groupKey;
 			this.latency = latency;
 		}
 
 		public InetAddress multicastGroup() { return mcGroup; }
 
-		public byte[] groupKey() { return groupKey.clone(); }
+		public Optional<byte[]> groupKey() { return optional(groupKey); }
 
 		public Duration latencyTolerance() { return latency; }
 
@@ -290,7 +290,7 @@ public final class Keyring {
 
 	void load() {
 		int line = 0;
-		try (var reader = XmlInputFactory.newInstance().createXMLReader(keyringUri)) {
+		try (final var reader = XmlInputFactory.newInstance().createXMLReader(keyringUri)) {
 			// call nextTag() to dive straight into first element, so we can check the keyring namespace
 			reader.nextTag();
 
@@ -348,8 +348,12 @@ public final class Keyring {
 					if (!validRoutingMulticast(mcastGroup))
 						throw new KNXMLException("loading keyring '" + keyringUri + "': " + mcastGroup.getHostAddress()
 								+ " is not a valid KNX multicast address");
-					final var groupKey = decode(reader.getAttributeValue(null, "Key"));
-					final var latency = Duration.ofMillis(Integer.parseInt(reader.getAttributeValue(null, "Latency")));
+
+					String val = reader.getAttributeValue(null, "Key");
+					final var groupKey = val != null ? decode(val) : null;
+
+					val = reader.getAttributeValue(null, "Latency");
+					final var latency = val != null ? Duration.ofMillis(Integer.parseInt(val)) : Duration.ZERO;
 
 					backbone = new Backbone(mcastGroup, groupKey, latency);
 				}
@@ -372,12 +376,14 @@ public final class Keyring {
 				}
 				else if (iface != null && "Group".equals(name)) { // [0, *]
 					final var addr = new GroupAddress(reader.getAttributeValue(null, "Address"));
-					final var senders = reader.getAttributeValue(null, "Senders"); // (empty) list of addresses
 
+					final var senders = reader.getAttributeValue(null, "Senders"); // optional, (empty) list of addresses
 					final var list = new ArrayList<IndividualAddress>();
-					final Matcher matcher = Pattern.compile("[^\\s]+").matcher(senders);
-					while (matcher.find())
-						list.add(new IndividualAddress(matcher.group()));
+					if (senders != null) {
+						final Matcher matcher = Pattern.compile("[^\\s]+").matcher(senders);
+						while (matcher.find())
+							list.add(new IndividualAddress(matcher.group()));
+					}
 
 					if (iface.groups.isEmpty())
 						iface.groups = new HashMap<>();
