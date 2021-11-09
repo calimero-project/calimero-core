@@ -52,6 +52,13 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  */
 public class DPTXlatorBoolean extends DPTXlator
 {
+	interface BooleanType<E extends Enum<E> & BooleanType<E>> {
+		@SuppressWarnings("unchecked")
+		default boolean value() { return ((Enum<E>) this).ordinal() == 1 ? true : false; }
+	}
+
+	public enum Step implements BooleanType<Step> { Decrease, Increase }
+
 	/**
 	 * DPT ID 1.001, Switch; values <b>off</b>, <b>on</b>.
 	 */
@@ -230,6 +237,10 @@ public class DPTXlatorBoolean extends DPTXlator
 	public final void setValue(final boolean value)
 	{
 		data = new short[] { (short) (value ? 1 : 0) };
+	}
+
+	public final void setValue(final BooleanType<?> value) {
+		setValue(value.value());
 	}
 
 	/**

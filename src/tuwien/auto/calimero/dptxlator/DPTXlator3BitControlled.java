@@ -194,6 +194,10 @@ public class DPTXlator3BitControlled extends DPTXlator
 		setStepCode(stepcode);
 	}
 
+	public final void setValue(final StepControl value) {
+		setValue(value.step().value(), value.stepcode());
+	}
+
 	@Override
 	public String[] getAllValues()
 	{
