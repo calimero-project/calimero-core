@@ -44,16 +44,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.time.DateTimeException;
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.TextStyle;
+import java.time.temporal.ChronoField;
 import java.util.Calendar;
+import java.util.Locale;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Isolated;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Util;
 
+@Isolated // because we change Locale
 class DPTXlatorDateTimeTest {
 	private DPTXlatorDateTime t;
 
@@ -64,7 +73,7 @@ class DPTXlatorDateTimeTest {
 	private final String insync = " (sync)";
 	private final String nosync = "";
 
-	private final String time = "12.45.33";
+	private final String time = "12:45:33";
 	private final String date = "7/22";
 	private final String dateday = "7/22 Tue";
 	private final String value = "Wed, 8-27, 2007 " + time + work + dst + insync;
@@ -123,7 +132,13 @@ class DPTXlatorDateTimeTest {
 		checkTime(12, 45, 33);
 		v = t.getAllValues();
 		final String item = v[4].toLowerCase();
-		assertFind(item, new String[] { "2007", "tue", "6", "5", "23", "22", "0", "dst", "workday" });
+
+		final String day = localizedDayOfWeek(DayOfWeek.TUESDAY.getValue());
+		assertFind(item, new String[] { "2007", day, "6", "5", "23", "22", "0", "dst", "workday" });
+	}
+
+	private static String localizedDayOfWeek(final int dayOfWeek) {
+		return DayOfWeek.of(dayOfWeek).getDisplayName(TextStyle.SHORT, Locale.getDefault());
 	}
 
 	@Test
@@ -201,7 +216,7 @@ class DPTXlatorDateTimeTest {
 	void testSetValueAndData() throws KNXFormatException {
 		t.setValue("24:00:00");
 		t.setValue("00:00:00");
-		t.setValue("13.56.43");
+		t.setValue("13:56:43");
 		try {
 			t.setValue("24:01:00");
 			fail("should throw");
@@ -232,7 +247,8 @@ class DPTXlatorDateTimeTest {
 	@Test
 	void testUseValueFormat() throws KNXFormatException {
 		t.setValue(value);
-		assertFind(t.getValue(), new String[] { "wed", "8", "27", "2007", "workday", "dst", "sync", });
+		final String day = localizedDayOfWeek(DayOfWeek.WEDNESDAY.getValue());
+		assertFind(t.getValue(), new String[] { day, "8", "27", "2007", "workday", "dst", "sync", });
 		t.useValueFormat(false);
 		assertFind(t.getValue(), new String[] { "8", "27", "2007" });
 		assertFindNot(t.getValue(), new String[] { "workday", "dst", "in", "sync", });
@@ -336,6 +352,12 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
+	void dateWithDotSeparators() throws KNXFormatException {
+		t.setValue("2021.2.3");
+		assertEquals("2021/2/3", t.getValue());
+	}
+
+	@Test
 	void testSetWorkday() {
 		assertFalse(t.isValidField(DPTXlatorDateTime.WORKDAY));
 		assertFalse(t.isWorkday());
@@ -361,6 +383,29 @@ class DPTXlatorDateTimeTest {
 		t.setValidField(DPTXlatorDateTime.DAY_OF_WEEK, false);
 		assertFalse(t.isValidField(DPTXlatorDateTime.DAY_OF_WEEK));
 		assertEquals(5, t.getDayOfWeek());
+	}
+
+	@ParameterizedTest
+	@MethodSource("localeProvider")
+	void localizedDayOfWeek(final Locale locale) {
+		final var current = Locale.getDefault();
+		Locale.setDefault(locale);
+		try {
+			for (final var dow : DayOfWeek.values()) {
+				final var now = LocalDateTime.now().with(ChronoField.DAY_OF_WEEK, dow.getValue());
+				t.setValue(now);
+				final var v = t.getValue();
+				final var day = localizedDayOfWeek(now.getDayOfWeek().getValue());
+				assertTrue(v.contains(day));
+			}
+		}
+		finally {
+			Locale.setDefault(current);
+		}
+	}
+
+	private static Locale[] localeProvider() {
+		return Locale.getAvailableLocales();
 	}
 
 	@Test
