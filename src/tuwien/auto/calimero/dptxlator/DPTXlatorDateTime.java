@@ -46,6 +46,7 @@ import java.time.MonthDay;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.StringTokenizer;
 
 import tuwien.auto.calimero.KNXFormatException;
@@ -335,10 +336,12 @@ public class DPTXlatorDateTime extends DPTXlator
 	}
 
 	/**
-	 * @return day of the week if day-of-week is set
-	 * @throws DateTimeException if day-of-week is "any day"
+	 * @return day of the week if day-of-week is set, empty if no day was set (any day)
 	 */
-	public final DayOfWeek dayOfWeek() { return DayOfWeek.of(getDayOfWeek()); }
+	public final Optional<DayOfWeek> dayOfWeek() {
+		final int dayOfWeek = getDayOfWeek();
+		return dayOfWeek == 0 ? Optional.empty() : Optional.of(DayOfWeek.of(dayOfWeek));
+	}
 
 	/**
 	 * @return the month-day if date information is available
