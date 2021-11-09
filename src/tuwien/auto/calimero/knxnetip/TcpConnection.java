@@ -437,13 +437,8 @@ public final class TcpConnection implements Closeable {
 					try {
 						client.handleServiceType(header, data, offset, conn.server.getAddress(), conn.server.getPort());
 					}
-					catch (final KNXFormatException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					catch (final IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					catch (KNXFormatException | IOException e) {
+						logger.warn("{} error processing {}", client, header, e);
 					}
 				return;
 			}
@@ -470,8 +465,7 @@ public final class TcpConnection implements Closeable {
 					logger.warn("communication channel {} does not exist", channelId);
 			}
 			catch (KNXFormatException | IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.warn("{} error processing {}", connection, header, e);
 			}
 		}
 
