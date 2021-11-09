@@ -425,6 +425,11 @@ public class DPTXlatorDateTime extends DPTXlator
 		data[6] |= NO_WD;
 	}
 
+	@Override
+	public void setValue(final double milliseconds) {
+		setValue((long) milliseconds);
+	}
+
 	/**
 	 * Sets the date/time for the first date/time item using UTC millisecond information.
 	 * <p>

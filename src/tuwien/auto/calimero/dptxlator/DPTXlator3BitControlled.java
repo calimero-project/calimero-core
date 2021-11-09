@@ -146,6 +146,11 @@ public class DPTXlator3BitControlled extends DPTXlator
 		data = new short[1];
 	}
 
+	@Override
+	public void setValue(final double value) {
+		setValue((int) value);
+	}
+
 	/**
 	 * Sets one new translation item with the given signed value, replacing any old items.
 	 * <p>

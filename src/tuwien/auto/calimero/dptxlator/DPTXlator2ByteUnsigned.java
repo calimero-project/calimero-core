@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -204,6 +204,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 			setValue((double) value);
 	}
 
+	@Override
 	public final void setValue(final double value) throws KNXFormatException
 	{
 		final short[] buf = new short[2];

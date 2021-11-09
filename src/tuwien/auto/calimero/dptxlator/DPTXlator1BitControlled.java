@@ -39,6 +39,7 @@ package tuwien.auto.calimero.dptxlator;
 import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 /**
  * Translator for KNX DPTs with main number 2, type <b>1 Bit controlled</b>.
@@ -194,11 +195,20 @@ public class DPTXlator1BitControlled extends DPTXlator
 		data = new short[1];
 	}
 
+	@Override
+	public void setValue(final double value) {
+		if (value < 0 || value > 3)
+			throw new KNXIllegalArgumentException("value " + value + " out of range [0..3]");
+		final int i = (int) value;
+		final boolean control = (i & 0x02) != 0;
+		final boolean v = (i & 0x01) != 0;
+		setValue(control, v);
+	}
+
 	/**
 	 * Sets one new translation item, replacing any old items.
 	 *
-	 * @param control control field, <code>false</code> is <i>no control</i>, <code>true</code> is
-	 *        <i>control</i>
+	 * @param control control field, <code>false</code> is <i>no control</i>, <code>true</code> is <i>control</i>
 	 * @param value value field
 	 * @see #setControlBit(boolean)
 	 */

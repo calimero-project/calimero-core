@@ -952,6 +952,11 @@ public class DPTXlator8BitEnum extends DPTXlator
 		return makeString(0);
 	}
 
+	@Override
+	public void setValue(final double element) throws KNXFormatException {
+		setValue((int) element);
+	}
+
 	/**
 	 * Sets one new translation item from an unsigned value, replacing any old items.
 	 *

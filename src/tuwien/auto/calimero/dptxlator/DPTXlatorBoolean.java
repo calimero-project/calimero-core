@@ -227,6 +227,16 @@ public class DPTXlatorBoolean extends DPTXlator
 		data = new short[1];
 	}
 
+	@Override
+	public void setValue(final double value) {
+		if (value == 0)
+			setValue(false);
+		else if (value == 1)
+			setValue(true);
+		else
+			throw new KNXIllegalArgumentException("value " + value + " out of range [0..1]");
+	}
+
 	/**
 	 * Sets the translation value from a boolean.
 	 * <p>

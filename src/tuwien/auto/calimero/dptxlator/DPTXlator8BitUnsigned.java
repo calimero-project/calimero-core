@@ -150,6 +150,7 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	 *         subtype dimension
 	 * @see #getType()
 	 */
+	@Override
 	public final void setValue(final double scaled) throws KNXFormatException
 	{
 		data = new short[] { toDPT(scaled) };

@@ -178,6 +178,7 @@ public class DptXlator2ByteSigned extends DPTXlator
 	 * @throws KNXFormatException on input value out of range for DPT
 	 * @see #getType()
 	 */
+	@Override
 	public final void setValue(final double value) throws KNXFormatException
 	{
 		final short[] buf = new short[2];

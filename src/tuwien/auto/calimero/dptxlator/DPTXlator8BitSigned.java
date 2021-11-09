@@ -112,6 +112,11 @@ public class DPTXlator8BitSigned extends DPTXlator
 		return makeString(0);
 	}
 
+	@Override
+	public void setValue(final double value) throws KNXFormatException {
+		setValue((int) value);
+	}
+
 	/**
 	 * Sets one new translation item from a signed value, replacing any old items.
 	 *

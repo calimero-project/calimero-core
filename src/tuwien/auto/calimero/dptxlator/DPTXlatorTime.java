@@ -261,6 +261,11 @@ public class DPTXlatorTime extends DPTXlator
 		return localTime(0);
 	}
 
+	@Override
+	public void setValue(final double milliseconds) {
+		setValue((long) milliseconds);
+	}
+
 	/**
 	 * Sets the time for the first item using UTC millisecond information.
 	 *

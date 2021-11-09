@@ -126,6 +126,15 @@ public class DPTXlatorRGB extends DPTXlator {
 		return data[BLUE];
 	}
 
+	@Override
+	public void setValue(final double value) {
+		final long v = (long) value;
+		final int red = (int) ((v >> 16) & 0xff);
+		final int green = (int) ((v >> 8) & 0xff);
+		final int blue = (int) (v & 0xff);
+		setValue(red, green, blue);
+	}
+
 	/**
 	 * Sets the translation value from a 3-tuple (R,G,B), specifying the red, green, and blue
 	 * color values.

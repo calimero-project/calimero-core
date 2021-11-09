@@ -194,6 +194,10 @@ public abstract class DPTXlator
 		data = buf;
 	}
 
+	public void setValue(final double value) throws KNXFormatException {
+		throw new KNXFormatException("No simple numeric representation possible");
+	}
+
 	/**
 	 * Returns the first value stored by this translator formatted into a string,
 	 * according to the subtype ID.

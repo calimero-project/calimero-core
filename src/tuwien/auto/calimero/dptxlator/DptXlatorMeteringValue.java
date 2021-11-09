@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2017, 2020 B. Malinowsky
+    Copyright (c) 2017, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -117,7 +117,8 @@ public class DptXlatorMeteringValue extends DPTXlator
 	 * @param value dimensionless counter value
 	 */
 	// TODO method might not make much sense
-	public final void setValue(final int value)
+	@Override
+	public final void setValue(final double value)
 	{
 		expUnitAdjustment = 0;
 		try {

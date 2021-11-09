@@ -153,6 +153,12 @@ public class DPTXlatorDate extends DPTXlator
 		return buf;
 	}
 
+	@Override
+	public void setValue(final double milliseconds) {
+		setValue((long) milliseconds);
+	}
+
+
 	/**
 	 * Sets the year, month, and day of month for the first date item.
 	 * <p>

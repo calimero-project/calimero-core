@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2019 B. Malinowsky
+    Copyright (c) 2009, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -650,10 +650,11 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	 * @param value the float value
 	 * @throws KNXFormatException if <code>value</code> doesn't fit into KNX data type
 	 */
-	public void setValue(final float value) throws KNXFormatException
+	@Override
+	public void setValue(final double value) throws KNXFormatException
 	{
 		final short[] buf = new short[4];
-		toDPT(value, buf, 0);
+		toDPT((float) value, buf, 0);
 		data = buf;
 	}
 
