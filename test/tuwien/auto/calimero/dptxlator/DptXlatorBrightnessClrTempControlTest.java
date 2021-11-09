@@ -49,12 +49,12 @@ import org.junit.jupiter.api.Test;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 
-class DptXlatorBrightnessClrTempCtrlTest {
-	private DptXlatorBrightnessClrTempCtrl t;
+class DptXlatorBrightnessClrTempControlTest {
+	private DptXlatorBrightnessClrTempControl t;
 
 	@BeforeEach
 	void init() throws KNXFormatException {
-		t = new DptXlatorBrightnessClrTempCtrl();
+		t = new DptXlatorBrightnessClrTempControl();
 	}
 
 	@Test

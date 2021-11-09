@@ -347,7 +347,7 @@ public final class TranslatorTypes
 			"DPTXlator8BitSigned",
 			"DPTXlator8BitUnsigned",
 			"DPTXlatorBoolean",
-			"DptXlatorBrightnessClrTempCtrl",
+			"DptXlatorBrightnessClrTempControl",
 			"DptXlatorBrightnessClrTempTrans",
 			"DPTXlatorDate",
 			"DPTXlatorDateTime",

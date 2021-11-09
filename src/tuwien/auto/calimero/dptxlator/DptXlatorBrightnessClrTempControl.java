@@ -48,7 +48,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * type width is 3 bytes. The default return value after creation is the value with all parts not valid
  * (<code>- -</code>).
  */
-public class DptXlatorBrightnessClrTempCtrl extends DPTXlator {
+public class DptXlatorBrightnessClrTempControl extends DPTXlator {
 	public static final String Description = "brightness & color temperature control";
 
 	/**
@@ -75,7 +75,7 @@ public class DptXlatorBrightnessClrTempCtrl extends DPTXlator {
 	 *
 	 * @throws KNXFormatException on not available DPT
 	 */
-	public DptXlatorBrightnessClrTempCtrl() throws KNXFormatException {
+	public DptXlatorBrightnessClrTempControl() throws KNXFormatException {
 		this(DptBrightnessClrTempCtrl);
 	}
 
@@ -85,7 +85,7 @@ public class DptXlatorBrightnessClrTempCtrl extends DPTXlator {
 	 * @param dpt the requested datapoint type
 	 * @throws KNXFormatException on not supported or not available DPT
 	 */
-	public DptXlatorBrightnessClrTempCtrl(final DPT dpt) throws KNXFormatException {
+	public DptXlatorBrightnessClrTempControl(final DPT dpt) throws KNXFormatException {
 		this(dpt.getID());
 	}
 
@@ -95,7 +95,7 @@ public class DptXlatorBrightnessClrTempCtrl extends DPTXlator {
 	 * @param dptId available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptId</code>
 	 */
-	public DptXlatorBrightnessClrTempCtrl(final String dptId) throws KNXFormatException {
+	public DptXlatorBrightnessClrTempControl(final String dptId) throws KNXFormatException {
 		super(3);
 		setTypeID(types, dptId);
 		data = new short[3];
