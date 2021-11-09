@@ -40,6 +40,9 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static tuwien.auto.calimero.dptxlator.StepControl.Break;
+import static tuwien.auto.calimero.dptxlator.StepControl.decrease;
+import static tuwien.auto.calimero.dptxlator.StepControl.increase;
 
 import java.util.stream.Stream;
 
@@ -86,21 +89,21 @@ class DptXlatorRelativeControlRgbwTest {
 
 	@Test
 	void setValidValue() {
-		t.setValue(false, 0, false, 0, false, 0, false, 0);
-		t.setValue(false, 1, false, 1, false, 1, false, 1);
-		t.setValue(true, 7, true, 7, true, 7, true, 7);
-		t.setValue(true, 3, false, 5, true, 4, false, 7);
-		t.setValue(false, 1, true, 6, false, 2, true, 4);
+		t.setValue(Break, Break, Break, Break);
+		t.setValue(decrease(1), decrease(1), decrease(1), decrease(1));
+		t.setValue(increase(7), increase(7), increase(7), increase(7));
+		t.setValue(increase(3), decrease(5), increase(4), decrease(7));
+		t.setValue(decrease(1), increase(6), decrease(2), increase(4));
 	}
 
 	@Test
 	void setIllegalValue() {
-		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(false, -1, false, 7, false, 7, false, 7));
-		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(true, 7, true, -1, false, 7, false, 7));
-		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(true, 8, true, 7, false, 7, false, 7));
-		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(true, 7, true, 8, false, 7, false, 7));
-		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(true, 7, true, 5, false, 8, false, 7));
-		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(true, 7, true, 5, false, 7, false, 8));
+		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(decrease(-1), decrease(7), decrease(7), decrease(7)));
+		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(increase(7), increase(-1), decrease(7), decrease(7)));
+		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(increase(8), increase(7), decrease(7), decrease(7)));
+		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(increase(7), increase(8), decrease(7), decrease(7)));
+		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(increase(7), increase(5), decrease(8), decrease(7)));
+		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(increase(7), increase(5), decrease(7), decrease(8)));
 	}
 
 	@Test
@@ -216,7 +219,7 @@ class DptXlatorRelativeControlRgbwTest {
 	@Test
 	void getItems() {
 		assertEquals(1, t.getItems());
-		t.setValue(true, 7, true, 7, true, 7, true, 7);
+		t.setValue(increase(7), increase(7), increase(7), increase(7));
 		assertEquals(1, t.getItems());
 	}
 
@@ -274,7 +277,7 @@ class DptXlatorRelativeControlRgbwTest {
 		String expected = value;
 		t.setAppendUnit(false);
 		assertEquals(expected, t.getValue());
-		t.setValue(false, 0, false, 0, false, 0, false, 0);
+		t.setValue(Break, Break, Break, Break);
 		expected = "R decrease break G decrease break B decrease break W decrease break";
 		assertEquals(expected, t.getValue());
 	}
@@ -285,7 +288,7 @@ class DptXlatorRelativeControlRgbwTest {
 		t.setValue(value);
 		final String expected = value;
 		assertEquals(expected, t.getValue());
-		t.setValue(true, 7, true, 7, true, 7, true, 7);
+		t.setValue(increase(7), increase(7), increase(7), increase(7));
 		assertEquals(expected, t.getValue());
 	}
 

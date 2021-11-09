@@ -39,7 +39,6 @@ package tuwien.auto.calimero.dptxlator;
 import java.util.Map;
 
 import tuwien.auto.calimero.KNXFormatException;
-import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 /**
  * Translator for KNX DPTs with main number 254, type <b>relative control RGB</b>. The KNX data
@@ -103,16 +102,12 @@ public class DptXlatorRelativeControlRgb extends DPTXlator {
 	/**
 	 * Sets one new translation item, replacing any old items.
 	 *
-	 * @param increaseRed increase or decrease value
-	 * @param redStepcode stepcode, <code>0 &le; clrTempStepcode &le; 7</code>
-	 * @param increaseGreen increase or decrease value
-	 * @param greenStepcode stepcode, <code>0 &le; clrTempStepcode &le; 7</code>
-	 * @param increaseBlue increase or decrease value
-	 * @param blueStepcode stepcode, <code>0 &le; clrTempStepcode &le; 7</code>
+	 * @param red step control for red
+	 * @param green step control for green
+	 * @param blue step control for blue
 	 */
-	public final void setValue(final boolean increaseRed, final int redStepcode, final boolean increaseGreen,
-			final int greenStepcode, final boolean increaseBlue, final int blueStepcode) {
-		data = toDpt(increaseRed, redStepcode, increaseGreen, greenStepcode, increaseBlue, blueStepcode);
+	public final void setValue(final StepControl red, final StepControl green, final StepControl blue) {
+		data = toDpt(red, green, blue);
 	}
 
 	public final void setRed(final StepControl value) {
@@ -234,24 +229,14 @@ public class DptXlatorRelativeControlRgb extends DPTXlator {
 		return t.getData()[0];
 	}
 
-	private short[] toDpt(final boolean increaseRed, final int redStepcode, final boolean increaseGreen,
-			final int greenStepcode, final boolean increaseBlue, final int blueStepcode) {
-		rangeCheck(redStepcode);
-		rangeCheck(greenStepcode);
-		rangeCheck(blueStepcode);
+	private short[] toDpt(final StepControl red, final StepControl green, final StepControl blue) {
+		t.setValue(red);
+		final short r = ubyte(t.getData()[0]);
+		t.setValue(green);
+		final short g = ubyte(t.getData()[0]);
+		t.setValue(blue);
+		final short b = ubyte(t.getData()[0]);
 
-		t.setValue(increaseRed, redStepcode);
-		final short red = ubyte(t.getData()[0]);
-		t.setValue(increaseGreen, greenStepcode);
-		final short green = ubyte(t.getData()[0]);
-		t.setValue(increaseBlue, blueStepcode);
-		final short blue = ubyte(t.getData()[0]);
-
-		return new short[] { red, green, blue };
-	}
-
-	private void rangeCheck(final int clrStepcode) {
-		if (clrStepcode < 0 || clrStepcode > 7)
-			throw new KNXIllegalArgumentException("stepcode " + clrStepcode + " out of range [0..7]");
+		return new short[] { r, g, b };
 	}
 }

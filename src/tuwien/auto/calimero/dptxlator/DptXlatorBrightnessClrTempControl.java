@@ -41,7 +41,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import tuwien.auto.calimero.KNXFormatException;
-import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 /**
  * Translator for KNX DPTs with main number 250, type <b>brightness &amp; color temperature control</b>. The KNX data
@@ -117,14 +116,11 @@ public class DptXlatorBrightnessClrTempControl extends DPTXlator {
 	/**
 	 * Sets one new translation item, replacing any old items.
 	 *
-	 * @param increaseClrTemp increase or decrease value
-	 * @param clrTempStepcode color temperature stepcode, <code>1 &le; clrTempStepcode &le; 7</code>
-	 * @param increaseBrightness increase or decrease value
-	 * @param brightnessStepcode brightness stepcode, <code>1 &le; brightnessStepcode &le; 7</code>
+	 * @param colorTemp color temperature
+	 * @param brightness brightness
 	 */
-	public final void setValue(final boolean increaseClrTemp, final int clrTempStepcode, final boolean increaseBrightness,
-			final int brightnessStepcode) {
-		data = toDpt(increaseClrTemp, clrTempStepcode, increaseBrightness, brightnessStepcode);
+	public final void setValue(final StepControl colorTemp, final StepControl brightness) {
+		data = toDpt(colorTemp, brightness);
 	}
 
 	public final void setBrightness(final StepControl value) {
@@ -265,23 +261,13 @@ public class DptXlatorBrightnessClrTempControl extends DPTXlator {
 		return t.getData()[0];
 	}
 
-	private short[] toDpt(final boolean increaseClrTemp, final int clrTempStepcode, final boolean increaseBrightness,
-			final int brightnessStepcode) {
-		rangeCheck(clrTempStepcode, brightnessStepcode);
-
-		t.setValue(increaseClrTemp, clrTempStepcode);
+	private short[] toDpt(final StepControl colorTemp, final StepControl brightness) {
+		t.setValue(colorTemp);
 		final short clrtemp = ubyte(t.getData()[0]);
-		t.setValue(increaseBrightness, brightnessStepcode);
+		t.setValue(brightness);
 		final short bright = ubyte(t.getData()[0]);
 		final int valid = 0b11;
 
 		return new short[] { clrtemp, bright, valid };
-	}
-
-	private static void rangeCheck(final int clrTempStepcode, final int brightnessStepcode) {
-		if (clrTempStepcode < 1 || clrTempStepcode > 7)
-			throw new KNXIllegalArgumentException("color temperature stepcode " + clrTempStepcode + " out of range [1..7]");
-		if (brightnessStepcode < 1 || brightnessStepcode > 7)
-			throw new KNXIllegalArgumentException("brightness stepcode " + brightnessStepcode + " out of range [1..7]");
 	}
 }

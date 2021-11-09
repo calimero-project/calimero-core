@@ -83,10 +83,10 @@ class DptXlatorBrightnessClrTempControlTest {
 
 	@Test
 	void setValidValue() {
-		t.setValue(false, 1, false, 1);
-		t.setValue(true, 7, true, 7);
-		t.setValue(true, 3, false, 5);
-		t.setValue(false, 1, true, 6);
+		t.setValue(decrease(1), decrease(1));
+		t.setValue(increase(7), increase(7));
+		t.setValue(increase(3), decrease(5));
+		t.setValue(decrease(1), increase(6));
 	}
 
 	@Test
@@ -121,10 +121,10 @@ class DptXlatorBrightnessClrTempControlTest {
 
 	@Test
 	void setIllegalValue() {
-		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(false, -1, false, 7));
-		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(true, 7, true, -1));
-		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(true, 8, true, 7));
-		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(true, 7, true, 8));
+		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(decrease(-1), decrease(7)));
+		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(increase(7), increase(-1)));
+		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(increase(8), increase(7)));
+		assertThrows(KNXIllegalArgumentException.class, () -> t.setValue(increase(7), increase(8)));
 	}
 
 	@Test
@@ -158,7 +158,7 @@ class DptXlatorBrightnessClrTempControlTest {
 	@Test
 	void getItems() {
 		assertEquals(1, t.getItems());
-		t.setValue(true, 7, true, 7);
+		t.setValue(increase(7), increase(7));
 		assertEquals(1, t.getItems());
 	}
 
@@ -216,7 +216,7 @@ class DptXlatorBrightnessClrTempControlTest {
 		final String expected = "CT decrease 1 BRT decrease 1";
 		t.setAppendUnit(false);
 		assertEquals(expected, t.getValue());
-		t.setValue(false, 1, false, 1);
+		t.setValue(decrease(1), decrease(1));
 		assertEquals(expected, t.getValue());
 	}
 
@@ -226,7 +226,7 @@ class DptXlatorBrightnessClrTempControlTest {
 		t.setValue(value);
 		final String expected = "CT increase 7 steps BRT increase 7 steps";
 		assertEquals(expected, t.getValue());
-		t.setValue(true, 7, true, 7);
+		t.setValue(increase(7), increase(7));
 		assertEquals(expected, t.getValue());
 	}
 }
