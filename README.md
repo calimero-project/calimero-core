@@ -117,7 +117,7 @@ Currently, the TP-UART and FT1.2 protocols can only be tested if the correspondi
 More Features, Tools, Examples
 ------------------------------
 
-* [introduction](https://github.com/calimero-project/introduction) provides code examples for programming with Calimero.
+* [introduction](https://github.com/calimero-project/introduction) provides code examples in Java and Kotlin for programming with Calimero.
 * [calimero-tools](https://github.com/calimero-project/calimero-tools) offers command-line tools for (secure) KNX process communication, monitoring, and management, BAOS communication, and ETS 5 datapoint import.
 * [calimero-gui](https://github.com/calimero-project/calimero-gui) provides a graphical user interface (based on SWT) for (secure) process communication, monitoring, and management.
 * [calimero-server](https://github.com/calimero-project/calimero-server) is the Calimero KNXnet/IP Server and provides KNXnet/IP (Secure) access to KNX networks.
