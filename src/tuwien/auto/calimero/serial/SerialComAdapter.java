@@ -39,9 +39,16 @@ package tuwien.auto.calimero.serial;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import tuwien.auto.calimero.KnxRuntimeException;
+import tuwien.auto.calimero.serial.spi.SerialCom;
 
 /**
  * Adapter for serial communication using a Calimero library platform dependent library API.
@@ -53,7 +60,7 @@ import org.slf4j.LoggerFactory;
  * @author B. Malinowsky
  */
 @SuppressWarnings("checkstyle:finalparameters")
-class SerialComAdapter extends LibraryAdapter
+public class SerialComAdapter implements SerialCom
 {
 	// ctrl identifiers
 	static final int BAUDRATE = 1;
@@ -115,6 +122,12 @@ class SerialComAdapter extends LibraryAdapter
 
 	private long fd = INVALID_HANDLE;
 
+	private final ReentrantLock lock = new ReentrantLock();
+	private InputStream is;
+	private OutputStream os;
+
+	private final Logger logger;
+
 	static final class Timeouts
 	{
 		final int readInterval;
@@ -156,28 +169,24 @@ class SerialComAdapter extends LibraryAdapter
 		loaded = b;
 	}
 
-	SerialComAdapter(final Logger logger, final String portId) throws IOException
-	{
-		super(logger);
-		if (portId == null)
-			throw new NullPointerException("no port id");
+	public SerialComAdapter() {
 		if (!loaded)
-			throw new IOException("no serial I/O communication support");
-		open(portId);
-	}
-
-	/**
-	 * Returns whether the platform dependent serial communication library is available or not.
-	 *
-	 * @return <code>true</code> if library was loaded and is available, <code>false</code> if SerialComAdapter
-	 *         functionality can not be used
-	 */
-	static boolean isAvailable()
-	{
-		return loaded;
+			throw new KnxRuntimeException("no serialcom library found");
+		logger = LoggerFactory.getLogger("calimero.serial");
 	}
 
 	static native boolean portExists(String portId);
+
+	@Override
+	public List<String> portIdentifiers() {
+		if (!loaded)
+			return List.of();
+
+		final List<String> ports = new ArrayList<>();
+		LibraryAdapter.defaultPortPrefixes().forEach(p -> IntStream.range(0, 20).mapToObj(i -> p + i)
+				.filter(SerialComAdapter::portExists).forEach(ports::add));
+		return ports;
+	}
 
 	native int writeBytes(byte[] b, int off, int len) throws IOException;
 
@@ -188,11 +197,24 @@ class SerialComAdapter extends LibraryAdapter
 	// return of -1 indicates timeout
 	native int read() throws IOException;
 
+	@Override
+	public void setSerialPortParams(final int baudrate, final int databits, final StopBits stopbits, final Parity parity)
+			throws IOException {
+		setBaudRate(baudrate);
+		setControl(DATABITS, 8);
+		setControl(STOPBITS, stopbits.value());
+		setParity(parity.value());
+	}
+
+	@Override
+	public void setFlowControlMode(final FlowControl mode) throws IOException {
+		setControl(FLOWCTRL, mode.value());
+	}
+
 	native void setTimeouts(Timeouts times) throws IOException;
 
 	native Timeouts getTimeouts() throws IOException;
 
-	@Override
 	public final void setBaudRate(final int baudrate)
 	{
 		try {
@@ -204,6 +226,10 @@ class SerialComAdapter extends LibraryAdapter
 	}
 
 	@Override
+	public int baudRate() {
+		return getBaudRate();
+	}
+
 	public final int getBaudRate()
 	{
 		try {
@@ -248,21 +274,29 @@ class SerialComAdapter extends LibraryAdapter
 	native int getControl(int control) throws IOException;
 
 	@Override
-	public InputStream getInputStream()
-	{
-		if (fd == INVALID_HANDLE)
-			// throw new IOException();
-			return null;
-		return new PortInputStream(this);
+	public InputStream inputStream() {
+		lock.lock();
+		try {
+			if (is == null)
+				is = new PortInputStream(this);
+			return is;
+		}
+		finally {
+			lock.unlock();
+		}
 	}
 
 	@Override
-	public OutputStream getOutputStream()
-	{
-		if (fd == INVALID_HANDLE)
-			// throw new IOException();
-			return null;
-		return new PortOutputStream(this);
+	public OutputStream outputStream() {
+		lock.lock();
+		try {
+			if (os == null)
+				os = new PortOutputStream(this);
+			return os;
+		}
+		finally {
+			lock.unlock();
+		}
 	}
 
 	// any open input/output stream accessing this port becomes unusable
@@ -279,11 +313,25 @@ class SerialComAdapter extends LibraryAdapter
 		fd = INVALID_HANDLE;
 	}
 
+	@Override
+	public String toString() {
+		if (fd == INVALID_HANDLE)
+			return "closed";
+		try {
+			return "baudrate " + getBaudRate() + ", even parity, " + getControl(SerialComAdapter.DATABITS)
+					+ " databits, " + getControl(SerialComAdapter.STOPBITS) + " stopbits, timeouts: " + getTimeouts();
+		}
+		catch (final IOException e) {
+			return "invalid port setup";
+		}
+	}
+
 	private native void setEvents(int eventMask, boolean enable) throws IOException;
 
 	private native int waitEvent() throws IOException;
 
-	private native void open(String portId) throws IOException;
+	@Override
+	public native void open(String portId) throws IOException;
 
 	private native void close0() throws IOException;
 }

@@ -72,6 +72,7 @@ import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.internal.EventListeners;
 import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.log.LogService.LogLevel;
+import tuwien.auto.calimero.serial.spi.SerialCom;
 
 /**
  * Provides a connection with a TP-UART-IC controller for transparent communication with a KNX TP1 network. The
@@ -141,7 +142,7 @@ public class TpuartConnection implements Connection<byte[]>
 
 
 	private final String portId;
-	private final LibraryAdapter adapter;
+	private final SerialCom adapter;
 	private final OutputStream os;
 	private final InputStream is;
 
@@ -181,8 +182,8 @@ public class TpuartConnection implements Connection<byte[]>
 		this.portId = portId;
 		logger = LogService.getAsyncLogger("calimero.serial.tpuart:" + portId);
 		adapter = LibraryAdapter.open(logger, portId, UartBaudRate, 0);
-		os = adapter.getOutputStream();
-		is = adapter.getInputStream();
+		os = adapter.outputStream();
+		is = adapter.inputStream();
 
 		addresses.add(GroupAddress.Broadcast);
 		addresses.addAll(acknowledge);

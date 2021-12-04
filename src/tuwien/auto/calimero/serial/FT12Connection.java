@@ -61,6 +61,9 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.internal.EventListeners;
 import tuwien.auto.calimero.log.LogService;
+import tuwien.auto.calimero.serial.spi.SerialCom;
+import tuwien.auto.calimero.serial.spi.SerialCom.Parity;
+import tuwien.auto.calimero.serial.spi.SerialCom.StopBits;
 
 /**
  * Provides a connection based on the FT1.2 protocol for communication with a BCU2 device.
@@ -138,7 +141,7 @@ public class FT12Connection implements Connection<byte[]>
 	// - for Calimero 2 native I/O, SerialComAdapter is used
 	// - with rx/tx available, RxtxAdapter is used
 	// - or some external serial I/O library adapter
-	private final LibraryAdapter adapter;
+	private final SerialCom adapter;
 
 	private final String port;
 	private final int exchangeTimeout;
@@ -179,7 +182,7 @@ public class FT12Connection implements Connection<byte[]>
 	 */
 	public FT12Connection(final int portNumber) throws KNXException, InterruptedException
 	{
-		this(LibraryAdapter.defaultPortPrefixes()[0] + portNumber, DEFAULT_BAUDRATE, false);
+		this(LibraryAdapter.defaultPortPrefixes().get(0) + portNumber, DEFAULT_BAUDRATE, false);
 	}
 
 	/**
@@ -240,7 +243,7 @@ public class FT12Connection implements Connection<byte[]>
 				idleTimeout(baudrate)), portId, cemi);
 	}
 
-	protected FT12Connection(final LibraryAdapter connection, final String portId, final boolean cemi)
+	protected FT12Connection(final SerialCom connection, final String portId, final boolean cemi)
 			throws KNXException, InterruptedException {
 		logger = LogService.getLogger("calimero.serial.ft12:" + portId);
 		listeners = new EventListeners<>(logger);
@@ -248,10 +251,10 @@ public class FT12Connection implements Connection<byte[]>
 
 		adapter = connection;
 		port = portId;
-		exchangeTimeout = exchangeTimeout(adapter.getBaudRate());
+		exchangeTimeout = exchangeTimeout(adapter.baudRate());
 		this.cemi = cemi;
-		is = adapter.getInputStream();
-		os = adapter.getOutputStream();
+		is = adapter.inputStream();
+		os = adapter.outputStream();
 		receiver = new Receiver();
 		receiver.start();
 		state = OK;
@@ -324,10 +327,11 @@ public class FT12Connection implements Connection<byte[]>
 	 * Sets a new baud rate for this connection.
 	 *
 	 * @param baud requested baud rate [bit/s], 0 &lt; baud rate
+	 * @throws IOException on error setting the baudrate
 	 */
-	public void setBaudrate(final int baud)
+	public void setBaudrate(final int baud) throws IOException
 	{
-		adapter.setBaudRate(baud);
+		adapter.setSerialPortParams(baud, 8, StopBits.One, Parity.Even);
 	}
 
 	/**
@@ -337,9 +341,9 @@ public class FT12Connection implements Connection<byte[]>
 	 *
 	 * @return baud rate in Bit/s
 	 */
-	public final int getBaudRate()
+	final int getBaudRate()
 	{
-		return adapter.getBaudRate();
+		return adapter.baudRate();
 	}
 
 	/**

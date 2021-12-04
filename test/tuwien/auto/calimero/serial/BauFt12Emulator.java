@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2020 B. Malinowsky
+    Copyright (c) 2020, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,13 +43,13 @@ import static tuwien.auto.calimero.serial.FT12Connection.START_FIXED;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import org.slf4j.LoggerFactory;
-
 import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.serial.spi.SerialCom;
 
-class BauFt12Emulator extends LibraryAdapter {
+class BauFt12Emulator extends LibraryAdapter implements SerialCom {
 	private final ArrayBlockingQueue<Byte> queue = new ArrayBlockingQueue<>(100);
 
 	boolean replyWithAck = true;
@@ -128,22 +128,32 @@ class BauFt12Emulator extends LibraryAdapter {
 		return chk;
 	}
 
-	BauFt12Emulator() {
-		super(LoggerFactory.getLogger("calimero.serial.ft12"));
-	}
+	BauFt12Emulator() {}
 
 	@Override
-	public OutputStream getOutputStream() {
+	public List<String> portIdentifiers() { return List.of(); }
+
+	@Override
+	public void open(final String portId) {}
+
+	@Override
+	public void setSerialPortParams(final int baudrate, final int databits, final StopBits stopbits, final Parity parity) {}
+
+	@Override
+	public void setFlowControlMode(final FlowControl flowControl) {}
+
+	@Override
+	public OutputStream outputStream() {
 		return os;
 	}
 
 	@Override
-	public InputStream getInputStream() {
+	public InputStream inputStream() {
 		return is;
 	}
 
 	@Override
-	public int getBaudRate() {
+	public int baudRate() {
 		return 19200;
 	}
 

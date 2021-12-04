@@ -36,70 +36,62 @@
 
 package tuwien.auto.calimero.serial;
 
-import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.IntStream;
+import java.util.Locale;
+import java.util.ServiceConfigurationError;
+import java.util.ServiceLoader;
+import java.util.ServiceLoader.Provider;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.serial.spi.SerialCom;
+import tuwien.auto.calimero.serial.spi.SerialCom.FlowControl;
+import tuwien.auto.calimero.serial.spi.SerialCom.Parity;
+import tuwien.auto.calimero.serial.spi.SerialCom.StopBits;
 
 /**
- * Adapter to access a serial communication port using some serial I/O library.
- * <p>
- * Subtypes of this class implementing the access to a specific library have to declare a public
- * constructor expecting a String and an <code>int</code> argument, i.e.,<br>
- * <code>public MyAdapter(String portID, int baudrate)</code> for a class named "MyAdapter". The
- * <code>portID</code> argument identifies the communication port on which to open the connection,
- * the <code>baudrate</code> argument specifies the requested baud rate for communication.<br>
- * Invoking that constructor will open the serial port according the supplied arguments.
- * <p>
- * After closing a library adapter, method behavior is undefined.
+ * Adapter to access a serial communication port using a {@link SerialCom} service provider.
  *
  * @author B. Malinowsky
  */
-public abstract class LibraryAdapter implements Closeable
+public class LibraryAdapter
 {
-	/**
-	 * The log service to use, supplied in the constructor; if a sub-class of LibraryAdapter does
-	 * not use logger, it might be set to null.
-	 */
-	protected final Logger logger;
+	private static class SerialComLoader {
+		private static final ServiceLoader<SerialCom> loader = ServiceLoader.load(SerialCom.class);
+
+		static Stream<Provider<SerialCom>> providers(final boolean refresh) {
+			if (refresh)
+				loader.reload();
+			return loader.stream();
+		}
+	}
+
+	private static final List<String> defaultPortPrefixes = System.getProperty("os.name").toLowerCase(Locale.ENGLISH)
+			.indexOf("windows") > -1
+					? List.of("\\\\.\\COM")
+					: List.of("/dev/ttyS", "/dev/ttyACM", "/dev/ttyUSB", "/dev/ttyAMA");
+
+	static List<String> defaultPortPrefixes() { return defaultPortPrefixes; }
 
 	/** @return all available serial communication port identifiers. */
-	public static List<String> getPortIdentifiers()
-	{
-		if (SerialComAdapter.isAvailable()) {
-			final List<String> ports = new ArrayList<>();
-			Arrays.asList(defaultPortPrefixes()).forEach(p -> IntStream.range(0, 20)
-					.filter(i -> SerialComAdapter.portExists(p + i)).forEach(i -> ports.add(p + i)));
-			return ports;
+	public static List<String> getPortIdentifiers() {
+		for (final var provider : SerialComLoader.providers(false).collect(Collectors.toList())) {
+			try {
+				final var inst = provider.get();
+				return inst.portIdentifiers();
+			}
+			catch (final ServiceConfigurationError e) {
+				final var ex = e.getCause() != null ? e.getCause() : e;
+				LoggerFactory.getLogger("calimero.serial").debug("skip service provider {}", provider.type().getName(), ex);
+			}
 		}
-		try {
-			final Class<?> c = Class.forName("tuwien.auto.calimero.serial.RxtxAdapter");
-			@SuppressWarnings("unchecked")
-			final List<String> ports = (List<String>) c.getMethod("getPortIdentifiers").invoke(null);
-			return ports;
-		}
-		catch (Exception | NoClassDefFoundError e) {}
-		return Collections.emptyList();
+		return List.of();
 	}
-
-	static String[] defaultPortPrefixes()
-	{
-		return System.getProperty("os.name").toLowerCase().indexOf("windows") > -1 ? new String[] { "\\\\.\\COM" }
-				: new String[] { "/dev/ttyS", "/dev/ttyACM", "/dev/ttyUSB", "/dev/ttyAMA" };
-	}
-
-	private static volatile boolean lookupRxtx = true;
 
 	/**
 	 * Factory method to open a serial connection using one of the available library adapters.
@@ -111,53 +103,20 @@ public abstract class LibraryAdapter implements Closeable
 	 * @return adapter to access serial communication port, port resource is in open state
 	 * @throws KNXException on failure to open or configure serial port, or no adapter available
 	 */
-	public static LibraryAdapter open(final Logger logger, final String portId, final int baudrate,
+	public static SerialCom open(final Logger logger, final String portId, final int baudrate,
 		final int idleTimeout) throws KNXException
 	{
 		Throwable t = null;
-		// check internal support for serial port access
-		// protocol support available for Win 32/64 platforms
-		// (so we provide serial port access at least on platforms with ETS)
-		if (SerialComAdapter.isAvailable()) {
-			logger.debug("open Calimero native serial port connection (serialcom) for {}", portId);
-			SerialComAdapter conn = null;
+
+		for (final var provider : SerialComLoader.providers(false).collect(Collectors.toList())) {
 			try {
-				conn = new SerialComAdapter(logger, portId);
-				conn.setBaudRate(baudrate);
-				//final int idleTimeout = idleTimeout(conn.getBaudRate());
-				conn.setTimeouts(new SerialComAdapter.Timeouts(idleTimeout, 0, 5, 0, 0));
-				conn.setParity(SerialComAdapter.PARITY_EVEN);
-				conn.setControl(SerialComAdapter.STOPBITS, SerialComAdapter.ONE_STOPBIT);
-				conn.setControl(SerialComAdapter.DATABITS, 8);
-				conn.setControl(SerialComAdapter.FLOWCTRL, SerialComAdapter.FLOWCTRL_NONE);
-				logger.debug("setup serial port: baudrate " + conn.getBaudRate() + ", even parity, "
-						+ conn.getControl(SerialComAdapter.DATABITS) + " databits, "
-						+ conn.getControl(SerialComAdapter.STOPBITS) + " stopbits, timeouts: "
-						+ conn.getTimeouts());
-				return conn;
+				return open(provider, logger, portId, baudrate, idleTimeout);
 			}
-			catch (final IOException e) {
-				if (conn != null)
-					conn.close();
-				t = e;
+			catch (final ServiceConfigurationError e) {
+				final var ex = e.getCause() != null ? e.getCause() : e;
+				logger.debug("skip service provider {}", provider.type().getName(), ex);
 			}
-		}
-		if (lookupRxtx) {
-			try {
-				final Class<?> c = Class.forName("tuwien.auto.calimero.serial.RxtxAdapter");
-				logger.debug("using rxtx library for serial port access");
-				final Class<? extends LibraryAdapter> adapter = LibraryAdapter.class;
-				return adapter.cast(
-						c.getConstructors()[0].newInstance(new Object[] { logger, portId, Integer.valueOf(baudrate) }));
-			}
-			catch (final ClassNotFoundException | NoClassDefFoundError e) {
-				logger.warn("no rxtx library adapter found");
-				lookupRxtx = false;
-			}
-			catch (final InvocationTargetException e) {
-				t = e.getCause();
-			}
-			catch (final Exception e) {
+			catch (final Throwable e) {
 				t = e;
 			}
 		}
@@ -166,101 +125,30 @@ public abstract class LibraryAdapter implements Closeable
 			throw (KNXException) t;
 		if (t != null)
 			throw new KNXException("failed to open serial port " + portId, t);
-		throw new KNXException("no serial adapter available to open " + portId);
+		throw new KNXException("no serial provider available to open " + portId);
 	}
 
-	/**
-	 * Creates a new library adapter.
-	 *
-	 * @param logService the log service to use for this adapter
-	 */
-	protected LibraryAdapter(final Logger logService)
-	{
-		logger = logService;
-	}
+	private static SerialCom open(final Provider<SerialCom> provider, final Logger logger, final String portId,
+			final int baudrate, final int idleTimeout) throws Throwable {
 
-	/**
-	 * Returns the output stream for the opened serial communication port.
-	 * <p>
-	 * Subsequent invocations might return the same or a new stream object.
-	 *
-	 * @return the OutputStream object
-	 */
-	public abstract OutputStream getOutputStream();
-
-	/**
-	 * Returns the input stream for the opened serial communication port.
-	 * <p>
-	 * Subsequent invocations might return the same or a new stream object.
-	 *
-	 * @return the InputStream object
-	 */
-	public abstract InputStream getInputStream();
-
-	/**
-	 * Sets a new baud rate for this connection.
-	 *
-	 * @param baudrate requested baud rate [Bit/s], 0 &lt; baud rate
-	 */
-	public void setBaudRate(final int baudrate)
-	{
+		final var inst = provider.get();
+		logger.debug("open serial communication provider {}", provider.type().getName());
+		inst.open(portId);
 		try {
-			invoke(this, "setBaudRate", new Object[] { Integer.valueOf(baudrate) });
-		}
-		catch (final Exception ignore) {}
-	}
+			inst.setSerialPortParams(baudrate, 8, StopBits.One, Parity.Even);
+			inst.setFlowControlMode(FlowControl.None);
 
-	/**
-	 * Returns the currently used baud rate.
-	 * <p>
-	 *
-	 * @return baud rate in bit/s
-	 */
-	public int getBaudRate()
-	{
-		try {
-			return ((Integer) invoke(this, "getBaudRate", new Object[0])).intValue();
+			if (provider.type().equals(SerialComAdapter.class)) {
+				final SerialComAdapter conn = (SerialComAdapter) inst;
+				//final int idleTimeout = idleTimeout(conn.getBaudRate());
+				conn.setTimeouts(new SerialComAdapter.Timeouts(idleTimeout, 0, 5, 0, 0));
+			}
 		}
-		catch (final Exception ignore) {}
-		return 0;
-	}
-
-	@Override
-	public abstract void close();
-
-	/**
-	 * Invokes <code>method</code> name on object <code>obj</code> with arguments <code>args</code>.
-	 * <p>
-	 * Arguments wrapped in an object of type Integer are replaced with the primitive int type when
-	 * looking up the method name.
-	 *
-	 * @param obj object on which to invoke the method
-	 * @param method method name
-	 * @param args list of arguments
-	 * @return the result of the invoked method
-	 * @throws NoSuchMethodException if a matching method is not found
-	 * @throws IllegalAccessException if <code>method</code> is inaccessible
-	 * @throws InvocationTargetException if the invoked method throws an exception
-	 * @see Class#getMethod(String, Class[])
-	 * @see Method#invoke(Object, Object[])
-	 */
-	protected Object invoke(final Object obj, final String method, final Object[] args)
-		throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
-	{
-		final Class<?>[] c = new Class<?>[args.length];
-		for (int i = 0; i < c.length; ++i) {
-			c[i] = args[i].getClass();
-			if (c[i] == Integer.class)
-				c[i] = int.class;
+		catch (IOException | RuntimeException e) {
+			inst.close();
+			throw e;
 		}
-		try {
-			if (obj instanceof Class)
-				return ((Class<?>) obj).getMethod(method, c).invoke(null, args);
-			return obj.getClass().getMethod(method, c).invoke(obj, args);
-		}
-		catch (final IllegalArgumentException e) {
-			throw new IllegalArgumentException("illegal argument on invoking "
-					+ obj.getClass().getName() + "." + method + ": " + e.getMessage());
-		}
+		logger.debug("serial port setup: {}", inst);
+		return inst;
 	}
 }
