@@ -38,8 +38,7 @@ package tuwien.auto.calimero;
 
 /**
  * The root checked exception type used in the Calimero 2 library.
- * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public class KNXException extends Exception
@@ -49,25 +48,24 @@ public class KNXException extends Exception
 	/**
 	 * Constructs a new <code>KNXException</code> without a detail message.
 	 */
-	public KNXException()
-	{}
+	public KNXException() {}
 
 	/**
 	 * Constructs a new <code>KNXException</code> with the specified detail message.
 	 * <p>
-	 * 
+	 *
 	 * @param s the detail message
 	 */
 	public KNXException(final String s)
 	{
 		super(s);
 	}
-	
+
 	/**
 	 * Constructs a new <code>KNXException</code> with the specified detail message and
 	 * cause.
 	 * <p>
-	 * 
+	 *
 	 * @param s the detail message
 	 * @param cause the cause in form of a throwable object, can be <code>null</code>
 	 */

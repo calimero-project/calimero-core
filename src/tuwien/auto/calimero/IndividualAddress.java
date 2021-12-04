@@ -46,7 +46,7 @@ import tuwien.auto.calimero.xml.XmlReader;
  * <i>device</i>. The address structure consists of a 16 bit address, consisting of
  * (starting from the most significant bit): area (4 bits), line (4 bits), and device (8
  * bits). The individual address KNX notation follows <i>area.line.device</i>, with the
- * required separator of type '.'.<br>
+ * required separator of type '.'.
  * <br>
  * The combined address levels <i>area</i> and <i>line</i> are referred to as subnetwork
  * address, i.e., and described by the higher 8 bits of the address value.<br>
