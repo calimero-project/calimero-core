@@ -505,8 +505,15 @@ public final class DataUnitBuilder
 		final int len = s.length();
 		final byte[] data = new byte[len / 2];
 		for (int i = 0; i < len; i += 2)
-			data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
+			data[i / 2] = (byte) ((digit(s.charAt(i)) << 4) + digit(s.charAt(i + 1)));
 		return data;
+	}
+
+	private static int digit(final char c) {
+		final int digit = Character.digit(c, 16);
+		if (digit == -1)
+			throw new KNXIllegalArgumentException("invalid hex char '" + c + "'");
+		return digit;
 	}
 
 	public static final class Builder {
