@@ -72,6 +72,52 @@ public class GroupAddress extends KNXAddress
 	private static volatile Presentation style = Presentation.ThreeLevelStyle;
 
 	/**
+	 * Returns a new KNX group address using a three-level address representation.
+	 *
+	 * @param mainGroup main group, range 0 &le; value &le; 0x1F
+	 * @param middleGroup middle group, range 0 &le; value &le; 0x7
+	 * @param subGroup sub group, range 0 &le; value &le; 0xFF
+	 * @return new KNX group address
+	 */
+	public static GroupAddress threeLevel(final int mainGroup, final int middleGroup, final int subGroup) {
+		return new GroupAddress(mainGroup, middleGroup, subGroup);
+	}
+
+	/**
+	 * Returns a new KNX group address using a two-level address representation.
+	 *
+	 * @param mainGroup main group, range 0 &le; value &le; 0x1F
+	 * @param subGroup sub group, range 0 &le; value &le; 0x7FF
+	 * @return new KNX group address
+	 */
+	public static GroupAddress twoLevel(final int mainGroup, final int subGroup) {
+		return new GroupAddress(mainGroup, subGroup);
+	}
+
+	/**
+	 * Returns a new KNX group address using a free-style address representation.
+	 *
+	 * @param address the address value in the range 0 &le; value &le; 0xFFFF
+	 * @return new KNX group address
+	 */
+	public static GroupAddress freeStyle(final int address) {
+		return new GroupAddress(address);
+	}
+
+	/**
+	 * Returns a new KNX group address from a string <code>address</code>. The address string can use either
+	 * presentation style, i.e., a 2-level, 3-level, or free-style group address. The separator between levels is '/'.
+	 * Examples are "2/1/2" for a 3-level address, or "4354" for a free-style or raw address.
+	 *
+	 * @param address the group address
+	 * @return new KNX group address
+	 * @throws KNXFormatException on wrong address syntax or group address values out of range
+	 */
+	public static GroupAddress from(final String address) throws KNXFormatException {
+		return new GroupAddress(address);
+	}
+
+	/**
 	 * Creates a KNX group address from a raw (or free-style) 16 Bit address value.
 	 *
 	 * @param address the address value in the range 0 &le; value &le; 0xFFFF
