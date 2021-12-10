@@ -200,10 +200,10 @@ public class SerialComAdapter implements SerialCom
 	@Override
 	public void setSerialPortParams(final int baudrate, final int databits, final StopBits stopbits, final Parity parity)
 			throws IOException {
-		setBaudRate(baudrate);
+		setControl(BAUDRATE, baudrate);
 		setControl(DATABITS, 8);
 		setControl(STOPBITS, stopbits.value());
-		setParity(parity.value());
+		setControl(PARITY, parity.value());
 	}
 
 	@Override
@@ -215,55 +215,9 @@ public class SerialComAdapter implements SerialCom
 
 	native Timeouts getTimeouts() throws IOException;
 
-	public final void setBaudRate(final int baudrate)
-	{
-		try {
-			setControl(BAUDRATE, baudrate);
-		}
-		catch (final IOException e) {
-			logger.error("set baudrate failed", e);
-		}
-	}
-
 	@Override
-	public int baudRate() {
-		return getBaudRate();
-	}
-
-	public final int getBaudRate()
-	{
-		try {
-			return getControl(BAUDRATE);
-		}
-		catch (final IOException e) {
-			logger.error("get baudrate failed", e);
-		}
-		return 0;
-	}
-
-	// will only set a supported parity, check result with getParity()
-	// return previous parity mode
-	final int setParity(final int parity)
-	{
-		try {
-			return setControl(PARITY, parity);
-		}
-		catch (final IOException e) {
-			logger.error("set parity failed", e);
-		}
-		return 0;
-	}
-
-	// returns 0 if getting parity failed
-	final int getParity()
-	{
-		try {
-			return getControl(PARITY);
-		}
-		catch (final IOException e) {
-			logger.error("get parity failed", e);
-		}
-		return 0;
+	public int baudRate() throws IOException {
+		return getControl(BAUDRATE);
 	}
 
 	// clear communication error and get device status
@@ -318,7 +272,7 @@ public class SerialComAdapter implements SerialCom
 		if (fd == INVALID_HANDLE)
 			return "closed";
 		try {
-			return "baudrate " + getBaudRate() + ", even parity, " + getControl(SerialComAdapter.DATABITS)
+			return "baudrate " + baudRate() + ", even parity, " + getControl(SerialComAdapter.DATABITS)
 					+ " databits, " + getControl(SerialComAdapter.STOPBITS) + " stopbits, timeouts: " + getTimeouts();
 		}
 		catch (final IOException e) {

@@ -71,7 +71,7 @@ public interface SerialCom extends AutoCloseable {
 
 	void setFlowControlMode(FlowControl mode) throws IOException;
 
-	int baudRate();
+	int baudRate() throws IOException;
 
 	InputStream inputStream();
 

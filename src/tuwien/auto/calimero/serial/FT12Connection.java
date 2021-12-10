@@ -251,7 +251,12 @@ public class FT12Connection implements Connection<byte[]>
 
 		adapter = connection;
 		port = portId;
-		exchangeTimeout = exchangeTimeout(adapter.baudRate());
+		try {
+			exchangeTimeout = exchangeTimeout(adapter.baudRate());
+		}
+		catch (final IOException e) {
+			throw new KNXException("calculating exchange timeout", e);
+		}
 		this.cemi = cemi;
 		is = adapter.inputStream();
 		os = adapter.outputStream();
@@ -340,8 +345,9 @@ public class FT12Connection implements Connection<byte[]>
 	 * After closing the connection, the returned baud rate is 0 by default.
 	 *
 	 * @return baud rate in Bit/s
+	 * @throws IOException
 	 */
-	final int getBaudRate()
+	final int getBaudRate() throws IOException
 	{
 		return adapter.baudRate();
 	}
