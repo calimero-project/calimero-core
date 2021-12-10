@@ -207,7 +207,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 		final KNXMediumSettings settings) throws KNXException
 	{
 		try {
-			return newRoutingLink(NetworkInterface.getByInetAddress(localEP), mcGroup, settings);
+			return newRoutingLink(netif(localEP), mcGroup, settings);
 		}
 		catch (final SocketException e) {
 			throw new KNXException("error getting network interface: " + e.getMessage());
@@ -510,5 +510,12 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 		if (p > 0)
 			return host + ":" + p;
 		return host;
+	}
+
+	private static NetworkInterface netif(final InetAddress addr) throws SocketException, KNXException {
+		final var netif = NetworkInterface.getByInetAddress(addr);
+		if (netif == null && !addr.isAnyLocalAddress())
+			throw new KNXException("no network interface with the specified IP address " + addr.getHostAddress());
+		return netif;
 	}
 }
