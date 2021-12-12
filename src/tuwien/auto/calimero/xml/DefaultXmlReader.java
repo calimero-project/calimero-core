@@ -66,6 +66,8 @@ class DefaultXmlReader implements XmlReader
 	private String elemText;
 	private boolean emptyTag;
 
+	private String currentNamespace;
+
 	private final Stack<String> openElems = new Stack<>();
 	private int event;
 	private int line;
@@ -263,6 +265,9 @@ class DefaultXmlReader implements XmlReader
 					value = value.substring(0, end);
 				attributeName.add(att);
 				attributeValue.add(References.replace(value, false));
+				if (att.equals("xmlns")) {
+					currentNamespace = value;
+				}
 			}
 			final int i = s.indexOf(quote ? s.charAt(0) : ' ', 1);
 			s = i == -1 ? "" : s.substring(i + 1);
@@ -515,7 +520,7 @@ class DefaultXmlReader implements XmlReader
 	@Override
 	public String getNamespaceURI()
 	{
-		return null;
+		return currentNamespace;
 	}
 
 	@Override
