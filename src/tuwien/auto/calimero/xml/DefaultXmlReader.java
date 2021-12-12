@@ -114,6 +114,12 @@ class DefaultXmlReader implements XmlReader
 			if (line == 0)
 				line = 1;
 
+			if (emptyTag) {
+				emptyTag = false;
+				event = XmlReader.END_ELEMENT;
+				return event;
+			}
+
 			read('<');
 			String str = read('>');
 			// if no comment and no closing tag
