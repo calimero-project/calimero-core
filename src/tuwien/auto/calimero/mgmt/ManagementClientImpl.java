@@ -1135,8 +1135,10 @@ public class ManagementClientImpl implements ManagementClient
 				if (apdu[i] != asdu[i - 1])
 					throw new KNXRemoteException("verify failed (erroneous memory data)");
 		}
-		else
-			tl.sendData(dst, priority, send);
+		else {
+			final int noResponseSvc = 0;
+			send(dst, priority, send, noResponseSvc);
+		}
 	}
 
 	static int crc16Ccitt(final byte[] input) {
