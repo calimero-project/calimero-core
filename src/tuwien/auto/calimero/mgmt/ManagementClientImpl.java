@@ -592,7 +592,7 @@ public class ManagementClientImpl implements ManagementClient
 	{
 		if (descType < 0 || descType > 63)
 			throw new KNXIllegalArgumentException("descriptor type out of range [0..63]");
-		final byte[] apdu = sendWait2(dst, priority, DataUnitBuilder.createLengthOptimizedAPDU(
+		final byte[] apdu = sendWait(dst, priority, DataUnitBuilder.createLengthOptimizedAPDU(
 				DEVICE_DESC_READ, new byte[] { (byte) descType }), DEVICE_DESC_RESPONSE, 2, 14);
 		final byte[] dd = new byte[apdu.length - 2];
 		for (int i = 0; i < apdu.length - 2; ++i)
@@ -627,7 +627,7 @@ public class ManagementClientImpl implements ManagementClient
 		else {
 			final byte[] sdu = new byte[] { 0x01, (byte) eraseCode.code(), (byte) channel, };
 			final byte[] send = DataUnitBuilder.createLengthOptimizedAPDU(RESTART, sdu);
-			final byte[] apdu = sendWait2(dst, priority, send, RESTART, 3, 3);
+			final byte[] apdu = sendWait(dst, priority, send, RESTART, 3, 3);
 			// check we get a restart response
 			if ((apdu[1] & 0x32) == 0)
 				throw new KNXInvalidResponseException("restart response bit not set");
@@ -756,7 +756,7 @@ public class ManagementClientImpl implements ManagementClient
 		for (int i = 0; i < data.length; ++i)
 			asdu[4 + i] = data[i];
 		final byte[] send = createAPDU(PROPERTY_WRITE, asdu);
-		final byte[] apdu = sendWait2(dst, priority, send, PROPERTY_RESPONSE, 4, maxAsduLength(dst));
+		final byte[] apdu = sendWait(dst, priority, send, PROPERTY_RESPONSE, 4, maxAsduLength(dst));
 		// if number of elements is 0, remote app had problems
 		final int elems = (apdu[4] & 0xFF) >> 4;
 		if (elems == 0)
@@ -886,7 +886,7 @@ public class ManagementClientImpl implements ManagementClient
 				.putShort(((objInstance & 0xf) << 12) | propertyId).putShort((propDescType << 12) | pidx).build();
 
 		for (int i = 0; i < 2; i++) {
-			final byte[] apdu = sendWait2(dst, priority, send, PropertyExtDescResponse, 15, 15);
+			final byte[] apdu = sendWait(dst, priority, send, PropertyExtDescResponse, 15, 15);
 			final int rcvPropertyId = (((apdu[5] & 0xf) << 8) | (apdu[6] & 0xff));
 			final int rcvPropDescType = (apdu[7] >> 4) & 0xf;
 			final int rcvPropertyIdx = (((apdu[7] & 0xf) << 8) | (apdu[8] & 0xff));
@@ -957,7 +957,7 @@ public class ManagementClientImpl implements ManagementClient
 			(byte) objIndex, (byte) propertyId, (byte) (propertyId == 0 ? propIndex : 0) });
 
 		for (int i = 0; i < 2; i++) {
-			final byte[] apdu = sendWait2(dst, priority, send, PROPERTY_DESC_RESPONSE, 7, 7);
+			final byte[] apdu = sendWait(dst, priority, send, PROPERTY_DESC_RESPONSE, 7, 7);
 			// make sure the response contains the requested description
 			final boolean oiOk = objIndex == (apdu[2] & 0xff);
 			final boolean pidOk = propertyId == 0 || propertyId == (apdu[3] & 0xff);
@@ -1279,15 +1279,6 @@ public class ManagementClientImpl implements ManagementClient
 	}
 
 	private byte[] sendWait(final Destination d, final Priority p,
-		final byte[] apdu, final int response, final int minAsduLen, final int maxAsduLen)
-		throws KNXDisconnectException, KNXTimeoutException, KNXInvalidResponseException,
-		KNXLinkClosedException, InterruptedException
-	{
-		final long start = send(d, p, apdu, response);
-		return waitForResponse(d.getAddress(), response, minAsduLen, maxAsduLen, start, responseTimeout);
-	}
-
-	private byte[] sendWait2(final Destination d, final Priority p,
 		final byte[] apdu, final int response, final int minAsduLen, final int maxAsduLen)
 		throws KNXDisconnectException, KNXTimeoutException, KNXInvalidResponseException,
 		KNXLinkClosedException, InterruptedException
