@@ -114,7 +114,7 @@ public class LibraryAdapter
 			}
 			catch (final ServiceConfigurationError e) {
 				final var ex = e.getCause() != null ? e.getCause() : e;
-				logger.debug("skip service provider {}", provider.type().getName(), ex);
+				logger.debug("skip service provider {}: {}", provider.type().getName(), ex.getMessage());
 			}
 			catch (final Throwable e) {
 				t = e;
