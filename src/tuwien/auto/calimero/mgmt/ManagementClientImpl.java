@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -86,9 +86,9 @@ import tuwien.auto.calimero.secure.SecurityControl;
 import tuwien.auto.calimero.secure.SecurityControl.DataSecurity;
 
 /**
- * Implementation of management client.
+ * Implementation of the management client.
  * <p>
- * Uses {@link TransportLayer} internally for communication.
+ * Uses {@link TransportLayer} internally for communication, and {@link SecureManagement} for KNX Secure if required.
  * All management service methods invoked after a detach of the network link are allowed
  * to throw {@link IllegalStateException}.
  *
@@ -245,11 +245,15 @@ public class ManagementClientImpl implements ManagementClient
 
 	protected ManagementClientImpl(final KNXNetworkLink link, final TransportLayer transportLayer)
 	{
-		tl = transportLayer;
+		this(link, new SecureManagement(transportLayer, Security.defaultInstallation().deviceToolKeys()));
+	}
+
+	protected ManagementClientImpl(final KNXNetworkLink link, final SecureManagement secureManagement) {
+		tl = secureManagement.transportLayer();
 		logger = LogService.getLogger("calimero.mgmt.MC " + link.getName());
 		src = link.getKNXMedium().getDeviceAddress();
 		listeners = new EventListeners<>(logger);
-		sal = new SecureManagement(tl, Security.defaultInstallation().deviceToolKeys());
+		sal = secureManagement;
 		sal.addListener(tlListener);
 	}
 
