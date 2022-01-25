@@ -1,6 +1,6 @@
 /*
     Calimero - A library for KNX network access
-    Copyright (c) 2019, 2021 B. Malinowsky
+    Copyright (c) 2019, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -180,7 +180,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 	};
 
 
-	public final class SalService {
+	public static final class SalService {
 		private final SecurityControl ctrl;
 		private final byte[] apdu;
 
