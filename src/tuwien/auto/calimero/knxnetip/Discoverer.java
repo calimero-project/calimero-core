@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -94,24 +94,23 @@ import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.log.LogService;
 
 /**
- * Does KNXnet/IP discovery and retrieval of self description from other devices.
+ * Does KNXnet/IP discovery and retrieval of self description from other KNX IP devices.
  * <p>
  * Both searches for server discovery and description requests can be run in blocking mode
- * or asynchronous in the background.<br>
- * This discoverer supports networks with routers doing network address translation.<br>
- * Requests for self description are sent using the UDP transport protocol.<br>
+ * or asynchronous in the background.
+ * Search or self-description requests are sent using UDP or TCP, depending on the created discoverer.<p>
+ * This discoverer supports networks with routers doing network address translation (NAT).
  * Due to protocol limitations, only IPv4 addresses are supported when network address
  * translation is <b>not</b> used. With NAT enabled, IPv6 addresses can be used as well.
- * <p>
  * A note on (not) using network address translation (NAT):<br>
  * If discovery or description attempts fail indicating a timeout limit, it might be
  * possible that NAT is used on routers while traversing the network, so the solution
- * would be to enable the use of NAT.<br>
+ * would be to enable the use of NAT.
  * On the other hand, if NAT is used but not supported by the answering device, no
  * response is received and a timeout will occur nevertheless.
  * <p>
- * For discovery searches, an additional option for choosing IP multicast over IP unicast
- * is available in {@link Discoverer#Discoverer(InetAddress, int, boolean, boolean)}. This
+ * For discovery searches, the default timeout is 10 seconds. An additional option for choosing IP multicast over IP
+ * unicast is available in {@link Discoverer#Discoverer(InetAddress, int, boolean, boolean)}. This
  * allows to select, whether search responses by answering servers are sent via multicast
  * and received by the local multicast socket, or if responses are sent via unicast using
  * the local host and port as address for the reply. Using multicast response is of
@@ -353,6 +352,12 @@ public class Discoverer
 		this.session = session;
 	}
 
+	/**
+	 * Sets the timeout used for subsequent KNXnet/IP discovery searches; the default timeout is 10 seconds.
+	 *
+	 * @param timeout timeout &gt; 0
+	 * @return this discoverer
+	 */
 	public Discoverer timeout(final Duration timeout) {
 		if (timeout.isNegative() || timeout.isZero())
 			throw new KNXIllegalArgumentException("timeout <= 0");
