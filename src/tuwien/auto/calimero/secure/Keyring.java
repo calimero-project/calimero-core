@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2021 B. Malinowsky
+    Copyright (c) 2019, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -256,6 +256,7 @@ public final class Keyring {
 
 	private byte[] signature;
 
+	private volatile String project;
 	private volatile Backbone backbone;
 	// TODO clarify the use of optional field 'host' for interface types Backbone/USB
 	// this mapping works for tunneling interfaces: host -> Interface
@@ -301,7 +302,7 @@ public final class Keyring {
 			if (!"Keyring".equals(reader.getLocalName()))
 				throw new KNXMLException("keyring '" + keyringUri + "' requires 'Keyring' element");
 
-			final var project = reader.getAttributeValue(null, "Project");
+			project = reader.getAttributeValue(null, "Project");
 			final var createdBy = reader.getAttributeValue(null, "CreatedBy");
 			final var created = reader.getAttributeValue(null, "Created");
 			logger.debug("read keyring for project '{}', created by {} on {}", project, createdBy, created);
@@ -522,6 +523,12 @@ public final class Keyring {
 		finally {
 			Arrays.fill(keyringPwdHash, (byte) 0);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return String.format("'%s' backbone: %s, interfaces: %s, group addresses: %d, devices: %d", project, backbone,
+				interfaces.keySet(), groups.size(), devices.size());
 	}
 
 	private static final long DefaultMulticast = unsigned(new byte[] { (byte) 224, 0, 23, 12 });

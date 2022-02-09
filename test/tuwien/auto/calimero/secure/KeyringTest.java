@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2021 B. Malinowsky
+    Copyright (c) 2019, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -225,6 +225,12 @@ class KeyringTest {
 		bb1 = new Keyring.Backbone(multicastGroup(), groupKey(), Duration.ofSeconds(1));
 		bb2 = new Keyring.Backbone(multicastGroup(), groupKey(), Duration.ofSeconds(2));
 		assertNotEquals(bb1, bb2);
+	}
+
+	@Test
+	void keyringToString() {
+		final var keyring = Keyring.load(keyringUri);
+		System.out.println(keyring);
 	}
 
 	private static InetAddress multicastGroup() throws UnknownHostException {
