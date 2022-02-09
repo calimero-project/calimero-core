@@ -228,6 +228,20 @@ class KeyringTest {
 	}
 
 	@Test
+	void keyringEquals() {
+		final var keyring1 = Keyring.load(keyringUri);
+		final var keyring2 = Keyring.load(keyringUri);
+		assertEquals(keyring1, keyring2);
+	}
+
+	@Test
+	void keyringSameHashCode() {
+		final var keyring1 = Keyring.load(keyringUri);
+		final var keyring2 = Keyring.load(keyringUri);
+		assertEquals(keyring1.hashCode(), keyring2.hashCode());
+	}
+
+	@Test
 	void keyringToString() {
 		final var keyring = Keyring.load(keyringUri);
 		System.out.println(keyring);

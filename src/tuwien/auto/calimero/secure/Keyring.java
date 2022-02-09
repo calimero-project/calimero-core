@@ -148,6 +148,28 @@ public final class Keyring {
 		public Map<GroupAddress, Set<IndividualAddress>> groups() { return groups; }
 
 		@Override
+		public boolean equals(final Object o) {
+			if (this == o)
+				return true;
+			if (!(o instanceof Interface))
+				return false;
+			final var other = (Interface) o;
+			return Objects.equals(addr, other.addr) && Arrays.equals(auth, other.auth)
+					&& Objects.equals(groups, other.groups) && Arrays.equals(pwd, other.pwd)
+					&& Objects.equals(type, other.type) && user == other.user;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + Arrays.hashCode(auth);
+			result = prime * result + Arrays.hashCode(pwd);
+			result = prime * result + Objects.hash(addr, groups, type, user);
+			return result;
+		}
+
+		@Override
 		public String toString() {
 			return type + " interface " + addr + ", user " + user + ", groups " + groups.keySet();
 		}
@@ -198,6 +220,28 @@ public final class Keyring {
 		public long sequenceNumber() { return sequence; }
 
 		@Override
+		public boolean equals(final Object o) {
+			if (this == o)
+				return true;
+			if (!(o instanceof Device))
+				return false;
+			final var other = (Device) o;
+			return Objects.equals(addr, other.addr) && Arrays.equals(auth, other.auth) && Arrays.equals(pwd, other.pwd)
+					&& sequence == other.sequence && Arrays.equals(toolkey, other.toolkey);
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + Arrays.hashCode(auth);
+			result = prime * result + Arrays.hashCode(pwd);
+			result = prime * result + Arrays.hashCode(toolkey);
+			result = prime * result + Objects.hash(addr, sequence);
+			return result;
+		}
+
+		@Override
 		public String toString() { return "device " + addr + " (seq " + sequence + ")"; }
 	}
 
@@ -219,18 +263,18 @@ public final class Keyring {
 		public Duration latencyTolerance() { return latency; }
 
 		@Override
-		public int hashCode() { return Objects.hash(mcGroup, Arrays.hashCode(groupKey), latency); }
-
-		@Override
-		public boolean equals(final Object obj) {
-			if (this == obj)
+		public boolean equals(final Object o) {
+			if (this == o)
 				return true;
-			if (!(obj instanceof Backbone))
+			if (!(o instanceof Backbone))
 				return false;
-			final Backbone other = (Backbone) obj;
+			final var other = (Backbone) o;
 			return Objects.equals(mcGroup, other.mcGroup) && Objects.equals(latency, other.latency)
 					&& Arrays.equals(groupKey, other.groupKey);
 		}
+
+		@Override
+		public int hashCode() { return Objects.hash(mcGroup, Arrays.hashCode(groupKey), latency); }
 
 		@Override
 		public String toString() {
@@ -526,9 +570,46 @@ public final class Keyring {
 	}
 
 	@Override
+	public boolean equals(final Object o) {
+		if (this == o)
+			return true;
+		if (!(o instanceof Keyring))
+			return false;
+		final var other = (Keyring) o;
+
+		if (Arrays.equals(signature, other.signature))
+			return true;
+
+		return project.equals(other.project) && backbone.equals(other.backbone) && interfaces.equals(other.interfaces)
+				&& groupsEquals(other.groups) && devices.equals(other.devices);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(project, backbone, interfaces, groupsHashCode(), devices);
+	}
+
+	@Override
 	public String toString() {
 		return String.format("'%s' backbone: %s, interfaces: %s, group addresses: %d, devices: %d", project, backbone,
 				interfaces.keySet(), groups.size(), devices.size());
+	}
+
+	// need this because groups map values are of type byte[]
+	private boolean groupsEquals(final Map<GroupAddress, byte[]> other) {
+		return (groups.size() == other.size()
+				&& groups.entrySet().stream().allMatch(e -> Arrays.equals(e.getValue(), other.get(e.getKey()))));
+	}
+
+	// need this because groups map values are of type byte[]
+	private int groupsHashCode() {
+		final int prime = 31;
+		int result = 1;
+		for (final var e : groups.entrySet()) {
+			result = prime * result + e.getKey().hashCode();
+			result = prime * result + Arrays.hashCode(e.getValue());
+		}
+		return result;
 	}
 
 	private static final long DefaultMulticast = unsigned(new byte[] { (byte) 224, 0, 23, 12 });
