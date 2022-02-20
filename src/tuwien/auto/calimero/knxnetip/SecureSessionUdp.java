@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2021 B. Malinowsky
+    Copyright (c) 2018, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -61,6 +61,7 @@ import org.slf4j.LoggerFactory;
 
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.SerialNumber;
 import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
@@ -169,7 +170,7 @@ final class SecureSessionUdp {
 		final InetSocketAddress src) throws KNXFormatException {
 
 		if (h.getServiceType() != SecureConnection.SecureSessionResponse)
-			throw new IllegalArgumentException("no secure channel response");
+			throw new KNXIllegalArgumentException("no secure channel response");
 		if (h.getTotalLength() != 0x38 && h.getTotalLength() != 0x08)
 			throw new KNXFormatException("invalid length " + data.length + " for a secure channel response");
 

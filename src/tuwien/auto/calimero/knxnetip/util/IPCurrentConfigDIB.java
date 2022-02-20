@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2019 B. Malinowsky
+    Copyright (c) 2015, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -227,7 +227,7 @@ public final class IPCurrentConfigDIB extends DIB
 			return (Inet4Address) InetAddress.getByAddress(addr);
 		}
 		catch (final UnknownHostException e) {
-			throw new IllegalArgumentException("illegal length of IPv4 address", e);
+			throw new KNXIllegalArgumentException("illegal length of IPv4 address", e);
 		}
 	}
 }

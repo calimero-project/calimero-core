@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -268,7 +268,7 @@ public class KNXnetIPHeader
 		if (version < 0x10 || version > 0xff)
 			throw new KNXIllegalArgumentException("version out of range [0x10..0xFF]");
 		if (serviceLength < 0)
-			throw new IllegalArgumentException("negative length of message body");
+			throw new KNXIllegalArgumentException("negative length of message body");
 		headersize = HEADER_SIZE_10;
 		service = serviceType;
 		this.version = version;

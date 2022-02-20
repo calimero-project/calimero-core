@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2021 B. Malinowsky
+    Copyright (c) 2019, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,6 +38,8 @@ package tuwien.auto.calimero.secure;
 
 import java.util.Objects;
 
+import tuwien.auto.calimero.KNXIllegalArgumentException;
+
 public final class SecurityControl {
 	public enum DataSecurity {
 		None, Auth, AuthConf;
@@ -57,7 +59,7 @@ public final class SecurityControl {
 	public static SecurityControl of(final DataSecurity security, final boolean toolAccess) {
 		if (security == DataSecurity.None) {
 			if (toolAccess)
-				throw new IllegalArgumentException("tool access requires security");
+				throw new KNXIllegalArgumentException("tool access requires security");
 			return Plain;
 		}
 		return new SecurityControl(security, toolAccess, false);

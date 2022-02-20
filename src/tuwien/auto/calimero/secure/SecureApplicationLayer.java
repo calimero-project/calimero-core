@@ -817,7 +817,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 			case SeqNoError: return seqErrors.get();
 			case CryptoError: return cryptoErrors.get();
 			case AccessAndRoleError: return accessAndRoleErrors.get();
-			default: throw new IllegalArgumentException("failure counter error type " + errorType);
+			default: throw new KNXIllegalArgumentException("failure counter error type " + errorType);
 		}
 	}
 
@@ -825,7 +825,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 			final IndividualAddress src, final KNXAddress dst, final int ctrlExtended, final long seqNo) {
 		final AtomicInteger[] counters = { null, scfErrors, seqErrors, cryptoErrors, accessAndRoleErrors };
 		if (errorType > 4)
-			throw new IllegalArgumentException("failure counter error type " + errorType);
+			throw new KNXIllegalArgumentException("failure counter error type " + errorType);
 		counters[errorType].updateAndGet(updateFunction);
 	}
 

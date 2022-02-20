@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2021 B. Malinowsky
+    Copyright (c) 2019, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -506,7 +506,7 @@ public final class BaosService implements ServiceType {
 	// TODO do timers have to be ordered in the frame (specifically, for sequences of delete/set timer)
 	public static BaosService setTimer(final Timer... timers) {
 		if (timers.length == 0)
-			throw new IllegalArgumentException("no timer supplied");
+			throw new KNXIllegalArgumentException("no timer supplied");
 		return new BaosService(SetTimer, timers[0].id(), timers.length, timerByteArray(timers));
 	}
 

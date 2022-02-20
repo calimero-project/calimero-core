@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2021 B. Malinowsky
+    Copyright (c) 2019, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -512,7 +512,7 @@ public final class TcpConnection implements Closeable {
 			final InetSocketAddress remote) throws KNXFormatException {
 
 			if (h.getServiceType() != SecureSessionResponse)
-				throw new IllegalArgumentException("no secure channel response");
+				throw new KNXIllegalArgumentException("no secure channel response");
 			if (h.getTotalLength() != 0x38)
 				throw new KNXFormatException("invalid length " + data.length + " for a secure session response");
 
