@@ -71,7 +71,6 @@ import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 
-import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -79,7 +78,6 @@ import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.KnxRuntimeException;
 import tuwien.auto.calimero.internal.UdpSocketLooper;
-import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
 import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.knxnetip.servicetype.DescriptionRequest;
 import tuwien.auto.calimero.knxnetip.servicetype.DescriptionResponse;
@@ -87,10 +85,8 @@ import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchRequest;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
-import tuwien.auto.calimero.knxnetip.util.CRI;
 import tuwien.auto.calimero.knxnetip.util.DIB;
 import tuwien.auto.calimero.knxnetip.util.Srp;
-import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.log.LogService;
 
 /**
@@ -162,12 +158,8 @@ public class Discoverer
 	// see also RFC 5135
 	private final boolean mcast;
 
-	// tcp unicast search
-	private TcpConnection connection;
-	private SecureSession session;
 
-
-	private volatile Duration timeout;
+	private volatile Duration timeout = Duration.ofSeconds(10);
 
 	private final List<ReceiverLoop> receivers = Collections.synchronizedList(new ArrayList<>());
 	private final List<Result<SearchResponse>> responses = Collections.synchronizedList(new ArrayList<>());
@@ -258,20 +250,20 @@ public class Discoverer
 	 * Returns a discoverer which uses the supplied TCP connection for discovery &amp; description requests.
 	 *
 	 * @param c the connection to use, ownership is not transferred to the discoverer
-	 * @return a discoverer
+	 * @return a {@link DiscovererTcp} instance
 	 */
 	public static Discoverer tcp(final TcpConnection c) {
-		return new Discoverer(c);
+		return new DiscovererTcp(c);
 	}
 
 	/**
 	 * Returns a discoverer which uses the supplied secure session for discovery &amp; description requests.
 	 *
 	 * @param session the secure session to use, ownership is not transferred to the discoverer
-	 * @return a discoverer
+	 * @return a {@link DiscovererTcp} instance
 	 */
 	public static Discoverer secure(final SecureSession session) {
-		return new Discoverer(session);
+		return new DiscovererTcp(session);
 	}
 
 	/**
@@ -335,21 +327,11 @@ public class Discoverer
 			throw new KNXIllegalArgumentException("IPv4 address required if NAT is not used (supplied " + host.getHostAddress() + ")");
 	}
 
-	private Discoverer(final TcpConnection c) {
+	Discoverer() {
 		host = null;
 		port = 0;
 		nat = false;
 		mcast = false;
-		this.connection = c;
-	}
-
-	private Discoverer(final SecureSession session) {
-		host = null;
-		port = 0;
-		nat = false;
-		mcast = false;
-		this.connection = session.connection();
-		this.session = session;
 	}
 
 	/**
@@ -370,18 +352,12 @@ public class Discoverer
 	}
 
 	public CompletableFuture<List<Result<SearchResponse>>> search(final Srp... searchParameters) {
-		if (connection != null)
-			return tcpSearch(searchParameters).thenApply(List::of);
-
-		return searchAsync(timeoutOrDefault(), searchParameters);
+		return searchAsync(timeout(), searchParameters);
 	}
 
 	// extended unicast search to server control endpoint
 	public CompletableFuture<Result<SearchResponse>> search(final InetSocketAddress serverControlEndpoint,
 			final Srp... searchParameters) throws KNXException {
-
-		if (connection != null)
-			return tcpSearch(searchParameters);
 
 		final InetAddress addr = nat ? host : host != null ? host
 				: Net.onSameSubnet(serverControlEndpoint.getAddress()).orElseGet(Discoverer::localHost);
@@ -398,7 +374,7 @@ public class Discoverer
 
 			final byte[] request = PacketHelper.toPacket(new SearchRequest(res, searchParameters));
 			dc.send(ByteBuffer.wrap(request), serverControlEndpoint);
-			return receiveAsync(dc, serverControlEndpoint, timeoutOrDefault());
+			return receiveAsync(dc, serverControlEndpoint, timeout());
 		}
 		catch (final IOException e) {
 			throw new KNXException("search request to " + hostPort(serverControlEndpoint) + " failed on " + addr, e);
@@ -414,93 +390,7 @@ public class Discoverer
 		}
 	}
 
-	private final class Tunnel<T> extends KNXnetIPTunnel {
-		private final CompletableFuture<Result<T>> cf;
-
-		Tunnel(final TunnelingLayer knxLayer, final TcpConnection connection,
-				final IndividualAddress tunnelingAddress, final CompletableFuture<Result<T>> cf) throws KNXException,
-				InterruptedException {
-			super(knxLayer, connection, tunnelingAddress);
-			this.cf = cf;
-		}
-
-		@Override
-		protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset,
-				final InetAddress src, final int port) throws KNXFormatException, IOException {
-
-			final int svc = h.getServiceType();
-			if (svc == KNXnetIPHeader.SearchResponse || svc == KNXnetIPHeader.DESCRIPTION_RES) {
-				final var sr = svc == KNXnetIPHeader.SearchResponse ? SearchResponse.from(h, data, offset)
-						: new DescriptionResponse(data, offset, h.getTotalLength() - h.getStructLength());
-				final var result = new Result<>(sr,
-						NetworkInterface.getByInetAddress(connection.localEndpoint().getAddress()),
-						connection.localEndpoint(), connection.server());
-				complete(result);
-				return true;
-			}
-			return super.handleServiceType(h, data, offset, src, port);
-		}
-
-		@SuppressWarnings("unchecked")
-		private void complete(final Result<?> result) { cf.complete((Result<T>) result); }
-
-		@Override
-		public String name() {
-			final String lock = new String(Character.toChars(0x1F512));
-			final String secure = session != null ? (" " + lock) : "";
-			return "KNX IP" + secure + " Tunneling " + hostPort(ctrlEndpt);
-		}
-
-		@Override
-		protected void connect(final TcpConnection c, final CRI cri) throws KNXException, InterruptedException {
-			if (session == null) {
-				super.connect(c, cri);
-				return;
-			}
-
-			session.ensureOpen();
-			session.registerConnectRequest(this);
-			try {
-				super.connect(c.localEndpoint(), c.server(), cri, false);
-			}
-			finally {
-				session.unregisterConnectRequest(this);
-			}
-		}
-
-		void send(final byte[] packet) throws IOException {
-			send(packet, new InetSocketAddress(0));
-		}
-
-		@Override
-		protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
-			var send = packet;
-			if (session != null)
-				send = SecureConnection.newSecurePacket(session.id(), session.nextSendSeq(), session.serialNumber(), 0,
-						packet, session.secretKey);
-			super.send(send, dst);
-		}
-	}
-
-	private CompletableFuture<Result<SearchResponse>> tcpSearch(final Srp... searchParameters) {
-		final SearchRequest req = SearchRequest.newTcpRequest(searchParameters);
-		return tcpSend(PacketHelper.toPacket(req));
-	}
-
-	private <T> CompletableFuture<Result<T>> tcpSend(final byte[] packet) {
-		try {
-			final var cf = new CompletableFuture<Result<T>>();
-			final var tunnel = new Tunnel<>(TunnelingLayer.LinkLayer, connection, KNXMediumSettings.BackboneRouter, cf);
-			tunnel.send(packet);
-			cf.whenCompleteAsync((_1, _2) -> tunnel.close());
-			return cf.orTimeout(timeoutOrDefault().toMillis(), TimeUnit.MILLISECONDS);
-		}
-		catch (KNXException | IOException | InterruptedException e) {
-			return CompletableFuture.failedFuture(e);
-		}
-	}
-
-	private Duration timeoutOrDefault() { return timeout != null ? timeout : Duration.ofSeconds(10); }
+	Duration timeout() { return timeout; }
 
 	/**
 	 * Starts a new search for KNXnet/IP discovery, the network interface can be
@@ -742,21 +632,6 @@ public class Discoverer
 		if (timeout <= 0 || timeout >= Integer.MAX_VALUE / 1000)
 			throw new KNXIllegalArgumentException("timeout out of range");
 
-		if (connection != null)
-			try {
-				return tcpDescription().get();
-			}
-			catch (final InterruptedException e) {
-				Thread.currentThread().interrupt();
-				throw new KnxRuntimeException("interrupted");
-			}
-			catch (final ExecutionException e) {
-				final var cause = e.getCause();
-				if (cause instanceof KNXException)
-					throw (KNXException) cause;
-				throw new KNXException("waiting for description response", cause);
-			}
-
 		final var localhost = host(server.getAddress());
 		final var bind = new InetSocketAddress(nat ? null : Net.onSameSubnet(server.getAddress()).orElse(localhost),
 				port);
@@ -775,11 +650,6 @@ public class Discoverer
 			throw new KNXException("network failure on getting description from " + hostPort(server), e);
 		}
 		throw new KNXTimeoutException("timeout, no description response received from " + hostPort(server));
-	}
-
-	private CompletableFuture<Result<DescriptionResponse>> tcpDescription() {
-		final byte[] request = PacketHelper.toPacket(DescriptionRequest.tcpRequest());
-		return tcpSend(request);
 	}
 
 	/**
