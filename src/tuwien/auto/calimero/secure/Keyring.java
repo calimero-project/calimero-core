@@ -42,8 +42,10 @@ import static java.util.function.Predicate.not;
 import java.io.ByteArrayOutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
@@ -62,9 +64,8 @@ import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 import javax.crypto.Cipher;
-import javax.crypto.SecretKeyFactory;
+import javax.crypto.Mac;
 import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.slf4j.Logger;
@@ -691,19 +692,45 @@ public final class Keyring {
 	}
 
 	private static byte[] pbkdf2WithHmacSha256(final char[] password, final byte[] salt)
-		throws GeneralSecurityException {
+			throws GeneralSecurityException {
+		if (password.length == 0)
+			return new byte[0];
+
 		final int iterations = 65_536;
-		final int keyLength = 16 * 8;
-		final var keySpec = new PBEKeySpec(password, salt, iterations, keyLength);
-		try {
-			final var secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-//			logger.trace("using secret key provider {}", secretKeyFactory.getProvider());
-			final var secretKey = secretKeyFactory.generateSecret(keySpec);
-			return secretKey.getEncoded();
+		final int keyLength = 16;
+		return deriveKey(password, salt, iterations, keyLength);
+	}
+
+	private static byte[] deriveKey(final char[] pwd, final byte[] salt, final int iterations, final int size)
+			throws NoSuchAlgorithmException, InvalidKeyException {
+		final var mac = hmac("HmacSHA256", macKey(pwd));
+
+		mac.update(salt);
+		final byte[] blockIdx = new byte[] { 0, 0, 0, 1 };
+		byte[] input = mac.doFinal(blockIdx);
+		final byte[] output = new byte[size];
+		for (int i = 0; i < iterations; ++i) {
+			for (int s = 0; s < size; ++s)
+				output[s] ^= input[s];
+			input = mac.doFinal(input);
 		}
-		finally {
-			keySpec.clearPassword();
-		}
+		return output;
+	}
+
+	private static byte[] macKey(final char[] pwd) {
+		final var buffer = StandardCharsets.US_ASCII.encode(CharBuffer.wrap(pwd));
+		final int len = buffer.remaining();
+		final byte[] macKey = new byte[len];
+		buffer.get(macKey);
+		buffer.clear().put(new byte[len]);
+		return macKey;
+	}
+
+	private static Mac hmac(final String algorithm, final byte[] key)
+			throws NoSuchAlgorithmException, InvalidKeyException {
+		final var mac = Mac.getInstance(algorithm);
+		mac.init(new SecretKeySpec(key, algorithm));
+		return mac;
 	}
 
 	private static byte[] utf8Bytes(final String s) {
