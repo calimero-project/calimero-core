@@ -50,6 +50,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import tag.KnxnetIP;
+import tag.KnxnetIPSequential;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXTimeoutException;
@@ -125,6 +126,7 @@ class DiscovererTcpTests {
 	}
 
 	@Test
+	@KnxnetIPSequential
 	void searchInProgrammingMode() throws KNXException, InterruptedException, ExecutionException {
 		final InetSocketAddress server = Util.getServer();
 		final int pidProgMode = 54;
