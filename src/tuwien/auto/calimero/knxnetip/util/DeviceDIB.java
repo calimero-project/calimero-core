@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -130,7 +130,7 @@ public class DeviceDIB extends DIB
 	/**
 	 * Creates a device information DIB using the supplied device information.
 	 *
-	 * @param friendlyName user friendly name to identify the device; a ISO 8859-1 string with a maximum length of 29
+	 * @param friendlyName user friendly name to identify the device; a ISO 8859-1 string with a maximum length of 30
 	 *        characters
 	 * @param deviceStatus current device status, <code>0 &le; deviceStatus &le; 0xff</code>
 	 *        <ul>
@@ -163,8 +163,8 @@ public class DeviceDIB extends DIB
 			// ISO 8859-1 support is mandatory on every Java platform
 			throw new Error("missing ISO 8859-1 charset, " + e.getMessage());
 		}
-		if (name.length() > 29)
-			throw new KNXIllegalArgumentException("friendly name exceeds 29 ISO 8859-1 characters");
+		if (name.length() > 30)
+			throw new KNXIllegalArgumentException("friendly name exceeds 30 ISO 8859-1 characters");
 
 		if (deviceStatus < 0 || deviceStatus > 0xff)
 			throw new KNXIllegalArgumentException("device status out of range [0..255]");
