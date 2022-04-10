@@ -142,6 +142,17 @@ public class DiscovererTcp extends Discoverer {
 	 */
 	@Override
 	@Deprecated(forRemoval = true)
+	public void startSearch(final int localPort, final NetworkInterface ni, final int timeout, final boolean wait) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * @deprecated
+	 *
+	 * @throws UnsupportedOperationException
+	 */
+	@Override
+	@Deprecated(forRemoval = true)
 	public Result<DescriptionResponse> getDescription(final InetSocketAddress server, final int timeout) {
 		throw new UnsupportedOperationException();
 	}
