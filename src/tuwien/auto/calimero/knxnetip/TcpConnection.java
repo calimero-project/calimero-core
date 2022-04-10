@@ -640,6 +640,16 @@ public final class TcpConnection implements Closeable {
 	/**
 	 * Creates a new TCP connection to a KNXnet/IP server.
 	 *
+	 * @param server remote endpoint address
+	 * @return a new TCP connection
+	 */
+	public static TcpConnection newTcpConnection(final InetSocketAddress server) {
+		return new TcpConnection(server);
+	}
+
+	/**
+	 * Creates a new TCP connection to a KNXnet/IP server.
+	 *
 	 * @param local local endpoint address
 	 * @param server remote endpoint address
 	 * @return a new TCP connection
@@ -651,6 +661,7 @@ public final class TcpConnection implements Closeable {
 	private TcpConnection(final InetSocketAddress server) {
 		this.server = server;
 		socket = new Socket();
+		localEndpoint = new InetSocketAddress(0);
 		logger = LoggerFactory.getLogger("calimero.knxnetip.tcp " + hostPort(server));
 	}
 
@@ -714,8 +725,9 @@ public final class TcpConnection implements Closeable {
 
 	@Override
 	public String toString() {
-		final var state = socket.isClosed() ? "closed" : socket.isConnected() ? "connected" : "bound";
-		return hostPort(localEndpoint()) + " " + hostPort(server) + " (" + state +")";
+		final var state = socket.isClosed() ? "closed"
+				: socket.isConnected() ? "connected" : socket.isBound() ? "bound" : "unbound";
+		return hostPort(localEndpoint()) + "<=>" + hostPort(server) + " (" + state +")";
 	}
 
 	Socket socket() { return socket; }
@@ -741,6 +753,7 @@ public final class TcpConnection implements Closeable {
 	public synchronized void connect() throws IOException {
 		if (!socket.isConnected()) {
 			socket.connect(server, (int) connectionTimeout.toMillis());
+			localEndpoint = (InetSocketAddress) socket.getLocalSocketAddress();
 			startTcpReceiver();
 		}
 	}
