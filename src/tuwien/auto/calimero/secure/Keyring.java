@@ -200,7 +200,7 @@ public final class Keyring {
 		public Optional<byte[]> toolKey() { return optional(toolkey); }
 
 		/**
-		 * Returns optional the encrypted management password of this device.
+		 * Returns the optional encrypted management password of this device.
 		 *
 		 * @return optional byte array containing encrypted password
 		 */
