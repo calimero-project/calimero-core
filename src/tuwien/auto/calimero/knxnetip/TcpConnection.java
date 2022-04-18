@@ -435,7 +435,7 @@ public final class TcpConnection implements Closeable {
 			if (svcType == KNXnetIPHeader.SearchResponse || svcType == KNXnetIPHeader.DESCRIPTION_RES) {
 				for (final var client : securedConnections.values())
 					try {
-						client.handleServiceType(header, data, offset, conn.server.getAddress(), conn.server.getPort());
+						client.handleServiceType(header, data, offset, conn.server);
 					}
 					catch (KNXFormatException | IOException e) {
 						logger.warn("{} error processing {}", client, header, e);
@@ -455,7 +455,7 @@ public final class TcpConnection implements Closeable {
 
 			try {
 				if (connection != null) {
-					connection.handleServiceType(header, data, offset, conn.server.getAddress(), conn.server.getPort());
+					connection.handleServiceType(header, data, offset, conn.server);
 					if (header.getServiceType() == KNXnetIPHeader.DISCONNECT_RES) {
 						logger.trace("remove connection {}", connection);
 						securedConnections.remove(channelId);
@@ -842,7 +842,7 @@ public final class TcpConnection implements Closeable {
 		final int svcType = header.getServiceType();
 		if (svcType == KNXnetIPHeader.SearchResponse || svcType == KNXnetIPHeader.DESCRIPTION_RES) {
 			for (final var client : unsecuredConnections.values())
-				client.handleServiceType(header, data, offset, server.getAddress(), server.getPort());
+				client.handleServiceType(header, data, offset, server);
 			return;
 		}
 
@@ -856,7 +856,7 @@ public final class TcpConnection implements Closeable {
 		}
 
 		if (connection != null) {
-			connection.handleServiceType(header, data, offset, server.getAddress(), server.getPort());
+			connection.handleServiceType(header, data, offset, server);
 			if (svcType == KNXnetIPHeader.DISCONNECT_RES)
 				unsecuredConnections.remove(channelId);
 		}

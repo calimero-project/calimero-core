@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2021 B. Malinowsky
+    Copyright (c) 2010, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 
@@ -370,6 +371,9 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 
 	boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset,
 			final InetSocketAddress source) throws KNXFormatException, IOException {
+		final int hdrStart = offset - h.getStructLength();
+		logger.trace("from {}: {}: {}", Net.hostPort(source), h,
+				DataUnitBuilder.toHex(Arrays.copyOfRange(data, hdrStart, hdrStart + h.getTotalLength()), " "));
 		return handleServiceType(h, data, offset, source.getAddress(), source.getPort());
 	}
 
