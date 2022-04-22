@@ -240,6 +240,9 @@ public class KNXnetIPHeader
 		if (version != expectedVersion)
 			throw new KNXFormatException(
 					String.format("unsupported KNXnet/IP protocol version, expected 0x%1h", expectedVersion), version);
+		if (totalsize < HEADER_SIZE_10)
+			throw new KNXFormatException(
+					String.format("KNXnet/IP header contains invalid total length < %d", HEADER_SIZE_10), totalsize);
 	}
 
 	/**
