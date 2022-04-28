@@ -610,6 +610,20 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	/** DPT ID 14.080, Apparent Power; values from <b>-3.40282347e+38f</b> to <b>3.40282347e+38f</b> VA. */
 	public static final DPT DPT_APPARENT_POWER = new DPT("14.080", "Apparent Power", "-3.40282347e+38f",
 			"3.40282347e+38f", "VA");
+	// metering
+
+	/**
+	 * DPT ID 14.1200, volume flux [m³/h] for meters; values from <b>-3.40282347e+38f</b> to
+	 * <b>3.40282347e+38f</b> m³/h.
+	 */
+	public static final DPT DPT_VOLUME_FLUX_METER = new DPT("14.1200", "volume flux [m³/h]", "-3.40282347e+38f", "3.40282347e+38f", "m³/h");
+
+	/**
+	 * DPT ID 14.1201, volume flux [l/s] for meters; values from <b>-3.40282347e+38f</b> to
+	 * <b>3.40282347e+38f</b> l/s.
+	 */
+	public static final DPT DPT_VOLUME_FLUX_LS = new DPT("14.1201", "volume flux [l/s]", "-3.40282347e+38f", "3.40282347e+38f", "l/s");
+
 
 	private static final Map<String, DPT> types = loadDatapointTypes(DPTXlator4ByteFloat.class);
 

@@ -206,7 +206,7 @@ class DPTXlator4ByteSignedTest {
 
 	@Test
 	void testGetSubTypes() {
-		assertEquals(10, t.getSubTypes().size());
+		assertEquals(12, t.getSubTypes().size());
 	}
 
 	@Test

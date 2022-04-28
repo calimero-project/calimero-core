@@ -156,7 +156,7 @@ public class DPTXlator4ByteFloatTest extends TestCase
 	public void testGetSubTypes()
 	{
 		final Map<String, DPT> types = x.getSubTypes();
-		assertEquals(81, types.size());
+		assertEquals(83, types.size());
 	}
 
 	/**
@@ -165,7 +165,7 @@ public class DPTXlator4ByteFloatTest extends TestCase
 	public void testGetSubTypesStatic()
 	{
 		final Map<String, DPT> types = DPTXlator4ByteFloat.getSubTypesStatic();
-		assertEquals(81, types.size());
+		assertEquals(83, types.size());
 	}
 
 	/**
