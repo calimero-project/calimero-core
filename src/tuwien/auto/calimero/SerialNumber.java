@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2021, 2021 B. Malinowsky
+    Copyright (c) 2021, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ public final class SerialNumber {
 	public int hashCode() { return Long.hashCode(sno); }
 
 	@Override
-	public String toString() { return String.format("%04x:%08x", sno >> 32, sno & 0xffff_ffff); }
+	public String toString() { return String.format("%04x:%08x", sno >> 32, sno & 0xffff_ffffL); }
 
 	private static long unsigned(final byte[] data) {
 		if (data.length != Size)
