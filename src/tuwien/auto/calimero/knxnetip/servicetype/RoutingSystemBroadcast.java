@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2021 B. Malinowsky
+    Copyright (c) 2019, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -111,8 +111,34 @@ public class RoutingSystemBroadcast extends ServiceType {
 	private static final int SecureSyncRequest = 2;
 	private static final int SecureSyncResponse = 3;
 
-	public static boolean isSystemBroadcast(final CEMI frame) {
+	/**
+	 * Is the cEMI {@code frame} a subnet broadcast message that shall be forwarded as IP system broadcast on IP side.
+	 *
+	 * Note: this condition is important for routing from TP1 to IP, when IP System Broadcast Routing mode is enabled.
+	 *
+	 * @param frame the frame to check
+	 * @return {@code true} if {@code frame} matches the rules for an IP system broadcast, {@code false} otherwise
+	 */
+	public static boolean isSubnetSystemBroadcast(final CEMI frame) {
 		return payload(frame).map(RoutingSystemBroadcast::subnetSystemBroadcast).orElse(false);
+	}
+
+	/**
+	 * Is the cEMI {@code frame} contained in a received IP system broadcast applicable to be forwarded as subnet
+	 * broadcast.
+	 *
+	 * Note: this condition is important for routing from IP to TP1, when IP System Broadcast Routing mode is enabled.
+	 *
+	 * @param frame the frame to check
+	 * @return {@code true} if {@code frame} matches the rules for a subnet broadcast, {@code false} otherwise
+	 */
+	public static boolean isIpSystemBroadcast(final CEMI frame) {
+		return payload(frame).map(RoutingSystemBroadcast::ipSystemBroadcast).orElse(false);
+	}
+
+	@Deprecated
+	public static boolean isSystemBroadcast(final CEMI frame) {
+		return isSubnetSystemBroadcast(frame);
 	}
 
 	public static boolean validSystemBroadcast(final CEMI frame) {
