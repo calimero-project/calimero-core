@@ -78,7 +78,7 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 	 * DPT ID 12.1200, volume liquid [liter] for water/heat meter total consumption; values from <b>0</b> to
 	 * <b>4294967295</b> liter.
 	 */
-	public static final DPT DptVolumeLiquid = new DPT("12.1200", "volume liquid [liter]", "0", "4294967295", "liter");
+	public static final DPT DptVolumeLiquid = new DPT("12.1200", "volume liquid [liter]", "0", "4294967295", "l");
 
 	/**
 	 * DPT ID 12.1201, volume [m³] for gas/water/heat meter total consumption; values from <b>0</b> to
