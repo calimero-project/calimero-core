@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2021 B. Malinowsky
+    Copyright (c) 2018, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -319,7 +319,7 @@ final class SecureRouting extends KNXnetIPRouting {
 
 	private void scheduleGroupSync(final long initialDelay) {
 		logger.trace("schedule group sync (initial delay {} ms)", initialDelay);
-		groupSync.cancel(true);
+		groupSync.cancel(false);
 		groupSync = groupSyncSender.scheduleWithFixedDelay(this::sendGroupSync, initialDelay, syncQueryInterval,
 				TimeUnit.MILLISECONDS);
 	}
