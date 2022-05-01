@@ -3,7 +3,7 @@
 <knxServer name="test-server" friendlyName="calimero-core knx test-server">
 	<discovery activate="true" listenNetIf="all" outgoingNetIf="all"/>
 	<serviceContainer activate="true" routing="true" listenNetIf="any"
-		networkMonitoring="true" udpPort="3671" keyfile="../calimero-core/test/resources/keyfile" securedServices="0">
+		networkMonitoring="true" udpPort="3671" keyfile="../calimero-core/test/resources/keyfile" securedServices="optional">
 		<knxAddress type="individual">1.1.0</knxAddress>
 		<routing>224.0.23.12</routing>
 		<disruptionBuffer expirationTimeout="30" udpPort="5555-5559"/>
