@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2021 B. Malinowsky
+    Copyright (c) 2010, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -417,6 +417,83 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		return equals;
 	}
 
+	/**
+	 * Reads the serial number of KNX devices in programming mode.
+	 * <p>
+	 * This method corresponds to the KNX <i>NM_Read_SerialNumber_By_ProgrammingMode<br>.
+	 * Depending on whether none, one, or several devices are in programming mode, the
+	 * returned list size of addresses is 0, 1, or &gt; 1, respectively.
+	 * Impl. note: the read timeout is 1.5 seconds.
+	 *
+	 * @return a list with {@link SerialNumber}s of devices in programming
+	 *         mode, with the list size equal to the number of device responses
+	 * @throws KNXLinkClosedException if network link to KNX network is closed
+	 * @throws KNXRemoteException on invalid response behavior from a remote endpoint
+	 * @throws KNXException and subtypes on other errors
+	 * @throws InterruptedException on interrupted thread
+	 */
+	public List<SerialNumber> readSerialNumber() throws KNXException, InterruptedException {
+		final List<byte[]> l = mc.readSystemNetworkParameter(0, PID.SERIAL_NUMBER, 1);
+		return l.stream().map(SerialNumber::from).collect(Collectors.toList());
+	}
+
+	/**
+	 * Reads the serial number of KNX devices in ex-factory state, i.e., devices of which both the domain address
+	 * (if available) and the individual address have their factory default value.
+	 * <p>
+	 * This method corresponds to the KNX <i>NM_Read_SerialNumber_By_ExFactoryState<br>.
+	 * Depending on whether none, one, or several devices respond, the
+	 * returned list size of addresses is 0, 1, or &gt; 1, respectively.
+	 *
+	 * @return a list with {@link SerialNumber}s of devices in programming
+	 *         mode, with the list size equal to the number of device responses
+	 * @throws KNXLinkClosedException if network link to KNX network is closed
+	 * @throws KNXRemoteException on invalid response behavior from a remote endpoint
+	 * @throws KNXException and subtypes on other errors
+	 * @throws InterruptedException on interrupted thread
+	 */
+	public List<SerialNumber> readSerialNumberExFactoryState() throws KNXException, InterruptedException {
+		final var waitTime = Duration.ofSeconds(3);
+		final List<byte[]> l = mc.readSystemNetworkParameter(0, PID.SERIAL_NUMBER, 2, (byte) waitTime.toSeconds());
+		return l.stream().map(SerialNumber::from).collect(Collectors.toList());
+	}
+
+	/**
+	 * Reads the serial number of KNX devices which have just been powered on, to identify and address "inaccessible
+	 * devices".
+	 * <p>
+	 * This method corresponds to the KNX <i>NM_Read_SerialNumber_By_PowerReset<br> procedure.
+	 * Depending on whether none, one, or several devices respond, the
+	 * returned list size of addresses is 0, 1, or &gt; 1, respectively. The read timeout is 4 minutes.
+	 *
+	 * @return a list with {@link SerialNumber}s of devices, with the list size equal to the number of device responses
+	 * @throws KNXLinkClosedException if network link to KNX network is closed
+	 * @throws KNXRemoteException on invalid response behavior from a remote endpoint
+	 * @throws KNXException and subtypes on other errors
+	 * @throws InterruptedException on interrupted thread
+	 */
+	public List<SerialNumber> readSerialNumberPowerReset() throws KNXException, InterruptedException {
+		final List<byte[]> l = new ArrayList<>();
+		// we have to use mc response timeout, because readSystemNetworkParameter registers services only for that
+		// duration, it doesn't consider a higher wait time
+		final var waitTime = mc.responseTimeout();
+
+		final long start = System.nanoTime();
+		final long stop = start + 4 * 60_000_000_000L;
+		long next = start;
+		while (next < stop) {
+			l.addAll(mc.readSystemNetworkParameter(0, PID.SERIAL_NUMBER, 3, (byte) waitTime.toSeconds()));
+
+			next = next + 30_000_000_000L;
+			long millis = (next - System.nanoTime()) / 1_000_000;
+			while (millis > 0) {
+				Thread.sleep(millis);
+				millis = (next - System.nanoTime()) / 1_000_000;
+			}
+		}
+		return l.stream().map(SerialNumber::from).collect(Collectors.toList());
+	}
+
 	@Override
 	public IndividualAddress[] scanNetworkRouters() throws KNXTimeoutException,
 		KNXLinkClosedException, InterruptedException
@@ -616,12 +693,12 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			final byte[] fdsk, final byte[] toolKey, final Duration maxLookup) throws KNXException, InterruptedException {
 
 		final var deadline = Instant.now().plus(maxLookup);
-		var list = List.<byte[]>of();
+		var list = List.<SerialNumber>of();
 		while (Instant.now().isBefore(deadline) && list.isEmpty())
-			list = mc.readSystemNetworkParameter(0, PropertyAccess.PID.SERIAL_NUMBER, 1);
+			list = readSerialNumber();
 		if (list.size() != 1)
 			throw new KNXRemoteException("" + (list.isEmpty() ? "no" : list.size()) + " devices in programming mode");
-		final var sno = SerialNumber.from(list.get(0));
+		final var sno = list.get(0);
 
 		final int medium = ((TransportLayerImpl) tl).link().getKNXMedium().getMedium();
 		final boolean openMedium = medium == KNXMediumSettings.MEDIUM_PL110 || medium == KNXMediumSettings.MEDIUM_RF;
