@@ -143,7 +143,7 @@ public class SecureManagement extends SecureApplicationLayer {
 	}
 
 	@Override
-	protected Security security() { return super.security(); };
+	public Security security() { return super.security(); };
 
 	protected TransportLayer transportLayer() { return transportLayer; }
 }

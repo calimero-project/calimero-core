@@ -442,7 +442,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 
 	private void send(final GroupAddress dst, final Priority p, final int service, final DPTXlator t)
 			throws KNXTimeoutException, KNXLinkClosedException, InterruptedException {
-		final boolean useGoDiagnostics = Security.defaultInstallation().groupKeys().containsKey(dst);
+		final boolean useGoDiagnostics = sal.security().groupKeys().containsKey(dst);
 		if (useGoDiagnostics) {
 			try {
 				final var future = sal.writeGroupObjectDiagnostics(dst, t == null ? new byte[0] : t.getData());

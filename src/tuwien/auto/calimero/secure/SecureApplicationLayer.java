@@ -740,7 +740,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 		link.removeLinkListener(linkListener);
 	}
 
-	protected Security security() { return security; }
+	public Security security() { return security; }
 
 	protected void dispatchLinkEvent(final FrameEvent e) {
 		final var cemi = e.getFrame();
