@@ -471,7 +471,7 @@
             <usage>Indvidual Address of the KNXnet/IP server</usage>
         </property>
         <property pid="53" pidName="PID_ADDITIONAL_INDIVIDUAL_ADDRESSES" name="Additional Individual Addresses" pdt="4" rw="R/W" writeEnabled="1">
-            <usage>Sorted list of additional KNX Individual Addresses for KNXnet/IP Routers and Tunnelling Servers</usage>
+            <usage>Sorted list of additional KNX Individual Addresses for KNXnet/IP Routers and Tunneling Servers</usage>
         </property>
         <property pid="54" pidName="PID_CURRENT_IP_ASSIGNMENT_METHOD" name="Current IP Assignment Method" pdt="2" rw="R" writeEnabled="0">
             <usage>Used IP address assignment method</usage>

@@ -182,16 +182,13 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		}
 
 		@Override
-		public void group(final FrameEvent e)
-		{}
+		public void group(final FrameEvent e) {}
 
 		@Override
-		public void detached(final DetachEvent e)
-		{}
+		public void detached(final DetachEvent e) {}
 
 		@Override
-		public void linkClosed(final CloseEvent e)
-		{}
+		public void linkClosed(final CloseEvent e) {}
 	};
 
 	/**
@@ -200,9 +197,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	 * @param link the KNX network link in open state, the management procedures instance does not take ownership
 	 * @throws KNXLinkClosedException on closed {@link KNXNetworkLink}
 	 */
-	public ManagementProceduresImpl(final KNXNetworkLink link)
-		throws KNXLinkClosedException
-	{
+	public ManagementProceduresImpl(final KNXNetworkLink link) throws KNXLinkClosedException {
 		tl = new TransportLayerImpl(link);
 		mc = new ManagementClientImpl(link, tl);
 		detachMgmtAndTransportLayer = true;
@@ -216,9 +211,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	 *        state
 	 * @param transportLayer the transport layer used to initialize <code>mgmtClient</code>
 	 */
-	protected ManagementProceduresImpl(final ManagementClient mgmtClient,
-		final TransportLayer transportLayer)
-	{
+	protected ManagementProceduresImpl(final ManagementClient mgmtClient, final TransportLayer transportLayer) {
 		mc = mgmtClient;
 		if (!mc.isOpen())
 			throw new IllegalStateException("management client not in open state");
