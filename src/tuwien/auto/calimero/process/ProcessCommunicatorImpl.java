@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -148,6 +148,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	private final KNXNetworkLink lnk;
 	private final NetworkLinkListener lnkListener = new NLListener();
 	private final SecureApplicationLayer sal;
+	private final boolean useGoDiagnostics;
 	private final EventListeners<ProcessListener> listeners;
 
 	private final Map<GroupAddress, FrameEvent> indications = new HashMap<>();
@@ -179,12 +180,29 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	 */
 	public ProcessCommunicatorImpl(final KNXNetworkLink link, final SecureApplicationLayer sal)
 			throws KNXLinkClosedException {
+		this(link, sal, true);
+	}
+
+	/**
+	 * Creates a new process communicator using the supplied secure application layer, attached to the supplied KNX
+	 * network link. This constructor allows to specify the communication behavior with respect to KNX Data Secure,
+	 * whether to use Group Object Diagnostics for outgoing messages or not.
+	 *
+	 * @param link network link used for communication with a KNX network
+	 * @param sal secure application layer
+	 * @param useGoDiagnostics <code>true</code> to use Group Object Diagnostics for outgoing KNX Data Secure messages,
+	 * <code>false</code> to directly secure with KNX Data Secure where encryption is required
+	 * @throws KNXLinkClosedException if the network link is closed
+	 */
+	public ProcessCommunicatorImpl(final KNXNetworkLink link, final SecureApplicationLayer sal,
+			final boolean useGoDiagnostics) throws KNXLinkClosedException {
 		if (!link.isOpen())
 			throw new KNXLinkClosedException(
 					"cannot initialize process communication using closed link " + link.getName());
 		logger = LogService.getLogger("calimero.process.communication " + link.getName());
 		lnk = link;
 		this.sal = sal;
+		this.useGoDiagnostics = useGoDiagnostics;
 
 		listeners = new EventListeners<>(logger);
 		sal.addListener(lnkListener);
@@ -440,10 +458,9 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		}
 	}
 
-	private void send(final GroupAddress dst, final Priority p, final int service, final DPTXlator t)
+	protected void send(final GroupAddress dst, final Priority p, final int service, final DPTXlator t)
 			throws KNXTimeoutException, KNXLinkClosedException, InterruptedException {
-		final boolean useGoDiagnostics = Security.defaultInstallation().groupKeys().containsKey(dst);
-		if (useGoDiagnostics) {
+		if (useGoDiagnostics && sal.security().groupKeys().containsKey(dst)) {
 			try {
 				final var future = sal.writeGroupObjectDiagnostics(dst, t == null ? new byte[0] : t.getData());
 				final var returnCode = future.get();
@@ -487,7 +504,6 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 				}
 			}
 		}
-		logger.info("timeout waiting for group read response from {}", from);
 		throw new KNXTimeoutException("timeout waiting for group read response from " + from);
 	}
 
