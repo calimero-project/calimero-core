@@ -114,6 +114,27 @@ public class SecureApplicationLayer implements AutoCloseable {
 	private final SerialNumber serialNumber;
 	private final Logger logger;
 
+
+	/*public record*/
+	public static final class SequenceNumbers {
+		private final long sequenceNumber;
+		private final long sequenceNumberToolAccess;
+		private final Map<IndividualAddress, Long> lastValidSequenceNumbers;
+		private final Map<IndividualAddress, Long> lastValidSequenceNumbersToolAccess;
+
+		public SequenceNumbers(final long sequenceNumber, final long sequenceNumberToolAccess,
+				final Map<IndividualAddress, Long> lastValidSequenceNumbers,
+				final Map<IndividualAddress, Long> lastValidSequenceNumbersToolAccess) {
+
+			if (sequenceNumber < 0 || sequenceNumberToolAccess < 0)
+				throw new KNXIllegalArgumentException("negative sequence number");
+			this.sequenceNumber = sequenceNumber;
+			this.sequenceNumberToolAccess = Math.max(1, sequenceNumberToolAccess);
+			this.lastValidSequenceNumbers = Map.copyOf(lastValidSequenceNumbers);
+			this.lastValidSequenceNumbersToolAccess = Map.copyOf(lastValidSequenceNumbersToolAccess);
+		}
+	}
+
 	// local sequences
 	private volatile long sequenceNumber;
 	private volatile long sequenceNumberToolAccess;
@@ -205,6 +226,15 @@ public class SecureApplicationLayer implements AutoCloseable {
 
 	public SecureApplicationLayer(final KNXNetworkLink link, final Security security) {
 		this(link, SerialNumber.Zero, 0, security);
+		link.addLinkListener(linkListener);
+	}
+
+	public SecureApplicationLayer(final KNXNetworkLink link, final Security security, final SerialNumber serialNumber,
+			final SequenceNumbers sequenceNumbers) {
+		this(link, serialNumber, sequenceNumbers.sequenceNumber, security);
+		sequenceNumberToolAccess = sequenceNumbers.sequenceNumberToolAccess;
+		lastValidSequenceToolAccess.putAll(sequenceNumbers.lastValidSequenceNumbersToolAccess);
+		lastValidSequence.putAll(sequenceNumbers.lastValidSequenceNumbers);
 		link.addLinkListener(linkListener);
 	}
 
@@ -645,8 +675,8 @@ public class SecureApplicationLayer implements AutoCloseable {
 			}
 
 			if (syncRes) {
-				Objects.requireNonNull(request).complete();
 				receivedSyncResponse(src, toolAccess, plainApdu);
+				Objects.requireNonNull(request).complete();
 				return new SalService(securityCtrl, new byte[0]);
 			}
 		}
