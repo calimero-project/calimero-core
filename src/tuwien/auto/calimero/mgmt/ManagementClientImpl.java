@@ -946,6 +946,13 @@ public class ManagementClientImpl implements ManagementClient
 		return readPropertyDescription(dst, objType, objInstance, propertyId, propIndex);
 	}
 
+	@Override
+	public Description readPropertyDescription(final Destination dst, final int objIndex, final int propertyId,
+			final int propertyIndex) throws KNXTimeoutException, KNXRemoteException, KNXDisconnectException,
+			KNXLinkClosedException, InterruptedException {
+		return new Description(0, readPropertyDesc(dst, objIndex, propertyId, propertyIndex));
+	}
+
 	private static final boolean useExtPropertyServices = false;
 
 	@Override
