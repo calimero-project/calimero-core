@@ -38,8 +38,9 @@ package tuwien.auto.calimero.mgmt;
 
 import java.lang.invoke.MethodHandles;
 import java.nio.ByteBuffer;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -55,8 +56,12 @@ import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.secure.Keyring;
 import tuwien.auto.calimero.secure.Keyring.Interface;
 import tuwien.auto.calimero.secure.KnxSecureException;
+import tuwien.auto.calimero.secure.Security;
 
 
+/**
+ * Recovery requires the device tool keys in {@link Security} for accessing KNX devices.
+ */
 public final class SecurityRecovery {
 	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -79,7 +84,6 @@ public final class SecurityRecovery {
 	 */
 	public long lastValidSequenceNumber(final List<Keyring.Interface> interfaces)
 			throws KNXLinkClosedException, InterruptedException {
-
 		final var ourAddress = link.getKNXMedium().getDeviceAddress();
 		final var ourInterface = interfaces.stream().filter(intf -> intf.address().equals(ourAddress)).findFirst()
 				.orElseThrow(() -> new KnxSecureException(
@@ -101,7 +105,7 @@ public final class SecurityRecovery {
 	 * @throws KNXLinkClosedException if link got closed
 	 * @throws InterruptedException on interrupted thread
 	 */
-	public long lastValidSequenceNumber(final Collection<IndividualAddress> linkedDevices)
+	public long lastValidSequenceNumber(final Iterable<IndividualAddress> linkedDevices)
 			throws KNXLinkClosedException, InterruptedException {
 		return lastValidSequenceNumber(link.getKNXMedium().getDeviceAddress(), linkedDevices);
 	}
@@ -117,7 +121,7 @@ public final class SecurityRecovery {
 	 * @throws InterruptedException on interrupted thread
 	 */
 	public long lastValidSequenceNumber(final IndividualAddress address,
-			final Collection<IndividualAddress> linkedDevices) throws KNXLinkClosedException, InterruptedException {
+			final Iterable<IndividualAddress> linkedDevices) throws KNXLinkClosedException, InterruptedException {
 
 		try (var mc = new ManagementClientImpl(link)) {
 			for (final var device : linkedDevices) {
@@ -135,8 +139,45 @@ public final class SecurityRecovery {
 		}
 	}
 
+	public Map<IndividualAddress, Long> lastValidSequenceNumbers(final Iterable<IndividualAddress> senders)
+			throws KNXLinkClosedException, InterruptedException {
+		final var lastValidSeqs = new HashMap<IndividualAddress, Long>();
+		try (var mc = new ManagementClientImpl(link)) {
+			for (final var device : senders) {
+				try (var dst = mc.createDestination(device, false)) {
+					final long seq = readSeqSending(mc, dst);
+					if (seq > 0)
+						lastValidSeqs.put(device, seq - 1);
+				}
+				catch (KNXTimeoutException | KNXRemoteException | KNXDisconnectException | KnxSecureException e) {
+					logger.debug("failed reading sequence number of {}: {}", device, e.getMessage());
+				}
+			}
+		}
+		return lastValidSeqs;
+	}
+
 	private static final int securityObject = 17;
 	private static final int pidSecIaTable = 54;
+	private static final int pidSeqSending = 59;
+
+	private static long readSeqSending(final ManagementClientImpl mc, final Destination dst)
+			throws KNXTimeoutException, KNXRemoteException, KNXDisconnectException, KNXLinkClosedException,
+			InterruptedException {
+
+		logger.trace("query sequence number of {}", dst.getAddress());
+		final var desc = mc.readPropertyDescription(dst, securityObject, 1, pidSeqSending, 0);
+
+		int objectIndex = desc.getObjectIndex();
+		if (objectIndex == 0) {
+			objectIndex = indexByIoList(mc, dst);
+			if (objectIndex == 0)
+				return -1;
+		}
+
+		final byte[] data = mc.readProperty(dst, objectIndex, pidSeqSending, 1, 1);
+		return unsigned(data);
+	}
 
 	private static long readLastValidSeq(final ManagementClientImpl mc, final Destination dst,
 			final IndividualAddress senderAddress) throws KNXTimeoutException, KNXRemoteException,
