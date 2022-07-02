@@ -67,13 +67,14 @@ import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.log.LogService.LogLevel;
 import tuwien.auto.calimero.secure.KnxSecureException;
 
-final class SecureRouting extends KNXnetIPRouting {
+public final class SecureRouting extends KNXnetIPRouting {
 
 	private static final int SecureGroupSync = 0x0955;
 
 	private final SerialNumber sno;
 	private final Key secretKey;
 
+	private static final double syncLatencyFraction = 0.102d;
 	private final int mcastLatencyTolerance; // [ms]
 	private final int syncLatencyTolerance; // [ms]
 
@@ -123,8 +124,12 @@ final class SecureRouting extends KNXnetIPRouting {
 
 		sno = deriveSerialNumber(netif);
 		secretKey = SecureConnection.createSecretKey(groupKey);
-		mcastLatencyTolerance = (int) latencyTolerance.toMillis();
-		syncLatencyTolerance = mcastLatencyTolerance / 10;
+		final int latTolMs = (int) latencyTolerance.toMillis();
+		if (latTolMs <= 0 || latTolMs > 8000)
+			throw new KNXIllegalArgumentException(
+					"multicast latency tolerance " + latTolMs + " ms out of bounds [1..8000]");
+		mcastLatencyTolerance = latTolMs;
+		syncLatencyTolerance = (int) (mcastLatencyTolerance * syncLatencyFraction);
 
 		init(netif, true, true);
 		// we don't randomize initial delay [0..10] seconds to minimize uncertainty window of eventual group sync
@@ -149,6 +154,10 @@ final class SecureRouting extends KNXnetIPRouting {
 		return SerialNumber.Zero;
 	}
 
+	public Duration latencyTolerance() { return Duration.ofMillis(mcastLatencyTolerance); }
+
+	public double syncLatencyFraction() { return syncLatencyFraction; }
+
 	@Override
 	public String name() {
 		return "KNX/IP " + SecureConnection.secureSymbol + " Routing " + ctrlEndpt.getAddress().getHostAddress();
@@ -171,6 +180,8 @@ final class SecureRouting extends KNXnetIPRouting {
 	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset,
 		final InetAddress src, final int port) throws KNXFormatException, IOException {
 		final int svc = h.getServiceType();
+		if (svc == KNXnetIPHeader.SEARCH_REQ || svc == KNXnetIPHeader.SearchRequest)
+			return super.handleServiceType(h, data, offset, src, port);
 		if (!h.isSecure()) {
 			logger.trace("received insecure service type 0x{} - ignore", Integer.toHexString(svc));
 			return true;
