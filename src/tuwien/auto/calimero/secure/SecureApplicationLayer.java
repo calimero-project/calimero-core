@@ -304,7 +304,8 @@ public class SecureApplicationLayer implements AutoCloseable {
 
 		final var surrogate = surrogate(group);
 		final var secCtrl = SecurityControl.of(DataSecurity.AuthConf, true);
-		final var secureApdu = secureData(address(), surrogate, apdu, secCtrl).get();
+		final var secureApdu = secureData(address(), surrogate, apdu, secCtrl)
+				.orElseThrow(() -> new KnxSecureException("no device toolkey for " + address()));
 		logger.trace("{}->{} GO diagnostics {} {}", address(), surrogate, service, DataUnitBuilder.toHex(value, " "));
 		send(surrogate, secureApdu);
 
@@ -583,6 +584,14 @@ public class SecureApplicationLayer implements AutoCloseable {
 
 		final byte[] sno = new byte[6];
 		if (service == SecureDataPdu) {
+			if (isGroupDst) {
+				final var senders = security.groupSenders(address()).get(dst);
+				if (senders != null && !senders.isEmpty() && !senders.contains(src)) {
+					logger.trace("{}->{} sender not in group sender list of {}, ignore", src, dst, address());
+					return new SalService(securityCtrl, new byte[0]);
+				}
+			}
+
 			final long expectedSeq = lastValidSequenceNumber(toolAccess, src) + 1;
 			if (receivedSeq < expectedSeq) {
 				securityFailure(SeqNoError, src, dst, receivedSeq);

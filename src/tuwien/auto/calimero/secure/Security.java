@@ -1,6 +1,6 @@
 /*
     Calimero - A library for KNX network access
-    Copyright (c) 2019, 2021 B. Malinowsky
+    Copyright (c) 2019, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,10 +40,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.SerialNumber;
+import tuwien.auto.calimero.secure.Keyring.Interface;
 
 /**
  * Contains key and address information required for KNX secure process communication and management.
@@ -55,6 +58,7 @@ public final class Security {
 	private final Map<IndividualAddress, byte[]> deviceToolKeys = new ConcurrentHashMap<>();
 	private final Map<GroupAddress, byte[]> groupKeys = new ConcurrentHashMap<>();
 	private final Map<GroupAddress, Set<IndividualAddress>> groupSenders = new ConcurrentHashMap<>();
+	private final Map<IndividualAddress, Map<GroupAddress, Set<IndividualAddress>>> sendersByInterface = new ConcurrentHashMap<>();
 	private final Map<SerialNumber, byte[]> broadcastToolKeys = new ConcurrentHashMap<>();
 
 
@@ -100,20 +104,35 @@ public final class Security {
 
 		keyring.groups().forEach((addr, key) -> groupKeys.put(addr, keyring.decryptKey(key, password)));
 
-		final var interfaces = keyring.interfaces().values();
-		final var sendersByGroupStream = interfaces.stream().flatMap(List::stream).map(Keyring.Interface::groups)
-				.map(Map::entrySet).flatMap(Set::stream);
-		sendersByGroupStream
-				.forEach(entry -> groupSenders.merge(entry.getKey(), concurrentSetOf(entry.getValue()), (a, b) -> {
-					a.addAll(b);
-					return a;
-				}));
+
+		final var interfaceAddresses = keyring.interfaces().values().stream().flatMap(List::stream)
+				.map(Interface::address).collect(Collectors.toSet());
+
+		for (final var interfaces : keyring.interfaces().values()) {
+			for (final var i : interfaces) {
+				for (final var entry : i.groups().entrySet()) {
+					final var senders = groupSenders.computeIfAbsent(entry.getKey(),
+							__ -> ConcurrentHashMap.newKeySet());
+					entry.getValue().stream().filter(Predicate.not(interfaceAddresses::contains)).forEach(senders::add);
+				}
+			}
+		}
+
+		keyring.interfaces().values().stream().flatMap(List::stream)
+				.forEach(entry -> sendersByInterface.put(entry.address(), mutableMapOf(entry.groups())));
 	}
 
 	private static <T> Set<T> concurrentSetOf(final Set<T> t) {
 		final var set = ConcurrentHashMap.<T> newKeySet();
 		set.addAll(t);
 		return set;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <K, V extends Set<T>, T> Map<K, V> mutableMapOf(final Map<K, V> m) {
+		final var map = new ConcurrentHashMap<K, V>();
+		m.forEach((k, v) -> map.put(k, (V) concurrentSetOf(v)));
+		return map;
 	}
 
 	/**
@@ -142,6 +161,16 @@ public final class Security {
 	 */
 	public Map<GroupAddress, Set<IndividualAddress>> groupSenders() {
 		return groupSenders;
+	}
+
+	/**
+	 * Returns the group addresses and group senders currently configured for a specific secure interface.
+	 * Group senders are addresses of devices acting as senders for a specific datapoint.
+	 *
+	 * @return modifiable mapping of group address to set of group senders, the map might be empty
+	 */
+	public Map<GroupAddress, Set<IndividualAddress>> groupSenders(final IndividualAddress interfaceAddress) {
+		return sendersByInterface.computeIfAbsent(interfaceAddress, __ -> new ConcurrentHashMap<>());
 	}
 
 	Map<SerialNumber, byte[]> broadcastToolKeys() { return broadcastToolKeys; }
