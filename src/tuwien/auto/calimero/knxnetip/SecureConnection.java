@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2021 B. Malinowsky
+    Copyright (c) 2018, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -114,8 +114,9 @@ public final class SecureConnection {
 	 * @param knxLayer tunneling layer
 	 * @param session secure session with remote endpoint
 	 * @param tunnelingAddress KNX device address of local endpoint, the requested address needs to be an element of the
-	 *        set of additional addresses offered by the session's remote endpoint (server); use {@code 0.0.0} for any
-	 *        suitable address
+	 *        set of additional addresses offered by the session's remote endpoint (server);
+	 *        the user id associated with the secure session determines for which tunneling address(es) the client has
+	 *        access rights; use {@code 0.0.0} for any suitable address
 	 * @return new KNXnet/IP tunnel
 	 * @throws KNXException on errors setting up the session (if necessary) or establishing the tunnel
 	 * @throws InterruptedException on thread interrupt

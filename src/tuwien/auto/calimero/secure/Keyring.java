@@ -142,7 +142,7 @@ public final class Keyring {
 		public Optional<byte[]> authentication() { return optional(auth); }
 
 		/**
-		 * Returns the groups specified for this interface, each with its set of senders.
+		 * Returns the group addresses linked with this interface, each with its set of group senders.
 		 *
 		 * @return group addresses, mapped to their (empty) set of senders
 		 */
