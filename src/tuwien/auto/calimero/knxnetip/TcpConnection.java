@@ -199,8 +199,10 @@ public final class TcpConnection implements Closeable {
 
 
 		private SecureSession(final TcpConnection connection, final int user, final byte[] userKey,
-			final byte[] deviceAuthCode) {
+				final byte[] deviceAuthCode) {
 			this.conn = connection;
+			if (user < 1 || user > 127)
+				throw new KNXIllegalArgumentException("user " + user + " out of range [1..127]");
 			this.user = user;
 
 			final byte[] key = userKey.length == 0 ? emptyUserPwdHash.clone() : userKey;
@@ -685,7 +687,7 @@ public final class TcpConnection implements Closeable {
 	/**
 	 * Creates a new secure session for this TCP connection.
 	 *
-	 * @param user user to authenticate for the session
+	 * @param user user to authenticate for the session, {@code 0 < user < 128}
 	 * @param userKey user key with {@code userKey.length == 16}
 	 * @param deviceAuthCode device authentication code with {@code deviceAuthCode.length == 16}, a
 	 *        {@code deviceAuthCode.length == 0} will skip device authentication
