@@ -61,6 +61,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.crypto.Cipher;
@@ -172,7 +173,10 @@ public final class Keyring {
 
 		@Override
 		public String toString() {
-			return type + " interface " + addr + ", user " + user + ", groups " + groups.keySet();
+			final int limit = 8;
+			final var entries = groups.size() > limit ? groups.keySet().stream().limit(limit)
+					.map(GroupAddress::toString).collect(Collectors.joining(", ", "[", ", ...]")) : groups.keySet();
+			return type + " interface " + addr + ", user " + user + ", groups " + entries;
 		}
 	}
 
