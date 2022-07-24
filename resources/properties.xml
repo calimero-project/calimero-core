@@ -558,7 +558,7 @@
         <property pid="93" pidName="PID_PASSWORD_HASHES" name="KNX IP secure password hashes" pdt="32" rw="x/2" writeEnabled="0" accessPolicy="008/008">
             <usage>Password hashes for authenticating clients during secure unicast connection setup</usage>
         </property>
-        <property pid="94" pidName="PID_SECURED_SERVICE_FAMILIES" name="KNX IP secured services" pdt="62" rw="3/2" writeEnabled="0"
+        <property pid="94" pidName="PID_SECURED_SERVICE_FAMILIES" name="KNX IP secured services" pdt="62" rw="3/2" writeEnabled="1"
             accessPolicy="15D/15D">
             <usage>Indicates the services for which communication security is enforced</usage>
         </property>
