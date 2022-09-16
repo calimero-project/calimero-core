@@ -51,6 +51,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -258,8 +259,16 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	private static final int routerObjectType = 6;
 	private static final int pidIpSbcControl = 120;
 
+	private static final Supplier<KNXNetworkLink> noLinkSupplier = () -> null;
+
 	public void writeDomainAddress(final SerialNumber serialNumber, final byte[] domainAddress,
 			final List<IndividualAddress> knxipRouters) throws KNXException, InterruptedException {
+		writeDomainAddress(serialNumber, domainAddress, knxipRouters, noLinkSupplier);
+	}
+
+	public void writeDomainAddress(final SerialNumber serialNumber, final byte[] domainAddress,
+			final List<IndividualAddress> knxipRouters, final Supplier<KNXNetworkLink> linkSupplier)
+					throws KNXException, InterruptedException {
 
 		final var ipSbcEnabled = new ArrayList<Destination>();
 		for (final var router : knxipRouters) {
@@ -276,18 +285,44 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		try {
 			for (int i = 0; i < 2; ++i) {
 				mc.writeDomainAddress(serialNumber, domainAddress);
-				Thread.sleep(1000);
 
 				if (domainAddress.length == 4 || domainAddress.length == 21) {
-					final int maxRoutingTimerSync = 25_700;
-					Thread.sleep(maxRoutingTimerSync);
-				}
-				try {
-					mc.readAddress(serialNumber);
-					break;
-				}
-				catch (final KNXTimeoutException e) {
+					if (domainAddress.length == 21) {
+						// remote endpoint executes timer sync for new mcast group & key; this nw procedure has no
+						// means to observe this reliably, e.g., on a TP network; we shall wait for max. sync time
+						// before proceeding
+						final int maxRoutingTimerSync = 25_700;
+						Thread.sleep(maxRoutingTimerSync);
+					}
+
 					Thread.sleep(1000);
+
+					// link supplier might need to update the keys in Security, too, if security mode got enabled
+					// in the device by writing a 21 byte DoA
+					final KNXNetworkLink supplierLink = linkSupplier.get();
+					final var link = supplierLink != null ? supplierLink : ((TransportLayerImpl) tl).link();
+
+					final var mcImpl = (ManagementClientImpl) mc;
+					try (var addressChecker = new ManagementClientImpl(link, mcImpl.secureApplicationLayer())) {
+						addressChecker.responseTimeout(Duration.ofSeconds(1));
+						for (int rep = 0; rep < 60; rep++) {
+							try {
+								addressChecker.readAddress(serialNumber);
+								return;
+							}
+							catch (final KNXTimeoutException e) {}
+						}
+					}
+				}
+				else {
+					Thread.sleep(1000);
+					try {
+						mc.readAddress(serialNumber);
+						return;
+					}
+					catch (final KNXTimeoutException e) {
+						Thread.sleep(1000);
+					}
 				}
 			}
 		}
