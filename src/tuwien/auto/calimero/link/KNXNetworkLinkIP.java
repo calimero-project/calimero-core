@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -81,6 +81,8 @@ import tuwien.auto.calimero.link.medium.KNXMediumSettings;
  * <p>
  * Once a link has been closed, it is not available for further link communication, i.e. it can't be reopened.
  * <p>
+ * Link-layer tunneling is supported for tunneling protocols v1 and v2.
+ * <p>
  * If KNXnet/IP routing is used as base protocol, the send methods with wait for confirmation behave equally like
  * without wait specified, since routing is an unconfirmed protocol. This implies that no confirmation frames are
  * generated, thus {@link NetworkLinkListener#confirmation(FrameEvent)} is not used.
@@ -150,6 +152,16 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 		return new KNXNetworkLinkIP(TUNNELING, localEP, remoteEP, useNAT, settings);
 	}
 
+	/**
+	 * Creates a new network link using unsecured KNXnet/IP tunneling v2 over TCP to a remote KNXnet/IP server endpoint.
+	 *
+	 * @param connection a TCP connection to the server (if the connection state is not connected, link setup will
+	 *        establish the connection); closing the link will not close the TCP connection
+	 * @param settings medium settings defining device and KNX medium specifics for communication
+	 * @return the network link in open state
+	 * @throws KNXException KNXException on failure establishing the link
+	 * @throws InterruptedException on interrupted thread while establishing link
+	 */
 	public static KNXNetworkLinkIP newTunnelingLink(final TcpConnection connection, final KNXMediumSettings settings)
 			throws KNXException, InterruptedException {
 		return new KNXNetworkLinkIP(TunnelingV2, KNXnetIPTunnel.newTcpTunnel(TunnelingLayer.LinkLayer, connection,
@@ -163,6 +175,16 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 		return new KNXNetworkLinkIP(TunnelingV2, c, settings);
 	}
 
+	/**
+	 * Creates a new network link using KNX IP secure tunneling over TCP to a remote KNXnet/IP server endpoint.
+	 *
+	 * @param session a secure session for the server (session state is allowed to be not authenticated);
+	 *        closing the link will not close the session
+	 * @param settings medium settings defining device and KNX medium specifics for communication
+	 * @return the network link in open state
+	 * @throws KNXException KNXException on failure establishing the link
+	 * @throws InterruptedException on interrupted thread while establishing link
+	 */
 	public static KNXNetworkLinkIP newSecureTunnelingLink(final SecureSession session, final KNXMediumSettings settings)
 			throws KNXException, InterruptedException {
 		final KNXnetIPConnection c = SecureConnection.newTunneling(LinkLayer, session, settings.getDeviceAddress());

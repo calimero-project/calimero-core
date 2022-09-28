@@ -216,6 +216,9 @@ public final class TcpConnection implements Closeable {
 			logger = LoggerFactory.getLogger("calimero.knxnetip." + secureSymbol + " Session " + hostPort(conn.server));
 		}
 
+		/**
+		 * @return the session identifier assigned by the server
+		 */
 		public int id() { return sessionId; }
 
 		public int user() { return user; }
