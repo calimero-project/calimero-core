@@ -781,6 +781,12 @@ public class SecureApplicationLayer implements AutoCloseable {
 
 	public Security security() { return security; }
 
+	@Override
+	public String toString() {
+		final String sno = serialNumber.equals(SerialNumber.Zero) ? "" : "[S/N " + serialNumber + "] ";
+		return "SAL " + sno + link.getName();
+	}
+
 	protected void dispatchLinkEvent(final FrameEvent e) {
 		final var cemi = e.getFrame();
 		if (cemi.getMessageCode() == CEMILData.MC_LDATA_IND)
