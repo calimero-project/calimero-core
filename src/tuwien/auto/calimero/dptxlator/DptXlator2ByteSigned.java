@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2021, 2021 B. Malinowsky
+    Copyright (c) 2021, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -145,7 +145,7 @@ public class DptXlator2ByteSigned extends DPTXlator
 		data = new short[2];
 		formatter.setMinimumFractionDigits(0);
 		formatter.setMaximumFractionDigits(2);
-		formatter.setParseIntegerOnly(dpt.equals(DptPercent) ? false : true);
+		formatter.setParseIntegerOnly(!dpt.equals(DptPercent));
 	}
 
 	@Override

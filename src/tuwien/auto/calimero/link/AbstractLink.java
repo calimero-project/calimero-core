@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2021 B. Malinowsky
+    Copyright (c) 2015, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -630,7 +630,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		final IndividualAddress src = medium.getDeviceAddress();
 		// use default address 0 in system broadcast
 		final KNXAddress d = dst == null ? GroupAddress.Broadcast : dst;
-		final boolean repeat = mc == CEMILData.MC_LDATA_IND ? false : true;
+		final boolean repeat = mc != CEMILData.MC_LDATA_IND;
 		final boolean tp = medium.getMedium() == KNXMediumSettings.MEDIUM_TP1;
 		if (nsdu.length <= 16 && tp)
 			return new CEMILData(mc, src, d, nsdu, p, repeat, hopCount);

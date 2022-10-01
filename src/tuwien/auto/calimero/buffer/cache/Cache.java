@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ package tuwien.auto.calimero.buffer.cache;
  * {@link CacheObject}.<br>
  * For comparison of keys, {@link Object#hashCode()} and
  * {@link Object#equals(Object)} are used.
- * 
+ *
  * @author B. Malinowsky
  * @see CacheObject
  */
@@ -52,13 +52,13 @@ public interface Cache
 	/**
 	 * Offers information about data counting and cache performance.
 	 */
-	public interface Statistic
+	interface Statistic
 	{
 		/**
 		 * Returns the total number of successful requests with
 		 * {@link Cache#get(Object)} for a {@link CacheObject}.
 		 * <p>
-		 * 
+		 *
 		 * @return total hits
 		 */
 		long hits();
@@ -67,7 +67,7 @@ public interface Cache
 		 * Returns the total number of {@link CacheObject} not found with
 		 * {@link Cache#get(Object)}.
 		 * <p>
-		 * 
+		 *
 		 * @return total misses
 		 */
 		long misses();
@@ -78,12 +78,12 @@ public interface Cache
 		 * <p>
 		 * This value is obtained through
 		 * <code>ratio = (hits / (hits + misses))</code>.
-		 * 
+		 *
 		 * @return the hit ratio in the range [0,1]
 		 */
 		double hitRatio();
 	}
-	
+
 	/**
 	 * Inserts the {@link CacheObject} <code>obj</code> into the cache.
 	 * <p>
@@ -92,7 +92,7 @@ public interface Cache
 	 * in the cache, it will be replaced by <code>obj</code>.<br>
 	 * {@link CacheObject#resetTimestamp()} is invoked on <code>obj</code> after
 	 * <code>obj</code> was inserted successfully.
-	 * 
+	 *
 	 * @param obj CacheObject to put into the cache
 	 */
 	void put(CacheObject obj);
@@ -102,22 +102,22 @@ public interface Cache
 	 * cache.
 	 * <p>
 	 * If found, the access count of the CacheObject is incremented by 1.
-	 * 
+	 *
 	 * @param key key to search
 	 * @return the CacheObject or <code>null</code> if <code>key</code> does
 	 *         not exist in the cache
 	 */
 	CacheObject get(Object key);
-	
+
 	/**
 	 * Removes the CacheObject associated with <code>key</code> from the cache,
 	 * if found.
 	 * <p>
-	 * 
+	 *
 	 * @param key key of CacheObject to remove
 	 */
 	void remove(Object key);
-	
+
 	/**
 	 * Removes all {@link CacheObject}s which are not valid anymore, as defined
 	 * by a caching policy, from the cache.
@@ -128,11 +128,11 @@ public interface Cache
 	 * Empties the cache of all {@link CacheObject}s.
 	 */
 	void clear();
-	
+
 	/**
 	 * Returns information collected by this cache since its creation.
 	 * <p>
-	 * 
+	 *
 	 * @return a {@link Statistic} object
 	 */
 	Statistic statistic();

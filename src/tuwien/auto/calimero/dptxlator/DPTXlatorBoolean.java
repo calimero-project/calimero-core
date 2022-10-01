@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ public class DPTXlatorBoolean extends DPTXlator
 {
 	interface BooleanType<E extends Enum<E> & BooleanType<E>> {
 		@SuppressWarnings("unchecked")
-		default boolean value() { return ((Enum<E>) this).ordinal() == 1 ? true : false; }
+		default boolean value() { return ((Enum<E>) this).ordinal() == 1; }
 	}
 
 	public enum Step implements BooleanType<Step> { Decrease, Increase }
@@ -261,7 +261,7 @@ public class DPTXlatorBoolean extends DPTXlator
 	 */
 	public final boolean getValueBoolean()
 	{
-		return (data[0] & 0x01) != 0 ? true : false;
+		return (data[0] & 0x01) != 0;
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2020, 2021 B. Malinowsky
+    Copyright (c) 2020, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -120,8 +120,8 @@ public class DptXlatorRelativeControlRgbw extends DPTXlator {
 	}
 
 	private Optional<StepControl> component(final Component what) {
-		int offset;
-		int validBit;
+		final int offset;
+		final int validBit;
 		if (what == Component.Red) {
 			offset = 0;
 			validBit = 8;

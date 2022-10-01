@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -365,7 +365,7 @@ public class FT12Connection implements Connection<byte[]>
 	@Override
 	public void send(final byte[] frame, final BlockingMode blockingMode)
 			throws KNXTimeoutException, KNXPortClosedException, InterruptedException {
-		send(frame, blockingMode == BlockingMode.NonBlocking ? false : true);
+		send(frame, blockingMode != BlockingMode.NonBlocking);
 	}
 
 	/**

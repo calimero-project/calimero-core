@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2021 B. Malinowsky
+    Copyright (c) 2015, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -491,7 +491,7 @@ public class UsbConnection implements Connection<HidReport>
 	@Override
 	public void send(final HidReport frame, final BlockingMode blockingMode)
 			throws KNXPortClosedException, KNXTimeoutException {
-		send(frame, blockingMode == BlockingMode.NonBlocking ? false : true);
+		send(frame, blockingMode != BlockingMode.NonBlocking);
 	}
 
 	@SuppressWarnings("unused")
@@ -641,7 +641,7 @@ public class UsbConnection implements Connection<HidReport>
 						final String inout = DescriptorUtils.getDirectionName(addr);
 						logger.trace("EP {} {}", index, inout);
 
-						final boolean epIn = (addr & LibUsb.ENDPOINT_IN) == 0 ? false : true;
+						final boolean epIn = (addr & LibUsb.ENDPOINT_IN) != 0;
 						if (epIn && epAddressIn == 0)
 							epAddressIn = addr & 0xff;
 						if (!epIn && epAddressOut == 0)

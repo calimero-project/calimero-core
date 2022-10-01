@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -280,7 +280,7 @@ public final class CEMIFactory
 
 		if (c) return new CEMILData(mc, new IndividualAddress(src), a, tpdu, p, c);
 		// for .ind always create a not repeated frame, otherwise default repetition behavior
-		final boolean repeat = mc == CEMILData.MC_LDATA_IND ? false : true;
+		final boolean repeat = mc != CEMILData.MC_LDATA_IND;
 		return new CEMILData(mc, new IndividualAddress(src), a, tpdu, p, repeat, domainBcast, ack, hops);
 	}
 

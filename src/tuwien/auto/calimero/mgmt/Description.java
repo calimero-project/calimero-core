@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -106,7 +106,7 @@ public final class Description
 		oindex = data[0] & 0xff;
 		id = data[1] & 0xff;
 		pindex = data[2] & 0xff;
-		write = (data[3] & 0x80) == 0x80 ? true : false;
+		write = (data[3] & 0x80) == 0x80;
 		pdt = data[3] & 0x3f;
 		dpt = Optional.empty();
 		maxElems = (data[4] & 0xff) << 8 | (data[5] & 0xff);

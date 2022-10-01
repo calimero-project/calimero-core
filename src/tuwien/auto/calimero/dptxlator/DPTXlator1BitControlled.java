@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2021 B. Malinowsky
+    Copyright (c) 2010, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -333,7 +333,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 
 	private boolean control(final int index)
 	{
-		return (data[index] & 0x02) != 0 ? true : false;
+		return (data[index] & 0x02) != 0;
 	}
 
 	private String fromDPT(final int index)

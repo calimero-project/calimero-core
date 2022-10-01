@@ -340,7 +340,7 @@ public final class Keyring {
 
 	void load() {
 		int line = 0;
-		try (final var reader = XmlInputFactory.newInstance().createXMLReader(keyringUri)) {
+		try (var reader = XmlInputFactory.newInstance().createXMLReader(keyringUri)) {
 			// call nextTag() to dive straight into first element, so we can check the keyring namespace
 			reader.nextTag();
 
