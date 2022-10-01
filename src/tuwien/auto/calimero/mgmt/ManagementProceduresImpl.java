@@ -732,7 +732,8 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	}
 
 	public void assignDomainAndDeviceAddress(final byte[] domainAddress, final IndividualAddress deviceAddress,
-			final byte[] fdsk, final byte[] toolKey, final Duration maxLookup) throws KNXException, InterruptedException {
+			final byte[] fdsk, final byte[] toolKey, final Duration maxLookup, final List<IndividualAddress> knxipRouters)
+			throws KNXException, InterruptedException {
 
 		final var deadline = Instant.now().plus(maxLookup);
 		var list = List.<SerialNumber>of();
@@ -742,9 +743,11 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			throw new KNXRemoteException("" + (list.isEmpty() ? "no" : list.size()) + " devices in programming mode");
 		final var sno = list.get(0);
 
-		final int medium = ((TransportLayerImpl) tl).link().getKNXMedium().getMedium();
+		final var link = ((TransportLayerImpl) tl).link();
+		final int medium = link.getKNXMedium().getMedium();
 		final boolean openMedium = medium == KNXMediumSettings.MEDIUM_PL110 || medium == KNXMediumSettings.MEDIUM_RF;
 		final boolean sysBcast = openMedium;
+
 		final SecureManagement sal  = ((ManagementClientImpl) mc).secureApplicationLayer();
 
 		final var result = broadacstSync(sal, sysBcast, sno, fdsk, toolKey);
@@ -752,7 +755,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		final AutoCloseable removeableKey = (AutoCloseable) result[1];
 
 		if (openMedium) {
-			writeDomainAddress(sno, domainAddress, List.of());
+			writeDomainAddress(sno, domainAddress, knxipRouters);
 		}
 		writeAddress(sno, deviceAddress);
 
@@ -777,6 +780,11 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		// NYI KNX IP Secure setup
 
 		mc.restart(dst, EraseCode.ConfirmedRestart, 0);
+	}
+
+	public void assignDomainAndDeviceAddress(final byte[] domainAddress, final IndividualAddress deviceAddress,
+			final byte[] fdsk, final byte[] toolKey, final Duration maxLookup) throws KNXException, InterruptedException {
+		assignDomainAndDeviceAddress(domainAddress, deviceAddress, fdsk, toolKey, maxLookup, List.of());
 	}
 
 	private Object[] broadacstSync(final SecureApplicationLayer sal, final boolean systemBroadcast,
