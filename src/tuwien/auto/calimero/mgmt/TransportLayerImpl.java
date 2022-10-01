@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,6 +47,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
@@ -255,16 +256,23 @@ public class TransportLayerImpl implements TransportLayer
 	}
 
 	/**
+	 * @deprecated Use {@link #destination(IndividualAddress)}.
 	 * Returns the destination object for the remote individual address, if such exists.
 	 *
 	 * @param remote the remote address to look up
 	 * @return the destination for that address, or <code>null</code> if no destination
 	 *         is currently maintained by the transport layer
 	 */
+	@Deprecated
 	public Destination getDestination(final IndividualAddress remote)
 	{
 		final AggregatorProxy proxy = proxies.get(remote);
 		return proxy != null ? proxy.getDestination() : null;
+	}
+
+	@Override
+	public Optional<Destination> destination(final IndividualAddress remote) {
+		return Optional.ofNullable(getDestination(remote));
 	}
 
 	@Override

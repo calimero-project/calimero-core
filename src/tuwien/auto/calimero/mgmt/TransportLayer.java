@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,6 +35,8 @@
 */
 
 package tuwien.auto.calimero.mgmt;
+
+import java.util.Optional;
 
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
@@ -99,6 +101,15 @@ public interface TransportLayer
 	 */
 	Destination createDestination(IndividualAddress remote, boolean connectionOriented,
 		boolean keepAlive, boolean verifyMode);
+
+	/**
+	 * Returns the destination object for the remote individual address, if such exists.
+	 *
+	 * @param remote the remote address to look up
+	 * @return the destination for that address, or an empty {@code Optional} if no destination
+	 *         is currently maintained by the transport layer
+	 */
+	Optional<Destination> destination(IndividualAddress remote);
 
 	/**
 	 * Destroys the given destination and removes it from being maintained by this
