@@ -223,8 +223,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	 * Creates a new management procedures instance, using the supplied management client
 	 * for application layer services.
 	 *
-	 * @param mgmtClient the management client, with a network link attached and in open
-	 *        state
+	 * @param mgmtClient the management client, with a network link attached and in open state
 	 * @param transportLayer the transport layer used to initialize <code>mgmtClient</code>
 	 */
 	protected ManagementProceduresImpl(final ManagementClient mgmtClient, final TransportLayer transportLayer) {
@@ -463,7 +462,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	/**
 	 * Reads the serial number of KNX devices in programming mode.
 	 * <p>
-	 * This method corresponds to the KNX <i>NM_Read_SerialNumber_By_ProgrammingMode<br>.
+	 * This method corresponds to the KNX <i>NM_Read_SerialNumber_By_ProgrammingMode</i><br>.
 	 * Depending on whether none, one, or several devices are in programming mode, the
 	 * returned list size of addresses is 0, 1, or &gt; 1, respectively.
 	 * Impl. note: the read timeout is 1.5 seconds.
@@ -484,7 +483,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	 * Reads the serial number of KNX devices in ex-factory state, i.e., devices of which both the domain address
 	 * (if available) and the individual address have their factory default value.
 	 * <p>
-	 * This method corresponds to the KNX <i>NM_Read_SerialNumber_By_ExFactoryState<br>.
+	 * This method corresponds to the KNX <i>NM_Read_SerialNumber_By_ExFactoryState</i><br>.
 	 * Depending on whether none, one, or several devices respond, the
 	 * returned list size of addresses is 0, 1, or &gt; 1, respectively.
 	 *
@@ -505,7 +504,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	 * Reads the serial number of KNX devices which have just been powered on, to identify and address "inaccessible
 	 * devices".
 	 * <p>
-	 * This method corresponds to the KNX <i>NM_Read_SerialNumber_By_PowerReset<br> procedure.
+	 * This method corresponds to the KNX <i>NM_Read_SerialNumber_By_PowerReset</i> procedure.
 	 * Depending on whether none, one, or several devices respond, the
 	 * returned list size of addresses is 0, 1, or &gt; 1, respectively. The read timeout is 4 minutes.
 	 *

@@ -861,7 +861,7 @@ public interface ManagementClient extends AutoCloseable
 	 * Authorizes at a communication partner using an authorization key to obtain a
 	 * certain access level.
 	 * <p>
-	 * This service uses point-to-point connection-oriented communication mode.<br>
+	 * This service corresponds to A_Authorize and uses point-to-point connection-oriented communication mode.<br>
 	 * The returned access level is between 0 (maximum access rights) and 3 (i.e., minimum
 	 * access rights) or 0 (maximum access rights) and 15 (minimum access rights).<br>
 	 * If no authorization is done at all or the supplied key is not valid, the default
@@ -869,7 +869,7 @@ public interface ManagementClient extends AutoCloseable
 	 * from the partner or a new authorization request is done.
 	 *
 	 * @param dst destination at which to authorize
-	 * @param key byte array containing authorization key
+	 * @param key byte array containing authorization key, {@code key.length = 4}
 	 * @return the granted access level
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXInvalidResponseException if the received access level is out of the
