@@ -828,8 +828,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	private Destination getOrCreateDestination(final IndividualAddress device,
 		final boolean keepAlive, final boolean verifyByServer)
 	{
-		final Destination d = ((TransportLayerImpl) tl).getDestination(device);
-		return d != null ? d : tl.createDestination(device, true, keepAlive, verifyByServer);
+		return tl.destination(device).orElseGet(() -> tl.createDestination(device, true, keepAlive, verifyByServer));
 	}
 
 	private IndividualAddress[] scanAddresses(final List<IndividualAddress> addresses,

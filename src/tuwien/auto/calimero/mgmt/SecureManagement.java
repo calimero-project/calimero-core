@@ -37,6 +37,7 @@
 package tuwien.auto.calimero.mgmt;
 
 import java.util.Map;
+import java.util.Optional;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.DetachEvent;
@@ -55,7 +56,7 @@ public class SecureManagement extends SecureApplicationLayer {
 
 	private static final int DataConnected = 0x40;
 
-	private final TransportLayerImpl transportLayer;
+	private final TransportLayer transportLayer;
 	private final EventListeners<TransportListener> listeners;
 
 	private final TransportListener transportListener = new TransportListener() {
@@ -112,11 +113,10 @@ public class SecureManagement extends SecureApplicationLayer {
 	@Override
 	protected void send(final KNXAddress remote, final byte[] secureApdu)
 			throws KNXTimeoutException, KNXLinkClosedException {
-		final var destination = remote instanceof IndividualAddress
-				? transportLayer.getDestination((IndividualAddress) remote) : null;
-		if (destination != null && destination.isConnectionOriented()) {
+		final var destination = destination(remote);
+		if (destination.isPresent() && destination.get().isConnectionOriented()) {
 			try {
-				transportLayer.sendData(destination, Priority.SYSTEM, secureApdu);
+				transportLayer.sendData(destination.get(), Priority.SYSTEM, secureApdu);
 			}
 			catch (final KNXDisconnectException e) {
 				throw new KNXTimeoutException("timeout caused by disconnect from " + remote, e);
@@ -128,18 +128,24 @@ public class SecureManagement extends SecureApplicationLayer {
 
 	@Override
 	protected int tpci(final KNXAddress dst) {
-		final var proxy = transportLayer.proxies().get(dst);
-
 		int seqSend = 0;
 		int tlMode = 0;
-		if (proxy != null) {
-			final var destination = proxy.getDestination();
+
+		final var proxy = ((TransportLayerImpl) transportLayer).proxies().get(dst);
+		final var destinationOpt = destination(dst);
+		if (destinationOpt.isPresent()) {
+			final var destination = destinationOpt.get();
 			tlMode = destination.isConnectionOriented() ? DataConnected : 0;
 			seqSend = proxy.getSeqSend();
 		}
 
 		final int tpci = tlMode | seqSend << 2;
 		return tpci;
+	}
+
+	private Optional<Destination> destination(final KNXAddress remote) {
+		return remote instanceof IndividualAddress ? transportLayer.destination((IndividualAddress) remote)
+				: Optional.<Destination> empty();
 	}
 
 	@Override
