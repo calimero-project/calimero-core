@@ -79,6 +79,7 @@ import tuwien.auto.calimero.mgmt.ManagementClient.EraseCode;
 import tuwien.auto.calimero.mgmt.ManagementClient.TestResult;
 import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
 import tuwien.auto.calimero.secure.SecureApplicationLayer;
+import tuwien.auto.calimero.secure.Security;
 
 /**
  * An implementation of {@link ManagementProcedures}.
@@ -201,6 +202,20 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	public ManagementProceduresImpl(final KNXNetworkLink link) throws KNXLinkClosedException {
 		tl = new TransportLayerImpl(link);
 		mc = new ManagementClientImpl(link, tl);
+		detachMgmtAndTransportLayer = true;
+	}
+
+	/**
+	 * Creates a new management procedures instance, using the supplied KNX network link, and {@code security} for
+	 * secure management if required.
+	 *
+	 * @param link the KNX network link in open state, the management procedures instance does not take ownership
+	 * @param security security with device tool keys to use for secure management
+	 * @throws KNXLinkClosedException on closed {@link KNXNetworkLink}
+	 */
+	public ManagementProceduresImpl(final KNXNetworkLink link, final Security security) throws KNXLinkClosedException {
+		tl = new TransportLayerImpl(link);
+		mc = new ManagementClientImpl(link, new SecureManagement(tl, security.deviceToolKeys()));
 		detachMgmtAndTransportLayer = true;
 	}
 

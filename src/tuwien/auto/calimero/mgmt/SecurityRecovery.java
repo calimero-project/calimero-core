@@ -66,10 +66,27 @@ public final class SecurityRecovery {
 	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	private final KNXNetworkLink link;
+	private final Security security;
 
 
+	/**
+	 * Creates a new instance for security recovery, using {@link Security#defaultInstallation} for secure management.
+	 *
+	 * @param link network link used for communication with a KNX network, SecurityRecovery does not take ownership
+	 */
 	public SecurityRecovery(final KNXNetworkLink link) {
 		this.link = link;
+		this.security = Security.defaultInstallation();
+	}
+
+	/**
+	 * Creates a new instance for security recovery, using {@code security} for secure management.
+	 *
+	 * @param link network link used for communication with a KNX network, SecurityRecovery does not take ownership
+	 */
+	public SecurityRecovery(final KNXNetworkLink link, final Security security) {
+		this.link = link;
+		this.security = security;
 	}
 
 	/**
@@ -123,7 +140,7 @@ public final class SecurityRecovery {
 	public long lastValidSequenceNumber(final IndividualAddress address,
 			final Iterable<IndividualAddress> linkedDevices) throws KNXLinkClosedException, InterruptedException {
 
-		try (var mc = new ManagementClientImpl(link)) {
+		try (var mc = new ManagementClientImpl(link, security)) {
 			for (final var device : linkedDevices) {
 				try (var dst = mc.createDestination(device, false)) {
 					final long seq = readLastValidSeq(mc, dst, address);
@@ -142,7 +159,7 @@ public final class SecurityRecovery {
 	public Map<IndividualAddress, Long> lastValidSequenceNumbers(final Iterable<IndividualAddress> senders)
 			throws KNXLinkClosedException, InterruptedException {
 		final var lastValidSeqs = new HashMap<IndividualAddress, Long>();
-		try (var mc = new ManagementClientImpl(link)) {
+		try (var mc = new ManagementClientImpl(link, security)) {
 			for (final var device : senders) {
 				try (var dst = mc.createDestination(device, false)) {
 					final long seq = readSeqSending(mc, dst);

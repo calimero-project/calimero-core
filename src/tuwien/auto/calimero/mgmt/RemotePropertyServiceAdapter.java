@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,9 +42,11 @@ import java.util.function.Consumer;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.NetworkLinkListener;
+import tuwien.auto.calimero.secure.Security;
 
 /**
  * Property adapter for remote property services.
@@ -55,25 +57,26 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 {
 	private final ManagementClient mc;
 	private final Destination dst;
-	private byte[] key;
-	private volatile int accessLevel;
-	private final NetworkLinkListener nll = new NLListener();
-	private final Consumer<CloseEvent> adapterClosed;
+	private final byte[] key;
+	private final int accessLevel;
 
-	private final class NLListener implements NetworkLinkListener {
+	private final Consumer<CloseEvent> adapterClosed;
+	private final NetworkLinkListener nll = new NetworkLinkListener() {
 		@Override
 		public void linkClosed(final CloseEvent e) {
 			adapterClosed.accept(new CloseEvent(RemotePropertyServiceAdapter.this, e.getInitiator(), e.getReason()));
 		}
-	}
+	};
+
 
 	/**
-	 * Creates a new property adapter for remote property access.
+	 * Creates a new property adapter for remote property access, using {@link Security#defaultInstallation()} for
+	 * KNX Data Secure property services.
 	 *
 	 * @param link KNX network link used for communication with the KNX network
 	 * @param remote KNX individual address to access its interface objects
-	 * @param adapterClosed receives notification about adapter close event
-	 * @param connOriented <code>true</code> to use connection oriented mode for access,
+	 * @param adapterClosed receives notification about adapter close event, which happens if {@code link} got closed
+	 * @param connOriented <code>true</code> to use connection-oriented mode for access,
 	 *        <code>false</code> to use connectionless mode
 	 * @throws KNXLinkClosedException if the network link is closed
 	 */
@@ -83,47 +86,69 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 	{
 		mc = new ManagementClientImpl(link);
 		dst = mc.createDestination(remote, connOriented);
+		key = new byte[0];
+		accessLevel = 15;
+
 		this.adapterClosed = Objects.requireNonNull(adapterClosed);
 		link.addLinkListener(nll);
-		key = null;
-		accessLevel = 15;
 	}
 
 	/**
 	 * Creates a new property adapter for remote property access in connection-oriented
-	 * mode with authorization.
+	 * mode with {@link ManagementClient#authorize authorization}, using {@link Security#defaultInstallation()} for
+	 * KNX Data Secure property services.
 	 *
 	 * @param link KNX network link used for communication with the KNX network
 	 * @param remote KNX individual address to access its interface objects
-	 * @param adapterClosed receives notification about adapter close event
-	 * @param authorizeKey byte array with authorization key to obtain a certain access level
+	 * @param adapterClosed receives notification about adapter close event, which happens if {@code link} got closed
+	 * @param authorizeKey authorization key to obtain a specific access level using {@link ManagementClient#authorize}
+	 *        for certain get or set operations, {@code authorizeKey.length = 4}
 	 * @throws KNXLinkClosedException if the network link is closed
 	 * @throws KNXException on failure during authorization
 	 * @throws InterruptedException on interrupted thread
 	 */
 	public RemotePropertyServiceAdapter(final KNXNetworkLink link,
-		final IndividualAddress remote, final Consumer<CloseEvent> adapterClosed,
-		final byte[] authorizeKey) throws KNXException, InterruptedException
-	{
-		this(link, remote, adapterClosed, true);
-		key = authorizeKey.clone();
-		try {
-			accessLevel = mc.authorize(dst, key);
-		}
-		catch (final KNXException e) {
-			close();
-			throw e;
-		}
+			final IndividualAddress remote, final Consumer<CloseEvent> adapterClosed,
+			final byte[] authorizeKey) throws KNXException, InterruptedException {
+		this(link, remote, Security.defaultInstallation(), true, validateAuthKeyLength(authorizeKey), adapterClosed);
 	}
 
 	/**
-	 * @return the access level granted by the remote communication endpoint, or minimum access rights (15) if
-	 *         remote property access was not authorized
+	 * Creates a new property adapter for remote property access, using {@code security} for KNX Data Secure property
+	 * services, and optionally {@link ManagementClient#authorize authorization}.
+	 * Note, that access control and authorization are not mutually exclusive, and can be used together
+	 * in a device implementing KNX Data Security.
+	 *
+	 * @param link KNX network link used for communication with the KNX network
+	 * @param remote KNX individual address to access its interface objects
+	 * @param security security containing the device tool key to use for KNX Data Secure property services with the
+	 *        {@code remote} endpoint
+	 * @param connOriented <code>true</code> to use connection-oriented mode for access,
+	 *        <code>false</code> to use connectionless mode
+	 * @param authorizeKey authorization key to obtain a specific access level using {@link ManagementClient#authorize}
+	 *        for certain get or set operations, {@code authorizeKey.length = 4};
+	 *        use {@code authorizeKey.length = 0} to skip authorization
+	 * @param adapterClosed receives notification about adapter close event
+	 * @throws KNXLinkClosedException if the network link is closed
+	 * @throws InterruptedException on interrupted thread
 	 */
-	public final int accessLevel()
-	{
-		return accessLevel;
+	public RemotePropertyServiceAdapter(final KNXNetworkLink link, final IndividualAddress remote,
+			final Security security, final boolean connOriented, final byte[] authorizeKey,
+			final Consumer<CloseEvent> adapterClosed) throws KNXException, InterruptedException {
+		mc = new ManagementClientImpl(link, security);
+		dst = mc.createDestination(remote, connOriented);
+		key = authorizeKey.clone();
+		accessLevel = authorize();
+
+		this.adapterClosed = Objects.requireNonNull(adapterClosed);
+		link.addLinkListener(nll);
 	}
+
+	/**
+	 * @return the access level granted by the remote communication endpoint, or minimum access rights
+	 *         (implementation note: access level 15) if remote property access was not authorized
+	 */
+	public final int accessLevel() { return accessLevel; }
 
 	public ManagementClient managementClient() { return mc; }
 
@@ -172,5 +197,23 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 		final KNXNetworkLink lnk = mc.detach();
 		if (lnk != null)
 			lnk.removeLinkListener(nll);
+	}
+
+	private int authorize() throws InterruptedException, KNXException {
+		if (key.length == 0)
+			return 15;
+		try {
+			return mc.authorize(dst, key);
+		}
+		catch (final KNXException e) {
+			close();
+			throw e;
+		}
+	}
+
+	private static byte[] validateAuthKeyLength(final byte[] authorizeKey) {
+		if (authorizeKey.length == 4) // also covers null ptr
+			return authorizeKey;
+		throw new KNXIllegalArgumentException("length of authorize key not 4 bytes");
 	}
 }

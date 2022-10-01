@@ -230,9 +230,7 @@ public class ManagementClientImpl implements ManagementClient
 
 	/**
 	 * Creates a new management client attached to the supplied KNX network link.
-	 * <p>
-	 * The log service used by this management client is named "MC " +
-	 * <code>link.getName()</code>.
+	 * For secure management, {@link Security#defaultInstallation} is used.
 	 *
 	 * @param link network link used for communication with a KNX network, the client does not take ownership
 	 * @throws KNXLinkClosedException if the network link is closed
@@ -243,6 +241,26 @@ public class ManagementClientImpl implements ManagementClient
 		detachTransportLayer = true;
 	}
 
+	/**
+	 * Creates a new management client attached to the supplied KNX network link, using {@code security} for secure
+	 * management if required.
+	 *
+	 * @param link network link used for communication with a KNX network, the client does not take ownership
+	 * @param security security with device tool keys to use for secure management
+	 * @throws KNXLinkClosedException if the network link is closed
+	 */
+	public ManagementClientImpl(final KNXNetworkLink link, final Security security) throws KNXLinkClosedException {
+		this(link, new SecureManagement(new TransportLayerImpl(link), security.deviceToolKeys()));
+		detachTransportLayer = true;
+	}
+
+	/**
+	 * Creates a new management client attached to the supplied KNX network link, and using the supplied transport layer instance.
+	 *
+	 * @param link network link used for communication with a KNX network, the client does not take ownership
+	 * @param transportLayer transport layer, the client does not take ownership (and won't {@link TransportLayer#detach}
+	 *        the link)
+	 */
 	protected ManagementClientImpl(final KNXNetworkLink link, final TransportLayer transportLayer)
 	{
 		this(link, new SecureManagement(transportLayer, Security.defaultInstallation().deviceToolKeys()));

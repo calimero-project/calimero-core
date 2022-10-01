@@ -162,12 +162,28 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 
 	/**
 	 * Creates a new process communicator attached to the supplied KNX network link.
+	 * For secure process communication, {@link Security#defaultInstallation} is used.
 	 *
 	 * @param link network link used for communication with a KNX network
 	 * @throws KNXLinkClosedException if the network link is closed
 	 */
 	public ProcessCommunicatorImpl(final KNXNetworkLink link) throws KNXLinkClosedException {
-		this(link, new SecureApplicationLayer(link, Security.defaultInstallation()));
+		this(link, Security.defaultInstallation(), true);
+	}
+
+	/**
+	 * Creates a new process communicator attached to the supplied KNX network link, using {@code security} for secure
+	 * process communication if required.
+	 *
+	 * @param link network link used for communication with a KNX network
+	 * @param security security to use for secure process communication
+	 * @param useGoDiagnostics {@code true} to use Group Object Diagnostics for outgoing KNX Data Secure messages,
+	 *        {@code false} to directly secure with KNX Data Secure where encryption is required
+	 * @throws KNXLinkClosedException
+	 */
+	public ProcessCommunicatorImpl(final KNXNetworkLink link, final Security security, final boolean useGoDiagnostics)
+			throws KNXLinkClosedException {
+		this(link, new SecureApplicationLayer(link, security), useGoDiagnostics);
 	}
 
 	/**
@@ -190,8 +206,8 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	 *
 	 * @param link network link used for communication with a KNX network
 	 * @param sal secure application layer
-	 * @param useGoDiagnostics <code>true</code> to use Group Object Diagnostics for outgoing KNX Data Secure messages,
-	 * <code>false</code> to directly secure with KNX Data Secure where encryption is required
+	 * @param useGoDiagnostics {@code true} to use Group Object Diagnostics for outgoing KNX Data Secure messages,
+	 *        {@code false} to directly secure with KNX Data Secure where encryption is required
 	 * @throws KNXLinkClosedException if the network link is closed
 	 */
 	public ProcessCommunicatorImpl(final KNXNetworkLink link, final SecureApplicationLayer sal,
