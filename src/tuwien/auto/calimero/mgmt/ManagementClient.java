@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -114,7 +114,9 @@ public interface ManagementClient extends AutoCloseable
 	 *        <code>false</code> for connectionless mode
 	 * @return destination representing the logical connection
 	 */
-	Destination createDestination(IndividualAddress remote, boolean connectionOriented);
+	default Destination createDestination(final IndividualAddress remote, final boolean connectionOriented) {
+		return createDestination(remote, connectionOriented, false, false);
+	}
 
 	/**
 	 * Creates a new destination using the remote KNX address and connection settings for

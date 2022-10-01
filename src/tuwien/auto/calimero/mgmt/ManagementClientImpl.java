@@ -303,13 +303,6 @@ public class ManagementClientImpl implements ManagementClient
 
 	@Override
 	public Destination createDestination(final IndividualAddress remote,
-		final boolean connectionOriented)
-	{
-		return tl.createDestination(remote, connectionOriented);
-	}
-
-	@Override
-	public Destination createDestination(final IndividualAddress remote,
 		final boolean connectionOriented, final boolean keepAlive, final boolean verifyMode)
 	{
 		return tl.createDestination(remote, connectionOriented, keepAlive, verifyMode);
