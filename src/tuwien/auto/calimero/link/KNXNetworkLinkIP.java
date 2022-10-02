@@ -64,7 +64,6 @@ import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.knxnetip.KNXnetIPDevMgmt;
 import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
-import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
 import tuwien.auto.calimero.knxnetip.LostMessageEvent;
 import tuwien.auto.calimero.knxnetip.RoutingBusyEvent;
 import tuwien.auto.calimero.knxnetip.RoutingListener;
@@ -159,12 +158,12 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 *        establish the connection); closing the link will not close the TCP connection
 	 * @param settings medium settings defining device and KNX medium specifics for communication
 	 * @return the network link in open state
-	 * @throws KNXException KNXException on failure establishing the link
+	 * @throws KNXException on failure establishing the link
 	 * @throws InterruptedException on interrupted thread while establishing link
 	 */
 	public static KNXNetworkLinkIP newTunnelingLink(final TcpConnection connection, final KNXMediumSettings settings)
 			throws KNXException, InterruptedException {
-		return new KNXNetworkLinkIP(TunnelingV2, KNXnetIPTunnel.newTcpTunnel(TunnelingLayer.LinkLayer, connection,
+		return new KNXNetworkLinkIP(TunnelingV2, KNXnetIPTunnel.newTcpTunnel(LinkLayer, connection,
 				settings.getDeviceAddress()), settings);
 	}
 
