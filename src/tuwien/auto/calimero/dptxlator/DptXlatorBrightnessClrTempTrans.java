@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2021 B. Malinowsky
+    Copyright (c) 2018, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 /**
  * Translator for KNX DPTs with main number 249, type <b>brightness, color temperature, transition</b>. The KNX data
  * type width is 6 bytes. The default return value after creation is the value with all parts not valid
- * (<code>- % - K - s</code>).
+ * ({@code - % - K - s}).
  * <p>
  * In value methods expecting string items, brightness and transition are parsed as floating point value.
  */
@@ -96,7 +96,7 @@ public class DptXlatorBrightnessClrTempTrans extends DPTXlator {
 	 * Creates a translator for the given datapoint type ID.
 	 *
 	 * @param dptId available implemented datapoint type ID
-	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptId</code>
+	 * @throws KNXFormatException on wrong formatted or not expected (available) {@code dptId}
 	 */
 	public DptXlatorBrightnessClrTempTrans(final String dptId) throws KNXFormatException {
 		super(6);
@@ -144,9 +144,9 @@ public class DptXlatorBrightnessClrTempTrans extends DPTXlator {
 	/**
 	 * Sets one new translation item, replacing any old items.
 	 *
-	 * @param brightness absolute brightness, <code>0 &le; brightness &le; 100 %</code>
-	 * @param clrTemperature absolute color temperature, <code>0 &le; temperature &le; 65535</code>
-	 * @param fadingTime duration of transition <code>0 &le; fadingTime &le; 6553500 ms</code> (100 ms resolution)
+	 * @param brightness absolute brightness, {@code 0 ≤; brightness ≤ 100 %}
+	 * @param clrTemperature absolute color temperature, {@code 0 ≤ temperature ≤ 65535}
+	 * @param fadingTime duration of transition {@code 0 ≤ fadingTime ≤ 6553500 ms} (100 ms resolution)
 	 */
 	public final void setValue(final double brightness, final int clrTemperature, final Duration fadingTime) {
 		data = toDpt(brightness, clrTemperature, fadingTime);

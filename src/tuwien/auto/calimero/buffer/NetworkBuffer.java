@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -401,7 +401,7 @@ public final class NetworkBuffer implements AutoCloseable
 	 * <p>
 	 * By default, the added configuration is not activated, and no filters are set by the
 	 * network buffer.<br>
-	 * If the supplied <code>link</code> gets closed, the created configuration will get
+	 * If the supplied {@code link} gets closed, the created configuration will get
 	 * deactivated (see {@link Configuration#activate(boolean)}), and the buffered link of
 	 * the configuration, obtained with {@link Configuration#getBufferedLink()}, will get
 	 * closed as well.
@@ -436,10 +436,10 @@ public final class NetworkBuffer implements AutoCloseable
 	 * Gets the configuration which provides the buffered link.
 	 * <p>
 	 * If the network link is not a buffered link or not found in the current
-	 * configurations of this network buffer, <code>null</code> is returned.
+	 * configurations of this network buffer, {@code null} is returned.
 	 *
 	 * @param bufferedLink the buffered link to get the configuration for
-	 * @return the owning configuration of that link or <code>null</code>
+	 * @return the owning configuration of that link or {@code null}
 	 */
 	public Configuration getConfiguration(final KNXNetworkLink bufferedLink)
 	{

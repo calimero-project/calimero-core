@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ public final class LogService
 	{}
 
 	/**
-	 * Returns an slf4j logger identified by <code>name</code>.
+	 * Returns an slf4j logger identified by {@code name}.
 	 *
 	 * @param name logger name
 	 * @return logger
@@ -95,7 +95,7 @@ public final class LogService
 	}
 
 	/**
-	 * Returns an slf4j logger identified by <code>name</code> with asynchronous processing of
+	 * Returns an slf4j logger identified by {@code name} with asynchronous processing of
 	 * logged information. Note that with asynchronous loggers the stack traces will not show the
 	 * original location.
 	 *
@@ -138,7 +138,7 @@ public final class LogService
 
 	/**
 	 * Logs a message with the specified log level, format, and arguments using the supplied logger. This method works
-	 * around the limitation that slf4j loggers don't have a generic <code>log</code> method.
+	 * around the limitation that slf4j loggers don't have a generic {@code log} method.
 	 *
 	 * @param logger the logger
 	 * @param level log level to use for the message

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2021 B. Malinowsky
+    Copyright (c) 2015, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -170,7 +170,7 @@ public interface DeviceDescriptor
 		/**
 		 * Returns the device descriptor type 0 from a byte array containing a mask version.
 		 *
-		 * @param data the type 0 descriptor data (mask version), <code>data.length == 2</code>
+		 * @param data the type 0 descriptor data (mask version), {@code data.length == 2}
 		 * @return the corresponding {@link DD0} object
 		 */
 		public static DD0 from(final byte[] data)
@@ -305,7 +305,7 @@ public interface DeviceDescriptor
 		/**
 		 * Returns the device descriptor type 2 from a descriptor data byte array.
 		 *
-		 * @param data the type 2 descriptor data, <code>data.length == 14</code>
+		 * @param data the type 2 descriptor data, {@code data.length == 14}
 		 * @return the corresponding {@link DD2} object
 		 */
 		public static DD2 from(final byte[] data)
@@ -372,8 +372,8 @@ public interface DeviceDescriptor
 		}
 
 		/**
-		 * @return <code>true</code> if network management procedures using A_Link_Read/Write are
-		 *         supported, <code>false</code> otherwise
+		 * @return {@code true} if network management procedures using A_Link_Read/Write are
+		 *         supported, {@code false} otherwise
 		 */
 		public boolean supportsLinkManagement()
 		{
@@ -401,7 +401,7 @@ public interface DeviceDescriptor
 		 * The number of channels implemented in the device for the specified channel type.
 		 *
 		 * @param channelType the requested channel type
-		 * @return the number of channels, <code>1 &le; channels &le; 8</code>
+		 * @return the number of channels, {@code 1 ≤ channels ≤ 8}
 		 */
 		public int channels(final Channel channelType)
 		{

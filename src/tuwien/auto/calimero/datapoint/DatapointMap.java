@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -78,7 +78,7 @@ public class DatapointMap<T extends Datapoint> implements DatapointModel<T>, Cha
 	}
 
 	/**
-	 * Creates a new datapoint map and adds all <code>datapoints</code> to the map.
+	 * Creates a new datapoint map and adds all {@code datapoints} to the map.
 	 * <p>
 	 * A datapoint to be added has to be unique according its main address, the attempt to
 	 * add two datapoints using the same main address results in a

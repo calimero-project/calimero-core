@@ -70,7 +70,7 @@ public final class IPCurrentConfigDIB extends DIB
 	 * <p>
 	 *
 	 * @param data byte array containing device DIB structure
-	 * @param offset start offset of DIB in <code>data</code>
+	 * @param offset start offset of DIB in {@code data}
 	 * @throws KNXFormatException if no DIB found or invalid structure
 	 */
 	public IPCurrentConfigDIB(final byte[] data, final int offset) throws KNXFormatException
@@ -99,13 +99,13 @@ public final class IPCurrentConfigDIB extends DIB
 	/**
 	 * Creates a IP current configuration DIB using the supplied device information.
 	 *
-	 * @param ip currently used IP address, use <code>null</code> or 0.0.0.0 if the device does not
+	 * @param ip currently used IP address, use {@code null} or 0.0.0.0 if the device does not
 	 *        provide this information
-	 * @param subnetMask currently used subnet mask, use <code>null</code> or 0.0.0.0 if the device
+	 * @param subnetMask currently used subnet mask, use {@code null} or 0.0.0.0 if the device
 	 *        does not provide this information
-	 * @param gateway address of the currently used default gateway, use <code>null</code> or
+	 * @param gateway address of the currently used default gateway, use {@code null} or
 	 *        0.0.0.0 if the device does not provide this information
-	 * @param dhcp address of the currently used DHCP server, use <code>null</code> or 0.0.0.0 if
+	 * @param dhcp address of the currently used DHCP server, use {@code null} or 0.0.0.0 if
 	 *        the device does not provide this information
 	 * @param ipAssignmentMethod the IP address assignment method applied to set the currently used
 	 *        IP address, a bitset with at most one set bit: Bit 0 = manually, 1 = BootP, 2 = DHCP,

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2019 B. Malinowsky
+    Copyright (c) 2018, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -93,7 +93,7 @@ public class AdditionalDeviceDib extends DIB {
 	 * Returns the current communication status of the KNX communication medium connected to the communication
 	 * interface (e.g., TP1 subnet of a KNXnet/IP server).
 	 *
-	 * @return <code>true</code> if communication is possible, <code>false</code> otherwise
+	 * @return {@code true} if communication is possible, {@code false} otherwise
 	 */
 	public final boolean communicationPossible() {
 		return (status & 1) == 0;

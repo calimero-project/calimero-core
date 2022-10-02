@@ -52,8 +52,8 @@ import tuwien.auto.calimero.KNXFormatException;
  * numbers, distinguished by using these prefixes:
  * <dl>
  * <dt>no prefix</dt><dd>for decimal numeral</dd>
- * <dt><code>0x</code>, <code>0X</code>, <code>#</code><dd>for hexadecimal numeral</dd>
- * <dt><code>0</code><dd>for octal numeral</dd>
+ * <dt>{@code 0x}, {@code 0X}, {@code #}<dd>for hexadecimal numeral</dd>
+ * <dt>{@code 0}<dd>for octal numeral</dd>
  * </dl>
  */
 public class DPTXlator2ByteUnsigned extends DPTXlator
@@ -157,7 +157,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
-	 *         <code>dptID</code>
+	 *         {@code dptID}
 	 */
 	public DPTXlator2ByteUnsigned(final String dptID) throws KNXFormatException
 	{
@@ -264,7 +264,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	 * rounded up).<br>
 	 * On any other DPT, the input is treated equal to {@link #setValue(int)}.
 	 *
-	 * @param milliseconds the value in milliseconds, 0 &lt;= <code>milliseconds</code>
+	 * @param milliseconds the value in milliseconds, 0 &lt;= {@code milliseconds}
 	 * @throws KNXFormatException on milliseconds out of range for DPT
 	 */
 	public final void setTimePeriod(final long milliseconds) throws KNXFormatException

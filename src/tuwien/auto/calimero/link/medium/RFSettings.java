@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ public class RFSettings extends KNXMediumSettings
 	 * Creates a new settings container with the device individual address for RF medium.
 	 * <p>
 	 * The domain address is initialized to broadcast domain, serial number is 0, unidirectional is set
-	 * <code>false</code>.
+	 * {@code false}.
 	 *
 	 * @param device device individual device address to use as source address in KNX messages
 	 */
@@ -75,9 +75,9 @@ public class RFSettings extends KNXMediumSettings
 	 *
 	 * @param device device individual device address to use as source address in KNX messages
 	 * @param domain byte array containing the domain address to use in KNX messages, address is given in network byte
-	 *        order, <code>domain.length</code> = 6, supplying <code>null</code> defaults to the broadcast domain
+	 *        order, {@code domain.length} = 6, supplying {@code null} defaults to the broadcast domain
 	 * @param serialNumber serial number of the device
-	 * @param unidirectional <code>true</code> to indicate an unidirectional device, <code>false</code> otherwise
+	 * @param unidirectional {@code true} to indicate an unidirectional device, {@code false} otherwise
 	 */
 	public RFSettings(final IndividualAddress device, final byte[] domain, final SerialNumber serialNumber,
 			final boolean unidirectional) {
@@ -91,8 +91,8 @@ public class RFSettings extends KNXMediumSettings
 	 * Sets a new domain address.
 	 *
 	 * @param domain byte array containing the domain address to use in KNX messages,
-	 *        address is given in network byte order, <code>domain.length</code> = 6,
-	 *        supplying <code>null</code> defaults to the broadcast domain
+	 *        address is given in network byte order, {@code domain.length} = 6,
+	 *        supplying {@code null} defaults to the broadcast domain
 	 */
 	public final synchronized void setDomainAddress(final byte[] domain)
 	{
@@ -124,7 +124,7 @@ public class RFSettings extends KNXMediumSettings
 	/**
 	 * Returns whether unidirectional device is set.
 	 *
-	 * @return <code>true</code> if unidirectional, <code>false</code> otherwise
+	 * @return {@code true} if unidirectional, {@code false} otherwise
 	 */
 	public final boolean isUnidirectional()
 	{

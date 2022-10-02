@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -113,10 +113,10 @@ public interface KNXnetIPConnection extends Connection<CEMI>
 
 
 	/**
-	 * Adds the specified event listener <code>l</code> to receive events from this
+	 * Adds the specified event listener {@code l} to receive events from this
 	 * connection.
 	 * <p>
-	 * If <code>l</code> was already added as listener, no action is performed.
+	 * If {@code l} was already added as listener, no action is performed.
 	 * <p>
 	 * Note: the method {@link KNXListener#frameReceived(tuwien.auto.calimero.FrameEvent)}
 	 * of an added listener will be invoked by the KNXnet/IP receiver, and not in the
@@ -131,10 +131,10 @@ public interface KNXnetIPConnection extends Connection<CEMI>
 	void addConnectionListener(KNXListener l);
 
 	/**
-	 * Removes the specified event listener <code>l</code>, so it does no longer receive
+	 * Removes the specified event listener {@code l}, so it does no longer receive
 	 * events from this connection.
 	 * <p>
-	 * If <code>l</code> was not added in the first place, no action is performed.
+	 * If {@code l} was not added in the first place, no action is performed.
 	 *
 	 * @param l the listener to remove
 	 */
@@ -169,7 +169,7 @@ public interface KNXnetIPConnection extends Connection<CEMI>
 	 *        supply one of the {@link BlockingMode} constants, with following blocking
 	 *        behavior in increasing order: {@link BlockingMode#NonBlocking}, {@link BlockingMode#WaitForAck},
 	 *        {@link BlockingMode#WaitForCon}
-	 * @throws KNXTimeoutException in a blocking <code>mode</code> if a timeout regarding
+	 * @throws KNXTimeoutException in a blocking {@code mode} if a timeout regarding
 	 *         a response message was encountered
 	 * @throws KNXConnectionClosedException if no communication was established in the
 	 *         first place or communication was closed

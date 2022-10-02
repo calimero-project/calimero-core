@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * based on the system default time zone and locale. All time information behaves in non-lenient mode, i.e., no value
  * overflow is allowed and values are not normalized or adjusted using the next, larger field.<br>
  * <p>
- * The default return value after creation is <code>00:00:00</code>.
+ * The default return value after creation is {@code 00:00:00}.
  *
  * @author B. Malinowsky
  */
@@ -142,7 +142,7 @@ public class DPTXlatorTime extends DPTXlator
 	 * Creates a translator for the given datapoint type ID.
 	 *
 	 * @param dptId available implemented datapoint type ID
-	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptID</code>
+	 * @throws KNXFormatException on wrong formatted or not expected (available) {@code dptID}
 	 */
 	public DPTXlatorTime(final String dptId) throws KNXFormatException
 	{

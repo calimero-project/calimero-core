@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -197,7 +197,7 @@ public class CEMIDevMgmt implements CEMI
 	 * Creates a new device management message from a byte stream.
 	 *
 	 * @param data byte stream containing a cEMI device management message
-	 * @param offset start offset of cEMI frame in <code>data</code>
+	 * @param offset start offset of cEMI frame in {@code data}
 	 * @param length length in bytes of the whole device management message
 	 * @throws KNXFormatException if no device management frame found or invalid frame
 	 *         structure
@@ -290,7 +290,7 @@ public class CEMIDevMgmt implements CEMI
 	 * <p>
 	 * If the error code is not known, the string "unknown error code" is returned.
 	 *
-	 * @param errorCode error code to get message for, <code>0 &le; errorCode</code>
+	 * @param errorCode error code to get message for, {@code 0 ≤ errorCode}
 	 * @return error status message as string
 	 */
 	public static String getErrorMessage(final int errorCode)

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -84,7 +84,7 @@ public class HPAI
 	 * Creates a HPAI out of a byte array.
 	 *
 	 * @param data byte array containing the HPAI structure
-	 * @param offset start offset of HPAI in <code>data</code>
+	 * @param offset start offset of HPAI in {@code data}
 	 * @throws KNXFormatException if no HPAI found, invalid structure or unknown host protocol
 	 */
 	public HPAI(final byte[] data, final int offset) throws KNXFormatException
@@ -114,14 +114,14 @@ public class HPAI
 
 	/**
 	 * Creates a HPAI for UDP communication with the given address information, using UDP as communication mode (default
-	 * in KNXnet/IP). The following first matching rule is used for the <code>addr</code> argument:<br>
-	 * 1) <code>addr</code> holds an {@link InetAddress}, use that address<br>
-	 * 2) <code>addr</code> is <code>null</code>, the local host is retrieved by {@link InetAddress#getLocalHost()}<br>
+	 * in KNXnet/IP). The following first matching rule is used for the {@code addr} argument:<br>
+	 * 1) {@code addr} holds an {@link InetAddress}, use that address<br>
+	 * 2) {@code addr} is {@code null}, the local host is retrieved by {@link InetAddress#getLocalHost()}<br>
 	 * 3) if no local host could be found, fall back to safe state and initialize IP <b>and</b> port to 0 (NAT aware
 	 * mode)
 	 *
-	 * @param addr local IP address, use <code>null</code> for setting local host
-	 * @param port local port number to set, 0 &lt;= <code>port</code> &lt;= 0xFFFF
+	 * @param addr local IP address, use {@code null} for setting local host
+	 * @param port local port number to set, 0 &lt;= {@code port} &lt;= 0xFFFF
 	 */
 	public HPAI(final InetAddress addr, final int port)
 	{
@@ -133,7 +133,7 @@ public class HPAI
 	 *
 	 * @param hostProtocol host protocol code (UDP or TCP on IP)
 	 * @param addr local IP address
-	 * @param port local port number to set, 0 &lt;= <code>port</code> &lt;= 0xFFFF
+	 * @param port local port number to set, 0 &lt;= {@code port} &lt;= 0xFFFF
 	 */
 	public HPAI(final int hostProtocol, final InetAddress addr, final int port)
 	{
@@ -144,11 +144,11 @@ public class HPAI
 	 * Creates a HPAI with the given address information.
 	 * <p>
 	 * To indicate the use of network address translation (NAT) to the receiver, leave
-	 * <code>addr</code> <code>null</code>.
+	 * {@code addr} {@code null}.
 	 *
 	 * @param hostProtocol host protocol code (UDP or TCP, see class constants)
-	 * @param addr socket address with IP address and port number, if <code>addr</code> =
-	 *        <code>null</code> address and port are initialized to 0
+	 * @param addr socket address with IP address and port number, if {@code addr} =
+	 *        {@code null} address and port are initialized to 0
 	 */
 	public HPAI(final int hostProtocol, final InetSocketAddress addr)
 	{
@@ -187,7 +187,7 @@ public class HPAI
 	/**
 	 * Indicates whether this HPAI is a route back HPAI, required for UDP NAT and TCP connections.
 	 *
-	 * @return <code>true</code> if this HPAI is a route back HPAI, <code>false</code> otherwise
+	 * @return {@code true} if this HPAI is a route back HPAI, {@code false} otherwise
 	 */
 	public final boolean isRouteBack() {
 		return addr.getAddress().isAnyLocalAddress() && addr.getPort() == 0;

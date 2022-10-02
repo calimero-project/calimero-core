@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * This type permits the hour set to 24 (with minute and second only valid if 0), representing midnight of the old day,
  * to handle time information used in schedule programs.
  * <p>
- * The default return value after creation is the calendar value equal to <code>1900/1/1 00:00:00</code> (year/month/day
+ * The default return value after creation is the calendar value equal to {@code 1900/1/1 00:00:00} (year/month/day
  * hh:mm:ss), no clock fault, not in daylight saving time, no external clock synchronization signal, day of week and
  * working day fields are not used.
  * <p>
@@ -98,7 +98,7 @@ public class DPTXlatorDateTime extends DPTXlator
 			"2155/12/31 24:00:00", "yr/mth/day hr:min:sec");
 
 	/**
-	 * Field number for <code>get</code> and <code>set</code> indicating whether the
+	 * Field number for {@code get} and {@code set} indicating whether the
 	 * year field is used.
 	 *
 	 * @see #setValidField(int, boolean)
@@ -107,7 +107,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	public static final int YEAR = 0;
 
 	/**
-	 * Field number for <code>get</code> and <code>set</code> indicating whether the
+	 * Field number for {@code get} and {@code set} indicating whether the
 	 * date field (month and day of month) is used.
 	 *
 	 * @see #setValidField(int, boolean)
@@ -116,7 +116,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	public static final int DATE = 1;
 
 	/**
-	 * Field number for <code>get</code> and <code>set</code> indicating whether the
+	 * Field number for {@code get} and {@code set} indicating whether the
 	 * time field (hour, minute and second) is used.
 	 *
 	 * @see #setValidField(int, boolean)
@@ -125,7 +125,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	public static final int TIME = 2;
 
 	/**
-	 * Field number for <code>get</code> and <code>set</code> indicating whether the
+	 * Field number for {@code get} and {@code set} indicating whether the
 	 * day of week field is used.
 	 *
 	 * @see #setValidField(int, boolean)
@@ -134,7 +134,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	public static final int DAY_OF_WEEK = 3;
 
 	/**
-	 * Field number for <code>get</code> and <code>set</code> indicating whether the working day field is used.
+	 * Field number for {@code get} and {@code set} indicating whether the working day field is used.
 	 * <p>
 	 * Working day information can be specified in string values by using "workday" to denote a working day, or
 	 * "holiday" to denote a (bank) holiday (no working day).
@@ -238,7 +238,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * Creates a translator for the given datapoint type ID.
 	 *
 	 * @param dptID available implemented datapoint type ID
-	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptID</code>
+	 * @throws KNXFormatException on wrong formatted or not expected (available) {@code dptID}
 	 */
 	public DPTXlatorDateTime(final String dptID) throws KNXFormatException
 	{
@@ -409,7 +409,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	/**
 	 * Sets the year, date, time, and day-of-week information for the first date/time item.
 	 * Working day information is set to not valid ({@link #isValidField(int)} with {@link #WORKDAY} returns
-	 * <code>false</code>). Daylight saving time is always <code>false</code>.
+	 * {@code false}). Daylight saving time is always {@code false}.
 	 *
 	 * @param dateTime local date-time to set
 	 */
@@ -435,7 +435,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * <p>
 	 * Following fields are set: year, month, day, day of week, hour, minute, second,
 	 * daylight time. All according fields are set to used state.<br>
-	 * The <code>value</code> is interpreted by a calendar obtained by
+	 * The {@code value} is interpreted by a calendar obtained by
 	 * {@link Calendar#getInstance()}.<br>
 	 * The new value item replaces any other items contained in this translator.
 	 *
@@ -536,7 +536,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * <p>
 	 * This method does not reset other item data or discard other translation items.
 	 *
-	 * @param faulty <code>true</code> if clock is faulty, <code>false</code> otherwise
+	 * @param faulty {@code true} if clock is faulty, {@code false} otherwise
 	 */
 	public final void setFaultyClock(final boolean faulty)
 	{
@@ -550,7 +550,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * A clock fault indicates one or more corrupted date/time fields, for example due to power-down of the KNX
 	 * device, a not configured clock, or no reception of synchronization message.
 	 *
-	 * @return <code>true</code> on clock fault, <code>false</code> otherwise
+	 * @return {@code true} on clock fault, {@code false} otherwise
 	 */
 	public final boolean isFaultyClock()
 	{
@@ -560,7 +560,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	/**
 	 * Sets an externally synchronized clock for the first date/time item.
 	 *
-	 * @param externalSync <code>true</code> if externally synchronized clock, <code>false</code> otherwise
+	 * @param externalSync {@code true} if externally synchronized clock, {@code false} otherwise
 	 */
 	public final void setClockSync(final boolean externalSync)
 	{
@@ -570,7 +570,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	/**
 	 * Returns whether the clock reading used for the date/time information comes from an externally synchronized clock.
 	 *
-	 * @return <code>true</code> if clock uses external synchronization, <code>false</code> otherwise
+	 * @return {@code true} if clock uses external synchronization, {@code false} otherwise
 	 */
 	public final boolean isSyncClock()
 	{
@@ -580,7 +580,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	/**
 	 * Returns the synchronization source reliability of the clock.
 	 *
-	 * @return <code>true</code> if clock uses a reliable synchronisation source (radio, Internet), <code>false</code>
+	 * @return {@code true} if clock uses a reliable synchronisation source (radio, Internet), {@code false}
 	 *         for unreliable synchronisation source (mains, local quartz)
 	 */
 	public final boolean isReliableSyncSource() { return isBitSetEx(0, SyncSourceReliability); }
@@ -588,7 +588,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	/**
 	 * Sets working day information for the first date/time item.
 	 *
-	 * @param workday <code>true</code> to mark date as working day, <code>false</code> for holiday (no working day)
+	 * @param workday {@code true} to mark date as working day, {@code false} for holiday (no working day)
 	 */
 	public final void setWorkday(final boolean workday)
 	{
@@ -597,7 +597,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	}
 
 	/**
-	 * @return <code>true</code> if date/time information is marked as working day, <code>false</code> for holiday (no
+	 * @return {@code true} if date/time information is marked as working day, {@code false} for holiday (no
 	 * working day)
 	 */
 	public final boolean isWorkday()
@@ -609,7 +609,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * Sets daylight saving time (DST) for the first date/time item; this setting does not affect any time field
 	 * information.
 	 *
-	 * @param dst <code>true</code> if daylight saving time is used, <code>false</code> otherwise
+	 * @param dst {@code true} if daylight saving time is used, {@code false} otherwise
 	 */
 	public final void setDst(final boolean dst)
 	{
@@ -619,7 +619,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	/**
 	 * Returns whether time information is corrected for daylight saving time (DST).
 	 *
-	 * @return <code>true</code> if daylight saving time (DST) is used, <code>false</code> otherwise; any DST offset is
+	 * @return {@code true} if daylight saving time (DST) is used, {@code false} otherwise; any DST offset is
 	 *         already considered for time, i.e., the hour field contains the already adjusted value
 	 */
 	public final boolean isDst()
@@ -630,14 +630,14 @@ public class DPTXlatorDateTime extends DPTXlator
 	/**
 	 * Sets a date/time field of the first translation item to valid or not valid.
 	 * <p>
-	 * A field which is valid, i.e., contains valid data, has to be set <code>true</code>,
-	 * otherwise the field should be set not valid with <code>false</code>.<br>
+	 * A field which is valid, i.e., contains valid data, has to be set {@code true},
+	 * otherwise the field should be set not valid with {@code false}.<br>
 	 * Possible fields allowed to be set valid or not valid are {@link #YEAR},
 	 * {@link #DATE}, {@link #TIME}, {@link #DAY_OF_WEEK} and {@link #WORKDAY}.
 	 *
 	 * @param field field number
-	 * @param valid <code>true</code> if field is supported and contains valid data,
-	 *        <code>false</code> otherwise
+	 * @param valid {@code true} if field is supported and contains valid data,
+	 *        {@code false} otherwise
 	 */
 	public final void setValidField(final int field, final boolean valid)
 	{
@@ -656,7 +656,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * {@link #DATE}, {@link #TIME}, {@link #DAY_OF_WEEK} and {@link #WORKDAY}.
 	 *
 	 * @param field field number
-	 * @return <code>true</code> if field is supported and in use, <code>false</code>
+	 * @return {@code true} if field is supported and in use, {@code false}
 	 *         otherwise
 	 */
 	public final boolean isValidField(final int field)
@@ -682,7 +682,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * This validation method checks if the date/time fields represent a valid calendar
 	 * time, which is a much stronger requirement.
 	 *
-	 * @return <code>true</code> if date/times are valid, <code>false</code> otherwise
+	 * @return {@code true} if date/times are valid, {@code false} otherwise
 	 */
 	public final boolean validate()
 	{
@@ -742,7 +742,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * <p>
 	 * The used format is extended by default.
 	 *
-	 * @param extended string format to use, <code>true</code> for extended format
+	 * @param extended string format to use, {@code true} for extended format
 	 */
 	public final void useValueFormat(final boolean extended)
 	{

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@ public class PerfTimer
 	}
 
 	/**
-	 * Returns all timing durations in milliseconds without <code>omitExtremes</code>
+	 * Returns all timing durations in milliseconds without {@code omitExtremes}
 	 * number of extremes in the durations value range.
 	 *
 	 * @param omitExtremes number of extremes to leave out, alternating one maximum and

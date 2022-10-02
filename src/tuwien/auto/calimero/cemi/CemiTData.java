@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019 B. Malinowsky
+    Copyright (c) 2019, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -67,8 +67,8 @@ public class CemiTData implements CEMI {
 	 * Creates a new T-Data message from a byte stream.
 	 *
 	 * @param data byte stream containing a cEMI T-Data message
-	 * @param offset start offset of cEMI frame in <code>data</code>
-	 * @param length length in bytes of the whole cEMI message in <code>data</code>
+	 * @param offset start offset of cEMI frame in {@code data}
+	 * @param length length in bytes of the whole cEMI message in {@code data}
 	 * @throws KNXFormatException if no (valid) frame was found
 	 */
 	public CemiTData(final byte[] data, final int offset, final int length) throws KNXFormatException {

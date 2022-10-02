@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ public class KNXMLException extends KnxRuntimeException
 	private final int line;
 
 	/**
-	 * Constructs a new <code>KNXMLException</code> with the specified detail message.
+	 * Constructs a new {@code KNXMLException} with the specified detail message.
 	 * <p>
 	 *
 	 * @param s the detail message
@@ -71,7 +71,7 @@ public class KNXMLException extends KnxRuntimeException
 	}
 
 	/**
-	 * Constructs a new <code>KNXMLException</code> with the specified detail message, the
+	 * Constructs a new {@code KNXMLException} with the specified detail message, the
 	 * problematic/erroneous processed XML item together with the line number it occurred on.
 	 * <p>
 	 *
@@ -87,7 +87,7 @@ public class KNXMLException extends KnxRuntimeException
 	}
 
 	/**
-	 * Constructs a new <code>KNXMLException</code> with the specified detail message and
+	 * Constructs a new {@code KNXMLException} with the specified detail message and
 	 * information about the current read status.
 	 * <p>
 	 *
@@ -126,7 +126,7 @@ public class KNXMLException extends KnxRuntimeException
 	 * Returns the processed item which caused this exception.
 	 * <p>
 	 *
-	 * @return bad item as string, or <code>null</code> if no item available
+	 * @return bad item as string, or {@code null} if no item available
 	 */
 	public final String getBadItem()
 	{

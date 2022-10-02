@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -264,8 +264,8 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		/**
 		 * Returns whether the property is defined with global object type.
 		 *
-		 * @return <code>true</code> if property has global object type,
-		 *         <code>false</code> if property has a specific object type
+		 * @return {@code true} if property has global object type,
+		 *         {@code false} if property has a specific object type
 		 */
 		public boolean isGlobal()
 		{
@@ -328,7 +328,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		 * @param propertyName property name, a friendly readable name for the property
 		 * @param objectType object type the property belongs to
 		 * @param pdt property data type
-		 * @param dpt datapoint type, use <code>null</code> if no DPT specified or to
+		 * @param dpt datapoint type, use {@code null} if no DPT specified or to
 		 *        indicate default DPT usage
 		 */
 		public Property(final int pid, final String pidName, final String propertyName,
@@ -413,7 +413,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		public final String description() { return description; }
 
 		/**
-		 * @return <code>true</code> if property is read-only, <code>false</code> if property is write-enabled
+		 * @return {@code true} if property is read-only, {@code false} if property is write-enabled
 		 */
 		public final boolean readOnly()
 		{
@@ -421,7 +421,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		}
 
 		/**
-		 * @return required access level for property write access to write-enabled property, <code>level &ge; 0</code>;
+		 * @return required access level for property write access to write-enabled property, {@code level ≥ 0};
 		 *         level is undefined for read-only property
 		 */
 		public final int writeLevel() {
@@ -625,8 +625,8 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	/**
 	 * Does a property description scan of the properties in all interface objects.
 	 *
-	 * @param allProperties <code>true</code> to scan all property descriptions in the interface
-	 *        objects, <code>false</code> to only scan the object type descriptions, i.e.,
+	 * @param allProperties {@code true} to scan all property descriptions in the interface
+	 *        objects, {@code false} to only scan the object type descriptions, i.e.,
 	 *        {@link PropertyAccess.PID#OBJECT_TYPE}
 	 * @param consumer invoked on every property read during the scan, taking a property
 	 *        {@link Description} argument
@@ -643,9 +643,9 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 * Does a property description scan of the properties of one interface object.
 	 *
 	 * @param objIndex interface object index in the device
-	 * @param allProperties <code>true</code> to scan all property descriptions in that interface
-	 *        object, <code>false</code> to only scan the object type description of the interface
-	 *        object specified by <code>objIndex</code>, i.e.,
+	 * @param allProperties {@code true} to scan all property descriptions in that interface
+	 *        object, {@code false} to only scan the object type description of the interface
+	 *        object specified by {@code objIndex}, i.e.,
 	 *        {@link PropertyAccess.PID#OBJECT_TYPE}
 	 * @param consumer invoked on every property read during the scan, taking a property
 	 *        {@link Description} argument
@@ -662,7 +662,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 * Returns whether the adapter used for property access is opened.
 	 * <p>
 	 *
-	 * @return <code>true</code> on open adapter, <code>false</code> on closed adapter
+	 * @return {@code true} on open adapter, {@code false} on closed adapter
 	 */
 	public final boolean isOpen()
 	{

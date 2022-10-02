@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -98,7 +98,7 @@ public abstract class DIB
 	 * <p>
 	 *
 	 * @param data byte array containing DIB structure
-	 * @param offset start offset of DIB in <code>data</code>
+	 * @param offset start offset of DIB in {@code data}
 	 * @throws KNXFormatException if no DIB found or invalid structure
 	 */
 	protected DIB(final byte[] data, final int offset) throws KNXFormatException
@@ -115,7 +115,7 @@ public abstract class DIB
 	 * Creates a new DIB and initializes basic fields.
 	 * <p>
 	 *
-	 * @param dibSize total size of DIB in bytes, <code>dibSize &gt; 0</code>
+	 * @param dibSize total size of DIB in bytes, {@code dibSize > 0}
 	 * @param descriptionType one of the description type code constants of this class
 	 */
 	protected DIB(final int dibSize, final int descriptionType)

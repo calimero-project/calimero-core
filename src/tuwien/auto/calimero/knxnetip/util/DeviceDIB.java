@@ -95,7 +95,7 @@ public class DeviceDIB extends DIB
 	 * Creates a device DIB out of a byte array.
 	 *
 	 * @param data byte array containing device DIB structure
-	 * @param offset start offset of DIB in <code>data</code>
+	 * @param offset start offset of DIB in {@code data}
 	 * @throws KNXFormatException if no DIB found or invalid structure
 	 */
 	public DeviceDIB(final byte[] data, final int offset) throws KNXFormatException
@@ -132,7 +132,7 @@ public class DeviceDIB extends DIB
 	 *
 	 * @param friendlyName user friendly name to identify the device; a ISO 8859-1 string with a maximum length of 30
 	 *        characters
-	 * @param deviceStatus current device status, <code>0 &le; deviceStatus &le; 0xff</code>
+	 * @param deviceStatus current device status, {@code 0 ≤ deviceStatus ≤ 0xff}
 	 *        <ul>
 	 *        <li>bit 0 is the programming mode:<br>
 	 *        1 = device is in programming mode<br>
@@ -145,9 +145,9 @@ public class DeviceDIB extends DIB
 	 * @param knxMedium KNX medium, one of the predefined KNX medium code constants of this class
 	 * @param knxAddress KNX individual address
 	 * @param serialNumber KNX serial number of the device, used to identify the device
-	 * @param routingMulticast KNXnet/IP IPv4 routing multicast address for a routing device, use IPv4 <code>0.0.0.0</code>
+	 * @param routingMulticast KNXnet/IP IPv4 routing multicast address for a routing device, use IPv4 {@code 0.0.0.0}
 	 *        if the device does not support routing
-	 * @param macAddress device Ethernet MAC address, <code>macAddress.length == 6</code>
+	 * @param macAddress device Ethernet MAC address, {@code macAddress.length == 6}
 	 */
 	public DeviceDIB(final String friendlyName, final int deviceStatus,
 		final int projectInstallationId, final int knxMedium, final IndividualAddress knxAddress,

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ class PortOutputStream extends OutputStream
 	private final SerialComAdapter p;
 
 	/**
-	 * Creates a new output stream for <code>port</code>.
+	 * Creates a new output stream for {@code port}.
 	 *
 	 * @param port open port for output
 	 */

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -70,8 +70,8 @@ public class CacheObject
 	private volatile int usage;
 
 	/**
-	 * Creates a CacheObject associated with <code>key</code> holding a
-	 * <code>value</code> entry.
+	 * Creates a CacheObject associated with {@code key} holding a
+	 * {@code value} entry.
 	 * <p>
 	 *
 	 * @param key key of this {@link CacheObject}
@@ -101,7 +101,7 @@ public class CacheObject
 	/**
 	 * Gets the value entry hold by this cache object.
 	 * <p>
-	 * Note that the value is guaranteed to be always a non <code>null</code>
+	 * Note that the value is guaranteed to be always a non {@code null}
 	 * reference.
 	 *
 	 * @return the value object

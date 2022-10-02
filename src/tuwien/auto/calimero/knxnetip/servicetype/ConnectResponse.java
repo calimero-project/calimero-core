@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ public class ConnectResponse extends ServiceType
 	 * <p>
 	 *
 	 * @param data byte array containing a connect response structure
-	 * @param offset start offset of response in <code>data</code>
+	 * @param offset start offset of response in {@code data}
 	 * @throws KNXFormatException if no connect response was found or invalid structure
 	 */
 	public ConnectResponse(final byte[] data, final int offset) throws KNXFormatException
@@ -150,10 +150,10 @@ public class ConnectResponse extends ServiceType
 	 * Returns the connection response data supplied in the response on a successful
 	 * established connection.
 	 * <p>
-	 * The CRD is <code>null</code> on error, check the status code of the response
+	 * The CRD is {@code null} on error, check the status code of the response
 	 * before.
 	 *
-	 * @return CRD, or <code>null</code>
+	 * @return CRD, or {@code null}
 	 */
 	public final CRD getCRD()
 	{
@@ -164,9 +164,9 @@ public class ConnectResponse extends ServiceType
 	 * Returns the server data endpoint used for the communication on a successful
 	 * established connection.
 	 * <p>
-	 * The HPAI is <code>null</code> otherwise, check the status code of the response.
+	 * The HPAI is {@code null} otherwise, check the status code of the response.
 	 *
-	 * @return data endpoint in a HPAI, or <code>null</code>
+	 * @return data endpoint in a HPAI, or {@code null}
 	 */
 	public final HPAI getDataEndpoint()
 	{

@@ -203,7 +203,7 @@ public final class TranslatorTypes
 		 *
 		 * @param mainNumber main number assigned to the data type
 		 * @param translator represents a translator class of type {@link DPTXlator}
-		 * @param description textual information describing this data type to a user, use <code>null</code> for no
+		 * @param description textual information describing this data type to a user, use {@code null} for no
 		 *        description
 		 */
 		public MainType(final int mainNumber, final Class<? extends DPTXlator> translator, final String description)
@@ -423,7 +423,7 @@ public final class TranslatorTypes
 	 * Returns the {@link MainType} object assigned the given data type main number.
 	 *
 	 * @param mainNumber main type to lookup
-	 * @return the main type information found, or <code>null</code> if main number not listed
+	 * @return the main type information found, or {@code null} if main number not listed
 	 */
 	public static MainType getMainType(final int mainNumber)
 	{
@@ -447,11 +447,11 @@ public final class TranslatorTypes
 	 * Returns all main types of a specific data type size, based on the currently available main types as provided by
 	 * {@link TranslatorTypes#getAllMainTypes()}.
 	 * <p>
-	 * For example, when specifying a type size of <code>2</code>, the returned list will contain the main types with
+	 * For example, when specifying a type size of {@code 2}, the returned list will contain the main types with
 	 * number 9 (<b>2-byte float</b>) and number 7 (<b>2 byte unsigned value</b>), assuming both are also returned by
 	 * {@link TranslatorTypes#getAllMainTypes()}.
 	 *
-	 * @param typeSize the data type size in bytes, use <code>0</code> for main types having a 6 bit ASDU
+	 * @param typeSize the data type size in bytes, use {@code 0} for main types having a 6 bit ASDU
 	 * @return list of all available main types of the requested type size or the empty list
 	 */
 	public static List<MainType> getMainTypesBySize(final int typeSize)
@@ -474,7 +474,7 @@ public final class TranslatorTypes
 	 * Returns all main types of a specific data type size, based on the currently available main types as provided by
 	 * {@link TranslatorTypes#getAllMainTypes()}.
 	 * <p>
-	 * For example, when specifying a size of <code>2</code> bits, the returned list will contain the main type with
+	 * For example, when specifying a size of {@code 2} bits, the returned list will contain the main type with
 	 * main number 2 (translator <b>1 Bit controlled</b>), assuming it is returned by
 	 * {@link TranslatorTypes#getAllMainTypes()}.
 	 *
@@ -504,10 +504,10 @@ public final class TranslatorTypes
 	/**
 	 * Does a lookup if the specified DPT is supported by a DPT translator.
 	 *
-	 * @param mainNumber data type main number, number &ge; 0; use 0 to infer translator type from <code>dptId</code>
+	 * @param mainNumber data type main number, number &ge; 0; use 0 to infer translator type from {@code dptId}
 	 *        argument only
 	 * @param dptId datapoint type ID to lookup this particular kind of value translation
-	 * @return <code>true</code> iff translator was found, <code>false</code> otherwise
+	 * @return {@code true} iff translator was found, {@code false} otherwise
 	 */
 	public static boolean hasTranslator(final int mainNumber, final String dptId)
 	{
@@ -526,12 +526,12 @@ public final class TranslatorTypes
 	 * <p>
 	 * The translation behavior of a DPT translator instance is uniquely defined by the supplied datapoint type ID.
 	 * <p>
-	 * If the <code>dptId</code> argument is built up the recommended way, that is "<i>main number</i>.<i>sub number</i>
-	 * ", the <code>mainNumber</code> argument might be left 0 to use the datapoint type ID only.<br>
-	 * Note, that we don't enforce any particular or standardized format on the <code>dptId</code> structure, so using a
+	 * If the {@code dptId} argument is built up the recommended way, that is "<i>main number</i>.<i>sub number</i>
+	 * ", the {@code mainNumber} argument might be left 0 to use the datapoint type ID only.<br>
+	 * Note, that we don't enforce any particular or standardized format on the {@code dptId} structure, so using a
 	 * different formatted dptId solely without main number argument results in undefined behavior.
 	 *
-	 * @param mainNumber data type main number, number &ge; 0; use 0 to infer translator type from <code>dptId</code>
+	 * @param mainNumber data type main number, number &ge; 0; use 0 to infer translator type from {@code dptId}
 	 *        argument only
 	 * @param dptId datapoint type ID for selecting a particular kind of value translation
 	 * @return the new {@link DPTXlator} object
@@ -618,7 +618,7 @@ public final class TranslatorTypes
 	/**
 	 * Creates a DPT translator for the given datapoint type ID.
 	 *
-	 * @param dptId datapoint type ID, formatted as <code>&lt;main number&gt;.&lt;sub number&gt;</code> with sub
+	 * @param dptId datapoint type ID, formatted as {@code <main number>.<sub number>} with sub
 	 *        numbers &lt; 100 zero-padded to 3 digits, e.g. "1.001"
 	 * @param data (optional) KNX datapoint data to set in the created translator for translation
 	 * @return the new {@link DPTXlator} object

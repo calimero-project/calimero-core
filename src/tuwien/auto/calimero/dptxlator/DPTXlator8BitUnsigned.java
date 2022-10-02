@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -56,9 +56,9 @@ import tuwien.auto.calimero.KNXFormatException;
  * <dl>
  * <dt>no prefix</dt>
  * <dd>for decimal numeral</dd>
- * <dt><code>0x</code>, <code>0X</code>, <code>#</code>
+ * <dt>{@code 0x}, {@code 0X}, {@code #}
  * <dd>for hexadecimal numeral</dd>
- * <dt><code>0</code>
+ * <dt>{@code 0}
  * <dd>for octal numeral</dd>
  * </dl>
  */
@@ -126,7 +126,7 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
-	 *         <code>dptID</code>
+	 *         {@code dptID}
 	 */
 	public DPTXlator8BitUnsigned(final String dptID) throws KNXFormatException
 	{
@@ -186,7 +186,7 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	 * <p>
 	 * No scaling is performed during translation, the value is equal to the raw KNX data.
 	 *
-	 * @param unscaled unscaled unsigned value, 0 &lt;= <code>unscaled</code> &lt;= 255,
+	 * @param unscaled unscaled unsigned value, 0 &lt;= {@code unscaled} &lt;= 255,
 	 *        the higher bytes are ignored
 	 */
 	public final void setValueUnscaled(final int unscaled)
@@ -239,7 +239,7 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	 *
 	 * @param dptID new subtype ID to set
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
-	 *         <code>dptID</code>
+	 *         {@code dptID}
 	 */
 	private void setSubType(final String dptID) throws KNXFormatException
 	{

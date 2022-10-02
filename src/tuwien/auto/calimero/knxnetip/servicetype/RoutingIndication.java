@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ import tuwien.auto.calimero.cemi.CEMIFactory;
  * message over IP networks. The routing indication service is unconfirmed.
  * <p>
  * Objects of this type are immutable.
- * 
+ *
  * @author B. Malinowsky
  */
 public class RoutingIndication extends ServiceType
@@ -59,7 +59,7 @@ public class RoutingIndication extends ServiceType
 	/**
 	 * Creates a routing indication carrying the given cEMI frame.
 	 * <p>
-	 * 
+	 *
 	 * @param frame cEMI frame to be routed over IP networks
 	 */
 	public RoutingIndication(final CEMI frame)
@@ -71,9 +71,9 @@ public class RoutingIndication extends ServiceType
 	/**
 	 * Creates a routing indication out of a byte array.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing a indication structure
-	 * @param offset start offset of indication in <code>data</code>
+	 * @param offset start offset of indication in {@code data}
 	 * @param length length in bytes of whole indication structure
 	 * @throws KNXFormatException if the contained cEMI frame could not be created
 	 */
@@ -87,7 +87,7 @@ public class RoutingIndication extends ServiceType
 	/**
 	 * Returns the cEMI frame contained in the indication.
 	 * <p>
-	 * 
+	 *
 	 * @return a cEMI type
 	 */
 	public final CEMI getCEMI()

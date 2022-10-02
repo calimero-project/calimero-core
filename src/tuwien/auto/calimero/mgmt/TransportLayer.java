@@ -71,8 +71,8 @@ public interface TransportLayer
 	 * implementation dependent.
 	 *
 	 * @param remote destination KNX individual address
-	 * @param connectionOriented <code>true</code> for connection oriented mode,
-	 *        <code>false</code> for connectionless mode
+	 * @param connectionOriented {@code true} for connection oriented mode,
+	 *        {@code false} for connectionless mode
 	 * @return destination representing the logical connection
 	 * @see Destination
 	 */
@@ -89,13 +89,13 @@ public interface TransportLayer
 	 * implementation dependent.
 	 *
 	 * @param remote destination KNX individual address
-	 * @param connectionOriented <code>true</code> for connection oriented mode,
-	 *        <code>false</code> for connectionless mode
-	 * @param keepAlive <code>true</code> to prevent a timing out of the logical
-	 *        connection in connection oriented mode, <code>false</code> to use default
+	 * @param connectionOriented {@code true} for connection oriented mode,
+	 *        {@code false} for connectionless mode
+	 * @param keepAlive {@code true} to prevent a timing out of the logical
+	 *        connection in connection oriented mode, {@code false} to use default
 	 *        connection timeout
-	 * @param verifyMode <code>true</code> to indicate the destination has verify mode
-	 *        enabled, <code>false</code> otherwise
+	 * @param verifyMode {@code true} to indicate the destination has verify mode
+	 *        enabled, {@code false} otherwise
 	 * @return destination representing the logical connection
 	 * @see Destination
 	 */
@@ -125,20 +125,20 @@ public interface TransportLayer
 	void destroyDestination(Destination d);
 
 	/**
-	 * Adds the specified event listener <code>l</code> to receive events from this
+	 * Adds the specified event listener {@code l} to receive events from this
 	 * transport layer.
 	 * <p>
-	 * If <code>l</code> was already added as listener, no action is performed.
+	 * If {@code l} was already added as listener, no action is performed.
 	 *
 	 * @param l the listener to add
 	 */
 	void addTransportListener(TransportListener l);
 
 	/**
-	 * Removes the specified event listener <code>l</code>, so it does no longer
+	 * Removes the specified event listener {@code l}, so it does no longer
 	 * receive events from this transport layer.
 	 * <p>
-	 * If <code>l</code> was not added in the first place, no action is performed.
+	 * If {@code l} was not added in the first place, no action is performed.
 	 *
 	 * @param l the listener to remove
 	 */
@@ -210,7 +210,7 @@ public interface TransportLayer
 	 * The broadcast mode for KNX messages also depends on the used KNX medium, and might
 	 * differ from the mode specified here.
 	 *
-	 * @param system <code>true</code> for system broadcast, <code>false</code> for
+	 * @param system {@code true} for system broadcast, {@code false} for
 	 *        default (domain) broadcast
 	 * @param p KNX message priority
 	 * @param tsdu transport layer service data unit to send
@@ -249,7 +249,7 @@ public interface TransportLayer
 	 * <p>
 	 * Note that a detach does not trigger a close of the used network link.
 	 *
-	 * @return the formerly attached KNX network link, or <code>null</code> if already
+	 * @return the formerly attached KNX network link, or {@code null} if already
 	 *         detached
 	 */
 	KNXNetworkLink detach();

@@ -224,7 +224,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	 * for application layer services.
 	 *
 	 * @param mgmtClient the management client, with a network link attached and in open state
-	 * @param transportLayer the transport layer used to initialize <code>mgmtClient</code>
+	 * @param transportLayer the transport layer used to initialize {@code mgmtClient}
 	 */
 	protected ManagementProceduresImpl(final ManagementClient mgmtClient, final TransportLayer transportLayer) {
 		mc = mgmtClient;

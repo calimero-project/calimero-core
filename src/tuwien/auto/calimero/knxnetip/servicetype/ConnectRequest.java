@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ import tuwien.auto.calimero.knxnetip.util.HPAI;
  * The connection request is answered with a connect response.
  * <p>
  * Objects of this type are immutable.
- * 
+ *
  * @author B. Malinowsky
  * @see tuwien.auto.calimero.knxnetip.servicetype.ConnectResponse
  */
@@ -64,9 +64,9 @@ public class ConnectRequest extends ServiceType
 	/**
 	 * Creates a connect request out of a byte array.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing a connect request structure
-	 * @param offset start offset of request in <code>data</code>
+	 * @param offset start offset of request in {@code data}
 	 * @throws KNXFormatException if no connect request was found or invalid structure
 	 */
 	public ConnectRequest(final byte[] data, final int offset) throws KNXFormatException
@@ -84,7 +84,7 @@ public class ConnectRequest extends ServiceType
 	 * <p>
 	 * The control and data endpoint specified are allowed to be equal, i.e all
 	 * communication is handled through the same endpoint at the client.
-	 * 
+	 *
 	 * @param requestInfo connection specific options, depending on connection type
 	 * @param ctrlEndpoint return address information of the client's control endpoint
 	 * @param dataEndpoint address information of the client's data endpoint for the
@@ -102,7 +102,7 @@ public class ConnectRequest extends ServiceType
 	 * Creates a connect request for UDP communication, done on the specified local port
 	 * and the system default local host.
 	 * <p>
-	 * 
+	 *
 	 * @param requestInfo connection specific options, depending on connection type
 	 * @param localPort local port of client used for connection, 0 &lt;= port &lt;=
 	 *        0xFFFF
@@ -119,7 +119,7 @@ public class ConnectRequest extends ServiceType
 	/**
 	 * Returns the connect request information used in the request.
 	 * <p>
-	 * 
+	 *
 	 * @return connection specific CRI
 	 */
 	public final CRI getCRI()
@@ -130,7 +130,7 @@ public class ConnectRequest extends ServiceType
 	/**
 	 * Returns the local control endpoint used for the connection.
 	 * <p>
-	 * 
+	 *
 	 * @return control endpoint in a HPAI
 	 */
 	public final HPAI getControlEndpoint()
@@ -141,7 +141,7 @@ public class ConnectRequest extends ServiceType
 	/**
 	 * Returns the local data endpoint used for the connection.
 	 * <p>
-	 * 
+	 *
 	 * @return data endpoint in a HPAI
 	 */
 	public final HPAI getDataEndpoint()

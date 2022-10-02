@@ -44,7 +44,7 @@ import tuwien.auto.calimero.KNXFormatException;
 /**
  * Translator for KNX DPTs with main number 252, type <b>relative control RGBW</b>. The KNX data
  * type width is 5 bytes. The default return value after creation is the value with all parts not valid
- * (<code>- - - -</code>).
+ * ({@code - - - -}).
  */
 public class DptXlatorRelativeControlRgbw extends DPTXlator {
 	public static final String Description = "relative control RGBW";
@@ -90,7 +90,7 @@ public class DptXlatorRelativeControlRgbw extends DPTXlator {
 	 * Creates a translator for the given datapoint type ID.
 	 *
 	 * @param dptId available implemented datapoint type ID
-	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptId</code>
+	 * @throws KNXFormatException on wrong formatted or not expected (available) {@code dptId}
 	 */
 	public DptXlatorRelativeControlRgbw(final String dptId) throws KNXFormatException {
 		super(5);

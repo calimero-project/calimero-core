@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2021 B. Malinowsky
+    Copyright (c) 2009, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ import tuwien.auto.calimero.KNXFormatException;
  * limits set.<br>
  * In value methods expecting a string type, the value is a float type representation.
  * <p>
- * The default return value after creation is <code>0.0</code>.<br>
+ * The default return value after creation is {@code 0.0}.<br>
  *
  * @author B. Malinowsky
  */
@@ -642,7 +642,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	}
 
 	/**
-	 * Creates a translator for <code>dptID</code>.
+	 * Creates a translator for {@code dptID}.
 	 *
 	 * @param dptId available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available) DPT
@@ -662,7 +662,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	 * If succeeded, any other items in the translator are discarded.
 	 *
 	 * @param value the float value
-	 * @throws KNXFormatException if <code>value</code> doesn't fit into KNX data type
+	 * @throws KNXFormatException if {@code value} doesn't fit into KNX data type
 	 */
 	@Override
 	public void setValue(final double value) throws KNXFormatException

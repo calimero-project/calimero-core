@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -82,23 +82,23 @@ public interface DatapointModel<T extends Datapoint>
 	void removeAll();
 
 	/**
-	 * Returns the datapoint identified using the specified <code>main</code> address,
+	 * Returns the datapoint identified using the specified {@code main} address,
 	 * if found in this model.
 	 * <p>
-	 * If no datapoint is found with that address, <code>null</code> is returned.
+	 * If no datapoint is found with that address, {@code null} is returned.
 	 *
 	 * @param main KNX group address to get the datapoint for
-	 * @return the datapoint or <code>null</code>
+	 * @return the datapoint or {@code null}
 	 */
 	T get(GroupAddress main);
 
 	/**
 	 * Checks whether this model contains the datapoint identified using the specified
-	 * <code>main</code> address.
+	 * {@code main} address.
 	 * <p>
 	 *
 	 * @param main KNX group address to look up
-	 * @return <code>true</code> iff such datapoint is found, <code>false</code>
+	 * @return {@code true} iff such datapoint is found, {@code false}
 	 *         otherwise
 	 */
 	boolean contains(GroupAddress main);
@@ -108,7 +108,7 @@ public interface DatapointModel<T extends Datapoint>
 	 * <p>
 	 *
 	 * @param dp datapoint to look up
-	 * @return <code>true</code> iff such datapoint is found, <code>false</code>
+	 * @return {@code true} iff such datapoint is found, {@code false}
 	 *         otherwise
 	 */
 	boolean contains(T dp);

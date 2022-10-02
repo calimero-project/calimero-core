@@ -1,7 +1,7 @@
 /*
     Calimero 2 - A library for KNX network access
     Copyright (c) 2005 B. Erb
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ import tuwien.auto.calimero.knxnetip.util.HPAI;
  * heartbeat monitoring procedure.
  * <p>
  * Objects of this type are immutable.
- * 
+ *
  * @author B. Malinowsky
  * @author Bernhard Erb
  * @see tuwien.auto.calimero.knxnetip.servicetype.ConnectionstateResponse
@@ -64,9 +64,9 @@ public class ConnectionstateRequest extends ServiceType
 	/**
 	 * Creates a connection state request out of a byte array.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing a connection state request structure
-	 * @param offset start offset of request in <code>data</code>
+	 * @param offset start offset of request in {@code data}
 	 * @throws KNXFormatException if no connection state request was found or invalid
 	 *         structure
 	 */
@@ -82,7 +82,7 @@ public class ConnectionstateRequest extends ServiceType
 	/**
 	 * Creates a new connection state request.
 	 * <p>
-	 * 
+	 *
 	 * @param channelID communication channel ID of the open connection, 0 &lt;= id &lt;=
 	 *        255
 	 * @param ctrlEP control endpoint of the client
@@ -100,7 +100,7 @@ public class ConnectionstateRequest extends ServiceType
 	 * Returns the communication channel ID of the connection this connection state
 	 * request belongs to.
 	 * <p>
-	 * 
+	 *
 	 * @return channel ID as unsigned byte
 	 */
 	public final int getChannelID()
@@ -111,7 +111,7 @@ public class ConnectionstateRequest extends ServiceType
 	/**
 	 * Returns the client control endpoint the server replies to.
 	 * <p>
-	 * 
+	 *
 	 * @return control endpoint in a HPAI
 	 */
 	public final HPAI getControlEndpoint()

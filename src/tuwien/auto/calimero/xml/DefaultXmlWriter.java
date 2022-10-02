@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -77,12 +77,12 @@ public class DefaultXmlWriter implements XmlWriter
 
 
 	/**
-	 * Creates a new XML writer with output <code>w</code>.
+	 * Creates a new XML writer with output {@code w}.
 	 * <p>
 	 * The writer is buffered by this XML writer.
 	 *
 	 * @param w the output {@link Writer}
-	 * @param closeWriter close <code>w</code> when XML writer is closed
+	 * @param closeWriter close {@code w} when XML writer is closed
 	 */
 	DefaultXmlWriter(final Writer w, final boolean closeWriter)
 	{

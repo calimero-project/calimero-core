@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,15 +44,15 @@ import tuwien.auto.calimero.cemi.CEMILData;
 /**
  * Used for holding {@link CEMILData} frames.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public class LDataObject extends CacheObject
 {
 	/**
-	 * Creates a {@link LDataObject} holding the <code>frame</code> argument.
+	 * Creates a {@link LDataObject} holding the {@code frame} argument.
 	 * <p>
-	 * 
+	 *
 	 * @param frame {@link CEMILData} frame
 	 */
 	public LDataObject(final CEMILData frame)
@@ -61,12 +61,12 @@ public class LDataObject extends CacheObject
 	}
 
 	/**
-	 * Creates a {@link LDataObject} set to key <code>addrKey</code> and holding
-	 * <code>value</code>.
+	 * Creates a {@link LDataObject} set to key {@code addrKey} and holding
+	 * {@code value}.
 	 * <p>
-	 * If <code>value</code> is not of type {@link CEMILData}, the methods
+	 * If {@code value} is not of type {@link CEMILData}, the methods
 	 * {@link #setFrame(CEMILData)} and {@link #getFrame()} have to be overridden.
-	 * 
+	 *
 	 * @param key key of this cache object
 	 * @param value value hold by this cache object
 	 */
@@ -76,14 +76,14 @@ public class LDataObject extends CacheObject
 	}
 
 	/**
-	 * Sets a new {@link CEMILData} <code>frame</code> for this cache object.
+	 * Sets a new {@link CEMILData} {@code frame} for this cache object.
 	 * <p>
-	 * The key generated out of <code>frame</code> (i.e., out of the KNX address of
-	 * <code>frame</code>) has to be equal to the key of this {@link LDataObject},
+	 * The key generated out of {@code frame} (i.e., out of the KNX address of
+	 * {@code frame}) has to be equal to the key of this {@link LDataObject},
 	 * as returned from {@link #getKey()}. Otherwise a
 	 * {@link KNXIllegalArgumentException} will be thrown.<br>
 	 * Note that on successful set the timestamp is renewed.
-	 * 
+	 *
 	 * @param frame the new {@link CEMILData} frame to set
 	 */
 	public synchronized void setFrame(final CEMILData frame)
@@ -97,9 +97,9 @@ public class LDataObject extends CacheObject
 	/**
 	 * Returns a {@link CEMILData} frame contained in this cache object.
 	 * <p>
-	 * On no frame available, <code>null</code> is returned.
-	 * 
-	 * @return the {@link CEMILData} frame, or <code>null</code>
+	 * On no frame available, {@code null} is returned.
+	 *
+	 * @return the {@link CEMILData} frame, or {@code null}
 	 */
 	public synchronized CEMILData getFrame()
 	{

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -105,12 +105,9 @@ public abstract class ExpiringCache implements Cache
 	}
 
 	/**
-	 * Removes all {@link CacheObject}s, where<br>
-	 * <code>{@link CacheObject#getTimestamp()} + timeToExpire &lt;= now</code>, with
-	 * <code>timeToExpire &gt; 0</code> and <code>now</code> is the point of time
-	 * {@link #removeExpired()} is invoked. <br>
-	 * If no expiring time was specified at creation of cache, no cache object will be
-	 * expired.
+	 * Removes all {@link CacheObject CacheObjects}, where {@code CacheObject::getTimestamp + timeToExpire ≤ now}, with
+	 * {@code timeToExpire > 0} and {@code now} is the point of time {@link #removeExpired()} is invoked.
+	 * If no expiring time was specified at creation of cache, no cache object will be expired.
 	 */
 	@Override
 	public void removeExpired()
@@ -145,7 +142,7 @@ public abstract class ExpiringCache implements Cache
 	/**
 	 * Starts a new {@link CacheSweeper}, if not already running, and if an expiring time
 	 * for {@link CacheObject} was specified.<br>
-	 * If the methods <code>startSweeper</code> and <code>stopSweeper</code> are invoked
+	 * If the methods {@code startSweeper} and {@code stopSweeper} are invoked
 	 * by different threads, they need to be synchronized.
 	 */
 	protected final void startSweeper()

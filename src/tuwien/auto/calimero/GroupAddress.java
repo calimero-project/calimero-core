@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -105,7 +105,7 @@ public class GroupAddress extends KNXAddress
 	}
 
 	/**
-	 * Returns a new KNX group address from a string <code>address</code>. The address string can use either
+	 * Returns a new KNX group address from a string {@code address}. The address string can use either
 	 * presentation style, i.e., a 2-level, 3-level, or free-style group address. The separator between levels is '/'.
 	 * Examples are "2/1/2" for a 3-level address, or "4354" for a free-style or raw address.
 	 *
@@ -154,7 +154,7 @@ public class GroupAddress extends KNXAddress
 	 * Creates a KNX group address from a byte array value.
 	 * <p>
 	 * The address is read out of the first 2 byte fields, while the address array itself
-	 * might be longer. The content of <code>address</code> is not modified.
+	 * might be longer. The content of {@code address} is not modified.
 	 *
 	 * @param address the address byte array in big-endian format, with address.length &gt; 1
 	 */
@@ -164,7 +164,7 @@ public class GroupAddress extends KNXAddress
 	}
 
 	/**
-	 * Creates a KNX group address from a string <code>address</code>.
+	 * Creates a KNX group address from a string {@code address}.
 	 * <p>
 	 * The address string can use either presentation style, i.e., a 2-level, 3-level, or free-style group address. The
 	 * allowed separators are '.' or '/', mutually exclusive. Examples are "2/1/2" for a 3-level address, or "4354" for
@@ -289,11 +289,11 @@ public class GroupAddress extends KNXAddress
 	}
 
 	/**
-	 * Returns whether <code>obj</code> is equal to this KNX address (type).
+	 * Returns whether {@code obj} is equal to this KNX address (type).
 	 *
 	 * @param obj KNX address object
-	 * @return <code>true</code> iff <code>obj</code> is of this type and contains the
-	 *         same address (raw), <code>false</code> otherwise
+	 * @return {@code true} iff {@code obj} is of this type and contains the
+	 *         same address (raw), {@code false} otherwise
 	 */
 	@Override
 	public boolean equals(final Object obj)

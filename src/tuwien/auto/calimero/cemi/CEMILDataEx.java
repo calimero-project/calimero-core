@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -165,8 +165,8 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 * Creates a new L-Data message from a byte stream.
 	 *
 	 * @param data byte stream containing a cEMI L-Data message
-	 * @param offset start offset of cEMI frame in <code>data</code>
-	 * @param length length in bytes of the whole cEMI message in <code>data</code>
+	 * @param offset start offset of cEMI frame in {@code data}
+	 * @param length length in bytes of the whole cEMI message in {@code data}
 	 * @throws KNXFormatException if no (valid) frame was found
 	 */
 	public CEMILDataEx(final byte[] data, final int offset, final int length)
@@ -214,8 +214,8 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 * @param tpdu data array, starting with the TPCI / APCI (transport / application layer protocol
 	 *        control information); i.e., the NPDU without the length field, tpdu.length &le; 255
 	 * @param p message priority, priority set in the control field
-	 * @param confirm confirm flag in the control field, <code>true</code> to set error,
-	 *        <code>false</code> for no error
+	 * @param confirm confirm flag in the control field, {@code true} to set error,
+	 *        {@code false} for no error
 	 */
 	public CEMILDataEx(final int msgCode, final IndividualAddress src, final KNXAddress dst,
 		final byte[] tpdu, final Priority p, final boolean confirm)
@@ -239,20 +239,20 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 * @param tpdu data array, starting with the TPCI / APCI (transport / application layer protocol
 	 *        control information), i.e., the NPDU without the length field, tpdu.length &le; 255
 	 * @param p message priority, priority set in the control field
-	 * @param repeat for request messages send repetitions on the medium - <code>false</code> for do
-	 *        not repeat if error, <code>true</code> for default repeat behavior; meaning of default
+	 * @param repeat for request messages send repetitions on the medium - {@code false} for do
+	 *        not repeat if error, {@code true} for default repeat behavior; meaning of default
 	 *        behavior on media:
 	 *        <ul>
 	 *        <li>RF: no repetitions</li>
 	 *        <li>TP1, PL110: repetitions allowed</li>
 	 *        </ul>
-	 *        for indication message - <code>true</code> if is repeated frame, <code>false</code>
+	 *        for indication message - {@code true} if is repeated frame, {@code false}
 	 *        otherwise
 	 * @param domainBroadcast system / domain broadcast behavior:
-	 *        <code>true</code> for domain broadcast, <code>false</code> for system broadcast (on TP1 medium,
-	 *        set <code>true</code> for "don't care")
-	 * @param ack acknowledge request, <code>true</code> if acknowledge is requested,
-	 *        <code>false</code> for default behavior; meaning of default behavior on media:
+	 *        {@code true} for domain broadcast, {@code false} for system broadcast (on TP1 medium,
+	 *        set {@code true} for "don't care")
+	 * @param ack acknowledge request, {@code true} if acknowledge is requested,
+	 *        {@code false} for default behavior; meaning of default behavior on media:
 	 *        <ul>
 	 *        <li>TP1, PL110: acknowledge requested</li>
 	 *        </ul>
@@ -277,14 +277,14 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 * @param tpdu data array, starting with the TPCI / APCI (transport / application layer protocol
 	 *        control information), i.e., the NPDU without the length field, tpdu.length &le; 255
 	 * @param p message priority, priority set in the control field
-	 * @param repeat for request message, send repetitions on the medium - <code>false</code> for do
-	 *        not repeat if error, <code>true</code> for default repeat behavior; meaning of default
+	 * @param repeat for request message, send repetitions on the medium - {@code false} for do
+	 *        not repeat if error, {@code true} for default repeat behavior; meaning of default
 	 *        behavior on media:
 	 *        <ul>
 	 *        <li>RF: no repetitions</li>
 	 *        <li>TP1, PL110: repetitions allowed</li>
 	 *        </ul>
-	 *        for indication message - <code>true</code> if is repeated frame, <code>false</code>
+	 *        for indication message - {@code true} if is repeated frame, {@code false}
 	 *        otherwise
 	 * @param hopCount hop count starting value set in control field, in the range 0 &le; value
 	 *        &le; 7
@@ -340,7 +340,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 * in the message.
 	 *
 	 * @param infoType type ID of the request additional information
-	 * @return additional information data or <code>null</code> if no such information is available
+	 * @return additional information data or {@code null} if no such information is available
 	 */
 	public synchronized byte[] getAdditionalInfo(final int infoType)
 	{
@@ -361,7 +361,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	 * Returns whether the message assembles an extended frame format.
 	 * <p>
 	 *
-	 * @return <code>true</code> if this is an extended frame, <code>false</code> otherwise
+	 * @return {@code true} if this is an extended frame, {@code false} otherwise
 	 */
 	public synchronized boolean isExtendedFrame()
 	{
@@ -371,8 +371,8 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/**
 	 * Specifies the kind of broadcast to use for sending.
 	 *
-	 * @param domainOnly <code>true</code> for doing a broadcast only within the domain,
-	 *        <code>false</code> for a system broadcast
+	 * @param domainOnly {@code true} for doing a broadcast only within the domain,
+	 *        {@code false} for a system broadcast
 	 */
 	@Override
 	public synchronized void setBroadcast(final boolean domainOnly)
@@ -383,11 +383,11 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	/**
 	 * Returns the kind of broadcast set for this message.
 	 * <p>
-	 * By default, <code>true</code> is returned, indicating "domain-only" broadcast on open media
+	 * By default, {@code true} is returned, indicating "domain-only" broadcast on open media
 	 * or "don't care" on closed media.
 	 *
-	 * @return <code>true</code> if broadcast only within domain or "don't care" mode,
-	 *         <code>false</code> for system broadcast
+	 * @return {@code true} if broadcast only within domain or "don't care" mode,
+	 *         {@code false} for system broadcast
 	 */
 	public synchronized boolean isDomainBroadcast()
 	{
@@ -497,7 +497,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	}
 
 	/**
-	 * Writes all additional information to <code>os</code>.
+	 * Writes all additional information to {@code os}.
 	 *
 	 * @param os the output stream
 	 */

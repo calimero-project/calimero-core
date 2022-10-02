@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -116,7 +116,7 @@ public class LDataObjectQueue extends LDataObject
 	private final Consumer<LDataObjectQueue> queueFull;
 
 	/**
-	 * Creates a new LDataObjectQueue for KNX address <code>addr</code>.
+	 * Creates a new LDataObjectQueue for KNX address {@code addr}.
 	 * <p>
 	 * There is no limit on the queue size used.
 	 *
@@ -129,15 +129,15 @@ public class LDataObjectQueue extends LDataObject
 	}
 
 	/**
-	 * Creates a new LDataObjectQueue for KNX address <code>addr</code>.
+	 * Creates a new LDataObjectQueue for KNX address {@code addr}.
 	 * <p>
 	 * There is no limit on the queue size used.
 	 *
 	 * @param addr KNX address to create the queue for, this address is used to generate
 	 *        the cache object key
-	 * @param consumingRead set <code>true</code> to remove a frame from the queue the
+	 * @param consumingRead set {@code true} to remove a frame from the queue the
 	 *        first time it gets requested for read (i.e., returned by a frame getter
-	 *        method), <code>false</code> to leave it in the queue
+	 *        method), {@code false} to leave it in the queue
 	 */
 	public LDataObjectQueue(final GroupAddress addr, final boolean consumingRead)
 	{
@@ -150,19 +150,19 @@ public class LDataObjectQueue extends LDataObject
 	}
 
 	/**
-	 * Creates a new LDataObjectQueue for KNX address <code>addr</code> with a fixed
+	 * Creates a new LDataObjectQueue for KNX address {@code addr} with a fixed
 	 * maximum queue size.
 	 *
 	 * @param addr KNX address to create the queue for, this address is used to generate
 	 *        the cache object key
-	 * @param consumingRead set <code>true</code> to remove a frame from the queue the
+	 * @param consumingRead set {@code true} to remove a frame from the queue the
 	 *        first time it gets requested for read (i.e., returned by a frame getter
-	 *        method), <code>false</code> to leave it in the queue
+	 *        method), {@code false} to leave it in the queue
 	 * @param maxSize the maximum queue size, i.e., max. number of frames hold by the
 	 *        queue, maxSize has to be &gt; 0
-	 * @param overwrite set <code>true</code> if on full queue a new frame should
+	 * @param overwrite set {@code true} if on full queue a new frame should
 	 *        replace the oldest frame in the queue (i.e., ring buffer semantics),
-	 *        set <code>false</code> if on full queue new frames should be ignored
+	 *        set {@code false} if on full queue new frames should be ignored
 	 * @param queueFull receive a notification if queue is full
 	 */
 	public LDataObjectQueue(final GroupAddress addr, final boolean consumingRead, final int maxSize,
@@ -182,9 +182,9 @@ public class LDataObjectQueue extends LDataObject
 	/**
 	 * {@inheritDoc}<br>
 	 * If a maximum size is set and the queue already reached maximum size, if
-	 * {@link #isOverwrite()} evaluates to<br> - <code>true</code>, <code>frame</code>
-	 * will replace the oldest inserted frame<br> - <code>false</code>,
-	 * <code>frame</code> is ignored and not queued.
+	 * {@link #isOverwrite()} evaluates to<br> - {@code true}, {@code frame}
+	 * will replace the oldest inserted frame<br> - {@code false},
+	 * {@code frame} is ignored and not queued.
 	 */
 	@Override
 	public synchronized void setFrame(final CEMILData frame)
@@ -319,7 +319,7 @@ public class LDataObjectQueue extends LDataObject
 	 * Returns mode for overwrite used for this queue.
 	 * <p>
 	 *
-	 * @return <code>true</code> if overwrite is used, <code>false</code> otherwise
+	 * @return {@code true} if overwrite is used, {@code false} otherwise
 	 */
 	public final boolean isOverwrite()
 	{
@@ -330,8 +330,8 @@ public class LDataObjectQueue extends LDataObject
 	 * Returns mode for consuming read behavior.
 	 * <p>
 	 *
-	 * @return <code>true</code> if queued items get consumed on read,
-	 *         <code>false</code> if a read does not modify the queue
+	 * @return {@code true} if queued items get consumed on read,
+	 *         {@code false} if a read does not modify the queue
 	 */
 	public final boolean isConsuming()
 	{

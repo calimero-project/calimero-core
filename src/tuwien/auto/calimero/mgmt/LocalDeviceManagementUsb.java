@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2021 B. Malinowsky
+    Copyright (c) 2015, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -74,13 +74,13 @@ public class LocalDeviceManagementUsb extends LocalDeviceManagement<HidReport>
 	 * The check whether a property is read only or write enabled, is done by issuing a write
 	 * request for that property. Due to the memory layout, write cycles of a memory location and
 	 * similar, this might not always be desired. To enable or skip this check, the
-	 * <code>queryWriteEnable</code> option has to be set appropriately. The write-enabled check is
+	 * {@code queryWriteEnable} option has to be set appropriately. The write-enabled check is
 	 * only of interest when getting a property description {@link #getDescription(int, int, int)}.
 	 *
 	 * @param c the USB connection
 	 * @param adapterClosed receives notification about adapter close event
-	 * @param queryWriteEnable <code>true</code> to check whether a property is write enabled or
-	 *        read only, <code>false</code> to skip the check
+	 * @param queryWriteEnable {@code true} to check whether a property is write enabled or
+	 *        read only, {@code false} to skip the check
 	 * @throws KNXException on failure establishing local device management connection or failure
 	 *         while initializing the property adapter
 	 * @throws InterruptedException on interrupt during initialization

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -81,8 +81,8 @@ public class KNXnetIPDevMgmt extends ClientConnection
 	 *
 	 * @param localEP the local endpoint to use for communication channel
 	 * @param serverCtrlEP the remote server control endpoint used for connect request
-	 * @param useNAT <code>true</code> to use a NAT (Network Address Translation) aware communication mechanism,
-	 *        <code>false</code> to use the default way
+	 * @param useNAT {@code true} to use a NAT (Network Address Translation) aware communication mechanism,
+	 *        {@code false} to use the default way
 	 * @throws KNXException on socket communication error
 	 * @throws KNXTimeoutException on no connect response before connect timeout
 	 * @throws KNXRemoteException if response indicates an error condition at the server concerning the request

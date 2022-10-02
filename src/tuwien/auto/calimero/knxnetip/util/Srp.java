@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2021 K.Heimrich
+    Copyright (c) 2018, 2022 K.Heimrich
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -158,7 +158,7 @@ public final class Srp
 	 * Creates a new SRP out of a byte array.
 	 *
 	 * @param data byte array containing SRP structure
-	 * @param offset start offset of SRP in <code>data</code>
+	 * @param offset start offset of SRP in {@code data}
 	 * @throws KNXFormatException if no SRP found or invalid structure
 	 */
 	public Srp(final byte[] data, final int offset) throws KNXFormatException {
@@ -255,7 +255,7 @@ public final class Srp
 	/**
 	 * Returns the mandatory flag of this SRP.
 	 *
-	 * @return <code>true</code> if the mandatory bit is set, <code>false</code> otherwise
+	 * @return {@code true} if the mandatory bit is set, {@code false} otherwise
 	 */
 	public boolean isMandatory() {
 		return mandatory;

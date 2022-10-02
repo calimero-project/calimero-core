@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -64,8 +64,8 @@ public final class Helper
 	/**
 	 * Assert similar for two strings.
 	 * <p>
-	 * Case insensitive check whether <code>expected</code> is contained in
-	 * <code>actual</code>.
+	 * Case insensitive check whether {@code expected} is contained in
+	 * {@code actual}.
 	 *
 	 * @param expected expected result
 	 * @param actual actual result
@@ -81,7 +81,7 @@ public final class Helper
 	 * the translator.
 	 *
 	 * @param dpts dpts to check in translator
-	 * @param testSimilarity <code>true</code> to check if getValue() of translator
+	 * @param testSimilarity {@code true} to check if getValue() of translator
 	 *        returns the expected exact value set before
 	 */
 	public static void checkDPTs(final DPT[] dpts, final boolean testSimilarity)

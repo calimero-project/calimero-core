@@ -77,7 +77,7 @@ public interface Cache
 		 * requests through {@link Cache#get(Object)}.
 		 * <p>
 		 * This value is obtained through
-		 * <code>ratio = (hits / (hits + misses))</code>.
+		 * {@code ratio = (hits / (hits + misses))}.
 		 *
 		 * @return the hit ratio in the range [0,1]
 		 */
@@ -85,32 +85,32 @@ public interface Cache
 	}
 
 	/**
-	 * Inserts the {@link CacheObject} <code>obj</code> into the cache.
+	 * Inserts the {@link CacheObject} {@code obj} into the cache.
 	 * <p>
 	 * If a {@link CacheObject} with an equal key (delivered by
-	 * {@link CacheObject#getKey()}) to <code>obj.getKey()</code> is already
-	 * in the cache, it will be replaced by <code>obj</code>.<br>
-	 * {@link CacheObject#resetTimestamp()} is invoked on <code>obj</code> after
-	 * <code>obj</code> was inserted successfully.
+	 * {@link CacheObject#getKey()}) to {@code obj.getKey()} is already
+	 * in the cache, it will be replaced by {@code obj}.<br>
+	 * {@link CacheObject#resetTimestamp()} is invoked on {@code obj} after
+	 * {@code obj} was inserted successfully.
 	 *
 	 * @param obj CacheObject to put into the cache
 	 */
 	void put(CacheObject obj);
 
 	/**
-	 * Gets the {@link CacheObject} associated with <code>key</code> from the
+	 * Gets the {@link CacheObject} associated with {@code key} from the
 	 * cache.
 	 * <p>
 	 * If found, the access count of the CacheObject is incremented by 1.
 	 *
 	 * @param key key to search
-	 * @return the CacheObject or <code>null</code> if <code>key</code> does
+	 * @return the CacheObject or {@code null} if {@code key} does
 	 *         not exist in the cache
 	 */
 	CacheObject get(Object key);
 
 	/**
-	 * Removes the CacheObject associated with <code>key</code> from the cache,
+	 * Removes the CacheObject associated with {@code key} from the cache,
 	 * if found.
 	 * <p>
 	 *

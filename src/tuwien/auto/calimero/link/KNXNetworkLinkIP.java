@@ -136,11 +136,11 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 * KNXnet/IP server endpoint.
 	 *
 	 * @param localEP the local control endpoint of the link to use, supply the wildcard address to use a local IP on
-	 *        the same subnet as <code>remoteEP</code> and an ephemeral port number
+	 *        the same subnet as {@code remoteEP} and an ephemeral port number
 	 * @param remoteEP the remote endpoint of the link to communicate with; this is the KNXnet/IP server control
 	 *        endpoint
-	 * @param useNAT <code>true</code> to use network address translation (NAT) in tunneling service mode,
-	 *        <code>false</code> to use the default (non aware) mode
+	 * @param useNAT {@code true} to use network address translation (NAT) in tunneling service mode,
+	 *        {@code false} to use the default (non aware) mode
 	 * @param settings medium settings defining device and KNX medium specifics for communication
 	 * @return the network link in open state
 	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
@@ -195,7 +195,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 * Creates a new network link using the {@link KNXnetIPRouting} protocol, with the local endpoint specified by a
 	 * network interface.
 	 *
-	 * @param netIf local network interface used to join the multicast group and for sending, use <code>null</code> for
+	 * @param netIf local network interface used to join the multicast group and for sending, use {@code null} for
 	 *        the host's default multicast interface
 	 * @param mcGroup address of the multicast group to join, use {@link #DefaultMulticast} for the default KNX IP
 	 *        multicast address
@@ -242,9 +242,9 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 * @param netif local network interface used to join the multicast group and for sending
 	 * @param mcGroup address of the multicast group to join, use {@link #DefaultMulticast} for the default KNX IP
 	 *        multicast address
-	 * @param groupKey KNX IP Secure group key (backbone key), <code>groupKey.length == 16</code>
+	 * @param groupKey KNX IP Secure group key (backbone key), {@code groupKey.length == 16}
 	 * @param latencyTolerance time window for accepting secure multicasts, depending on max. end-to-end network latency
-	 *        (typically 500 ms to 5000 ms), <code>0 &lt; latencyTolerance.toMillis() &le; 8000</code>
+	 *        (typically 500 ms to 5000 ms), {@code 0 < latencyTolerance.toMillis() ≤ 8000}
 	 * @param settings medium settings defining device and medium specifics needed for communication
 	 * @return the network link in open state
 	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
@@ -263,21 +263,21 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	/**
 	 * Creates a new network link based on the KNXnet/IP protocol, using a {@link KNXnetIPConnection}.
 	 *
-	 * @param serviceMode mode of communication to open, <code>serviceMode</code> is one of the service mode constants
+	 * @param serviceMode mode of communication to open, {@code serviceMode} is one of the service mode constants
 	 *        (e.g. {@link #TUNNELING}); depending on the mode set, the expected local/remote endpoints might differ
 	 * @param localEP the local endpoint of the link to use;<br>
-	 *        - in tunneling mode (point-to-point), this is the client control endpoint, use <code>null</code> for the
+	 *        - in tunneling mode (point-to-point), this is the client control endpoint, use {@code null} for the
 	 *        default local host and an ephemeral port number<br>
 	 *        - in {@link #ROUTING} mode, specifies the multicast interface, i.e., the local network interface is taken
 	 *        that has the IP address bound to it (if IP address is bound more than once, it's undefined which interface
-	 *        is returned), the port is not used; use <code>null</code> for <code>localEP</code> or an unresolved IP
+	 *        is returned), the port is not used; use {@code null} for {@code localEP} or an unresolved IP
 	 *        address to take the host's default multicast interface
 	 * @param remoteEP the remote endpoint of the link to communicate with;<br>
 	 *        - in tunneling mode (point-to-point), this is the server control endpoint <br>
 	 *        - in {@link #ROUTING} mode, the IP address specifies the multicast group to join, the port is not used;
-	 *        use <code>null</code> for <code>remoteEP</code> or an unresolved IP address to take the default multicast
+	 *        use {@code null} for {@code remoteEP} or an unresolved IP address to take the default multicast
 	 *        group
-	 * @param useNAT <code>true</code> to use network address translation in tunneling service mode, <code>false</code>
+	 * @param useNAT {@code true} to use network address translation in tunneling service mode, {@code false}
 	 *        to use the default (non aware) mode; parameter is ignored for routing
 	 * @param settings medium settings defining device and medium specifics needed for communication
 	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
@@ -292,7 +292,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	}
 
 	/**
-	 * Creates a new network link with <code>serviceMode</code> based on the supplied KNXnet/IP connection.
+	 * Creates a new network link with {@code serviceMode} based on the supplied KNXnet/IP connection.
 	 *
 	 * @param serviceMode mode of communication, one of the service mode constants {@link #TUNNELING},
 	 *        {@link #TunnelingV2}, or {@link #ROUTING}
@@ -402,7 +402,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 
 	/**
 	 * {@inheritDoc} When communicating with a KNX network which uses open medium, messages are broadcasted within
-	 * domain (as opposite to system broadcast) by default. Specify <code>dst = null</code> for system broadcast.
+	 * domain (as opposite to system broadcast) by default. Specify {@code dst = null} for system broadcast.
 	 */
 	@Override
 	public void sendRequest(final KNXAddress dst, final Priority p, final byte[] nsdu)
@@ -414,7 +414,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 
 	/**
 	 * {@inheritDoc} When communicating with a KNX network which uses open medium, messages are broadcasted within
-	 * domain (as opposite to system broadcast) by default. Specify <code>dst null</code> for system broadcast.
+	 * domain (as opposite to system broadcast) by default. Specify {@code dst null} for system broadcast.
 	 */
 	@Override
 	public void sendRequestWait(final KNXAddress dst, final Priority p, final byte[] nsdu)

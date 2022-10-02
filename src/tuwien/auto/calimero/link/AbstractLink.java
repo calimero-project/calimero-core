@@ -107,8 +107,8 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	protected boolean cEMI = true;
 
 	/**
-	 * With cEMI format, use {@link #onSend(KNXAddress, byte[], boolean)} if set <code>true</code>,
-	 * use {@link #onSend(CEMILData, boolean)} if set <code>false</code>.
+	 * With cEMI format, use {@link #onSend(KNXAddress, byte[], boolean)} if set {@code true},
+	 * use {@link #onSend(CEMILData, boolean)} if set {@code false}.
 	 */
 	protected boolean sendCEmiAsByteArray;
 
@@ -224,7 +224,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	};
 
 	/**
-	 * @param connection if not <code>null</code>, the link object will close this resource as last
+	 * @param connection if not {@code null}, the link object will close this resource as last
 	 *        action before returning from {@link #close()}, relinquishing any underlying resources
 	 * @param name the link name
 	 * @param settings medium settings of the accessed KNX network
@@ -370,8 +370,8 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	 * @param dst KNX destination address
 	 * @param p message priority
 	 * @param nsdu NSDU
-	 * @param waitForCon <code>true</code> to wait for a link layer confirmation response,
-	 *        <code>false</code> to not wait for the confirmation
+	 * @param waitForCon {@code true} to wait for a link layer confirmation response,
+	 *        {@code false} to not wait for the confirmation
 	 * @throws KNXTimeoutException on a timeout during send or while waiting for the confirmation
 	 * @throws KNXLinkClosedException if the link is closed
 	 */
@@ -393,10 +393,10 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	 * supplied as byte array over the link. In case a L-Data confirmation is requested, the message
 	 * send is only successful if the corresponding confirmation is received.
 	 *
-	 * @param dst for logging purposes only: the KNX destination address, or <code>null</code>
+	 * @param dst for logging purposes only: the KNX destination address, or {@code null}
 	 * @param msg the message to send
-	 * @param waitForCon <code>true</code> to wait for a link layer confirmation response,
-	 *        <code>false</code> to not wait for the confirmation
+	 * @param waitForCon {@code true} to wait for a link layer confirmation response,
+	 *        {@code false} to not wait for the confirmation
 	 * @throws KNXTimeoutException on a timeout during send or while waiting for the confirmation
 	 * @throws KNXLinkClosedException if the link is closed
 	 */
@@ -409,9 +409,9 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	 * message send is only successful if the corresponding confirmation is received.
 	 *
 	 * @param msg the message to send
-	 * @param waitForCon <code>true</code>, if the communication protocol should block and wait for
+	 * @param waitForCon {@code true}, if the communication protocol should block and wait for
 	 *        the link layer confirmation (L-Data.con), executing all required retransmission
-	 *        attempts and timeout validations, <code>false</code> if no confirmation is requested
+	 *        attempts and timeout validations, {@code false} if no confirmation is requested
 	 * @throws KNXTimeoutException on a timeout during send or while waiting for the confirmation
 	 * @throws KNXLinkClosedException if the link is closed
 	 */

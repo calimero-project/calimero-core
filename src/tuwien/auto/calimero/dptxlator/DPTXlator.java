@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -57,8 +57,8 @@ import tuwien.auto.calimero.log.LogService;
  * <p>
  * A translator supports translation of more than one values / DPTs at the same time.<br>
  * After creation, a translator initially contains at least one valid default item (i.e.
- * value and data) representation for return through a <code>getValue</code>- or
- * <code>getData</code>-like method call.
+ * value and data) representation for return through a {@code getValue}- or
+ * {@code getData}-like method call.
  * <p>
  * The naming convention used for translator methods is to use methods comprising "data"
  * in its name for handling KNX data types (usually contained in byte arrays), while
@@ -104,7 +104,7 @@ public abstract class DPTXlator
 	protected DPT dpt;
 
 	/**
-	 * Specifies the size of the data type in bytes, set <code>0</code> if type size
+	 * Specifies the size of the data type in bytes, set {@code 0} if type size
 	 * &lt;= 6 bits.
 	 * <p>
 	 * It is used for calculating the number of items in the translator, and also by users
@@ -118,8 +118,8 @@ public abstract class DPTXlator
 	 * Behavior regarding appending a DPT engineering unit.
 	 * <p>
 	 * Methods capable of returning an item value together the engineering unit of the
-	 * DPT, should append the unit on <code>true</code>, and omit any unit
-	 * representation on <code>false</code>; default setting is <code>true</code>.
+	 * DPT, should append the unit on {@code true}, and omit any unit
+	 * representation on {@code false}; default setting is {@code true}.
 	 * Only relevant for DPTs with an associated engineering unit.
 	 */
 	protected boolean appendUnit = true;
@@ -143,14 +143,14 @@ public abstract class DPTXlator
 	/**
 	 * Translates the array of strings according to the set datapoint ID.
 	 * <p>
-	 * If, and only if, all items in <code>values</code> can successfully be translated,
+	 * If, and only if, all items in {@code values} can successfully be translated,
 	 * they get stored by the translator, replacing any old items. On
-	 * <code>values.length == 0</code>, no action is performed.<br>
-	 * Textual commands contained in <code>values</code> are treated case insensitive.
+	 * {@code values.length == 0}, no action is performed.<br>
+	 * Textual commands contained in {@code values} are treated case insensitive.
 	 *
 	 * @param values string array holding values for translation
-	 * @throws KNXFormatException if an item in <code>values</code> can't be translated
-	 *         due to a wrong formatted content, or if <code>value</code>doesn't fit
+	 * @throws KNXFormatException if an item in {@code values} can't be translated
+	 *         due to a wrong formatted content, or if {@code value}doesn't fit
 	 *         into KNX data type
 	 */
 	public void setValues(final String... values) throws KNXFormatException
@@ -175,17 +175,17 @@ public abstract class DPTXlator
 	public abstract String[] getAllValues();
 
 	/**
-	 * Translates the <code>value</code> according to the set datapoint ID.
+	 * Translates the {@code value} according to the set datapoint ID.
 	 * <p>
-	 * If, and only if, <code>value</code> can successfully be translated, it gets
+	 * If, and only if, {@code value} can successfully be translated, it gets
 	 * stored by the translator, replacing any old items. Textual commands contained in
-	 * <code>value</code> are treated case insensitive.<br>
-	 * The <code>value</code> string might have its unit of measure appended (units are
+	 * {@code value} are treated case insensitive.<br>
+	 * The {@code value} string might have its unit of measure appended (units are
 	 * case sensitive).
 	 *
 	 * @param value value represented as string for translation, case insensitive
-	 * @throws KNXFormatException if <code>value</code> can't be translated due to wrong
-	 *         formatted content, or if <code>value</code>doesn't fit into KNX data type
+	 * @throws KNXFormatException if {@code value} can't be translated due to wrong
+	 *         formatted content, or if {@code value}doesn't fit into KNX data type
 	 */
 	public void setValue(final String value) throws KNXFormatException
 	{
@@ -238,22 +238,21 @@ public abstract class DPTXlator
 	/**
 	 * Sets the data array with KNX datapoint type items for translation.
 	 * <p>
-	 * The <code>data</code> array contains at least one DPT item, the new item(s) will
+	 * The {@code data} array contains at least one DPT item, the new item(s) will
 	 * replace any other items set in the translator before.<br>
-	 * The number of items (KNX data values) for translation in <code>data</code> is
-	 * inferred from the length of the usable <code>data</code> range:<br>
-	 * <code>items = (data.length - offset) / (length of KNX data type)</code>
+	 * The number of items (KNX data values) for translation in {@code data} is
+	 * inferred from the length of the usable {@code data} range:<br>
+	 * {@code items = (data.length - offset) / (length of KNX data type)}
 	 * <p>
 	 * In general, the KNX data type width is implicitly known in the context where a
 	 * translator is invoked (e.g., by appropriate DP configuration). Therefore,
-	 * <code>data.length</code> will satisfy the minimum acceptable length. If this is
+	 * {@code data.length} will satisfy the minimum acceptable length. If this is
 	 * not the case, {@link KNXIllegalArgumentException} has to be caught and handled in
 	 * the caller's context.
 	 *
 	 * @param data byte array containing KNX DPT item(s)
-	 * @param offset offset into <code>data</code> from where to start, 0 &lt;= offset
-	 *        &lt; <code>data.length</code>
-	 * @throws KNXIllegalArgumentException if <code>data.length</code> - offset &lt;
+	 * @param offset offset into {@code data} from where to start, {@code 0 ≤ offset < data.length}
+	 * @throws KNXIllegalArgumentException if {@code data.length} - offset &lt;
 	 *         data type width of this DPTXlator
 	 */
 	public void setData(final byte[] data, final int offset)
@@ -281,20 +280,19 @@ public abstract class DPTXlator
 	}
 
 	/**
-	 * Copies KNX DPT value items stored by this translator into <code>dst</code>, starting at
-	 * <code>offset</code>.
+	 * Copies KNX DPT value items stored by this translator into {@code dst}, starting at
+	 * {@code offset}.
 	 * <p>
-	 * The number of items copied depends on the usable <code>dst</code> range, i.e., how many items
-	 * completely fit into <code>dst.length - offset</code>. If the usable range is too short, no
-	 * item is copied at all, and <code>dst</code> is not modified.<br>
+	 * The number of items copied depends on the usable {@code dst} range, i.e., how many items
+	 * completely fit into {@code dst.length - offset}. If the usable range is too short, no
+	 * item is copied at all, and {@code dst} is not modified.<br>
 	 * Datapoint types shorter than 1 bytes only change the affected lower bit positions, leaving
-	 * the upper (high) bits of <code>dst</code> bytes untouched.
+	 * the upper (high) bits of {@code dst} bytes untouched.
 	 *
 	 * @param dst byte array for storing DPT values
-	 * @param offset offset into <code>dst</code> from where to start, 0 &lt;= offset &lt;
-	 *        <code>dst.length</code>
-	 * @return <code>dst</code>
-	 * @throws KNXIllegalArgumentException if the usable destination range of <code>dst</code> is
+	 * @param offset offset into {@code dst} from where to start, {@code 0 ≤ offset < dst.length}
+	 * @return {@code dst}
+	 * @throws KNXIllegalArgumentException if the usable destination range of {@code dst} is
 	 *         not sufficient to hold at least 1 item
 	 */
 	public byte[] getData(final byte[] dst, final int offset)
@@ -319,8 +317,8 @@ public abstract class DPTXlator
 	 * Translator methods capable of appending an available DPT unit will act according
 	 * this setting.
 	 *
-	 * @param append <code>true</code> to append a DPT unit if any available,
-	 *        <code>false</code> to omit any unit
+	 * @param append {@code true} to append a DPT unit if any available,
+	 *        {@code false} to omit any unit
 	 */
 	public final void setAppendUnit(final boolean append)
 	{
@@ -434,16 +432,16 @@ public abstract class DPTXlator
 
 	/**
 	 * Translates a string value representation into KNX data type according the current
-	 * DPT and stores the result into <code>dst</code>. The index parameter specifies
+	 * DPT and stores the result into {@code dst}. The index parameter specifies
 	 * the item index of the value. The translated KNX data is stored at the corresponding
-	 * array offset in <code>dst</code>. Calculation of offset:
-	 * <code>offset = index * KNX data type size</code>.
+	 * array offset in {@code dst}. Calculation of offset:
+	 * {@code offset = index * KNX data type size}.
 	 *
 	 * @param value value to translate
 	 * @param dst destination array for resulting KNX data
 	 * @param index item index in destination array
-	 * @throws KNXFormatException if <code>value</code> can't be translated due to wrong
-	 *         formatted content, or if <code>value</code>doesn't fit into KNX data
+	 * @throws KNXFormatException if {@code value} can't be translated due to wrong
+	 *         formatted content, or if {@code value}doesn't fit into KNX data
 	 *         type
 	 */
 	protected abstract void toDPT(String value, short[] dst, int index) throws KNXFormatException;

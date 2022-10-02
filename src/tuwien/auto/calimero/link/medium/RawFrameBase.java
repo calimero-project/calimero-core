@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -78,7 +78,7 @@ public abstract class RawFrameBase implements RawFrame
 	protected KNXAddress dst;
 
 	/**
-	 * Is this an extended (<code>true</code>) or a standard frame (<code>false</code>).
+	 * Is this an extended ({@code true}) or a standard frame ({@code false}).
 	 */
 	protected boolean ext;
 
@@ -161,8 +161,8 @@ public abstract class RawFrameBase implements RawFrame
 	/**
 	 * Returns whether frame repetition is requested, or this is a repeated frame.
 	 * <p>
-	 * A request for repetition or repeated frame is indicated with <code>true</code>,
-	 * otherwise <code>false</code> is returned.
+	 * A request for repetition or repeated frame is indicated with {@code true},
+	 * otherwise {@code false} is returned.
 	 *
 	 * @return repeat state as boolean
 	 */
@@ -175,7 +175,7 @@ public abstract class RawFrameBase implements RawFrame
 	 * Returns a copy of the TPDU, if available.
 	 * <p>
 	 *
-	 * @return tpdu as byte array or <code>null</code> for L-polldata frames
+	 * @return tpdu as byte array or {@code null} for L-polldata frames
 	 */
 	public final byte[] getTPDU()
 	{

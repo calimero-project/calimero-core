@@ -186,7 +186,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 	 *
 	 * @param dptId available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
-	 *         <code>dptID</code>
+	 *         {@code dptID}
 	 */
 	public DPTXlator1BitControlled(final String dptId) throws KNXFormatException
 	{
@@ -208,7 +208,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 	/**
 	 * Sets one new translation item, replacing any old items.
 	 *
-	 * @param control control field, <code>false</code> is <i>no control</i>, <code>true</code> is <i>control</i>
+	 * @param control control field, {@code false} is <i>no control</i>, {@code true} is <i>control</i>
 	 * @param value value field
 	 * @see #setControlBit(boolean)
 	 */
@@ -231,7 +231,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 	/**
 	 * Sets the control field for the first translation item.
 	 * <p>
-	 * A value of <code>false</code> stands for <i>no control</i>, <code>true</code> for
+	 * A value of {@code false} stands for <i>no control</i>, {@code true} for
 	 * <i>control</i>.<br>
 	 * This method does not reset other item data or discard other translation items.
 	 *
@@ -248,7 +248,7 @@ public class DPTXlator1BitControlled extends DPTXlator
 	/**
 	 * Returns the control field of the first translation item.
 	 * <p>
-	 * A value of <code>false</code> stands for decrease / up, <code>true</code> for
+	 * A value of {@code false} stands for decrease / up, {@code true} for
 	 * increase / down.
 	 *
 	 * @return control bit as boolean

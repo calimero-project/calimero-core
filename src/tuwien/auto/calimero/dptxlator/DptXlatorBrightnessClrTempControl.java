@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2021 B. Malinowsky
+    Copyright (c) 2018, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ import tuwien.auto.calimero.KNXFormatException;
 /**
  * Translator for KNX DPTs with main number 250, type <b>brightness &amp; color temperature control</b>. The KNX data
  * type width is 3 bytes. The default return value after creation is the value with all parts not valid
- * (<code>- -</code>).
+ * ({@code - -}).
  */
 public class DptXlatorBrightnessClrTempControl extends DPTXlator {
 	public static final String Description = "brightness & color temperature control";
@@ -92,7 +92,7 @@ public class DptXlatorBrightnessClrTempControl extends DPTXlator {
 	 * Creates a translator for the given datapoint type ID.
 	 *
 	 * @param dptId available implemented datapoint type ID
-	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptId</code>
+	 * @throws KNXFormatException on wrong formatted or not expected (available) {@code dptId}
 	 */
 	public DptXlatorBrightnessClrTempControl(final String dptId) throws KNXFormatException {
 		super(3);

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -57,8 +57,8 @@ public final class CacheSweeper extends Thread
 	private final Object lock = new Object();
 
 	/**
-	 * Creates a {@link CacheSweeper} for <code>cache</code> with the given
-	 * <code>sweepInterval</code>.
+	 * Creates a {@link CacheSweeper} for {@code cache} with the given
+	 * {@code sweepInterval}.
 	 * <p>
 	 *
 	 * @param cache the cache for which {@link Cache#removeExpired()} should be invoked

@@ -396,13 +396,13 @@ public class UsbConnection implements Connection<HidReport>
 	}
 
 	/**
-	 * Creates a new KNX USB connection using a KNX USB <code>device</code> identifier to locate the USB interface,
-	 * being either a <code>vendorId:productId</code>, or a name used for pattern matching with the USB device
+	 * Creates a new KNX USB connection using a KNX USB {@code device} identifier to locate the USB interface,
+	 * being either a {@code vendorId:productId}, or a name used for pattern matching with the USB device
 	 * descriptor strings.
 	 *
-	 * @param device a <code>vendorId:productId</code> identifier, or a name (case-insensitive) that is used to match a
+	 * @param device a {@code vendorId:productId} identifier, or a name (case-insensitive) that is used to match a
 	 *        KNX USB device by its description strings, e.g, "siemens", "busch-jaeger", "abb". Note, that with more
-	 *        than one USB device matching the criteria of <code>device</code>, the first one found is selected
+	 *        than one USB device matching the criteria of {@code device}, the first one found is selected
 	 * @throws KNXException on errors finding or accessing the USB interface, or opening the KNX USB connection
 	 */
 	public UsbConnection(final String device) throws KNXException
@@ -412,11 +412,11 @@ public class UsbConnection implements Connection<HidReport>
 
 	/**
 	 * Creates a new KNX USB connection using a vendor and product identifier to locate the USB interface. Note, that
-	 * with more than one USB interfaces matching <code>vendorId:productId</code>, the first one found is selected. This
+	 * with more than one USB interfaces matching {@code vendorId:productId}, the first one found is selected. This
 	 * is only the case if several USB interfaces of the same make and model are attached to the host.
 	 *
-	 * @param vendorId the vendor identifier of the USB <code>vendorId:productId</code>
-	 * @param productId the product identifier of the USB <code>vendorId:productId</code>
+	 * @param vendorId the vendor identifier of the USB {@code vendorId:productId}
+	 * @param productId the product identifier of the USB {@code vendorId:productId}
 	 * @throws KNXException on errors finding or accessing the USB interface, or opening the KNX USB connection
 	 */
 	// TODO we use the first matching USB device we find, current param list is not sufficient!
@@ -465,7 +465,7 @@ public class UsbConnection implements Connection<HidReport>
 	}
 
 	/**
-	 * Adds the specified event listener <code>l</code> to receive events from this connection. If <code>l</code> was
+	 * Adds the specified event listener {@code l} to receive events from this connection. If {@code l} was
 	 * already added as listener, no action is performed.
 	 *
 	 * @param l the listener to add
@@ -477,8 +477,8 @@ public class UsbConnection implements Connection<HidReport>
 	}
 
 	/**
-	 * Removes the specified event listener <code>l</code>, so it does no longer receive events from this connection. If
-	 * <code>l</code> was not added in the first place, no action is performed.
+	 * Removes the specified event listener {@code l}, so it does no longer receive events from this connection. If
+	 * {@code l} was not added in the first place, no action is performed.
 	 *
 	 * @param l the listener to remove
 	 */
@@ -813,7 +813,7 @@ public class UsbConnection implements Connection<HidReport>
 
 	/**
 	 * Fires a frame received event ({@link KNXListener#frameReceived(FrameEvent)}) for the supplied EMI
-	 * <code>frame</code>.
+	 * {@code frame}.
 	 *
 	 * @param frame the EMI1/EMI2/cEMI L-data frame to generate the event for
 	 * @throws KNXFormatException on error creating cEMI message

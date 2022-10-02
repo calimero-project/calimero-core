@@ -377,7 +377,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	/**
 	 * {@inheritDoc}
 	 * <p>
-	 * If <code>dp</code> has no {@link DPT} set, this method returns a hexadecimal representation
+	 * If {@code dp} has no {@link DPT} set, this method returns a hexadecimal representation
 	 * of the ASDU.
 	 */
 	@Override
@@ -566,7 +566,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	 * translator.
 	 * <p>
 	 * The whole service data unit is taken as data for translation. If the length of the supplied
-	 * <code>apdu</code> is 2, a length-optimized (compact) group APDU format layout is assumed.<br>
+	 * {@code apdu} is 2, a length-optimized (compact) group APDU format layout is assumed.<br>
 	 * On return of this method, the supplied translator contains the DPT items from the ASDU.
 	 *
 	 * @param apdu application layer protocol data unit, 2 &lt;= apdu.length

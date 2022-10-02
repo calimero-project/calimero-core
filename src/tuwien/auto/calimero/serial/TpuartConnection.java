@@ -167,13 +167,13 @@ public class TpuartConnection implements Connection<byte[]>
 	private final Logger logger;
 
 	/**
-	 * Creates a new TP-UART connection using communication port <code>portId</code>, expecting a collection of KNX
+	 * Creates a new TP-UART connection using communication port {@code portId}, expecting a collection of KNX
 	 * addresses for which the host shall acknowledge TP1 frame reception.
 	 *
 	 * @param portId the identifier of the communication port
 	 * @param acknowledge a (possibly empty) collection of KNX addresses this endpoint shall issue a positive
 	 *        acknowledgement for, on receiving a valid TP1 frame with its destination address being an element in
-	 *        <code>acknowledge</code>. By default, this endpoint also won't acknowledge the default individual
+	 *        {@code acknowledge}. By default, this endpoint also won't acknowledge the default individual
 	 *        address 0.2.ff on the TP1 network.
 	 * @throws KNXException on error opening the communication port, or initializing the TP-UART controller
 	 */
@@ -223,7 +223,7 @@ public class TpuartConnection implements Connection<byte[]>
 	}
 
 	/**
-	 * Adds the specified event listener <code>l</code> to receive events from this connection. If <code>l</code> was
+	 * Adds the specified event listener {@code l} to receive events from this connection. If {@code l} was
 	 * already added as listener, no action is performed.
 	 *
 	 * @param l the listener to add
@@ -235,8 +235,8 @@ public class TpuartConnection implements Connection<byte[]>
 	}
 
 	/**
-	 * Removes the specified event listener <code>l</code>, so it does no longer receive events from this connection. If
-	 * <code>l</code> was not added in the first place, no action is performed.
+	 * Removes the specified event listener {@code l}, so it does no longer receive events from this connection. If
+	 * {@code l} was not added in the first place, no action is performed.
 	 *
 	 * @param l the listener to remove
 	 */

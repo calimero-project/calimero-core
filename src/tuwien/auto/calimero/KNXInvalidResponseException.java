@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ public class KNXInvalidResponseException extends KNXRemoteException
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Constructs a new <code>KNXInvalidResponseException</code> with the specified
+	 * Constructs a new {@code KNXInvalidResponseException} with the specified
 	 * detail message.
 	 * <p>
 	 *
@@ -61,7 +61,7 @@ public class KNXInvalidResponseException extends KNXRemoteException
 	}
 
 	/**
-	 * Constructs a new <code>KNXInvalidResponseException</code> with the specified detail message and cause.
+	 * Constructs a new {@code KNXInvalidResponseException} with the specified detail message and cause.
 	 *
 	 * @param s the detail message
 	 * @param cause the cause in form of a throwable object

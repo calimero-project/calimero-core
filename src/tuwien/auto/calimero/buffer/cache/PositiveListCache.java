@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -113,7 +113,7 @@ public class PositiveListCache extends ExpiringCache
 	}
 
 	/**
-	 * Adds a new allowed <code>key</code> to the positive list, if it is not
+	 * Adds a new allowed {@code key} to the positive list, if it is not
 	 * already present.
 	 *
 	 * @param key the new key object
@@ -124,7 +124,7 @@ public class PositiveListCache extends ExpiringCache
 	}
 
 	/**
-	 * Removes the <code>key</code> from the positive list, if it is present.
+	 * Removes the {@code key} from the positive list, if it is present.
 	 * <p>
 	 * The cache objects will be updated immediately according to the removed
 	 * key.

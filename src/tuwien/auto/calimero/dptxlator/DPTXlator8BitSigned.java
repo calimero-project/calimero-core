@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -96,7 +96,7 @@ public class DPTXlator8BitSigned extends DPTXlator
 	 * <p>
 	 *
 	 * @param dptID available implemented datapoint type ID
-	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptID</code>
+	 * @throws KNXFormatException on wrong formatted or not expected (available) {@code dptID}
 	 */
 	public DPTXlator8BitSigned(final String dptID) throws KNXFormatException
 	{
@@ -120,8 +120,8 @@ public class DPTXlator8BitSigned extends DPTXlator
 	/**
 	 * Sets one new translation item from a signed value, replacing any old items.
 	 *
-	 * @param value signed value, -128 &le; <code>value</code> &le; 127
-	 * @throws KNXFormatException if <code>value</code> is out of range
+	 * @param value signed value, -128 &le; {@code value} &le; 127
+	 * @throws KNXFormatException if {@code value} is out of range
 	 */
 	public final void setValue(final int value) throws KNXFormatException
 	{
@@ -162,7 +162,7 @@ public class DPTXlator8BitSigned extends DPTXlator
 	 * @param c status bit 2
 	 * @param d status bit 3
 	 * @param e status bit 4
-	 * @param mode the active mode, <code>0</code> &le; mode &le; <code>2</code>
+	 * @param mode the active mode, {@code 0} &le; mode &le; {@code 2}
 	 */
 	public final void setStatusMode(final boolean a, final boolean b, final boolean c,
 		final boolean d, final boolean e, final int mode)
@@ -184,8 +184,8 @@ public class DPTXlator8BitSigned extends DPTXlator
 	 * Returns a status bit; this method is only applicable for DPT 6.020, other DPTs will cause a
 	 * {@link IllegalStateException}.
 	 *
-	 * @param statusBit to check, <code>0 &le; statusBit &le; 4</code>
-	 * @return <code>true</code> if status bit is set, <code>false</code> otherwise
+	 * @param statusBit to check, {@code 0 ≤ statusBit ≤ 4}
+	 * @return {@code true} if status bit is set, {@code false} otherwise
 	 * @see #setStatusMode
 	 */
 	boolean statusBit(final int statusBit)

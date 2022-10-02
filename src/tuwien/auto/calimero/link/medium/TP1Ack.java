@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ public class TP1Ack extends RawAckBase
 	 * Creates a new TP1 acknowledgment frame out of a byte array.
 	 *
 	 * @param data byte array containing the acknowledgment frame structure
-	 * @param offset start offset of frame structure in <code>data</code>, offset &gt;= 0
+	 * @param offset start offset of frame structure in {@code data}, offset &gt;= 0
 	 * @throws KNXFormatException if no valid acknowledgment frame was found
 	 */
 	public TP1Ack(final byte[] data, final int offset) throws KNXFormatException

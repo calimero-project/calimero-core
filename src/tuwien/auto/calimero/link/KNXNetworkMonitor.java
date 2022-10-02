@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -65,9 +65,9 @@ public interface KNXNetworkMonitor extends AutoCloseable
 	 * <p>
 	 * These informations are differing between KNX media and depend on the KNX network
 	 * this link is communicating with.<br>
-	 * The <code>settings</code> medium type has to match the medium type supplied to
+	 * The {@code settings} medium type has to match the medium type supplied to
 	 * the link in the first place.<br>
-	 * The <code>settings</code> object is not copied internally to allow subsequent
+	 * The {@code settings} object is not copied internally to allow subsequent
 	 * changes to medium settings by the user which should take effect immediately.
 	 *
 	 * @param settings medium settings to use, the expected subtype is according to the
@@ -85,20 +85,20 @@ public interface KNXNetworkMonitor extends AutoCloseable
 	KNXMediumSettings getKNXMedium();
 
 	/**
-	 * Adds the specified event listener <code>l</code> to receive events from this
+	 * Adds the specified event listener {@code l} to receive events from this
 	 * network monitor.
 	 * <p>
-	 * If <code>l</code> was already added as listener, no action is performed.
+	 * If {@code l} was already added as listener, no action is performed.
 	 *
 	 * @param l the listener to add
 	 */
 	void addMonitorListener(LinkListener l);
 
 	/**
-	 * Removes the specified event listener <code>l</code>, so it does no longer
+	 * Removes the specified event listener {@code l}, so it does no longer
 	 * receive events from this network monitor.
 	 * <p>
-	 * If <code>l</code> was not added in the first place, no action is performed.
+	 * If {@code l} was not added in the first place, no action is performed.
 	 *
 	 * @param l the listener to remove
 	 */
@@ -112,7 +112,7 @@ public interface KNXNetworkMonitor extends AutoCloseable
 	 * {@link MonitorFrameEvent#getRawFrame()} within a link listener registered for this
 	 * monitor.
 	 *
-	 * @param decode <code>true</code> to enable decoding, <code>false</code> to skip
+	 * @param decode {@code true} to enable decoding, {@code false} to skip
 	 *        decoding
 	 */
 	void setDecodeRawFrames(boolean decode);
@@ -136,9 +136,9 @@ public interface KNXNetworkMonitor extends AutoCloseable
 	 * Checks for open monitor link.
 	 * <p>
 	 * After a call to {@link #close()} or after the underlying protocol initiated the end
-	 * of the communication, this method always returns <code>false</code>.
+	 * of the communication, this method always returns {@code false}.
 	 *
-	 * @return <code>true</code> if this network monitor is open, <code>false</code>
+	 * @return {@code true} if this network monitor is open, {@code false}
 	 *         on closed
 	 */
 	boolean isOpen();

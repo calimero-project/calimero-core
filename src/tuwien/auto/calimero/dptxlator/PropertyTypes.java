@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -418,8 +418,8 @@ public final class PropertyTypes
 	 * is implemented and can be used for translation.
 	 *
 	 * @param dataType property data type (PDT) to lookup
-	 * @return <code>true</code> iff translator and its subtype was found,
-	 *         <code>false</code> otherwise
+	 * @return {@code true} iff translator and its subtype was found,
+	 *         {@code false} otherwise
 	 */
 	public static boolean hasTranslator(final int dataType)
 	{
@@ -480,12 +480,12 @@ public final class PropertyTypes
 	 * Utility method for retrieving the string representations of the KNX DPT data of the
 	 * specified property data type.
 	 *
-	 * @param dataType property data type of the <code>data</code> items
+	 * @param dataType property data type of the {@code data} items
 	 * @param data array with KNX DPT formatted data, the number of contained items is
 	 *        determined by the used DPT
 	 * @return string array with representation of the data items according to the used
 	 *         DPT translator as returned by {@link DPTXlator#getAllValues()}, length of
-	 *         array equals translated items in <code>data</code>
+	 *         array equals translated items in {@code data}
 	 * @throws KNXException if translator could not be created
 	 */
 	public static String[] getValues(final int dataType, final byte[] data) throws KNXException

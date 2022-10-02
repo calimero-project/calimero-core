@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -82,13 +82,13 @@ class DefaultXmlReader implements XmlReader
 	private int textLength;
 
 	/**
-	 * Creates a new XML reader with input <code>r</code>.
+	 * Creates a new XML reader with input {@code r}.
 	 * <p>
 	 * If necessary, the {@link Reader} should already be buffered or wrapped with a buffered reader, e.g., when reading
 	 * from a file on disk.
 	 *
 	 * @param r a {@link Reader} for input
-	 * @param closeReader close <code>r</code> when XML reader is closed
+	 * @param closeReader close {@code r} when XML reader is closed
 	 */
 	DefaultXmlReader(final Reader r, final boolean closeReader)
 	{

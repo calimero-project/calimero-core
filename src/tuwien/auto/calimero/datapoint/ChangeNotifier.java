@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2011 B. Malinowsky
+    Copyright (c) 2011, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,21 +46,21 @@ package tuwien.auto.calimero.datapoint;
 public interface ChangeNotifier
 {
 	/**
-	 * Adds the specified listener <code>l</code> to receive notifications from the class
+	 * Adds the specified listener {@code l} to receive notifications from the class
 	 * implementing this interface.
 	 * <p>
-	 * If <code>l</code> is
-	 * <code>null</code> or was already added as listener, no action is performed.
+	 * If {@code l} is
+	 * {@code null} or was already added as listener, no action is performed.
 	 *
 	 * @param l the listener to add
 	 */
 	void addChangeListener(ChangeListener l);
 
 	/**
-	 * Removes the specified event listener <code>l</code> from the class implementing
+	 * Removes the specified event listener {@code l} from the class implementing
 	 * this interface.
 	 * <p>
-	 * If <code>l</code> was not added in the first place, no action is performed.
+	 * If {@code l} was not added in the first place, no action is performed.
 	 *
 	 * @param l the listener to remove
 	 */

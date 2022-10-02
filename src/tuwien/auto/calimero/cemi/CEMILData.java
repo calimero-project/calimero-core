@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -107,8 +107,8 @@ public class CEMILData implements CEMI
 	 * Creates a new L-Data message from a byte stream.
 	 *
 	 * @param data byte stream containing a cEMI L-Data message
-	 * @param offset start offset of cEMI frame in <code>data</code>
-	 * @param length length in bytes of the whole cEMI message in <code>data</code>
+	 * @param offset start offset of cEMI frame in {@code data}
+	 * @param length length in bytes of the whole cEMI message in {@code data}
 	 * @throws KNXFormatException if no (valid) frame was found or the provided frame is
 	 *         not a standard frame
 	 */
@@ -161,8 +161,8 @@ public class CEMILData implements CEMI
 	 *        layer protocol control information); i.e., the NPDU without the length field,
 	 *        tpdu.length &lt;= 16
 	 * @param p message priority, priority set in the control field
-	 * @param confirm confirm flag in the control field, <code>true</code> to set error,
-	 *        <code>false</code> for no error
+	 * @param confirm confirm flag in the control field, {@code true} to set error,
+	 *        {@code false} for no error
 	 */
 	public CEMILData(final int msgCode, final IndividualAddress src, final KNXAddress dst,
 		final byte[] tpdu, final Priority p, final boolean confirm)
@@ -187,20 +187,20 @@ public class CEMILData implements CEMI
 	 *        tpdu.length &lt;= 16
 	 * @param p message priority, priority set in the control field
 	 * @param repeat for request messages, send repetitions on the medium -
-	 *        <code>false</code> for do not repeat if error, <code>true</code> for
+	 *        {@code false} for do not repeat if error, {@code true} for
 	 *        default repeat behavior;<br>
 	 *        meaning of default behavior on media:<br>
 	 *        <ul>
 	 *        <li>RF: no repetitions</li>
 	 *        <li>TP1, PL110: repetitions allowed</li>
 	 *        </ul>
-	 *        for indication message - <code>true</code> if is repeated frame,
-	 *        <code>false</code> otherwise
+	 *        for indication message - {@code true} if is repeated frame,
+	 *        {@code false} otherwise
 	 * @param broadcast system / domain broadcast behavior, applicable on open media only:
-	 *        <code>false</code> for system broadcast, <code>true</code> for
-	 *        broadcast; on closed media set <code>true</code> for "don't care"
-	 * @param ack acknowledge request, <code>true</code> if acknowledge is requested,
-	 *        <code>false</code> for default behavior;<br>
+	 *        {@code false} for system broadcast, {@code true} for
+	 *        broadcast; on closed media set {@code true} for "don't care"
+	 * @param ack acknowledge request, {@code true} if acknowledge is requested,
+	 *        {@code false} for default behavior;<br>
 	 *        meaning of default behavior on media:<br>
 	 *        <ul>
 	 *        <li>TP1, PL110: acknowledge requested</li>
@@ -248,15 +248,15 @@ public class CEMILData implements CEMI
 	 *        tpdu.length &lt;= 16
 	 * @param p message priority, priority set in the control field
 	 * @param repeat for request message, send repetitions on the medium -
-	 *        <code>false</code> for do not repeat if error, <code>true</code> for
+	 *        {@code false} for do not repeat if error, {@code true} for
 	 *        default repeat behavior;<br>
 	 *        meaning of default behavior on media:<br>
 	 *        <ul>
 	 *        <li>RF: no repetitions</li>
 	 *        <li>TP1, PL110: repetitions allowed</li>
 	 *        </ul>
-	 *        for indication message - <code>true</code> if is repeated frame,
-	 *        <code>false</code> otherwise
+	 *        for indication message - {@code true} if is repeated frame,
+	 *        {@code false} otherwise
 	 * @param hopCount hop count starting value set in control field, in the range 0 &lt;=
 	 *        value &lt;= 7
 	 */
@@ -342,9 +342,9 @@ public class CEMILData implements CEMI
 
 	/**
 	 * Returns the broadcast type of this message, applicable for open transmission media. By default, returns
-	 * <code>false</code>, indicating domain-only broadcast on open media or "don't care" on closed media.
+	 * {@code false}, indicating domain-only broadcast on open media or "don't care" on closed media.
 	 *
-	 * @return <code>true</code> if system broadcast (open media), <code>false</code> for broadcast within domain or
+	 * @return {@code true} if system broadcast (open media), {@code false} for broadcast within domain or
 	 *         "don't care"
 	 */
 	public final boolean isSystemBroadcast() {
@@ -359,7 +359,7 @@ public class CEMILData implements CEMI
 	 * value like the corresponding request).
 	 * <p>
 	 * For requests the following returns apply:<br>
-	 * If <code>true</code>, acknowledge was requested explicitly, <code>false</code>
+	 * If {@code true}, acknowledge was requested explicitly, {@code false}
 	 * for "don't care" (default medium behavior).<br>
 	 * Default behavior on media for L2 ack:
 	 * <ul>
@@ -381,15 +381,15 @@ public class CEMILData implements CEMI
 	/**
 	 * Returns whether frame repetition is requested, or this is a repeated frame.
 	 * <p>
-	 * For request messages, returns <code>false</code> for do not repeat if error,
-	 * <code>true</code> for default repeat behavior.<br>
+	 * For request messages, returns {@code false} for do not repeat if error,
+	 * {@code true} for default repeat behavior.<br>
 	 * Meaning of default behavior on media:
 	 * <ul>
 	 * <li>TP1, PL110: repetitions allowed</li>
 	 * </ul>
 	 * <p>
-	 * For indication messages, returns <code>false</code> if this is not a repeated
-	 * frame, <code>true</code> if repeated frame.
+	 * For indication messages, returns {@code false} if this is not a repeated
+	 * frame, {@code true} if repeated frame.
 	 * <p>
 	 * For L-Data confirmations the value behavior is undefined (it might have the same
 	 * value like the corresponding request).
@@ -408,12 +408,12 @@ public class CEMILData implements CEMI
 	/**
 	 * Returns if confirmation indicates success or error in a confirmation message.
 	 * <p>
-	 * If return is <code>true</code> (confirmation bit in control field is 0 for no
+	 * If return is {@code true} (confirmation bit in control field is 0 for no
 	 * error), the associated request message to this confirmation was transmitted
-	 * successfully, <code>false</code> otherwise (confirmation bit in control field is
+	 * successfully, {@code false} otherwise (confirmation bit in control field is
 	 * 1 for error).<br>
 	 * On messages types other than confirmation, this information is "don't care" and
-	 * always returns <code>true</code>.
+	 * always returns {@code true}.
 	 *
 	 * @return the confirmation state as boolean
 	 */
@@ -491,7 +491,7 @@ public class CEMILData implements CEMI
 	}
 
 	/**
-	 * Writes additional information to <code>os</code>.
+	 * Writes additional information to {@code os}.
 	 * <p>
 	 * This type does not support additional information; the additional info length is
 	 * set to 0, indicating no additional information.
@@ -592,8 +592,8 @@ public class CEMILData implements CEMI
 	/**
 	 * Sets the repeat flag in control field, using the message code type for decision.
 	 *
-	 * @param repeat <code>true</code> for a repeat request or repeated frame,
-	 *        <code>false</code> otherwise
+	 * @param repeat {@code true} for a repeat request or repeated frame,
+	 *        {@code false} otherwise
 	 */
 	private void setRepeat(final boolean repeat)
 	{

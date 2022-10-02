@@ -1,7 +1,7 @@
 /*
     Calimero 2 - A library for KNX network access
     Copyright (c) 2005 B. Erb
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * Connection state responses are sent by a server in reply to a connection state request.
  * <p>
  * Objects of this type are immutable.
- * 
+ *
  * @author B. Malinowsky
  * @author Bernhard Erb
  * @see tuwien.auto.calimero.knxnetip.servicetype.ConnectionstateRequest
@@ -61,9 +61,9 @@ public class ConnectionstateResponse extends ServiceType
 	/**
 	 * Creates a connection state response out of a byte array.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing a connection state response structure
-	 * @param offset start offset of response in <code>data</code>
+	 * @param offset start offset of response in {@code data}
 	 * @throws KNXFormatException if no connection state response was found or invalid
 	 *         structure
 	 */
@@ -79,7 +79,7 @@ public class ConnectionstateResponse extends ServiceType
 	/**
 	 * Creates a new connection state request.
 	 * <p>
-	 * 
+	 *
 	 * @param channelID communication channel ID passed with the corresponding connection
 	 *        state request, 0 &lt;= id &lt;= 255
 	 * @param status status of the connection, 0 &lt;= status &lt;= 255
@@ -98,7 +98,7 @@ public class ConnectionstateResponse extends ServiceType
 	/**
 	 * Returns the communication channel ID used for the response.
 	 * <p>
-	 * 
+	 *
 	 * @return channel ID as unsigned byte
 	 */
 	public final int getChannelID()
@@ -109,7 +109,7 @@ public class ConnectionstateResponse extends ServiceType
 	/**
 	 * Returns the status of the connection.
 	 * <p>
-	 * 
+	 *
 	 * @return status code as unsigned byte
 	 */
 	public final int getStatus()
@@ -120,7 +120,7 @@ public class ConnectionstateResponse extends ServiceType
 	/**
 	 * Returns a textual representation of the status code.
 	 * <p>
-	 * 
+	 *
 	 * @return short description of status as string
 	 */
 	public String getStatusString()

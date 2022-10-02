@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -93,15 +93,15 @@ public class CEMIBusMon implements CEMI
 	 *
 	 * @param status the status information field (busmonitor error flags) as specified by
 	 *        cEMI, located in the additional information type {@link #TYPEID_STATUSINFO},
-	 *        <code>0 &lt;= status &lt;= 0xFF</code>
+	 *        {@code 0 ≤ status ≤ 0xFF}
 	 * @param timestamp relative timestamp as specified by cEMI, it might either be a
 	 *        normal (2 byte range) timestamp for {@link #TYPEID_TIMESTAMP}, or an
 	 *        extended (4 byte range) timestamp of type {@link #TYPEID_TIMESTAMP_EXT}
-	 * @param extTimestamp <code>true</code> if <code>timestamp</code> is an extended
-	 *        timestamp value, <code>false</code> otherwise
+	 * @param extTimestamp {@code true} if {@code timestamp} is an extended
+	 *        timestamp value, {@code false} otherwise
 	 * @param rawFrame byte array holding the raw frame on the medium (inclusive FCS),
 	 *        also referred to as the data part in the message structure,
-	 *        <code>rawFrame.length</code> &lt;= 23
+	 *        {@code rawFrame.length ≤ 23}
 	 */
 	private CEMIBusMon(final int status, final long timestamp, final boolean extTimestamp,
 			final byte[] rawFrame)
@@ -113,24 +113,24 @@ public class CEMIBusMon implements CEMI
 	/**
 	 * Creates a new busmonitor message, allowing to specify every status flag in detail.
 	 *
-	 * @param frameError <code>true</code> if a frame error was detected in the message,
-	 *        <code>false</code> otherwise
-	 * @param bitError <code>true</code> if an invalid bit was detected in one or several
-	 *        of the frame characters, <code>false</code> otherwise
-	 * @param parityError <code>true</code> if an invalid parity bit was detected,
-	 *        <code>false</code> otherwise
-	 * @param lost <code>true</code> if at least one frame or frame piece was lost by the
-	 *        Data Link Layer, <code>false</code> otherwise
+	 * @param frameError {@code true} if a frame error was detected in the message,
+	 *        {@code false} otherwise
+	 * @param bitError {@code true} if an invalid bit was detected in one or several
+	 *        of the frame characters, {@code false} otherwise
+	 * @param parityError {@code true} if an invalid parity bit was detected,
+	 *        {@code false} otherwise
+	 * @param lost {@code true} if at least one frame or frame piece was lost by the
+	 *        Data Link Layer, {@code false} otherwise
 	 * @param seqNumber sequence number in the status field (bits 2..0), 0 &lt;=
-	 *        <code>seqNumber</code> &lt;= 7
+	 *        {@code seqNumber ≤ 7}
 	 * @param timestamp relative timestamp as specified by cEMI, it might either be a
 	 *        normal (2 byte range) timestamp for {@link #TYPEID_TIMESTAMP}, or an
 	 *        extended (4 byte range) timestamp of type {@link #TYPEID_TIMESTAMP_EXT}
-	 * @param extTimestamp <code>true</code> if <code>timestamp</code> is an extended
-	 *        timestamp value, <code>false</code> otherwise
+	 * @param extTimestamp {@code true} if {@code timestamp} is an extended
+	 *        timestamp value, {@code false} otherwise
 	 * @param rawFrame byte array holding the raw frame on the medium (inclusive FCS),
 	 *        also referred to as the data part in the message structure
-	 *        <code>rawFrame.length</code> &lt;= 23
+	 *        {@code rawFrame.length ≤ 23}
 	 */
 	public CEMIBusMon(final boolean frameError, final boolean bitError, final boolean parityError,
 		final boolean lost, final int seqNumber, final long timestamp, final boolean extTimestamp,
@@ -154,7 +154,7 @@ public class CEMIBusMon implements CEMI
 	 * Creates a new busmonitor message from a byte stream.
 	 *
 	 * @param data byte stream containing a cEMI busmonitor message
-	 * @param offset start offset of cEMI frame in <code>data</code>
+	 * @param offset start offset of cEMI frame in {@code data}
 	 * @param length length in bytes of the whole bus monitor message
 	 * @throws KNXFormatException if no busmonitor frame found or invalid frame structure
 	 */
@@ -204,11 +204,11 @@ public class CEMIBusMon implements CEMI
 	 * @param timestamp relative timestamp as specified by cEMI, it might either be a
 	 *        normal (2 byte range) timestamp for {@link #TYPEID_TIMESTAMP}, or an
 	 *        extended (4 byte range) timestamp of type {@link #TYPEID_TIMESTAMP_EXT}
-	 * @param extTimestamp <code>true</code> if <code>timestamp</code> is an extended
-	 *        timestamp value, <code>false</code> otherwise
+	 * @param extTimestamp {@code true} if {@code timestamp} is an extended
+	 *        timestamp value, {@code false} otherwise
 	 * @param rawFrame byte array holding the raw frame on the medium (inclusive FCS),
 	 *        also referred to as the data part in the message structure,
-	 *        <code>rawFrame.length</code> &lt;= 23
+	 *        {@code rawFrame.length ≤ 23}
 	 * @return a new instance of CEMIBusMon
 	 */
 	public static CEMIBusMon newWithStatus(final int status, final long timestamp,
@@ -228,15 +228,15 @@ public class CEMIBusMon implements CEMI
 	 * loss).
 	 *
 	 * @param seqNumber sequence number in the status field (bits 2..0), 0 &lt;=
-	 *        <code>seqNumber</code> &lt;= 7
+	 *        {@code seqNumber ≤ 7}
 	 * @param timestamp relative timestamp as specified by cEMI, it might either be a
 	 *        normal (2 byte range) timestamp for {@link #TYPEID_TIMESTAMP}, or an
 	 *        extended (4 byte range) timestamp of type {@link #TYPEID_TIMESTAMP_EXT}
-	 * @param extTimestamp <code>true</code> if <code>timestamp</code> is an extended
-	 *        timestamp value, <code>false</code> otherwise
+	 * @param extTimestamp {@code true} if {@code timestamp} is an extended
+	 *        timestamp value, {@code false} otherwise
 	 * @param rawFrame byte array holding the raw frame on the medium (inclusive FCS),
 	 *        also referred to as the data part in the message structure
-	 *        <code>rawFrame.length</code> &lt;= 23
+	 *        {@code rawFrame.length ≤ 23}
 	 * @return a new instance of CEMIBusMon
 	 */
 	public static CEMIBusMon newWithSequenceNumber(final int seqNumber, final long timestamp,
@@ -281,7 +281,7 @@ public class CEMIBusMon implements CEMI
 	/**
 	 * Returns the bit error flag state set in the status information.
 	 * <p>
-	 * If <code>true</code>, an invalid bit was detected in one or several of the frame
+	 * If {@code true}, an invalid bit was detected in one or several of the frame
 	 * characters.
 	 *
 	 * @return bit error flag as boolean
@@ -294,7 +294,7 @@ public class CEMIBusMon implements CEMI
 	/**
 	 * Returns the frame error flag state set in the status information.
 	 * <p>
-	 * If <code>true</code>, a frame error was detected in the message.
+	 * If {@code true}, a frame error was detected in the message.
 	 *
 	 * @return frame error flag as boolean
 	 */
@@ -306,7 +306,7 @@ public class CEMIBusMon implements CEMI
 	/**
 	 * Returns the lost flag state set in the status information.
 	 * <p>
-	 * If <code>true</code>, at least one frame (piece) was lost by the Data Link Layer.
+	 * If {@code true}, at least one frame (piece) was lost by the Data Link Layer.
 	 *
 	 * @return lost flag as boolean
 	 */
@@ -318,7 +318,7 @@ public class CEMIBusMon implements CEMI
 	/**
 	 * Returns the parity error flag state set in the status information.
 	 * <p>
-	 * If <code>true</code>, an invalid parity bit was detected in the frame bits.
+	 * If {@code true}, an invalid parity bit was detected in the frame bits.
 	 *
 	 * @return parity error flag as boolean
 	 */

@@ -1,11 +1,11 @@
 /**
  * Base package of the Calimero library. All functionality part of Calimero is located in here and in sub packages. This
- * package contains functionality used throughout the library, as well as the <code>Settings</code> class for querying
+ * package contains functionality used throughout the library, as well as the {@code Settings} class for querying
  * library-related information.
  * <p>
- * This package contains common types of (checked) exceptions thrown throughout the library by <code>public</code> or
- * <code>protected</code> visible methods.<br>
- * In general, checked exceptions used in Calimero should extend the base exception <code>KNXException</code>.
+ * This package contains common types of (checked) exceptions thrown throughout the library by {@code public} or
+ * {@code protected} visible methods.<br>
+ * In general, checked exceptions used in Calimero should extend the base exception {@code KNXException}.
  * <p>
  * <b>Unchecked exceptions only:</b><br>
  * Since a method might throw any type of runtime exception, even those not specified here, there is no

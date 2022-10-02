@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ public class CRD extends CRBase
 	 * Creates a new CRD out of a byte array.
 	 *
 	 * @param data byte array containing a CRD structure
-	 * @param offset start offset of CRD in <code>data</code>
+	 * @param offset start offset of CRD in {@code data}
 	 * @throws KNXFormatException if no CRD found or invalid structure
 	 */
 	public CRD(final byte[] data, final int offset) throws KNXFormatException
@@ -72,13 +72,13 @@ public class CRD extends CRBase
 	/**
 	 * Creates a new CRD for the given connection type.
 	 * <p>
-	 * The array of <code>optionalData</code> is not copied for internal storage. No
+	 * The array of {@code optionalData} is not copied for internal storage. No
 	 * additional checks regarding content are done.
 	 *
 	 * @param connectionType connection type the description is intended for
 	 * @param optionalData byte array containing optional host protocol independent and
 	 *        dependent data, this information is located starting at offset 2 in the CRD
-	 *        structure, <code>optionalData.length</code> &lt; 254
+	 *        structure, {@code optionalData.length} &lt; 254
 	 */
 	public CRD(final int connectionType, final byte[] optionalData)
 	{
@@ -90,10 +90,10 @@ public class CRD extends CRBase
 	 * <p>
 	 * If possible, a matching, more specific, CRD subtype is returned. Note, that CRD for
 	 * specific communication types might expect certain characteristics on
-	 * <code>data</code> (regarding contained data).<br>
+	 * {@code data} (regarding contained data).<br>
 	 *
 	 * @param data byte array containing the CRD structure
-	 * @param offset start offset of CRD in <code>data</code>
+	 * @param offset start offset of CRD in {@code data}
 	 * @return the new CRD object
 	 * @throws KNXFormatException if no CRD found or invalid structure
 	 */
@@ -107,13 +107,13 @@ public class CRD extends CRBase
 	 * <p>
 	 * If possible, a matching, more specific, CRD subtype is returned. Note, that CRD for
 	 * specific communication types might expect certain characteristics on
-	 * <code>optionalData</code> (regarding length and/or content).
+	 * {@code optionalData} (regarding length and/or content).
 	 *
 	 * @param connectionType connection type this CRD is used for, e.g., a tunneling
 	 *        connection
 	 * @param optionalData byte array containing optional host protocol independent and
 	 *        dependent data, this information is located starting at offset 2 in the CRD
-	 *        structure, <code>optionalData.length</code> &lt; 254
+	 *        structure, {@code optionalData.length} &lt; 254
 	 * @return the new CRD object
 	 */
 	public static CRD createResponse(final int connectionType, final byte... optionalData)

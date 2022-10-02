@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ public abstract class KNXMediumSettings
 	 */
 	public static final int MEDIUM_KNXIP = 0x20;
 
-	/** Individual address <code>0.0.0</code>. */
+	/** Individual address {@code 0.0.0}. */
 	public static final IndividualAddress BackboneRouter = new IndividualAddress(0);
 
 	// local device address if in transparent server mode
@@ -225,7 +225,7 @@ public abstract class KNXMediumSettings
 	/**
 	 * Returns the medium dependent time factor required for calculating certain protocol timings.
 	 *
-	 * @return medium dependent time factor in milliseconds, might be <code>0</code>
+	 * @return medium dependent time factor in milliseconds, might be {@code 0}
 	 */
 	public int timeFactor()
 	{

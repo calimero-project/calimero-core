@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ public class CommandDP extends Datapoint
 	 * @param main the group address used to identify this datapoint
 	 * @param name user defined datapoint name
 	 * @param mainNumber main number of the data type used for translation of a datapoint
-	 *        value; if the used <code>dptID</code> argument unambiguously identifies a
+	 *        value; if the used {@code dptID} argument unambiguously identifies a
 	 *        DPT translator, main number might be left 0
 	 * @param dptID the datapoint type ID used for translation in a DPT translator
 	 */

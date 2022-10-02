@@ -106,7 +106,7 @@ public interface Configuration
 	interface RequestFilter
 	{
 		/**
-		 * Requests data for address <code>dst</code> from the network buffer.
+		 * Requests data for address {@code dst} from the network buffer.
 		 * <p>
 		 * How a buffer is searched and data is matched depends on the individual filter
 		 * rules. A filter might use provided information of the configuration if
@@ -114,7 +114,7 @@ public interface Configuration
 		 *
 		 * @param dst address to request data for
 		 * @param c the configuration this filter belongs to
-		 * @return the cEMI data on match in buffer, <code>null</code> otherwise
+		 * @return the cEMI data on match in buffer, {@code null} otherwise
 		 */
 		CEMILData request(KNXAddress dst, Configuration c);
 	}
@@ -128,21 +128,21 @@ public interface Configuration
 	 * cache contents not used anymore, when buffering is deactivated.<br>
 	 * Setting a new cache does not change the buffering activation state (for example
 	 * enable caching if not already enabled). Use {@link #activate(boolean)} for this. To
-	 * remove a currently used cache, invoke with argument <code>null</code>. Applying
-	 * this method to a <code>null</code> argument will always deactivate buffering to
+	 * remove a currently used cache, invoke with argument {@code null}. Applying
+	 * this method to a {@code null} argument will always deactivate buffering to
 	 * prevent filters trying to access a non existing cache object.
 	 *
-	 * @param c cache to use subsequently for buffering message; use <code>null</code>
+	 * @param c cache to use subsequently for buffering message; use {@code null}
 	 *        to remove the currently used cache, if any (this also deactivates buffering)
 	 */
 	void setCache(Cache c);
 
 	/**
-	 * Returns the currently used cache object or <code>null</code>, if no cache was
+	 * Returns the currently used cache object or {@code null}, if no cache was
 	 * set.
 	 * <p>
 	 *
-	 * @return the cache, or <code>null</code> if no cache in use
+	 * @return the cache, or {@code null} if no cache in use
 	 */
 	Cache getCache();
 
@@ -152,14 +152,14 @@ public interface Configuration
 	 * The supplied model will not get modified in any way by this configuration.
 	 *
 	 * @param model datapoint model containing an arrangement with datapoints of interest;
-	 *        use <code>null</code> to remove a currently set model (if any)
+	 *        use {@code null} to remove a currently set model (if any)
 	 */
 	void setDatapointModel(DatapointModel<? extends Datapoint> model);
 
 	/**
 	 * Returns the datapoint model set for this configuration, if any.
 	 *
-	 * @return datapoint model or <code>null</code>
+	 * @return datapoint model or {@code null}
 	 */
 	DatapointModel<? extends Datapoint> getDatapointModel();
 
@@ -176,18 +176,18 @@ public interface Configuration
 	/**
 	 * Returns the filter applied on incoming messages from the KNX network.
 	 * <p>
-	 * If no filter was set in the first place, <code>null</code> is returned.
+	 * If no filter was set in the first place, {@code null} is returned.
 	 *
-	 * @return the network filter or <code>null</code>
+	 * @return the network filter or {@code null}
 	 */
 	NetworkFilter getNetworkFilter();
 
 	/**
 	 * Returns the filter responsible for handling requests.
 	 * <p>
-	 * If no filter was set in the first place, <code>null</code> is returned.
+	 * If no filter was set in the first place, {@code null} is returned.
 	 *
-	 * @return the request filter or <code>null</code>
+	 * @return the request filter or {@code null}
 	 */
 	RequestFilter getRequestFilter();
 
@@ -232,8 +232,8 @@ public interface Configuration
 	 * This method allows to control the behavior, whether queries which can not be
 	 * answered from the network buffer should be forwarded to the KNX network or not.<br>
 	 * By default, queries are forwarded to the KNX network whenever necessary, and not
-	 * restricted to the network buffer (<code>bufferOnly</code> defaults to
-	 * <code>false</code>).<br>
+	 * restricted to the network buffer ({@code bufferOnly} defaults to
+	 * {@code false}).<br>
 	 * Setting this behavior does not influence nor prevent write requests to the KNX
 	 * network.<br>
 	 * If this option is enabled (queries will get answered from network buffer only), a
@@ -252,8 +252,8 @@ public interface Configuration
 	 * required data entries might be explicitly queried on demand by the user.
 	 * <p>
 	 *
-	 * @param bufferOnly <code>true</code> to limit all queries to network buffer,
-	 *        <code>false</code> to forward unanswered queries to the KNX network
+	 * @param bufferOnly {@code true} to limit all queries to network buffer,
+	 *        {@code false} to forward unanswered queries to the KNX network
 	 * @see #getBufferedLink
 	 */
 	void setQueryBufferOnly(boolean bufferOnly);
@@ -272,7 +272,7 @@ public interface Configuration
 	 * to be used for subsequent caching operations. A deactivation will not remove or
 	 * empty any cached contents.
 	 *
-	 * @param activate <code>true</code> to activate the buffer, <code>false</code>
+	 * @param activate {@code true} to activate the buffer, {@code false}
 	 *        otherwise
 	 */
 	void activate(boolean activate);
@@ -281,7 +281,7 @@ public interface Configuration
 	 * Returns whether the network buffer is activated.
 	 * <p>
 	 *
-	 * @return <code>true</code> iff buffer is active, <code>false</code> otherwise
+	 * @return {@code true} iff buffer is active, {@code false} otherwise
 	 */
 	boolean isActive();
 }

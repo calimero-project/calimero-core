@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2021 B. Malinowsky
+    Copyright (c) 2015, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ public class KNXNetworkLinkTpuart extends AbstractLink<TpuartConnection>
 {
 	/**
 	 * Creates a new network link for accessing the KNX network using the specified communication
-	 * port identifier. The parameter <code>acknowledge</code> allows to configure KNX addresses
+	 * port identifier. The parameter {@code acknowledge} allows to configure KNX addresses
 	 * that shall be acknowledged on the bus, e.g., the group address of a KNX datapoint this
 	 * endpoint is answering to, or the individual address of an additional KNX device.
 	 *
@@ -71,7 +71,7 @@ public class KNXNetworkLinkTpuart extends AbstractLink<TpuartConnection>
 	 *        L-Data indications with that address will always be acknowledged on the TP1 bus
 	 * @param acknowledge a (possibly empty) collection of KNX addresses this endpoint shall issue a
 	 *        positive acknowledgement for, on receiving a valid TP1 frame with its destination
-	 *        address being an element in <code>acknowledge</code>
+	 *        address being an element in {@code acknowledge}
 	 * @throws KNXException on error establishing the TP-UART connection
 	 */
 	public KNXNetworkLinkTpuart(final String portId, final KNXMediumSettings settings,

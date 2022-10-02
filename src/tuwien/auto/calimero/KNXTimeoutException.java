@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ package tuwien.auto.calimero;
 /**
  * Thrown to indicate that a timeout occurred.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public class KNXTimeoutException extends KNXException
@@ -48,16 +48,16 @@ public class KNXTimeoutException extends KNXException
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Constructs a new <code>KNXTimeoutException</code> without a detail message.
+	 * Constructs a new {@code KNXTimeoutException} without a detail message.
 	 */
 	public KNXTimeoutException()
 	{}
 
 	/**
-	 * Constructs a new <code>KNXTimeoutException</code> with the specified detail
+	 * Constructs a new {@code KNXTimeoutException} with the specified detail
 	 * message.
 	 * <p>
-	 * 
+	 *
 	 * @param s the detail message
 	 */
 	public KNXTimeoutException(final String s)
@@ -66,10 +66,10 @@ public class KNXTimeoutException extends KNXException
 	}
 
 	/**
-	 * Constructs a new <code>KNXTimeoutException</code> with the specified detail message
+	 * Constructs a new {@code KNXTimeoutException} with the specified detail message
 	 * and cause.
 	 * <p>
-	 * 
+	 *
 	 * @param s the detail message
 	 * @param cause the cause
 	 */

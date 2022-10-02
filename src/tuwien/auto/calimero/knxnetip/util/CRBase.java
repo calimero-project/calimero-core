@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -82,13 +82,13 @@ class CRBase
 	/**
 	 * Creates a new CR for the given connection type.
 	 * <p>
-	 * The array of <code>optionalData</code> is not copied for internal storage. No
+	 * The array of {@code optionalData} is not copied for internal storage. No
 	 * additional checks regarding content are done.
 	 *
 	 * @param connectionType connection type the CR is used for
 	 * @param optionalData byte array containing optional host protocol independent and
 	 *        dependent data, this information is located starting at offset 2 in the CR
-	 *        structure, <code>optionalData.length</code> &lt; 254
+	 *        structure, {@code optionalData.length} &lt; 254
 	 */
 	CRBase(final int connectionType, final byte[] optionalData)
 	{

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ public class KNXLinkClosedException extends KNXException
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Constructs a new <code>KNXLinkClosedException</code> with the specified detail message.
+	 * Constructs a new {@code KNXLinkClosedException} with the specified detail message.
 	 *
 	 * @param s the detail message
 	 */
@@ -58,7 +58,7 @@ public class KNXLinkClosedException extends KNXException
 	}
 
 	/**
-	 * Constructs a new <code>KNXLinkClosedException</code> with the specified detail message and
+	 * Constructs a new {@code KNXLinkClosedException} with the specified detail message and
 	 * cause.
 	 *
 	 * @param s the detail message

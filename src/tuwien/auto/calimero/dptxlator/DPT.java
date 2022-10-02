@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ public class DPT
 	 * @param description short textual description
 	 * @param lower lower value information
 	 * @param upper upper value information
-	 * @param unit unit of measure, use "" or <code>null</code> for no unit
+	 * @param unit unit of measure, use "" or {@code null} for no unit
 	 */
 	public DPT(final String typeID, final String description, final String lower,
 		final String upper, final String unit)

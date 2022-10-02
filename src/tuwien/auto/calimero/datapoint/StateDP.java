@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -98,7 +98,7 @@ public class StateDP extends Datapoint
 	 * @param main the group address used to identify this datapoint
 	 * @param name user defined datapoint name
 	 * @param mainNumber main number of the data type used for translation of a datapoint
-	 *        value; if the used <code>dptID</code> argument unambiguously identifies a
+	 *        value; if the used {@code dptID} argument unambiguously identifies a
 	 *        DPT translator, main number might be left 0
 	 * @param dptID the datapoint type ID used for translation in a DPT translator
 	 */
@@ -227,8 +227,8 @@ public class StateDP extends Datapoint
 	 * Returns the collection of KNX group addresses which are allowed to alter the state
 	 * of this datapoint.
 	 *
-	 * @param updatingAddresses <code>true</code> if the updating addresses should be
-	 *        returned, <code>false</code> for the invalidating addresses
+	 * @param updatingAddresses {@code true} if the updating addresses should be
+	 *        returned, {@code false} for the invalidating addresses
 	 * @return an unmodifiable collection with entries of type {@link GroupAddress}
 	 */
 	public Collection<GroupAddress> getAddresses(final boolean updatingAddresses)
@@ -238,10 +238,10 @@ public class StateDP extends Datapoint
 
 	/**
 	 * Returns whether KNX indication messages with destination group address
-	 * <code>a</code> will invalidate the associated datapoint state of this datapoint.
+	 * {@code a} will invalidate the associated datapoint state of this datapoint.
 	 *
 	 * @param a the address to check
-	 * @return <code>true</code> iff address is invalidating, <code>false</code> otherwise
+	 * @return {@code true} iff address is invalidating, {@code false} otherwise
 	 */
 	public final boolean isInvalidating(final GroupAddress a)
 	{
@@ -250,10 +250,10 @@ public class StateDP extends Datapoint
 
 	/**
 	 * Returns whether KNX indication or response messages with destination address
-	 * <code>a</code> will update the associated datapoint state of this datapoint.
+	 * {@code a} will update the associated datapoint state of this datapoint.
 	 *
 	 * @param a the address to check
-	 * @return <code>true</code> iff address is updating, <code>false</code> otherwise
+	 * @return {@code true} iff address is updating, {@code false} otherwise
 	 */
 	public final boolean isUpdating(final GroupAddress a)
 	{

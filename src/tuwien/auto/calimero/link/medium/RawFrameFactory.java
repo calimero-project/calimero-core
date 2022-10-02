@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -58,8 +58,8 @@ public final class RawFrameFactory
 	 *
 	 * @param mediumType KNX communication medium, one of the media types declared in {@link KNXMediumSettings}
 	 * @param data byte array containing the raw frame structure
-	 * @param offset start offset of frame structure in <code>data</code>, 0 &lt;= offset &lt; <code>data.length</code>
-	 * @param extBusmon parse <code>data</code> as PL110 extended busmonitor frame, i.e., <code>data</code> contains the
+	 * @param offset start offset of frame structure in {@code data}, 0 &lt;= offset &lt; {@code data.length}
+	 * @param extBusmon parse {@code data} as PL110 extended busmonitor frame, i.e., {@code data} contains the
 	 *        domain address; ignored if medium type is not PL110
 	 * @return the created raw frame for the specified medium
 	 * @throws KNXFormatException on unknown/not supported KNX medium or no valid frame structure
@@ -83,8 +83,8 @@ public final class RawFrameFactory
 	 * Creates a raw frame out of a byte array for the TP1 communication medium.
 	 *
 	 * @param data byte array containing the TP1 raw frame structure
-	 * @param offset start offset of frame structure in <code>data</code>, 0 &lt;=
-	 *        offset &lt; <code>data.length</code>
+	 * @param offset start offset of frame structure in {@code data}, 0 &lt;=
+	 *        offset &lt; {@code data.length}
 	 * @return the created TP1 raw frame
 	 * @throws KNXFormatException on no valid frame structure
 	 */
@@ -106,8 +106,8 @@ public final class RawFrameFactory
 	 * Creates a raw frame out of a byte array for the PL110 communication medium.
 	 *
 	 * @param data byte array containing the PL110 raw frame structure
-	 * @param offset start offset of frame structure in <code>data</code>, 0 &lt;= offset &lt; <code>data.length</code>
-	 * @param extBusmon parse <code>data</code> as PL110 extended busmonitor frame, i.e., <code>data</code> contains the
+	 * @param offset start offset of frame structure in {@code data}, 0 &lt;= offset &lt; {@code data.length}
+	 * @param extBusmon parse {@code data} as PL110 extended busmonitor frame, i.e., {@code data} contains the
 	 *        domain address
 	 * @return the created PL110 raw frame
 	 * @throws KNXFormatException on no valid frame structure

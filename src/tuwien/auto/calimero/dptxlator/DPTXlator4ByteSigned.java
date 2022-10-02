@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2021 B. Malinowsky
+    Copyright (c) 2009, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,8 +50,8 @@ import tuwien.auto.calimero.KNXFormatException;
  * hexadecimal, and octal numbers, distinguished by using these prefixes:
  * <dl>
  * <dt>no prefix</dt><dd>for decimal numeral</dd>
- * <dt><code>0x</code>, <code>0X</code>, <code>#</code><dd>for hexadecimal numeral</dd>
- * <dt><code>0</code><dd>for octal numeral</dd>
+ * <dt>{@code 0x}, {@code 0X}, {@code #}<dd>for hexadecimal numeral</dd>
+ * <dt>{@code 0}<dd>for octal numeral</dd>
  * </dl>
  */
 public class DPTXlator4ByteSigned extends DPTXlator
@@ -152,7 +152,7 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	 *
 	 * @param dptId available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
-	 *         <code>dptID</code>
+	 *         {@code dptID}
 	 */
 	public DPTXlator4ByteSigned(final String dptId) throws KNXFormatException
 	{

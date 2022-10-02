@@ -78,12 +78,12 @@ public final class Description
 	/**
 	 * Creates a new description object for a property out of a byte array.
 	 * <p>
-	 * The description structure layout of <code>data</code> is according to the
+	 * The description structure layout of {@code data} is according to the
 	 * application layer property description read service.
 	 *
 	 * @param objType interface object type the property belongs to
 	 * @param data byte array containing property description, starting at
-	 *        <code>data[0]</code>
+	 *        {@code data[0]}
 	 */
 	public Description(final int objType, final byte[] data)
 	{
@@ -286,7 +286,7 @@ public final class Description
 	 * Returns whether the property is write-enabled or read-only.
 	 * <p>
 	 *
-	 * @return <code>true</code> if write enabled, <code>false</code> otherwise
+	 * @return {@code true} if write enabled, {@code false} otherwise
 	 */
 	public boolean isWriteEnabled()
 	{

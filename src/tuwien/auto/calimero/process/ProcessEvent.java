@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -72,8 +72,8 @@ public class ProcessEvent extends EventObject
 	 * @param svcCode the process communication service code
 	 * @param asdu byte array with the application layer service data unit (ASDU), no copy is
 	 *        created
-	 * @param optimized <code>true</code> iff ASDU is optimized, i.e., length of data &le; 6 Bits;
-	 *        <code>false</code> otherwise
+	 * @param optimized {@code true} iff ASDU is optimized, i.e., length of data &le; 6 Bits;
+	 *        {@code false} otherwise
 	 */
 	public ProcessEvent(final ProcessCommunicator source, final IndividualAddress src,
 		final GroupAddress dst, final int svcCode, final byte[] asdu, final boolean optimized)
@@ -129,7 +129,7 @@ public class ProcessEvent extends EventObject
 	/**
 	 * Returns whether the APDU is length-optimized, i.e., contains &le; 6 Bits data.
 	 *
-	 * @return <code>true</code> if optimized, <code>false</code> otherwise
+	 * @return {@code true} if optimized, {@code false} otherwise
 	 */
 	public final boolean isLengthOptimizedAPDU()
 	{

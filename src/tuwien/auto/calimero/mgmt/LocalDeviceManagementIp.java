@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -83,16 +83,16 @@ public class LocalDeviceManagementIp extends LocalDeviceManagement<CEMI> {
 	 * A note on write-enabled / read-only properties:<br>
 	 * The check whether a property is read only or write enabled, is done by issuing a write request for that property.
 	 * Due to the memory layout, write cycles of a memory location and similar, this might not always be desired. To
-	 * enable or skip this check, <code>queryWriteEnable</code> has to be set appropriately. Currently, the write
+	 * enable or skip this check, {@code queryWriteEnable} has to be set appropriately. Currently, the write
 	 * enabled check is only of interest when getting a property description {@link #getDescription(int, int, int)}.
 	 *
 	 * @param localEP the local endpoint of the connection, supply the wildcard address to use a local IP on the same
-	 *        subnet as <code>serverCtrlEP</code> and an unused (ephemeral) port
+	 *        subnet as {@code serverCtrlEP} and an unused (ephemeral) port
 	 * @param serverCtrlEP the remote server control endpoint used for connect request
-	 * @param useNat <code>true</code> to use network address translation (NAT) aware communication, <code>false</code>
+	 * @param useNat {@code true} to use network address translation (NAT) aware communication, {@code false}
 	 *        to use the default way
-	 * @param queryWriteEnable <code>true</code> to check whether a property is write-enabled or read-only,
-	 *        <code>false</code> to skip the check
+	 * @param queryWriteEnable {@code true} to check whether a property is write-enabled or read-only,
+	 *        {@code false} to skip the check
 	 * @param adapterClosed receives the notification if the adapter got closed
 	 * @return a new local device management connection
 	 * @throws KNXException on failure establishing local device management connection or failure while initializing the
@@ -138,18 +138,18 @@ public class LocalDeviceManagementIp extends LocalDeviceManagement<CEMI> {
 	 * The check whether a property is read-only or write-enabled is done by issuing a write
 	 * request for that property. Due to the memory layout of a KNX device, write cycles of a memory location, and
 	 * similar, this might not always be desired. To enable or skip this check, the
-	 * <code>queryWriteEnable</code> parameter has to be set appropriately. Currently, the write
+	 * {@code queryWriteEnable} parameter has to be set appropriately. Currently, the write
 	 * enabled check is only of interest when getting a property description
 	 * {@link #getDescription(int, int, int)}.
 	 *
 	 * @param localEP the local endpoint of the connection, supply the wildcard address to use a
-	 *        local IP on the same subnet as <code>serverCtrlEP</code> and an unused (ephemeral) port
+	 *        local IP on the same subnet as {@code serverCtrlEP} and an unused (ephemeral) port
 	 * @param serverCtrlEP the remote server control endpoint used for connect request
-	 * @param useNat <code>true</code> to use a network address translation (NAT) aware communication
-	 *        mechanism, <code>false</code> to use the default way
+	 * @param useNat {@code true} to use a network address translation (NAT) aware communication
+	 *        mechanism, {@code false} to use the default way
 	 * @param adapterClosed receives the notification about an adapter close event
-	 * @param queryWriteEnable <code>true</code> to check whether a property is write-enabled or
-	 *        read-only, <code>false</code> to skip that check
+	 * @param queryWriteEnable {@code true} to check whether a property is write-enabled or
+	 *        read-only, {@code false} to skip that check
 	 * @throws KNXException on failure establishing the local device management connection or failure
 	 *         while initializing the property adapter
 	 * @throws InterruptedException on interrupted thread while initializing the adapter

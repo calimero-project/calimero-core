@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -117,7 +117,7 @@ public class KNXNetworkMonitorFT12 extends AbstractMonitor<FT12Connection>
 	 * @param conn an open FT12Connection, the link takes ownership
 	 * @param settings medium settings defining the specific KNX medium needed for decoding raw
 	 *        frames received from the KNX network
-	 * @param cEMI <code>true</code> to use cEMI format, <code>false</code> to use EMI2 format
+	 * @param cEMI {@code true} to use cEMI format, {@code false} to use EMI2 format
 	 * @throws KNXException on error entering busmonitor mode
 	 */
 	protected KNXNetworkMonitorFT12(final FT12Connection conn, final KNXMediumSettings settings, final boolean cEMI)

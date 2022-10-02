@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ public interface ProcessCommunicator extends ProcessCommunication
 	/**
 	 * @deprecated Use {@link #responseTimeout(Duration)}
 	 *
-	 * @param timeout time in seconds, <code>timeout &gt; 0</code>
+	 * @param timeout time in seconds, {@code timeout > 0}
 	 */
 	@Deprecated(forRemoval = true)
 	default void setResponseTimeout(final int timeout) { responseTimeout(Duration.ofSeconds(timeout)); }
@@ -88,7 +88,7 @@ public interface ProcessCommunicator extends ProcessCommunication
 	/**
 	 * Sets the response timeout to wait for a KNX response message to arrive to complete a message exchange.
 	 *
-	 * @param timeout <code>timeout &gt; 0</code>
+	 * @param timeout {@code timeout > 0}
 	 */
 	void responseTimeout(Duration timeout);
 
@@ -184,7 +184,7 @@ public interface ProcessCommunicator extends ProcessCommunication
 	 * Reads a datapoint value from a group destination.
 	 * <p>
 	 * The used KNX message priority is according the supplied datapoint priority.<br>
-	 * If no {@link DPT} is set for <code>dp</code>, a non-translated representation of the ASDU is
+	 * If no {@link DPT} is set for {@code dp}, a non-translated representation of the ASDU is
 	 * returned, e.g., a hexadecimal value string.
 	 *
 	 * @param dp the datapoint to read
@@ -201,10 +201,10 @@ public interface ProcessCommunicator extends ProcessCommunication
 	/**
 	 * Reads a numeric datapoint value from a group destination.
 	 * <p>
-	 * This method is applicable for any datapoint where the DPT translation fits into a <code>double</code> or
-	 * <code>long</code> data type. If no numeric representation is defined for <code>dp</code>, any returned value or
+	 * This method is applicable for any datapoint where the DPT translation fits into a {@code double} or
+	 * {@code long} data type. If no numeric representation is defined for {@code dp}, any returned value or
 	 * exception is implementation-specific. For example, an implementation might parse the ASDU into a value of type
-	 * <code>long</code>.<br>
+	 * {@code long}.<br>
 	 * The used KNX message priority is according the supplied datapoint priority.
 	 *
 	 * @param dp the datapoint to read
@@ -225,7 +225,7 @@ public interface ProcessCommunicator extends ProcessCommunication
 	 * <p>
 	 * Note that a detach does not trigger a close of the used network link.
 	 *
-	 * @return the formerly attached KNX network link, or <code>null</code> if already
+	 * @return the formerly attached KNX network link, or {@code null} if already
 	 *         detached
 	 */
 	@Override

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -112,7 +112,7 @@ public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 	 *
 	 * @param c a FT1.2 protocol connection in open state
 	 * @param settings medium settings defining device and medium specifics needed for communication
-	 * @param cEMI <code>true</code> to use cEMI format, <code>false</code> to use EMI2 format
+	 * @param cEMI {@code true} to use cEMI format, {@code false} to use EMI2 format
 	 * @throws KNXException on error, timeout, or interrupt while switching to link layer mode
 	 */
 	protected KNXNetworkLinkFT12(final FT12Connection c, final KNXMediumSettings settings, final boolean cEMI)

@@ -58,7 +58,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * on the system default time zone and locale. All time information behaves in strict (i.e., non-lenient) mode; no value
  * overflow is allowed and values are not normalized or adjusted using the next, larger field.
  * <p>
- * The default return value after creation is <code>2000-01-01</code>.
+ * The default return value after creation is {@code 2000-01-01}.
  *
  * @author B. Malinowsky
  */
@@ -109,7 +109,7 @@ public class DPTXlatorDate extends DPTXlator
 	 * Creates a translator for the given datapoint type ID.
 	 *
 	 * @param dptId available implemented datapoint type ID
-	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptID</code>
+	 * @throws KNXFormatException on wrong formatted or not expected (available) {@code dptID}
 	 */
 	public DPTXlatorDate(final String dptId) throws KNXFormatException
 	{

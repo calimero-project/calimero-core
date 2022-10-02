@@ -188,17 +188,17 @@ public final class BaosService implements ServiceType {
 		}
 
 		/**
-		 * @return <code>true</code> if datapoint value has already been received, <code>false</code> if value is unknown
+		 * @return {@code true} if datapoint value has already been received, {@code false} if value is unknown
 		 */
 		public boolean valid() { return (state & 0b10000) != 0; }
 
 		/**
-		 * @return <code>true</code> if datapoint value got updated from the bus, <code>false</code> if value was not updated
+		 * @return {@code true} if datapoint value got updated from the bus, {@code false} if value was not updated
 		 */
 		public boolean updated() { return (state & 0b01000) != 0; }
 
 		/**
-		 * @return <code>true</code> if read request should be sent, <code>false</code> if write request should be sent
+		 * @return {@code true} if read request should be sent, {@code false} if write request should be sent
 		 */
 		public boolean readRequest() { return (state & 0b00100) != 0; }
 

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2020, 2021 B. Malinowsky
+    Copyright (c) 2020, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 /**
  * Translator for KNX DPTs with main number 243, type <b>color transition xyY</b>. The KNX data
  * type width is 8 bytes. The default return value after creation is a time period of 0 seconds with invalid
- * coordinates and brightness (<code>0 s</code>).
+ * coordinates and brightness ({@code 0 s}).
  */
 public class DptXlatorXyYTransition extends DPTXlator {
 	public static final String Description = "color transition xyY";
@@ -89,7 +89,7 @@ public class DptXlatorXyYTransition extends DPTXlator {
 	 * Creates a translator for the given datapoint type ID.
 	 *
 	 * @param dptId available implemented datapoint type ID
-	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptId</code>
+	 * @throws KNXFormatException on wrong formatted or not expected (available) {@code dptId}
 	 */
 	public DptXlatorXyYTransition(final String dptId) throws KNXFormatException {
 		super(8);
@@ -126,10 +126,10 @@ public class DptXlatorXyYTransition extends DPTXlator {
 	/**
 	 * Sets one new translation item, replacing any old items.
 	 *
-	 * @param x x coordinate of the color information, <code>0 &le; x &le; 1</code>
-	 * @param y y coordinate of the color information, <code>0 &le; y &le; 1</code>
-	 * @param brightness color brightness in percent, <code>0 &le; brightness &le; 100 %</code>
-	 * @param fadingTime fading time in 100 ms steps, <code>0 &le; duration &le; 6553.5 s</code>
+	 * @param x x coordinate of the color information, {@code 0 ≤ x ≤ 1}
+	 * @param y y coordinate of the color information, {@code 0 ≤ y ≤ 1}
+	 * @param brightness color brightness in percent, {@code 0 ≤ brightness ≤ 100 %}
+	 * @param fadingTime fading time in 100 ms steps, {@code 0 ≤ duration ≤ 6553.5 s}
 	 */
 	public final void setValue(final double x, final double y, final double brightness, final Duration fadingTime) {
 		toDpt(x, y, brightness, fadingTime);

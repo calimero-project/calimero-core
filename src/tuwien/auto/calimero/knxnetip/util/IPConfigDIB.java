@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2019 B. Malinowsky
+    Copyright (c) 2015, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ public final class IPConfigDIB extends DIB
 	 * <p>
 	 *
 	 * @param data byte array containing device DIB structure
-	 * @param offset start offset of DIB in <code>data</code>
+	 * @param offset start offset of DIB in {@code data}
 	 * @throws KNXFormatException if no DIB found or invalid structure
 	 */
 	public IPConfigDIB(final byte[] data, final int offset) throws KNXFormatException
@@ -97,11 +97,11 @@ public final class IPConfigDIB extends DIB
 	 * Creates a IP configuration DIB using the supplied device information.
 	 * <p>
 	 *
-	 * @param ip the configured fixed IP address, use <code>null</code> or 0.0.0.0 if the device
+	 * @param ip the configured fixed IP address, use {@code null} or 0.0.0.0 if the device
 	 *        does not provide this information
-	 * @param subnetMask the configured subnet mask, use <code>null</code> or 0.0.0.0 if the device
+	 * @param subnetMask the configured subnet mask, use {@code null} or 0.0.0.0 if the device
 	 *        does not provide this information
-	 * @param gateway address of the configured default gateway, use <code>null</code> or 0.0.0.0 if
+	 * @param gateway address of the configured default gateway, use {@code null} or 0.0.0.0 if
 	 *        the device does not provide this information
 	 * @param ipCapabilities supported IP capabilities, a bitset of available assignment methods;
 	 *        set the following bits to indicate support: Bit 0 = BootP, 1 = DHCP, 2 = AutoIP

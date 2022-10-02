@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2021 B. Malinowsky
+    Copyright (c) 2015, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ public class RoutingBusy extends ServiceType
 	 * Creates a new routing busy indication out of a byte array.
 	 *
 	 * @param data byte array containing a lost message indication structure
-	 * @param offset start offset of indication in <code>data</code>
+	 * @param offset start offset of indication in {@code data}
 	 * @throws KNXFormatException if buffer is too short for routing lost message indication or lost
 	 *         message info has wrong size
 	 */
@@ -94,7 +94,7 @@ public class RoutingBusy extends ServiceType
 	 *        69 in object type 11 of the KNX property definitions (with the state maintained by the
 	 *        corresponding property value)
 	 * @param waitTime time required to empty the affected receive queue,
-	 *        <code>waitTime</code> shall be at least 20 ms and shall not exceed 100 ms
+	 *        {@code waitTime} shall be at least 20 ms and shall not exceed 100 ms
 	 * @param control routing busy indication control field, default value is 0x0
 	 */
 	public RoutingBusy(final int deviceState, final Duration waitTime, final int control)
@@ -129,7 +129,7 @@ public class RoutingBusy extends ServiceType
 	 * <p>
 	 * The KNX fault mode is part of the device state.
 	 *
-	 * @return <code>true</code> on KNX access fault, <code>false</code> otherwise
+	 * @return {@code true} on KNX access fault, {@code false} otherwise
 	 * @see #getDeviceState()
 	 */
 	public final boolean isKnxFault()
@@ -145,20 +145,20 @@ public class RoutingBusy extends ServiceType
 	 * device shall stop sending further routing indications for a time of {@link #waitTime()}.
 	 * The following flow control mechanism applies:<br>
 	 * The total timeout after which a KNX device is permitted to resume sending is calculated as
-	 * <code>totalTime = {@link #waitTime()} + rand(0..1) * N * 50 ms</code>.<br>
-	 * The factor <code>N</code> is calculated as follows:
+	 * {@code totalTime = waitTime() + rand(0..1) * N * 50 ms}.<br>
+	 * The factor {@code N} is calculated as follows:
 	 * <ul>
-	 * <li>Increment <code>N</code> by one for each new routing busy indication received &ge; 10 ms
+	 * <li>Increment {@code N} by one for each new routing busy indication received &ge; 10 ms
 	 * have passed since the last routing busy indication.</li>
-	 * <li>Decrement <code>N</code> by one every 5 ms after <code>t_slowduration</code> has elapsed.</li>
-	 * <li><code>t_slowduration</code> = N * 100 ms.</li>
+	 * <li>Decrement {@code N} by one every 5 ms after {@code t_slowduration} has elapsed.</li>
+	 * <li>{@code t_slowduration} = N * 100 ms.</li>
 	 * </ul>
 	 *
 	 * The wait time value used by the indicating device is also stored in the KNX property
-	 * <code>ROUTING_BUSY_WAIT_TIME</code> with the <code>PID = 78</code>.
+	 * {@code ROUTING_BUSY_WAIT_TIME} with the {@code PID = 78}.
 	 *
 	 * @return time required to empty the affected receive queue, value shall be in
-	 *         the range of <code>20 ms &le; time &le; 100 ms</code>
+	 *         the range of {@code 20 ms ≤ time ≤ 100 ms}
 	 */
 	public final Duration waitTime() { return waitTime; }
 

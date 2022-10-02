@@ -1,7 +1,7 @@
 /*
     Calimero 2 - A library for KNX network access
     Copyright (c) 2005 B. Erb
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ public class DescriptionRequest extends ServiceType {
 	 * Creates a description request out of a byte array.
 	 *
 	 * @param data byte array containing a description request structure
-	 * @param offset start offset of request in <code>data</code>
+	 * @param offset start offset of request in {@code data}
 	 * @throws KNXFormatException if no description request was found or invalid structure
 	 */
 	public DescriptionRequest(final byte[] data, final int offset) throws KNXFormatException
@@ -94,7 +94,7 @@ public class DescriptionRequest extends ServiceType {
 	 * Creates a new UDP description request with the supplied address used for a description response.
 	 *
 	 * @param responseAddr address of client control endpoint used for response, use
-	 *        <code>null</code> if NAT is used on the IP network
+	 *        {@code null} if NAT is used on the IP network
 	 */
 	public DescriptionRequest(final InetSocketAddress responseAddr)
 	{

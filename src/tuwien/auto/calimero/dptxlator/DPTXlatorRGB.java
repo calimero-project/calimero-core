@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * The KNX data type width is 3 bytes.
  * The type contains the color information red, green and blue, with a resolution of 1.
  * <p>
- * The default return value after creation is <code>0 0 0</code>.
+ * The default return value after creation is {@code 0 0 0}.
  * <p>
  * Note, that the RGB color model is device dependent, and RGB values are based on a
  * device-dependent interpretation of RGB. Therefore, do not expect consistent behavior with respect
@@ -96,7 +96,7 @@ public class DPTXlatorRGB extends DPTXlator {
 	 * Creates a translator for the given datapoint type ID.
 	 *
 	 * @param dptID available implemented datapoint type ID
-	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptID</code>
+	 * @throws KNXFormatException on wrong formatted or not expected (available) {@code dptID}
 	 */
 	public DPTXlatorRGB(final String dptID) throws KNXFormatException
 	{
@@ -141,9 +141,9 @@ public class DPTXlatorRGB extends DPTXlator {
 	 * <p>
 	 * If succeeded, any other items in the translator are discarded.
 	 *
-	 * @param red the red color component, <code>0 &le; red &le; 255</code>
-	 * @param green the green color component, <code>0 &le; red &le; 255</code>
-	 * @param blue the blue color component, <code>0 &le; red &le; 255</code>
+	 * @param red the red color component, {@code 0 ≤ red ≤ 255}
+	 * @param green the green color component, {@code 0 ≤ red ≤ 255}
+	 * @param blue the blue color component, {@code 0 ≤ red ≤ 255}
 	 */
 	public final void setValue(final int red, final int green, final int blue)
 	{

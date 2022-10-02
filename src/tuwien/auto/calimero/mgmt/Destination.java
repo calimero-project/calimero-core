@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -260,8 +260,8 @@ public class Destination implements AutoCloseable
 	 *
 	 * @param aggregator aggregator proxy to associate with this destination
 	 * @param remote KNX remote address specifying the connection destination
-	 * @param connectionOriented <code>true</code> for connection oriented mode,
-	 *        <code>false</code> to use connectionless mode
+	 * @param connectionOriented {@code true} for connection oriented mode,
+	 *        {@code false} to use connectionless mode
 	 */
 	public Destination(final AggregatorProxy aggregator, final IndividualAddress remote,
 		final boolean connectionOriented)
@@ -283,13 +283,13 @@ public class Destination implements AutoCloseable
 	 *
 	 * @param aggregator aggregator proxy to associate with this destination
 	 * @param remote KNX remote address specifying the connection destination
-	 * @param connectionOriented <code>true</code> for connection oriented mode,
-	 *        <code>false</code> to use connectionless mode
-	 * @param keepAlive <code>true</code> to prevent a timing out of the logical
-	 *        connection in connection oriented mode, <code>false</code> to use default
+	 * @param connectionOriented {@code true} for connection oriented mode,
+	 *        {@code false} to use connectionless mode
+	 * @param keepAlive {@code true} to prevent a timing out of the logical
+	 *        connection in connection oriented mode, {@code false} to use default
 	 *        connection timeout
-	 * @param verifyMode <code>true</code> to indicate the destination has verify mode
-	 *        enabled, <code>false</code> otherwise
+	 * @param verifyMode {@code true} to indicate the destination has verify mode
+	 *        enabled, {@code false} otherwise
 	 */
 	public Destination(final AggregatorProxy aggregator, final IndividualAddress remote,
 			final boolean connectionOriented, final boolean keepAlive, final boolean verifyMode)
@@ -326,7 +326,7 @@ public class Destination implements AutoCloseable
 	 * Returns whether this destination uses connection oriented mode or connectionless
 	 * mode.
 	 *
-	 * @return <code>true</code> for connection oriented mode, <code>false</code>
+	 * @return {@code true} for connection oriented mode, {@code false}
 	 *         otherwise
 	 */
 	public final boolean isConnectionOriented()
@@ -337,8 +337,8 @@ public class Destination implements AutoCloseable
 	/**
 	 * Returns whether keep alive of connection is specified.
 	 *
-	 * @return <code>true</code> if keep alive is specified and connection oriented mode
-	 *         is used, <code>false</code> otherwise
+	 * @return {@code true} if keep alive is specified and connection oriented mode
+	 *         is used, {@code false} otherwise
 	 */
 	public final boolean isKeepAlive()
 	{
@@ -348,7 +348,7 @@ public class Destination implements AutoCloseable
 	/**
 	 * Returns whether verify mode is supported by the destination.
 	 *
-	 * @return <code>true</code> for verify mode enabled, <code>false</code> otherwise
+	 * @return {@code true} for verify mode enabled, {@code false} otherwise
 	 */
 	public final boolean isVerifyMode()
 	{

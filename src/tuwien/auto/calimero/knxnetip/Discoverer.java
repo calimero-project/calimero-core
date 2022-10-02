@@ -114,7 +114,7 @@ import tuwien.auto.calimero.log.LogService;
  * <p>
  * Cancellation policy on thread interrupts: any running searches are canceled, see
  * {@link #stopSearch()}, blocking invocations of startSearch (i.e., parameter
- * <code>wait = true</code>) will return (before the specified timeout occurred).
+ * {@code wait = true}) will return (before the specified timeout occurred).
  *
  * @author B. Malinowsky
  */
@@ -239,7 +239,7 @@ public class Discoverer
 	/**
 	 * Returns a discoverer which uses UDP with unicast responses for discovery &amp; description requests.
 	 *
-	 * @param nat <code>true</code> to use network address translation (NAT) aware discovery, <code>false</code> otherwise
+	 * @param nat {@code true} to use network address translation (NAT) aware discovery, {@code false} otherwise
 	 * @return a discoverer
 	 */
 	public static Discoverer udp(final boolean nat) {
@@ -275,15 +275,15 @@ public class Discoverer
 	 * traversing the network (besides the other reason that timeouts are too short). This
 	 * would effectively stop any communication done in the standard way, due to the way
 	 * the HPAI structure is used by default.<br>
-	 * Setting the parameter for indicating use of NAT to <code>true</code> takes account
+	 * Setting the parameter for indicating use of NAT to {@code true} takes account
 	 * of such routers, leading to the desired behavior.
 	 *
 	 * @param localPort the port number used to bind a socket, a valid port is in the
 	 *        range of 1 to 65535, or use 0 to pick an arbitrary unused (ephemeral) port.
 	 *        Note that a specified valid port does not ensure a successful bind in
 	 *        subsequent discoverer operations due to operating system dependencies.
-	 * @param natAware <code>true</code> to use a NAT (network address translation) aware
-	 *        discovery/description mechanism, <code>false</code> to use the default way
+	 * @param natAware {@code true} to use a NAT (network address translation) aware
+	 *        discovery/description mechanism, {@code false} to use the default way
 	 */
 	public Discoverer(final int localPort, final boolean natAware)
 	{
@@ -294,7 +294,7 @@ public class Discoverer
 	 * Creates a new Discoverer and allows to specify a local host.
 	 * <p>
 	 * See {@link Discoverer#Discoverer(int, boolean)} for additional description.<br>
-	 * The <code>localHost</code> is used to specify a particular local host address, used
+	 * The {@code localHost} is used to specify a particular local host address, used
 	 * as response destination address when doing discovery / description. By default, subnet matching or the
 	 * local host as obtained by {@link InetAddress#getLocalHost()} is used (in that order). The returned
 	 * address is quite system dependent and might not always be useful in some
@@ -302,15 +302,15 @@ public class Discoverer
 	 * constructor.
 	 *
 	 * @param localHost local host address used for KNXnet/IP description, or
-	 *        <code>null</code> to use the default local host if required
+	 *        {@code null} to use the default local host if required
 	 * @param localPort the port number used to bind a socket, a valid port is in the
 	 *        range of 1 to 65535, or use 0 to pick an arbitrary unused (ephemeral) port.
 	 *        Note that a specified valid port does not ensure a successful bind in
 	 *        subsequent discoverer operations due to operating system dependencies.
-	 * @param natAware <code>true</code> to use a NAT (network address translation) aware
-	 *        discovery/description mechanism, <code>false</code> to use the default way
-	 * @param mcastResponse set <code>true</code> to use multicasting for search responses
-	 *        in KNXnet/IP discovery, <code>false</code> to use unicast for search
+	 * @param natAware {@code true} to use a NAT (network address translation) aware
+	 *        discovery/description mechanism, {@code false} to use the default way
+	 * @param mcastResponse set {@code true} to use multicasting for search responses
+	 *        in KNXnet/IP discovery, {@code false} to use unicast for search
 	 *        responses to this local host and port address
 	 */
 	public Discoverer(final InetAddress localHost, final int localPort, final boolean natAware,
@@ -396,21 +396,21 @@ public class Discoverer
 	 * Starts a new search for KNXnet/IP discovery, the network interface can be
 	 * specified.
 	 * <p>
-	 * The search will continue for <code>timeout</code> seconds, or infinite if timeout
+	 * The search will continue for {@code timeout} seconds, or infinite if timeout
 	 * value is zero. During this time, search responses will get collected asynchronous
 	 * in the background by this {@link Discoverer}.<br>
-	 * With <code>wait</code> you can force this method into blocking mode to wait until
+	 * With {@code wait} you can force this method into blocking mode to wait until
 	 * the search finished, otherwise the method returns with the search running in the
 	 * background.<br>
-	 * A search is finished if either the <code>timeout</code> was reached or the
+	 * A search is finished if either the {@code timeout} was reached or the
 	 * background receiver stopped.<br>
 	 *
 	 * @param ni the {@link NetworkInterface} used for sending outgoing multicast
-	 *        messages, or <code>null</code> to use the default multicast interface
+	 *        messages, or {@code null} to use the default multicast interface
 	 * @param timeout time window in seconds during which search response messages will
 	 *        get collected, timeout &ge; 0. If timeout is zero, no timeout is set, the
 	 *        search has to be stopped with {@link #stopSearch()}.
-	 * @param wait <code>true</code> to block until end of search before return
+	 * @param wait {@code true} to block until end of search before return
 	 * @throws KNXException on network I/O error
 	 * @throws InterruptedException if search was interrupted in blocking mode before the
 	 *         specified timeout was reached; the search is stopped before passing this
@@ -424,24 +424,24 @@ public class Discoverer
 	}
 
 	/**
-	 * Starts a new search for KNXnet/IP discovery, the <code>localPort</code> and network
+	 * Starts a new search for KNXnet/IP discovery, the {@code localPort} and network
 	 * interface can be specified.
 	 * <p>
 	 * See documentation for method {@link #startSearch(NetworkInterface, int, boolean)}.<br>
 	 * To distinguish between search responses if a user started two or more searches
 	 * running concurrently, this method allows to specify a dedicated
-	 * <code>localPort</code>, not using the port set with
+	 * {@code localPort}, not using the port set with
 	 * {@link #Discoverer(int, boolean)}.
 	 *
 	 * @param localPort the port used to bind the socket, a valid port is 0 to 65535, if
-	 *        <code>localPort</code> is zero an arbitrary unused (ephemeral) port is
+	 *        {@code localPort} is zero an arbitrary unused (ephemeral) port is
 	 *        picked
 	 * @param ni the {@link NetworkInterface} used for sending outgoing multicast
-	 *        messages, or <code>null</code> to use the default multicast interface
+	 *        messages, or {@code null} to use the default multicast interface
 	 * @param timeout time window in seconds during which search response messages will
-	 *        get collected, <code>timeout &ge; 0</code>. If timeout is zero, no timeout is
+	 *        get collected, {@code timeout ≥ 0}. If timeout is zero, no timeout is
 	 *        set, the search has to be stopped with {@link #stopSearch()}.
-	 * @param wait <code>true</code> to block until end of search before return
+	 * @param wait {@code true} to block until end of search before return
 	 * @throws KNXException on network I/O error
 	 * @throws InterruptedException if search was interrupted in blocking mode before the
 	 *         specified timeout was reached; the search is stopped before passing this
@@ -476,20 +476,20 @@ public class Discoverer
 	/**
 	 * Starts a new search for KNXnet/IP discovery on all found network interfaces.
 	 * <p>
-	 * The search will continue for <code>timeout</code> seconds, or infinite if timeout
+	 * The search will continue for {@code timeout} seconds, or infinite if timeout
 	 * value is zero. During this time, search responses will get collected asynchronous
 	 * in the background by this Discoverer.<br>
-	 * With <code>wait</code> you can force this method into blocking mode to wait until
+	 * With {@code wait} you can force this method into blocking mode to wait until
 	 * the search finished, otherwise the method returns with the search running in the
 	 * background.<br>
-	 * A search has finished if either the <code>timeout</code> was reached, all
+	 * A search has finished if either the {@code timeout} was reached, all
 	 * background receivers stopped (all responses received) or {@link #stopSearch()} was
 	 * invoked.
 	 *
 	 * @param timeout time window in seconds during which search response messages will
 	 *        get collected, timeout &ge; 0. If timeout is 0, no timeout is set, the search
-	 *        has to be stopped with <code>stopSearch</code>.
-	 * @param wait <code>true</code> to block until end of search before return
+	 *        has to be stopped with {@code stopSearch}.
+	 * @param wait {@code true} to block until end of search before return
 	 * @throws InterruptedException if search was interrupted in blocking mode before the
 	 *         specified timeout was reached; the search is stopped before passing this
 	 *         exception back to the caller
@@ -582,9 +582,9 @@ public class Discoverer
 	}
 
 	/**
-	 * Returns <code>true</code> if a search is currently running.
+	 * Returns {@code true} if a search is currently running.
 	 *
-	 * @return a <code>boolean</code> showing the search state
+	 * @return a {@code boolean} showing the search state
 	 */
 	public final boolean isSearching()
 	{
@@ -614,8 +614,8 @@ public class Discoverer
 	}
 
 	/**
-	 * Sends a description request to <code>server</code> and waits at most
-	 * <code>timeout</code> seconds for the answer message to arrive.
+	 * Sends a description request to {@code server} and waits at most
+	 * {@code timeout} seconds for the answer message to arrive.
 	 *
 	 * @param server the socket address of the server the description is requested from
 	 * @param timeout time window in seconds to wait for answer message, 0 &lt; timeout
@@ -624,7 +624,7 @@ public class Discoverer
 	 * @throws KNXException on network I/O error
 	 * @throws KNXTimeoutException if the timeout was reached before the description
 	 *         response arrived
-	 * @throws KNXInvalidResponseException if a received message from <code>server</code>
+	 * @throws KNXInvalidResponseException if a received message from {@code server}
 	 *         does not match the expected response
 	 */
 	public Result<DescriptionResponse> getDescription(final InetSocketAddress server, final int timeout)
@@ -658,7 +658,7 @@ public class Discoverer
 	 * @param localAddr local address to send search request from
 	 * @param localPort local port to send search request from
 	 * @param ni {@link NetworkInterface} used to send outgoing multicast, or
-	 *        <code>null</code> to use the default multicast interface
+	 *        {@code null} to use the default multicast interface
 	 * @param timeout search timeout, timeout &ge; 0, 0 for an infinite time window
 	 * @param notifyResponse consumer for responses
 	 * @param searchParameters optional search parameters for extended search

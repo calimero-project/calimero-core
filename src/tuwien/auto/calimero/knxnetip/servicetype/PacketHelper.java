@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ public final class PacketHelper
 
 	/**
 	 * Creates a packet with a KNXnet/IP message header v1.0, containing the specified
-	 * service <code>type</code>, and generates the corresponding byte representation
+	 * service {@code type}, and generates the corresponding byte representation
 	 * of this structure.
 	 *
 	 * @param type service type to pack

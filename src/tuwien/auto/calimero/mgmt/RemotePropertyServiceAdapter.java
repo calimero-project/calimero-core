@@ -76,8 +76,8 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 	 * @param link KNX network link used for communication with the KNX network
 	 * @param remote KNX individual address to access its interface objects
 	 * @param adapterClosed receives notification about adapter close event, which happens if {@code link} got closed
-	 * @param connOriented <code>true</code> to use connection-oriented mode for access,
-	 *        <code>false</code> to use connectionless mode
+	 * @param connOriented {@code true} to use connection-oriented mode for access,
+	 *        {@code false} to use connectionless mode
 	 * @throws KNXLinkClosedException if the network link is closed
 	 */
 	public RemotePropertyServiceAdapter(final KNXNetworkLink link,
@@ -123,8 +123,8 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 	 * @param remote KNX individual address to access its interface objects
 	 * @param security security containing the device tool key to use for KNX Data Secure property services with the
 	 *        {@code remote} endpoint
-	 * @param connOriented <code>true</code> to use connection-oriented mode for access,
-	 *        <code>false</code> to use connectionless mode
+	 * @param connOriented {@code true} to use connection-oriented mode for access,
+	 *        {@code false} to use connectionless mode
 	 * @param authorizeKey authorization key to obtain a specific access level using {@link ManagementClient#authorize}
 	 *        for certain get or set operations, {@code authorizeKey.length = 4};
 	 *        use {@code authorizeKey.length = 0} to skip authorization

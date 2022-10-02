@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ public class MonitorFrameEvent extends FrameEvent
 	 * @param source the network monitor which received the frame
 	 * @param frame monitor indication frame encapsulated in cEMI type
 	 * @param rawFrame the decoded raw frame on medium encapsulated in type RawFrame, use
-	 *        <code>null</code> if no decoded raw frame is available
+	 *        {@code null} if no decoded raw frame is available
 	 */
 	public MonitorFrameEvent(final KNXNetworkMonitor source, final CEMI frame,
 		final RawFrame rawFrame)
@@ -106,10 +106,10 @@ public class MonitorFrameEvent extends FrameEvent
 	/**
 	 * Returns the decoded raw frame on medium.
 	 * <p>
-	 * If decoding of raw frames is enabled and this method returns <code>null</code>, try
+	 * If decoding of raw frames is enabled and this method returns {@code null}, try
 	 * {@link #getDecodeError()} for decode error information.
 	 *
-	 * @return the frame of type RawFrame or <code>null</code> on no decoded raw frame
+	 * @return the frame of type RawFrame or {@code null} on no decoded raw frame
 	 */
 	public final RawFrame getRawFrame()
 	{
@@ -120,9 +120,9 @@ public class MonitorFrameEvent extends FrameEvent
 	 * Returns the exception object obtained during creation of a decoded raw frame, providing error
 	 * information while decoding the raw frame on medium.<p>
 	 *
-	 * If decoding of raw frames is disabled, this method returns always <code>null</code>.
+	 * If decoding of raw frames is disabled, this method returns always {@code null}.
 	 *
-	 * @return the exception object, or <code>null</code> if {@link #getRawFrame()} returns the
+	 * @return the exception object, or {@code null} if {@link #getRawFrame()} returns the
 	 *         decoded {@link RawFrame}
 	 */
 	public final KNXFormatException getDecodeError()

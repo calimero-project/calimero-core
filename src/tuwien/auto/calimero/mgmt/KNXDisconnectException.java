@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ import tuwien.auto.calimero.KNXException;
 /**
  * Thrown to indicate that a layer 4 disconnect event happened.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public class KNXDisconnectException extends KNXException
@@ -51,7 +51,7 @@ public class KNXDisconnectException extends KNXException
 	private final Destination dst;
 
 	/**
-	 * Constructs a <code>KNXDisconnectException</code> without a detail message.
+	 * Constructs a {@code KNXDisconnectException} without a detail message.
 	 */
 	public KNXDisconnectException()
 	{
@@ -59,10 +59,10 @@ public class KNXDisconnectException extends KNXException
 	}
 
 	/**
-	 * Constructs a <code>KNXDisconnectException</code> with the specified detail
+	 * Constructs a {@code KNXDisconnectException} with the specified detail
 	 * message.
 	 * <p>
-	 * 
+	 *
 	 * @param s the detail message
 	 */
 	public KNXDisconnectException(final String s)
@@ -72,10 +72,10 @@ public class KNXDisconnectException extends KNXException
 	}
 
 	/**
-	 * Constructs a <code>KNXDisconnectException</code> with the specified detail
+	 * Constructs a {@code KNXDisconnectException} with the specified detail
 	 * message and the affected destination object.
 	 * <p>
-	 * 
+	 *
 	 * @param s the detail message
 	 * @param d destination causing this exception by its disconnected state
 	 */
@@ -88,8 +88,8 @@ public class KNXDisconnectException extends KNXException
 	/**
 	 * Returns the destination which caused this exception.
 	 * <p>
-	 * 
-	 * @return the Destination, or <code>null</code> if not supplied
+	 *
+	 * @return the Destination, or {@code null} if not supplied
 	 */
 	public final Destination getDestination()
 	{

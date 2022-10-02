@@ -57,8 +57,8 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * using these prefixes:
  * <dl>
  * <dt>no prefix</dt><dd>for decimal numeral</dd>
- * <dt><code>0x</code>, <code>0X</code>, <code>#</code><dd>for hexadecimal numeral</dd>
- * <dt><code>0</code><dd>for octal numeral</dd>
+ * <dt>{@code 0x}, {@code 0X}, {@code #}<dd>for hexadecimal numeral</dd>
+ * <dt>{@code 0}<dd>for octal numeral</dd>
  * </dl>
  */
 public class DPTXlator3BitControlled extends DPTXlator
@@ -137,7 +137,7 @@ public class DPTXlator3BitControlled extends DPTXlator
 	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
-	 *         <code>dptID</code>
+	 *         {@code dptID}
 	 */
 	public DPTXlator3BitControlled(final String dptID) throws KNXFormatException
 	{
@@ -154,9 +154,9 @@ public class DPTXlator3BitControlled extends DPTXlator
 	/**
 	 * Sets one new translation item with the given signed value, replacing any old items.
 	 * <p>
-	 * The <code>value</code>'s absolute value represents the stepcode, and the sign
+	 * The {@code value}'s absolute value represents the stepcode, and the sign
 	 * represents the control flag, a positive control flag is shown by a positive sign,
-	 * control flag 0 by a negative sign. A <code>value</code> of 0 is interpreted as
+	 * control flag 0 by a negative sign. A {@code value} of 0 is interpreted as
 	 * stepcode 0 with positive control flag.
 	 *
 	 * @param value 3 Bit controlled value in signed representation
@@ -215,7 +215,7 @@ public class DPTXlator3BitControlled extends DPTXlator
 	/**
 	 * Sets the control field to the specified direction for the first translation item.
 	 * <p>
-	 * A value of <code>false</code> stands for decrease/up, <code>true</code> for
+	 * A value of {@code false} stands for decrease/up, {@code true} for
 	 * increase/down.<br>
 	 * This method does not reset other item data or discard other translation items.
 	 *
@@ -232,7 +232,7 @@ public class DPTXlator3BitControlled extends DPTXlator
 	/**
 	 * Returns the control field of the first translation item.
 	 * <p>
-	 * A value of <code>false</code> stands for decrease / up, <code>true</code> for
+	 * A value of {@code false} stands for decrease / up, {@code true} for
 	 * increase / down.
 	 *
 	 * @return control bit as boolean
@@ -276,7 +276,7 @@ public class DPTXlator3BitControlled extends DPTXlator
 	 * <p>
 	 * This number specifies the intervals in which the range between 0 % and 100 % should
 	 * get divided.<br>
-	 * The value of <code>numberOfIntervals</code> is rounded to the nearest intervals
+	 * The value of {@code numberOfIntervals} is rounded to the nearest intervals
 	 * representable with a stepcode. A specified value exactly in between two
 	 * representable intervals is rounded off, e.g., 48 is rounded off to 32, 3 is rounded off to
 	 * 2.<br>

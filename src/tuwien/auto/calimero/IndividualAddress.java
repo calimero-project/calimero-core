@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -84,7 +84,7 @@ public class IndividualAddress extends KNXAddress
 	 * Creates a KNX individual address from a byte array value.
 	 * <p>
 	 * The address is read out of the first 2 byte fields, while the address array itself
-	 * might be longer. The content of <code>address</code> is not modified.
+	 * might be longer. The content of {@code address} is not modified.
 	 *
 	 * @param address the address byte array in big-endian format, with address.length &gt; 1
 	 */
@@ -94,7 +94,7 @@ public class IndividualAddress extends KNXAddress
 	}
 
 	/**
-	 * Creates a KNX individual address from a string <code>address</code> representation.
+	 * Creates a KNX individual address from a string {@code address} representation.
 	 * <p>
 	 * The address string can either be formatted, e.g., "1.1.2", or the raw address, e.g., "4354".
 	 * A formatted address consists of 3 levels (see class header specification), the allowed
@@ -172,11 +172,11 @@ public class IndividualAddress extends KNXAddress
 	}
 
 	/**
-	 * Returns whether <code>obj</code> is equal to this KNX address type.
+	 * Returns whether {@code obj} is equal to this KNX address type.
 	 *
 	 * @param obj knx address object
-	 * @return <code>true</code> iff <code>obj</code> is of this type and contains the
-	 *         same address, <code>false</code> otherwise
+	 * @return {@code true} iff {@code obj} is of this type and contains the
+	 *         same address, {@code false} otherwise
 	 */
 	@Override
 	public boolean equals(final Object obj)

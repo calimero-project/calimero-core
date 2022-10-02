@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -69,9 +69,9 @@ public interface KNXNetworkLink extends AutoCloseable
 	 * <p>
 	 * These informations are differing between KNX media and depend on the KNX network
 	 * this link is communicating with.<br>
-	 * The <code>settings</code> medium type has to match the medium type supplied to
+	 * The {@code settings} medium type has to match the medium type supplied to
 	 * the link in the first place.<br>
-	 * The <code>settings</code> object is not copied internally to allow subsequent
+	 * The {@code settings} object is not copied internally to allow subsequent
 	 * changes to medium settings by the user which should take effect immediately.
 	 *
 	 * @param settings medium settings to use, the expected subtype is according to the
@@ -89,20 +89,20 @@ public interface KNXNetworkLink extends AutoCloseable
 	KNXMediumSettings getKNXMedium();
 
 	/**
-	 * Adds the specified event listener <code>l</code> to receive events from this
+	 * Adds the specified event listener {@code l} to receive events from this
 	 * link.
 	 * <p>
-	 * If <code>l</code> was already added as listener, no action is performed.
+	 * If {@code l} was already added as listener, no action is performed.
 	 *
 	 * @param l the listener to add
 	 */
 	void addLinkListener(NetworkLinkListener l);
 
 	/**
-	 * Removes the specified event listener <code>l</code>, so it does no longer
+	 * Removes the specified event listener {@code l}, so it does no longer
 	 * receive events from this link.
 	 * <p>
-	 * If <code>l</code> was not added in the first place, no action is performed.
+	 * If {@code l} was not added in the first place, no action is performed.
 	 *
 	 * @param l the listener to remove
 	 */
@@ -135,11 +135,11 @@ public interface KNXNetworkLink extends AutoCloseable
 	 * Sends a link layer request message to the given destination.
 	 * <p>
 	 * Depending on the address, the request is either point-to-point, multicast or
-	 * broadcast. A network link implementation is allowed to interpret a <code>dst</code>
-	 * parameter of <code>null</code> as system broadcast, or otherwise uses its default
+	 * broadcast. A network link implementation is allowed to interpret a {@code dst}
+	 * parameter of {@code null} as system broadcast, or otherwise uses its default
 	 * broadcast behavior.
 	 *
-	 * @param dst KNX destination address, or <code>null</code>
+	 * @param dst KNX destination address, or {@code null}
 	 * @param p priority this KNX message is assigned to
 	 * @param nsdu network layer service data unit
 	 * @throws KNXTimeoutException on a timeout during send (for example, when waiting on
@@ -153,11 +153,11 @@ public interface KNXNetworkLink extends AutoCloseable
 	 * corresponding link layer confirmation.
 	 * <p>
 	 * Depending on the address, the request is either point-to-point, multicast or
-	 * broadcast. A network link implementation is allowed to interpret a <code>dst</code>
-	 * parameter of <code>null</code> as system broadcast, or otherwise uses its default
+	 * broadcast. A network link implementation is allowed to interpret a {@code dst}
+	 * parameter of {@code null} as system broadcast, or otherwise uses its default
 	 * broadcast behavior.
 	 *
-	 * @param dst KNX destination address, or <code>null</code>
+	 * @param dst KNX destination address, or {@code null}
 	 * @param p priority this message is assigned to
 	 * @param nsdu network layer service data unit
 	 * @throws KNXTimeoutException on a timeout during send or while waiting for the
@@ -169,12 +169,12 @@ public interface KNXNetworkLink extends AutoCloseable
 	/**
 	 * Sends a KNX link layer message supplied as type cEMI L-data.
 	 * <p>
-	 * If the source address of <code>msg</code> is 0.0.0, the device address supplied
+	 * If the source address of {@code msg} is 0.0.0, the device address supplied
 	 * in the medium settings is used as message source address.
 	 *
 	 * @param msg cEMI L-data message to send
-	 * @param waitForCon <code>true</code> to wait for link layer confirmation response,
-	 *        <code>false</code> to not wait for the confirmation
+	 * @param waitForCon {@code true} to wait for link layer confirmation response,
+	 *        {@code false} to not wait for the confirmation
 	 * @throws KNXTimeoutException on a timeout during send (for example, when waiting on
 	 *         acknowledgment using a reliable transmission protocol)
 	 * @throws KNXLinkClosedException if the link is closed
@@ -197,9 +197,9 @@ public interface KNXNetworkLink extends AutoCloseable
 	 * Checks for open network link.
 	 * <p>
 	 * After a call to {@link #close()} or after the underlying protocol initiated the end of the communication, this
-	 * method always returns <code>false</code>.
+	 * method always returns {@code false}.
 	 *
-	 * @return <code>true</code> if this network link is open, <code>false</code> if closed
+	 * @return {@code true} if this network link is open, {@code false} if closed
 	 */
 	boolean isOpen();
 

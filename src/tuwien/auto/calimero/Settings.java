@@ -77,8 +77,8 @@ public final class Settings
 	 * Vienna University of Technology where the library was developed, and copyright.
 	 * The returned information parts are divided using the newline ('\n') character.
 	 *
-	 * @param verbose <code>true</code> to return all header information just mentioned,
-	 *        <code>false</code> to only return library name and version comprised of
+	 * @param verbose {@code true} to return all header information just mentioned,
+	 *        {@code false} to only return library name and version comprised of
 	 *        one line (no line separators)
 	 * @return header as string
 	 */

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2021 B. Malinowsky
+    Copyright (c) 2015, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -86,7 +86,7 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 	 * Creates a new network monitor for accessing the KNX network over a USB connection.
 	 *
 	 * @param device an identifier to lookup the USB device, e.g., based on (part of) a device string like the product
-	 *        or manufacturer name, or USB vendor and product ID in the format <code>vendorId:productId</code>
+	 *        or manufacturer name, or USB vendor and product ID in the format {@code vendorId:productId}
 	 * @param settings medium settings defining the specific KNX medium needed for decoding raw frames received from the
 	 *        KNX network
 	 * @throws KNXException on error creating USB link

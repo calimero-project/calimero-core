@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2017, 2021 B. Malinowsky
+    Copyright (c) 2017, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * In value methods expecting string items, an item is formatted as metering value with (optional) unit, e.g., "210.35
  * l/h". The unit is used to assign the M-Bus value information field (VIF) coding, i.e., in the case of "l/h" the
  * encoding would be "volume flow" in m³/h. A metering value without unit is encoded as <i>dimensionless counter</i>
- * (M-Bus VIFE coding <code>0b10111010</code>).
+ * (M-Bus VIFE coding {@code 0b10111010}).
  */
 @SuppressWarnings("checkstyle:javadocvariable")
 public class DptXlatorMeteringValue extends DPTXlator
@@ -96,7 +96,7 @@ public class DptXlatorMeteringValue extends DPTXlator
 	 * Creates a translator for the given datapoint type ID.
 	 *
 	 * @param dptId datapoint type ID
-	 * @throws KNXFormatException on wrong formatted or unsupported <code>dptId</code>
+	 * @throws KNXFormatException on wrong formatted or unsupported {@code dptId}
 	 */
 	public DptXlatorMeteringValue(final String dptId) throws KNXFormatException
 	{
@@ -133,7 +133,7 @@ public class DptXlatorMeteringValue extends DPTXlator
 	/**
 	 * Sets one new translation item from a metering value, replacing any old items.
 	 *
-	 * @param coding coding of <code>value</code>
+	 * @param coding coding of {@code value}
 	 * @param value metering value
 	 * @throws KNXFormatException if value is out of range specified by the DPT
 	 */

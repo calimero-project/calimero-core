@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -105,10 +105,10 @@ public class ServiceRequest<T extends ServiceType> extends tuwien.auto.calimero.
 	 * Creates a new service request out of a byte array.
 	 *
 	 * @param serviceType service request type identifier describing the request in
-	 *        <code>data</code>, 0 &lt;= type &lt;= 0xFFFF
+	 *        {@code data}, 0 &lt;= type &lt;= 0xFFFF
 	 * @param data byte array containing a service request structure
-	 * @param offset start offset in bytes of request in <code>data</code>
-	 * @param length the length in bytes of the whole request contained in <code>data</code>
+	 * @param offset start offset in bytes of request in {@code data}
+	 * @param length the length in bytes of the whole request contained in {@code data}
 	 * @throws KNXFormatException if buffer is too short for request, on unsupported
 	 *         service type or connection header structure
 	 */

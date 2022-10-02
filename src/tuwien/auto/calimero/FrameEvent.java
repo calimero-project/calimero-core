@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ public class FrameEvent extends EventObject
 	private final SecurityControl securityCtrl;
 
 	/**
-	 * Creates a new frame event for <code>frame</code>.
+	 * Creates a new frame event for {@code frame}.
 	 *
 	 * @param source the creator of this event
 	 * @param frame cEMI frame
@@ -74,12 +74,12 @@ public class FrameEvent extends EventObject
 	}
 
 	/**
-	 * Creates a new frame event for <code>frame</code>.
+	 * Creates a new frame event for {@code frame}.
 	 *
 	 * @param source the creator of this event
 	 * @param frame cEMI frame
-	 * @param systemBroadcast <code>true</code> if the cEMI frame was received as IP system broadcast,
-	 *        <code>false</code> otherwise
+	 * @param systemBroadcast {@code true} if the cEMI frame was received as IP system broadcast,
+	 *        {@code false} otherwise
 	 */
 	public FrameEvent(final Object source, final CEMI frame, final boolean systemBroadcast)
 	{
@@ -87,12 +87,12 @@ public class FrameEvent extends EventObject
 	}
 
 	/**
-	 * Creates a new frame event for <code>frame</code>.
+	 * Creates a new frame event for {@code frame}.
 	 *
 	 * @param source the creator of this event
 	 * @param frame cEMI frame
-	 * @param systemBroadcast <code>true</code> if the cEMI frame was received as IP system broadcast,
-	 *        <code>false</code> otherwise
+	 * @param systemBroadcast {@code true} if the cEMI frame was received as IP system broadcast,
+	 *        {@code false} otherwise
 	 * @param securityCtrl data security control
 	 */
 	public FrameEvent(final Object source, final CEMI frame, final boolean systemBroadcast,
@@ -106,7 +106,7 @@ public class FrameEvent extends EventObject
 	}
 
 	/**
-	 * Creates a new frame event for <code>frame</code>.
+	 * Creates a new frame event for {@code frame}.
 	 *
 	 * @param source the creator of this event
 	 * @param frame EMI2 L-data frame
@@ -124,7 +124,7 @@ public class FrameEvent extends EventObject
 	/**
 	 * Returns the cEMI frame, if supplied at event creation.
 	 *
-	 * @return cEMI frame object, or <code>null</code>
+	 * @return cEMI frame object, or {@code null}
 	 */
 	public final CEMI getFrame()
 	{
@@ -134,7 +134,7 @@ public class FrameEvent extends EventObject
 	/**
 	 * Returns the frame as byte array, if supplied at event creation.
 	 *
-	 * @return copy of frame as byte array, or <code>null</code>
+	 * @return copy of frame as byte array, or {@code null}
 	 */
 	public final byte[] getFrameBytes()
 	{

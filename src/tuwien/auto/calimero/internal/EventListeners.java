@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -85,9 +85,9 @@ public class EventListeners<T>
 	}
 
 	/**
-	 * Adds the specified event listener <code>l</code> to this container.
+	 * Adds the specified event listener {@code l} to this container.
 	 * <p>
-	 * If <code>l</code> was already added as listener, no action is performed.
+	 * If {@code l} was already added as listener, no action is performed.
 	 *
 	 * @param l the listener to add
 	 */
@@ -98,9 +98,9 @@ public class EventListeners<T>
 	}
 
 	/**
-	 * Removes the specified event listener <code>l</code> from this container.
+	 * Removes the specified event listener {@code l} from this container.
 	 * <p>
-	 * If <code>l</code> was not added in the first place, no action is performed.
+	 * If {@code l} was not added in the first place, no action is performed.
 	 *
 	 * @param l the listener to remove
 	 */

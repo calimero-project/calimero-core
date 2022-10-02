@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ public class RoutingLostMessage extends ServiceType
 	 * <p>
 	 *
 	 * @param data byte array containing a lost message indication structure
-	 * @param offset start offset of indication in <code>data</code>
+	 * @param offset start offset of indication in {@code data}
 	 * @throws KNXFormatException if buffer is too short for routing lost message
 	 *         indication or lost message info has wrong size
 	 */
@@ -130,7 +130,7 @@ public class RoutingLostMessage extends ServiceType
 	 * <p>
 	 * The KNX fault mode is part of the device state.
 	 *
-	 * @return <code>true</code> on KNX access fault, <code>false</code> otherwise
+	 * @return {@code true} on KNX access fault, {@code false} otherwise
 	 * @see #getDeviceState()
 	 */
 	public final boolean isKNXFault()

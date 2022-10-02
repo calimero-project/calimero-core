@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -152,10 +152,10 @@ public class KNXnetIPRouting extends ConnectionBase
 	 *
 	 * @param netIf specifies the local network interface used to send outgoing multicast datagrams,
 	 *        and join the multicast group to receive multicast datagrams,
-	 *        use <code>null</code> for the default interface;
+	 *        use {@code null} for the default interface;
 	 * @param mcGroup IP multicast address specifying the multicast group this connection shall join,
 	 *        use {@link #DefaultMulticast} for the default multicast group;
-	 *        value of <code>mcGroup &ge; </code>{@value #DEFAULT_MULTICAST}
+	 *        value of {@code mcGroup ≥ }{@value #DEFAULT_MULTICAST}
 	 * @throws KNXException on socket error, or if joining the multicast group failed
 	 */
 	public KNXnetIPRouting(final NetworkInterface netIf, final InetAddress mcGroup) throws KNXException
@@ -290,7 +290,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	 * Returns whether this KNXnet/IP routing instance has local loopback of KNXnet/IP
 	 * routing multicast datagrams enabled or not.
 	 *
-	 * @return <code>true</code> if loopback is used, <code>false</code> otherwise
+	 * @return {@code true} if loopback is used, {@code false} otherwise
 	 */
 	public final boolean usesMulticastLoopback()
 	{
@@ -308,7 +308,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	 * Checks whether the supplied IP address is a valid KNX routing multicast address.
 	 *
 	 * @param address the IP address to check
-	 * @return <code>true</code> if address qualifies as KNX multicast, <code>false</code> otherwise
+	 * @return {@code true} if address qualifies as KNX multicast, {@code false} otherwise
 	 */
 	public static boolean isValidRoutingMulticast(final InetAddress address)
 	{
@@ -323,13 +323,13 @@ public class KNXnetIPRouting extends ConnectionBase
 	 * Call this method only once during initialization.
 	 *
 	 * @param netIf see {@link #KNXnetIPRouting(NetworkInterface, InetAddress)}
-	 * @param useMulticastLoopback <code>true</code> to loopback multicast packets to the
-	 *        local socket, <code>false</code> otherwise; this parameter is only
+	 * @param useMulticastLoopback {@code true} to loopback multicast packets to the
+	 *        local socket, {@code false} otherwise; this parameter is only
 	 *        interpreted as a hint by the operating system
-	 * @param startReceiver <code>true</code> to start a threaded receiver loop which
+	 * @param startReceiver {@code true} to start a threaded receiver loop which
 	 *        dispatches to
 	 *        {@link #handleServiceType(KNXnetIPHeader, byte[], int, InetAddress, int)},
-	 *        <code>false</code> if received socket datagrams are handled by other means
+	 *        {@code false} if received socket datagrams are handled by other means
 	 * @throws KNXException on failed creation or initialization of multicast socket
 	 */
 	protected void init(final NetworkInterface netIf, final boolean useMulticastLoopback,

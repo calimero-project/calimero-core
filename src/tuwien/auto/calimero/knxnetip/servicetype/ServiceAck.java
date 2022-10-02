@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -62,9 +62,9 @@ public class ServiceAck extends ServiceType
 	 * Creates a new service acknowledgment out of a byte array.
 	 *
 	 * @param serviceType service type identifier describing the service to acknowledge in
-	 *        <code>data</code>, 0 &lt;= type &lt;= 0xFFFF
+	 *        {@code data}, 0 &lt;= type &lt;= 0xFFFF
 	 * @param data byte array containing a service acknowledgment structure
-	 * @param offset start offset of the acknowledgment structure in <code>data</code>
+	 * @param offset start offset of the acknowledgment structure in {@code data}
 	 * @throws KNXFormatException if buffer is too short for the expected acknowledgment
 	 *         structure, on unsupported service type or connection header structure
 	 */
@@ -154,7 +154,7 @@ public class ServiceAck extends ServiceType
 	/**
 	 * Returns a textual representation of the status code.
 	 *
-	 * @return short description of status as string, not <code>null</code>
+	 * @return short description of status as string, not {@code null}
 	 */
 	public String getStatusString()
 	{

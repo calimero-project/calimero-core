@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -86,7 +86,7 @@ public abstract class Datapoint
 	 *
 	 * @param main the group address used to identify this datapoint
 	 * @param name user defined datapoint name
-	 * @param stateBased <code>true</code> for state based datapoint, <code>false</code>
+	 * @param stateBased {@code true} for state based datapoint, {@code false}
 	 *        for command based datapoint
 	 */
 	Datapoint(final GroupAddress main, final String name, final boolean stateBased)
@@ -198,7 +198,7 @@ public abstract class Datapoint
 	 * Returns whether this datapoint is state or command based.
 	 * <p>
 	 *
-	 * @return <code>true</code> if datapoint is state based, <code>false</code> for
+	 * @return {@code true} if datapoint is state based, {@code false} for
 	 *         command based
 	 */
 	public final boolean isStateBased()
@@ -230,10 +230,10 @@ public abstract class Datapoint
 	/**
 	 * Sets the datapoint type to use for translation of datapoint values.
 	 * <p>
-	 * A datapoint type is used with <code>DPTXlator</code>s for value translation.
+	 * A datapoint type is used with {@code DPTXlator}s for value translation.
 	 *
 	 * @param mainNumber main number of the data type used for translation of a datapoint
-	 *        value; if the used <code>dptID</code> argument unambiguously identifies a
+	 *        value; if the used {@code dptID} argument unambiguously identifies a
 	 *        DPT translator, main number might be left 0
 	 * @param dptID the datapoint type used for translation in a DPT translator
 	 */

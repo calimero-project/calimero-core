@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2021 B. Malinowsky
+    Copyright (c) 2015, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -95,12 +95,12 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 
 	/**
 	 * Creates a new network link for accessing the KNX network over a USB connection. Because
-	 * arguments for parameter <code>device</code> are not necessarily unique identifiers, the first
+	 * arguments for parameter {@code device} are not necessarily unique identifiers, the first
 	 * matching USB interface is selected.
 	 *
 	 * @param device an identifier to lookup the USB device, e.g., based on (part of) a device
 	 *        string like the product or manufacturer name, or USB vendor and product ID in the
-	 *        format <code>vendorId:productId</code>
+	 *        format {@code vendorId:productId}
 	 * @param settings KNX medium settings, with device and medium-specific communication settings
 	 * @throws KNXException on error creating USB link
 	 * @throws InterruptedException on interrupt

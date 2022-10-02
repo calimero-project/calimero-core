@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,12 +46,12 @@ public class KNXException extends Exception
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Constructs a new <code>KNXException</code> without a detail message.
+	 * Constructs a new {@code KNXException} without a detail message.
 	 */
 	public KNXException() {}
 
 	/**
-	 * Constructs a new <code>KNXException</code> with the specified detail message.
+	 * Constructs a new {@code KNXException} with the specified detail message.
 	 * <p>
 	 *
 	 * @param s the detail message
@@ -62,12 +62,12 @@ public class KNXException extends Exception
 	}
 
 	/**
-	 * Constructs a new <code>KNXException</code> with the specified detail message and
+	 * Constructs a new {@code KNXException} with the specified detail message and
 	 * cause.
 	 * <p>
 	 *
 	 * @param s the detail message
-	 * @param cause the cause in form of a throwable object, can be <code>null</code>
+	 * @param cause the cause in form of a throwable object, can be {@code null}
 	 */
 	public KNXException(final String s, final Throwable cause)
 	{

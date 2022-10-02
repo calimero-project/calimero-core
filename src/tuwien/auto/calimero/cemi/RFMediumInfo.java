@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2020 B. Malinowsky
+    Copyright (c) 2015, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -85,7 +85,7 @@ public final class RFMediumInfo extends AdditionalInfo
 	 * Constructs RF medium info from a byte array containing the additional RF medium information.
 	 *
 	 * @param info RF medium info data
-	 * @param systemBroadcast indicate whether <code>info</code> contains a RF domain address or
+	 * @param systemBroadcast indicate whether {@code info} contains a RF domain address or
 	 *        device S/N, the interpretation depends on the cEMI message control information
 	 */
 	public RFMediumInfo(final byte[] info, final boolean systemBroadcast)
@@ -98,8 +98,8 @@ public final class RFMediumInfo extends AdditionalInfo
 	 * Constructs RF medium info for use in a cEMI .req or .con message, with domain address and S/N
 	 * set 0.
 	 *
-	 * @param batteryOk battery of sender device is OK (<code>true</code>), or weak (
-	 *        <code>false</code>)
+	 * @param batteryOk battery of sender device is OK ({@code true}), or weak (
+	 *        {@code false})
 	 * @param transmitOnlyDevice is sender a transmit-only device (unidirectional), or not
 	 *        (bidirectional)
 	 */
@@ -111,11 +111,11 @@ public final class RFMediumInfo extends AdditionalInfo
 	/**
 	 * Constructs RF medium info for use in a cEMI .req or .con message.
 	 *
-	 * @param batteryOk battery of sender device is OK (<code>true</code>), or weak (
-	 *        <code>false</code>)
+	 * @param batteryOk battery of sender device is OK ({@code true}), or weak (
+	 *        {@code false})
 	 * @param transmitOnlyDevice is sender a transmit-only (unidirectional) or not (bidirectional)
 	 *        device
-	 * @param doA RF domain address, <code>doA.length = 6</code>
+	 * @param doA RF domain address, {@code doA.length = 6}
 	 * @param lfn link-layer frame number, 0 &le; lfn &le; 7, or 0xff (the cEMI server shall insert
 	 *        the value for LFN)
 	 */
@@ -127,9 +127,9 @@ public final class RFMediumInfo extends AdditionalInfo
 	 * Constructs RF medium info for use in a cEMI .req or .con message, setting the system broadcast behavior. Note,
 	 * that system broadcast behavior is not used in the additional information structure for RF.
 	 *
-	 * @param batteryOk battery of sender device is OK (<code>true</code>), or weak (<code>false</code>)
+	 * @param batteryOk battery of sender device is OK ({@code true}), or weak ({@code false})
 	 * @param transmitOnlyDevice is sender a transmit-only (unidirectional) or not (bidirectional) device
-	 * @param doA RF domain address, <code>doA.length = 6</code>
+	 * @param doA RF domain address, {@code doA.length = 6}
 	 * @param lfn link-layer frame number, 0 &le; lfn &le; 7, or 0xff (the cEMI server shall insert
 	 *        the value for LFN)
 	 * @param systemBroadcast {@code true} for system broadcast, {@code false} for domain broadcast
@@ -146,11 +146,11 @@ public final class RFMediumInfo extends AdditionalInfo
 	 * @param sender sender RSS
 	 * @param retransmitter RSS of lowest retransmitter, use {@link RSS#Void} for no
 	 *        retransmitter
-	 * @param batteryOk battery of sender device is OK (<code>true</code>), or weak (
-	 *        <code>false</code>)
+	 * @param batteryOk battery of sender device is OK ({@code true}), or weak (
+	 *        {@code false})
 	 * @param transmitOnlyDevice is sender a transmit-only (unidirectional) or not (bidirectional)
 	 *        device
-	 * @param doA RF domain address, <code>doA.length = 6</code>
+	 * @param doA RF domain address, {@code doA.length = 6}
 	 * @param lfn link-layer frame number, 0 &le; lfn &le; 7
 	 */
 	public RFMediumInfo(final RSS sender, final RSS retransmitter, final boolean batteryOk,

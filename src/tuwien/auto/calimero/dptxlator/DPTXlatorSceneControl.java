@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2013, 2017 B. Malinowsky
+    Copyright (c) 2013, 2022 B. Malinowsky
     Copyright (c) 2013 Juan Ruzafa Millán
 
     This program is free software; you can redistribute it and/or modify
@@ -54,8 +54,8 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * and octal numbers, distinguished by using these prefixes:
  * <ul>
  * <li>no prefix for decimal numeral</li>
- * <li><code>0x</code>, <code>0X</code> or <code>#</code> for hexadecimal numeral</li>
- * <li><code>0</code> for octal numeral</li>
+ * <li>{@code 0x}, {@code 0X} or {@code #} for hexadecimal numeral</li>
+ * <li>{@code 0} for octal numeral</li>
  * </ul>
  *
  * @author Juan Ruzafa Millán
@@ -90,7 +90,7 @@ public class DPTXlatorSceneControl extends DPTXlator
 	 * Creates a translator for the given datapoint type ID.
 	 *
 	 * @param dptID available implemented datapoint type ID
-	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptID</code>
+	 * @throws KNXFormatException on wrong formatted or not expected (available) {@code dptID}
 	 */
 	public DPTXlatorSceneControl(final String dptID) throws KNXFormatException
 	{
@@ -108,8 +108,8 @@ public class DPTXlatorSceneControl extends DPTXlator
 	/**
 	 * Sets one new translation item, replacing any old items.
 	 *
-	 * @param control control bit to activate or learn a scene, <code>false</code> = activate,
-	 *        <code>true</code> = learn
+	 * @param control control bit to activate or learn a scene, {@code false} = activate,
+	 *        {@code true} = learn
 	 * @param scene number, 0 &lt;= scene number &lt;= 63
 	 */
 	public final void setValue(final boolean control, final int scene)

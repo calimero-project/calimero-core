@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ public class KNXFormatException extends KNXException
 	private final String item;
 
 	/**
-	 * Constructs a new <code>KNXFormatException</code> with the specified detail message.
+	 * Constructs a new {@code KNXFormatException} with the specified detail message.
 	 *
 	 * @param s the detail message
 	 */
@@ -59,10 +59,10 @@ public class KNXFormatException extends KNXException
 	}
 
 	/**
-	 * Constructs a new <code>KNXFormatException</code> with the specified detail message and cause.
+	 * Constructs a new {@code KNXFormatException} with the specified detail message and cause.
 	 *
 	 * @param s the detail message
-	 * @param cause the cause in form of a throwable object, can be <code>null</code>
+	 * @param cause the cause in form of a throwable object, can be {@code null}
 	 */
 	public KNXFormatException(final String s, final Throwable cause)
 	{
@@ -71,10 +71,10 @@ public class KNXFormatException extends KNXException
 	}
 
 	/**
-	 * Constructs a new <code>KNXFormatException</code> with the specified detail message and the invalid item.
+	 * Constructs a new {@code KNXFormatException} with the specified detail message and the invalid item.
 	 *
 	 * @param s the detail message
-	 * @param item value, content or piece of information causing this exception (allowed to be <code>null</code>)
+	 * @param item value, content or piece of information causing this exception (allowed to be {@code null})
 	 */
 	public KNXFormatException(final String s, final String item)
 	{
@@ -82,11 +82,11 @@ public class KNXFormatException extends KNXException
 	}
 
 	/**
-	 * Constructs a new <code>KNXFormatException</code> with the specified detail message, invalid item, and cause.
+	 * Constructs a new {@code KNXFormatException} with the specified detail message, invalid item, and cause.
 	 *
 	 * @param s the detail message
-	 * @param item value, content or piece of information causing this exception (allowed to be <code>null</code>)
-	 * @param cause the cause in form of a throwable object, can be <code>null</code>
+	 * @param item value, content or piece of information causing this exception (allowed to be {@code null})
+	 * @param cause the cause in form of a throwable object, can be {@code null}
 	 */
 	public KNXFormatException(final String s, final String item, final Throwable cause)
 	{
@@ -95,8 +95,8 @@ public class KNXFormatException extends KNXException
 	}
 
 	/**
-	 * Constructs a new <code>KNXFormatException</code> with the specified detail message and the invalid item value of
-	 * type int. The <code>item</code> value is formatted into a hexadecimal string representation using the format "0x"
+	 * Constructs a new {@code KNXFormatException} with the specified detail message and the invalid item value of
+	 * type int. The {@code item} value is formatted into a hexadecimal string representation using the format "0x"
 	 * prefix + value (e.g. "0x23" for an item value of hexadecimal 23).
 	 *
 	 * @param s the detail message
@@ -112,7 +112,7 @@ public class KNXFormatException extends KNXException
 	 * Returns the value, content, or piece of information which caused the exception.
 	 * <p>
 	 *
-	 * @return item representation as string, or <code>null</code> if no item was set
+	 * @return item representation as string, or {@code null} if no item was set
 	 */
 	public final String getItem()
 	{

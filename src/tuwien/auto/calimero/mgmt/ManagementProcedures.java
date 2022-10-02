@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -105,7 +105,7 @@ public interface ManagementProcedures extends AutoCloseable
 	 * <p>
 	 * This method corresponds to the KNX <i>NM_IndividualAddress_SerialNumber_Read</i> procedure.
 	 *
-	 * @param serialNo byte array with serial number, <code>serialNo.length</code> = 6
+	 * @param serialNo byte array with serial number, {@code serialNo.length} = 6
 	 * @return the individual address of the device
 	 * @throws KNXTimeoutException on a timeout during send or no address response was received
 	 * @throws KNXInvalidResponseException on invalid read response message
@@ -123,12 +123,12 @@ public interface ManagementProcedures extends AutoCloseable
 	 * <p>
 	 * This method corresponds to the KNX <i>NM_IndividualAddress_Write</i> procedure.<br>
 	 * This procedure verifies that no other devices share the same individual address as
-	 * supplied by <code>newAddress</code>, and waits until exactly one device is in
+	 * supplied by {@code newAddress}, and waits until exactly one device is in
 	 * programming mode. It checks for successful address programming and requests a
 	 * restart of the remote endpoint (thereby switching off its programming).
 	 *
 	 * @param newAddress the new address for the device in programming mode
-	 * @return <code>true</code> if address was written successfully, <code>false</code>
+	 * @return {@code true} if address was written successfully, {@code false}
 	 *         if device with address exists but was not set to programming mode
 	 * @throws KNXException on error attempting to write the new individual device address
 	 * @throws InterruptedException on interrupted thread
@@ -145,9 +145,9 @@ public interface ManagementProcedures extends AutoCloseable
 	 * restart the programmed device.
 	 *
 	 * @param serialNo the device serial number
-	 * @param newAddress the new address for the device identified by <code>serialNo</code>
-	 * @return <code>true</code> if the new address is set and was verified successfully,
-	 *         <code>false</code> if the device reports back a differing (e.g., old) address on verification
+	 * @param newAddress the new address for the device identified by {@code serialNo}
+	 * @return {@code true} if the new address is set and was verified successfully,
+	 *         {@code false} if the device reports back a differing (e.g., old) address on verification
 	 * @throws KNXException on any errors attempting to write or verify the written individual device address
 	 * @throws InterruptedException on interrupted thread
 	 */
@@ -156,10 +156,10 @@ public interface ManagementProcedures extends AutoCloseable
 	/**
 	 * Writes the individual address of a single KNX device with known serial number.
 	 *
-	 * @param serialNo the device serial number, <code>serialNo.length = 6</code>
-	 * @param newAddress the new address for the device identified by <code>serialNo</code>
-	 * @return <code>true</code> if the new address is set and was verified successfully,
-	 *         <code>false</code> if the device reports back a differing (e.g., old) address on verification
+	 * @param serialNo the device serial number, {@code serialNo.length = 6}
+	 * @param newAddress the new address for the device identified by {@code serialNo}
+	 * @return {@code true} if the new address is set and was verified successfully,
+	 *         {@code false} if the device reports back a differing (e.g., old) address on verification
 	 * @throws KNXException on any errors attempting to write or verify the written individual device address
 	 * @throws InterruptedException on interrupted thread
 	 * @see #writeAddress(SerialNumber, IndividualAddress)
@@ -185,13 +185,13 @@ public interface ManagementProcedures extends AutoCloseable
 	void resetAddress() throws KNXException, InterruptedException;
 
 	/**
-	 * Determines whether the supplied <code>devAddr</code> is occupied by a device in the
+	 * Determines whether the supplied {@code devAddr} is occupied by a device in the
 	 * KNX network or not.
 	 * <p>
 	 * This method corresponds to the KNX <i>NM_IndividualAddress_Check</i> procedure.<br>
 	 *
 	 * @param devAddr the individual address to check
-	 * @return <code>true</code> if address is occupied, <code>false</code> if not
+	 * @return {@code true} if address is occupied, {@code false} if not
 	 *         occupied
 	 * @throws KNXException on network or send errors
 	 * @throws InterruptedException on interrupted thread
@@ -243,17 +243,17 @@ public interface ManagementProcedures extends AutoCloseable
 	 * <p>
 	 * This method corresponds to the KNX network management subnetwork devices scan
 	 * procedure <i>NM_SubnetworkDevices_Scan</i>.<br>
-	 * It scans a specific KNX subnetwork, identified by the <code>area</code> and
-	 * <code>line</code> of the KNX network.<br>
+	 * It scans a specific KNX subnetwork, identified by the {@code area} and
+	 * {@code line} of the KNX network.<br>
 	 * For this procedure, the individual address of used routers in the KNX network and
 	 * the domain address have to be configured.
 	 *
 	 * @param area the KNX network area to scan for network devices,
-	 *        <code>0 &le; area &le; 0x0F</code>, devices in the backbone line of areas are
+	 *        {@code 0 ≤ area ≤ 0x0F}, devices in the backbone line of areas are
 	 *        assigned area address 0; for a definition of area, see
 	 *        {@link IndividualAddress}
 	 * @param line the KNX network line to scan for network devices,
-	 *        <code>0 &le; line &le; 0x0F</code>, devices in the main line of an area are
+	 *        {@code 0 ≤ line ≤ 0x0F}, devices in the main line of an area are
 	 *        assigned line address 0; for a definition of line, see
 	 *        {@link IndividualAddress}
 	 * @return an array of {@link IndividualAddress}es of the existing network devices,
@@ -269,14 +269,14 @@ public interface ManagementProcedures extends AutoCloseable
 	/**
 	 * Determines the existing KNX network devices on a specific KNX subnetwork. This method corresponds to the KNX
 	 * network management subnetwork devices scan procedure <i>NM_SubnetworkDevices_Scan</i>. This procedure scans a
-	 * specific KNX subnetwork, identified by the <code>area</code> and <code>line</code> of the KNX network.<br>
+	 * specific KNX subnetwork, identified by the {@code area} and {@code line} of the KNX network.<br>
 	 * For this procedure to work, the individual address (and the domain address for open media) of the used routers in
 	 * the KNX network have to be configured.
 	 *
-	 * @param area the KNX network area to scan for network devices, <code>0 &le; area &le; 0x0F</code>; devices in the
+	 * @param area the KNX network area to scan for network devices, {@code 0 ≤ area ≤ 0x0F}; devices in the
 	 *        backbone line of areas are assigned area address 0. For a definition of area, see
 	 *        {@link IndividualAddress}.
-	 * @param line the KNX network line to scan for network devices, <code>0 &le; line &le; 0x0F</code>; devices in the
+	 * @param line the KNX network line to scan for network devices, {@code 0 ≤ line ≤ 0x0F}; devices in the
 	 *        main line of an area are assigned line address 0. for a definition of line, see {@link IndividualAddress}
 	 * @param device consumer called for every device found during the scan
 	 * @throws KNXLinkClosedException on a closed KNXNetworkLink to the KNX network
@@ -290,14 +290,14 @@ public interface ManagementProcedures extends AutoCloseable
 	/**
 	 * Determines the existing KNX network devices on a specific KNX subnetwork. This method corresponds to the KNX
 	 * network management subnetwork devices scan procedure <i>NM_SubnetworkDevices_Scan</i>. This procedure scans a
-	 * specific KNX subnetwork, identified by the <code>area</code> and <code>line</code> of the KNX network.<br>
+	 * specific KNX subnetwork, identified by the {@code area} and {@code line} of the KNX network.<br>
 	 * For this procedure to work, the individual address (and the domain address for open media) of the used routers in
 	 * the KNX network have to be configured.
 	 *
-	 * @param area the KNX network area to scan for network devices, <code>0 &le; area &le; 0x0F</code>; devices in the
+	 * @param area the KNX network area to scan for network devices, {@code 0 ≤ area ≤ 0x0F}; devices in the
 	 *        backbone line of areas are assigned area address 0. For a definition of area, see
 	 *        {@link IndividualAddress}.
-	 * @param line the KNX network line to scan for network devices, <code>0 &le; line &le; 0x0F</code>; devices in the
+	 * @param line the KNX network line to scan for network devices, {@code 0 ≤ line ≤ 0x0F}; devices in the
 	 *        main line of an area are assigned line address 0. for a definition of line, see {@link IndividualAddress}
 	 * @param device consumer called for every device found during the scan
 	 * @param deviceWithDescriptor consumer called for every device which answers to a device descriptor read during the
@@ -322,12 +322,12 @@ public interface ManagementProcedures extends AutoCloseable
 	 * <li>4: PL 110</li>
 	 * <li>5: RF</li>
 	 * </ul>
-	 * Choose one of the listed entries for the <code>medium</code> parameter.<br>
+	 * Choose one of the listed entries for the {@code medium} parameter.<br>
 	 * Implementation note: The number of each list entry for a medium equals the default subnetwork
 	 * address part for that medium.
 	 *
 	 * @param medium KNX network medium (for the medium-dependent default subnetwork identifier),
-	 *        <code>0 &lt; medium &lt; 6</code>
+	 *        {@code 0 < medium < 6}
 	 * @return a new list with byte arrays of serial numbers, corresponding to KNX devices having
 	 *         the default individual address set
 	 * @throws KNXException on network or reading error obtaining the serial numbers
@@ -358,8 +358,8 @@ public interface ManagementProcedures extends AutoCloseable
 	 * (<i>DMP_ProgModeSwitch_RCo</i>) procedure.<br>
 	 *
 	 * @param device the addressed KNX network device
-	 * @param programming <code>true</code> to set the device into programming mode,
-	 *        <code>false</code> to switch off programming mode
+	 * @param programming {@code true} to set the device into programming mode,
+	 *        {@code false} to switch off programming mode
 	 * @throws KNXException on communication error or device access problems
 	 * @throws InterruptedException on interrupted thread
 	 */
@@ -375,21 +375,21 @@ public interface ManagementProcedures extends AutoCloseable
 	 * <i>DMP_MemWrite_RCoV</i>) procedure.<br>
 	 * This procedure allows to write bigger blocks of contiguous memory, splitting up the data into
 	 * suitable packets for transfer over the KNX network, if necessary.<br>
-	 * The memory is written in the order given by <code>data</code>, starting from
-	 * <code>data[0]</code>, to the device memory, starting from <code>startAddress</code>
+	 * The memory is written in the order given by {@code data}, starting from
+	 * {@code data[0]}, to the device memory, starting from {@code startAddress}
 	 * (inclusive).
 	 *
 	 * @param device the destination device address
 	 * @param startAddress the memory destination start address,
-	 *        <code>0 &le; startAddress &le; 0xFFFFFFFF</code>
-	 * @param data the data to be written, with <code>data.length</code> equal to the number of
+	 *        {@code 0 ≤ startAddress ≤ 0xFFFFFFFF}
+	 * @param data the data to be written, with {@code data.length} equal to the number of
 	 *        bytes to write
-	 * @param verifyWrite <code>true</code> to read back and compare any written memory for
-	 *        equality, <code>false</code> otherwise; if <code>true</code>,
-	 *        <code>verifyByServer</code> has to be set to <code>false</code>
-	 * @param verifyByServer <code>true</code> to enable verification by the management server of
-	 *        any written memory, <code>false</code> otherwise; if <code>true</code>,
-	 *        <code>verifyWrite</code> has to be set to <code>false</code>
+	 * @param verifyWrite {@code true} to read back and compare any written memory for
+	 *        equality, {@code false} otherwise; if {@code true},
+	 *        {@code verifyByServer} has to be set to {@code false}
+	 * @param verifyByServer {@code true} to enable verification by the management server of
+	 *        any written memory, {@code false} otherwise; if {@code true},
+	 *        {@code verifyWrite} has to be set to {@code false}
 	 * @throws KNXException on communication error or device access problems
 	 * @throws InterruptedException on interrupted thread
 	 */
@@ -403,13 +403,13 @@ public interface ManagementProcedures extends AutoCloseable
 	 * This method allows to read bigger blocks of contiguous memory, splitting up the
 	 * data into suitable packets for transfer over the KNX network, if necessary.<br>
 	 * The memory is read in increasing steps of memory addresses, starting from
-	 * <code>startAddress</code> (inclusive).
+	 * {@code startAddress} (inclusive).
 	 *
 	 * @param device the destination device address
 	 * @param startAddress the memory source start address,
-	 *        <code>0 &le; startAddress &le; 0xFFFFFFFF</code>
-	 * @param bytes number of bytes to read, <code>0 &lt; bytes</code>
-	 * @return an array of bytes, with the length of the array equal to <code>bytes</code>
+	 *        {@code 0 ≤ startAddress ≤ 0xFFFFFFFF}
+	 * @param bytes number of bytes to read, {@code 0 < bytes}
+	 * @return an array of bytes, with the length of the array equal to {@code bytes}
 	 * @throws KNXException on communication error or device access problems
 	 * @throws InterruptedException on interrupted thread
 	 */

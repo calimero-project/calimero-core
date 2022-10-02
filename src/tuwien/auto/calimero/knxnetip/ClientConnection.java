@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2021 B. Malinowsky
+    Copyright (c) 2010, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -145,8 +145,8 @@ public abstract class ClientConnection extends ConnectionBase
 	 * @param serverCtrlEP the remote server control endpoint used for connect request
 	 * @param cri connect request information used to configure the communication
 	 *        attributes
-	 * @param useNAT <code>true</code> to use a NAT (network address translation) aware
-	 *        communication mechanism, <code>false</code> to use the default way
+	 * @param useNAT {@code true} to use a NAT (network address translation) aware
+	 *        communication mechanism, {@code false} to use the default way
 	 * @throws KNXException on socket communication error
 	 * @throws KNXTimeoutException on no connect response before connect timeout
 	 * @throws KNXRemoteException if response indicates an error condition at the server
@@ -413,7 +413,7 @@ public abstract class ClientConnection extends ConnectionBase
 	 * {@link ClientConnection#close(int, String, LogLevel, Throwable)} is invoked.
 	 *
 	 * @param h KNX header to check
-	 * @return <code>true</code> on supported version, <code>false</code> otherwise
+	 * @return {@code true} on supported version, {@code false} otherwise
 	 */
 	private boolean checkVersion(final KNXnetIPHeader h)
 	{

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2020 B. Malinowsky
+    Copyright (c) 2010, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -157,20 +157,20 @@ public interface ProcessCommunication extends AutoCloseable
 	Priority getPriority();
 
 	/**
-	 * Adds the specified event listener <code>l</code> to receive events from this
+	 * Adds the specified event listener {@code l} to receive events from this
 	 * process communicator.
 	 * <p>
-	 * If <code>l</code> was already added as listener, no action is performed.
+	 * If {@code l} was already added as listener, no action is performed.
 	 *
 	 * @param l the listener to add
 	 */
 	void addProcessListener(ProcessListener l);
 
 	/**
-	 * Removes the specified event listener <code>l</code>, so it does no longer
+	 * Removes the specified event listener {@code l}, so it does no longer
 	 * receive events from this process communicator.
 	 * <p>
-	 * If <code>l</code> was not added in the first place, no action is performed.
+	 * If {@code l} was not added in the first place, no action is performed.
 	 *
 	 * @param l the listener to remove
 	 */
@@ -228,8 +228,8 @@ public interface ProcessCommunication extends AutoCloseable
 	 * @param dst group destination to write to
 	 * @param value float value to write
 	 * @param use4ByteFloat specifies the float type of the datapoint; either writes a 2-byte KNX
-	 *        float of DPT main number 9 (<code>false</code>), or a 4-byte float of DPT main number
-	 *        14 (<code>true</code>)
+	 *        float of DPT main number 9 ({@code false}), or a 4-byte float of DPT main number
+	 *        14 ({@code true})
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXFormatException on translation problem of the supplied datapoint value
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
@@ -282,7 +282,7 @@ public interface ProcessCommunication extends AutoCloseable
 	 * <p>
 	 * If no network link is attached, no action is performed.
 	 *
-	 * @return the formerly attached KNX network link, or <code>null</code> if already detached
+	 * @return the formerly attached KNX network link, or {@code null} if already detached
 	 */
 	KNXNetworkLink detach();
 

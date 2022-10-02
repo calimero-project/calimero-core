@@ -1283,8 +1283,8 @@ public class ManagementClientImpl implements ManagementClient
 	 * @param maxAsduLen maximum accepted asdu length of a response
 	 * @param start timestamp obtained by {@link #send(Destination, Priority, byte[], int)}
 	 * @param timeout maximum time this method will wait for responses
-	 * @param oneResponseOnly <code>true</code> if this method should return with the first valid response,
-	 *        <code>false</code> to await the specified {@code timeout}
+	 * @param oneResponseOnly {@code true} if this method should return with the first valid response,
+	 *        {@code false} to await the specified {@code timeout}
 	 * @param responseFilter filter a response according to its content, the filter parameters are the response source address and apdu
 	 * @return list of accepted responses
 	 * @throws KNXInvalidResponseException

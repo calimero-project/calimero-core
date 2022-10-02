@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,8 +55,8 @@ public class TunnelCRI extends CRI
 	/**
 	 * Creates a new CRI for tunnel connection type out of a byte array. The CRI structure has a length of 4 or 6 bytes.
 	 *
-	 * @param data byte array containing a CRI structure, <code>data.length - offset = 4 or 6</code>
-	 * @param offset start offset of CRI in <code>data</code>
+	 * @param data byte array containing a CRI structure, {@code data.length - offset = 4 or 6}
+	 * @param offset start offset of CRI in {@code data}
 	 * @throws KNXFormatException if no CRI found or invalid structure
 	 */
 	public TunnelCRI(final byte[] data, final int offset) throws KNXFormatException
@@ -97,7 +97,7 @@ public class TunnelCRI extends CRI
 	 *
 	 * @param optionalData byte array containing tunneling host protocol data, this
 	 *        information is located starting at offset 2 in the CRI structure,
-	 *        <code>optionalData.length</code> = 2
+	 *        {@code optionalData.length} = 2
 	 */
 	TunnelCRI(final byte[] optionalData)
 	{

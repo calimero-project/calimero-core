@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ import tuwien.auto.calimero.xml.XmlWriter;
 
 /**
  * Represents a KNX address, consisting of a 16 Bit unsigned value. Concrete implementations of address are
- * {@link GroupAddress} and {@link IndividualAddress}. Instances of <code>KNXAddress</code> are immutable.<br>
+ * {@link GroupAddress} and {@link IndividualAddress}. Instances of {@code KNXAddress} are immutable.<br>
  * Loading and saving KNX addresses in XML format is supported.
  */
 public abstract class KNXAddress implements Comparable<KNXAddress>
@@ -70,7 +70,7 @@ public abstract class KNXAddress implements Comparable<KNXAddress>
 	 * Creates a KNX address from a byte array.
 	 * <p>
 	 * The address is read out of the first 2 byte fields, while the address array itself might be longer. The content
-	 * of <code>address</code> is not modified.
+	 * of {@code address} is not modified.
 	 *
 	 * @param address the address byte array in big-endian format, with address.length &ge; 2
 	 */
@@ -131,9 +131,9 @@ public abstract class KNXAddress implements Comparable<KNXAddress>
 	}
 
 	/**
-	 * Creates a KNX address from a string <code>address</code> representation.
+	 * Creates a KNX address from a string {@code address} representation.
 	 * <p>
-	 * An address level separator of type '.' found in <code>address</code> indicates an individual address, i.e., an
+	 * An address level separator of type '.' found in {@code address} indicates an individual address, i.e., an
 	 * {@link IndividualAddress} is created, otherwise a {@link GroupAddress} is created.<br>
 	 * Allowed separators are '.' or '/', mutually exclusive.
 	 *

@@ -45,7 +45,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * Translator for KNX DPTs with main number 1, type <b>Boolean</b>.
  * <p>
  * The KNX data type width is the lowest bit of 1 byte.<br>
- * The default return value after creation is <code>0</code>, i.e., <code>false</code>
+ * The default return value after creation is {@code 0}, i.e., {@code false}
  * for DPT Boolean for example.
  *
  * @author B. Malinowsky
@@ -218,7 +218,7 @@ public class DPTXlatorBoolean extends DPTXlator
 	 *
 	 * @param dptID available implemented datapoint type ID
 	 * @throws KNXFormatException on wrong formatted or not expected (available)
-	 *         <code>dptID</code>
+	 *         {@code dptID}
 	 */
 	public DPTXlatorBoolean(final String dptID) throws KNXFormatException
 	{
@@ -280,8 +280,8 @@ public class DPTXlatorBoolean extends DPTXlator
 	}
 
 	/**
-	 * Returns the value of the first translation item, using 0 for boolean <code>false</code> and 1
-	 * for boolean <code>true</code>.
+	 * Returns the value of the first translation item, using 0 for boolean {@code false} and 1
+	 * for boolean {@code true}.
 	 *
 	 * @return 0 for boolean false and 1 for boolean true
 	 * @see tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()

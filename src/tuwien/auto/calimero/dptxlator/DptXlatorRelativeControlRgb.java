@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2020, 2021 B. Malinowsky
+    Copyright (c) 2020, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ import tuwien.auto.calimero.KNXFormatException;
 /**
  * Translator for KNX DPTs with main number 254, type <b>relative control RGB</b>. The KNX data
  * type width is 3 bytes. The default return value after creation is the value with all color components stop fading
- * (<code>break break break</code>).
+ * ({@code break break break}).
  */
 public class DptXlatorRelativeControlRgb extends DPTXlator {
 	public static final String Description = "relative control RGB";
@@ -86,7 +86,7 @@ public class DptXlatorRelativeControlRgb extends DPTXlator {
 	 * Creates a translator for the given datapoint type ID.
 	 *
 	 * @param dptId available implemented datapoint type ID
-	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptId</code>
+	 * @throws KNXFormatException on wrong formatted or not expected (available) {@code dptId}
 	 */
 	public DptXlatorRelativeControlRgb(final String dptId) throws KNXFormatException {
 		super(3);

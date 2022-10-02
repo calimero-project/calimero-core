@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -171,7 +171,7 @@ public interface ProcessListener extends EventListener
 	}
 
 	/**
-	 * Returns the ASDU of the received process event, containing a value of DPT <code>dptId</code>, translated as
+	 * Returns the ASDU of the received process event, containing a value of DPT {@code dptId}, translated as
 	 * String representation.
 	 * <p>
 	 * This method has to be invoked manually by the user (either in {@link #groupReadResponse(ProcessEvent)} or
@@ -189,7 +189,7 @@ public interface ProcessListener extends EventListener
 	}
 
 	/**
-	 * Returns the ASDU of the received process event, containing a value of <code>dptID</code>, as String
+	 * Returns the ASDU of the received process event, containing a value of {@code dptID}, as String
 	 * representation.
 	 * <p>
 	 * This method has to be invoked manually by the user (either in {@link #groupReadResponse(ProcessEvent)} or
@@ -197,7 +197,7 @@ public interface ProcessListener extends EventListener
 	 *
 	 * @param e the process event with the ASDU to translate
 	 * @param dptMainNumber datapoint type main number, number &ge; 0; use 0 to infer translator type from
-	 *        <code>dptID</code> argument only
+	 *        {@code dptID} argument only
 	 * @param dptID datapoint type ID for selecting a particular kind of value translation
 	 * @return the received value of the requested type as String representation
 	 * @throws KNXException on not supported or not available DPT

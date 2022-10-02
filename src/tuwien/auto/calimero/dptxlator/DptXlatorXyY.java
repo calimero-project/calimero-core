@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2021 B. Malinowsky
+    Copyright (c) 2018, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 /**
  * Translator for KNX DPTs with main number 242, type <b>color xyY</b>. The KNX data type width is 6 bytes. The default
- * return value after creation is the value with all components invalid (<code>""</code>).
+ * return value after creation is the value with all components invalid ({@code ""}).
  * <p>
  * In value methods expecting string items, x, y, and brightness are parsed as floating point value.
  */
@@ -86,7 +86,7 @@ public class DptXlatorXyY extends DPTXlator {
 	 * Creates a translator for the given datapoint type ID.
 	 *
 	 * @param dptId available implemented datapoint type ID
-	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptId</code>
+	 * @throws KNXFormatException on wrong formatted or not expected (available) {@code dptId}
 	 */
 	public DptXlatorXyY(final String dptId) throws KNXFormatException {
 		super(6);
@@ -119,9 +119,9 @@ public class DptXlatorXyY extends DPTXlator {
 	/**
 	 * Sets one new translation item, replacing any old items.
 	 *
-	 * @param x x coordinate, <code>0 &le; x &le; 1</code>
-	 * @param y y coordinate, <code>0 &le; y &le; 1</code>
-	 * @param brightness absolute brightness <code>0 &le; brightness &le; 100 %</code>
+	 * @param x x coordinate, {@code 0 ≤ x ≤ 1}
+	 * @param y y coordinate, {@code 0 ≤ y ≤ 1}
+	 * @param brightness absolute brightness {@code 0 ≤ brightness ≤ 100 %}
 	 */
 	public final void setValue(final double x, final double y, final double brightness) {
 		toDpt(x, y, brightness);

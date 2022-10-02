@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -93,7 +93,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 	 * <p>
 	 * The listener will replace any previously set listener.
 	 *
-	 * @param l the listener to set, use <code>null</code> for no listener
+	 * @param l the listener to set, use {@code null} for no listener
 	 */
 	public void setQueueListener(final Consumer<LDataObjectQueue> l)
 	{
@@ -104,8 +104,8 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 	 * Returns whether new indications are available.
 	 * <p>
 	 *
-	 * @return <code>true</code> if at least one indication is available,
-	 *         <code>false</code> otherwise
+	 * @return {@code true} if at least one indication is available,
+	 *         {@code false} otherwise
 	 */
 	public boolean hasNewIndication()
 	{
@@ -121,7 +121,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 	 * time they were supplied to the filter and buffered in the first place, i.e., an
 	 * earlier accepted frame is returned before a frame accepted at some later time.<br>
 	 * Every item is only returned once by this method, after that it is no longer marked
-	 * as new and will not cause {@link #hasNewIndication()} to return <code>true</code>
+	 * as new and will not cause {@link #hasNewIndication()} to return {@code true}
 	 * for it.<br>
 	 * If no indication is available, throws {@link java.util.NoSuchElementException}.
 	 * <p>

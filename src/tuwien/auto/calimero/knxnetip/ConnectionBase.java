@@ -172,7 +172,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	}
 
 	/**
-	 * If <code>mode</code> is {@link BlockingMode#WaitForCon} or {@link BlockingMode#WaitForAck}, the sequence
+	 * If {@code mode} is {@link BlockingMode#WaitForCon} or {@link BlockingMode#WaitForAck}, the sequence
 	 * order of more {@link #send(CEMI, BlockingMode)} calls from different threads is being maintained according to
 	 * invocation order (FIFO).<br>
 	 * Calling send blocks until any previous invocation finished, then communication proceeds according to the protocol
@@ -359,7 +359,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 
 	/**
 	 * Fires a frame received event ({@link KNXListener#frameReceived(FrameEvent)}) for the supplied cEMI
-	 * <code>frame</code>.
+	 * {@code frame}.
 	 *
 	 * @param frame the cEMI to generate the event for
 	 */
@@ -385,7 +385,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	 * @param offset datagram data start offset
 	 * @param src sender IP address
 	 * @param port sender UDP port
-	 * @return <code>true</code> if service type was known and handled (successfully or not), <code>false</code>
+	 * @return {@code true} if service type was known and handled (successfully or not), {@code false}
 	 *         otherwise
 	 * @throws KNXFormatException on service type parsing or data format errors
 	 * @throws IOException on socket problems
@@ -440,7 +440,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	 * @param initiator one of the constants of {@link CloseEvent}
 	 * @param reason short text statement why close was called on this connection
 	 * @param level log level to use for logging, adjust this to the reason of closing this connection
-	 * @param t a throwable, to pass to the logger if the close event was caused by some error, can be <code>null</code>
+	 * @param t a throwable, to pass to the logger if the close event was caused by some error, can be {@code null}
 	 */
 	protected void close(final int initiator, final String reason, final LogLevel level, final Throwable t)
 	{
@@ -481,7 +481,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	 * @param initiator one of the constants of {@link CloseEvent}
 	 * @param reason short text statement why close was called on this connection
 	 * @param level log level to use for logging, adjust this to the reason of closing this connection
-	 * @param t a throwable, to pass to the logger if the close event was caused by some error, can be <code>null</code>
+	 * @param t a throwable, to pass to the logger if the close event was caused by some error, can be {@code null}
 	 */
 	protected void cleanup(final int initiator, final String reason, final LogLevel level, final Throwable t)
 	{
@@ -504,7 +504,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	 *
 	 * @param id received id to check
 	 * @param svcType packet service type
-	 * @return <code>true</code> if valid, <code>false</code> otherwise
+	 * @return {@code true} if valid, {@code false} otherwise
 	 */
 	protected boolean checkChannelId(final int id, final String svcType)
 	{

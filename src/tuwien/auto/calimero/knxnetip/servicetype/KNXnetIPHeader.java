@@ -215,8 +215,8 @@ public class KNXnetIPHeader
 	 * Creates a new KNXnet/IP header by reading in the header of a KNXnet/IP frame.
 	 *
 	 * @param frame byte array with contained KNXnet/IP frame
-	 * @param offset start offset of KNXnet/IP header structure in <code>frame</code>
-	 * @throws KNXFormatException if <code>frame</code> is too short for header, on
+	 * @param offset start offset of KNXnet/IP header structure in {@code frame}
+	 * @throws KNXFormatException if {@code frame} is too short for header, on
 	 *         wrong header size or not supported KNXnet/IP protocol version
 	 */
 	public KNXnetIPHeader(final byte[] frame, final int offset) throws KNXFormatException

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ public class KNXIllegalArgumentException extends KnxRuntimeException
 	private final String arg;
 
 	/**
-	 * Constructs a new <code>KNXIllegalArgumentException</code> with the specified detail message.
+	 * Constructs a new {@code KNXIllegalArgumentException} with the specified detail message.
 	 *
 	 * @param s the detail message
 	 */
@@ -59,7 +59,7 @@ public class KNXIllegalArgumentException extends KnxRuntimeException
 	}
 
 	/**
-	 * Constructs a new <code>KNXIllegalArgumentException</code> with the specified detail message and cause.
+	 * Constructs a new {@code KNXIllegalArgumentException} with the specified detail message and cause.
 	 *
 	 * @param s the detail message
 	 * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method).
@@ -73,7 +73,7 @@ public class KNXIllegalArgumentException extends KnxRuntimeException
 	/**
 	 * Returns the argument which caused the exception.
 	 *
-	 * @return argument as string, or <code>null</code> if no argument was set
+	 * @return argument as string, or {@code null} if no argument was set
 	 */
 	public final String getArgument()
 	{

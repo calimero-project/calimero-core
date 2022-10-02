@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
 /**
  * Connection response data used for KNX tunneling connection.
  * <p>
- * 
+ *
  * @author B. Malinowsky
  */
 public class TunnelCRD extends CRD
@@ -53,10 +53,10 @@ public class TunnelCRD extends CRD
 	 * Creates a new CRD for tunnel connection type out of a byte array.
 	 * <p>
 	 * The CRD structure has a length of 4 bytes.<br>
-	 * 
+	 *
 	 * @param data byte array containing a CRD structure,
-	 *        <code>data.length - offset = 4</code>
-	 * @param offset start offset of CRD in <code>data</code>
+	 *        {@code data.length - offset = 4}
+	 * @param offset start offset of CRD in {@code data}
 	 * @throws KNXFormatException if no CRD found or invalid structure
 	 */
 	public TunnelCRD(final byte[] data, final int offset) throws KNXFormatException
@@ -72,7 +72,7 @@ public class TunnelCRD extends CRD
 	 * Creates a new CRD for tunnel connection type containing the given address
 	 * information.
 	 * <p>
-	 * 
+	 *
 	 * @param addr individual address assigned to the tunneling connection
 	 */
 	public TunnelCRD(final IndividualAddress addr)
@@ -84,10 +84,10 @@ public class TunnelCRD extends CRD
 	 * Creates a CRD for tunnel connection type containing optional data.
 	 * <p>
 	 * Note, the optional data field contains the assigned individual address.<br>
-	 * 
+	 *
 	 * @param optionalData byte array containing tunneling host protocol data, this
 	 *        information is located starting at offset 2 in the CRD structure,
-	 *        <code>optionalData.length</code> = 2
+	 *        {@code optionalData.length} = 2
 	 */
 	TunnelCRD(final byte[] optionalData)
 	{
@@ -99,7 +99,7 @@ public class TunnelCRD extends CRD
 	/**
 	 * Returns the assigned address for the tunneling connection.
 	 * <p>
-	 * 
+	 *
 	 * @return individual address as {@link IndividualAddress}
 	 */
 	public final IndividualAddress getAssignedAddress()
@@ -110,7 +110,7 @@ public class TunnelCRD extends CRD
 	/**
 	 * Returns a textual representation of this tunnel CRD.
 	 * <p>
-	 * 
+	 *
 	 * @return a string representation of the object
 	 */
 	@Override

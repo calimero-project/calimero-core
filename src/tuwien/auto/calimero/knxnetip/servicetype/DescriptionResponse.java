@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -87,8 +87,8 @@ public class DescriptionResponse extends ServiceType
 	 * Creates a new description response out of a byte array.
 	 *
 	 * @param data byte array containing a description response structure
-	 * @param offset start offset of response in <code>data</code>
-	 * @param length usable length of <code>data</code>, <code>0 &lt; length &le; (data.length - offset)</code>
+	 * @param offset start offset of response in {@code data}
+	 * @param length usable length of {@code data}, {@code 0 < length ≤ (data.length - offset)}
 	 * @throws KNXFormatException if no description response was found or invalid structure of DIBs carried in the
 	 *         response
 	 */

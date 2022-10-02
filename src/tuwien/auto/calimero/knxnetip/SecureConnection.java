@@ -138,7 +138,7 @@ public final class SecureConnection {
 	 * @param mcGroup a valid KNX multicast address (see {@link KNXnetIPRouting#isValidRoutingMulticast(InetAddress)}
 	 * @param groupKey secure group key (backbone key), {@code groupKey.length == 16}
 	 * @param latencyTolerance the acceptance window for incoming secure multicasts having a past multicast timer value;
-	 *        <code>0 &lt; latencyTolerance.toMillis() &le; 8000</code>, depending on max. end-to-end network latency
+	 *        {@code 0 < latencyTolerance.toMillis() ≤ 8000}, depending on max. end-to-end network latency
 	 * @return new secure routing connection
 	 * @throws KNXException if creation or initialization of the multicast socket failed
 	 */

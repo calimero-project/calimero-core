@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -102,7 +102,7 @@ public interface PropertyAdapter extends AutoCloseable
 	/**
 	 * Returns whether this adapter can be used for property access and is not closed.
 	 *
-	 * @return <code>true</code> if adapter open, <code>false</code> if closed
+	 * @return {@code true} if adapter open, {@code false} if closed
 	 */
 	boolean isOpen();
 

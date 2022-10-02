@@ -74,7 +74,7 @@ public class RoutingSystemBroadcast extends ServiceType {
 	 * Creates a routing system broadcast from a byte array.
 	 *
 	 * @param data byte array containing an indication structure
-	 * @param offset start offset of indication in <code>data</code>
+	 * @param offset start offset of indication in {@code data}
 	 * @param length length in bytes of whole indication structure
 	 * @throws KNXFormatException if the contained cEMI frame could not be created or is not a valid system broadcast
 	 */

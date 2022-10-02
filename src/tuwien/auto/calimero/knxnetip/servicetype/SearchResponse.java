@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ public class SearchResponse extends ServiceType
 	 *
 	 * @param h KNXnet/IP header preceding the search response in the byte array
 	 * @param data byte array containing a search response
-	 * @param offset start offset of response in <code>data</code>
+	 * @param offset start offset of response in {@code data}
 	 * @return search response
 	 * @throws KNXFormatException on wrong structure size or invalid host protocol address information
 	 */
@@ -86,8 +86,8 @@ public class SearchResponse extends ServiceType
 	 * Creates a new search response out of a byte array.
 	 *
 	 * @param data byte array containing a search response structure
-	 * @param offset start offset of response in <code>data</code>
-	 * @param length usable length of <code>data</code>, <code>0 &lt; length &le; (data.length - offset)</code>
+	 * @param offset start offset of response in {@code data}
+	 * @param length usable length of {@code data}, {@code 0 < length ≤ (data.length - offset)}
 	 * @throws KNXFormatException if no search response was found or invalid structure
 	 */
 	public SearchResponse(final byte[] data, final int offset, final int length) throws KNXFormatException

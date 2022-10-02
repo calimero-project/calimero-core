@@ -1,7 +1,7 @@
 /*
     Calimero 2 - A library for KNX network access
     Copyright (c) 2005 B. Erb
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ import tuwien.auto.calimero.knxnetip.util.HPAI;
  * The counterpart sent in reply to this request is a disconnect response.
  * <p>
  * Objects of this type are immutable.
- * 
+ *
  * @author B. Malinowsky
  * @author Bernhard Erb
  * @see tuwien.auto.calimero.knxnetip.servicetype.DisconnectResponse
@@ -64,9 +64,9 @@ public class DisconnectRequest extends ServiceType
 	/**
 	 * Creates a disconnect request out of a byte array.
 	 * <p>
-	 * 
+	 *
 	 * @param data byte array containing a disconnect request structure
-	 * @param offset start offset of request in <code>data</code>
+	 * @param offset start offset of request in {@code data}
 	 * @throws KNXFormatException if no disconnect request was found or invalid structure
 	 */
 	public DisconnectRequest(final byte[] data, final int offset) throws KNXFormatException
@@ -84,7 +84,7 @@ public class DisconnectRequest extends ServiceType
 	/**
 	 * Creates a new disconnect request for the connection identified by the channel ID.
 	 * <p>
-	 * 
+	 *
 	 * @param channelID communication channel ID uniquely identifying the connection to
 	 *        close
 	 * @param ctrlEndpoint client control endpoint used for disconnect response
@@ -101,7 +101,7 @@ public class DisconnectRequest extends ServiceType
 	/**
 	 * Returns the communication channel identifier of the connection being closed.
 	 * <p>
-	 * 
+	 *
 	 * @return The communication channel ID as unsigned byte
 	 */
 	public final int getChannelID()
@@ -112,7 +112,7 @@ public class DisconnectRequest extends ServiceType
 	/**
 	 * Returns the client control endpoint.
 	 * <p>
-	 * 
+	 *
 	 * @return control endpoint in a HPAI
 	 */
 	public final HPAI getEndpoint()

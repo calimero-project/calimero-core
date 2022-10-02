@@ -52,8 +52,8 @@ import tuwien.auto.calimero.KNXFormatException;
  * numbers, distinguished by using these prefixes:
  * <dl>
  * <dt>no prefix</dt><dd>for decimal numeral</dd>
- * <dt><code>0x</code>, <code>0X</code>, <code>#</code><dd>for hexadecimal numeral</dd>
- * <dt><code>0</code><dd>for octal numeral</dd>
+ * <dt>{@code 0x}, {@code 0X}, {@code #}<dd>for hexadecimal numeral</dd>
+ * <dt>{@code 0}<dd>for octal numeral</dd>
  * </dl>
  */
 public class DptXlator2ByteSigned extends DPTXlator
@@ -134,7 +134,7 @@ public class DptXlator2ByteSigned extends DPTXlator
 	 * Creates a translator for the given datapoint type ID.
 	 *
 	 * @param dptId available implemented datapoint type ID
-	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptId</code>
+	 * @throws KNXFormatException on wrong formatted or not expected (available) {@code dptId}
 	 */
 	public DptXlator2ByteSigned(final String dptId) throws KNXFormatException
 	{

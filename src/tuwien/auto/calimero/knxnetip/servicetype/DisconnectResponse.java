@@ -1,7 +1,7 @@
 /*
     Calimero 2 - A library for KNX network access
     Copyright (c) 2005 B. Erb
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ public class DisconnectResponse extends ServiceType
 	 * Creates a disconnect response out of a byte array.
 	 *
 	 * @param data byte array containing a disconnect response structure
-	 * @param offset start offset of response in <code>data</code>
+	 * @param offset start offset of response in {@code data}
 	 * @throws KNXFormatException if found structure is too short
 	 */
 	public DisconnectResponse(final byte[] data, final int offset) throws KNXFormatException

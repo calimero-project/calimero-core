@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ public final class DataUnitBuilder
 	/**
 	 * Returns the application layer service of a given protocol data unit.
 	 *
-	 * @param apdu application layer protocol data unit, requires <code>apdu.length</code> &gt; 1
+	 * @param apdu application layer protocol data unit, requires {@code apdu.length} &gt; 1
 	 * @return APDU service code
 	 */
 	public static int getAPDUService(final byte[] apdu)
@@ -157,7 +157,7 @@ public final class DataUnitBuilder
 	 * length-optimized (compact) APDU, refer to {@link #createLengthOptimizedAPDU(int, byte[])}.
 	 *
 	 * @param service application layer service code
-	 * @param asdu application layer service data unit, <code>asdu.length</code> &lt; 255
+	 * @param asdu application layer service data unit, {@code asdu.length} &lt; 255
 	 * @return APDU as byte array
 	 */
 	public static byte[] createAPDU(final int service, final byte... asdu)
@@ -177,10 +177,10 @@ public final class DataUnitBuilder
 	 * code and a service data unit.
 	 * <p>
 	 * The transport layer bits in the first byte (TL / AL control field) are set 0. If the compact
-	 * APDU shall not contain any ASDU information, <code>asdu</code> can be left <code>null</code>.
+	 * APDU shall not contain any ASDU information, {@code asdu} can be left {@code null}.
 	 *
 	 * @param service application layer service code
-	 * @param asdu application layer service data unit, <code>asdu.length</code> &lt; 255
+	 * @param asdu application layer service data unit, {@code asdu.length} &lt; 255
 	 * @return APDU as byte array
 	 */
 	public static byte[] createLengthOptimizedAPDU(final int service, final byte... asdu)
@@ -278,7 +278,7 @@ public final class DataUnitBuilder
 	 *
 	 * @param tpdu transport layer protocol data unit to decode
 	 * @param dst KNX destination address belonging to the TPDU, might be
-	 *        <code>null</code>
+	 *        {@code null}
 	 * @return textual representation of control information in the TPDU
 	 */
 	public static String decode(final byte[] tpdu, final KNXAddress dst)
@@ -297,7 +297,7 @@ public final class DataUnitBuilder
 	 *
 	 * @param tpci transport layer protocol control information
 	 * @param dst KNX destination address belonging to the tpci, might be
-	 *        <code>null</code>
+	 *        {@code null}
 	 * @return textual representation of TPCI
 	 */
 	public static String decodeTPCI(final int tpci, final KNXAddress dst)
@@ -467,13 +467,13 @@ public final class DataUnitBuilder
 	}
 
 	/**
-	 * Returns the content of <code>data</code> as unsigned bytes in hexadecimal string
+	 * Returns the content of {@code data} as unsigned bytes in hexadecimal string
 	 * representation.
 	 * <p>
 	 * This method does not add hexadecimal prefixes (like 0x).
 	 *
 	 * @param data data array to format
-	 * @param sep separator to insert between 2 formatted data bytes, <code>null</code>
+	 * @param sep separator to insert between 2 formatted data bytes, {@code null}
 	 *        or "" for no gap between byte tokens
 	 * @return an unsigned hexadecimal string of data
 	 */
@@ -492,12 +492,12 @@ public final class DataUnitBuilder
 	}
 
 	/**
-	 * Parses <code>hex</code> as unsigned hexadecimal value into a byte array. Input containing space characters
+	 * Parses {@code hex} as unsigned hexadecimal value into a byte array. Input containing space characters
 	 * (ASCII code 0x20) is treated as if the spaces are non-existent.
 	 *
-	 * @param hex hexadecimal string representation, without any hexadecimal prefixes (like 0x); <code>hex.length</code>
+	 * @param hex hexadecimal string representation, without any hexadecimal prefixes (like 0x); {@code hex.length}
 	 *        (ignoring spaces) has to be even
-	 * @return byte array containing the parsed value, with array length equal to <code>hex.length / 2</code> (not
+	 * @return byte array containing the parsed value, with array length equal to {@code hex.length / 2} (not
 	 * considering any spaces)
 	 */
 	public static byte[] fromHex(final String hex) {

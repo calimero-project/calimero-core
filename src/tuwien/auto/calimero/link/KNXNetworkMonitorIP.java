@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -70,9 +70,9 @@ public class KNXNetworkMonitorIP extends AbstractMonitor<KNXnetIPConnection>
 	 * Creates a new network monitor based on the KNXnet/IP protocol for accessing the KNX network.
 	 *
 	 * @param localEP the local control endpoint to use for the link, supply the wildcard address to use a local IP on
-	 *        the same subnet as <code>remoteEP</code> and an ephemeral port number
+	 *        the same subnet as {@code remoteEP} and an ephemeral port number
 	 * @param remoteEP the remote endpoint of the link; this is the server control endpoint
-	 * @param useNAT <code>true</code> to use network address translation in the KNXnet/IP protocol, <code>false</code>
+	 * @param useNAT {@code true} to use network address translation in the KNXnet/IP protocol, {@code false}
 	 *        to use the default (non aware) mode
 	 * @param settings medium settings defining the specific KNX medium needed for decoding raw frames received from the
 	 *        KNX network

@@ -488,7 +488,7 @@ public final class Keyring {
 	 * Verifies the keyring signature using the supplied keyring password.
 	 *
 	 * @param keyringPassword keyring password used for keyring encryption
-	 * @return <code>true</code> if signature is valid, <code>false</code> otherwise
+	 * @return {@code true} if signature is valid, {@code false} otherwise
 	 * @throws KNXMLException on XML parsing errors during signature verification
 	 * @throws KnxSecureException if generating the secret key for the password hash fails
 	 */

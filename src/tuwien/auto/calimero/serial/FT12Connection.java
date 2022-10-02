@@ -171,7 +171,7 @@ public class FT12Connection implements Connection<byte[]>
 	 * {@link FT12Connection#FT12Connection(String)}.<br>
 	 * The baud rate is set to 19200.<br>
 	 * The associated log service to which the created instance will output logging events
-	 * is named "calimero.serial.ft12:<code>portId</code>", with <code>portId</code> being the
+	 * is named "calimero.serial.ft12:{@code portId}", with {@code portId} being the
 	 * port identifier created from {@code portNumber}.
 	 *
 	 * @param portNumber port number of the serial communication port to use; mapped to
@@ -190,7 +190,7 @@ public class FT12Connection implements Connection<byte[]>
 	 * <p>
 	 * The baud rate is set to 19200.<br>
 	 * The associated log service to which the created instance will output logging events
-	 * is named "calimero.serial.ft12:<code>portId</code>", with <code>portId</code> being the supplied
+	 * is named "calimero.serial.ft12:{@code portId}", with {@code portId} being the supplied
 	 * port identifier.
 	 *
 	 * @param portId port identifier of the serial communication port to use
@@ -232,7 +232,7 @@ public class FT12Connection implements Connection<byte[]>
 	 *
 	 * @param portId port identifier of the serial communication port to use
 	 * @param baudrate baud rate to use for communication, 0 &lt; baud rate
-	 * @param cemi <code>true</code> if connection uses cEMI frames, <code>false</code> otherwise
+	 * @param cemi {@code true} if connection uses cEMI frames, {@code false} otherwise
 	 * @throws KNXException on port not found or access error, initializing port settings
 	 *         failed, if reset of BCU2 failed
 	 * @throws InterruptedException on interrupted thread while creating the FT1.2 connection
@@ -282,10 +282,10 @@ public class FT12Connection implements Connection<byte[]>
 	}
 
 	/**
-	 * Adds the specified event listener <code>l</code> to receive events from this
+	 * Adds the specified event listener {@code l} to receive events from this
 	 * connection.
 	 * <p>
-	 * If <code>l</code> was already added as listener, no action is performed.
+	 * If {@code l} was already added as listener, no action is performed.
 	 *
 	 * @param l the listener to add
 	 */
@@ -296,10 +296,10 @@ public class FT12Connection implements Connection<byte[]>
 	}
 
 	/**
-	 * Removes the specified event listener <code>l</code>, so it does no longer receive
+	 * Removes the specified event listener {@code l}, so it does no longer receive
 	 * events from this connection.
 	 * <p>
-	 * If <code>l</code> was not added in the first place, no action is performed.
+	 * If {@code l} was not added in the first place, no action is performed.
 	 *
 	 * @param l the listener to remove
 	 */
@@ -381,11 +381,11 @@ public class FT12Connection implements Connection<byte[]>
 	 * prevent another send call from a listener.
 	 *
 	 * @param frame EMI message to send, length of frame &lt; 256 bytes
-	 * @param blocking <code>true</code> to block for confirmation (ACK),
-	 *        <code>false</code> to immediately return after send
-	 * @throws KNXAckTimeoutException in <code>blocking</code> mode, if a timeout
+	 * @param blocking {@code true} to block for confirmation (ACK),
+	 *        {@code false} to immediately return after send
+	 * @throws KNXAckTimeoutException in {@code blocking} mode, if a timeout
 	 *         regarding the frame acknowledgment message was encountered
-	 * @throws KNXTimeoutException in <code>blocking</code> mode, if a timeout
+	 * @throws KNXTimeoutException in {@code blocking} mode, if a timeout
 	 *         regarding the frame confirmation message was encountered
 	 * @throws KNXPortClosedException if no communication was established in the first
 	 *         place or communication was closed
@@ -819,7 +819,7 @@ public class FT12Connection implements Connection<byte[]>
 
 		/**
 		 * Fires a frame received event ({@link KNXListener#frameReceived(FrameEvent)})
-		 * for the supplied EMI2 <code>frame</code>.
+		 * for the supplied EMI2 {@code frame}.
 		 *
 		 * @param frame the EMI2 L-data frame to generate the event for
 		 */

@@ -61,7 +61,7 @@ public interface ManagementClient extends AutoCloseable
 	/**
 	 * @deprecated Use {@link #responseTimeout(Duration)}
 	 *
-	 * @param timeout time in seconds, <code>timeout &gt; 0</code>
+	 * @param timeout time in seconds, {@code timeout > 0}
 	 */
 	@Deprecated(forRemoval = true)
 	default void setResponseTimeout(final int timeout) { responseTimeout(Duration.ofSeconds(timeout)); }
@@ -84,7 +84,7 @@ public interface ManagementClient extends AutoCloseable
 	/**
 	 * Sets the response timeout to wait for a KNX response message to arrive to complete a message exchange.
 	 *
-	 * @param timeout <code>timeout &gt; 0</code>
+	 * @param timeout {@code timeout > 0}
 	 */
 	void responseTimeout(Duration timeout);
 
@@ -110,8 +110,8 @@ public interface ManagementClient extends AutoCloseable
 	 * A management client will use the transport layer for creating the destination.
 	 *
 	 * @param remote destination KNX individual address
-	 * @param connectionOriented <code>true</code> for connection-oriented mode,
-	 *        <code>false</code> for connectionless mode
+	 * @param connectionOriented {@code true} for connection-oriented mode,
+	 *        {@code false} for connectionless mode
 	 * @return destination representing the logical connection
 	 */
 	default Destination createDestination(final IndividualAddress remote, final boolean connectionOriented) {
@@ -125,13 +125,13 @@ public interface ManagementClient extends AutoCloseable
 	 * A management client will use the transport layer for creating the destination.
 	 *
 	 * @param remote destination KNX individual address
-	 * @param connectionOriented <code>true</code> for connection-oriented mode,
-	 *        <code>false</code> for connectionless mode
-	 * @param keepAlive <code>true</code> to prevent a timing out of the logical
-	 *        connection in connection-oriented mode, <code>false</code> to use default
+	 * @param connectionOriented {@code true} for connection-oriented mode,
+	 *        {@code false} for connectionless mode
+	 * @param keepAlive {@code true} to prevent a timing out of the logical
+	 *        connection in connection-oriented mode, {@code false} to use default
 	 *        connection timeout
-	 * @param verifyMode <code>true</code> to indicate the destination has verify mode
-	 *        enabled, <code>false</code> otherwise
+	 * @param verifyMode {@code true} to indicate the destination has verify mode
+	 *        enabled, {@code false} otherwise
 	 * @return destination representing the logical connection
 	 */
 	Destination createDestination(IndividualAddress remote, boolean connectionOriented,
@@ -155,14 +155,14 @@ public interface ManagementClient extends AutoCloseable
 	 * This service uses broadcast communication mode.<br>
 	 * The communication partner is a device in programming mode. In situations necessary
 	 * to know whether more than one device is in programming mode,
-	 * <code>oneAddressOnly</code> is set to <code>false</code> and the device addresses
+	 * {@code oneAddressOnly} is set to {@code false} and the device addresses
 	 * are listed in the returned address array. In this case, the whole response timeout
-	 * is waited for read responses. If <code>oneAddressOnly</code> is <code>true</code>,
+	 * is waited for read responses. If {@code oneAddressOnly} is {@code true},
 	 * the array size of returned addresses is 1, and the method returns after receiving
 	 * the first read response.
 	 *
-	 * @param oneAddressOnly <code>true</code> if method should return after receiving the
-	 *        first read response, <code>false</code> to wait the whole response timeout
+	 * @param oneAddressOnly {@code true} if method should return after receiving the
+	 *        first read response, {@code false} to wait the whole response timeout
 	 *        for read responses
 	 * @return array of individual addresses, in the order of reception
 	 * @throws KNXTimeoutException on a timeout during send or no address response was
@@ -183,7 +183,7 @@ public interface ManagementClient extends AutoCloseable
 	 * <p>
 	 * This service uses broadcast communication mode.<br>
 	 *
-	 * @param serialNo byte array with serial number, <code>serialNo.length</code> = 6
+	 * @param serialNo byte array with serial number, {@code serialNo.length} = 6
 	 * @param newAddress new address
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
@@ -201,7 +201,7 @@ public interface ManagementClient extends AutoCloseable
 	 * <p>
 	 * This service uses broadcast communication mode.<br>
 	 *
-	 * @param serialNo byte array with serial number, <code>serialNo.length</code> = 6
+	 * @param serialNo byte array with serial number, {@code serialNo.length} = 6
 	 * @return the individual address
 	 * @throws KNXTimeoutException on a timeout during send or no address response was
 	 *         received
@@ -219,8 +219,8 @@ public interface ManagementClient extends AutoCloseable
 	 * <p>
 	 * This service uses system broadcast communication mode.
 	 *
-	 * @param domain byte array with domain address, <code>domain.length</code> = 2 (on
-	 *        powerline medium) or <code>domain.length</code> = 6 (on RF medium)
+	 * @param domain byte array with domain address, {@code domain.length} = 2 (on
+	 *        powerline medium) or {@code domain.length} = 6 (on RF medium)
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 */
@@ -231,8 +231,8 @@ public interface ManagementClient extends AutoCloseable
 	 * This service uses system broadcast communication mode.
 	 *
 	 * @param serialNumber device serial number
-	 * @param domain byte array with domain address, <code>domain.length</code> = 2 on
-	 *        powerline medium, <code>domain.length</code> = 6 on RF medium, {@code domain.length = 4 or 21} on IP medium
+	 * @param domain byte array with domain address, {@code domain.length} = 2 on
+	 *        powerline medium, {@code domain.length} = 6 on RF medium, {@code domain.length = 4 or 21} on IP medium
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 */
@@ -244,14 +244,14 @@ public interface ManagementClient extends AutoCloseable
 	 * This service uses system broadcast communication mode.<br>
 	 * The communication partner is a device in programming mode. In situations necessary
 	 * to read domain addresses from more than one device in programming mode,
-	 * <code>oneAddressOnly</code> is set to <code>false</code> and all received domain
+	 * {@code oneAddressOnly} is set to {@code false} and all received domain
 	 * addresses are returned in the list. In this case, the whole response timeout is
-	 * waited for address responses. If <code>oneAddressOnly</code> is <code>true</code>,
+	 * waited for address responses. If {@code oneAddressOnly} is {@code true},
 	 * the method returns after receiving the first read response, and the list contains
 	 * one domain address.
 	 *
-	 * @param oneAddressOnly <code>true</code> if method should return after receiving the
-	 *        first read response, <code>false</code> to wait the whole response timeout
+	 * @param oneAddressOnly {@code true} if method should return after receiving the
+	 *        first read response, {@code false} to wait the whole response timeout
 	 *        for read responses
 	 * @return list of byte arrays with domain addresses, ordered according to time of
 	 *         reception
@@ -289,12 +289,12 @@ public interface ManagementClient extends AutoCloseable
 	 * power-line medium and paying attention to more installations.<br>
 	 * This service uses system broadcast communication mode.<br>
 	 * <p>
-	 * A note on answering behavior when the specified <code>range</code> is &lt; 255:<br>
+	 * A note on answering behavior when the specified {@code range} is &lt; 255:<br>
 	 * If an answering device 'A' receives a domain address response from another
 	 * answering device 'B', 'A' will terminate the transmission of its response.
 	 *
 	 * @param domain byte array with domain address to check for,
-	 *        <code>domain.length</code> = 2 (power-line medium only)
+	 *        {@code domain.length} = 2 (power-line medium only)
 	 * @param startAddress start from this individual address, lower bound of checked
 	 *        range
 	 * @param range address range, specifies upper bound address (startAddress + range)
@@ -318,10 +318,10 @@ public interface ManagementClient extends AutoCloseable
 	 * investigated parameters against the test information.
 	 *
 	 * @param remote address of remote endpoint
-	 * @param objectType interface object type, <code>0 &le; objectType &lt; 0xffff</code>
-	 * @param pid KNX property identifier, <code>0 &le; pid &lt; 0xff</code>
-	 * @param testInfo test information, <code>0 &lt; testInfo.length &lt; </code> parameter-specific
-	 * @return received responses as (empty) list of byte arrays, <code>byte array length &gt; 0</code>
+	 * @param objectType interface object type, {@code 0 ≤ objectType < 0xffff}
+	 * @param pid KNX property identifier, {@code 0 ≤ pid < 0xff}
+	 * @param testInfo test information, {@code 0 < testInfo.length <} parameter-specific
+	 * @return received responses as (empty) list of byte arrays, {@code byte array length > 0}
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXTimeoutException on timeout during send or waiting for a response
 	 * @throws KNXInvalidResponseException on invalid read response message
@@ -344,7 +344,7 @@ public interface ManagementClient extends AutoCloseable
 		}
 
 		/**
-		 * @return byte array with response, <code>length &gt; 0</code>
+		 * @return byte array with response, {@code length > 0}
 		 */
 		public byte[] result() {
 			return response;
@@ -357,9 +357,9 @@ public interface ManagementClient extends AutoCloseable
 	 * not supported by the remote endpoint in question, or 2) on a negative check with respect to the supplied
 	 * parameters against the test information {@code testInfo}.
 	 *
-	 * @param objectType interface object type, <code>0 &le; objectType &lt; 0xffff</code>
-	 * @param pid KNX property identifier, <code>0 &le; pid &lt; 0xff</code>
-	 * @param testInfo test information, <code>0 &lt; testInfo.length &lt; </code> parameter-specific
+	 * @param objectType interface object type, {@code 0 ≤ objectType < 0xffff}
+	 * @param pid KNX property identifier, {@code 0 ≤ pid < 0xff}
+	 * @param testInfo test information, {@code 0 < testInfo.length <} parameter-specific
 	 * @return received responses with test results as (empty) list
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXTimeoutException on timeout during send or waiting for a response
@@ -373,9 +373,9 @@ public interface ManagementClient extends AutoCloseable
 	 * Writes a network parameter to a {@code remote} endpoint. The remote endpoint will neglect unknown parameter types
 	 * without any further action.
 	 *
-	 * @param remote address of remote endpoint, or <code>null</code> to use broadcast communication
-	 * @param objectType interface object type, <code>0 &le; objectType &lt; 0xffff</code>
-	 * @param pid KNX property identifier, <code>0 &le; pid &lt; 0xff</code>
+	 * @param remote address of remote endpoint, or {@code null} to use broadcast communication
+	 * @param objectType interface object type, {@code 0 ≤ objectType < 0xffff}
+	 * @param pid KNX property identifier, {@code 0 ≤ pid < 0xff}
 	 * @param value value to write
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXTimeoutException on timeout during send
@@ -389,11 +389,11 @@ public interface ManagementClient extends AutoCloseable
 	 * On open communication medium, a system broadcast (point to all-point) is used; on closed communication medium, a
 	 * broadcast (point to domain) is used.
 	 *
-	 * @param objectType interface object type, <code>0 &le; objectType &lt; 0xffff</code>
-	 * @param pid KNX property identifier, <code>0 &le; pid &lt; 0xfff</code>
+	 * @param objectType interface object type, {@code 0 ≤ objectType < 0xffff}
+	 * @param pid KNX property identifier, {@code 0 ≤ pid < 0xfff}
 	 * @param operand operand, being the first byte of the test information
 	 * @param additionalTestInfo any additional test information after the operand
-	 * @return list of test results as byte array, with each <code>result.length &gt; 0</code>
+	 * @return list of test results as byte array, with each {@code result.length > 0}
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXTimeoutException on timeout during send or waiting for a response
 	 * @throws KNXInvalidResponseException on invalid read response message
@@ -409,8 +409,8 @@ public interface ManagementClient extends AutoCloseable
 	 * broadcast (point to domain) is used. A remote endpoint will neglect write requests with unknown parameter types
 	 * without any further action.
 	 *
-	 * @param objectType interface object type, <code>0 &le; objectType &lt; 0xffff</code>
-	 * @param pid KNX property identifier, <code>0 &le; pid &lt; 0xfff</code>
+	 * @param objectType interface object type, {@code 0 ≤ objectType < 0xffff}
+	 * @param pid KNX property identifier, {@code 0 ≤ pid < 0xfff}
 	 * @param value value to write
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXTimeoutException on timeout during send
@@ -426,18 +426,18 @@ public interface ManagementClient extends AutoCloseable
 	 * <p>
 	 * The returned descriptor information format for device descriptor type 0 is as
 	 * follows (MSB to LSB):<br>
-	 * <code>| mask type (8 bit) | firmware version (8 bit) |</code><br>
+	 * {@code | mask type (8 bit) | firmware version (8 bit) |}<br>
 	 * with the mask type split up into<br>
-	 * <code>| Medium Type (4 bit) | Firmware Type (4 bit)|</code><br>
+	 * {@code | Medium Type (4 bit) | Firmware Type (4 bit)|}<br>
 	 * and the firmware version split up into<br>
-	 * <code>| version (4 bit) | sub code (4 bit) |</code><br>
+	 * {@code | version (4 bit) | sub code (4 bit) |}<br>
 	 * <br>
 	 * The returned descriptor information format for device descriptor type 2 is as
 	 * follows (MSB to LSB):<br>
 	 * <code>| application manufacturer (16 bit) | device type (16 bit) | version (8 bit) |<br>
 	 * | Link Mgmt Service support (2 bit) | Logical Tag (LT) base value (6 bit) |<br>
 	 * | CI 1 (16 bit) | CI 2 (16 bit) | CI 3 (16 bit) | CI 4 (16 bit) |</code><br>
-	 * with <code>CI = channel info</code>
+	 * with {@code CI = channel info}
 	 *
 	 * @param dst destination to read from
 	 * @param descType device descriptor type, 0 for type 0 or 2 for type 2
@@ -539,12 +539,12 @@ public interface ManagementClient extends AutoCloseable
 	 * Available erase codes:
 	 * <ul>
 	 * <li>1: confirmed restart (basic restart with confirmation)</li>
-	 * <li>2: factory reset (used together with <code>channel</code>)</li>
+	 * <li>2: factory reset (used together with {@code channel})</li>
 	 * <li>3: reset the device individual address to its default</li>
 	 * <li>4: reset application program memory to default application</li>
-	 * <li>5: reset application parameter memory (used together with <code>channel</code>)</li>
-	 * <li>6: reset links (used together with <code>channel</code></li>
-	 * <li>7: factory reset without resetting the device individual address (used together with <code>channel</code>)</li>
+	 * <li>5: reset application parameter memory (used together with {@code channel})</li>
+	 * <li>6: reset links (used together with {@code channel}</li>
+	 * <li>7: factory reset without resetting the device individual address (used together with {@code channel})</li>
 	 * </ul>
 	 *
 	 * @param dst destination to reset
@@ -573,10 +573,10 @@ public interface ManagementClient extends AutoCloseable
 	 * This service uses point-to-point connectionless or connection-oriented
 	 * communication mode.<br>
 	 * One value element in the returned data byte array consumes<br>
-	 * <code>(data.length / elements)</code> bytes.<br>
+	 * {@code (data.length / elements)} bytes.<br>
 	 * The byte offset into the returned data to access a property value element with
-	 * index <code>i</code> (zero based) is calculated the following way:<br>
-	 * <code>offset = (data.length / elements) * i</code>.<br>
+	 * index {@code i} (zero based) is calculated the following way:<br>
+	 * {@code offset = (data.length / elements) * i}.<br>
 	 * Note that interface objects with active access protection are only accessible over
 	 * connection-oriented communication.
 	 *
@@ -659,8 +659,8 @@ public interface ManagementClient extends AutoCloseable
 	 * <p>
 	 * This service corresponds to A_PropertyExtDescription_Read and uses point-to-point connectionless or
 	 * connection-oriented communication mode.<br>
-	 * The property of the object is addressed either with the <code>propertyId</code>
-	 * or with the <code>propertyIndex</code>. The property index is only used if the property
+	 * The property of the object is addressed either with the {@code propertyId}
+	 * or with the {@code propertyIndex}. The property index is only used if the property
 	 * identifier is 0, otherwise the index is ignored.
 	 * When using the property ID for access, the property index in the returned
 	 * description is either the correct property index of the addressed property or 0.
@@ -687,8 +687,8 @@ public interface ManagementClient extends AutoCloseable
 	 * <p>
 	 * This service uses point-to-point connectionless or connection-oriented
 	 * communication mode.<br>
-	 * The property of the object is addressed either with a the <code>propertyId</code>
-	 * or with the <code>propIndex</code>. The property index is only used if the property
+	 * The property of the object is addressed either with a the {@code propertyId}
+	 * or with the {@code propIndex}. The property index is only used if the property
 	 * identifier is 0, otherwise the index is ignored. When using the property ID for access, the property index in
 	 * the returned description is either the correct property index of the addressed property or 0.
 	 *
@@ -716,8 +716,8 @@ public interface ManagementClient extends AutoCloseable
 	 * <p>
 	 * This service uses point-to-point connectionless or connection-oriented
 	 * communication mode.<br>
-	 * The property of the object is addressed either with a the <code>propertyId</code>
-	 * or with the <code>propIndex</code>. The property index is only used if the property
+	 * The property of the object is addressed either with a the {@code propertyId}
+	 * or with the {@code propIndex}. The property index is only used if the property
 	 * identifier is 0, otherwise the index is ignored.<br>
 	 * When using the property ID for access, the property index in the returned
 	 * description is either the correct property index of the addressed property or 0.
@@ -819,7 +819,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @param dst destination to read from
 	 * @param startAddr 16 bit start address to read in memory
 	 * @param bytes number of data bytes to read (with increasing addresses),
-	 *        <code>bytes &gt; 0</code>
+	 *        {@code bytes > 0}
 	 * @return byte array containing the data read from the memory
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXRemoteException on problems of the partner reading (part of) the memory
@@ -886,9 +886,9 @@ public interface ManagementClient extends AutoCloseable
 	 * communication partner.
 	 * <p>
 	 * This service uses point-to-point connection-oriented communication mode.<br>
-	 * If the supplied key is 0xFFFFFFFF, the key for the given access <code>level</code>
+	 * If the supplied key is 0xFFFFFFFF, the key for the given access {@code level}
 	 * is removed. The write request has to be done using equal or higher access rights
-	 * than the access rights of the <code>level</code> which is to be modified (i.e.
+	 * than the access rights of the {@code level} which is to be modified (i.e.
 	 * current level &lt;= level to change).
 	 *
 	 * @param dst destination to write to
@@ -907,7 +907,7 @@ public interface ManagementClient extends AutoCloseable
 	/**
 	 * Returns whether a network link is attached to this management client.
 	 *
-	 * @return <code>true</code> if link attached, <code>false</code> if detached
+	 * @return {@code true} if link attached, {@code false} if detached
 	 */
 	boolean isOpen();
 
@@ -919,7 +919,7 @@ public interface ManagementClient extends AutoCloseable
 	 * <p>
 	 * Note that a detach does not trigger a close of the used network link.
 	 *
-	 * @return the formerly attached KNX network link, or <code>null</code> if already
+	 * @return the formerly attached KNX network link, or {@code null} if already
 	 *         detached
 	 * @see TransportLayer#detach()
 	 */

@@ -1,7 +1,7 @@
 /*
     Calimero 2 - A library for KNX network access
     Copyright (c) 2005 B. Erb
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
     Copyright (c) 2018 Karsten Heimrich
 
     This program is free software; you can redistribute it and/or modify
@@ -78,7 +78,7 @@ public class SearchRequest extends ServiceType
 	 *
 	 * @param h KNXnet/IP header preceding the search request in the byte array
 	 * @param data byte array containing a search request
-	 * @param offset start offset of request in <code>data</code>
+	 * @param offset start offset of request in {@code data}
 	 * @return search request
 	 * @throws KNXFormatException on wrong structure size or invalid host protocol address information
 	 */
@@ -104,7 +104,7 @@ public class SearchRequest extends ServiceType
 	 * Creates a search request out of a byte array.
 	 *
 	 * @param data byte array containing a search request structure
-	 * @param offset start offset of request in <code>data</code>
+	 * @param offset start offset of request in {@code data}
 	 * @throws KNXFormatException if no valid host protocol address information was found
 	 */
 	public SearchRequest(final byte[] data, final int offset) throws KNXFormatException
@@ -132,7 +132,7 @@ public class SearchRequest extends ServiceType
 	 * Creates a new search request with the given response address.
 	 *
 	 * @param responseAddr address of the client discovery endpoint used for the response,
-	 *        use <code>null</code> to create a NAT aware search request
+	 *        use {@code null} to create a NAT aware search request
 	 */
 	public SearchRequest(final InetSocketAddress responseAddr)
 	{

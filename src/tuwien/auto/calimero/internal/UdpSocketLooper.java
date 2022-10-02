@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2021 B. Malinowsky
+    Copyright (c) 2010, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -75,8 +75,8 @@ public abstract class UdpSocketLooper
 	 * Creates a socket looper for the supplied UDP socket.
 	 *
 	 * @param socket the UDP socket to loop on
-	 * @param closeSocket <code>true</code> to close the socket on {@link #quit()},
-	 *        <code>false</code> otherwise
+	 * @param closeSocket {@code true} to close the socket on {@link #quit()},
+	 *        {@code false} otherwise
 	 */
 	public UdpSocketLooper(final DatagramSocket socket, final boolean closeSocket)
 	{
@@ -87,12 +87,12 @@ public abstract class UdpSocketLooper
 	 * Creates a socket looper for the supplied UDP socket and timeout parameters.
 	 *
 	 * @param socket the UDP socket to loop on
-	 * @param closeSocket <code>true</code> to close the socket on {@link #quit()},
-	 *        <code>false</code> otherwise
+	 * @param closeSocket {@code true} to close the socket on {@link #quit()},
+	 *        {@code false} otherwise
 	 * @param receiveBufferSize sets the maximum size of the socket receive buffer
 	 * @param socketTimeout the socket's receive method shall time out after a maximum of
-	 *        <code>socketTimeout</code> milliseconds
-	 * @param loopTimeout this looper shall quit after <code>loopTimeout</code> milliseconds
+	 *        {@code socketTimeout} milliseconds
+	 * @param loopTimeout this looper shall quit after {@code loopTimeout} milliseconds
 	 */
 	public UdpSocketLooper(final DatagramSocket socket, final boolean closeSocket,
 		final int receiveBufferSize, final int socketTimeout, final int loopTimeout)

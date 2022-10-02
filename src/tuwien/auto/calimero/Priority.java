@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -91,7 +91,7 @@ public enum Priority {
 	/**
 	 * Returns the priority of the supplied priority value representation.
 	 * <p>
-	 * The following textual representations for <code>value</code> are allowed:
+	 * The following textual representations for {@code value} are allowed:
 	 * <ul>
 	 * <li>"system"</li>
 	 * <li>"normal"</li>

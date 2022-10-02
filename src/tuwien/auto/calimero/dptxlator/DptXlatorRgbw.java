@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2021 B. Malinowsky
+    Copyright (c) 2018, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 /**
  * Translator for KNX DPTs with main number 251, type <b>Color RGBW</b>. The KNX data type width is 6 bytes. The default
- * return value after creation is the RGBW value with all components not valid (<code>- - - - %</code>).
+ * return value after creation is the RGBW value with all components not valid ({@code - - - - %}).
  * <p>
  * In value methods expecting string items, values are parsed as floating point value.
  */
@@ -91,7 +91,7 @@ public class DptXlatorRgbw extends DPTXlator {
 	 * Creates a translator for the given datapoint type ID.
 	 *
 	 * @param dptId available implemented datapoint type ID
-	 * @throws KNXFormatException on wrong formatted or not expected (available) <code>dptId</code>
+	 * @throws KNXFormatException on wrong formatted or not expected (available) {@code dptId}
 	 */
 	public DptXlatorRgbw(final String dptId) throws KNXFormatException {
 		super(6);
@@ -108,10 +108,10 @@ public class DptXlatorRgbw extends DPTXlator {
 	/**
 	 * Sets one new translation item, replacing any old items.
 	 *
-	 * @param red <code>0 &le; red &le; 100</code>
-	 * @param green <code>0 &le; green &le; 100</code>
-	 * @param blue <code>0 &le; blue &le; 100</code>
-	 * @param white <code>0 &le; white &le; 100</code>
+	 * @param red {@code 0 ≤ red ≤ 100}
+	 * @param green {@code 0 ≤ green ≤ 100}
+	 * @param blue {@code 0 ≤ blue ≤ 100}
+	 * @param white {@code 0 ≤ white ≤ 100}
 	 */
 	public final void setValue(final double red, final double green, final double blue, final double white) {
 		data = toDpt(red, green, blue, white);

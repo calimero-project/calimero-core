@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,12 +51,12 @@ public class KNXPortClosedException extends KNXException
 	private final String id;
 
 	/**
-	 * Constructs a new <code>KNXPortClosedException</code> with the specified detail message,
+	 * Constructs a new {@code KNXPortClosedException} with the specified detail message,
 	 * cause, and port identifier.
 	 *
 	 * @param s the detail message
-	 * @param portId port identifier, can be <code>null</code>
-	 * @param cause the cause in form of a throwable object, can be <code>null</code>
+	 * @param portId port identifier, can be {@code null}
+	 * @param cause the cause in form of a throwable object, can be {@code null}
 	 */
 	public KNXPortClosedException(final String s, final String portId, final Throwable cause)
 	{
@@ -65,11 +65,11 @@ public class KNXPortClosedException extends KNXException
 	}
 
 	/**
-	 * Constructs a new <code>KNXPortClosedException</code> with the specified detail message and
+	 * Constructs a new {@code KNXPortClosedException} with the specified detail message and
 	 * the serial port identifier.
 	 *
 	 * @param s the detail message
-	 * @param portId serial port identifier of the closed port, can be <code>null</code>
+	 * @param portId serial port identifier of the closed port, can be {@code null}
 	 */
 	public KNXPortClosedException(final String s, final String portId)
 	{
@@ -81,7 +81,7 @@ public class KNXPortClosedException extends KNXException
 	 * Returns the serial port identifier supplied with this exception.
 	 * <p>
 	 *
-	 * @return port ID as string, or <code>null</code> if no port ID specified
+	 * @return port ID as string, or {@code null} if no port ID specified
 	 */
 	public final String getPortID()
 	{

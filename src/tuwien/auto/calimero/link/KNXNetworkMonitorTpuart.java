@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2020 B. Malinowsky
+    Copyright (c) 2015, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -61,8 +61,8 @@ public class KNXNetworkMonitorTpuart extends AbstractMonitor<TpuartConnection>
 	 * usually device and platform specific.
 	 *
 	 * @param portId identifier of the serial communication port
-	 * @param decodeRawFrames <code>true</code> to decode the received raw frame on medium for
-	 *        notification (supplying the exception if decoding failed), <code>false</code> to
+	 * @param decodeRawFrames {@code true} to decode the received raw frame on medium for
+	 *        notification (supplying the exception if decoding failed), {@code false} to
 	 *        provide only the cEMI bus monitor indication in the notification
 	 * @throws KNXException on error establishing the TP-UART connection
 	 */
