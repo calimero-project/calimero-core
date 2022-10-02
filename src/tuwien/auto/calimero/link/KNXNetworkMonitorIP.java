@@ -44,12 +44,16 @@ import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
 import tuwien.auto.calimero.knxnetip.SecureConnection;
+import tuwien.auto.calimero.knxnetip.TcpConnection;
+import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 
 /**
  * Implementation of the KNX network monitor link based on the KNXnet/IP protocol, using a
  * {@link KNXnetIPConnection}. Once a monitor has been closed, it is not available for further link
  * communication, i.e., it can't be reopened.
+ * <p>
+ * Tunneling on bus monitor layer is supported for tunneling protocols v1 and v2.
  * <p>
  * Pay attention to the IP address consideration stated in the API documentation of class
  * {@link KNXNetworkLinkIP}.
@@ -58,6 +62,41 @@ import tuwien.auto.calimero.link.medium.KNXMediumSettings;
  */
 public class KNXNetworkMonitorIP extends AbstractMonitor<KNXnetIPConnection>
 {
+	/**
+	 * Creates a new monitor link using unsecured KNXnet/IP tunneling v2 over TCP to a remote KNXnet/IP server endpoint.
+	 *
+	 * @param connection a TCP connection to the server (if the connection state is not connected, link setup will
+	 *        establish the connection); closing the link will not close the TCP connection
+	 * @param settings medium settings defining device and KNX medium specifics for communication
+	 * @return the monitor link in open state
+	 * @throws KNXException on failure establishing the link
+	 * @throws InterruptedException on interrupted thread while establishing link
+	 */
+	public static KNXNetworkMonitorIP newMonitorLink(final TcpConnection connection, final KNXMediumSettings settings)
+			throws KNXException, InterruptedException {
+		return new KNXNetworkMonitorIP(KNXnetIPTunnel.newTcpTunnel(BusMonitorLayer, connection,
+				settings.getDeviceAddress()), settings);
+	}
+
+	/**
+	 * Creates a new monitor link using KNX IP secure tunneling over TCP to a remote KNXnet/IP server endpoint.
+	 *
+	 * @param session a secure session for the server (session state is allowed to be not authenticated);
+	 *        closing the link will not close the session
+	 * @param settings medium settings defining device and KNX medium specifics for communication
+	 * @return the monitor link in open state
+	 * @throws KNXException on failure establishing the link
+	 * @throws InterruptedException on interrupted thread while establishing link
+	 */
+	public static KNXNetworkMonitorIP newSecureMonitorLink(final SecureSession session, final KNXMediumSettings settings)
+			throws KNXException, InterruptedException {
+		final KNXnetIPConnection c = SecureConnection.newTunneling(BusMonitorLayer, session, settings.getDeviceAddress());
+		return new KNXNetworkMonitorIP(c, settings);
+	}
+
+	/**
+	 * Not part of the KNX specification.
+	 */
 	public static KNXNetworkMonitorIP newSecureMonitorLink(final InetSocketAddress localEP, final InetSocketAddress remoteEP,
 		final boolean useNat, final byte[] deviceAuthCode, final int userId, final byte[] userKey, final KNXMediumSettings settings)
 		throws KNXException, InterruptedException {
