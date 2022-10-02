@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2020, 2021 B. Malinowsky
+    Copyright (c) 2020, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.serial.spi.SerialCom;
 
-class BauFt12Emulator extends LibraryAdapter implements SerialCom {
+class BauFt12Emulator implements SerialCom {
 	private final ArrayBlockingQueue<Byte> queue = new ArrayBlockingQueue<>(100);
 
 	boolean replyWithAck = true;

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -59,8 +59,10 @@ import tuwien.auto.calimero.serial.spi.SerialCom.StopBits;
  *
  * @author B. Malinowsky
  */
-public class LibraryAdapter
+public final class LibraryAdapter
 {
+	private LibraryAdapter() {}
+
 	private static class SerialComLoader {
 		private static final ServiceLoader<SerialCom> loader = ServiceLoader.load(SerialCom.class);
 
