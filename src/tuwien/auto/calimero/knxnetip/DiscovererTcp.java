@@ -112,51 +112,6 @@ public class DiscovererTcp extends Discoverer {
 		}
 	}
 
-	/**
-	 * @deprecated
-	 *
-	 * @throws UnsupportedOperationException
-	 */
-	@Override
-	@Deprecated(forRemoval = true)
-	public CompletableFuture<Result<SearchResponse>> search(final InetSocketAddress serverControlEndpoint,
-			final Srp... searchParameters) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @deprecated
-	 *
-	 * @throws UnsupportedOperationException
-	 */
-	@Override
-	@Deprecated(forRemoval = true)
-	public void startSearch(final NetworkInterface ni, final int timeout, final boolean wait) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @deprecated
-	 *
-	 * @throws UnsupportedOperationException
-	 */
-	@Override
-	@Deprecated(forRemoval = true)
-	public void startSearch(final int localPort, final NetworkInterface ni, final int timeout, final boolean wait) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @deprecated
-	 *
-	 * @throws UnsupportedOperationException
-	 */
-	@Override
-	@Deprecated(forRemoval = true)
-	public Result<DescriptionResponse> getDescription(final InetSocketAddress server, final int timeout) {
-		throw new UnsupportedOperationException();
-	}
-
 	private <T> CompletableFuture<Result<T>> send(final byte[] packet) {
 		try {
 			final var cf = new CompletableFuture<Result<T>>();
