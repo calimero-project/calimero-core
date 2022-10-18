@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -73,13 +73,9 @@ import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.KNXNetworkLinkIP;
 import tuwien.auto.calimero.link.medium.TPSettings;
 
-/**
- * @author B. Malinowsky
- */
 @KnxnetIP
 @ResourceLock("calimero.datapoint")
-class ProcessCommunicatorTest
-{
+class ProcessCommunicatorTest {
 	private ProcessCommunicator pc;
 	private ProcessCommunicator pc2;
 	private KNXNetworkLink link;
@@ -94,8 +90,7 @@ class ProcessCommunicatorTest
 
 	private final String dpStringValue = "Hello KNX!";
 
-	ProcessCommunicatorTest() throws KNXFormatException
-	{
+	ProcessCommunicatorTest() throws KNXFormatException {
 		dpBool = new GroupAddress("1/0/1");
 		dpBool2 = new GroupAddress("1/0/11");
 		dpControl = new GroupAddress("1/0/2");
@@ -106,16 +101,14 @@ class ProcessCommunicatorTest
 	}
 
 	@BeforeEach
-	void init() throws Exception
-	{
+	void init() throws Exception {
 		link = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false, new TPSettings());
 		pc = new ProcessCommunicatorImpl(link);
 		pc2 = new ProcessCommunicatorImpl(link);
 	}
 
 	@AfterEach
-	void tearDown() throws Exception
-	{
+	void tearDown() throws Exception {
 		if (pc != null)
 			pc.detach();
 		if (pc2 != null)
@@ -125,8 +118,7 @@ class ProcessCommunicatorTest
 	}
 
 	@Test
-	void testSetResponseTimeout()
-	{
+	void setResponseTimeout() {
 		final var two = Duration.ofSeconds(2);
 		pc.responseTimeout(two);
 		assertEquals(two, pc.responseTimeout());
@@ -139,15 +131,13 @@ class ProcessCommunicatorTest
 	}
 
 	@Test
-	void defaultResponseTimeout()
-	{
+	void defaultResponseTimeout() {
 		// test for correct standard timeout
 		assertEquals(5, pc.responseTimeout().toSeconds());
 	}
 
 	@Test
-	void testSetPriority()
-	{
+	void setPriority() {
 		pc.setPriority(Priority.SYSTEM);
 		assertEquals(Priority.SYSTEM, pc.getPriority());
 
@@ -156,31 +146,25 @@ class ProcessCommunicatorTest
 	}
 
 	@Test
-	void testGetPriority()
-	{
+	void getPriority() {
 		// test for default priority
 		assertEquals(Priority.LOW, pc.getPriority());
 	}
 
 	@Test
-	void testAddProcessListener()
-	{
+	void addProcessListener() {
 		final ProcessListener l = new ProcessListener() {
 			@Override
-			public void groupReadRequest(final ProcessEvent e)
-			{}
+			public void groupReadRequest(final ProcessEvent e) {}
 
 			@Override
-			public void groupReadResponse(final ProcessEvent e)
-			{}
+			public void groupReadResponse(final ProcessEvent e) {}
 
 			@Override
-			public void groupWrite(final ProcessEvent e)
-			{}
+			public void groupWrite(final ProcessEvent e) {}
 
 			@Override
-			public void detached(final DetachEvent e)
-			{}
+			public void detached(final DetachEvent e) {}
 		};
 		pc.addProcessListener(l);
 		pc.removeProcessListener(l);
@@ -190,24 +174,19 @@ class ProcessCommunicatorTest
 	}
 
 	@Test
-	void testRemoveProcessListener()
-	{
+	void removeProcessListener() {
 		final ProcessListener l = new ProcessListener() {
 			@Override
-			public void groupReadRequest(final ProcessEvent e)
-			{}
+			public void groupReadRequest(final ProcessEvent e) {}
 
 			@Override
-			public void groupReadResponse(final ProcessEvent e)
-			{}
+			public void groupReadResponse(final ProcessEvent e) {}
 
 			@Override
-			public void groupWrite(final ProcessEvent e)
-			{}
+			public void groupWrite(final ProcessEvent e) {}
 
 			@Override
-			public void detached(final DetachEvent e)
-			{}
+			public void detached(final DetachEvent e) {}
 		};
 		pc.removeProcessListener(l);
 		pc.addProcessListener(l);
@@ -216,8 +195,7 @@ class ProcessCommunicatorTest
 	}
 
 	@Test
-	void testReadBool() throws KNXException, InterruptedException
-	{
+	void readBool() throws KNXException, InterruptedException {
 		// test concurrent read, needs breakpoints in waitForResponse method
 		// useful to see behavior when more than one indication is in the queue
 
@@ -226,8 +204,7 @@ class ProcessCommunicatorTest
 		pc.write(dpBool, true);
 		new Thread("testReadBool Concurrent 1") {
 			@Override
-			public void run()
-			{
+			public void run() {
 				try {
 					pc2.readBool(dpBool);
 				}
@@ -243,8 +220,7 @@ class ProcessCommunicatorTest
 		pc.write(dpBool2, false);
 		new Thread("testReadBool Concurrent 2") {
 			@Override
-			public void run()
-			{
+			public void run() {
 				try {
 					pc2.readBool(dpBool);
 				}
@@ -258,8 +234,7 @@ class ProcessCommunicatorTest
 		// read from different address using same process communicator
 		new Thread("testReadBool Concurrent 3") {
 			@Override
-			public void run()
-			{
+			public void run() {
 				try {
 					pc.readBool(dpBool);
 				}
@@ -272,8 +247,7 @@ class ProcessCommunicatorTest
 	}
 
 	@Test
-	void testWriteGroupAddressBoolean() throws KNXException, InterruptedException
-	{
+	void writeGroupAddressBoolean() throws KNXException, InterruptedException {
 		// read from same address
 		// if we are testing with a virtual network make sure we have some value set
 		pc.write(dpBool, true);
@@ -285,15 +259,13 @@ class ProcessCommunicatorTest
 	}
 
 	@Test
-	void testReadUnsigned() throws KNXException, InterruptedException
-	{
+	void readUnsigned() throws KNXException, InterruptedException {
 		// read from same address
 		pc.readUnsigned(dpUnsigned1, ProcessCommunication.SCALING);
 	}
 
 	@Test
-	void testWriteGroupAddressIntString() throws KNXException, InterruptedException
-	{
+	void writeGroupAddressIntString() throws KNXException, InterruptedException {
 		final int v = 80;
 		pc.write(dpUnsigned1, v, ProcessCommunication.SCALING);
 		Thread.sleep(100);
@@ -302,21 +274,18 @@ class ProcessCommunicatorTest
 	}
 
 	@Test
-	void testReadControl() throws KNXException, InterruptedException
-	{
+	void readControl() throws KNXException, InterruptedException {
 		pc.readControl(dpControl);
 	}
 
 	@Test
-	void testWriteGroupAddressBooleanInt() throws KNXException
-	{
+	void writeGroupAddressBooleanInt() throws KNXException {
 		final GroupAddress addr = new GroupAddress(1, 0, 1);
 		pc.write(addr, true, 4);
 	}
 
 	@Test
-	void readFloat() throws KNXException, InterruptedException
-	{
+	void readFloat() throws KNXException, InterruptedException {
 		final double f2 = pc.readFloat(dpFloat2);
 		new DPTXlator2ByteFloat(DPTXlator2ByteFloat.DPT_RAIN_AMOUNT).setValue(f2);
 		final double f4 = pc.readFloat(dpFloat4);
@@ -324,24 +293,21 @@ class ProcessCommunicatorTest
 	}
 
 	@Test
-	void testWriteFloatingPoint() throws KNXException
-	{
+	void writeFloatingPoint() throws KNXException {
 		final float f = (float) 0.01;
 		pc.write(dpFloat2, f, false);
 		pc.write(dpFloat4, f, true);
 	}
 
 	@Test
-	void testReadString() throws KNXException, InterruptedException
-	{
+	void readString() throws KNXException, InterruptedException {
 		final String s = pc.readString(dpString);
 		assertTrue(s.length() > 0);
 		assertEquals(dpStringValue, s);
 	}
 
 	@Test
-	void testWriteGroupAddressString() throws KNXException, InterruptedException
-	{
+	void writeGroupAddressString() throws KNXException, InterruptedException {
 		pc.write(dpString, "test");
 		pc.write(dpString, "test2");
 		Thread.sleep(100);
@@ -350,8 +316,7 @@ class ProcessCommunicatorTest
 	}
 
 	@Test
-	void testRead() throws KNXException, InterruptedException
-	{
+	void read() throws KNXException, InterruptedException {
 		final Datapoint dp = new StateDP(dpString, "test datapoint");
 		dp.setDPT(0, DPTXlatorString.DPT_STRING_8859_1.getID());
 		final String res = pc2.read(dp);
@@ -359,8 +324,7 @@ class ProcessCommunicatorTest
 	}
 
 	@Test
-	void testConcurrentRead()
-	{
+	void concurrentRead() {
 		final Datapoint dp = new StateDP(dpString, "test datapoint");
 		dp.setDPT(0, DPTXlatorString.DPT_STRING_8859_1.getID());
 		final List<Thread> threads = new ArrayList<>();
@@ -370,7 +334,8 @@ class ProcessCommunicatorTest
 				try {
 					count.addAndGet(pc2.read(dp).length() > 0 ? 1 : 0);
 				}
-				catch (KNXException | InterruptedException e) {}
+				catch (KNXException | InterruptedException e) {
+				}
 			});
 			threads.add(t);
 		}
@@ -385,8 +350,7 @@ class ProcessCommunicatorTest
 	}
 
 	@Test
-	void testConcurrentRead2() throws KNXException, InterruptedException
-	{
+	void concurrentRead2() throws KNXException, InterruptedException {
 		final List<Thread> threads = new ArrayList<>();
 		final AtomicInteger count = new AtomicInteger();
 		final boolean b = pc2.readBool(dpBool);
@@ -420,8 +384,7 @@ class ProcessCommunicatorTest
 	}
 
 	@Test
-	void testConcurrentReadNonExistingDestination()
-	{
+	void concurrentReadNonExistingDestination() {
 		final List<Thread> threads = new ArrayList<>();
 		final AtomicInteger count = new AtomicInteger();
 		final LocalTime start = LocalTime.now();
@@ -450,16 +413,14 @@ class ProcessCommunicatorTest
 	}
 
 	@Test
-	void testWriteDatapointString() throws KNXException
-	{
+	void writeDatapointString() throws KNXException {
 		final Datapoint dp = new StateDP(dpUnsigned1, "test datapoint");
 		dp.setDPT(0, DPTXlator8BitUnsigned.DPT_PERCENT_U8.getID());
 		pc2.write(dp, "80");
 	}
 
 	@Test
-	void testDetach()
-	{
+	void detach() {
 		final KNXNetworkLink ret = pc.detach();
 		assertEquals(link, ret);
 	}

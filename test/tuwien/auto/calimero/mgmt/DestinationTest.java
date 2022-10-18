@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -61,11 +61,9 @@ import tuwien.auto.calimero.link.KNXNetworkLinkIP;
 import tuwien.auto.calimero.link.medium.TPSettings;
 import tuwien.auto.calimero.mgmt.Destination.State;
 
-/**
- * @author B. Malinowsky
- */
+
 @KnxnetIP
-public class DestinationTest
+class DestinationTest
 {
 	private KNXNetworkLink lnk;
 	private TransportLayer tl;
@@ -75,9 +73,6 @@ public class DestinationTest
 	private final class TLListener implements TransportListener
 	{
 		volatile int disconnected;
-
-		TLListener()
-		{}
 
 		@Override
 		public void broadcast(final FrameEvent e)
@@ -127,14 +122,8 @@ public class DestinationTest
 			lnk.close();
 	}
 
-	/**
-	 * Test method for
-	 * {@link Destination#Destination(Destination.AggregatorProxy, tuwien.auto.calimero.IndividualAddress, boolean)}.
-	 *
-	 * @throws KNXFormatException
-	 */
 	@Test
-	public final void testDestinationAggregatorProxyIndividualAddressBoolean() throws KNXFormatException
+	void destinationAggregatorProxyIndividualAddressBoolean() throws KNXFormatException
 	{
 		@SuppressWarnings("resource")
 		final Destination d = new Destination(new Destination.AggregatorProxy(tl), new IndividualAddress("2.2.2"),
@@ -143,38 +132,23 @@ public class DestinationTest
 		assertFalse(d.isVerifyMode());
 	}
 
-	/**
-	 * Test method for {@link Destination#destroy()}.
-	 */
 	@Test
-	public final void testDestroy()
+	void destroy()
 	{
 		dst.destroy();
 		assertEquals(State.Destroyed, dst.getState());
 	}
 
-	/**
-	 * Test method for {@link Destination#getAddress()}.
-	 *
-	 * @throws KNXFormatException
-	 */
 	@Test
-	public final void testGetAddress() throws KNXFormatException
+	void getAddress() throws KNXFormatException
 	{
 		assertEquals(new IndividualAddress("2.2.2"), dst.getAddress());
 		dst.destroy();
 		assertEquals(new IndividualAddress("2.2.2"), dst.getAddress());
 	}
 
-	/**
-	 * Test method for {@link Destination#getState()}.
-	 *
-	 * @throws KNXLinkClosedException
-	 * @throws KNXTimeoutException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	public final void testGetState() throws KNXLinkClosedException, KNXTimeoutException, InterruptedException
+	void getState() throws KNXLinkClosedException, KNXTimeoutException, InterruptedException
 	{
 		assertEquals(Destination.State.Disconnected, dst.getState());
 		assertEquals(0, tll.disconnected);
@@ -204,13 +178,8 @@ public class DestinationTest
 		assertEquals(Destination.State.Destroyed, dst.getState());
 	}
 
-	/**
-	 * Test method for {@link Destination#isConnectionOriented()}.
-	 *
-	 * @throws KNXFormatException
-	 */
 	@Test
-	public final void testIsConnectionOriented() throws KNXFormatException
+	void isConnectionOriented() throws KNXFormatException
 	{
 		assertTrue(dst.isConnectionOriented());
 		@SuppressWarnings("resource")
@@ -219,13 +188,8 @@ public class DestinationTest
 		assertFalse(d.isConnectionOriented());
 	}
 
-	/**
-	 * Test method for {@link Destination#isKeepAlive()}.
-	 *
-	 * @throws KNXFormatException
-	 */
 	@Test
-	public final void testIsKeepAlive() throws KNXFormatException
+	void isKeepAlive() throws KNXFormatException
 	{
 		assertFalse(dst.isKeepAlive());
 		@SuppressWarnings("resource")
@@ -234,13 +198,8 @@ public class DestinationTest
 		assertTrue(d.isKeepAlive());
 	}
 
-	/**
-	 * Test method for {@link Destination#isVerifyMode()}.
-	 *
-	 * @throws KNXFormatException
-	 */
 	@Test
-	public final void testIsVerifyMode() throws KNXFormatException
+	void isVerifyMode() throws KNXFormatException
 	{
 		assertFalse(dst.isVerifyMode());
 		@SuppressWarnings("resource")
@@ -249,9 +208,6 @@ public class DestinationTest
 		assertTrue(d.isVerifyMode());
 	}
 
-	/**
-	 * Test method for {@link Destination#toString()}.
-	 */
 	@Test
 	void testToString()
 	{

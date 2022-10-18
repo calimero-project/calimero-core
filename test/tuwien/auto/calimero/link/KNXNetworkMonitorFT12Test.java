@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -103,15 +103,9 @@ class KNXNetworkMonitorFT12Test
 	@BeforeEach
 	void setUp() throws Exception
 	{
-		try {
-			// prevents access problems with a just previously closed port
-			Thread.sleep(50);
-			mon = new KNXNetworkMonitorFT12(Util.getSerialPort(), new TPSettings());
-		}
-		catch (final Exception e) {
-			Util.tearDownLogging();
-			throw e;
-		}
+		// prevents access problems with a just previously closed port
+		Thread.sleep(50);
+		mon = new KNXNetworkMonitorFT12(Util.getSerialPort(), new TPSettings());
 		lmon = new MonListener();
 		mon.addMonitorListener(lmon);
 	}
@@ -124,14 +118,14 @@ class KNXNetworkMonitorFT12Test
 	}
 
 	@Test
-	void testKNXNetworkMonitorFT12StringKNXMediumSettings() throws KNXException, InterruptedException
+	void networkMonitorFT12StringKNXMediumSettings() throws KNXException, InterruptedException
 	{
 		mon.close();
 		mon = new KNXNetworkMonitorFT12(Util.getSerialPortID(), new TPSettings());
 	}
 
 	@Test
-	void testKNXNetworkMonitorFT12IntKNXMediumSettings() throws InterruptedException
+	void networkMonitorFT12IntKNXMediumSettings() throws InterruptedException
 	{
 		mon.close();
 		try {
@@ -144,7 +138,7 @@ class KNXNetworkMonitorFT12Test
 	}
 
 	@Test
-	void testSetKNXMedium()
+	void setKNXMedium()
 	{
 		try {
 			mon.setKNXMedium(new PLSettings());
@@ -168,7 +162,7 @@ class KNXNetworkMonitorFT12Test
 	}
 
 	@Test
-	void testSetDecodeRawFrames() throws InterruptedException
+	void setDecodeRawFrames() throws InterruptedException
 	{
 		mon.setDecodeRawFrames(true);
 		lmon.raw = null;
@@ -182,7 +176,7 @@ class KNXNetworkMonitorFT12Test
 	}
 
 	@Test
-	void testGetName()
+	void getName()
 	{
 		String n = mon.getName();
 		final String port = Util.getSerialPortID();
@@ -195,7 +189,7 @@ class KNXNetworkMonitorFT12Test
 	}
 
 	@Test
-	void testClose() throws InterruptedException
+	void close() throws InterruptedException
 	{
 		System.out.println(mon.toString());
 		assertTrue(mon.isOpen());

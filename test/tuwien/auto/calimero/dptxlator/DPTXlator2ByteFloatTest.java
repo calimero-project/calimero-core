@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,17 +36,21 @@
 
 package tuwien.auto.calimero.dptxlator;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.Arrays;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.Util;
 
-/**
- * @author B. Malinowsky
- */
-public class DPTXlator2ByteFloatTest extends TestCase
+
+class DPTXlator2ByteFloatTest
 {
 	private DPTXlator2ByteFloat t;
 	private final String min = "-671088.64";
@@ -82,32 +86,15 @@ public class DPTXlator2ByteFloatTest extends TestCase
 		DPTXlator2ByteFloat.DPT_WIND_SPEED_KMH, DPTXlator2ByteFloat.DptAbsoluteHumidity,
 		DPTXlator2ByteFloat.DptConcentration };
 
-	/**
-	 * @param name name of test case
-	 */
-	public DPTXlator2ByteFloatTest(final String name)
-	{
-		super(name);
-	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
+	@BeforeEach
+	void init() throws Exception
 	{
-		super.setUp();
-		Util.setupLogging("DPTXlator");
 		t = new DPTXlator2ByteFloat(DPTXlator2ByteFloat.DPT_RAIN_AMOUNT);
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#setValues (java.lang.String[])}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testSetValues() throws KNXFormatException
+	@Test
+	void setValues() throws KNXFormatException
 	{
 		t.setValues(new String[] {});
 		assertEquals(1, t.getItems());
@@ -119,12 +106,8 @@ public class DPTXlator2ByteFloatTest extends TestCase
 		t.setValues(new String[] { t.getValue(), t.getValue() });
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#getAllValues()}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testGetAllValues() throws KNXFormatException
+	@Test
+	void getAllValues() throws KNXFormatException
 	{
 		assertEquals(t.getItems(), t.getItems());
 		assertEquals(0.0, t.getNumericValue(), 0);
@@ -136,13 +119,8 @@ public class DPTXlator2ByteFloatTest extends TestCase
 			assertTrue(returned[i].indexOf(strings[i]) >= 0);
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#setValue (java.lang.String)}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testSetValueString() throws KNXFormatException
+	@Test
+	void setValueString() throws KNXFormatException
 	{
 		t.setValue(value1);
 		assertEquals(1, t.getItems());
@@ -153,11 +131,8 @@ public class DPTXlator2ByteFloatTest extends TestCase
 		assertTrue(t.getValue().startsWith(value1Enc));
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#setData(byte[], int)}.
-	 */
-	public final void testSetDataByteArrayInt()
+	@Test
+	void setDataByteArrayInt()
 	{
 		t.setData(dataMin, 0);
 		try {
@@ -181,13 +156,8 @@ public class DPTXlator2ByteFloatTest extends TestCase
 		Helper.assertSimilar(new String[] { max, value1Enc }, t.getAllValues());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#getData(byte[], int)}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testGetDataByteArrayInt() throws KNXFormatException
+	@Test
+	void getDataByteArrayInt() throws KNXFormatException
 	{
 		t.setData(dataValue2, 2);
 		final byte[] data = t.getData(new byte[5], 2);
@@ -211,10 +181,8 @@ public class DPTXlator2ByteFloatTest extends TestCase
 		assertTrue(Arrays.equals(array, t.getData(new byte[6], 1)));
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#getSubTypes()}.
-	 */
-	public final void testGetSubTypes()
+	@Test
+	void getSubTypes()
 	{
 		assertEquals(dpts.length, t.getSubTypes().size());
 		t.getSubTypes().remove(dpts[0].getID());
@@ -224,13 +192,8 @@ public class DPTXlator2ByteFloatTest extends TestCase
 		assertEquals(dpts.length, t.getSubTypes().size());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#DPTXlator2ByteFloat
-	 * (tuwien.auto.calimero.dptxlator.DPT)}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testDPTXlator2ByteFloatDPT() throws KNXFormatException
+	@Test
+	void dptXlator2ByteFloatDPT() throws KNXFormatException
 	{
 		// do no similarity test because float type rounding issues
 		Helper.checkDPTs(dpts, false);
@@ -262,12 +225,8 @@ public class DPTXlator2ByteFloatTest extends TestCase
 		catch (final KNXFormatException e) {}
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#getNumericValue()}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testGetNumericValue() throws KNXFormatException
+	@Test
+	void getNumericValue() throws KNXFormatException
 	{
 		assertEquals(0.0, t.getNumericValue(), 0);
 
@@ -288,12 +247,8 @@ public class DPTXlator2ByteFloatTest extends TestCase
 		}
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat#setValue(double)}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testSetValueDouble() throws KNXFormatException
+	@Test
+	void setValueDouble() throws KNXFormatException
 	{
 		for (int i = 0; i < floats.length; i++) {
 			t.setValue(floats[i]);
@@ -302,12 +257,8 @@ public class DPTXlator2ByteFloatTest extends TestCase
 		}
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#toString()}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testToString() throws KNXFormatException
+	@Test
+	void testToString() throws KNXFormatException
 	{
 		assertTrue(t.toString().indexOf("0.0") >= 0);
 		t.setValues(strings);
@@ -317,12 +268,8 @@ public class DPTXlator2ByteFloatTest extends TestCase
 		}
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#getValue()}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testGetValue() throws KNXFormatException
+	@Test
+	void getValue() throws KNXFormatException
 	{
 		assertTrue(t.getValue().indexOf("0") >= 0);
 		assertTrue(t.getValue().indexOf(t.getType().getUnit()) >= 0);
@@ -334,10 +281,8 @@ public class DPTXlator2ByteFloatTest extends TestCase
 		assertTrue(t.getValue().indexOf(s) >= 0);
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#getType()}.
-	 */
-	public final void testGetType()
+	@Test
+	void getType()
 	{
 		assertEquals(t.getType(), dpts[17]);
 	}

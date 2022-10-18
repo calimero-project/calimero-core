@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@
 
 package tuwien.auto.calimero.cemi;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -55,9 +55,7 @@ import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Priority;
 
-/**
- * @author B. Malinowsky
- */
+
 class CEMILDataExTest
 {
 	private CEMILDataEx f;
@@ -77,7 +75,7 @@ class CEMILDataExTest
 	}
 
 	@Test
-	void testGetStructLength()
+	void getStructLength()
 	{
 		assertEquals(11 + 2 + 2 + 2 + 4, f.getStructLength());
 		f.additionalInfo().removeIf(info -> info.type() == AdditionalInfo.PlMedium);
@@ -93,7 +91,7 @@ class CEMILDataExTest
 	}
 
 	@Test
-	void testSetHopCount()
+	void setHopCount()
 	{
 		assertEquals(6, f.getHopCount());
 		f.setHopCount(2);
@@ -104,7 +102,7 @@ class CEMILDataExTest
 	}
 
 	@Test
-	void testSetPriority()
+	void setPriority()
 	{
 		assertEquals(Priority.LOW, f.getPriority());
 		f.setPriority(Priority.SYSTEM);
@@ -112,7 +110,7 @@ class CEMILDataExTest
 	}
 
 	@Test
-	void testSetBroadcast()
+	void setBroadcast()
 	{
 		assertTrue(f.isDomainBroadcast());
 		f.setBroadcast(false);
@@ -133,13 +131,13 @@ class CEMILDataExTest
 	}
 
 	@Test
-	void testGetAdditionalInfoInt()
+	void getAdditionalInfoInt()
 	{
 		assertNull(f.getAdditionalInfo(AdditionalInfo.RfMedium));
 	}
 
 	@Test
-	void testIsExtendedFrame()
+	void isExtendedFrame()
 	{
 		assertFalse(f.isExtendedFrame());
 		final CEMILDataEx f2 = new CEMILDataEx(CEMILData.MC_LDATA_REQ, src, dst,

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,9 +48,7 @@ import tuwien.auto.calimero.link.medium.TP1Ack;
 import tuwien.auto.calimero.link.medium.TP1LData;
 import tuwien.auto.calimero.link.medium.TP1LPollData;
 
-/**
- * @author B. Malinowsky
- */
+
 public final class Debug
 {
 	private static boolean printToSystemOut;

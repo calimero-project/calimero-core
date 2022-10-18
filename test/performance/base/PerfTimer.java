@@ -40,10 +40,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * @author B. Malinowsky
- */
-public class PerfTimer
+
+class PerfTimer
 {
 	private final List<Long> start = new ArrayList<>();
 	private final List<Long> stop = new ArrayList<>();

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -88,9 +88,7 @@ import tuwien.auto.calimero.knxnetip.servicetype.RoutingBusy;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingSystemBroadcast;
 import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
 
-/**
- * @author B. Malinowsky
- */
+
 @KnxnetIP
 class KNXnetIPRouterTest
 {
@@ -164,7 +162,7 @@ class KNXnetIPRouterTest
 	}
 
 	@Test
-	void testSend() throws KNXException
+	void send() throws KNXException
 	{
 		newRouter();
 		doSend(frame, NonBlocking);
@@ -173,7 +171,7 @@ class KNXnetIPRouterTest
 	}
 
 	@Test
-	void testSend2() throws KNXException, SocketException, UnknownHostException
+	void send2() throws KNXException, SocketException, UnknownHostException
 	{
 		r = new KNXnetIPRouting(Util.localInterface(), InetAddress.getByName(KNXnetIPRouting.DEFAULT_MULTICAST));
 		r.addConnectionListener(l);
@@ -192,7 +190,7 @@ class KNXnetIPRouterTest
 	}
 
 	@Test
-	void testKNXnetIPRouter() throws SocketException, UnknownHostException, KNXException
+	void knxnetIPRouter() throws SocketException, UnknownHostException, KNXException
 	{
 		newRouter();
 		assertEquals(KNXnetIPConnection.OK, r.getState());
@@ -209,7 +207,7 @@ class KNXnetIPRouterTest
 
 	@Test
 	@Slow
-	void testReceive() throws KNXException
+	void receive() throws KNXException
 	{
 		newRouter();
 		Util.out("waiting for some incoming frames...");
@@ -220,7 +218,7 @@ class KNXnetIPRouterTest
 	}
 
 	@Test
-	void testSetHopCount() throws KNXException
+	void setHopCount() throws KNXException
 	{
 		newRouter();
 		final int hobbes = r.getHopCount();
@@ -247,7 +245,7 @@ class KNXnetIPRouterTest
 	}
 
 	@Test
-	void testClose() throws KNXException
+	void close() throws KNXException
 	{
 		newRouter();
 		r.close();
@@ -261,7 +259,7 @@ class KNXnetIPRouterTest
 	}
 
 	@Test
-	void testGetRemoteAddress() throws KNXException, SocketException, UnknownHostException
+	void getRemoteAddress() throws KNXException, SocketException, UnknownHostException
 	{
 		newRouter();
 		assertEquals(new InetSocketAddress(KNXnetIPRouting.DEFAULT_MULTICAST, KNXnetIPConnection.DEFAULT_PORT),
@@ -279,7 +277,7 @@ class KNXnetIPRouterTest
 
 	@Test
 	@KnxnetIPSequential
-	public void testLostMessageIndication() throws KNXException
+	void lostMessageIndication() throws KNXException
 	{
 		newRouter();
 		int sent = 0;

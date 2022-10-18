@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,15 +36,17 @@
 
 package tuwien.auto.calimero.buffer.cache;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 
-/**
- * @author B. Malinowsky
- */
-public class CacheSweeperTest extends TestCase
-{
 
+class CacheSweeperTest
+{
 	class TestCache implements Cache
 	{
 		@Override
@@ -81,19 +83,9 @@ public class CacheSweeperTest extends TestCase
 	Cache test;
 	CacheSweeper sweeper;
 
-	/**
-	 * @param name name of test case
-	 */
-	public CacheSweeperTest(final String name)
-	{
-		super(name);
-	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
+	@BeforeEach
+	void init() throws Exception
 	{
 		test = new TestCache();
 		sweeper = new CacheSweeper(test, 4);
@@ -101,21 +93,15 @@ public class CacheSweeperTest extends TestCase
 		Thread.sleep(10);
 	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
+	@AfterEach
+	void tearDown() throws Exception
 	{
 		if (sweeper != null)
 			sweeper.stopSweeper();
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.cache.CacheSweeper#setSweepInterval(int)}.
-	 */
-	public void testSetSweepInterval()
+	@Test
+	void setSweepInterval()
 	{
 		boolean zero = false;
 		try {
@@ -156,15 +142,12 @@ public class CacheSweeperTest extends TestCase
 			catch (final InterruptedException e) {}
 		}
 		after = System.currentTimeMillis();
-		assertTrue("it was " + String.valueOf(after - now), after - now >= 1950);
-		assertTrue("it was " + String.valueOf(after - now), after - now < 2050);
+		assertTrue(after - now >= 1950, "it was " + String.valueOf(after - now));
+		assertTrue(after - now < 2050, "it was " + String.valueOf(after - now));
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.cache.CacheSweeper#stopSweeper()}.
-	 */
-	public void testStopSweeper()
+	@Test
+	void stopSweeper()
 	{
 		final long now = System.currentTimeMillis();
 		sweeper.stopSweeper();
@@ -175,5 +158,4 @@ public class CacheSweeperTest extends TestCase
 		final long after = System.currentTimeMillis();
 		assertTrue(after - now < 50);
 	}
-
 }

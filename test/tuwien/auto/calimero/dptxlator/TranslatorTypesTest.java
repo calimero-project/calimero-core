@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,49 +36,34 @@
 
 package tuwien.auto.calimero.dptxlator;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.dptxlator.TranslatorTypes.MainType;
 
-/**
- * @author B. Malinowsky
- */
-public class TranslatorTypesTest extends TestCase
+
+class TranslatorTypesTest
 {
 	private final MainType[] types =
 		TranslatorTypes.getAllMainTypes().values().toArray(new MainType[0]);
 
-	/**
-	 * @param name name for test case
-	 */
-	public TranslatorTypesTest(final String name)
-	{
-		super(name);
-	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-	}
-
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.TranslatorTypes#getMainType(int)}.
-	 *
-	 * @throws KNXException
-	 */
-	public final void testGetMainType() throws KNXException
+	@Test
+	void getMainType() throws KNXException
 	{
 		for (int i = 0; i < 100; ++i) {
 			if (TranslatorTypes.getMainType(i) == null
@@ -94,13 +79,8 @@ public class TranslatorTypesTest extends TestCase
 		}
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.TranslatorTypes#getAllMainTypes()}.
-	 *
-	 * @throws KNXException
-	 */
-	public final void testGetAllMainTypes() throws KNXException
+	@Test
+	void getAllMainTypes() throws KNXException
 	{
 		assertTrue(TranslatorTypes.getAllMainTypes().size() > 7);
 		final Map<Integer, MainType> m = TranslatorTypes.getAllMainTypes();
@@ -135,7 +115,8 @@ public class TranslatorTypesTest extends TestCase
 			DPTXlatorBoolean.DPT_ENABLE).getClass(), DPTXlatorBoolean.class);
 	}
 
-	public void testOfBitSize()
+	@Test
+	void ofBitSize()
 	{
 		List<MainType> ofBitSize = TranslatorTypes.ofBitSize(-1);
 		assertEquals(0, ofBitSize.size());
@@ -165,13 +146,8 @@ public class TranslatorTypesTest extends TestCase
 
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.TranslatorTypes#createTranslator(int, java.lang.String)}.
-	 *
-	 * @throws KNXException
-	 */
-	public final void testCreateTranslator() throws KNXException
+	@Test
+	void createTranslator() throws KNXException
 	{
 		// with main number
 		for (int i = 0; i < types.length; i++) {
@@ -209,7 +185,8 @@ public class TranslatorTypesTest extends TestCase
 		catch (final KNXException e) {}
 	}
 
-	public void testCreateTranslatorWithData() throws KNXIllegalArgumentException, KNXException
+	@Test
+	void createTranslatorWithData() throws KNXIllegalArgumentException, KNXException
 	{
 		DPTXlator t = TranslatorTypes.createTranslator("9.001");
 		assertEquals(0.0, t.getNumericValue());
@@ -230,7 +207,8 @@ public class TranslatorTypesTest extends TestCase
 		assertTrue(Arrays.deepEquals(new String[] { "25.0", "25.32" }, t.getAllValues()));
 	}
 
-	public void testCreateTranslatorWithMainSub() throws KNXException
+	@Test
+	void createTranslatorWithMainSub() throws KNXException
 	{
 		final DPTXlator t = TranslatorTypes.createTranslator(9, 1);
 		assertEquals(DPTXlator2ByteFloat.DPT_TEMPERATURE, t.getType());

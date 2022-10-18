@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,7 +47,6 @@ import org.junit.jupiter.api.Test;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.Util;
 
 class DPTXlator4ByteUnsignedTest {
 	private DPTXlator4ByteUnsigned t;
@@ -71,12 +70,11 @@ class DPTXlator4ByteUnsignedTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		Util.setupLogging("DPTXlator");
 		t = new DPTXlator4ByteUnsigned(DPTXlator4ByteUnsigned.DPT_VALUE_4_UCOUNT);
 	}
 
 	@Test
-	void testSetValues() throws KNXFormatException {
+	void setValues() throws KNXFormatException {
 		t.setValues(strings);
 		assertEquals(strings.length, t.getItems());
 		Helper.assertSimilar(strings, t.getAllValues());
@@ -94,7 +92,7 @@ class DPTXlator4ByteUnsignedTest {
 	}
 
 	@Test
-	void testGetAllValues() throws KNXFormatException {
+	void getAllValues() throws KNXFormatException {
 		assertEquals(1, t.getItems());
 		Helper.assertSimilar("0", t.getAllValues()[0]);
 
@@ -113,7 +111,7 @@ class DPTXlator4ByteUnsignedTest {
 	}
 
 	@Test
-	void testSetValueString() throws KNXFormatException {
+	void setValueString() throws KNXFormatException {
 		t.setValue(value2);
 		Helper.assertSimilar(value2, t.getValue());
 		String s = t.getValue();
@@ -130,7 +128,7 @@ class DPTXlator4ByteUnsignedTest {
 	}
 
 	@Test
-	void testGetValue() throws KNXFormatException {
+	void getValue() throws KNXFormatException {
 		Helper.assertSimilar("0", t.getValue());
 		t.setValues(new String[0]);
 		Helper.assertSimilar("0", t.getValue());
@@ -143,7 +141,7 @@ class DPTXlator4ByteUnsignedTest {
 	}
 
 	@Test
-	void testSetDataByteArrayInt() {
+	void setDataByteArrayInt() {
 		t.setData(dataMin, 0);
 		try {
 			t.setData(new byte[] {}, 0);
@@ -172,7 +170,7 @@ class DPTXlator4ByteUnsignedTest {
 	}
 
 	@Test
-	void testGetDataByteArrayInt() throws KNXFormatException {
+	void getDataByteArrayInt() throws KNXFormatException {
 		byte[] d = new byte[5];
 		Arrays.fill(d, (byte) 0xAA);
 		assertEquals(5, t.getData(d, 1).length);
@@ -204,12 +202,12 @@ class DPTXlator4ByteUnsignedTest {
 	}
 
 	@Test
-	void testGetSubTypes() {
+	void getSubTypes() {
 		assertEquals(6, t.getSubTypes().size());
 	}
 
 	@Test
-	void testGetValueUnsigned() throws KNXFormatException {
+	void getValueUnsigned() throws KNXFormatException {
 		assertEquals(0, t.getValueUnsigned());
 
 		for (int i = 0; i < uints.length - 1; i++) {
@@ -226,7 +224,7 @@ class DPTXlator4ByteUnsignedTest {
 	}
 
 	@Test
-	void testSetValueLong() throws KNXFormatException {
+	void setValueLong() throws KNXFormatException {
 		for (int i = 0; i < uints.length; i++) {
 			t.setValue(uints[i]);
 			assertEquals(uints[i], t.getValueUnsigned());

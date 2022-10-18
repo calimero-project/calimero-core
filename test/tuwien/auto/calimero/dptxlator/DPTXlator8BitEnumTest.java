@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2021 B. Malinowsky
+    Copyright (c) 2015, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,7 +48,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import tuwien.auto.calimero.KNXFormatException;
-import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.dptxlator.DPTXlator8BitEnum.ApplicationArea;
 import tuwien.auto.calimero.dptxlator.DPTXlator8BitEnum.OccupancyMode;
 
@@ -81,13 +80,12 @@ class DPTXlator8BitEnumTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		Util.setupLogging("DPTXlator");
 		TranslatorTypes.createTranslator(0, "20.003");
 		t = new DPTXlator8BitEnum(DPTXlator8BitEnum.DptApplicationArea.getID());
 	}
 
 	@Test
-	void testGetAllValues() throws KNXFormatException {
+	void getAllValues() throws KNXFormatException {
 		assertEquals(1, t.getAllValues().length);
 		assertEquals("no fault", t.getAllValues()[0]);
 
@@ -96,7 +94,7 @@ class DPTXlator8BitEnumTest {
 	}
 
 	@Test
-	void testGetValue() throws KNXFormatException {
+	void getValue() throws KNXFormatException {
 		// translator specific
 		assertEquals("no fault", t.getValue());
 		t.setValue(1);
@@ -112,13 +110,13 @@ class DPTXlator8BitEnumTest {
 	}
 
 	@Test
-	void testGetSubTypes() {
+	void getSubTypes() {
 		final Map<String, DPT> subTypes = t.getSubTypes();
 		assertEquals(58, subTypes.size());
 	}
 
 	@Test
-	void testSetValueInt() throws KNXFormatException {
+	void setValueInt() throws KNXFormatException {
 		t.setValue(OccupancyMode.Occupied.value());
 		t.setValue(e2);
 		try {
@@ -141,7 +139,7 @@ class DPTXlator8BitEnumTest {
 	}
 
 	@Test
-	void testGetValueUnsigned() throws KNXFormatException {
+	void getValueUnsigned() throws KNXFormatException {
 		final Map<String, DPT> subTypes = DPTXlator8BitEnum.getSubTypesStatic();
 		final Set<String> keySet = subTypes.keySet();
 		for (final String s : keySet) {
@@ -153,7 +151,7 @@ class DPTXlator8BitEnumTest {
 	}
 
 	@Test
-	void testSetValues() throws KNXFormatException {
+	void setValues() throws KNXFormatException {
 		t.setValues(strings);
 		t.setValues(stringsDesc);
 		t.setValues(stringsName);
@@ -168,7 +166,7 @@ class DPTXlator8BitEnumTest {
 	}
 
 	@Test
-	void testSetDataByteArrayInt() throws KNXFormatException {
+	void setDataByteArrayInt() throws KNXFormatException {
 		t.setData(e1Data, 0);
 		assertEquals(0, t.getValueUnsigned());
 
@@ -193,7 +191,7 @@ class DPTXlator8BitEnumTest {
 	}
 
 	@Test
-	void testGetDataByteArrayInt() throws KNXFormatException {
+	void getDataByteArrayInt() throws KNXFormatException {
 		t.setValue(e1);
 		assertArrayEquals(e1Data, t.getData());
 		t.setData(eAllData);
@@ -211,7 +209,7 @@ class DPTXlator8BitEnumTest {
 	}
 
 	@Test
-	void testGetTypeSize() {
+	void getTypeSize() {
 		assertEquals(1, t.getTypeSize());
 	}
 

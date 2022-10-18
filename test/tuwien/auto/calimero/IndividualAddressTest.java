@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2014 B. Malinowsky
+    Copyright (c) 2014, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,48 +36,13 @@
 
 package tuwien.auto.calimero;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author B. Malinowsky
- */
-public class IndividualAddressTest extends TestCase
-{
+import org.junit.jupiter.api.Test;
 
-	/**
-	 * @param name
-	 */
-	public IndividualAddressTest(final String name)
-	{
-		super(name);
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
-	{
-		super.tearDown();
-	}
-
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.IndividualAddress#IndividualAddress(java.lang.String)}.
-	 * 
-	 * @throws KNXFormatException
-	 */
-	public void testIndividualAddressString() throws KNXFormatException
-	{
+class IndividualAddressTest {
+	@Test
+	void individualAddressString() throws KNXFormatException {
 		new IndividualAddress("1.2.3");
 		final IndividualAddress a = new IndividualAddress("4611");
 		assertEquals(4611, a.getRawAddress());

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,63 +36,36 @@
 
 package tuwien.auto.calimero.buffer.cache;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.List;
 import java.util.Vector;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 
-/**
- * @author B. Malinowsky
- */
-public class CacheObjectTest extends TestCase
-{
+class CacheObjectTest {
 	private final Object key = new Object();
 	private final Object value = new Object();
 
-	/**
-	 * @param name name of test case
-	 */
-	public CacheObjectTest(final String name)
-	{
-		super(name);
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
-	{
-		super.tearDown();
-	}
-
-	/**
-	 * Test method for {@link tuwien.auto.calimero.buffer.cache.CacheObject#CacheObject
-	 * (java.lang.Object, java.lang.Object)}.
-	 */
-	public void testCacheObject()
-	{
+	@Test
+	void cacheObject() {
 		CacheObject o = null;
 		try {
 			o = new CacheObject(null, null);
 		}
-		catch (final KNXIllegalArgumentException e) {}
+		catch (final KNXIllegalArgumentException e) {
+		}
 		assertNull(o);
 
 		try {
 			o = new CacheObject("CacheObject", null);
 		}
-		catch (final KNXIllegalArgumentException e) {}
+		catch (final KNXIllegalArgumentException e) {
+		}
 		assertNull(o);
 
 		o = new CacheObject(key, value);
@@ -106,17 +79,11 @@ public class CacheObjectTest extends TestCase
 		assertEquals(vvalue, o.getValue());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.cache.CacheObject#getTimestamp()}.
-	 */
-	public void testGetTimestamp()
-	{
+	@Test
+	void getTimestamp() {
 		final long time = System.currentTimeMillis();
 		final CacheObject o = new CacheObject(key, value);
 		assertTrue(o.getTimestamp() != 0);
-		assertTrue("wrong timestamp", o.getTimestamp() >= time
-			&& o.getTimestamp() <= time + 2);
+		assertTrue(o.getTimestamp() >= time && o.getTimestamp() <= time + 2, "wrong timestamp");
 	}
-
 }

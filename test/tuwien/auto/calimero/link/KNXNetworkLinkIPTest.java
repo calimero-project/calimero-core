@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -83,11 +83,9 @@ import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature.InterfaceFeatu
 import tuwien.auto.calimero.link.medium.PLSettings;
 import tuwien.auto.calimero.link.medium.TPSettings;
 
-/**
- * @author B. Malinowsky
- */
+
 @KnxnetIP
-public class KNXNetworkLinkIPTest
+class KNXNetworkLinkIPTest
 {
 	private KNXNetworkLink tnl;
 	private KNXNetworkLink rtr;
@@ -166,7 +164,7 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
-	void testKNXNetworkLinkIPConstructor() throws KNXException, InterruptedException
+	void networkLinkIPConstructor() throws KNXException, InterruptedException
 	{
 		tnl.close();
 		try (KNXNetworkLink l = new KNXNetworkLinkIP(100, new InetSocketAddress(0), Util.getServer(), false,
@@ -199,14 +197,14 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
-	void testAddLinkListener()
+	void addLinkListener()
 	{
 		tnl.addLinkListener(ltnl);
 		tnl.addLinkListener(ltnl);
 	}
 
 	@Test
-	void testSetKNXMedium()
+	void setKNXMedium()
 	{
 		try {
 			tnl.setKNXMedium(new PLSettings());
@@ -230,14 +228,14 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
-	void testGetKNXMedium()
+	void getKNXMedium()
 	{
 		assertTrue(tnl.getKNXMedium() instanceof TPSettings);
 		assertEquals(0, tnl.getKNXMedium().getDeviceAddress().getRawAddress());
 	}
 
 	@Test
-	void testClose() throws InterruptedException, KNXTimeoutException
+	void close() throws InterruptedException, KNXTimeoutException
 	{
 		assertTrue(tnl.isOpen());
 		tnl.close();
@@ -254,7 +252,7 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
-	void testGetHopCount()
+	void getHopCount()
 	{
 		assertEquals(6, rtr.getHopCount());
 		rtr.setHopCount(7);
@@ -272,7 +270,7 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
-	void testRemoveLinkListener()
+	void removeLinkListener()
 	{
 		tnl.removeLinkListener(ltnl);
 		tnl.removeLinkListener(ltnl);
@@ -281,7 +279,7 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
-	void testSendRequestKNXAddressPriorityByteArray()
+	void sendRequestKNXAddressPriorityByteArray()
 		throws InterruptedException, UnknownHostException, KNXException
 	{
 		doSend(true, new byte[] { 0, (byte) (0x80 | 1) });
@@ -313,7 +311,7 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
-	void testSendRequestCEMILData() throws KNXLinkClosedException, KNXTimeoutException
+	void sendRequestCEMILData() throws KNXLinkClosedException, KNXTimeoutException
 	{
 		ltnl.con = null;
 		tnl.send(frame2, false);
@@ -331,7 +329,7 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
-	void testSendRequestWaitKNXAddressPriorityByteArray()
+	void sendRequestWaitKNXAddressPriorityByteArray()
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
 		doSendWait(true, new byte[] { 0, (byte) (0x80 | 1) });
@@ -358,7 +356,7 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
-	void testSendRequestWaitCEMILData() throws KNXTimeoutException, KNXLinkClosedException
+	void sendRequestWaitCEMILData() throws KNXTimeoutException, KNXLinkClosedException
 	{
 		ltnl.con = null;
 		try {
@@ -381,7 +379,7 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
-	void testGetName()
+	void getName()
 	{
 		String n = tnl.getName();
 		assertTrue(n.indexOf(Util.getServer().getAddress().getHostAddress()) > -1);

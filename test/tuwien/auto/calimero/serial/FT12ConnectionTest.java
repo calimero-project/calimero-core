@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ class FT12ConnectionTest {
 	}
 
 	@Test
-	void testGetPortIdentifiers() {
+	void getPortIdentifiers() {
 		assertNotNull(FT12Connection.getPortIdentifiers());
 	}
 
@@ -100,7 +100,7 @@ class FT12ConnectionTest {
 		}
 
 		@Test
-		void testFT12ConnectionInt() throws InterruptedException {
+		void ft12ConnectionInt() throws InterruptedException {
 			portID = c.getPortID();
 			try {
 				final FT12Connection c2 = new FT12Connection(usePort);
@@ -119,7 +119,7 @@ class FT12ConnectionTest {
 		}
 
 		@Test
-		void testFT12ConnectionStringInt() throws KNXException, InterruptedException {
+		void ft12ConnectionStringInt() throws KNXException, InterruptedException {
 			c.close();
 			c = new FT12Connection(portID, 19200);
 			c.close();
@@ -133,7 +133,7 @@ class FT12ConnectionTest {
 		}
 
 		@Test
-		void testClose() throws KNXException, InterruptedException {
+		void close() throws KNXException, InterruptedException {
 			assertEquals(FT12Connection.OK, c.getState());
 			c.close();
 			assertEquals(FT12Connection.CLOSED, c.getState());
@@ -149,7 +149,7 @@ class FT12ConnectionTest {
 		}
 
 		@Test
-		void testGetSetBaudRate() throws IOException {
+		void getSetBaudRate() throws IOException {
 			assertEquals(19200, c.getBaudRate());
 			c.setBaudrate(9600);
 			assertEquals(9600, c.getBaudRate());
@@ -160,7 +160,7 @@ class FT12ConnectionTest {
 		}
 
 		@Test
-		void testGetState() throws KNXException, InterruptedException {
+		void getState() throws KNXException, InterruptedException {
 			assertEquals(FT12Connection.OK, c.getState());
 			final byte[] switchNormal = { (byte) 0xA9, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
 			c.send(switchNormal, true);
@@ -177,7 +177,7 @@ class FT12ConnectionTest {
 		}
 
 		@Test
-		void testSend() throws KNXException, InterruptedException {
+		void send() throws KNXException, InterruptedException {
 			c.send(new byte[] { 1, 2, }, true);
 			c.send(new byte[] { 1, 2, }, false);
 			c.send(new byte[] { 1, 2, }, true);

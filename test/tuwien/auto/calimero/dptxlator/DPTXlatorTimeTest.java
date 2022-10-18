@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ class DPTXlatorTimeTest
 	}
 
 	@Test
-	void testSetValues() throws KNXFormatException
+	void setValues() throws KNXFormatException
 	{
 		t.setValues(values);
 		assertEquals(3, t.getItems());
@@ -94,7 +94,7 @@ class DPTXlatorTimeTest
 	}
 
 	@Test
-	void testGetAllValues() throws KNXFormatException
+	void getAllValues() throws KNXFormatException
 	{
 		assertEquals(1, t.getAllValues().length);
 		Helper.assertSimilar("00:00:00", t.getAllValues()[0]);
@@ -106,7 +106,7 @@ class DPTXlatorTimeTest
 	}
 
 	@Test
-	void testSetValueString() throws KNXFormatException
+	void setValueString() throws KNXFormatException
 	{
 		assertEquals(1, t.getItems());
 		t.setValue(dpt.getLowerValue());
@@ -131,7 +131,7 @@ class DPTXlatorTimeTest
 	}
 
 	@Test
-	void testSetDataByteArrayInt()
+	void setDataByteArrayInt()
 	{
 		t.setData(data, 1);
 		assertEquals(1, t.getItems());
@@ -148,7 +148,7 @@ class DPTXlatorTimeTest
 	}
 
 	@Test
-	void testGetDataByteArrayInt()
+	void getDataByteArrayInt()
 	{
 		byte[] d = t.getData(new byte[5], 2);
 		for (int i = 0; i < d.length; ++i)
@@ -160,14 +160,14 @@ class DPTXlatorTimeTest
 	}
 
 	@Test
-	void testGetSubTypes()
+	void getSubTypes()
 	{
 		assertEquals(1, t.getSubTypes().size());
 		t.getSubTypes().containsKey(dpt.getID());
 	}
 
 	@Test
-	void testSetValueIntIntIntInt()
+	void setValueIntIntIntInt()
 	{
 		t.setValue(6, 15, 16, 17);
 		assertEquals(15, t.getHour());
@@ -195,7 +195,7 @@ class DPTXlatorTimeTest
 	}
 
 	@Test
-	void testInitialGet()
+	void initialGet()
 	{
 		assertEquals(1, t.getItems());
 		assertEquals(0, t.getDayOfWeek());
@@ -206,7 +206,7 @@ class DPTXlatorTimeTest
 	}
 
 	@Test
-	void testSetValueLong()
+	void setValueLong()
 	{
 		final Calendar c = Calendar.getInstance();
 		t.setValue(c.getTimeInMillis());
@@ -221,7 +221,7 @@ class DPTXlatorTimeTest
 	}
 
 	@Test
-	void testGetValueMilliseconds()
+	void getValueMilliseconds()
 	{
 		final Calendar c = Calendar.getInstance();
 		final SimpleDateFormat sdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
@@ -243,7 +243,7 @@ class DPTXlatorTimeTest
 	}
 
 	@Test
-	void testLocalTime()
+	void localTime()
 	{
 		final LocalTime time = t.localTime();
 		assertEquals(time.getHour(), t.getHour());
@@ -253,7 +253,7 @@ class DPTXlatorTimeTest
 
 	@Test
 	@ResourceLock(value = "useValueFormat", mode = ResourceAccessMode.READ_WRITE)
-	void testUseValueFormat() throws KNXFormatException
+	void useValueFormat() throws KNXFormatException
 	{
 		DPTXlatorTime.useValueFormat("[uuMMdd ]HHmmss");
 		final String v = "071020 223344";

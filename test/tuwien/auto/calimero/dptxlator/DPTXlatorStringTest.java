@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,17 +36,20 @@
 
 package tuwien.auto.calimero.dptxlator;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.Arrays;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.Util;
 
-/**
- * @author B. Malinowsky
- */
-public class DPTXlatorStringTest extends TestCase
+
+class DPTXlatorStringTest
 {
 	private DPTXlatorString t;
 	private final String string1 = "test1";
@@ -69,22 +72,10 @@ public class DPTXlatorStringTest extends TestCase
 	private final byte[] data = new byte[42];
 	private final String[] strings = new String[] { string1, max, string2 };
 
-	/**
-	 * @param name name of test case
-	 */
-	public DPTXlatorStringTest(final String name)
-	{
-		super(name);
-	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
+	@BeforeEach
+	void init() throws Exception
 	{
-		super.setUp();
-		Util.setupLogging("DPTXlator");
 		t = new DPTXlatorString(DPTXlatorString.DPT_STRING_8859_1);
 		data1[0] = (byte) 't';
 		data1[1] = (byte) 'e';
@@ -106,13 +97,8 @@ public class DPTXlatorStringTest extends TestCase
 			data[i] = data2[i - 28];
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorString#setValues(java.lang.String[])}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testSetValues() throws KNXFormatException
+	@Test
+	void setValues() throws KNXFormatException
 	{
 		t.setValues(strings);
 		String[] ret = t.getAllValues();
@@ -135,13 +121,8 @@ public class DPTXlatorStringTest extends TestCase
 		assertArrayEquals(buf, t.getAllValues());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorString#getAllValues()}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testGetAllValues() throws KNXFormatException
+	@Test
+	void getAllValues() throws KNXFormatException
 	{
 		assertEquals(1, t.getItems());
 		assertEquals(t.getItems(), t.getItems());
@@ -156,13 +137,8 @@ public class DPTXlatorStringTest extends TestCase
 		assertEquals(string1, t.getAllValues()[0]);
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorString#setValue(java.lang.String)}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testSetValue() throws KNXFormatException
+	@Test
+	void setValue() throws KNXFormatException
 	{
 		t.setValue(string1);
 		assertEquals(string1, t.getValue());
@@ -201,11 +177,8 @@ public class DPTXlatorStringTest extends TestCase
 		assertEquals("ab?cd?", t.getValue());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorString#setData(byte[], int)}.
-	 */
-	public final void testSetDataByteArrayInt()
+	@Test
+	void setDataByteArrayInt()
 	{
 		t.setData(data, 0);
 		try {
@@ -249,13 +222,8 @@ public class DPTXlatorStringTest extends TestCase
 		assertArrayEquals(strings, t.getAllValues());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorString#getData(byte[], int)}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testGetDataByteArrayInt() throws KNXFormatException
+	@Test
+	void getDataByteArrayInt() throws KNXFormatException
 	{
 		assertEquals(25, t.getData(new byte[25], 4).length);
 		final byte[] buf = new byte[20];
@@ -280,25 +248,16 @@ public class DPTXlatorStringTest extends TestCase
 		}
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorString#getSubTypes()}.
-	 */
-	public final void testGetSubTypes()
+	@Test
+	void getSubTypes()
 	{
 		assertEquals(2, t.getSubTypes().size());
 		t.getSubTypes().containsKey(DPTXlatorString.DPT_STRING_ASCII.getID());
 		t.getSubTypes().containsKey(DPTXlatorString.DPT_STRING_8859_1.getID());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorString#DPTXlatorString
-	 * (tuwien.auto.calimero.dptxlator.DPT)}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testDPTXlatorStringDPT() throws KNXFormatException
+	@Test
+	void dptXlatorStringDPT() throws KNXFormatException
 	{
 		new DPTXlatorString(DPTXlatorString.DPT_STRING_8859_1);
 	}

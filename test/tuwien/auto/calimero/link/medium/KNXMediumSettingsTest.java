@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2013, 2015 B. Malinowsky
+    Copyright (c) 2013, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,46 +36,16 @@
 
 package tuwien.auto.calimero.link.medium;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import org.junit.jupiter.api.Test;
+
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 
-/**
- * @author B. Malinowsky
- */
-public class KNXMediumSettingsTest extends TestCase
-{
-	/**
-	 * @param name
-	 */
-	public KNXMediumSettingsTest(final String name)
-	{
-		super(name);
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
-	{
-		super.tearDown();
-	}
-
-	/**
-	 * Test method for {@link tuwien.auto.calimero.link.medium.KNXMediumSettings
-	 * #create(int, tuwien.auto.calimero.IndividualAddress)}.
-	 */
-	public void testCreate()
-	{
+class KNXMediumSettingsTest {
+	@Test
+	void create() {
 		testCreate(KNXMediumSettings.MEDIUM_TP1, TPSettings.class);
 		testCreate(KNXMediumSettings.MEDIUM_PL110, PLSettings.class);
 		testCreate(KNXMediumSettings.MEDIUM_RF, RFSettings.class);
@@ -97,19 +67,14 @@ public class KNXMediumSettingsTest extends TestCase
 		}
 	}
 
-	private void testCreate(final int medium, final Class<? extends KNXMediumSettings> type)
-	{
+	private void testCreate(final int medium, final Class<? extends KNXMediumSettings> type) {
 		final KNXMediumSettings settings = KNXMediumSettings.create(medium, null);
 		assertEquals(settings.getClass(), type);
 		assertEquals(medium, settings.getMedium());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.link.medium.KNXMediumSettings#getMedium(java.lang.String)}.
-	 */
-	public void testGetMediumString()
-	{
+	@Test
+	void getMediumString() {
 		assertEquals(KNXMediumSettings.MEDIUM_TP1, KNXMediumSettings.getMedium("TP1"));
 		assertEquals(KNXMediumSettings.MEDIUM_PL110, KNXMediumSettings.getMedium("p110"));
 		assertEquals(KNXMediumSettings.MEDIUM_PL110, KNXMediumSettings.getMedium("PL110"));
@@ -120,17 +85,20 @@ public class KNXMediumSettingsTest extends TestCase
 			KNXMediumSettings.getMedium("Re");
 			fail("unknown medium type name");
 		}
-		catch (final KNXIllegalArgumentException e) {}
+		catch (final KNXIllegalArgumentException e) {
+		}
 		try {
 			KNXMediumSettings.getMedium("KNX  IP");
 			fail("unknown medium type name");
 		}
-		catch (final KNXIllegalArgumentException e) {}
+		catch (final KNXIllegalArgumentException e) {
+		}
 		try {
 			KNXMediumSettings.getMedium("");
 			fail("no medium type name");
 		}
-		catch (final KNXIllegalArgumentException e) {}
+		catch (final KNXIllegalArgumentException e) {
+		}
 		try {
 			KNXMediumSettings.getMedium(null);
 			fail("null medium type name");

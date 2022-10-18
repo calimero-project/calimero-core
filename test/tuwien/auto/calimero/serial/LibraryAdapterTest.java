@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2016, 2020 B. Malinowsky
+    Copyright (c) 2016, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,11 +40,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 
-class LibraryAdapterTest
-{
+class LibraryAdapterTest {
 	@Test
-	void getPortIdentifiers()
-	{
+	void getPortIdentifiers() {
 		assertNotNull(LibraryAdapter.getPortIdentifiers());
 	}
 }

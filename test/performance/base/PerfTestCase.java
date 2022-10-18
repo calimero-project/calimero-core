@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,13 +39,10 @@ package performance.base;
 import java.io.PrintStream;
 import java.util.Arrays;
 
-import junit.framework.TestCase;
 import tuwien.auto.calimero.Util;
 
-/**
- * @author B. Malinowsky
- */
-public class PerfTestCase extends TestCase
+
+public class PerfTestCase
 {
 	/** rounds to perform before timing the test. */
 	protected int warmups = 10;
@@ -57,85 +54,6 @@ public class PerfTestCase extends TestCase
 	private int normalize = 1;
 	private final PerfTimer t = new PerfTimer();
 
-	/**
-	 * Creates a new test case for measuring performance.
-	 */
-	public PerfTestCase()
-	{
-		super();
-	}
-
-	/**
-	 * Creates a new test case for measuring performance.
-	 * <p>
-	 *
-	 * @param name name of test case name of test case
-	 */
-	public PerfTestCase(final String name)
-	{
-		super(name);
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#runBare()
-	 */
-	@Override
-	public void runBare() throws Throwable
-	{
-		setUp();
-		Thread.currentThread().setPriority(10);
-		assertEquals(Thread.currentThread().getPriority(), 10);
-		try {
-			for (int i = 0; i < warmups; ++i)
-				runTest();
-			for (int i = 0; i < measure; ++i) {
-				Thread.sleep(1);
-				t.start();
-				try {
-					runTest();
-				}
-				finally {
-					t.stop();
-				}
-			}
-		}
-		finally {
-			tearDown();
-		}
-	}
-
-	/**
-	 * Returns the number of rounds to perform before timing the test.
-	 * <p>
-	 *
-	 * @return number of warm-up rounds
-	 */
-	public int getWarmupLaps()
-	{
-		return warmups;
-	}
-
-	/**
-	 * Returns the number of rounds to perform for measuring the test.
-	 * <p>
-	 *
-	 * @return number of measure rounds
-	 */
-	public int getMeasureLaps()
-	{
-		return measure;
-	}
-
-	/**
-	 * Returns the normalize value used for the test case result.
-	 * <p>
-	 *
-	 * @return normalize value
-	 */
-	public int getNormalize()
-	{
-		return normalize;
-	}
 
 	/**
 	 * Sets the normalize value used for calculating the test result.
@@ -158,7 +76,7 @@ public class PerfTestCase extends TestCase
 	public void printResults()
 	{
 		final Integer[] d = t.getDurations();
-		Util.out("Timing results for " + getName());
+		Util.out("Timing results for " + this);
 		Util.out("Laps: " + warmups + " warmups, " + measure + " measured (out of " + d.length + "), "
 				+ (warmups + measure) + " total");
 		String s = "Avg lap: " + t.getAverageDuration() + " ms, normalized: " + (t.getAverageDuration() / normalize)
@@ -184,10 +102,5 @@ public class PerfTestCase extends TestCase
 	protected PerfTimer getTimer()
 	{
 		return t;
-	}
-
-	public final void testDummy()
-	{
-		// prevents jUnit warning "no test found in test case"
 	}
 }

@@ -142,6 +142,4 @@ dependencies {
     api 'org.usb4java:usb4java-javax:1.3.0'
 
 	testImplementation "org.junit.jupiter:junit-jupiter:${junitJupiterVersion}"
-	testCompileOnly 'junit:junit:4.13.2'
-	testRuntimeOnly "org.junit.vintage:junit-vintage-engine:${junitJupiterVersion}"
 }

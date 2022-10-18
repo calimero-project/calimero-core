@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -57,10 +57,8 @@ import tuwien.auto.calimero.xml.XmlOutputFactory;
 import tuwien.auto.calimero.xml.XmlReader;
 import tuwien.auto.calimero.xml.XmlWriter;
 
-/**
- * @author B. Malinowsky
- */
-public class DatapointMapTest
+
+class DatapointMapTest
 {
 	private static final String dpFile = Util.getTargetPath() + "datapointMap.xml";
 
@@ -78,12 +76,8 @@ public class DatapointMapTest
 		m = new DatapointMap<>();
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.datapoint.DatapointMap#DatapointMap(
-	 * java.util.Collection)}.
-	 */
 	@Test
-	public final void testDatapointMapCollection()
+	void datapointMapCollection()
 	{
 		final List<Datapoint> l = new ArrayList<>();
 		l.add(dp1);
@@ -95,12 +89,8 @@ public class DatapointMapTest
 		assertTrue(dpm.contains(ga3));
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.datapoint.DatapointMap#add(
-	 * tuwien.auto.calimero.datapoint.Datapoint)}.
-	 */
 	@Test
-	public final void testAdd()
+	void add()
 	{
 		assertFalse(m.contains(ga1));
 		assertFalse(m.contains(dp1));
@@ -110,12 +100,8 @@ public class DatapointMapTest
 		assertEquals(dp1, m.get(ga1));
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.datapoint.DatapointMap#remove(
-	 * tuwien.auto.calimero.datapoint.Datapoint)}.
-	 */
 	@Test
-	public final void testRemove()
+	void remove()
 	{
 		m.add(dp1);
 		assertTrue(m.contains(ga1));
@@ -125,12 +111,8 @@ public class DatapointMapTest
 		assertFalse(m.contains(ga1));
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.datapoint.DatapointMap#get(
-	 * tuwien.auto.calimero.GroupAddress)}.
-	 */
 	@Test
-	public final void testGet()
+	void get()
 	{
 		assertNull(m.get(ga3));
 		m.add(dp3);
@@ -140,11 +122,8 @@ public class DatapointMapTest
 		assertNull(m.get(ga3));
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.datapoint.DatapointMap#removeAll()}.
-	 */
 	@Test
-	public final void testRemoveAll()
+	void removeAll()
 	{
 		final List<Datapoint> l = new ArrayList<>();
 		l.add(dp1);
@@ -157,11 +136,8 @@ public class DatapointMapTest
 		assertFalse(dpm.contains(ga3));
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.datapoint.DatapointMap#getDatapoints()}.
-	 */
 	@Test
-	public final void testGetDatapoints()
+	void getDatapoints()
 	{
 		Collection<Datapoint> c = ((DatapointMap<Datapoint>) m).getDatapoints();
 		assertEquals(0, c.size());
@@ -180,14 +156,8 @@ public class DatapointMapTest
 		assertEquals(3, c.size());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.datapoint.DatapointMap#load(
-	 * tuwien.auto.calimero.xml.XmlReader)}.
-	 *
-	 * @throws KNXMLException
-	 */
 	@Test
-	public final void testLoad() throws KNXMLException
+	void load() throws KNXMLException
 	{
 		final XmlWriter w = XmlOutputFactory.newInstance().createXMLWriter(dpFile);
 		m.add(dp1);
@@ -247,14 +217,8 @@ public class DatapointMapTest
 		r5.close();
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.datapoint.DatapointMap#save(
-	 * tuwien.auto.calimero.xml.XmlWriter)}.
-	 *
-	 * @throws KNXMLException
-	 */
 	@Test
-	public final void testSave() throws KNXMLException
+	void save() throws KNXMLException
 	{
 		final XmlWriter w = XmlOutputFactory.newInstance().createXMLWriter(dpFile);
 		m.save(w);

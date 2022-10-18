@@ -36,17 +36,16 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import org.junit.Assert;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import tuwien.auto.calimero.KNXException;
 
-/**
- * @author B. Malinowsky
- */
+
 public final class Helper
 {
-	private Helper()
-	{}
+	private Helper() {}
 
 	/**
 	 * Assert similar for String array.
@@ -56,7 +55,7 @@ public final class Helper
 	 */
 	public static void assertSimilar(final String[] expected, final String[] actual)
 	{
-		Assert.assertEquals(expected.length, actual.length);
+		assertEquals(expected.length, actual.length);
 		for (int i = 0; i < expected.length; i++)
 			assertSimilar(expected[i], actual[i]);
 	}
@@ -72,8 +71,8 @@ public final class Helper
 	 */
 	public static void assertSimilar(final String expected, final String actual)
 	{
-		Assert.assertTrue("expected: " + expected + ", actual: " + actual, actual
-			.toLowerCase().indexOf(expected.toLowerCase()) > -1);
+		assertTrue(actual.toLowerCase().indexOf(expected.toLowerCase()) > -1,
+				"expected: " + expected + ", actual: " + actual);
 	}
 
 	/**
@@ -98,7 +97,7 @@ public final class Helper
 			}
 		}
 		catch (final KNXException e) {
-			Assert.fail(e.getMessage());
+			fail(e.getMessage());
 		}
 	}
 }

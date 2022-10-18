@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,18 +36,22 @@
 
 package tuwien.auto.calimero.dptxlator;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.Arrays;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled.DPT3BitControlled;
 
-/**
- * @author B. Malinowsky
- */
-public class DPTXlator3BitControlledTest extends TestCase
+
+class DPTXlator3BitControlledTest
 {
 	// translator for DPT 3.007 dimming
 	private DPTXlator3BitControlled t7;
@@ -78,44 +82,23 @@ public class DPTXlator3BitControlledTest extends TestCase
 	// for all DPTs: offset = 2, items: value2, valueBreak, value1,
 	private final byte[] data = { 0, 0, 0x0F, 0x0, 0x1, };
 
-	/**
-	 * @param name name of test case
-	 */
-	public DPTXlator3BitControlledTest(final String name)
-	{
-		super(name);
-	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
+	@BeforeEach
+	void init() throws Exception
 	{
-		super.setUp();
-		Util.setupLogging("DPTXlator");
 		t7 = new DPTXlator3BitControlled(dim);
 		t8 = new DPTXlator3BitControlled(blind);
 	}
 
-	/**
-	 * Test method for {@link DPTXlator3BitControlled#DPTXlator3BitControlled(DPT)}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testDPTXlator3BitControlled() throws KNXFormatException
+	@Test
+	void dptXlator3BitControlled() throws KNXFormatException
 	{
 		new DPTXlator3BitControlled(DPTXlator3BitControlled.DPT_CONTROL_BLINDS);
 		new DPTXlator3BitControlled(DPTXlator3BitControlled.DPT_CONTROL_DIMMING);
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled#setValues(java.lang.String[])}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testSetValues() throws KNXFormatException
+	@Test
+	void setValues() throws KNXFormatException
 	{
 		t7.setValues(dims);
 		assertEquals(dims.length, t7.getItems());
@@ -133,11 +116,8 @@ public class DPTXlator3BitControlledTest extends TestCase
 		t7.setValues(new String[] { t7.getValue(), t7.getValue() });
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled#getAllValues()}.
-	 */
-	public final void testGetAllValues()
+	@Test
+	void getAllValues()
 	{
 		assertEquals(1, t8.getItems());
 		assertEquals(t8.getItems(), t8.getItems());
@@ -153,14 +133,8 @@ public class DPTXlator3BitControlledTest extends TestCase
 		Helper.assertSimilar(blindValue2, t8.getAllValues()[0]);
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled#setValue
-	 * (java.lang.String)}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testSetValueString() throws KNXFormatException
+	@Test
+	void setValueString() throws KNXFormatException
 	{
 		t7.setValue(DPTXlator3BitControlled.DPT_CONTROL_DIMMING.getLowerValue());
 		t7.setValue(DPTXlator3BitControlled.DPT_CONTROL_DIMMING.getUpperValue());
@@ -195,11 +169,8 @@ public class DPTXlator3BitControlledTest extends TestCase
 		catch (final KNXFormatException e) {}
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled#setData(byte[], int)}.
-	 */
-	public final void testSetDataByteArrayInt()
+	@Test
+	void setDataByteArrayInt()
 	{
 		t8.setData(blindData, 0);
 		try {
@@ -223,11 +194,8 @@ public class DPTXlator3BitControlledTest extends TestCase
 			.getAllValues());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled#getData(byte[], int)}.
-	 */
-	public final void testGetDataByteArrayInt()
+	@Test
+	void getDataByteArrayInt()
 	{
 		assertEquals(4, t7.getData(new byte[4], 1).length);
 		final byte[] empty = new byte[4];
@@ -254,11 +222,8 @@ public class DPTXlator3BitControlledTest extends TestCase
 		}
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled#getSubTypes()}.
-	 */
-	public final void testGetSubTypes()
+	@Test
+	void getSubTypes()
 	{
 		assertEquals(2, t7.getSubTypes().size());
 		t7.getSubTypes().remove(dim.getID());
@@ -273,13 +238,8 @@ public class DPTXlator3BitControlledTest extends TestCase
 		assertEquals(2, t7.getSubTypes().size());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled#getControlBit()}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testGetControlBit() throws KNXFormatException
+	@Test
+	void getControlBit() throws KNXFormatException
 	{
 		assertFalse(t7.getControlBit());
 		t7.setControlBit(true);
@@ -290,13 +250,8 @@ public class DPTXlator3BitControlledTest extends TestCase
 		assertTrue(t7.getControlBit());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled#setControlBit(boolean)}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testSetControlBit() throws KNXFormatException
+	@Test
+	void setControlBit() throws KNXFormatException
 	{
 		t7.setControlBit(true);
 		assertTrue(t7.getControlBit());
@@ -315,13 +270,8 @@ public class DPTXlator3BitControlledTest extends TestCase
 		assertEquals(7, t7.getStepCode());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled#getStepCode()}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testGetStepCode() throws KNXFormatException
+	@Test
+	void getStepCode() throws KNXFormatException
 	{
 		assertEquals(0, t8.getStepCode());
 		t8.setData(blindData);
@@ -332,11 +282,8 @@ public class DPTXlator3BitControlledTest extends TestCase
 		assertEquals(7, t8.getStepCode());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled#getIntervals()}.
-	 */
-	public final void testGetIntervals()
+	@Test
+	void getIntervals()
 	{
 		assertEquals(0, t8.getIntervals());
 		t8.setStepCode(7);
@@ -347,11 +294,8 @@ public class DPTXlator3BitControlledTest extends TestCase
 		assertEquals(4, t8.getIntervals());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled#setIntervals(int)}.
-	 */
-	public final void testSetIntervals()
+	@Test
+	void setIntervals()
 	{
 		try {
 			t8.setIntervals(0);
@@ -377,13 +321,8 @@ public class DPTXlator3BitControlledTest extends TestCase
 		assertEquals(1, t8.getIntervals());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled#setStepCode(int)}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testSetStepCode() throws KNXFormatException
+	@Test
+	void setStepCode() throws KNXFormatException
 	{
 		try {
 			t8.setStepCode(8);
@@ -409,12 +348,8 @@ public class DPTXlator3BitControlledTest extends TestCase
 		assertEquals(2, t8.getStepCode());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#getValue()}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testGetValue() throws KNXFormatException
+	@Test
+	void getValue() throws KNXFormatException
 	{
 		Helper.assertSimilar("decrease break", t7.getValue());
 		Helper.assertSimilar("up break", t8.getValue());
@@ -429,10 +364,8 @@ public class DPTXlator3BitControlledTest extends TestCase
 		Helper.assertSimilar(blindValue3, t8.getValue());
 	}
 
-	/**
-	 * Test method for {@link DPTXlator3BitControlled#setValue(int)}.
-	 */
-	public final void testSetValueInt()
+	@Test
+	void setValueInt()
 	{
 		t7.setValue(3);
 		assertEquals(3, t7.getValueSigned());
