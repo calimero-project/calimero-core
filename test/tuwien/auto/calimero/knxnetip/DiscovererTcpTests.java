@@ -69,7 +69,7 @@ class DiscovererTcpTests {
 	@BeforeEach
 	void setUp() throws Exception {
 		conn = TcpConnection.newTcpConnection(Util.localEndpoint(), Util.getServer());
-		discoverer = (DiscovererTcp) Discoverer.tcp(conn);
+		discoverer = Discoverer.tcp(conn);
 	}
 
 	@AfterEach
@@ -107,7 +107,7 @@ class DiscovererTcpTests {
 	void descriptionUsingSecureSession() throws KNXException, InterruptedException {
 		final var pwdHash = SecureConnection.hashUserPassword("user1".toCharArray());
 		try (var session = conn.newSecureSession(1, pwdHash, new byte[16])) {
-			final var discoverer = (DiscovererTcp) Discoverer.secure(session);
+			final var discoverer = Discoverer.secure(session);
 			final var result = discoverer.description();
 			assertEquals(Util.getServer(), result.remoteEndpoint());
 		}
@@ -187,14 +187,5 @@ class DiscovererTcpTests {
 			discoverer.timeout(Duration.ofNanos(1)).description();
 		}
 		catch (final KNXTimeoutException ok) {}
-	}
-
-	@Test
-	@SuppressWarnings("removal")
-	void unsupportedMethodsThrow() {
-		final var server = Util.getServer();
-		assertThrows(UnsupportedOperationException.class, () -> discoverer.search(server));
-		assertThrows(UnsupportedOperationException.class, () -> discoverer.startSearch(Util.localInterface(), 5, true));
-		assertThrows(UnsupportedOperationException.class, () -> discoverer.getDescription(server, 5));
 	}
 }
