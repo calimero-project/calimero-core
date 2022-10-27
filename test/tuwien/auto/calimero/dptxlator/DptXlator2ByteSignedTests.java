@@ -307,12 +307,16 @@ class DptXlator2ByteSignedTests {
 		try {
 			for (int i = 0; i < dpts.length; i++) {
 				final DPTXlator t = TranslatorTypes.createTranslator(0, dpts[i].getID());
-				t.setValue(dpts[i].getLowerValue());
+
+				final String lower = format(Double.parseDouble(dpts[i].getLowerValue()));
+				t.setValue(lower);
 				if (testSimilarity)
-					Helper.assertSimilar(format(Double.parseDouble(dpts[i].getLowerValue())), t.getValue());
-				t.setValue(dpts[i].getUpperValue());
+					Helper.assertSimilar(lower, t.getValue());
+
+				final String upper = format(Double.parseDouble(dpts[i].getUpperValue()));
+				t.setValue(upper);
 				if (testSimilarity)
-					Helper.assertSimilar(format(Double.parseDouble(dpts[i].getUpperValue())), t.getValue());
+					Helper.assertSimilar(upper, t.getValue());
 			}
 		}
 		catch (final KNXException e) {

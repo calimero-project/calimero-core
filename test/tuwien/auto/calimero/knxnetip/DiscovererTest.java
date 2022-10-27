@@ -441,12 +441,12 @@ class DiscovererTest
 
 	// checks that all used receiver threads are idle
 	private static void allReceiverThreadsIdle() throws InterruptedException {
-		Thread.sleep(100);
+		Thread.sleep(1500);
 		final Thread[] threads = new Thread[Thread.activeCount() + 5];
 		assertTrue(Thread.enumerate(threads) < threads.length);
 		final List<Thread> l = Arrays.asList(threads);
 		assertTrue(l.stream().filter(Objects::nonNull).map(Thread::getName).filter(s -> s.startsWith("Discoverer"))
-				.allMatch(s -> s.equals("Discoverer (idle)")));
+				.allMatch(s -> s.equals("Discoverer (idle)")), "receiver thread(s) not idle");
 	}
 
 	@Test

@@ -48,11 +48,13 @@ import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Isolated;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 
 
+@Isolated("modifies Locale")
 class DPTXlator4ByteFloatTest
 {
 	private DPTXlator4ByteFloat x;

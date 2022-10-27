@@ -226,16 +226,6 @@ class DPTXlator3BitControlledTest
 	void getSubTypes()
 	{
 		assertEquals(2, t7.getSubTypes().size());
-		t7.getSubTypes().remove(dim.getID());
-		assertEquals(1, t7.getSubTypes().size());
-		assertEquals(1, t8.getSubTypes().size());
-
-		t8.getSubTypes().put(blind.getID(), blind);
-		assertEquals(1, t7.getSubTypes().size());
-		assertEquals(1, t8.getSubTypes().size());
-		// type map is static member in translator, so add DPT again
-		t7.getSubTypes().put(dim.getID(), dim);
-		assertEquals(2, t7.getSubTypes().size());
 	}
 
 	@Test

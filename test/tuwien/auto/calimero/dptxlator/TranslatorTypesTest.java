@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Isolated;
 
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
@@ -56,6 +57,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.dptxlator.TranslatorTypes.MainType;
 
 
+@Isolated("clears map obtained by getAllMainTypes")
 class TranslatorTypesTest
 {
 	private final MainType[] types =

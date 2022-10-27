@@ -61,7 +61,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 
-@Isolated // because we change Locale
+@Isolated("modifies Locale")
 class DPTXlatorDateTimeTest {
 	private DPTXlatorDateTime t;
 
