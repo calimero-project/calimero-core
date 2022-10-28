@@ -44,9 +44,7 @@ javadoc.options.encoding = 'UTF-8'
 
 
 compileJava.options*.compilerArgs = [
-	'-Xlint:all',
-	'-Xlint:-options',
-//	'-Werror'
+	'-Xlint:all,-serial',
 	"--limit-modules", "java.base,java.xml"
 ]
 
