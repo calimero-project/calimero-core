@@ -44,10 +44,14 @@ import static tuwien.auto.calimero.mgmt.Destination.State.OpenWait;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
@@ -117,17 +121,18 @@ public class TransportLayerImpl implements TransportLayer
 			else {
 				final IndividualAddress src = f.getSource();
 				// are we waiting for ack?
-				synchronized (indications) {
+				ackLock.lock();
+				try {
 					if (active != null && active.getDestination().getAddress().equals(src)) {
 						indications.add(e);
-						indications.notify();
+						ackCond.signal();
 						return;
 					}
 				}
-				AggregatorProxy ap = null;
-				synchronized (proxies) {
-					ap = proxies.get(src);
+				finally {
+					ackLock.unlock();
 				}
+				final AggregatorProxy ap = proxies.get(src);
 				try {
 					handleConnected(f, ap);
 				}
@@ -177,12 +182,14 @@ public class TransportLayerImpl implements TransportLayer
 	private final EventListeners<TransportListener> listeners;
 
 	// holds the mapping of connection destination address to proxy
-	private final Map<IndividualAddress, AggregatorProxy> proxies = new HashMap<>();
-	private final Map<IndividualAddress, AggregatorProxy> incomingProxies = new HashMap<>();
+	private final Map<IndividualAddress, AggregatorProxy> proxies = new ConcurrentHashMap<>();
 	private AggregatorProxy active;
 
 	private volatile int repeated;
-	private final Object lock = new Object();
+
+	private final ReentrantLock sendLock = new ReentrantLock(true);
+	private final ReentrantLock ackLock = new ReentrantLock(true);
+	private final Condition ackCond = ackLock.newCondition();
 
 	/**
 	 * Creates a new client-side transport layer end-point attached to the supplied KNX network
@@ -244,15 +251,14 @@ public class TransportLayerImpl implements TransportLayer
 	{
 		if (detached)
 			throw new IllegalStateException("TL detached");
-		synchronized (proxies) {
-			if (proxies.containsKey(remote))
-				throw new KNXIllegalArgumentException("destination already created: " + remote);
-			final AggregatorProxy p = new AggregatorProxy(this);
-			final Destination d = new Destination(p, remote, connectionOriented, keepAlive, verifyMode);
-			proxies.put(remote, p);
-			logger.trace("created {}", d);
-			return d;
-		}
+
+		final AggregatorProxy p = new AggregatorProxy(this);
+		if (proxies.putIfAbsent(remote, p) != null)
+			throw new KNXIllegalArgumentException("destination already created: " + remote);
+
+		final Destination d = new Destination(p, remote, connectionOriented, keepAlive, verifyMode);
+		logger.trace("created {}", d);
+		return d;
 	}
 
 	/**
@@ -278,20 +284,25 @@ public class TransportLayerImpl implements TransportLayer
 	@Override
 	public void destroyDestination(final Destination d)
 	{
-		// method invocation is idempotent
-		synchronized (proxies) {
-			final AggregatorProxy p = proxies.get(d.getAddress());
-			if (p == null)
-				return;
-			if (p.getDestination() == d) {
-				d.destroy();
-				proxies.remove(d.getAddress());
-				synchronized (indications) {
-					indications.notify();
-				}
-			}
-			else
-				logger.warn("not owner of " + d.getAddress());
+		final AggregatorProxy p = proxies.get(d.getAddress());
+		if (p == null)
+			return;
+		if (p.getDestination() != d) {
+			logger.warn("not owner of " + d.getAddress());
+			return;
+		}
+
+		d.destroy();
+		// Destination::destroy needs the proxy entry, so remove has to be after destroy
+		if (proxies.remove(d.getAddress()) == null)
+			return;
+		// someone might be waiting for an ack from this particular destination, wake up
+		ackLock.lock();
+		try {
+			ackCond.signal();
+		}
+		finally {
+			ackLock.unlock();
 		}
 	}
 
@@ -345,32 +356,36 @@ public class TransportLayerImpl implements TransportLayer
 		}
 		final AggregatorProxy ap = getProxy(d);
 		tsdu[0] = (byte) (tsdu[0] & 0x03 | DATA_CONNECTED | ap.getSeqSend() << 2);
-		// the entry lock guards between send and return (only one at a time)
-		synchronized (lock) {
-			// on indications we do wait() for incoming messages
-			synchronized (indications) {
-				try {
-					active = ap;
-					for (repeated = 0; repeated < MAX_REPEAT + 1; ++repeated) {
-						try {
-							logger.trace("sending data connected to {}, attempt {}", d.getAddress(), (repeated + 1));
-							// set state and timer
-							ap.setState(OpenWait);
-							lnk.sendRequestWait(d.getAddress(), p, tsdu);
-							if (waitForAck())
-								return;
-						}
-						catch (final KNXTimeoutException e) {}
-						// cancel repetitions if detached or destroyed
-						if (detached || d.getState() == Destroyed)
-							throw new KNXDisconnectException("send data connected failed", d);
+		// this lock guards between send and return (only one at a time)
+		sendLock.lock();
+		try {
+			// on indications lock we wait for incoming messages
+			ackLock.lock();
+			try {
+				active = ap;
+				for (repeated = 0; repeated < MAX_REPEAT + 1; ++repeated) {
+					try {
+						logger.trace("sending data connected to {}, attempt {}", d.getAddress(), (repeated + 1));
+						// set state and timer
+						ap.setState(OpenWait);
+						lnk.sendRequestWait(d.getAddress(), p, tsdu);
+						if (waitForAck())
+							return;
 					}
-				}
-				finally {
-					active = null;
-					repeated = 0;
+					catch (final KNXTimeoutException e) {}
+					// cancel repetitions if detached or destroyed
+					if (detached || d.getState() == Destroyed)
+						throw new KNXDisconnectException("send data connected failed", d);
 				}
 			}
+			finally {
+				active = null;
+				repeated = 0;
+				ackLock.unlock();
+			}
+		}
+		finally {
+			sendLock.unlock();
 		}
 		disconnectIndicate(ap, true);
 		throw new KNXDisconnectException("send data connected failed", d);
@@ -424,14 +439,13 @@ public class TransportLayerImpl implements TransportLayer
 	{
 		if (detached)
 			throw new IllegalStateException("TL detached");
-		synchronized (proxies) {
-			final AggregatorProxy p = proxies.get(d.getAddress());
-			// TODO at this point, proxy might also be null because destination just got destroyed
-			// check identity, too, to prevent destination with only same address
-			if (p == null || p.getDestination() != d)
-				throw new KNXIllegalArgumentException("not the owner of " + d.toString());
-			return p;
-		}
+
+		final AggregatorProxy p = proxies.get(d.getAddress());
+		// proxy might also be null because destination already got destroyed
+		// check identity, too, to prevent destination with only same address
+		if (p == null || p.getDestination() != d)
+			throw new KNXIllegalArgumentException("not the owner of " + d);
+		return p;
 	}
 
 	private void handleConnected(final CEMILData frame, final AggregatorProxy p)
@@ -452,32 +466,31 @@ public class TransportLayerImpl implements TransportLayer
 				if (!frame.getDestination().equals(device))
 					return;
 
-				AggregatorProxy proxy = p;
 				// if we receive a new connect, but an old destination is still
 				// here configured as connection-less, we get a problem with setting
 				// the connection timeout (connectionless has no support for that)
-				if (proxy != null && !d.isConnectionOriented()) {
+				if (p != null && !d.isConnectionOriented()) {
 					logger.warn(d + ": recreate for conn-oriented");
 					d.destroy();
-					proxy = null;
 				}
 
-				// allow incoming connect requests (server)
-				if (proxy == null) {
-					proxy = new AggregatorProxy(this);
-					// constructor of destination assigns itself to proxy
-					@SuppressWarnings({ "resource", "unused" })
-					final var client = new Destination(proxy, sender, true);
-					incomingProxies.put(sender, proxy);
-					proxies.put(sender, proxy);
-					proxy.setState(OpenIdle);
-				}
-				else {
-					// reset the sequence counters
-					proxy.setState(Connecting);
+				final BiFunction<IndividualAddress, AggregatorProxy, AggregatorProxy> setupProxy = (__, proxy) -> {
+					if (proxy == null) {
+						// allow incoming connect requests (server)
+						proxy = new AggregatorProxy(this);
+						// constructor of destination assigns itself to proxy
+						new Destination(proxy, sender, true);
+					}
+					else {
+						// reset the sequence counters
+						proxy.setState(Connecting);
+					}
 					// restart disconnect timer
 					proxy.setState(OpenIdle);
-				}
+					return proxy;
+				};
+
+				proxies.compute(sender, setupProxy);
 			}
 			else {
 				// don't allow (client side)
@@ -545,7 +558,7 @@ public class TransportLayerImpl implements TransportLayer
 						throw new KNXDisconnectException(d.getAddress() + " disconnected while awaiting ACK", d);
 					if (d.getState() == OpenIdle)
 						return true;
-					indications.wait(remaining);
+					ackCond.await(remaining, TimeUnit.MILLISECONDS);
 					if (d.getState() == Disconnected || d.getState() == Destroyed)
 						throw new KNXDisconnectException(d.getAddress() + " disconnected while awaiting ACK", d);
 				}
@@ -564,14 +577,7 @@ public class TransportLayerImpl implements TransportLayer
 
 	private void closeDestinations(final boolean skipSendDisconnect)
 	{
-		// we can't use proxies default iterator due to concurrent modifications in
-		// destroyDestination(), called by d.destroy()
-		AggregatorProxy[] allProxies = new AggregatorProxy[proxies.size()];
-		synchronized (proxies) {
-			allProxies = proxies.values().toArray(allProxies);
-		}
-		for (int i = 0; i < allProxies.length; i++) {
-			final AggregatorProxy p = allProxies[i];
+		for (final AggregatorProxy p : proxies.values()) {
 			final Destination d = p.getDestination();
 			if (skipSendDisconnect && d.getState() != Disconnected) {
 				p.setState(Disconnected);

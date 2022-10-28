@@ -42,6 +42,9 @@ import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.IndividualAddress;
@@ -446,13 +449,14 @@ public abstract class ClientConnection extends ConnectionBase
 		private static final int CONNECTIONSTATE_REQ_TIMEOUT = 10;
 		private static final int HEARTBEAT_INTERVAL = 60;
 		private static final int MAX_REQUEST_ATTEMPTS = 4;
-		private boolean received;
 
 		HeartbeatMonitor()
 		{
 			super("KNXnet/IP heartbeat monitor");
 			setDaemon(true);
 		}
+		private final ReentrantLock lock = new ReentrantLock();
+		private final Condition received = lock.newCondition();
 
 		@Override
 		public void run()
@@ -465,18 +469,14 @@ public abstract class ClientConnection extends ConnectionBase
 					int i = 0;
 					for (; i < MAX_REQUEST_ATTEMPTS; i++) {
 						logger.trace("sending connection state request, attempt " + (i + 1));
-						synchronized (this) {
-							received = false;
+						lock.lock();
+						try {
 							send(buf, ctrlEndpt);
-
-							long remaining = CONNECTIONSTATE_REQ_TIMEOUT * 1000L;
-							final long end = System.currentTimeMillis() + remaining;
-							while (!received && remaining > 0) {
-								wait(remaining);
-								remaining = end - System.currentTimeMillis();
-							}
-							if (received)
+							if (received.await(CONNECTIONSTATE_REQ_TIMEOUT, TimeUnit.SECONDS))
 								break;
+						}
+						finally {
+							lock.unlock();
 						}
 					}
 					// disconnect on no reply
@@ -509,13 +509,16 @@ public abstract class ClientConnection extends ConnectionBase
 
 		void setResponse(final ConnectionstateResponse res)
 		{
-			final boolean ok = res.getStatus() == ErrorCodes.NO_ERROR;
-			synchronized (this) {
-				if (ok)
-					received = true;
-				notify();
+			if (res.getStatus() == ErrorCodes.NO_ERROR) {
+				lock.lock();
+				try {
+					received.signal();
+				}
+				finally {
+					lock.unlock();
+				}
 			}
-			if (!ok)
+			else
 				logger.warn("connection state response: {} (channel {})", res.getStatusString(), channelId);
 		}
 	}

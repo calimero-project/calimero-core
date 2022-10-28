@@ -443,4 +443,9 @@ class TransportLayerImplTest
 		final CEMILData ldata = (CEMILData) ltl.ind.poll(3, TimeUnit.SECONDS);
 		assertNotNull(ldata, "no property response received");
 	}
+
+	@Test
+	void destroyDestination() {
+		tl.destroyDestination(dco);
+	}
 }

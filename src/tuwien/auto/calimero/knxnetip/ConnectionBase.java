@@ -46,6 +46,9 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.slf4j.Logger;
 
@@ -133,7 +136,8 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	private ReceiverLoop receiver;
 
 	// lock object to do wait() on for protocol timeouts
-	final Object lock = new Object();
+	final ReentrantLock lock = new ReentrantLock(true);
+	private final Condition cond = lock.newCondition();
 
 	// send/receive sequence numbers
 	private int seqRcv;
@@ -204,7 +208,8 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		}
 		// arrange into line depending on blocking mode
 		sendWaitQueue.acquire(mode != NonBlocking);
-		synchronized (lock) {
+		lock.lock();
+		try {
 			if (mode == NonBlocking && state != OK && state != ACK_ERROR) {
 				logger.warn(
 						"nonblocking send invoked while waiting for data response in state " + state + " - aborted");
@@ -276,6 +281,9 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 				if (mode != NonBlocking || serviceRequest == KNXnetIPHeader.ROUTING_IND)
 					sendWaitQueue.release(mode != NonBlocking);
 			}
+		}
+		finally {
+			lock.unlock();
 		}
 	}
 
@@ -424,12 +432,16 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	 */
 	protected final void setStateNotify(final int newState)
 	{
-		synchronized (lock) {
+		lock.lock();
+		try {
 			setState(newState);
 			if (newState == OK && !inBlockingSend)
 				this.sendWaitQueue.release(false);
 			// worst case: we notify 2 threads, the closing one and 1 sending
-			lock.notifyAll();
+			cond.signalAll();
+		}
+		finally {
+			lock.unlock();
 		}
 	}
 
@@ -449,20 +461,19 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 				return;
 			closing = 1;
 		}
+		lock.lock();
 		try {
-			synchronized (lock) {
-				final boolean tcp = ctrlSocket == null;
-				final var hpai = tcp ? HPAI.Tcp : new HPAI(HPAI.IPV4_UDP,
-						useNat ? null : (InetSocketAddress) ctrlSocket.getLocalSocketAddress());
-				logger.trace("sending disconnect request for {}", this);
-				final byte[] buf = PacketHelper.toPacket(new DisconnectRequest(channelId, hpai));
-				send(buf, ctrlEndpt);
-				long remaining = CONNECT_REQ_TIMEOUT * 1000L;
-				final long end = System.currentTimeMillis() + remaining;
-				while (closing == 1 && remaining > 0) {
-					lock.wait(remaining);
-					remaining = end - System.currentTimeMillis();
-				}
+			final boolean tcp = ctrlSocket == null;
+			final var hpai = tcp ? HPAI.Tcp : new HPAI(HPAI.IPV4_UDP,
+					useNat ? null : (InetSocketAddress) ctrlSocket.getLocalSocketAddress());
+			logger.trace("sending disconnect request for {}", this);
+			final byte[] buf = PacketHelper.toPacket(new DisconnectRequest(channelId, hpai));
+			send(buf, ctrlEndpt);
+			long remaining = CONNECT_REQ_TIMEOUT * 1000L;
+			final long end = System.currentTimeMillis() + remaining;
+			while (closing == 1 && remaining > 0) {
+				cond.await(remaining, TimeUnit.MILLISECONDS);
+				remaining = end - System.currentTimeMillis();
 			}
 		}
 		catch (final InterruptedException e) {
@@ -473,6 +484,9 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 			// before close(), getLocalSocketAddress() might throw illegal argument
 			// exception or return the wildcard address, indicating a messed up socket
 			logger.error("send disconnect failed", e);
+		}
+		finally {
+			lock.unlock();
 		}
 		cleanup(initiator, reason, level, t);
 	}
@@ -547,11 +561,15 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		boolean changed = false;
 		long remaining = timeout * 1000L;
 		final long end = System.currentTimeMillis() + remaining;
-		synchronized (lock) {
+		lock.lock();
+		try {
 			while (internalState == initialState && remaining > 0) {
-				lock.wait(remaining);
+				cond.await(remaining, TimeUnit.MILLISECONDS);
 				remaining = end - System.currentTimeMillis();
 			}
+		}
+		finally {
+			lock.unlock();
 		}
 		changed = remaining > 0;
 		return changed;

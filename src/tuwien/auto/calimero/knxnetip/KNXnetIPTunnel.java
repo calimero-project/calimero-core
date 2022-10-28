@@ -217,9 +217,13 @@ public class KNXnetIPTunnel extends ClientConnection
 	// sendFeature / getFeature?
 	public void send(final InterfaceFeature feature) throws KNXConnectionClosedException, KNXTimeoutException,
 			InterruptedException {
-		synchronized (lock) {
+		lock.lock();
+		try {
 			final TunnelingFeature get = TunnelingFeature.newGet(feature);
 			send(get);
+		}
+		finally {
+			lock.unlock();
 		}
 	}
 
@@ -227,9 +231,13 @@ public class KNXnetIPTunnel extends ClientConnection
 	// sendFeature / setFeature?
 	public void send(final InterfaceFeature feature, final byte... featureValue)
 		throws KNXConnectionClosedException, KNXTimeoutException, InterruptedException {
-		synchronized (lock) {
+		lock.lock();
+		try {
 			final TunnelingFeature set = TunnelingFeature.newSet(feature, featureValue);
 			send(set);
+		}
+		finally {
+			lock.unlock();
 		}
 	}
 
@@ -391,7 +399,8 @@ public class KNXnetIPTunnel extends ClientConnection
 			// TODO move notification to after we know it's a valid .con (we should keep it out of the lock, though)
 			fireFrameReceived(cemi);
 
-			synchronized (lock) {
+			lock.lock();
+			try {
 				final CEMILData ldata = (CEMILData) keepForCon;
 				if (ldata != null && internalState == CEMI_CON_PENDING) {
 					// check if address was set by server
@@ -416,6 +425,9 @@ public class KNXnetIPTunnel extends ClientConnection
 						}
 					}
 				}
+			}
+			finally {
+				lock.unlock();
 			}
 		}
 		else if (mc == CEMILData.MC_LDATA_REQ)
