@@ -65,6 +65,7 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.KnxRuntimeException;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.internal.Executor;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingBusy;
@@ -414,9 +415,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	}
 
 	private void startChannelReceiver(final ReceiverLoop looper, final String name) {
-		final Thread t = new Thread(looper, name);
-		t.setDaemon(true);
-		t.start();
+		Executor.execute(looper, name);
 	}
 
 	private static class ChannelReceiver extends ReceiverLoop {

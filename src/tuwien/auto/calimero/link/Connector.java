@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2021 B. Malinowsky
+    Copyright (c) 2015, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -57,6 +56,7 @@ import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.internal.Executor;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 
 /**
@@ -174,21 +174,6 @@ public final class Connector
 		private volatile boolean decodeRawFrames;
 
 		private final TSupplier<? extends T> creator;
-
-		// we should replace this with a scheduled _cached_ thread pool executor implementation,
-		// this one is a fixed sized pool, with thread time-out enabled
-		private static ScheduledThreadPoolExecutor reconnect = new ScheduledThreadPoolExecutor(4, runnable -> {
-			final Thread t = new Thread(runnable);
-			t.setName("Calimero Connector " + t.getId());
-			t.setDaemon(true);
-			return t;
-		});
-
-		static {
-			// try to remove idle threads after a while
-			reconnect.setKeepAliveTime(61, TimeUnit.SECONDS);
-			reconnect.allowCoreThreadTimeOut(true);
-		}
 
 		// we save a copy of the connector options that won't get modified
 		private final Connector connector;
@@ -394,6 +379,7 @@ public final class Connector
 			final long remaining = remainingAttempts - 1;
 			final long attempt = max - remaining;
 			final Runnable s = () -> {
+				Thread.currentThread().setName("Calimero Connector");
 				try {
 					final String maxSuffix;
 					if (connector.maxAttempts == NoMaxAttempts)
@@ -414,7 +400,7 @@ public final class Connector
 					scheduleConnect(remaining);
 				}
 			};
-			f = reconnect.schedule(s, connector.reconnectDelay, TimeUnit.MILLISECONDS);
+			f = Executor.scheduledExecutor().schedule(s, connector.reconnectDelay, TimeUnit.MILLISECONDS);
 		}
 
 		private AutoCloseable connect() throws InterruptedException, KNXException

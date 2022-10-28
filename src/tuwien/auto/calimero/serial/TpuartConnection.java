@@ -73,6 +73,7 @@ import tuwien.auto.calimero.cemi.CEMIBusMon;
 import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.internal.EventListeners;
+import tuwien.auto.calimero.internal.Executor;
 import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.log.LogService.LogLevel;
 import tuwien.auto.calimero.serial.spi.SerialCom;
@@ -146,7 +147,7 @@ public class TpuartConnection implements Connection<byte[]>
 	private final OutputStream os;
 	private final InputStream is;
 
-	private final Receiver receiver;
+	private final Receiver receiver = new Receiver();
 
 	private final ReentrantLock lock = new ReentrantLock();
 	private final Condition con = lock.newCondition();
@@ -189,8 +190,7 @@ public class TpuartConnection implements Connection<byte[]>
 		addresses.add(GroupAddress.Broadcast);
 		addresses.addAll(acknowledge);
 
-		receiver = new Receiver();
-		receiver.start();
+		Executor.execute(receiver, "Calimero TP-UART receiver");
 		try {
 			reset();
 		}
@@ -523,9 +523,10 @@ public class TpuartConnection implements Connection<byte[]>
 		}
 	}
 
-	private final class Receiver extends Thread
+	private final class Receiver implements Runnable
 	{
 		private volatile boolean quit;
+		private volatile Thread thread;
 
 		private final ByteArrayOutputStream in = new ByteArrayOutputStream();
 		private long lastRead;
@@ -541,17 +542,12 @@ public class TpuartConnection implements Connection<byte[]>
 
 		private long coolDownUntil;
 
-		Receiver()
-		{
-			super("Calimero TP-UART receiver");
-			setDaemon(true);
-			// more or less useless on Linux (requires root with UseThreadPriorities flag)
-			setPriority(Thread.MAX_PRIORITY);
-		}
 
 		@Override
 		public void run()
 		{
+			thread = Thread.currentThread();
+
 			// at first drain rx queue of any old frames
 			// most likely, flushes out the reset.ind corresponding to our init reset, but that's ok
 			int drained = 0;
@@ -624,11 +620,14 @@ public class TpuartConnection implements Connection<byte[]>
 		void quit()
 		{
 			quit = true;
-			interrupt();
-			if (currentThread() == this)
+			final var t = thread;
+			if (t == null)
+				return;
+			t.interrupt();
+			if (Thread.currentThread() == t)
 				return;
 			try {
-				join(50);
+				t.join(50);
 			}
 			catch (final InterruptedException e) {
 				Thread.currentThread().interrupt();

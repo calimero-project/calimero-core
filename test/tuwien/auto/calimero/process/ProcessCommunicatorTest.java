@@ -42,13 +42,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,6 +61,7 @@ import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.datapoint.Datapoint;
@@ -69,6 +70,7 @@ import tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat;
 import tuwien.auto.calimero.dptxlator.DPTXlator4ByteFloat;
 import tuwien.auto.calimero.dptxlator.DPTXlator8BitUnsigned;
 import tuwien.auto.calimero.dptxlator.DPTXlatorString;
+import tuwien.auto.calimero.internal.Executor;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.KNXNetworkLinkIP;
 import tuwien.auto.calimero.link.medium.TPSettings;
@@ -202,47 +204,34 @@ class ProcessCommunicatorTest {
 		// read from same address
 		// if we are testing with a virtual network make sure we have some value set
 		pc.write(dpBool, true);
-		new Thread("testReadBool Concurrent 1") {
-			@Override
-			public void run() {
-				try {
-					pc2.readBool(dpBool);
-				}
-				catch (KNXException | InterruptedException e) {
-					fail(getName() + ": read bool");
-				}
-			};
-		}.start();
+
+		final Runnable task = () -> {
+			try {
+				pc2.readBool(dpBool);
+			}
+			catch (KNXException | InterruptedException e) {
+				fail(Thread.currentThread().getName() + ": read bool");
+			}
+		};
+		Executor.execute(task, "testReadBool Concurrent 1");
 		pc.readBool(dpBool);
 
 		// read from different address
 		// if we are testing with a virtual network make sure we have some value set
 		pc.write(dpBool2, false);
-		new Thread("testReadBool Concurrent 2") {
-			@Override
-			public void run() {
-				try {
-					pc2.readBool(dpBool);
-				}
-				catch (KNXException | InterruptedException e) {
-					fail(getName() + ": read bool");
-				}
-			};
-		}.start();
+		Executor.execute(task, "testReadBool Concurrent 2");
 		pc.readBool(dpBool2);
 
 		// read from different address using same process communicator
-		new Thread("testReadBool Concurrent 3") {
-			@Override
-			public void run() {
-				try {
-					pc.readBool(dpBool);
-				}
-				catch (KNXException | InterruptedException e) {
-					fail(getName() + ": " + e);
-				}
-			};
-		}.start();
+		final Runnable task2 = () -> {
+			try {
+				pc.readBool(dpBool);
+			}
+			catch (KNXException | InterruptedException e) {
+				fail(Thread.currentThread().getName() + ": " + e);
+			}
+		};
+		Executor.execute(task2, "testReadBool Concurrent 3");
 		pc.readBool(dpBool2);
 	}
 
@@ -324,88 +313,49 @@ class ProcessCommunicatorTest {
 	}
 
 	@Test
-	void concurrentRead() {
+	void concurrentRead() throws InterruptedException, ExecutionException {
 		final Datapoint dp = new StateDP(dpString, "test datapoint");
 		dp.setDPT(0, DPTXlatorString.DPT_STRING_8859_1.getID());
-		final List<Thread> threads = new ArrayList<>();
-		final AtomicInteger count = new AtomicInteger();
-		for (int i = 0; i < 10; i++) {
-			final Thread t = new Thread(() -> {
-				try {
-					count.addAndGet(pc2.read(dp).length() > 0 ? 1 : 0);
-				}
-				catch (KNXException | InterruptedException e) {
-				}
-			});
-			threads.add(t);
-		}
-		threads.forEach(Thread::start);
-		threads.forEach((t) -> {
-			try {
-				t.join();
-			}
-			catch (final InterruptedException e) {}
-		});
-		assertEquals(threads.size(), count.get());
+
+		final Callable<Integer> task = () -> pc2.read(dp).length() > 0 ? 1 : 0;
+		final var tasks = Collections.nCopies(10, task);
+		final var all = Executor.executor().invokeAll(tasks);
+		int count = 0;
+		for (final var f : all)
+			count += f.get();
+		assertEquals(tasks.size(), count);
 	}
 
 	@Test
-	void concurrentRead2() throws KNXException, InterruptedException {
-		final List<Thread> threads = new ArrayList<>();
-		final AtomicInteger count = new AtomicInteger();
+	void concurrentRead2() throws KNXException, InterruptedException, ExecutionException {
 		final boolean b = pc2.readBool(dpBool);
 		final double d = pc2.readFloat(dpFloat2);
-		for (int i = 0; i < 20; i++) {
-			final int index = i;
-			final Thread t = new Thread(() -> {
-				try {
-					if (index % 2 == 0)
-						count.addAndGet(pc2.readBool(dpBool) == b ? 1 : 0);
-					else
-						count.addAndGet(pc2.readFloat(dpFloat2) == d ? 1 : 0);
-				}
-				catch (KNXException | InterruptedException e) {
-					final StringWriter errors = new StringWriter();
-					e.printStackTrace(new PrintWriter(errors));
-					fail("ProcessCommunicatorTest:testConcurrentRead2() thread " + Thread.currentThread().getName()
-							+ ": " + errors.toString());
-				}
-			}, "concurrent read index " + i);
-			threads.add(t);
-		}
-		threads.forEach(Thread::start);
-		threads.forEach((t) -> {
-			try {
-				t.join();
-			}
-			catch (final InterruptedException e) {}
-		});
-		assertEquals(threads.size(), count.get());
+
+		final Callable<Integer> task1 = () -> pc2.readBool(dpBool) == b ? 1 : 0;
+		final Callable<Integer> task2 = () -> pc2.readFloat(dpFloat2) == d ? 1 : 0;
+
+		final List<Callable<Integer>> tasks = new ArrayList<>();
+		tasks.addAll(Collections.nCopies(10, task1));
+		tasks.addAll(Collections.nCopies(10, task2));
+		final var all = Executor.executor().invokeAll(tasks);
+		int count = 0;
+		for (final var f : all)
+			count += f.get();
+		assertEquals(tasks.size(), count);
 	}
 
 	@Test
-	void concurrentReadNonExistingDestination() {
-		final List<Thread> threads = new ArrayList<>();
-		final AtomicInteger count = new AtomicInteger();
+	void concurrentReadNonExistingDestination() throws InterruptedException {
 		final LocalTime start = LocalTime.now();
-		for (int i = 0; i < 5; i++) {
-			final Thread t = new Thread(() -> {
-				try {
-					pc2.readBool(new GroupAddress(7, 7, 7));
-					count.incrementAndGet();
-				}
-				catch (KNXException | InterruptedException e) {}
-			});
-			threads.add(t);
+
+		final Callable<Integer> task = () -> pc2.readBool(new GroupAddress(7, 7, 7)) ? 1 : 1;
+		final var tasks = Collections.nCopies(5, task);
+		final var all = Executor.executor().invokeAll(tasks);
+		for (final var f : all) {
+			final var t = assertThrows(ExecutionException.class, f::get);
+			assertEquals(KNXTimeoutException.class, t.getCause().getClass());
 		}
-		threads.forEach(Thread::start);
-		threads.forEach((t) -> {
-			try {
-				t.join();
-			}
-			catch (final InterruptedException e) {}
-		});
-		assertEquals(0, count.get());
+
 		final LocalTime now = LocalTime.now();
 		final var timeout = pc2.responseTimeout();
 		assertTrue(now.isAfter(start.plus(timeout)));

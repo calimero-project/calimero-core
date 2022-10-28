@@ -54,6 +54,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.internal.Executor;
 import tuwien.auto.calimero.knxnetip.servicetype.ConnectRequest;
 import tuwien.auto.calimero.knxnetip.servicetype.ConnectResponse;
 import tuwien.auto.calimero.knxnetip.servicetype.ConnectionstateRequest;
@@ -99,7 +100,8 @@ public abstract class ClientConnection extends ConnectionBase
 	// request to confirmation timeout
 	private static final int CONFIRMATION_TIMEOUT = 3;
 
-	private HeartbeatMonitor heartbeat;
+
+	private final HeartbeatMonitor heartbeat = new HeartbeatMonitor();
 	private IndividualAddress tunnelingAddress;
 
 	// additional textual information about connection status
@@ -203,8 +205,7 @@ public abstract class ClientConnection extends ConnectionBase
 		try {
 			final boolean changed = waitForStateChange(CLOSED, CONNECT_REQ_TIMEOUT);
 			if (state == OK) {
-				heartbeat = new HeartbeatMonitor();
-				heartbeat.start();
+				Executor.execute(heartbeat, "KNXnet/IP heartbeat monitor");
 
 				String optionalConnectionInfo = "";
 				if (tunnelingAddress != null)
@@ -251,9 +252,7 @@ public abstract class ClientConnection extends ConnectionBase
 		}
 
 		LogService.log(logger, level, "close connection - " + reason, t);
-		// heartbeat was not necessarily used at all
-		if (heartbeat != null)
-			heartbeat.quit();
+		heartbeat.quit();
 		stopReceiver();
 		closeSocket();
 		// ensure user sees final state CLOSED
@@ -443,28 +442,26 @@ public abstract class ClientConnection extends ConnectionBase
 			socket.close();
 	}
 
-	private final class HeartbeatMonitor extends Thread
+	private final class HeartbeatMonitor implements Runnable
 	{
 		// client SHALL wait 10 seconds for a connection state response from server
 		private static final int CONNECTIONSTATE_REQ_TIMEOUT = 10;
 		private static final int HEARTBEAT_INTERVAL = 60;
 		private static final int MAX_REQUEST_ATTEMPTS = 4;
 
-		HeartbeatMonitor()
-		{
-			super("KNXnet/IP heartbeat monitor");
-			setDaemon(true);
-		}
+		private volatile boolean stop;
+		private volatile Thread thread;
 		private final ReentrantLock lock = new ReentrantLock();
 		private final Condition received = lock.newCondition();
 
 		@Override
 		public void run()
 		{
+			thread = Thread.currentThread();
 			final var hpai = tcp ? HPAI.Tcp : new HPAI(HPAI.IPV4_UDP, useNat ? null : localSocketAddress());
 			final byte[] buf = PacketHelper.toPacket(protocolVersion(), new ConnectionstateRequest(channelId, hpai));
 			try {
-				while (true) {
+				while (!stop) {
 					Thread.sleep(HEARTBEAT_INTERVAL * 1000);
 					int i = 0;
 					for (; i < MAX_REQUEST_ATTEMPTS; i++) {
@@ -496,11 +493,15 @@ public abstract class ClientConnection extends ConnectionBase
 
 		void quit()
 		{
-			interrupt();
-			if (currentThread() == this)
+			stop = true;
+			final var t = thread;
+			if (t == null)
+				return;
+			t.interrupt();
+			if (Thread.currentThread() == t)
 				return;
 			try {
-				join();
+				t.join();
 			}
 			catch (final InterruptedException e) {
 				Thread.currentThread().interrupt();

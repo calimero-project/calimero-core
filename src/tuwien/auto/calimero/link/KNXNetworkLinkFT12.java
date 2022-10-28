@@ -45,6 +45,7 @@ import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.internal.Executor;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.serial.ConnectionEvent;
 import tuwien.auto.calimero.serial.ConnectionStatus;
@@ -177,15 +178,11 @@ public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 				else
 					linkLayerMode();
 			}
-			catch (final KNXException e) {
+			catch (KNXException | InterruptedException e) {
 				close();
-			}
-			catch (final InterruptedException e) {
-				close();
-				Thread.currentThread().interrupt();
 			}
 		};
-		new Thread(modeSetter, "FT1.2 connection reset mode switcher").start();
+		Executor.execute(modeSetter, "FT1.2 connection reset mode switcher");
 	}
 
 	private void linkLayerMode() throws KNXException {

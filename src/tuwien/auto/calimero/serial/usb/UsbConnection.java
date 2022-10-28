@@ -107,6 +107,7 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.KnxRuntimeException;
 import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.internal.EventListeners;
+import tuwien.auto.calimero.internal.Executor;
 import tuwien.auto.calimero.serial.ConnectionEvent;
 import tuwien.auto.calimero.serial.ConnectionStatus;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
@@ -220,14 +221,9 @@ public class UsbConnection implements Connection<HidReport>
 
 	private final UsbCallback callback = new UsbCallback();
 
-	private final class UsbCallback extends Thread implements UsbPipeListener
+	private final class UsbCallback implements Runnable, UsbPipeListener
 	{
 		private volatile boolean close;
-
-		{
-			setDaemon(true);
-			setName("Calimero USB callback");
-		}
 
 		@Override
 		public void run()
@@ -452,7 +448,7 @@ public class UsbConnection implements Connection<HidReport>
 			}
 			while (irp.isComplete());
 
-			callback.start();
+			Executor.execute(callback, "Calimero USB callback");
 		}
 		catch (UsbNotActiveException | UsbDisconnectedException | UsbNotClaimedException | UsbException e) {
 			throw new KNXException("open USB connection '" + this.name + "'", e);

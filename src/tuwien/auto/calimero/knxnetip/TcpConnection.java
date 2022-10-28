@@ -66,7 +66,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
@@ -85,6 +84,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.KnxRuntimeException;
 import tuwien.auto.calimero.SerialNumber;
+import tuwien.auto.calimero.internal.Executor;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
@@ -150,17 +150,6 @@ public final class TcpConnection implements Closeable {
 		private static final int sessionSetupTimeout = 10_000; // [ms]
 
 		private static final Duration keepAliveInvterval = Duration.ofSeconds(30);
-		private static final ScheduledThreadPoolExecutor keepAliveSender = new ScheduledThreadPoolExecutor(1, r -> {
-			final Thread t = new Thread(r);
-			t.setName("KNX IP Secure session keep-alive");
-			t.setDaemon(true);
-			return t;
-		});
-		static {
-			// remove idle threads after a while
-			keepAliveSender.setKeepAliveTime(90, TimeUnit.SECONDS);
-			keepAliveSender.allowCoreThreadTimeOut(true);
-		}
 
 		private static final byte[] emptyUserPwdHash = { (byte) 0xe9, (byte) 0xc3, 0x04, (byte) 0xb9, 0x14, (byte) 0xa3,
 			0x51, 0x75, (byte) 0xfd, 0x7d, 0x1c, 0x67, 0x3a, (byte) 0xb5, 0x2f, (byte) 0xe1 };
@@ -318,14 +307,13 @@ public final class TcpConnection implements Closeable {
 					throw new KNXTimeoutException("timeout establishing secure session with " + hostPort);
 
 				final var delay = keepAliveInvterval.toMillis();
-				keepAliveFuture = keepAliveSender.scheduleWithFixedDelay(this::sendKeepAlive, delay, delay,
+				keepAliveFuture = Executor.scheduledExecutor().scheduleWithFixedDelay(this::sendKeepAlive, delay, delay,
 						TimeUnit.MILLISECONDS);
 			}
 			catch (final GeneralSecurityException e) {
 				throw new KnxSecureException("error creating key pair for " + hostPort, e);
 			}
 			catch (final SocketTimeoutException e) {
-				Thread.currentThread().interrupt();
 				throw new InterruptedException(
 						"interrupted I/O establishing secure session with " + hostPort + ": " + e.getMessage());
 			}
@@ -764,9 +752,7 @@ public final class TcpConnection implements Closeable {
 	}
 
 	private void startTcpReceiver() {
-		final Thread t = new Thread(this::runReceiveLoop, "KNXnet/IP tcp receiver " + hostPort(server));
-		t.setDaemon(true);
-		t.start();
+		Executor.execute(this::runReceiveLoop, "KNXnet/IP tcp receiver " + hostPort(server));
 	}
 
 	private void runReceiveLoop() {

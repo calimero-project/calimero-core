@@ -45,11 +45,11 @@ import static tuwien.auto.calimero.mgmt.Destination.State.OpenWait;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import tuwien.auto.calimero.IndividualAddress;
+import tuwien.auto.calimero.internal.Executor;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 
 /**
@@ -211,8 +211,6 @@ public class Destination implements AutoCloseable
 	// idle timeout for a connection in milliseconds
 	private static final int TIMEOUT = 6000;
 
-	// scheduled disconnects for all active destination objects
-	private static final ScheduledThreadPoolExecutor disconnect = new ScheduledThreadPoolExecutor(0);
 
 	/** Destination state. */
 	public enum State {
@@ -475,7 +473,7 @@ public class Destination implements AutoCloseable
 			if (state == Destroyed)
 				return;
 			remove(notify);
-			notify.future = disconnect.schedule(notify, TIMEOUT, TimeUnit.MILLISECONDS);
+			notify.future = Executor.scheduledExecutor().schedule(notify, TIMEOUT, TimeUnit.MILLISECONDS);
 		}
 		finally {
 			lock.unlock();

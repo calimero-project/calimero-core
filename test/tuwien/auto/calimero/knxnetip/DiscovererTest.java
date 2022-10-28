@@ -52,6 +52,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -70,6 +71,7 @@ import tag.Slow;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Util;
+import tuwien.auto.calimero.internal.Executor;
 import tuwien.auto.calimero.knxnetip.Discoverer.Result;
 import tuwien.auto.calimero.knxnetip.servicetype.DescriptionResponse;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
@@ -314,7 +316,7 @@ class DiscovererTest
 	}
 
 	@Test
-	void stopSearch() throws InterruptedException
+	void stopSearch() throws InterruptedException, ExecutionException
 	{
 		ddef.startSearch(timeout, false);
 		ddef.startSearch(timeout, false);
@@ -328,28 +330,17 @@ class DiscovererTest
 		assertFalse(ddef.isSearching());
 		assertEquals(responses, ddef.getSearchResponses().size());
 
-		final class Stopper extends Thread
-		{
-			volatile int res;
-
-			@Override
-			public void run()
-			{
-				try {
-					sleep(500);
-				}
-				catch (final InterruptedException e) {}
-				res = ddef.getSearchResponses().size();
-				ddef.stopSearch();
-			}
-		}
-		final Stopper stopper = new Stopper();
+		final Callable<Integer> stopper = () -> {
+			final int res = ddef.getSearchResponses().size();
+			ddef.stopSearch();
+			return res;
+		};
 		ddef.clearSearchResponses();
-		stopper.start();
+		final var future = Executor.scheduledExecutor().schedule(stopper, 500, TimeUnit.MILLISECONDS);
 		// run blocking, so we're sure stopper stops search
 		ddef.startSearch(0, true);
-		stopper.join();
-		assertEquals(stopper.res, ddef.getSearchResponses().size());
+		final int stopperRes = future.get();
+		assertEquals(stopperRes, ddef.getSearchResponses().size());
 	}
 
 	@Test
@@ -368,20 +359,7 @@ class DiscovererTest
 	{
 		final Thread t = Thread.currentThread();
 		try {
-			final class Stopper extends Thread
-			{
-				@Override
-				public void run()
-				{
-					try {
-						sleep(1500);
-					}
-					catch (final InterruptedException e) {}
-					t.interrupt();
-				}
-			}
-			final Stopper stopper = new Stopper();
-			stopper.start();
+			Executor.scheduledExecutor().schedule((Runnable) t::interrupt, 1500, TimeUnit.MILLISECONDS);
 			ddef.startSearch(5, true);
 		}
 		catch (final InterruptedException e) {

@@ -62,6 +62,7 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.ServiceType;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.internal.EventListeners;
+import tuwien.auto.calimero.internal.Executor;
 import tuwien.auto.calimero.knxnetip.servicetype.DisconnectRequest;
 import tuwien.auto.calimero.knxnetip.servicetype.ErrorCodes;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
@@ -543,9 +544,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	{
 		if (receiver == null) {
 			final ReceiverLoop looper = new ReceiverLoop(this, socket, 0x200);
-			final Thread t = new Thread(looper, "KNXnet/IP receiver");
-			t.setDaemon(true);
-			t.start();
+			Executor.execute(looper, "KNXnet/IP receiver");
 			receiver = looper;
 		}
 	}
