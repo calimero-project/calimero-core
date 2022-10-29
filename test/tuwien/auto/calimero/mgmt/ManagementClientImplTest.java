@@ -50,6 +50,7 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.junit.jupiter.api.parallel.Isolated;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -558,6 +559,7 @@ class ManagementClientImplTest
 	}
 
 	@Test
+	@DisabledIfEnvironmentVariable(named="CI", matches="true")
 	void readSystemNetworkParameterStartup() throws KNXException, InterruptedException {
 		final byte maxWaitSeconds = 2;
 		List<byte[]> l = mc.readSystemNetworkParameter(0, PID.SERIAL_NUMBER, 3, maxWaitSeconds);
