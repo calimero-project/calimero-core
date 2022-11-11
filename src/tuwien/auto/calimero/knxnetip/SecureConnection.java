@@ -141,9 +141,10 @@ public final class SecureConnection {
 	 *        {@code 0 < latencyTolerance.toMillis() ≤ 8000}, depending on max. end-to-end network latency
 	 * @return new secure routing connection
 	 * @throws KNXException if creation or initialization of the multicast socket failed
+	 * @throws InterruptedException on thread interrupt during multicast group timer synchronization
 	 */
 	public static KNXnetIPRouting newRouting(final NetworkInterface netIf, final InetAddress mcGroup,
-			final byte[] groupKey, final Duration latencyTolerance) throws KNXException {
+			final byte[] groupKey, final Duration latencyTolerance) throws KNXException, InterruptedException {
 		return new SecureRouting(netIf, mcGroup, groupKey, latencyTolerance);
 	}
 

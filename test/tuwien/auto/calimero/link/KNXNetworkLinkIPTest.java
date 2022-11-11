@@ -420,7 +420,7 @@ class KNXNetworkLinkIPTest
 
 	@Test
 	@KnxSecure
-	void secureRoutingLink() throws KNXException, SocketException {
+	void secureRoutingLink() throws KNXException, SocketException, InterruptedException {
 		final NetworkInterface netif = Util.localInterface();
 		final byte[] groupKey = new byte[16];
 		try (KNXNetworkLink link = KNXNetworkLinkIP.newSecureRoutingLink(netif, KNXNetworkLinkIP.DefaultMulticast, groupKey,

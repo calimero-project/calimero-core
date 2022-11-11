@@ -247,16 +247,12 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 * @param settings medium settings defining device and medium specifics needed for communication
 	 * @return the network link in open state
 	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
+	 * @throws InterruptedException on thread interrupt while establishing link
 	 */
 	public static KNXNetworkLinkIP newSecureRoutingLink(final NetworkInterface netif, final InetAddress mcGroup, final byte[] groupKey,
-		final Duration latencyTolerance, final KNXMediumSettings settings) throws KNXException {
-		try {
-			return new KNXNetworkLinkIP(ROUTING, SecureConnection.newRouting(netif, mcGroup, groupKey, latencyTolerance),
-					settings);
-		}
-		catch (final InterruptedException unreachable) {
-			throw new IllegalStateException();
-		}
+		final Duration latencyTolerance, final KNXMediumSettings settings) throws KNXException, InterruptedException {
+		return new KNXNetworkLinkIP(ROUTING, SecureConnection.newRouting(netif, mcGroup, groupKey, latencyTolerance),
+				settings);
 	}
 
 	/**

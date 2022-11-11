@@ -106,7 +106,7 @@ public final class SecureRouting extends KNXnetIPRouting {
 
 
 	SecureRouting(final NetworkInterface netif, final InetAddress mcGroup, final byte[] groupKey,
-			final Duration latencyTolerance) throws KNXException {
+			final Duration latencyTolerance) throws KNXException, InterruptedException {
 		super(mcGroup);
 
 		sno = deriveSerialNumber(netif);
@@ -125,7 +125,8 @@ public final class SecureRouting extends KNXnetIPRouting {
 			awaitGroupSync();
 		}
 		catch (final InterruptedException e) {
-			Thread.currentThread().interrupt();
+			close();
+			throw e;
 		}
 	}
 
