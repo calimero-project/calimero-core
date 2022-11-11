@@ -87,6 +87,7 @@ public final class Executor {
 
 	public static Thread execute(final Runnable task, final String name) {
 		final var thread = new Thread(task, name);
+		thread.setDaemon(true);
 		thread.start();
 		return thread;
 	}
