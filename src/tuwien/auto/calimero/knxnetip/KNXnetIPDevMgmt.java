@@ -77,7 +77,7 @@ public class KNXnetIPDevMgmt extends ClientConnection
 	static final CRI cri = CRI.createRequest(DEVICE_MGMT_CONNECTION);
 
 	/**
-	 * Creates a new KNXnet/IP device management connection to a remote device.
+	 * Creates a new unsecured KNXnet/IP device management connection over UDP to a remote device.
 	 *
 	 * @param localEP the local endpoint to use for communication channel
 	 * @param serverCtrlEP the remote server control endpoint used for connect request
@@ -87,7 +87,7 @@ public class KNXnetIPDevMgmt extends ClientConnection
 	 * @throws KNXTimeoutException on no connect response before connect timeout
 	 * @throws KNXRemoteException if response indicates an error condition at the server concerning the request
 	 * @throws KNXInvalidResponseException if connect response is in wrong format
-	 * @throws InterruptedException on interrupted thread while creating management connection
+	 * @throws InterruptedException on interrupted thread while creating the management connection
 	 */
 	public KNXnetIPDevMgmt(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP, final boolean useNAT)
 		throws KNXException, InterruptedException
@@ -96,6 +96,17 @@ public class KNXnetIPDevMgmt extends ClientConnection
 		connect(localEP, serverCtrlEP, cri, useNAT);
 	}
 
+	/**
+	 * Creates a new unsecured KNXnet/IP device management connection over TCP to a remote IP device.
+	 *
+	 * @param connection a TCP connection to the KNX IP device (if the connection state is not connected, link setup will
+	 *        establish the connection); closing the link will not close the TCP connection
+	 * @throws KNXException on socket communication error
+	 * @throws KNXTimeoutException on no connect response before connect timeout
+	 * @throws KNXRemoteException if response indicates an error condition at the remote endpoint concerning the request
+	 * @throws KNXInvalidResponseException if connect response is in wrong format
+	 * @throws InterruptedException on interrupted thread while creating the management connection
+	 */
 	public KNXnetIPDevMgmt(final TcpConnection connection) throws KNXException, InterruptedException {
 		super(KNXnetIPHeader.DEVICE_CONFIGURATION_REQ, KNXnetIPHeader.DEVICE_CONFIGURATION_ACK, 4,
 				CONFIGURATION_REQ_TIMEOUT, connection);
