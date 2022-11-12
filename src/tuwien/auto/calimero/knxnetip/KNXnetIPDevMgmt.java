@@ -164,7 +164,7 @@ public class KNXnetIPDevMgmt extends ClientConnection
 		final int mc = cemi.getMessageCode();
 		if (mc == CEMIDevMgmt.MC_PROPINFO_IND || mc == CEMIDevMgmt.MC_RESET_IND)
 			fireFrameReceived(cemi);
-		else if (mc == CEMIDevMgmt.MC_PROPREAD_CON || mc == CEMIDevMgmt.MC_PROPWRITE_CON) {
+		else if (mc == CEMIDevMgmt.MC_PROPREAD_CON || mc == CEMIDevMgmt.MC_PROPWRITE_CON || mc == CEMIDevMgmt.MC_FUNCPROP_CON) {
 			// invariant: notify listener before return from blocking send
 			fireFrameReceived(cemi);
 			setStateNotify(OK);

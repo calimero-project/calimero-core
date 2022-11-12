@@ -78,6 +78,12 @@ public interface PropertyAdapter extends AutoCloseable
 	 */
 	byte[] getProperty(int objIndex, int pid, int start, int elements) throws KNXException, InterruptedException;
 
+	void callFunctionProperty(int objectType, int objectInstance, int pid, int serviceId, byte... serviceInfo)
+			throws KNXException, InterruptedException;
+
+	byte[] getFunctionPropertyState(int objectType, int objectInstance, int pid, int serviceId, byte... serviceInfo)
+			throws KNXException, InterruptedException;
+
 	/**
 	 * Reads the description of a property of an interface object, returning a property description layout according the
 	 * application layer property description service.

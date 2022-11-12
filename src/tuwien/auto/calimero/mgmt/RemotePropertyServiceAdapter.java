@@ -169,6 +169,18 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 	}
 
 	@Override
+	public void callFunctionProperty(final int objectType, final int objectInstance, final int pid, final int serviceId,
+			final byte... serviceInfo) throws KNXException, InterruptedException {
+		mc.callFunctionProperty(dst, objectType, objectInstance, pid, serviceId, serviceInfo);
+	}
+
+	@Override
+	public byte[] getFunctionPropertyState(final int objectType, final int objectInstance, final int pid, final int serviceId,
+			final byte... serviceInfo) throws KNXException, InterruptedException {
+		return mc.readFunctionPropertyState(dst, objectType, objectInstance, pid, serviceId, serviceInfo);
+	}
+
+	@Override
 	public byte[] getDescription(final int objIndex, final int pid, final int propIndex)
 		throws KNXException, InterruptedException
 	{
