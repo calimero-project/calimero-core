@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2022, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,31 +36,17 @@
 
 package tuwien.auto.calimero.knxnetip;
 
-import tuwien.auto.calimero.KNXListener;
+import java.util.EventObject;
 
-/**
- * A listener for use with {@link KNXnetIPRouting} connections.
- * <p>
- * In routing mode, it is possible that indications sent with KNXnet/IP routing might be
- * looped back by the network stack and received again through a registered listener in
- * {@link KNXListener#frameReceived(tuwien.auto.calimero.FrameEvent)}.<br>
- * Background: a platform's network interface has the option to send multicast
- * datagrams back to the local socket of the sender; setting the socket's loopback mode is
- * only considered as request and does not have to be followed rigorously.<br>
- *
- * @author B. Malinowsky
- * @see KNXnetIPRouting
- */
-public interface RoutingListener extends KNXListener
-{
+public class RateLimitEvent extends EventObject {
+	private static final long serialVersionUID = 1L;
+
+	public RateLimitEvent(final KNXnetIPRouting source) {
+		super(source);
+	}
+
 	/**
-	 * Informs about the loss of messages in the KNXnet/IP router.
-	 *
-	 * @param e event with lost message information
+	 * @return the reached rate limit in datagrams per second
 	 */
-	void lostMessage(LostMessageEvent e);
-
-	void routingBusy(RoutingBusyEvent e);
-
-	default void rateLimit(final RateLimitEvent e) {}
+	public final int rateLimit() { return KNXnetIPRouting.MaxDatagramsPerSecond; }
 }

@@ -44,14 +44,21 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.StandardProtocolFamily;
 import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 
 import tuwien.auto.calimero.CloseEvent;
@@ -108,6 +115,8 @@ import tuwien.auto.calimero.log.LogService.LogLevel;
  */
 public class KNXnetIPRouting extends ConnectionBase
 {
+	static final int MaxDatagramsPerSecond = 50;
+
 	/**
 	 * Multicast address assigned by default to KNXnet/IP routers, address {@value
 	 * #DEFAULT_MULTICAST}.
@@ -143,6 +152,23 @@ public class KNXnetIPRouting extends ConnectionBase
 	private static final int maxLoopbackQueueSize = 20;
 
 	private volatile BiFunction<KNXnetIPHeader, ByteBuffer, SearchResponse> searchRequestCallback;
+
+	// KNX IP routing busy flow control
+
+	private static final Duration randomWaitScale = Duration.ofMillis(50);
+	private static final Duration throttleScale = Duration.ofMillis(100);
+	private Instant currentWaitUntil = Instant.EPOCH;
+	private volatile Instant pauseSendingUntil = Instant.EPOCH;
+	private volatile Instant throttleUntil = Instant.EPOCH;
+	private Instant lastRoutingBusy = Instant.EPOCH;
+	private final AtomicInteger routingBusyCounter = new AtomicInteger();
+	private volatile Future<?> decrementBusyCounter = CompletableFuture.completedFuture(null);
+
+	private long datagramCount;
+	private long countStart = System.nanoTime();
+
+	private long lastTx;
+
 
 	/**
 	 * Creates a new KNXnet/IP routing service.
@@ -201,18 +227,22 @@ public class KNXnetIPRouting extends ConnectionBase
 				}
 				logger.trace("add to multicast loopback frame buffer: {}", frame);
 			}
+			checkLastTx();
 			// filter IP system broadcasts and always send them unsecured
 			if (RoutingSystemBroadcast.validSystemBroadcast(frame)) {
 				final var buf = ByteBuffer.wrap(PacketHelper.toPacket(new RoutingSystemBroadcast(frame)));
 				final InetSocketAddress dst = new InetSocketAddress(systemBroadcast, DEFAULT_PORT);
+				enforceDatagramRateLimit();
 				logger.trace("sending cEMI frame, SBC {} {}", NonBlocking, DataUnitBuilder.toHex(buf.array(), " "));
 				if (dcSysBcast != null)
 					dcSysBcast.send(buf, dst);
 				else
 					dc.send(buf, dst);
 			}
-			else
+			else {
+				applyRoutingFlowControl();
 				super.send(frame, NonBlocking);
+			}
 
 			// we always succeed...
 			setState(OK);
@@ -460,6 +490,8 @@ public class KNXnetIPRouting extends ConnectionBase
 		}
 		else if (svc == KNXnetIPHeader.ROUTING_BUSY) {
 			final RoutingBusy busy = new RoutingBusy(data, offset);
+			updateRoutingFlowControl(busy, new InetSocketAddress(src, port));
+
 			fireRoutingBusy(new InetSocketAddress(src, port), busy);
 		}
 		else if (svc == KNXnetIPHeader.RoutingSystemBroadcast && multicast.equals(systemBroadcast)) {
@@ -597,6 +629,14 @@ public class KNXnetIPRouting extends ConnectionBase
 		});
 	}
 
+	private void fireRateLimit() {
+		final var e = new RateLimitEvent(this);
+		listeners.fire(l -> {
+			if (l instanceof RoutingListener)
+				((RoutingListener) l).rateLimit(e);
+		});
+	}
+
 	private boolean discardLoopbackFrame(final CEMI frame)
 	{
 		if (!loopbackEnabled)
@@ -615,6 +655,137 @@ public class KNXnetIPRouting extends ConnectionBase
 			}
 		}
 		return false;
+	}
+
+	private void checkLastTx() throws InterruptedException {
+		lock.lock();
+		try {
+			final long now = System.nanoTime();
+			final long diff = now - lastTx;
+			if (diff < 5_000_000) {
+				final long millis = Math.round((5_000_000 - diff) / 1_000_000d);
+				Thread.sleep(millis);
+			}
+			lastTx = now;
+		}
+		finally {
+			lock.unlock();
+		}
+	}
+
+	private void updateRoutingFlowControl(final RoutingBusy busy, final InetSocketAddress sender) {
+		// in case we sent the routing busy notification, ignore it
+		if (sentByUs(sender))
+			return;
+
+		// setup timing for routing busy flow control
+		final Instant now = Instant.now();
+		final Instant waitUntil = now.plus(busy.waitTime());
+		LogLevel level = LogLevel.TRACE;
+		boolean update = false;
+		if (waitUntil.isAfter(currentWaitUntil)) {
+			currentWaitUntil = waitUntil;
+			level = LogLevel.DEBUG;
+			update = true;
+		}
+		LogService.log(logger, level, "device {} sent {}", Net.hostPort(sender), busy);
+
+		// increment random wait scaling iff >= 10 ms have passed since the last counted routing busy
+		if (now.isAfter(lastRoutingBusy.plusMillis(10))) {
+			lastRoutingBusy = now;
+			routingBusyCounter.incrementAndGet();
+			update = true;
+		}
+
+		if (!update)
+			return;
+
+		final double rand = Math.random();
+		final long randomWait = Math.round(rand * routingBusyCounter.get() * randomWaitScale.toMillis());
+
+		// invariant on instants: throttle >= pause sending >= current wait
+		pauseSendingUntil = currentWaitUntil.plusMillis(randomWait);
+		final long throttle = routingBusyCounter.get() * throttleScale.toMillis();
+		throttleUntil = pauseSendingUntil.plusMillis(throttle);
+
+		final long continueIn = Duration.between(now, pauseSendingUntil).toMillis();
+		logger.debug("set routing busy counter = {}, random wait = {} ms, continue sending in {} ms, throttle {} ms",
+				routingBusyCounter, randomWait, continueIn, throttle);
+
+		final long initialDelay = Duration.between(now, throttleUntil).toMillis() + 5;
+		decrementBusyCounter.cancel(false);
+		decrementBusyCounter = Executor.scheduledExecutor().scheduleAtFixedRate(this::decrementBusyCounter,
+				initialDelay, 5, TimeUnit.MILLISECONDS);
+	}
+
+	private boolean sentByUs(final InetSocketAddress sender) {
+		final var netif = networkInterface();
+		if (netif == Net.defaultNetif) {
+			// check addresses of all netifs, in case no outgoing mcast netif was configured
+			try {
+				return NetworkInterface.networkInterfaces().flatMap(NetworkInterface::inetAddresses)
+						.anyMatch(sender.getAddress()::equals);
+			}
+			catch (final SocketException e) {}
+		}
+
+		// this will give a false positive if we and sending device use the same local netif
+		return netif.inetAddresses().anyMatch(sender.getAddress()::equals);
+	}
+
+	private void decrementBusyCounter() {
+		// decrement iff counter > 0, otherwise cancel decrementing
+		if (routingBusyCounter.accumulateAndGet(0, (v, u) -> v > 0 ? --v : v) == 0)
+			decrementBusyCounter.cancel(false);
+	}
+
+	// check whether we have to slow down or pause sending due to routing flow control
+	private void applyRoutingFlowControl() throws InterruptedException {
+		enforceDatagramRateLimit();
+
+		if (routingBusyCounter.get() == 0)
+			return;
+
+		// we have to loop because a new arrival of routing busy might update timings
+		while (true) {
+			final Instant now = Instant.now();
+			final long sleep = Duration.between(now, pauseSendingUntil).toMillis();
+			if (sleep > 0) {
+				logger.debug("applying routing flow control for {}, wait {} ms ...",
+						getRemoteAddress().getAddress().getHostAddress(), sleep);
+				Thread.sleep(sleep);
+			}
+			else if (now.isBefore(throttleUntil)) {
+				Thread.sleep(5);
+				break;
+			}
+			else
+				break;
+		}
+	}
+
+	private void enforceDatagramRateLimit() throws InterruptedException {
+		lock.lock();
+		try {
+			final long now = System.nanoTime();
+			final long diff = now - countStart;
+			if (diff >= 1_000_000_000) {
+				countStart = now;
+				datagramCount = 1;
+				return;
+			}
+			if (++datagramCount > MaxDatagramsPerSecond) {
+				final long remaining = 1_000 - diff / 1_000_000;
+				if (remaining > 0) {
+					fireRateLimit();
+					logger.debug("reached max. datagrams/second, wait {} ms ...", remaining);
+					Thread.sleep(remaining);
+				}
+			}
+		}
+		finally {
+			lock.unlock();
+		}
 	}
 
 	private static long toLong(final InetAddress addr)

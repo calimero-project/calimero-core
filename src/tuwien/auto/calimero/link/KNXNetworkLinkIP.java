@@ -65,6 +65,7 @@ import tuwien.auto.calimero.knxnetip.KNXnetIPDevMgmt;
 import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
 import tuwien.auto.calimero.knxnetip.LostMessageEvent;
+import tuwien.auto.calimero.knxnetip.RateLimitEvent;
 import tuwien.auto.calimero.knxnetip.RoutingBusyEvent;
 import tuwien.auto.calimero.knxnetip.RoutingListener;
 import tuwien.auto.calimero.knxnetip.SecureConnection;
@@ -364,6 +365,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 		else if (c instanceof KNXnetIPRouting) {
 			notifier.registerEventType(LostMessageEvent.class);
 			notifier.registerEventType(RoutingBusyEvent.class);
+			notifier.registerEventType(RateLimitEvent.class);
 
 			c.addConnectionListener(new RoutingListener() {
 				@Override
@@ -376,6 +378,11 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 
 				@Override
 				public void lostMessage(final LostMessageEvent e) {
+					dispatchCustomEvent(e);
+				}
+
+				@Override
+				public void rateLimit(final RateLimitEvent e) {
 					dispatchCustomEvent(e);
 				}
 			});

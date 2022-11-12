@@ -52,6 +52,7 @@ import java.net.UnknownHostException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -75,6 +76,7 @@ import tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode;
 import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
 import tuwien.auto.calimero.knxnetip.LostMessageEvent;
+import tuwien.auto.calimero.knxnetip.RateLimitEvent;
 import tuwien.auto.calimero.knxnetip.RoutingBusyEvent;
 import tuwien.auto.calimero.knxnetip.TcpConnection;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingLostMessage;
@@ -514,5 +516,23 @@ class KNXNetworkLinkIPTest
 			((KNXnetIPTunnel) link.conn).send(InterfaceFeature.ConnectionStatus);
 			((KNXnetIPTunnel) link.conn).send(InterfaceFeature.IndividualAddress);
 		}
+	}
+
+	@Test
+	void routingRateLimitCustomNotification() throws SocketException, KNXException, InterruptedException {
+		final var cnt = new AtomicInteger();
+		try (final var link = KNXNetworkLinkIP.newRoutingLink(Util.localInterface(), KNXNetworkLinkIP.DefaultMulticast, new TPSettings())) {
+			final var listener = new NetworkLinkListener() {
+				@LinkEvent
+				void rateLimitWarning(final RateLimitEvent event) { cnt.incrementAndGet(); }
+			};
+			link.addLinkListener(listener);
+
+			int i = 0;
+			while (i++ < 100) {
+				link.conn.send(frameInd, BlockingMode.NonBlocking);
+			}
+		}
+		assertTrue(cnt.get() == 1);
 	}
 }
