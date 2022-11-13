@@ -390,14 +390,7 @@ public class KNXnetIPRouting extends ConnectionBase
 
 			// socket is unused
 			socket = dc.socket();
-		}
-		catch (final IOException e) {
-			closeSilently(dc, e);
-			closeSilently(dcSysBcast, e);
-			throw new KNXException(
-					"initializing multicast (group " + multicast.getHostAddress() + "): " + e.getMessage(), e);
-		}
-		try {
+
 			dc.setOption(StandardSocketOptions.IP_MULTICAST_LOOP, useMulticastLoopback);
 			if (dcSysBcast != null)
 				dcSysBcast.setOption(StandardSocketOptions.IP_MULTICAST_LOOP, useMulticastLoopback);
@@ -405,7 +398,10 @@ public class KNXnetIPRouting extends ConnectionBase
 			logger.info("multicast loopback mode " + (loopbackEnabled ? "enabled" : "disabled"));
 		}
 		catch (final IOException e) {
-			logger.warn("failed to access multicast loopback mode, " + e.getMessage());
+			closeSilently(dc, e);
+			closeSilently(dcSysBcast, e);
+			throw new KNXException(
+					"initializing multicast (group " + multicast.getHostAddress() + "): " + e.getMessage(), e);
 		}
 
 		if (startReceiver)
