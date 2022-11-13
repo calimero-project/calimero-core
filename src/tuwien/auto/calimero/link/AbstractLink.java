@@ -62,6 +62,7 @@ import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.cemi.CEMILData;
 import tuwien.auto.calimero.cemi.CEMILDataEx;
+import tuwien.auto.calimero.cemi.CemiTData;
 import tuwien.auto.calimero.cemi.RFMediumInfo;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.link.medium.PLSettings;
@@ -183,6 +184,16 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 				final CEMI cemi = onReceive(e);
 				if (cemi instanceof CEMIDevMgmt)
 					onDevMgmt((CEMIDevMgmt) cemi);
+				else if (cemi instanceof CemiTData) {
+					final var tdata = (CemiTData) cemi;
+					final int mc = tdata.getMessageCode();
+					if (mc == CemiTData.IndividualIndication || mc == CemiTData.ConnectedIndication) {
+						addEvent(l -> l.indication(new FrameEvent(source, tdata)));
+						logger.debug("received {}", tdata);
+					}
+					else
+						logger.warn("unsupported cEMI T-Data, msg code = 0x{}: {}", Integer.toHexString(mc), tdata);
+				}
 
 				// from this point on, we are only dealing with L_Data
 				if (!(cemi instanceof CEMILData))
@@ -381,8 +392,11 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		if (closed)
 			throw new KNXLinkClosedException("link closed");
 		if (cEMI && !sendCEmiAsByteArray) {
-			final CEMILData f = cEMI(mc, dst, p, nsdu);
-			onSend(f, waitForCon);
+			final CEMI f = cEMI(mc, dst, p, nsdu);
+			if (f instanceof CEMILData)
+				onSend((CEMILData) f, waitForCon);
+			else if (f instanceof CemiTData)
+				onSend((CemiTData) f);
 			return;
 		}
 		onSend(dst, createEmi(mc, dst, p, nsdu), waitForCon);
@@ -417,6 +431,19 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	 */
 	protected abstract void onSend(CEMILData msg, boolean waitForCon)
 		throws KNXTimeoutException, KNXLinkClosedException;
+
+	/**
+	 * Implement with the connection/medium-specific protocol send primitive for sending a message
+	 * in cEMI T-Data format over the link.
+	 *
+	 * @param msg the message to send
+	 * @throws KNXTimeoutException on a timeout during send
+	 * @throws KNXLinkClosedException if the link is closed
+	 */
+	@SuppressWarnings("unused")
+	protected void onSend(final CemiTData msg) throws KNXTimeoutException, KNXLinkClosedException {
+		throw new UnsupportedOperationException();
+	}
 
 	/**
 	 * Returns a cEMI representation, e.g., cEMI L-Data, using the received frame event for EMI and
@@ -601,6 +628,25 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		logger.trace("add cEMI additional info for {}{}", medium.getMediumString(), s);
 	}
 
+	private void addMediumInfo(final CemiTData msg) {
+		String s = "";
+		if (medium instanceof PLSettings) {
+			if (msg.additionalInfo().stream().anyMatch(info -> info.type() == AdditionalInfo.PlMedium))
+				return;
+			msg.additionalInfo().add(AdditionalInfo.of(AdditionalInfo.PlMedium, ((PLSettings) medium).getDomainAddress()));
+		}
+		else if (medium.getMedium() == KNXMediumSettings.MEDIUM_RF) {
+			if (msg.additionalInfo().stream().anyMatch(info -> info.type() == AdditionalInfo.RfMedium))
+				return;
+			final RFSettings rf = (RFSettings) medium;
+			msg.additionalInfo().add(new RFMediumInfo(true, rf.isUnidirectional(), rf.getDomainAddress(), 255, false));
+			s = " (using domain address)";
+		}
+		else
+			return;
+		logger.trace("add cEMI additional info for {}{}", medium.getMediumString(), s);
+	}
+
 	// Creates the target EMI format using L-Data message parameters
 	private byte[] createEmi(final int mc, final KNXAddress dst, final Priority p, final byte[] nsdu)
 	{
@@ -625,8 +671,14 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		return CEMIFactory.toEmi(f);
 	}
 
-	private CEMILData cEMI(final int mc, final KNXAddress dst, final Priority p, final byte[] nsdu)
+	private CEMI cEMI(final int mc, final KNXAddress dst, final Priority p, final byte[] nsdu)
 	{
+		if (mc == CemiTData.IndividualRequest || mc == CemiTData.ConnectedRequest) {
+			final var tdata = new CemiTData(mc, nsdu);
+			addMediumInfo(tdata);
+			return tdata;
+		}
+
 		final IndividualAddress src = medium.getDeviceAddress();
 		// use default address 0 in system broadcast
 		final KNXAddress d = dst == null ? GroupAddress.Broadcast : dst;

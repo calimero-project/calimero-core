@@ -50,6 +50,7 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.ServiceType;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
+import tuwien.auto.calimero.cemi.CemiTData;
 import tuwien.auto.calimero.knxnetip.servicetype.ErrorCodes;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
@@ -123,13 +124,13 @@ public class KNXnetIPDevMgmt extends ClientConnection
 	/**
 	 * Sends a cEMI device management frame to the remote server communicating with this endpoint.
 	 *
-	 * @param frame cEMI device management message of type {@link CEMIDevMgmt} to send
+	 * @param frame cEMI device management message of type {@link CEMIDevMgmt} or {@link CemiTData} to send
 	 */
 	@Override
 	public void send(final CEMI frame, final BlockingMode mode)
 		throws KNXTimeoutException, KNXConnectionClosedException, InterruptedException
 	{
-		if (!(frame instanceof CEMIDevMgmt))
+		if (!(frame instanceof CEMIDevMgmt) && !(frame instanceof CemiTData))
 			throw new KNXIllegalArgumentException("unsupported cEMI type");
 		super.send(frame, mode);
 	}
@@ -175,7 +176,9 @@ public class KNXnetIPDevMgmt extends ClientConnection
 		final int mc = cemi.getMessageCode();
 		if (mc == CEMIDevMgmt.MC_PROPINFO_IND || mc == CEMIDevMgmt.MC_RESET_IND)
 			fireFrameReceived(cemi);
-		else if (mc == CEMIDevMgmt.MC_PROPREAD_CON || mc == CEMIDevMgmt.MC_PROPWRITE_CON || mc == CEMIDevMgmt.MC_FUNCPROP_CON) {
+		else if (mc == CEMIDevMgmt.MC_PROPREAD_CON || mc == CEMIDevMgmt.MC_PROPWRITE_CON
+				|| mc == CEMIDevMgmt.MC_FUNCPROP_CON || mc == CemiTData.ConnectedIndication
+				|| mc == CemiTData.IndividualIndication) {
 			// invariant: notify listener before return from blocking send
 			fireFrameReceived(cemi);
 			setStateNotify(OK);
