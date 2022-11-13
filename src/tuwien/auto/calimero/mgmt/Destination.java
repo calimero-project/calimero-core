@@ -114,7 +114,6 @@ public class Destination implements AutoCloseable
 
 		/**
 		 * Returns the receive sequence number of the connection.
-		 * <p>
 		 *
 		 * @return sequence number, 0 &lt;= number &lt;= 15
 		 */
@@ -136,7 +135,6 @@ public class Destination implements AutoCloseable
 
 		/**
 		 * Returns the send sequence number of the connection.
-		 * <p>
 		 *
 		 * @return sequence number, 0 &lt;= number &lt;= 15
 		 */

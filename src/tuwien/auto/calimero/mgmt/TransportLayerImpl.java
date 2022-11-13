@@ -168,7 +168,7 @@ public class TransportLayerImpl implements TransportLayer
 
 	// used as default on incoming conn.oriented messages from unknown remote devices
 	private final Destination unknownPartner = new Destination(new AggregatorProxy(this),
-		new IndividualAddress(0), true);
+			new IndividualAddress(0), true);
 
 	private final Logger logger;
 

@@ -79,8 +79,7 @@ public final class LogService
 		return t;
 	});
 
-	private LogService()
-	{}
+	private LogService() {}
 
 	/**
 	 * Returns an slf4j logger identified by {@code name}.
