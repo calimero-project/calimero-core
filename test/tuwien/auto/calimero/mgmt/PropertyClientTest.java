@@ -42,6 +42,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -76,27 +78,26 @@ class PropertyClientTest
 
 	private IndividualAddress remote;
 
-	private volatile boolean closed;
+	private final CountDownLatch closed = new CountDownLatch(1);
 	private final Consumer<CloseEvent> adapterClosed = this::adapterClosed;
 
 	private void adapterClosed(final CloseEvent e) {
 		assertTrue(localAdpt == e.getSource() || remAdpt == e.getSource());
-		if (closed)
+		if (closed.getCount() == 0)
 			fail("already closed");
-		closed = true;
+		closed.countDown();
 	}
 
 	@BeforeEach
 	void init() throws Exception
 	{
 		remote = Util.getKnxDeviceCO();
-		closed = false;
 		try {
 			lnk = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false, new TPSettings());
 			remAdpt = new RemotePropertyServiceAdapter(lnk, remote, event -> {}, true);
 			rem = new PropertyClient(remAdpt);
 			localAdpt = LocalDeviceManagementIp.newAdapter(new InetSocketAddress(0), Util.getServer(), false,
-					true, adapterClosed);
+					true, e -> {});
 			local = new PropertyClient(localAdpt);
 
 			final String resource = "/properties.xml";
@@ -116,7 +117,6 @@ class PropertyClientTest
 	@AfterEach
 	void tearDown() throws Exception
 	{
-		closed = false;
 		if (rem != null)
 			rem.close();
 		if (local != null)
@@ -149,7 +149,8 @@ class PropertyClientTest
 
 		remAdpt = new RemotePropertyServiceAdapter(lnk, remote, adapterClosed, true);
 		lnk.close();
-		assertTrue(closed);
+		final boolean c = closed.await(1, TimeUnit.SECONDS);
+		assertTrue(c);
 	}
 
 	@Test
