@@ -59,6 +59,7 @@ import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.secure.Keyring.Interface;
+import tuwien.auto.calimero.secure.Keyring.Interface.Type;
 import tuwien.auto.calimero.xml.KNXMLException;
 
 class KeyringTest {
@@ -263,5 +264,18 @@ class KeyringTest {
 	@ValueSource(strings = {"BackBone", "Tunnelling", "Usb", "blah"})
 	void invalidInterfaceType(final String type) {
 		assertThrows(KNXIllegalArgumentException.class, () -> Interface.Type.from(type));
+	}
+
+	@Test
+	void decryptInterface() {
+		final var keyring = Keyring.load(keyringUri);
+		final var interfaces = keyring.interfaces();
+		final var secIf = interfaces.get(host).get(0);
+		final var tunnelInterface = secIf.decrypt(keyringPwd);
+
+		assertEquals(tunnelInterface.type(), Type.Tunneling);
+		assertTrue(tunnelInterface.user() > 0);
+		assertEquals(tunnelInterface.userKey().length, 16);
+		assertEquals(tunnelInterface.deviceAuthCode().length, 16);
 	}
 }

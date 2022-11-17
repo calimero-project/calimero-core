@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2021 B. Malinowsky
+    Copyright (c) 2019, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,11 +44,13 @@ import org.junit.jupiter.api.Test;
 
 import tag.KnxnetIPSequential;
 import tag.Slow;
+import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
 import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
+import tuwien.auto.calimero.secure.Keyring;
 
 @KnxnetIPSequential
 class ConnectionTest {
@@ -188,5 +190,19 @@ class ConnectionTest {
 			}
 		}
 		assertEquals(1, conn.sessions.size());
+	}
+
+	private static final String keyringUri = "test/resources/KeyringTest.knxkeys";
+	private static final IndividualAddress host = new IndividualAddress(1, 1, 0);
+	private static final char[] keyringPwd = "pwd".toCharArray();
+
+	@Test
+	void newSessionWithDecryptedInterface() {
+		final var keyring = Keyring.load(keyringUri);
+		final var interfaces = keyring.interfaces();
+		final var secIf = interfaces.get(host).get(0);
+		final var tunnelInterface = secIf.decrypt(keyringPwd);
+		try (var session = conn.newSecureSession(tunnelInterface)) {
+		}
 	}
 }

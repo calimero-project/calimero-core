@@ -90,6 +90,8 @@ import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
 import tuwien.auto.calimero.knxnetip.util.HPAI;
 import tuwien.auto.calimero.log.LogService;
 import tuwien.auto.calimero.log.LogService.LogLevel;
+import tuwien.auto.calimero.secure.Keyring;
+import tuwien.auto.calimero.secure.Keyring.Interface.Type;
 import tuwien.auto.calimero.secure.KnxSecureException;
 
 /**
@@ -686,6 +688,12 @@ public final class TcpConnection implements Closeable {
 	 */
 	public SecureSession newSecureSession(final int user, final byte[] userKey, final byte[] deviceAuthCode) {
 		return new SecureSession(this, user, userKey, deviceAuthCode);
+	}
+
+	public SecureSession newSecureSession(final Keyring.DecryptedInterface tunnelInterface) {
+		if (tunnelInterface.type() != Type.Tunneling)
+			throw new IllegalArgumentException("'" + tunnelInterface + "' is not a tunneling interface");
+		return newSecureSession(tunnelInterface.user(), tunnelInterface.userKey(), tunnelInterface.deviceAuthCode());
 	}
 
 	public InetSocketAddress localEndpoint() { return localEndpoint; }
