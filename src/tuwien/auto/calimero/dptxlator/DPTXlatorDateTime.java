@@ -979,7 +979,7 @@ public class DPTXlatorDateTime extends DPTXlator
 				}
 				else if (++day == 1) {
 					final String prefix = s.toLowerCase();
-					final var optDow = IntStream.range(1, 8).filter(n -> localizedDayOfWeek(n).equals(prefix)).findFirst();
+					final var optDow = IntStream.range(1, 8).filter(n -> localizedDayOfWeek(n).equalsIgnoreCase(prefix)).findFirst();
 					if (optDow.isPresent())
 						set(dst, index, DOW, optDow.getAsInt());
 					else {
@@ -988,7 +988,7 @@ public class DPTXlatorDateTime extends DPTXlator
 							--dow;
 						final boolean anyday = dow == 0 && t.hasMoreTokens() && t.nextToken().equalsIgnoreCase("day");
 						if (dow <= 0 && !anyday)
-							throw newException(s + ": wrong weekday", s, null);
+							throw newException("wrong weekday", s, null);
 						set(dst, index, DOW, dow);
 					}
 

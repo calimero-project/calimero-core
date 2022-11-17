@@ -137,8 +137,7 @@ public class KNXNetworkLinkTpuart extends AbstractLink<TpuartConnection>
 	}
 
 	@Override
-	protected void onSend(final CEMILData msg, final boolean waitForCon)
-	{}
+	protected void onSend(final CEMILData msg, final boolean waitForCon) {}
 
 	// if possible, add this link to the list of addresses to acknowledge
 	private static Collection<? extends KNXAddress> ensureDeviceAck(final KNXMediumSettings settings,

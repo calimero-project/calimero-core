@@ -75,9 +75,7 @@ import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.KNXNetworkLinkIP;
 import tuwien.auto.calimero.link.medium.TPSettings;
 
-/**
- * @author B. Malinowsky
- */
+
 @KnxnetIP
 class TransportLayerImplTest
 {
@@ -187,7 +185,7 @@ class TransportLayerImplTest
 	}
 
 	@Test
-	void testTransportLayerImpl()
+	void transportLayerImpl()
 	{
 		nl.close();
 		try {
@@ -198,7 +196,7 @@ class TransportLayerImplTest
 	}
 
 	@Test
-	void testAddEventListener()
+	void addEventListener()
 	{
 		tl.addTransportListener(new TLListener());
 		tl.addTransportListener(ltl);
@@ -206,7 +204,7 @@ class TransportLayerImplTest
 
 	@Test
 	@KnxnetIPSequential
-	void testBroadcast() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
+	void broadcast() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		final int indAddrRead = 0x0100;
 
@@ -217,7 +215,7 @@ class TransportLayerImplTest
 	}
 
 	@Test
-	void testConnect() throws KNXTimeoutException, KNXLinkClosedException
+	void connect() throws KNXTimeoutException, KNXLinkClosedException
 	{
 		tl.connect(dco);
 		tl.connect(dco);
@@ -234,7 +232,7 @@ class TransportLayerImplTest
 	}
 
 	@Test
-	void testCreateDestinationIndividualAddressBoolean()
+	void createDestinationIndividualAddressBoolean()
 	{
 		assertTrue(dco.isConnectionOriented());
 		assertEquals(Util.getKnxDeviceCO(), dco.getAddress());
@@ -245,7 +243,7 @@ class TransportLayerImplTest
 	}
 
 	@Test
-	void testCreateDestinationIndividualAddressBooleanBooleanBoolean()
+	void createDestinationIndividualAddressBooleanBooleanBoolean()
 	{
 		Destination d;
 		try {
@@ -262,7 +260,7 @@ class TransportLayerImplTest
 	}
 
 	@Test
-	void testDetach() throws KNXLinkClosedException
+	void detach() throws KNXLinkClosedException
 	{
 		assertFalse(ltl.detached);
 		tl.detach();
@@ -283,7 +281,7 @@ class TransportLayerImplTest
 	}
 
 	@Test
-	void testDetach2() throws KNXTimeoutException, KNXLinkClosedException
+	void detach2() throws KNXTimeoutException, KNXLinkClosedException
 	{
 		tl.detach();
 		tl.detach();
@@ -305,14 +303,14 @@ class TransportLayerImplTest
 	}
 
 	@Test
-	void testDetach3()
+	void detach3()
 	{
 		nl.close();
 		tl.detach();
 	}
 
 	@Test
-	void testDisconnect() throws KNXLinkClosedException, KNXTimeoutException
+	void disconnect() throws KNXLinkClosedException, KNXTimeoutException
 	{
 		tl.disconnect(dco);
 		tl.disconnect(dco);
@@ -341,7 +339,7 @@ class TransportLayerImplTest
 	}
 
 	@Test
-	void testGetName()
+	void getName()
 	{
 		String n = tl.getName();
 		assertTrue(n.indexOf(nl.getName()) > -1);
@@ -353,7 +351,7 @@ class TransportLayerImplTest
 	}
 
 	@Test
-	void testRemoveEventListener()
+	void removeEventListener()
 	{
 		tl.removeTransportListener(ltl);
 		tl.removeTransportListener(ltl);
@@ -362,7 +360,7 @@ class TransportLayerImplTest
 	}
 
 	@Test
-	void testSendDataDestinationPriorityByteArray()
+	void sendDataDestinationPriorityByteArray()
 		throws KNXDisconnectException, KNXLinkClosedException, InterruptedException
 	{
 		tl.sendData(dco, p, tsduDescRead);
@@ -382,7 +380,7 @@ class TransportLayerImplTest
 	}
 
 	@Test
-	void testSendDataNonExistingAddress()
+	void sendDataNonExistingAddress()
 		throws KNXLinkClosedException, InterruptedException
 	{
 		// not existing device address
@@ -398,7 +396,7 @@ class TransportLayerImplTest
 	}
 
 	@Test
-	void testSendDataDetach() throws InterruptedException, ExecutionException
+	void sendDataDetach() throws InterruptedException, ExecutionException
 	{
 		Executor.scheduledExecutor().schedule((Runnable) tl::detach, 0, TimeUnit.SECONDS).get();
 		assertThrows(IllegalStateException.class, () -> tl.sendData(dco, p, tsduDescRead));
@@ -407,7 +405,7 @@ class TransportLayerImplTest
 	}
 
 	@Test
-	void testSendDataLinkClose()
+	void sendDataLinkClose()
 		throws KNXLinkClosedException, KNXDisconnectException, InterruptedException
 	{
 		// do a link closed while waiting for L4 response
@@ -417,7 +415,7 @@ class TransportLayerImplTest
 	}
 
 	@Test
-	void testSendDataKNXAddressPriorityByteArray()
+	void sendDataKNXAddressPriorityByteArray()
 		throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		final int propRead = 0x03D5;

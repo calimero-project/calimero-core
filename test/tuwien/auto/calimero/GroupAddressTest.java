@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2014 B. Malinowsky
+    Copyright (c) 2014, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,46 +36,15 @@
 
 package tuwien.auto.calimero;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author B. Malinowsky
- */
-public class GroupAddressTest extends TestCase
+import org.junit.jupiter.api.Test;
+
+
+class GroupAddressTest
 {
-
-	/**
-	 * @param name
-	 */
-	public GroupAddressTest(final String name)
-	{
-		super(name);
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
-	{
-		super.tearDown();
-	}
-
-	/**
-	 * Test method for {@link tuwien.auto.calimero.GroupAddress#GroupAddress(java.lang.String)}.
-	 * 
-	 * @throws KNXFormatException
-	 */
-	public void testGroupAddressString() throws KNXFormatException
+	@Test
+	void groupAddressString() throws KNXFormatException
 	{
 		new GroupAddress("1/2/3");
 		new GroupAddress("1/515");

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,21 +36,13 @@
 
 package tuwien.auto.calimero.xml;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Tests commented out because class References has default visibility.
- *
- * @author B. Malinowsky
- */
-public class ReferencesTest extends TestCase
-{
+import org.junit.jupiter.api.Test;
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.xml.References#replaceFromRef(java.lang.String)}.
-	 */
-	public void testReplaceFromRef()
-	{
+class ReferencesTest {
+	@Test
+	void replaceFromRef() {
 		String s = "text &amp; text &#38; text &#x26; text";
 		String out = References.replaceFromRef(s);
 		assertEquals("text & text & text & text", out);
@@ -84,11 +76,8 @@ public class ReferencesTest extends TestCase
 		assertEquals(s, out);
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.xml.References#replaceWithRef(java.lang.String)}.
-	 */
-	public void testReplaceWithRef()
-	{
+	@Test
+	void replaceWithRef() {
 		String s = "& < > \" '";
 		String out = References.replaceWithRef(s);
 		assertEquals("&amp; &lt; &gt; &quot; &apos;", out);

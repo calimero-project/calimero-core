@@ -50,6 +50,9 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,6 +60,7 @@ import org.junit.jupiter.api.Test;
 
 import tag.KnxSecure;
 import tag.KnxnetIP;
+import tag.KnxnetIPSequential;
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.FrameEvent;
 import tuwien.auto.calimero.GroupAddress;
@@ -72,6 +76,7 @@ import tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode;
 import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
 import tuwien.auto.calimero.knxnetip.LostMessageEvent;
+import tuwien.auto.calimero.knxnetip.RateLimitEvent;
 import tuwien.auto.calimero.knxnetip.RoutingBusyEvent;
 import tuwien.auto.calimero.knxnetip.TcpConnection;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingLostMessage;
@@ -80,11 +85,9 @@ import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature.InterfaceFeatu
 import tuwien.auto.calimero.link.medium.PLSettings;
 import tuwien.auto.calimero.link.medium.TPSettings;
 
-/**
- * @author B. Malinowsky
- */
+
 @KnxnetIP
-public class KNXNetworkLinkIPTest
+class KNXNetworkLinkIPTest
 {
 	private KNXNetworkLink tnl;
 	private KNXNetworkLink rtr;
@@ -163,7 +166,7 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
-	void testKNXNetworkLinkIPConstructor() throws KNXException, InterruptedException
+	void networkLinkIPConstructor() throws KNXException, InterruptedException
 	{
 		tnl.close();
 		try (KNXNetworkLink l = new KNXNetworkLinkIP(100, new InetSocketAddress(0), Util.getServer(), false,
@@ -196,14 +199,14 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
-	void testAddLinkListener()
+	void addLinkListener()
 	{
 		tnl.addLinkListener(ltnl);
 		tnl.addLinkListener(ltnl);
 	}
 
 	@Test
-	void testSetKNXMedium()
+	void setKNXMedium()
 	{
 		try {
 			tnl.setKNXMedium(new PLSettings());
@@ -227,14 +230,14 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
-	void testGetKNXMedium()
+	void getKNXMedium()
 	{
 		assertTrue(tnl.getKNXMedium() instanceof TPSettings);
 		assertEquals(0, tnl.getKNXMedium().getDeviceAddress().getRawAddress());
 	}
 
 	@Test
-	void testClose() throws InterruptedException, KNXTimeoutException
+	void close() throws InterruptedException, KNXTimeoutException
 	{
 		assertTrue(tnl.isOpen());
 		tnl.close();
@@ -251,7 +254,7 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
-	void testGetHopCount()
+	void getHopCount()
 	{
 		assertEquals(6, rtr.getHopCount());
 		rtr.setHopCount(7);
@@ -269,7 +272,7 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
-	void testRemoveLinkListener()
+	void removeLinkListener()
 	{
 		tnl.removeLinkListener(ltnl);
 		tnl.removeLinkListener(ltnl);
@@ -278,7 +281,7 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
-	void testSendRequestKNXAddressPriorityByteArray()
+	void sendRequestKNXAddressPriorityByteArray()
 		throws InterruptedException, UnknownHostException, KNXException
 	{
 		doSend(true, new byte[] { 0, (byte) (0x80 | 1) });
@@ -310,7 +313,7 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
-	void testSendRequestCEMILData() throws KNXLinkClosedException, KNXTimeoutException
+	void sendRequestCEMILData() throws KNXLinkClosedException, KNXTimeoutException
 	{
 		ltnl.con = null;
 		tnl.send(frame2, false);
@@ -328,7 +331,7 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
-	void testSendRequestWaitKNXAddressPriorityByteArray()
+	void sendRequestWaitKNXAddressPriorityByteArray()
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
 		doSendWait(true, new byte[] { 0, (byte) (0x80 | 1) });
@@ -355,7 +358,7 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
-	void testSendRequestWaitCEMILData() throws KNXTimeoutException, KNXLinkClosedException
+	void sendRequestWaitCEMILData() throws KNXTimeoutException, KNXLinkClosedException
 	{
 		ltnl.con = null;
 		try {
@@ -378,7 +381,7 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
-	void testGetName()
+	void getName()
 	{
 		String n = tnl.getName();
 		assertTrue(n.indexOf(Util.getServer().getAddress().getHostAddress()) > -1);
@@ -397,8 +400,29 @@ public class KNXNetworkLinkIPTest
 	}
 
 	@Test
+	@KnxnetIPSequential
+	void runNotifierOnlyAfterEstablishingConnection()
+	{
+		// create some links that fail during construction
+		final InetSocketAddress sa = new InetSocketAddress(0);
+		assertThrows(KNXException.class, () -> KNXNetworkLinkIP.newTunnelingLink(sa, sa, false, new TPSettings()),
+				"no KNXnet/IP server with wildcard IP");
+		assertThrows(KNXException.class, () -> KNXNetworkLinkIP.newTunnelingLink(sa,
+				new InetSocketAddress("1.0.0.1", 3671), false, new TPSettings()), "no KNXnet/IP server with that IP");
+
+		final Thread[] threads = new Thread[Thread.activeCount() + 10];
+		final int active = Thread.enumerate(threads);
+		assertTrue(active <= threads.length);
+
+		final List<Thread> list = Arrays.asList(threads).subList(0, active);
+		final long cnt = list.stream().map(Thread::getName).filter(s -> s.equals("Calimero link notifier")).count();
+		// we should only have our two initial link notifiers running, not the failed ones
+		assertEquals(2, cnt, "running notifiers");
+	}
+
+	@Test
 	@KnxSecure
-	void secureRoutingLink() throws KNXException, SocketException {
+	void secureRoutingLink() throws KNXException, SocketException, InterruptedException {
 		final NetworkInterface netif = Util.localInterface();
 		final byte[] groupKey = new byte[16];
 		try (KNXNetworkLink link = KNXNetworkLinkIP.newSecureRoutingLink(netif, KNXNetworkLinkIP.DefaultMulticast, groupKey,
@@ -492,5 +516,23 @@ public class KNXNetworkLinkIPTest
 			((KNXnetIPTunnel) link.conn).send(InterfaceFeature.ConnectionStatus);
 			((KNXnetIPTunnel) link.conn).send(InterfaceFeature.IndividualAddress);
 		}
+	}
+
+	@Test
+	void routingRateLimitCustomNotification() throws SocketException, KNXException, InterruptedException {
+		final var cnt = new AtomicInteger();
+		try (final var link = KNXNetworkLinkIP.newRoutingLink(Util.localInterface(), KNXNetworkLinkIP.DefaultMulticast, new TPSettings())) {
+			final var listener = new NetworkLinkListener() {
+				@LinkEvent
+				void rateLimitWarning(final RateLimitEvent event) { cnt.incrementAndGet(); }
+			};
+			link.addLinkListener(listener);
+
+			int i = 0;
+			while (i++ < 100) {
+				link.conn.send(frameInd, BlockingMode.NonBlocking);
+			}
+		}
+		assertTrue(cnt.get() == 1);
 	}
 }

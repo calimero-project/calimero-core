@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -74,11 +74,9 @@ import tuwien.auto.calimero.link.medium.TPSettings;
 import tuwien.auto.calimero.process.ProcessCommunicator;
 import tuwien.auto.calimero.process.ProcessCommunicatorImpl;
 
-/**
- * @author B. Malinowsky
- */
+
 @KnxnetIP
-public class NetworkBufferTest
+class NetworkBufferTest
 {
 	private final GroupAddress group1 = new GroupAddress(1, 0, 1);
 	private final GroupAddress invalidatingGroup = new GroupAddress(1, 0, 11);
@@ -244,42 +242,30 @@ public class NetworkBufferTest
 
 	// tests
 
-	/**
-	 * Test method for {@link NetworkBuffer#createBuffer(java.lang.String)}.
-	 */
 	@Test
-	void testCreateBuffer()
+	void createBuffer()
 	{
 		final String id = "testInstallation";
 		assertNotNull(NetworkBuffer.createBuffer(id));
 	}
 
-	/**
-	 * Test method for {@link NetworkBuffer#addConfiguration(tuwien.auto.calimero.link.KNXNetworkLink)}.
-	 */
 	@Test
-	void testCreateConfigurationKNXNetworkLink()
+	void createConfigurationKNXNetworkLink()
 	{
 		final NetworkBuffer b = NetworkBuffer.createBuffer(null);
 		b.addConfiguration(lnk);
 	}
 
-	/**
-	 * Test method for {@link NetworkBuffer#getConfiguration(tuwien.auto.calimero.link.KNXNetworkLink)}.
-	 */
 	@Test
-	void testGetConfiguration()
+	void getConfiguration()
 	{
 		final Configuration c = buffer.addConfiguration(lnk);
 		final Configuration c2 = buffer.getConfiguration(c.getBufferedLink());
 		assertEquals(c, c2);
 	}
 
-	/**
-	 * Test method for {@link NetworkBuffer#removeConfiguration(Configuration)}.
-	 */
 	@Test
-	void testRemoveConfigurationConfiguration()
+	void removeConfigurationConfiguration()
 	{
 		final Configuration c = buffer.addConfiguration(lnk);
 		final KNXNetworkLink buf = c.getBufferedLink();
@@ -287,14 +273,8 @@ public class NetworkBufferTest
 		assertNull(buffer.getConfiguration(buf));
 	}
 
-	/**
-	 * Test method for state based buffering.
-	 *
-	 * @throws InterruptedException on interrupted thread
-	 * @throws KNXException
-	 */
 	@Test
-	void testStateBasedBuffering() throws InterruptedException, KNXException
+	void stateBasedBuffering() throws InterruptedException, KNXException
 	{
 		final GroupAddress group1 = new GroupAddress(1, 0, 1);
 		final GroupAddress group2 = new GroupAddress(1, 0, 11);
@@ -394,14 +374,8 @@ public class NetworkBufferTest
 		assertEquals(s1, pc.read(dp));
 	}
 
-	/**
-	 * Test method for command based buffering.
-	 *
-	 * @throws InterruptedException on interrupted thread
-	 * @throws KNXException
-	 */
 	@Test
-	void testCommandBasedBuffering() throws InterruptedException, KNXException
+	void commandBasedBuffering() throws InterruptedException, KNXException
 	{
 		final Configuration c = buffer.addConfiguration(lnk);
 		final CommandFilter f = new CommandFilter();
@@ -454,15 +428,9 @@ public class NetworkBufferTest
 		assertFalse(f.hasNewIndication());
 	}
 
-	/**
-	 * Test method for query buffer only mode.
-	 *
-	 * @throws InterruptedException on interrupted thread
-	 * @throws KNXException
-	 */
 	@Test
 	@KnxnetIPSequential
-	void testQueryBufferOnly() throws InterruptedException, KNXException
+	void queryBufferOnly() throws InterruptedException, KNXException
 	{
 		final Configuration c = buffer.addConfiguration(lnk);
 		final StateFilter f = new StateFilter();

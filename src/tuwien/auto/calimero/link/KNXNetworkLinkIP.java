@@ -57,14 +57,17 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.KnxRuntimeException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.ReturnCode;
+import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.cemi.CEMILData;
+import tuwien.auto.calimero.cemi.CemiTData;
 import tuwien.auto.calimero.knxnetip.KNXConnectionClosedException;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection;
 import tuwien.auto.calimero.knxnetip.KNXnetIPDevMgmt;
 import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel;
 import tuwien.auto.calimero.knxnetip.LostMessageEvent;
+import tuwien.auto.calimero.knxnetip.RateLimitEvent;
 import tuwien.auto.calimero.knxnetip.RoutingBusyEvent;
 import tuwien.auto.calimero.knxnetip.RoutingListener;
 import tuwien.auto.calimero.knxnetip.SecureConnection;
@@ -120,6 +123,11 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 * Service mode for link layer tunneling v2.
 	 */
 	protected static final int TunnelingV2 = 3;
+
+	/**
+	 * Service mode for cEMI T-Data device management.
+	 */
+	protected static final int DevMgmt = 4;
 
 	/**
 	 * Service mode for routing.
@@ -247,17 +255,64 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 * @param settings medium settings defining device and medium specifics needed for communication
 	 * @return the network link in open state
 	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
+	 * @throws InterruptedException on thread interrupt while establishing link
 	 */
-	public static KNXNetworkLinkIP newSecureRoutingLink(final NetworkInterface netif, final InetAddress mcGroup, final byte[] groupKey,
-		final Duration latencyTolerance, final KNXMediumSettings settings) throws KNXException {
-		try {
-			return new KNXNetworkLinkIP(ROUTING, SecureConnection.newRouting(netif, mcGroup, groupKey, latencyTolerance),
-					settings);
-		}
-		catch (final InterruptedException unreachable) {
-			throw new IllegalStateException();
-		}
+	public static KNXNetworkLinkIP newSecureRoutingLink(final NetworkInterface netif, final InetAddress mcGroup,
+			final byte[] groupKey, final Duration latencyTolerance, final KNXMediumSettings settings)
+			throws KNXException, InterruptedException {
+		return new KNXNetworkLinkIP(ROUTING, SecureConnection.newRouting(netif, mcGroup, groupKey, latencyTolerance),
+				settings);
 	}
+
+	/**
+	 * Creates a new network link over unsecured UDP to a remote KNX IP device for KNXnet/IP cEMI T-Data device management.
+	 *
+	 * @param localEp the local control endpoint of the link to use, supply the wildcard address to use a local IP on
+	 *        the same subnet as {@code remoteEP} and an ephemeral port number
+	 * @param remoteEp the remote endpoint of the link to communicate with
+	 * @param useNat {@code true} to use network address translation (NAT) in tunneling service mode,
+	 *        {@code false} to use the default (non aware) mode
+	 * @param settings medium settings defining device and KNX medium specifics for communication
+	 * @return the network link in open state
+	 * @throws KNXException on failure establishing the link
+	 * @throws InterruptedException on interrupted thread while establishing link
+	 */
+	public static KNXNetworkLinkIP newDeviceManagementLink(final InetSocketAddress localEp,
+			final InetSocketAddress remoteEp, final boolean useNat, final KNXMediumSettings settings)
+			throws KNXException, InterruptedException {
+		return new KNXNetworkLinkIP(DevMgmt, new KNXnetIPDevMgmt(localEp, remoteEp, useNat), settings);
+	}
+
+	/**
+	 * Creates a new network link over unsecured TCP to a remote KNX IP device for KNXnet/IP cEMI T-Data device management.
+	 *
+	 * @param connection a TCP connection to the KNX IP device (if the connection state is not connected, link setup will
+	 *        establish the connection); closing the link will not close the TCP connection
+	 * @param settings medium settings defining device and KNX medium specifics for communication
+	 * @return the network link in open state
+	 * @throws KNXException on failure establishing the link
+	 * @throws InterruptedException on interrupted thread while establishing link
+	 */
+	public static KNXNetworkLinkIP newDeviceManagementLink(final TcpConnection connection,
+			final KNXMediumSettings settings) throws KNXException, InterruptedException {
+		return new KNXNetworkLinkIP(DevMgmt, new KNXnetIPDevMgmt(connection), settings);
+	}
+
+	/**
+	 * Creates a new network link using KNX IP secure to a remote KNX IP device for KNXnet/IP cEMI T-Data device management.
+	 *
+	 * @param session a secure session for the KNX IP device (session state is allowed to be not authenticated);
+	 *        closing the link will not close the session
+	 * @param settings medium settings defining device and KNX medium specifics for communication
+	 * @return the network link in open state
+	 * @throws KNXException on failure establishing the link
+	 * @throws InterruptedException on interrupted thread while establishing link
+	 */
+	public static KNXNetworkLinkIP newSecureDeviceManagementLink(final SecureSession session,
+			final KNXMediumSettings settings) throws KNXException, InterruptedException {
+		return new KNXNetworkLinkIP(DevMgmt, SecureConnection.newDeviceManagement(session), settings);
+	}
+
 
 	/**
 	 * Creates a new network link based on the KNXnet/IP protocol, using a {@link KNXnetIPConnection}.
@@ -368,6 +423,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 		else if (c instanceof KNXnetIPRouting) {
 			notifier.registerEventType(LostMessageEvent.class);
 			notifier.registerEventType(RoutingBusyEvent.class);
+			notifier.registerEventType(RateLimitEvent.class);
 
 			c.addConnectionListener(new RoutingListener() {
 				@Override
@@ -380,6 +436,11 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 
 				@Override
 				public void lostMessage(final LostMessageEvent e) {
+					dispatchCustomEvent(e);
+				}
+
+				@Override
+				public void rateLimit(final RateLimitEvent e) {
 					dispatchCustomEvent(e);
 				}
 			});
@@ -405,10 +466,8 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 */
 	@Override
 	public void sendRequest(final KNXAddress dst, final Priority p, final byte[] nsdu)
-		throws KNXLinkClosedException, KNXTimeoutException
-	{
-		final int mc = mode == ROUTING ? CEMILData.MC_LDATA_IND : CEMILData.MC_LDATA_REQ;
-		send(mc, dst, p, nsdu, false);
+			throws KNXLinkClosedException, KNXTimeoutException {
+		send(msgCode(), dst, p, nsdu, false);
 	}
 
 	/**
@@ -417,10 +476,13 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 */
 	@Override
 	public void sendRequestWait(final KNXAddress dst, final Priority p, final byte[] nsdu)
-		throws KNXTimeoutException, KNXLinkClosedException
-	{
-		final int mc = mode == ROUTING ? CEMILData.MC_LDATA_IND : CEMILData.MC_LDATA_REQ;
-		send(mc, dst, p, nsdu, true);
+			throws KNXTimeoutException, KNXLinkClosedException {
+		send(msgCode(), dst, p, nsdu, true);
+	}
+
+	private int msgCode() {
+		return mode == KNXNetworkLinkIP.ROUTING ? CEMILData.MC_LDATA_IND
+				: mode == KNXNetworkLinkIP.DevMgmt ? CemiTData.IndividualRequest : CEMILData.MC_LDATA_REQ;
 	}
 
 	@Override
@@ -437,12 +499,27 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 
 	@Override
 	protected void onSend(final CEMILData msg, final boolean waitForCon)
-		throws KNXTimeoutException, KNXLinkClosedException
-	{
+			throws KNXTimeoutException, KNXLinkClosedException {
+		doSend(msg, waitForCon);
+	}
+
+	@Override
+	protected void onSend(final CemiTData msg) throws KNXTimeoutException, KNXLinkClosedException {
+		doSend(msg, false);
+	}
+
+	private void doSend(final CEMI msg, final boolean waitForCon)
+			throws KNXTimeoutException, KNXLinkClosedException {
 		try {
 			logger.debug("send {}{}", (waitForCon ? "(wait for confirmation) " : ""), msg);
 			conn.send(msg, waitForCon ? WaitForCon : WaitForAck);
-			logger.trace("send {}->{} succeeded", msg.getSource(), msg.getDestination());
+
+			if (msg instanceof CEMILData)
+				logger.trace("send {}->{} succeeded", ((CEMILData) msg).getSource(),
+						((CEMILData) msg).getDestination());
+			else
+				logger.trace("send {}->{}:{} succeeded", "local", conn.getRemoteAddress().getAddress(),
+						conn.getRemoteAddress().getPort());
 		}
 		catch (final InterruptedException e) {
 			close();
@@ -450,7 +527,6 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 			throw new KNXLinkClosedException("link closed (interrupted)");
 		}
 		catch (final KNXConnectionClosedException e) {
-			logger.error("send error, closing link", e);
 			close();
 			throw new KNXLinkClosedException("link closed, " + e.getMessage());
 		}

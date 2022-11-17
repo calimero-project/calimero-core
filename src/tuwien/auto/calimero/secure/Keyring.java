@@ -76,6 +76,8 @@ import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.knxnetip.SecureConnection;
+import tuwien.auto.calimero.secure.Keyring.Interface.Type;
 import tuwien.auto.calimero.xml.KNXMLException;
 import tuwien.auto.calimero.xml.XmlInputFactory;
 import tuwien.auto.calimero.xml.XmlReader;
@@ -101,6 +103,8 @@ public final class Keyring {
 			}
 		}
 
+
+		private final Keyring keyring;
 		private final String type; // TODO candidate for subtyping via sealed interface
 		private final IndividualAddress addr;
 		private final int user;
@@ -108,8 +112,9 @@ public final class Keyring {
 		private final byte[] auth;
 		private volatile Map<GroupAddress, Set<IndividualAddress>> groups = Map.of();
 
-		Interface(final String type, final IndividualAddress addr, final int user, final byte[] pwd,
-				final byte[] auth) {
+		Interface(final Keyring keyring, final String type, final IndividualAddress addr, final int user,
+				final byte[] pwd, final byte[] auth) {
+			this.keyring = keyring;
 			this.type = type;
 			this.addr = addr;
 			this.user = user;
@@ -149,6 +154,27 @@ public final class Keyring {
 		 */
 		public Map<GroupAddress, Set<IndividualAddress>> groups() { return groups; }
 
+		/**
+		 * Returns an interface with decrypted keys.
+		 *
+		 * @param keyringPwd keyring password
+		 * @return DecryptedInterface with decrypted keys of this interface
+		 * @throws KnxSecureException if password or authentication is not available, or decryption fails
+		 */
+		public DecryptedInterface decrypt(final char[] keyringPwd) {
+			final var encUserPwd = password()
+					.orElseThrow(() -> new KnxSecureException("no user password set for interface " + addr));
+			final var decUserPwd = keyring.decryptPassword(encUserPwd, keyringPwd);
+			final var userKey = SecureConnection.hashUserPassword(decUserPwd);
+
+			final byte[] encDevAuth = authentication()
+					.orElseThrow(() -> new KnxSecureException("no device authentication code set for interface " + addr));
+			final char[] decDevAuth = keyring.decryptPassword(encDevAuth, keyringPwd);
+			final var deviceAuthCode = SecureConnection.hashDeviceAuthenticationPassword(decDevAuth);
+
+			return new DecryptedInterface(type(), addr, user, userKey, deviceAuthCode);
+		}
+
 		@Override
 		public boolean equals(final Object o) {
 			if (this == o)
@@ -178,6 +204,40 @@ public final class Keyring {
 					.map(GroupAddress::toString).collect(Collectors.joining(", ", "[", ", ...]")) : groups.keySet();
 			return type + " interface " + addr + ", user " + user + ", groups " + entries;
 		}
+	}
+
+	/**
+	 * An {@link Interface} with decrypted keys.
+	 */
+	/* public record */
+	public static final class DecryptedInterface {
+		private final Type type;
+		private final IndividualAddress address;
+		private final int user;
+		private final byte[] userKey;
+		private final byte[] deviceAuthCode;
+
+		DecryptedInterface(final Type type, final IndividualAddress address, final int user, final byte[] userKey,
+				final byte[] deviceAuthCode) {
+			this.type = type;
+			this.address = address;
+			this.user = user;
+			this.userKey = userKey;
+			this.deviceAuthCode = deviceAuthCode;
+		}
+
+		public Interface.Type type() { return type; }
+
+		public IndividualAddress address() { return address; }
+
+		public int user() { return user; }
+
+		public byte[] userKey() { return userKey.clone(); }
+
+		public byte[] deviceAuthCode() { return deviceAuthCode.clone(); }
+
+		@Override
+		public String toString() { return type + " interface " + address + ", user " + user; }
 	}
 
 	public static final class Device {
@@ -420,7 +480,7 @@ public final class Keyring {
 					final var pwd = readAttribute(reader, "Password", Keyring::decode, null);
 					final var auth = readAttribute(reader, "Authentication", Keyring::decode, null);
 
-					iface = new Interface(type, addr, user, pwd, auth);
+					iface = new Interface(this, type, addr, user, pwd, auth);
 					interfaces.computeIfAbsent(host, key -> new ArrayList<>()).add(iface);
 
 				}

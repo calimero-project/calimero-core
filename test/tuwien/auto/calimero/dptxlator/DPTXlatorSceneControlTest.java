@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2013, 2016 B. Malinowsky
+    Copyright (c) 2013, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,17 +36,20 @@
 
 package tuwien.auto.calimero.dptxlator;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.Arrays;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.Util;
 
-/**
- * @author B. Malinowsky
- */
-public class DPTXlatorSceneControlTest extends TestCase
+
+class DPTXlatorSceneControlTest
 {
 	private DPTXlatorSceneControl t;
 
@@ -70,32 +73,15 @@ public class DPTXlatorSceneControlTest extends TestCase
 	DPT sc = DPTXlatorSceneControl.DPT_SCENE_CONTROL;
 	DPT[] dpts = { DPTXlatorSceneControl.DPT_SCENE_CONTROL };
 
-	/**
-	 * @param name
-	 */
-	public DPTXlatorSceneControlTest(final String name)
-	{
-		super(name);
-	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
+	@BeforeEach
+	void init() throws Exception
 	{
-		super.setUp();
-		Util.setupLogging("DPTXlator");
 		t = new DPTXlatorSceneControl(sc);
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorSceneControl#setValues(java.lang.String[])}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testSetValues() throws KNXFormatException
+	@Test
+	void setValues() throws KNXFormatException
 	{
 		t.setValues(strings);
 		assertEquals(strings.length, t.getItems());
@@ -113,12 +99,8 @@ public class DPTXlatorSceneControlTest extends TestCase
 		t.setValues(new String[] { t.getValue(), t.getValue() });
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorSceneControl#getAllValues()}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public void testGetAllValues() throws KNXFormatException
+	@Test
+	void getAllValues() throws KNXFormatException
 	{
 		assertEquals(1, t.getItems());
 		Helper.assertSimilar("0", t.getAllValues()[0]);
@@ -133,13 +115,8 @@ public class DPTXlatorSceneControlTest extends TestCase
 		Helper.assertSimilar(strings[0], t.getAllValues()[0]);
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorSceneControl#setValue(java.lang.String)}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public void testSetValueString() throws KNXFormatException
+	@Test
+	void setValueString() throws KNXFormatException
 	{
 		t.setValue("  " + value1 + "  ");
 		Helper.assertSimilar(value1, t.getValue());
@@ -159,12 +136,8 @@ public class DPTXlatorSceneControlTest extends TestCase
 		}
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorSceneControl#getValue()}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public void testGetValue() throws KNXFormatException
+	@Test
+	void getValue() throws KNXFormatException
 	{
 		Helper.assertSimilar("0", t.getValue());
 		t.setValues(new String[0]);
@@ -177,11 +150,8 @@ public class DPTXlatorSceneControlTest extends TestCase
 		Helper.assertSimilar(max, t.getValue());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorSceneControl#setData(byte[], int)}.
-	 */
-	public void testSetDataByteArrayInt()
+	@Test
+	void setDataByteArrayInt()
 	{
 		t.setData(dataMax, 0);
 		try {
@@ -204,13 +174,8 @@ public class DPTXlatorSceneControlTest extends TestCase
 		Helper.assertSimilar(strings, t.getAllValues());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorSceneControl#getData(byte[], int)}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public void testGetDataByteArrayInt() throws KNXFormatException
+	@Test
+	void getDataByteArrayInt() throws KNXFormatException
 	{
 		assertEquals(2, t.getData(new byte[2], 1).length);
 		final byte[] empty = new byte[2];
@@ -235,10 +200,8 @@ public class DPTXlatorSceneControlTest extends TestCase
 		}
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorSceneControl#getSubTypes()}.
-	 */
-	public void testGetSubTypes()
+	@Test
+	void getSubTypes()
 	{
 		assertEquals(dpts.length, t.getSubTypes().size());
 		t.getSubTypes().remove(dpts[0].getID());
@@ -248,21 +211,14 @@ public class DPTXlatorSceneControlTest extends TestCase
 		assertEquals(dpts.length, t.getSubTypes().size());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorSceneControl#DPTXlatorSceneControl(
-	 * tuwien.auto.calimero.dptxlator.DPT)}.
-	 */
-	public void testDPTXlatorSceneControlDPT()
+	@Test
+	void dptXlatorSceneControlDPT()
 	{
 		Helper.checkDPTs(dpts, true);
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlatorSceneControl#setValue(boolean, int)}.
-	 */
-	public void testSetValueBooleanInt()
+	@Test
+	void setValueBooleanInt()
 	{
 		t.setValue(true, 13);
 		Helper.assertSimilar(value1, t.getValue());

@@ -433,6 +433,8 @@ public final class DataUnitBuilder
 			return "A_DoA-S/N.write";
 		case 0b1011000111:
 			return "A_FunctionPropertyCommand";
+		case 0b1011001000:
+			return "A_FunctionPropertyState.read";
 		case 0b1011001001:
 			return "A_FunctionPropertyState.response";
 		// services for extended interface object addressing

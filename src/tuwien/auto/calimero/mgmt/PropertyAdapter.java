@@ -43,7 +43,7 @@ import tuwien.auto.calimero.KNXException;
  * <p>
  * A property adapter is created for one communication partner (KNX device, KNXnet/IP router). If {@link #close()} is
  * called by a user on an open adapter, all methods which do interface object property access are allowed to throw
- * {@link IllegalStateException} if invoked on that closed adapter.<br>
+ * {@link IllegalStateException} if invoked on that closed adapter.
  *
  * @author B. Malinowsky
  */
@@ -77,6 +77,12 @@ public interface PropertyAdapter extends AutoCloseable
 	 * @throws InterruptedException on interrupted thread
 	 */
 	byte[] getProperty(int objIndex, int pid, int start, int elements) throws KNXException, InterruptedException;
+
+	void callFunctionProperty(int objectType, int objectInstance, int pid, int serviceId, byte... serviceInfo)
+			throws KNXException, InterruptedException;
+
+	byte[] getFunctionPropertyState(int objectType, int objectInstance, int pid, int serviceId, byte... serviceInfo)
+			throws KNXException, InterruptedException;
 
 	/**
 	 * Reads the description of a property of an interface object, returning a property description layout according the

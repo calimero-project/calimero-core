@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -64,11 +64,9 @@ import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.knxnetip.KNXnetIPConnection.BlockingMode;
 
-/**
- * @author B. Malinowsky
- */
+
 @KnxnetIP
-public class KNXnetIPDevMgmtTest
+class KNXnetIPDevMgmtTest
 {
 //	private static KNXnetIPConnection.BlockingMode noblock = KNXnetIPConnection.BlockingMode.NonBlocking;
 //	private static KNXnetIPConnection.BlockingMode ack = KNXnetIPConnection.BlockingMode.WaitForAck;
@@ -137,7 +135,7 @@ public class KNXnetIPDevMgmtTest
 	}
 
 	@Test
-	void testSend() throws KNXException, InterruptedException
+	void send() throws KNXException, InterruptedException
 	{
 		newMgmt();
 		doSend(frame, con, true);
@@ -156,14 +154,14 @@ public class KNXnetIPDevMgmtTest
 	}
 
 	@Test
-	void testKNXnetIPDevMgmt() throws KNXException, InterruptedException
+	void knxnetIPDevMgmt() throws KNXException, InterruptedException
 	{
 		newMgmt();
 		assertEquals(KNXnetIPConnection.OK, m.getState());
 	}
 
 	@Test
-	void testClose() throws KNXException, InterruptedException
+	void close() throws KNXException, InterruptedException
 	{
 		newMgmt();
 		m.close();
@@ -177,7 +175,7 @@ public class KNXnetIPDevMgmtTest
 	}
 
 	@Test
-	void testGetRemoteAddress() throws KNXException, InterruptedException
+	void getRemoteAddress() throws KNXException, InterruptedException
 	{
 		newMgmt();
 		assertEquals(Util.getServer(), m.getRemoteAddress());
@@ -188,7 +186,7 @@ public class KNXnetIPDevMgmtTest
 
 	@Test
 	@Slow
-	void testGetState() throws InterruptedException, KNXException
+	void getState() throws InterruptedException, KNXException
 	{
 		newMgmt();
 		assertEquals(KNXnetIPConnection.OK, m.getState());

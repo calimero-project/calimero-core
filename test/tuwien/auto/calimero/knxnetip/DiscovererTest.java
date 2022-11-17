@@ -62,11 +62,10 @@ import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.opentest4j.AssertionFailedError;
 
-import junit.framework.AssertionFailedError;
 import tag.KnxnetIP;
 import tag.Slow;
 import tuwien.auto.calimero.KNXException;
@@ -78,9 +77,7 @@ import tuwien.auto.calimero.knxnetip.servicetype.DescriptionResponse;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
 import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB.ServiceFamily;
 
-/**
- * @author B. Malinowsky
- */
+
 @KnxnetIP
 @Execution(ExecutionMode.SAME_THREAD)
 class DiscovererTest
@@ -111,7 +108,7 @@ class DiscovererTest
 	}
 
 	@Test
-	void testDiscoverer()
+	void discoverer()
 	{
 		try {
 			ddef = new Discoverer(-1, false);
@@ -127,7 +124,7 @@ class DiscovererTest
 	}
 
 	@Test
-	void testClearSearchResponses() throws InterruptedException
+	void clearSearchResponses() throws InterruptedException
 	{
 		ddef.startSearch(timeout, true);
 		assertTrue(ddef.getSearchResponses().size() > 0);
@@ -136,13 +133,13 @@ class DiscovererTest
 	}
 
 	@Test
-	void testGetDescription() throws KNXException
+	void getDescription() throws KNXException
 	{
 		doGetDesc(ddef);
 	}
 
 	@Test
-	void testNATGetDescription() throws KNXException
+	void natGetDescription() throws KNXException
 	{
 		if (!Util.TEST_NAT) {
 			System.out.println("\n==== skip testNATGetDescription ====\n");
@@ -165,13 +162,13 @@ class DiscovererTest
 	}
 
 	@Test
-	void testGetSearchResponses() throws InterruptedException
+	void getSearchResponses() throws InterruptedException
 	{
 		doGetSearchRes(ddef);
 	}
 
 	@Test
-	void testNATGetSearchResponses() throws InterruptedException
+	void natGetSearchResponses() throws InterruptedException
 	{
 		if (!Util.TEST_NAT) {
 			System.out.println("\n==== skip testNATGetSearchResponses ====\n");
@@ -186,7 +183,7 @@ class DiscovererTest
 	}
 
 	@Test
-	void testMcastGetSearchResponses() throws InterruptedException
+	void mcastGetSearchResponses() throws InterruptedException
 	{
 		doGetSearchRes(dmcast);
 	}
@@ -206,15 +203,14 @@ class DiscovererTest
 	}
 
 	@Test
-	void testStartSearchIntNetworkInterfaceIntBoolean()
+	void startSearchIntNetworkInterfaceIntBoolean()
 		throws SocketException, KNXException, InterruptedException
 	{
 		doStartSearchIF(ddef, false);
 	}
 
 	@Test
-	@DisabledIfEnvironmentVariable(named="TRAVIS", matches=".*")
-	void testNATStartSearchIntNetworkInterfaceIntBoolean() throws SocketException, InterruptedException
+	void natStartSearchIntNetworkInterfaceIntBoolean() throws SocketException, InterruptedException
 	{
 		if (!Util.TEST_NAT) {
 			System.out.println("\n==== skip testNATStartSearchIntNetworkInterfaceIntBoolean ====\n");
@@ -232,7 +228,7 @@ class DiscovererTest
 	}
 
 	@Test
-	void testMcastStartSearchIntNetworkInterfaceIntBoolean()
+	void mcastStartSearchIntNetworkInterfaceIntBoolean()
 		throws SocketException, KNXException, InterruptedException
 	{
 		doStartSearchIF(dmcast, true);
@@ -266,13 +262,13 @@ class DiscovererTest
 	}
 
 	@Test
-	void testStartSearchIntBoolean() throws InterruptedException, ExecutionException
+	void startSearchIntBoolean() throws InterruptedException, ExecutionException
 	{
 		doSearch(ddef, false);
 	}
 
 	@Test
-	void testNATStartSearchIntBoolean() throws InterruptedException, ExecutionException
+	void natStartSearchIntBoolean() throws InterruptedException, ExecutionException
 	{
 		if (!Util.TEST_NAT) {
 			System.out.println("\n==== skip testNATStartSearchIntBoolean ====\n");
@@ -287,7 +283,7 @@ class DiscovererTest
 	}
 
 	@Test
-	void testMcastStartSearchIntBoolean() throws InterruptedException, ExecutionException
+	void mcastStartSearchIntBoolean() throws InterruptedException, ExecutionException
 	{
 		doSearch(dmcast, true);
 	}
@@ -320,7 +316,7 @@ class DiscovererTest
 	}
 
 	@Test
-	void testStopSearch() throws InterruptedException, ExecutionException
+	void stopSearch() throws InterruptedException, ExecutionException
 	{
 		ddef.startSearch(timeout, false);
 		ddef.startSearch(timeout, false);
@@ -348,7 +344,7 @@ class DiscovererTest
 	}
 
 	@Test
-	void testIsSearching() throws InterruptedException
+	void isSearching() throws InterruptedException
 	{
 		ddef.startSearch(timeout, false);
 		assertTrue(ddef.isSearching());
@@ -359,7 +355,7 @@ class DiscovererTest
 	}
 
 	@Test
-	void testStartSearchInterrupt()
+	void startSearchInterrupt()
 	{
 		final Thread t = Thread.currentThread();
 		try {
@@ -423,12 +419,12 @@ class DiscovererTest
 
 	// checks that all used receiver threads are idle
 	private static void allReceiverThreadsIdle() throws InterruptedException {
-		Thread.sleep(100);
+		Thread.sleep(1500);
 		final Thread[] threads = new Thread[Thread.activeCount() + 5];
 		assertTrue(Thread.enumerate(threads) < threads.length);
 		final List<Thread> l = Arrays.asList(threads);
 		assertTrue(l.stream().filter(Objects::nonNull).map(Thread::getName).filter(s -> s.startsWith("Discoverer"))
-				.allMatch(s -> s.equals("Discoverer (idle)")));
+				.allMatch(s -> s.equals("Discoverer (idle)")), "receiver thread(s) not idle");
 	}
 
 	@Test

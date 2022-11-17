@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -113,15 +113,9 @@ class KNXNetworkLinkFT12Test
 	@BeforeEach
 	void setUp() throws Exception
 	{
-		try {
-			// prevents access problems with a just previously closed port
-			Thread.sleep(50);
-			lnk = new KNXNetworkLinkFT12(Util.getSerialPort(), new TPSettings());
-		}
-		catch (final Exception e) {
-			Util.tearDownLogging();
-			throw e;
-		}
+		// prevents access problems with a just previously closed port
+		Thread.sleep(50);
+		lnk = new KNXNetworkLinkFT12(Util.getSerialPort(), new TPSettings());
 		nll = new NLListenerImpl();
 		lnk.addLinkListener(nll);
 
@@ -141,7 +135,7 @@ class KNXNetworkLinkFT12Test
 	}
 
 	@Test
-	void testKNXNetworkLinkFT12StringKNXMediumSettings() throws KNXException, InterruptedException
+	void networkLinkFT12StringKNXMediumSettings() throws KNXException, InterruptedException
 	{
 		lnk.close();
 		lnk = new KNXNetworkLinkFT12(Util.getSerialPortID(), new TPSettings());
@@ -149,7 +143,7 @@ class KNXNetworkLinkFT12Test
 	}
 
 	@Test
-	void testKNXNetworkLinkFT12IntKNXMediumSettings() throws InterruptedException
+	void networkLinkFT12IntKNXMediumSettings() throws InterruptedException
 	{
 		try {
 			lnk = new KNXNetworkLinkFT12(1055, new TPSettings());
@@ -161,7 +155,7 @@ class KNXNetworkLinkFT12Test
 	}
 
 	@Test
-	void testSetKNXMedium()
+	void setKNXMedium()
 	{
 		try {
 			lnk.setKNXMedium(new PLSettings());
@@ -185,21 +179,21 @@ class KNXNetworkLinkFT12Test
 	}
 
 	@Test
-	void testGetKNXMedium()
+	void getKNXMedium()
 	{
 		assertTrue(lnk.getKNXMedium() instanceof TPSettings);
 		assertEquals(0, lnk.getKNXMedium().getDeviceAddress().getRawAddress());
 	}
 
 	@Test
-	void testAddLinkListener()
+	void addLinkListener()
 	{
 		lnk.addLinkListener(nll);
 		lnk.addLinkListener(nll);
 	}
 
 	@Test
-	void testRemoveLinkListener()
+	void removeLinkListener()
 	{
 		lnk.removeLinkListener(nll);
 		lnk.removeLinkListener(nll);
@@ -208,7 +202,7 @@ class KNXNetworkLinkFT12Test
 	}
 
 	@Test
-	void testGetHopCount()
+	void getHopCount()
 	{
 		assertEquals(6, lnk.getHopCount());
 		lnk.setHopCount(7);
@@ -226,7 +220,7 @@ class KNXNetworkLinkFT12Test
 	}
 
 	@Test
-	void testSendRequest() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
+	void sendRequest() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		doSend(new byte[] { 0, (byte) (0x80 | 1) });
 		doSend(new byte[] { 0, (byte) (0x80 | 0) });
@@ -250,7 +244,7 @@ class KNXNetworkLinkFT12Test
 	}
 
 	@Test
-	void testSendRequestWait() throws KNXLinkClosedException, KNXTimeoutException
+	void sendRequestWait() throws KNXLinkClosedException, KNXTimeoutException
 	{
 		doSendWait(new byte[] { 0, (byte) (0x80 | 1) });
 		doSendWait(new byte[] { 0, (byte) (0x80 | 0) });
@@ -271,7 +265,7 @@ class KNXNetworkLinkFT12Test
 	}
 
 	@Test
-	void testSend() throws KNXTimeoutException, KNXLinkClosedException
+	void send() throws KNXTimeoutException, KNXLinkClosedException
 	{
 		nll.con = null;
 		lnk.send(frame2, false);
@@ -294,7 +288,7 @@ class KNXNetworkLinkFT12Test
 	}
 
 	@Test
-	void testGetName()
+	void getName()
 	{
 		String n = lnk.getName();
 		assertTrue(n.indexOf(Util.getSerialPortID()) > -1, Util.getSerialPortID());
@@ -306,7 +300,7 @@ class KNXNetworkLinkFT12Test
 	}
 
 	@Test
-	void testIsOpen()
+	void isOpen()
 	{
 		assertTrue(lnk.isOpen());
 		lnk.close();
@@ -314,7 +308,7 @@ class KNXNetworkLinkFT12Test
 	}
 
 	@Test
-	void testClose() throws InterruptedException, KNXTimeoutException
+	void close() throws InterruptedException, KNXTimeoutException
 	{
 		assertTrue(lnk.isOpen());
 		lnk.close();

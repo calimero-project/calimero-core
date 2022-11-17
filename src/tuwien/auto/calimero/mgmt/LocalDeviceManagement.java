@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2021 B. Malinowsky
+    Copyright (c) 2015, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,6 +50,7 @@ import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXRemoteException;
+import tuwien.auto.calimero.ReturnCode;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 
@@ -202,6 +203,46 @@ abstract class LocalDeviceManagement<T> implements PropertyAdapter
 		// for (int i = 0; i < ret.length; ++i)
 		// 	elements = elements << 8 | ret[i] & 0xff;
 		return new byte[] { (byte) objIndex, (byte) p, (byte) propIndex, (byte) writeEnabled, 0, 0, 0 };
+	}
+
+	public void callFunctionProperty(final int objIndex, final int pid, final int serviceId, final byte... serviceInfo)
+			throws KNXException, InterruptedException {
+		if (closed)
+			throw new IllegalStateException("adapter closed");
+		final int objectType = getObjectType(objIndex);
+		final int objectInstance = getObjectInstance(objIndex, objectType);
+		callFunctionProperty(objectType, objectInstance, pid, serviceId, serviceInfo);
+	}
+
+	@Override
+	public void callFunctionProperty(final int objectType, final int objectInstance, final int pid, final int serviceId,
+			final byte... serviceInfo) throws KNXException, InterruptedException {
+		if (closed)
+			throw new IllegalStateException("adapter closed");
+		final var req = CEMIDevMgmt.newFunctionPropertyService(CEMIDevMgmt.MC_FUNCPROP_CMD_REQ, objectType,
+				objectInstance, pid, ReturnCode.Success, serviceId, serviceInfo);
+		send(req, BlockingMode.Confirmation);
+		findFrame(CEMIDevMgmt.MC_FUNCPROP_CON, req);
+	}
+
+	public byte[] getFunctionPropertyState(final int objIndex, final int pid, final int serviceId,
+			final byte... serviceInfo) throws KNXException, InterruptedException {
+		if (closed)
+			throw new IllegalStateException("adapter closed");
+		final int objectType = getObjectType(objIndex);
+		final int objectInstance = getObjectInstance(objIndex, objectType);
+		return getFunctionPropertyState(objectType, objectInstance, pid, serviceId, serviceInfo);
+	}
+
+	@Override
+	public byte[] getFunctionPropertyState(final int objectType, final int objectInstance, final int pid,
+			final int serviceId, final byte... serviceInfo) throws KNXException, InterruptedException {
+		if (closed)
+			throw new IllegalStateException("adapter closed");
+		final var req = CEMIDevMgmt.newFunctionPropertyService(CEMIDevMgmt.MC_FUNCPROP_READ_REQ, objectType,
+				objectInstance, pid, ReturnCode.Success, serviceId, serviceInfo);
+		send(req, BlockingMode.Confirmation);
+		return findFrame(CEMIDevMgmt.MC_FUNCPROP_CON, req);
 	}
 
 	@Override

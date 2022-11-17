@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,13 +39,14 @@ package tuwien.auto.calimero.buffer.cache.performance;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import performance.base.PerfTestCase;
 
 
-/**
- * @author B. Malinowsky
- */
-public class QueueTest extends PerfTestCase
+class QueueTest extends PerfTestCase
 {
 	private final int iterations = 100000;
 	private final int capacity = 30;
@@ -110,21 +111,10 @@ public class QueueTest extends PerfTestCase
 		}
 	}
 
-	/**
-	 * @param name name of test case
-	 */
-	public QueueTest(final String name)
-	{
-		super(name);
-	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
+	@BeforeEach
+	void init() throws Exception
 	{
-		super.setUp();
 		setNormalize(iterations);
 		primitive = new LongVector(capacity);
 		list = new ArrayList<>(capacity);
@@ -137,19 +127,14 @@ public class QueueTest extends PerfTestCase
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
+	@AfterEach
+	void tearDown() throws Exception
 	{
 		printResults();
 	}
 
-	/**
-	 * Test method for LongVector.
-	 */
-	public void testLongVectorSet()
+	@Test
+	void longVectorSet()
 	{
 		for (int i = 0; i < iterations; ++i) {
 			final long time = System.currentTimeMillis();
@@ -161,10 +146,8 @@ public class QueueTest extends PerfTestCase
 		}
 	}
 
-	/**
-	 * Test method for ArrayList.
-	 */
-	public void testArrayListSet()
+	@Test
+	void arrayListSet()
 	{
 		for (int i = 0; i < capacity; ++i)
 			list.add(System.currentTimeMillis());
@@ -179,20 +162,16 @@ public class QueueTest extends PerfTestCase
 		}
 	}
 
-	/**
-	 * Test method for LongVector to long[] conversion.
-	 */
-	public void testLongVectorToArray()
+	@Test
+	void longVectorToArray()
 	{
 		for (int i = 0; i < iterations; ++i) {
 			primitiveFilled.toArray();
 		}
 	}
 
-	/**
-	 * Test method for ArrayList to long[] conversion.
-	 */
-	public void testArrayListToArray()
+	@Test
+	void arrayListToArray()
 	{
 		for (int i = 0; i < iterations; ++i) {
 			listFilled.toArray(new Long[0]);

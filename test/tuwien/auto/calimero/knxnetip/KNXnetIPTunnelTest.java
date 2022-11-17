@@ -83,9 +83,7 @@ import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature;
 import tuwien.auto.calimero.knxnetip.servicetype.TunnelingFeature.InterfaceFeature;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 
-/**
- * @author B. Malinowsky
- */
+
 @KnxnetIP
 class KNXnetIPTunnelTest
 {
@@ -197,7 +195,7 @@ class KNXnetIPTunnelTest
 	}
 
 	@Test
-	void testSend() throws KNXException, InterruptedException
+	void send() throws KNXException, InterruptedException
 	{
 		newTunnel();
 		doSend(frame, con, true);
@@ -223,7 +221,7 @@ class KNXnetIPTunnelTest
 	}
 
 	@Test
-	void testFIFOSend() throws KNXException, InterruptedException, ExecutionException
+	void fifoSend() throws KNXException, InterruptedException, ExecutionException
 	{
 		final int sends = 10;
 		final List<CEMILData> frames = new Vector<>();
@@ -264,7 +262,7 @@ class KNXnetIPTunnelTest
 	}
 
 	@Test
-	void testNATSend() throws KNXException, InterruptedException
+	void natSend() throws KNXException, InterruptedException
 	{
 		if (!Util.TEST_NAT) {
 			System.out.println("\n==== skip testNATSend ====\n");
@@ -279,7 +277,7 @@ class KNXnetIPTunnelTest
 
 	@Test
 	@KnxnetIPSequential
-	void testMonitorSend() throws KNXException, InterruptedException
+	void monitorSend() throws KNXException, InterruptedException
 	{
 		newMonitor();
 		try {
@@ -297,7 +295,7 @@ class KNXnetIPTunnelTest
 
 	@Test
 	@KnxnetIPSequential
-	void testTunnelWithMonitor() throws KNXException, InterruptedException
+	void tunnelWithMonitor() throws KNXException, InterruptedException
 	{
 		newTunnel();
 		try {
@@ -309,7 +307,7 @@ class KNXnetIPTunnelTest
 
 	@Test
 	@Slow
-	void testReceive() throws KNXException, InterruptedException
+	void receive() throws KNXException, InterruptedException
 	{
 		newTunnel();
 		Util.out("Tunnel: waiting for some incoming frames...");
@@ -321,7 +319,7 @@ class KNXnetIPTunnelTest
 
 	@Test
 	@KnxnetIPSequential
-	void testReceiveMonitor() throws KNXException, InterruptedException
+	void receiveMonitor() throws KNXException, InterruptedException
 	{
 		newMonitor();
 		Util.out("Monitor: waiting for some incoming frames...");
@@ -369,7 +367,7 @@ class KNXnetIPTunnelTest
 	}
 
 	@Test
-	void testKNXnetIPTunnel() throws KNXException, InterruptedException
+	void knxnetIPTunnel() throws KNXException, InterruptedException
 	{
 		try (KNXnetIPConnection c = new KNXnetIPTunnel(LinkLayer, null, new InetSocketAddress("127.0.0.1", 4000),
 				false)) {
@@ -389,20 +387,14 @@ class KNXnetIPTunnelTest
 
 	@Test
 	@KnxnetIPSequential
-	void testKNXnetIPMonitor() throws KNXException, InterruptedException
+	void knxnetIPMonitor() throws KNXException, InterruptedException
 	{
 		newMonitor();
 		assertEquals(KNXnetIPConnection.OK, mon.getState());
 	}
 
-	/**
-	 * Test method for {@link KNXnetIPTunnel#close()}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	void testClose() throws KNXException, InterruptedException
+	void close() throws KNXException, InterruptedException
 	{
 		newTunnel();
 		t.close();
@@ -415,14 +407,8 @@ class KNXnetIPTunnelTest
 		assertEquals(KNXnetIPConnection.CLOSED, t.getState());
 	}
 
-	/**
-	 * Test method for {@link KNXnetIPTunnel#getRemoteAddress()}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	void testGetRemoteAddress() throws KNXException, InterruptedException
+	void getRemoteAddress() throws KNXException, InterruptedException
 	{
 		newTunnel();
 		assertEquals(Util.getServer(), t.getRemoteAddress());
@@ -431,15 +417,9 @@ class KNXnetIPTunnelTest
 		assertTrue(t.getRemoteAddress().getPort() == 0);
 	}
 
-	/**
-	 * Test method for {@link KNXnetIPTunnel#getState()}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	@Slow
-	void testGetState() throws KNXException, InterruptedException
+	void getState() throws KNXException, InterruptedException
 	{
 		newTunnel();
 		assertEquals(KNXnetIPConnection.OK, t.getState());
@@ -452,16 +432,10 @@ class KNXnetIPTunnelTest
 		assertEquals(KNXnetIPConnection.OK, t.getState());
 	}
 
-	/**
-	 * Test method for {@link KNXnetIPTunnel#getState()}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
 	@Slow
 	@KnxnetIPSequential
-	void testMonitorGetState() throws KNXException, InterruptedException
+	void monitorGetState() throws KNXException, InterruptedException
 	{
 		newMonitor();
 		assertEquals(KNXnetIPConnection.OK, mon.getState());

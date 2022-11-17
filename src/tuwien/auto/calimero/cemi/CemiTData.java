@@ -91,9 +91,9 @@ public class CemiTData implements CEMI {
 				throw new KNXFormatException("length of tpdu exceeds available data", len);
 		}
 		this.tpdu = new byte[len];
-		if (!isValidTpduLength(data))
+		if (!isValidTpduLength(tpdu))
 			throw new KNXFormatException("length of tpdu exceeds maximum length of 255", len);
-		is.read(data, 0, len);
+		is.read(tpdu, 0, len);
 	}
 
 	/**

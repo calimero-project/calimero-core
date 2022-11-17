@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2016 B. Malinowsky
+    Copyright (c) 2010, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,18 +36,22 @@
 
 package tuwien.auto.calimero.dptxlator;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.Arrays;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.Util;
 
-/**
- * @author B. Malinowsky
- */
-public class DPTXlator1BitControlledTest extends TestCase
+
+class DPTXlator1BitControlledTest
 {
 	private DPTXlator1BitControlled t;
 	private DPTXlator1BitControlled t7;
@@ -64,35 +68,17 @@ public class DPTXlator1BitControlledTest extends TestCase
 
 	private final byte[] stepData = { 0xF, 0x1, 0x3, };
 
-	/**
-	 * @param name
-	 */
-	public DPTXlator1BitControlledTest(final String name)
-	{
-		super(name);
-	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
+	@BeforeEach
+	void init() throws Exception
 	{
-		super.setUp();
-		Util.setupLogging("DPTXlator");
 		t = new DPTXlator1BitControlled(DPTXlator1BitControlled.DPT_BOOL_CONTROL);
 		t7 = new DPTXlator1BitControlled(step);
 		dpts = t.getSubTypes().values().toArray(new DPT[0]);
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator#setValues
-	 * (java.lang.String[])}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testSetValues() throws KNXFormatException
+	@Test
+	void setValues() throws KNXFormatException
 	{
 		t.setValues(strings);
 		assertEquals(strings.length, t.getItems());
@@ -110,10 +96,8 @@ public class DPTXlator1BitControlledTest extends TestCase
 		t.setValues(new String[] { t.getValue(), t.getValue() });
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator1BitControlled#getAllValues()}.
-	 */
-	public void testGetAllValues()
+	@Test
+	void getAllValues()
 	{
 		assertEquals(1, t.getItems());
 		assertEquals(t.getItems(), t.getItems());
@@ -129,10 +113,8 @@ public class DPTXlator1BitControlledTest extends TestCase
 		Helper.assertSimilar(strings[0], t.getAllValues()[0]);
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator1BitControlled#setData(byte[], int)}.
-	 */
-	public void testSetDataByteArrayInt()
+	@Test
+	void setDataByteArrayInt()
 	{
 		t.setData(data, 0);
 		try {
@@ -161,10 +143,8 @@ public class DPTXlator1BitControlledTest extends TestCase
 		assertTrue(t.getValueBit());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator1BitControlled#getData(byte[], int)}.
-	 */
-	public void testGetDataByteArrayInt()
+	@Test
+	void getDataByteArrayInt()
 	{
 		assertEquals(4, t7.getData(new byte[4], 1).length);
 		final byte[] empty = new byte[4];
@@ -192,27 +172,21 @@ public class DPTXlator1BitControlledTest extends TestCase
 		}
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator1BitControlled#getSubTypes()}.
-	 */
-	public void testGetSubTypes()
+	@Test
+	void getSubTypes()
 	{
 		final Map<String, DPT> types = t.getSubTypes();
 		assertEquals(12, types.size());
 	}
 
-	/**
-	 * Test method for {@link DPTXlator1BitControlled#DPTXlator1BitControlled(tuwien.auto.calimero.dptxlator.DPT)}.
-	 */
-	public void testDPTXlator1BitControlledDPT()
+	@Test
+	void dptXlator1BitControlledDPT()
 	{
 		Helper.checkDPTs(dpts, false);
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator1BitControlled#setValue(boolean, boolean)}.
-	 */
-	public void testSetValueBooleanBoolean()
+	@Test
+	void setValueBooleanBoolean()
 	{
 		assertEquals(false, t.getControlBit());
 		assertEquals(false, t.getValueBit());
@@ -230,11 +204,8 @@ public class DPTXlator1BitControlledTest extends TestCase
 		assertEquals(true, t.getValueBit());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator1BitControlled#setControlBit(boolean)}.
-	 * @throws KNXFormatException
-	 */
-	public void testSetControlBit() throws KNXFormatException
+	@Test
+	void setControlBit() throws KNXFormatException
 	{
 		t7.setControlBit(true);
 		assertTrue(t7.getControlBit());
@@ -255,11 +226,8 @@ public class DPTXlator1BitControlledTest extends TestCase
 		assertEquals(b, t7.getValueBit());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator1BitControlled#getControlBit()}.
-	 * @throws KNXFormatException
-	 */
-	public void testGetControlBit() throws KNXFormatException
+	@Test
+	void getControlBit() throws KNXFormatException
 	{
 		assertFalse(t7.getControlBit());
 		t7.setControlBit(true);
@@ -270,11 +238,8 @@ public class DPTXlator1BitControlledTest extends TestCase
 		assertTrue(t7.getControlBit());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator1BitControlled#getValueBit()}.
-	 * @throws KNXFormatException
-	 */
-	public void testGetValueBit() throws KNXFormatException
+	@Test
+	void getValueBit() throws KNXFormatException
 	{
 		assertFalse(t7.getValueBit());
 		t7.setControlBit(true);

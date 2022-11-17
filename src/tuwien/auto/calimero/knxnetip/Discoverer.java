@@ -252,7 +252,7 @@ public class Discoverer
 	 * @param c the connection to use, ownership is not transferred to the discoverer
 	 * @return a {@link DiscovererTcp} instance
 	 */
-	public static Discoverer tcp(final TcpConnection c) {
+	public static DiscovererTcp tcp(final TcpConnection c) {
 		return new DiscovererTcp(c);
 	}
 
@@ -262,7 +262,7 @@ public class Discoverer
 	 * @param session the secure session to use, ownership is not transferred to the discoverer
 	 * @return a {@link DiscovererTcp} instance
 	 */
-	public static Discoverer secure(final SecureSession session) {
+	public static DiscovererTcp secure(final SecureSession session) {
 		return new DiscovererTcp(session);
 	}
 
@@ -736,7 +736,7 @@ public class Discoverer
 		}
 	}
 
-	private static ExecutorService executor = Executor.scheduledExecutor();
+	private static final ExecutorService executor = Executor.scheduledExecutor();
 
 	private CompletableFuture<Void> receiveAsync(final DatagramChannel dc, final InetSocketAddress localEndpoint,
 		final Duration timeout, final String name, final Consumer< Result<SearchResponse>> notifyResponse) throws IOException

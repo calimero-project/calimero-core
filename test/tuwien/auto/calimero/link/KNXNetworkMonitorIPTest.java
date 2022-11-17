@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -63,9 +63,7 @@ import tuwien.auto.calimero.link.medium.PLSettings;
 import tuwien.auto.calimero.link.medium.RawFrame;
 import tuwien.auto.calimero.link.medium.TPSettings;
 
-/**
- * @author B. Malinowsky
- */
+
 @KnxnetIPSequential
 class KNXNetworkMonitorIPTest
 {
@@ -119,7 +117,7 @@ class KNXNetworkMonitorIPTest
 	}
 
 	@Test
-	void testKNXNetworkMonitorIP() throws KNXException, InterruptedException
+	void networkMonitorIP() throws KNXException, InterruptedException
 	{
 		if (mon != null)
 			mon.close();
@@ -130,7 +128,7 @@ class KNXNetworkMonitorIPTest
 	}
 
 	@Test
-	void testSetKNXMedium()
+	void setKNXMedium()
 	{
 		try {
 			mon.setKNXMedium(new PLSettings());
@@ -154,7 +152,7 @@ class KNXNetworkMonitorIPTest
 	}
 
 	@Test
-	void testClose() throws InterruptedException
+	void close() throws InterruptedException
 	{
 		assertTrue(mon.isOpen());
 		mon.close();
@@ -167,7 +165,7 @@ class KNXNetworkMonitorIPTest
 
 	@Test
 	@Slow
-	void testSetDecodeRawFrames() throws InterruptedException
+	void setDecodeRawFrames() throws InterruptedException
 	{
 		mon.setDecodeRawFrames(true);
 		lmon.raw = null;
@@ -181,7 +179,7 @@ class KNXNetworkMonitorIPTest
 	}
 
 	@Test
-	void testGetName()
+	void getName()
 	{
 		String n = mon.getName();
 		assertTrue(n.indexOf(Util.getServer().getAddress().getHostAddress()) > -1);

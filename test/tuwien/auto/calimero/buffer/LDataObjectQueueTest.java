@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,9 +36,17 @@
 
 package tuwien.auto.calimero.buffer;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.function.Consumer;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXFormatException;
@@ -47,10 +55,8 @@ import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMILData;
 
-/**
- * @author B. Malinowsky
- */
-public class LDataObjectQueueTest extends TestCase
+
+class LDataObjectQueueTest
 {
 	private LDataObjectQueue var, fix, ring, one;
 	private CEMILData frame1, frame2, frame3, frame4, frame5, diff;
@@ -58,16 +64,9 @@ public class LDataObjectQueueTest extends TestCase
 	private volatile LDataObjectQueue queue;
 	private final Consumer<LDataObjectQueue> l = queue -> this.queue = queue;
 
-	/**
-	 * @param name name of test case
-	 */
-	public LDataObjectQueueTest(final String name)
-	{
-		super(name);
-	}
 
-	@Override
-	protected void setUp() throws Exception
+	@BeforeEach
+	void init() throws Exception
 	{
 		final var groupAddress = new GroupAddress("10/4/10");
 		var = new LDataObjectQueue(groupAddress);
@@ -89,16 +88,8 @@ public class LDataObjectQueueTest extends TestCase
 				new byte[] { 6, }, Priority.NORMAL);
 	}
 
-	@Override
-	protected void tearDown() throws Exception
-	{
-		super.tearDown();
-	}
-
-	/**
-	 * Test method for {@link tuwien.auto.calimero.buffer.LDataObjectQueue#getFrame()}.
-	 */
-	public void testGetFrame()
+	@Test
+	void getFrame()
 	{
 		// var
 		assertNull(var.getFrame());
@@ -167,11 +158,8 @@ public class LDataObjectQueueTest extends TestCase
 		assertNull(one.getFrame());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.LDataObjectQueue#setFrame(CEMILData)}.
-	 */
-	public void testSet()
+	@Test
+	void set()
 	{
 		// var
 		boolean failed = false;
@@ -219,12 +207,8 @@ public class LDataObjectQueueTest extends TestCase
 		assertEquals(frame2, one.getFrame());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.LDataObjectQueue#LDataObjectQueue
-	 * (tuwien.auto.calimero.GroupAddress)}.
-	 */
-	public void testCEMICacheObjectQueueGroupAddress()
+	@Test
+	void cEMICacheObjectQueueGroupAddress()
 	{
 		var = null;
 		try {
@@ -234,10 +218,8 @@ public class LDataObjectQueueTest extends TestCase
 		assertNull(var);
 	}
 
-	/**
-	 * @throws KNXFormatException
-	 */
-	public void testCEMICacheObjectQueueGroupAddressIntBooleanBoolean()
+	@Test
+	void cEMICacheObjectQueueGroupAddressIntBooleanBoolean()
 		throws KNXFormatException
 	{
 		var = null;
@@ -260,10 +242,8 @@ public class LDataObjectQueueTest extends TestCase
 		}
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.buffer.LDataObjectQueue#getFrames()}.
-	 */
-	public void testGetFrames()
+	@Test
+	void getFrames()
 	{
 		// var
 		assertEquals(0, var.getFrames().length);
@@ -340,10 +320,8 @@ public class LDataObjectQueueTest extends TestCase
 		assertEquals(frame3, one.getFrames()[0]);
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.buffer.LDataObjectQueue#getSize()}.
-	 */
-	public void testGetSize()
+	@Test
+	void getSize()
 	{
 		assertEquals(0, var.getSize());
 		var.setFrame(frame1);
@@ -359,13 +337,8 @@ public class LDataObjectQueueTest extends TestCase
 		assertEquals(1, one.getSize());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.LDataObjectQueue#getTimestamps()}.
-	 *
-	 * @throws InterruptedException on interrupted thread
-	 */
-	public void testGetTimestamps() throws InterruptedException
+	@Test
+	void getTimestamps() throws InterruptedException
 	{
 		final long[] time = new long[6];
 		// var
@@ -385,8 +358,8 @@ public class LDataObjectQueueTest extends TestCase
 		// resolution of currentTimeMillis is system dependent
 		// but should be <= 50 ms
 		for (int i = 0; i < stamps.length; ++i)
-			assertTrue("not in range: " + time[i] + " <= " + stamps[i] + " <= " + (time[i] + 50),
-					stamps[i] >= time[i] && stamps[i] <= time[i] + 50);
+			assertTrue(stamps[i] >= time[i] && stamps[i] <= time[i] + 50,
+					"not in range: " + time[i] + " <= " + stamps[i] + " <= " + (time[i] + 50));
 		assertEquals(var.getTimestamp(), stamps[2]);
 
 		// fix
@@ -415,8 +388,8 @@ public class LDataObjectQueueTest extends TestCase
 		// resolution of currentTimeMillis is system dependent
 		// but should be <= 50 ms
 		for (int i = 0; i < stamps.length; ++i)
-			assertTrue("not in range: " + time[i] + " <= " + stamps[i] + " <= " + (time[i] + 50),
-					stamps[i] >= time[i] && stamps[i] <= time[i] + 50);
+			assertTrue(stamps[i] >= time[i] && stamps[i] <= time[i] + 50,
+					"not in range: " + time[i] + " <= " + stamps[i] + " <= " + (time[i] + 50));
 		assertEquals(fix.getTimestamp(), stamps[3]);
 
 		// ring
@@ -434,8 +407,8 @@ public class LDataObjectQueueTest extends TestCase
 		Thread.sleep(200);
 		final LDataObjectQueue.QueueItem item = ring.getItem();
 		assertEquals(frame2, item.getFrame());
-		assertTrue("not in range: " + time[1] + " <= " + item.getTimestamp() + " <= " + (time[1] + 50),
-				item.getTimestamp() >= time[1] && item.getTimestamp() <= time[1] + 50);
+		assertTrue(item.getTimestamp() >= time[1] && item.getTimestamp() <= time[1] + 50,
+				"not in range: " + time[1] + " <= " + item.getTimestamp() + " <= " + (time[1] + 50));
 
 		time[3] = System.currentTimeMillis();
 		ring.setFrame(frame4);
@@ -465,41 +438,35 @@ public class LDataObjectQueueTest extends TestCase
 		assertEquals(one.getTimestamp(), stamps[0]);
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.buffer.LDataObjectQueue#clear()}.
-	 *
-	 * @throws Exception
-	 */
-	public void testClear() throws Exception
+	@Test
+	void clear() throws Exception
 	{
 		var.clear();
 		fix.clear();
 		ring.clear();
 		one.clear();
-		testGetSize();
+		getSize();
 		var.clear();
 		fix.clear();
 		ring.clear();
 		one.clear();
-		testSet();
+		set();
 		var.clear();
 		fix.clear();
 		ring.clear();
 		one.clear();
 		// we got notified, so reset for testGetFrame()
 		queue = null;
-		testGetFrame();
+		getFrame();
 		var.clear();
 		fix.clear();
 		ring.clear();
 		one.clear();
-		testGetFrames();
+		getFrames();
 	}
 
-	/**
-	 * Test method for size.
-	 */
-	public final void testSize()
+	@Test
+	void size()
 	{
 		for (int i = 0; i < 40; ++i)
 			var.setFrame(frame1);
@@ -514,10 +481,8 @@ public class LDataObjectQueueTest extends TestCase
 			assertEquals(frame2, frames[i]);
 	}
 
-	/**
-	 * Test method for consuming read.
-	 */
-	public final void testConsuming()
+	@Test
+	void consuming()
 	{
 		// test specific behavior with variable size and consuming read
 		final LDataObjectQueue con =

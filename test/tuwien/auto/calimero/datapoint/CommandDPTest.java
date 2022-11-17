@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2017 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,12 @@
 
 package tuwien.auto.calimero.datapoint;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
+
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.xml.KNXMLException;
@@ -45,70 +50,29 @@ import tuwien.auto.calimero.xml.XmlOutputFactory;
 import tuwien.auto.calimero.xml.XmlReader;
 import tuwien.auto.calimero.xml.XmlWriter;
 
-/**
- * @author B. Malinowsky
- */
-public class CommandDPTest extends TestCase
-{
+class CommandDPTest {
 	private static final GroupAddress ga = new GroupAddress(3, 2, 1);
 	private static final String filename = "commandDP.xml";
 	private static final String dpFile = Util.getTargetPath() + filename;
 
-	/**
-	 * @param name
-	 */
-	public CommandDPTest(final String name)
-	{
-		super(name);
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
-	{
-		super.tearDown();
-	}
-
-	/**
-	 * Test method for {@link tuwien.auto.calimero.datapoint.CommandDP#toString()}.
-	 */
-	public final void testToString()
-	{
+	@Test
+	void testToString() {
 		final Datapoint dp = new CommandDP(ga, "test");
 		assertTrue(dp.toString().indexOf("test") >= 0);
 		assertTrue(dp.toString().indexOf("command DP") >= 0);
 		assertTrue(dp.toString().indexOf(ga.toString()) >= 0);
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.datapoint.CommandDP#CommandDP(
-	 * tuwien.auto.calimero.GroupAddress, java.lang.String)}.
-	 */
-	public final void testCommandDPGroupAddressString()
-	{
+	@Test
+	void commandDPGroupAddressString() {
 		final Datapoint dp = new CommandDP(ga, "test");
 		assertEquals(ga, dp.getMainAddress());
 		assertEquals("test", dp.getName());
 		assertFalse(dp.isStateBased());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.datapoint.CommandDP#CommandDP(
-	 * tuwien.auto.calimero.GroupAddress, java.lang.String, int, java.lang.String)}.
-	 */
-	public final void testCommandDPGroupAddressStringIntString()
-	{
+	@Test
+	void commandDPGroupAddressStringIntString() {
 		final Datapoint dp = new CommandDP(ga, "test", 1, "1.001");
 		assertEquals(ga, dp.getMainAddress());
 		assertEquals("test", dp.getName());
@@ -117,14 +81,8 @@ public class CommandDPTest extends TestCase
 		assertEquals("1.001", dp.getDPT());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.datapoint.CommandDP#CommandDP(
-	 * tuwien.auto.calimero.xml.XmlReader)}.
-	 *
-	 * @throws KNXMLException
-	 */
-	public final void testCommandDPXmlReader() throws KNXMLException
-	{
+	@Test
+	void commandDPXmlReader() throws KNXMLException {
 		Datapoint dp = new CommandDP(ga, "testSave", 4, "4.001");
 		final XmlWriter w = XmlOutputFactory.newInstance().createXMLWriter(dpFile);
 		dp.save(w);
@@ -140,13 +98,8 @@ public class CommandDPTest extends TestCase
 		assertEquals("4.001", dp.getDPT());
 	}
 
-	/**
-	 * Test method for {@link Datapoint#create(XmlReader)}.
-	 *
-	 * @throws KNXMLException
-	 */
-	public final void testCreate() throws KNXMLException
-	{
+	@Test
+	void create() throws KNXMLException {
 		final XmlReader r = XmlInputFactory.newInstance().createXMLReader(Util.getPath() + filename);
 		assertTrue(Datapoint.create(r) instanceof CommandDP);
 		r.close();

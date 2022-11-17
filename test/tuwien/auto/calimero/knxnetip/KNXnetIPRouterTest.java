@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ package tuwien.auto.calimero.knxnetip;
 
 import static java.nio.ByteBuffer.allocate;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -88,9 +89,7 @@ import tuwien.auto.calimero.knxnetip.servicetype.RoutingBusy;
 import tuwien.auto.calimero.knxnetip.servicetype.RoutingSystemBroadcast;
 import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
 
-/**
- * @author B. Malinowsky
- */
+
 @KnxnetIP
 class KNXnetIPRouterTest
 {
@@ -103,11 +102,12 @@ class KNXnetIPRouterTest
 	private CEMILData frameNoDest;
 
 	private final AtomicInteger routingBusy = new AtomicInteger();
+	private final AtomicInteger rateLimit = new AtomicInteger();
 
 	private final class RouterListenerImpl implements RoutingListener
 	{
 		volatile boolean closed;
-		BlockingQueue<CEMI> received = new ArrayBlockingQueue<>(10);
+		BlockingQueue<CEMI> received = new ArrayBlockingQueue<>(100);
 		List<LostMessageEvent> lost = new Vector<>();
 
 		@Override
@@ -140,6 +140,11 @@ class KNXnetIPRouterTest
 		{
 			routingBusy.incrementAndGet();
 		}
+
+		@Override
+		public void rateLimit(final RateLimitEvent e) {
+			rateLimit.incrementAndGet();
+		}
 	}
 
 	@BeforeEach
@@ -153,6 +158,9 @@ class KNXnetIPRouterTest
 		frameNoDest = new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0), new GroupAddress(10, 7, 10),
 				new byte[] { 0, (byte) (0x80 | 0) }, Priority.URGENT);
 		routingBusy.set(0);
+
+		r = new KNXnetIPRouting(null, KNXnetIPRouting.DefaultMulticast);
+		r.addConnectionListener(l);
 	}
 
 	@AfterEach
@@ -164,18 +172,19 @@ class KNXnetIPRouterTest
 	}
 
 	@Test
-	void testSend() throws KNXException
+	void send() throws KNXException
 	{
-		newRouter();
 		doSend(frame, NonBlocking);
 		doSend(frame2, NonBlocking);
 		doSend(frameNoDest, NonBlocking);
 	}
 
 	@Test
-	void testSend2() throws KNXException, SocketException, UnknownHostException
+	void send2() throws KNXException, SocketException, UnknownHostException
 	{
+		r.close();
 		r = new KNXnetIPRouting(Util.localInterface(), InetAddress.getByName(KNXnetIPRouting.DEFAULT_MULTICAST));
+		l = new RouterListenerImpl();
 		r.addConnectionListener(l);
 		doSend(frame, NonBlocking);
 		doSend(frame2, NonBlocking);
@@ -192,9 +201,8 @@ class KNXnetIPRouterTest
 	}
 
 	@Test
-	void testKNXnetIPRouter() throws SocketException, UnknownHostException, KNXException
+	void knxnetIPRouter() throws SocketException, UnknownHostException, KNXException
 	{
-		newRouter();
 		assertEquals(KNXnetIPConnection.OK, r.getState());
 		r.close();
 		r = new KNXnetIPRouting(Util.localInterface(), InetAddress.getByName(KNXnetIPRouting.DEFAULT_MULTICAST));
@@ -209,9 +217,8 @@ class KNXnetIPRouterTest
 
 	@Test
 	@Slow
-	void testReceive() throws KNXException
+	void receive()
 	{
-		newRouter();
 		Util.out("waiting for some incoming frames...");
 		try {
 			Thread.sleep(10 * 1000);
@@ -220,9 +227,8 @@ class KNXnetIPRouterTest
 	}
 
 	@Test
-	void testSetHopCount() throws KNXException
+	void setHopCount()
 	{
-		newRouter();
 		final int hobbes = r.getHopCount();
 		r.setHopCount(hobbes + 1);
 		assertEquals(hobbes + 1, r.getHopCount());
@@ -247,9 +253,8 @@ class KNXnetIPRouterTest
 	}
 
 	@Test
-	void testClose() throws KNXException
+	void close()
 	{
-		newRouter();
 		r.close();
 		assertEquals(KNXnetIPConnection.CLOSED, r.getState());
 		try {
@@ -261,9 +266,8 @@ class KNXnetIPRouterTest
 	}
 
 	@Test
-	void testGetRemoteAddress() throws KNXException, SocketException, UnknownHostException
+	void getRemoteAddress() throws KNXException, SocketException, UnknownHostException
 	{
-		newRouter();
 		assertEquals(new InetSocketAddress(KNXnetIPRouting.DEFAULT_MULTICAST, KNXnetIPConnection.DEFAULT_PORT),
 				r.getRemoteAddress());
 		r.close();
@@ -279,9 +283,8 @@ class KNXnetIPRouterTest
 
 	@Test
 	@KnxnetIPSequential
-	public void testLostMessageIndication() throws KNXException
+	void lostMessageIndication() throws KNXException
 	{
-		newRouter();
 		int sent = 0;
 		while (sent < 1000 && l.lost.isEmpty()) {
 			r.send(frame, NonBlocking);
@@ -307,7 +310,6 @@ class KNXnetIPRouterTest
 	@Test
 	void sendRoutingBusy() throws KNXException
 	{
-		newRouter();
 		r.send(new RoutingBusy(0, Duration.ofMillis(100), 0));
 		Assertions.assertTimeout(timeout, () -> {
 			while (routingBusy.get() == 0)
@@ -319,7 +321,6 @@ class KNXnetIPRouterTest
 	@Test
 	void incrementRoutingBusyCounter() throws KNXException, InterruptedException
 	{
-		newRouter();
 		final int messages = 5;
 		for (int i = 0; i < messages; i++) {
 			r.send(new RoutingBusy(1, Duration.ofMillis(20), 0));
@@ -336,7 +337,6 @@ class KNXnetIPRouterTest
 	@KnxnetIPSequential
 	void fastSendManyRoutingBusy() throws KNXException
 	{
-		newRouter();
 		final int messages = 40;
 		for (int i = 0; i < messages; i++) {
 			r.send(new RoutingBusy(1, Duration.ofMillis(20), 0));
@@ -348,15 +348,9 @@ class KNXnetIPRouterTest
 		assertEquals(messages, routingBusy.get());
 	}
 
-	private void newRouter() throws KNXException
-	{
-		r = new KNXnetIPRouting(null, KNXnetIPRouting.DefaultMulticast);
-		r.addConnectionListener(l);
-	}
-
 	@Test
-	void initWithSystemBroadcastSocket() throws UnknownHostException, KNXException {
-		r = new KNXnetIPRouting(null, InetAddress.getByName("224.0.23.13"));
+	void initWithSystemBroadcastSocket() {
+		assertDoesNotThrow(() ->  new KNXnetIPRouting(null, InetAddress.getByName("224.0.23.13")));
 	}
 
 	@Test
@@ -370,12 +364,14 @@ class KNXnetIPRouterTest
 	}
 
 	private void sysBroadcast(final InetAddress senderGroup, final InetAddress receiverGroup)
-		throws KNXException, IOException, InterruptedException {
+			throws KNXException, IOException, InterruptedException {
 
 		final CEMILDataEx sysBcast = newSystemBroadcastFrame(systemNetworkParamResponse());
 
 		// receiver
+		r.close();
 		r = new KNXnetIPRouting(null, receiverGroup);
+		l = new RouterListenerImpl();
 		r.addConnectionListener(l);
 
 		try (KNXnetIPRouting sender = new KNXnetIPRouting(null, senderGroup);
@@ -404,7 +400,7 @@ class KNXnetIPRouterTest
 	}
 
 	private CEMILDataEx newSystemBroadcastFrame(final byte[] tpdu) {
-		final IndividualAddress src = new IndividualAddress(1, 1, 20);
+		final IndividualAddress src = new IndividualAddress(1, 1, 200);
 		final KNXAddress dst = GroupAddress.Broadcast;
 		return new CEMILDataEx(CEMILData.MC_LDATA_IND, src, dst, tpdu, Priority.SYSTEM, false, false, false, 6);
 	}
@@ -427,5 +423,59 @@ class KNXnetIPRouterTest
 		assertEquals(expected.getSource(), actual.getSource());
 		assertEquals(expected.getDestination(), actual.getDestination());
 		assertArrayEquals(expected.getPayload(), actual.getPayload());
+	}
+
+	@Test
+	void maxDatagramsPerSecond() throws InterruptedException, KNXException {
+		sendMaxDatagramsPerSecond();
+		Thread.sleep(1000);
+		l.received.clear();
+		sendMaxDatagramsPerSecond();
+	}
+
+	private void sendMaxDatagramsPerSecond() throws KNXConnectionClosedException, InterruptedException {
+		Thread.sleep(1000);
+		final long end = System.nanoTime() + 1_000_000_000;
+		int sent = 0;
+		while (System.nanoTime() < end) {
+			r.send(frame, BlockingMode.NonBlocking);
+			++sent;
+			assertTrue(l.received.size() <= KNXnetIPRouting.MaxDatagramsPerSecond + 1);
+		}
+		assertTrue(sent <= KNXnetIPRouting.MaxDatagramsPerSecond + 1, "sent should be <= 51, but sent = " + sent);
+	}
+
+	@Test
+	void rateLimitNotification() throws KNXConnectionClosedException, InterruptedException {
+		sendMaxDatagramsPerSecond();
+		assertTrue(rateLimit.get() > 0);
+	}
+
+	private static final int A_FunctionPropertyCommand = 0b1011000111;
+	private static final int A_FunctionPropertyRead = 0b1011001000;
+	private static final int pidIpSbcControl = 120;
+
+	@Test
+	void maxSysBcastsPerSecond() throws KNXConnectionClosedException, InterruptedException {
+		final int routerObjectIndex = 9;
+
+		var tsdu = DataUnitBuilder.createAPDU(A_FunctionPropertyCommand, (byte) routerObjectIndex, (byte) pidIpSbcControl,
+				(byte) 0, (byte) 0, (byte) 1);
+		final IndividualAddress src = new IndividualAddress(1, 1, 200);
+		final var server = Util.getRouterAddress();
+
+		final CEMILData enableSysBcast = new CEMILData(CEMILData.MC_LDATA_IND, src, server, tsdu, Priority.SYSTEM, false, 6);
+		r.send(enableSysBcast, BlockingMode.NonBlocking);
+
+		tsdu = DataUnitBuilder.createAPDU(A_FunctionPropertyRead, (byte) routerObjectIndex, (byte) pidIpSbcControl,
+				(byte) 0, (byte) 0);
+		final CEMILData checkSysBcast = new CEMILData(CEMILData.MC_LDATA_IND, src, server, tsdu, Priority.SYSTEM, false, 6);
+		r.send(checkSysBcast, BlockingMode.NonBlocking);
+
+		final CEMILDataEx sysBcast = newSystemBroadcastFrame(systemNetworkParamResponse());
+		for (int i = 0; i < 300; i++) {
+			r.send(sysBcast, BlockingMode.NonBlocking);
+		}
+		Thread.sleep(1000);
 	}
 }

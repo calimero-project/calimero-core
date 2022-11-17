@@ -136,11 +136,6 @@ public class RoutingSystemBroadcast extends ServiceType {
 		return payload(frame).map(RoutingSystemBroadcast::ipSystemBroadcast).orElse(false);
 	}
 
-	@Deprecated
-	public static boolean isSystemBroadcast(final CEMI frame) {
-		return isSubnetSystemBroadcast(frame);
-	}
-
 	public static boolean validSystemBroadcast(final CEMI frame) {
 		return payload(frame).map(tpdu -> subnetSystemBroadcast(tpdu) || ipSystemBroadcast(tpdu)).orElse(false);
 	}

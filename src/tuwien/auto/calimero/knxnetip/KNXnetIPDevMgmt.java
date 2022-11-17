@@ -50,6 +50,7 @@ import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.ServiceType;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
+import tuwien.auto.calimero.cemi.CemiTData;
 import tuwien.auto.calimero.knxnetip.servicetype.ErrorCodes;
 import tuwien.auto.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import tuwien.auto.calimero.knxnetip.servicetype.PacketHelper;
@@ -77,7 +78,7 @@ public class KNXnetIPDevMgmt extends ClientConnection
 	static final CRI cri = CRI.createRequest(DEVICE_MGMT_CONNECTION);
 
 	/**
-	 * Creates a new KNXnet/IP device management connection to a remote device.
+	 * Creates a new unsecured KNXnet/IP device management connection over UDP to a remote device.
 	 *
 	 * @param localEP the local endpoint to use for communication channel
 	 * @param serverCtrlEP the remote server control endpoint used for connect request
@@ -87,7 +88,7 @@ public class KNXnetIPDevMgmt extends ClientConnection
 	 * @throws KNXTimeoutException on no connect response before connect timeout
 	 * @throws KNXRemoteException if response indicates an error condition at the server concerning the request
 	 * @throws KNXInvalidResponseException if connect response is in wrong format
-	 * @throws InterruptedException on interrupted thread while creating management connection
+	 * @throws InterruptedException on interrupted thread while creating the management connection
 	 */
 	public KNXnetIPDevMgmt(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP, final boolean useNAT)
 		throws KNXException, InterruptedException
@@ -96,6 +97,17 @@ public class KNXnetIPDevMgmt extends ClientConnection
 		connect(localEP, serverCtrlEP, cri, useNAT);
 	}
 
+	/**
+	 * Creates a new unsecured KNXnet/IP device management connection over TCP to a remote IP device.
+	 *
+	 * @param connection a TCP connection to the KNX IP device (if the connection state is not connected, link setup will
+	 *        establish the connection); closing the link will not close the TCP connection
+	 * @throws KNXException on socket communication error
+	 * @throws KNXTimeoutException on no connect response before connect timeout
+	 * @throws KNXRemoteException if response indicates an error condition at the remote endpoint concerning the request
+	 * @throws KNXInvalidResponseException if connect response is in wrong format
+	 * @throws InterruptedException on interrupted thread while creating the management connection
+	 */
 	public KNXnetIPDevMgmt(final TcpConnection connection) throws KNXException, InterruptedException {
 		super(KNXnetIPHeader.DEVICE_CONFIGURATION_REQ, KNXnetIPHeader.DEVICE_CONFIGURATION_ACK, 4,
 				CONFIGURATION_REQ_TIMEOUT, connection);
@@ -112,13 +124,13 @@ public class KNXnetIPDevMgmt extends ClientConnection
 	/**
 	 * Sends a cEMI device management frame to the remote server communicating with this endpoint.
 	 *
-	 * @param frame cEMI device management message of type {@link CEMIDevMgmt} to send
+	 * @param frame cEMI device management message of type {@link CEMIDevMgmt} or {@link CemiTData} to send
 	 */
 	@Override
 	public void send(final CEMI frame, final BlockingMode mode)
 		throws KNXTimeoutException, KNXConnectionClosedException, InterruptedException
 	{
-		if (!(frame instanceof CEMIDevMgmt))
+		if (!(frame instanceof CEMIDevMgmt) && !(frame instanceof CemiTData))
 			throw new KNXIllegalArgumentException("unsupported cEMI type");
 		super.send(frame, mode);
 	}
@@ -164,7 +176,9 @@ public class KNXnetIPDevMgmt extends ClientConnection
 		final int mc = cemi.getMessageCode();
 		if (mc == CEMIDevMgmt.MC_PROPINFO_IND || mc == CEMIDevMgmt.MC_RESET_IND)
 			fireFrameReceived(cemi);
-		else if (mc == CEMIDevMgmt.MC_PROPREAD_CON || mc == CEMIDevMgmt.MC_PROPWRITE_CON) {
+		else if (mc == CEMIDevMgmt.MC_PROPREAD_CON || mc == CEMIDevMgmt.MC_PROPWRITE_CON
+				|| mc == CEMIDevMgmt.MC_FUNCPROP_CON || mc == CemiTData.ConnectedIndication
+				|| mc == CemiTData.IndividualIndication) {
 			// invariant: notify listener before return from blocking send
 			fireFrameReceived(cemi);
 			setStateNotify(OK);

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,14 +36,14 @@
 
 package tuwien.auto.calimero.buffer.cache;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.Comparator;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-/**
- * @author B. Malinowsky
- */
-public class LFUObjectCompareTest extends TestCase
+
+class LFUObjectCompareTest
 {
 	Cache lfu = new LFUCache(0, 0);
 
@@ -65,20 +65,8 @@ public class LFUObjectCompareTest extends TestCase
 		}
 	}
 
-	/**
-	 * @param name name of test case
-	 */
-	public LFUObjectCompareTest(final String name)
-	{
-		super(name);
-	}
-
-	/**
-	 * Test method for
-	 * tuwien.auto.calimero.cache.LFUObjectCompare#compare(java.lang.Object,
-	 * java.lang.Object).
-	 */
-	public void testCompare()
+	@Test
+	void compare()
 	{
 		final LFUObjectCompare cmp = new LFUObjectCompare();
 		final CacheObject o1 = new CacheObject("1", "value 1");
@@ -129,5 +117,4 @@ public class LFUObjectCompareTest extends TestCase
 		assertEquals(0, cmp.compare(o2, o1));
 		assertEquals(-1, cmp.compare(o1equal, o2));
 	}
-
 }

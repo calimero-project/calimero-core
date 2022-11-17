@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,79 +36,57 @@
 
 package tuwien.auto.calimero.buffer.cache;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
-/**
- * @author B. Malinowsky
- */
-public class ExpiringCacheTest extends TestCase
-{
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-	private class ExpCacheImpl extends ExpiringCache
-	{
+class ExpiringCacheTest {
+	private class ExpCacheImpl extends ExpiringCache {
 		boolean notified;
 		boolean remove;
 		int count;
 
-		/**
-		 * @param timeToExpire
-		 */
-		ExpCacheImpl(final int timeToExpire)
-		{
+		/** @param timeToExpire */
+		ExpCacheImpl(final int timeToExpire) {
 			super(timeToExpire);
 			sweepInterval = 1;
 		}
 
-		/* (non-Javadoc)
-		 * @see tuwien.auto.calimero.cache.Cache#clear()
-		 */
 		@Override
-		public void clear()
-		{}
+		public void clear() {}
 
-		/* (non-Javadoc)
-		 * @see tuwien.auto.calimero.cache.Cache#get(java.lang.Object)
-		 */
 		@Override
-		public CacheObject get(final Object key)
-		{
+		public CacheObject get(final Object key) {
 			return map.get(key);
 		}
 
-		/* (non-Javadoc)
-		 * @see tuwien.auto.calimero.cache.Cache#put(tuwien.auto.calimero.cache.CacheObject)
-		 */
 		@Override
-		public void put(final CacheObject obj)
-		{
+		public void put(final CacheObject obj) {
 			map.put(obj.getKey(), obj);
 		}
 
-		/* (non-Javadoc)
-		 * @see tuwien.auto.calimero.cache.Cache#remove(java.lang.Object)
-		 */
 		@Override
-		public void remove(final Object key)
-		{
+		public void remove(final Object key) {
 			map.remove(key);
 		}
 
-		void myStartSweeper()
-		{
+		void myStartSweeper() {
 			startSweeper();
 		}
 
-		void myStopSweeper()
-		{
+		void myStopSweeper() {
 			stopSweeper();
 		}
 
-		/* (non-Javadoc)
-		 * @see tuwien.auto.calimero.cache.ExpiringCache#removeExpired()
-		 */
 		@Override
-		public void removeExpired()
-		{
+		public void removeExpired() {
 			remove = true;
 			super.removeExpired();
 			synchronized (this) {
@@ -116,13 +94,8 @@ public class ExpiringCacheTest extends TestCase
 			}
 		}
 
-		/* (non-Javadoc)
-		 * @see tuwien.auto.calimero.cache.ExpiringCache#notifyRemoved
-		 * (tuwien.auto.calimero.cache.CacheObject)
-		 */
 		@Override
-		protected void notifyRemoved(final CacheObject obj)
-		{
+		protected void notifyRemoved(final CacheObject obj) {
 			notified = true;
 			count++;
 			synchronized (this) {
@@ -130,52 +103,27 @@ public class ExpiringCacheTest extends TestCase
 			}
 		}
 
-		/* (non-Javadoc)
-		 * @see tuwien.auto.calimero.cache.Cache#statistic()
-		 */
 		@Override
-		public Statistic statistic()
-		{
+		public Statistic statistic() {
 			return null;
 		}
 	}
 
 	private ExpCacheImpl c;
 
-	/**
-	 * @param name name of test case
-	 */
-	public ExpiringCacheTest(final String name)
-	{
-		super(name);
-	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
+	@BeforeEach
+	void init() throws Exception {
 		c = new ExpCacheImpl(1);
 	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
-	{
-		super.tearDown();
+	@AfterEach
+	void tearDown() throws Exception {
 		c.myStopSweeper();
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.cache.ExpiringCache#ExpiringCache(int)}.
-	 */
-	public void testExpiringCache()
-	{
+	@Test
+	void expiringCache() {
 		c.myStartSweeper();
 		try {
 			synchronized (c) {
@@ -208,12 +156,8 @@ public class ExpiringCacheTest extends TestCase
 		assertFalse(c2.remove);
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.cache.ExpiringCache#removeExpired()}.
-	 */
-	public void testRemoveExpired()
-	{
+	@Test
+	void removeExpired() {
 		c.myStartSweeper();
 		c.put(new CacheObject("key1", "value"));
 		c.put(new CacheObject("key2", "value"));
@@ -265,13 +209,8 @@ public class ExpiringCacheTest extends TestCase
 		assertNull(c.get("key3"));
 	}
 
-	/**
-	 * Test method for
-	 * tuwien.auto.calimero.cache.ExpiringCache#notifyRemoved
-	 * (tuwien.auto.calimero.cache.CacheObject).
-	 */
-	public void testNotifyRemoved()
-	{
+	@Test
+	void notifyRemoved() {
 		c.myStartSweeper();
 		c.put(new CacheObject("key", "value"));
 		try {
@@ -294,11 +233,8 @@ public class ExpiringCacheTest extends TestCase
 		assertTrue(c.notified);
 	}
 
-	/**
-	 * Test method for tuwien.auto.calimero.cache.ExpiringCache#startSweeper().
-	 */
-	public void testStartSweeper()
-	{
+	@Test
+	void startSweeper() {
 		c.myStartSweeper();
 		c.myStopSweeper();
 		c.myStartSweeper();
@@ -311,14 +247,11 @@ public class ExpiringCacheTest extends TestCase
 		catch (final InterruptedException e) {
 			fail("no remove was called while cache sweeping running");
 		}
-		assertTrue("no remove was called while cache sweeping running", c.remove);
+		assertTrue(c.remove, "no remove was called while cache sweeping running");
 	}
 
-	/**
-	 * Test method for tuwien.auto.calimero.cache.ExpiringCache#stopSweeper().
-	 */
-	public void testStopSweeper()
-	{
+	@Test
+	void stopSweeper() {
 		c.myStartSweeper();
 		c.myStartSweeper();
 		c.myStartSweeper();
@@ -335,5 +268,4 @@ public class ExpiringCacheTest extends TestCase
 		assertFalse(c.notified);
 		assertEquals(0, c.count);
 	}
-
 }

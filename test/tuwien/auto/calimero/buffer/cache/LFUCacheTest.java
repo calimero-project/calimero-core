@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,16 +36,20 @@
 
 package tuwien.auto.calimero.buffer.cache;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.buffer.LDataObject;
 import tuwien.auto.calimero.cemi.CEMILData;
 
-/**
- * @author B. Malinowsky
- */
-public class LFUCacheTest extends TestCase
+
+class LFUCacheTest
 {
 	Cache var, fix, exp;
 	CacheObject o1, o2, o3, o4, o5, o6;
@@ -60,19 +64,9 @@ public class LFUCacheTest extends TestCase
 		}
 	}
 
-	/**
-	 * @param name name of test case
-	 */
-	public LFUCacheTest(final String name)
-	{
-		super(name);
-	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
+	@BeforeEach
+	void init() throws Exception
 	{
 		var = new LFUCache(0, 0);
 		fix = new LFUCache(5, 0);
@@ -88,22 +82,16 @@ public class LFUCacheTest extends TestCase
 				new byte[] { 10 }, Priority.NORMAL));
 	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
+	@AfterEach
+	void tearDown() throws Exception
 	{
 		var.clear();
 		fix.clear();
 		exp.clear();
-		super.tearDown();
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.buffer.cache.LFUCache#clear()}.
-	 */
-	public void testClear()
+	@Test
+	void clear()
 	{
 		var.put(o1);
 		var.put(o2);
@@ -130,13 +118,8 @@ public class LFUCacheTest extends TestCase
 		assertNull(exp.get("2"));
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.cache.LFUCache#get(java.lang.Object)}.
-	 *
-	 * @throws InterruptedException on interrupted thread
-	 */
-	public void testGet() throws InterruptedException
+	@Test
+	void get() throws InterruptedException
 	{
 		// var
 		var.put(o1);
@@ -223,8 +206,7 @@ public class LFUCacheTest extends TestCase
 		exp.put(new CacheObject("new 1", "x"));
 		exp.put(new CacheObject("new 2", "y"));
 		Thread.sleep(700);
-		assertNull("sweepInterval in our test cache ExpCache not adjusted to 1 second?",
-			exp.get("1"));
+		assertNull(exp.get("1"), "sweepInterval in our test cache ExpCache not adjusted to 1 second?");
 		assertNull(exp.get("2"));
 		assertEquals("x", exp.get("new 1").getValue());
 		assertEquals("y", exp.get("new 2").getValue());
@@ -233,11 +215,8 @@ public class LFUCacheTest extends TestCase
 		assertNull(exp.get("new 2"));
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.buffer.cache.LFUCache#put
-	 * (tuwien.auto.calimero.buffer.cache.CacheObject)}.
-	 */
-	public void testPut()
+	@Test
+	void put()
 	{
 		assertEquals(0, o1.getCount());
 		assertEquals(0, o2.getCount());
@@ -250,11 +229,8 @@ public class LFUCacheTest extends TestCase
 		assertEquals(2, var.get(o1.getKey()).getCount());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.cache.LFUCache#remove(java.lang.Object)}.
-	 */
-	public void testRemove()
+	@Test
+	void remove()
 	{
 		// var
 		var.put(o1);
@@ -289,12 +265,8 @@ public class LFUCacheTest extends TestCase
 
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.buffer.cache.LFUCache#removeExpired()}.
-	 *
-	 * @throws InterruptedException on interrupted thread
-	 */
-	public void testRemoveExpired() throws InterruptedException
+	@Test
+	void removeExpired() throws InterruptedException
 	{
 		exp.put(o1);
 		exp.put(o2);
@@ -315,10 +287,8 @@ public class LFUCacheTest extends TestCase
 		assertNull(exp.get("new 2"));
 	}
 
-	/**
-	 * Test method for statistics.
-	 */
-	public void testStatistic()
+	@Test
+	void statistic()
 	{
 		assertEquals(0.0, var.statistic().hitRatio(), 0.0);
 		var.put(o1);

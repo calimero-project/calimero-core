@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2011, 2021 B. Malinowsky
+    Copyright (c) 2011, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -58,9 +58,7 @@ import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.link.KNXNetworkLinkIP;
 import tuwien.auto.calimero.link.medium.TPSettings;
 
-/**
- * @author B. Malinowsky
- */
+
 @KnxnetIP
 @Isolated
 class ManagementProceduresImplTest
@@ -87,13 +85,13 @@ class ManagementProceduresImplTest
 	}
 
 	@Test
-	void testManagementProceduresImpl() throws KNXLinkClosedException
+	void managementProceduresImpl() throws KNXLinkClosedException
 	{
 		try (ManagementProcedures test = new ManagementProceduresImpl(link)) {};
 	}
 
 	@Test
-	void testReadAddress() throws KNXException, InterruptedException
+	void readAddress() throws KNXException, InterruptedException
 	{
 		IndividualAddress[] read = mp.readAddress();
 		assertEquals(1, read.length);
@@ -105,7 +103,7 @@ class ManagementProceduresImplTest
 
 	@Test
 	@Slow
-	void testWriteAddress() throws KNXException, InterruptedException
+	void writeAddress() throws KNXException, InterruptedException
 	{
 		final IndividualAddress programDevice = Util.getKnxDevice();
 		final IndividualAddress nonexist2 = Util.getNonExistingKnxDevice();
@@ -123,7 +121,7 @@ class ManagementProceduresImplTest
 	}
 
 	@Test
-	void testResetAddress() throws KNXException, InterruptedException
+	void resetAddress() throws KNXException, InterruptedException
 	{
 		mp.resetAddress();
 		Thread.sleep(1000);
@@ -134,21 +132,21 @@ class ManagementProceduresImplTest
 	}
 
 	@Test
-	void testIsAddressOccupied() throws KNXException, InterruptedException
+	void isAddressOccupied() throws KNXException, InterruptedException
 	{
 		assertTrue(mp.isAddressOccupied(device));
 		assertFalse(mp.isAddressOccupied(nonexist));
 	}
 
 	@Test
-	void testReadAddressByte() throws KNXException, InterruptedException
+	void readAddressByte() throws KNXException, InterruptedException
 	{
 		final byte[] serialNo = new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
 		mp.readAddress(serialNo);
 	}
 
 	@Test
-	void testWriteAddressByteArrayIndividualAddress() throws KNXException, InterruptedException
+	void writeAddressByteArrayIndividualAddress() throws KNXException, InterruptedException
 	{
 		final byte[] serialNo = new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
 		mp.writeAddress(serialNo, new IndividualAddress(1, 1, 5));
@@ -156,7 +154,7 @@ class ManagementProceduresImplTest
 
 	@Test
 	@Slow
-	void testScanNetworkRouters() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
+	void scanNetworkRouters() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		System.out.println("start scanNetworkRouters, takes a while ...");
 		final IndividualAddress[] list = mp.scanNetworkRouters();
@@ -166,7 +164,7 @@ class ManagementProceduresImplTest
 
 	@Test
 	@Slow
-	void testScanNetworkDevices() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
+	void scanNetworkDevices() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		try {
 			mp.scanNetworkDevices(-1, 0);
@@ -215,14 +213,14 @@ class ManagementProceduresImplTest
 	}
 
 	@Test
-	void testSetProgrammingMode() throws KNXException, InterruptedException
+	void setProgrammingMode() throws KNXException, InterruptedException
 	{
 		mp.setProgrammingMode(device, true);
 		mp.setProgrammingMode(device, false);
 	}
 
 	@Test
-	void testWriteMemoryShort() throws KNXException, InterruptedException
+	void writeMemoryShort() throws KNXException, InterruptedException
 	{
 		final byte[] data = new byte[8];
 
@@ -234,7 +232,7 @@ class ManagementProceduresImplTest
 	}
 
 	@Test
-	void testWriteMemoryLong() throws KNXException, InterruptedException
+	void writeMemoryLong() throws KNXException, InterruptedException
 	{
 		final byte[] data = new byte[32];
 
@@ -246,13 +244,13 @@ class ManagementProceduresImplTest
 	}
 
 	@Test
-	void testReadMemoryShort() throws KNXException, InterruptedException
+	void readMemoryShort() throws KNXException, InterruptedException
 	{
 		/*final byte[] data =*/ mp.readMemory(device, 0x10, 8);
 	}
 
 	@Test
-	void testReadMemoryLong() throws KNXException, InterruptedException
+	void readMemoryLong() throws KNXException, InterruptedException
 	{
 		/*final byte[] data =*/ mp.readMemory(device, 0x20, 17);
 	}

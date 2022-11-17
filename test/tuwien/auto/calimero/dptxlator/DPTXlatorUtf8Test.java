@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2018 B. Malinowsky
+    Copyright (c) 2015, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,20 +36,22 @@
 
 package tuwien.auto.calimero.dptxlator;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.Util;
 
-/**
- * @author B. Malinowsky
- */
-public class DPTXlatorUtf8Test extends TestCase
+
+class DPTXlatorUtf8Test
 {
 	private DPTXlator t;
 
@@ -67,22 +69,10 @@ public class DPTXlatorUtf8Test extends TestCase
 	private byte[] data;
 	private final String[] strings = new String[] { string1, string2, nonASCII, nonLatin };
 
-	/**
-	 * @param name
-	 */
-	public DPTXlatorUtf8Test(final String name)
-	{
-		super(name);
-	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
+	@BeforeEach
+	void init() throws Exception
 	{
-		super.setUp();
-		Util.setupLogging("DPTXlator");
 		TranslatorTypes.createTranslator(TranslatorTypes.TYPE_UTF8, "28.001");
 		t = new DPTXlatorUtf8(DPTXlatorUtf8.DPT_UTF8);
 
@@ -116,12 +106,8 @@ public class DPTXlatorUtf8Test extends TestCase
 		data[k++] = 0;
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorUtf8#getAllValues()}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testGetAllValues() throws KNXFormatException
+	@Test
+	void getAllValues() throws KNXFormatException
 	{
 		assertEquals(1, t.getItems());
 		assertEquals(t.getItems(), t.getItems());
@@ -136,10 +122,8 @@ public class DPTXlatorUtf8Test extends TestCase
 		assertEquals(string1, t.getAllValues()[0]);
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlatorUtf8#setData(byte[], int)}.
-	 */
-	public final void testSetDataByteArrayInt()
+	@Test
+	void setDataByteArrayInt()
 	{
 		t.setData(data, 0);
 		try {
@@ -174,14 +158,8 @@ public class DPTXlatorUtf8Test extends TestCase
 		assertArrayEquals(strings, t.getAllValues());
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.dptxlator.DPTXlator#setValues(java.lang.String[])}.
-	 *
-	 * @throws KNXFormatException
-	 * @throws UnsupportedEncodingException
-	 */
-	public final void testSetValues() throws KNXFormatException, UnsupportedEncodingException
+	@Test
+	void setValues() throws KNXFormatException, UnsupportedEncodingException
 	{
 		final String signs = "ÆÐÑØý";
 		final String german = "ü ö ä Ä Ü Ö ß";
@@ -196,17 +174,15 @@ public class DPTXlatorUtf8Test extends TestCase
 		System.arraycopy(utfdata2, 0, data, utfdata.length + 1, utfdata2.length);
 		System.arraycopy(utfdata3, 0, data, utfdata.length + 1 + utfdata2.length + 1,
 				utfdata3.length);
-		Assert.assertArrayEquals(data, t.getData());
+		Assertions.assertArrayEquals(data, t.getData());
 		assertArrayEquals(values, t.getAllValues());
 
 		t.setValues(new String[0]);
-		Assert.assertArrayEquals(data, t.getData());
+		Assertions.assertArrayEquals(data, t.getData());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#getNumericValue()}.
-	 */
-	public final void testGetNumericValue()
+	@Test
+	void getNumericValue()
 	{
 		try {
 			t.getNumericValue();
@@ -217,10 +193,8 @@ public class DPTXlatorUtf8Test extends TestCase
 		}
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#getData(byte[], int)}.
-	 */
-	public final void testGetDataByteArrayInt()
+	@Test
+	void getDataByteArrayInt()
 	{
 		assertEquals(25, t.getData(new byte[25], 4).length);
 		final byte[] buf = new byte[20];
@@ -238,12 +212,8 @@ public class DPTXlatorUtf8Test extends TestCase
 			assertEquals((byte) 0xCC, d[i]);
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#getItems()}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testGetItems() throws KNXFormatException
+	@Test
+	void getItems() throws KNXFormatException
 	{
 		assertEquals(1, t.getItems());
 		t.setValue(string1);
@@ -252,12 +222,8 @@ public class DPTXlatorUtf8Test extends TestCase
 		assertEquals(strings.length, t.getItems());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.dptxlator.DPTXlator#getTypeSize()}.
-	 *
-	 * @throws KNXFormatException
-	 */
-	public final void testGetTypeSize() throws KNXFormatException
+	@Test
+	void getTypeSize() throws KNXFormatException
 	{
 		assertEquals(1, t.getTypeSize());
 		t.setValue(string1);

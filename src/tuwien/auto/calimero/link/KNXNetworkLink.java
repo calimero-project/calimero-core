@@ -116,7 +116,6 @@ public interface KNXNetworkLink extends AutoCloseable
 	 * looping. On hop count value 0, the message is discarded from the network. A hop
 	 * count of 7 never gets decremented.<br>
 	 * By default, a hop count of 6 is specified.
-	 * <p>
 	 *
 	 * @param count hop count value, 0 &lt;= value &lt;= 7
 	 */
@@ -124,7 +123,6 @@ public interface KNXNetworkLink extends AutoCloseable
 
 	/**
 	 * Returns the hop count used as default for KNX messages.
-	 * <p>
 	 *
 	 * @return hop count as 3 Bit unsigned value with the range 0 to 7
 	 * @see #setHopCount(int)
@@ -139,7 +137,7 @@ public interface KNXNetworkLink extends AutoCloseable
 	 * parameter of {@code null} as system broadcast, or otherwise uses its default
 	 * broadcast behavior.
 	 *
-	 * @param dst KNX destination address, or {@code null}
+	 * @param dst KNX destination address, or {@code null} for system broadcast
 	 * @param p priority this KNX message is assigned to
 	 * @param nsdu network layer service data unit
 	 * @throws KNXTimeoutException on a timeout during send (for example, when waiting on
@@ -157,7 +155,7 @@ public interface KNXNetworkLink extends AutoCloseable
 	 * parameter of {@code null} as system broadcast, or otherwise uses its default
 	 * broadcast behavior.
 	 *
-	 * @param dst KNX destination address, or {@code null}
+	 * @param dst KNX destination address, or {@code null} for system broadcast
 	 * @param p priority this message is assigned to
 	 * @param nsdu network layer service data unit
 	 * @throws KNXTimeoutException on a timeout during send or while waiting for the

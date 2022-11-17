@@ -66,9 +66,7 @@ import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
 import tuwien.auto.calimero.mgmt.PropertyClient.XmlPropertyDefinitions;
 import tuwien.auto.calimero.xml.XmlInputFactory;
 
-/**
- * @author B. Malinowsky
- */
+
 @KnxnetIP
 class PropertyClientTest
 {
@@ -127,14 +125,8 @@ class PropertyClientTest
 			lnk.close();
 	}
 
-	/**
-	 * Test method for property adapter.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	void testPropertyClient() throws KNXException, InterruptedException
+	void propertyClient() throws KNXException, InterruptedException
 	{
 		rem.close();
 		remAdpt = null;
@@ -161,11 +153,8 @@ class PropertyClientTest
 		assertTrue(c);
 	}
 
-	/**
-	 * Test method for {@link PropertyClient#getObjectTypeName(int)}.
-	 */
 	@Test
-	void testGetObjectTypeName()
+	void getObjectTypeName()
 	{
 		for (int i = 0; i < 20; ++i) {
 			final String s = PropertyClient.getObjectTypeName(i);
@@ -176,14 +165,8 @@ class PropertyClientTest
 		}
 	}
 
-	/**
-	 * Test method for {@link PropertyClient#close()}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	void testClose() throws KNXException, InterruptedException
+	void close() throws KNXException, InterruptedException
 	{
 		rem.close();
 		try {
@@ -200,38 +183,20 @@ class PropertyClientTest
 		catch (final IllegalStateException e) {}
 	}
 
-	/**
-	 * Test method for {@link PropertyClient#getDescription(int, int)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	void testLocalGetDescription() throws KNXException, InterruptedException
+	void localGetDescription() throws KNXException, InterruptedException
 	{
 		printDesc(local.getDescription(0, PID.SERIAL_NUMBER));
 	}
 
-	/**
-	 * Test method for {@link PropertyClient#getDescription(int, int)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	void testRemoteGetDescription() throws KNXException, InterruptedException
+	void remoteGetDescription() throws KNXException, InterruptedException
 	{
 		printDesc(rem.getDescription(0, PID.SERIAL_NUMBER));
 	}
 
-	/**
-	 * Test method for {@link PropertyClient#getDescriptionByIndex(int, int)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	void testGetDescriptionByIndex() throws KNXException, InterruptedException
+	void getDescriptionByIndex() throws KNXException, InterruptedException
 	{
 		final Description d, d2;
 		printDesc(d = rem.getDescriptionByIndex(0, 1));
@@ -248,14 +213,8 @@ class PropertyClientTest
 		assertEquals(0, d2.getWriteLevel());
 	}
 
-	/**
-	 * Test method for {@link PropertyClient#getProperty(int, int)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	void testGetPropertyIntInt() throws KNXException, InterruptedException
+	void getPropertyIntInt() throws KNXException, InterruptedException
 	{
 		String s = rem.getProperty(0, 56);
 		assertNotNull(s);
@@ -265,27 +224,15 @@ class PropertyClientTest
 		assertTrue(s.length() > 0);
 	}
 
-	/**
-	 * Test method for {@link PropertyClient#getProperty(int, int, int, int)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	void testGetPropertyIntIntIntInt() throws KNXException, InterruptedException
+	void getPropertyIntIntIntInt() throws KNXException, InterruptedException
 	{
 		Util.out("OT 0 PID 56", rem.getProperty(0, 56, 1, 1));
 		Util.out("OT 0 PID 56", local.getProperty(0, 56, 1, 1));
 	}
 
-	/**
-	 * Test method for {@link PropertyClient#getPropertyTranslated(int, int, int, int)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	void testGetPropertyTranslated() throws KNXException, InterruptedException
+	void getPropertyTranslated() throws KNXException, InterruptedException
 	{
 		final DPTXlator2ByteUnsigned t = (DPTXlator2ByteUnsigned) rem.getPropertyTranslated(0, PID.MAX_APDULENGTH, 1, 1);
 		assertEquals(15, t.getValueUnsigned());
@@ -294,14 +241,8 @@ class PropertyClientTest
 		assertTrue(254 >= t2.getValueUnsigned());
 	}
 
-	/**
-	 * Test method for {@link PropertyClient#scanProperties(boolean, java.util.function.Consumer)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	void testScanPropertiesBooleanConsumer() throws KNXException, InterruptedException
+	void scanPropertiesBooleanConsumer() throws KNXException, InterruptedException
 	{
 		final AtomicBoolean i = new AtomicBoolean();
 		final AtomicBoolean k = new AtomicBoolean();
@@ -311,14 +252,8 @@ class PropertyClientTest
 		assertTrue(k.get());
 	}
 
-	/**
-	 * Test method for {@link PropertyClient#scanProperties(int, boolean, java.util.function.Consumer)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	void testScanPropertiesIntegerBooleanConsumer() throws KNXException, InterruptedException
+	void scanPropertiesIntegerBooleanConsumer() throws KNXException, InterruptedException
 	{
 		final AtomicBoolean i = new AtomicBoolean();
 		final AtomicBoolean k = new AtomicBoolean();
@@ -328,14 +263,8 @@ class PropertyClientTest
 		assertTrue(k.get());
 	}
 
-	/**
-	 * Test method for {@link PropertyClient#setProperty(int, int, int, int, byte[])}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	void testSetPropertyIntIntIntIntByteArray() throws KNXException, InterruptedException
+	void setPropertyIntIntIntIntByteArray() throws KNXException, InterruptedException
 	{
 		final int pidProgramVersion = 13;
 		byte[] data = new byte[5];
@@ -351,14 +280,8 @@ class PropertyClientTest
 		rem.setProperty(0, pidProgramVersion, 1, 1, data);
 	}
 
-	/**
-	 * Test method for {@link PropertyClient#setProperty(int, int, int, java.lang.String)}.
-	 *
-	 * @throws KNXException
-	 * @throws InterruptedException on interrupted thread
-	 */
 	@Test
-	void testSetPropertyIntIntIntString() throws KNXException, InterruptedException
+	void setPropertyIntIntIntString() throws KNXException, InterruptedException
 	{
 		final int knxParamsIndex = 8;
 		final int pidProjectId = PID.PROJECT_INSTALLATION_ID;

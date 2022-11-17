@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,60 +36,26 @@
 
 package tuwien.auto.calimero.datapoint;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
+
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.Priority;
 
-/**
- * @author B. Malinowsky
- */
-public class DatapointTest extends TestCase
-{
+class DatapointTest {
 	private static final GroupAddress ga = new GroupAddress(3, 2, 1);
 
-	/**
-	 * @param name name of test case
-	 */
-	public DatapointTest(final String name)
-	{
-		super(name);
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
-	{
-		super.tearDown();
-	}
-
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.datapoint.Datapoint#setName(java.lang.String)}.
-	 */
-	public final void testSetName()
-	{
+	@Test
+	void setName() {
 		final Datapoint dp = new StateDP(ga, "name1");
 		assertEquals("name1", dp.getName());
 		dp.setName("changedName");
 		assertEquals("changedName", dp.getName());
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.datapoint.Datapoint#getPriority()}.
-	 */
-	public final void testGetPriority()
-	{
+	@Test
+	void getPriority() {
 		final Datapoint dp = new StateDP(ga, "name1");
 		assertEquals(Priority.LOW, dp.getPriority());
 		dp.setPriority(Priority.SYSTEM);

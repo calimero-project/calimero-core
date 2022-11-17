@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,39 +36,34 @@
 
 package tuwien.auto.calimero.buffer.cache;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.buffer.LDataObject;
 import tuwien.auto.calimero.cemi.CEMILData;
 
-/**
- * @author B. Malinowsky
- */
-public class PositiveListCacheTest extends TestCase
+
+class PositiveListCacheTest
 {
 	private PositiveListCache fix, exp;
 	private CacheObject o1, o2, o3, o4;
 	private LDataObject co;
 
-	/**
-	 * @param name name of test case
-	 */
-	public PositiveListCacheTest(final String name)
-	{
-		super(name);
-	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
+	@BeforeEach
+	void init() throws Exception
 	{
 		fix = new PositiveListCache(0);
 		exp = new PositiveListCache(1);
@@ -82,22 +77,14 @@ public class PositiveListCacheTest extends TestCase
 				new byte[] { 10 }, Priority.NORMAL));
 	}
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
+	@AfterEach
+	void tearDown() throws Exception
 	{
 		exp.clear();
-		super.tearDown();
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.cache.PositiveListCache#PositiveListCache
-	 * (java.util.Collection, int)}.
-	 */
-	public void testPositiveListCacheCollectionInt()
+	@Test
+	void positiveListCacheCollectionInt()
 	{
 		final List<Object> v = new Vector<>();
 		v.add(new String("1"));
@@ -111,12 +98,8 @@ public class PositiveListCacheTest extends TestCase
 			assertTrue(v.indexOf(list[i]) != -1);
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.cache.PositiveListCache#setPositiveList
-	 * (java.util.Collection)}.
-	 */
-	public void testSetPositiveList()
+	@Test
+	void setPositiveList()
 	{
 		assertEquals(0, fix.getPositiveList().length);
 		final String[] a = { "1", "2", "3" };
@@ -128,12 +111,8 @@ public class PositiveListCacheTest extends TestCase
 			assertTrue(list.contains(ret[i]));
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.cache.PositiveListCache#addToPositiveList
-	 * (java.lang.Object)}.
-	 */
-	public void testAddToPositiveList()
+	@Test
+	void addToPositiveList()
 	{
 		// will be overwritten by setPositiveList()
 		fix.addToPositiveList("bogus");
@@ -163,12 +142,8 @@ public class PositiveListCacheTest extends TestCase
 
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.cache.PositiveListCache#removeFromPositiveList
-	 * (java.lang.Object)}.
-	 */
-	public void testRemoveFromPositiveList()
+	@Test
+	void removeFromPositiveList()
 	{
 		fix.removeFromPositiveList("1");
 
@@ -184,11 +159,8 @@ public class PositiveListCacheTest extends TestCase
 		assertEquals("1", ret[0]);
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.cache.PositiveListCache#get(java.lang.Object)}.
-	 */
-	public void testGet()
+	@Test
+	void get()
 	{
 		fix.put(o1);
 		fix.put(o2);
@@ -213,11 +185,8 @@ public class PositiveListCacheTest extends TestCase
 		assertNull(fix.get(o2.getKey()));
 	}
 
-	/**
-	 * Test method for {@link tuwien.auto.calimero.buffer.cache.PositiveListCache#put
-	 * (tuwien.auto.calimero.buffer.cache.CacheObject)}.
-	 */
-	public void testPut()
+	@Test
+	void put()
 	{
 		fix.put(o1);
 		fix.put(o2);
@@ -238,11 +207,8 @@ public class PositiveListCacheTest extends TestCase
 		assertNull(fix.get(equal.getKey()));
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.cache.PositiveListCache#remove(java.lang.Object)}.
-	 */
-	public void testRemove()
+	@Test
+	void remove()
 	{
 		fix.remove(o1.getKey());
 
@@ -253,13 +219,8 @@ public class PositiveListCacheTest extends TestCase
 		assertNull(fix.get(o1.getKey()));
 	}
 
-	/**
-	 * Test method for
-	 * {@link tuwien.auto.calimero.buffer.cache.PositiveListCache#removeExpired()}.
-	 *
-	 * @throws InterruptedException on interrupted thread
-	 */
-	public void testRemoveExpired() throws InterruptedException
+	@Test
+	void removeExpired() throws InterruptedException
 	{
 		exp.addToPositiveList(o1.getKey());
 		exp.addToPositiveList(o2.getKey());
@@ -285,10 +246,8 @@ public class PositiveListCacheTest extends TestCase
 		assertNull(exp.get("new 2"));
 	}
 
-	/**
-	 * Test method for statistics.
-	 */
-	public void testStatistic()
+	@Test
+	void statistic()
 	{
 		final String[] a = { "1", "2", "3" };
 		final Collection<String> list = Arrays.asList(a);

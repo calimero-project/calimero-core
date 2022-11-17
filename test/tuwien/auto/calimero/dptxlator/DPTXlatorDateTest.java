@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -85,7 +85,7 @@ class DPTXlatorDateTest
 	}
 
 	@Test
-	void testSetValues() throws KNXFormatException
+	void setValues() throws KNXFormatException
 	{
 		t.setValues(values);
 		assertEquals(3, t.getItems());
@@ -106,7 +106,7 @@ class DPTXlatorDateTest
 	}
 
 	@Test
-	void testGetAllValues() throws KNXFormatException
+	void getAllValues() throws KNXFormatException
 	{
 		assertEquals(1, t.getAllValues().length);
 		Helper.assertSimilar("2000-01-01", t.getAllValues()[0]);
@@ -121,7 +121,7 @@ class DPTXlatorDateTest
 	}
 
 	@Test
-	void testSetValueString() throws KNXFormatException
+	void setValueString() throws KNXFormatException
 	{
 		assertEquals(1, t.getItems());
 		t.setValue(dpt.getLowerValue());
@@ -154,7 +154,7 @@ class DPTXlatorDateTest
 	}
 
 	@Test
-	void testSetDataByteArrayInt()
+	void setDataByteArrayInt()
 	{
 		t.setData(data, 1);
 		assertEquals(1, t.getItems());
@@ -177,7 +177,7 @@ class DPTXlatorDateTest
 	}
 
 	@Test
-	void testGetDataByteArrayInt()
+	void getDataByteArrayInt()
 	{
 		byte[] d = t.getData(new byte[5], 2);
 		final byte[] expected = new byte[] { 0, 0, 1, 1, 0, };
@@ -190,7 +190,7 @@ class DPTXlatorDateTest
 	}
 
 	@Test
-	void testGetSubTypes()
+	void getSubTypes()
 	{
 		assertEquals(1, t.getSubTypes().size());
 		t.getSubTypes().containsKey(dpt.getID());
@@ -198,7 +198,7 @@ class DPTXlatorDateTest
 
 	@Test
 	@ResourceLock(value = "calimero.dptxlator.date", mode = READ_WRITE)
-	void testUseValueFormat() throws KNXFormatException
+	void useValueFormat() throws KNXFormatException
 	{
 		final String pattern = "EEEE, MMMM dd, yyyy[ HH:mm]";
 		DPTXlatorDate.useValueFormat(pattern);
@@ -216,7 +216,7 @@ class DPTXlatorDateTest
 	}
 
 	@Test
-	void testSetValueIntIntInt()
+	void setValueIntIntInt()
 	{
 		t.setValue(1990, 1, 1);
 		assertEquals(1990, t.getYear());
@@ -251,7 +251,7 @@ class DPTXlatorDateTest
 	}
 
 	@Test
-	void testSetValueLong()
+	void setValueLong()
 	{
 		final Calendar c = Calendar.getInstance();
 		t.setValue(c.getTimeInMillis());
@@ -262,7 +262,7 @@ class DPTXlatorDateTest
 	}
 
 	@Test
-	void testGetValueMilliseconds() throws KNXFormatException
+	void getValueMilliseconds() throws KNXFormatException
 	{
 		final Calendar c = Calendar.getInstance();
 		final SimpleDateFormat sdf = new SimpleDateFormat("EEE, d MMM yyyy");
@@ -294,7 +294,7 @@ class DPTXlatorDateTest
 	}
 
 	@Test
-	void testLocalDate()
+	void localDate()
 	{
 		final LocalDate date = t.localDate();
 		assertEquals(date.getYear(), t.getYear());

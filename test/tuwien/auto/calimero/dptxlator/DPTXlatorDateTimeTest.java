@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,10 +36,10 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -60,9 +60,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
-import tuwien.auto.calimero.Util;
 
-@Isolated // because we change Locale
+@Isolated("modifies Locale")
 class DPTXlatorDateTimeTest {
 	private DPTXlatorDateTime t;
 
@@ -93,7 +92,6 @@ class DPTXlatorDateTimeTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		Util.setupLogging("DPTXlator");
 		t = new DPTXlatorDateTime(DPTXlatorDateTime.DPT_DATE_TIME.getID());
 		def = t.getValue();
 	}
@@ -111,7 +109,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testSetValues() throws KNXFormatException {
+	void setValues() throws KNXFormatException {
 		t.setValues(new String[0]);
 		assertTrue(t.getItems() == 1);
 		assertTrue(t.getValue().equals(def));
@@ -124,7 +122,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testGetAllValues() throws KNXFormatException {
+	void getAllValues() throws KNXFormatException {
 		String[] v = new String[] { time, date, dateday, value, value2, value3 };
 		t.setValues(v);
 		assertEquals(v.length, t.getItems());
@@ -142,14 +140,14 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testSetValue() throws KNXFormatException {
+	void setValue() throws KNXFormatException {
 		t.setValue(dateday);
 		assertEquals(t.getItems(), 1);
 		assertFalse(t.getValue().equals(def));
 	}
 
 	@Test
-	void testSetDataByteArrayInt() {
+	void setDataByteArrayInt() {
 		t.setData(data);
 		assertEquals(2007, t.getYear());
 		assertEquals(8, t.getMonth());
@@ -177,7 +175,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testGetDataByteArrayInt() throws KNXFormatException {
+	void getDataByteArrayInt() throws KNXFormatException {
 		testGetByteArrayHelper(value, data);
 		testGetByteArrayHelper(value2, data2);
 		testGetByteArrayHelper(value3, data3);
@@ -199,7 +197,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testGetSubTypes() {
+	void getSubTypes() {
 		assertEquals(1, t.getSubTypes().size());
 		assertEquals(DPTXlatorDateTime.DPT_DATE_TIME, t.getSubTypes().values().iterator()
 			.next());
@@ -213,7 +211,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testSetValueAndData() throws KNXFormatException {
+	void setValueAndData() throws KNXFormatException {
 		t.setValue("24:00:00");
 		t.setValue("00:00:00");
 		t.setValue("13:56:43");
@@ -245,7 +243,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testUseValueFormat() throws KNXFormatException {
+	void useValueFormat() throws KNXFormatException {
 		t.setValue(value);
 		final String day = localizedDayOfWeek(DayOfWeek.WEDNESDAY.getValue());
 		assertFind(t.getValue(), new String[] { day, "8", "27", "2007", "workday", "dst", "sync", });
@@ -261,7 +259,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testGetValueMilliseconds() throws KNXFormatException {
+	void getValueMilliseconds() throws KNXFormatException {
 		long ms;
 		t.setValue(time);
 		try {
@@ -358,7 +356,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testSetWorkday() {
+	void setWorkday() {
 		assertFalse(t.isValidField(DPTXlatorDateTime.WORKDAY));
 		assertFalse(t.isWorkday());
 		t.setWorkday(true);
@@ -372,7 +370,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testSetDayOfWeek() {
+	void setDayOfWeek() {
 		assertFalse(t.isValidField(DPTXlatorDateTime.DAY_OF_WEEK));
 		assertEquals(0, t.getDayOfWeek());
 		t.setDayOfWeek(0);
@@ -409,7 +407,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testSetYear() {
+	void setYear() {
 		yearHelper(1900, 0);
 		yearHelper(2155, 255);
 		yearHelper(2007, 107);
@@ -436,7 +434,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testSetDate() {
+	void setDate() {
 		dateHelper(1, 1, 1, 1);
 		dateHelper(12, 31, 12, 31);
 		dateHelper(7, 25, 7, 25);
@@ -476,7 +474,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testSetTime() {
+	void setTime() {
 		timeHelper(0, 0, 0, 0, 0, 0);
 		timeHelper(24, 0, 0, 24, 0, 0);
 		timeHelper(12, 59, 59, 12, 59, 59);
@@ -527,7 +525,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testSetDaylightTime() {
+	void setDaylightTime() {
 		assertFalse(t.isDst());
 		t.setDst(true);
 		assertTrue(t.isDst());
@@ -536,7 +534,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testSetQualityOfClock() {
+	void setQualityOfClock() {
 		assertFalse(t.isSyncClock());
 		t.setClockSync(true);
 		assertTrue(t.isSyncClock());
@@ -545,7 +543,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testSetValueMilliseconds() throws KNXFormatException {
+	void setValueMilliseconds() throws KNXFormatException {
 		final Calendar c = Calendar.getInstance();
 		c.clear();
 		c.set(2007, 7, 15, 20, 30, 10);
@@ -567,7 +565,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testIsFaultyClock() {
+	void isFaultyClock() {
 		assertFalse(t.isFaultyClock());
 		assertEquals(t.getData()[6] & 0x80, 0x00);
 		t.setFaultyClock(true);
@@ -576,7 +574,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testIsWorkdaySet() {
+	void isWorkdaySet() {
 		assertFalse(t.isValidField(DPTXlatorDateTime.WORKDAY));
 		assertEquals(t.getData()[6] & 0x20, 0x20);
 		t.setValidField(DPTXlatorDateTime.WORKDAY, true);
@@ -588,7 +586,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testIsYearSet() {
+	void isYearSet() {
 		assertTrue(t.isValidField(DPTXlatorDateTime.YEAR));
 		assertEquals(t.getData()[6] & 0x10, 0x00);
 		t.setValidField(DPTXlatorDateTime.YEAR, false);
@@ -600,7 +598,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testIsDateSet() {
+	void isDateSet() {
 		assertTrue(t.isValidField(DPTXlatorDateTime.DATE));
 		assertEquals(t.getData()[6] & 0x08, 0x00);
 		t.setValidField(DPTXlatorDateTime.DATE, false);
@@ -612,7 +610,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testIsDayOfWeekSet() {
+	void isDayOfWeekSet() {
 		assertFalse(t.isValidField(DPTXlatorDateTime.DAY_OF_WEEK));
 		assertEquals(t.getData()[6] & 0x04, 0x04);
 		t.setValidField(DPTXlatorDateTime.DAY_OF_WEEK, true);
@@ -624,7 +622,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testIsTimeSet() {
+	void isTimeSet() {
 		assertTrue(t.isValidField(DPTXlatorDateTime.TIME));
 		assertEquals(t.getData()[6] & 0x02, 0x00);
 		t.setValidField(DPTXlatorDateTime.TIME, false);
@@ -636,7 +634,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testInDaylightTime() throws KNXFormatException {
+	void inDaylightTime() throws KNXFormatException {
 		t.setValue(value);
 		assertTrue(t.isDst());
 		t.setData(data2);
@@ -646,7 +644,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testHasExternalSyncSignal() throws KNXFormatException {
+	void hasExternalSyncSignal() throws KNXFormatException {
 		t.setValue(value);
 		assertTrue(t.isSyncClock());
 		t.setData(data);
@@ -658,7 +656,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testIsWorkday() {
+	void isWorkday() {
 		assertFalse(t.isWorkday());
 		t.setWorkday(true);
 		assertTrue(t.isWorkday());
@@ -669,7 +667,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testIsHoliday() throws KNXFormatException {
+	void isHoliday() throws KNXFormatException {
 		final var value = t.getValue();
 		assertFalse(t.isValidField(DPTXlatorDateTime.WORKDAY));
 
@@ -686,7 +684,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testHolidayAndWorkingDay() throws KNXFormatException {
+	void holidayAndWorkingDay() throws KNXFormatException {
 		final var value = t.getValue() + " holiday, workday";
 		final var parser = new DPTXlatorDateTime(DPTXlatorDateTime.DPT_DATE_TIME);
 		assertFalse(parser.isValidField(DPTXlatorDateTime.WORKDAY));
@@ -695,7 +693,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testWorkingDayAndHoliday() throws KNXFormatException {
+	void workingDayAndHoliday() throws KNXFormatException {
 		final var value = t.getValue() + " workday, holiday";
 		final var parser = new DPTXlatorDateTime(DPTXlatorDateTime.DPT_DATE_TIME);
 		assertFalse(parser.isValidField(DPTXlatorDateTime.WORKDAY));
@@ -704,7 +702,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testDuplicateHoliday() throws KNXFormatException {
+	void duplicateHoliday() throws KNXFormatException {
 		final var value = t.getValue() + " holiday (holiday)";
 		final var parser = new DPTXlatorDateTime(DPTXlatorDateTime.DPT_DATE_TIME);
 		assertFalse(parser.isValidField(DPTXlatorDateTime.WORKDAY));
@@ -713,7 +711,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testUseAllFlags() throws KNXFormatException {
+	void useAllFlags() throws KNXFormatException {
 		t.setFaultyClock(false); // needs to be false
 		t.setWorkday(false);
 		t.setClockSync(true);
@@ -724,7 +722,7 @@ class DPTXlatorDateTimeTest {
 	}
 
 	@Test
-	void testValidate() throws KNXFormatException {
+	void validate() throws KNXFormatException {
 		final Calendar c = Calendar.getInstance();
 		t.setValue(c.getTimeInMillis());
 		assertTrue(t.validate());

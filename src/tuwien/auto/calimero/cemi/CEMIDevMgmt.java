@@ -42,12 +42,10 @@ import java.util.BitSet;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.ReturnCode;
 
 /**
  * A cEMI device management message.
- * <p>
- * Function properties are not supported for the time being.
- * <p>
  * Objects of this type are immutable.
  *
  * @author B. Malinowsky
@@ -148,6 +146,18 @@ public class CEMIDevMgmt implements CEMI
 	 */
 	public static final int MC_PROPINFO_IND = 0xF7;
 	/**
+	 * Message code for function property command request, code = {@value #MC_FUNCPROP_CMD_REQ}.
+	 */
+	public static final int MC_FUNCPROP_CMD_REQ = 0xF8;
+	/**
+	 * Message code for function property status read request, code = {@value #MC_FUNCPROP_READ_REQ}.
+	 */
+	public static final int MC_FUNCPROP_READ_REQ = 0xF9;
+	/**
+	 * Message code for function property command or status read confirmation, code = {@value #MC_FUNCPROP_CON}.
+	 */
+	public static final int MC_FUNCPROP_CON = 0xFA;
+	/**
 	 * Message code for property reset request, code = {@value #MC_RESET_REQ}.
 	 */
 	public static final int MC_RESET_REQ = 0xF1;
@@ -163,7 +173,8 @@ public class CEMIDevMgmt implements CEMI
 	private static final byte[] empty = new byte[0];
 
 	private static final String[] errors = new String[] {
-		"unspecified Error (unknown error)", "out of range (write value not allowed)",
+		"unspecified Error (unknown error)",
+		"out of range (write value not allowed)",
 		"out of max. range (write value too high)",
 		"out of min. range (write value too low)",
 		"memory error (memory can not be written or only with faults)",
@@ -171,7 +182,9 @@ public class CEMIDevMgmt implements CEMI
 		"illegal command (command not valid or not supported)",
 		"void DP (read/write access to nonexistent property)",
 		"type conflict (write access with a wrong data type (datapoint length))",
-		"property index/range error (read/write access to nonexistent property index)", };
+		"property index/range error (read/write access to nonexistent property index)",
+		"the property exists but can at this moment not be written with a new value"
+	};
 
 	private final int mc;
 	private int iot;
@@ -189,8 +202,48 @@ public class CEMIDevMgmt implements CEMI
 		msgCodes.set(MC_PROPWRITE_REQ - MC_OFFSET);
 		msgCodes.set(MC_PROPWRITE_CON - MC_OFFSET);
 		msgCodes.set(MC_PROPINFO_IND - MC_OFFSET);
+		msgCodes.set(MC_FUNCPROP_CMD_REQ - MC_OFFSET);
+		msgCodes.set(MC_FUNCPROP_READ_REQ - MC_OFFSET);
+		msgCodes.set(MC_FUNCPROP_CON - MC_OFFSET);
 		msgCodes.set(MC_RESET_REQ - MC_OFFSET);
 		msgCodes.set(MC_RESET_IND - MC_OFFSET);
+	}
+
+
+	/**
+	 * Creates a new device management message for a function property service.
+	 *
+	 * @param msgCode a message code constant for a function property service declared by this class
+	 * @param objType interface object type, value in the range 0 &lt;= value &lt;= 0xFFFF
+	 * @param objInstance object instance, value in the range 1 &lt;= value &lt;= 0xFF
+	 * @param propId property identifier (PID), in the range 0 &lt;= PID &lt;= 0xFF
+	 * @param data contains the data for the function property service
+	 * @return new CEMIDevMgmt message containing the function property service
+	 */
+	public static CEMIDevMgmt newFunctionPropertyService(final int msgCode, final int objType, final int objInstance,
+			final int propId, final byte... data) {
+		return new CEMIDevMgmt(msgCode, objType, objInstance, propId, data);
+	}
+
+	/**
+	 * Creates a new device management message for a function property service.
+	 *
+	 * @param msgCode a message code constant for a function property service declared by this class
+	 * @param objType interface object type, value in the range 0 &lt;= value &lt;= 0xFFFF
+	 * @param objInstance object instance, value in the range 1 &lt;= value &lt;= 0xFF
+	 * @param propId property identifier (PID), in the range 0 &lt;= PID &lt;= 0xFF
+	 * @param returnCode return code, use {@link ReturnCode#Success} for requests
+	 * @param serviceId function property service identifier
+	 * @param serviceInfo contains the service data for the function property service
+	 * @return new CEMIDevMgmt message containing the function property service
+	 */
+	public static CEMIDevMgmt newFunctionPropertyService(final int msgCode, final int objType, final int objInstance,
+		final int propId, final ReturnCode returnCode, final int serviceId, final byte... serviceInfo) {
+		final byte[] data = new byte[2 + serviceInfo.length];
+		data[0] = (byte) returnCode.code();
+		data[1] = (byte) serviceId;
+		System.arraycopy(serviceInfo, 0, data, 2, serviceInfo.length);
+		return new CEMIDevMgmt(msgCode, objType, objInstance, propId, data);
 	}
 
 	/**
@@ -199,11 +252,9 @@ public class CEMIDevMgmt implements CEMI
 	 * @param data byte stream containing a cEMI device management message
 	 * @param offset start offset of cEMI frame in {@code data}
 	 * @param length length in bytes of the whole device management message
-	 * @throws KNXFormatException if no device management frame found or invalid frame
-	 *         structure
+	 * @throws KNXFormatException if no device management frame found or invalid frame structure
 	 */
-	public CEMIDevMgmt(final byte[] data, final int offset, final int length)
-		throws KNXFormatException
+	public CEMIDevMgmt(final byte[] data, final int offset, final int length) throws KNXFormatException
 	{
 		final ByteArrayInputStream is = new ByteArrayInputStream(data, offset, length);
 		checkLength(is, 1);
@@ -282,6 +333,13 @@ public class CEMIDevMgmt implements CEMI
 		final int propID, final int startIndex, final int elements, final byte[] data)
 	{
 		this(msgCode, objType, objInstance, propID, startIndex, elements);
+		this.data = data.clone();
+	}
+
+	protected CEMIDevMgmt(final int msgCode, final int objType, final int objInstance, final int propID,
+			final byte[] data) {
+		this(msgCode, objType, objInstance, propID, 0, 0);
+		header = 5;
 		this.data = data.clone();
 	}
 
@@ -463,8 +521,10 @@ public class CEMIDevMgmt implements CEMI
 			buf[i++] = (byte) iot;
 			buf[i++] = (byte) oi;
 			buf[i++] = (byte) pid;
-			buf[i++] = (byte) (elems << 4 | start >>> 8);
-			buf[i++] = (byte) start;
+			if (header == 7) {
+				buf[i++] = (byte) (elems << 4 | start >>> 8);
+				buf[i++] = (byte) start;
+			}
 			for (int k = 0; k < data.length; ++k)
 				buf[i++] = data[k];
 		}
@@ -486,6 +546,12 @@ public class CEMIDevMgmt implements CEMI
 			buf.append("prop-write.con");
 		else if (mc == MC_PROPINFO_IND)
 			buf.append("prop-info.ind");
+		else if (mc == MC_FUNCPROP_CMD_REQ)
+			buf.append("funcprop-cmd.req");
+		else if (mc == MC_FUNCPROP_READ_REQ)
+			buf.append("funcprop-read.req");
+		else if (mc == MC_FUNCPROP_CON)
+			buf.append("funcprop.con");
 		else if (mc == MC_RESET_REQ)
 			return "DM reset.req";
 		else if (mc == MC_RESET_IND)
@@ -493,15 +559,22 @@ public class CEMIDevMgmt implements CEMI
 		buf.append(" objtype ").append(iot);
 		buf.append(" instance ").append(oi);
 		buf.append(" pid ").append(pid);
-		buf.append(" start ").append(start);
+		final boolean funcprop = isFuncProp();
+		if (!funcprop)
+			buf.append(" start ").append(start);
 		if (isNegativeResponse())
 			buf.append(" ").append(getErrorMessage());
 		else {
-			buf.append(" elements ").append(elems);
+			if (!funcprop)
+				buf.append(" elements ").append(elems);
 			if (data.length > 0)
 				buf.append(" data ").append(DataUnitBuilder.toHex(data, " "));
 		}
 		return buf.toString();
+	}
+
+	private boolean isFuncProp() {
+		return mc == MC_FUNCPROP_CMD_REQ || mc == MC_FUNCPROP_READ_REQ || mc == MC_FUNCPROP_CON;
 	}
 
 	private static void checkLength(final ByteArrayInputStream is, final int len) throws KNXFormatException
@@ -519,11 +592,19 @@ public class CEMIDevMgmt implements CEMI
 	private void initHeader(final ByteArrayInputStream is) throws KNXFormatException
 	{
 		checkLength(is, 6);
-		header = 7;
+		header = isFuncProp() ? 5 : 7;
 		try {
-			final int tmp;
-			checkSetHeaderInfo(is.read() << 8 | is.read(), is.read(), is.read(),
-					((tmp = is.read()) & 0x0F) << 8 | is.read(), tmp >> 4);
+			final int objType = is.read() << 8 | is.read();
+			final int objInstance = is.read();
+			final int propID = is.read();
+			int startIndex = 0;
+			int elements = 0;
+			if (!isFuncProp()) {
+				final int tmp = is.read();
+				startIndex = (tmp & 0x0F) << 8 | is.read();
+				elements = tmp >> 4;
+			}
+			checkSetHeaderInfo(objType, objInstance, propID, startIndex, elements);
 		}
 		catch (final KNXIllegalArgumentException e) {
 			throw new KNXFormatException(e.getMessage());
@@ -535,7 +616,7 @@ public class CEMIDevMgmt implements CEMI
 		// read error information on negative response
 		if (isNegativeResponse())
 			data = new byte[] { (byte) is.read() };
-		else if (mc == MC_PROPREAD_CON || mc == MC_PROPWRITE_REQ || mc == MC_PROPINFO_IND) {
+		else if (mc == MC_PROPREAD_CON || mc == MC_PROPWRITE_REQ || mc == MC_PROPINFO_IND || isFuncProp()) {
 			checkLength(is, 1);
 			data = new byte[is.available()];
 			is.read(data, 0, data.length);

@@ -89,6 +89,9 @@ public final class CEMIFactory
 		case CEMIDevMgmt.MC_PROPREAD_CON:
 		case CEMIDevMgmt.MC_PROPWRITE_REQ:
 		case CEMIDevMgmt.MC_PROPWRITE_CON:
+		case CEMIDevMgmt.MC_FUNCPROP_CMD_REQ:
+		case CEMIDevMgmt.MC_FUNCPROP_READ_REQ:
+		case CEMIDevMgmt.MC_FUNCPROP_CON:
 		case CEMIDevMgmt.MC_PROPINFO_IND:
 		case CEMIDevMgmt.MC_RESET_REQ:
 		case CEMIDevMgmt.MC_RESET_IND:

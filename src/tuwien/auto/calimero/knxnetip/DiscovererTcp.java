@@ -52,7 +52,9 @@ import java.util.concurrent.TimeoutException;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
+import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.knxnetip.Discoverer.Result;
 import tuwien.auto.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
 import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.knxnetip.servicetype.DescriptionRequest;
@@ -69,9 +71,11 @@ import tuwien.auto.calimero.link.medium.KNXMediumSettings;
  * KNXnet/IP discovery and retrieval of self description for TCP capable KNX devices, supporting both plain and
  * KNX IP Secure connections.
  */
-public class DiscovererTcp extends Discoverer {
+public class DiscovererTcp {
 	private final TcpConnection connection;
 	private final SecureSession session;
+
+	private volatile Duration timeout = Duration.ofSeconds(10);
 
 
 	DiscovererTcp(final TcpConnection c) {
@@ -84,12 +88,19 @@ public class DiscovererTcp extends Discoverer {
 		this.session = s;
 	}
 
-	@Override
+	/**
+	 * Sets the timeout used for subsequent KNXnet/IP discovery &amp; description; the default timeout is 10 seconds.
+	 *
+	 * @param timeout timeout &gt; 0
+	 * @return this discoverer
+	 */
 	public DiscovererTcp timeout(final Duration timeout) {
-		return (DiscovererTcp) super.timeout(timeout);
+		if (timeout.isNegative() || timeout.isZero())
+			throw new KNXIllegalArgumentException("timeout <= 0");
+		this.timeout = timeout;
+		return this;
 	}
 
-	@Override
 	public CompletableFuture<List<Result<SearchResponse>>> search(final Srp... searchParameters) {
 		final SearchRequest req = SearchRequest.newTcpRequest(searchParameters);
 		final CompletableFuture<Result<SearchResponse>> result = send(PacketHelper.toPacket(req));
@@ -112,58 +123,13 @@ public class DiscovererTcp extends Discoverer {
 		}
 	}
 
-	/**
-	 * @deprecated
-	 *
-	 * @throws UnsupportedOperationException
-	 */
-	@Override
-	@Deprecated(forRemoval = true)
-	public CompletableFuture<Result<SearchResponse>> search(final InetSocketAddress serverControlEndpoint,
-			final Srp... searchParameters) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @deprecated
-	 *
-	 * @throws UnsupportedOperationException
-	 */
-	@Override
-	@Deprecated(forRemoval = true)
-	public void startSearch(final NetworkInterface ni, final int timeout, final boolean wait) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @deprecated
-	 *
-	 * @throws UnsupportedOperationException
-	 */
-	@Override
-	@Deprecated(forRemoval = true)
-	public void startSearch(final int localPort, final NetworkInterface ni, final int timeout, final boolean wait) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @deprecated
-	 *
-	 * @throws UnsupportedOperationException
-	 */
-	@Override
-	@Deprecated(forRemoval = true)
-	public Result<DescriptionResponse> getDescription(final InetSocketAddress server, final int timeout) {
-		throw new UnsupportedOperationException();
-	}
-
 	private <T> CompletableFuture<Result<T>> send(final byte[] packet) {
 		try {
 			final var cf = new CompletableFuture<Result<T>>();
 			final var tunnel = new Tunnel<>(TunnelingLayer.LinkLayer, connection, KNXMediumSettings.BackboneRouter, cf);
 			tunnel.send(packet);
 			cf.whenCompleteAsync((_1, _2) -> tunnel.close());
-			return cf.orTimeout(timeout().toMillis(), TimeUnit.MILLISECONDS);
+			return cf.orTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS);
 		}
 		catch (KNXException | IOException | InterruptedException e) {
 			return CompletableFuture.failedFuture(e);
