@@ -53,7 +53,7 @@ import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.secure.Keyring;
 
 @KnxnetIPSequential
-class ConnectionTest {
+class TcpConnectionTest {
 
 	private TcpConnection conn;
 
