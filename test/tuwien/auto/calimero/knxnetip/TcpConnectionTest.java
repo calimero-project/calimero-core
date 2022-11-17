@@ -51,7 +51,7 @@ import tuwien.auto.calimero.knxnetip.TcpConnection.SecureSession;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 
 @KnxnetIPSequential
-class ConnectionTest {
+class TcpConnectionTest {
 
 	private TcpConnection conn;
 
