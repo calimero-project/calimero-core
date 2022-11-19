@@ -40,6 +40,8 @@ import static io.calimero.serial.usb.UsbConnection.EmiType.Cemi;
 import static io.calimero.serial.usb.UsbConnection.EmiType.Emi1;
 import static io.calimero.serial.usb.UsbConnection.EmiType.Emi2;
 
+import static java.lang.System.Logger.Level.INFO;
+
 import java.util.EnumSet;
 
 import io.calimero.Connection.BlockingMode;
@@ -124,7 +126,7 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 				// report device descriptor before switching to busmonitor mode
 				// not all devices provide a device descriptor 0
 				final DD0 dd0 = conn.deviceDescriptor();
-				logger.info("Device Descriptor (Mask Version) {}", dd0);
+				logger.log(INFO, "Device Descriptor (Mask Version) {0}", dd0);
 			}
 			catch (final KNXTimeoutException expected) {}
 
@@ -135,7 +137,7 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 			close();
 			throw e;
 		}
-		logger.info("in busmonitor mode - ready to receive");
+		logger.log(INFO, "in busmonitor mode - ready to receive");
 		conn.addConnectionListener(notifier);
 	}
 

@@ -36,6 +36,7 @@
 
 package io.calimero.dptxlator;
 
+import java.lang.System.Logger;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.AbstractCollection;
@@ -45,8 +46,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
 
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;

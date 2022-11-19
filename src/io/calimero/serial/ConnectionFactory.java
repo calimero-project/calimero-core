@@ -37,16 +37,17 @@
 package io.calimero.serial;
 
 import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.ServiceLoader.Provider;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.calimero.KNXException;
+import io.calimero.log.LogService;
 
 /**
  * Internal use only.
@@ -55,7 +56,7 @@ import io.calimero.KNXException;
  * @param <C> Connection
  */
 public final class ConnectionFactory<P, C> {
-	private static final Logger logger = LoggerFactory.getLogger("io.calimero.serial");
+	private static final Logger logger = LogService.getLogger(MethodHandles.lookup().lookupClass());
 
 	private final ServiceLoader<P> sl;
 	private final String svcName;
@@ -74,7 +75,7 @@ public final class ConnectionFactory<P, C> {
 		final var optC = providers().map(provider -> {
 			try {
 				final var conn = openFunc.open(provider);
-				logger.debug("serial port setup: {}", conn);
+				logger.log(Level.DEBUG, "serial port setup: {0}", conn);
 				return Optional.of(conn);
 			}
 			catch (KNXException | IOException | RuntimeException t) {
@@ -98,12 +99,12 @@ public final class ConnectionFactory<P, C> {
 	public Stream<P> providers() {
 		return providers(true).map(provider -> {
 			try {
-				logger.trace("instantiate service provider {}", provider.type().getName());
+				logger.log(Level.TRACE, "instantiate service provider {0}", provider.type().getName());
 				return provider.get();
 			}
 			catch (final Throwable e) { // handles ServiceConfigurationError
 				final var ex = e.getCause() != null ? e.getCause() : e;
-				logger.debug("skip service provider {}: {}", provider.type().getName(), ex.getMessage());
+				logger.log(Level.DEBUG, "skip service provider {0}: {1}", provider.type().getName(), ex.getMessage());
 			}
 			return null;
 		}).filter(p -> p != null);

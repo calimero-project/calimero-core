@@ -47,7 +47,7 @@ javadoc.options.encoding = 'UTF-8'
 
 compileJava.options*.compilerArgs = [
 	'-Xlint:all,-serial',
-	"--limit-modules", "java.base,java.xml,org.slf4j"
+	"--limit-modules", "java.base,java.xml"
 ]
 
 compileTestJava.options*.compilerArgs = [
@@ -159,8 +159,6 @@ plugins.withType(JavaPlugin) {
 }
 
 dependencies {
-    api 'org.slf4j:slf4j-api:1.7.36'
-
 	testImplementation "org.junit.jupiter:junit-jupiter:${junitJupiterVersion}"
 	// Eclipse treats circular dependencies as errors by default, see eclipseJdt task above
 //	testRuntimeOnly "io.calimero:calimero-rxtx:${version}"

@@ -36,14 +36,19 @@
 
 package io.calimero.process;
 
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
+import static java.lang.System.Logger.Level.TRACE;
+import static java.lang.System.Logger.Level.WARNING;
+
+import java.lang.System.Logger;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-
-import org.slf4j.Logger;
 
 import io.calimero.CloseEvent;
 import io.calimero.DataUnitBuilder;
@@ -115,7 +120,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 					fireGroupReadWrite(f, DataUnitBuilder.extractASDU(apdu), svc, apdu.length <= 2);
 			}
 			catch (final RuntimeException rte) {
-				logger.error("on group indication from {}", f.getSource(), rte);
+				logger.log(ERROR, "on group indication from {0}", f.getSource(), rte);
 			}
 		}
 
@@ -136,7 +141,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		@Override
 		public void linkClosed(final CloseEvent e)
 		{
-			logger.info("attached link was closed ({})", e.getReason());
+			logger.log(INFO, "attached link was closed ({0})", e.getReason());
 			detach();
 		}
 	}
@@ -430,7 +435,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		lnk.removeLinkListener(lnkListener);
 		sal.close();
 		fireDetached();
-		logger.debug("detached from link {}", lnk.getName());
+		logger.log(DEBUG, "detached from link {0}", lnk.getName());
 		return lnk;
 	}
 
@@ -441,7 +446,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 			throw new IllegalStateException("process communicator detached");
 		try {
 			send(dst, p, GROUP_WRITE, t);
-			logger.trace("group write to {} succeeded", dst);
+			logger.log(TRACE, "group write to {0} succeeded", dst);
 		}
 		catch (final InterruptedException e) {
 			Thread.currentThread().interrupt();
@@ -461,7 +466,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 				indications.putIfAbsent(dst, NoResponse);
 			}
 			send(dst, p, GROUP_READ, null);
-			logger.trace("sent group read request to {}", dst);
+			logger.log(TRACE, "sent group read request to {0}", dst);
 			return waitForResponse(dst, minASDULen + 2, maxASDULen + 2);
 		}
 		finally {
@@ -480,10 +485,10 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 				final var future = sal.writeGroupObjectDiagnostics(dst, t == null ? new byte[0] : t.getData());
 				final var returnCode = future.get();
 				if (returnCode != ReturnCode.Success)
-					logger.warn("{} {}", dst, returnCode);
+					logger.log(WARNING, "{0} {1}", dst, returnCode);
 			}
 			catch (final ExecutionException e) {
-				logger.warn("waiting for GO diagnostics", e.getCause());
+				logger.log(WARNING, "waiting for GO diagnostics", e.getCause());
 			}
 		}
 		else {
@@ -514,7 +519,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 						return d;
 
 					final String s = "APDU response length " + len + " bytes, expected " + minAPDU + " to " + maxAPDU;
-					logger.error("received group read response from {} with {}", from, s);
+					logger.log(ERROR, "received group read response from {0} with {1}", from, s);
 					throw new KNXInvalidResponseException(s);
 				}
 			}

@@ -36,9 +36,11 @@
 
 package io.calimero;
 
-import java.io.ByteArrayOutputStream;
+import static java.lang.System.Logger.Level.WARNING;
 
-import org.slf4j.Logger;
+import java.io.ByteArrayOutputStream;
+import java.lang.System.Logger;
+import java.lang.invoke.MethodHandles;
 
 import io.calimero.log.LogService;
 
@@ -52,7 +54,7 @@ import io.calimero.log.LogService;
 public final class DataUnitBuilder
 {
 	/** Name of the log service used by data-unit builder methods. */
-	public static final String LOG_SERVICE = "Data-unit builder";
+	public static final String LOG_SERVICE = MethodHandles.lookup().lookupClass().getName();
 
 	private static final Logger logger = LogService.getLogger(LOG_SERVICE);
 
@@ -117,7 +119,7 @@ public final class DataUnitBuilder
 			return apci4 << 6 | apci6;
 		// unknown codes
 		final int code = apci4 << 6 | apci6;
-		logger.warn("unknown APCI service code 0x" + Integer.toHexString(code));
+		logger.log(WARNING, "unknown APCI service code 0x" + Integer.toHexString(code));
 		return code;
 	}
 
@@ -145,7 +147,7 @@ public final class DataUnitBuilder
 			return T_ACK;
 		if ((ctrl & 0xC3) == T_NAK)
 			return T_NAK;
-		logger.warn("unknown TPCI service code 0x" + Integer.toHexString(ctrl));
+		logger.log(WARNING, "unknown TPCI service code 0x" + Integer.toHexString(ctrl));
 		return ctrl;
 	}
 

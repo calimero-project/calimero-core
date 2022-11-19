@@ -36,6 +36,8 @@
 
 package io.calimero.link;
 
+import java.lang.System.Logger.Level;
+
 import io.calimero.KNXException;
 import io.calimero.KNXTimeoutException;
 import io.calimero.link.medium.KNXMediumSettings;
@@ -106,7 +108,7 @@ public class KNXNetworkMonitorFT12 extends AbstractMonitor<FT12Connection>
 		super(conn, "monitor " + conn.getPortID(), settings);
 		this.cEMI = cEMI;
 		enterBusmonitor();
-		logger.info("in busmonitor mode - ready to receive");
+		logger.log(Level.INFO, "in busmonitor mode - ready to receive");
 		conn.addConnectionListener(notifier);
 	}
 
