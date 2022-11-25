@@ -51,6 +51,7 @@ import java.util.Optional;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+import tuwien.auto.calimero.KnxRuntimeException;
 
 /**
  * Maintains available KNX datapoint main numbers and its associated DPT translators, and provides all available,
@@ -263,8 +264,7 @@ public final class TranslatorTypes
 				throw new KNXFormatException("failed to init translator", dptId);
 			}
 			catch (final NoSuchMethodException e) {
-				DPTXlator.logger.error("DPT translator is required to have a public constructor(String dptId)");
-				throw new KNXException("interface specification error at translator");
+				throw new KnxRuntimeException("interface specification error, no public constructor(String dptId)");
 			}
 			catch (final Exception e) {
 				// for SecurityException, InstantiationException, IllegalAccessException
@@ -306,13 +306,7 @@ public final class TranslatorTypes
 		public Map<String, DPT> getSubTypes() throws KNXException
 		{
 			try {
-				@SuppressWarnings("unchecked")
-				final Map<String, DPT> m = (Map<String, DPT>) xlator
-						.getDeclaredMethod("getSubTypesStatic", (Class<?>[]) null).invoke(null, (Object[]) null);
-				return m;
-			}
-			catch (final NoSuchMethodException e) {
-				throw new KNXException("no method to get subtypes, " + e.getMessage());
+				return subTypes(xlator);
 			}
 			catch (final Exception e) {
 				// for SecurityException and IllegalAccessException
@@ -387,19 +381,28 @@ public final class TranslatorTypes
 
 			@SuppressWarnings("unchecked")
 			final Class<? extends DPTXlator> x = (Class<? extends DPTXlator>) c;
-			@SuppressWarnings("unchecked")
-			final Map<String, DPT> dpts = (Map<String, DPT>) x.getDeclaredMethod("getSubTypesStatic").invoke(null);
+			final Map<String, DPT> dpts = subTypes(x);
 			final String id = dpts.values().iterator().next().getID();
-			final String s = id.substring(0, id.indexOf('.'));
-			final int mainNumber = Integer.parseInt(s);
+			final int mainNumber = getMainNumber(0, id);
 			final String desc = descriptionFor(x) + " (main number " + mainNumber + ")";
 
 			map.put(mainNumber, new MainType(mainNumber, x, desc));
 			DPTXlator.logger.trace("loaded DPT translator for {}", desc);
 		}
-		catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
+		catch (ReflectiveOperationException | RuntimeException e) {
 			DPTXlator.logger.warn("lookup DPT translator class {}", className, e);
+		}
+	}
+
+	private static Map<String, DPT> subTypes(final Class<? extends DPTXlator> x)
+			throws IllegalAccessException, InvocationTargetException {
+		try {
+			@SuppressWarnings("unchecked")
+			final Map<String, DPT> dpts = (Map<String, DPT>) x.getDeclaredMethod("getSubTypesStatic").invoke(null);
+			return dpts;
+		}
+		catch (final NoSuchMethodException e) {
+			throw new KnxRuntimeException("interface specification error, no method getSubTypesStatic");
 		}
 	}
 
@@ -634,9 +637,11 @@ public final class TranslatorTypes
 		return t;
 	}
 
-	// throws NumberFormatException
+	// throws NumberFormatException or KNXIllegalArgumentException
 	private static int getMainNumber(final int mainNumber, final String dptId)
 	{
+		if (mainNumber == 0 && dptId == null)
+			throw new KNXIllegalArgumentException("no DPT main number nor DPT ID");
 		return mainNumber != 0 ? mainNumber : Integer.parseInt(dptId.substring(0, dptId.indexOf('.')));
 	}
 }
