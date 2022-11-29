@@ -140,11 +140,11 @@ public final class LibraryAdapter
 			inst.setSerialPortParams(baudrate, 8, StopBits.One, Parity.Even);
 			inst.setFlowControlMode(FlowControl.None);
 
-			if (provider.type().equals(SerialComAdapter.class)) {
-				final SerialComAdapter conn = (SerialComAdapter) inst;
-				//final int idleTimeout = idleTimeout(conn.getBaudRate());
-				conn.setTimeouts(new SerialComAdapter.Timeouts(idleTimeout, 0, 5, 0, 0));
-			}
+//			if (provider.type().equals(SerialComAdapter.class)) {
+//				final SerialComAdapter conn = (SerialComAdapter) inst;
+//				//final int idleTimeout = idleTimeout(conn.getBaudRate());
+//				conn.setTimeouts(new SerialComAdapter.Timeouts(idleTimeout, 0, 5, 0, 0));
+//			}
 		}
 		catch (IOException | RuntimeException e) {
 			inst.close();
