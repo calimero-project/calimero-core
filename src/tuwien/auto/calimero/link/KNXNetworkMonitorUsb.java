@@ -36,8 +36,13 @@
 
 package tuwien.auto.calimero.link;
 
+import static tuwien.auto.calimero.serial.usb.UsbConnection.EmiType.Cemi;
+import static tuwien.auto.calimero.serial.usb.UsbConnection.EmiType.Emi1;
+import static tuwien.auto.calimero.serial.usb.UsbConnection.EmiType.Emi2;
+
 import java.util.EnumSet;
 
+import tuwien.auto.calimero.Connection.BlockingMode;
 import tuwien.auto.calimero.DeviceDescriptor.DD0;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
@@ -48,10 +53,8 @@ import tuwien.auto.calimero.link.BcuSwitcher.BcuMode;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.link.medium.PLSettings;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
-import tuwien.auto.calimero.serial.usb.HidReport;
-import tuwien.auto.calimero.serial.usb.TransferProtocolHeader.KnxTunnelEmi;
 import tuwien.auto.calimero.serial.usb.UsbConnection;
-import tuwien.auto.calimero.serial.usb.UsbConnection.EmiType;
+import tuwien.auto.calimero.serial.usb.UsbConnectionFactory;
 
 /**
  * Implementation of the KNX network monitor link over USB, using a {@link UsbConnection}. Once a monitor has been
@@ -63,8 +66,8 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 {
 	private static final int PEI_SWITCH = 0xA9;
 
-	private final EnumSet<EmiType> emiTypes;
-	private EmiType activeEmi;
+	private final EnumSet<UsbConnection.EmiType> emiTypes;
+	private UsbConnection.EmiType activeEmi;
 
 	/**
 	 * Creates a new network monitor for accessing the KNX network over a USB connection.
@@ -79,7 +82,7 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 	public KNXNetworkMonitorUsb(final int vendorId, final int productId, final KNXMediumSettings settings)
 		throws KNXException, InterruptedException
 	{
-		this(new UsbConnection(vendorId, productId), settings);
+		this(UsbConnectionFactory.open(vendorId, productId), settings);
 	}
 
 	/**
@@ -95,7 +98,7 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 	public KNXNetworkMonitorUsb(final String device, final KNXMediumSettings settings)
 		throws KNXException, InterruptedException
 	{
-		this(new UsbConnection(device), settings);
+		this(UsbConnectionFactory.open(device), settings);
 	}
 
 	/**
@@ -113,8 +116,8 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 		try {
 			if (!conn.isKnxConnectionActive())
 				throw new KNXLinkClosedException("USB interface is not connected to KNX network");
-			emiTypes = conn.getSupportedEmiTypes();
-			if (!trySetActiveEmi(EmiType.CEmi) && !trySetActiveEmi(EmiType.Emi2) && !trySetActiveEmi(EmiType.Emi1)) {
+			emiTypes = conn.supportedEmiTypes();
+			if (!trySetActiveEmi(Cemi) && !trySetActiveEmi(Emi2) && !trySetActiveEmi(Emi1)) {
 				throw new KNXLinkClosedException("failed to set active any supported EMI type");
 			}
 			try {
@@ -136,12 +139,12 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 		conn.addConnectionListener(notifier);
 	}
 
-	private boolean trySetActiveEmi(final EmiType active)
+	private boolean trySetActiveEmi(final UsbConnection.EmiType active)
 		throws KNXPortClosedException, KNXTimeoutException, InterruptedException
 	{
 		if (emiTypes.contains(active)) {
 			conn.setActiveEmiType(active);
-			activeEmi = conn.getActiveEmiType();
+			activeEmi = conn.activeEmiType();
 			return activeEmi == active;
 		}
 		return false;
@@ -150,20 +153,20 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 	private void enterBusmonitor(final boolean extBusmon)
 		throws KNXPortClosedException, KNXTimeoutException, KNXFormatException, InterruptedException
 	{
-		if (activeEmi == EmiType.CEmi) {
+		if (activeEmi == Cemi) {
 			final var frame = BcuSwitcher.commModeRequest(BcuSwitcher.Busmonitor);
-			conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame).get(0), true);
+			conn.send(frame, BlockingMode.Confirmation);
 			// TODO close monitor if we cannot switch to busmonitor
 			// check for .con
 			//findFrame(CEMIDevMgmt.MC_PROPWRITE_CON);
 		}
-		else if (activeEmi == EmiType.Emi1) {
-			new BcuSwitcher<>(conn, logger, frame -> HidReport.create(KnxTunnelEmi.Emi1, frame).get(0))
+		else if (activeEmi == Emi1) {
+			new BcuSwitcher<>(conn, logger)
 				.enter(extBusmon ? BcuMode.ExtBusmonitor : BcuMode.Busmonitor);
 		}
 		else {
 			final byte[] switchBusmon = { (byte) PEI_SWITCH, (byte) 0x90, 0x18, 0x34, 0x56, 0x78, 0x0A, };
-			conn.send(HidReport.create(activeEmi.emi, switchBusmon).get(0), true);
+			conn.send(switchBusmon, BlockingMode.Confirmation);
 		}
 	}
 
@@ -178,16 +181,16 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 
 	private void normalMode() throws KNXPortClosedException, KNXTimeoutException, InterruptedException
 	{
-		if (activeEmi == EmiType.CEmi) {
+		if (activeEmi == Cemi) {
 			final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_RESET_REQ);
-			conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame.toByteArray()).get(0), true);
+			conn.send(frame.toByteArray(), BlockingMode.Confirmation);
 		}
-		else if (activeEmi == EmiType.Emi1) {
-			new BcuSwitcher<>(conn, logger, frame -> HidReport.create(KnxTunnelEmi.Emi1, frame).get(0)).reset();
+		else if (activeEmi == Emi1) {
+			new BcuSwitcher<>(conn, logger).reset();
 		}
-		else if (activeEmi == EmiType.Emi2) {
+		else if (activeEmi == Emi2) {
 			final byte[] switchNormal = { (byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
-			conn.send(HidReport.create(activeEmi.emi, switchNormal).get(0), true);
+			conn.send(switchNormal, BlockingMode.Confirmation);
 		}
 	}
 }

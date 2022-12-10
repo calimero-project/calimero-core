@@ -37,7 +37,6 @@
 package tuwien.auto.calimero.mgmt;
 
 import java.util.EnumSet;
-import java.util.List;
 import java.util.function.Consumer;
 
 import tuwien.auto.calimero.CloseEvent;
@@ -48,17 +47,14 @@ import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
-import tuwien.auto.calimero.serial.usb.HidReport;
-import tuwien.auto.calimero.serial.usb.TransferProtocolHeader.KnxTunnelEmi;
 import tuwien.auto.calimero.serial.usb.UsbConnection;
-import tuwien.auto.calimero.serial.usb.UsbConnection.EmiType;
 
 /**
  * USB adapter for local device management. This adapter is based on a {@link UsbConnection}.
  *
  * @author B. Malinowsky
  */
-public class LocalDeviceManagementUsb extends LocalDeviceManagement<HidReport>
+public class LocalDeviceManagementUsb extends LocalDeviceManagement<byte[]>
 {
 	private static final int cEmiServerObject = 8;
 	private static final int pidCommMode = 52;
@@ -90,10 +86,10 @@ public class LocalDeviceManagementUsb extends LocalDeviceManagement<HidReport>
 	{
 		super(c, adapterClosed, queryWriteEnable);
 
-		final EnumSet<EmiType> emiTypes = c.getSupportedEmiTypes();
+		final EnumSet<UsbConnection.EmiType> emiTypes = c.supportedEmiTypes();
 		c.addConnectionListener(new KNXListenerImpl());
-		if (emiTypes.contains(EmiType.CEmi)) {
-			c.setActiveEmiType(EmiType.CEmi);
+		if (emiTypes.contains(UsbConnection.EmiType.Cemi)) {
+			c.setActiveEmiType(UsbConnection.EmiType.Cemi);
 			final int objectInstance = 1;
 			setProperty(cEmiServerObject, objectInstance, pidCommMode, 1, 1, new byte[] { 0x00 });
 		}
@@ -161,9 +157,7 @@ public class LocalDeviceManagementUsb extends LocalDeviceManagement<HidReport>
 
 	@Override
 	protected void send(final CEMIDevMgmt frame, final BlockingMode mode) throws KNXException, InterruptedException {
-		final List<HidReport> reports = HidReport.create(KnxTunnelEmi.CEmi, frame.toByteArray());
-		for (final HidReport r : reports)
-			c.send(r, mode);
+		c.send(frame.toByteArray(), mode);
 	}
 
 	@Override
