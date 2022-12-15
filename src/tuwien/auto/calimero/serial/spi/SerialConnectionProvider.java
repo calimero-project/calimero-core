@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2016, 2022 B. Malinowsky
+    Copyright (c) 2022, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,15 +34,38 @@
     version.
 */
 
-package tuwien.auto.calimero.serial;
+package tuwien.auto.calimero.serial.spi;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.Set;
 
-import org.junit.jupiter.api.Test;
+import tuwien.auto.calimero.KNXException;
+import tuwien.auto.calimero.serial.spi.SerialCom.FlowControl;
+import tuwien.auto.calimero.serial.spi.SerialCom.Parity;
+import tuwien.auto.calimero.serial.spi.SerialCom.StopBits;
 
-class LibraryAdapterTest {
-	@Test
-	void getPortIdentifiers() {
-		assertNotNull(LibraryAdapter.getPortIdentifiers());
+public interface SerialConnectionProvider {
+
+	interface Settings {
+		String portId();
+
+		int baudrate();
+
+		int databits();
+
+		StopBits stopbits();
+
+		Parity parity();
+
+		FlowControl flowControl();
+
+		Duration readIntervalTimeout();
+
+		Duration receiveTimeout();
 	}
+
+	SerialCom open(Settings settings) throws KNXException, IOException;
+
+	Set<String> portIdentifiers();
 }

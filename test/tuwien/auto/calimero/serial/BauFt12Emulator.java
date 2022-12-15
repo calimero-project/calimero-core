@@ -43,7 +43,6 @@ import static tuwien.auto.calimero.serial.FT12Connection.START_FIXED;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
-import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import tuwien.auto.calimero.cemi.CEMILData;
@@ -129,18 +128,6 @@ class BauFt12Emulator implements SerialCom {
 	}
 
 	BauFt12Emulator() {}
-
-	@Override
-	public List<String> portIdentifiers() { return List.of(); }
-
-	@Override
-	public void open(final String portId) {}
-
-	@Override
-	public void setSerialPortParams(final int baudrate, final int databits, final StopBits stopbits, final Parity parity) {}
-
-	@Override
-	public void setFlowControlMode(final FlowControl flowControl) {}
 
 	@Override
 	public OutputStream outputStream() {

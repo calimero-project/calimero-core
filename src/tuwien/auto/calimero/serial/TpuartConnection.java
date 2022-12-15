@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -143,7 +144,7 @@ public class TpuartConnection implements Connection<byte[]>
 
 
 	private final String portId;
-	private final SerialCom adapter;
+	private final SerialCom com;
 	private final OutputStream os;
 	private final InputStream is;
 
@@ -183,9 +184,9 @@ public class TpuartConnection implements Connection<byte[]>
 	{
 		this.portId = portId;
 		logger = LogService.getAsyncLogger("calimero.serial.tpuart:" + portId);
-		adapter = LibraryAdapter.open(logger, portId, UartBaudRate, 0);
-		os = adapter.outputStream();
-		is = adapter.inputStream();
+		com = SerialConnectionFactory.open(portId, UartBaudRate, Duration.ZERO, Duration.ofMillis(5));
+		os = com.outputStream();
+		is = com.inputStream();
 
 		addresses.add(GroupAddress.Broadcast);
 		addresses.addAll(acknowledge);
@@ -384,7 +385,7 @@ public class TpuartConnection implements Connection<byte[]>
 
 	private void closeResources() {
 		receiver.quit();
-		adapter.close();
+		com.close();
 	}
 
 	private void fireConnectionClosed(final int origin, final String reason)

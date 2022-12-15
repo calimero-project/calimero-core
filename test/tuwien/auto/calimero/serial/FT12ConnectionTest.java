@@ -37,8 +37,6 @@
 package tuwien.auto.calimero.serial;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -77,11 +75,6 @@ class FT12ConnectionTest {
 	void tearDown() throws Exception {
 		if (c != null)
 			c.close();
-	}
-
-	@Test
-	void getPortIdentifiers() {
-		assertNotNull(FT12Connection.getPortIdentifiers());
 	}
 
 	@Test
@@ -149,14 +142,8 @@ class FT12ConnectionTest {
 		}
 
 		@Test
-		void getSetBaudRate() throws IOException {
+		void getBaudRate() throws IOException {
 			assertEquals(19200, c.getBaudRate());
-			c.setBaudrate(9600);
-			assertEquals(9600, c.getBaudRate());
-			c.setBaudrate(0);
-			assertFalse(0 == c.getBaudRate());
-			c.close();
-			c.setBaudrate(9600);
 		}
 
 		@Test

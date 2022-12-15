@@ -166,14 +166,7 @@ public class FT12Connection implements Connection<byte[]>
 	private final EventListeners<KNXListener> listeners;
 
 	/**
-	 * Creates a new connection to a BCU2 using the FT1.2 protocol.
-	 * <p>
-	 * If the port to use can not be told just by the number, use
-	 * {@link FT12Connection#FT12Connection(String)}.<br>
-	 * The baud rate is set to 19200.<br>
-	 * The associated log service to which the created instance will output logging events
-	 * is named "calimero.serial.ft12:{@code portId}", with {@code portId} being the
-	 * port identifier created from {@code portNumber}.
+	 * @deprecated Use {@link #FT12Connection(String)}.
 	 *
 	 * @param portNumber port number of the serial communication port to use; mapped to
 	 *        the default port identifier using this number (device and platform specific)
@@ -181,9 +174,10 @@ public class FT12Connection implements Connection<byte[]>
 	 *         failed, if reset of BCU2 failed
 	 * @throws InterruptedException on interrupted thread while creating the FT1.2 connection
 	 */
+	@Deprecated
 	public FT12Connection(final int portNumber) throws KNXException, InterruptedException
 	{
-		this(LibraryAdapter.defaultPortPrefixes().get(0) + portNumber, DEFAULT_BAUDRATE, false);
+		this(SerialConnectionFactory.defaultPortPrefixes().get(0) + portNumber, DEFAULT_BAUDRATE, false);
 	}
 
 	/**
@@ -240,8 +234,7 @@ public class FT12Connection implements Connection<byte[]>
 	 */
 	public FT12Connection(final String portId, final int baudrate, final boolean cemi)
 			throws KNXException, InterruptedException {
-		this(LibraryAdapter.open(LogService.getLogger("calimero.serial.ft12:" + portId), portId, baudrate,
-				idleTimeout(baudrate)), portId, cemi);
+		this(SerialConnectionFactory.open(portId, baudrate, idleTimeout(baudrate), Duration.ofMillis(5)), portId, cemi);
 	}
 
 	protected FT12Connection(final SerialCom connection, final String portId, final boolean cemi)
@@ -277,9 +270,10 @@ public class FT12Connection implements Connection<byte[]>
 	 *
 	 * @return array of strings with found port identifiers
 	 */
+	@Deprecated
 	public static String[] getPortIdentifiers()
 	{
-		return LibraryAdapter.getPortIdentifiers().toArray(String[]::new);
+		return SerialConnectionFactory.portIdentifiers().toArray(String[]::new);
 	}
 
 	/**
@@ -330,11 +324,12 @@ public class FT12Connection implements Connection<byte[]>
 	}
 
 	/**
-	 * Sets a new baud rate for this connection.
+	 * @deprecated Specify during connection setup.
 	 *
 	 * @param baud requested baud rate [bit/s], 0 &lt; baud rate
 	 * @throws IOException on error setting the baudrate
 	 */
+	@Deprecated
 	public void setBaudrate(final int baud) throws IOException
 	{
 		adapter.setSerialPortParams(baud, 8, StopBits.One, Parity.Even);
@@ -604,12 +599,12 @@ public class FT12Connection implements Connection<byte[]>
 		return Math.round(1000f * EXCHANGE_TIMEOUT / baudrate) + xTolerance;
 	}
 
-	private static int idleTimeout(final int baudrate) {
+	private static Duration idleTimeout(final int baudrate) {
 		// with some serial driver/BCU/OS combinations, the calculated
 		// timeouts are just too short, so add some milliseconds just as it fits
 		// this little extra time usually doesn't hurt
 		final int iTolerance = 15;
-		return Math.round(1000f * IDLE_TIMEOUT / baudrate) + iTolerance;
+		return Duration.ofMillis(Math.round(1000f * IDLE_TIMEOUT / baudrate) + iTolerance);
 	}
 
 	private static byte checksum(final byte[] data, final int offset, final int length)
