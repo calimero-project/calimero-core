@@ -70,13 +70,6 @@
 			</plugin>
 		</plugins>
 	</build>
-	<dependencies>
-		<dependency>
-			<groupId>org.usb4java</groupId>
-			<artifactId>usb4java-javax</artifactId>
-			<version>1.3.0</version>
-		</dependency>
-	</dependencies>
 	<profiles>
 		<profile>
 			<id>testAll</id>

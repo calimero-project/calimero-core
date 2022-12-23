@@ -36,12 +36,15 @@
 
 package tuwien.auto.calimero.link;
 
+import static tuwien.auto.calimero.serial.usb.UsbConnection.EmiType.Cemi;
+import static tuwien.auto.calimero.serial.usb.UsbConnection.EmiType.Emi1;
+
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import tuwien.auto.calimero.Connection.BlockingMode;
 import tuwien.auto.calimero.DataUnitBuilder;
 import tuwien.auto.calimero.DeviceDescriptor.DD0;
 import tuwien.auto.calimero.FrameEvent;
@@ -58,10 +61,8 @@ import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.serial.ConnectionEvent;
 import tuwien.auto.calimero.serial.ConnectionStatus;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
-import tuwien.auto.calimero.serial.usb.HidReport;
-import tuwien.auto.calimero.serial.usb.TransferProtocolHeader.KnxTunnelEmi;
 import tuwien.auto.calimero.serial.usb.UsbConnection;
-import tuwien.auto.calimero.serial.usb.UsbConnection.EmiType;
+import tuwien.auto.calimero.serial.usb.UsbConnectionFactory;
 
 /**
  * Implementation of the KNX network network link over USB, using a {@link UsbConnection}. Once a link has been closed,
@@ -74,8 +75,8 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 	// EMI1/2 switch command
 	private static final int PEI_SWITCH = 0xA9;
 
-	private final EnumSet<EmiType> emiTypes;
-	private EmiType activeEmi;
+	private final EnumSet<UsbConnection.EmiType> emiTypes;
+	private UsbConnection.EmiType activeEmi;
 
 	/**
 	 * Creates a new network link for accessing the KNX network over a USB connection, using a USB
@@ -90,7 +91,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 	public KNXNetworkLinkUsb(final int vendorId, final int productId,
 		final KNXMediumSettings settings) throws KNXException, InterruptedException
 	{
-		this(new UsbConnection(vendorId, productId), settings);
+		this(UsbConnectionFactory.open(vendorId, productId), settings);
 	}
 
 	/**
@@ -108,7 +109,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 	public KNXNetworkLinkUsb(final String device, final KNXMediumSettings settings)
 		throws KNXException, InterruptedException
 	{
-		this(new UsbConnection(device), settings);
+		this(UsbConnectionFactory.open(device), settings);
 	}
 
 	/**
@@ -127,8 +128,8 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 			if (!conn.isKnxConnectionActive())
 				throw new KNXLinkClosedException("USB interface is not connected to KNX network");
 
-			emiTypes = conn.getSupportedEmiTypes();
-			if (!trySetActiveEmi(EmiType.CEmi) && !trySetActiveEmi(EmiType.Emi2) && !trySetActiveEmi(EmiType.Emi1)) {
+			emiTypes = conn.supportedEmiTypes();
+			if (!trySetActiveEmi(Cemi) && !trySetActiveEmi(UsbConnection.EmiType.Emi2) && !trySetActiveEmi(Emi1)) {
 				throw new KNXLinkClosedException("failed to set active any supported EMI type");
 			}
 			try {
@@ -156,7 +157,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 			conn.close();
 			throw e;
 		}
-		cEMI = emiTypes.contains(EmiType.CEmi);
+		cEMI = emiTypes.contains(Cemi);
 		sendCEmiAsByteArray = true;
 
 		supportedCommModes();
@@ -173,9 +174,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 		try {
 			if (logger.isTraceEnabled())
 				logger.trace("EMI {}", DataUnitBuilder.toHex(msg, " "));
-			final List<HidReport> reports = HidReport.create(activeEmi.emi, msg);
-			for (final HidReport r : reports)
-				conn.send(r, waitForCon);
+			conn.send(msg, waitForCon ? BlockingMode.Confirmation : BlockingMode.NonBlocking);
 			logger.trace("send to {} succeeded", dst);
 		}
 		catch (final KNXPortClosedException e) {
@@ -201,15 +200,17 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 
 	@Override
 	void onSend(final CEMIDevMgmt frame) throws KNXPortClosedException, KNXTimeoutException {
-		conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame.toByteArray()).get(0), true);
+		if (activeEmi != Cemi)
+			throw new IllegalStateException("cEMI mode not active in KNX USB interface");
+		conn.send(frame.toByteArray(), BlockingMode.Confirmation);
 	}
 
-	private boolean trySetActiveEmi(final EmiType active) throws KNXPortClosedException,
+	private boolean trySetActiveEmi(final UsbConnection.EmiType active) throws KNXPortClosedException,
 		KNXTimeoutException, InterruptedException
 	{
 		if (emiTypes.contains(active)) {
 			conn.setActiveEmiType(active);
-			activeEmi = conn.getActiveEmiType();
+			activeEmi = conn.activeEmiType();
 			return activeEmi == active;
 		}
 		return false;
@@ -217,33 +218,33 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 
 	private void linkLayerMode() throws KNXException, InterruptedException
 	{
-		if (activeEmi == EmiType.CEmi) {
+		if (activeEmi == Cemi) {
 			final var frame = BcuSwitcher.commModeRequest(BcuSwitcher.DataLinkLayer);
-			conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame).get(0), true);
+			conn.send(frame, BlockingMode.Confirmation);
 			// wait for .con
 			responseFor(CEMIDevMgmt.MC_PROPWRITE_CON, BcuSwitcher.pidCommMode);
 		}
-		else if (activeEmi == EmiType.Emi1) {
-			new BcuSwitcher<>(conn, logger, frame -> HidReport.create(KnxTunnelEmi.Emi1, frame).get(0)).enter(BcuMode.LinkLayer);
+		else if (activeEmi == Emi1) {
+			new BcuSwitcher<>(conn, logger).enter(BcuMode.LinkLayer);
 		}
 		else {
 			final byte[] switchLinkLayer = { (byte) PEI_SWITCH, 0x00, 0x18, 0x34, 0x56, 0x78, 0x0A, };
-			conn.send(HidReport.create(activeEmi.emi, switchLinkLayer).get(0), true);
+			conn.send(switchLinkLayer, BlockingMode.Confirmation);
 		}
 	}
 
 	private void normalMode() throws KNXPortClosedException, KNXTimeoutException, InterruptedException
 	{
-		if (activeEmi == EmiType.CEmi) {
+		if (activeEmi == Cemi) {
 			final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_RESET_REQ);
-			conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame.toByteArray()).get(0), true);
+			conn.send(frame.toByteArray(), BlockingMode.Confirmation);
 		}
-		else if (activeEmi == EmiType.Emi1) {
-			new BcuSwitcher<>(conn, logger, frame -> HidReport.create(KnxTunnelEmi.Emi1, frame).get(0)).reset();
+		else if (activeEmi == Emi1) {
+			new BcuSwitcher<>(conn, logger).reset();
 		}
 		else {
 			final byte[] switchNormal = { (byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
-			conn.send(HidReport.create(activeEmi.emi, switchNormal).get(0), true);
+			conn.send(switchNormal, BlockingMode.Confirmation);
 		}
 	}
 
@@ -287,7 +288,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 		final int objectInstance = 1;
 		final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, objectType, objectInstance, pid, 1, 1, data);
 		logger.trace("write mgmt OT {} PID {} data 0x{}", objectType, pid, DataUnitBuilder.toHex(data, ""));
-		conn.send(HidReport.create(KnxTunnelEmi.CEmi, frame.toByteArray()).get(0), true);
+		conn.send(frame.toByteArray(), BlockingMode.Confirmation);
 	}
 
 	private void notifyConnectionStatus(final ConnectionStatus status) {

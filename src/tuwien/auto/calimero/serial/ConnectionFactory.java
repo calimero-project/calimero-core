@@ -54,18 +54,18 @@ import tuwien.auto.calimero.KNXException;
  * @param <P> Connection provider
  * @param <C> Connection
  */
-final class ConnectionFactory<P, C> {
+public final class ConnectionFactory<P, C> {
 	private static final Logger logger = LoggerFactory.getLogger("tuwien.auto.calimero.serial");
 
 	private final ServiceLoader<P> sl;
 
-	interface ThrowingFunction<P, C> {
+	public interface ThrowingFunction<P, C> {
 		C open(P provider) throws KNXException, IOException;
 	}
 
 	public ConnectionFactory(final Class<P> service) { sl = ServiceLoader.load(service); }
 
-	C open(final ThrowingFunction<P, C> openFunc) throws KNXException, IOException {
+	public C open(final ThrowingFunction<P, C> openFunc) throws KNXException, IOException {
 		final var tref = new AtomicReference<Throwable>(new KNXException("no service provider available"));
 		final var optC = providers().map(provider -> {
 			try {

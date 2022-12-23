@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2021 B. Malinowsky
+    Copyright (c) 2015, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,7 +38,6 @@ package tuwien.auto.calimero.link;
 
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.function.Function;
 
 import org.slf4j.Logger;
 
@@ -121,16 +120,14 @@ final class BcuSwitcher<T>
 	private static final int responseTimeout = 1000;
 	private byte[] response;
 
-	private final Connection<T> c;
+	private final Connection<byte[]> c;
 	private final Logger logger;
-	private final Function<byte[], T> generator;
 
 
-	BcuSwitcher(final Connection<T> c, final Logger l, final Function<byte[], T> frameGenerator)
+	BcuSwitcher(final Connection<byte[]> c, final Logger l)
 	{
 		this.c = c;
 		logger = l;
-		this.generator = frameGenerator;
 		c.addConnectionListener(e -> setResponse(e.getFrameBytes()));
 	}
 
@@ -279,7 +276,7 @@ final class BcuSwitcher<T>
 		}
 		tsLastTx = now;
 		try {
-			c.send(generator.apply(frame), BlockingMode.Confirmation);
+			c.send(frame, BlockingMode.Confirmation);
 		}
 		catch (final KNXPortClosedException | KNXTimeoutException e) {
 			throw e;
@@ -387,7 +384,7 @@ final class BcuSwitcher<T>
 	private void switchLayer(final boolean cEMI, final int cemiCommMode, final byte[] peiSwitch)
 			throws KNXTimeoutException, KNXPortClosedException, KNXLinkClosedException {
 		try {
-			c.send(generator.apply(cEMI ? commModeRequest(cemiCommMode) : peiSwitch), BlockingMode.Confirmation);
+			c.send(cEMI ? commModeRequest(cemiCommMode) : peiSwitch, BlockingMode.Confirmation);
 			// TODO check .con for error case
 		}
 		catch (final InterruptedException e) {
