@@ -1,5 +1,7 @@
 plugins {
   id "com.github.ben-manes.versions" version "0.44.0"
+  id 'java-library'
+  id 'application'
   id 'maven-publish'
   id 'signing'
   id "org.gradle.test-retry" version "1.5.0"
@@ -13,9 +15,6 @@ repositories {
 
 ext.junitJupiterVersion = '5.9.1'
 ext.desc = 'Calimero, a free KNX network library'
-
-apply plugin: 'java-library'
-apply plugin:'application'
 
 group = 'com.github.calimero'
 version = '2.6-SNAPSHOT'
@@ -118,7 +117,7 @@ publishing {
                     }
                 }
                 scm {
-                    connection = 'scm:git:git://github.com:calimero-project/calimero-core.git'
+                    connection = 'scm:git:git://github.com/calimero-project/calimero-core.git'
                     url = 'https://github.com/calimero-project/calimero-core.git'
                 }
             }
