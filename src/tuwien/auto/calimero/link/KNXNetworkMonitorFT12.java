@@ -77,17 +77,9 @@ public class KNXNetworkMonitorFT12 extends AbstractMonitor<FT12Connection>
 	}
 
 	/**
-	 * Creates a new network monitor based on the FT1.2 protocol for accessing the KNX network.
-	 * <p>
-	 * The port number is used to choose the serial port for communication. It is mapped to the
-	 * default port identifier using that number on the platform.
-	 *
-	 * @param portNumber port number of the serial communication port to use
-	 * @param settings medium settings defining the specific KNX medium needed for decoding raw
-	 *        frames received from the KNX network
-	 * @throws KNXException on error creating FT1.2 connection or entering busmonitor mode
-	 * @throws InterruptedException on thread interrupt creating the FT1.2 connection
+	 * @deprecated Use {@link #KNXNetworkMonitorFT12(String, KNXMediumSettings)}.
 	 */
+	@Deprecated
 	public KNXNetworkMonitorFT12(final int portNumber, final KNXMediumSettings settings)
 			throws KNXException, InterruptedException
 	{

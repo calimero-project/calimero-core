@@ -79,16 +79,9 @@ public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 	}
 
 	/**
-	 * Creates a new network link based on the FT1.2 protocol for accessing the KNX network.
-	 * <p>
-	 * The port number is used to choose the serial port for communication. It is mapped to the
-	 * default port identifier using that number on the platform.
-	 *
-	 * @param portNumber port number of the serial communication port to use
-	 * @param settings medium settings defining device and medium specifics needed for communication
-	 * @throws KNXException on error creating FT1.2 connection, or timeout switching to link layer mode
-	 * @throws InterruptedException on thread interrupt creating the FT1.2 connection
+	 * @deprecated Use {@link #KNXNetworkLinkFT12(String, KNXMediumSettings)}.
 	 */
+	@Deprecated
 	public KNXNetworkLinkFT12(final int portNumber, final KNXMediumSettings settings)
 			throws KNXException, InterruptedException {
 		this(new FT12Connection(portNumber), settings);
