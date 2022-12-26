@@ -58,15 +58,19 @@ public final class ConnectionFactory<P, C> {
 	private static final Logger logger = LoggerFactory.getLogger("tuwien.auto.calimero.serial");
 
 	private final ServiceLoader<P> sl;
+	private final String svcName;
 
 	public interface ThrowingFunction<P, C> {
 		C open(P provider) throws KNXException, IOException;
 	}
 
-	public ConnectionFactory(final Class<P> service) { sl = ServiceLoader.load(service); }
+	public ConnectionFactory(final Class<P> service) {
+		sl = ServiceLoader.load(service);
+		svcName = service.getName();
+	}
 
 	public C open(final ThrowingFunction<P, C> openFunc) throws KNXException, IOException {
-		final var tref = new AtomicReference<Throwable>(new KNXException("no service provider available"));
+		final var tref = new AtomicReference<Throwable>();
 		final var optC = providers().map(provider -> {
 			try {
 				final var conn = openFunc.open(provider);
@@ -82,11 +86,13 @@ public final class ConnectionFactory<P, C> {
 			return optC.get();
 
 		final var t = tref.get();
+		if (t == null)
+			throw new KNXException("no service provider available for " + svcName);
 		if (t instanceof KNXException)
 			throw (KNXException) t;
 		if (t instanceof IOException)
 			throw (IOException) t;
-		throw new KNXException("failed to open device", t);
+		throw new KNXException("failed to open connection", t);
 	}
 
 	public Stream<P> providers() {
