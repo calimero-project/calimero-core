@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        java: [11, 17]
+        java: [11, 17, 19]
     name: Java ${{ matrix.java }} sample
 
     steps:
