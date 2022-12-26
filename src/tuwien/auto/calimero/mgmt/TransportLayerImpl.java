@@ -179,7 +179,7 @@ public class TransportLayerImpl implements TransportLayer
 	private final KNXNetworkLink lnk;
 	private final NetworkLinkListener lnkListener = new NLListener();
 	private final Deque<FrameEvent> indications = new ArrayDeque<>();
-	private final EventListeners<TransportListener> listeners;
+	private final EventListeners<TransportListener> listeners = new EventListeners<>();
 
 	// holds the mapping of connection destination address to proxy
 	private final Map<IndividualAddress, AggregatorProxy> proxies = new ConcurrentHashMap<>();
@@ -220,7 +220,6 @@ public class TransportLayerImpl implements TransportLayer
 		lnk = link;
 		logger = LogService.getLogger("calimero.mgmt." + getName());
 		lnk.addLinkListener(lnkListener);
-		listeners = new EventListeners<>(logger);
 		serverSide = serverEndpoint;
 	}
 

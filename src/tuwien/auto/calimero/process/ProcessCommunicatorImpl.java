@@ -149,7 +149,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	private final NetworkLinkListener lnkListener = new NLListener();
 	private final SecureApplicationLayer sal;
 	private final boolean useGoDiagnostics;
-	private final EventListeners<ProcessListener> listeners;
+	private final EventListeners<ProcessListener> listeners = new EventListeners<>();
 
 	private final Map<GroupAddress, FrameEvent> indications = new HashMap<>();
 	private static final FrameEvent NoResponse = new FrameEvent(ProcessCommunicatorImpl.class, (CEMI) null);
@@ -220,7 +220,6 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		this.sal = sal;
 		this.useGoDiagnostics = useGoDiagnostics;
 
-		listeners = new EventListeners<>(logger);
 		sal.addListener(lnkListener);
 	}
 

@@ -163,7 +163,7 @@ public class FT12Connection implements Connection<byte[]>
 	private volatile int sendFrameCount;
 	private volatile int rcvFrameCount;
 
-	private final EventListeners<KNXListener> listeners;
+	private final EventListeners<KNXListener> listeners = new EventListeners<>();
 
 	/**
 	 * @deprecated Use {@link #FT12Connection(String)}.
@@ -240,7 +240,6 @@ public class FT12Connection implements Connection<byte[]>
 	protected FT12Connection(final SerialCom connection, final String portId, final boolean cemi)
 			throws KNXException, InterruptedException {
 		logger = LogService.getLogger("calimero.serial.ft12:" + portId);
-		listeners = new EventListeners<>(logger);
 		listeners.registerEventType(ConnectionStatus.class);
 
 		adapter = connection;

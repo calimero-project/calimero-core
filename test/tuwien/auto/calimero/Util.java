@@ -53,7 +53,7 @@ import java.util.Optional;
 import tuwien.auto.calimero.knxnetip.Discoverer;
 import tuwien.auto.calimero.knxnetip.Discoverer.Result;
 import tuwien.auto.calimero.knxnetip.servicetype.SearchResponse;
-import tuwien.auto.calimero.serial.FT12Connection;
+import tuwien.auto.calimero.serial.SerialConnectionFactory;
 
 
 public final class Util
@@ -272,28 +272,13 @@ public final class Util
 	}
 
 	/**
-	 * Returns the serial port number to use for testing the FT1.2 protocol.
-	 * <p>
-	 * The returned port has to correspond with the port identifier returned by
-	 * {@link #getSerialPortID()}.
-	 *
-	 * @return port number
-	 */
-	public static int getSerialPort()
-	{
-		// on windows platforms, it is port 1 most of the time, linux 0
-		return 0;
-	}
-
-	/**
 	 * Returns the serial port identifier to use for testing the FT1.2 protocol.
-	 * <p>
 	 *
 	 * @return port ID, {@code null} if no ID found
 	 */
 	public static String getSerialPortID()
 	{
-		final String[] ids = FT12Connection.getPortIdentifiers();
+		final String[] ids = SerialConnectionFactory.portIdentifiers().toArray(String[]::new);
 		return ids.length > 0 ? ids[0] : null;
 	}
 

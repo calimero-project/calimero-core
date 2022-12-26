@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2021 B. Malinowsky
+    Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ public abstract class EventNotifier<T extends LinkListener> extends Thread imple
 	final Logger logger;
 	final Object source;
 
-	private final EventListeners<T> listeners;
+	private final EventListeners<T> listeners = new EventListeners<>(LinkEvent.class);
 
 	private final Deque<Consumer<? super T>> events = new ArrayDeque<>();
 	private volatile boolean running = true;
@@ -67,7 +67,6 @@ public abstract class EventNotifier<T extends LinkListener> extends Thread imple
 		super("Calimero link notifier");
 		this.logger = logger;
 		this.source = source;
-		listeners = new EventListeners<>(logger, LinkEvent.class);
 		setDaemon(true);
 	}
 

@@ -60,8 +60,7 @@ import tuwien.auto.calimero.cemi.CEMIFactory;
 import tuwien.auto.calimero.cemi.CEMILData;
 
 class FT12ConnectionTest {
-	private static int usePort = Util.getSerialPort();
-	private static String portID;
+	private static String portID = Util.getSerialPortID();
 	private FT12Connection c;
 	private final BauFt12Emulator emulator = new BauFt12Emulator();
 
@@ -89,25 +88,17 @@ class FT12ConnectionTest {
 	class InitWithPhysicalConnection {
 		@BeforeEach
 		void init() throws KNXException, InterruptedException {
-			c = new FT12Connection(usePort);
+			c = new FT12Connection(portID);
 		}
 
 		@Test
-		void ft12ConnectionInt() throws InterruptedException {
-			portID = c.getPortID();
+		void ft12ConnectionNoSharing() throws InterruptedException {
 			try {
-				final FT12Connection c2 = new FT12Connection(usePort);
+				final FT12Connection c2 = new FT12Connection(portID);
 				c2.close();
 				fail("no sharing");
 			}
-			catch (final KNXException e) {
-			}
-			try {
-				final FT12Connection c3 = new FT12Connection(2);
-				c3.close();
-			}
-			catch (final KNXException e) {
-			}
+			catch (final KNXException e) {}
 			c.close();
 		}
 
@@ -121,8 +112,7 @@ class FT12ConnectionTest {
 				c2.close();
 				fail("this baud rate should not work with BCU");
 			}
-			catch (final KNXException e) {
-			}
+			catch (final KNXException e) {}
 		}
 
 		@Test
@@ -136,8 +126,7 @@ class FT12ConnectionTest {
 				c.send(new byte[] { 1, 2, }, true);
 				fail("closed");
 			}
-			catch (final KNXPortClosedException e) {
-			}
+			catch (final KNXPortClosedException e) {}
 			assertEquals(FT12Connection.CLOSED, c.getState());
 		}
 

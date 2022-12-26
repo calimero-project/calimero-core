@@ -105,7 +105,7 @@ class KNXNetworkMonitorFT12Test
 	{
 		// prevents access problems with a just previously closed port
 		Thread.sleep(50);
-		mon = new KNXNetworkMonitorFT12(Util.getSerialPort(), new TPSettings());
+		mon = new KNXNetworkMonitorFT12(Util.getSerialPortID(), new TPSettings());
 		lmon = new MonListener();
 		mon.addMonitorListener(lmon);
 	}
@@ -125,11 +125,11 @@ class KNXNetworkMonitorFT12Test
 	}
 
 	@Test
-	void networkMonitorFT12IntKNXMediumSettings() throws InterruptedException
+	void networkMonitorFT12EmptyPortId() throws InterruptedException
 	{
 		mon.close();
 		try {
-			mon = new KNXNetworkMonitorFT12(1055, new TPSettings());
+			mon = new KNXNetworkMonitorFT12("", new TPSettings());
 			fail("should fail");
 		}
 		catch (final KNXException e) {

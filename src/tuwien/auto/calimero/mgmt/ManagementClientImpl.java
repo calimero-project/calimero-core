@@ -225,7 +225,7 @@ public class ManagementClientImpl implements ManagementClient
 	private volatile boolean detached;
 	private final Logger logger;
 
-	private final EventListeners<Consumer<FrameEvent>> listeners;
+	private final EventListeners<Consumer<FrameEvent>> listeners = new EventListeners<>();
 
 	SecureManagement secureApplicationLayer() { return sal; }
 
@@ -271,7 +271,6 @@ public class ManagementClientImpl implements ManagementClient
 		tl = secureManagement.transportLayer();
 		logger = LogService.getLogger("calimero.mgmt.MC " + link.getName());
 		src = link.getKNXMedium().getDeviceAddress();
-		listeners = new EventListeners<>(logger);
 		sal = secureManagement;
 		sal.addListener(tlListener);
 	}
