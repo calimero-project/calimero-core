@@ -60,16 +60,19 @@ public class EventListeners<T>
 	private final EventDispatcher<?> customEvents;
 
 	/**
-	 * Creates a new event listeners container object.
-	 *
-	 * @param logger optional logger for log output
+	 * @deprecated
 	 */
+	@Deprecated
 	public EventListeners(final Logger logger)
 	{
 		this.logger = logger;
 		customEvents = new EventDispatcher<>(Annotation.class, logger);
 	}
 
+	/**
+	 * @deprecated
+	 */
+	@Deprecated
 	public EventListeners(final Logger logger, final Class<? extends Annotation> eventAnnotation)
 	{
 		this.logger = logger;
@@ -79,9 +82,12 @@ public class EventListeners<T>
 	/**
 	 * Creates a new event listeners container object.
 	 */
-	public EventListeners()
-	{
-		this(LoggerFactory.getLogger("calimero"));
+	public EventListeners() {
+		this(Annotation.class);
+	}
+
+	public EventListeners(final Class<? extends Annotation> eventAnnotation) {
+		this(LoggerFactory.getLogger("calimero.event"), eventAnnotation);
 	}
 
 	/**
@@ -138,7 +144,7 @@ public class EventListeners<T>
 			}
 			catch (final RuntimeException rte) {
 				remove(l);
-				logger.error("removed event listener", rte);
+				logger.error("uncaught user exception: remove event listener", rte);
 			}
 		}
 	}
