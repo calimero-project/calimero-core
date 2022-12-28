@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class XmlInputFactory // extends XMLInputFactory
 {
-	private static final Logger l = LoggerFactory.getLogger("calimero.xml");
+	private static final Logger l = LoggerFactory.getLogger("io.calimero.xml");
 
 	private final Map<String, Object> config = new HashMap<>();
 	private static final String RESOLVER = "javax.xml.stream.resolver";

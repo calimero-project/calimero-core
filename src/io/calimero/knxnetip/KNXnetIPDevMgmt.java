@@ -118,7 +118,7 @@ public class KNXnetIPDevMgmt extends ClientConnection
 		super(KNXnetIPHeader.DEVICE_CONFIGURATION_REQ, KNXnetIPHeader.DEVICE_CONFIGURATION_ACK, 4,
 				CONFIGURATION_REQ_TIMEOUT);
 		ctrlEndpt = serverCtrlEP;
-		logger = LogService.getLogger("calimero.knxnetip." + name());
+		logger = LogService.getLogger("io.calimero.knxnetip." + name());
 	}
 
 	/**

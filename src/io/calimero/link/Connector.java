@@ -476,7 +476,7 @@ public final class Connector
 
 		private Logger logger()
 		{
-			return LoggerFactory.getLogger("calimero.link." + getName());
+			return LoggerFactory.getLogger("io.calimero.link." + getName());
 		}
 	}
 }

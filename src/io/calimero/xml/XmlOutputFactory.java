@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
  */
 public class XmlOutputFactory // extends XMLOutputFactory
 {
-	private static final Logger l = LoggerFactory.getLogger("calimero.xml");
+	private static final Logger l = LoggerFactory.getLogger("io.calimero.xml");
 
 	private final Map<String, Object> config = new HashMap<>();
 

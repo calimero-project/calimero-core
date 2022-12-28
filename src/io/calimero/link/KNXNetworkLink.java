@@ -184,7 +184,7 @@ public interface KNXNetworkLink extends AutoCloseable
 	 * <p>
 	 * The name is unique for links with different remote endpoints, or different types of communication links. By
 	 * default, the address/ID of the remote endpoint is used, e.g., "192.168.0.10:3671" for an IP link.<br>
-	 * The name is also used for the link logger; by default, use "calimero.link." +
+	 * The name is also used for the link logger; by default, use "io.calimero.link." +
 	 * {@link #getName()} to retrieve the logger of this link.
 	 *
 	 * @return link name as string

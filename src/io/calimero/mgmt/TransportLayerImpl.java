@@ -218,7 +218,7 @@ public class TransportLayerImpl implements TransportLayer
 			throw new KNXLinkClosedException(
 					"cannot initialize transport layer using closed link " + link.getName());
 		lnk = link;
-		logger = LogService.getLogger("calimero.mgmt." + getName());
+		logger = LogService.getLogger("io.calimero.mgmt." + getName());
 		lnk.addLinkListener(lnkListener);
 		serverSide = serverEndpoint;
 	}

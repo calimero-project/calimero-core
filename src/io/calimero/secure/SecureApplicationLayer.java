@@ -255,7 +255,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 		this.link = link;
 		this.serialNumber = serialNumber;
 
-		this.logger = LogService.getLogger("calimero." + secureSymbol + "-AL " + link.getName());
+		this.logger = LogService.getLogger("io.calimero." + secureSymbol + "-AL " + link.getName());
 
 		this.security = security;
 		this.sequenceNumber = sequenceNumber;

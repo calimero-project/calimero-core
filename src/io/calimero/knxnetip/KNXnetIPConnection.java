@@ -56,7 +56,7 @@ import io.calimero.cemi.CEMI;
  * server. If the message is not responded to within a timeout of 10 seconds, it is
  * repeated 3 times, and on no response the connection will be terminated.
  * <p>
- * Log information of this connection is provided using a logger in the namespace "calimero.knxnetip" and the name
+ * Log information of this connection is provided using a logger in the namespace "io.calimero.knxnetip" and the name
  * obtained from {@link KNXnetIPConnection#name()}.
  *
  * @author B. Malinowsky

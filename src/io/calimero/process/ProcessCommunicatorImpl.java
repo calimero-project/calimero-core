@@ -215,7 +215,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		if (!link.isOpen())
 			throw new KNXLinkClosedException(
 					"cannot initialize process communication using closed link " + link.getName());
-		logger = LogService.getLogger("calimero.process.communication " + link.getName());
+		logger = LogService.getLogger("io.calimero.process.communication " + link.getName());
 		lnk = link;
 		this.sal = sal;
 		this.useGoDiagnostics = useGoDiagnostics;

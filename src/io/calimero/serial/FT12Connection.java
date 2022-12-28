@@ -185,7 +185,7 @@ public class FT12Connection implements Connection<byte[]>
 	 * <p>
 	 * The baud rate is set to 19200.<br>
 	 * The associated log service to which the created instance will output logging events
-	 * is named "calimero.serial.ft12:{@code portId}", with {@code portId} being the supplied
+	 * is named "io.calimero.serial.ft12:{@code portId}", with {@code portId} being the supplied
 	 * port identifier.
 	 *
 	 * @param portId port identifier of the serial communication port to use
@@ -239,7 +239,7 @@ public class FT12Connection implements Connection<byte[]>
 
 	protected FT12Connection(final SerialCom connection, final String portId, final boolean cemi)
 			throws KNXException, InterruptedException {
-		logger = LogService.getLogger("calimero.serial.ft12:" + portId);
+		logger = LogService.getLogger("io.calimero.serial.ft12:" + portId);
 		listeners.registerEventType(ConnectionStatus.class);
 
 		adapter = connection;

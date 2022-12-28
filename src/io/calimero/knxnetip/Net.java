@@ -55,7 +55,7 @@ import io.calimero.KNXIllegalArgumentException;
 final class Net {
 	private Net() {}
 
-	private static final Logger logger = LoggerFactory.getLogger("calimero.knxnetip.Net");
+	private static final Logger logger = LoggerFactory.getLogger("io.calimero.knxnetip.Net");
 
 
 	static final NetworkInterface defaultNetif;

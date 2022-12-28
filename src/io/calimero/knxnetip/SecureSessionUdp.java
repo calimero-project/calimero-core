@@ -101,7 +101,7 @@ final class SecureSessionUdp {
 			final InetSocketAddress serverCtrlEP) {
 		session = TcpConnection.Udp.newSecureSession(userId, userKey, deviceAuthCode);
 		this.logger = LoggerFactory.getLogger(
-				"calimero.knxnetip.KNX/IP " + SecureConnection.secureSymbol + " Session " + hostPort(serverCtrlEP));
+				"io.calimero.knxnetip.KNX/IP " + SecureConnection.secureSymbol + " Session " + hostPort(serverCtrlEP));
 	}
 
 	// session.req -> session.res -> auth.req -> session-status

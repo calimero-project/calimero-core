@@ -183,7 +183,7 @@ public class TpuartConnection implements Connection<byte[]>
 	public TpuartConnection(final String portId, final Collection<? extends KNXAddress> acknowledge) throws KNXException
 	{
 		this.portId = portId;
-		logger = LogService.getAsyncLogger("calimero.serial.tpuart:" + portId);
+		logger = LogService.getAsyncLogger("io.calimero.serial.tpuart:" + portId);
 		com = SerialConnectionFactory.open(portId, UartBaudRate, Duration.ZERO, Duration.ofMillis(5));
 		os = com.outputStream();
 		is = com.inputStream();
@@ -516,11 +516,11 @@ public class TpuartConnection implements Connection<byte[]>
 			if (delay != null) {
 				final int value = Integer.parseUnsignedInt(delay);
 				maxInterByteDelay.set(value);
-				LoggerFactory.getLogger("calimero.serial.tpuart").info("using {} of {} us", key, value);
+				LoggerFactory.getLogger("io.calimero.serial.tpuart").info("using {} of {} us", key, value);
 			}
 		}
 		catch (final RuntimeException e) {
-			LoggerFactory.getLogger("calimero.serial.tpuart").warn("on checking property {}", key, e);
+			LoggerFactory.getLogger("io.calimero.serial.tpuart").warn("on checking property {}", key, e);
 		}
 	}
 

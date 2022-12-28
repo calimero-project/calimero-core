@@ -191,7 +191,7 @@ public class KNXnetIPTunnel extends ClientConnection
 		ctrlEndpt = serverCtrlEP;
 		if (ctrlEndpt.isUnresolved())
 			throw new KNXException("server control endpoint is unresolved: " + serverCtrlEP);
-		logger = LogService.getLogger("calimero.knxnetip." + name());
+		logger = LogService.getLogger("io.calimero.knxnetip." + name());
 	}
 
 	/**

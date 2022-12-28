@@ -87,7 +87,7 @@ public class EventListeners<T>
 	}
 
 	public EventListeners(final Class<? extends Annotation> eventAnnotation) {
-		this(LoggerFactory.getLogger("calimero.event"), eventAnnotation);
+		this(LoggerFactory.getLogger("io.calimero.event"), eventAnnotation);
 	}
 
 	/**

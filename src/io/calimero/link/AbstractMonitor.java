@@ -150,7 +150,7 @@ public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNet
 	protected AbstractMonitor(final T conn, final String name, final KNXMediumSettings settings) {
 		this.conn = conn;
 		this.name = name;
-		logger = LogService.getLogger("calimero.link." + getName());
+		logger = LogService.getLogger("io.calimero.link." + getName());
 
 		if (settings instanceof PLSettings)
 			logger.info("power-line medium, assuming BCU has extended busmonitor enabled");

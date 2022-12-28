@@ -355,7 +355,7 @@ public final class Keyring {
 
 	private static final byte[] emptyPwd = new byte[0];
 
-	private static final Logger logger = LoggerFactory.getLogger("calimero.keyring");
+	private static final Logger logger = LoggerFactory.getLogger("io.calimero.keyring");
 
 	private final String keyringUri;
 	private final char[] keyringPassword;

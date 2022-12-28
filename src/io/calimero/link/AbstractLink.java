@@ -244,7 +244,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	{
 		conn = connection;
 		this.name = name;
-		logger = LogService.getLogger("calimero.link." + getName());
+		logger = LogService.getLogger("io.calimero.link." + getName());
 		notifier = new LinkNotifier();
 		setKNXMedium(settings);
 		notifier.start();
@@ -260,7 +260,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	{
 		conn = null;
 		this.name = name;
-		logger = LogService.getLogger("calimero.link." + getName());
+		logger = LogService.getLogger("io.calimero.link." + getName());
 		notifier = new LinkNotifier();
 		setKNXMedium(settings);
 	}

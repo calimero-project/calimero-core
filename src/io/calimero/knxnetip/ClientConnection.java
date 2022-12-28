@@ -172,7 +172,7 @@ public abstract class ClientConnection extends ConnectionBase
 			throw new KNXIllegalArgumentException("server control endpoint cannot be a multicast address ("
 					+ ctrlEndpt.getAddress().getHostAddress() + ")");
 		useNat = useNAT;
-		logger = LogService.getLogger("calimero.knxnetip." + name());
+		logger = LogService.getLogger("io.calimero.knxnetip." + name());
 		// if we allow localEP to be null, we would create an unbound socket
 		if (localEP == null)
 			throw new KNXIllegalArgumentException("no local endpoint specified");

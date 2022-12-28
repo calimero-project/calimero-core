@@ -204,7 +204,7 @@ public final class TcpConnection implements Closeable {
 
 			sno = deriveSerialNumber(conn.localEndpoint());
 
-			logger = LoggerFactory.getLogger("calimero.knxnetip." + secureSymbol + " Session " + hostPort(conn.server));
+			logger = LoggerFactory.getLogger("io.calimero.knxnetip." + secureSymbol + " Session " + hostPort(conn.server));
 		}
 
 		/**
@@ -657,7 +657,7 @@ public final class TcpConnection implements Closeable {
 		this.server = server;
 		socket = new Socket();
 		localEndpoint = new InetSocketAddress(0);
-		logger = LoggerFactory.getLogger("calimero.knxnetip.tcp " + hostPort(server));
+		logger = LoggerFactory.getLogger("io.calimero.knxnetip.tcp " + hostPort(server));
 	}
 
 	protected TcpConnection(final InetSocketAddress local, final InetSocketAddress server) {

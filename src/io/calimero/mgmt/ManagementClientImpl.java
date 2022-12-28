@@ -269,7 +269,7 @@ public class ManagementClientImpl implements ManagementClient
 
 	protected ManagementClientImpl(final KNXNetworkLink link, final SecureManagement secureManagement) {
 		tl = secureManagement.transportLayer();
-		logger = LogService.getLogger("calimero.mgmt.MC " + link.getName());
+		logger = LogService.getLogger("io.calimero.mgmt.MC " + link.getName());
 		src = link.getKNXMedium().getDeviceAddress();
 		sal = secureManagement;
 		sal.addListener(tlListener);
