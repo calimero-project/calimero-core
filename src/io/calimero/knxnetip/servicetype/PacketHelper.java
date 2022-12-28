@@ -59,7 +59,7 @@ public final class PacketHelper
 	 * @param type service type to pack
 	 * @return the packet as byte array
 	 */
-	public static byte[] toPacket(final ServiceType type)
+	public static byte[] toPacket(@SuppressWarnings("exports") final ServiceType type)
 	{
 		final KNXnetIPHeader h = new KNXnetIPHeader(type.svcType, type.getStructLength());
 		final ByteArrayOutputStream os = new ByteArrayOutputStream(h.getTotalLength());
@@ -67,7 +67,7 @@ public final class PacketHelper
 		return type.toByteArray(os);
 	}
 
-	public static byte[] toPacket(final int version, final ServiceType type) {
+	public static byte[] toPacket(final int version, @SuppressWarnings("exports") final ServiceType type) {
 		final KNXnetIPHeader h = new KNXnetIPHeader(type.svcType, version, type.getStructLength());
 		final ByteArrayOutputStream os = new ByteArrayOutputStream(h.getTotalLength());
 		os.write(h.toByteArray(), 0, h.getStructLength());

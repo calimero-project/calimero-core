@@ -47,7 +47,7 @@ javadoc.options.encoding = 'UTF-8'
 
 compileJava.options*.compilerArgs = [
 	'-Xlint:all,-serial',
-	"--limit-modules", "java.base,java.xml"
+	"--limit-modules", "java.base,java.xml,org.slf4j"
 ]
 
 compileTestJava.options*.compilerArgs = [
@@ -55,8 +55,14 @@ compileTestJava.options*.compilerArgs = [
 	'-Xlint:-try',
 ]
 
+tasks.named('compileJava') {
+    options.javaModuleVersion = provider { project.version }
+}
 
-mainClassName = 'tuwien.auto.calimero.Settings'
+application {
+    mainModule = 'io.calimero.core' 
+    mainClass = 'io.calimero.Settings'
+}
 
 sourceSets {
     main {
@@ -76,7 +82,7 @@ tasks.withType(Javadoc) {
 
 jar {
 	manifest {
-		attributes 'Main-Class': mainClassName
+		attributes 'Main-Class': application.mainClass
 	}
 }
 
