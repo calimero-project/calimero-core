@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2021 B. Malinowsky
+    Copyright (c) 2015, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ import javax.xml.stream.XMLStreamReader;
  *
  * @author B. Malinowsky
  */
-public final class XmlStreamReaderProxy implements XmlReader
+final class XmlStreamReaderProxy implements XmlReader
 {
 	public static XmlStreamReaderProxy createXmlReader(final InputStream is, final Closeable onClose)
 		throws XMLStreamException, FactoryConfigurationError {
@@ -67,7 +67,7 @@ public final class XmlStreamReaderProxy implements XmlReader
 	final XMLStreamReader r;
 	private final Closeable close;
 
-	public XmlStreamReaderProxy(final XMLStreamReader reader, final Closeable onClose) { r = reader; close = onClose; }
+	private XmlStreamReaderProxy(final XMLStreamReader reader, final Closeable onClose) { r = reader; close = onClose; }
 
 	@Override
 	public Object getProperty(final java.lang.String name)

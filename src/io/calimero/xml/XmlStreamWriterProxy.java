@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2021 B. Malinowsky
+    Copyright (c) 2015, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ import javax.xml.stream.XMLStreamWriter;
  *
  * @author B. Malinowsky
  */
-public final class XmlStreamWriterProxy implements XmlWriter
+final class XmlStreamWriterProxy implements XmlWriter
 {
 	final XMLStreamWriter w;
 	private final Closeable close;
@@ -71,7 +71,7 @@ public final class XmlStreamWriterProxy implements XmlWriter
 		return new XmlStreamWriterProxy(XMLOutputFactory.newInstance().createXMLStreamWriter(stream), () -> {});
 	}
 
-	XmlStreamWriterProxy(final XMLStreamWriter writer, final Closeable onClose)
+	private XmlStreamWriterProxy(final XMLStreamWriter writer, final Closeable onClose)
 	{
 		w = writer;
 		close = onClose;
