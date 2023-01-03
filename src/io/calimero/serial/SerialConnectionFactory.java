@@ -60,8 +60,6 @@ import io.calimero.serial.spi.SerialConnectionProvider.Settings;
 public final class SerialConnectionFactory {
 	private static final ConnectionFactory<SerialConnectionProvider, SerialCom> factory = new ConnectionFactory<>(
 			SerialConnectionProvider.class);
-	private static final ConnectionFactory<SerialCom, SerialCom> oldFactory = new ConnectionFactory<>(
-			SerialCom.class);
 
 	private static final List<String> defaultPortPrefixes = System.getProperty("os.name").toLowerCase(Locale.ENGLISH)
 			.indexOf("windows") > -1
@@ -180,7 +178,6 @@ public final class SerialConnectionFactory {
 	 * @return new connection for the specified serial communication port, port resource is in open state
 	 * @throws KNXException on failure to open or configure serial port, or no adapter available
 	 */
-	@SuppressWarnings("deprecation")
 	public static SerialCom open(final String portId, final int baudrate, final Duration readIntervalTimeout,
 			final Duration receiveTimeout) throws KNXException {
 		final int databits = 8;
@@ -193,27 +190,8 @@ public final class SerialConnectionFactory {
 		try {
 			return factory.open(p -> p.open(settings));
 		}
-		catch (KNXException | IOException e) {
-			try {
-				return oldFactory.open(p -> {
-					try {
-						p.open(portId);
-						p.setSerialPortParams(baudrate, databits, stopbits, parity);
-						p.setFlowControlMode(flowControl);
-						return p;
-					}
-					catch (IOException | RuntimeException ex) {
-						p.close();
-						throw ex;
-					}
-				});
-			}
-			catch (final KNXException | IOException e1) {
-				e.addSuppressed(e1);
-				if (e instanceof KNXException)
-					throw (KNXException) e;
-				throw new KNXException("opening device " + portId, e);
-			}
+		catch (final IOException e) {
+			throw new KNXException("opening device " + portId, e);
 		}
 	}
 }
