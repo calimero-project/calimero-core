@@ -104,7 +104,13 @@ class EventDispatcher<T extends Annotation> {
 			return;
 		}
 		try {
-			final var privateLookup = MethodHandles.privateLookupIn(listener.getClass(), lookup);
+			Lookup privateLookup = lookup;
+			try {
+				privateLookup = MethodHandles.privateLookupIn(listener.getClass(), lookup);
+			}
+			catch (final IllegalAccessException ok) {
+				// module which contains listener does not permit access (reads/opens directives)
+			}
 			final var boundMethod = privateLookup.unreflect(method).bindTo(listener);
 			customEvents.get(paramType).add(new ListenerMH(listener, boundMethod));
 			logger.trace("registered {}", method);
