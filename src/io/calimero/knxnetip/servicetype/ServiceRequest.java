@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -206,18 +206,6 @@ public class ServiceRequest<T extends ServiceType> extends io.calimero.knxnetip.
 		if (svc == null)
 			svc = svcSupplier.get();
 		return (R) svc;
-	}
-
-	/**
-	 * @deprecated
-	 * Returns the cEMI frame carried by the request.
-	 *
-	 * @return a cEMI type
-	 */
-	@Deprecated
-	public final CEMI getCEMI()
-	{
-		return CEMIFactory.copy((CEMI) svc);
 	}
 
 	@Override

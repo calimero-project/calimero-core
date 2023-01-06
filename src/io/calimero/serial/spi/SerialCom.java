@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2021, 2022 B. Malinowsky
+    Copyright (c) 2021, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,9 +39,6 @@ package io.calimero.serial.spi;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
-
-import io.calimero.KNXException;
 
 public interface SerialCom extends AutoCloseable {
 	enum StopBits {
@@ -61,22 +58,6 @@ public interface SerialCom extends AutoCloseable {
 
 		public int value() { return ordinal(); }
 	}
-
-	@Deprecated
-	default List<String> portIdentifiers() { return List.of(); };
-
-	@Deprecated
-	@SuppressWarnings("unused")
-	default void open(final String portId) throws IOException, KNXException {};
-
-	@Deprecated
-	@SuppressWarnings("unused")
-	default void setSerialPortParams(final int baudrate, final int databits, final StopBits stopbits, final Parity parity)
-			throws IOException {}
-
-	@Deprecated
-	@SuppressWarnings("unused")
-	default void setFlowControlMode(final FlowControl mode) throws IOException {}
 
 	int baudRate() throws IOException;
 

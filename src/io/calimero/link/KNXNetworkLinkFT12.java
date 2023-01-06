@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -76,15 +76,6 @@ public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 	public KNXNetworkLinkFT12(final String portID, final KNXMediumSettings settings)
 			throws KNXException, InterruptedException {
 		this(new FT12Connection(portID), settings);
-	}
-
-	/**
-	 * @deprecated Use {@link #KNXNetworkLinkFT12(String, KNXMediumSettings)}.
-	 */
-	@Deprecated
-	public KNXNetworkLinkFT12(final int portNumber, final KNXMediumSettings settings)
-			throws KNXException, InterruptedException {
-		this(new FT12Connection(portNumber), settings);
 	}
 
 	/**

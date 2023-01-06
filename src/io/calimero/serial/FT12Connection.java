@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -63,8 +63,6 @@ import io.calimero.internal.EventListeners;
 import io.calimero.internal.Executor;
 import io.calimero.log.LogService;
 import io.calimero.serial.spi.SerialCom;
-import io.calimero.serial.spi.SerialCom.Parity;
-import io.calimero.serial.spi.SerialCom.StopBits;
 
 /**
  * Provides a connection based on the FT1.2 protocol for communication with a BCU2 device.
@@ -138,10 +136,6 @@ public class FT12Connection implements Connection<byte[]>
 
 	private final Logger logger;
 
-	// adapter for the used serial I/O connection:
-	// - for Calimero 2 native I/O, SerialComAdapter is used
-	// - with rx/tx available, RxtxAdapter is used
-	// - or some external serial I/O library adapter
 	private final SerialCom adapter;
 
 	private final String port;
@@ -165,20 +159,6 @@ public class FT12Connection implements Connection<byte[]>
 
 	private final EventListeners<KNXListener> listeners = new EventListeners<>();
 
-	/**
-	 * @deprecated Use {@link #FT12Connection(String)}.
-	 *
-	 * @param portNumber port number of the serial communication port to use; mapped to
-	 *        the default port identifier using this number (device and platform specific)
-	 * @throws KNXException on port not found or access error, initializing port settings
-	 *         failed, if reset of BCU2 failed
-	 * @throws InterruptedException on interrupted thread while creating the FT1.2 connection
-	 */
-	@Deprecated
-	public FT12Connection(final int portNumber) throws KNXException, InterruptedException
-	{
-		this(SerialConnectionFactory.defaultPortPrefixes().get(0) + portNumber, DEFAULT_BAUDRATE, false);
-	}
 
 	/**
 	 * Creates a new connection to a BCU2 using the FT1.2 protocol.
@@ -261,21 +241,6 @@ public class FT12Connection implements Connection<byte[]>
 	}
 
 	/**
-	 * Attempts to gets the available serial communication ports on the host.
-	 * <p>
-	 * If Calimero has access to serial ports, the lowest 20
-	 * port numbers of each of the default system name prefixes are checked if present.<br>
-	 * The empty array is returned if no ports are discovered.
-	 *
-	 * @return array of strings with found port identifiers
-	 */
-	@Deprecated
-	public static String[] getPortIdentifiers()
-	{
-		return SerialConnectionFactory.portIdentifiers().toArray(String[]::new);
-	}
-
-	/**
 	 * Adds the specified event listener {@code l} to receive events from this
 	 * connection.
 	 * <p>
@@ -320,18 +285,6 @@ public class FT12Connection implements Connection<byte[]>
 	public final String getPortID()
 	{
 		return state == CLOSED ? "" : port;
-	}
-
-	/**
-	 * @deprecated Specify during connection setup.
-	 *
-	 * @param baud requested baud rate [bit/s], 0 &lt; baud rate
-	 * @throws IOException on error setting the baudrate
-	 */
-	@Deprecated
-	public void setBaudrate(final int baud) throws IOException
-	{
-		adapter.setSerialPortParams(baud, 8, StopBits.One, Parity.Even);
 	}
 
 	/**

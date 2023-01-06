@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -74,16 +74,6 @@ public class KNXNetworkMonitorFT12 extends AbstractMonitor<FT12Connection>
 			throws KNXException, InterruptedException
 	{
 		this(new FT12Connection(portID), settings);
-	}
-
-	/**
-	 * @deprecated Use {@link #KNXNetworkMonitorFT12(String, KNXMediumSettings)}.
-	 */
-	@Deprecated
-	public KNXNetworkMonitorFT12(final int portNumber, final KNXMediumSettings settings)
-			throws KNXException, InterruptedException
-	{
-		this(new FT12Connection(portNumber), settings);
 	}
 
 	/**

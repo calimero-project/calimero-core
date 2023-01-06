@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -61,22 +61,6 @@ public interface ProcessCommunicator extends ProcessCommunication
 {
 	// Implementation note: responding to read indications is done the same way as
 	// all the writing stuff just with different service, so no magic here...
-
-	/**
-	 * @deprecated Use {@link #responseTimeout(Duration)}
-	 *
-	 * @param timeout time in seconds, {@code timeout > 0}
-	 */
-	@Deprecated(forRemoval = true)
-	default void setResponseTimeout(final int timeout) { responseTimeout(Duration.ofSeconds(timeout)); }
-
-	/**
-	 * @deprecated Use {@link #responseTimeout()}
-	 *
-	 * @return timeout in seconds
-	 */
-	@Deprecated(forRemoval = true)
-	default int getResponseTimeout() { return (int) responseTimeout().toSeconds(); }
 
 	/**
 	 * Returns the response timeout used when waiting for a KNX response message to arrive.

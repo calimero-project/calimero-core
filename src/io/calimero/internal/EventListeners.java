@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -59,25 +59,6 @@ public class EventListeners<T>
 	private final Logger logger;
 	private final EventDispatcher<?> customEvents;
 
-	/**
-	 * @deprecated
-	 */
-	@Deprecated
-	public EventListeners(final Logger logger)
-	{
-		this.logger = logger;
-		customEvents = new EventDispatcher<>(Annotation.class, logger);
-	}
-
-	/**
-	 * @deprecated
-	 */
-	@Deprecated
-	public EventListeners(final Logger logger, final Class<? extends Annotation> eventAnnotation)
-	{
-		this.logger = logger;
-		customEvents = new EventDispatcher<>(eventAnnotation, logger);
-	}
 
 	/**
 	 * Creates a new event listeners container object.
@@ -87,7 +68,8 @@ public class EventListeners<T>
 	}
 
 	public EventListeners(final Class<? extends Annotation> eventAnnotation) {
-		this(LoggerFactory.getLogger("io.calimero.event"), eventAnnotation);
+		this.logger = LoggerFactory.getLogger("io.calimero.event");
+		customEvents = new EventDispatcher<>(eventAnnotation, logger);
 	}
 
 	/**

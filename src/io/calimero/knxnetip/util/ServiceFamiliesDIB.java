@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -94,54 +94,6 @@ public class ServiceFamiliesDIB extends DIB
 			return values()[familyId - 2];
 		}
 	}
-
-	/**
-	 * @deprecated
-	 */
-	@Deprecated
-	public static final int CORE = 0x02;
-
-	/**
-	 * @deprecated
-	 */
-	@Deprecated
-	public static final int DEVICE_MANAGEMENT = 0x03;
-
-	/**
-	 * @deprecated
-	 */
-	@Deprecated
-	public static final int TUNNELING = 0x04;
-
-	/**
-	 * @deprecated
-	 */
-	@Deprecated
-	public static final int ROUTING = 0x05;
-
-	/**
-	 * @deprecated
-	 */
-	@Deprecated
-	public static final int REMOTE_LOGGING = 0x06;
-
-	/**
-	 * @deprecated
-	 */
-	@Deprecated
-	public static final int REMOTE_CONFIGURATION_DIAGNOSIS = 0x07;
-
-	/**
-	 * @deprecated
-	 */
-	@Deprecated
-	public static final int OBJECT_SERVER = 0x08;
-
-	/**
-	 * @deprecated
-	 */
-	@Deprecated
-	public static final int Security = 0x09;
 
 
 	private final EnumMap<ServiceFamily, Integer> families = new EnumMap<>(ServiceFamily.class);

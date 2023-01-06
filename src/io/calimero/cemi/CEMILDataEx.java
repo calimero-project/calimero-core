@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -60,90 +60,6 @@ import io.calimero.Priority;
  */
 public class CEMILDataEx extends CEMILData implements Cloneable
 {
-	/**
-	 * @deprecated Use {@link AdditionalInfo}
-	 */
-	@Deprecated(forRemoval = true)
-	public static class AddInfo extends AdditionalInfo
-	{
-		/**
-		 * @deprecated Use {@link AdditionalInfo#of}
-		 */
-		@Deprecated(forRemoval = true)
-		public AddInfo(final int infoType, final byte[] info)
-		{
-			super(infoType, info);
-			if (infoType < 0 || infoType >= ADDINFO_ESC)
-				throw new KNXIllegalArgumentException("cEMI additional info type " + infoType + " out of range [0..254]");
-			if (info.length > 255)
-				throw new KNXIllegalArgumentException("cEMI additional info of type " + infoType + " exceeds maximum length of 255 bytes");
-			if (infoType < ADDINFO_LENGTHS.length && info.length != ADDINFO_LENGTHS[infoType])
-				throw new KNXIllegalArgumentException(
-						"invalid length " + info.length + " for cEMI additional info type " + infoType);
-		}
-
-		/**
-		 * Returns the additional information associated with this type.
-		 *
-		 * @return the data as byte array
-		 */
-		public final byte[] getInfo()
-		{
-			return info();
-		}
-
-		/**
-		 * Returns the type of additional information (see ADDINFO_* constants in class CEMILDataEx).
-		 *
-		 * @return type ID
-		 */
-		public final int getType()
-		{
-			return type();
-		}
-
-		@Override
-		public String toString() {
-			switch (type()) {
-			case ADDINFO_RFMEDIUM:
-				return new RFMediumInfo(info(), false).toString(); // we default to domain broadcast
-			default:
-				return super.toString();
-			}
-		}
-	}
-
-	// public static final int ADDINFO_RESERVED = 0x00;
-
-	/** @deprecated Use {@link AdditionalInfo}. */
-	@Deprecated(forRemoval = true)
-	public static final int ADDINFO_PLMEDIUM = 0x01;
-
-	/** @deprecated Use {@link AdditionalInfo}. */
-	@Deprecated(forRemoval = true)
-	public static final int ADDINFO_RFMEDIUM = 0x02;
-	// public static final int ADDINFO_BUSMON = 0x03;
-
-	/** @deprecated Use {@link AdditionalInfo}. */
-	@Deprecated(forRemoval = true)
-	public static final int ADDINFO_TIMESTAMP = 0x04;
-
-	/** @deprecated Use {@link AdditionalInfo}. */
-	@Deprecated(forRemoval = true)
-	public static final int ADDINFO_TIMEDELAY = 0x05;
-
-	/** @deprecated Use {@link AdditionalInfo}. */
-	@Deprecated(forRemoval = true)
-	public static final int ADDINFO_TIMESTAMP_EXT = 0x06;
-
-	/** @deprecated Use {@link AdditionalInfo}. */
-	@Deprecated(forRemoval = true)
-	public static final int ADDINFO_BIBAT = 0x07;
-
-	private static final int ADDINFO_ESC = 0xFF;
-
-	private static final int[] ADDINFO_LENGTHS = { 0, 2, 8, 1, 2, 4, 4, 2, 4, 3 };
-
 	private final List<AdditionalInfo> addInfo = Collections.synchronizedList(new ArrayList<>());
 
 
@@ -311,31 +227,6 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	}
 
 	/**
-	 * @deprecated Use {@link #additionalInfo()}.
-	 * @param infoType type ID of additional information
-	 * @param info additional information data
-	 */
-	@Deprecated(forRemoval = true)
-	public synchronized void addAdditionalInfo(final int infoType, final byte[] info)
-	{
-		if (infoType < 0 || infoType >= ADDINFO_ESC)
-			throw new KNXIllegalArgumentException("info type out of range [0..254]");
-		if (!checkAddInfoLength(infoType, info.length))
-			throw new KNXIllegalArgumentException("wrong info data length, expected " + ADDINFO_LENGTHS[infoType] + " bytes");
-		addInfo.add(new AddInfo(infoType, info));
-	}
-
-	/**
-	 * @deprecated Use {@link #additionalInfo()}.
-	 * @return a List with {@link AddInfo} objects
-	 */
-	@Deprecated(forRemoval = true)
-	public synchronized List<? extends AdditionalInfo> getAdditionalInfo()
-	{
-		return new ArrayList<>(addInfo);
-	}
-
-	/**
 	 * Returns additional information data corresponding to the supplied type ID, if it is contained
 	 * in the message.
 	 *
@@ -392,16 +283,6 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	public synchronized boolean isDomainBroadcast()
 	{
 		return (ctrl1 & 0x10) != 0;
-	}
-
-	/**
-	 * @deprecated Use {@link #additionalInfo()}.removeIf(info -&gt; info.type == infoType).
-	 * @param infoType type ID of additional information to remove
-	 */
-	@Deprecated(forRemoval = true)
-	public synchronized void removeAdditionalInfo(final int infoType)
-	{
-		addInfo.removeIf(info -> info.type() == infoType);
 	}
 
 	@Override
@@ -531,16 +412,6 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	{
 		// value of length field is limited to 254, 255 is reserved as ESC code
 		return tpdu.length <= 255;
-	}
-
-	private static boolean checkAddInfoLength(final int infoType, final int len)
-	{
-		if (len > 255)
-			throw new KNXIllegalArgumentException(
-					"additional info exceeds maximum length of 255 bytes");
-		if (infoType < ADDINFO_LENGTHS.length && len != ADDINFO_LENGTHS[infoType])
-			return false;
-		return true;
 	}
 
 	private int getAddInfoLength()

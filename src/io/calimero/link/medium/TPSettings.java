@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,12 +45,6 @@ import io.calimero.IndividualAddress;
  */
 public class TPSettings extends KNXMediumSettings
 {
-	/**
-	 * @deprecated
-	 */
-	@Deprecated(forRemoval = true)
-	public static final TPSettings TP1 = new TPSettings();
-
 	/**
 	 * Creates a new settings container with TP1 medium specific information.
 	 *

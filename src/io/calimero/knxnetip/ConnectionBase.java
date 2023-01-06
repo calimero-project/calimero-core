@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2022 B. Malinowsky
+    Copyright (c) 2010, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -59,7 +59,6 @@ import io.calimero.KNXAckTimeoutException;
 import io.calimero.KNXFormatException;
 import io.calimero.KNXListener;
 import io.calimero.KNXTimeoutException;
-import io.calimero.ServiceType;
 import io.calimero.cemi.CEMI;
 import io.calimero.internal.EventListeners;
 import io.calimero.internal.Executor;
@@ -528,16 +527,6 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		logger.warn("received service " + svcType + " with wrong channel ID " + id + ", expected " + channelId
 				+ " - ignored");
 		return false;
-	}
-
-	/**
-	 * @deprecated No replacement. Use {@link ServiceRequest#from(KNXnetIPHeader, byte[], int)}.
-	 */
-	@Deprecated
-	protected ServiceRequest<ServiceType> getServiceRequest(final KNXnetIPHeader h, final byte[] data, final int offset)
-		throws KNXFormatException
-	{
-		return ServiceRequest.from(h, data, offset);
 	}
 
 	final void startReceiver()
