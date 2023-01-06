@@ -4,6 +4,14 @@ Calimero-core [![CI with Gradle](https://github.com/calimero-project/calimero-co
 git clone https://github.com/calimero-project/calimero-core.git
 ~~~
 
+ Changes with io.calimero | Prior | => | New
+---|---|---|---
+ _Maven group ID_ | com.github.calimero || io.calimero
+ _Modules_  | n/a || io.calimero.*
+ _Packages_ | tuwien.auto.calimero.* || io.calimero.*
+ _Logging_  | calimero.* || io.calimero.*
+
+
 Calimero-core provides (secure) KNX communication protocols, KNX datapoint & property access, and management functionality. [Java SE 11](https://jdk.java.net/archive/) (_java.base_) is the minimum required runtime environment.
 Calimero was developed with a focus on applications that run on embedded devices and require a small footprint.
 
