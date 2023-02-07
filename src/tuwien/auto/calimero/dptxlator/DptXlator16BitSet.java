@@ -75,6 +75,10 @@ public class DptXlator16BitSet extends DPTXlator {
 	}
 
 	// HVAC domain
+	public enum DhwControllerStatus implements EnumBase<DhwControllerStatus> {
+		Fault, Load, LegioProtection, Push, OtherEnergySource, SolarEnergyOnly, SolarEnergySupport, TemperatureOptimizationShift;
+	}
+	public static final EnumDpt<DhwControllerStatus> DptDhwControllerStatus = new EnumDpt<>("22.100", DhwControllerStatus.class);
 
 	public enum RhccStatus implements EnumBase<RhccStatus> {
 		Fault, HeatingEcoMode, LimitFlowTemperature, LimitReturnTemperature, HeatingMorningBoost, EarlyMorningStart, EarlyEveningShutdown,
@@ -100,6 +104,13 @@ public class DptXlator16BitSet extends DPTXlator {
 
 	}
 	public static final EnumDpt<Medium> DptMedia = new EnumDpt<>("22.1000", Medium.class);
+
+	public enum ChannelActivationState16 implements EnumBase<ChannelActivationState16> {
+		Channel1, Channel2, Channel3, Channel4, Channel5, Channel6, Channel7, Channel8,
+		Channel9, Channel10, Channel11, Channel12, Channel13, Channel14, Channel15, Channel16, Channel17;
+	}
+	public static final EnumDpt<ChannelActivationState16> DptChannelActivation16 = new EnumDpt<ChannelActivationState16>("22.1010",
+			ChannelActivationState16.class);
 
 	private static final Map<String, DPT> types = loadDatapointTypes(DptXlator16BitSet.class);
 
@@ -187,7 +198,7 @@ public class DptXlator16BitSet extends DPTXlator {
 		final int offset = 2 * index;
 		final int d = (data[offset] << 8) | data[offset + 1];
 		final StringJoiner joiner = new StringJoiner(", ");
-		for (int i = 0x4000; i > 0; i >>= 1)
+		for (int i = 0x8000; i > 0; i >>= 1)
 			if ((d & i) == i)
 				joiner.add(((EnumDpt<?>) dpt).textOf(i));
 		// RHCC status special case: controller is cooling if HeatingMode = false and CoolingDisabled = false

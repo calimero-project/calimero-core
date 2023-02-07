@@ -298,6 +298,14 @@ public class DPTXlator8BitEnum extends DPTXlator
 		CloudCover(final int element, final String description) { init(element, description); }
 	}
 
+	public enum PowerReturnMode implements EnumBase<PowerReturnMode> {
+		DoNotSend(0),
+		SendAlways(1),
+		SendIfValueChangedDuringPowerdown(2);
+
+		PowerReturnMode(final int element) { init(element); }
+	}
+
 	public enum FuelType implements EnumBase<FuelType> {
 		Auto(0),
 		Oil(1),
@@ -459,6 +467,14 @@ public class DPTXlator8BitEnum extends DPTXlator
 		VoidDeviceType(255, "void device type");
 
 		MeteringDeviceType(final int element, final String description) { init(element, description); }
+	}
+
+	public enum HumDehumMode implements EnumBase<HumDehumMode> {
+		Inactive(0, "Inactive"),
+		Humidification(1, "Humidification"),
+		Dehumidification(2, "Dehumidification");
+
+		HumDehumMode(final int element, final String description) { init(element, description); }
 	}
 
 	public enum AirDamperActuatorType implements EnumBase<AirDamperActuatorType> {
@@ -812,6 +828,8 @@ public class DPTXlator8BitEnum extends DPTXlator
 			"20.020", ActuatorConnectType.class, "1", "2");
 	public static final EnumDpt<CloudCover> DptCloudCover = new EnumDpt<>("20.021", CloudCover.class,
 			"0", "9");
+	public static final EnumDpt<PowerReturnMode> DptPowerReturnMode = new EnumDpt<>("20.022", PowerReturnMode.class,
+			"0", "2");
 	public static final EnumDpt<FuelType> DptFuelType = new EnumDpt<>("20.100", FuelType.class, "0", "3");
 	public static final EnumDpt<BurnerType> DptBurnerType = new EnumDpt<>("20.101", BurnerType.class, "0", "3");
 	public static final EnumDpt<HvacMode> DptHvacMode = new EnumDpt<>("20.102", "HVAC Mode",
@@ -836,6 +854,8 @@ public class DPTXlator8BitEnum extends DPTXlator
 			StatusRoomSetpoint.class, "0", "2");
 	public static final EnumDpt<MeteringDeviceType> DptMeteringDeviceType = new EnumDpt<>("20.114",
 			MeteringDeviceType.class, "0", "41/255");
+	public static final EnumDpt<HumDehumMode> DptHumDehumMode = new EnumDpt<>("20.115",
+			HumDehumMode.class, "0", "2");
 	public static final EnumDpt<AirDamperActuatorType> DptAirDamperActuatorType = new EnumDpt<>("20.120",
 			AirDamperActuatorType.class, "1", "2");
 	public static final EnumDpt<BackupMode> DptBackupMode = new EnumDpt<>("20.121", BackupMode.class, "0", "1");

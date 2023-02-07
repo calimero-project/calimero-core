@@ -112,7 +112,7 @@ class DPTXlator8BitEnumTest {
 	@Test
 	void getSubTypes() {
 		final Map<String, DPT> subTypes = t.getSubTypes();
-		assertEquals(58, subTypes.size());
+		assertEquals(60, subTypes.size());
 	}
 
 	@Test
