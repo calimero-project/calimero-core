@@ -470,11 +470,11 @@ public class DPTXlator8BitEnum extends DPTXlator
 	}
 
 	public enum HumDehumMode implements EnumBase<HumDehumMode> {
-		Inactive(0, "Inactive"),
-		Humidification(1, "Humidification"),
-		Dehumidification(2, "Dehumidification");
+		Inactive(0),
+		Humidification(1),
+		Dehumidification(2);
 
-		HumDehumMode(final int element, final String description) { init(element, description); }
+		HumDehumMode(final int element) { init(element); }
 	}
 
 	public enum AirDamperActuatorType implements EnumBase<AirDamperActuatorType> {
