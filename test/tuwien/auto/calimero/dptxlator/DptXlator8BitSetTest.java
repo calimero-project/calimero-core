@@ -77,6 +77,17 @@ class DptXlator8BitSetTest
 	}
 
 	@Test
+	void testSet() throws KNXFormatException {
+		t = new DptXlator8BitSet(DptXlator8BitSet.DptChannelActivation);
+		t.setValue("1 0 0 0 1 1 0 1");
+		assertEquals("channel8, channel4, channel3, channel1", t.getValue());
+
+		t = new DptXlator8BitSet(DptXlator8BitSet.DptChannelActivation);
+		t.setValue("channel1");
+		assertEquals("channel1", t.getValue());
+	}
+
+	@Test
 	void getAllValues() throws KNXFormatException
 	{
 		assertEquals(1, t.getAllValues().length);

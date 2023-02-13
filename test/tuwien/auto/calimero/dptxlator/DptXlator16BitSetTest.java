@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static tuwien.auto.calimero.dptxlator.DptXlator16BitSet.DhwControllerStatus.TemperatureOptimizationShift;
 import static tuwien.auto.calimero.dptxlator.DptXlator16BitSet.RhccStatus.EarlyEveningShutdown;
 import static tuwien.auto.calimero.dptxlator.DptXlator16BitSet.RhccStatus.Fault;
 import static tuwien.auto.calimero.dptxlator.DptXlator16BitSet.RhccStatus.FrostAlarm;
@@ -78,6 +79,29 @@ class DptXlator16BitSetTest {
 	}
 
 	@Test
+	void testSet() throws KNXFormatException {
+		t = new DptXlator16BitSet(DptXlator16BitSet.DptChannelActivation16);
+		t.setValue("1 1 0 0 0 0 1 0 0 0 0 0 1 1 0 1");
+		assertEquals("channel16, channel15, channel10, channel4, channel3, channel1", t.getValue());
+
+		DptXlator16BitSet t2 = new DptXlator16BitSet(DptXlator16BitSet.DptChannelActivation16);
+		t2.setValues(t.getValue());
+		assertEquals(t.getValue(), t2.getValue());
+	}
+
+	@Test
+	void testDwhControllerStatus() throws KNXFormatException {
+		t = new DptXlator16BitSet(DptXlator16BitSet.DptDhwControllerStatus);
+		assertEquals("", t.getValue());
+
+		t.setValues("SolarEnergyOnly, Fault");
+		assertEquals("solar energy only, fault", t.getValue());
+
+		t.setValue(DptXlator16BitSet.DhwControllerStatus.TemperatureOptimizationShift.toString());
+		assertEquals("temperature optimization shift", t.getValue());
+	}
+
+	@Test
 	void getAllValues() throws KNXFormatException {
 		assertEquals(1, t.getAllValues().length);
 		assertEquals("Cooling Mode", t.getAllValues()[0]);
@@ -110,7 +134,7 @@ class DptXlator16BitSetTest {
 	@Test
 	void implementedSubTypes() {
 		final Map<String, DPT> subTypes = t.getSubTypes();
-		assertEquals(2, subTypes.size());
+		assertEquals(4, subTypes.size());
 	}
 
 	@Test
