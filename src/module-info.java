@@ -70,7 +70,8 @@ module io.calimero.core {
 	exports io.calimero.internal to
 		io.calimero.device,
 		io.calimero.server,
-		io.calimero.usb;
+		io.calimero.gui,
+		io.calimero.usb.provider;
 
 	opens io.calimero.link to
 		io.calimero.device; // AbstractLink.conn
