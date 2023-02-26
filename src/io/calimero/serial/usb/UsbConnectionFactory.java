@@ -37,6 +37,8 @@
 package io.calimero.serial.usb;
 
 import java.io.IOException;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import io.calimero.KNXException;
 import io.calimero.serial.ConnectionFactory;
@@ -64,5 +66,10 @@ public final class UsbConnectionFactory {
 		catch (final IOException e) {
 			throw new KNXException(String.format("open USB connection %s", device), e);
 		}
+	}
+
+	public static Set<Device> attachedKnxUsbDevices() {
+		return factory.providers().map(UsbConnectionProvider::attachedKnxUsbDevices).flatMap(Set::stream)
+				.collect(Collectors.toSet());
 	}
 }

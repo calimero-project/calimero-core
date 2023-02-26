@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2022, 2023 B. Malinowsky
+    Copyright (c) 2023, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,19 +34,44 @@
     version.
 */
 
-package io.calimero.serial.usb.spi;
+package io.calimero.serial.usb;
 
-import java.util.Set;
+import java.util.Objects;
+import java.util.StringJoiner;
 
-import io.calimero.KNXException;
-import io.calimero.serial.usb.Device;
-import io.calimero.serial.usb.UsbConnection;
+/**
+ * Provides vendor:product identification and descriptors of a USB device.
+ *
+ * @param vendorId vendor ID, 0 if not set
+ * @param productId product ID, 0 if not set
+ * @param serialNumber device serial number (optional), "" if not set
+ * @param manufacturer manufacturer description (optional), "" if not set
+ * @param product product description (optional), "" if not set
+ */
+public record Device(int vendorId, int productId, String serialNumber, String manufacturer, String product) {
+	public Device {
+		Objects.requireNonNull(serialNumber);
+		Objects.requireNonNull(manufacturer);
+		Objects.requireNonNull(product);
+	}
 
-public interface UsbConnectionProvider {
+	public Device(final int vendorId, final int productId) {
+		this(vendorId, productId, "", "", "");
+	}
 
-	UsbConnection open(int vendorId, int productId) throws KNXException;
+	public Device(final String serialNumber) {
+		this(0, 0, serialNumber, "", "");
+	}
 
-	UsbConnection open(String device) throws KNXException;
-
-	Set<Device> attachedKnxUsbDevices();
+	@Override
+	public String toString() {
+		var joiner = new StringJoiner(" ").add(String.format("%04x:%04x", vendorId, productId));
+		if (!manufacturer.isEmpty())
+			joiner.add(manufacturer);
+		if (!product.isEmpty())
+			joiner.add(product);
+		if (!serialNumber.isEmpty())
+			joiner.add("S/N").add(serialNumber);
+		return joiner.toString();
+	}
 }
