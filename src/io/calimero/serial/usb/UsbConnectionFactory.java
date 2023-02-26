@@ -50,12 +50,12 @@ public final class UsbConnectionFactory {
 
 	private UsbConnectionFactory() {}
 
-	public static UsbConnection open(final int vendorId, final int productId) throws KNXException {
+	public static UsbConnection open(Device device) throws KNXException {
 		try {
-			return factory.open(p -> p.open(vendorId, productId));
+			return factory.open(p -> p.open(device));
 		}
 		catch (final IOException e) {
-			throw new KNXException(String.format("open USB connection %s:%s", vendorId, productId), e);
+			throw new KNXException(String.format("open USB connection %s", device), e);
 		}
 	}
 
