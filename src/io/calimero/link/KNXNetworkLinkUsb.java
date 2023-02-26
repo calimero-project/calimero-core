@@ -61,6 +61,7 @@ import io.calimero.link.medium.KNXMediumSettings;
 import io.calimero.serial.ConnectionEvent;
 import io.calimero.serial.ConnectionStatus;
 import io.calimero.serial.KNXPortClosedException;
+import io.calimero.serial.usb.Device;
 import io.calimero.serial.usb.UsbConnection;
 import io.calimero.serial.usb.UsbConnectionFactory;
 
@@ -91,7 +92,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 	public KNXNetworkLinkUsb(final int vendorId, final int productId,
 		final KNXMediumSettings settings) throws KNXException, InterruptedException
 	{
-		this(UsbConnectionFactory.open(vendorId, productId), settings);
+		this(UsbConnectionFactory.open(new Device(vendorId, productId)), settings);
 	}
 
 	/**

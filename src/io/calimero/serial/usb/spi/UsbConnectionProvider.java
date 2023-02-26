@@ -44,7 +44,7 @@ import io.calimero.serial.usb.UsbConnection;
 
 public interface UsbConnectionProvider {
 
-	UsbConnection open(int vendorId, int productId) throws KNXException;
+	UsbConnection open(Device device) throws KNXException;
 
 	UsbConnection open(String device) throws KNXException;
 
