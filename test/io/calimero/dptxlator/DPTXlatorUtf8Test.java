@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2022 B. Malinowsky
+    Copyright (c) 2015, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,10 +37,10 @@
 package io.calimero.dptxlator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Assertions;
@@ -88,21 +88,21 @@ class DPTXlatorUtf8Test
 		data2[3] = (byte) 't';
 		data2[4] = (byte) '2';
 
-		final byte[] nonAsciiBytes = nonASCII.getBytes("utf-8");
-		final byte[] nonLatinBytes = nonLatin.getBytes("utf-8");
+		final byte[] nonAsciiBytes = nonASCII.getBytes(StandardCharsets.UTF_8);
+		final byte[] nonLatinBytes = nonLatin.getBytes(StandardCharsets.UTF_8);
 		final int nonAsciiLength = nonAsciiBytes.length;
 		final int nonLatinLength = nonLatinBytes.length;
 		data = new byte[data1.length + data2.length + nonAsciiLength + nonLatinLength + 2];
 		int k = 0;
-		for (int i = 0; i < data1.length; ++i)
-			data[k++] = data1[i];
-		for (int i = 0; i < data2.length; ++i)
-			data[k++] = data2[i];
-		for (int i = 0; i < nonAsciiLength; ++i)
-			data[k++] = nonAsciiBytes[i];
+		for (final byte value : data1)
+			data[k++] = value;
+		for (final byte b : data2)
+			data[k++] = b;
+		for (final byte nonAsciiByte : nonAsciiBytes)
+			data[k++] = nonAsciiByte;
 		data[k++] = 0;
-		for (int i = 0; i < nonLatinLength; ++i)
-			data[k++] = nonLatinBytes[i];
+		for (final byte nonLatinByte : nonLatinBytes)
+			data[k++] = nonLatinByte;
 		data[k++] = 0;
 	}
 
@@ -140,20 +140,20 @@ class DPTXlatorUtf8Test
 		catch (final KNXIllegalArgumentException e) {
 			// ok
 		}
-		assertTrue(Arrays.equals(data, t.getData()));
+        Assertions.assertArrayEquals(data, t.getData());
 		final byte[] dataOffset = new byte[9];
 		System.arraycopy(data1, 0, dataOffset, 3, data1.length);
 		t.setData(dataOffset, 3);
 		byte[] d = t.getData();
 		assertEquals(6, d.length);
-		assertTrue(Arrays.equals(data1, d));
+        Assertions.assertArrayEquals(data1, d);
 
 		final byte[] array = new byte[data.length + 1];
 		System.arraycopy(data, 0, array, 1, data.length);
 		t.setData(array, 1);
 		d = t.getData();
 		assertEquals(data.length, d.length);
-		assertTrue(Arrays.equals(data, d));
+        Assertions.assertArrayEquals(data, d);
 		assertEquals(4, t.getItems());
 		assertArrayEquals(strings, t.getAllValues());
 	}
@@ -166,9 +166,9 @@ class DPTXlatorUtf8Test
 		final String greek = "ΕΘΨθψϘϨϸ";
 		final String[] values = new String[] { signs, german, greek };
 		t.setValues(values);
-		final byte[] utfdata = signs.getBytes("utf-8");
-		final byte[] utfdata2 = german.getBytes("utf-8");
-		final byte[] utfdata3 = greek.getBytes("utf-8");
+		final byte[] utfdata = signs.getBytes(StandardCharsets.UTF_8);
+		final byte[] utfdata2 = german.getBytes(StandardCharsets.UTF_8);
+		final byte[] utfdata3 = greek.getBytes(StandardCharsets.UTF_8);
 		final byte[] data = new byte[utfdata.length + utfdata2.length + utfdata3.length + 3];
 		System.arraycopy(utfdata, 0, data, 0, utfdata.length);
 		System.arraycopy(utfdata2, 0, data, utfdata.length + 1, utfdata2.length);
@@ -177,7 +177,7 @@ class DPTXlatorUtf8Test
 		Assertions.assertArrayEquals(data, t.getData());
 		assertArrayEquals(values, t.getAllValues());
 
-		t.setValues(new String[0]);
+		t.setValues();
 		Assertions.assertArrayEquals(data, t.getData());
 	}
 
@@ -198,7 +198,7 @@ class DPTXlatorUtf8Test
 	{
 		assertEquals(25, t.getData(new byte[25], 4).length);
 		final byte[] buf = new byte[20];
-		assertTrue(Arrays.equals(buf, t.getData(new byte[20], 3)));
+        Assertions.assertArrayEquals(buf, t.getData(new byte[20], 3));
 
 		t.setData(data);
 		final byte[] d = new byte[45];

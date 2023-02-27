@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2022 B. Malinowsky
+    Copyright (c) 2015, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,7 +39,6 @@ package io.calimero.knxnetip.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -116,8 +115,7 @@ public final class KnxAddressesDIB extends DIB
 	{
 		final byte[] buf = super.toByteArray();
 		int i = 2;
-		for (final Iterator<IndividualAddress> it = addresses.iterator(); it.hasNext();) {
-			final IndividualAddress ia = it.next();
+		for (final IndividualAddress ia : addresses) {
 			final byte[] raw = ia.toByteArray();
 			buf[i++] = raw[0];
 			buf[i++] = raw[1];

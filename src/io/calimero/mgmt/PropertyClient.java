@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -292,7 +291,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		public int compareTo(final PropertyKey o)
 		{
 			final int rhs = o.hashCode();
-			return hashCode() < rhs ? -1 : hashCode() > rhs ? 1 : 0;
+			return Integer.compare(hashCode(), rhs);
 		}
 
 		@Override
@@ -530,10 +529,9 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 */
 	public void addDefinitions(final Collection<Property> definitions)
 	{
-		for (final Iterator<Property> i = definitions.iterator(); i.hasNext();) {
-			final Property p = i.next();
-			properties.put(new PropertyKey(p.objType, p.id), p);
-		}
+        for (final Property p : definitions) {
+            properties.put(new PropertyKey(p.objType, p.id), p);
+        }
 	}
 
 	/**
@@ -731,11 +729,10 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 
 	private int getObjectType(final int objIndex, final boolean queryObject) throws KNXException, InterruptedException
 	{
-		for (final Iterator<Pair> i = objectTypes.iterator(); i.hasNext();) {
-			final Pair p = i.next();
-			if (p.oindex == objIndex)
-				return p.otype;
-		}
+        for (final Pair p : objectTypes) {
+            if (p.oindex == objIndex)
+                return p.otype;
+        }
 		if (queryObject)
 			return queryObjectType(objIndex);
 		throw new KNXException("couldn't deduce object type");
@@ -876,31 +873,30 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 			writer.writeStartElement(PROPDEFS_TAG);
 			final int noType = -2;
 			int objType = noType;
-			for (final Iterator<Property> i = definitions.iterator(); i.hasNext();) {
-				final Property p = i.next();
-				if (p.objType != objType) {
-					if (objType != noType)
-						writer.writeEndElement();
-					objType = p.objType;
-					writer.writeStartElement(OBJECT_TAG);
-					writer.writeAttribute(OBJECTTYPE_ATTR, objType == -1 ? "global"
-							: Integer.toString(objType));
-				}
-				// property attributes
-				writer.writeStartElement(PROPERTY_TAG);
-				writer.writeAttribute(PID_ATTR, Integer.toString(p.id));
-				writer.writeAttribute(PIDNAME_ATTR, p.name);
-				writer.writeAttribute(NAME_ATTR, p.propName);
-				writer.writeAttribute(PDT_ATTR, p.pdt == -1 ? "<tbd>" : Integer.toString(p.pdt));
-				if (p.dpt != null && p.dpt.length() > 0)
-					writer.writeAttribute(DPT_ATTR, p.dpt);
-				writer.writeAttribute(RW_ATTR, String.format("%d/%d", p.read, p.write));
-				writer.writeAttribute(WRITE_ATTR, p.readOnly() ? "0" : "1");
-				// write property
-				writer.writeStartElement(USAGE_TAG);
-				writer.writeEndElement();
-				writer.writeEndElement();
-			}
+            for (final Property p : definitions) {
+                if (p.objType != objType) {
+                    if (objType != noType)
+                        writer.writeEndElement();
+                    objType = p.objType;
+                    writer.writeStartElement(OBJECT_TAG);
+                    writer.writeAttribute(OBJECTTYPE_ATTR, objType == -1 ? "global"
+                            : Integer.toString(objType));
+                }
+                // property attributes
+                writer.writeStartElement(PROPERTY_TAG);
+                writer.writeAttribute(PID_ATTR, Integer.toString(p.id));
+                writer.writeAttribute(PIDNAME_ATTR, p.name);
+                writer.writeAttribute(NAME_ATTR, p.propName);
+                writer.writeAttribute(PDT_ATTR, p.pdt == -1 ? "<tbd>" : Integer.toString(p.pdt));
+                if (p.dpt != null && p.dpt.length() > 0)
+                    writer.writeAttribute(DPT_ATTR, p.dpt);
+                writer.writeAttribute(RW_ATTR, String.format("%d/%d", p.read, p.write));
+                writer.writeAttribute(WRITE_ATTR, p.readOnly() ? "0" : "1");
+                // write property
+                writer.writeStartElement(USAGE_TAG);
+                writer.writeEndElement();
+                writer.writeEndElement();
+            }
 			writer.writeEndElement();
 		}
 
@@ -956,7 +952,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 				if (s != null) {
 					if (s.equals("<tbd>") || s.equals("-"))
 						return -1;
-					return s.length() == 0 ? 0 : Integer.decode(s).intValue();
+					return s.length() == 0 ? 0 : Integer.decode(s);
 				}
 			}
 			catch (final NumberFormatException e) {}

@@ -1,7 +1,7 @@
 /*
     Calimero 2 - A library for KNX network access
     Copyright (c) 2005 B. Erb
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ import io.calimero.knxnetip.util.HPAI;
 /**
  * Represents a KNXnet/IP description request.
  * <p>
- * A request for self description is mainly used by a client after discovery of a new
+ * A request for self-description is mainly used by a client after discovery of a new
  * remote device endpoint. It is sent to the control endpoint of the server device. The
  * counterpart to this request is the description response.
  * <p>

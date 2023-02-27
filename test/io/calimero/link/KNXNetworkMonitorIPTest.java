@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -110,8 +110,7 @@ class KNXNetworkMonitorIPTest
 	}
 
 	@AfterEach
-	void tearDown() throws Exception
-	{
+	void tearDown() {
 		if (mon != null)
 			mon.close();
 	}
@@ -182,11 +181,11 @@ class KNXNetworkMonitorIPTest
 	void getName()
 	{
 		String n = mon.getName();
-		assertTrue(n.indexOf(Util.getServer().getAddress().getHostAddress()) > -1);
-		assertTrue(n.indexOf("monitor") > -1);
+		assertTrue(n.contains(Util.getServer().getAddress().getHostAddress()));
+		assertTrue(n.contains("monitor"));
 		mon.close();
 		n = mon.getName();
 		assertNotNull(n);
-		assertTrue(n.indexOf("monitor") > -1);
+		assertTrue(n.contains("monitor"));
 	}
 }

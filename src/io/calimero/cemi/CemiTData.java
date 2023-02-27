@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2022 B. Malinowsky
+    Copyright (c) 2019, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import io.calimero.DataUnitBuilder;
@@ -171,7 +172,7 @@ public class CemiTData implements CEMI {
 	private void writeAddInfo(final ByteArrayOutputStream os) {
 		synchronized (additionalInfo) {
 			os.write(additionalInfoLength());
-			additionalInfo.sort((lhs, rhs) -> lhs.type() - rhs.type());
+			additionalInfo.sort(Comparator.comparingInt(AdditionalInfo::type));
 			for (final AdditionalInfo info : additionalInfo) {
 				os.write(info.type());
 				os.write(info.info().length);

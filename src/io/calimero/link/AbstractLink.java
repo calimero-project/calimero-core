@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2022 B. Malinowsky
+    Copyright (c) 2015, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -232,7 +232,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 			}
 			super.connectionClosed(e);
 		}
-	};
+	}
 
 	/**
 	 * @param connection if not {@code null}, the link object will close this resource as last
@@ -404,7 +404,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 
 	/**
 	 * Implement with the connection/medium-specific protocol send primitive. Sends the message
-	 * supplied as byte array over the link. In case a L-Data confirmation is requested, the message
+	 * supplied as byte array over the link. In case an L-Data confirmation is requested, the message
 	 * send is only successful if the corresponding confirmation is received.
 	 *
 	 * @param dst for logging purposes only: the KNX destination address, or {@code null}
@@ -419,7 +419,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 
 	/**
 	 * Implement with the connection/medium-specific protocol send primitive. Sends the message
-	 * supplied in cEMI L-Data format over the link. In case a L-Data confirmation is requested, the
+	 * supplied in cEMI L-Data format over the link. In case an L-Data confirmation is requested, the
 	 * message send is only successful if the corresponding confirmation is received.
 	 *
 	 * @param msg the message to send

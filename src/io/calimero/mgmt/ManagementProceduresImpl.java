@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2022 B. Malinowsky
+    Copyright (c) 2010, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -191,7 +190,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 
 		@Override
 		public void linkClosed(final CloseEvent e) {}
-	};
+	}
 
 	/**
 	 * Creates a new management procedures instance, using the supplied KNX network link.
@@ -686,8 +685,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		setAddress(write, 2, dataBlockStartAddress);
 		setAddress(write, 6, startAddress);
 		setAddress(write, 10, endAddress);
-		for (int i = 0; i < data.length; ++i)
-			write[offset + i] = data[i];
+		System.arraycopy(data, 0, write, 14, data.length);
 
 		// write memory in chunks matching the maximum asdu length of the device
 		final int asduLength = readMaxAsduLength(d);
@@ -849,27 +847,25 @@ public class ManagementProceduresImpl implements ManagementProcedures
 
 		final List<Destination> destinations = new ArrayList<>();
 		try {
-			for (final Iterator<IndividualAddress> i = addresses.iterator(); i.hasNext();) {
-				final IndividualAddress remote = i.next();
-				final Destination d = getOrCreateDestination(remote, true, false);
-				destinations.add(d);
-				tl.connect(d);
-				// increased from 100 (the default) to minimize chance of overflow over FT1.2
-				waitFor(115);
-			}
+            for (final IndividualAddress remote : addresses) {
+                final Destination d = getOrCreateDestination(remote, true, false);
+                destinations.add(d);
+                tl.connect(d);
+                // increased from 100 (the default) to minimize chance of overflow over FT1.2
+                waitFor(115);
+            }
 			// we wait in total (115 + 6000 + 1000 + 100) ms for a possible T-disconnect, taking
 			// into account the KNXnet/IP tunneling.req retransmit timeout plus some network delay
 			waitFor(disconnectTimeout + 1100);
 		}
 		finally {
 			tl.removeTransportListener(tll);
-			for (final Iterator<Destination> i = destinations.iterator(); i.hasNext();) {
-				final Destination d = i.next();
-				tl.destroyDestination(d);
-			}
+            for (final Destination d : destinations) {
+                tl.destroyDestination(d);
+            }
 		}
 		final IndividualAddress[] array = devices
-				.toArray(new IndividualAddress[devices.size()]);
+				.toArray(new IndividualAddress[0]);
 		return array;
 	}
 

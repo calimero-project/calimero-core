@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2013, 2022 B. Malinowsky
+    Copyright (c) 2013, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,10 +36,6 @@
 
 package io.calimero.dptxlator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -47,6 +43,8 @@ import org.junit.jupiter.api.Test;
 
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class DPTXlatorSceneNumberTest
@@ -70,8 +68,8 @@ class DPTXlatorSceneNumberTest
 	private final byte[] dataValue2 = { 0, 0, (byte) 30, };
 	private final byte[] data = { (byte) 63, 34, 0, (byte) 30, };
 
-	DPT sc = DPTXlatorSceneNumber.DPT_SCENE_NUMBER;
-	DPT[] dpts = { DPTXlatorSceneNumber.DPT_SCENE_NUMBER };
+	final DPT sc = DPTXlatorSceneNumber.DPT_SCENE_NUMBER;
+	final DPT[] dpts = { DPTXlatorSceneNumber.DPT_SCENE_NUMBER };
 
 
 	@BeforeEach
@@ -87,7 +85,7 @@ class DPTXlatorSceneNumberTest
 		assertEquals(strings.length, t.getItems());
 		Helper.assertSimilar(strings, t.getAllValues());
 
-		t.setValues(new String[0]);
+		t.setValues();
 		assertEquals(strings.length, t.getItems());
 		Helper.assertSimilar(strings, t.getAllValues());
 
@@ -96,7 +94,7 @@ class DPTXlatorSceneNumberTest
 		assertEquals(s.length, t.getItems());
 		Helper.assertSimilar(s, t.getAllValues());
 
-		t.setValues(new String[] { t.getValue(), t.getValue() });
+		t.setValues(t.getValue(), t.getValue());
 	}
 
 	@Test
@@ -126,12 +124,11 @@ class DPTXlatorSceneNumberTest
 		Helper.assertSimilar(value1, t.getValue());
 		assertEquals(s, t.getValue());
 
-		for (int i = 0; i < invalidStrings.length; i++) {
+		for (String invalidString : invalidStrings) {
 			try {
-				t.setValue(invalidStrings[i]);
-				fail("should not succeed: " + invalidStrings[i]);
-			}
-			catch (final Exception e) {
+				t.setValue(invalidString);
+				fail("should not succeed: " + invalidString);
+			} catch (final Exception e) {
 				// fine
 			}
 		}
@@ -141,7 +138,7 @@ class DPTXlatorSceneNumberTest
 	void getValue() throws KNXFormatException
 	{
 		Helper.assertSimilar("0", t.getValue());
-		t.setValues(new String[0]);
+		t.setValues();
 		Helper.assertSimilar("0", t.getValue());
 		t.setValue(strings[0]);
 		Helper.assertSimilar(strings[0], t.getValue());
@@ -160,7 +157,7 @@ class DPTXlatorSceneNumberTest
 			fail("should throw");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-		assertTrue(Arrays.equals(dataMax, t.getData()));
+        assertArrayEquals(dataMax, t.getData());
 		t.setData(dataValue2, 2);
 		byte[] d = t.getData();
 		assertEquals(1, d.length);
@@ -171,7 +168,7 @@ class DPTXlatorSceneNumberTest
 		t.setData(array, 1);
 		d = t.getData();
 		assertEquals(data.length, d.length);
-		assertTrue(Arrays.equals(data, d));
+        assertArrayEquals(data, d);
 		Helper.assertSimilar(strings, t.getAllValues());
 	}
 
@@ -180,7 +177,7 @@ class DPTXlatorSceneNumberTest
 	{
 		assertEquals(2, t.getData(new byte[2], 1).length);
 		final byte[] empty = new byte[2];
-		assertTrue(Arrays.equals(empty, t.getData(new byte[2], 1)));
+        assertArrayEquals(empty, t.getData(new byte[2], 1));
 
 		t.setData(data);
 		byte[] d = new byte[10];

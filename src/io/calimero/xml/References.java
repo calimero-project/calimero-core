@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -90,7 +90,7 @@ final class References
 				break;
 			final String entity = map.get(text.substring(pos, end + 1));
 			if (entity != null) {
-				mod.append(text.substring(oldpos, pos));
+				mod.append(text, oldpos, pos);
 				mod.append(entity);
 				oldpos = end + 1;
 				pos = end;

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,10 +36,6 @@
 
 package io.calimero.dptxlator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.text.DecimalFormat;
 import java.util.Arrays;
 
@@ -48,6 +44,8 @@ import org.junit.jupiter.api.Test;
 
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class DPTXlator8BitUnsignedTest
@@ -93,7 +91,7 @@ class DPTXlator8BitUnsignedTest
 		assertEquals(strings.length, t.getItems());
 		Helper.assertSimilar(strings, t.getAllValues());
 
-		t.setValues(new String[0]);
+		t.setValues();
 		assertEquals(strings.length, t.getItems());
 		Helper.assertSimilar(strings, t.getAllValues());
 
@@ -102,7 +100,7 @@ class DPTXlator8BitUnsignedTest
 		assertEquals(s.length, t.getItems());
 		Helper.assertSimilar(s, t.getAllValues());
 
-		t.setValues(new String[] { t.getValue(), t.getValue() });
+		t.setValues(t.getValue(), t.getValue());
 	}
 
 	@Test
@@ -136,7 +134,7 @@ class DPTXlator8BitUnsignedTest
 	void getValue() throws KNXFormatException
 	{
 		Helper.assertSimilar("0", t.getValue());
-		t.setValues(new String[0]);
+		t.setValues();
 		Helper.assertSimilar("0", t.getValue());
 		t.setValue(values[0]);
 		Helper.assertSimilar(strings[0], t.getValue());
@@ -155,7 +153,7 @@ class DPTXlator8BitUnsignedTest
 			fail("should throw");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-		assertTrue(Arrays.equals(dataMax, t.getData()));
+        assertArrayEquals(dataMax, t.getData());
 		t.setData(dataValue2, 2);
 		byte[] d = t.getData();
 		assertEquals(1, d.length);
@@ -166,7 +164,7 @@ class DPTXlator8BitUnsignedTest
 		t.setData(array, 1);
 		d = t.getData();
 		assertEquals(data.length, d.length);
-		assertTrue(Arrays.equals(data, d));
+        assertArrayEquals(data, d);
 		Helper.assertSimilar(stringsRaw, t.getAllValues());
 	}
 
@@ -175,7 +173,7 @@ class DPTXlator8BitUnsignedTest
 	{
 		assertEquals(2, t.getData(new byte[2], 1).length);
 		final byte[] empty = new byte[2];
-		assertTrue(Arrays.equals(empty, t.getData(new byte[2], 1)));
+        assertArrayEquals(empty, t.getData(new byte[2], 1));
 
 		t.setData(data);
 		byte[] d = new byte[10];
@@ -251,10 +249,10 @@ class DPTXlator8BitUnsignedTest
 		assertEquals(255, t.getValueUnscaled());
 		t.setData(dataMin);
 		assertEquals(0, t.getValueUnscaled());
-		for (int i = 0; i < values.length; i++) {
-			t.setValue(values[i]);
-			assertEquals(values[i], t.getValueUnscaled());
-		}
+        for (int value : values) {
+            t.setValue(value);
+            assertEquals(value, t.getValueUnscaled());
+        }
 		final DPTXlator8BitUnsigned tscaled = new DPTXlator8BitUnsigned(dpts[0]);
 		tscaled.setValue(maxScale);
 		assertEquals(100, tscaled.getValueUnsigned());
@@ -287,12 +285,12 @@ class DPTXlator8BitUnsignedTest
 	@Test
 	void setValueInt() throws KNXFormatException
 	{
-		for (int i = 0; i < dpts.length; i++) {
-			setValueIntFail(new DPTXlator8BitUnsigned(dpts[i]), Integer.parseInt(dpts[i]
-				.getLowerValue()) - 1);
-			setValueIntFail(new DPTXlator8BitUnsigned(dpts[i]), Integer.parseInt(dpts[i]
-				.getUpperValue()) + 1);
-		}
+        for (DPT dpt : dpts) {
+            setValueIntFail(new DPTXlator8BitUnsigned(dpt), Integer.parseInt(dpt
+                    .getLowerValue()) - 1);
+            setValueIntFail(new DPTXlator8BitUnsigned(dpt), Integer.parseInt(dpt
+                    .getUpperValue()) + 1);
+        }
 	}
 
 	private void setValueIntFail(final DPTXlator8BitUnsigned tr, final int v)
@@ -312,10 +310,10 @@ class DPTXlator8BitUnsignedTest
 		t.setValueUnscaled(0);
 		assertEquals(1, t.getItems());
 
-		for (int i = 0; i < valuesRaw.length; i++) {
-			t.setValueUnscaled(valuesRaw[i]);
-			assertEquals(valuesRaw[i], t.getValueUnscaled());
-		}
+        for (int j : valuesRaw) {
+            t.setValueUnscaled(j);
+            assertEquals(j, t.getValueUnscaled());
+        }
 
 		final DPTXlator8BitUnsigned tscaled = new DPTXlator8BitUnsigned(dpts[0]);
 		tscaled.setValueUnscaled(255);

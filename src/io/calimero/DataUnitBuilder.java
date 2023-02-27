@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -167,8 +167,7 @@ public final class DataUnitBuilder
 		final byte[] apdu = new byte[2 + asdu.length];
 		apdu[0] = (byte) ((service >> 8) & 0x03);
 		apdu[1] |= (byte) service;
-		for (int i = 0; i < asdu.length; ++i)
-			apdu[i + 2] = asdu[i];
+		System.arraycopy(asdu, 0, apdu, 2, asdu.length);
 		return apdu;
 	}
 
@@ -193,8 +192,7 @@ public final class DataUnitBuilder
 		if (asdu != null && asdu.length > 0) {
 			// maximum of 6 bits in asdu[0] are valid
 			apdu[1] |= asdu[0] & 0x3F;
-			for (int i = 1; i < asdu.length; ++i)
-				apdu[i + 1] = asdu[i];
+			System.arraycopy(asdu, 1, apdu, 2, asdu.length - 1);
 		}
 		return apdu;
 	}
@@ -258,8 +256,7 @@ public final class DataUnitBuilder
 			mask = 0x3f;
 		}
 		final byte[] asdu = new byte[apdu.length - offset];
-		for (int i = 0; i < asdu.length; ++i)
-			asdu[i] = apdu[offset + i];
+		System.arraycopy(apdu, offset + 0, asdu, 0, asdu.length);
 
 		// some ASDUs have length 0, e.g., DoA.read
 		if (asdu.length > 0)

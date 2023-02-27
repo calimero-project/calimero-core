@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2022 B. Malinowsky
+    Copyright (c) 2015, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -278,7 +278,7 @@ public interface DeviceDescriptor
 		}
 
 		/**
-		 * @return the device profile name as human readable string
+		 * @return the device profile name as human-readable string
 		 */
 		public String deviceProfile()
 		{
@@ -395,9 +395,9 @@ public interface DeviceDescriptor
 
 		public enum Channel {
 			Channel1, Channel2, Channel3, Channel4
-		};
+		}
 
-		/**
+        /**
 		 * The number of channels implemented in the device for the specified channel type.
 		 *
 		 * @param channelType the requested channel type

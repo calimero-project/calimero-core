@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -573,9 +573,8 @@ public class Discoverer
 	public final void stopSearch()
 	{
 		final ReceiverLoop[] loopers = receivers
-				.toArray(new ReceiverLoop[receivers.size()]);
-		for (int i = 0; i < loopers.length; i++) {
-			final ReceiverLoop loop = loopers[i];
+				.toArray(new ReceiverLoop[0]);
+		for (final ReceiverLoop loop : loopers) {
 			loop.quit();
 		}
 		receivers.removeAll(Arrays.asList(loopers));

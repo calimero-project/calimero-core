@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class ExpiringCacheTest {
-	private class ExpCacheImpl extends ExpiringCache {
+	private static class ExpCacheImpl extends ExpiringCache {
 		boolean notified;
 		boolean remove;
 		int count;
@@ -113,12 +113,12 @@ class ExpiringCacheTest {
 
 
 	@BeforeEach
-	void init() throws Exception {
+	void init() {
 		c = new ExpCacheImpl(1);
 	}
 
 	@AfterEach
-	void tearDown() throws Exception {
+	void tearDown() {
 		c.myStopSweeper();
 	}
 

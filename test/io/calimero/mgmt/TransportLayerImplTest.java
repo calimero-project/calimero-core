@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ class TransportLayerImplTest
 
 	// device descriptor read
 	private final int devDescRead = 0x300;
-	private final byte[] tsduDescRead = new byte[] { (byte) (devDescRead >> 8), (byte) (devDescRead | 0) };
+	private final byte[] tsduDescRead = new byte[] { (byte) (devDescRead >> 8), (byte) (devDescRead) };
 
 	private final class TLListener implements TransportListener
 	{
@@ -161,7 +161,7 @@ class TransportLayerImplTest
 		{
 			detached = true;
 		}
-	};
+	}
 
 	@BeforeEach
 	void init() throws Exception
@@ -175,8 +175,7 @@ class TransportLayerImplTest
 	}
 
 	@AfterEach
-	void tearDown() throws Exception
-	{
+	void tearDown() {
 		if (tl != null) {
 			tl.detach();
 		}
@@ -342,12 +341,12 @@ class TransportLayerImplTest
 	void getName()
 	{
 		String n = tl.getName();
-		assertTrue(n.indexOf(nl.getName()) > -1);
-		assertTrue(n.indexOf("TL") > -1);
+		assertTrue(n.contains(nl.getName()));
+		assertTrue(n.contains("TL"));
 		tl.detach();
 		n = tl.getName();
 		assertNotNull(n);
-		assertTrue(n.indexOf("TL") > -1);
+		assertTrue(n.contains("TL"));
 	}
 
 	@Test
@@ -392,7 +391,7 @@ class TransportLayerImplTest
 		}
 		catch (final KNXDisconnectException e) {}
 		Thread.sleep(100);
-		assertTrue(ltl.conn.size() == 0);
+        assertEquals(0, ltl.conn.size());
 	}
 
 	@Test

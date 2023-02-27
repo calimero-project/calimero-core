@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,7 +49,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Callable;
@@ -89,16 +88,14 @@ class DiscovererTest
 	private final int timeout = 3;
 
 	@BeforeEach
-	void init() throws Exception
-	{
+	void init() {
 		ddef = new Discoverer(0, false);
 		dnat = new Discoverer(0, true);
 		dmcast = new Discoverer(null, 0, false, true);
 	}
 
 	@AfterEach
-	void tearDown() throws Exception
-	{
+	void tearDown() {
 		if (ddef != null)
 			ddef.stopSearch();
 		if (dnat != null)
@@ -129,7 +126,7 @@ class DiscovererTest
 		ddef.startSearch(timeout, true);
 		assertTrue(ddef.getSearchResponses().size() > 0);
 		ddef.clearSearchResponses();
-		assertTrue(ddef.getSearchResponses().size() == 0);
+        assertEquals(0, ddef.getSearchResponses().size());
 	}
 
 	@Test
@@ -193,8 +190,7 @@ class DiscovererTest
 		d.startSearch(timeout, true);
 		final List<Result<SearchResponse>> search = d.getSearchResponses();
 		assertTrue(search.size() > 0);
-		for (final Iterator<Result<SearchResponse>> i = search.iterator(); i.hasNext();) {
-			final Result<SearchResponse> result = i.next();
+		for (final Result<SearchResponse> result : search) {
 			final SearchResponse response = result.getResponse();
 			assertNotNull(response);
 			assertNotNull(result.localEndpoint().getAddress());
@@ -240,8 +236,7 @@ class DiscovererTest
 		d.startSearch(40000, Util.localInterface(), timeout, true);
 		final List<Result<SearchResponse>> search = d.getSearchResponses();
 		assertTrue(search.size() > 0, "search results > 0");
-		for (final Iterator<Result<SearchResponse>> i = search.iterator(); i.hasNext();) {
-			final Result<SearchResponse> result = i.next();
+		for (final Result<SearchResponse> result : search) {
 			final SearchResponse response = result.getResponse();
 			assertNotNull(response);
 		}
@@ -359,7 +354,7 @@ class DiscovererTest
 	{
 		final Thread t = Thread.currentThread();
 		try {
-			Executor.scheduledExecutor().schedule((Runnable) t::interrupt, 1500, TimeUnit.MILLISECONDS);
+			Executor.scheduledExecutor().schedule(t::interrupt, 1500, TimeUnit.MILLISECONDS);
 			ddef.startSearch(5, true);
 		}
 		catch (final InterruptedException e) {
@@ -374,7 +369,7 @@ class DiscovererTest
 		final Duration timeout = Duration.ofSeconds(this.timeout);
 		final CompletableFuture<List<Result<SearchResponse>>> search = ddef.timeout(timeout).search();
 		final List<Result<SearchResponse>> result = search.get(timeout.toMillis() + 200, TimeUnit.MILLISECONDS);
-		assertTrue(!result.isEmpty());
+        assertFalse(result.isEmpty());
 	}
 
 	@Test
@@ -409,7 +404,7 @@ class DiscovererTest
 		final CompletableFuture<List<Result<SearchResponse>>> search = d.timeout(timeout).search();
 		Thread.sleep(1000);
 		search.cancel(false);
-		assertThrows(CancellationException.class, () -> search.get());
+		assertThrows(CancellationException.class, search::get);
 		assertTrue(search.isCompletedExceptionally());
 		assertTrue(search.isDone());
 		while (d.isSearching())

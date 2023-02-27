@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ package io.calimero.dptxlator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -110,15 +111,15 @@ class DPTXlatorDateTimeTest {
 
 	@Test
 	void setValues() throws KNXFormatException {
-		t.setValues(new String[0]);
-		assertTrue(t.getItems() == 1);
-		assertTrue(t.getValue().equals(def));
-		t.setValues(new String[] { value2, value3 });
-		assertTrue(t.getItems() == 2);
-		assertFalse(t.getValue().equals(def));
-		assertFalse(t.getAllValues()[1].equals(def));
+		t.setValues();
+        assertEquals(1, t.getItems());
+        assertEquals(t.getValue(), def);
+		t.setValues(value2, value3);
+        assertEquals(2, t.getItems());
+        assertNotEquals(t.getValue(), def);
+        assertNotEquals(t.getAllValues()[1], def);
 
-		t.setValues(new String[] { t.getValue(), t.getValue() });
+		t.setValues(t.getValue(), t.getValue());
 	}
 
 	@Test
@@ -143,7 +144,7 @@ class DPTXlatorDateTimeTest {
 	void setValue() throws KNXFormatException {
 		t.setValue(dateday);
 		assertEquals(t.getItems(), 1);
-		assertFalse(t.getValue().equals(def));
+        assertNotEquals(t.getValue(), def);
 	}
 
 	@Test
@@ -741,11 +742,11 @@ class DPTXlatorDateTimeTest {
 		assertTrue(t.validate());
 
 		if (useDaylightTime)
-			t.setValues(new String[] { "2002/12/31 23:59:59", "Sat, 2007/5/12 24:00:00 DST ", "2007/2/28 sync" });
+			t.setValues("2002/12/31 23:59:59", "Sat, 2007/5/12 24:00:00 DST ", "2007/2/28 sync");
 		else
-			t.setValues(new String[] { "2002/12/31 23:59:59", "Sat, 2007/5/12 24:00:00 ", "2007/2/28 sync" });
+			t.setValues("2002/12/31 23:59:59", "Sat, 2007/5/12 24:00:00 ", "2007/2/28 sync");
 		assertTrue(t.validate());
-		t.setValues(new String[] { "2002/12/31 23:59:59", "Sat, 2007/5/12 24:00:00 DST ", "2007/2/29" });
+		t.setValues("2002/12/31 23:59:59", "Sat, 2007/5/12 24:00:00 DST ", "2007/2/29");
 		assertFalse(t.validate());
 	}
 
@@ -766,12 +767,12 @@ class DPTXlatorDateTimeTest {
 	}
 
 	private void assertFind(final String text, final String[] find) {
-		for (int i = 0; i < find.length; ++i)
-			assertTrue(text.toLowerCase().indexOf(find[i].toLowerCase()) >= 0);
+		for (final String s : find)
+			assertTrue(text.toLowerCase().contains(s.toLowerCase()));
 	}
 
 	private void assertFindNot(final String text, final String[] find) {
-		for (int i = 0; i < find.length; ++i)
-			assertTrue(text.toLowerCase().indexOf(find[i].toLowerCase()) == -1);
+		for (final String s : find)
+			assertTrue(!text.toLowerCase().contains(s.toLowerCase()));
 	}
 }

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -430,8 +430,7 @@ public final class PropertyTypes
 				if (t != null)
 					return t.getSubTypes().get(dpt.getDPT()) != null;
 			}
-			catch (final NumberFormatException e) {}
-			catch (final KNXException e) {}
+			catch (final NumberFormatException | KNXException e) {}
 		return false;
 	}
 

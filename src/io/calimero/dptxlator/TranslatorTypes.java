@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,7 +43,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -460,15 +459,14 @@ public final class TranslatorTypes
 	public static List<MainType> getMainTypesBySize(final int typeSize)
 	{
 		final List<MainType> l = new ArrayList<>();
-		for (final Iterator<MainType> i = map.values().iterator(); i.hasNext();) {
-			final MainType type = i.next();
+		for (final MainType type : map.values()) {
 			try {
 				final String dptId = type.getSubTypes().keySet().iterator().next();
 				final int size = type.createTranslator(dptId).getTypeSize();
 				if (size == typeSize)
 					l.add(type);
+			} catch (final KNXException e) {
 			}
-			catch (final KNXException e) {}
 		}
 		return l;
 	}
@@ -519,8 +517,7 @@ public final class TranslatorTypes
 			if (t != null)
 				return t.getSubTypes().get(dptId) != null;
 		}
-		catch (final NumberFormatException e) {}
-		catch (final KNXException e) {}
+		catch (final NumberFormatException | KNXException e) {}
 		return false;
 	}
 

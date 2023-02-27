@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2022, 2022 B. Malinowsky
+    Copyright (c) 2022, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 package io.calimero.serial;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.ServiceLoader.Provider;
@@ -106,7 +107,7 @@ public final class ConnectionFactory<P, C> {
 				logger.debug("skip service provider {}: {}", provider.type().getName(), ex.getMessage());
 			}
 			return null;
-		}).filter(p -> p != null);
+		}).filter(Objects::nonNull);
 	}
 
 	private Stream<Provider<P>> providers(final boolean refresh) {

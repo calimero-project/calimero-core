@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2022 B. Malinowsky
+    Copyright (c) 2015, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,10 +36,6 @@
 
 package io.calimero.dptxlator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
@@ -50,6 +46,8 @@ import org.junit.jupiter.api.Test;
 import io.calimero.KNXFormatException;
 import io.calimero.dptxlator.DPTXlator8BitEnum.ApplicationArea;
 import io.calimero.dptxlator.DPTXlator8BitEnum.OccupancyMode;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class DPTXlator8BitEnumTest {
 	private DPTXlator8BitEnum t;
@@ -98,7 +96,7 @@ class DPTXlator8BitEnumTest {
 		// translator specific
 		assertEquals("no fault", t.getValue());
 		t.setValue(1);
-		assertFalse("no fault".equals(t.getValue()), "should not equal \"no fault\"");
+        assertNotEquals("no fault", t.getValue(), "should not equal \"no fault\"");
 
 		// try a enum with no 0 element
 		final DPTXlator8BitEnum x = new DPTXlator8BitEnum(DPTXlator8BitEnum.DptAlarmClassType);
@@ -159,7 +157,7 @@ class DPTXlator8BitEnumTest {
 		assertEquals(values[0], t.getValueUnsigned());
 
 		try {
-			t.setValues(new String[] { "xyz" });
+			t.setValues("xyz");
 			fail("element does not exist");
 		}
 		catch (final KNXFormatException expected) {}

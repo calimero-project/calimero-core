@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,8 +45,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Arrays;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -67,8 +65,7 @@ class CEMILDataExTest
 
 
 	@BeforeEach
-	void init() throws Exception
-	{
+	void init() {
 		f = new CEMILDataEx(CEMILData.MC_LDATA_REQ, src, dst, tpdu, Priority.LOW);
 		f.additionalInfo().add(AdditionalInfo.of(AdditionalInfo.PlMedium, plinfo));
 		f.additionalInfo().add(AdditionalInfo.of(AdditionalInfo.ExtendedTimestamp, extts));
@@ -123,11 +120,11 @@ class CEMILDataExTest
 		assertThrows(KNXIllegalArgumentException.class, () -> AdditionalInfo.of(AdditionalInfo.PlMedium, new byte[] { 1 }), "wrong length");
 
 		final byte[] getPL = f.getAdditionalInfo(AdditionalInfo.PlMedium);
-		assertTrue(Arrays.equals(plinfo, getPL));
+		assertArrayEquals(plinfo, getPL);
 		f.additionalInfo().removeIf(info -> info.type() == AdditionalInfo.ExtendedTimestamp);
 		f.additionalInfo().add(AdditionalInfo.of(AdditionalInfo.ExtendedTimestamp, new byte[] { 4, 4, 4, 4 }));
 		final byte[] getTS = f.getAdditionalInfo(AdditionalInfo.ExtendedTimestamp);
-		assertTrue(Arrays.equals(new byte[] { 4, 4, 4, 4 }, getTS));
+		assertArrayEquals(new byte[]{4, 4, 4, 4}, getTS);
 	}
 
 	@Test

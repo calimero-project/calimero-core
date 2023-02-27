@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,11 +37,11 @@
 package io.calimero.dptxlator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Arrays;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -89,12 +89,9 @@ class DPTXlatorStringTest
 		data2[3] = (byte) 't';
 		data2[4] = (byte) '2';
 
-		for (int i = 0; i < 14; ++i)
-			data[i] = data1[i];
-		for (int i = 14; i < 28; ++i)
-			data[i] = dataMax[i - 14];
-		for (int i = 28; i < 42; ++i)
-			data[i] = data2[i - 28];
+		System.arraycopy(data1, 0, data, 0, 14);
+		System.arraycopy(dataMax, 0, data, 14, 14);
+		System.arraycopy(data2, 0, data, 28, 14);
 	}
 
 	@Test
@@ -115,7 +112,7 @@ class DPTXlatorStringTest
 		assertArrayEquals(buf, ret);
 
 		try {
-			t.setValues(new String[] { "ok", "tooooooooo long" });
+			t.setValues("ok", "tooooooooo long");
 		}
 		catch (final KNXFormatException e) {}
 		assertArrayEquals(buf, t.getAllValues());
@@ -148,7 +145,7 @@ class DPTXlatorStringTest
 		assertEquals(s, t.getValue());
 		t.setValue(empty);
 		assertEquals(empty, t.getValue());
-		assertTrue(Arrays.equals(dataEmpty, t.getData()));
+		Assertions.assertArrayEquals(dataEmpty, t.getData());
 		t.setValue(max);
 		assertEquals(max, t.getValue());
 
@@ -165,7 +162,7 @@ class DPTXlatorStringTest
 		final byte[] expected =
 			{ (byte) 'a', (byte) 'b', (byte) '?', (byte) 'c', (byte) 'd', (byte) '?',
 				(byte) 'e', (byte) 'f', 0, 0, 0, 0, 0, 0 };
-		assertTrue(Arrays.equals(expected, nonAsciiData));
+		Assertions.assertArrayEquals(expected, nonAsciiData);
 
 		t.setValue(nonASCII);
 		assertEquals(nonASCII, t.getValue());
@@ -195,7 +192,7 @@ class DPTXlatorStringTest
 		catch (final KNXIllegalArgumentException e) {
 			// ok
 		}
-		assertTrue(Arrays.equals(data, t.getData()));
+		Assertions.assertArrayEquals(data, t.getData());
 		final byte[] dataOffset = new byte[28];
 		System.arraycopy(data1, 0, dataOffset, 3, data1.length);
 		try {
@@ -206,7 +203,7 @@ class DPTXlatorStringTest
 		t.setData(Arrays.copyOf(dataOffset, 17), 3);
 		byte[] d = t.getData();
 		assertEquals(14, d.length);
-		assertTrue(Arrays.equals(data1, d));
+		Assertions.assertArrayEquals(data1, d);
 
 		final byte[] array = new byte[data.length + 8];
 		System.arraycopy(data, 0, array, 1, data.length);
@@ -218,7 +215,7 @@ class DPTXlatorStringTest
 		t.setData(Arrays.copyOf(array, data.length + 1), 1);
 		d = t.getData();
 		assertEquals(data.length, d.length);
-		assertTrue(Arrays.equals(data, d));
+		Assertions.assertArrayEquals(data, d);
 		assertArrayEquals(strings, t.getAllValues());
 	}
 
@@ -227,7 +224,7 @@ class DPTXlatorStringTest
 	{
 		assertEquals(25, t.getData(new byte[25], 4).length);
 		final byte[] buf = new byte[20];
-		assertTrue(Arrays.equals(buf, t.getData(new byte[20], 3)));
+		Assertions.assertArrayEquals(buf, t.getData(new byte[20], 3));
 
 		t.setData(data);
 		byte[] d = new byte[45];

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -109,10 +109,10 @@ class CRBase
 			throw new KNXFormatException("buffer too short for " + (request ? "CRI" : "CRD"));
 		final int type = data[offset + 1] & 0xff;
 		if (type == KNXnetIPTunnel.TUNNEL_CONNECTION)
-			return request ? (CRBase) new TunnelCRI(data, offset) : new TunnelCRD(data, offset);
+			return request ? new TunnelCRI(data, offset) : new TunnelCRD(data, offset);
 		if (type != KNXnetIPDevMgmt.DEVICE_MGMT_CONNECTION && type != 0xf0)
 			logger.warn("unknown connection type 0x" + Integer.toHexString(type) + ", create default CRI/CRD");
-		return request ? (CRBase) new CRI(data, offset) : new CRD(data, offset);
+		return request ? new CRI(data, offset) : new CRD(data, offset);
 	}
 
 	// returns a CRI or CRD depending on request
@@ -120,10 +120,10 @@ class CRBase
 	{
 		final byte[] opt = data;
 		if (type == KNXnetIPTunnel.TUNNEL_CONNECTION)
-			return request ? (CRBase) new TunnelCRI(opt) : new TunnelCRD(opt);
+			return request ? new TunnelCRI(opt) : new TunnelCRD(opt);
 		if (type != KNXnetIPDevMgmt.DEVICE_MGMT_CONNECTION && type != 0xf0)
 			logger.warn("unknown connection type 0x" + Integer.toHexString(type) + ", create default CRI/CRD");
-		return request ? (CRBase) new CRI(type, opt.clone()) : new CRD(type, opt.clone());
+		return request ? new CRI(type, opt.clone()) : new CRD(type, opt.clone());
 	}
 
 	/**

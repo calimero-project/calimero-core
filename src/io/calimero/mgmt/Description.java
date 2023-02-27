@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -301,7 +301,7 @@ public final class Description
 	@Override
 	public String toString()
 	{
-		final String dptString = dpt.isPresent() ? " DPT " + dpt.get() : "";
+		final String dptString = dpt.map(s -> " DPT " + s).orElse("");
 		return "OT " + otype + " OI " + oindex + " PID " + id + " PI " + pindex + " PDT "
 				+ (pdt == -1 ? "-" : pdt) + dptString + ", " + currElems
 				+ " elements (max " + maxElems + "), r/w access " + rLevel + "/" + (wLevel == -1 ? "-" : wLevel)
@@ -332,8 +332,8 @@ public final class Description
 	static int parseCurrentElements(final byte[] data)
 	{
 		int elems = 0;
-		for (int i = 0; i < data.length; ++i)
-			elems = elems << 8 | (data[i] & 0xff);
+		for (final byte b : data)
+			elems = elems << 8 | (b & 0xff);
 		return elems;
 	}
 

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ public final class Debug
 		buf.append(", rep=" + f.isRepetition());
 		buf.append("L-data").append(Util.toHexDec(f.getPayload()));
 		buf.append("\ntoString(): ");
-		buf.append(f.toString());
+		buf.append(f);
 		buf.append(": ").append(DataUnitBuilder.decode(f.getPayload(), f.getDestination()));
 		print(buf);
 	}
@@ -94,7 +94,7 @@ public final class Debug
 		buf.append(", start=" + f.getStartIndex());
 		buf.append("DevMgmt-data").append(Util.toHexDec(f.getPayload()));
 		buf.append("\ntoString(): ");
-		buf.append(f.toString());
+		buf.append(f);
 		print(buf);
 	}
 
@@ -110,7 +110,7 @@ public final class Debug
 		buf.append(", parityerr=" + ind.getParityError());
 		buf.append("Mon-data").append(Util.toHexDec(ind.getPayload()));
 		buf.append("\ntoString(): ");
-		buf.append(ind.toString());
+		buf.append(ind);
 		print(buf);
 	}
 
@@ -170,7 +170,7 @@ public final class Debug
 				if (tp1 instanceof RawFrameBase)
 					Util.out("tpdu", ((TP1LData) tp1).getTPDU());
 				System.out.println();
-				System.out.print("toString: " + tp1.toString());
+				System.out.print("toString: " + tp1);
 				if (tp1 instanceof RawFrameBase)
 					System.out.println(": "
 							+ DataUnitBuilder.decode(((TP1LData) tp1).getTPDU(), ((TP1LData) tp1).getDestination()));

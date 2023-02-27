@@ -40,6 +40,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import io.calimero.GroupAddress;
@@ -98,7 +99,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	}
 
 	/**
-	 * Creates a L-Data message with most control information set to default values.
+	 * Creates an L-Data message with most control information set to default values.
 	 * <p>
 	 * The initialized message has send repetitions according to default medium behavior (for
 	 * indication message this equals "not repeated frame"), broadcast is "don't care", acknowledge
@@ -119,7 +120,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	}
 
 	/**
-	 * Creates a L-Data message, mainly for confirmation.
+	 * Creates an L-Data message, mainly for confirmation.
 	 * <p>
 	 * The message hop count is set to 6, send repetitions according to default medium behavior,
 	 * broadcast and acknowledge request are set to "don't care" in the control field.<br>
@@ -143,7 +144,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	}
 
 	/**
-	 * Creates a L-Data message with full customization for control information.
+	 * Creates an L-Data message with full customization for control information.
 	 * <p>
 	 * The confirmation flag of the control field is left out, since it is mutual exclusive with the
 	 * rest of the control information and set to "don't care" (refer to
@@ -185,7 +186,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	}
 
 	/**
-	 * Creates a L-Data message, mainly for TP1 media.
+	 * Creates an L-Data message, mainly for TP1 media.
 	 *
 	 * @param msgCode a message code value specified in the L-Data type
 	 * @param src individual address of source
@@ -317,7 +318,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 
 		final int svcStart = s.indexOf(' ');
 		final int split = s.indexOf(',');
-		buf.append(s.substring(svcStart, split + 1));
+		buf.append(s, svcStart, split + 1);
 
 		for (final var infoField : addInfo) {
 			buf.append(" ");
@@ -387,7 +388,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	{
 		synchronized (addInfo) {
 			os.write(getAddInfoLength());
-			addInfo.sort((lhs, rhs) -> lhs.type() - rhs.type());
+			addInfo.sort(Comparator.comparingInt(AdditionalInfo::type));
 			for (final var infoField : addInfo) {
 				os.write(infoField.type());
 				final byte[] info = infoField.info();

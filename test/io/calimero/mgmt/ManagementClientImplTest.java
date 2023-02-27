@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,15 +36,8 @@
 
 package io.calimero.mgmt;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
@@ -70,6 +63,8 @@ import io.calimero.link.KNXNetworkLinkIP;
 import io.calimero.link.medium.TPSettings;
 import io.calimero.mgmt.PropertyAccess.PID;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 
 @KnxnetIP
 @Isolated
@@ -91,8 +86,7 @@ class ManagementClientImplTest
 	}
 
 	@AfterEach
-	void tearDown() throws Exception
-	{
+	void tearDown() {
 		if (mc != null)
 			mc.detach();
 		if (lnk != null)
@@ -423,7 +417,7 @@ class ManagementClientImplTest
 		final byte[] write = new byte[] { 7, 7, 7, 7, 7 };
 		mc.writeProperty(dco2, 0, pidProgramVersion, 1, 1, write);
 		final byte[] read2 = mc.readProperty(dco2, 0, pidProgramVersion, 1, 1);
-		assertTrue(Arrays.equals(write, read2));
+		assertArrayEquals(write, read2);
 		mc.writeProperty(dco2, 0, pidProgramVersion, 1, 1, read);
 	}
 
@@ -563,7 +557,7 @@ class ManagementClientImplTest
 	void readSystemNetworkParameterStartup() throws KNXException, InterruptedException {
 		final byte maxWaitSeconds = 2;
 		List<byte[]> l = mc.readSystemNetworkParameter(0, PID.SERIAL_NUMBER, 3, maxWaitSeconds);
-		assertTrue(!l.isEmpty(), "devices should respond once");
+		assertFalse(l.isEmpty(), "devices should respond once");
 		assertEquals(3, l.size(), "2 test devices + router, each should respond once");
 		l.forEach(sn -> assertEquals(6, sn.length));
 

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2021, 2021 B. Malinowsky
+    Copyright (c) 2021, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.InterfaceAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -76,7 +77,7 @@ final class Net {
 					.peek(ia -> logger.trace("match local address {}/{} to {}", ia.getAddress().getHostAddress(),
 							ia.getNetworkPrefixLength(), remote.getHostAddress()))
 					.filter(ia -> matchesPrefix(ia.getAddress(), ia.getNetworkPrefixLength(), remote))
-					.map(ia -> ia.getAddress()).findFirst();
+					.map(InterfaceAddress::getAddress).findFirst();
 		}
 		catch (final SocketException ignore) {}
 		return Optional.empty();

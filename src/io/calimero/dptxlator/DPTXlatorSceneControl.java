@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2013, 2022 B. Malinowsky
+    Copyright (c) 2013, 2023 B. Malinowsky
     Copyright (c) 2013 Juan Ruzafa Millán
 
     This program is free software; you can redistribute it and/or modify
@@ -174,7 +174,7 @@ public class DPTXlatorSceneControl extends DPTXlator
 			throw newException("wrong value format", value);
 		try {
 			s = token.nextToken();
-			dst[index] = toDPT(learn, Integer.decode(s).intValue());
+			dst[index] = toDPT(learn, Integer.decode(s));
 		}
 		catch (final NumberFormatException e) {
 			throw newException("parsing", value);

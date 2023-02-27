@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ public final class Helper
 	 */
 	public static void assertSimilar(final String expected, final String actual)
 	{
-		assertTrue(actual.toLowerCase().indexOf(expected.toLowerCase()) > -1,
+		assertTrue(actual.toLowerCase().contains(expected.toLowerCase()),
 				"expected: " + expected + ", actual: " + actual);
 	}
 
@@ -86,15 +86,15 @@ public final class Helper
 	public static void checkDPTs(final DPT[] dpts, final boolean testSimilarity)
 	{
 		try {
-			for (int i = 0; i < dpts.length; i++) {
-				final DPTXlator t = TranslatorTypes.createTranslator(0, dpts[i].getID());
-				t.setValue(dpts[i].getLowerValue());
-				if (testSimilarity)
-					assertSimilar(dpts[i].getLowerValue(), t.getValue());
-				t.setValue(dpts[i].getUpperValue());
-				if (testSimilarity)
-					assertSimilar(dpts[i].getUpperValue(), t.getValue());
-			}
+            for (DPT dpt : dpts) {
+                final DPTXlator t = TranslatorTypes.createTranslator(0, dpt.getID());
+                t.setValue(dpt.getLowerValue());
+                if (testSimilarity)
+                    assertSimilar(dpt.getLowerValue(), t.getValue());
+                t.setValue(dpt.getUpperValue());
+                if (testSimilarity)
+                    assertSimilar(dpt.getUpperValue(), t.getValue());
+            }
 		}
 		catch (final KNXException e) {
 			fail(e.getMessage());

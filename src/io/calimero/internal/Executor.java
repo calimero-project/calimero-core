@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2020, 2022 B. Malinowsky
+    Copyright (c) 2020, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ public final class Executor {
 	private static final ScheduledExecutorService scheduledExecutor;
 	static {
 		final var se = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS,
-				new SynchronousQueue<Runnable>(), threadFactory) {
+                new SynchronousQueue<>(), threadFactory) {
 			@Override
 			protected void afterExecute(final Runnable r, final Throwable t) {
 				Thread.currentThread().setName(idleThreadName);

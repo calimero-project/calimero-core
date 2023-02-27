@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -112,7 +112,7 @@ public class CacheObject
 	}
 
 	/**
-	 * Returns the most up to date timestamp of the moment the current value
+	 * Returns the most up-to-date timestamp of the moment the current value
 	 * object was assigned to this cache object, or the moment this object was
 	 * {@link Cache#put(CacheObject)} into a cache.
 	 * <p>

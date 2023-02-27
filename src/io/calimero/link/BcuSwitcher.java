@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2022 B. Malinowsky
+    Copyright (c) 2015, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -92,7 +92,7 @@ final class BcuSwitcher<T>
 		ApplicationLayer(0x1E),
 		Reset(0xC0);
 
-		OperationMode(final int mode) { this.mode = mode; };
+		OperationMode(final int mode) { this.mode = mode; }
 
 		final int mode;
 
@@ -209,8 +209,7 @@ final class BcuSwitcher<T>
 		frame[1] = (byte) data.length;
 		frame[2] = (byte) (address >> 8);
 		frame[3] = (byte) address;
-		for (int i = 0; i < data.length; i++)
-			frame[i + frameOffsetData] = data[i];
+		System.arraycopy(data, 0, frame, 4, data.length);
 		return frame;
 	}
 
@@ -236,9 +235,7 @@ final class BcuSwitcher<T>
 		if (length + frameOffsetData != frame.length)
 			throw new KNXFormatException("invalid length for frame size " + frame.length, length);
 		final byte[] data = new byte[length];
-		for (int i = 0; i < length; i++) {
-			data[i] = frame[frameOffsetData + i];
-		}
+		System.arraycopy(frame, 4, data, 0, length);
 		return data;
 	}
 

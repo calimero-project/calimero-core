@@ -67,7 +67,7 @@ public class ServiceRequest<T extends ServiceType> extends io.calimero.knxnetip.
 	private final Supplier<T> svcSupplier;
 	private volatile T svc;
 
-	private static Function<ByteBuffer, CEMI> cemiParser = buf -> {
+	private static final Function<ByteBuffer, CEMI> cemiParser = buf -> {
 		try {
 			return CEMIFactory.create(buf.array(), buf.position(), buf.remaining());
 		}
@@ -76,7 +76,7 @@ public class ServiceRequest<T extends ServiceType> extends io.calimero.knxnetip.
 		}
 	};
 
-	private static BiFunction<Integer, ByteBuffer, TunnelingFeature> tunnelingFeatureParser = (svc, buf) -> {
+	private static final BiFunction<Integer, ByteBuffer, TunnelingFeature> tunnelingFeatureParser = (svc, buf) -> {
 		try {
 			return TunnelingFeature.from(svc, buf);
 		}

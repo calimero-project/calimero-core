@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -273,7 +273,7 @@ public abstract class RawFrameBase implements RawFrame
 
 	void setDestination(final int addr, final boolean group)
 	{
-		dst = group ? (KNXAddress) new GroupAddress(addr) : new IndividualAddress(addr);
+		dst = group ? new GroupAddress(addr) : new IndividualAddress(addr);
 	}
 
 	int readCtrlEx(final ByteArrayInputStream is)

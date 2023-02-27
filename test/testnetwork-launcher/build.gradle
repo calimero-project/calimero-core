@@ -1,5 +1,5 @@
 apply plugin:'application'
-mainClassName = 'io.calimero.TestNetwork'
+mainClassName = 'io.calimero.testnetwork.TestNetwork'
 
 run {
     // for attaching to debugger, start with -Ddebug=true

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -122,14 +122,13 @@ class KNXNetworkLinkFT12Test
 		frame = new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0), new GroupAddress(0, 0, 1),
 				new byte[] { 0, (byte) (0x80 | 1) }, Priority.LOW);
 		frame2 = new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0), new GroupAddress(0, 0, 1),
-				new byte[] { 0, (byte) (0x80 | 0) }, Priority.URGENT, true, 3);
+				new byte[] { 0, (byte) (0x80) }, Priority.URGENT, true, 3);
 		frame3 = new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0), new GroupAddress(0, 0, 3),
-				new byte[] { 0, (byte) (0x80 | 0) }, Priority.NORMAL);
+				new byte[] { 0, (byte) (0x80) }, Priority.NORMAL);
 	}
 
 	@AfterEach
-	void tearDown() throws Exception
-	{
+	void tearDown() {
 		if (lnk != null)
 			lnk.close();
 	}
@@ -223,14 +222,14 @@ class KNXNetworkLinkFT12Test
 	void sendRequest() throws KNXTimeoutException, KNXLinkClosedException, InterruptedException
 	{
 		doSend(new byte[] { 0, (byte) (0x80 | 1) });
-		doSend(new byte[] { 0, (byte) (0x80 | 0) });
+		doSend(new byte[] { 0, (byte) (0x80) });
 		doSend(new byte[] { 0, (byte) (0x80 | 1) });
-		doSend(new byte[] { 0, (byte) (0x80 | 0) });
+		doSend(new byte[] { 0, (byte) (0x80) });
 
 		// send an extended PL frame
 		try {
 			lnk.sendRequestWait(new GroupAddress(0, 0, 1), Priority.LOW,
-					new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (byte) (0x80 | 0) });
+					new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (byte) (0x80) });
 		}
 		catch (final KNXIllegalArgumentException e) {}
 	}
@@ -247,9 +246,9 @@ class KNXNetworkLinkFT12Test
 	void sendRequestWait() throws KNXLinkClosedException, KNXTimeoutException
 	{
 		doSendWait(new byte[] { 0, (byte) (0x80 | 1) });
-		doSendWait(new byte[] { 0, (byte) (0x80 | 0) });
+		doSendWait(new byte[] { 0, (byte) (0x80) });
 		doSendWait(new byte[] { 0, (byte) (0x80 | 1) });
-		doSendWait(new byte[] { 0, (byte) (0x80 | 0) });
+		doSendWait(new byte[] { 0, (byte) (0x80) });
 	}
 
 	private void doSendWait(final byte[] nsdu) throws KNXLinkClosedException, KNXTimeoutException
@@ -291,12 +290,12 @@ class KNXNetworkLinkFT12Test
 	void getName()
 	{
 		String n = lnk.getName();
-		assertTrue(n.indexOf(Util.getSerialPortID()) > -1, Util.getSerialPortID());
-		assertTrue(n.indexOf("link") > -1);
+		assertTrue(n.contains(Util.getSerialPortID()), Util.getSerialPortID());
+		assertTrue(n.contains("link"));
 		lnk.close();
 		n = lnk.getName();
 		assertNotNull(n);
-		assertTrue(n.indexOf("link") > -1);
+		assertTrue(n.contains("link"));
 	}
 
 	@Test

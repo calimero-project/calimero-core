@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2018 B. Malinowsky
+    Copyright (c) 2015, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -109,12 +110,7 @@ public class XmlOutputFactory // extends XMLOutputFactory
 			l.trace("no StaX implementation found ({}), using internal XMLStreamWriter", e.toString());
 			// fall-through to minimal writer implementation
 		}
-		try {
-			return new DefaultXmlWriter(new OutputStreamWriter(stream, "UTF-8"), closeStream);
-		}
-		catch (final UnsupportedEncodingException e) {
-			throw new KNXMLException("encoding UTF-8 unknown", e);
-		}
+		return new DefaultXmlWriter(new OutputStreamWriter(stream, StandardCharsets.UTF_8), closeStream);
 	}
 
 	public XmlWriter createXMLStreamWriter(final OutputStream stream, final String encoding)

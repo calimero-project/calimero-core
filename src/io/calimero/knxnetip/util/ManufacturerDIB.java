@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -124,8 +124,7 @@ public class ManufacturerDIB extends DIB
 		final byte[] buf = super.toByteArray();
 		buf[2] = (byte) (id >> 8);
 		buf[3] = (byte) id;
-		for (int i = 0; i < mfrData.length; ++i)
-			buf[4 + i] = mfrData[i];
+        System.arraycopy(mfrData, 0, buf, 4, mfrData.length);
 		return buf;
 	}
 

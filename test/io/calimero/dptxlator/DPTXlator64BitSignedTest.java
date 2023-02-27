@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2022 B. Malinowsky
+    Copyright (c) 2015, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,10 +36,6 @@
 
 package io.calimero.dptxlator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -47,6 +43,8 @@ import org.junit.jupiter.api.Test;
 
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class DPTXlator64BitSignedTest
@@ -108,7 +106,7 @@ class DPTXlator64BitSignedTest
 		assertEquals(strings.length, t.getItems());
 		Helper.assertSimilar(strings, t.getAllValues());
 
-		t.setValues(new String[0]);
+		t.setValues();
 		assertEquals(strings.length, t.getItems());
 		Helper.assertSimilar(strings, t.getAllValues());
 
@@ -117,7 +115,7 @@ class DPTXlator64BitSignedTest
 		assertEquals(s.length, t.getItems());
 		Helper.assertSimilar(s, t.getAllValues());
 
-		t.setValues(new String[] { t.getValue(), t.getValue() });
+		t.setValues(t.getValue(), t.getValue());
 	}
 
 	@Test
@@ -157,7 +155,7 @@ class DPTXlator64BitSignedTest
 	void getValue() throws KNXFormatException
 	{
 		Helper.assertSimilar("0", t.getValue());
-		t.setValues(new String[0]);
+		t.setValues();
 		Helper.assertSimilar("0", t.getValue());
 		t.setValue(longs[0]);
 		Helper.assertSimilar(strings[0], t.getValue());
@@ -176,10 +174,10 @@ class DPTXlator64BitSignedTest
 			fail("should throw");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-		assertTrue(Arrays.equals(dataMin, t.getData()));
+        assertArrayEquals(dataMin, t.getData());
 
 		t.setData(dataMax, 0);
-		assertTrue(Arrays.equals(dataMax, t.getData()));
+        assertArrayEquals(dataMax, t.getData());
 
 		t.setData(dataValue2, 2);
 		byte[] d = t.getData();
@@ -193,7 +191,7 @@ class DPTXlator64BitSignedTest
 		t.setData(array, 3);
 		d = t.getData();
 		assertEquals(data.length, d.length);
-		assertTrue(Arrays.equals(data, d));
+        assertArrayEquals(data, d);
 		Helper.assertSimilar(strings, t.getAllValues());
 	}
 
@@ -211,7 +209,7 @@ class DPTXlator64BitSignedTest
 		catch (final KNXIllegalArgumentException expected) {}
 
 		final byte[] empty = new byte[9];
-		assertTrue(Arrays.equals(empty, t.getData(new byte[9], 1)));
+        assertArrayEquals(empty, t.getData(new byte[9], 1));
 
 		t.setData(data);
 		d = t.getData(new byte[25], 6);

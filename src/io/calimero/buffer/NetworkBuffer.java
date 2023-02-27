@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,7 +38,6 @@ package io.calimero.buffer;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import io.calimero.CloseEvent;
@@ -444,11 +443,10 @@ public final class NetworkBuffer implements AutoCloseable
 	public Configuration getConfiguration(final KNXNetworkLink bufferedLink)
 	{
 		synchronized (configs) {
-			for (final Iterator<ConfigImpl> i = configs.iterator(); i.hasNext();) {
-				final ConfigImpl lc = i.next();
-				if (lc.getBufferedLink() == bufferedLink)
-					return lc;
-			}
+            for (final ConfigImpl lc : configs) {
+                if (lc.getBufferedLink() == bufferedLink)
+                    return lc;
+            }
 		}
 		return null;
 	}
@@ -461,7 +459,7 @@ public final class NetworkBuffer implements AutoCloseable
 	 */
 	public Configuration[] getAllConfigurations()
 	{
-		return configs.toArray(new Configuration[configs.size()]);
+		return configs.toArray(new Configuration[0]);
 	}
 
 	/**

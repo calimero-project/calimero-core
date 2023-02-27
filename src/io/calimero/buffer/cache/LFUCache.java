@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2014 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -172,11 +172,7 @@ public class LFUCache extends ExpiringCache
 				return 1;
 			if (o1.getUsage() < o2.getUsage())
 				return -1;
-			if (o1.getCount() > o2.getCount())
-				return 1;
-			if (o1.getCount() < o2.getCount())
-				return -1;
-			return 0;
+			return Integer.compare(o1.getCount(), o2.getCount());
 		}
 	}
 }

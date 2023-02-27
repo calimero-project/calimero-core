@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2011, 2022 B. Malinowsky
+    Copyright (c) 2011, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -78,8 +78,7 @@ class ManagementProceduresImplTest
 	}
 
 	@AfterEach
-	void tearDown() throws Exception
-	{
+	void tearDown() {
 		if (link != null)
 			link.close();
 	}
@@ -87,7 +86,7 @@ class ManagementProceduresImplTest
 	@Test
 	void managementProceduresImpl() throws KNXLinkClosedException
 	{
-		try (ManagementProcedures test = new ManagementProceduresImpl(link)) {};
+		try (ManagementProcedures test = new ManagementProceduresImpl(link)) {}
 	}
 
 	@Test

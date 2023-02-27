@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2017, 2020 B. Malinowsky
+    Copyright (c) 2017, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,7 +38,6 @@ package io.calimero.dptxlator;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static io.calimero.dptxlator.DptXlator8BitSet.GeneralStatus.AlarmUnAck;
 import static io.calimero.dptxlator.DptXlator8BitSet.GeneralStatus.Fault;
@@ -99,7 +98,7 @@ class DptXlator8BitSetTest
 	{
 		assertEquals("", t.getValue());
 		t.setValue(1);
-		assertTrue(e3.equals(t.getValue()));
+        assertEquals(e3, t.getValue());
 
 		final DptXlator8BitSet x = new DptXlator8BitSet(DptXlator8BitSet.DptDeviceControl);
 		final int v = (int) x.getNumericValue();
@@ -168,13 +167,13 @@ class DptXlator8BitSetTest
 	{
 		t.setValues(strValues);
 		t.setValues(strValues);
-		t.setValues(new String[] { OutOfService.name(), Fault.name(), Overridden.name(), InAlarm.name(),
-			AlarmUnAck.name() });
+		t.setValues(OutOfService.name(), Fault.name(), Overridden.name(), InAlarm.name(),
+                AlarmUnAck.name());
 
 		assertEquals(1, t.getNumericValue());
 
 		try {
-			t.setValues(new String[] { "xyz" });
+			t.setValues("xyz");
 			fail("element does not exist");
 		}
 		catch (final KNXFormatException expected) {}

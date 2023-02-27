@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2021, 2022 B. Malinowsky
+    Copyright (c) 2021, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ class DiscovererTcpTests {
 	private DiscovererTcp discoverer;
 
 	@BeforeEach
-	void setUp() throws Exception {
+	void setUp() {
 		conn = TcpConnection.newTcpConnection(Util.localEndpoint(), Util.getServer());
 		discoverer = Discoverer.tcp(conn);
 	}
@@ -151,7 +151,7 @@ class DiscovererTcpTests {
 	@Test
 	void searchDeviceNotInProgrammingMode() {
 		final var future = discoverer.search(Srp.withProgrammingMode());
-		assertThrows(ExecutionException.class, () -> future.get());
+		assertThrows(ExecutionException.class, future::get);
 	}
 
 	@Test
@@ -160,7 +160,7 @@ class DiscovererTcpTests {
 		try (var c = TcpConnection.newTcpConnection(new InetSocketAddress(0), server); var mgmt = new KNXnetIPDevMgmt(c)) {
 			final byte[] macAddress = new byte[6];
 			mgmt.addConnectionListener((final FrameEvent e) -> {
-					final byte[] data = ((CEMIDevMgmt) e.getFrame()).getPayload();
+					final byte[] data = e.getFrame().getPayload();
 					System.arraycopy(data, 0, macAddress, 0, 6);
 				});
 			final int pidMacAddress = 64;

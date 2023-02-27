@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,13 +36,6 @@
 
 package io.calimero.dptxlator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +48,8 @@ import io.calimero.KNXException;
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
 import io.calimero.dptxlator.TranslatorTypes.MainType;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @Isolated("clears map obtained by getAllMainTypes")
@@ -69,15 +64,15 @@ class TranslatorTypesTest
 	{
 		for (int i = 0; i < 100; ++i) {
 			if (TranslatorTypes.getMainType(i) == null
-				&& TranslatorTypes.getAllMainTypes().containsKey(Integer.valueOf(i)))
+				&& TranslatorTypes.getAllMainTypes().containsKey(i))
 				fail("not found but in type list");
 		}
 
-		for (int i = 0; i < types.length; ++i) {
-			final MainType t = TranslatorTypes.getMainType(types[i].getMainNumber());
-			assertEquals(t.getMainNumber(), types[i].getMainNumber());
+		for (MainType type : types) {
+			final MainType t = TranslatorTypes.getMainType(type.getMainNumber());
+			assertEquals(t.getMainNumber(), type.getMainNumber());
 			t.createTranslator(t.getSubTypes().values().iterator().next()
-				.getID());
+					.getID());
 		}
 	}
 
@@ -152,18 +147,18 @@ class TranslatorTypesTest
 	void createTranslator() throws KNXException
 	{
 		// with main number
-		for (int i = 0; i < types.length; i++) {
-			final int main = types[i].getMainNumber();
+		for (MainType mainType : types) {
+			final int main = mainType.getMainNumber();
 			final String dptID = TranslatorTypes.getMainType(main).getSubTypes()
-				.values().iterator().next().getID();
+					.values().iterator().next().getID();
 			TranslatorTypes.createTranslator(main, dptID);
 		}
 
 		// without main number
-		for (int i = 0; i < types.length; i++) {
-			final int main = types[i].getMainNumber();
+		for (MainType type : types) {
+			final int main = type.getMainNumber();
 			final String dptID = TranslatorTypes.getMainType(main).getSubTypes()
-				.values().iterator().next().getID();
+					.values().iterator().next().getID();
 			TranslatorTypes.createTranslator(0, dptID);
 		}
 
@@ -203,7 +198,7 @@ class TranslatorTypesTest
 		t = TranslatorTypes.createTranslator("9.001", (byte) 0xc, (byte) 0xe2);
 		assertEquals(25.0, t.getNumericValue());
 
-		t = TranslatorTypes.createTranslator("9.001", new byte[] { (byte) 0xc, (byte) 0xe2, (byte) 0xc, (byte) 0xf2 });
+		t = TranslatorTypes.createTranslator("9.001", (byte) 0xc, (byte) 0xe2, (byte) 0xc, (byte) 0xf2);
 		t.setAppendUnit(false);
 		assertEquals(2, t.getItems());
 		assertTrue(Arrays.deepEquals(new String[] { "25.0", "25.32" }, t.getAllValues()));
@@ -222,7 +217,7 @@ class TranslatorTypesTest
 		final byte[] data = new byte[] { (byte) 0xc, (byte) 0xe2 };
 		t2 = TranslatorTypes.createTranslator(9, 0, data);
 		assertTrue(t2.getType().getID().startsWith("9"));
-		assertTrue(Arrays.equals(data, t2.getData()));
+        assertArrayEquals(data, t2.getData());
 
 		try {
 			TranslatorTypes.createTranslator(9, -1);

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2022 B. Malinowsky
+    Copyright (c) 2010, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,11 +36,6 @@
 
 package io.calimero.dptxlator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.util.Arrays;
 import java.util.Map;
 
@@ -49,6 +44,8 @@ import org.junit.jupiter.api.Test;
 
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class DPTXlator1BitControlledTest
@@ -84,7 +81,7 @@ class DPTXlator1BitControlledTest
 		assertEquals(strings.length, t.getItems());
 		Helper.assertSimilar(strings, t.getAllValues());
 
-		t.setValues(new String[0]);
+		t.setValues();
 		assertEquals(strings.length, t.getItems());
 		Helper.assertSimilar(strings, t.getAllValues());
 
@@ -93,7 +90,7 @@ class DPTXlator1BitControlledTest
 		assertEquals(s.length, t.getItems());
 		Helper.assertSimilar(s, t.getAllValues());
 
-		t.setValues(new String[] { t.getValue(), t.getValue() });
+		t.setValues(t.getValue(), t.getValue());
 	}
 
 	@Test
@@ -122,7 +119,7 @@ class DPTXlator1BitControlledTest
 			fail("should throw");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-		assertTrue(Arrays.equals(data, t.getData()));
+        assertArrayEquals(data, t.getData());
 		t.setData(dataValue1, 2);
 		byte[] d = t.getData();
 		assertEquals(1, d.length);
@@ -133,7 +130,7 @@ class DPTXlator1BitControlledTest
 		t.setData(array, 1);
 		d = t.getData();
 		assertEquals(data.length, d.length);
-		assertTrue(Arrays.equals(data, d));
+        assertArrayEquals(data, d);
 		Helper.assertSimilar(strings, t.getAllValues());
 
 		t.setData(new byte[] { (byte) 0xFF, (byte) 0xFF });
@@ -148,7 +145,7 @@ class DPTXlator1BitControlledTest
 	{
 		assertEquals(4, t7.getData(new byte[4], 1).length);
 		final byte[] empty = new byte[4];
-		assertTrue(Arrays.equals(empty, t7.getData(new byte[4], 1)));
+        assertArrayEquals(empty, t7.getData(new byte[4], 1));
 
 		t7.setData(stepData);
 		byte[] d = new byte[10];
@@ -188,20 +185,20 @@ class DPTXlator1BitControlledTest
 	@Test
 	void setValueBooleanBoolean()
 	{
-		assertEquals(false, t.getControlBit());
-		assertEquals(false, t.getValueBit());
+        assertFalse(t.getControlBit());
+        assertFalse(t.getValueBit());
 
 		t.setValue(true, false);
-		assertEquals(true, t.getControlBit());
-		assertEquals(false, t.getValueBit());
+        assertTrue(t.getControlBit());
+        assertFalse(t.getValueBit());
 
 		t.setValue(false, true);
-		assertEquals(false, t.getControlBit());
-		assertEquals(true, t.getValueBit());
+        assertFalse(t.getControlBit());
+        assertTrue(t.getValueBit());
 
 		t.setValue(true, true);
-		assertEquals(true, t.getControlBit());
-		assertEquals(true, t.getValueBit());
+        assertTrue(t.getControlBit());
+        assertTrue(t.getValueBit());
 	}
 
 	@Test

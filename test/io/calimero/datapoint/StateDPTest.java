@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,7 +45,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -71,8 +70,7 @@ class StateDPTest
 
 
 	@BeforeEach
-	void init() throws Exception
-	{
+	void init() {
 		inv = new ArrayList<>();
 		inv.add(new GroupAddress(1, 1, 1));
 		inv.add(new GroupAddress(2, 2, 2));
@@ -86,9 +84,9 @@ class StateDPTest
 	void testToString()
 	{
 		final Datapoint dp = new StateDP(ga, "test");
-		assertTrue(dp.toString().indexOf("test") >= 0);
-		assertTrue(dp.toString().indexOf("state DP") >= 0);
-		assertTrue(dp.toString().indexOf(ga.toString()) >= 0);
+		assertTrue(dp.toString().contains("test"));
+		assertTrue(dp.toString().contains("state DP"));
+		assertTrue(dp.toString().contains(ga.toString()));
 	}
 
 	@Test
@@ -181,13 +179,11 @@ class StateDPTest
 	void add()
 	{
 		final StateDP dp = new StateDP(ga, "name1", inv, upd);
-		for (final Iterator<GroupAddress> i = upd.iterator(); i.hasNext();) {
-			final GroupAddress a = i.next();
+		for (final GroupAddress a : upd) {
 			dp.addUpdatingAddress(a);
 		}
 		assertEquals(upd.size(), dp.getAddresses(true).size());
-		for (final Iterator<GroupAddress> i = inv.iterator(); i.hasNext();) {
-			final GroupAddress a = i.next();
+		for (final GroupAddress a : inv) {
 			dp.addInvalidatingAddress(a);
 		}
 		assertEquals(inv.size(), dp.getAddresses(false).size());

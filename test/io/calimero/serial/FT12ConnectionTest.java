@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,7 +38,6 @@ package io.calimero.serial;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
@@ -60,7 +59,7 @@ import io.calimero.cemi.CEMIFactory;
 import io.calimero.cemi.CEMILData;
 
 class FT12ConnectionTest {
-	private static String portID = Util.getSerialPortID();
+	private static final String portID = Util.getSerialPortID();
 	private FT12Connection c;
 	private final BauFt12Emulator emulator = new BauFt12Emulator();
 
@@ -71,7 +70,7 @@ class FT12ConnectionTest {
 	private static final byte[] emi2LDataReq = CEMIFactory.toEmi(cemiLDataReq);
 
 	@AfterEach
-	void tearDown() throws Exception {
+	void tearDown() {
 		if (c != null)
 			c.close();
 	}
@@ -171,48 +170,48 @@ class FT12ConnectionTest {
 
 		@Test
 		void stateOk() {
-			assertTrue(c.getState() == FT12Connection.OK);
+            assertEquals(FT12Connection.OK, c.getState());
 		}
 
 		@Test
 		void stateOkAfterSendingNoLDataBlocking()
 			throws KNXTimeoutException, KNXPortClosedException, InterruptedException {
 			c.send(new byte[10], true);
-			assertTrue(c.getState() == FT12Connection.OK);
+            assertEquals(FT12Connection.OK, c.getState());
 		}
 
 		@Test
 		void stateOkAfterSendingCemiLDataBlocking()
 			throws KNXTimeoutException, KNXPortClosedException, InterruptedException {
 			c.send(cemiLDataReq.toByteArray(), true);
-			assertTrue(c.getState() == FT12Connection.OK);
+            assertEquals(FT12Connection.OK, c.getState());
 		}
 
 		@Test
 		void stateOkAfterSendingEmi2LDataBlocking()
 			throws KNXTimeoutException, KNXPortClosedException, InterruptedException {
 			c.send(emi2LDataReq, true);
-			assertTrue(c.getState() == FT12Connection.OK);
+            assertEquals(FT12Connection.OK, c.getState());
 		}
 
 		@Test
 		void noAckForSend() {
 			emulator.replyWithAck = false;
 			assertThrows(KNXAckTimeoutException.class, () -> c.send(new byte[2], true), "send got ACKed");
-			assertTrue(c.getState() == FT12Connection.OK);
+            assertEquals(FT12Connection.OK, c.getState());
 		}
 
 		@Test
 		void noConForSend() {
 			emulator.replyWithCon = false;
 			assertThrows(KNXTimeoutException.class, () -> c.send(cemiLDataReq.toByteArray(), true), "received .con");
-			assertTrue(c.getState() == FT12Connection.OK);
+            assertEquals(FT12Connection.OK, c.getState());
 		}
 
 		@Test
 		void stateClosed() {
 			c.close();
-			assertTrue(c.getState() == FT12Connection.CLOSED);
+            assertEquals(FT12Connection.CLOSED, c.getState());
 		}
 	}
 }

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -98,7 +98,7 @@ public class CEMIDevMgmt implements CEMI
 		public static final int ILLEGAL_COMMAND = 0x06;
 
 		/**
-		 * Error code: read or write access to an non existing property, used in negative
+		 * Error code: read or write access to an non-existing property, used in negative
 		 * read/write message confirmations.
 		 */
 		public static final int VOID_DP = 0x07;
@@ -110,7 +110,7 @@ public class CEMIDevMgmt implements CEMI
 		public static final int TYPE_CONFLICT = 0x08;
 
 		/**
-		 * Error code: read or write access to a non existing property array index, used
+		 * Error code: read or write access to a non-existing property array index, used
 		 * in negative read/write message confirmations.
 		 */
 		public static final int PROP_INDEX_RANGE_ERROR = 0x09;
@@ -167,7 +167,7 @@ public class CEMIDevMgmt implements CEMI
 	public static final int MC_RESET_IND = 0xF0;
 
 
-	private static BitSet msgCodes;
+	private static final BitSet msgCodes;
 	private static final int MC_OFFSET = 0xF0;
 
 	private static final byte[] empty = new byte[0];
@@ -525,8 +525,8 @@ public class CEMIDevMgmt implements CEMI
 				buf[i++] = (byte) (elems << 4 | start >>> 8);
 				buf[i++] = (byte) start;
 			}
-			for (int k = 0; k < data.length; ++k)
-				buf[i++] = data[k];
+            for (final byte b : data)
+            	buf[i++] = b;
 		}
 		return buf;
 	}

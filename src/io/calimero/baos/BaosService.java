@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2022 B. Malinowsky
+    Copyright (c) 2019, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -235,7 +235,7 @@ public final class BaosService implements ServiceType {
 					return v;
 			throw new KNXIllegalArgumentException("invalid history command '" + command + "'");
 		}
-	};
+	}
 
 	public static final class Item<T> {
 		public static Item<Property> property(final Property p, final byte[] data) {

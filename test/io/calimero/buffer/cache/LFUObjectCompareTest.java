@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ import org.junit.jupiter.api.Test;
 
 class LFUObjectCompareTest
 {
-	Cache lfu = new LFUCache(0, 0);
+	final Cache lfu = new LFUCache(0, 0);
 
 	// !! This is a copy of the private LFUObjectCompare class in LFUCache !!
 	private static class LFUObjectCompare implements Comparator<CacheObject>
@@ -57,11 +57,7 @@ class LFUObjectCompareTest
 				return 1;
 			if (o1.getUsage() < o2.getUsage())
 				return -1;
-			if (o1.getCount() > o2.getCount())
-				return 1;
-			if (o1.getCount() < o2.getCount())
-				return -1;
-			return 0;
+			return Integer.compare(o1.getCount(), o2.getCount());
 		}
 	}
 

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2022 B. Malinowsky
+    Copyright (c) 2018, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -78,8 +78,8 @@ public class DptXlator16BitSet extends DPTXlator {
 
 	public enum RhccStatus implements EnumBase<RhccStatus> {
 		Fault, HeatingEcoMode, LimitFlowTemperature, LimitReturnTemperature, HeatingMorningBoost, EarlyMorningStart, EarlyEveningShutdown,
-		HeatingDisabled, HeatingMode, CoolingEcoMode, PreCoolingMode, CoolingDisabled, DewPointAlarm, FrostAlarm, OverheatAlarm;
-	}
+		HeatingDisabled, HeatingMode, CoolingEcoMode, PreCoolingMode, CoolingDisabled, DewPointAlarm, FrostAlarm, OverheatAlarm
+    }
 	public static final EnumDpt<RhccStatus> DptRhccStatus = new EnumDpt<>("22.101", RhccStatus.class);
 
 	// System domain
@@ -96,9 +96,9 @@ public class DptXlator16BitSet extends DPTXlator {
 				case 5: return "KNX IP";
 				default: return "undefined";
 			}
-		};
+		}
 
-	}
+    }
 	public static final EnumDpt<Medium> DptMedia = new EnumDpt<>("22.1000", Medium.class);
 
 	private static final Map<String, DPT> types = loadDatapointTypes(DptXlator16BitSet.class);

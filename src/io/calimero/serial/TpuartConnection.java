@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2014, 2022 B. Malinowsky
+    Copyright (c) 2014, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -216,7 +216,7 @@ public class TpuartConnection implements Connection<byte[]>
 
 				Thread.sleep(10);
 				now = System.nanoTime();
-			};
+			}
 		}
 		catch (final InterruptedException e) {
 			Thread.currentThread().interrupt();
@@ -443,8 +443,7 @@ public class TpuartConnection implements Connection<byte[]>
 				throw new KNXIllegalArgumentException("L-Data frame length " + length + " > max. 64 bytes for TP-UART");
 
 			tp1 = new byte[length];
-			for (int i = skipToCtrl1; i < frame.length; i++)
-				tp1[i - skipToCtrl1] = frame[i];
+			System.arraycopy(frame, skipToCtrl1, tp1, skipToCtrl1 - skipToCtrl1, frame.length - skipToCtrl1);
 
 			// ensure not repeated ext frame
 			tp1[0] &= ~StdFrameFormat;
@@ -612,7 +611,7 @@ public class TpuartConnection implements Connection<byte[]>
 				catch (final InterruptedException e) {}
 				catch (final IOException e) {
 					if (!quit)
-						close(CloseEvent.INTERNAL, "receiver communication failure, " + e.toString());
+						close(CloseEvent.INTERNAL, "receiver communication failure, " + e);
 					break;
 				}
 			}
@@ -910,12 +909,10 @@ public class TpuartConnection implements Connection<byte[]>
 				// tpci
 				ind[9] = tp1[6];
 				// apdu
-				for (int i = 0; i < len; i++)
-					ind[10 + i] = tp1[7 + i];
+				System.arraycopy(tp1, 7, ind, 10, len);
 			}
 			else {
-				for (int i = 0; i < tp1.length - 1; i++)
-					ind[2 + i] = tp1[i];
+				System.arraycopy(tp1, 0, ind, 2, tp1.length - 1);
 			}
 			return ind;
 		}
