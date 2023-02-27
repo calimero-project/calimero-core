@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2021 B. Malinowsky
+    Copyright (c) 2018, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,7 +38,6 @@ package tuwien.auto.calimero.dptxlator;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static tuwien.auto.calimero.dptxlator.DptXlator16BitSet.DhwControllerStatus.TemperatureOptimizationShift;
 import static tuwien.auto.calimero.dptxlator.DptXlator16BitSet.RhccStatus.EarlyEveningShutdown;
@@ -121,7 +120,7 @@ class DptXlator16BitSetTest {
 	void getValue() throws KNXFormatException {
 		assertEquals("Cooling Mode", t.getValue());
 		t.setValue(1);
-		assertTrue(Fault.name().toLowerCase().equals(t.getValue()));
+        assertEquals(Fault.name().toLowerCase(), t.getValue());
 
 		final DptXlator16BitSet x = new DptXlator16BitSet(DptXlator16BitSet.DptRhccStatus);
 		final int v = (int) x.getNumericValue();
@@ -191,7 +190,7 @@ class DptXlator16BitSetTest {
 		assertEquals(2, t.getNumericValue());
 
 		try {
-			t.setValues(new String[] { "xyz" });
+			t.setValues("xyz");
 			fail("element does not exist");
 		}
 		catch (final KNXFormatException expected) {}

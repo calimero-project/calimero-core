@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2022 B. Malinowsky
+    Copyright (c) 2015, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -66,8 +66,8 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
  * <p>
  * The default return value after creation is the empty string "" or 1 byte containing the
  * <i>NULL</i> (0x00) string termination character.<br>
- * Each character is encoded according the Unicode Transformation Format UTF-8, see
- * http://www.ietf.org/rfc/rfc3629.txt.
+ * Each character is encoded according the Unicode Transformation Format
+ * <a href="http://www.ietf.org/rfc/rfc3629.txt">UTF-8</a>.
  */
 public class DPTXlatorUtf8 extends DPTXlator
 {
@@ -119,8 +119,8 @@ public class DPTXlatorUtf8 extends DPTXlator
 		if (values.length == 0)
 			return;
 		int length = 0;
-		for (int i = 0; i < values.length; i++)
-			length += toUtf8(values[i]).length + 1;
+        for (final String value : values)
+        	length += toUtf8(value).length + 1;
 		final short[] buf = new short[length];
 		for (int i = 0; i < values.length; ++i)
 			toDPT(values[i], buf, i);
@@ -140,7 +140,7 @@ public class DPTXlatorUtf8 extends DPTXlator
 	@Override
 	public void setValue(final String value) throws KNXFormatException
 	{
-		setValues(new String[] { value });
+		setValues(value);
 	}
 
 	@Override
@@ -265,9 +265,9 @@ public class DPTXlatorUtf8 extends DPTXlator
 	private void countItems()
 	{
 		int found = 0;
-		for (int i = 0; i < data.length; i++)
-			if (data[i] == 0)
-				found++;
+        for (final short s : data)
+            if (s == 0)
+                found++;
 		items = found;
 	}
 }

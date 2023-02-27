@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ public abstract class ExpiringCache implements Cache
 	 * The map instance itself is not synchronized, synchronization is done using the
 	 * cache object (this).
 	 */
-	protected Map<Object, CacheObject> map;
+	protected final Map<Object, CacheObject> map;
 	private ScheduledFuture<?> sweeper;
 	private final int timeToExpire;
 

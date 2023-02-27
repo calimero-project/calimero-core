@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -427,7 +427,7 @@ public abstract class DPTXlator
 	@Override
 	public String toString()
 	{
-		return "DPT " + dpt.getID() + " " + Arrays.asList(getAllValues()).toString();
+		return "DPT " + dpt.getID() + " " + Arrays.asList(getAllValues());
 	}
 
 	/**
@@ -516,9 +516,9 @@ public abstract class DPTXlator
 	static Map<String, DPT> loadDatapointTypes(final Class<? extends DPTXlator> translator) {
 		final Map<String, DPT> types = new HashMap<>();
 		final Field[] fields = translator.getFields();
-		for (int i = 0; i < fields.length; i++) {
+		for (final Field field : fields) {
 			try {
-				final Object o = fields[i].get(null);
+				final Object o = field.get(null);
 				if (o instanceof DPT) {
 					final DPT dpt = (DPT) o;
 					types.put(dpt.getID(), dpt);

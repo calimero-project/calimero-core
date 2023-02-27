@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -61,10 +61,10 @@ import tuwien.auto.calimero.KNXFormatException;
 public class DPTXlator2ByteFloat extends DPTXlator
 {
 	/**
-	 * DPT ID 9.001, Temperature; values from <b>-273</b> to <b>+670760</b> \u00b0C.
+	 * DPT ID 9.001, Temperature; values from <b>-273</b> to <b>+670760</b> °C.
 	 */
 	public static final DPT DPT_TEMPERATURE =
-		new DPT("9.001", "Temperature", "-273", "+670760", "\u00b0C");
+		new DPT("9.001", "Temperature", "-273", "+670760", "°C");
 
 	/**
 	 * DPT ID 9.002, Temperature difference; value range <b>+/-670760</b> K.
@@ -110,7 +110,7 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	 * DPT ID 9.009, Air flow; value range <b>+/-670760</b> m&sup3;/h; resolution 0.01 m&sup3;/h.
 	 */
 	public static final DPT DPT_AIR_FLOW = new DPT("9.009", "Air flow", "-670760", "+670760",
-			"m\u00b3/h");
+			"m³/h");
 
 	/**
 	 * DPT ID 9.010, Time difference in seconds; value range <b>+/-670760</b> s.
@@ -139,7 +139,7 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	 * DPT ID 9.022, Power density; value range <b>+/-670760</b> W/m<sup>2</sup>.
 	 */
 	public static final DPT DPT_POWERDENSITY =
-		new DPT("9.022", "Power density", "-670760", "+670760", "W/m\u00b2");
+		new DPT("9.022", "Power density", "-670760", "+670760", "W/m²");
 
 	/**
 	 * DPT ID 9.023, Kelvin/percent; value range <b>+/-670760</b> K/%.
@@ -163,14 +163,14 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	 * <b>670760.96</b> l/m<sup>2</sup>, resolution 0.01.
 	 */
 	public static final DPT DPT_RAIN_AMOUNT = new DPT("9.026", "Rain amount", "-671088.64",
-			"670760.96", "l/m\u00b2");
+			"670760.96", "l/m²");
 
 	/**
 	 * DPT ID 9.027, Temperature in Degree Fahrenheit; values from <b>+/-459.6</b> to
-	 * <b>670760.96</b> \u00b0F, resolution 0.01.
+	 * <b>670760.96</b> °F, resolution 0.01.
 	 */
 	public static final DPT DPT_TEMP_F = new DPT("9.027", "Temperature", "-459.6", "670760.96",
-			"\u00b0F");
+			"°F");
 
 	/**
 	 * DPT ID 9.028, Wind speed in km/h; values from <b>0</b> to <b>670760.96</b> km/h, resolution

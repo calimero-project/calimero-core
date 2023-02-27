@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2022 B. Malinowsky
+    Copyright (c) 2009, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ import tuwien.auto.calimero.KNXFormatException;
  * non-zero literal of type float is 1.40239846e-45f. The negative minimum finite float literal is
  * -3.40282347e+38f. DPTs adjust the usable range to reasonable limits for its values, the translator
  * will check and enforce those DPT specific limits in all methods working with java values (e.g.
- * {@link #setValue(float)}). Data methods for KNX data (e.g. {@link #setData(byte[])} accept all
+ * {@link #setValue(double)}). Data methods for KNX data (e.g. {@link #setData(byte[])} accept all
  * data within the maximum usable range. The DPTs 14.000 to 14.079 do not have any specific range
  * limits set.<br>
  * In value methods expecting a string type, the value is a float type representation.
@@ -74,14 +74,14 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	 * ms-2.
 	 */
 	public static final DPT DPT_ACCELERATION = new DPT("14.000", "Acceleration", "-3.40282347e+38f",
-			"3.40282347e+38f", "ms\u207B²");
+			"3.40282347e+38f", "ms⁻²");
 
 	/**
 	 * DPT ID 14.001, Acceleration, angular; values from <b>-3.40282347e+38f</b> to
 	 * <b>3.40282347e+38f</b> rad s-2.
 	 */
 	public static final DPT DPT_ACCELERATION_ANGULAR = new DPT("14.001", "Acceleration, angular",
-			"-3.40282347e+38f", "3.40282347e+38f", "rad s\u207B²");
+			"-3.40282347e+38f", "3.40282347e+38f", "rad s⁻²");
 
 	/**
 	 * DPT ID 14.002, Activation Energy; values from <b>-3.40282347e+38f</b> to
@@ -92,10 +92,10 @@ public class DPTXlator4ByteFloat extends DPTXlator
 
 	/**
 	 * DPT ID 14.003, Activity (radioactive); values from <b>-3.40282347e+38f</b> to
-	 * <b>3.40282347e+38f</b> s\u207B¹.
+	 * <b>3.40282347e+38f</b> s⁻¹.
 	 */
 	public static final DPT DPT_ACTIVITY = new DPT("14.003", "Activity", "-3.40282347e+38f",
-			"3.40282347e+38f", "s\u207B¹");
+			"3.40282347e+38f", "s⁻¹");
 
 	/**
 	 * DPT ID 14.004, Mol, amount of substance; values from <b>-3.40282347e+38f</b> to
@@ -155,14 +155,14 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	 * <b>3.40282347e+38f</b> C m-2.
 	 */
 	public static final DPT DPT_CHARGE_DENSITY_SURFACE = new DPT("14.012",
-			"Charge density (surface)", "-3.40282347e+38f", "3.40282347e+38f", "C m\u207B²");
+			"Charge density (surface)", "-3.40282347e+38f", "3.40282347e+38f", "C m⁻²");
 
 	/**
 	 * DPT ID 14.013, Charge density (volume); values from <b>-3.40282347e+38f</b> to
-	 * <b>3.40282347e+38f</b> C m\u207B³.
+	 * <b>3.40282347e+38f</b> C m⁻³.
 	 */
 	public static final DPT DPT_CHARGE_DENSITY_VOLUME = new DPT("14.013",
-			"Charge density (volume)", "-3.40282347e+38f", "3.40282347e+38f", "C m\u207B³");
+			"Charge density (volume)", "-3.40282347e+38f", "3.40282347e+38f", "C m⁻³");
 
 	/**
 	 * DPT ID 14.014, Compressibility; values from <b>-3.40282347e+38f</b> to <b>3.40282347e+38f</b>
@@ -173,23 +173,23 @@ public class DPTXlator4ByteFloat extends DPTXlator
 
 	/**
 	 * DPT ID 14.015, Conductance; values from <b>-3.40282347e+38f</b> to <b>3.40282347e+38f</b> S =
-	 * Ω\u207B¹.
+	 * Ω⁻¹.
 	 */
 	public static final DPT DPT_CONDUCTANCE = new DPT("14.015", "Conductance", "-3.40282347e+38f",
-			"3.40282347e+38f", "Ω\u207B¹");
+			"3.40282347e+38f", "Ω⁻¹");
 
 	/**
 	 * DPT ID 14.016, Electrical conductivity; values from <b>-3.40282347e+38f</b> to
-	 * <b>3.40282347e+38f</b> Ω\u207B¹m\u207B¹.
+	 * <b>3.40282347e+38f</b> Ω⁻¹m⁻¹.
 	 */
 	public static final DPT DPT_ELECTRICAL_CONDUCTIVITY = new DPT("14.016",
-			"Conductivity, electrical", "-3.40282347e+38f", "3.40282347e+38f", "Ω\u207B¹m\u207B¹");
+			"Conductivity, electrical", "-3.40282347e+38f", "3.40282347e+38f", "Ω⁻¹m⁻¹");
 
 	/**
-	 * DPT ID 14.017, Density; values from <b>-3.40282347e+38f</b> to <b>3.40282347e+38f</b> kg m\u207B³.
+	 * DPT ID 14.017, Density; values from <b>-3.40282347e+38f</b> to <b>3.40282347e+38f</b> kg m⁻³.
 	 */
 	public static final DPT DPT_DENSITY = new DPT("14.017", "Density", "-3.40282347e+38f",
-			"3.40282347e+38f", "kg m\u207B³");
+			"3.40282347e+38f", "kg m⁻³");
 
 	/**
 	 * DPT ID 14.018, Electric charge; values from <b>-3.40282347e+38f</b> to <b>3.40282347e+38f</b>
@@ -210,7 +210,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	 * <b>3.40282347e+38f</b> A m-2.
 	 */
 	public static final DPT DPT_ELECTRIC_CURRENTDENSITY = new DPT("14.020",
-			"Electric current density", "-3.40282347e+38f", "3.40282347e+38f", "A m\u207B²");
+			"Electric current density", "-3.40282347e+38f", "3.40282347e+38f", "A m⁻²");
 
 	/**
 	 * DPT ID 14.021, Electric dipole moment; values from <b>-3.40282347e+38f</b> to
@@ -224,7 +224,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	 * <b>3.40282347e+38f</b> C m-2.
 	 */
 	public static final DPT DPT_ELECTRIC_DISPLACEMENT = new DPT("14.022", "Electric displacement",
-			"-3.40282347e+38f", "3.40282347e+38f", "C m\u207B²");
+			"-3.40282347e+38f", "3.40282347e+38f", "C m⁻²");
 
 	/**
 	 * DPT ID 14.023, Electric field strength; values from <b>-3.40282347e+38f</b> to
@@ -246,14 +246,14 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	 * <b>3.40282347e+38f</b> C m-2.
 	 */
 	public static final DPT DPT_ELECTRIC_FLUX_DENSITY = new DPT("14.025", "Electric flux density",
-			"-3.40282347e+38f", "3.40282347e+38f", "C m\u207B²");
+			"-3.40282347e+38f", "3.40282347e+38f", "C m⁻²");
 
 	/**
 	 * DPT ID 14.026, Electric polarization; values from <b>-3.40282347e+38f</b> to
 	 * <b>3.40282347e+38f</b> C m-2.
 	 */
 	public static final DPT DPT_ELECTRIC_POLARIZATION = new DPT("14.026", "Electric polarization",
-			"-3.40282347e+38f", "3.40282347e+38f", "C m\u207B²");
+			"-3.40282347e+38f", "3.40282347e+38f", "C m⁻²");
 
 	/**
 	 * DPT ID 14.027, Electric potential; values from <b>-3.40282347e+38f</b> to
@@ -354,7 +354,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	 * m-2.
 	 */
 	public static final DPT DPT_LUMINANCE = new DPT("14.041", "Luminance", "-3.40282347e+38f",
-			"3.40282347e+38f", "cd m\u207B²");
+			"3.40282347e+38f", "cd m⁻²");
 
 	/**
 	 * DPT ID 14.042, Luminous flux; values from <b>-3.40282347e+38f</b> to <b>3.40282347e+38f</b>
@@ -506,7 +506,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	 * W m-2.
 	 */
 	public static final DPT DPT_SOUND_INTENSITY = new DPT("14.064", "Sound intensity",
-			"-3.40282347e+38f", "3.40282347e+38f", "W m\u207B²");
+			"-3.40282347e+38f", "3.40282347e+38f", "W m⁻²");
 
 	/**
 	 * DPT ID 14.065, Speed; values from <b>-3.40282347e+38f</b> to <b>3.40282347e+38f</b> m/s.
@@ -561,7 +561,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	 * <b>3.40282347e+38f</b> W/(m K).
 	 */
 	public static final DPT DPT_THERMAL_CONDUCTIVITY = new DPT("14.072", "Thermal conductivity",
-			"-3.40282347e+38f", "3.40282347e+38f", "W/m K\u207B¹");
+			"-3.40282347e+38f", "3.40282347e+38f", "W/m K⁻¹");
 
 	/**
 	 * DPT ID 14.073, Thermoelectric power; values from <b>-3.40282347e+38f</b> to

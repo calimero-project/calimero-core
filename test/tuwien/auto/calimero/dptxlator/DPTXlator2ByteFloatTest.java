@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,18 +36,13 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
-import java.util.Arrays;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class DPTXlator2ByteFloatTest
@@ -96,14 +91,14 @@ class DPTXlator2ByteFloatTest
 	@Test
 	void setValues() throws KNXFormatException
 	{
-		t.setValues(new String[] {});
+		t.setValues();
 		assertEquals(1, t.getItems());
 		assertEquals(0.0, t.getNumericValue(), 0);
-		t.setValues(new String[] { min, max, zero, value1, value2, });
+		t.setValues(min, max, zero, value1, value2);
 		assertEquals(5, t.getItems());
 		assertEquals(-671088.64, t.getNumericValue(), 1.0);
 		t.setValue(100);
-		t.setValues(new String[] { t.getValue(), t.getValue() });
+		t.setValues(t.getValue(), t.getValue());
 	}
 
 	@Test
@@ -116,7 +111,7 @@ class DPTXlator2ByteFloatTest
 		assertEquals(strings.length, returned.length);
 		assertEquals(t.getItems(), returned.length);
 		for (int i = 0; i < strings.length; ++i)
-			assertTrue(returned[i].indexOf(strings[i]) >= 0);
+			assertTrue(returned[i].contains(strings[i]));
 	}
 
 	@Test
@@ -140,7 +135,7 @@ class DPTXlator2ByteFloatTest
 			fail("should throw");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-		assertTrue(Arrays.equals(dataMin, t.getData()));
+		assertArrayEquals(dataMin, t.getData());
 		t.setData(dataValue2, 2);
 		byte[] data = t.getData();
 		assertEquals(2, data.length);
@@ -162,7 +157,7 @@ class DPTXlator2ByteFloatTest
 		t.setData(dataValue2, 2);
 		final byte[] data = t.getData(new byte[5], 2);
 		assertEquals(5, data.length);
-		assertTrue(Arrays.equals(dataValue2, data));
+		assertArrayEquals(dataValue2, data);
 
 		try {
 			// usable range too short
@@ -170,15 +165,15 @@ class DPTXlator2ByteFloatTest
 			fail("usable range too short");
 		}
 		catch (final KNXIllegalArgumentException expected) {}
-		assertTrue(Arrays.equals(dataValue2, t.getData(new byte[5], 2)));
+		assertArrayEquals(dataValue2, t.getData(new byte[5], 2));
 		assertNotNull(t.getData(new byte[0], 0));
 
 		final byte[] array = { 0, dataValue1[0], dataValue1[1], dataMin[0], dataMin[1], 0 };
 		t.setData(array, 1);
-		assertTrue(Arrays.equals(array, t.getData(new byte[6], 1)));
+		assertArrayEquals(array, t.getData(new byte[6], 1));
 
-		t.setValues(new String[] { value1, min });
-		assertTrue(Arrays.equals(array, t.getData(new byte[6], 1)));
+		t.setValues(value1, min);
+		assertArrayEquals(array, t.getData(new byte[6], 1));
 	}
 
 	@Test
@@ -198,12 +193,12 @@ class DPTXlator2ByteFloatTest
 		// do no similarity test because float type rounding issues
 		Helper.checkDPTs(dpts, false);
 
-		for (int i = 0; i < dpts.length; i++) {
-			setValueFloatFail(new DPTXlator2ByteFloat(dpts[i]),
-					Double.parseDouble(dpts[i].getLowerValue()) - 0.1d);
-			setValueFloatFail(new DPTXlator2ByteFloat(dpts[i]),
-					Double.parseDouble(dpts[i].getUpperValue()) + 0.1d);
-		}
+        for (DPT value : dpts) {
+            setValueFloatFail(new DPTXlator2ByteFloat(value),
+                    Double.parseDouble(value.getLowerValue()) - 0.1d);
+            setValueFloatFail(new DPTXlator2ByteFloat(value),
+                    Double.parseDouble(value.getUpperValue()) + 0.1d);
+        }
 
 		final DPT dpt = new DPT("0.00", "invalid", "invalid", "invalid", "invalid");
 		boolean failed = false;
@@ -260,25 +255,25 @@ class DPTXlator2ByteFloatTest
 	@Test
 	void testToString() throws KNXFormatException
 	{
-		assertTrue(t.toString().indexOf("0.0") >= 0);
+		assertTrue(t.toString().contains("0.0"));
 		t.setValues(strings);
 		final String s = t.toString();
-		for (int i = 0; i < strings.length; i++) {
-			assertTrue(s.indexOf(strings[i]) >= 0);
-		}
+        for (String string : strings) {
+            assertTrue(s.contains(string));
+        }
 	}
 
 	@Test
 	void getValue() throws KNXFormatException
 	{
-		assertTrue(t.getValue().indexOf("0") >= 0);
-		assertTrue(t.getValue().indexOf(t.getType().getUnit()) >= 0);
+		assertTrue(t.getValue().contains("0"));
+		assertTrue(t.getValue().contains(t.getType().getUnit()));
 
 		t.setValue(265);
 		final double d = t.getNumericValue();
 		assertEquals(265, d, 1.0);
 		final String s = String.valueOf(d);
-		assertTrue(t.getValue().indexOf(s) >= 0);
+		assertTrue(t.getValue().contains(s));
 	}
 
 	@Test

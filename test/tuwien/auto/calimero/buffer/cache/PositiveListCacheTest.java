@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -78,8 +78,7 @@ class PositiveListCacheTest
 	}
 
 	@AfterEach
-	void tearDown() throws Exception
-	{
+	void tearDown() {
 		exp.clear();
 	}
 
@@ -87,15 +86,15 @@ class PositiveListCacheTest
 	void positiveListCacheCollectionInt()
 	{
 		final List<Object> v = new Vector<>();
-		v.add(new String("1"));
+		v.add("1");
 		v.add(o2.getKey());
 		v.add(o3.getKey());
 		v.add(o4.getKey());
 		v.add(co.getKey());
 		final PositiveListCache c = new PositiveListCache(v, 0);
 		final Object[] list = c.getPositiveList();
-		for (int i = 0; i < list.length; ++i)
-			assertTrue(v.indexOf(list[i]) != -1);
+		for (final Object o : list)
+			assertTrue(v.contains(o));
 	}
 
 	@Test
@@ -107,8 +106,8 @@ class PositiveListCacheTest
 		fix.setPositiveList(list);
 		final Object[] ret = fix.getPositiveList();
 		assertEquals(3, fix.getPositiveList().length);
-		for (int i = 0; i < ret.length; ++i)
-			assertTrue(list.contains(ret[i]));
+		for (final Object o : ret)
+			assertTrue(list.contains(o));
 	}
 
 	@Test
@@ -123,22 +122,22 @@ class PositiveListCacheTest
 		fix.setPositiveList(v);
 		Object[] ret = fix.getPositiveList();
 		assertEquals(2, fix.getPositiveList().length);
-		for (int i = 0; i < ret.length; ++i)
-			assertTrue(v.contains(ret[i]));
+		for (final Object item : ret)
+			assertTrue(v.contains(item));
 		fix.addToPositiveList("3");
 		v.add("3");
 		ret = fix.getPositiveList();
 		assertEquals(3, fix.getPositiveList().length);
-		for (int i = 0; i < ret.length; ++i)
-			assertTrue(v.contains(ret[i]));
+		for (final Object value : ret)
+			assertTrue(v.contains(value));
 
 		// the old list again
 		v.remove("3");
 		fix.setPositiveList(v);
 		ret = fix.getPositiveList();
 		assertEquals(2, fix.getPositiveList().length);
-		for (int i = 0; i < ret.length; ++i)
-			assertTrue(v.contains(ret[i]));
+		for (final Object o : ret)
+			assertTrue(v.contains(o));
 
 	}
 

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2022 B. Malinowsky
+    Copyright (c) 2010, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -144,7 +144,7 @@ public abstract class ClientConnection extends ConnectionBase
 	 * Opens a new IP communication channel to a remote server.
 	 * <p>
 	 * The communication state of this object is assumed to be closed state. This method
-	 * is designed to be called only once during the objects lifetime!
+	 * is designed to be called only once during the object's lifetime!
 	 *
 	 * @param localEP the local endpoint to use for communication channel
 	 * @param serverCtrlEP the remote server control endpoint used for connect request
@@ -293,7 +293,7 @@ public abstract class ClientConnection extends ConnectionBase
 			final ConnectResponse res = new ConnectResponse(data, offset);
 			// address info is only != null on no error
 			final HPAI ep = res.getDataEndpoint();
-			if (res.getStatus() == ErrorCodes.NO_ERROR && !(tcp ^ (ep.getHostProtocol() == HPAI.IPV4_TCP))) {
+			if (res.getStatus() == ErrorCodes.NO_ERROR && tcp == (ep.getHostProtocol() == HPAI.IPV4_TCP)) {
 				channelId = res.getChannelID();
 				if (tcp) {
 					if (!ep.isRouteBack()) {

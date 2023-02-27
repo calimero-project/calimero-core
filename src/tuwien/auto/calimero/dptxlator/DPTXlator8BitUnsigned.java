@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -70,9 +70,9 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 	public static final DPT DPT_SCALING = new DPT("5.001", "Scaling", "0", "100", "%");
 
 	/**
-	 * DPT ID 5.003, Angle; values from <b>0</b> to <b>360</b> \u00b0 (degree).
+	 * DPT ID 5.003, Angle; values from <b>0</b> to <b>360</b> ° (degree).
 	 */
-	public static final DPT DPT_ANGLE = new DPT("5.003", "Angle", "0", "360", "\u00b0");
+	public static final DPT DPT_ANGLE = new DPT("5.003", "Angle", "0", "360", "°");
 
 	/**
 	 * DPT ID 5.004, Percent 8 Bit; values from <b>0</b> to <b>255</b> %.
@@ -284,7 +284,7 @@ public class DPTXlator8BitUnsigned extends DPTXlator
 				dst[index] = toDPT(Double.parseDouble(removeUnit(value).replace(',', '.')));
 			}
 			catch (final NumberFormatException e) {
-				dst[index] = toDPT(Short.decode(removeUnit(value)).shortValue());
+				dst[index] = toDPT(Short.decode(removeUnit(value)));
 			}
 		}
 		catch (final NumberFormatException e) {

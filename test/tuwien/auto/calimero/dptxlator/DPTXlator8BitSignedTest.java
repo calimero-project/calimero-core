@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2022 B. Malinowsky
+    Copyright (c) 2015, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,11 +36,6 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +43,8 @@ import org.junit.jupiter.api.Test;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class DPTXlator8BitSignedTest
@@ -90,7 +87,7 @@ class DPTXlator8BitSignedTest
 		assertEquals(strings.length, t.getItems());
 		Helper.assertSimilar(strings, t.getAllValues());
 
-		t.setValues(new String[0]);
+		t.setValues();
 		assertEquals(strings.length, t.getItems());
 		Helper.assertSimilar(strings, t.getAllValues());
 
@@ -99,7 +96,7 @@ class DPTXlator8BitSignedTest
 		assertEquals(s.length, t.getItems());
 		Helper.assertSimilar(s, t.getAllValues());
 
-		t.setValues(new String[] { t.getValue(), t.getValue() });
+		t.setValues(t.getValue(), t.getValue());
 	}
 
 	@Test
@@ -163,7 +160,7 @@ class DPTXlator8BitSignedTest
 	void getValue() throws KNXFormatException
 	{
 		Helper.assertSimilar("0", t.getValue());
-		t.setValues(new String[0]);
+		t.setValues();
 		Helper.assertSimilar("0", t.getValue());
 		t.setValue(values[0]);
 		Helper.assertSimilar(strings[0], t.getValue());
@@ -192,7 +189,7 @@ class DPTXlator8BitSignedTest
 			fail("should throw");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-		assertTrue(Arrays.equals(dataMax, t.getData()));
+        assertArrayEquals(dataMax, t.getData());
 		t.setData(dataValue2, 2);
 		byte[] d = t.getData();
 		assertEquals(1, d.length);
@@ -203,7 +200,7 @@ class DPTXlator8BitSignedTest
 		t.setData(array, 1);
 		d = t.getData();
 		assertEquals(data.length, d.length);
-		assertTrue(Arrays.equals(data, d));
+        assertArrayEquals(data, d);
 		Helper.assertSimilar(stringsRaw, t.getAllValues());
 	}
 
@@ -212,7 +209,7 @@ class DPTXlator8BitSignedTest
 	{
 		assertEquals(2, t.getData(new byte[2], 1).length);
 		final byte[] empty = new byte[2];
-		assertTrue(Arrays.equals(empty, t.getData(new byte[2], 1)));
+        assertArrayEquals(empty, t.getData(new byte[2], 1));
 
 		t.setData(data);
 		byte[] d = new byte[10];
@@ -281,12 +278,12 @@ class DPTXlator8BitSignedTest
 	@Test
 	void setValueInt() throws KNXFormatException
 	{
-		for (int i = 0; i < dpts.length; i++) {
-			setValueIntFail(new DPTXlator8BitSigned(dpts[i]),
-					Integer.parseInt(dpts[i].getLowerValue()) - 1);
-			setValueIntFail(new DPTXlator8BitSigned(dpts[i]),
-					Integer.parseInt(dpts[i].getUpperValue()) + 1);
-		}
+        for (DPT dpt : dpts) {
+            setValueIntFail(new DPTXlator8BitSigned(dpt),
+                    Integer.parseInt(dpt.getLowerValue()) - 1);
+            setValueIntFail(new DPTXlator8BitSigned(dpt),
+                    Integer.parseInt(dpt.getUpperValue()) + 1);
+        }
 	}
 
 	@Test

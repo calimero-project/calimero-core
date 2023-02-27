@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2019 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,7 +39,6 @@ package tuwien.auto.calimero.buffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -278,12 +277,12 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		if (update != null) {
 			final List<GroupAddress> upd = update.get(f.getDestination());
 			if (upd != null)
-				for (final Iterator<GroupAddress> i = upd.iterator(); i.hasNext();) {
-					final CacheObject co = c.get(i.next());
-					if (co != null)
-						((LDataObject) co).setFrame(CEMIFactory.create(null,
-								(KNXAddress) co.getKey(), f, false));
-				}
+                for (final var groupAddress : upd) {
+                    final CacheObject co = c.get(groupAddress);
+                    if (co != null)
+                        ((LDataObject) co).setFrame(CEMIFactory.create(null,
+                                (KNXAddress) co.getKey(), f, false));
+                }
 		}
 	}
 
@@ -292,8 +291,8 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		if (invalidate != null) {
 			final List<GroupAddress> inv = invalidate.get(f.getDestination());
 			if (inv != null)
-				for (final Iterator<GroupAddress> i = inv.iterator(); i.hasNext();)
-					c.remove(i.next());
+                for (final var groupAddress : inv)
+                	c.remove(groupAddress);
 		}
 	}
 
@@ -304,11 +303,10 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		final Collection<? extends Datapoint> c = ((DatapointMap<? extends Datapoint>) m)
 				.getDatapoints();
 		synchronized (c) {
-			for (final Iterator<? extends Datapoint> i = c.iterator(); i.hasNext();) {
-				final Datapoint dp = i.next();
-				if (dp instanceof StateDP)
-					createReferences((StateDP) dp);
-			}
+            for (final Datapoint dp : c) {
+                if (dp instanceof StateDP)
+                    createReferences((StateDP) dp);
+            }
 		}
 	}
 
@@ -321,13 +319,10 @@ public class StateFilter implements NetworkFilter, RequestFilter
 	private static void createReferences(final Map<KNXAddress, List<GroupAddress>> map,
 		final Collection<GroupAddress> forAddr, final GroupAddress toAddr)
 	{
-		for (final Iterator<GroupAddress> i = forAddr.iterator(); i.hasNext();) {
-			final GroupAddress ga = i.next();
-			List<GroupAddress> l = map.get(ga);
-			if (l == null)
-				map.put(ga, l = new ArrayList<>());
+        for (final GroupAddress ga : forAddr) {
+			final List<GroupAddress> l = map.computeIfAbsent(ga, k -> new ArrayList<>());
 			l.add(toAddr);
-		}
+        }
 	}
 
 	private void destroyReferences(final StateDP dp)
@@ -339,14 +334,13 @@ public class StateFilter implements NetworkFilter, RequestFilter
 	private static void destroyReferences(final Map<KNXAddress, List<GroupAddress>> map,
 		final Collection<GroupAddress> forAddr, final GroupAddress toAddr)
 	{
-		for (final Iterator<GroupAddress> i = forAddr.iterator(); i.hasNext();) {
-			final GroupAddress ga = i.next();
-			final List<GroupAddress> l = map.get(ga);
-			if (l != null) {
-				l.remove(toAddr);
-				if (l.isEmpty())
-					map.remove(ga);
-			}
-		}
+        for (final GroupAddress ga : forAddr) {
+            final List<GroupAddress> l = map.get(ga);
+            if (l != null) {
+                l.remove(toAddr);
+                if (l.isEmpty())
+                    map.remove(ga);
+            }
+        }
 	}
 }

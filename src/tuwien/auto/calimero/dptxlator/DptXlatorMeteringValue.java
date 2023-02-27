@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2017, 2022 B. Malinowsky
+    Copyright (c) 2017, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,7 +39,6 @@ package tuwien.auto.calimero.dptxlator;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -183,12 +182,11 @@ public class DptXlatorMeteringValue extends DPTXlator
 		try {
 			final short[] result = toDpt(coding, Double.parseDouble(number));
 			final int offset = index * typeSize;
-			for (int i = 0; i < result.length; i++)
-				dst[offset + i] = result[i];
+			System.arraycopy(result, 0, dst, offset + 0, result.length);
 			// if we got any status info, parse it and set the status field
 			if (split.length > 2) {
 				final String[] statusPart = Arrays.copyOfRange(split, 0, split.length - 2);
-				status.setValue(Arrays.asList(statusPart).stream().collect(Collectors.joining(" ")));
+				status.setValue(String.join(" ", Arrays.asList(statusPart)));
 				dst[offset + 5] = (short) status.getNumericValue();
 			}
 		}

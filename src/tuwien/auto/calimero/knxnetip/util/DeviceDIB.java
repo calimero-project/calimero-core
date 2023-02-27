@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,10 +38,10 @@ package tuwien.auto.calimero.knxnetip.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -130,7 +130,7 @@ public class DeviceDIB extends DIB
 	/**
 	 * Creates a device information DIB using the supplied device information.
 	 *
-	 * @param friendlyName user friendly name to identify the device; a ISO 8859-1 string with a maximum length of 30
+	 * @param friendlyName user-friendly name to identify the device; a ISO 8859-1 string with a maximum length of 30
 	 *        characters
 	 * @param deviceStatus current device status, {@code 0 ≤ deviceStatus ≤ 0xff}
 	 *        <ul>
@@ -156,13 +156,7 @@ public class DeviceDIB extends DIB
 		super(DIB_SIZE, DEVICE_INFO);
 
 		// be sure and check for characters in string
-		try {
-			name = new String(friendlyName.getBytes("ISO-8859-1"), "ISO-8859-1");
-		}
-		catch (final UnsupportedEncodingException e) {
-			// ISO 8859-1 support is mandatory on every Java platform
-			throw new Error("missing ISO 8859-1 charset, " + e.getMessage());
-		}
+		name = new String(friendlyName.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.ISO_8859_1);
 		if (name.length() > 30)
 			throw new KNXIllegalArgumentException("friendly name exceeds 30 ISO 8859-1 characters");
 
@@ -404,6 +398,6 @@ public class DeviceDIB extends DIB
 		return address.equals(other.address) && name.equals(other.name) && status == other.status
 				&& knxmedium == other.knxmedium && serial.equals(other.serial)
 				&& installationId == other.installationId && Arrays.equals(mcast, other.mcast)
-				&& Arrays.equals(mac, other.mac) && name.equals(other.name);
+				&& Arrays.equals(mac, other.mac);
 	}
 }

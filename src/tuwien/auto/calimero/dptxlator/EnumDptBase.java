@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2021, 2021 B. Malinowsky
+    Copyright (c) 2021, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -102,10 +102,8 @@ class EnumDptBase<T extends Enum<T> & EnumDptBase.EnumBase<T>> extends DPT {
 
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder(30);
-		sb.append(getID()).append(": ").append(getDescription()).append(", enumeration [");
-		sb.append(getLowerValue()).append("..").append(getUpperValue()).append("]");
-		return sb.toString();
+		return getID() + ": " + getDescription() + ", enumeration [" +
+				getLowerValue() + ".." + getUpperValue() + "]";
 	}
 
 	private static final String regex = "(\\p{Lower})\\B([A-Z])";

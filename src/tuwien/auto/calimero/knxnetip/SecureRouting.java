@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2022 B. Malinowsky
+    Copyright (c) 2018, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -313,7 +313,7 @@ public final class SecureRouting extends KNXnetIPRouting {
 			netifs = noneSet ? NetworkInterface.networkInterfaces() : Stream.of(ni);
 		}
 		catch (final IOException e) {}
-		return netifs.flatMap(ni -> ni.inetAddresses()).anyMatch(addr::equals);
+		return netifs.flatMap(NetworkInterface::inetAddresses).anyMatch(addr::equals);
 	}
 
 	private void scheduleGroupSync(final long initialDelay) {

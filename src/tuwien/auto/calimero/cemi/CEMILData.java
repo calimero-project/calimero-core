@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -126,7 +126,7 @@ public class CEMILData implements CEMI
 	}
 
 	/**
-	 * Creates a L-Data message with most control information set to default values.
+	 * Creates an L-Data message with most control information set to default values.
 	 * <p>
 	 * The initialized message has send repetitions according to default medium behavior
 	 * (for indication message this equals "not repeated frame"), broadcast is "don't
@@ -148,7 +148,7 @@ public class CEMILData implements CEMI
 	}
 
 	/**
-	 * Creates a L-Data message, mainly for confirmation.
+	 * Creates an L-Data message, mainly for confirmation.
 	 * <p>
 	 * The message hop count is set to 6, send repetitions according to default medium
 	 * behavior, broadcast and request acknowledge are set to "don't care" in the control
@@ -172,7 +172,7 @@ public class CEMILData implements CEMI
 	}
 
 	/**
-	 * Creates a L-Data message with full customization for control information.
+	 * Creates an L-Data message with full customization for control information.
 	 * <p>
 	 * The confirmation flag of the control field is left out, since it is mutual
 	 * exclusive with the rest of the control information and set to "don't care" (refer
@@ -238,7 +238,7 @@ public class CEMILData implements CEMI
 	}
 
 	/**
-	 * Creates a L-Data message, mainly for TP1 media.
+	 * Creates an L-Data message, mainly for TP1 media.
 	 *
 	 * @param msgCode a message code value specified in the L-Data type
 	 * @param src individual address of source
@@ -356,7 +356,7 @@ public class CEMILData implements CEMI
 	 * <p>
 	 * This information is valid in L-Data requests and partially in L-Data indications;
 	 * for L-Data confirmations the value behavior is undefined (it might have the same
-	 * value like the corresponding request).
+	 * value as the corresponding request).
 	 * <p>
 	 * For requests the following returns apply:<br>
 	 * If {@code true}, acknowledge was requested explicitly, {@code false}
@@ -392,7 +392,7 @@ public class CEMILData implements CEMI
 	 * frame, {@code true} if repeated frame.
 	 * <p>
 	 * For L-Data confirmations the value behavior is undefined (it might have the same
-	 * value like the corresponding request).
+	 * value as the corresponding request).
 	 *
 	 * @return repeat state as boolean
 	 */

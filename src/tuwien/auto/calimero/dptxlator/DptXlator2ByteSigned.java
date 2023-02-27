@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2021, 2022 B. Malinowsky
+    Copyright (c) 2021, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -221,7 +221,7 @@ public class DptXlator2ByteSigned extends DPTXlator
 	 * {@link #DptDeltaTimeHours}. The milliseconds are converted to the unit of the
 	 * set DPT, with the result rounded to the nearest representable value (with 0.5
 	 * rounded up).<br>
-	 * On any other DPT, the input is treated equal to {@link #setValue(int)}.
+	 * On any other DPT, the input is treated equal to {@link #setValue(double)}.
 	 *
 	 * @param milliseconds the value in milliseconds
 	 * @throws KNXFormatException on milliseconds out of range for DPT
@@ -267,7 +267,7 @@ public class DptXlator2ByteSigned extends DPTXlator
 				v = formatter.parse(s).doubleValue();
 			else {
 				try {
-					v = Integer.decode(s).intValue();
+					v = Integer.decode(s);
 				}
 				catch (final NumberFormatException e) {
 					v = formatter.parse(s).longValue();

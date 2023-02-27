@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ class LFUCacheTest
 	CacheObject o1, o2, o3, o4, o5, o6;
 	LDataObject co;
 
-	private class ExpCache extends LFUCache
+	private static class ExpCache extends LFUCache
 	{
 		ExpCache(final int cacheSize, final int timeToExpire)
 		{
@@ -83,8 +83,7 @@ class LFUCacheTest
 	}
 
 	@AfterEach
-	void tearDown() throws Exception
-	{
+	void tearDown() {
 		var.clear();
 		fix.clear();
 		exp.clear();

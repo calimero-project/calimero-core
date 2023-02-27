@@ -47,14 +47,14 @@ public interface SerialCom extends AutoCloseable {
 	enum StopBits {
 		One, Two;
 
-		public int value() { return ordinal() + 1; };
-	}
+		public int value() { return ordinal() + 1; }
+    }
 
 	enum Parity {
 		None, Odd, Even, Mark;
 
-		public int value() { return ordinal(); };
-	}
+		public int value() { return ordinal(); }
+    }
 
 	enum FlowControl {
 		None;

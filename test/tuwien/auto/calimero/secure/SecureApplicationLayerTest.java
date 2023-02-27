@@ -1,6 +1,6 @@
 /*
     Calimero - A library for KNX network access
-    Copyright (c) 2019, 2021 B. Malinowsky
+    Copyright (c) 2019, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -115,9 +115,9 @@ class SecureApplicationLayerTest {
 				if (toolAccess)
 					return sequenceNumberToolAccess;
 				return 5;
-			};
+			}
 
-			@Override
+            @Override
 			protected long lastValidSequenceNumber(final boolean toolAccess, final IndividualAddress remote) {
 				if (toolAccess)
 					return sequenceNumberToolAccess - 1;
@@ -205,7 +205,7 @@ class SecureApplicationLayerTest {
 		// A+C
 		final byte[] secureApdu = secure(SecureApplicationLayer.SecureDataPdu, remote, local, apdu);
 
-		final byte[] prefix = { 0x03, (byte) 0xf1, (byte) 0x90, 0x00, 00, 00, 00, 00, (byte) seq };
+		final byte[] prefix = { 0x03, (byte) 0xf1, (byte) 0x90, 0x00, 0, 0, 0, 0, (byte) seq };
 		final String encoded = "706f533105503557cb2b24f1dd341b60b7e017ecd6b06849a72b";
 		final byte[] encrypted = fromHex(encoded);
 		final byte[] expected = new byte[prefix.length + encrypted.length];
@@ -241,8 +241,7 @@ class SecureApplicationLayerTest {
 		asdu[1] = (byte) pidGroupKeyTable;
 		asdu[2] = (byte) ((elements << 4) | ((start >>> 8) & 0x0f));
 		asdu[3] = (byte) start;
-		for (int i = 0; i < data.length; ++i)
-			asdu[i + 4] = data[i];
+		System.arraycopy(data, 0, asdu, 4, data.length);
 
 		return asdu;
 	}

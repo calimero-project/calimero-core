@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2022 B. Malinowsky
+    Copyright (c) 2009, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,12 +36,7 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -52,6 +47,8 @@ import org.junit.jupiter.api.parallel.Isolated;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @Isolated("modifies Locale")
@@ -109,7 +106,7 @@ class DPTXlator4ByteFloatTest
 		assertEquals(strCmp.length, t.getItems());
 		Helper.assertSimilar(strCmp, t.getAllValues());
 
-		t.setValues(new String[0]);
+		t.setValues();
 		assertEquals(strings.length, t.getItems());
 		Helper.assertSimilar(strCmp, t.getAllValues());
 
@@ -118,7 +115,7 @@ class DPTXlator4ByteFloatTest
 		assertEquals(s.length, t.getItems());
 		Helper.assertSimilar(s, t.getAllValues());
 
-		t.setValues(new String[] { t.getValue(), t.getValue() });
+		t.setValues(t.getValue(), t.getValue());
 	}
 
 	@Test
@@ -131,7 +128,7 @@ class DPTXlator4ByteFloatTest
 		assertEquals(strings.length, returned.length);
 		assertEquals(t.getItems(), returned.length);
 		for (int i = 0; i < strings.length; ++i)
-			assertTrue(returned[i].indexOf(strCmp[i]) >= 0);
+			assertTrue(returned[i].contains(strCmp[i]));
 	}
 
 	@Test
@@ -201,12 +198,12 @@ class DPTXlator4ByteFloatTest
 	@Test
 	void getValue() throws KNXFormatException
 	{
-		assertTrue(t.getValue().indexOf("0") >= 0);
-		assertTrue(t.getValue().indexOf(t.getType().getUnit()) >= 0);
+		assertTrue(t.getValue().contains("0"));
+		assertTrue(t.getValue().contains(t.getType().getUnit()));
 		t.setValue(265f);
 		final float f = t.getValueFloat();
 		assertEquals(265, f, 1.0);
-		assertTrue(t.getValue().indexOf(String.valueOf(f)) >= 0);
+		assertTrue(t.getValue().contains(String.valueOf(f)));
 
 		// test non-localized formatted output for bigger floating point values
 		// that use scientific notation
@@ -216,8 +213,7 @@ class DPTXlator4ByteFloatTest
 		final Locale saved = Locale.getDefault();
 		final Locale[] locales = Locale.getAvailableLocales();
 		final List<String> output = new ArrayList<>();
-		for (int i = 0; i < locales.length; ++i) {
-			final Locale l = locales[i];
+		for (final Locale l : locales) {
 			Locale.setDefault(l);
 			//System.out.println("test language " + l);
 			final DPTXlator4ByteFloat t = new DPTXlator4ByteFloat(DPTXlator4ByteFloat.DPT_ACCELERATION);
@@ -243,7 +239,7 @@ class DPTXlator4ByteFloatTest
 			fail("should throw");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-		assertTrue(Arrays.equals(dataMin, t.getData()));
+        assertArrayEquals(dataMin, t.getData());
 		t.setData(dataValue2, 4);
 		byte[] data = t.getData();
 		assertEquals(4, data.length);
@@ -278,11 +274,11 @@ class DPTXlator4ByteFloatTest
 	@Test
 	void testToString() throws KNXFormatException
 	{
-		assertTrue(t.toString().indexOf("0.0") >= 0);
+		assertTrue(t.toString().contains("0.0"));
 		t.setValues(strings);
 		final String s = t.toString();
 		for (int i = 0; i < strings.length; i++) {
-			assertTrue(s.indexOf(strCmp[i]) >= 0);
+			assertTrue(s.contains(strCmp[i]));
 		}
 	}
 

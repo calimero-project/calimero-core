@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -146,7 +146,7 @@ public final class LogService
 	 */
 	public static void log(final Logger logger, final LogLevel level, final String format, final Object... arguments)
 	{
-		log(logger, level, (Marker) null, format, arguments);
+		log(logger, level, null, format, arguments);
 	}
 
 	private static void log(final Logger logger, final LogLevel level, final Marker marker,

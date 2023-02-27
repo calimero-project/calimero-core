@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -68,11 +68,11 @@ public final class Util
 	private static IndividualAddress device;
 
 	// KNX test devices, for connection-less and connection-oriented mode
-	private static IndividualAddress testDeviceCL = new IndividualAddress(1, 1, 4);
-	private static IndividualAddress testDeviceCO = new IndividualAddress(1, 1, 5);
+	private static final IndividualAddress testDeviceCL = new IndividualAddress(1, 1, 4);
+	private static final IndividualAddress testDeviceCO = new IndividualAddress(1, 1, 5);
 
 	// make sure its the same subnet as the test device (for tests that set the address)
-	private static IndividualAddress nonExisting = new IndividualAddress(1, 1, 200);
+	private static final IndividualAddress nonExisting = new IndividualAddress(1, 1, 200);
 
 	private Util()
 	{}
@@ -210,7 +210,7 @@ public final class Util
 			return Collections.list(NetworkInterface.getNetworkInterfaces()).stream()
 					.flatMap(ni -> ni.getInterfaceAddresses().stream())
 					.filter(ia -> ia.getAddress() instanceof Inet4Address).filter(ia -> matchesPrefix(ia, remote))
-					.map(ia -> ia.getAddress()).findFirst();
+					.map(InterfaceAddress::getAddress).findFirst();
 		}
 		catch (final SocketException ignore) {}
 		return Optional.empty();
@@ -290,7 +290,7 @@ public final class Util
 		return "test/resources/";
 	}
 
-	private static Path temp;
+	private static final Path temp;
 	static {
 		try {
 			temp = Files.createTempDirectory("calimero-junit-");

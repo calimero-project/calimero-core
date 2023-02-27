@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2018 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -120,7 +120,7 @@ public final class XmlInputFactory // extends XMLInputFactory
 
 	public XmlReader createXMLStreamReader(final InputStream stream)
 	{
-		return createXMLStreamReader(new InputStreamReader(stream, Charset.forName("UTF-8")));
+		return createXMLStreamReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
 	}
 
 	public XmlReader createXMLStreamReader(final InputStream stream, final String encoding)

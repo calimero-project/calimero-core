@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -58,9 +58,9 @@ class CommandDPTest {
 	@Test
 	void testToString() {
 		final Datapoint dp = new CommandDP(ga, "test");
-		assertTrue(dp.toString().indexOf("test") >= 0);
-		assertTrue(dp.toString().indexOf("command DP") >= 0);
-		assertTrue(dp.toString().indexOf(ga.toString()) >= 0);
+		assertTrue(dp.toString().contains("test"));
+		assertTrue(dp.toString().contains("command DP"));
+		assertTrue(dp.toString().contains(ga.toString()));
 	}
 
 	@Test

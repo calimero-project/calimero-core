@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ class KNXnetIPDevMgmtTest
 {
 //	private static KNXnetIPConnection.BlockingMode noblock = KNXnetIPConnection.BlockingMode.NonBlocking;
 //	private static KNXnetIPConnection.BlockingMode ack = KNXnetIPConnection.BlockingMode.WaitForAck;
-	private static KNXnetIPConnection.BlockingMode con = KNXnetIPConnection.BlockingMode.WaitForCon;
+	private static final KNXnetIPConnection.BlockingMode con = KNXnetIPConnection.BlockingMode.WaitForCon;
 
 	private KNXnetIPDevMgmt m;
 	private KNXListenerImpl l;
@@ -82,7 +82,7 @@ class KNXnetIPDevMgmtTest
 	{
 		boolean closed;
 		CEMI received;
-		BlockingQueue<CEMIDevMgmt> propCon = new ArrayBlockingQueue<>(1);
+		final BlockingQueue<CEMIDevMgmt> propCon = new ArrayBlockingQueue<>(1);
 
 		@Override
 		public void frameReceived(final FrameEvent e)
@@ -117,8 +117,7 @@ class KNXnetIPDevMgmtTest
 	}
 
 	@BeforeEach
-	void init() throws Exception
-	{
+	void init() {
 		l = new KNXListenerImpl();
 		// pid 52 = individual address
 		frame = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, 11, 1, 52, 1, 1);
@@ -127,8 +126,7 @@ class KNXnetIPDevMgmtTest
 	}
 
 	@AfterEach
-	void tearDown() throws Exception
-	{
+	void tearDown() {
 		if (m != null) {
 			m.close();
 		}
@@ -181,7 +179,7 @@ class KNXnetIPDevMgmtTest
 		assertEquals(Util.getServer(), m.getRemoteAddress());
 		m.close();
 		assertTrue(m.getRemoteAddress().getAddress().isAnyLocalAddress());
-		assertTrue(m.getRemoteAddress().getPort() == 0);
+        assertEquals(0, m.getRemoteAddress().getPort());
 	}
 
 	@Test

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -91,9 +91,9 @@ public class DefaultXmlWriter implements XmlWriter
 		layout = new Stack<>();
 		indent = 0;
 		newTag = false;
-	};
+	}
 
-	private void writeDeclaration(final boolean standalone, final String encoding,
+    private void writeDeclaration(final boolean standalone, final String encoding,
 		final String version) throws KNXMLException
 	{
 		write("<?xml version=", quote, version, quote);

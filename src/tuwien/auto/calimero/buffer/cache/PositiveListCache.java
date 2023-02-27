@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,7 +38,6 @@ package tuwien.auto.calimero.buffer.cache;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
@@ -85,7 +84,7 @@ public class PositiveListCache extends ExpiringCache
 	 * @param timeToExpire timespan in seconds for cache objects to stay valid,
 	 *        or 0 for no expiring
 	 */
-	public PositiveListCache(final Collection<? extends Object> positiveList, final int timeToExpire)
+	public PositiveListCache(final Collection<?> positiveList, final int timeToExpire)
 	{
 		this(timeToExpire);
 		setPositiveList(positiveList);
@@ -99,16 +98,14 @@ public class PositiveListCache extends ExpiringCache
 	 *
 	 * @param positiveList a Collection holding the allowed keys for this cache
 	 */
-	public final synchronized void setPositiveList(final Collection<? extends Object> positiveList)
+	public final synchronized void setPositiveList(final Collection<?> positiveList)
 	{
 		if (posList.size() == 0)
 			posList.addAll(positiveList);
 		else {
 			posList = new HashSet<>(positiveList);
 			// remove old keys not in the new list anymore
-			for (final Iterator<Object> i = map.keySet().iterator(); i.hasNext();)
-				if (!posList.contains(i.next()))
-					i.remove();
+			map.keySet().removeIf(o -> !posList.contains(o));
 		}
 	}
 

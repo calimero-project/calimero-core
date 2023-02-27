@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2021 B. Malinowsky
+    Copyright (c) 2018, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -94,9 +94,9 @@ class DptXlatorXyYTest {
 		t.setValue(1, 1, 100);
 		t.setValue(0.1, 0.1, 10);
 		t.setValue(0.97, 0.98, 99);
-		assertEquals(0.97, t.x().get().doubleValue(), 0.2);
-		assertEquals(0.98, t.y().get().doubleValue(), 0.2);
-		assertEquals(99, t.brightness().get().doubleValue(), 0.2);
+		assertEquals(0.97, t.x().get(), 0.2);
+		assertEquals(0.98, t.y().get(), 0.2);
+		assertEquals(99, t.brightness().get(), 0.2);
 	}
 
 	@Test

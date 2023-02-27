@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -53,7 +53,6 @@ import java.net.MulticastSocket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.time.Duration;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -107,8 +106,8 @@ class KNXnetIPRouterTest
 	private final class RouterListenerImpl implements RoutingListener
 	{
 		volatile boolean closed;
-		BlockingQueue<CEMI> received = new ArrayBlockingQueue<>(100);
-		List<LostMessageEvent> lost = new Vector<>();
+		final BlockingQueue<CEMI> received = new ArrayBlockingQueue<>(100);
+		final List<LostMessageEvent> lost = new Vector<>();
 
 		@Override
 		public void frameReceived(final FrameEvent e)
@@ -154,9 +153,9 @@ class KNXnetIPRouterTest
 		frame = new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0), new GroupAddress(0, 0, 1),
 				new byte[] { 0, (byte) (0x80 | 1) }, Priority.NORMAL);
 		frame2 = new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0), new GroupAddress(0, 0, 1),
-				new byte[] { 0, (byte) (0x80 | 0) }, Priority.URGENT);
+				new byte[] { 0, (byte) (0x80) }, Priority.URGENT);
 		frameNoDest = new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0), new GroupAddress(10, 7, 10),
-				new byte[] { 0, (byte) (0x80 | 0) }, Priority.URGENT);
+				new byte[] { 0, (byte) (0x80) }, Priority.URGENT);
 		routingBusy.set(0);
 
 		r = new KNXnetIPRouting(null, KNXnetIPRouting.DefaultMulticast);
@@ -164,8 +163,7 @@ class KNXnetIPRouterTest
 	}
 
 	@AfterEach
-	void tearDown() throws Exception
-	{
+	void tearDown() {
 		if (r != null) {
 			r.close();
 		}
@@ -272,13 +270,13 @@ class KNXnetIPRouterTest
 				r.getRemoteAddress());
 		r.close();
 		assertTrue(r.getRemoteAddress().getAddress().isAnyLocalAddress());
-		assertTrue(r.getRemoteAddress().getPort() == 0);
+        assertEquals(0, r.getRemoteAddress().getPort());
 
 		r = new KNXnetIPRouting(Util.localInterface(), InetAddress.getByName("224.0.23.33"));
 		assertEquals(new InetSocketAddress("224.0.23.33", KNXnetIPConnection.DEFAULT_PORT), r.getRemoteAddress());
 		r.close();
 		assertTrue(r.getRemoteAddress().getAddress().isAnyLocalAddress());
-		assertTrue(r.getRemoteAddress().getPort() == 0);
+        assertEquals(0, r.getRemoteAddress().getPort());
 	}
 
 	@Test
@@ -299,8 +297,7 @@ class KNXnetIPRouterTest
 			Thread.sleep(100);
 		}
 		catch (final InterruptedException e1) {}
-		for (final Iterator<LostMessageEvent> i = l.lost.iterator(); i.hasNext();) {
-			final LostMessageEvent e = i.next();
+		for (final LostMessageEvent e : l.lost) {
 			System.out.println("dev.state:" + e.getDeviceState() + ", lost msgs:" + e.getLostMessages());
 		}
 	}

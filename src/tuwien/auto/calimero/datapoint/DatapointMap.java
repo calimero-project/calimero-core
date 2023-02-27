@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,7 +39,6 @@ package tuwien.auto.calimero.datapoint;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import tuwien.auto.calimero.GroupAddress;
@@ -91,12 +90,11 @@ public class DatapointMap<T extends Datapoint> implements DatapointModel<T>, Cha
 	{
 		// not all HashSets put additional capacity in HashSet(Collection) ctor
 		final Map<GroupAddress, T> m = new HashMap<>(Math.max(2 * datapoints.size(), 11));
-		for (final Iterator<T> i = datapoints.iterator(); i.hasNext();) {
-			final T dp = i.next();
-			if (m.containsKey(dp.getMainAddress()))
-				throw new KNXIllegalArgumentException("duplicate datapoint " + dp.getMainAddress());
-			m.put(dp.getMainAddress(), dp);
-		}
+        for (final T dp : datapoints) {
+            if (m.containsKey(dp.getMainAddress()))
+                throw new KNXIllegalArgumentException("duplicate datapoint " + dp.getMainAddress());
+            m.put(dp.getMainAddress(), dp);
+        }
 		points = Collections.synchronizedMap(m);
 		dpTypeRef = Datapoint.class;
 	}
@@ -183,8 +181,8 @@ public class DatapointMap<T extends Datapoint> implements DatapointModel<T>, Cha
 	{
 		w.writeStartElement(TAG_DATAPOINTS);
 		synchronized (points) {
-			for (final Iterator<T> i = points.values().iterator(); i.hasNext();)
-				i.next().save(w);
+            for (final T t : points.values())
+            	t.save(w);
 		}
 		w.writeEndElement();
 	}

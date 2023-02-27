@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2022 B. Malinowsky
+    Copyright (c) 2018, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ public class DptXlatorRgbw extends DPTXlator {
 
 
 	/**
-	 * Creates a translator for {@link DptRgbw}.
+	 * Creates a translator for {@link #DptRgbw}.
 	 *
 	 * @throws KNXFormatException on not available DPT
 	 */

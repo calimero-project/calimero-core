@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -151,14 +151,13 @@ class KNXNetworkLinkIPTest
 		frame = new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0), new GroupAddress(0, 0, 1),
 				new byte[] { 0, (byte) (0x80 | 1) }, Priority.LOW);
 		frame2 = new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0), new GroupAddress(0, 0, 1),
-				new byte[] { 0, (byte) (0x80 | 0) }, Priority.URGENT);
+				new byte[] { 0, (byte) (0x80) }, Priority.URGENT);
 		frameInd = new CEMILData(CEMILData.MC_LDATA_IND, new IndividualAddress(0), new GroupAddress(0, 0, 1),
-				new byte[] { 0, (byte) (0x80 | 0) }, Priority.NORMAL);
+				new byte[] { 0, (byte) (0x80) }, Priority.NORMAL);
 	}
 
 	@AfterEach
-	void tearDown() throws Exception
-	{
+	void tearDown() {
 		if (tnl != null)
 			tnl.close();
 		if (rtr != null)
@@ -285,16 +284,16 @@ class KNXNetworkLinkIPTest
 		throws InterruptedException, UnknownHostException, KNXException
 	{
 		doSend(true, new byte[] { 0, (byte) (0x80 | 1) });
-		doSend(true, new byte[] { 0, (byte) (0x80 | 0) });
+		doSend(true, new byte[] { 0, (byte) (0x80) });
 		doSend(false, new byte[] { 0, (byte) (0x80 | 1) });
-		doSend(false, new byte[] { 0, (byte) (0x80 | 0) });
+		doSend(false, new byte[] { 0, (byte) (0x80) });
 
 		// send an extended PL frame
 		final KNXNetworkLink plrtr = new KNXNetworkLinkIP(KNXNetworkLinkIP.ROUTING, Util.getLocalHost(),
 				new InetSocketAddress(InetAddress.getByName(KNXnetIPRouting.DEFAULT_MULTICAST), 0), false,
 				new PLSettings());
 		plrtr.sendRequest(new GroupAddress(0, 0, 1), Priority.LOW,
-				new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (byte) (0x80 | 0) });
+				new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (byte) (0x80) });
 		plrtr.close();
 	}
 
@@ -335,9 +334,9 @@ class KNXNetworkLinkIPTest
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
 		doSendWait(true, new byte[] { 0, (byte) (0x80 | 1) });
-		doSendWait(true, new byte[] { 0, (byte) (0x80 | 0) });
+		doSendWait(true, new byte[] { 0, (byte) (0x80) });
 		doSendWait(false, new byte[] { 0, (byte) (0x80 | 1) });
-		doSendWait(false, new byte[] { 0, (byte) (0x80 | 0) });
+		doSendWait(false, new byte[] { 0, (byte) (0x80) });
 	}
 
 	private void doSendWait(final boolean tunnel, final byte[] nsdu) throws KNXLinkClosedException, KNXTimeoutException
@@ -384,19 +383,19 @@ class KNXNetworkLinkIPTest
 	void getName()
 	{
 		String n = tnl.getName();
-		assertTrue(n.indexOf(Util.getServer().getAddress().getHostAddress()) > -1);
+		assertTrue(n.contains(Util.getServer().getAddress().getHostAddress()));
 		tnl.close();
 		n = tnl.getName();
 		assertNotNull(n);
-		assertTrue(n.indexOf(Util.getServer().getAddress().getHostAddress()) > -1);
+		assertTrue(n.contains(Util.getServer().getAddress().getHostAddress()));
 
 		n = rtr.getName();
-		assertTrue(n.indexOf(KNXnetIPRouting.DEFAULT_MULTICAST) > -1);
+		assertTrue(n.contains(KNXnetIPRouting.DEFAULT_MULTICAST));
 //		assertTrue(n.indexOf("link") > -1);
 		rtr.close();
 		n = rtr.getName();
 		assertNotNull(n);
-		assertTrue(n.indexOf(KNXnetIPRouting.DEFAULT_MULTICAST) > -1);
+		assertTrue(n.contains(KNXnetIPRouting.DEFAULT_MULTICAST));
 	}
 
 	@Test
@@ -438,7 +437,7 @@ class KNXNetworkLinkIPTest
 				KNXNetworkLinkIP.DefaultMulticast, groupKey, Duration.ofMillis(2000), new TPSettings()));
 	}
 
-	private static interface DefaultMethodEvent extends NetworkLinkListener {
+	private interface DefaultMethodEvent extends NetworkLinkListener {
 		@LinkEvent
 		default void tunnelingFeature(final TunnelingFeature feature) { System.out.println("default method event " + feature); }
 	}
@@ -533,6 +532,6 @@ class KNXNetworkLinkIPTest
 				link.conn.send(frameInd, BlockingMode.NonBlocking);
 			}
 		}
-		assertTrue(cnt.get() == 1);
+		assertEquals(1, cnt.get());
 	}
 }

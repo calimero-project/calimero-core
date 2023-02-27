@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,13 +36,6 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -50,21 +43,21 @@ import org.junit.jupiter.api.Test;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.dptxlator.PropertyTypes.DPTID;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 class PropertyTypesTest {
 	@Test
 	void getAllPropertyTypes() {
 		final Map<Integer, DPTID> m = PropertyTypes.getAllPropertyTypes();
 		m.put(1000, new DPTID(1000, "1000.001"));
-		m.remove(Integer.valueOf(1000));
-		for (final Iterator<Integer> i = m.keySet().iterator(); i.hasNext();) {
-			final Integer type = i.next();
-			assertTrue(type > 0);
-		}
-		for (final Iterator<DPTID> i = m.values().iterator(); i.hasNext();) {
-			final DPTID type = i.next();
-			assertTrue(type.getMainNumber() > 0);
-			assertTrue(type.getDPT().length() >= 5);
-		}
+		m.remove(1000);
+        for (final Integer type : m.keySet()) {
+            assertTrue(type > 0);
+        }
+        for (final DPTID type : m.values()) {
+            assertTrue(type.getMainNumber() > 0);
+            assertTrue(type.getDPT().length() >= 5);
+        }
 	}
 
 	@Test
@@ -107,6 +100,6 @@ class PropertyTypesTest {
 		final DPTXlator t = PropertyTypes.createTranslator(PropertyTypes.PDT_BINARY_INFORMATION,
 				new byte[] { 1, 0, 1 });
 		assertEquals(3, t.getItems());
-		assertTrue(Arrays.equals(new byte[] { 1, 0, 1 }, t.getData()));
+        assertArrayEquals(new byte[]{1, 0, 1}, t.getData());
 	}
 }

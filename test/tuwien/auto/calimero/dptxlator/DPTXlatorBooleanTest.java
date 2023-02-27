@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,11 +36,6 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +43,8 @@ import org.junit.jupiter.api.Test;
 
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class DPTXlatorBooleanTest
@@ -76,7 +73,7 @@ class DPTXlatorBooleanTest
 		assertEquals(strings.length, t.getItems());
 		Helper.assertSimilar(strings, t.getAllValues());
 
-		t.setValues(new String[0]);
+		t.setValues();
 		assertEquals(strings.length, t.getItems());
 		Helper.assertSimilar(strings, t.getAllValues());
 
@@ -85,7 +82,7 @@ class DPTXlatorBooleanTest
 		assertEquals(s.length, t.getItems());
 		Helper.assertSimilar(s, t.getAllValues());
 
-		t.setValues(new String[] { t.getValue(), t.getValue() });
+		t.setValues(t.getValue(), t.getValue());
 	}
 
 	@Test
@@ -134,7 +131,7 @@ class DPTXlatorBooleanTest
 	void getValue() throws KNXFormatException
 	{
 		Helper.assertSimilar("false", t.getValue());
-		t.setValues(new String[0]);
+		t.setValues();
 		Helper.assertSimilar("false", t.getValue());
 		t.setValue(values[0]);
 		Helper.assertSimilar(strings[0], t.getValue());
@@ -154,7 +151,7 @@ class DPTXlatorBooleanTest
 			fail("should throw");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-		assertTrue(Arrays.equals(data, t.getData()));
+        assertArrayEquals(data, t.getData());
 		t.setData(dataValue1, 2);
 		byte[] d = t.getData();
 		assertEquals(1, d.length);
@@ -165,7 +162,7 @@ class DPTXlatorBooleanTest
 		t.setData(array, 1);
 		d = t.getData();
 		assertEquals(data.length, d.length);
-		assertTrue(Arrays.equals(data, d));
+        assertArrayEquals(data, d);
 		Helper.assertSimilar(strings, t.getAllValues());
 
 		t.setData(new byte[] { (byte) 0xFF, (byte) 0xFF });
@@ -180,7 +177,7 @@ class DPTXlatorBooleanTest
 	{
 		assertEquals(2, t.getData(new byte[2], 1).length);
 		final byte[] empty = new byte[2];
-		assertTrue(Arrays.equals(empty, t.getData(new byte[2], 1)));
+        assertArrayEquals(empty, t.getData(new byte[2], 1));
 
 		t.setData(data);
 		byte[] d = new byte[10];
@@ -231,12 +228,12 @@ class DPTXlatorBooleanTest
 	@Test
 	void getValueBoolean() throws KNXFormatException
 	{
-		assertEquals(false, t.getValueBoolean());
+        assertFalse(t.getValueBoolean());
 
 		t.setData(new byte[] { 1 });
-		assertEquals(true, t.getValueBoolean());
+        assertTrue(t.getValueBoolean());
 		t.setData(new byte[] { 0 });
-		assertEquals(false, t.getValueBoolean());
+        assertFalse(t.getValueBoolean());
 		t.setData(data);
 		assertEquals(values[0], t.getValueBoolean());
 		assertEquals(data.length, t.getItems());

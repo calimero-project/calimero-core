@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -129,7 +129,7 @@ public interface DatapointModel<T extends Datapoint>
 	 * Saves the datapoint model to XML using the supplied writer.
 	 * <p>
 	 *
-	 * @param w a XML writer
+	 * @param w an XML writer
 	 * @throws KNXMLException on error saving the datapoint model
 	 */
 	void save(XmlWriter w) throws KNXMLException;

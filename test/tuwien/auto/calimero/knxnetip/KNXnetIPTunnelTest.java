@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -87,9 +87,9 @@ import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 @KnxnetIP
 class KNXnetIPTunnelTest
 {
-	private static KNXnetIPConnection.BlockingMode noblock = KNXnetIPConnection.BlockingMode.NonBlocking;
-	private static KNXnetIPConnection.BlockingMode ack = KNXnetIPConnection.BlockingMode.WaitForAck;
-	private static KNXnetIPConnection.BlockingMode con = KNXnetIPConnection.BlockingMode.WaitForCon;
+	private static final KNXnetIPConnection.BlockingMode noblock = KNXnetIPConnection.BlockingMode.NonBlocking;
+	private static final KNXnetIPConnection.BlockingMode ack = KNXnetIPConnection.BlockingMode.WaitForAck;
+	private static final KNXnetIPConnection.BlockingMode con = KNXnetIPConnection.BlockingMode.WaitForCon;
 
 	private TcpConnection connection;
 
@@ -109,10 +109,10 @@ class KNXnetIPTunnelTest
 	{
 		boolean closed;
 		CEMI received;
-		List<CEMI> fifoReceived = new Vector<>();
+		final List<CEMI> fifoReceived = new Vector<>();
 
-		BlockingQueue<TunnelingFeature> featureResponse = new ArrayBlockingQueue<>(1);
-		BlockingQueue<CEMILData> con = new ArrayBlockingQueue<>(100);
+		final BlockingQueue<TunnelingFeature> featureResponse = new ArrayBlockingQueue<>(1);
+		final BlockingQueue<CEMILData> con = new ArrayBlockingQueue<>(100);
 
 		@Override
 		public void frameReceived(final FrameEvent e)
@@ -164,8 +164,7 @@ class KNXnetIPTunnelTest
 	}
 
 	@BeforeEach
-	void init() throws Exception
-	{
+	void init() {
 		l = new KNXListenerImpl();
 		lnat = new KNXListenerImpl();
 		lmon = new KNXListenerImpl();
@@ -173,14 +172,13 @@ class KNXnetIPTunnelTest
 		frame = new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0), new GroupAddress(0, 0, 1),
 				new byte[] { 0, (byte) (0x80 | 1) }, Priority.NORMAL);
 		frame2 = new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0), new GroupAddress(0, 0, 1),
-				new byte[] { 0, (byte) (0x80 | 0) }, Priority.URGENT);
+				new byte[] { 0, (byte) (0x80) }, Priority.URGENT);
 		frameNoDest = new CEMILData(CEMILData.MC_LDATA_REQ, new IndividualAddress(0), new GroupAddress(10, 7, 10),
-				new byte[] { 0, (byte) (0x80 | 0) }, Priority.LOW);
+				new byte[] { 0, (byte) (0x80) }, Priority.LOW);
 	}
 
 	@AfterEach
-	void tearDown() throws Exception
-	{
+	void tearDown() {
 		if (t != null) {
 			t.close();
 		}
@@ -414,7 +412,7 @@ class KNXnetIPTunnelTest
 		assertEquals(Util.getServer(), t.getRemoteAddress());
 		t.close();
 		assertTrue(t.getRemoteAddress().getAddress().isAnyLocalAddress());
-		assertTrue(t.getRemoteAddress().getPort() == 0);
+        assertEquals(0, t.getRemoteAddress().getPort());
 	}
 
 	@Test

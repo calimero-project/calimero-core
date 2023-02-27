@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2017, 2022 B. Malinowsky
+    Copyright (c) 2017, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -79,85 +79,85 @@ public class DptXlator8BitSet extends DPTXlator
 	// Common use domain
 
 	public enum GeneralStatus implements EnumBase<GeneralStatus> {
-		OutOfService, Fault, Overridden, InAlarm, AlarmUnAck;
-	}
+		OutOfService, Fault, Overridden, InAlarm, AlarmUnAck
+    }
 	public static final EnumDpt<GeneralStatus> DptGeneralStatus = new EnumDpt<>("21.001", GeneralStatus.class);
 
 	public enum DeviceControl implements EnumBase<DeviceControl> {
-		UserStopped, OwnIndAddress, VerifyMode;
-	}
+		UserStopped, OwnIndAddress, VerifyMode
+    }
 	public static final EnumDpt<DeviceControl> DptDeviceControl = new EnumDpt<>("21.002", DeviceControl.class);
 
 	// HVAC domain
 
 	public enum ForcingSignal implements EnumBase<ForcingSignal> {
-		ForceRequest, Protection, Oversupply, Overrun, DhwNorm, DhwLegio, RoomHeatingComfort, RoomHeatingMax;
-	}
+		ForceRequest, Protection, Oversupply, Overrun, DhwNorm, DhwLegio, RoomHeatingComfort, RoomHeatingMax
+    }
 	public static final EnumDpt<ForcingSignal> DptForcingSignal = new EnumDpt<>("21.100", ForcingSignal.class);
 
 	public enum ForcingSignalCool implements EnumBase<ForcingSignalCool> {
-		ForceRequest;
-	}
+		ForceRequest
+    }
 	public static final EnumDpt<ForcingSignalCool> DptForcingSignalCool = new EnumDpt<>("21.101",
 			ForcingSignalCool.class);
 
 	public enum RoomHeatingControllerStatus implements EnumBase<RoomHeatingControllerStatus> {
-		Fault, EcoMode, FlowTempLimit, ReturnTempLimit, MorningBoost, StartOptimization, StopOptimization, SummerMode;
-	}
+		Fault, EcoMode, FlowTempLimit, ReturnTempLimit, MorningBoost, StartOptimization, StopOptimization, SummerMode
+    }
 	public static final EnumDpt<RoomHeatingControllerStatus> DptRoomHeatingControllerStatus = new EnumDpt<>("21.102",
 			RoomHeatingControllerStatus.class);
 
 	public enum SolarDhwControllerStatus implements EnumBase<SolarDhwControllerStatus> {
-		Fault, SolarDhwLoadActive, SolarLoadSufficient;
-	}
+		Fault, SolarDhwLoadActive, SolarLoadSufficient
+    }
 	public static final EnumDpt<SolarDhwControllerStatus> DptSolarDhwControllerStatus = new EnumDpt<>("21.103",
 			SolarDhwControllerStatus.class);
 
 	public enum FuelTypeSet implements EnumBase<FuelTypeSet> {
-		Oil, Gas, SolidState;
-	}
+		Oil, Gas, SolidState
+    }
 	public static final EnumDpt<FuelTypeSet> DptFuelTypeSet = new EnumDpt<>("21.104", FuelTypeSet.class);
 
 	public enum RoomCoolingControllerStatus implements EnumBase<RoomCoolingControllerStatus> {
-		Fault;
-	}
+		Fault
+    }
 	public static final EnumDpt<RoomCoolingControllerStatus> DptRoomCoolingControllerStatus = new EnumDpt<>("21.105",
 			RoomCoolingControllerStatus.class);
 
 	public enum VentilationControllerStatus implements EnumBase<VentilationControllerStatus> {
-		Fault, FanActive, Heat, Cool;
-	}
+		Fault, FanActive, Heat, Cool
+    }
 	public static final EnumDpt<VentilationControllerStatus> DptVentilationControllerStatus = new EnumDpt<>("21.106",
 			VentilationControllerStatus.class);
 
 	// Lighting domain
 
 	public enum LightActuatorErrorInfo implements EnumBase<LightActuatorErrorInfo> {
-		LoadDetectionFailed, Undervoltage, Overcurrent, Underload, DefectiveLoad, LampFailure, Overheat;
-	}
+		LoadDetectionFailed, Undervoltage, Overcurrent, Underload, DefectiveLoad, LampFailure, Overheat
+    }
 	public static final EnumDpt<LightActuatorErrorInfo> DptLightActuatorErrorInfo = new EnumDpt<>("21.601",
 			LightActuatorErrorInfo.class);
 
 	// System domain
 
 	public enum RFCommModeInfo implements EnumBase<RFCommModeInfo> {
-		Asynchronous, BiBatMaster, BiBatSlave;
-	}
+		Asynchronous, BiBatMaster, BiBatSlave
+    }
 	public static final EnumDpt<RFCommModeInfo> DptRFCommModeInfo = new EnumDpt<>("21.1000", RFCommModeInfo.class);
 
 	public enum RFFilterModes implements EnumBase<RFFilterModes> {
-		DomainAddress, SerialNumber, DoAAndSN;
-	}
+		DomainAddress, SerialNumber, DoAAndSN
+    }
 	public static final EnumDpt<RFFilterModes> DptRFFilterInfo = new EnumDpt<>("21.1001", RFFilterModes.class);
 
 	public enum SecurityReport implements EnumBase<SecurityReport> {
-		SecurityFailure;
-	}
+		SecurityFailure
+    }
 	public static final EnumDpt<SecurityReport> DptSecurityReport = new EnumDpt<>("21.1002", SecurityReport.class);
 
 	public enum ChannelActivationState implements EnumBase<ChannelActivationState> {
-		Channel1, Channel2, Channel3, Channel4, Channel5, Channel6, Channel7, Channel8;
-	}
+		Channel1, Channel2, Channel3, Channel4, Channel5, Channel6, Channel7, Channel8
+    }
 	public static final EnumDpt<ChannelActivationState> DptChannelActivation = new EnumDpt<>("21.1010",
 			ChannelActivationState.class);
 

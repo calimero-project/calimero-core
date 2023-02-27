@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -385,8 +385,8 @@ public class CEMIBusMon implements CEMI
 		}
 		buf[i++] = (byte) (tstamp >> 8);
 		buf[i++] = (byte) tstamp;
-		for (int k = 0; k < raw.length; ++k)
-			buf[i++] = raw[k];
+		for (final byte b : raw)
+			buf[i++] = b;
 		return buf;
 	}
 

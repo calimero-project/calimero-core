@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -274,7 +274,7 @@ public final class CEMIFactory
 		final boolean ack = (frame[1] & 0x02) != 0;
 		final boolean c = (frame[1] & 0x01) != 0;
 		final int dst = (frame[4] & 0xff) << 8 | (frame[5] & 0xff);
-		final KNXAddress a = (frame[6] & 0x80) != 0 ? (KNXAddress) new GroupAddress(dst)
+		final KNXAddress a = (frame[6] & 0x80) != 0 ? new GroupAddress(dst)
 				: new IndividualAddress(dst);
 		final int hops = frame[6] >> 4 & 0x07;
 		final int len = (frame[6] & 0x0f) + 1;
@@ -359,8 +359,7 @@ public final class CEMIFactory
 		buf[6] = (byte) (hopCount << 4 | (nsdu.length - 1));
 		if (dst instanceof GroupAddress)
 			buf[6] |= 0x80;
-		for (int i = 0; i < nsdu.length; ++i)
-			buf[7 + i] = nsdu[i];
+        System.arraycopy(nsdu, 0, buf, 7, nsdu.length);
 		return buf;
 	}
 
@@ -378,7 +377,7 @@ public final class CEMIFactory
 		// on original == null we just return null, too
 		if (original instanceof CEMILDataEx)
 			return ((CEMILDataEx) original).clone();
-		// all other are immutable
+		// all others are immutable
 		return original;
 	}
 

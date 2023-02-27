@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -71,8 +71,7 @@ class DatapointMapTest
 	private final Datapoint dp3 = new StateDP(ga3, "test3");
 
 	@BeforeEach
-	protected void init() throws Exception
-	{
+	protected void init() {
 		m = new DatapointMap<>();
 	}
 

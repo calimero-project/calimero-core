@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2022 B. Malinowsky
+    Copyright (c) 2019, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -148,16 +148,11 @@ class TcpConnectionTest {
 	@Slow
 	void manySecureSessions() {
 		for (int i = 0; i < 5000; ++i) {
-			final SecureSession session = conn.newSecureSession(1, userKey1.clone(), deviceAuthCode.clone());
-			try {
+			try (SecureSession session = conn.newSecureSession(1, userKey1.clone(), deviceAuthCode.clone())) {
 				session.ensureOpen();
-			}
-			catch (KNXException | InterruptedException e) {
+			} catch (KNXException | InterruptedException e) {
 				e.printStackTrace();
 				break;
-			}
-			finally {
-				session.close();
 			}
 		}
 		assertEquals(0, conn.sessions.size());

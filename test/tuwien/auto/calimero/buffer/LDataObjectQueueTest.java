@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,12 +36,6 @@
 
 package tuwien.auto.calimero.buffer;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.util.function.Consumer;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -54,6 +48,8 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMILData;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class LDataObjectQueueTest
@@ -439,8 +435,7 @@ class LDataObjectQueueTest
 	}
 
 	@Test
-	void clear() throws Exception
-	{
+	void clear() {
 		var.clear();
 		fix.clear();
 		ring.clear();
@@ -510,9 +505,9 @@ class LDataObjectQueueTest
 		con.setFrame(frame5);
 		item = con.getItem();
 		assertEquals(frame1, item.getFrame());
-		assertFalse(0 == item.getTimestamp());
+		assertNotEquals(0, item.getTimestamp());
 		item = con.getItem();
 		assertEquals(frame5, item.getFrame());
-		assertFalse(0 == item.getTimestamp());
+		assertNotEquals(0, item.getTimestamp());
 	}
 }

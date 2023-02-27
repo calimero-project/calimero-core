@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,7 +39,6 @@ package tuwien.auto.calimero.knxnetip.servicetype;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -169,7 +168,7 @@ public class DescriptionResponse extends ServiceType
 	 */
 	public final List<DIB> getDescription()
 	{
-		return Arrays.asList(dibs.values().toArray(new DIB[dibs.size()]));
+		return Arrays.asList(dibs.values().toArray(new DIB[0]));
 	}
 
 	/**
@@ -220,16 +219,16 @@ public class DescriptionResponse extends ServiceType
 	int getStructLength()
 	{
 		int len = 0;
-		for (final Iterator<DIB> i = getDescription().iterator(); i.hasNext();)
-			len += i.next().getStructLength();
+		for (final var dib : getDescription())
+			len += dib.getStructLength();
 		return len;
 	}
 
 	@Override
 	byte[] toByteArray(final ByteArrayOutputStream os)
 	{
-		for (final Iterator<DIB> i = getDescription().iterator(); i.hasNext();) {
-			final byte[] bytes = i.next().toByteArray();
+		for (final var dib : getDescription()) {
+			final byte[] bytes = dib.toByteArray();
 			os.write(bytes, 0, bytes.length);
 		}
 		return os.toByteArray();

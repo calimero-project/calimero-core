@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2021 B. Malinowsky
+    Copyright (c) 2018, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -199,7 +199,7 @@ class DptXlatorBrightnessClrTempTransTest {
 		t.setValue("100 65535 " + localize(6553.5));
 		t.setAppendUnit(false);
 		assertEquals("100 65535 " + localize(6553.5), t.getValue());
-		t.setValue(100, 65535, Duration.ofSeconds(6553, 500_000_000l));
+		t.setValue(100, 65535, Duration.ofSeconds(6553, 500_000_000L));
 		assertEquals("100 65535 " + localize(6553.5), t.getValue());
 	}
 

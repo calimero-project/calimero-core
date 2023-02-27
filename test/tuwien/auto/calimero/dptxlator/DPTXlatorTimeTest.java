@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -102,7 +102,7 @@ class DPTXlatorTimeTest
 		assertEquals(values.length, t.getAllValues().length);
 		final String[] all = t.getAllValues();
 		for (int i = 0; i < values.length; i++)
-			assertTrue(all[i].toLowerCase().indexOf(values[i].toLowerCase().trim()) > -1);
+			assertTrue(all[i].toLowerCase().contains(values[i].toLowerCase().trim()));
 	}
 
 	@Test
@@ -151,8 +151,8 @@ class DPTXlatorTimeTest
 	void getDataByteArrayInt()
 	{
 		byte[] d = t.getData(new byte[5], 2);
-		for (int i = 0; i < d.length; ++i)
-			assertEquals(0, d[i]);
+        for (final byte b : d)
+        	assertEquals(0, b);
 		t.setData(data, 1);
 		d = t.getData(new byte[5], 1);
 		for (int i = 0; i < 4; ++i)

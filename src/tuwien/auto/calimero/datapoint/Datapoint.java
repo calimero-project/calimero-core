@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -125,7 +125,7 @@ public abstract class Datapoint
 		try {
 			a = r.getAttributeValue(null, ATTR_MAINNUMBER);
 			if (a != null)
-				mainNo = Integer.decode(a).intValue();
+				mainNo = Integer.decode(a);
 			a = r.getAttributeValue(null, ATTR_PRIORITY);
 			if (a != null)
 				priority = Priority.get(a);
@@ -176,7 +176,7 @@ public abstract class Datapoint
 	 * The datapoint name might be any user defined name, it is only used for interaction
 	 * with the user.
 	 *
-	 * @param friendlyName user friendly name of the datapoint
+	 * @param friendlyName user-friendly name of the datapoint
 	 */
 	public final void setName(final String friendlyName)
 	{

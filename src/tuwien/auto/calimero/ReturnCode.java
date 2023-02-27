@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2022 B. Malinowsky
+    Copyright (c) 2019, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ import java.util.Map;
  * Note, that several older KNX services and functions do not use these return codes.
  */
 public final class ReturnCode {
-	static Map<Integer, ReturnCode> values = Collections.synchronizedMap(new HashMap<>());
+	static final Map<Integer, ReturnCode> values = Collections.synchronizedMap(new HashMap<>());
 
 	// Generic positive return codes
 

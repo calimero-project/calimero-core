@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,11 +36,6 @@
 
 package tuwien.auto.calimero.dptxlator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -49,6 +44,8 @@ import org.junit.jupiter.api.Test;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled.DPT3BitControlled;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class DPTXlator3BitControlledTest
@@ -104,7 +101,7 @@ class DPTXlator3BitControlledTest
 		assertEquals(dims.length, t7.getItems());
 		Helper.assertSimilar(dims, t7.getAllValues());
 
-		t7.setValues(new String[0]);
+		t7.setValues();
 		assertEquals(dims.length, t7.getItems());
 		Helper.assertSimilar(dims, t7.getAllValues());
 
@@ -113,7 +110,7 @@ class DPTXlator3BitControlledTest
 		assertEquals(s.length, t7.getItems());
 		Helper.assertSimilar(s, t7.getAllValues());
 
-		t7.setValues(new String[] { t7.getValue(), t7.getValue() });
+		t7.setValues(t7.getValue(), t7.getValue());
 	}
 
 	@Test
@@ -178,7 +175,7 @@ class DPTXlator3BitControlledTest
 			fail("should throw");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-		assertTrue(Arrays.equals(blindData, t8.getData()));
+        assertArrayEquals(blindData, t8.getData());
 		t8.setData(dataBlindValue3);
 		byte[] d = t8.getData();
 		assertEquals(1, d.length);
@@ -199,7 +196,7 @@ class DPTXlator3BitControlledTest
 	{
 		assertEquals(4, t7.getData(new byte[4], 1).length);
 		final byte[] empty = new byte[4];
-		assertTrue(Arrays.equals(empty, t7.getData(new byte[4], 1)));
+        assertArrayEquals(empty, t7.getData(new byte[4], 1));
 
 		t7.setData(dimData);
 		byte[] d = new byte[10];
@@ -343,7 +340,7 @@ class DPTXlator3BitControlledTest
 	{
 		Helper.assertSimilar("decrease break", t7.getValue());
 		Helper.assertSimilar("up break", t8.getValue());
-		t7.setValues(new String[0]);
+		t7.setValues();
 		Helper.assertSimilar("decrease break", t7.getValue());
 
 		t7.setValue(false, 3);

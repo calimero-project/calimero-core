@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2022 B. Malinowsky
+    Copyright (c) 2009, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -257,7 +257,7 @@ public class DPTXlator4ByteSigned extends DPTXlator
 		throws KNXFormatException
 	{
 		try {
-			toDPT(Integer.decode(removeUnit(value)).intValue(), dst, index);
+			toDPT(Integer.decode(removeUnit(value)), dst, index);
 		}
 		catch (final NumberFormatException e) {
 			throw newException("wrong value format", value);

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2022 B. Malinowsky
+    Copyright (c) 2015, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,9 +36,6 @@
 
 package tuwien.auto.calimero.link.medium;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -47,6 +44,8 @@ import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.cemi.RFMediumInfo.RSS;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class RFLDataTest {
 	private final boolean batteryOk = true;
@@ -71,7 +70,7 @@ class RFLDataTest {
 		(byte) 0x83 };
 
 	@BeforeEach
-	void setUp() throws Exception {
+	void setUp() {
 		rf = new RFLData(batteryOk, transmitOnlyDevice, frameType, frameNumber, doa, src, dst, tpdu);
 	}
 
@@ -80,7 +79,7 @@ class RFLDataTest {
 		final RFLData f = RFLData.newForTransmitOnlyDevice(batteryOk, frameType, frameNumber, serial,
 				new GroupAddress(1), tpdu);
 		assertEquals(batteryOk, f.isBatteryOk());
-		assertEquals(true, f.isTransmitOnlyDevice());
+		assertTrue(f.isTransmitOnlyDevice());
 		assertEquals(frameType, f.getFrameType());
 		assertEquals(frameNumber, f.getFrameNumber());
 		assertArrayEquals(serial, f.getDoAorSN());
@@ -138,17 +137,17 @@ class RFLDataTest {
 
 	@Test
 	void isSystemBroadcast() {
-		assertEquals(true, rf.isSystemBroadcast());
+		assertTrue(rf.isSystemBroadcast());
 
 		RFLData f = new RFLData(batteryOk, transmitOnlyDevice, frameType, frameNumber, doa, null, dst, tpdu);
-		assertEquals(true, f.isSystemBroadcast());
+		assertTrue(f.isSystemBroadcast());
 
 		f = new RFLData(batteryOk, transmitOnlyDevice, frameType, frameNumber, doa, src, new IndividualAddress(1, 1, 1),
 				tpdu);
-		assertEquals(false, f.isSystemBroadcast());
+		assertFalse(f.isSystemBroadcast());
 
 		f = new RFLData(batteryOk, transmitOnlyDevice, frameType, frameNumber, doa, src, GroupAddress.Broadcast, tpdu);
-		assertEquals(false, f.isSystemBroadcast());
+		assertFalse(f.isSystemBroadcast());
 	}
 
 	@Test
