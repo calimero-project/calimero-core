@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.github.calimero</groupId>
+		<groupId>io.calimero</groupId>
 		<artifactId>calimero-parent</artifactId>
 		<version>2.6-SNAPSHOT</version>
 	</parent>
@@ -26,7 +26,7 @@
 		</developer>
 	</developers>
 	<properties>
-		<exec.mainClass>tuwien.auto.calimero.Settings</exec.mainClass>
+		<exec.mainClass>io.calimero.Settings</exec.mainClass>
 		<test.exclude.tags>slow,ft12</test.exclude.tags>
 	</properties>
 	<build>
@@ -49,7 +49,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>tuwien.auto.calimero.Settings</mainClass>
+							<mainClass>io.calimero.Settings</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

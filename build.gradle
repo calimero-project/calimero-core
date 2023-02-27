@@ -17,7 +17,7 @@ repositories {
 ext.junitJupiterVersion = '5.9.1'
 ext.desc = 'Calimero, a free KNX network library'
 
-group = 'com.github.calimero'
+group = 'io.calimero'
 version = '2.6-SNAPSHOT'
 
 sourceCompatibility = 11
@@ -28,14 +28,14 @@ java {
     withJavadocJar()
 }
 
-tasks.withType(Jar) {
-	from("${projectDir}") {
+tasks.withType(Jar).configureEach {
+    from("${projectDir}") {
         include 'LICENSE.txt'
         into "META-INF"
     }
     if (name.equals('sourcesJar')) {
-    	from("${projectDir}") {
-		    include 'README.md'
+        from("${projectDir}") {
+            include 'README.md'
         }
     }
 }
@@ -47,7 +47,7 @@ javadoc.options.encoding = 'UTF-8'
 
 compileJava.options*.compilerArgs = [
 	'-Xlint:all,-serial',
-	"--limit-modules", "java.base,java.xml"
+	"--limit-modules", "java.base,java.xml,org.slf4j"
 ]
 
 compileTestJava.options*.compilerArgs = [
@@ -55,8 +55,14 @@ compileTestJava.options*.compilerArgs = [
 	'-Xlint:-try',
 ]
 
+tasks.named('compileJava') {
+    options.javaModuleVersion = provider { project.version }
+}
 
-mainClassName = 'tuwien.auto.calimero.Settings'
+application {
+    mainModule = 'io.calimero.core' 
+    mainClass = 'io.calimero.Settings'
+}
 
 sourceSets {
     main {
@@ -70,13 +76,13 @@ sourceSets {
     }
 }
 
-tasks.withType(Javadoc) {
+tasks.withType(Javadoc).configureEach {
     options.addStringOption("Xdoclint:-missing", '-quiet')
 }
 
 jar {
 	manifest {
-		attributes 'Main-Class': mainClassName
+		attributes 'Main-Class': application.mainClass
 	}
 }
 
@@ -127,8 +133,8 @@ publishing {
     repositories {
         maven {
             name 'maven'
-            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2"
+            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots"
             url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
             credentials(PasswordCredentials)
         }
@@ -141,8 +147,8 @@ signing {
     }
 }
 
-plugins.withType(JavaPlugin) {
-	eclipse {
+plugins.withType(JavaPlugin).configureEach {
+    eclipse {
         jdt {
             file.withProperties { properties ->
                 // Eclipse's view of projects treats circular dependencies as errors by default
@@ -157,5 +163,5 @@ dependencies {
 
 	testImplementation "org.junit.jupiter:junit-jupiter:${junitJupiterVersion}"
 	// Eclipse treats circular dependencies as errors by default, see eclipseJdt task above
-//	testRuntimeOnly "com.github.calimero:calimero-rxtx:${version}"
+//	testRuntimeOnly "io.calimero:calimero-rxtx:${version}"
 }
