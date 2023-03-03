@@ -76,7 +76,7 @@ public class DptXlator16BitSet extends DPTXlator {
 
 	// HVAC domain
 	public enum DhwControllerStatus implements EnumBase<DhwControllerStatus> {
-		Fault, Load, LegioProtection, Push, OtherEnergySource, SolarEnergyOnly, SolarEnergySupport, TemperatureOptimizationShift;
+		Fault, Load, LegioProtection, Push, OtherEnergySource, SolarEnergyOnly, SolarEnergySupport, TemperatureOptimizationShift
 	}
 	public static final EnumDpt<DhwControllerStatus> DptDhwControllerStatus = new EnumDpt<>("22.100", DhwControllerStatus.class);
 
@@ -107,9 +107,9 @@ public class DptXlator16BitSet extends DPTXlator {
 
 	public enum ChannelActivationState16 implements EnumBase<ChannelActivationState16> {
 		Channel1, Channel2, Channel3, Channel4, Channel5, Channel6, Channel7, Channel8,
-		Channel9, Channel10, Channel11, Channel12, Channel13, Channel14, Channel15, Channel16;
+		Channel9, Channel10, Channel11, Channel12, Channel13, Channel14, Channel15, Channel16
 	}
-	public static final EnumDpt<ChannelActivationState16> DptChannelActivation16 = new EnumDpt<ChannelActivationState16>("22.1010",
+	public static final EnumDpt<ChannelActivationState16> DptChannelActivation16 = new EnumDpt<>("22.1010",
 			ChannelActivationState16.class);
 
 	private static final Map<String, DPT> types = loadDatapointTypes(DptXlator16BitSet.class);

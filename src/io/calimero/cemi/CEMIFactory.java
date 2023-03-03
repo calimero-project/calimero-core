@@ -347,7 +347,7 @@ public final class CEMIFactory
 
 		buf[1] = (byte) (p.value << 2);
 		// repeat flag is only relevant for .con
-		final boolean rep = mc == Emi1_LData_con ? repeat : false;
+		final boolean rep = mc == Emi1_LData_con && repeat;
 		final int ctrl = (rep ? 0x20 : 0) | (ackRequest ? 0x02 : 0) | (positiveCon ? 0 : 0x01);
 		buf[1] |= (byte) ctrl;
 

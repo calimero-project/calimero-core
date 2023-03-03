@@ -36,15 +36,15 @@
 
 package io.calimero.dptxlator;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 import static io.calimero.dptxlator.DptXlator16BitSet.DhwControllerStatus.TemperatureOptimizationShift;
 import static io.calimero.dptxlator.DptXlator16BitSet.RhccStatus.EarlyEveningShutdown;
 import static io.calimero.dptxlator.DptXlator16BitSet.RhccStatus.Fault;
 import static io.calimero.dptxlator.DptXlator16BitSet.RhccStatus.FrostAlarm;
 import static io.calimero.dptxlator.DptXlator16BitSet.RhccStatus.HeatingEcoMode;
 import static io.calimero.dptxlator.DptXlator16BitSet.RhccStatus.OverheatAlarm;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -83,7 +83,7 @@ class DptXlator16BitSetTest {
 		t.setValue("1 1 0 0 0 0 1 0 0 0 0 0 1 1 0 1");
 		assertEquals("channel16, channel15, channel10, channel4, channel3, channel1", t.getValue());
 
-		DptXlator16BitSet t2 = new DptXlator16BitSet(DptXlator16BitSet.DptChannelActivation16);
+		final DptXlator16BitSet t2 = new DptXlator16BitSet(DptXlator16BitSet.DptChannelActivation16);
 		t2.setValues(t.getValue());
 		assertEquals(t.getValue(), t2.getValue());
 	}
@@ -96,7 +96,7 @@ class DptXlator16BitSetTest {
 		t.setValues("SolarEnergyOnly, Fault");
 		assertEquals("solar energy only, fault", t.getValue());
 
-		t.setValue(DptXlator16BitSet.DhwControllerStatus.TemperatureOptimizationShift.toString());
+		t.setValue(TemperatureOptimizationShift.toString());
 		assertEquals("temperature optimization shift", t.getValue());
 	}
 
