@@ -20,8 +20,8 @@ ext.desc = 'Calimero, a free KNX network library'
 group = 'io.calimero'
 version = '2.6-SNAPSHOT'
 
-sourceCompatibility = 11
-targetCompatibility = 11
+sourceCompatibility = 17
+targetCompatibility = 17
 
 java {
     withSourcesJar()
