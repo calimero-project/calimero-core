@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2021, 2021 B. Malinowsky
+    Copyright (c) 2021, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -100,23 +100,21 @@ class BaosTest {
 		final var serverEp = Util.localInterface().inetAddresses().filter(Inet4Address.class::isInstance).findFirst().get();
 		final var objectServer = new InetSocketAddress(serverEp, 12004);
 
-		final var server = new BaosServer();
-		CompletableFuture.runAsync(server);
-		Thread.sleep(500);
-		try (var link = BaosLinkIp.newTcpLink(TcpConnection.newTcpConnection(new InetSocketAddress(0), objectServer))) {
-			final var rcv = new LinkedBlockingQueue<>();
-			link.addLinkListener(new NetworkLinkListener() {
-				@LinkEvent
-				void objectServerEvent(final BaosService svc) {
-					rcv.offer(svc);
-				}
-			});
+		try (var server = new BaosServer()) {
+			CompletableFuture.runAsync(server);
+			Thread.sleep(500);
+			try (var link = BaosLinkIp.newTcpLink(TcpConnection.newTcpConnection(new InetSocketAddress(0), objectServer))) {
+				final var rcv = new LinkedBlockingQueue<>();
+				link.addLinkListener(new NetworkLinkListener() {
+					@LinkEvent
+					void objectServerEvent(final BaosService svc) {
+						rcv.offer(svc);
+					}
+				});
 
-			link.send(BaosService.getServerItem(Property.TimeSinceReset, 1));
-			assertNotNull(rcv.poll(3, TimeUnit.SECONDS));
-		}
-		finally {
-			server.close();
+				link.send(BaosService.getServerItem(Property.TimeSinceReset, 1));
+				assertNotNull(rcv.poll(3, TimeUnit.SECONDS));
+			}
 		}
 	}
 }
