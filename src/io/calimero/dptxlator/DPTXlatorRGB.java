@@ -194,17 +194,11 @@ public class DPTXlatorRGB extends DPTXlator {
 					if (t2.hasMoreTokens()) {
 						final String componentValue = t2.nextToken();
 
-						if (componentID.equals("r")) {
-							r = Short.parseShort(componentValue);
-						}
-						else if (componentID.equals("g")) {
-							g = Short.parseShort(componentValue);
-						}
-						else if (componentID.equals("b")) {
-							b = Short.parseShort(componentValue);
-						}
-						else {
-							throw newException("invalid color component " + componentID + " in", value);
+						switch (componentID) {
+							case "r" -> r = Short.parseShort(componentValue);
+							case "g" -> g = Short.parseShort(componentValue);
+							case "b" -> b = Short.parseShort(componentValue);
+							default -> throw newException("invalid color component " + componentID + " in", value);
 						}
 					}
 					else {
