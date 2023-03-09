@@ -236,7 +236,7 @@ public class DptXlator2ByteSigned extends DPTXlator
 	}
 
 	/**
-	 * @return the subtypes of the 2-byte signed translator type
+	 * {@return the subtypes of the 2-byte signed translator type}
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
 	protected static Map<String, DPT> getSubTypesStatic() {

@@ -718,7 +718,7 @@ public class DPTXlator4ByteFloat extends DPTXlator
 	}
 
 	/**
-	 * @return the subtypes of the 2-byte float translator type
+	 * {@return the subtypes of the 2-byte float translator type}
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
 	protected static Map<String, DPT> getSubTypesStatic()

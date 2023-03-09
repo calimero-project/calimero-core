@@ -174,8 +174,7 @@ public final class RFMediumInfo extends AdditionalInfo
 	}
 
 	/**
-	 * @return the lowest retransmitter RSS, {@link RSS#Void} indicates no retransmitter
-	 *         measurements
+	 * {@return the lowest retransmitter RSS} {@link RSS#Void} indicates no retransmitter measurements.
 	 */
 	public RSS getRetransmitterRSS()
 	{

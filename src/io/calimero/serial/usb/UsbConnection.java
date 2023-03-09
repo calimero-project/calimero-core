@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2022 B. Malinowsky
+    Copyright (c) 2015, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,9 +54,7 @@ public interface UsbConnection extends Connection<byte[]> {
 	}
 
 	/**
-	 * Returns the KNX device descriptor type 0 of the USB interface.
-	 *
-	 * @return device descriptor type 0
+	 * {@return the KNX device descriptor type 0 of the USB interface}
 	 * @throws KNXPortClosedException on closed port
 	 * @throws KNXTimeoutException on response timeout
 	 * @throws InterruptedException on interrupt
@@ -65,7 +63,7 @@ public interface UsbConnection extends Connection<byte[]> {
 	DD0 deviceDescriptor() throws KNXPortClosedException, KNXTimeoutException, InterruptedException;
 
 	/**
-	 * @return the EMI types supported by the KNX USB device
+	 * {@return the EMI types supported by the KNX USB device}
 	 * @throws KNXPortClosedException on closed port
 	 * @throws KNXTimeoutException on response timeout
 	 * @throws InterruptedException on interrupt
@@ -73,7 +71,7 @@ public interface UsbConnection extends Connection<byte[]> {
 	EnumSet<EmiType> supportedEmiTypes() throws KNXPortClosedException, KNXTimeoutException, InterruptedException;
 
 	/**
-	 * @return the currently active EMI type in the KNX USB device
+	 * {@return the currently active EMI type in the KNX USB device}
 	 * @throws KNXPortClosedException on closed port
 	 * @throws KNXTimeoutException on response timeout
 	 * @throws InterruptedException on interrupt
@@ -92,7 +90,7 @@ public interface UsbConnection extends Connection<byte[]> {
 	void setActiveEmiType(EmiType active) throws KNXPortClosedException, KNXTimeoutException;
 
 	/**
-	 * @return current state of the KNX connection, active/not active
+	 * {@return the current state of the KNX connection, active/not active}
 	 * @throws KNXPortClosedException on closed port
 	 * @throws KNXTimeoutException on response timeout
 	 * @throws InterruptedException on interrupt
@@ -100,7 +98,7 @@ public interface UsbConnection extends Connection<byte[]> {
 	boolean isKnxConnectionActive() throws KNXPortClosedException, KNXTimeoutException, InterruptedException;
 
 	/**
-	 * @return the KNX USB manufacturer code as 16 bit unsigned value
+	 * {@return the KNX USB manufacturer code as 16 bit unsigned value}
 	 * @throws KNXPortClosedException on closed port
 	 * @throws KNXTimeoutException on response timeout
 	 * @throws InterruptedException on interrupt

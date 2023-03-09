@@ -290,15 +290,14 @@ public class DPTXlatorDateTime extends DPTXlator
 	}
 
 	/**
-	 * @return month-of-year if month information is available
+	 * {@return month-of-year if month information is available}
 	 * @throws DateTimeException if month information is 0
 	 */
 	public final Month month() { return Month.of(getMonth()); }
 
 	/**
 	 * Returns the day of month information.
-	 * <p>
-	 * The first day of month equals 1.<br>
+	 * The first day of month equals 1.
 	 *
 	 * @return day value, 0 &lt; day &lt;= 31, might be 0 on unused field
 	 */
@@ -336,7 +335,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	}
 
 	/**
-	 * @return day of the week if day-of-week is set, empty if no day was set (any day)
+	 * {@return day of the week if day-of-week is set, empty if no day was set (any day)}
 	 */
 	public final Optional<DayOfWeek> dayOfWeek() {
 		final int dayOfWeek = getDayOfWeek();
@@ -344,7 +343,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	}
 
 	/**
-	 * @return the month-day if date information is available
+	 * {@return the month-day if date information is available}
 	 * @throws DateTimeException if day is 0 or day-of-month is invalid for the month
 	 */
 	public final MonthDay monthDay() { return MonthDay.of(getMonth(), getDay()); }
@@ -753,7 +752,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	}
 
 	/**
-	 * @return the subtypes of the date with time translator type
+	 * {@return the subtypes of the date with time translator type}
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
 	protected static Map<String, DPT> getSubTypesStatic()

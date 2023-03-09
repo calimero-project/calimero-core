@@ -253,7 +253,7 @@ public class DPTXlatorTime extends DPTXlator
 	}
 
 	/**
-	 * @return the local time obtained from hour, minute, and second of the first translation item
+	 * {@return the local time obtained from hour, minute, and second of the first translation item}
 	 * @throws DateTimeException if the value of any field is out of range
 	 */
 	public final LocalTime localTime()
@@ -322,7 +322,7 @@ public class DPTXlatorTime extends DPTXlator
 	}
 
 	/**
-	 * @return the subtypes of the time translator type
+	 * {@return the subtypes of the time translator type}
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
 	protected static Map<String, DPT> getSubTypesStatic()

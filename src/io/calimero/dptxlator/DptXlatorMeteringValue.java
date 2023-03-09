@@ -196,7 +196,7 @@ public class DptXlatorMeteringValue extends DPTXlator
 	}
 
 	/**
-	 * @return all available subtypes of this translator
+	 * {@return all available subtypes of this translator}
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
 	protected static Map<String, DPT> getSubTypesStatic()

@@ -118,7 +118,7 @@ public class CemiTData implements CEMI {
 	public int getMessageCode() { return mc; }
 
 	/**
-	 * @return mutable list with cEMI additional information, empty list if no additional information
+	 * {@return the mutable list with cEMI additional information, empty list if no additional information}
 	 */
 	public List<AdditionalInfo> additionalInfo() { return additionalInfo; }
 

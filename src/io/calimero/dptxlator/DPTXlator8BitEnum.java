@@ -1037,7 +1037,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 	}
 
 	/**
-	 * @return the subtypes of the 8 Bit enumeration translator type
+	 * {@return the subtypes of the 8 Bit enumeration translator type}
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
 	protected static Map<String, DPT> getSubTypesStatic()

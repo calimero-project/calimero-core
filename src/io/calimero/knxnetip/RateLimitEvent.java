@@ -46,7 +46,7 @@ public class RateLimitEvent extends EventObject {
 	}
 
 	/**
-	 * @return the reached rate limit in datagrams per second
+	 * {@return the reached rate limit in datagrams per second}
 	 */
 	public final int rateLimit() { return KNXnetIPRouting.MaxDatagramsPerSecond; }
 }

@@ -180,7 +180,7 @@ public class SearchRequest extends ServiceType
 	}
 
 	/**
-	 * @return unmodifiable list of search request parameter (SRP) blocks
+	 * {@return unmodifiable list of search request parameter (SRP) blocks}
 	 */
 	public final List<Srp> searchParameters() {
 		return Collections.unmodifiableList(srps);

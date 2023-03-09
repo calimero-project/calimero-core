@@ -145,8 +145,8 @@ public class RemotePropertyServiceAdapter implements PropertyAdapter
 	}
 
 	/**
-	 * @return the access level granted by the remote communication endpoint, or minimum access rights
-	 *         (implementation note: access level 15) if remote property access was not authorized
+	 * {@return the access level granted by the remote communication endpoint, or minimum access rights
+	 *         (implementation note: access level 15) if remote property access was not authorized}
 	 */
 	public final int accessLevel() { return accessLevel; }
 

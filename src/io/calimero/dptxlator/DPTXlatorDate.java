@@ -193,7 +193,7 @@ public class DPTXlatorDate extends DPTXlator
 	}
 
 	/**
-	 * @return month-of-year
+	 * {@return month-of-year}
 	 */
 	public final Month month() { return Month.of(getMonth()); }
 
@@ -208,7 +208,7 @@ public class DPTXlatorDate extends DPTXlator
 	}
 
 	/**
-	 * @return the local date obtained from year, month, and day of the first translation item
+	 * {@return the local date obtained from year, month, and day of the first translation item}
 	 * @throws DateTimeException if the value of any field is out of range, or if the day-of-month is invalid for the
 	 *         month-year
 	 */
@@ -271,7 +271,7 @@ public class DPTXlatorDate extends DPTXlator
 	}
 
 	/**
-	 * @return the subtypes of the date translator type
+	 * {@return the subtypes of the date translator type}
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
 	protected static Map<String, DPT> getSubTypesStatic()

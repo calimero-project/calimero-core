@@ -36,11 +36,11 @@
 
 package io.calimero.mgmt;
 
+import static io.calimero.DataUnitBuilder.createAPDU;
+import static io.calimero.DataUnitBuilder.createLengthOptimizedAPDU;
 import static java.lang.String.format;
 import static java.nio.ByteBuffer.allocate;
 import static java.util.stream.Collectors.toList;
-import static io.calimero.DataUnitBuilder.createAPDU;
-import static io.calimero.DataUnitBuilder.createLengthOptimizedAPDU;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
@@ -1230,7 +1230,7 @@ public class ManagementClientImpl implements ManagementClient
 	}
 
 	/**
-	 * @return the transport layer instance used by this management client
+	 * {@return the transport layer instance used by this management client}
 	 */
 	protected TransportLayer transportLayer() { return tl; }
 

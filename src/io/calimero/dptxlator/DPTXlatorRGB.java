@@ -157,7 +157,7 @@ public class DPTXlatorRGB extends DPTXlator {
 	}
 
 	/**
-	 * @return the subtypes of the RGB translator type
+	 * {@return the subtypes of the RGB translator type}
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
 	protected static Map<String, DPT> getSubTypesStatic()
