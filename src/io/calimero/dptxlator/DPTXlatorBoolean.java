@@ -325,7 +325,7 @@ public class DPTXlatorBoolean extends DPTXlator
 	}
 
 	/**
-	 * @return the subtypes of the boolean translator type
+	 * {@return the subtypes of the boolean translator type}
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
 	protected static Map<String, DPT> getSubTypesStatic()

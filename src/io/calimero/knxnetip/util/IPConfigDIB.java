@@ -127,7 +127,7 @@ public final class IPConfigDIB extends DIB
 	}
 
 	/**
-	 * @return the current IPv4 address
+	 * {@return the current IPv4 address}
 	 */
 	public Inet4Address getIPAddress()
 	{
@@ -135,7 +135,7 @@ public final class IPConfigDIB extends DIB
 	}
 
 	/**
-	 * @return the current IPv4 subnet mask
+	 * {@return the current IPv4 subnet mask}
 	 */
 	public Inet4Address getSubnetMask()
 	{
@@ -143,7 +143,7 @@ public final class IPConfigDIB extends DIB
 	}
 
 	/**
-	 * @return the current default gateway IPv4 address
+	 * {@return the current default gateway IPv4 address}
 	 */
 	public Inet4Address getDefaultGateway()
 	{
@@ -151,7 +151,7 @@ public final class IPConfigDIB extends DIB
 	}
 
 	/**
-	 * @return the IP capabilities, contained in bits 0 to 7
+	 * {@return the IP capabilities, contained in bits 0 to 7}
 	 */
 	public int getIPCapabilities()
 	{
@@ -159,7 +159,7 @@ public final class IPConfigDIB extends DIB
 	}
 
 	/**
-	 * @return the enabled IP assignment methods, contained in bits 0 to 7
+	 * {@return the enabled IP assignment methods, contained in bits 0 to 7}
 	 */
 	public int getIPAssignmentMethods()
 	{

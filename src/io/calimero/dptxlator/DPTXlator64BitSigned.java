@@ -174,7 +174,7 @@ public class DPTXlator64BitSigned extends DPTXlator
 	}
 
 	/**
-	 * @return the subtypes of the 4-byte unsigned translator type
+	 * {@return the subtypes of the 4-byte unsigned translator type}
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
 	protected static Map<String, DPT> getSubTypesStatic()

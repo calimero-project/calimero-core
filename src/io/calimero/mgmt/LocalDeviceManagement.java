@@ -118,8 +118,8 @@ abstract class LocalDeviceManagement<T> implements PropertyAdapter
 	}
 
 	/**
-	 * @return unmodifiable list of interface objects in ascending order, containing the object type of each interface
-	 *         object
+	 * {@return unmodifiable list of interface objects in ascending order, containing the object type of each interface
+	 *         object}
 	 */
 	public final List<Integer> interfaceObjects() { return List.copyOf(interfaceObjects); }
 

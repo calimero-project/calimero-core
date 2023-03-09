@@ -137,12 +137,12 @@ public class TunnelingDib extends DIB {
 	}
 
 	/**
-	 * @return the maximum supported APDU length of the tunneling interface for KNX network access
+	 * {@return the maximum supported APDU length of the tunneling interface for KNX network access}
 	 */
 	public int maxApduLength() { return maxApduLength; }
 
 	/**
-	 * @return tunneling slot information
+	 * {@return tunneling slot information}
 	 */
 	public final Map<IndividualAddress, EnumSet<SlotStatus>> slots() {
 		return deepCopy(slots);

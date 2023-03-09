@@ -39,6 +39,7 @@ package io.calimero.dptxlator;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
 
@@ -195,7 +196,7 @@ public class DptXlatorMeteringValue extends DPTXlator
 	}
 
 	/**
-	 * @return all available subtypes of this translator
+	 * {@return all available subtypes of this translator}
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
 	protected static Map<String, DPT> getSubTypesStatic()

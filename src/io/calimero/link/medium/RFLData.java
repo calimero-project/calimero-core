@@ -335,7 +335,7 @@ public class RFLData implements RawFrame
 	}
 
 	/**
-	 * @return the data link layer frame number (LFN)
+	 * {@return the data link layer frame number (LFN)}
 	 */
 	public final int getFrameNumber()
 	{

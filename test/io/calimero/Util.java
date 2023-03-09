@@ -154,7 +154,7 @@ public final class Util
 	}
 
 	/**
-	 * @return the individual address of the remote KNX device used for tests
+	 * {@return the individual address of the remote KNX device used for tests}
 	 */
 	public static IndividualAddress getKnxDevice()
 	{
@@ -162,7 +162,7 @@ public final class Util
 	}
 
 	/**
-	 * @return the individual address of the remote KNX device used for tests, device supports Layer
+	 * {@return the individual address of the remote KNX device used for tests, device supports Layer}
 	 *         4 connection-oriented mode
 	 */
 	public static IndividualAddress getKnxDeviceCO()
@@ -171,7 +171,7 @@ public final class Util
 	}
 
 	/**
-	 * @return the individual address for a non-existing KNX device used for tests
+	 * {@return the individual address for a non-existing KNX device used for tests}
 	 */
 	public static IndividualAddress getNonExistingKnxDevice()
 	{
@@ -179,7 +179,7 @@ public final class Util
 	}
 
 	/**
-	 * @return the local host used for testing
+	 * {@return the local host used for testing}
 	 */
 	public static InetSocketAddress getLocalHost()
 	{
@@ -187,7 +187,7 @@ public final class Util
 	}
 
 	/**
-	 * @return the local endpoint used for connecting to the test server
+	 * {@return the local endpoint used for connecting to the test server}
 	 */
 	public static InetSocketAddress localEndpoint()
 	{
@@ -195,7 +195,7 @@ public final class Util
 	}
 
 	/**
-	 * @return the local network interface used for connecting to the test server
+	 * {@return the local network interface used for connecting to the test server}
 	 * @throws SocketException
 	 */
 	public static NetworkInterface localInterface() throws SocketException
@@ -283,7 +283,7 @@ public final class Util
 	}
 
 	/**
-	 * @return the base directory used for unit testing
+	 * {@return the base directory used for unit testing}
 	 */
 	public static String getPath()
 	{
@@ -302,7 +302,7 @@ public final class Util
 	}
 
 	/**
-	 * @return the base output directory used for unit testing
+	 * {@return the base output directory used for unit testing}
 	 */
 	public static String getTargetPath()
 	{

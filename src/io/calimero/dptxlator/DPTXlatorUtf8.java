@@ -192,7 +192,7 @@ public class DPTXlatorUtf8 extends DPTXlator
 	}
 
 	/**
-	 * @return the subtypes of the string translator type
+	 * {@return the subtypes of the string translator type}
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
 	protected static Map<String, DPT> getSubTypesStatic()

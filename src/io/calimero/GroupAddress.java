@@ -207,7 +207,7 @@ public class GroupAddress extends KNXAddress
 	}
 
 	/**
-	 * @return the address presentation style preset for all KNX group addresses
+	 * {@return the address presentation style preset for all KNX group addresses}
 	 */
 	public static Presentation addressStyle()
 	{

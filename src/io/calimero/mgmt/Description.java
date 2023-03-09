@@ -192,7 +192,7 @@ public final class Description
 	}
 
 	/**
-	 * @return the object instance when used with extended property description services, 0 otherwise
+	 * {@return the object instance when used with extended property description services, 0 otherwise}
 	 */
 	public int objectInstance() { return objectInstance; }
 
@@ -231,8 +231,8 @@ public final class Description
 	}
 
 	/**
-	 * @return the optional datapoint type (DPT) of the property when used with extended property description services,
-	 * otherwise always the empty optional
+	 * {@return the optional datapoint type (DPT) of the property when used with extended property description services,
+	 * otherwise always the empty optional}
 	 */
 	public Optional<String> dpt() { return dpt; }
 

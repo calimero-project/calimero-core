@@ -163,8 +163,8 @@ public class DescriptionResponse extends ServiceType
 	}
 
 	/**
-	 * @return the complete description information contained in this response, as list of
-	 *         description information blocks (DIBs)
+	 * {@return the complete description information contained in this response, as list of
+	 *         description information blocks (DIBs)}
 	 */
 	public final List<DIB> getDescription()
 	{

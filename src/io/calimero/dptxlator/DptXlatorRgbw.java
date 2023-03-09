@@ -168,7 +168,7 @@ public class DptXlatorRgbw extends DPTXlator {
 	}
 
 	/**
-	 * @return the subtypes of this translator
+	 * {@return the subtypes of this translator}
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
 	protected static Map<String, DPT> getSubTypesStatic() {

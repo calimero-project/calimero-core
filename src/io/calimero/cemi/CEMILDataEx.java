@@ -221,7 +221,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	}
 
 	/**
-	 * @return mutable list with cEMI additional info, empty list if no additional info
+	 * {@return the mutable list with cEMI additional info, empty list if no additional info}
 	 */
 	public List<AdditionalInfo> additionalInfo() {
 		return addInfo;

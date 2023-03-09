@@ -221,7 +221,7 @@ public class DPTXlator8BitSigned extends DPTXlator
 	}
 
 	/**
-	 * @return the subtypes of the 8 Bit signed translator type
+	 * {@return the subtypes of the 8 Bit signed translator type}
 	 * @see DPTXlator#getSubTypesStatic()
 	 */
 	protected static Map<String, DPT> getSubTypesStatic()
