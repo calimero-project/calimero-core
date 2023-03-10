@@ -86,13 +86,9 @@ public final class Settings
 	{
 		if (!verbose)
 			return library + " " + version;
-		final StringBuilder buf = new StringBuilder();
-		buf.append(library).append(" version ").append(version).append(" - ");
-		buf.append(desc).append(sep);
-		buf.append(group).append(", ");
-		buf.append(tuwien).append(sep);
-		buf.append(copyright);
-		return buf.toString();
+		return library + " version " + version + " - " + desc + sep +
+				group + ", " + tuwien + sep +
+				copyright;
 	}
 
 	/**

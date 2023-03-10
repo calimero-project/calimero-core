@@ -378,11 +378,11 @@ public abstract class ClientConnection extends ConnectionBase
 
 	@Override
 	String connectionState() {
-		switch (state) {
-		case CEMI_CON_PENDING: return "cEMI.con pending";
-		case UNKNOWN_ERROR: return "unknown error";
-		default: return super.connectionState();
-		}
+		return switch (state) {
+			case CEMI_CON_PENDING -> "cEMI.con pending";
+			case UNKNOWN_ERROR -> "unknown error";
+			default -> super.connectionState();
+		};
 	}
 
 	private InetSocketAddress localSocketAddress() {

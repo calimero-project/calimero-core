@@ -432,11 +432,11 @@ public final class BaosService implements ServiceType {
 		case GetTimer                  : return "GetTimer";
 		case SetTimer                  : return "SetTimer";
 		}
-		switch (subService) {
-		case DatapointValueIndication  : return "DatapointValueIndication";
-		case ServerItemIndication      : return "ServerItemIndication";
-		default: return "" + subService;
-		}
+		return switch (subService) {
+			case DatapointValueIndication -> "DatapointValueIndication";
+			case ServerItemIndication -> "ServerItemIndication";
+			default -> "" + subService;
+		};
 	}
 
 	// service code bit for the corresponding service response

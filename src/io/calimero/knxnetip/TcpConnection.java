@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2022 B. Malinowsky
+    Copyright (c) 2019, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -866,16 +866,11 @@ public final class TcpConnection implements Closeable {
 	private static int channelId(final KNXnetIPHeader header, final byte[] data, final int offset) {
 		// communication channel ID in the connection header of a tunneling/config request has a different offset
 		// than in connection management services
-		int channelIdOffset = offset;
-		switch (header.getServiceType()) {
-		case KNXnetIPHeader.TUNNELING_REQ:
-		case KNXnetIPHeader.DEVICE_CONFIGURATION_REQ:
-		case KNXnetIPHeader.TunnelingFeatureResponse:
-		case KNXnetIPHeader.TunnelingFeatureInfo:
-		case KNXnetIPHeader.ObjectServerRequest:
-		case KNXnetIPHeader.ObjectServerAck:
-			channelIdOffset = offset + 1;
-		}
+		int channelIdOffset = switch (header.getServiceType()) {
+			case KNXnetIPHeader.TUNNELING_REQ, KNXnetIPHeader.DEVICE_CONFIGURATION_REQ, KNXnetIPHeader.TunnelingFeatureResponse, KNXnetIPHeader.TunnelingFeatureInfo, KNXnetIPHeader.ObjectServerRequest, KNXnetIPHeader.ObjectServerAck ->
+					offset + 1;
+			default -> offset;
+		};
 		final var channelId = data[channelIdOffset] & 0xff;
 		return channelId;
 	}

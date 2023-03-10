@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2021 B. Malinowsky
+    Copyright (c) 2018, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -169,22 +169,11 @@ public final class TunnelingFeature implements io.calimero.ServiceType {
 		if (svcType == KNXnetIPHeader.TunnelingFeatureGet)
 			length = 0;
 		else {
-			switch (featureId) {
-			case SupportedEmiTypes:
-			case DeviceDescriptorType0:
-			case Manufacturer:
-			case IndividualAddress:
-			case MaxApduLength:
-				length = 2;
-				break;
-			case ConnectionStatus:
-			case ActiveEmiType:
-			case EnableFeatureInfoService:
-				length = 1;
-				break;
-			default:
-				throw new IllegalStateException();
-			}
+			length = switch (featureId) {
+				case SupportedEmiTypes, DeviceDescriptorType0, Manufacturer, IndividualAddress, MaxApduLength -> 2;
+				case ConnectionStatus, ActiveEmiType, EnableFeatureInfoService -> 1;
+				default -> throw new IllegalStateException();
+			};
 		}
 		if (data.length != length)
 			throw new KNXIllegalArgumentException(String.format("%s %s value %s with invalid length %d, expected %d",

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2020, 2022 B. Malinowsky
+    Copyright (c) 2020, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -186,7 +186,7 @@ public class DptXlatorXyYTransition extends DPTXlator {
 
 		final int dur = ushort(offset);
 		try {
-			t.setTimePeriod(dur * 100);
+			t.setTimePeriod(dur * 100L);
 			t.setAppendUnit(appendUnit);
 			joiner.add(t.getValue());
 		}

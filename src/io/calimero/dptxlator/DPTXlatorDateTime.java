@@ -769,9 +769,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	// check on hour = 24, minutes and seconds have to be 0
 	private static boolean check24Hours(final int hr, final int min, final int sec)
 	{
-		if (hr != 24 || min == 0 && sec == 0)
-			return true;
-		return false;
+		return hr != 24 || min == 0 && sec == 0;
 	}
 
 	private String fromDPT(final int index)
@@ -846,7 +844,7 @@ public class DPTXlatorDateTime extends DPTXlator
 					if ((data[i + 3] >> 5) != day)
 						throw new KNXFormatException("differing day of week");
 				}
-				if (getDateTimeFlag(index, DAYLIGHT) != (c.get(Calendar.DST_OFFSET) != 0))
+				if (getDateTimeFlag(index, DAYLIGHT) == (c.get(Calendar.DST_OFFSET) == 0))
 					throw new KNXFormatException("differing daylight saving time");
 				return ms;
 			}

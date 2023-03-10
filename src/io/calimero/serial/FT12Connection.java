@@ -722,9 +722,7 @@ public class FT12Connection implements Connection<byte[]>
 					rcvFrameCount ^= FRAMECOUNT_BIT;
 				}
 			}
-			if ((c & 0x0f) == USER_DATA && (c & FRAMECOUNT_VALID) == 0)
-				return false;
-			return true;
+			return (c & 0x0f) != USER_DATA || (c & FRAMECOUNT_VALID) != 0;
 		}
 
 		private void checkLDataCon(final byte[] ldata) throws InterruptedException {

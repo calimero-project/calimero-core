@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -198,12 +198,10 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 	public void accept(final CEMI frame, final Configuration c)
 	{
 		final Cache cache = c.getCache();
-		if (cache == null || !(frame instanceof CEMILData))
+		if (cache == null || !(frame instanceof final CEMILData f))
 			return;
-		final CEMILData f = (CEMILData) frame;
-		if (!(f.getDestination() instanceof GroupAddress))
+		if (!(f.getDestination() instanceof final GroupAddress dst))
 			return;
-		final GroupAddress dst = (GroupAddress) f.getDestination();
 		// check if we have a datapoint model, whether it contains the address,
 		// and datapoint is command based
 		final DatapointModel<?> m = c.getDatapointModel();

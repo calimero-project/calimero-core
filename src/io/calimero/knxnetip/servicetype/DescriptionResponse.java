@@ -115,18 +115,18 @@ public class DescriptionResponse extends ServiceType
 
 	private static DIB parseDib(final int type, final byte[] data, final int offset, final int size)
 		throws KNXFormatException {
-		switch (type) {
-		case DIB.DEVICE_INFO: return new DeviceDIB(data, offset);
-		case DIB.SUPP_SVC_FAMILIES: return new ServiceFamiliesDIB(data, offset);
-		case DIB.IP_CONFIG: return new IPConfigDIB(data, offset);
-		case DIB.IP_CURRENT_CONFIG: return new IPCurrentConfigDIB(data, offset);
-		case DIB.KNX_ADDRESSES: return new KnxAddressesDIB(data, offset);
-		case DIB.MFR_DATA: return new ManufacturerDIB(data, offset);
-		case DIB.SecureServiceFamilies: return new ServiceFamiliesDIB(data, offset);
-		case DIB.TunnelingInfo: return new TunnelingDib(data, offset, size);
-		case DIB.AdditionalDeviceInfo: return new AdditionalDeviceDib(data, offset, size);
-		}
-		return null;
+		return switch (type) {
+			case DIB.DEVICE_INFO -> new DeviceDIB(data, offset);
+			case DIB.SUPP_SVC_FAMILIES -> new ServiceFamiliesDIB(data, offset);
+			case DIB.IP_CONFIG -> new IPConfigDIB(data, offset);
+			case DIB.IP_CURRENT_CONFIG -> new IPCurrentConfigDIB(data, offset);
+			case DIB.KNX_ADDRESSES -> new KnxAddressesDIB(data, offset);
+			case DIB.MFR_DATA -> new ManufacturerDIB(data, offset);
+			case DIB.SecureServiceFamilies -> new ServiceFamiliesDIB(data, offset);
+			case DIB.TunnelingInfo -> new TunnelingDib(data, offset, size);
+			case DIB.AdditionalDeviceInfo -> new AdditionalDeviceDib(data, offset, size);
+			default -> null;
+		};
 	}
 
 	/**
@@ -196,9 +196,8 @@ public class DescriptionResponse extends ServiceType
 	{
 		if (this == obj)
 			return true;
-		if (!(obj instanceof DescriptionResponse))
+		if (!(obj instanceof final DescriptionResponse other))
 			return false;
-		final DescriptionResponse other = (DescriptionResponse) obj;
 		return dibs.equals(other.dibs);
 	}
 

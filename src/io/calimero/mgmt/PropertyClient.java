@@ -232,8 +232,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		 *
 		 * @param pid property identifier
 		 */
-		public PropertyKey(final int pid)
-		{
+		public PropertyKey(final int pid) {
 			ot = GLOBAL_OBJTYPE;
 			id = pid;
 		}
@@ -244,19 +243,15 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		 * @param objType object type of the property
 		 * @param pid property identifier
 		 */
-		public PropertyKey(final int objType, final int pid)
-		{
+		public PropertyKey(final int objType, final int pid) {
 			ot = objType;
 			id = pid;
 		}
 
 		/**
-		 * Returns the property identifier part of this key.
-		 *
-		 * @return the PID as unsigned number
+		 * {@return the property identifier (PID) part of this key as unsigned number}
 		 */
-		public int getPID()
-		{
+		public int getPID() {
 			return id;
 		}
 
@@ -266,30 +261,24 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		 * @return {@code true} if property has global object type,
 		 *         {@code false} if property has a specific object type
 		 */
-		public boolean isGlobal()
-		{
+		public boolean isGlobal() {
 			return ot == GLOBAL_OBJTYPE;
 		}
 
 		@Override
-		public int hashCode()
-		{
+		public int hashCode() {
 			return ot << 16 | id;
 		}
 
 		@Override
-		public boolean equals(final Object obj)
-		{
-			if (obj instanceof PropertyKey) {
-				final PropertyKey key = (PropertyKey) obj;
+		public boolean equals(final Object obj) {
+			if (obj instanceof final PropertyKey key)
 				return ot == key.ot && id == key.id;
-			}
 			return false;
 		}
 
 		@Override
-		public int compareTo(final PropertyKey o)
-		{
+		public int compareTo(final PropertyKey o) {
 			final int rhs = o.hashCode();
 			return Integer.compare(hashCode(), rhs);
 		}
@@ -740,8 +729,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 
 	private int queryObjectType(final int objIndex) throws KNXException, InterruptedException
 	{
-		if (pa instanceof LocalDeviceManagement) {
-			final LocalDeviceManagement<?> ldm = (LocalDeviceManagement<?>) pa;
+		if (pa instanceof final LocalDeviceManagement<?> ldm) {
 			final int ot = ldm.getObjectType(objIndex);
 			objectTypes.add(new Pair(objIndex, ot));
 			return ot;
@@ -930,9 +918,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 				return false;
 			if ("1".equals(s) || "true".equals(s))
 				return true;
-			if ("w".equals(s))
-				return true;
-			return false;
+			return "w".equals(s);
 		}
 
 		private static int parseAccessPolicy(final String attribute) throws KNXFormatException {

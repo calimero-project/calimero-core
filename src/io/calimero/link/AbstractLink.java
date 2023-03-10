@@ -184,8 +184,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 				final CEMI cemi = onReceive(e);
 				if (cemi instanceof CEMIDevMgmt)
 					onDevMgmt((CEMIDevMgmt) cemi);
-				else if (cemi instanceof CemiTData) {
-					final var tdata = (CemiTData) cemi;
+				else if (cemi instanceof final CemiTData tdata) {
 					final int mc = tdata.getMessageCode();
 					if (mc == CemiTData.IndividualIndication || mc == CemiTData.ConnectedIndication) {
 						addEvent(l -> l.indication(new FrameEvent(source, tdata)));
@@ -196,9 +195,8 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 				}
 
 				// from this point on, we are only dealing with L_Data
-				if (!(cemi instanceof CEMILData))
+				if (!(cemi instanceof final CEMILData ldata))
 					return;
-				final CEMILData ldata = (CEMILData) cemi;
 				final int mc = cemi.getMessageCode();
 				if (mc == CEMILData.MC_LDATA_IND) {
 					addEvent(l -> l.indication(new FrameEvent(source, ldata)));
@@ -701,9 +699,8 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 			final RFSettings rfSettings = (RFSettings) medium;
 			if (rfSettings.isUnidirectional())
 				return false;
-			if (dst instanceof IndividualAddress)
-				return true;
-			return false; // we send broadcasts always as system broadcast
+			// we send broadcasts always as system broadcast
+			return dst instanceof IndividualAddress;
 		}
 		return true;
 	}

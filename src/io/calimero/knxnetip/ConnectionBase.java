@@ -574,13 +574,13 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	void doExtraBlockingModes() throws KNXTimeoutException, InterruptedException {}
 
 	String connectionState() {
-		switch (state) {
-		case OK: return "OK";
-		case CLOSED: return "closed";
-		case ACK_PENDING: return "ACK pending";
-		case ACK_ERROR: return "ACK error";
-		default: return "unknown";
-		}
+		return switch (state) {
+			case OK -> "OK";
+			case CLOSED -> "closed";
+			case ACK_PENDING -> "ACK pending";
+			case ACK_ERROR -> "ACK error";
+			default -> "unknown";
+		};
 	}
 
 	private void fireConnectionClosed(final int initiator, final String reason)

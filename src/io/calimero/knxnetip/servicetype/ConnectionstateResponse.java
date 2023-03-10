@@ -1,7 +1,7 @@
 /*
     Calimero 2 - A library for KNX network access
     Copyright (c) 2005 B. Erb
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -125,18 +125,13 @@ public class ConnectionstateResponse extends ServiceType
 	 */
 	public String getStatusString()
 	{
-		switch (status) {
-		case ErrorCodes.NO_ERROR:
-			return "connection state is normal";
-		case ErrorCodes.CONNECTION_ID:
-			return "server could not find active data connection with specified ID";
-		case ErrorCodes.DATA_CONNECTION:
-			return "server detected error concerning the data connection";
-		case ErrorCodes.KNX_CONNECTION:
-			return "server detected error concerning the KNX bus/subsystem connection";
-		default:
-			return "unknown status";
-		}
+		return switch (status) {
+			case ErrorCodes.NO_ERROR -> "connection state is normal";
+			case ErrorCodes.CONNECTION_ID -> "server could not find active data connection with specified ID";
+			case ErrorCodes.DATA_CONNECTION -> "server detected error concerning the data connection";
+			case ErrorCodes.KNX_CONNECTION -> "server detected error concerning the KNX bus/subsystem connection";
+			default -> "unknown status";
+		};
 	}
 
 	/* (non-Javadoc)

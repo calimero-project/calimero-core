@@ -443,7 +443,7 @@ public class TpuartConnection implements Connection<byte[]>
 				throw new KNXIllegalArgumentException("L-Data frame length " + length + " > max. 64 bytes for TP-UART");
 
 			tp1 = new byte[length];
-			System.arraycopy(frame, skipToCtrl1, tp1, skipToCtrl1 - skipToCtrl1, frame.length - skipToCtrl1);
+			System.arraycopy(frame, skipToCtrl1, tp1, 0, frame.length - skipToCtrl1);
 
 			// ensure not repeated ext frame
 			tp1[0] &= ~StdFrameFormat;
@@ -658,7 +658,7 @@ public class TpuartConnection implements Connection<byte[]>
 					resetReceiveBuffer(c, diff);
 					size = 0;
 				}
-				else if (size >= minLength && diff > 4 * maxInterByteDelay()) {
+				else if (size >= minLength && diff > 4L * maxInterByteDelay()) {
 					resetReceiveBuffer(c, diff);
 					size = 0;
 				}

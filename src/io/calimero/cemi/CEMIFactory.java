@@ -390,8 +390,7 @@ public final class CEMIFactory
 		final IndividualAddress s = src != null ? src : original.getSource();
 		final KNXAddress d = dst != null ? dst : original.getDestination();
 		final byte[] content = data != null ? data : original.getPayload();
-		if (original instanceof CEMILDataEx) {
-			final CEMILDataEx f = (CEMILDataEx) original;
+		if (original instanceof final CEMILDataEx f) {
 			final CEMILDataEx copy = new CEMILDataEx(mc, s, d, content, f.getPriority(), repeat,
 					f.isDomainBroadcast(), f.isAckRequested(), f.getHopCount());
 			if ((original.ctrl1 & 0x80) == 0)

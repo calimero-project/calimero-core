@@ -219,9 +219,8 @@ public class Discoverer
 		{
 			if (this == obj)
 				return true;
-			if (!(obj instanceof Result<?>))
+			if (!(obj instanceof final Result<?> other))
 				return false;
-			final Result<?> other = (Result<?>) obj;
 			return getNetworkInterface().equals(other.getNetworkInterface())
 					&& localEndpoint().equals(other.localEndpoint())
 					&& getResponse().equals(other.getResponse()) && remote.equals(other.remote);

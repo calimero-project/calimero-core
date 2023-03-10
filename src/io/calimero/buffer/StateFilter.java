@@ -125,25 +125,17 @@ public class StateFilter implements NetworkFilter, RequestFilter
 	/**
 	 * Creates a new state based filter.
 	 */
-	public StateFilter()
-	{}
+	public StateFilter() {}
 
-	/* (non-Javadoc)
-	 * @see io.calimero.buffer.Configuration.NetworkFilter#init
-	 * (io.calimero.buffer.Configuration)
-	 */
 	@Override
 	public void init(final Configuration c)
 	{
 		// check if we have a current model which emits change notifications
-		if (model instanceof ChangeNotifier) {
-			final ChangeNotifier notifier = (ChangeNotifier) model;
+		if (model instanceof final ChangeNotifier notifier)
 			notifier.removeChangeListener(cl);
-		}
 		final DatapointModel<?> m = c.getDatapointModel();
-		if (m instanceof ChangeNotifier) {
+		if (m instanceof final ChangeNotifier notifier) {
 			model = m;
-			final ChangeNotifier notifier = (ChangeNotifier) m;
 			notifier.addChangeListener(cl);
 		}
 		if (m != null)
@@ -176,13 +168,11 @@ public class StateFilter implements NetworkFilter, RequestFilter
 	public void accept(final CEMI frame, final Configuration c)
 	{
 		final Cache cache = c.getCache();
-		if (cache == null || !(frame instanceof CEMILData))
+		if (cache == null || !(frame instanceof final CEMILData f))
 			return;
 
-		final CEMILData f = (CEMILData) frame;
-		if (!(f.getDestination() instanceof GroupAddress))
+		if (!(f.getDestination() instanceof final GroupAddress dst))
 			return;
-		final GroupAddress dst = (GroupAddress) f.getDestination();
 		final DatapointModel<?> m = c.getDatapointModel();
 		Datapoint dp = null;
 		if (m != null && ((dp = m.get(dst)) == null || !dp.isStateBased()))

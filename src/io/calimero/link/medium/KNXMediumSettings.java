@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -91,18 +91,13 @@ public abstract class KNXMediumSettings
 	 */
 	public static KNXMediumSettings create(final int medium, final IndividualAddress device)
 	{
-		switch (medium) {
-		case MEDIUM_TP1:
-			return new TPSettings(device);
-		case MEDIUM_PL110:
-			return new PLSettings(device, null);
-		case MEDIUM_RF:
-			return new RFSettings(device);
-		case MEDIUM_KNXIP:
-			return new KnxIPSettings(device);
-		default:
-			throw new KNXIllegalArgumentException("unknown medium type " + medium);
-		}
+		return switch (medium) {
+			case MEDIUM_TP1 -> new TPSettings(device);
+			case MEDIUM_PL110 -> new PLSettings(device, null);
+			case MEDIUM_RF -> new RFSettings(device);
+			case MEDIUM_KNXIP -> new KnxIPSettings(device);
+			default -> throw new KNXIllegalArgumentException("unknown medium type " + medium);
+		};
 	}
 
 	/**

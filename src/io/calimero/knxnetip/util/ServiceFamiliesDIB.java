@@ -192,9 +192,8 @@ public class ServiceFamiliesDIB extends DIB
 	public boolean equals(final Object obj) {
 		if (this == obj)
 			return true;
-		if (!(obj instanceof ServiceFamiliesDIB))
+		if (!(obj instanceof final ServiceFamiliesDIB other))
 			return false;
-		final ServiceFamiliesDIB other = (ServiceFamiliesDIB) obj;
 		return families.equals(other.families);
 	}
 

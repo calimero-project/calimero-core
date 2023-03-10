@@ -235,22 +235,15 @@ public interface DeviceDescriptor
 		public KNXMediumSettings medium()
 		{
 			final int type = mediumType();
-			switch (type) {
-			case 0:
-				return new TPSettings();
-			case 1:
-				return new PLSettings();
-			case 2:
-				return new RFSettings(KNXMediumSettings.BackboneRouter);
-			case 3:
-				throw new KNXIllegalArgumentException("TP0 medium not supported any longer");
-			case 4:
-				throw new KNXIllegalArgumentException("PL132 medium not supported any longer");
-			case 5:
-				return new KnxIPSettings(KNXMediumSettings.BackboneRouter);
-			default:
-				throw new KNXIllegalArgumentException("unknown KNX medium type " + type);
-			}
+			return switch (type) {
+				case 0 -> new TPSettings();
+				case 1 -> new PLSettings();
+				case 2 -> new RFSettings(KNXMediumSettings.BackboneRouter);
+				case 3 -> throw new KNXIllegalArgumentException("TP0 medium not supported any longer");
+				case 4 -> throw new KNXIllegalArgumentException("PL132 medium not supported any longer");
+				case 5 -> new KnxIPSettings(KNXMediumSettings.BackboneRouter);
+				default -> throw new KNXIllegalArgumentException("unknown KNX medium type " + type);
+			};
 		}
 
 		/**

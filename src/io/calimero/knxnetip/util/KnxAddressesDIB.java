@@ -132,9 +132,8 @@ public final class KnxAddressesDIB extends DIB
 	public boolean equals(final Object obj) {
 		if (this == obj)
 			return true;
-		if (!(obj instanceof KnxAddressesDIB))
+		if (!(obj instanceof final KnxAddressesDIB other))
 			return false;
-		final KnxAddressesDIB other = (KnxAddressesDIB) obj;
 		return addresses.equals(other.addresses);
 	}
 }

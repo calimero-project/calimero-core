@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2022 B. Malinowsky
+    Copyright (c) 2015, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -211,9 +211,8 @@ public final class IPConfigDIB extends DIB
 	public boolean equals(final Object obj) {
 		if (this == obj)
 			return true;
-		if (!(obj instanceof IPConfigDIB))
+		if (!(obj instanceof final IPConfigDIB other))
 			return false;
-		final IPConfigDIB other = (IPConfigDIB) obj;
 		return caps == other.caps && assignment == other.assignment && Arrays.equals(ip, other.ip)
 				&& Arrays.equals(subnet, other.subnet) && Arrays.equals(gw, other.gw);
 	}

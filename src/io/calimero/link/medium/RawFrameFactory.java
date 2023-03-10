@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -67,16 +67,12 @@ public final class RawFrameFactory
 	public static RawFrame create(final int mediumType, final byte[] data,
 		final int offset, final boolean extBusmon) throws KNXFormatException
 	{
-		switch (mediumType) {
-		case KNXMediumSettings.MEDIUM_TP1:
-			return createTP1(data, offset);
-		case KNXMediumSettings.MEDIUM_PL110:
-			return createPL110(data, offset, extBusmon);
-		case KNXMediumSettings.MEDIUM_RF:
-			return new RFLData(data, offset);
-		default:
-			throw new KNXFormatException("unknown KNX medium for raw frame", mediumType);
-		}
+		return switch (mediumType) {
+			case KNXMediumSettings.MEDIUM_TP1 -> createTP1(data, offset);
+			case KNXMediumSettings.MEDIUM_PL110 -> createPL110(data, offset, extBusmon);
+			case KNXMediumSettings.MEDIUM_RF -> new RFLData(data, offset);
+			default -> throw new KNXFormatException("unknown KNX medium for raw frame", mediumType);
+		};
 	}
 
 	/**

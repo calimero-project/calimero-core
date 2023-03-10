@@ -1,6 +1,6 @@
 /*
     Calimero - A library for KNX network access
-    Copyright (c) 2019, 2022 B. Malinowsky
+    Copyright (c) 2019, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -506,8 +506,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 
 	protected Optional<FrameEvent> extract(final FrameEvent e) {
 		final var cemi = e.getFrame();
-		if (cemi instanceof CEMILData) {
-			final CEMILData ldata = (CEMILData) cemi;
+		if (cemi instanceof final CEMILData ldata) {
 			try {
 				final var salData = extract(ldata);
 				if (salData.apdu().length == 0)
@@ -802,8 +801,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 	protected byte[] toolKey(final IndividualAddress device) { return security.deviceToolKeys().get(device); }
 
 	protected byte[] securityKey(final KNXAddress addr) {
-		if (addr instanceof GroupAddress) {
-			final var group = (GroupAddress) addr;
+		if (addr instanceof final GroupAddress group) {
 			final var key = security.groupKeys().get(group);
 			if (key == null)
 				throw new KnxSecureException("no group key for " + group);
@@ -857,13 +855,13 @@ public class SecureApplicationLayer implements AutoCloseable {
 	}
 
 	protected final int failureCounter(final int errorType) {
-		switch (errorType) {
-			case InvalidScf: return scfErrors.get();
-			case SeqNoError: return seqErrors.get();
-			case CryptoError: return cryptoErrors.get();
-			case AccessAndRoleError: return accessAndRoleErrors.get();
-			default: throw new KNXIllegalArgumentException("failure counter error type " + errorType);
-		}
+		return switch (errorType) {
+			case InvalidScf -> scfErrors.get();
+			case SeqNoError -> seqErrors.get();
+			case CryptoError -> cryptoErrors.get();
+			case AccessAndRoleError -> accessAndRoleErrors.get();
+			default -> throw new KNXIllegalArgumentException("failure counter error type " + errorType);
+		};
 	}
 
 	protected void securityFailure(final int errorType, final IntUnaryOperator updateFunction,

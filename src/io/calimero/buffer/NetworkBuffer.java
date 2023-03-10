@@ -276,9 +276,8 @@ public final class NetworkBuffer implements AutoCloseable
 					public void accept(final CEMI frame, final Configuration c)
 					{
 						final Cache localCache = c.getCache();
-						if (localCache == null || !(frame instanceof CEMILData))
+						if (localCache == null || !(frame instanceof final CEMILData f))
 							return;
-						final CEMILData f = (CEMILData) frame;
 						// put into cache object
 						final CacheObject co = localCache.get(f.getDestination());
 						if (co != null) {
