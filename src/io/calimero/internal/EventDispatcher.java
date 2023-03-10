@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2021, 2021 B. Malinowsky
+    Copyright (c) 2021, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,15 +50,7 @@ import org.slf4j.Logger;
 class EventDispatcher<T extends Annotation> {
 	private static final Lookup lookup = MethodHandles.lookup();
 
-	private static final class ListenerMH {
-		private final Object listener;
-		private final MethodHandle mh;
-
-		ListenerMH(final Object listener, final MethodHandle mh) {
-			this.listener = listener;
-			this.mh = mh;
-		}
-	}
+	private record ListenerMH(Object listener, MethodHandle mh) {}
 
 	final Map<Class<?>, Set<ListenerMH>> customEvents = new ConcurrentHashMap<>();
 	private final Class<T> eventAnnotation;

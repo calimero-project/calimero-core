@@ -40,7 +40,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -74,98 +73,9 @@ public final class SerialConnectionFactory {
 	}
 
 
-	private /*record*/ static final class SettingsImpl implements Settings {
-		private final String portId;
-		private final int baudrate;
-		private final int databits;
-		private final StopBits stopbits;
-		private final Parity parity;
-		private final FlowControl flowControl;
-		private final Duration readIntervalTimeout;
-		private final Duration receiveTimeout;
-
-		SettingsImpl(final String portId, final int baudrate, final int databits, final StopBits stopbits,
-			final Parity parity, final FlowControl flowControl, final Duration readIntervalTimeout,
-			final Duration receiveTimeout) {
-			this.portId = portId;
-			this.baudrate = baudrate;
-			this.databits = databits;
-			this.stopbits = stopbits;
-			this.parity = parity;
-			this.flowControl = flowControl;
-			this.readIntervalTimeout = readIntervalTimeout;
-			this.receiveTimeout = receiveTimeout;
-		}
-
-		@Override
-		public String portId() {
-			return portId;
-		}
-
-		@Override
-		public int baudrate() {
-			return baudrate;
-		}
-
-		@Override
-		public int databits() {
-			return databits;
-		}
-
-		@Override
-		public StopBits stopbits() {
-			return stopbits;
-		}
-
-		@Override
-		public Parity parity() {
-			return parity;
-		}
-
-		@Override
-		public FlowControl flowControl() {
-			return flowControl;
-		}
-
-		@Override
-		public Duration readIntervalTimeout() {
-			return readIntervalTimeout;
-		}
-
-		@Override
-		public Duration receiveTimeout() {
-			return receiveTimeout;
-		}
-
-		@Override
-		public boolean equals(final Object obj) {
-			if (obj == this)
-				return true;
-			if (obj == null || obj.getClass() != this.getClass())
-				return false;
-			final var that = (SettingsImpl) obj;
-			return Objects.equals(this.portId, that.portId) && this.baudrate == that.baudrate
-					&& this.databits == that.databits && Objects.equals(this.stopbits, that.stopbits)
-					&& Objects.equals(this.parity, that.parity) && Objects.equals(this.flowControl, that.flowControl)
-					&& Objects.equals(this.readIntervalTimeout, that.readIntervalTimeout)
-					&& Objects.equals(this.receiveTimeout, that.receiveTimeout);
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hash(portId, baudrate, databits, stopbits, parity, flowControl, readIntervalTimeout,
-					receiveTimeout);
-		}
-
-		@Override
-		public String toString() {
-			return "Settings[" + "portId=" + portId + ", " + "baudrate=" + baudrate + ", " + "databits=" + databits
-					+ ", " + "stopbits=" + stopbits + ", " + "parity=" + parity + ", " + "flowControl=" + flowControl
-					+ ", " + "readIntervalTimeout=" + readIntervalTimeout + ", " + "receiveTimeout=" + receiveTimeout
-					+ ']';
-		}
+	private record SettingsImpl(String portId, int baudrate, int databits, StopBits stopbits, Parity parity,
+			FlowControl flowControl, Duration readIntervalTimeout, Duration receiveTimeout) implements Settings {
 	}
-
 
 	/**
 	 * Opens a serial connection using one of the available serial connection providers.
