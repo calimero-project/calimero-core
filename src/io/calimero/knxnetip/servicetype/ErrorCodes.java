@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2016 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -122,21 +122,14 @@ public final class ErrorCodes
 	 */
 	public static String getErrorMessage(final int code)
 	{
-		switch (code) {
-		case NO_ERROR:
-			return "success";
-		case HOST_PROTOCOL_TYPE:
-			return "host protocol type not supported";
-		case VERSION_NOT_SUPPORTED:
-			return "protocol version not supported";
-		case SEQUENCE_NUMBER:
-			return "sequence number out of order";
-		case CONNECTION_ID:
-			return "no active data connection with that ID";
-		case NO_MORE_CONNECTIONS:
-			return "could not accept new connection (maximum reached)";
-		default:
-			return "error code 0x" + Integer.toHexString(code);
-		}
+		return switch (code) {
+			case NO_ERROR -> "success";
+			case HOST_PROTOCOL_TYPE -> "host protocol type not supported";
+			case VERSION_NOT_SUPPORTED -> "protocol version not supported";
+			case SEQUENCE_NUMBER -> "sequence number out of order";
+			case CONNECTION_ID -> "no active data connection with that ID";
+			case NO_MORE_CONNECTIONS -> "could not accept new connection (maximum reached)";
+			default -> "error code 0x" + Integer.toHexString(code);
+		};
 	}
 }

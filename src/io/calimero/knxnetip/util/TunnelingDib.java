@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2021 B. Malinowsky
+    Copyright (c) 2018, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -84,12 +84,12 @@ public class TunnelingDib extends DIB {
 		public int value() { return (int) Math.pow(2, ordinal()); }
 
 		public static SlotStatus of(final int value) {
-			switch (value) {
-				case 1: return Free;
-				case 2: return Authorized;
-				case 4: return Usable;
-			}
-			throw new KNXIllegalArgumentException(value + " is not a valid status value");
+			return switch (value) {
+				case 1 -> Free;
+				case 2 -> Authorized;
+				case 4 -> Usable;
+				default -> throw new KNXIllegalArgumentException(value + " is not a valid status value");
+			};
 		}
 	}
 
@@ -176,9 +176,8 @@ public class TunnelingDib extends DIB {
 	public boolean equals(final Object obj) {
 		if (this == obj)
 			return true;
-		if (!(obj instanceof TunnelingDib))
+		if (!(obj instanceof final TunnelingDib other))
 			return false;
-		final TunnelingDib other = (TunnelingDib) obj;
 		return maxApduLength == other.maxApduLength && slots.equals(other.slots);
 	}
 

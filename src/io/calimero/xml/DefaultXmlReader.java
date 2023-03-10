@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -502,10 +502,8 @@ class DefaultXmlReader implements XmlReader
 	@Override
 	public String getEncoding()
 	{
-		if (r instanceof InputStreamReader) {
-			final InputStreamReader isr = (InputStreamReader) r;
+		if (r instanceof final InputStreamReader isr)
 			return isr.getEncoding();
-		}
 		return encoding;
 	}
 

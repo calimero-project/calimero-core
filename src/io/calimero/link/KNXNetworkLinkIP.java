@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -363,10 +363,9 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 
 		mode = serviceMode;
 		conn.addConnectionListener(notifier);
-		if (c instanceof KNXnetIPTunnel && mode == TunnelingV2) {
+		if (c instanceof final KNXnetIPTunnel tunnel && mode == TunnelingV2) {
 			notifier.registerEventType(TunnelingFeature.class);
 
-			final var tunnel = (KNXnetIPTunnel) c;
 			tunnel.addConnectionListener(new TunnelingListener() {
 				@Override
 				public void featureResponse(final TunnelingFeature feature) {

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2021, 2021 B. Malinowsky
+    Copyright (c) 2021, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -171,19 +171,15 @@ public final class LteHeeTag {
 				return appDomain() + "/0x" + Integer.toHexString(unassignedTag()) + " (app)";
 
 			final var sb = new StringBuilder("HVAC ").append(hvacType()).append(' ');
-			switch (hvacType()) {
-			case ProdSegHotWater:
-			case ProdSegColdWater:
-				// producer segment doesn't have wildcards
-				return sb.append(producerSegment()).append(' ').append(wildcard(hvacZone())).toString();
-
-			case Reserved:
-				return sb.append(String.format("0b%8s", Integer.toBinaryString(unassignedTag())).replace(' ', '0'))
-						.toString();
-
-			default:
-				return sb.append(wildcard(hvacZone())).toString();
-			}
+			return switch (hvacType()) {
+				case ProdSegHotWater, ProdSegColdWater ->
+						// producer segment doesn't have wildcards
+						sb.append(producerSegment()).append(' ').append(wildcard(hvacZone())).toString();
+				case Reserved ->
+						sb.append(String.format("0b%8s", Integer.toBinaryString(unassignedTag())).replace(' ', '0'))
+								.toString();
+				default -> sb.append(wildcard(hvacZone())).toString();
+			};
 
 		case Unassigned:
 			return "unassigned tag 0x" + Integer.toHexString(unassignedTag());

@@ -93,13 +93,13 @@ public class DptXlator16BitSet extends DPTXlator {
 
 		@Override
 		public String description() {
-			switch (this.ordinal()) {
-				case 1: return "TP1";
-				case 2: return "PL110";
-				case 4: return "RF";
-				case 5: return "KNX IP";
-				default: return "undefined";
-			}
+			return switch (this.ordinal()) {
+				case 1 -> "TP1";
+				case 2 -> "PL110";
+				case 4 -> "RF";
+				case 5 -> "KNX IP";
+				default -> "undefined";
+			};
 		}
 
     }

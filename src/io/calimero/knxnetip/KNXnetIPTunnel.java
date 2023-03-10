@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,7 +44,6 @@ import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -452,11 +451,9 @@ public class KNXnetIPTunnel extends ClientConnection
 
 	private static List<Integer> additionalInfoTypesOf(final CEMILData ldata)
 	{
-		if (ldata instanceof CEMILDataEx) {
-			final CEMILDataEx ext = (CEMILDataEx) ldata;
+		if (ldata instanceof final CEMILDataEx ext)
 			return ext.additionalInfo().stream().map(AdditionalInfo::type).collect(Collectors.toList());
-		}
-		return Collections.emptyList();
+		return List.of();
 	}
 
 	// types parameter: a workaround introduced for the Gira server, which sometimes adds non-standard
@@ -464,8 +461,7 @@ public class KNXnetIPTunnel extends ClientConnection
 	private byte[] unifyLData(final CEMI ldata, final boolean emptySrc, final List<Integer> types)
 	{
 		final byte[] data;
-		if (ldata instanceof CEMILDataEx) {
-			final CEMILDataEx ext = ((CEMILDataEx) ldata);
+		if (ldata instanceof final CEMILDataEx ext) {
 			final var additionalInfo = ext.additionalInfo();
 			synchronized (additionalInfo) {
 				for (final var i = additionalInfo.iterator(); i.hasNext();) {

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2022 B. Malinowsky
+    Copyright (c) 2019, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -179,9 +179,8 @@ public final class Keyring {
 		public boolean equals(final Object o) {
 			if (this == o)
 				return true;
-			if (!(o instanceof Interface))
+			if (!(o instanceof final Interface other))
 				return false;
-			final var other = (Interface) o;
 			return Objects.equals(addr, other.addr) && Arrays.equals(auth, other.auth)
 					&& Objects.equals(groups, other.groups) && Arrays.equals(pwd, other.pwd)
 					&& Objects.equals(type, other.type) && user == other.user;
@@ -288,9 +287,8 @@ public final class Keyring {
 		public boolean equals(final Object o) {
 			if (this == o)
 				return true;
-			if (!(o instanceof Device))
+			if (!(o instanceof final Device other))
 				return false;
-			final var other = (Device) o;
 			return Objects.equals(addr, other.addr) && Arrays.equals(auth, other.auth) && Arrays.equals(pwd, other.pwd)
 					&& sequence == other.sequence && Arrays.equals(toolkey, other.toolkey);
 		}
@@ -331,9 +329,8 @@ public final class Keyring {
 		public boolean equals(final Object o) {
 			if (this == o)
 				return true;
-			if (!(o instanceof Backbone))
+			if (!(o instanceof final Backbone other))
 				return false;
-			final var other = (Backbone) o;
 			return Objects.equals(mcGroup, other.mcGroup) && Objects.equals(latency, other.latency)
 					&& Arrays.equals(groupKey, other.groupKey);
 		}
@@ -638,9 +635,8 @@ public final class Keyring {
 	public boolean equals(final Object o) {
 		if (this == o)
 			return true;
-		if (!(o instanceof Keyring))
+		if (!(o instanceof final Keyring other))
 			return false;
-		final var other = (Keyring) o;
 
 		if (Arrays.equals(signature, other.signature))
 			return true;

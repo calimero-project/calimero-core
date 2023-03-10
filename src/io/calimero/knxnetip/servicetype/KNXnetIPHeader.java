@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -356,58 +356,39 @@ public class KNXnetIPHeader
 
 	static String getSvcName(final int svcType)
 	{
-		switch (svcType) {
-		case CONNECT_REQ:
-			return "connect.req";
-		case CONNECT_RES:
-			return "connect.res";
-		case CONNECTIONSTATE_REQ:
-			return "connectionstate.req";
-		case CONNECTIONSTATE_RES:
-			return "connectionstate.res";
-		case DISCONNECT_REQ:
-			return "disconnect.req";
-		case DISCONNECT_RES:
-			return "disconnect.res";
-		case DESCRIPTION_REQ:
-			return "description.req";
-		case DESCRIPTION_RES:
-			return "description.res";
-		case SEARCH_REQ:
-			return "search.req";
-		case SEARCH_RES:
-			return "search.res";
-		case DEVICE_CONFIGURATION_REQ:
-			return "device-configuration.req";
-		case DEVICE_CONFIGURATION_ACK:
-			return "device-configuration.ack";
-		case TUNNELING_REQ:
-			return "tunneling.req";
-		case TUNNELING_ACK:
-			return "tunneling.ack";
-		case ROUTING_IND:
-			return "routing.ind";
-		case ROUTING_LOST_MSG:
-			return "routing-lost.msg";
-		case ROUTING_BUSY:
-			return "routing-busy.ind";
-		case RoutingSystemBroadcast:
-			return "routing-system-broadcast";
-		case SearchRequest: return "search.req";
-		case SearchResponse: return "search.res";
-		case SecureWrapper: return "secure-msg";
-		case SecureSessionRequest: return "session.req";
-		case SecureSessionResponse: return "session.res";
-		case SecureSessionAuth: return "session-auth";
-		case SecureSessionStatus: return "session-status";
-		case SecureGroupSync: return "group-sync";
-		case TunnelingFeatureGet: return "tunneling-feat.get";
-		case TunnelingFeatureResponse: return "tunneling-feat.res";
-		case TunnelingFeatureSet: return "tunneling-feat.set";
-		case TunnelingFeatureInfo: return "tunneling-feat.info";
-		default:
-			return "unknown service";
-		}
+		return switch (svcType) {
+			case CONNECT_REQ -> "connect.req";
+			case CONNECT_RES -> "connect.res";
+			case CONNECTIONSTATE_REQ -> "connectionstate.req";
+			case CONNECTIONSTATE_RES -> "connectionstate.res";
+			case DISCONNECT_REQ -> "disconnect.req";
+			case DISCONNECT_RES -> "disconnect.res";
+			case DESCRIPTION_REQ -> "description.req";
+			case DESCRIPTION_RES -> "description.res";
+			case SEARCH_REQ -> "search.req";
+			case SEARCH_RES -> "search.res";
+			case DEVICE_CONFIGURATION_REQ -> "device-configuration.req";
+			case DEVICE_CONFIGURATION_ACK -> "device-configuration.ack";
+			case TUNNELING_REQ -> "tunneling.req";
+			case TUNNELING_ACK -> "tunneling.ack";
+			case ROUTING_IND -> "routing.ind";
+			case ROUTING_LOST_MSG -> "routing-lost.msg";
+			case ROUTING_BUSY -> "routing-busy.ind";
+			case RoutingSystemBroadcast -> "routing-system-broadcast";
+			case SearchRequest -> "search.req";
+			case SearchResponse -> "search.res";
+			case SecureWrapper -> "secure-msg";
+			case SecureSessionRequest -> "session.req";
+			case SecureSessionResponse -> "session.res";
+			case SecureSessionAuth -> "session-auth";
+			case SecureSessionStatus -> "session-status";
+			case SecureGroupSync -> "group-sync";
+			case TunnelingFeatureGet -> "tunneling-feat.get";
+			case TunnelingFeatureResponse -> "tunneling-feat.res";
+			case TunnelingFeatureSet -> "tunneling-feat.set";
+			case TunnelingFeatureInfo -> "tunneling-feat.info";
+			default -> "unknown service";
+		};
 	}
 
 	private static int version(final int serviceType) {

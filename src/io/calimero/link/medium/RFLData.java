@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2021 B. Malinowsky
+    Copyright (c) 2015, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -422,28 +422,18 @@ public class RFLData implements RawFrame
 
 	private static String getFrameType(final int format)
 	{
-		switch (format) {
-		case 0:
-			return "L-Data (async)";
-		case 1:
-			return "Fast ACK";
-		case 4:
-			return "L-Data (sync)";
-		case 5:
-			return "BiBat Sync";
-		case 6:
-			return "BiBat Help Call";
-		case 7:
-			return "BiBat Help Call Res";
-		case 8:
-			return "RF Multi L-Data (async)";
-		case 9:
-			return "RF Multi L-Data (async, ACK.req)";
-		case 10:
-			return "RF Multi Repeater ACK";
-		default:
-			return "Reserved";
-		}
+		return switch (format) {
+			case 0 -> "L-Data (async)";
+			case 1 -> "Fast ACK";
+			case 4 -> "L-Data (sync)";
+			case 5 -> "BiBat Sync";
+			case 6 -> "BiBat Help Call";
+			case 7 -> "BiBat Help Call Res";
+			case 8 -> "RF Multi L-Data (async)";
+			case 9 -> "RF Multi L-Data (async, ACK.req)";
+			case 10 -> "RF Multi Repeater ACK";
+			default -> "Reserved";
+		};
 	}
 
 	private static void verifyCrc(final int crc, final byte[] data, final int offset,

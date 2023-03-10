@@ -333,136 +333,72 @@ public final class DataUnitBuilder
 	 */
 	public static String decodeAPCI(final int apci)
 	{
-		switch (apci) {
-		case 0x00:
-			return "A_Group.read";
-		case 0x40:
-			return "A_Group.response";
-		case 0x80:
-			return "A_Group.write";
-		case 0x0180:
-			return "A_ADC.read";
-		case 0x01C0:
-			return "A_ADC.response";
-		case 0x03D1:
-			return "A_Authorize.read";
-		case 0x03D2:
-			return "A_Authorize.response";
-		case 0x3E0:
-			return "A_Domain.write";
-		case 0x3E1:
-			return "A_Domain.read";
-		case 0x3E2:
-			return "A_Domain.response";
-		case 0x3E3:
-			return "A_Domain-selective.read";
-		case 0x0100:
-			return "A_IndAddr.read";
-		case 0x0140:
-			return "A_IndAddr.response";
-		case 0xC0:
-			return "A_IndAddr.write";
-		case 0x03DC:
-			return "A_IndAddr-S/N.read";
-		case 0x03DD:
-			return "A_IndAddr-S/N.response";
-		case 0x03DE:
-			return "A_IndAddr-S/N.write";
-		case 0x300:
-			return "A_Device-desc.read";
-		case 0x340:
-			return "A_Device-desc.response";
-		case 0x03D3:
-			return "A_Key.write";
-		case 0x03D4:
-			return "A_Key.response";
-		case 0x0200:
-			return "A_Memory.read";
-		case 0x0240:
-			return "A_Memory.response";
-		case 0x0280:
-			return "A_Memory.write";
-		case 0x03D8:
-			return "A_Property-desc.read";
-		case 0x03D9:
-			return "A_Property-desc.response";
-		case 0x03D5:
-			return "A_Property.read";
-		case 0x03D6:
-			return "A_Property.response";
-		case 0x03D7:
-			return "A_Property.write";
-		case 0x0380:
-			return "A_Restart";
-		case 0b1111011010:
-			return "A_NetworkParameter.read";
-		case 0b1111011011:
-			return "A_NetworkParameter.response";
-		case 0b1111100100:
-			return "A_NetworkParameter.write";
-		case 0b1111101000:
-			return "A_GroupPropValue.read";
-		case 0b1111101001:
-			return "A_GroupPropValue.response";
-		case 0b1111101010:
-			return "A_GroupPropValue.write";
-		case 0b1111101011:
-			return "A_GroupPropValue.info";
-		case 0b0111111011:
-			return "A_MemoryExtended.write";
-		case 0b0111111100:
-			return "A_MemoryExtended.write-response";
-		case 0b0111111101:
-			return "A_MemoryExtended.read";
-		case 0b0111111110:
-			return "A_MemoryExtended.read-response";
-		case 0b0111001000:
-			return "A_SystemNetworkParameter.read";
-		case 0b0111001001:
-			return "A_SystemNetworkParameter.response";
-		case 0b0111001010:
-			return "A_SystemNetworkParameter.write";
-		case 0b1111101100:
-			return "A_DoA-S/N.read";
-		case 0b1111101101:
-			return "A_DoA-S/N.response";
-		case 0b1111101110:
-			return "A_DoA-S/N.write";
-		case 0b1011000111:
-			return "A_FunctionPropertyCommand";
-		case 0b1011001000:
-			return "A_FunctionPropertyState.read";
-		case 0b1011001001:
-			return "A_FunctionPropertyState.response";
-		// services for extended interface object addressing
-		case 0b0111001100:
-			return "A_PropertyExtValue.read";
-		case 0b0111001101:
-			return "A_PropertyExtValue.response";
-		case 0b0111001110:
-			return "A_PropertyExtValue.write";
-		case 0b0111001111:
-			return "A_PropertyExtValue.write-response";
-		case 0b0111010000:
-			return "A_PropertyExtValue.write-uncon";
-		case 0b0111010001:
-			return "A_PropertyExtValue.info";
-		case 0b0111010010:
-			return "A_PropertyExtDescription.read";
-		case 0b0111010011:
-			return "A_PropertyExtDescription.response";
-		case 0b0111010100:
-			return "A_FunctionPropertyExtCommand";
-		case 0b0111010101:
-			return "A_FunctionPropertyExtState.read";
-		case 0b0111010110:
-			return "A_FunctionPropertyExtState.response";
-
-		case 0x3f1:
-			return "S-A_Data";
-		default:
-			return "APCI 0x" + Integer.toHexString(apci);
-		}
+		return switch (apci) {
+			case 0x00 -> "A_Group.read";
+			case 0x40 -> "A_Group.response";
+			case 0x80 -> "A_Group.write";
+			case 0x0180 -> "A_ADC.read";
+			case 0x01C0 -> "A_ADC.response";
+			case 0x03D1 -> "A_Authorize.read";
+			case 0x03D2 -> "A_Authorize.response";
+			case 0x3E0 -> "A_Domain.write";
+			case 0x3E1 -> "A_Domain.read";
+			case 0x3E2 -> "A_Domain.response";
+			case 0x3E3 -> "A_Domain-selective.read";
+			case 0x0100 -> "A_IndAddr.read";
+			case 0x0140 -> "A_IndAddr.response";
+			case 0xC0 -> "A_IndAddr.write";
+			case 0x03DC -> "A_IndAddr-S/N.read";
+			case 0x03DD -> "A_IndAddr-S/N.response";
+			case 0x03DE -> "A_IndAddr-S/N.write";
+			case 0x300 -> "A_Device-desc.read";
+			case 0x340 -> "A_Device-desc.response";
+			case 0x03D3 -> "A_Key.write";
+			case 0x03D4 -> "A_Key.response";
+			case 0x0200 -> "A_Memory.read";
+			case 0x0240 -> "A_Memory.response";
+			case 0x0280 -> "A_Memory.write";
+			case 0x03D8 -> "A_Property-desc.read";
+			case 0x03D9 -> "A_Property-desc.response";
+			case 0x03D5 -> "A_Property.read";
+			case 0x03D6 -> "A_Property.response";
+			case 0x03D7 -> "A_Property.write";
+			case 0x0380 -> "A_Restart";
+			case 0b1111011010 -> "A_NetworkParameter.read";
+			case 0b1111011011 -> "A_NetworkParameter.response";
+			case 0b1111100100 -> "A_NetworkParameter.write";
+			case 0b1111101000 -> "A_GroupPropValue.read";
+			case 0b1111101001 -> "A_GroupPropValue.response";
+			case 0b1111101010 -> "A_GroupPropValue.write";
+			case 0b1111101011 -> "A_GroupPropValue.info";
+			case 0b0111111011 -> "A_MemoryExtended.write";
+			case 0b0111111100 -> "A_MemoryExtended.write-response";
+			case 0b0111111101 -> "A_MemoryExtended.read";
+			case 0b0111111110 -> "A_MemoryExtended.read-response";
+			case 0b0111001000 -> "A_SystemNetworkParameter.read";
+			case 0b0111001001 -> "A_SystemNetworkParameter.response";
+			case 0b0111001010 -> "A_SystemNetworkParameter.write";
+			case 0b1111101100 -> "A_DoA-S/N.read";
+			case 0b1111101101 -> "A_DoA-S/N.response";
+			case 0b1111101110 -> "A_DoA-S/N.write";
+			case 0b1011000111 -> "A_FunctionPropertyCommand";
+			case 0b1011001000 -> "A_FunctionPropertyState.read";
+			case 0b1011001001 -> "A_FunctionPropertyState.response";
+			// services for extended interface object addressing
+			case 0b0111001100 -> "A_PropertyExtValue.read";
+			case 0b0111001101 -> "A_PropertyExtValue.response";
+			case 0b0111001110 -> "A_PropertyExtValue.write";
+			case 0b0111001111 -> "A_PropertyExtValue.write-response";
+			case 0b0111010000 -> "A_PropertyExtValue.write-uncon";
+			case 0b0111010001 -> "A_PropertyExtValue.info";
+			case 0b0111010010 -> "A_PropertyExtDescription.read";
+			case 0b0111010011 -> "A_PropertyExtDescription.response";
+			case 0b0111010100 -> "A_FunctionPropertyExtCommand";
+			case 0b0111010101 -> "A_FunctionPropertyExtState.read";
+			case 0b0111010110 -> "A_FunctionPropertyExtState.response";
+			case 0x3f1 -> "S-A_Data";
+			default -> "APCI 0x" + Integer.toHexString(apci);
+		};
 	}
 
 	/**

@@ -154,9 +154,8 @@ public class ManufacturerDIB extends DIB
 	public boolean equals(final Object obj) {
 		if (this == obj)
 			return true;
-		if (!(obj instanceof ManufacturerDIB))
+		if (!(obj instanceof final ManufacturerDIB other))
 			return false;
-		final ManufacturerDIB other = (ManufacturerDIB) obj;
 		return id == other.id && Arrays.equals(mfrData, other.mfrData);
 	}
 }

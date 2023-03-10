@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2021, 2022 B. Malinowsky
+    Copyright (c) 2021, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -86,10 +86,8 @@ public final class StepControl {
 	public boolean equals(final Object other) {
 		if (this == other)
 			return true;
-		if (other instanceof StepControl)	{
-			final StepControl sc = (StepControl) other;
+		if (other instanceof final StepControl sc)
 			return step == sc.step && stepcode == sc.stepcode;
-		}
 		return false;
 	}
 

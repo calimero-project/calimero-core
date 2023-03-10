@@ -228,18 +228,13 @@ public class DeviceDIB extends DIB
 	 */
 	public String getKNXMediumString()
 	{
-		switch (knxmedium) {
-		case MEDIUM_TP1:
-			return "TP1";
-		case MEDIUM_PL110:
-			return "PL110";
-		case MEDIUM_RF:
-			return "RF";
-		case MEDIUM_KNXIP:
-			return "KNX IP";
-		default:
-			return "unknown";
-		}
+		return switch (knxmedium) {
+			case MEDIUM_TP1 -> "TP1";
+			case MEDIUM_PL110 -> "PL110";
+			case MEDIUM_RF -> "RF";
+			case MEDIUM_KNXIP -> "KNX IP";
+			default -> "unknown";
+		};
 	}
 
 	/**
@@ -392,9 +387,8 @@ public class DeviceDIB extends DIB
 	public boolean equals(final Object obj) {
 		if (this == obj)
 			return true;
-		if (!(obj instanceof DeviceDIB))
+		if (!(obj instanceof final DeviceDIB other))
 			return false;
-		final DeviceDIB other = (DeviceDIB) obj;
 		return address.equals(other.address) && name.equals(other.name) && status == other.status
 				&& knxmedium == other.knxmedium && serial.equals(other.serial)
 				&& installationId == other.installationId && Arrays.equals(mcast, other.mcast)

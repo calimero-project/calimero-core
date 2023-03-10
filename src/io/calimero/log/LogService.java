@@ -173,18 +173,12 @@ public final class LogService
 
 	private static boolean isEnabled(final Logger logger, final LogLevel level)
 	{
-		switch (level) {
-		case TRACE:
-			return logger.isTraceEnabled();
-		case DEBUG:
-			return logger.isDebugEnabled();
-		case INFO:
-			return logger.isInfoEnabled();
-		case WARN:
-			return logger.isWarnEnabled();
-		case ERROR:
-			return logger.isErrorEnabled();
-		}
-		throw new KNXIllegalArgumentException("unknown log level");
+		return switch (level) {
+			case TRACE -> logger.isTraceEnabled();
+			case DEBUG -> logger.isDebugEnabled();
+			case INFO -> logger.isInfoEnabled();
+			case WARN -> logger.isWarnEnabled();
+			case ERROR -> logger.isErrorEnabled();
+		};
 	}
 }

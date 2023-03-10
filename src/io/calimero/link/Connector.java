@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2022 B. Malinowsky
+    Copyright (c) 2015, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -412,8 +412,7 @@ public final class Connector
 			if (connecting.compareAndSet(false, true)) {
 				try {
 					final T t = creator.get();
-					if (t instanceof KNXNetworkLink) {
-						final KNXNetworkLink link = (KNXNetworkLink) t;
+					if (t instanceof final KNXNetworkLink link) {
 						if (impl == null) {
 							settings = link.getKNXMedium();
 							hopCount = link.getHopCount();
@@ -421,27 +420,21 @@ public final class Connector
 						link.setKNXMedium(settings);
 						link.setHopCount(hopCount);
 						link.addLinkListener(this);
-						if (link instanceof AbstractLink<?>) {
-							final var abstractLink = (AbstractLink<?>) link;
+						if (link instanceof final AbstractLink<?> abstractLink)
 							abstractLink.wrappedByConnector = true;
-						}
 						listeners.forEach(l -> link.addLinkListener((NetworkLinkListener) l));
 					}
-					else if (t instanceof KNXNetworkMonitor) {
-						final KNXNetworkMonitor monitor = (KNXNetworkMonitor) t;
+					else if (t instanceof final KNXNetworkMonitor monitor) {
 						monitor.setDecodeRawFrames(decodeRawFrames);
 						monitor.addMonitorListener(this);
-						if (monitor instanceof AbstractMonitor<?>) {
-							final var abstractLink = (AbstractMonitor<?>) monitor;
+						if (monitor instanceof final AbstractMonitor<?> abstractLink)
 							abstractLink.wrappedByConnector = true;
-						}
 						listeners.forEach(monitor::addMonitorListener);
 					}
 					impl = t;
 				}
 				catch (final KNXRemoteException e) {
-					final KNXLinkClosedException lce = new KNXLinkClosedException(e.getMessage());
-					lce.initCause(e);
+					final KNXLinkClosedException lce = new KNXLinkClosedException(e.getMessage(), e);
 					throw lce;
 				}
 				finally {

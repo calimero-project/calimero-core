@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2022 B. Malinowsky
+    Copyright (c) 2019, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -141,19 +141,18 @@ public class RoutingSystemBroadcast extends ServiceType {
 	}
 
 	private static boolean subnetSystemBroadcast(final byte[] tpdu) {
-		switch (DataUnitBuilder.getAPDUService(tpdu)) {
-		case SystemNetworkParamRead:
-			// pdu: 2 bytes APCI + 2 bytes obj type + 2 bytes PID + 1 byte operand
-			return tpdu.length == 7 && tpdu[2] == 0 && tpdu[3] == 0 && tpdu[4] == 0 && (tpdu[5] & 0xff) == (11 << 4)
-					&& tpdu[6] == 1;
+		return switch (DataUnitBuilder.getAPDUService(tpdu)) {
+			case SystemNetworkParamRead ->
+					// pdu: 2 bytes APCI + 2 bytes obj type + 2 bytes PID + 1 byte operand
+					tpdu.length == 7 && tpdu[2] == 0 && tpdu[3] == 0 && tpdu[4] == 0 && (tpdu[5] & 0xff) == (11 << 4)
+							&& tpdu[6] == 1;
+			case DoASerialNumberWrite -> // DoA serial number write service with IP domain
+					tpdu.length == 2 + 6 + 4; // APCI + SNo + mcast group
 
-		case DoASerialNumberWrite: // DoA serial number write service with IP domain
-			return tpdu.length == 2 + 6 + 4; // APCI + SNo + mcast group
-
-		case SecureService: // we look for secure data or sync request, and require tool access, system broadcast, A+C
-			return secureService(tpdu, SecureDataPdu, SecureSyncRequest);
-		}
-		return false;
+			case SecureService -> // we look for secure data or sync request, and require tool access, system broadcast, A+C
+					secureService(tpdu, SecureDataPdu, SecureSyncRequest);
+			default -> false;
+		};
 	}
 
 	private static boolean ipSystemBroadcast(final byte[] tpdu) {
@@ -179,8 +178,7 @@ public class RoutingSystemBroadcast extends ServiceType {
 	}
 
 	private static Optional<byte[]> payload(final CEMI frame) {
-		if (frame.getMessageCode() == CEMILData.MC_LDATA_IND && frame instanceof CEMILData) {
-			final CEMILData ldata = (CEMILData) frame;
+		if (frame.getMessageCode() == CEMILData.MC_LDATA_IND && frame instanceof final CEMILData ldata) {
 			final KNXAddress dst = ldata.getDestination();
 			// L-Data system bcast check is not mandated, it could cause false negatives
 			if (dst instanceof GroupAddress && dst.getRawAddress() == 0) {

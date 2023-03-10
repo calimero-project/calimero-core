@@ -519,10 +519,8 @@ public abstract class DPTXlator
 		for (final Field field : fields) {
 			try {
 				final Object o = field.get(null);
-				if (o instanceof DPT) {
-					final DPT dpt = (DPT) o;
+				if (o instanceof final DPT dpt)
 					types.put(dpt.getID(), dpt);
-				}
 			}
 			catch (final IllegalAccessException e) {}
 		}

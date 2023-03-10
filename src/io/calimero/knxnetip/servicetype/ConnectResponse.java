@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -192,32 +192,20 @@ public class ConnectResponse extends ServiceType
 	 */
 	public String getStatusString()
 	{
-		switch (status) {
-		case ErrorCodes.NO_ERROR:
-			return "the connection was established successfully";
-		case ErrorCodes.CONNECTION_TYPE:
-			return "the requested connection type is not supported";
-		case ErrorCodes.CONNECTION_OPTION:
-			return "one or more connection options are not supported";
-		case ErrorCodes.NO_MORE_CONNECTIONS:
-			return "could not accept new connection (maximum reached)";
-		case NoMoreUniqueConnections:
-			return "KNXnet/IP tunneling address for connection is not unique";
-		case ErrorCodes.KNX_CONNECTION:
-			return "server detected error concerning KNX subsystem connection";
-		case ErrorCodes.TUNNELING_LAYER:
-			return "the requested tunneling layer is not supported";
-		case AuthError:
-			return "not authorized to establish the requested connection";
-		case NoTunnelingAddress:
-			return "requested address is not a tunneling address";
-		case ConnectionInUse:
-			return "requested address is in use";
-		case Error:
-			return "undefined error";
-		default:
-			return "unknown status";
-		}
+		return switch (status) {
+			case ErrorCodes.NO_ERROR -> "the connection was established successfully";
+			case ErrorCodes.CONNECTION_TYPE -> "the requested connection type is not supported";
+			case ErrorCodes.CONNECTION_OPTION -> "one or more connection options are not supported";
+			case ErrorCodes.NO_MORE_CONNECTIONS -> "could not accept new connection (maximum reached)";
+			case NoMoreUniqueConnections -> "KNXnet/IP tunneling address for connection is not unique";
+			case ErrorCodes.KNX_CONNECTION -> "server detected error concerning KNX subsystem connection";
+			case ErrorCodes.TUNNELING_LAYER -> "the requested tunneling layer is not supported";
+			case AuthError -> "not authorized to establish the requested connection";
+			case NoTunnelingAddress -> "requested address is not a tunneling address";
+			case ConnectionInUse -> "requested address is in use";
+			case Error -> "undefined error";
+			default -> "unknown status";
+		};
 	}
 
 	@Override

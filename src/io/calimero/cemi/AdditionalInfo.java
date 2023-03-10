@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2020 B. Malinowsky
+    Copyright (c) 2019, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -174,22 +174,15 @@ public class AdditionalInfo {
 
 	@Override
 	public String toString() {
-		switch (type) {
-		case PlMedium:
-			return "PL DoA " + (Integer.toHexString((data[0] & 0xff) << 8 | (data[1] & 0xff)));
-		case RfMedium:
-			return new RFMediumInfo(data, false).toString(); // we default to domain broadcast
-		case Timestamp:
-			return "timestamp " + ((data[0] & 0xff) << 8 | (data[1] & 0xff));
-		case TimeDelay:
-			return "timedelay " + unsigned(data);
-		case ExtendedTimestamp:
-			return "ext.timestamp " + unsigned(data);
-		case BiBat:
-			return "BiBat 0x" + DataUnitBuilder.toHex(data, " ");
-		default:
-			return "type " + type + " = 0x" + DataUnitBuilder.toHex(data, "");
-		}
+		return switch (type) {
+			case PlMedium -> "PL DoA " + (Integer.toHexString((data[0] & 0xff) << 8 | (data[1] & 0xff)));
+			case RfMedium -> new RFMediumInfo(data, false).toString(); // we default to domain broadcast
+			case Timestamp -> "timestamp " + ((data[0] & 0xff) << 8 | (data[1] & 0xff));
+			case TimeDelay -> "timedelay " + unsigned(data);
+			case ExtendedTimestamp -> "ext.timestamp " + unsigned(data);
+			case BiBat -> "BiBat 0x" + DataUnitBuilder.toHex(data, " ");
+			default -> "type " + type + " = 0x" + DataUnitBuilder.toHex(data, "");
+		};
 	}
 
 	private static long unsigned(final byte[] data) {
