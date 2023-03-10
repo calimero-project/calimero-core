@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,55 +39,16 @@ package io.calimero.buffer.cache;
 import io.calimero.buffer.cache.Cache.Statistic;
 
 /**
- * Provide basic {@link Cache} information as required by {@link Cache.Statistic}.
+ * Provide basic {@link Cache} information as required by {@link Statistic}.
  * <p>
  * This statistics implementation is immutable.
- * 
+ *
  * @author B. Malinowsky
- * @see Cache.Statistic
+ * @see Statistic
  */
-public class StatisticImpl implements Statistic
-{
-	private final long hits;
-	private final long misses;
-
-	/**
-	 * Creates an instance and fills it with data.
-	 * <p>
-	 * 
-	 * @param hits cache hit count
-	 * @param misses cache miss count
-	 */
-	public StatisticImpl(final long hits, final long misses)
-	{
-		this.hits = hits;
-		this.misses = misses;
-	}
-
-	/* (non-Javadoc)
-	 * @see io.calimero.buffer.cache.Cache.Statistic#hits()
-	 */
+public record StatisticImpl(long hits, long misses) implements Statistic {
 	@Override
-	public final long hits()
-	{
-		return hits;
-	}
-
-	/* (non-Javadoc)
-	 * @see io.calimero.buffer.cache.Cache.Statistic#misses()
-	 */
-	@Override
-	public final long misses()
-	{
-		return misses;
-	}
-
-	/* (non-Javadoc)
-	 * @see io.calimero.buffer.cache.Cache.Statistic#hitRatio()
-	 */
-	@Override
-	public final double hitRatio()
-	{
+	public final double hitRatio() {
 		final double total = hits + misses;
 		return total == 0.0 ? 0.0 : hits / total;
 	}

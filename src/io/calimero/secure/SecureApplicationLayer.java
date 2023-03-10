@@ -115,23 +115,16 @@ public class SecureApplicationLayer implements AutoCloseable {
 	private final Logger logger;
 
 
-	/*public record*/
-	public static final class SequenceNumbers {
-		private final long sequenceNumber;
-		private final long sequenceNumberToolAccess;
-		private final Map<IndividualAddress, Long> lastValidSequenceNumbers;
-		private final Map<IndividualAddress, Long> lastValidSequenceNumbersToolAccess;
+	public record SequenceNumbers(long sequenceNumber, long sequenceNumberToolAccess,
+			Map<IndividualAddress, Long> lastValidSequenceNumbers,
+			Map<IndividualAddress, Long> lastValidSequenceNumbersToolAccess) {
 
-		public SequenceNumbers(final long sequenceNumber, final long sequenceNumberToolAccess,
-				final Map<IndividualAddress, Long> lastValidSequenceNumbers,
-				final Map<IndividualAddress, Long> lastValidSequenceNumbersToolAccess) {
-
+		public SequenceNumbers {
 			if (sequenceNumber < 0 || sequenceNumberToolAccess < 0)
 				throw new KNXIllegalArgumentException("negative sequence number");
-			this.sequenceNumber = sequenceNumber;
-			this.sequenceNumberToolAccess = Math.max(1, sequenceNumberToolAccess);
-			this.lastValidSequenceNumbers = Map.copyOf(lastValidSequenceNumbers);
-			this.lastValidSequenceNumbersToolAccess = Map.copyOf(lastValidSequenceNumbersToolAccess);
+			sequenceNumberToolAccess = Math.max(1, sequenceNumberToolAccess);
+			lastValidSequenceNumbers = Map.copyOf(lastValidSequenceNumbers);
+			lastValidSequenceNumbersToolAccess = Map.copyOf(lastValidSequenceNumbersToolAccess);
 		}
 	}
 
