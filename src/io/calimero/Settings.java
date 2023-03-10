@@ -43,13 +43,13 @@ package io.calimero;
  */
 public final class Settings
 {
-	private static final String version = "2.6-SNAPSHOT";
+	private static final String version = "3.0-SNAPSHOT";
 	private static final String library = "Calimero";
 	private static final String desc = "A library for KNX network access";
 
 	private static final String tuwien = "Vienna University of Technology";
 	private static final String group = "Automation Systems Group";
-	private static final String copyright = "Copyright © 2006-2022";
+	private static final String copyright = "Copyright © 2006-2023";
 
 	// just use newline, it's easier to deal with
 	private static final String sep = "\n";
