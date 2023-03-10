@@ -37,6 +37,8 @@
 package io.calimero.knxnetip;
 
 import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -47,16 +49,14 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.calimero.KNXException;
 import io.calimero.KNXIllegalArgumentException;
+import io.calimero.log.LogService;
 
 final class Net {
 	private Net() {}
 
-	private static final Logger logger = LoggerFactory.getLogger("io.calimero.knxnetip.Net");
+	private static final Logger logger = LogService.getLogger("io.calimero.knxnetip.Net");
 
 
 	static final NetworkInterface defaultNetif;
@@ -74,7 +74,7 @@ final class Net {
 		try {
 			return NetworkInterface.networkInterfaces().flatMap(ni -> ni.getInterfaceAddresses().stream())
 					.filter(ia -> ia.getAddress() instanceof Inet4Address)
-					.peek(ia -> logger.trace("match local address {}/{} to {}", ia.getAddress().getHostAddress(),
+					.peek(ia -> logger.log(Level.TRACE, "match local address {0}/{1} to {2}", ia.getAddress().getHostAddress(),
 							ia.getNetworkPrefixLength(), remote.getHostAddress()))
 					.filter(ia -> matchesPrefix(ia.getAddress(), ia.getNetworkPrefixLength(), remote))
 					.map(InterfaceAddress::getAddress).findFirst();

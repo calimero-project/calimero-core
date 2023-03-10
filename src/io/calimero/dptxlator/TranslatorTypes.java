@@ -36,6 +36,9 @@
 
 package io.calimero.dptxlator;
 
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.TRACE;
+import static java.lang.System.Logger.Level.WARNING;
 import static java.util.Collections.emptyList;
 
 import java.lang.reflect.Field;
@@ -364,7 +367,7 @@ public final class TranslatorTypes
 				addTranslator("io.calimero.dptxlator." + x);
 		}
 		catch (final Exception e) {
-			DPTXlator.logger.error("failed to initialize list of available DPT translators", e);
+			DPTXlator.logger.log(ERROR, "failed to initialize list of available DPT translators", e);
 		}
 	}
 
@@ -386,10 +389,10 @@ public final class TranslatorTypes
 			final String desc = descriptionFor(x) + " (main number " + mainNumber + ")";
 
 			map.put(mainNumber, new MainType(mainNumber, x, desc));
-			DPTXlator.logger.trace("loaded DPT translator for {}", desc);
+			DPTXlator.logger.log(TRACE, "loaded DPT translator for {0}", desc);
 		}
 		catch (ReflectiveOperationException | RuntimeException e) {
-			DPTXlator.logger.warn("lookup DPT translator class {}", className, e);
+			DPTXlator.logger.log(WARNING, "lookup DPT translator class {0}", className, e);
 		}
 	}
 

@@ -42,7 +42,6 @@
  */
 module io.calimero.core {
 	requires static java.xml;
-	requires transitive org.slf4j;
 
 	exports io.calimero;
 	exports io.calimero.baos;

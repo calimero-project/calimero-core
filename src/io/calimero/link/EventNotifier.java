@@ -36,11 +36,10 @@
 
 package io.calimero.link;
 
+import java.lang.System.Logger;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.function.Consumer;
-
-import org.slf4j.Logger;
 
 import io.calimero.CloseEvent;
 import io.calimero.FrameEvent;

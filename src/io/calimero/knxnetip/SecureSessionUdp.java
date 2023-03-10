@@ -39,8 +39,13 @@ package io.calimero.knxnetip;
 import static io.calimero.DataUnitBuilder.toHex;
 import static io.calimero.knxnetip.Net.hostPort;
 import static io.calimero.knxnetip.SecureConnection.secureSymbol;
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.TRACE;
+import static java.lang.System.Logger.Level.WARNING;
 
 import java.io.IOException;
+import java.lang.System.Logger;
 import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -56,9 +61,6 @@ import java.util.Arrays;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.calimero.KNXException;
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
@@ -69,7 +71,6 @@ import io.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import io.calimero.knxnetip.servicetype.PacketHelper;
 import io.calimero.knxnetip.util.HPAI;
 import io.calimero.log.LogService;
-import io.calimero.log.LogService.LogLevel;
 import io.calimero.secure.KnxSecureException;
 
 final class SecureSessionUdp {
@@ -100,7 +101,7 @@ final class SecureSessionUdp {
 	SecureSessionUdp(final int userId, final byte[] userKey, final byte[] deviceAuthCode,
 			final InetSocketAddress serverCtrlEP) {
 		session = TcpConnection.Udp.newSecureSession(userId, userKey, deviceAuthCode);
-		this.logger = LoggerFactory.getLogger(
+		this.logger = LogService.getLogger(
 				"io.calimero.knxnetip.KNX/IP " + SecureConnection.secureSymbol + " Session " + hostPort(serverCtrlEP));
 	}
 
@@ -109,7 +110,7 @@ final class SecureSessionUdp {
 			final InetSocketAddress serverCtrlEP, final boolean useNat)
 		throws KNXException {
 
-		logger.debug("setup secure session with {}", serverCtrlEP);
+		logger.log(DEBUG, "setup secure session with {0}", serverCtrlEP);
 		try {
 			final KeyPair keyPair = SecureConnection.generateKeyPair();
 			privateKey = keyPair.getPrivate();
@@ -156,13 +157,13 @@ final class SecureSessionUdp {
 			final byte[] serverPublicKey = (byte[]) res[1];
 			final byte[] auth = newSessionAuth(serverPublicKey);
 			final byte[] packet = newSecurePacket(auth);
-			logger.debug("secure session {}, request access for user {}", sessionId, session.user());
+			logger.log(DEBUG, "secure session {0}, request access for user {1}", sessionId, session.user());
 			localSocket.send(new DatagramPacket(packet, packet.length, source));
 		}
 		catch (final RuntimeException e) {
 			sessionStatus = AuthFailed;
 			quitSetupLoop();
-			logger.error("negotiating session key failed", e);
+			logger.log(ERROR, "negotiating session key failed", e);
 		}
 	}
 
@@ -189,7 +190,7 @@ final class SecureSessionUdp {
 
 		final boolean skipDeviceAuth = Arrays.equals(session.deviceAuthKey().getEncoded(), new byte[16]);
 		if (skipDeviceAuth) {
-			logger.warn("skipping device authentication of {} (no device key)", hostPort(src));
+			logger.log(WARNING, "skipping device authentication of {0} (no device key)", hostPort(src));
 		}
 		else {
 			final ByteBuffer mac = SecureConnection.decrypt(buffer, session.deviceAuthKey(),
@@ -240,7 +241,7 @@ final class SecureSessionUdp {
 	void sessionStatus(final byte[] packet, final KNXnetIPHeader containedHeader) throws KNXFormatException {
 		final int status = TcpConnection.SecureSession.newChannelStatus(containedHeader, packet,
 				containedHeader.getStructLength());
-		LogService.log(logger, status == 0 ? LogLevel.TRACE : LogLevel.ERROR, "{}: {}", this,
+		logger.log(status == 0 ? TRACE : ERROR, "{0}: {1}", this,
 				SecureConnection.statusMsg(status));
 		quitSetupLoop();
 		sessionStatus = status;
@@ -266,7 +267,7 @@ final class SecureSessionUdp {
 		final var sn = (SerialNumber) fields[2];
 		final int tag = (int) fields[3];
 		final byte[] knxipPacket = (byte[]) fields[4];
-		logger.trace("received {} (session {} seq {} S/N {} tag {})", toHex(knxipPacket, " "), sid, seq, sn, tag);
+		logger.log(TRACE, "received {0} (session {1} seq {2} S/N {3} tag {4})", toHex(knxipPacket, " "), sid, seq, sn, tag);
 		return new Object[] { fields[0], fields[1], sn, fields[3], fields[4] };
 	}
 
@@ -279,7 +280,7 @@ final class SecureSessionUdp {
 
 	private byte[] cbcMacSimple(final Key secretKey, final byte[] data, final int offset, final int length) {
 		final byte[] exact = Arrays.copyOfRange(data, offset, offset + length);
-		logger.trace("authenticating (length {}): {}", length, toHex(exact, " "));
+		logger.log(TRACE, "authenticating (length {0}): {1}", length, toHex(exact, " "));
 
 		try {
 			final Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");

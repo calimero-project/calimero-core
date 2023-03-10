@@ -38,6 +38,11 @@ package io.calimero.knxnetip;
 
 import static io.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.BusMonitorLayer;
 import static io.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.RawLayer;
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
+import static java.lang.System.Logger.Level.TRACE;
+import static java.lang.System.Logger.Level.WARNING;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -73,7 +78,6 @@ import io.calimero.knxnetip.servicetype.TunnelingFeature.InterfaceFeature;
 import io.calimero.knxnetip.util.TunnelCRI;
 import io.calimero.link.medium.KNXMediumSettings;
 import io.calimero.log.LogService;
-import io.calimero.log.LogService.LogLevel;
 
 /**
  * KNXnet/IP connection for KNX tunneling.
@@ -258,7 +262,7 @@ public class KNXnetIPTunnel extends ClientConnection
 		try {
 			int attempt = 0;
 			for (; attempt < maxSendAttempts; ++attempt) {
-				logger.trace("sending {}, attempt {}", tunnelingFeature, attempt + 1);
+				logger.log(TRACE, "sending {0}, attempt {1}", tunnelingFeature, attempt + 1);
 				updateState = false;
 
 				send(buf, dataEndpt);
@@ -276,7 +280,7 @@ public class KNXnetIPTunnel extends ClientConnection
 			}
 			if (attempt == maxSendAttempts) {
 				final var e = new KNXAckTimeoutException("maximum send attempts, no service acknowledgment received");
-				close(CloseEvent.INTERNAL, "maximum send attempts", LogLevel.ERROR, e);
+				close(CloseEvent.INTERNAL, "maximum send attempts", ERROR, e);
 				throw e;
 			}
 			// always forward this state to user
@@ -287,7 +291,7 @@ public class KNXnetIPTunnel extends ClientConnection
 			throw new InterruptedException("interrupted I/O, " + e);
 		}
 		catch (final IOException e) {
-			close(CloseEvent.INTERNAL, "communication failure", LogLevel.ERROR, e);
+			close(CloseEvent.INTERNAL, "communication failure", ERROR, e);
 			throw new KNXConnectionClosedException("connection closed");
 		}
 		finally {
@@ -302,7 +306,7 @@ public class KNXnetIPTunnel extends ClientConnection
 		waitForStateChange(ClientConnection.CEMI_CON_PENDING, 3);
 		// throw on no answer
 		if (internalState == ClientConnection.CEMI_CON_PENDING) {
-			logger.warn("response timeout waiting for response to {}", tf);
+			logger.log(WARNING, "response timeout waiting for response to {0}", tf);
 			internalState = OK;
 			throw new KNXTimeoutException("no response received for " + tf);
 		}
@@ -341,7 +345,7 @@ public class KNXnetIPTunnel extends ClientConnection
 				final String s = System.getProperty("calimero.knxnetip.tunneling.resyncSkippedRcvSeq");
 				final boolean resync = "".equals(s) || "true".equalsIgnoreCase(s);
 				if (resync) {
-					logger.error("tunneling request with rcv-seq " + seq + ", expected " + getSeqRcv()
+					logger.log(ERROR, "tunneling request with rcv-seq " + seq + ", expected " + getSeqRcv()
 							+ " -> re-sync with server (1 tunneled msg lost)");
 					incSeqRcv();
 				}
@@ -356,18 +360,18 @@ public class KNXnetIPTunnel extends ClientConnection
 				final byte[] buf = PacketHelper.toPacket(new ServiceAck(serviceAck, channelId, seq, status));
 				send(buf, dataEndpt);
 				if (status == ErrorCodes.VERSION_NOT_SUPPORTED) {
-					close(CloseEvent.INTERNAL, "protocol version changed", LogLevel.ERROR, null);
+					close(CloseEvent.INTERNAL, "protocol version changed", ERROR, null);
 					return true;
 				}
 			}
 			else {
-				logger.warn("tunneling request with invalid rcv-seq {}, expected {}", seq, getSeqRcv());
+				logger.log(WARNING, "tunneling request with invalid rcv-seq {0}, expected {1}", seq, getSeqRcv());
 				return true;
 			}
 
 			// ignore repeated tunneling requests
 			if (repeated) {
-				logger.debug("skip tunneling request with rcv-seq {} (already received)", seq);
+				logger.log(DEBUG, "skip tunneling request with rcv-seq {0} (already received)", seq);
 				return true;
 			}
 
@@ -376,7 +380,7 @@ public class KNXnetIPTunnel extends ClientConnection
 
 		if (svc >= KNXnetIPHeader.TunnelingFeatureGet && svc <= KNXnetIPHeader.TunnelingFeatureInfo) {
 			final TunnelingFeature feature = req.service();
-			logger.trace("received {}", feature);
+			logger.log(TRACE, "received {0}", feature);
 			setStateNotify(OK);
 
 			listeners.listeners().stream().filter(TunnelingListener.class::isInstance)
@@ -387,13 +391,13 @@ public class KNXnetIPTunnel extends ClientConnection
 		final CEMI cemi = req.service();
 		final int mc = cemi.getMessageCode();
 		if (mc == CEMILData.MC_LDATA_IND || mc == CEMIBusMon.MC_BUSMON_IND) {
-			logger.trace("received request seq {} (channel {}) cEMI {}", req.getSequenceNumber(), channelId,
+			logger.log(TRACE, "received request seq {0} (channel {1}) cEMI {2}", req.getSequenceNumber(), channelId,
 					DataUnitBuilder.toHex(cemi.toByteArray(), " "));
 			fireFrameReceived(cemi);
 		}
 		else if (mc == CEMILData.MC_LDATA_CON) {
 			// invariant: notify listener before return from blocking send
-			logger.debug("received request seq {} (channel {}) cEMI L-Data.con {}->{}", req.getSequenceNumber(),
+			logger.log(DEBUG, "received request seq {0} (channel {1}) cEMI L-Data.con {2}->{3}", req.getSequenceNumber(),
 					channelId, ((CEMILData) cemi).getSource(), ((CEMILData) cemi).getDestination());
 			// TODO move notification to after we know it's a valid .con (we should keep it out of the lock, though)
 			fireFrameReceived(cemi);
@@ -419,7 +423,7 @@ public class KNXnetIPTunnel extends ClientConnection
 						if (Arrays.equals(recv, sent)) {
 							keepForCon = null;
 							setStateNotify(OK);
-							logger.info("received L_Data.con with hop count decremented by 1 (sent {}, got {})",
+							logger.log(INFO, "received L_Data.con with hop count decremented by 1 (sent {0}, got {2})",
 									sendCount + 1, sendCount);
 						}
 					}
@@ -430,7 +434,7 @@ public class KNXnetIPTunnel extends ClientConnection
 			}
 		}
 		else if (mc == CEMILData.MC_LDATA_REQ)
-			logger.warn("received L-Data request - ignore {}", cemi);
+			logger.log(WARNING, "received L-Data request - ignore {0}", cemi);
 
 		return true;
 	}
@@ -442,10 +446,10 @@ public class KNXnetIPTunnel extends ClientConnection
 			else if (svc == KNXnetIPHeader.TunnelingFeatureInfo)
 				tl.featureInfo(feature);
 			else
-				logger.warn("unsupported {} - ignored", feature);
+				logger.log(WARNING, "unsupported {0} - ignored", feature);
 		}
 		catch (final RuntimeException rte) {
-			logger.warn("catch your runtime exceptions in {}!", tl.getClass().getName(), rte);
+			logger.log(WARNING, "catch your runtime exceptions in {0}!", tl.getClass().getName(), rte);
 		}
 	}
 
@@ -467,7 +471,7 @@ public class KNXnetIPTunnel extends ClientConnection
 				for (final var i = additionalInfo.iterator(); i.hasNext();) {
 					final AdditionalInfo info = i.next();
 					if (!types.contains(info.type())) {
-						logger.warn("remove L-Data additional info {}", info);
+						logger.log(WARNING, "remove L-Data additional info {0}", info);
 						i.remove();
 					}
 				}

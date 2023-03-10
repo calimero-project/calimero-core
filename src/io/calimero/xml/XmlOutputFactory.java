@@ -36,16 +36,19 @@
 
 package io.calimero.xml;
 
+import static java.lang.System.Logger.Level.TRACE;
+
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.lang.System.Logger;
+import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.calimero.log.LogService;
 
 /**
  * Creates XML stream writers for working with XML resources. The factory tries to obtain a platform
@@ -56,7 +59,7 @@ import org.slf4j.LoggerFactory;
  */
 public class XmlOutputFactory // extends XMLOutputFactory
 {
-	private static final Logger l = LoggerFactory.getLogger("io.calimero.xml");
+	private static final Logger l = LogService.getLogger(MethodHandles.lookup().lookupClass());
 
 	private final Map<String, Object> config = new HashMap<>();
 
@@ -83,11 +86,11 @@ public class XmlOutputFactory // extends XMLOutputFactory
 	{
 		try {
 			final XmlStreamWriterProxy w = XmlStreamWriterProxy.createXmlStreamWriter(stream);
-			l.trace("using StaX XMLStreamWriter {}", w.w.getClass().getName());
+			l.log(TRACE, "using StaX XMLStreamWriter {0}", w.w.getClass().getName());
 			return w;
 		}
 		catch (Exception | Error e) {
-			l.trace("no StaX implementation found ({}), using internal XMLStreamWriter", e.toString());
+			l.log(TRACE, "no StaX implementation found ({0}), using internal XMLStreamWriter", e.toString());
 			// fall-through to minimal writer implementation
 		}
 		return new DefaultXmlWriter(stream, false);
@@ -103,11 +106,11 @@ public class XmlOutputFactory // extends XMLOutputFactory
 		try {
 			final XmlStreamWriterProxy w = XmlStreamWriterProxy.createXmlStreamWriter(stream,
 					closeStream ? stream : () -> {});
-			l.trace("using StaX XMLStreamWriter {}", w.w.getClass().getName());
+			l.log(TRACE, "using StaX XMLStreamWriter {0}", w.w.getClass().getName());
 			return w;
 		}
 		catch (Exception | Error e) {
-			l.trace("no StaX implementation found ({}), using internal XMLStreamWriter", e.toString());
+			l.log(TRACE, "no StaX implementation found ({0}), using internal XMLStreamWriter", e.toString());
 			// fall-through to minimal writer implementation
 		}
 		return new DefaultXmlWriter(new OutputStreamWriter(stream, StandardCharsets.UTF_8), closeStream);

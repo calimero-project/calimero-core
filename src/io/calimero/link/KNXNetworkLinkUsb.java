@@ -39,6 +39,11 @@ package io.calimero.link;
 import static io.calimero.serial.usb.UsbConnection.EmiType.Cemi;
 import static io.calimero.serial.usb.UsbConnection.EmiType.Emi1;
 
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
+import static java.lang.System.Logger.Level.TRACE;
+
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -136,7 +141,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 				// report device descriptor before switching to link layer mode
 				// not all devices provide a device descriptor 0
 				final DD0 dd0 = conn.deviceDescriptor();
-				logger.info("Device Descriptor (Mask Version) {}", dd0);
+				logger.log(INFO, "Device Descriptor (Mask Version) {0}", dd0);
 			}
 			catch (final KNXTimeoutException expected) {}
 
@@ -172,13 +177,12 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
 		try {
-			if (logger.isTraceEnabled())
-				logger.trace("EMI {}", DataUnitBuilder.toHex(msg, " "));
+			logger.log(TRACE, () -> "EMI " + DataUnitBuilder.toHex(msg, " "));
 			conn.send(msg, waitForCon ? BlockingMode.Confirmation : BlockingMode.NonBlocking);
-			logger.trace("send to {} succeeded", dst);
+			logger.log(TRACE, "send to {0} succeeded", dst);
 		}
 		catch (final KNXPortClosedException e) {
-			logger.error("send error, closing link", e);
+			logger.log(ERROR, "send error, closing link", e);
 			close();
 			throw new KNXLinkClosedException("link closed, " + e.getMessage());
 		}
@@ -194,7 +198,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 			normalMode();
 		}
 		catch (final Exception e) {
-			logger.error("could not switch BCU back to normal mode", e);
+			logger.log(ERROR, "could not switch BCU back to normal mode", e);
 		}
 	}
 
@@ -255,7 +259,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 	}
 
 	private void logCommModes(final int modes) {
-		logger.debug("KNX interface supports {}",
+		logger.log(DEBUG, "KNX interface supports {0}",
 				Stream.of(bool(modes & 0b1000, "transport link layer"), bool(modes & 0b100, "raw mode"),
 						bool(modes & 0b10, "busmonitor"), bool(modes & 0b1, "data link layer"))
 						.filter(s -> !s.isEmpty()).collect(Collectors.joining(", ")));
@@ -271,7 +275,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 		final Optional<byte[]> subnet = read(0, pidSubnet);
 		if (subnet.isPresent()) {
 			final int addr = read(0, pidDeviceAddr).map(data -> unsigned(subnet.get()[0], data[0])).orElse(0);
-			logger.debug("KNX interface address {}", new IndividualAddress(addr));
+			logger.log(DEBUG, "KNX interface address {0}", new IndividualAddress(addr));
 		}
 	}
 
@@ -287,7 +291,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 			return;
 		final int objectInstance = 1;
 		final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, objectType, objectInstance, pid, 1, 1, data);
-		logger.trace("write mgmt OT {} PID {} data 0x{}", objectType, pid, DataUnitBuilder.toHex(data, ""));
+		logger.log(TRACE, "write mgmt OT {0} PID {1} data 0x{2}", objectType, pid, DataUnitBuilder.toHex(data, ""));
 		conn.send(frame.toByteArray(), BlockingMode.Confirmation);
 	}
 

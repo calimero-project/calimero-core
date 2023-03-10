@@ -39,6 +39,7 @@ package io.calimero.knxnetip.servicetype;
 import static io.calimero.ReturnCode.Success;
 
 import java.io.ByteArrayOutputStream;
+import java.lang.System.Logger.Level;
 import java.nio.ByteBuffer;
 import java.util.Optional;
 
@@ -158,7 +159,7 @@ public final class TunnelingFeature implements io.calimero.ServiceType {
 		featureId = InterfaceFeature.values()[id - 1];
 		status = ReturnCode.of(bb.get() & 0xff);
 		if (status.code() > 0xf0)
-			ServiceType.logger.warn("feature {} responded with '{}'", featureId, status);
+			ServiceType.logger.log(Level.WARNING, "feature {0} responded with ''{1}''", featureId, status);
 		data = new byte[bb.remaining()];
 		bb.get(data);
 		validateFeatureValueLength();

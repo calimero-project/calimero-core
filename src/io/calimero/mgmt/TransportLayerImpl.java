@@ -41,7 +41,12 @@ import static io.calimero.mgmt.Destination.State.Destroyed;
 import static io.calimero.mgmt.Destination.State.Disconnected;
 import static io.calimero.mgmt.Destination.State.OpenIdle;
 import static io.calimero.mgmt.Destination.State.OpenWait;
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.TRACE;
+import static java.lang.System.Logger.Level.WARNING;
 
+import java.lang.System.Logger;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
@@ -53,8 +58,6 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-
-import org.slf4j.Logger;
 
 import io.calimero.CloseEvent;
 import io.calimero.DetachEvent;
@@ -140,7 +143,7 @@ public class TransportLayerImpl implements TransportLayer
 					// we get notified with link-closed event, possible timeouts on sending ack don't matter
 				}
 				catch (final RuntimeException rte) {
-					logger.error("{}: {}", ap != null ? ap.getDestination() : "destination n/a", f, rte);
+					logger.log(ERROR, "{0}: {1}", ap != null ? ap.getDestination() : "destination n/a", f, rte);
 				}
 			}
 		}
@@ -148,7 +151,7 @@ public class TransportLayerImpl implements TransportLayer
 		@Override
 		public void linkClosed(final CloseEvent e)
 		{
-			logger.debug("attached link was closed");
+			logger.log(DEBUG, "attached link was closed");
 			closeDestinations(true);
 			fireLinkClosed(e);
 		}
@@ -256,7 +259,7 @@ public class TransportLayerImpl implements TransportLayer
 			throw new KNXIllegalArgumentException("destination already created: " + remote);
 
 		final Destination d = new Destination(p, remote, connectionOriented, keepAlive, verifyMode);
-		logger.trace("created {}", d);
+		logger.log(TRACE, "created {0}", d);
 		return d;
 	}
 
@@ -274,7 +277,7 @@ public class TransportLayerImpl implements TransportLayer
 		if (p == null)
 			return;
 		if (p.getDestination() != d) {
-			logger.warn("not owner of " + d.getAddress());
+			logger.log(WARNING, "not owner of " + d.getAddress());
 			return;
 		}
 
@@ -309,7 +312,7 @@ public class TransportLayerImpl implements TransportLayer
 	{
 		final AggregatorProxy p = getProxy(d);
 		if (!d.isConnectionOriented()) {
-			logger.error("destination not connection-oriented: " + d.getAddress());
+			logger.log(ERROR, "destination not connection-oriented: " + d.getAddress());
 			return;
 		}
 		if (d.getState() != Disconnected)
@@ -318,7 +321,7 @@ public class TransportLayerImpl implements TransportLayer
 		final byte[] tpdu = new byte[] { (byte) CONNECT };
 		lnk.sendRequestWait(d.getAddress(), Priority.SYSTEM, tpdu);
 		p.setState(OpenIdle);
-		logger.trace("connected with {}", d.getAddress());
+		logger.log(TRACE, "connected with {0}", d.getAddress());
 	}
 
 	@Override
@@ -351,7 +354,7 @@ public class TransportLayerImpl implements TransportLayer
 				active = ap;
 				for (repeated = 0; repeated < MAX_REPEAT + 1; ++repeated) {
 					try {
-						logger.trace("sending data connected to {}, attempt {}", d.getAddress(), (repeated + 1));
+						logger.log(TRACE, "sending data connected to {0}, attempt {1}", d.getAddress(), (repeated + 1));
 						// set state and timer
 						ap.setState(OpenWait);
 						lnk.sendRequestWait(d.getAddress(), p, tsdu);
@@ -413,7 +416,7 @@ public class TransportLayerImpl implements TransportLayer
 		lnk.removeLinkListener(lnkListener);
 		detached = true;
 		fireDetached();
-		logger.debug("detached from {}", lnk);
+		logger.log(DEBUG, "detached from {0}", lnk);
 		return lnk;
 	}
 
@@ -456,7 +459,7 @@ public class TransportLayerImpl implements TransportLayer
 				// here configured as connection-less, we get a problem with setting
 				// the connection timeout (connectionless has no support for that)
 				if (p != null && !d.isConnectionOriented()) {
-					logger.warn(d + ": recreate for conn-oriented");
+					logger.log(WARNING, d + ": recreate for conn-oriented");
 					d.destroy();
 				}
 
@@ -512,7 +515,7 @@ public class TransportLayerImpl implements TransportLayer
 			else if (d.getState() == OpenWait && seq == Objects.requireNonNull(p).getSeqSend()) {
 				p.incSeqSend();
 				p.setState(OpenIdle);
-				logger.trace("positive ack by {}", d.getAddress());
+				logger.log(TRACE, "positive ack by {0}", d.getAddress());
 			}
 			else
 				disconnectIndicate(p, true);
@@ -586,7 +589,7 @@ public class TransportLayerImpl implements TransportLayer
 		}
 		finally {
 			fireDisconnected(p.getDestination());
-			logger.trace("disconnected from {}", p.getDestination().getAddress());
+			logger.log(TRACE, "disconnected from {0}", p.getDestination().getAddress());
 		}
 	}
 
@@ -600,12 +603,12 @@ public class TransportLayerImpl implements TransportLayer
 	{
 		final byte[] tpdu = { (byte) DISCONNECT };
 		try {
-			logger.trace("send disconnect to {}", addr);
+			logger.log(TRACE, "send disconnect to {0}", addr);
 			lnk.sendRequestWait(addr, Priority.SYSTEM, tpdu);
 		}
 		catch (final KNXTimeoutException ignore) {
 			// do a warning, but otherwise can be ignored
-			logger.warn("disconnected not gracefully (timeout)", ignore);
+			logger.log(WARNING, "disconnected not gracefully (timeout)", ignore);
 		}
 	}
 

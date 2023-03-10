@@ -36,6 +36,11 @@
 
 package io.calimero.mgmt;
 
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
+import static java.lang.System.Logger.Level.WARNING;
+
+import java.lang.System.Logger;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -46,8 +51,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-
-import org.slf4j.Logger;
 
 import io.calimero.KNXException;
 import io.calimero.KNXFormatException;
@@ -664,7 +667,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	{
 		if (pa.isOpen()) {
 			pa.close();
-			logger.info("closed property client");
+			logger.log(INFO, "closed property client");
 		}
 	}
 
@@ -692,7 +695,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		}
 		catch (final KNXException e) {
 			if (!KNXRemoteException.class.equals(e.getClass()) && !KNXTimeoutException.class.equals(e.getClass())) {
-				logger.error("scan properties failed", e);
+				logger.log(ERROR, "scan properties failed", e);
 				throw e;
 			}
 		}
@@ -707,7 +710,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 			data = pa.getProperty(oi, pid, 0, 1);
 		}
 		catch (final KNXRemoteException e) {
-			logger.warn("failed to get current number of elements for OI {} PID {}: {}", oi, pid, e.getMessage());
+			logger.log(WARNING, "failed to get current number of elements for OI {0} PID {1}: {2}", oi, pid, e.getMessage());
 		}
 		final Description d = new Description(getObjectType(oi, true), Description.parseCurrentElements(data), desc);
 		// workaround for PDT on local DM
@@ -756,7 +759,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 					return t;
 				}
 				catch (final KNXException e) {
-					logger.warn("fallback to default translator for PID " + pid
+					logger.log(WARNING, "fallback to default translator for PID " + pid
 							+ ", no translator for DPT " + p.dpt, e);
 				}
 			pdt = p.pdt;

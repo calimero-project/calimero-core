@@ -36,10 +36,14 @@
 
 package io.calimero.link;
 
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
+import static java.lang.System.Logger.Level.TRACE;
+
+import java.lang.System.Logger;
 import java.util.Arrays;
 import java.util.EnumSet;
-
-import org.slf4j.Logger;
 
 import io.calimero.Connection;
 import io.calimero.Connection.BlockingMode;
@@ -145,11 +149,11 @@ final class BcuSwitcher<T>
 		c.addConnectionListener(l);
 		try {
 			byte[] data = read(createGetValue(AddrExpectedPeiType, 1));
-			logger.info("PEI type {}", data[0] & 0xff);
+			logger.log(INFO, "PEI type {0}", data[0] & 0xff);
 			data = read(createGetValue(AddrStartAddressTable, 1));
-			logger.debug("Address Table location {}", DataUnitBuilder.toHex(data, ""));
+			logger.log(DEBUG, "Address Table location {0}", DataUnitBuilder.toHex(data, ""));
 			data = read(createGetValue(AddrSystemState, 1));
-			logger.debug("Current operation mode {}", OperationMode.of(data[0] & 0xff));
+			logger.log(DEBUG, "Current operation mode {0}", OperationMode.of(data[0] & 0xff));
 			// set PEI type 1: ensure that the application will not be started
 			writeVerify(AddrExpectedPeiType, new byte[] { 1 });
 			// power line: set extended busmonitor to transmit domain address in .ind
@@ -160,7 +164,7 @@ final class BcuSwitcher<T>
 			// set address table to 0
 			writeVerify(AddrStartAddressTable, new byte[] { 0 });
 			data = read(createGetValue(AddrIndividualAddress, 2));
-			logger.info("KNX individual address " + new IndividualAddress(data));
+			logger.log(INFO, "KNX individual address " + new IndividualAddress(data));
 		}
 		finally {
 			c.removeConnectionListener(l);
@@ -243,7 +247,7 @@ final class BcuSwitcher<T>
 		KNXTimeoutException, KNXFormatException, InterruptedException
 	{
 		final byte[] data = read(createGetValue(AddrBaseConfig, 1));
-		logger.debug("Base configuration flags {}", Integer.toBinaryString(data[0] & 0xff));
+		logger.log(DEBUG, "Base configuration flags {0}", Integer.toBinaryString(data[0] & 0xff));
 		int config = data[0] & 0xff;
 		if (ext)
 			config &= ~(1 << 3);
@@ -268,7 +272,7 @@ final class BcuSwitcher<T>
 		final long now = System.currentTimeMillis();
 		final long wait = txInterframeSpacing - now + tsLastTx;
 		if (wait > 0) {
-			logger.trace("enforce transmission interframe spacing, wait {} ms", wait);
+			logger.log(TRACE, "enforce transmission interframe spacing, wait {0} ms", wait);
 			Thread.sleep(wait);
 		}
 		tsLastTx = now;
@@ -290,7 +294,7 @@ final class BcuSwitcher<T>
 		final byte[] read = read(createGetValue(address, data.length));
 		final boolean equal = Arrays.equals(data, read);
 		if (!equal)
-			logger.error("verify write failed for address " + Integer.toHexString(address) + ": "
+			logger.log(ERROR, "verify write failed for address " + Integer.toHexString(address) + ": "
 					+ DataUnitBuilder.toHex(data, "") + " vs " + DataUnitBuilder.toHex(read, ""));
 		return equal;
 	}

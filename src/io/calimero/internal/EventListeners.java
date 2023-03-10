@@ -36,14 +36,16 @@
 
 package io.calimero.internal;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.calimero.log.LogService;
+
 
 /**
  * Container for keeping event listeners.
@@ -68,7 +70,7 @@ public class EventListeners<T>
 	}
 
 	public EventListeners(final Class<? extends Annotation> eventAnnotation) {
-		this.logger = LoggerFactory.getLogger("io.calimero.event");
+		this.logger = LogService.getLogger("io.calimero.event");
 		customEvents = new EventDispatcher<>(eventAnnotation, logger);
 	}
 
@@ -126,7 +128,7 @@ public class EventListeners<T>
 			}
 			catch (final RuntimeException rte) {
 				remove(l);
-				logger.error("uncaught user exception: remove event listener", rte);
+				logger.log(Level.ERROR, "removed event listener", rte);
 			}
 		}
 	}

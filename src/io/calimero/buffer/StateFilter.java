@@ -36,6 +36,8 @@
 
 package io.calimero.buffer;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -188,7 +190,7 @@ public class StateFilter implements NetworkFilter, RequestFilter
 					copy = (CEMILData) CEMIFactory.create(CEMILData.MC_LDATA_IND, d, f);
 				}
 				catch (final KNXFormatException e) {
-					LogService.getLogger("io.calimero").error("create L_Data.ind for network buffer: {}", f, e);
+					LogService.getLogger("io.calimero").log(ERROR, "create L_Data.ind for network buffer: {0}", f, e);
 					return;
 				}
 			else
@@ -201,7 +203,7 @@ public class StateFilter implements NetworkFilter, RequestFilter
 				copy = (CEMILData) CEMIFactory.create(CEMILData.MC_LDATA_IND, d, f);
 			}
 			catch (final KNXFormatException e) {
-				LogService.getLogger("io.calimero").error("create L_Data.ind for network buffer: {}", f, e);
+				LogService.getLogger("io.calimero").log(ERROR, "create L_Data.ind for network buffer: {0}", f, e);
 				return;
 			}
 		}
