@@ -50,6 +50,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.HexFormat;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -302,7 +303,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 		final var secCtrl = SecurityControl.of(DataSecurity.AuthConf, true);
 		final var secureApdu = secureData(address(), surrogate, apdu, secCtrl)
 				.orElseThrow(() -> new KnxSecureException("no device toolkey for " + address()));
-		logger.log(TRACE, "{0}->{1} GO diagnostics {2} {3}", address(), surrogate, service, DataUnitBuilder.toHex(value, " "));
+		logger.log(TRACE, "{0}->{1} GO diagnostics {2} {3}", address(), surrogate, service, HexFormat.ofDelimiter(" ").formatHex(value));
 		send(surrogate, secureApdu);
 
 		final var future = new CompletableFuture<ReturnCode>().orTimeout(3, TimeUnit.SECONDS);

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2022 B. Malinowsky
+    Copyright (c) 2018, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,6 @@
 
 package io.calimero.knxnetip;
 
-import static io.calimero.DataUnitBuilder.toHex;
 import static io.calimero.knxnetip.Net.hostPort;
 import static io.calimero.knxnetip.SecureConnection.secureSymbol;
 import static java.lang.System.Logger.Level.DEBUG;
@@ -57,6 +56,7 @@ import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.interfaces.XECPublicKey;
 import java.util.Arrays;
+import java.util.HexFormat;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -209,7 +209,7 @@ final class SecureSessionUdp {
 					macInput.capacity());
 			final boolean authenticated = Arrays.equals(mac.array(), verifyAgainst);
 			if (!authenticated) {
-				final String packet = toHex(Arrays.copyOfRange(data, offset - 6, offset - 6 + 0x38), " ");
+				final String packet = HexFormat.ofDelimiter(" ").formatHex(data, offset - 6, offset - 6 + 0x38);
 				throw new KnxSecureException("authentication failed for session response " + packet);
 			}
 		}
@@ -267,7 +267,7 @@ final class SecureSessionUdp {
 		final var sn = (SerialNumber) fields[2];
 		final int tag = (int) fields[3];
 		final byte[] knxipPacket = (byte[]) fields[4];
-		logger.log(TRACE, "received {0} (session {1} seq {2} S/N {3} tag {4})", toHex(knxipPacket, " "), sid, seq, sn, tag);
+		logger.log(TRACE, "received {0} (session {1} seq {2} S/N {3} tag {4})", HexFormat.ofDelimiter(" ").formatHex(knxipPacket), sid, seq, sn, tag);
 		return new Object[] { fields[0], fields[1], sn, fields[3], fields[4] };
 	}
 
@@ -280,7 +280,7 @@ final class SecureSessionUdp {
 
 	private byte[] cbcMacSimple(final Key secretKey, final byte[] data, final int offset, final int length) {
 		final byte[] exact = Arrays.copyOfRange(data, offset, offset + length);
-		logger.log(TRACE, "authenticating (length {0}): {1}", length, toHex(exact, " "));
+		logger.log(TRACE, "authenticating (length {0}): {1}", length, HexFormat.ofDelimiter(" ").formatHex(exact));
 
 		try {
 			final Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
@@ -293,7 +293,7 @@ final class SecureSessionUdp {
 			return mac;
 		}
 		catch (final GeneralSecurityException e) {
-			throw new KnxSecureException("calculating CBC-MAC of " + toHex(exact, " "), e);
+			throw new KnxSecureException("calculating CBC-MAC of " + HexFormat.ofDelimiter(" ").formatHex(exact), e);
 		}
 	}
 }

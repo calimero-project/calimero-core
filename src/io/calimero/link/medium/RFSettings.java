@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,8 @@
 
 package io.calimero.link.medium;
 
-import io.calimero.DataUnitBuilder;
+import java.util.HexFormat;
+
 import io.calimero.IndividualAddress;
 import io.calimero.KNXIllegalArgumentException;
 import io.calimero.SerialNumber;
@@ -140,7 +141,7 @@ public class RFSettings extends KNXMediumSettings
 	@Override
 	public String toString()
 	{
-		return super.toString() + " domain 0x" + DataUnitBuilder.toHex(doa, null) + " s/n "
+		return super.toString() + " domain 0x" + HexFormat.of().formatHex(doa) + " s/n "
 				+ sno + (unidir ? " unidirectional" : "");
 	}
 }

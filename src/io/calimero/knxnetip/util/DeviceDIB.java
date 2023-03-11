@@ -44,9 +44,9 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HexFormat;
 import java.util.Objects;
 
-import io.calimero.DataUnitBuilder;
 import io.calimero.IndividualAddress;
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
@@ -255,7 +255,7 @@ public class DeviceDIB extends DIB
 	 */
 	public final String getMACAddressString()
 	{
-		return DataUnitBuilder.toHex(mac, ":");
+		return HexFormat.ofDelimiter(":").formatHex(mac);
 	}
 
 	/**

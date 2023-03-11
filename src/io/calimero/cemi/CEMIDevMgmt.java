@@ -38,8 +38,8 @@ package io.calimero.cemi;
 
 import java.io.ByteArrayInputStream;
 import java.util.BitSet;
+import java.util.HexFormat;
 
-import io.calimero.DataUnitBuilder;
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
 import io.calimero.ReturnCode;
@@ -567,8 +567,10 @@ public class CEMIDevMgmt implements CEMI
 		else {
 			if (!funcprop)
 				buf.append(" elements ").append(elems);
-			if (data.length > 0)
-				buf.append(" data ").append(DataUnitBuilder.toHex(data, " "));
+			if (data.length > 0) {
+				buf.append(" data ");
+				HexFormat.ofDelimiter(" ").formatHex(buf, data);
+			}
 		}
 		return buf.toString();
 	}

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2022 B. Malinowsky
+    Copyright (c) 2015, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,19 +38,18 @@ package io.calimero.link;
 
 import static io.calimero.serial.usb.UsbConnection.EmiType.Cemi;
 import static io.calimero.serial.usb.UsbConnection.EmiType.Emi1;
-
 import static java.lang.System.Logger.Level.DEBUG;
 import static java.lang.System.Logger.Level.ERROR;
 import static java.lang.System.Logger.Level.INFO;
 import static java.lang.System.Logger.Level.TRACE;
 
 import java.util.EnumSet;
+import java.util.HexFormat;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.calimero.Connection.BlockingMode;
-import io.calimero.DataUnitBuilder;
 import io.calimero.DeviceDescriptor.DD0;
 import io.calimero.FrameEvent;
 import io.calimero.IndividualAddress;
@@ -177,7 +176,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
 		try {
-			logger.log(TRACE, () -> "EMI " + DataUnitBuilder.toHex(msg, " "));
+			logger.log(TRACE, () -> "EMI " + HexFormat.ofDelimiter(" ").formatHex(msg));
 			conn.send(msg, waitForCon ? BlockingMode.Confirmation : BlockingMode.NonBlocking);
 			logger.log(TRACE, "send to {0} succeeded", dst);
 		}
@@ -291,7 +290,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 			return;
 		final int objectInstance = 1;
 		final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPWRITE_REQ, objectType, objectInstance, pid, 1, 1, data);
-		logger.log(TRACE, "write mgmt OT {0} PID {1} data 0x{2}", objectType, pid, DataUnitBuilder.toHex(data, ""));
+		logger.log(TRACE, "write mgmt OT {0} PID {1} data 0x{2}", objectType, pid, HexFormat.of().formatHex(data));
 		conn.send(frame.toByteArray(), BlockingMode.Confirmation);
 	}
 

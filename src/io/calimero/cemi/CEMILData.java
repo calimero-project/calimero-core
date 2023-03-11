@@ -38,8 +38,8 @@ package io.calimero.cemi;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.HexFormat;
 
-import io.calimero.DataUnitBuilder;
 import io.calimero.GroupAddress;
 import io.calimero.IndividualAddress;
 import io.calimero.KNXAddress;
@@ -471,7 +471,8 @@ public class CEMILData implements CEMI
 			if (isRepetition())
 				buf.append(" repeat");
 		}
-		buf.append(", tpdu ").append(DataUnitBuilder.toHex(data, " "));
+		buf.append(", tpdu ");
+		HexFormat.ofDelimiter(" ").formatHex(buf, data);
 		return buf.toString();
 	}
 

@@ -47,12 +47,12 @@ import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.lang.System.Logger;
 import java.time.Duration;
+import java.util.HexFormat;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import io.calimero.CloseEvent;
 import io.calimero.Connection;
-import io.calimero.DataUnitBuilder;
 import io.calimero.FrameEvent;
 import io.calimero.GroupAddress;
 import io.calimero.IndividualAddress;
@@ -689,7 +689,7 @@ public class FT12Connection implements Connection<byte[]>
 					return false;
 
 				if (checksum(buf, 0, len) != chk)
-					logger.log(WARNING, "invalid checksum in frame " + DataUnitBuilder.toHex(buf, " "));
+					logger.log(WARNING, "invalid checksum in frame " + HexFormat.ofDelimiter(" ").formatHex(buf));
 				else {
 					sendAck();
 					lastChecksum = chk;
@@ -704,7 +704,7 @@ public class FT12Connection implements Connection<byte[]>
 				}
 			}
 			else
-				logger.log(WARNING, "invalid frame, discarded " + read + " bytes: " + DataUnitBuilder.toHex(buf, " "));
+				logger.log(WARNING, "invalid frame, discarded " + read + " bytes: " + HexFormat.ofDelimiter(" ").formatHex(buf));
 			return false;
 		}
 

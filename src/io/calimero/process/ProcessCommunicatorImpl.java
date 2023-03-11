@@ -45,6 +45,7 @@ import static java.lang.System.Logger.Level.WARNING;
 import java.lang.System.Logger;
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.HexFormat;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -389,7 +390,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	{
 		final byte[] apdu = readFromGroup(dp.getMainAddress(), dp.getPriority(), 0, 14);
 		if (dp.getDPT() == null)
-			return DataUnitBuilder.toHex(DataUnitBuilder.extractASDU(apdu), " ");
+			return HexFormat.ofDelimiter(" ").formatHex(DataUnitBuilder.extractASDU(apdu));
 		final DPTXlator t = TranslatorTypes.createTranslator(dp.getMainNumber(), dp.getDPT());
 		extractGroupASDU(apdu, t);
 		return t.getValue();

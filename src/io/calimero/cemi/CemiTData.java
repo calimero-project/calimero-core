@@ -41,9 +41,9 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HexFormat;
 import java.util.List;
 
-import io.calimero.DataUnitBuilder;
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
 
@@ -152,7 +152,7 @@ public class CemiTData implements CEMI {
 			buf.append(additionalInfo);
 			buf.append(",");
 		}
-		buf.append(" tpdu ").append(DataUnitBuilder.toHex(tpdu, " "));
+		buf.append(" tpdu ").append(HexFormat.ofDelimiter(" ").formatHex(tpdu));
 		return buf.toString();
 	}
 

@@ -53,6 +53,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.HexFormat;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -63,7 +64,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import io.calimero.CloseEvent;
 import io.calimero.Connection;
-import io.calimero.DataUnitBuilder;
 import io.calimero.FrameEvent;
 import io.calimero.GroupAddress;
 import io.calimero.IndividualAddress;
@@ -314,7 +314,7 @@ public class TpuartConnection implements Connection<byte[]>
 		try {
 			final byte[] tp1Frame = cEmiToTP1(frame);
 			final byte[] data = toUartServices(tp1Frame);
-			logger.log(TRACE, () -> "create UART services " + DataUnitBuilder.toHex(data, " "));
+			logger.log(TRACE, () -> "create UART services " + HexFormat.ofDelimiter(" ").formatHex(data));
 			req = frame.clone();
 
 			// force cool down period if we got a crispy chip
@@ -685,7 +685,7 @@ public class TpuartConnection implements Connection<byte[]>
 						try {
 							final byte[] data = in.toByteArray();
 							logger.log(DEBUG, "received TP1 L-Data (length {0}): {2}", frame.length,
-									DataUnitBuilder.toHex(data, " "));
+									HexFormat.ofDelimiter(" ").formatHex(data));
 							consecutiveFrameDrops = -1;
 							if (busmon) {
 								fireFrameReceived(createBusmonInd(data));
@@ -707,7 +707,7 @@ public class TpuartConnection implements Connection<byte[]>
 						}
 						catch (final Exception e) {
 							logger.log(ERROR, "error creating {0} from TP1 data (length {2}): {3}",
-									busmon ? "Busmon.ind" : "L-Data", frame.length, DataUnitBuilder.toHex(frame, " "),
+									busmon ? "Busmon.ind" : "L-Data", frame.length, HexFormat.ofDelimiter(" ").formatHex(frame),
 									e);
 						}
 						finally {
@@ -743,7 +743,7 @@ public class TpuartConnection implements Connection<byte[]>
 			final byte[] buf = in.toByteArray();
 			in.reset();
 			logger.log(DEBUG, "reset receive buffer after {0} us, char 0x{1}, discard partial frame (length {2}) {3}",
-					diff, Integer.toHexString(c), buf.length, DataUnitBuilder.toHex(buf, " "));
+					diff, Integer.toHexString(c), buf.length, HexFormat.ofDelimiter(" ").formatHex(buf));
 			consecutiveFrameDrops++;
 		}
 
@@ -932,14 +932,14 @@ public class TpuartConnection implements Connection<byte[]>
 		{
 			if (frame == null)
 				return;
-			logger.log(TRACE, "cEMI (length {0}): {1}", frame.length, DataUnitBuilder.toHex(frame, " "));
+			logger.log(TRACE, "cEMI (length {0}): {1}", frame.length, HexFormat.ofDelimiter(" ").formatHex(frame));
 			try {
 				final CEMI msg = CEMIFactory.create(frame, 0, frame.length);
 				final FrameEvent fe = new FrameEvent(this, msg);
 				listeners.fire(l -> l.frameReceived(fe));
 			}
 			catch (final KNXFormatException | RuntimeException e) {
-				logger.log(ERROR, "invalid frame for cEMI: {0}", DataUnitBuilder.toHex(frame, " "), e);
+				logger.log(ERROR, "invalid frame for cEMI: {0}", HexFormat.ofDelimiter(" ").formatHex(frame), e);
 			}
 		}
 	}

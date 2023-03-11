@@ -38,8 +38,8 @@ package io.calimero.link.medium;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.HexFormat;
 
-import io.calimero.DataUnitBuilder;
 import io.calimero.GroupAddress;
 import io.calimero.IndividualAddress;
 import io.calimero.KNXAddress;
@@ -410,13 +410,12 @@ public class RFLData implements RawFrame
 		else
 			sb.append(dst);
 
-		sb.append(isSystemBroadcast() ? " SN " : " DoA ").append(
-				DataUnitBuilder.toHex(getDoAorSN(), ""));
+		sb.append(isSystemBroadcast() ? " SN " : " DoA ").append(HexFormat.of().formatHex(getDoAorSN()));
 		sb.append(", RSS=").append(getRss());
 		sb.append(" Battery ").append(isBatteryOk() ? "OK" : "weak");
 		sb.append(", LFN ").append(getFrameNumber());
 
-		sb.append(": ").append(DataUnitBuilder.toHex(tpdu, ""));
+		sb.append(": ").append(HexFormat.of().formatHex(tpdu));
 		return sb.toString();
 	}
 

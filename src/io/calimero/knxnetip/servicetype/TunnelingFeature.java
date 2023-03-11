@@ -41,9 +41,9 @@ import static io.calimero.ReturnCode.Success;
 import java.io.ByteArrayOutputStream;
 import java.lang.System.Logger.Level;
 import java.nio.ByteBuffer;
+import java.util.HexFormat;
 import java.util.Optional;
 
-import io.calimero.DataUnitBuilder;
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
 import io.calimero.ReturnCode;
@@ -178,7 +178,7 @@ public final class TunnelingFeature implements io.calimero.ServiceType {
 		}
 		if (data.length != length)
 			throw new KNXIllegalArgumentException(String.format("%s %s value %s with invalid length %d, expected %d",
-					KNXnetIPHeader.getSvcName(svcType), featureId, DataUnitBuilder.toHex(data, ""), data.length, length));
+					KNXnetIPHeader.getSvcName(svcType), featureId, HexFormat.of().formatHex(data), data.length, length));
 	}
 
 	public int type() { return svcType; }
@@ -197,7 +197,7 @@ public final class TunnelingFeature implements io.calimero.ServiceType {
 
 	@Override
 	public String toString() {
-		final var s = status == Success ? DataUnitBuilder.toHex(featureValue().orElse(new byte[0]), "") : status;
+		final var s = status == Success ? HexFormat.of().formatHex(featureValue().orElse(new byte[0])) : status;
 		return String.format("%s %s %s", KNXnetIPHeader.getSvcName(svcType), featureId, s);
 	}
 

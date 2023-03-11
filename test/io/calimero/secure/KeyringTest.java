@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2022 B. Malinowsky
+    Copyright (c) 2019, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,12 +43,12 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static io.calimero.DataUnitBuilder.fromHex;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.HexFormat;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -87,7 +87,7 @@ class KeyringTest {
 		final var keyring = Keyring.load(keyringUri);
 		final var backbone = keyring.backbone().orElseThrow();
 
-		final byte[] decrypted = fromHex("96F034FCCF510760CBD63DA0F70D4A9D");
+		final byte[] decrypted = HexFormat.of().parseHex("96F034FCCF510760CBD63DA0F70D4A9D");
 		assertArrayEquals(decrypted, keyring.decryptKey(backbone.groupKey().get(), keyringPwd));
 	}
 
@@ -153,7 +153,7 @@ class KeyringTest {
 		final var keyring = Keyring.load(keyringUri);
 
 		final var device = keyring.devices().get(host);
-		final byte[] toolkey = fromHex("AEAC47C4653ED0B25249B4AB3F474479");
+		final byte[] toolkey = HexFormat.of().parseHex("AEAC47C4653ED0B25249B4AB3F474479");
 		assertArrayEquals(toolkey, keyring.decryptKey(device.toolKey().get(), keyringPwd));
 	}
 
@@ -175,7 +175,7 @@ class KeyringTest {
 		final GroupAddress group = new GroupAddress(1, 1, 1);
 		assertTrue(iface.groups().containsKey(group));
 
-		final byte[] groupAddrKey = fromHex("E14343050F4377E3159B90AFE0228216");
+		final byte[] groupAddrKey = HexFormat.of().parseHex("E14343050F4377E3159B90AFE0228216");
 		final byte[] encrypted = keyring.groups().get(group);
 		assertArrayEquals(groupAddrKey, keyring.decryptKey(encrypted, keyringPwd));
 	}

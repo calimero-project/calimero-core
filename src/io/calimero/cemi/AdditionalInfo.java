@@ -37,8 +37,8 @@
 package io.calimero.cemi;
 
 import java.io.ByteArrayInputStream;
+import java.util.HexFormat;
 
-import io.calimero.DataUnitBuilder;
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
 
@@ -180,8 +180,8 @@ public class AdditionalInfo {
 			case Timestamp -> "timestamp " + ((data[0] & 0xff) << 8 | (data[1] & 0xff));
 			case TimeDelay -> "timedelay " + unsigned(data);
 			case ExtendedTimestamp -> "ext.timestamp " + unsigned(data);
-			case BiBat -> "BiBat 0x" + DataUnitBuilder.toHex(data, " ");
-			default -> "type " + type + " = 0x" + DataUnitBuilder.toHex(data, "");
+			case BiBat -> "BiBat 0x" + HexFormat.ofDelimiter(" ").formatHex(data);
+			default -> "type " + type + " = 0x" + HexFormat.of().formatHex(data);
 		};
 	}
 

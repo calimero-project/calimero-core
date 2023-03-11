@@ -36,7 +36,6 @@
 
 package io.calimero.knxnetip;
 
-import static io.calimero.DataUnitBuilder.toHex;
 import static io.calimero.knxnetip.Net.hostPort;
 import static io.calimero.knxnetip.SecureConnection.securityInfo;
 import static java.lang.System.Logger.Level.DEBUG;
@@ -55,6 +54,7 @@ import java.nio.ByteBuffer;
 import java.security.Key;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.HexFormat;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -385,7 +385,7 @@ public final class SecureRouting extends KNXnetIPRouting {
 		final var sn = (SerialNumber) fields[2];
 		final int tag = (int) fields[3];
 		final byte[] knxipPacket = (byte[]) fields[4];
-		logger.log(TRACE, "received {0} (session {1} seq {2} S/N {3} tag {4})", toHex(knxipPacket, " "), sid, seq, sn, tag);
+		logger.log(TRACE, "received {0} (session {1} seq {2} S/N {3} tag {4})", HexFormat.ofDelimiter(" ").formatHex(knxipPacket), sid, seq, sn, tag);
 		return new Object[] { fields[0], fields[1], sn, fields[3], fields[4] };
 	}
 
@@ -429,7 +429,7 @@ public final class SecureRouting extends KNXnetIPRouting {
 		final byte[] secInfo = securityInfo(buffer.array(), 6, 0);
 		SecureConnection.cbcMacVerify(data, offset - h.getStructLength(), h.getTotalLength() - SecureConnection.macSize,
 				secretKey, secInfo, mac.array());
-		logger.log(TRACE, "received group sync timestamp {0} ms (S/N {1}, tag {2})", timestamp, toHex(sn, ""), msgTag);
+		logger.log(TRACE, "received group sync timestamp {0} ms (S/N {1}, tag {2})", timestamp, HexFormat.of().formatHex(sn), msgTag);
 		return new Object[] { timestamp, SerialNumber.from(sn), msgTag };
 	}
 

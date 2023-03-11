@@ -50,13 +50,12 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.util.Arrays;
+import java.util.HexFormat;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import io.calimero.CloseEvent;
-import io.calimero.DataUnitBuilder;
 import io.calimero.FrameEvent;
 import io.calimero.KNXAckTimeoutException;
 import io.calimero.KNXFormatException;
@@ -234,7 +233,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 				for (; attempt < maxSendAttempts; ++attempt) {
 					if (logger.isLoggable(TRACE))
 						logger.log(TRACE, "sending cEMI frame seq {0}, {1}, attempt {2} (channel {3}) {4}", getSeqSend(), mode,
-								(attempt + 1), channelId, DataUnitBuilder.toHex(buf, " "));
+								(attempt + 1), channelId, HexFormat.ofDelimiter(" ").formatHex(buf));
 
 					send(buf, dataEndpt);
 					// shortcut for routing, don't switch into 'ack-pending'
@@ -383,7 +382,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 			final InetSocketAddress source) throws KNXFormatException, IOException {
 		final int hdrStart = offset - h.getStructLength();
 		logger.log(TRACE, "from {0}: {1}: {2}", Net.hostPort(source), h,
-				DataUnitBuilder.toHex(Arrays.copyOfRange(data, hdrStart, hdrStart + h.getTotalLength()), " "));
+				HexFormat.ofDelimiter(" ").formatHex(data, hdrStart, hdrStart + h.getTotalLength()));
 		return handleServiceType(h, data, offset, source.getAddress(), source.getPort());
 	}
 

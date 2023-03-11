@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -59,6 +59,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HexFormat;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -68,7 +69,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 
 import io.calimero.CloseEvent;
-import io.calimero.DataUnitBuilder;
 import io.calimero.FrameEvent;
 import io.calimero.KNXException;
 import io.calimero.KNXFormatException;
@@ -238,7 +238,7 @@ public class KNXnetIPRouting extends ConnectionBase
 				final var buf = ByteBuffer.wrap(PacketHelper.toPacket(new RoutingSystemBroadcast(frame)));
 				final InetSocketAddress dst = new InetSocketAddress(systemBroadcast, DEFAULT_PORT);
 				enforceDatagramRateLimit();
-				logger.log(TRACE, "sending cEMI frame, SBC {0} {1}", NonBlocking, DataUnitBuilder.toHex(buf.array(), " "));
+				logger.log(TRACE, "sending cEMI frame, SBC {0} {1}", NonBlocking, HexFormat.ofDelimiter(" ").formatHex(buf.array()));
 				if (dcSysBcast != null)
 					dcSysBcast.send(buf, dst);
 				else
@@ -503,7 +503,7 @@ public class KNXnetIPRouting extends ConnectionBase
 		else if (svc == GiraUnsupportedSvcType) {
 			if (!loggedGiraUnsupportedSvcType)
 				logger.log(WARNING, "received unsupported Gira-specific service type 0x538, will be silently ignored: {0}",
-						DataUnitBuilder.toHex(data, " "));
+						HexFormat.ofDelimiter(" ").formatHex(data));
 			loggedGiraUnsupportedSvcType = true;
 		}
 		// skip multicast packets from searches & secure services, to avoid logged warnings about unknown frames

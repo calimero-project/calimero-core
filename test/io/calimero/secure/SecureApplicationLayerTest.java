@@ -36,12 +36,13 @@
 
 package io.calimero.secure;
 
+import static io.calimero.DataUnitBuilder.fromHex;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static io.calimero.DataUnitBuilder.fromHex;
 
 import java.nio.ByteBuffer;
+import java.util.HexFormat;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -196,7 +197,7 @@ class SecureApplicationLayerTest {
 		final byte[] asdu = propertyAsdu();
 		final byte[] apdu = DataUnitBuilder.createAPDU(PropertyResponse, asdu);
 
-		assertArrayEquals(fromHex("03D605351001202122232425262728292A2B2C2D2E2F"), apdu);
+		assertArrayEquals(HexFormat.of().parseHex("03D605351001202122232425262728292A2B2C2D2E2F"), apdu);
 
 		final int seq = 3;
 		sequenceNumberToolAccess = seq;
@@ -207,7 +208,7 @@ class SecureApplicationLayerTest {
 
 		final byte[] prefix = { 0x03, (byte) 0xf1, (byte) 0x90, 0x00, 0, 0, 0, 0, (byte) seq };
 		final String encoded = "706f533105503557cb2b24f1dd341b60b7e017ecd6b06849a72b";
-		final byte[] encrypted = fromHex(encoded);
+		final byte[] encrypted = HexFormat.of().parseHex(encoded);
 		final byte[] expected = new byte[prefix.length + encrypted.length];
 		System.arraycopy(prefix, 0, expected, 0, prefix.length);
 		System.arraycopy(encrypted, 0, expected, prefix.length, encrypted.length);

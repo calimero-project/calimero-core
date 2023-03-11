@@ -41,7 +41,8 @@ import static java.lang.System.Logger.Level.ERROR;
 import static java.lang.System.Logger.Level.TRACE;
 import static java.lang.System.Logger.Level.WARNING;
 
-import io.calimero.DataUnitBuilder;
+import java.util.HexFormat;
+
 import io.calimero.FrameEvent;
 import io.calimero.KNXAddress;
 import io.calimero.KNXException;
@@ -128,7 +129,7 @@ public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 	{
 		try {
 			logger.log(DEBUG, "send message to {0}{1}", dst, (waitForCon ? ", wait for ack" : ""));
-			logger.log(TRACE, () -> "EMI " + DataUnitBuilder.toHex(msg, " "));
+			logger.log(TRACE, () -> "EMI " + HexFormat.ofDelimiter(" ").formatHex(msg));
 			conn.send(msg, waitForCon);
 			logger.log(TRACE, "send to {0} succeeded", dst);
 		}

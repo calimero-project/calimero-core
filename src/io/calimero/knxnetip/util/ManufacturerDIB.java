@@ -37,9 +37,9 @@
 package io.calimero.knxnetip.util;
 
 import java.util.Arrays;
+import java.util.HexFormat;
 import java.util.Objects;
 
-import io.calimero.DataUnitBuilder;
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
 
@@ -130,15 +130,13 @@ public class ManufacturerDIB extends DIB
 
 	/**
 	 * Returns a textual representation of this manufacturer DIB.
-	 * <p>
 	 *
 	 * @return a string representation of the DIB object
 	 */
 	@Override
 	public String toString()
 	{
-		return "KNX manufacturer ID 0x" + Integer.toHexString(id) + ", data 0x"
-				+ DataUnitBuilder.toHex(mfrData, "");
+		return "KNX manufacturer ID 0x" + Integer.toHexString(id) + ", data 0x" + HexFormat.of().formatHex(mfrData);
 	}
 
 	@Override

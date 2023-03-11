@@ -47,11 +47,11 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.nio.ByteBuffer;
+import java.util.HexFormat;
 import java.util.Optional;
 import java.util.StringJoiner;
 
 import io.calimero.CloseEvent;
-import io.calimero.DataUnitBuilder;
 import io.calimero.FrameEvent;
 import io.calimero.GroupAddress;
 import io.calimero.IndividualAddress;
@@ -162,7 +162,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 						return;
 
 					if ((frame[0] & 0xff) == PeiIdentifyCon) {
-						logger.log(INFO, "PEI identify {0}", DataUnitBuilder.toHex(frame, " "));
+						logger.log(INFO, "PEI identify {0}", HexFormat.ofDelimiter(" ").formatHex(frame));
 						final int manufacturer = unsigned(frame[3], frame[4]);
 						if (manufacturer == 0xc5) {
 							logger.log(INFO, "link connected to weinzierl device");
@@ -213,13 +213,13 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 						logger.log(DEBUG, "confirmation of {0}", ldata.getDestination());
 					else
 						logger.log(WARNING, "negative confirmation of {0}: {1}", ldata.getDestination(),
-								DataUnitBuilder.toHex(ldata.toByteArray(), " "));
+								HexFormat.ofDelimiter(" ").formatHex(ldata.toByteArray()));
 				}
 				else
 					logger.log(WARNING, "unspecified L-data frame event - ignored, msg code = 0x" + Integer.toHexString(mc));
 			}
 			catch (final KNXFormatException | RuntimeException ex) {
-				logger.log(WARNING, "received unspecified frame {0}", DataUnitBuilder.toHex(e.getFrameBytes(), " "), ex);
+				logger.log(WARNING, "received unspecified frame {0}", HexFormat.ofDelimiter(" ").formatHex(e.getFrameBytes()), ex);
 			}
 		}
 
@@ -544,7 +544,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 			onSend(recheck);
 			responseFor(CEMIDevMgmt.MC_PROPREAD_CON, BcuSwitcher.pidCommMode)
 					.ifPresent(mode -> logger.log(DEBUG, "comm mode {0}",
-							(mode[0] & 0xff) == 0xf0 ? "BAOS" : DataUnitBuilder.toHex(mode, "")));
+							(mode[0] & 0xff) == 0xf0 ? "BAOS" : HexFormat.of().formatHex(mode)));
 			baosMode = enable;
 		}
 		// ??? check baos support ahead

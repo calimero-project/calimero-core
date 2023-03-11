@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2022 B. Malinowsky
+    Copyright (c) 2018, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,8 +36,6 @@
 
 package io.calimero.knxnetip;
 
-import static io.calimero.DataUnitBuilder.toHex;
-
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -59,6 +57,7 @@ import java.security.spec.NamedParameterSpec;
 import java.security.spec.XECPublicKeySpec;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.HexFormat;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyAgreement;
@@ -342,7 +341,7 @@ public final class SecureConnection {
 		final byte[] mac = cbcMac(data, offset, length, secretKey, secInfo);
 		final boolean authenticated = Arrays.equals(mac, verifyAgainst);
 		if (!authenticated) {
-			final String packet = toHex(Arrays.copyOfRange(data, offset, offset + length), " ");
+			final String packet = HexFormat.ofDelimiter(" ").formatHex(data, offset, offset + length);
 			throw new KnxSecureException("authentication failed for " + packet);
 		}
 	}
@@ -380,7 +379,7 @@ public final class SecureConnection {
 			return mac;
 		}
 		catch (final GeneralSecurityException e) {
-			throw new KnxSecureException("calculating CBC-MAC of " + toHex(log, " "), e);
+			throw new KnxSecureException("calculating CBC-MAC of " + HexFormat.ofDelimiter(" ").formatHex(log), e);
 		}
 	}
 

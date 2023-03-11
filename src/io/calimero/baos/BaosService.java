@@ -46,13 +46,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.calimero.DataUnitBuilder;
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
 import io.calimero.ServiceType;
@@ -383,7 +382,7 @@ public final class BaosService implements ServiceType {
 			if (jobParams.length > 4) {
 				final int dp = (jobParams[0] & 0xff) << 8 | jobParams[1] & 0xff;
 				final String jobInfo = ", set datapoint " + dp + ", command " + (jobParams[2] & 0xff) + ": "
-						+ DataUnitBuilder.toHex(Arrays.copyOfRange(jobParams, 4, jobParams.length), " ");
+						+ HexFormat.ofDelimiter(" ").formatHex(jobParams, 4, jobParams.length);
 				s += jobInfo;
 			}
 			return s;
@@ -617,9 +616,9 @@ public final class BaosService implements ServiceType {
 
 		final var s = svc + response + " start " + start + " items " + count;
 		if (data.length > 0 || !items.isEmpty()) {
-			return s + ", " + DataUnitBuilder.toHex(data, " ") + items.stream()
+			return s + ", " + HexFormat.ofDelimiter(" ").formatHex(data) + items.stream()
 					.map(item -> ((subService & 0x7f) == GetServerItem ? Property.of(item.id()) : item.id())
-							+ "=" + DataUnitBuilder.toHex(item.data, ""))
+							+ "=" + HexFormat.of().formatHex(item.data))
 					.collect(Collectors.joining(", "));
 		}
 		return s;

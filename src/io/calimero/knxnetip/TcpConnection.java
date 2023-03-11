@@ -36,7 +36,6 @@
 
 package io.calimero.knxnetip;
 
-import static io.calimero.DataUnitBuilder.toHex;
 import static io.calimero.knxnetip.Net.hostPort;
 import static io.calimero.knxnetip.SecureConnection.secureSymbol;
 import static java.lang.System.Logger.Level.DEBUG;
@@ -67,6 +66,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -501,7 +501,7 @@ public final class TcpConnection implements Closeable {
 			if (tag != 0)
 				throw new KnxSecureException("expected message tag 0, received " + tag);
 			final byte[] knxipPacket = (byte[]) fields[4];
-			logger.log(TRACE, "received (seq {0} S/N {1}) {2}", seq, sn, toHex(knxipPacket, " "));
+			logger.log(TRACE, "received (seq {0} S/N {1}) {2}", seq, sn, HexFormat.ofDelimiter(" ").formatHex(knxipPacket));
 			return knxipPacket;
 		}
 
@@ -551,7 +551,7 @@ public final class TcpConnection implements Closeable {
 				final byte[] verifyAgainst = cbcMacSimple(deviceAuthKey, macInput.array(), 0, macInput.capacity());
 				final boolean authenticated = Arrays.equals(mac.array(), verifyAgainst);
 				if (!authenticated) {
-					final String packet = toHex(Arrays.copyOfRange(data, offset - 6, offset - 6 + 0x38), " ");
+					final String packet = HexFormat.ofDelimiter(" ").formatHex(data, offset - 6, offset - 6 + 0x38);
 					throw new KnxSecureException("authentication failed for session response " + packet);
 				}
 			}
@@ -590,7 +590,7 @@ public final class TcpConnection implements Closeable {
 
 		private byte[] cbcMacSimple(final Key secretKey, final byte[] data, final int offset, final int length) {
 			final byte[] log = Arrays.copyOfRange(data, offset, offset + length);
-			logger.log(TRACE, "authenticating (length {0}): {1}", length, toHex(log, " "));
+			logger.log(TRACE, "authenticating (length {0}): {1}", length, HexFormat.ofDelimiter(" ").formatHex(log));
 
 			try {
 				final var cipher = Cipher.getInstance("AES/CBC/NoPadding");
@@ -603,7 +603,7 @@ public final class TcpConnection implements Closeable {
 				return mac;
 			}
 			catch (final GeneralSecurityException e) {
-				throw new KnxSecureException("calculating CBC-MAC of " + toHex(log, " "), e);
+				throw new KnxSecureException("calculating CBC-MAC of " + HexFormat.ofDelimiter(" ").formatHex(log), e);
 			}
 		}
 
@@ -868,9 +868,10 @@ public final class TcpConnection implements Closeable {
 	private static int channelId(final KNXnetIPHeader header, final byte[] data, final int offset) {
 		// communication channel ID in the connection header of a tunneling/config request has a different offset
 		// than in connection management services
-		int channelIdOffset = switch (header.getServiceType()) {
-			case KNXnetIPHeader.TUNNELING_REQ, KNXnetIPHeader.DEVICE_CONFIGURATION_REQ, KNXnetIPHeader.TunnelingFeatureResponse, KNXnetIPHeader.TunnelingFeatureInfo, KNXnetIPHeader.ObjectServerRequest, KNXnetIPHeader.ObjectServerAck ->
-					offset + 1;
+		final int channelIdOffset = switch (header.getServiceType()) {
+			case KNXnetIPHeader.TUNNELING_REQ, KNXnetIPHeader.DEVICE_CONFIGURATION_REQ,
+					KNXnetIPHeader.TunnelingFeatureResponse, KNXnetIPHeader.TunnelingFeatureInfo,
+					KNXnetIPHeader.ObjectServerRequest, KNXnetIPHeader.ObjectServerAck -> offset + 1;
 			default -> offset;
 		};
 		final var channelId = data[channelIdOffset] & 0xff;

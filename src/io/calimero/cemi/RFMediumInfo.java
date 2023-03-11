@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2022 B. Malinowsky
+    Copyright (c) 2015, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,8 +37,8 @@
 package io.calimero.cemi;
 
 import java.util.Arrays;
+import java.util.HexFormat;
 
-import io.calimero.DataUnitBuilder;
 import io.calimero.KNXIllegalArgumentException;
 
 /**
@@ -222,7 +222,7 @@ public final class RFMediumInfo extends AdditionalInfo
 		final String rtx = retxRss == RSS.Void ? "" : " ReTx RSS=" + retxRss;
 		final String battery = isBatteryOk() ? "OK" : "weak";
 
-		return "RF " + domain + DataUnitBuilder.toHex(getDoAorSN(), "") + ", LFN "
+		return "RF " + domain + HexFormat.of().formatHex(getDoAorSN()) + ", LFN "
 				+ getFrameNumber() + ", RSS=" + getRSS() + rtx + ", Battery " + battery;
 	}
 
@@ -235,7 +235,7 @@ public final class RFMediumInfo extends AdditionalInfo
 				| (batteryOK ? 0x02 : 0x0) | unidir);
 		if (doA.length != 6)
 			throw new KNXIllegalArgumentException(
-					"DoA/SN invalid length: 0x" + DataUnitBuilder.toHex(doA, ""));
+					"DoA/SN invalid length: 0x" + HexFormat.of().formatHex(doA));
 		for (int i = 0; i < doA.length; i++) {
 			final byte b = doA[i];
 			info[1 + i] = b;

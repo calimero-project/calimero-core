@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2021, 2021 B. Malinowsky
+    Copyright (c) 2021, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,9 +43,9 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HexFormat;
 import java.util.function.Function;
 
-import io.calimero.DataUnitBuilder;
 import io.calimero.KNXFormatException;
 import io.calimero.KnxRuntimeException;
 import io.calimero.baos.BaosService.Item;
@@ -79,7 +79,7 @@ class BaosServer implements Runnable, AutoCloseable {
 					if (baos.size() > 10) {
 						try {
 							final byte[] data = baos.toByteArray();
-							System.out.println(DataUnitBuilder.toHex(data, " "));
+							System.out.println(HexFormat.ofDelimiter(" ").formatHex(data));
 							final var h = new KNXnetIPHeader(data, 0);
 
 							final Function<ByteBuffer, BaosService> objectServerParser = buf -> {

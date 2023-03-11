@@ -36,6 +36,8 @@
 
 package io.calimero;
 
+import java.util.HexFormat;
+
 import io.calimero.link.medium.KNXMediumSettings;
 import io.calimero.link.medium.KnxIPSettings;
 import io.calimero.link.medium.PLSettings;
@@ -177,7 +179,7 @@ public interface DeviceDescriptor
 		{
 			if (data.length != 2)
 				throw new KNXIllegalArgumentException("unspecified device descriptor type 0 using "
-						+ "length " + data.length + ": " + DataUnitBuilder.toHex(data, ""));
+						+ "length " + data.length + ": " + HexFormat.of().formatHex(data));
 			final int i = (data[0] & 0xff) << 8 | data[1] & 0xff;
 			return from(i);
 		}
@@ -415,7 +417,7 @@ public interface DeviceDescriptor
 		@Override
 		public String toString()
 		{
-			return DataUnitBuilder.toHex(d, "");
+			return HexFormat.of().formatHex(d);
 		}
 
 		@Override

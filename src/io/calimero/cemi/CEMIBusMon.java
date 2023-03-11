@@ -37,8 +37,8 @@
 package io.calimero.cemi;
 
 import java.io.ByteArrayInputStream;
+import java.util.HexFormat;
 
-import io.calimero.DataUnitBuilder;
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
 
@@ -417,7 +417,7 @@ public class CEMIBusMon implements CEMI
 				buf.deleteCharAt(buf.length() - 1);
 			buf.append(")");
 		}
-		buf.append(": ").append(DataUnitBuilder.toHex(raw, " "));
+		buf.append(": ").append(HexFormat.ofDelimiter(" ").formatHex(raw));
 		return buf.toString();
 	}
 

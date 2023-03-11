@@ -40,8 +40,8 @@ import static java.lang.System.Logger.Level.WARNING;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.System.Logger;
+import java.util.HexFormat;
 
-import io.calimero.DataUnitBuilder;
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
 import io.calimero.knxnetip.KNXnetIPDevMgmt;
@@ -166,7 +166,7 @@ class CRBase
 	public String toString()
 	{
 		return "connection type " + connType + " length " + length + " data "
-				+ (opt.length == 0 ? "-" : DataUnitBuilder.toHex(opt, " "));
+				+ (opt.length == 0 ? "-" : HexFormat.ofDelimiter(" ").formatHex(opt));
 	}
 
 	/**

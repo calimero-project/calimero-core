@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 package io.calimero.process;
 
 import java.util.EventObject;
+import java.util.HexFormat;
 
 import io.calimero.DataUnitBuilder;
 import io.calimero.GroupAddress;
@@ -138,6 +139,6 @@ public class ProcessEvent extends EventObject
 
 	@Override
 	public String toString() {
-		return src + "->" + dst + " " + DataUnitBuilder.decodeAPCI(svcCode) + " " + DataUnitBuilder.toHex(asdu, "");
+		return src + "->" + dst + " " + DataUnitBuilder.decodeAPCI(svcCode) + " " + HexFormat.of().formatHex(asdu);
 	}
 }

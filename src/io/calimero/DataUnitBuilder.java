@@ -41,6 +41,7 @@ import static java.lang.System.Logger.Level.WARNING;
 import java.io.ByteArrayOutputStream;
 import java.lang.System.Logger;
 import java.lang.invoke.MethodHandles;
+import java.util.HexFormat;
 
 import io.calimero.log.LogService;
 
@@ -75,7 +76,7 @@ public final class DataUnitBuilder
 	public static int getAPDUService(final byte[] apdu)
 	{
 		if (apdu.length < 2)
-			throw new KNXIllegalArgumentException("getting APDU service from [0x" + toHex(apdu, "")
+			throw new KNXIllegalArgumentException("getting APDU service from [0x" + HexFormat.of().formatHex(apdu)
 					+ "], APCI length < 2");
 		// high 4 bits of APCI
 		final int apci4 = (apdu[0] & 0x03) << 2 | (apdu[1] & 0xC0) >> 6;
@@ -404,28 +405,12 @@ public final class DataUnitBuilder
 	}
 
 	/**
-	 * Returns the content of {@code data} as unsigned bytes in hexadecimal string
-	 * representation.
-	 * <p>
-	 * This method does not add hexadecimal prefixes (like 0x).
-	 *
-	 * @param data data array to format
-	 * @param sep separator to insert between 2 formatted data bytes, {@code null}
-	 *        or "" for no gap between byte tokens
-	 * @return an unsigned hexadecimal string of data
+	 * @deprecated Use {@link HexFormat}.
 	 */
+	@Deprecated
 	public static String toHex(final byte[] data, final String sep)
 	{
-		final StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < data.length; ++i) {
-			final int no = data[i] & 0xff;
-			if (no < 0x10)
-				sb.append('0');
-			sb.append(Integer.toHexString(no));
-			if (sep != null && i < data.length - 1)
-				sb.append(sep);
-		}
-		return sb.toString();
+		return HexFormat.ofDelimiter(sep).formatHex(data);
 	}
 
 	/**

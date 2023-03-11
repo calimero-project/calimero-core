@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2022 B. Malinowsky
+    Copyright (c) 2015, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,8 +39,8 @@ package io.calimero.link;
 import java.lang.System.Logger.Level;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HexFormat;
 
-import io.calimero.DataUnitBuilder;
 import io.calimero.IndividualAddress;
 import io.calimero.KNXAddress;
 import io.calimero.KNXException;
@@ -125,7 +125,7 @@ public class KNXNetworkLinkTpuart extends AbstractLink<TpuartConnection>
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
 		try {
-			logger.log(Level.TRACE, () -> "send cEMI " + DataUnitBuilder.toHex(msg, " "));
+			logger.log(Level.TRACE, () -> "send cEMI " + HexFormat.ofDelimiter(" ").formatHex(msg));
 			conn.send(msg, waitForCon);
 		}
 		catch (final InterruptedException | KNXPortClosedException e) {

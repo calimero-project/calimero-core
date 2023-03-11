@@ -49,12 +49,12 @@ import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import io.calimero.CloseEvent;
-import io.calimero.DataUnitBuilder;
 import io.calimero.IndividualAddress;
 import io.calimero.KNXAckTimeoutException;
 import io.calimero.KNXException;
@@ -392,7 +392,7 @@ public class KNXnetIPTunnel extends ClientConnection
 		final int mc = cemi.getMessageCode();
 		if (mc == CEMILData.MC_LDATA_IND || mc == CEMIBusMon.MC_BUSMON_IND) {
 			logger.log(TRACE, "received request seq {0} (channel {1}) cEMI {2}", req.getSequenceNumber(), channelId,
-					DataUnitBuilder.toHex(cemi.toByteArray(), " "));
+					HexFormat.ofDelimiter(" ").formatHex(cemi.toByteArray()));
 			fireFrameReceived(cemi);
 		}
 		else if (mc == CEMILData.MC_LDATA_CON) {

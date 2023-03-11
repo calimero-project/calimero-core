@@ -44,10 +44,10 @@ import static java.lang.System.Logger.Level.TRACE;
 import java.lang.System.Logger;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HexFormat;
 
 import io.calimero.Connection;
 import io.calimero.Connection.BlockingMode;
-import io.calimero.DataUnitBuilder;
 import io.calimero.FrameEvent;
 import io.calimero.IndividualAddress;
 import io.calimero.KNXAckTimeoutException;
@@ -151,7 +151,7 @@ final class BcuSwitcher<T>
 			byte[] data = read(createGetValue(AddrExpectedPeiType, 1));
 			logger.log(INFO, "PEI type {0}", data[0] & 0xff);
 			data = read(createGetValue(AddrStartAddressTable, 1));
-			logger.log(DEBUG, "Address Table location {0}", DataUnitBuilder.toHex(data, ""));
+			logger.log(DEBUG, "Address Table location {0}", HexFormat.of().formatHex(data));
 			data = read(createGetValue(AddrSystemState, 1));
 			logger.log(DEBUG, "Current operation mode {0}", OperationMode.of(data[0] & 0xff));
 			// set PEI type 1: ensure that the application will not be started
@@ -295,7 +295,7 @@ final class BcuSwitcher<T>
 		final boolean equal = Arrays.equals(data, read);
 		if (!equal)
 			logger.log(ERROR, "verify write failed for address " + Integer.toHexString(address) + ": "
-					+ DataUnitBuilder.toHex(data, "") + " vs " + DataUnitBuilder.toHex(read, ""));
+					+ HexFormat.of().formatHex(data) + " vs " + HexFormat.of().formatHex(read));
 		return equal;
 	}
 
