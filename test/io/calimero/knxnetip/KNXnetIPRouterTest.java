@@ -270,13 +270,13 @@ class KNXnetIPRouterTest
 				r.getRemoteAddress());
 		r.close();
 		assertTrue(r.getRemoteAddress().getAddress().isAnyLocalAddress());
-        assertEquals(0, r.getRemoteAddress().getPort());
+		assertEquals(0, r.getRemoteAddress().getPort());
 
 		r = new KNXnetIPRouting(Util.localInterface(), InetAddress.getByName("224.0.23.33"));
 		assertEquals(new InetSocketAddress("224.0.23.33", KNXnetIPConnection.DEFAULT_PORT), r.getRemoteAddress());
 		r.close();
 		assertTrue(r.getRemoteAddress().getAddress().isAnyLocalAddress());
-        assertEquals(0, r.getRemoteAddress().getPort());
+		assertEquals(0, r.getRemoteAddress().getPort());
 	}
 
 	@Test

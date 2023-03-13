@@ -109,7 +109,7 @@ class DptXlator8BitSetTest
 	{
 		assertEquals("", t.getValue());
 		t.setValue(1);
-        assertEquals(e3, t.getValue());
+		assertEquals(e3, t.getValue());
 
 		final DptXlator8BitSet x = new DptXlator8BitSet(DptXlator8BitSet.DptDeviceControl);
 		final int v = (int) x.getNumericValue();
@@ -179,7 +179,7 @@ class DptXlator8BitSetTest
 		t.setValues(strValues);
 		t.setValues(strValues);
 		t.setValues(OutOfService.name(), Fault.name(), Overridden.name(), InAlarm.name(),
-                AlarmUnAck.name());
+				AlarmUnAck.name());
 
 		assertEquals(1, t.getNumericValue());
 

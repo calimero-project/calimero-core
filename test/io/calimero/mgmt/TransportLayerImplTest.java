@@ -391,7 +391,7 @@ class TransportLayerImplTest
 		}
 		catch (final KNXDisconnectException e) {}
 		Thread.sleep(100);
-        assertEquals(0, ltl.conn.size());
+		assertEquals(0, ltl.conn.size());
 	}
 
 	@Test

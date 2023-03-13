@@ -174,10 +174,10 @@ class DPTXlator64BitSignedTest
 			fail("should throw");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-        assertArrayEquals(dataMin, t.getData());
+		assertArrayEquals(dataMin, t.getData());
 
 		t.setData(dataMax, 0);
-        assertArrayEquals(dataMax, t.getData());
+		assertArrayEquals(dataMax, t.getData());
 
 		t.setData(dataValue2, 2);
 		byte[] d = t.getData();
@@ -191,7 +191,7 @@ class DPTXlator64BitSignedTest
 		t.setData(array, 3);
 		d = t.getData();
 		assertEquals(data.length, d.length);
-        assertArrayEquals(data, d);
+		assertArrayEquals(data, d);
 		Helper.assertSimilar(strings, t.getAllValues());
 	}
 
@@ -209,7 +209,7 @@ class DPTXlator64BitSignedTest
 		catch (final KNXIllegalArgumentException expected) {}
 
 		final byte[] empty = new byte[9];
-        assertArrayEquals(empty, t.getData(new byte[9], 1));
+		assertArrayEquals(empty, t.getData(new byte[9], 1));
 
 		t.setData(data);
 		d = t.getData(new byte[25], 6);

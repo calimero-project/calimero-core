@@ -189,7 +189,7 @@ class DPTXlator8BitSignedTest
 			fail("should throw");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-        assertArrayEquals(dataMax, t.getData());
+		assertArrayEquals(dataMax, t.getData());
 		t.setData(dataValue2, 2);
 		byte[] d = t.getData();
 		assertEquals(1, d.length);
@@ -200,7 +200,7 @@ class DPTXlator8BitSignedTest
 		t.setData(array, 1);
 		d = t.getData();
 		assertEquals(data.length, d.length);
-        assertArrayEquals(data, d);
+		assertArrayEquals(data, d);
 		Helper.assertSimilar(stringsRaw, t.getAllValues());
 	}
 
@@ -209,7 +209,7 @@ class DPTXlator8BitSignedTest
 	{
 		assertEquals(2, t.getData(new byte[2], 1).length);
 		final byte[] empty = new byte[2];
-        assertArrayEquals(empty, t.getData(new byte[2], 1));
+		assertArrayEquals(empty, t.getData(new byte[2], 1));
 
 		t.setData(data);
 		byte[] d = new byte[10];
@@ -278,12 +278,12 @@ class DPTXlator8BitSignedTest
 	@Test
 	void setValueInt() throws KNXFormatException
 	{
-        for (DPT dpt : dpts) {
-            setValueIntFail(new DPTXlator8BitSigned(dpt),
-                    Integer.parseInt(dpt.getLowerValue()) - 1);
-            setValueIntFail(new DPTXlator8BitSigned(dpt),
-                    Integer.parseInt(dpt.getUpperValue()) + 1);
-        }
+		for (DPT dpt : dpts) {
+			setValueIntFail(new DPTXlator8BitSigned(dpt),
+					Integer.parseInt(dpt.getLowerValue()) - 1);
+			setValueIntFail(new DPTXlator8BitSigned(dpt),
+					Integer.parseInt(dpt.getUpperValue()) + 1);
+		}
 	}
 
 	@Test

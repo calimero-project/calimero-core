@@ -535,7 +535,7 @@ public class TransportLayerImpl implements TransportLayer
 				checkSendDisconnect(frame);
 			else if (d.getState() == OpenWait && seq == Objects.requireNonNull(p).getSeqSend()
 					&& repeated < MAX_REPEAT) {
-                // do nothing, we will send message again
+				// do nothing, we will send message again
 			}
 			else
 				disconnectIndicate(p, true);

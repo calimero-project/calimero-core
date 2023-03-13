@@ -156,7 +156,7 @@ class DPTXlator2ByteUnsignedTest
 		fail("should throw");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-        assertArrayEquals(dataMin, t.getData());
+		assertArrayEquals(dataMin, t.getData());
 		t.setData(dataValue2, 2);
 		byte[] d = t.getData();
 		assertEquals(2, d.length);
@@ -168,7 +168,7 @@ class DPTXlator2ByteUnsignedTest
 		t.setData(array, 3);
 		d = t.getData();
 		assertEquals(data.length, d.length);
-        assertArrayEquals(data, d);
+		assertArrayEquals(data, d);
 		Helper.assertSimilar(strings, t.getAllValues());
 	}
 
@@ -177,7 +177,7 @@ class DPTXlator2ByteUnsignedTest
 	{
 		assertEquals(4, t.getData(new byte[4], 1).length);
 		final byte[] empty = new byte[4];
-        assertArrayEquals(empty, t.getData(new byte[4], 1));
+		assertArrayEquals(empty, t.getData(new byte[4], 1));
 
 		t.setData(data);
 		byte[] d = t.getData(new byte[20], 10);
@@ -211,12 +211,12 @@ class DPTXlator2ByteUnsignedTest
 	void dptXlator2ByteUnsignedDPT() throws KNXFormatException
 	{
 		checkDPTs(dpts, true);
-        for (DPT dpt : dpts) {
-            setValueIntFail(new DPTXlator2ByteUnsigned(dpt), Integer.parseInt(dpt
-                    .getLowerValue()) - 1);
-            setValueDoubleFail(new DPTXlator2ByteUnsigned(dpt), Double.parseDouble(dpt
-                    .getUpperValue()) + 1);
-        }
+		for (DPT dpt : dpts) {
+			setValueIntFail(new DPTXlator2ByteUnsigned(dpt), Integer.parseInt(dpt
+					.getLowerValue()) - 1);
+			setValueDoubleFail(new DPTXlator2ByteUnsigned(dpt), Double.parseDouble(dpt
+					.getUpperValue()) + 1);
+		}
 	}
 
 	private void setValueIntFail(final DPTXlator2ByteUnsigned tr, final int v)
@@ -325,19 +325,19 @@ class DPTXlator2ByteUnsignedTest
 	private static void checkDPTs(final DPT[] dpts, final boolean testSimilarity)
 	{
 		try {
-            for (DPT dpt : dpts) {
-                final DPTXlator t = TranslatorTypes.createTranslator(0, dpt.getID());
+			for (DPT dpt : dpts) {
+				final DPTXlator t = TranslatorTypes.createTranslator(0, dpt.getID());
 
-                final String lower = format(Double.parseDouble(dpt.getLowerValue()));
-                t.setValue(lower);
-                if (testSimilarity)
-                    Helper.assertSimilar(lower, t.getValue());
+				final String lower = format(Double.parseDouble(dpt.getLowerValue()));
+				t.setValue(lower);
+				if (testSimilarity)
+					Helper.assertSimilar(lower, t.getValue());
 
-                final String upper = format(Double.parseDouble(dpt.getUpperValue()));
-                t.setValue(upper);
-                if (testSimilarity)
-                    Helper.assertSimilar(upper, t.getValue());
-            }
+				final String upper = format(Double.parseDouble(dpt.getUpperValue()));
+				t.setValue(upper);
+				if (testSimilarity)
+					Helper.assertSimilar(upper, t.getValue());
+			}
 		}
 		catch (final KNXException e) {
 			fail(e.getMessage());

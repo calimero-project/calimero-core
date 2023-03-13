@@ -117,7 +117,7 @@ class SecureApplicationLayerTest {
 				return 5;
 			}
 
-            @Override
+			@Override
 			protected long lastValidSequenceNumber(final boolean toolAccess, final IndividualAddress remote) {
 				if (toolAccess)
 					return sequenceNumberToolAccess - 1;

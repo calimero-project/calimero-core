@@ -96,7 +96,7 @@ class DPTXlator8BitEnumTest {
 		// translator specific
 		assertEquals("no fault", t.getValue());
 		t.setValue(1);
-        assertNotEquals("no fault", t.getValue(), "should not equal \"no fault\"");
+		assertNotEquals("no fault", t.getValue(), "should not equal \"no fault\"");
 
 		// try a enum with no 0 element
 		final DPTXlator8BitEnum x = new DPTXlator8BitEnum(DPTXlator8BitEnum.DptAlarmClassType);

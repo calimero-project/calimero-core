@@ -119,8 +119,8 @@ public class DPTXlatorUtf8 extends DPTXlator
 		if (values.length == 0)
 			return;
 		int length = 0;
-        for (final String value : values)
-        	length += toUtf8(value).length + 1;
+		for (final String value : values)
+			length += toUtf8(value).length + 1;
 		final short[] buf = new short[length];
 		for (int i = 0; i < values.length; ++i)
 			toDPT(values[i], buf, i);
@@ -265,9 +265,9 @@ public class DPTXlatorUtf8 extends DPTXlator
 	private void countItems()
 	{
 		int found = 0;
-        for (final short s : data)
-            if (s == 0)
-                found++;
+		for (final short s : data)
+			if (s == 0)
+				found++;
 		items = found;
 	}
 }

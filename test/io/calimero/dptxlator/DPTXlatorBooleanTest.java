@@ -151,7 +151,7 @@ class DPTXlatorBooleanTest
 			fail("should throw");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-        assertArrayEquals(data, t.getData());
+		assertArrayEquals(data, t.getData());
 		t.setData(dataValue1, 2);
 		byte[] d = t.getData();
 		assertEquals(1, d.length);
@@ -162,7 +162,7 @@ class DPTXlatorBooleanTest
 		t.setData(array, 1);
 		d = t.getData();
 		assertEquals(data.length, d.length);
-        assertArrayEquals(data, d);
+		assertArrayEquals(data, d);
 		Helper.assertSimilar(strings, t.getAllValues());
 
 		t.setData(new byte[] { (byte) 0xFF, (byte) 0xFF });
@@ -177,7 +177,7 @@ class DPTXlatorBooleanTest
 	{
 		assertEquals(2, t.getData(new byte[2], 1).length);
 		final byte[] empty = new byte[2];
-        assertArrayEquals(empty, t.getData(new byte[2], 1));
+		assertArrayEquals(empty, t.getData(new byte[2], 1));
 
 		t.setData(data);
 		byte[] d = new byte[10];
@@ -228,12 +228,12 @@ class DPTXlatorBooleanTest
 	@Test
 	void getValueBoolean() throws KNXFormatException
 	{
-        assertFalse(t.getValueBoolean());
+		assertFalse(t.getValueBoolean());
 
 		t.setData(new byte[] { 1 });
-        assertTrue(t.getValueBoolean());
+		assertTrue(t.getValueBoolean());
 		t.setData(new byte[] { 0 });
-        assertFalse(t.getValueBoolean());
+		assertFalse(t.getValueBoolean());
 		t.setData(data);
 		assertEquals(values[0], t.getValueBoolean());
 		assertEquals(data.length, t.getItems());

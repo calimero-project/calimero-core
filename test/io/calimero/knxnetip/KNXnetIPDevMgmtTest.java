@@ -179,7 +179,7 @@ class KNXnetIPDevMgmtTest
 		assertEquals(Util.getServer(), m.getRemoteAddress());
 		m.close();
 		assertTrue(m.getRemoteAddress().getAddress().isAnyLocalAddress());
-        assertEquals(0, m.getRemoteAddress().getPort());
+		assertEquals(0, m.getRemoteAddress().getPort());
 	}
 
 	@Test

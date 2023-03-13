@@ -112,12 +112,12 @@ class DPTXlatorDateTimeTest {
 	@Test
 	void setValues() throws KNXFormatException {
 		t.setValues();
-        assertEquals(1, t.getItems());
-        assertEquals(t.getValue(), def);
+		assertEquals(1, t.getItems());
+		assertEquals(t.getValue(), def);
 		t.setValues(value2, value3);
-        assertEquals(2, t.getItems());
-        assertNotEquals(t.getValue(), def);
-        assertNotEquals(t.getAllValues()[1], def);
+		assertEquals(2, t.getItems());
+		assertNotEquals(t.getValue(), def);
+		assertNotEquals(t.getAllValues()[1], def);
 
 		t.setValues(t.getValue(), t.getValue());
 	}
@@ -144,7 +144,7 @@ class DPTXlatorDateTimeTest {
 	void setValue() throws KNXFormatException {
 		t.setValue(dateday);
 		assertEquals(t.getItems(), 1);
-        assertNotEquals(t.getValue(), def);
+		assertNotEquals(t.getValue(), def);
 	}
 
 	@Test

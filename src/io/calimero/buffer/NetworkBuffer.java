@@ -442,10 +442,10 @@ public final class NetworkBuffer implements AutoCloseable
 	public Configuration getConfiguration(final KNXNetworkLink bufferedLink)
 	{
 		synchronized (configs) {
-            for (final ConfigImpl lc : configs) {
-                if (lc.getBufferedLink() == bufferedLink)
-                    return lc;
-            }
+			for (final ConfigImpl lc : configs) {
+				if (lc.getBufferedLink() == bufferedLink)
+					return lc;
+			}
 		}
 		return null;
 	}

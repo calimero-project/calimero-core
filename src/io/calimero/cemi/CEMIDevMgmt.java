@@ -525,8 +525,8 @@ public class CEMIDevMgmt implements CEMI
 				buf[i++] = (byte) (elems << 4 | start >>> 8);
 				buf[i++] = (byte) start;
 			}
-            for (final byte b : data)
-            	buf[i++] = b;
+			for (final byte b : data)
+				buf[i++] = b;
 		}
 		return buf;
 	}

@@ -518,9 +518,9 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 */
 	public void addDefinitions(final Collection<Property> definitions)
 	{
-        for (final Property p : definitions) {
-            properties.put(new PropertyKey(p.objType, p.id), p);
-        }
+		for (final Property p : definitions) {
+			properties.put(new PropertyKey(p.objType, p.id), p);
+		}
 	}
 
 	/**
@@ -718,10 +718,10 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 
 	private int getObjectType(final int objIndex, final boolean queryObject) throws KNXException, InterruptedException
 	{
-        for (final Pair p : objectTypes) {
-            if (p.oindex == objIndex)
-                return p.otype;
-        }
+		for (final Pair p : objectTypes) {
+			if (p.oindex == objIndex)
+				return p.otype;
+		}
 		if (queryObject)
 			return queryObjectType(objIndex);
 		throw new KNXException("couldn't deduce object type");
@@ -861,30 +861,30 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 			writer.writeStartElement(PROPDEFS_TAG);
 			final int noType = -2;
 			int objType = noType;
-            for (final Property p : definitions) {
-                if (p.objType != objType) {
-                    if (objType != noType)
-                        writer.writeEndElement();
-                    objType = p.objType;
-                    writer.writeStartElement(OBJECT_TAG);
-                    writer.writeAttribute(OBJECTTYPE_ATTR, objType == -1 ? "global"
-                            : Integer.toString(objType));
-                }
-                // property attributes
-                writer.writeStartElement(PROPERTY_TAG);
-                writer.writeAttribute(PID_ATTR, Integer.toString(p.id));
-                writer.writeAttribute(PIDNAME_ATTR, p.name);
-                writer.writeAttribute(NAME_ATTR, p.propName);
-                writer.writeAttribute(PDT_ATTR, p.pdt == -1 ? "<tbd>" : Integer.toString(p.pdt));
-                if (p.dpt != null && p.dpt.length() > 0)
-                    writer.writeAttribute(DPT_ATTR, p.dpt);
-                writer.writeAttribute(RW_ATTR, String.format("%d/%d", p.read, p.write));
-                writer.writeAttribute(WRITE_ATTR, p.readOnly() ? "0" : "1");
-                // write property
-                writer.writeStartElement(USAGE_TAG);
-                writer.writeEndElement();
-                writer.writeEndElement();
-            }
+			for (final Property p : definitions) {
+				if (p.objType != objType) {
+					if (objType != noType)
+						writer.writeEndElement();
+					objType = p.objType;
+					writer.writeStartElement(OBJECT_TAG);
+					writer.writeAttribute(OBJECTTYPE_ATTR, objType == -1 ? "global"
+							: Integer.toString(objType));
+				}
+				// property attributes
+				writer.writeStartElement(PROPERTY_TAG);
+				writer.writeAttribute(PID_ATTR, Integer.toString(p.id));
+				writer.writeAttribute(PIDNAME_ATTR, p.name);
+				writer.writeAttribute(NAME_ATTR, p.propName);
+				writer.writeAttribute(PDT_ATTR, p.pdt == -1 ? "<tbd>" : Integer.toString(p.pdt));
+				if (p.dpt != null && p.dpt.length() > 0)
+					writer.writeAttribute(DPT_ATTR, p.dpt);
+				writer.writeAttribute(RW_ATTR, String.format("%d/%d", p.read, p.write));
+				writer.writeAttribute(WRITE_ATTR, p.readOnly() ? "0" : "1");
+				// write property
+				writer.writeStartElement(USAGE_TAG);
+				writer.writeEndElement();
+				writer.writeEndElement();
+			}
 			writer.writeEndElement();
 		}
 

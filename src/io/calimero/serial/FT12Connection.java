@@ -546,8 +546,8 @@ public class FT12Connection implements Connection<byte[]>
 		buf[i++] = (byte) (data.length + 1);
 		buf[i++] = START;
 		buf[i++] = (byte) (INITIATOR | sendFrameCount | FRAMECOUNT_VALID | USER_DATA);
-        for (final byte b : data)
-        	buf[i++] = b;
+		for (final byte b : data)
+			buf[i++] = b;
 		buf[i++] = checksum(buf, 4, data.length + 1);
 		buf[i++] = END;
 
@@ -738,7 +738,7 @@ public class FT12Connection implements Connection<byte[]>
 					lastChecksum = chk;
 					rcvFrameCount ^= FRAMECOUNT_BIT;
 					final byte[] ldata = new byte[len - 1];
-                    System.arraycopy(buf, 1, ldata, 0, ldata.length);
+					System.arraycopy(buf, 1, ldata, 0, ldata.length);
 
 					fireFrameReceived(ldata);
 

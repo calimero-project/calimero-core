@@ -140,20 +140,20 @@ class DPTXlatorUtf8Test
 		catch (final KNXIllegalArgumentException e) {
 			// ok
 		}
-        Assertions.assertArrayEquals(data, t.getData());
+		Assertions.assertArrayEquals(data, t.getData());
 		final byte[] dataOffset = new byte[9];
 		System.arraycopy(data1, 0, dataOffset, 3, data1.length);
 		t.setData(dataOffset, 3);
 		byte[] d = t.getData();
 		assertEquals(6, d.length);
-        Assertions.assertArrayEquals(data1, d);
+		Assertions.assertArrayEquals(data1, d);
 
 		final byte[] array = new byte[data.length + 1];
 		System.arraycopy(data, 0, array, 1, data.length);
 		t.setData(array, 1);
 		d = t.getData();
 		assertEquals(data.length, d.length);
-        Assertions.assertArrayEquals(data, d);
+		Assertions.assertArrayEquals(data, d);
 		assertEquals(4, t.getItems());
 		assertArrayEquals(strings, t.getAllValues());
 	}
@@ -198,7 +198,7 @@ class DPTXlatorUtf8Test
 	{
 		assertEquals(25, t.getData(new byte[25], 4).length);
 		final byte[] buf = new byte[20];
-        Assertions.assertArrayEquals(buf, t.getData(new byte[20], 3));
+		Assertions.assertArrayEquals(buf, t.getData(new byte[20], 3));
 
 		t.setData(data);
 		final byte[] d = new byte[45];

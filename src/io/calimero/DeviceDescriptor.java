@@ -390,7 +390,7 @@ public interface DeviceDescriptor
 			Channel1, Channel2, Channel3, Channel4
 		}
 
-        /**
+		/**
 		 * The number of channels implemented in the device for the specified channel type.
 		 *
 		 * @param channelType the requested channel type

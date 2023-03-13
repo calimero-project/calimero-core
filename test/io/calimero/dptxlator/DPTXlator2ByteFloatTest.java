@@ -193,12 +193,12 @@ class DPTXlator2ByteFloatTest
 		// do no similarity test because float type rounding issues
 		Helper.checkDPTs(dpts, false);
 
-        for (DPT value : dpts) {
-            setValueFloatFail(new DPTXlator2ByteFloat(value),
-                    Double.parseDouble(value.getLowerValue()) - 0.1d);
-            setValueFloatFail(new DPTXlator2ByteFloat(value),
-                    Double.parseDouble(value.getUpperValue()) + 0.1d);
-        }
+		for (DPT value : dpts) {
+			setValueFloatFail(new DPTXlator2ByteFloat(value),
+					Double.parseDouble(value.getLowerValue()) - 0.1d);
+			setValueFloatFail(new DPTXlator2ByteFloat(value),
+					Double.parseDouble(value.getUpperValue()) + 0.1d);
+		}
 
 		final DPT dpt = new DPT("0.00", "invalid", "invalid", "invalid", "invalid");
 		boolean failed = false;
@@ -258,9 +258,9 @@ class DPTXlator2ByteFloatTest
 		assertTrue(t.toString().contains("0.0"));
 		t.setValues(strings);
 		final String s = t.toString();
-        for (String string : strings) {
-            assertTrue(s.contains(string));
-        }
+		for (String string : strings) {
+			assertTrue(s.contains(string));
+		}
 	}
 
 	@Test

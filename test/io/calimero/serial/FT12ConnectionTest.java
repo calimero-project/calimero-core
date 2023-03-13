@@ -170,48 +170,48 @@ class FT12ConnectionTest {
 
 		@Test
 		void stateOk() {
-            assertEquals(FT12Connection.OK, c.getState());
+			assertEquals(FT12Connection.OK, c.getState());
 		}
 
 		@Test
 		void stateOkAfterSendingNoLDataBlocking()
 			throws KNXTimeoutException, KNXPortClosedException, InterruptedException {
 			c.send(new byte[10], true);
-            assertEquals(FT12Connection.OK, c.getState());
+			assertEquals(FT12Connection.OK, c.getState());
 		}
 
 		@Test
 		void stateOkAfterSendingCemiLDataBlocking()
 			throws KNXTimeoutException, KNXPortClosedException, InterruptedException {
 			c.send(cemiLDataReq.toByteArray(), true);
-            assertEquals(FT12Connection.OK, c.getState());
+			assertEquals(FT12Connection.OK, c.getState());
 		}
 
 		@Test
 		void stateOkAfterSendingEmi2LDataBlocking()
 			throws KNXTimeoutException, KNXPortClosedException, InterruptedException {
 			c.send(emi2LDataReq, true);
-            assertEquals(FT12Connection.OK, c.getState());
+			assertEquals(FT12Connection.OK, c.getState());
 		}
 
 		@Test
 		void noAckForSend() {
 			emulator.replyWithAck = false;
 			assertThrows(KNXAckTimeoutException.class, () -> c.send(new byte[2], true), "send got ACKed");
-            assertEquals(FT12Connection.OK, c.getState());
+			assertEquals(FT12Connection.OK, c.getState());
 		}
 
 		@Test
 		void noConForSend() {
 			emulator.replyWithCon = false;
 			assertThrows(KNXTimeoutException.class, () -> c.send(cemiLDataReq.toByteArray(), true), "received .con");
-            assertEquals(FT12Connection.OK, c.getState());
+			assertEquals(FT12Connection.OK, c.getState());
 		}
 
 		@Test
 		void stateClosed() {
 			c.close();
-            assertEquals(FT12Connection.CLOSED, c.getState());
+			assertEquals(FT12Connection.CLOSED, c.getState());
 		}
 	}
 }

@@ -126,7 +126,7 @@ class DiscovererTest
 		ddef.startSearch(timeout, true);
 		assertTrue(ddef.getSearchResponses().size() > 0);
 		ddef.clearSearchResponses();
-        assertEquals(0, ddef.getSearchResponses().size());
+		assertEquals(0, ddef.getSearchResponses().size());
 	}
 
 	@Test
@@ -369,7 +369,7 @@ class DiscovererTest
 		final Duration timeout = Duration.ofSeconds(this.timeout);
 		final CompletableFuture<List<Result<SearchResponse>>> search = ddef.timeout(timeout).search();
 		final List<Result<SearchResponse>> result = search.get(timeout.toMillis() + 200, TimeUnit.MILLISECONDS);
-        assertFalse(result.isEmpty());
+		assertFalse(result.isEmpty());
 	}
 
 	@Test
