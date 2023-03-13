@@ -157,7 +157,7 @@ class DPTXlatorSceneNumberTest
 			fail("should throw");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-        assertArrayEquals(dataMax, t.getData());
+		assertArrayEquals(dataMax, t.getData());
 		t.setData(dataValue2, 2);
 		byte[] d = t.getData();
 		assertEquals(1, d.length);
@@ -168,7 +168,7 @@ class DPTXlatorSceneNumberTest
 		t.setData(array, 1);
 		d = t.getData();
 		assertEquals(data.length, d.length);
-        assertArrayEquals(data, d);
+		assertArrayEquals(data, d);
 		Helper.assertSimilar(strings, t.getAllValues());
 	}
 
@@ -177,7 +177,7 @@ class DPTXlatorSceneNumberTest
 	{
 		assertEquals(2, t.getData(new byte[2], 1).length);
 		final byte[] empty = new byte[2];
-        assertArrayEquals(empty, t.getData(new byte[2], 1));
+		assertArrayEquals(empty, t.getData(new byte[2], 1));
 
 		t.setData(data);
 		byte[] d = new byte[10];

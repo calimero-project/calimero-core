@@ -51,13 +51,13 @@ class PropertyTypesTest {
 		final Map<Integer, DPTID> m = PropertyTypes.getAllPropertyTypes();
 		m.put(1000, new DPTID(1000, "1000.001"));
 		m.remove(1000);
-        for (final Integer type : m.keySet()) {
-            assertTrue(type > 0);
-        }
-        for (final DPTID type : m.values()) {
-            assertTrue(type.getMainNumber() > 0);
-            assertTrue(type.getDPT().length() >= 5);
-        }
+		for (final Integer type : m.keySet()) {
+			assertTrue(type > 0);
+		}
+		for (final DPTID type : m.values()) {
+			assertTrue(type.getMainNumber() > 0);
+			assertTrue(type.getDPT().length() >= 5);
+		}
 	}
 
 	@Test
@@ -100,6 +100,6 @@ class PropertyTypesTest {
 		final DPTXlator t = PropertyTypes.createTranslator(PropertyTypes.PDT_BINARY_INFORMATION,
 				new byte[] { 1, 0, 1 });
 		assertEquals(3, t.getItems());
-        assertArrayEquals(new byte[]{1, 0, 1}, t.getData());
+		assertArrayEquals(new byte[]{1, 0, 1}, t.getData());
 	}
 }

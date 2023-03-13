@@ -144,7 +144,7 @@ class DptXlator2ByteSignedTests {
 		}
 		catch (final KNXIllegalArgumentException e) {
 		}
-        assertArrayEquals(dataMin, t.getData());
+		assertArrayEquals(dataMin, t.getData());
 		t.setData(dataValue2, 2);
 		byte[] d = t.getData();
 		assertEquals(2, d.length);
@@ -156,7 +156,7 @@ class DptXlator2ByteSignedTests {
 		t.setData(array, 3);
 		d = t.getData();
 		assertEquals(data.length, d.length);
-        assertArrayEquals(data, d);
+		assertArrayEquals(data, d);
 		Helper.assertSimilar(strings, t.getAllValues());
 	}
 
@@ -164,7 +164,7 @@ class DptXlator2ByteSignedTests {
 	void getDataByteArrayInt() throws KNXFormatException {
 		assertEquals(4, t.getData(new byte[4], 1).length);
 		final byte[] empty = new byte[4];
-        assertArrayEquals(empty, t.getData(new byte[4], 1));
+		assertArrayEquals(empty, t.getData(new byte[4], 1));
 
 		t.setData(data);
 		byte[] d = t.getData(new byte[20], 10);
@@ -196,16 +196,16 @@ class DptXlator2ByteSignedTests {
 	@Test
 	void dptLimits() throws KNXFormatException {
 		checkDPTs(dpts, true);
-        for (DPT dpt : dpts) {
-            final var tr = new DptXlator2ByteSigned(dpt);
-            if (dpt.equals(DptXlator2ByteSigned.DptPercent)) {
-                setValueFail(tr, Double.parseDouble(dpt.getLowerValue()) - 1);
-                setValueFail(tr, Double.parseDouble(dpt.getUpperValue()) + 1);
-            } else {
-                setValueFail(tr, Long.parseLong(dpt.getLowerValue()) - 1);
-                setValueFail(tr, Long.parseLong(dpt.getUpperValue()) + 1);
-            }
-        }
+		for (DPT dpt : dpts) {
+			final var tr = new DptXlator2ByteSigned(dpt);
+			if (dpt.equals(DptXlator2ByteSigned.DptPercent)) {
+				setValueFail(tr, Double.parseDouble(dpt.getLowerValue()) - 1);
+				setValueFail(tr, Double.parseDouble(dpt.getUpperValue()) + 1);
+			} else {
+				setValueFail(tr, Long.parseLong(dpt.getLowerValue()) - 1);
+				setValueFail(tr, Long.parseLong(dpt.getUpperValue()) + 1);
+			}
+		}
 	}
 
 	private void setValueFail(final DptXlator2ByteSigned tr, final double v) {
@@ -300,19 +300,19 @@ class DptXlator2ByteSignedTests {
 	// TODO copied from Helper because we need to adjust numbers for current locale
 	private static void checkDPTs(final DPT[] dpts, final boolean testSimilarity) {
 		try {
-            for (DPT dpt : dpts) {
-                final DPTXlator t = TranslatorTypes.createTranslator(0, dpt.getID());
+			for (DPT dpt : dpts) {
+				final DPTXlator t = TranslatorTypes.createTranslator(0, dpt.getID());
 
-                final String lower = format(Double.parseDouble(dpt.getLowerValue()));
-                t.setValue(lower);
-                if (testSimilarity)
-                    Helper.assertSimilar(lower, t.getValue());
+				final String lower = format(Double.parseDouble(dpt.getLowerValue()));
+				t.setValue(lower);
+				if (testSimilarity)
+					Helper.assertSimilar(lower, t.getValue());
 
-                final String upper = format(Double.parseDouble(dpt.getUpperValue()));
-                t.setValue(upper);
-                if (testSimilarity)
-                    Helper.assertSimilar(upper, t.getValue());
-            }
+				final String upper = format(Double.parseDouble(dpt.getUpperValue()));
+				t.setValue(upper);
+				if (testSimilarity)
+					Helper.assertSimilar(upper, t.getValue());
+			}
 		}
 		catch (final KNXException e) {
 			fail(e.getMessage());

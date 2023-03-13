@@ -86,15 +86,15 @@ public final class Helper
 	public static void checkDPTs(final DPT[] dpts, final boolean testSimilarity)
 	{
 		try {
-            for (DPT dpt : dpts) {
-                final DPTXlator t = TranslatorTypes.createTranslator(0, dpt.getID());
-                t.setValue(dpt.getLowerValue());
-                if (testSimilarity)
-                    assertSimilar(dpt.getLowerValue(), t.getValue());
-                t.setValue(dpt.getUpperValue());
-                if (testSimilarity)
-                    assertSimilar(dpt.getUpperValue(), t.getValue());
-            }
+			for (DPT dpt : dpts) {
+				final DPTXlator t = TranslatorTypes.createTranslator(0, dpt.getID());
+				t.setValue(dpt.getLowerValue());
+				if (testSimilarity)
+					assertSimilar(dpt.getLowerValue(), t.getValue());
+				t.setValue(dpt.getUpperValue());
+				if (testSimilarity)
+					assertSimilar(dpt.getUpperValue(), t.getValue());
+			}
 		}
 		catch (final KNXException e) {
 			fail(e.getMessage());

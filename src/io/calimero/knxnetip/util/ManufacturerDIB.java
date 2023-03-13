@@ -124,7 +124,7 @@ public class ManufacturerDIB extends DIB
 		final byte[] buf = super.toByteArray();
 		buf[2] = (byte) (id >> 8);
 		buf[3] = (byte) id;
-        System.arraycopy(mfrData, 0, buf, 4, mfrData.length);
+		System.arraycopy(mfrData, 0, buf, 4, mfrData.length);
 		return buf;
 	}
 

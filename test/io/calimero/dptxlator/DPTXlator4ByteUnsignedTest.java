@@ -146,10 +146,10 @@ class DPTXlator4ByteUnsignedTest {
 			fail("should throw");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-        assertArrayEquals(dataMin, t.getData());
+		assertArrayEquals(dataMin, t.getData());
 
 		t.setData(dataMax, 0);
-        assertArrayEquals(dataMax, t.getData());
+		assertArrayEquals(dataMax, t.getData());
 
 		t.setData(dataValue2, 2);
 		byte[] d = t.getData();
@@ -163,7 +163,7 @@ class DPTXlator4ByteUnsignedTest {
 		t.setData(array, 3);
 		d = t.getData();
 		assertEquals(data.length, d.length);
-        assertArrayEquals(data, d);
+		assertArrayEquals(data, d);
 		Helper.assertSimilar(strings, t.getAllValues());
 	}
 
@@ -179,7 +179,7 @@ class DPTXlator4ByteUnsignedTest {
 		}
 		catch (final KNXIllegalArgumentException expected) {}
 		final byte[] empty = new byte[5];
-        assertArrayEquals(empty, t.getData(new byte[5], 1));
+		assertArrayEquals(empty, t.getData(new byte[5], 1));
 
 		t.setData(data);
 		d = t.getData(new byte[25], 6);

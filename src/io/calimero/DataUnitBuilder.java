@@ -420,7 +420,7 @@ public final class DataUnitBuilder
 	 * @param hex hexadecimal string representation, without any hexadecimal prefixes (like 0x); {@code hex.length}
 	 *        (ignoring spaces) has to be even
 	 * @return byte array containing the parsed value, with array length equal to {@code hex.length / 2} (not
-	 * considering any spaces)
+	 *        considering any spaces)
 	 */
 	public static byte[] fromHex(final String hex) {
 		final String s = hex.replace(" ", "");

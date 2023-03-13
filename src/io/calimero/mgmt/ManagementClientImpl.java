@@ -529,7 +529,7 @@ public class ManagementClientImpl implements ManagementClient
 		asdu[0] = (byte) (objectType >> 8);
 		asdu[1] = (byte) objectType;
 		asdu[2] = (byte) pid;
-        System.arraycopy(value, 0, asdu, 3, value.length);
+		System.arraycopy(value, 0, asdu, 3, value.length);
 
 		final Priority p = Priority.SYSTEM;
 		final byte[] tsdu = createAPDU(apci, asdu);
@@ -611,7 +611,7 @@ public class ManagementClientImpl implements ManagementClient
 		final byte[] apdu = sendWait(dst, priority, DataUnitBuilder.createLengthOptimizedAPDU(
 				DEVICE_DESC_READ, (byte) descType), DEVICE_DESC_RESPONSE, 2, 14);
 		final byte[] dd = new byte[apdu.length - 2];
-        System.arraycopy(apdu, 2, dd, 0, apdu.length - 2);
+		System.arraycopy(apdu, 2, dd, 0, apdu.length - 2);
 		return dd;
 	}
 
@@ -669,7 +669,7 @@ public class ManagementClientImpl implements ManagementClient
 							lock.notify();
 						}
 				}
-            };
+			};
 			tl.addTransportListener(l);
 			try {
 				synchronized (lock) {
@@ -771,7 +771,7 @@ public class ManagementClientImpl implements ManagementClient
 		asdu[1] = (byte) propertyId;
 		asdu[2] = (byte) ((elements << 4) | ((start >>> 8) & 0xF));
 		asdu[3] = (byte) start;
-        System.arraycopy(data, 0, asdu, 4, data.length);
+		System.arraycopy(data, 0, asdu, 4, data.length);
 		final byte[] send = createAPDU(PROPERTY_WRITE, asdu);
 		final byte[] apdu = sendWait(dst, priority, send, PROPERTY_RESPONSE, 4, maxAsduLength(dst));
 		// if number of elements is 0, remote app had problems
@@ -1065,7 +1065,7 @@ public class ManagementClientImpl implements ManagementClient
 			throw new KNXIllegalArgumentException("read ADC requires connection-oriented mode: " + dst);
 		final byte[] apdu = sendWait(dst, priority,
 				DataUnitBuilder.createLengthOptimizedAPDU(ADC_READ, (byte) channel,
-                        (byte) repeat), ADC_RESPONSE, 3, 3);
+						(byte) repeat), ADC_RESPONSE, 3, 3);
 		if (apdu[2] == 0)
 			throw new KNXRemoteException("error reading value of A/D converter");
 		return ((apdu[3] & 0xff) << 8) | apdu[4] & 0xff;
@@ -1086,7 +1086,7 @@ public class ManagementClientImpl implements ManagementClient
 		// use extended read service for memory access above 65 K
 		if (startAddr > 0xffff) {
 			final byte[] send = createAPDU(MemoryExtendedRead,
-                    (byte) bytes, (byte) (startAddr >>> 16), (byte) (startAddr >>> 8), (byte) startAddr);
+					(byte) bytes, (byte) (startAddr >>> 16), (byte) (startAddr >>> 8), (byte) startAddr);
 			final byte[] apdu = sendWait(dst, priority, send, MemoryExtendedReadResponse, 4, 252);
 			final ReturnCode ret = ReturnCode.of(apdu[2] & 0xff);
 			if (ret != ReturnCode.Success)
@@ -1097,7 +1097,7 @@ public class ManagementClientImpl implements ManagementClient
 
 		final byte[] apdu = sendWait(dst, priority,
 				createLengthOptimizedAPDU(MEMORY_READ,
-                        (byte) bytes, (byte) (startAddr >>> 8), (byte) startAddr),
+						(byte) bytes, (byte) (startAddr >>> 8), (byte) startAddr),
 				MEMORY_RESPONSE, 2, 65);
 		int no = apdu[1] & 0x3F;
 		if (no == 0)
@@ -1145,7 +1145,7 @@ public class ManagementClientImpl implements ManagementClient
 		asdu[0] = (byte) data.length;
 		asdu[1] = (byte) (startAddr >> 8);
 		asdu[2] = (byte) startAddr;
-        System.arraycopy(data, 0, asdu, 3, data.length);
+		System.arraycopy(data, 0, asdu, 3, data.length);
 		final byte[] send = DataUnitBuilder.createLengthOptimizedAPDU(MEMORY_WRITE, asdu);
 		if (dst.isVerifyMode()) {
 			// explicitly read back data
@@ -1207,7 +1207,7 @@ public class ManagementClientImpl implements ManagementClient
 			throw new KNXIllegalArgumentException("write key requires connection-oriented mode: " + dst);
 		final byte[] apdu = sendWait(dst, priority,
 			DataUnitBuilder.createAPDU(KEY_WRITE, (byte) level, key[0],
-                    key[1], key[2], key[3]), KEY_RESPONSE, 1, 1);
+					key[1], key[2], key[3]), KEY_RESPONSE, 1, 1);
 		if ((apdu[1] & 0xFF) == 0xFF)
 			throw new KNXRemoteException("access denied: current access level > write level");
 	}
@@ -1480,7 +1480,7 @@ public class ManagementClientImpl implements ManagementClient
 			throw new KNXInvalidResponseException(String.format(
 					"property access OI %d PID %d expected %d elements (received %d)", oi, pid, elements, number));
 		final byte[] prop = new byte[apdu.length - 6];
-        System.arraycopy(apdu, 6, prop, 0, prop.length);
+		System.arraycopy(apdu, 6, prop, 0, prop.length);
 		return prop;
 	}
 }

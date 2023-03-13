@@ -151,8 +151,8 @@ class DPTXlatorTimeTest
 	void getDataByteArrayInt()
 	{
 		byte[] d = t.getData(new byte[5], 2);
-        for (final byte b : d)
-        	assertEquals(0, b);
+		for (final byte b : d)
+			assertEquals(0, b);
 		t.setData(data, 1);
 		d = t.getData(new byte[5], 1);
 		for (int i = 0; i < 4; ++i)

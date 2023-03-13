@@ -90,11 +90,11 @@ public class DatapointMap<T extends Datapoint> implements DatapointModel<T>, Cha
 	{
 		// not all HashSets put additional capacity in HashSet(Collection) ctor
 		final Map<GroupAddress, T> m = new HashMap<>(Math.max(2 * datapoints.size(), 11));
-        for (final T dp : datapoints) {
-            if (m.containsKey(dp.getMainAddress()))
-                throw new KNXIllegalArgumentException("duplicate datapoint " + dp.getMainAddress());
-            m.put(dp.getMainAddress(), dp);
-        }
+		for (final T dp : datapoints) {
+			if (m.containsKey(dp.getMainAddress()))
+				throw new KNXIllegalArgumentException("duplicate datapoint " + dp.getMainAddress());
+			m.put(dp.getMainAddress(), dp);
+		}
 		points = Collections.synchronizedMap(m);
 		dpTypeRef = Datapoint.class;
 	}
@@ -181,8 +181,8 @@ public class DatapointMap<T extends Datapoint> implements DatapointModel<T>, Cha
 	{
 		w.writeStartElement(TAG_DATAPOINTS);
 		synchronized (points) {
-            for (final T t : points.values())
-            	t.save(w);
+			for (final T t : points.values())
+				t.save(w);
 		}
 		w.writeEndElement();
 	}

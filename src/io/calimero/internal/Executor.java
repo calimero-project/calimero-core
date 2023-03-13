@@ -62,7 +62,7 @@ public final class Executor {
 	private static final ScheduledExecutorService scheduledExecutor;
 	static {
 		final var se = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS,
-                new SynchronousQueue<>(), threadFactory) {
+				new SynchronousQueue<>(), threadFactory) {
 			@Override
 			protected void afterExecute(final Runnable r, final Throwable t) {
 				Thread.currentThread().setName(idleThreadName);

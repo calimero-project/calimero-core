@@ -849,22 +849,22 @@ public class ManagementProceduresImpl implements ManagementProcedures
 
 		final List<Destination> destinations = new ArrayList<>();
 		try {
-            for (final IndividualAddress remote : addresses) {
-                final Destination d = getOrCreateDestination(remote, true, false);
-                destinations.add(d);
-                tl.connect(d);
-                // increased from 100 (the default) to minimize chance of overflow over FT1.2
-                waitFor(115);
-            }
+			for (final IndividualAddress remote : addresses) {
+				final Destination d = getOrCreateDestination(remote, true, false);
+				destinations.add(d);
+				tl.connect(d);
+				// increased from 100 (the default) to minimize chance of overflow over FT1.2
+				waitFor(115);
+			}
 			// we wait in total (115 + 6000 + 1000 + 100) ms for a possible T-disconnect, taking
 			// into account the KNXnet/IP tunneling.req retransmit timeout plus some network delay
 			waitFor(disconnectTimeout + 1100);
 		}
 		finally {
 			tl.removeTransportListener(tll);
-            for (final Destination d : destinations) {
-                tl.destroyDestination(d);
-            }
+			for (final Destination d : destinations) {
+				tl.destroyDestination(d);
+			}
 		}
 		final IndividualAddress[] array = devices
 				.toArray(new IndividualAddress[0]);

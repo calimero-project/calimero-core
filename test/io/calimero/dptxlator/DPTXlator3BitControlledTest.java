@@ -175,7 +175,7 @@ class DPTXlator3BitControlledTest
 			fail("should throw");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-        assertArrayEquals(blindData, t8.getData());
+		assertArrayEquals(blindData, t8.getData());
 		t8.setData(dataBlindValue3);
 		byte[] d = t8.getData();
 		assertEquals(1, d.length);
@@ -196,7 +196,7 @@ class DPTXlator3BitControlledTest
 	{
 		assertEquals(4, t7.getData(new byte[4], 1).length);
 		final byte[] empty = new byte[4];
-        assertArrayEquals(empty, t7.getData(new byte[4], 1));
+		assertArrayEquals(empty, t7.getData(new byte[4], 1));
 
 		t7.setData(dimData);
 		byte[] d = new byte[10];

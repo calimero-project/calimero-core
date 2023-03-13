@@ -119,7 +119,7 @@ class DPTXlator1BitControlledTest
 			fail("should throw");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-        assertArrayEquals(data, t.getData());
+		assertArrayEquals(data, t.getData());
 		t.setData(dataValue1, 2);
 		byte[] d = t.getData();
 		assertEquals(1, d.length);
@@ -130,7 +130,7 @@ class DPTXlator1BitControlledTest
 		t.setData(array, 1);
 		d = t.getData();
 		assertEquals(data.length, d.length);
-        assertArrayEquals(data, d);
+		assertArrayEquals(data, d);
 		Helper.assertSimilar(strings, t.getAllValues());
 
 		t.setData(new byte[] { (byte) 0xFF, (byte) 0xFF });
@@ -145,7 +145,7 @@ class DPTXlator1BitControlledTest
 	{
 		assertEquals(4, t7.getData(new byte[4], 1).length);
 		final byte[] empty = new byte[4];
-        assertArrayEquals(empty, t7.getData(new byte[4], 1));
+		assertArrayEquals(empty, t7.getData(new byte[4], 1));
 
 		t7.setData(stepData);
 		byte[] d = new byte[10];
@@ -185,20 +185,20 @@ class DPTXlator1BitControlledTest
 	@Test
 	void setValueBooleanBoolean()
 	{
-        assertFalse(t.getControlBit());
-        assertFalse(t.getValueBit());
+		assertFalse(t.getControlBit());
+		assertFalse(t.getValueBit());
 
 		t.setValue(true, false);
-        assertTrue(t.getControlBit());
-        assertFalse(t.getValueBit());
+		assertTrue(t.getControlBit());
+		assertFalse(t.getValueBit());
 
 		t.setValue(false, true);
-        assertFalse(t.getControlBit());
-        assertTrue(t.getValueBit());
+		assertFalse(t.getControlBit());
+		assertTrue(t.getValueBit());
 
 		t.setValue(true, true);
-        assertTrue(t.getControlBit());
-        assertTrue(t.getValueBit());
+		assertTrue(t.getControlBit());
+		assertTrue(t.getValueBit());
 	}
 
 	@Test

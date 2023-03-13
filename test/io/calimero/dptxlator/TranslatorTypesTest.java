@@ -217,7 +217,7 @@ class TranslatorTypesTest
 		final byte[] data = new byte[] { (byte) 0xc, (byte) 0xe2 };
 		t2 = TranslatorTypes.createTranslator(9, 0, data);
 		assertTrue(t2.getType().getID().startsWith("9"));
-        assertArrayEquals(data, t2.getData());
+		assertArrayEquals(data, t2.getData());
 
 		try {
 			TranslatorTypes.createTranslator(9, -1);

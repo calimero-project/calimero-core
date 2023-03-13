@@ -239,7 +239,7 @@ class DPTXlator4ByteFloatTest
 			fail("should throw");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-        assertArrayEquals(dataMin, t.getData());
+		assertArrayEquals(dataMin, t.getData());
 		t.setData(dataValue2, 4);
 		byte[] data = t.getData();
 		assertEquals(4, data.length);

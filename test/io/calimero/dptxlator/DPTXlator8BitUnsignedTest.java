@@ -153,7 +153,7 @@ class DPTXlator8BitUnsignedTest
 			fail("should throw");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-        assertArrayEquals(dataMax, t.getData());
+		assertArrayEquals(dataMax, t.getData());
 		t.setData(dataValue2, 2);
 		byte[] d = t.getData();
 		assertEquals(1, d.length);
@@ -164,7 +164,7 @@ class DPTXlator8BitUnsignedTest
 		t.setData(array, 1);
 		d = t.getData();
 		assertEquals(data.length, d.length);
-        assertArrayEquals(data, d);
+		assertArrayEquals(data, d);
 		Helper.assertSimilar(stringsRaw, t.getAllValues());
 	}
 
@@ -173,7 +173,7 @@ class DPTXlator8BitUnsignedTest
 	{
 		assertEquals(2, t.getData(new byte[2], 1).length);
 		final byte[] empty = new byte[2];
-        assertArrayEquals(empty, t.getData(new byte[2], 1));
+		assertArrayEquals(empty, t.getData(new byte[2], 1));
 
 		t.setData(data);
 		byte[] d = new byte[10];
@@ -249,10 +249,10 @@ class DPTXlator8BitUnsignedTest
 		assertEquals(255, t.getValueUnscaled());
 		t.setData(dataMin);
 		assertEquals(0, t.getValueUnscaled());
-        for (int value : values) {
-            t.setValue(value);
-            assertEquals(value, t.getValueUnscaled());
-        }
+		for (int value : values) {
+			t.setValue(value);
+			assertEquals(value, t.getValueUnscaled());
+		}
 		final DPTXlator8BitUnsigned tscaled = new DPTXlator8BitUnsigned(dpts[0]);
 		tscaled.setValue(maxScale);
 		assertEquals(100, tscaled.getValueUnsigned());
@@ -285,12 +285,12 @@ class DPTXlator8BitUnsignedTest
 	@Test
 	void setValueInt() throws KNXFormatException
 	{
-        for (DPT dpt : dpts) {
-            setValueIntFail(new DPTXlator8BitUnsigned(dpt), Integer.parseInt(dpt
-                    .getLowerValue()) - 1);
-            setValueIntFail(new DPTXlator8BitUnsigned(dpt), Integer.parseInt(dpt
-                    .getUpperValue()) + 1);
-        }
+		for (DPT dpt : dpts) {
+			setValueIntFail(new DPTXlator8BitUnsigned(dpt), Integer.parseInt(dpt
+					.getLowerValue()) - 1);
+			setValueIntFail(new DPTXlator8BitUnsigned(dpt), Integer.parseInt(dpt
+					.getUpperValue()) + 1);
+		}
 	}
 
 	private void setValueIntFail(final DPTXlator8BitUnsigned tr, final int v)
@@ -310,10 +310,10 @@ class DPTXlator8BitUnsignedTest
 		t.setValueUnscaled(0);
 		assertEquals(1, t.getItems());
 
-        for (int j : valuesRaw) {
-            t.setValueUnscaled(j);
-            assertEquals(j, t.getValueUnscaled());
-        }
+		for (int j : valuesRaw) {
+			t.setValueUnscaled(j);
+			assertEquals(j, t.getValueUnscaled());
+		}
 
 		final DPTXlator8BitUnsigned tscaled = new DPTXlator8BitUnsigned(dpts[0]);
 		tscaled.setValueUnscaled(255);

@@ -120,7 +120,7 @@ class DptXlator16BitSetTest {
 	void getValue() throws KNXFormatException {
 		assertEquals("Cooling Mode", t.getValue());
 		t.setValue(1);
-        assertEquals(Fault.name().toLowerCase(), t.getValue());
+		assertEquals(Fault.name().toLowerCase(), t.getValue());
 
 		final DptXlator16BitSet x = new DptXlator16BitSet(DptXlator16BitSet.DptRhccStatus);
 		final int v = (int) x.getNumericValue();

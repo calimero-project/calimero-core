@@ -269,12 +269,12 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		if (update != null) {
 			final List<GroupAddress> upd = update.get(f.getDestination());
 			if (upd != null)
-                for (final var groupAddress : upd) {
-                    final CacheObject co = c.get(groupAddress);
-                    if (co != null)
-                        ((LDataObject) co).setFrame(CEMIFactory.create(null,
-                                (KNXAddress) co.getKey(), f, false));
-                }
+				for (final var groupAddress : upd) {
+					final CacheObject co = c.get(groupAddress);
+					if (co != null)
+						((LDataObject) co).setFrame(CEMIFactory.create(null,
+								(KNXAddress) co.getKey(), f, false));
+				}
 		}
 	}
 
@@ -283,8 +283,8 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		if (invalidate != null) {
 			final List<GroupAddress> inv = invalidate.get(f.getDestination());
 			if (inv != null)
-                for (final var groupAddress : inv)
-                	c.remove(groupAddress);
+				for (final var groupAddress : inv)
+					c.remove(groupAddress);
 		}
 	}
 
@@ -295,10 +295,10 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		final Collection<? extends Datapoint> c = ((DatapointMap<? extends Datapoint>) m)
 				.getDatapoints();
 		synchronized (c) {
-            for (final Datapoint dp : c) {
-                if (dp instanceof StateDP)
-                    createReferences((StateDP) dp);
-            }
+			for (final Datapoint dp : c) {
+				if (dp instanceof StateDP)
+					createReferences((StateDP) dp);
+			}
 		}
 	}
 
@@ -311,10 +311,10 @@ public class StateFilter implements NetworkFilter, RequestFilter
 	private static void createReferences(final Map<KNXAddress, List<GroupAddress>> map,
 		final Collection<GroupAddress> forAddr, final GroupAddress toAddr)
 	{
-        for (final GroupAddress ga : forAddr) {
+		for (final GroupAddress ga : forAddr) {
 			final List<GroupAddress> l = map.computeIfAbsent(ga, k -> new ArrayList<>());
 			l.add(toAddr);
-        }
+		}
 	}
 
 	private void destroyReferences(final StateDP dp)
@@ -326,13 +326,13 @@ public class StateFilter implements NetworkFilter, RequestFilter
 	private static void destroyReferences(final Map<KNXAddress, List<GroupAddress>> map,
 		final Collection<GroupAddress> forAddr, final GroupAddress toAddr)
 	{
-        for (final GroupAddress ga : forAddr) {
-            final List<GroupAddress> l = map.get(ga);
-            if (l != null) {
-                l.remove(toAddr);
-                if (l.isEmpty())
-                    map.remove(ga);
-            }
-        }
+		for (final GroupAddress ga : forAddr) {
+			final List<GroupAddress> l = map.get(ga);
+			if (l != null) {
+				l.remove(toAddr);
+				if (l.isEmpty())
+					map.remove(ga);
+			}
+		}
 	}
 }

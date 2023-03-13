@@ -412,7 +412,7 @@ class KNXnetIPTunnelTest
 		assertEquals(Util.getServer(), t.getRemoteAddress());
 		t.close();
 		assertTrue(t.getRemoteAddress().getAddress().isAnyLocalAddress());
-        assertEquals(0, t.getRemoteAddress().getPort());
+		assertEquals(0, t.getRemoteAddress().getPort());
 	}
 
 	@Test
