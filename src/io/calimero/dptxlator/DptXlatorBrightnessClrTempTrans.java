@@ -231,17 +231,17 @@ public class DptXlatorBrightnessClrTempTrans extends DPTXlator {
 		int valid = 0;
 
 		String field = fields[0];
-		boolean invalid = field.equals("-");
+		boolean invalid = "-".equals(field);
 		final double brightness = invalid ? 0 : parse(field);
 		valid |= invalid ? 0 : 1;
 
 		field = fields[inc];
-		invalid = field.equals("-");
+		invalid = "-".equals(field);
 		final int temperature = invalid ? 0 : parseInt(field);
 		valid |= invalid ? 0 : 2;
 
 		field = fields[2 * inc];
-		invalid = field.equals("-");
+		invalid = "-".equals(field);
 		final double time = invalid ? 0 : parse(field);
 		valid |= invalid ? 0 : 4;
 

@@ -414,7 +414,7 @@ class KNXNetworkLinkIPTest
 		assertTrue(active <= threads.length);
 
 		final List<Thread> list = Arrays.asList(threads).subList(0, active);
-		final long cnt = list.stream().map(Thread::getName).filter(s -> s.equals("Calimero link notifier")).count();
+		final long cnt = list.stream().map(Thread::getName).filter("Calimero link notifier"::equals).count();
 		// we should only have our two initial link notifiers running, not the failed ones
 		assertEquals(2, cnt, "running notifiers");
 	}

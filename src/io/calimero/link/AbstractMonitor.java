@@ -102,8 +102,8 @@ public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNet
 				final CEMIBusMon mon;
 				if (frame == null)
 					mon = (CEMIBusMon) CEMIFactory.fromEmiBusmon(e.getFrameBytes());
-				else if (frame instanceof CEMIBusMon)
-					mon = (CEMIBusMon) frame;
+				else if (frame instanceof CEMIBusMon busMon)
+					mon = busMon;
 				else {
 					logger.log(WARNING, "received unsupported frame type with msg code 0x"
 							+ Integer.toHexString(frame.getMessageCode()));

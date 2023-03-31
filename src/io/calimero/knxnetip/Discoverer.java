@@ -555,7 +555,7 @@ public class Discoverer
 					}
 			}
 		}
-		if (cfs.size() == 0)
+		if (cfs.isEmpty())
 			return CompletableFuture.failedFuture(
 					new KNXException("search could not be started on any network interface"));
 
@@ -590,7 +590,7 @@ public class Discoverer
 	 */
 	public final boolean isSearching()
 	{
-		return receivers.size() != 0;
+		return !receivers.isEmpty();
 	}
 
 	/**

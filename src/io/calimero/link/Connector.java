@@ -215,10 +215,10 @@ public final class Connector
 		public void setKNXMedium(final KNXMediumSettings settings)
 		{
 			final T t = impl;
-			if (t instanceof KNXNetworkLink)
-				((KNXNetworkLink) t).setKNXMedium(settings);
-			else if (t instanceof KNXNetworkMonitor)
-				((KNXNetworkMonitor) t).setKNXMedium(settings);
+			if (t instanceof KNXNetworkLink link)
+				link.setKNXMedium(settings);
+			else if (t instanceof KNXNetworkMonitor monitor)
+				monitor.setKNXMedium(settings);
 			this.settings = settings;
 		}
 
@@ -226,18 +226,18 @@ public final class Connector
 		public KNXMediumSettings getKNXMedium()
 		{
 			final T t = impl;
-			if (t instanceof KNXNetworkLink)
-				return ((KNXNetworkLink) t).getKNXMedium();
-			if (t instanceof KNXNetworkMonitor)
-				return ((KNXNetworkMonitor) t).getKNXMedium();
+			if (t instanceof KNXNetworkLink link)
+				return link.getKNXMedium();
+			if (t instanceof KNXNetworkMonitor monitor)
+				return monitor.getKNXMedium();
 			return settings;
 		}
 
 		@Override
 		public void addLinkListener(final NetworkLinkListener l)
 		{
-			if (impl instanceof KNXNetworkLink)
-				((KNXNetworkLink) impl).addLinkListener(l);
+			if (impl instanceof KNXNetworkLink link)
+				link.addLinkListener(l);
 			listeners.add(l);
 		}
 
@@ -245,15 +245,15 @@ public final class Connector
 		public void removeLinkListener(final NetworkLinkListener l)
 		{
 			listeners.remove(l);
-			if (impl instanceof KNXNetworkLink)
-				((KNXNetworkLink) impl).removeLinkListener(l);
+			if (impl instanceof KNXNetworkLink link)
+				link.removeLinkListener(l);
 		}
 
 		@Override
 		public void addMonitorListener(final LinkListener l)
 		{
-			if (impl instanceof KNXNetworkMonitor)
-				((KNXNetworkMonitor) impl).addMonitorListener(l);
+			if (impl instanceof KNXNetworkMonitor monitor)
+				monitor.addMonitorListener(l);
 			listeners.add(l);
 		}
 
@@ -261,23 +261,23 @@ public final class Connector
 		public void removeMonitorListener(final LinkListener l)
 		{
 			listeners.remove(l);
-			if (impl instanceof KNXNetworkMonitor)
-				((KNXNetworkMonitor) impl).removeMonitorListener(l);
+			if (impl instanceof KNXNetworkMonitor monitor)
+				monitor.removeMonitorListener(l);
 		}
 
 		@Override
 		public void setDecodeRawFrames(final boolean decode)
 		{
 			decodeRawFrames = decode;
-			if (impl instanceof KNXNetworkMonitor)
-				((KNXNetworkMonitor) impl).setDecodeRawFrames(decode);
+			if (impl instanceof KNXNetworkMonitor monitor)
+				monitor.setDecodeRawFrames(decode);
 		}
 
 		@Override
 		public void setHopCount(final int count)
 		{
-			if (impl instanceof KNXNetworkLink)
-				((KNXNetworkLink) impl).setHopCount(count);
+			if (impl instanceof KNXNetworkLink link)
+				link.setHopCount(count);
 			hopCount = count;
 		}
 
@@ -312,10 +312,10 @@ public final class Connector
 		public String getName()
 		{
 			final T t = impl;
-			if (t instanceof KNXNetworkLink)
-				return ((KNXNetworkLink) t).getName();
-			if (t instanceof KNXNetworkMonitor)
-				return ((KNXNetworkMonitor) t).getName();
+			if (t instanceof KNXNetworkLink link)
+				return link.getName();
+			if (t instanceof KNXNetworkMonitor monitor)
+				return monitor.getName();
 			return "connector";
 		}
 
@@ -437,8 +437,7 @@ public final class Connector
 					impl = t;
 				}
 				catch (final KNXRemoteException e) {
-					final KNXLinkClosedException lce = new KNXLinkClosedException(e.getMessage(), e);
-					throw lce;
+					throw new KNXLinkClosedException(e.getMessage(), e);
 				}
 				finally {
 					connecting.set(false);
@@ -463,10 +462,10 @@ public final class Connector
 		private boolean targetOpen()
 		{
 			final T t = impl;
-			if (t instanceof KNXNetworkLink)
-				return ((KNXNetworkLink) t).isOpen();
-			if (t instanceof KNXNetworkMonitor)
-				return ((KNXNetworkMonitor) t).isOpen();
+			if (t instanceof KNXNetworkLink link)
+				return link.isOpen();
+			if (t instanceof KNXNetworkMonitor monitor)
+				return monitor.isOpen();
 			return false;
 		}
 

@@ -284,7 +284,7 @@ public class StateDP extends Datapoint
 							throw new KNXMLException("malformed attribute timeout", r);
 						}
 				}
-				else if (tag.equals("location"))
+				else if ("location".equals(tag))
 					locations.add(r.getElementText());
 				else if (tag.equals(TAG_UPDATING))
 					while (r.nextTag() == XmlReader.START_ELEMENT)

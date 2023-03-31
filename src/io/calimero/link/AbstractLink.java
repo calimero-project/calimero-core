@@ -187,8 +187,8 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 				}
 
 				final CEMI cemi = onReceive(e);
-				if (cemi instanceof CEMIDevMgmt)
-					onDevMgmt((CEMIDevMgmt) cemi);
+				if (cemi instanceof CEMIDevMgmt mgmt)
+					onDevMgmt(mgmt);
 				else if (cemi instanceof final CemiTData tdata) {
 					final int mc = tdata.getMessageCode();
 					if (mc == CemiTData.IndividualIndication || mc == CemiTData.ConnectedIndication) {
@@ -396,10 +396,10 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 			throw new KNXLinkClosedException("link closed");
 		if (cEMI && !sendCEmiAsByteArray) {
 			final CEMI f = cEMI(mc, dst, p, nsdu);
-			if (f instanceof CEMILData)
-				onSend((CEMILData) f, waitForCon);
-			else if (f instanceof CemiTData)
-				onSend((CemiTData) f);
+			if (f instanceof CEMILData data)
+				onSend(data, waitForCon);
+			else if (f instanceof CemiTData data)
+				onSend(data);
 			return;
 		}
 		onSend(dst, createEmi(mc, dst, p, nsdu), waitForCon);
@@ -611,11 +611,11 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	private void addMediumInfo(final CEMILData msg)
 	{
 		String s = "";
-		if (medium instanceof PLSettings) {
+		if (medium instanceof PLSettings settings) {
 			final CEMILDataEx f = (CEMILDataEx) msg;
 			if (f.getAdditionalInfo(AdditionalInfo.PlMedium) != null)
 				return;
-			f.additionalInfo().add(AdditionalInfo.of(AdditionalInfo.PlMedium, ((PLSettings) medium).getDomainAddress()));
+			f.additionalInfo().add(AdditionalInfo.of(AdditionalInfo.PlMedium, settings.getDomainAddress()));
 		}
 		else if (medium.getMedium() == KNXMediumSettings.MEDIUM_RF) {
 			final CEMILDataEx f = (CEMILDataEx) msg;
@@ -633,10 +633,10 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 
 	private void addMediumInfo(final CemiTData msg) {
 		String s = "";
-		if (medium instanceof PLSettings) {
+		if (medium instanceof PLSettings settings) {
 			if (msg.additionalInfo().stream().anyMatch(info -> info.type() == AdditionalInfo.PlMedium))
 				return;
-			msg.additionalInfo().add(AdditionalInfo.of(AdditionalInfo.PlMedium, ((PLSettings) medium).getDomainAddress()));
+			msg.additionalInfo().add(AdditionalInfo.of(AdditionalInfo.PlMedium, settings.getDomainAddress()));
 		}
 		else if (medium.getMedium() == KNXMediumSettings.MEDIUM_RF) {
 			if (msg.additionalInfo().stream().anyMatch(info -> info.type() == AdditionalInfo.RfMedium))

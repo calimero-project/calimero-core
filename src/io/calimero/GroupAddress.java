@@ -295,8 +295,8 @@ public class GroupAddress extends KNXAddress
 	@Override
 	public boolean equals(final Object obj)
 	{
-		if (obj instanceof GroupAddress)
-			return address == ((GroupAddress) obj).address;
+		if (obj instanceof GroupAddress groupAddress)
+			return address == groupAddress.address;
 		return false;
 	}
 

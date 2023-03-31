@@ -198,7 +198,7 @@ class DptXlatorRelativeControlRgbwTest {
 
 	@Test
 	void getNumericValue() {
-		assertThrows(KNXFormatException.class, () -> t.getNumericValue());
+		assertThrows(KNXFormatException.class, t::getNumericValue);
 	}
 
 	@Test

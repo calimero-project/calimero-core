@@ -696,8 +696,8 @@ public class SecureApplicationLayer implements AutoCloseable {
 		}
 
 		final int plainService = DataUnitBuilder.getAPDUService(plainApdu);
-		if (dst instanceof IndividualAddress)
-			checkGoDiagnosticsResponse(src, (IndividualAddress) dst, plainService, plainApdu);
+		if (dst instanceof IndividualAddress address)
+			checkGoDiagnosticsResponse(src, address, plainService, plainApdu);
 
 		if (!checkAccess(dst, plainService, securityCtrl)) {
 			securityFailure(AccessAndRoleError, src, dst, receivedSeq);
@@ -931,7 +931,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 
 	private void syncWith(final KNXAddress dst, final boolean toolAccess) throws InterruptedException {
 		try {
-			final var device = dst instanceof GroupAddress ? surrogate((GroupAddress) dst) : (IndividualAddress) dst;
+			final var device = dst instanceof GroupAddress ga ? surrogate(ga) : (IndividualAddress) dst;
 			final var future = sendSyncRequest(device, toolAccess);
 			future.get();
 		}

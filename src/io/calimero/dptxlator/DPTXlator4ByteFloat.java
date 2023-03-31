@@ -735,8 +735,8 @@ public class DPTXlator4ByteFloat extends DPTXlator
 		}
 		else {
 			final NumberFormat dcf = NumberFormat.getInstance(Locale.US);
-			if (dcf instanceof DecimalFormat) {
-				((DecimalFormat) dcf).applyPattern("0.#####E0");
+			if (dcf instanceof DecimalFormat format) {
+				format.applyPattern("0.#####E0");
 			}
 			s = dcf.format(f);
 		}

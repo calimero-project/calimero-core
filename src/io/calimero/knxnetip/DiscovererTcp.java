@@ -115,8 +115,8 @@ public class DiscovererTcp {
 		}
 		catch (final ExecutionException e) {
 			final var cause = e.getCause();
-			if (cause instanceof KNXException)
-				throw (KNXException) cause;
+			if (cause instanceof KNXException exception)
+				throw exception;
 			if (cause instanceof TimeoutException)
 				throw new KNXTimeoutException(cause.getMessage());
 			throw new KNXException("waiting for description response", cause);
