@@ -89,10 +89,10 @@ public final class ConnectionFactory<P, C> {
 		final var t = tref.get();
 		if (t == null)
 			throw new KNXException("no service provider available for " + svcName);
-		if (t instanceof KNXException)
-			throw (KNXException) t;
-		if (t instanceof IOException)
-			throw (IOException) t;
+		if (t instanceof KNXException exception)
+			throw exception;
+		if (t instanceof IOException exception)
+			throw exception;
 		throw new KNXException("failed to open connection", t);
 	}
 

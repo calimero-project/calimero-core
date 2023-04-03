@@ -39,7 +39,6 @@ package io.calimero.dptxlator;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -173,7 +172,7 @@ public class DPTXlatorUtf8 extends DPTXlator
 	public List<DPTXlator> split()
 	{
 		if (getItems() == 1)
-			return Collections.singletonList(this);
+			return List.of(this);
 
 		final List<DPTXlator> l = new ArrayList<>();
 		int from = 0;

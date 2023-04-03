@@ -375,8 +375,8 @@ public final class CEMIFactory
 	public static CEMI copy(final CEMI original)
 	{
 		// on original == null we just return null, too
-		if (original instanceof CEMILDataEx)
-			return ((CEMILDataEx) original).clone();
+		if (original instanceof CEMILDataEx ex)
+			return ex.clone();
 		// all others are immutable
 		return original;
 	}

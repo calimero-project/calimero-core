@@ -167,7 +167,7 @@ public class ServiceRequest<T extends ServiceType> extends io.calimero.knxnetip.
 		channelid = channelID;
 		seq = seqNumber;
 
-		svc = service instanceof CEMI ? (T) CEMIFactory.copy((CEMI) service) : service;
+		svc = service instanceof CEMI cemi ? (T) CEMIFactory.copy(cemi) : service;
 		svcSupplier = null;
 	}
 

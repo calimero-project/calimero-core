@@ -189,7 +189,7 @@ class KeyringTest {
 	@Test
 	void keyringWithWrongSignature() {
 		assertThrows(KnxSecureException.class,
-				() -> new Keyring("test/resources/WrongSignature.knxkeys", keyringPwd).load());
+			new Keyring("test/resources/WrongSignature.knxkeys", keyringPwd)::load);
 
 		final var keyring = Keyring.load("test/resources/WrongSignature.knxkeys");
 		assertFalse(keyring.verifySignature(keyringPwd));

@@ -745,7 +745,7 @@ public class ManagementClientImpl implements ManagementClient
 				throw exceptions.get(0);
 			final KNXRemoteException e = new KNXRemoteException(
 					"reading property " + dst.getAddress() + " OI " + objIndex + " PID " + propertyId + " failed");
-			if (exceptions.size() > 0)
+			if (!exceptions.isEmpty())
 				exceptions.forEach(e::addSuppressed);
 			throw e;
 		}
@@ -945,7 +945,7 @@ public class ManagementClientImpl implements ManagementClient
 			throw new KNXIllegalArgumentException("argument value out of range");
 
 		final var ioList = getOrQueryInterfaceObjectList(dst);
-		if (!(ioList.length > objIndex))
+		if (ioList.length <= objIndex)
 			return null;
 
 		final int objType = ioList[objIndex];
@@ -1311,7 +1311,7 @@ public class ManagementClientImpl implements ManagementClient
 					if (responseServiceType != DataUnitBuilder.getAPDUService(apdu))
 						continue;
 
-					final IndividualAddress source = frame instanceof CEMILData ? ((CEMILData) frame).getSource() : new IndividualAddress(0);
+					final IndividualAddress source = frame instanceof CEMILData cemild ? cemild.getSource() : new IndividualAddress(0);
 					if (apdu.length < minAsduLen + 2 || apdu.length > maxAsduLen + 2) {
 						final String s = "invalid ASDU response length " + (apdu.length - 2) + " bytes, expected "
 								+ minAsduLen + " to " + maxAsduLen;

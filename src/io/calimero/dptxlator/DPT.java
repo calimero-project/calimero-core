@@ -175,7 +175,7 @@ public class DPT
 	@Override
 	public boolean equals(final Object obj)
 	{
-		return obj == this || obj instanceof DPT && ((DPT) obj).id.equals(id);
+		return obj == this || obj instanceof DPT dpt && dpt.id.equals(id);
 	}
 
 	@Override

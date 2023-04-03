@@ -105,7 +105,7 @@ public final class Settings
 	 */
 	public static void main(final String[] args)
 	{
-		if (args.length > 0 && (args[0].equals("--version") || args[0].equals("-v")))
+		if (args.length > 0 && ("--version".equals(args[0]) || "-v".equals(args[0])))
 			out(getLibraryHeader(false));
 		else
 			out(getLibraryHeader(true));

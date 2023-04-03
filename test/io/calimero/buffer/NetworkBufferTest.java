@@ -344,7 +344,7 @@ class NetworkBufferTest
 		final ProcessCommunicator pc = initConfig();
 
 		final String s3 = pc.read(updatingDp);
-		final String write = s3.equals("off") ? "on" : "off";
+		final String write = "off".equals(s3) ? "on" : "off";
 		write(pc, updatingDp, write);
 		assertEquals(write, pc.read(dp));
 		assertEquals(write, pc.read(updatingDp));

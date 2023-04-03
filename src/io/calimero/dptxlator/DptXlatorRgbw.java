@@ -208,7 +208,7 @@ public class DptXlatorRgbw extends DPTXlator {
 		int valid = 0;
 		for (int i = 0; i < 4; i++) {
 			final int mask = 1 << (3 - i);
-			if (!components[i].equals("-")) {
+			if (!"-".equals(components[i])) {
 				valid |= mask;
 				dst[index * 6 + i] = toDpt(components[i]);
 			}

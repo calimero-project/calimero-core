@@ -247,8 +247,7 @@ class KNXnetIPTunnelTest
 		final List<IndividualAddress> fifoAddresses = new ArrayList<>();
 		synchronized (l.fifoReceived) {
 			for (final CEMI cemi : l.fifoReceived) {
-				if (cemi instanceof CEMILData) {
-					final CEMILData ldata = (CEMILData) cemi;
+				if (cemi instanceof CEMILData ldata) {
 					fifoAddresses.add(ldata.getSource());
 				}
 			}

@@ -551,7 +551,7 @@ public class TransportLayerImpl implements TransportLayer
 			final Destination d = active.getDestination();
 			while (remaining > 0) {
 				try {
-					while (indications.size() > 0)
+					while (!indications.isEmpty())
 						handleConnected((CEMILData) indications.remove().getFrame(), active);
 					if (d.getState() == Disconnected || d.getState() == Destroyed)
 						throw new KNXDisconnectException(d.getAddress() + " disconnected while awaiting ACK", d);

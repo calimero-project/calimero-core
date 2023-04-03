@@ -168,9 +168,9 @@ public class DPTXlatorSceneControl extends DPTXlator
 			throw newException("wrong value format", value);
 		boolean learn = false;
 		String s = token.nextToken();
-		if (s.equals("learn"))
+		if ("learn".equals(s))
 			learn = true;
-		else if (!s.equals("activate"))
+		else if (!"activate".equals(s))
 			throw newException("wrong value format", value);
 		try {
 			s = token.nextToken();

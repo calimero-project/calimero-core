@@ -41,7 +41,6 @@ import java.lang.reflect.Field;
 import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -411,7 +410,7 @@ public abstract class DPTXlator
 			}
 			catch (ReflectiveOperationException | IllegalArgumentException /*| SecurityException*/ e) {}
 		}
-		return Collections.singletonList(this);
+		return List.of(this);
 	}
 
 	/**

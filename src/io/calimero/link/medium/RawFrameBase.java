@@ -278,7 +278,6 @@ public abstract class RawFrameBase implements RawFrame
 
 	int readCtrlEx(final ByteArrayInputStream is)
 	{
-		final int ctrle = is.read();
-		return ctrle;
+		return is.read();
 	}
 }

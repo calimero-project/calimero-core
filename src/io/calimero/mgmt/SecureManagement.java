@@ -144,7 +144,7 @@ public class SecureManagement extends SecureApplicationLayer {
 	}
 
 	private Optional<Destination> destination(final KNXAddress remote) {
-		return remote instanceof IndividualAddress ? transportLayer.destination((IndividualAddress) remote)
+		return remote instanceof IndividualAddress ia ? transportLayer.destination(ia)
 				: Optional.empty();
 	}
 

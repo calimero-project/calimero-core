@@ -82,7 +82,7 @@ class DiscovererTcpTests {
 		try (var connection = TcpConnection.newTcpConnection(Util.getLocalHost(), Util.getServer())) {
 			final var future = Discoverer.tcp(connection).search();
 			final var result = future.get();
-			assertTrue(result.size() > 0);
+			assertTrue(!result.isEmpty());
 		}
 	}
 
@@ -93,7 +93,7 @@ class DiscovererTcpTests {
 
 			final var future = Discoverer.secure(session).search();
 			final var result = future.get();
-			assertTrue(result.size() > 0);
+			assertTrue(!result.isEmpty());
 		}
 	}
 
