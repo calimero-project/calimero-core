@@ -100,7 +100,7 @@ public class PositiveListCache extends ExpiringCache
 	 */
 	public final synchronized void setPositiveList(final Collection<?> positiveList)
 	{
-		if (posList.size() == 0)
+		if (posList.isEmpty())
 			posList.addAll(positiveList);
 		else {
 			posList = new HashSet<>(positiveList);

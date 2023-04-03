@@ -124,7 +124,7 @@ class DiscovererTest
 	void clearSearchResponses() throws InterruptedException
 	{
 		ddef.startSearch(timeout, true);
-		assertTrue(ddef.getSearchResponses().size() > 0);
+		assertTrue(!ddef.getSearchResponses().isEmpty());
 		ddef.clearSearchResponses();
 		assertEquals(0, ddef.getSearchResponses().size());
 	}
@@ -189,7 +189,7 @@ class DiscovererTest
 	{
 		d.startSearch(timeout, true);
 		final List<Result<SearchResponse>> search = d.getSearchResponses();
-		assertTrue(search.size() > 0);
+		assertTrue(!search.isEmpty());
 		for (final Result<SearchResponse> result : search) {
 			final SearchResponse response = result.getResponse();
 			assertNotNull(response);
@@ -235,7 +235,7 @@ class DiscovererTest
 	{
 		d.startSearch(40000, Util.localInterface(), timeout, true);
 		final List<Result<SearchResponse>> search = d.getSearchResponses();
-		assertTrue(search.size() > 0, "search results > 0");
+		assertTrue(!search.isEmpty(), "search results > 0");
 		for (final Result<SearchResponse> result : search) {
 			final SearchResponse response = result.getResponse();
 			assertNotNull(response);
@@ -297,7 +297,7 @@ class DiscovererTest
 		}
 		catch (final KNXIllegalArgumentException e) {}
 		final var result = d.timeout(Duration.ofSeconds(timeout)).search().get();
-		assertTrue(result.size() > 0);
+		assertTrue(!result.isEmpty());
 		assertFalse(d.isSearching());
 		final int responses = result.size();
 
@@ -419,7 +419,7 @@ class DiscovererTest
 		assertTrue(Thread.enumerate(threads) < threads.length);
 		final List<Thread> l = Arrays.asList(threads);
 		assertTrue(l.stream().filter(Objects::nonNull).map(Thread::getName).filter(s -> s.startsWith("Discoverer"))
-				.allMatch(s -> s.equals("Discoverer (idle)")), "receiver thread(s) not idle");
+				.allMatch("Discoverer (idle)"::equals), "receiver thread(s) not idle");
 	}
 
 	@Test

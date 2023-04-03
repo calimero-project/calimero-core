@@ -146,9 +146,9 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		@Override
 		public void dataConnected(final FrameEvent e) {
 			final var frame = e.getFrame();
-			if (frame instanceof CEMILData) {
+			if (frame instanceof CEMILData data) {
 				final byte[] apdu = frame.getPayload();
-				final var source = ((CEMILData) frame).getSource();
+				final var source = data.getSource();
 				if (DataUnitBuilder.getAPDUService(apdu) == DEVICE_DESC_RESPONSE) {
 					try {
 						final var dd = DD0.from(Arrays.copyOfRange(apdu, 2, 4));
@@ -866,9 +866,8 @@ public class ManagementProceduresImpl implements ManagementProcedures
 				tl.destroyDestination(d);
 			}
 		}
-		final IndividualAddress[] array = devices
+		return devices
 				.toArray(new IndividualAddress[0]);
-		return array;
 	}
 
 	private void scanAddresses(final List<IndividualAddress> addresses, final boolean routers,

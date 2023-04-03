@@ -108,8 +108,8 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		public void onDatapointRemoved(final DatapointModel<? extends Datapoint> m,
 			final Datapoint dp)
 		{
-			if (dp instanceof StateDP)
-				destroyReferences((StateDP) dp);
+			if (dp instanceof StateDP dP)
+				destroyReferences(dP);
 		}
 
 		/**
@@ -119,8 +119,8 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		@Override
 		public void onDatapointAdded(final DatapointModel<? extends Datapoint> m, final Datapoint dp)
 		{
-			if (dp instanceof StateDP)
-				createReferences((StateDP) dp);
+			if (dp instanceof StateDP dP)
+				createReferences(dP);
 		}
 	};
 
@@ -213,9 +213,9 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		// adjust some fields of the frame to buffer: hop count, repetition
 		// make sure the frame hop count is 6
 		final int hops = 6;
-		if (copy instanceof CEMILDataEx) {
+		if (copy instanceof CEMILDataEx ex) {
 			if (copy.getHopCount() != hops)
-				((CEMILDataEx) copy).setHopCount(hops);
+				ex.setHopCount(hops);
 			if (copy.isRepetition())
 				copy = CEMIFactory.create(null, null, copy, false, false);
 		}
@@ -296,8 +296,8 @@ public class StateFilter implements NetworkFilter, RequestFilter
 				.getDatapoints();
 		synchronized (c) {
 			for (final Datapoint dp : c) {
-				if (dp instanceof StateDP)
-					createReferences((StateDP) dp);
+				if (dp instanceof StateDP dP)
+					createReferences(dP);
 			}
 		}
 	}

@@ -239,7 +239,7 @@ public class DptXlatorXyYTransition extends DPTXlator {
 			valid = 2;
 			i++;
 		}
-		if (fields.length > i + 1 && fields[i + 1].equals("%")) {
+		if (fields.length > i + 1 && "%".equals(fields[i + 1])) {
 			scaled.setValue(fields[i] + " %");
 			brightness = scaled.getValueUnsigned();
 			brightnessRaw = scaled.getValueUnscaled();
@@ -255,7 +255,7 @@ public class DptXlatorXyYTransition extends DPTXlator {
 		}
 		t.setValue(fields[i]);
 		i++;
-		if (fields.length > i && fields[i].equals("s"))
+		if (fields.length > i && "s".equals(fields[i]))
 			i++;
 
 		if (i < fields.length)

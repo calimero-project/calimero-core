@@ -132,16 +132,14 @@ public final class Debug
 			type = "unknown";
 		}
 		buf.append("frametype=" + type);
-		if (tp1 instanceof TP1LData) {
-			final TP1LData f = (TP1LData) tp1;
+		if (tp1 instanceof TP1LData f) {
 			buf.append(", src=" + f.getSource());
 			buf.append(", dst=" + f.getDestination());
 			buf.append(", prio=" + f.getPriority());
 			buf.append(", rep=" + f.isRepetition());
 			buf.append(", chksum=" + f.getChecksum());
 		}
-		else if (tp1 instanceof TP1Ack) {
-			final TP1Ack f = (TP1Ack) tp1;
+		else if (tp1 instanceof TP1Ack f) {
 			final int acktype = f.getAckType();
 			String ack;
 			if (acktype == RawAckBase.ACK)
@@ -156,8 +154,7 @@ public final class Debug
 				ack = "unknown";
 			buf.append(", ack=" + ack);
 		}
-		else if (tp1 instanceof TP1LPollData) {
-			final TP1LPollData f = (TP1LPollData) tp1;
+		else if (tp1 instanceof TP1LPollData f) {
 			buf.append(", src=" + f.getSource());
 			buf.append(", dst=" + f.getDestination());
 			buf.append(", prio=" + f.getPriority());

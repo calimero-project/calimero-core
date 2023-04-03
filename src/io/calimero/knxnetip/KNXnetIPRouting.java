@@ -616,8 +616,8 @@ public class KNXnetIPRouting extends ConnectionBase
 	{
 		final LostMessageEvent e = new LostMessageEvent(this, sender, lost.getDeviceState(), lost.getLostMessages());
 		listeners.fire(l -> {
-			if (l instanceof RoutingListener)
-				((RoutingListener) l).lostMessage(e);
+			if (l instanceof RoutingListener listener)
+				listener.lostMessage(e);
 		});
 	}
 
@@ -625,16 +625,16 @@ public class KNXnetIPRouting extends ConnectionBase
 	{
 		final RoutingBusyEvent e = new RoutingBusyEvent(this, sender, busy);
 		listeners.fire(l -> {
-			if (l instanceof RoutingListener)
-				((RoutingListener) l).routingBusy(e);
+			if (l instanceof RoutingListener listener)
+				listener.routingBusy(e);
 		});
 	}
 
 	private void fireRateLimit() {
 		final var e = new RateLimitEvent(this);
 		listeners.fire(l -> {
-			if (l instanceof RoutingListener)
-				((RoutingListener) l).rateLimit(e);
+			if (l instanceof RoutingListener listener)
+				listener.rateLimit(e);
 		});
 	}
 

@@ -69,7 +69,7 @@ public final class SerialNumber {
 
 	@Override
 	public boolean equals(final Object obj) {
-		return obj instanceof SerialNumber && ((SerialNumber) obj).sno == sno;
+		return obj instanceof SerialNumber sn && sn.sno == sno;
 	}
 
 	@Override

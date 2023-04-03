@@ -394,7 +394,7 @@ public class DPTXlator3BitControlled extends DPTXlator
 			throw newException("translation error, unknown control value string", s);
 		try {
 			s = token.nextToken();
-			if (s.equalsIgnoreCase("break"))
+			if ("break".equalsIgnoreCase(s))
 				s = "0";
 			final short code = Short.decode(s);
 			if (code >= 0 && code < 8) {

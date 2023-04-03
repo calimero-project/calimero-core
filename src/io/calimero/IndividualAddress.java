@@ -181,8 +181,8 @@ public class IndividualAddress extends KNXAddress
 	@Override
 	public boolean equals(final Object obj)
 	{
-		if (obj instanceof IndividualAddress)
-			return address == ((IndividualAddress) obj).address;
+		if (obj instanceof IndividualAddress individualAddress)
+			return address == individualAddress.address;
 		return false;
 	}
 

@@ -275,10 +275,10 @@ public final class BaosService implements ServiceType {
 			if (info instanceof Timer)
 				return data;
 			final var buf = allocate(size()).putShort((short) id);
-			if (info instanceof Instant)
-				buf.putInt((int) ((Instant) info).getEpochSecond());
-			else if (info instanceof DatapointCommand)
-				buf.put((byte) ((DatapointCommand) info).ordinal());
+			if (info instanceof Instant instant)
+				buf.putInt((int) instant.getEpochSecond());
+			else if (info instanceof DatapointCommand command)
+				buf.put((byte) command.ordinal());
 			return buf.put((byte) data.length).put(data).array();
 		}
 	}

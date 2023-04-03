@@ -271,7 +271,7 @@ class DefaultXmlReader implements XmlReader
 					value = value.substring(0, end);
 				attributeName.add(att);
 				attributeValue.add(References.replace(value, false));
-				if (att.equals("xmlns")) {
+				if ("xmlns".equals(att)) {
 					currentNamespace = value;
 				}
 			}

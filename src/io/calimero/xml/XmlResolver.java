@@ -135,7 +135,7 @@ public final class XmlResolver
 			// search xml declaration
 			final char[] decl = new char[5];
 			r.read(decl);
-			if (!new String(decl).equals("<?xml")) {
+			if (!"<?xml".equals(new String(decl))) {
 				in.reset();
 				return new InputStreamReader(in, encoding);
 			}
@@ -234,7 +234,7 @@ public final class XmlResolver
 			else if (state == 1 || state == 2) {
 				if (s.startsWith("standalone")) {
 					standalone = getAttValue(s = s.substring(10));
-					if (!standalone.equals("yes") && !standalone.equals("no"))
+					if (!"yes".equals(standalone) && !"no".equals(standalone))
 						throw new KNXMLException("invalid standalone pseudo-attribute",
 							standalone, 0);
 					break;
