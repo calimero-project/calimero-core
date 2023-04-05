@@ -48,7 +48,6 @@ import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.security.Key;
@@ -314,10 +313,6 @@ public final class TcpConnection implements Closeable {
 			}
 			catch (final GeneralSecurityException e) {
 				throw new KnxSecureException("error creating key pair for " + hostPort, e);
-			}
-			catch (final SocketTimeoutException e) {
-				throw new InterruptedException(
-						"interrupted I/O establishing secure session with " + hostPort + ": " + e.getMessage());
 			}
 			catch (final IOException e) {
 				close();
