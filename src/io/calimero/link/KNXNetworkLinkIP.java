@@ -36,13 +36,13 @@
 
 package io.calimero.link;
 
+import static io.calimero.knxnetip.KNXnetIPConnection.BlockingMode.WaitForAck;
+import static io.calimero.knxnetip.KNXnetIPConnection.BlockingMode.WaitForCon;
+import static io.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.LinkLayer;
 import static java.lang.System.Logger.Level.DEBUG;
 import static java.lang.System.Logger.Level.INFO;
 import static java.lang.System.Logger.Level.TRACE;
 import static java.lang.System.Logger.Level.WARNING;
-import static io.calimero.knxnetip.KNXnetIPConnection.BlockingMode.WaitForAck;
-import static io.calimero.knxnetip.KNXnetIPConnection.BlockingMode.WaitForCon;
-import static io.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.LinkLayer;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -450,7 +450,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 		}
 	}
 
-	private void getTunnelingFeature(final KNXnetIPTunnel tunnel, final InterfaceFeature feature)
+	private static void getTunnelingFeature(final KNXnetIPTunnel tunnel, final InterfaceFeature feature)
 			throws KNXConnectionClosedException, KNXAckTimeoutException, InterruptedException {
 		try {
 			tunnel.send(feature);
