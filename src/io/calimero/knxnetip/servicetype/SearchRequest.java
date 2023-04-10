@@ -120,7 +120,7 @@ public class SearchRequest extends ServiceType
 		if (svc == KNXnetIPHeader.SearchRequest && length > MinimumStructSize) {
 			int index = endpoint.getStructLength();
 			while (index < length) {
-				final Srp srp = new Srp(data, offset + index);
+				final Srp srp = Srp.from(data, offset + index);
 				srps.add(srp);
 				index += srp.structLength();
 			}

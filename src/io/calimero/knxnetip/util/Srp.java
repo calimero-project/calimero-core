@@ -1,6 +1,7 @@
 /*
     Calimero 2 - A library for KNX network access
     Copyright (c) 2018, 2022 K.Heimrich
+    Copyright (c) 2023, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,6 +38,7 @@
 package io.calimero.knxnetip.util;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
@@ -52,10 +54,37 @@ import io.calimero.knxnetip.util.ServiceFamiliesDIB.ServiceFamily;
  * or server will only respond to the extended search request if the search request parameter
  * block is completely satisfied.
  *
+ * @param type specifies which kind of search request parameter information is contained in the SRP, one of the
+ *        search request parameter block types (see {@link Type})
+ * @param isMandatory the mandatory flag of this SRP, {@code true} if the mandatory bit is set, {@code false} otherwise;
+ *        to be evaluated by a KNXnet/IP router or server device
+ * @param data byte array containing additional data, ignored for select by programming mode SRPs
+
  * @author Karsten Heimrich
  */
-public final class Srp
-{
+public record Srp(Srp.Type type, boolean isMandatory, byte... data) {
+	public Srp {
+		switch (type) {
+			case Invalid, SelectByProgrammingMode -> data = new byte[0];
+			case SelectByMacAddress -> {
+				if (data.length != 6)
+					throw new KNXIllegalArgumentException("MAC size does not match expected value");
+			}
+			case SelectByService -> {
+				if (data.length != 2)
+					throw new KNXIllegalArgumentException("service info size does not match expected value");
+			}
+			case RequestDibs -> {
+				if (data.length < 1)
+					throw new KNXIllegalArgumentException("requested DIBs size does not match expected value");
+				data = Arrays.copyOf(data, (data.length + 1) / 2 * 2);
+			}
+		}
+	}
+
+	/**
+	 * Search request parameter type.
+	 */
 	public enum Type {
 		/**
 		 * The invalid type is used to test the behavior of the KNXnet/IP router or server for unknown
@@ -106,53 +135,8 @@ public final class Srp
 		}
 	}
 
-	private final int size;
-	private final boolean mandatory;
-	private final Type type;
-	private final byte[] data;
 
 	private static final int SrpHeaderSize = 2;
-
-	/**
-	 * Creates a new SRP and initializes basic fields.
-	 *
-	 * @param srpType one of the search request parameter block types (see {@link Type})
-	 * @param isMandatory to be evaluated by a KNXnet/IP router or server device
-	 * @param data byte array containing additional data, ignored for select by programming mode SRPs
-	 */
-	public Srp(final Srp.Type srpType, final boolean isMandatory, final byte... data) {
-		type = srpType;
-		mandatory = isMandatory;
-
-		switch (srpType) {
-		case Invalid:
-		case SelectByProgrammingMode:
-			size = SrpHeaderSize;
-			this.data = new byte[0];
-			break;
-		case SelectByMacAddress:
-			if (data.length != 6)
-				throw new KNXIllegalArgumentException("MAC size does not match expected value");
-			size = SrpHeaderSize + 6;
-			this.data = data;
-			break;
-		case SelectByService:
-			if (data.length != 2)
-				throw new KNXIllegalArgumentException("service info size does not match expected value");
-			size = SrpHeaderSize + 2;
-			this.data = data;
-			break;
-		case RequestDibs:
-			if (data.length < 1)
-				throw new KNXIllegalArgumentException("requested DIBs size does not match expected value");
-			this.data = new byte[(data.length % 2) == 0 ? data.length : data.length + 1];
-			System.arraycopy(data, 0, this.data, 0, data.length);
-			size = SrpHeaderSize + this.data.length;
-			break;
-		default:
-			throw new KNXIllegalArgumentException("illegal SRP type + 0x" + Integer.toHexString(srpType.getValue()));
-		}
-	}
 
 	/**
 	 * Creates a new SRP out of a byte array.
@@ -161,24 +145,24 @@ public final class Srp
 	 * @param offset start offset of SRP in {@code data}
 	 * @throws KNXFormatException if no SRP found or invalid structure
 	 */
-	public Srp(final byte[] data, final int offset) throws KNXFormatException {
+	public static Srp from(final byte[] data, final int offset) throws KNXFormatException {
 		if (data.length - offset < SrpHeaderSize)
 			throw new KNXFormatException("buffer too short for SRP header");
 
-		size = data[offset] & 0xff;
+		final int size = data[offset] & 0xff;
 		if (size > data.length - offset)
 			throw new KNXFormatException("SRP size bigger than actual data length", size);
 
-		mandatory = (data[offset + 1] & 0x80) == 0x80;
-		type = Srp.Type.from(data[offset + 1] & 0x7f);
+		final boolean mandatory = (data[offset + 1] & 0x80) == 0x80;
+		final Type type = Type.from(data[offset + 1] & 0x7f);
 
+		byte[] paramData = new byte[0];
 		if ((size - SrpHeaderSize) > 0) {
-			this.data = new byte[size - SrpHeaderSize];
-			System.arraycopy(data, offset + SrpHeaderSize, this.data, 0, size - SrpHeaderSize);
+			paramData = new byte[size - SrpHeaderSize];
+			System.arraycopy(data, offset + SrpHeaderSize, paramData, 0, size - SrpHeaderSize);
 		}
-		else {
-			this.data = new byte[0];
-		}
+
+		return new Srp(type, mandatory, paramData);
 	}
 
 	/**
@@ -238,27 +222,12 @@ public final class Srp
 	 * @return structure length as unsigned byte
 	 */
 	public int structLength() {
-		return size;
-	}
-
-	/**
-	 * Returns the type of this SRP.
-	 * <p>
-	 * The type specifies which kind of search request parameter information is contained in the SRP.
-	 *
-	 * @return search request parameter type (see {@link Type})
-	 */
-	public Srp.Type type() {
-		return type;
-	}
-
-	/**
-	 * Returns the mandatory flag of this SRP.
-	 *
-	 * @return {@code true} if the mandatory bit is set, {@code false} otherwise
-	 */
-	public boolean isMandatory() {
-		return mandatory;
+		return switch (type) {
+			case Invalid, SelectByProgrammingMode -> SrpHeaderSize;
+			case SelectByMacAddress -> SrpHeaderSize + 6;
+			case SelectByService -> SrpHeaderSize + 2;
+			case RequestDibs -> SrpHeaderSize + this.data.length;
+		};
 	}
 
 	/**
@@ -278,9 +247,10 @@ public final class Srp
 	 * @return byte array containing the SRP structure
 	 */
 	public byte[] toByteArray() {
+		final int size = structLength();
 		final byte[] buf = new byte[size];
 		buf[0] = (byte) size;
-		buf[1] = (byte) (mandatory ? 0x80 : 0x00);
+		buf[1] = (byte) (isMandatory ? 0x80 : 0x00);
 		buf[1] |= (byte) (type.getValue() & 0x07);
 		if (data.length > 0)
 			System.arraycopy(data, 0, buf, SrpHeaderSize, data.length);
