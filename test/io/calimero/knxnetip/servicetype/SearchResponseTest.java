@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2022 B. Malinowsky
+    Copyright (c) 2018, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ class SearchResponseTest {
 		final List<DIB> dibs = List.of(device, svcFamilies);
 		final SearchResponse res = new SearchResponse(false, hpai, dibs);
 
-		assertEquals(device.getStructLength() + svcFamilies.getStructLength() + tunneling.getStructLength(), res.getStructLength());
+		assertEquals(device.getStructLength() + svcFamilies.getStructLength() + tunneling.getStructLength(), res.length());
 	}
 
 	@Test
@@ -97,7 +97,7 @@ class SearchResponseTest {
 		final int expected = hpai.getStructLength() + device.getStructLength() + svcFamilies.getStructLength()
 				+ secureFamilies.getStructLength() + tunneling.getStructLength();
 
-		assertEquals(expected, res.getStructLength());
+		assertEquals(expected, res.length());
 	}
 
 	@Test
@@ -110,7 +110,7 @@ class SearchResponseTest {
 		final SearchResponse parsed = SearchResponse.from(h, packet, h.getStructLength());
 
 		assertEquals(KNXnetIPHeader.SEARCH_RES, parsed.svcType);
-		assertEquals(res.getStructLength(), parsed.getStructLength());
+		assertEquals(res.length(), parsed.length());
 		assertEquals(res, parsed);
 	}
 
@@ -125,15 +125,15 @@ class SearchResponseTest {
 		final SearchResponse parsed = SearchResponse.from(h, packet, h.getStructLength());
 
 		assertEquals(KNXnetIPHeader.SearchResponse, parsed.svcType);
-		assertEquals(res.getStructLength(), parsed.getStructLength());
+		assertEquals(res.length(), parsed.length());
 		assertEquals(res, parsed);
 	}
 
 	@Test
 	void validSearchResponse() {
-		new SearchResponse(hpai, device, svcFamilies);
-		new SearchResponse(false, hpai, List.of(device, svcFamilies));
-		new SearchResponse(true, hpai, List.of(device, svcFamilies));
+		assertDoesNotThrow(() -> new SearchResponse(hpai, device, svcFamilies));
+		assertDoesNotThrow(() -> new SearchResponse(false, hpai, List.of(device, svcFamilies)));
+		assertDoesNotThrow(() -> new SearchResponse(true, hpai, List.of(device, svcFamilies)));
 	}
 
 	@Test

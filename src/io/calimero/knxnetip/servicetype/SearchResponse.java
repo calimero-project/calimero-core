@@ -195,9 +195,9 @@ public class SearchResponse extends ServiceType
 	}
 
 	@Override
-	int getStructLength()
+	public int length()
 	{
-		return endpt.getStructLength() + desc.getStructLength();
+		return endpt.getStructLength() + desc.length();
 	}
 
 	@Override

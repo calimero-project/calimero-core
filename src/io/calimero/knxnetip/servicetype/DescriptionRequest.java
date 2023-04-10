@@ -126,7 +126,7 @@ public class DescriptionRequest extends ServiceType {
 	}
 
 	@Override
-	int getStructLength()
+	public int length()
 	{
 		return endpoint.getStructLength();
 	}

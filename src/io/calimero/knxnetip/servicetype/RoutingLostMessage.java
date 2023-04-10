@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -139,19 +139,12 @@ public class RoutingLostMessage extends ServiceType
 		return (state & 0x01) != 0;
 	}
 
-	/* (non-Javadoc)
-	 * @see io.calimero.knxnetip.servicetype.ServiceType#getStructLength()
-	 */
 	@Override
-	int getStructLength()
+	public int length()
 	{
 		return 4;
 	}
 
-	/* (non-Javadoc)
-	 * @see io.calimero.knxnetip.servicetype.ServiceType#toByteArray
-	 * (java.io.ByteArrayOutputStream)
-	 */
 	@Override
 	byte[] toByteArray(final ByteArrayOutputStream os)
 	{

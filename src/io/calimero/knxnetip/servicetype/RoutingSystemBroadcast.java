@@ -93,7 +93,7 @@ public class RoutingSystemBroadcast extends ServiceType {
 	public final CEMI cemi() { return CEMIFactory.copy(cemi); }
 
 	@Override
-	int getStructLength() { return cemi.getStructLength(); }
+	public int length() { return cemi.getStructLength(); }
 
 	@Override
 	byte[] toByteArray(final ByteArrayOutputStream os) {

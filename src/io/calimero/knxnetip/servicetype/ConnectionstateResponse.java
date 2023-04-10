@@ -134,19 +134,12 @@ public class ConnectionstateResponse extends ServiceType
 		};
 	}
 
-	/* (non-Javadoc)
-	 * @see io.calimero.knxnetip.servicetype.ServiceType#getStructLength()
-	 */
 	@Override
-	int getStructLength()
+	public int length()
 	{
 		return 2;
 	}
 
-	/* (non-Javadoc)
-	 * @see io.calimero.knxnetip.servicetype.ServiceType#toByteArray
-	 *      (java.io.ByteArrayOutputStream)
-	 */
 	@Override
 	byte[] toByteArray(final ByteArrayOutputStream os)
 	{

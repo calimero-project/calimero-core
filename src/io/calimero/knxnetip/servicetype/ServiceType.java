@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -60,11 +60,6 @@ abstract class ServiceType implements io.calimero.ServiceType
 		svcType = serviceType;
 	}
 
-	@Override
-	public int length() {
-		return getStructLength();
-	}
-
 	/**
 	 * Returns the service type structure formatted into a byte array.
 	 *
@@ -89,6 +84,4 @@ abstract class ServiceType implements io.calimero.ServiceType
 	}
 
 	abstract byte[] toByteArray(ByteArrayOutputStream os);
-
-	abstract int getStructLength();
 }

@@ -216,7 +216,7 @@ public class DescriptionResponse extends ServiceType
 	}
 
 	@Override
-	int getStructLength()
+	public int length()
 	{
 		int len = 0;
 		for (final var dib : getDescription())

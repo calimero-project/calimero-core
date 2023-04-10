@@ -214,7 +214,7 @@ public class ConnectResponse extends ServiceType
 	}
 
 	@Override
-	int getStructLength()
+	public int length()
 	{
 		int len = 2;
 		if (endpt != null && crd != null)

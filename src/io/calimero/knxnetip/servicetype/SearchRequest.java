@@ -185,7 +185,7 @@ public class SearchRequest extends ServiceType
 	}
 
 	@Override
-	int getStructLength()
+	public int length()
 	{
 		return endpoint.getStructLength() + searchParametersSize();
 	}

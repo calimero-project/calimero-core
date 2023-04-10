@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -61,14 +61,14 @@ public final class PacketHelper
 	 */
 	public static byte[] toPacket(@SuppressWarnings("exports") final ServiceType type)
 	{
-		final KNXnetIPHeader h = new KNXnetIPHeader(type.svcType, type.getStructLength());
+		final KNXnetIPHeader h = new KNXnetIPHeader(type.svcType, type.length());
 		final ByteArrayOutputStream os = new ByteArrayOutputStream(h.getTotalLength());
 		os.write(h.toByteArray(), 0, h.getStructLength());
 		return type.toByteArray(os);
 	}
 
 	public static byte[] toPacket(final int version, @SuppressWarnings("exports") final ServiceType type) {
-		final KNXnetIPHeader h = new KNXnetIPHeader(type.svcType, version, type.getStructLength());
+		final KNXnetIPHeader h = new KNXnetIPHeader(type.svcType, version, type.length());
 		final ByteArrayOutputStream os = new ByteArrayOutputStream(h.getTotalLength());
 		os.write(h.toByteArray(), 0, h.getStructLength());
 		return type.toByteArray(os);
