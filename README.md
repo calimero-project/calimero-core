@@ -4,11 +4,20 @@ Calimero-core [![CI with Gradle](https://github.com/calimero-project/calimero-co
 git clone https://github.com/calimero-project/calimero-core.git
 ~~~
 
-Calimero-core provides (secure) KNX communication protocols, KNX datapoint & property access, and management functionality. [Java SE 11](https://jdk.java.net/archive/) (_java.base_) is the minimum required runtime environment.
+Calimero-core provides (secure) KNX communication protocols, KNX datapoint & property access, and management functionality. [JDK 17](https://openjdk.org/projects/jdk/17/) (_java.base_) is the minimum required runtime environment.
 Calimero was developed with a focus on applications that run on embedded devices and require a small footprint.
 
 Code examples for using this library are shown in the [introduction](https://github.com/calimero-project/introduction).
 
+**Changes with Calimero v3 snapshots**
+
+|                          | Prior                  | =>  | New           |
+|--------------------------|------------------------|-----|---------------|
+| _Maven group ID_         | com.github.calimero    |     | io.calimero   |
+| _Modules_                | n/a                    |     | io.calimero.* |
+| _Packages_               | tuwien.auto.calimero.* |     | io.calimero.* |
+| _Logging prefix_         | calimero.*             |     | io.calimero.* |
+| _Logging API_            | SLF4J                  |     | System.Logger |
 
 Supported Features
 --------
@@ -58,8 +67,8 @@ Supported Features
 * 18.x - Scene control
 * 19.x - Date with time
 * 20.x - 8 Bit enumeration, e.g., Occupancy Mode, Blinds Control Mode
-* 21.x - Bit array of length 8, e.g., General Status, Room Heating Controller Status
-* 22.x - Bit array of length 16, implemented are DPT 22.101 and DPT 22.1000
+* 21.x - Bit array of length 8, e.g., General Status, Room Heating Controller Status, 8-bit Cannel Activation
+* 22.x - Bit array of length 16, implemented are DHW Controller Status, RHCC Status, Media Type, 16-bit Channel Activation
 * 28.x - UTF-8 string
 * 29.x - 64 Bit signed value, e.g., Active Energy, Apparent energy
 * 229.001 - M-Bus metering value, with the various M-Bus VIF/VIFE codings
@@ -102,7 +111,8 @@ Access via KNXnet/IP, KNX USB, KNX RF USB, TP-UART, and FT1.2
 Logging
 -------
 
-Calimero uses the [Simple Logging Facade for Java (slf4j)](http://www.slf4j.org/). Users can bind any desired logging frameworks. The default dependency is the [Simple Logger](http://www.slf4j.org/api/org/slf4j/impl/SimpleLogger.html). The simple logger logs everything to standard output, and can be configured via the file `simplelogger.properties`, JVM system properties, or `java` command line options, e.g., `-Dorg.slf4j.simpleLogger.defaultLogLevel=trace`.
+Calimero uses the [System.Logger](https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/System.Logger.html). Bind any desired logging frameworks of your choice.
+
 
 Testing
 -------

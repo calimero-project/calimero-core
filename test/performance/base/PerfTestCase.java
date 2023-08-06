@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,15 +39,15 @@ package performance.base;
 import java.io.PrintStream;
 import java.util.Arrays;
 
-import tuwien.auto.calimero.Util;
+import io.calimero.Util;
 
 
 public class PerfTestCase
 {
 	/** rounds to perform before timing the test. */
-	protected int warmups = 10;
+	protected final int warmups = 10;
 	/** rounds to perform for measuring the test. */
-	protected int measure = 10;
+	protected final int measure = 10;
 	/** output print stream for results. */
 	protected PrintStream out = System.out;
 
@@ -84,8 +84,8 @@ public class PerfTestCase
 		if (d.length > 3) {
 			final Integer[] d2 = t.getDurations(2);
 			long sum = 0;
-			for (int i = 0; i < d2.length; ++i)
-				sum += d2[i].intValue();
+			for (final Integer integer : d2)
+				sum += integer;
 			final float avg = (float) sum / d2.length;
 			s += " (" + avg + " ms / " + (avg / normalize) + " ms without extremes)";
 		}

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -91,7 +91,7 @@ class PerfTimer
 		final List<Integer> buf = new ArrayList<>();
 		final int size = Math.min(start.size(), stop.size());
 		for (int i = 0; i < size; ++i)
-			buf.add((int) (stop.get(i).longValue() - start.get(i).longValue()));
+			buf.add((int) (stop.get(i) - start.get(i)));
 		for (int i = 0; i < omitExtremes; ++i)
 			if (i % 2 == 0)
 				buf.remove(Collections.max(buf));
@@ -107,7 +107,7 @@ class PerfTimer
 			return 0;
 		long sum = 0;
 		for (int i = 0; i < durations; ++i)
-			sum += stop.get(i).longValue() - start.get(i).longValue();
+			sum += stop.get(i) - start.get(i);
 		return (float) sum / durations;
 	}
 }
