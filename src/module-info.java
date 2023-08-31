@@ -70,7 +70,8 @@ module io.calimero.core {
 		io.calimero.device,
 		io.calimero.server,
 		io.calimero.gui,
-		io.calimero.usb.provider.javax;
+		io.calimero.usb.provider.javax,
+		io.calimero.testnetwork;
 
 	opens io.calimero.link to
 		io.calimero.device; // AbstractLink.conn

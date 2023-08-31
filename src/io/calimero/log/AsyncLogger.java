@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2014, 2022 B. Malinowsky
+    Copyright (c) 2014, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,6 +40,8 @@ package io.calimero.log;
 import java.lang.System.Logger;
 import java.util.ResourceBundle;
 
+import io.calimero.internal.Executor;
+
 class AsyncLogger implements Logger
 {
 	private final Logger logger;
@@ -62,11 +64,23 @@ class AsyncLogger implements Logger
 
 	@Override
 	public void log(final Level level, final ResourceBundle bundle, final String msg, final Throwable thrown) {
-		LogService.async(logger, level, bundle, msg, thrown);
+		async(logger, level, bundle, msg, thrown);
 	}
 
 	@Override
 	public void log(final Level level, final ResourceBundle bundle, final String format, final Object... params) {
-		LogService.async(logger, level, bundle, format, null, params);
+		async(logger, level, bundle, format, null, params);
+	}
+
+	static void async(final Logger l, final Level level, final ResourceBundle bundle, final String format,
+			final Throwable t, final Object... o) {
+		if (!l.isLoggable(level))
+			return;
+		Executor.execute(() -> {
+			if (t != null)
+				l.log(level, bundle, format, t);
+			else
+				l.log(level, bundle, format, o);
+		}, Thread.currentThread().getName());
 	}
 }

@@ -46,7 +46,6 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 
-@SuppressWarnings("preview")
 public final class Executor {
 	private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
@@ -54,6 +53,7 @@ public final class Executor {
 			.inheritInheritableThreadLocals(false).factory();
 
 
+	@SuppressWarnings("serial")
 	private static final class KillThreadAfterExecuteException extends RuntimeException { }
 
 	private static Runnable withExitLogger(final Runnable r) {
@@ -104,6 +104,8 @@ public final class Executor {
 		thread.start();
 		return thread;
 	}
+
+	public static ExecutorService executor() { return vtExecutor; }
 
 	public static ScheduledExecutorService scheduledExecutor() { return vtScheduledExecutor; }
 

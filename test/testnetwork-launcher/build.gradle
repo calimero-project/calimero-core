@@ -14,8 +14,6 @@ run {
 group = 'io.calimero'
 version = '3.0-SNAPSHOT'
 
-tasks.withType(JavaExec) { jvmArgs += "--enable-preview" }
-
 repositories {
     mavenLocal()
     mavenCentral()

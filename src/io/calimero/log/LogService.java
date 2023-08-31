@@ -37,10 +37,6 @@
 package io.calimero.log;
 
 import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
-import java.util.ResourceBundle;
-
-import io.calimero.internal.Executor;
 
 /**
  * LogService provides access to {@link System.Logger}.
@@ -75,17 +71,5 @@ public final class LogService {
 	 */
 	public static Logger getAsyncLogger(final String name) {
 		return new AsyncLogger(getLogger(name));
-	}
-
-	static void async(final Logger l, final Level level, final ResourceBundle bundle, final String format,
-			final Throwable t, final Object... o) {
-		if (!l.isLoggable(level))
-			return;
-		Executor.execute(() -> {
-			if (t != null)
-				l.log(level, bundle, format, t);
-			else
-				l.log(level, bundle, format, o);
-		}, Thread.currentThread().getName());
 	}
 }

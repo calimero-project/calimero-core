@@ -49,7 +49,6 @@ import io.calimero.KNXException;
 import io.calimero.KNXListener;
 import io.calimero.KNXTimeoutException;
 import io.calimero.cemi.CEMILData;
-import io.calimero.internal.Executor;
 import io.calimero.link.medium.KNXMediumSettings;
 import io.calimero.serial.ConnectionEvent;
 import io.calimero.serial.ConnectionStatus;

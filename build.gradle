@@ -20,15 +20,13 @@ ext.desc = 'Calimero, a free KNX network library'
 group = 'io.calimero'
 version = '3.0-SNAPSHOT'
 
-sourceCompatibility = 19
-targetCompatibility = 19
-
 java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
     withSourcesJar()
     withJavadocJar()
 }
-
-tasks.withType(JavaExec) { jvmArgs += "--enable-preview" }
 
 tasks.withType(Jar).configureEach {
     from("${projectDir}") {
@@ -48,9 +46,8 @@ javadoc.options.encoding = 'UTF-8'
 
 
 compileJava.options*.compilerArgs = [
-	'-Xlint:all,-serial',
+	'-Xlint:all,-serial,-this-escape,-lossy-conversions',
 	"--limit-modules", "java.base,java.xml",
-	"--enable-preview"
 ]
 
 compileTestJava.options*.compilerArgs = [
@@ -81,8 +78,7 @@ sourceSets {
 
 tasks.withType(Javadoc).configureEach {
     options.addStringOption("Xdoclint:-missing", '-quiet')
-    options.addBooleanOption('-enable-preview', true)
-	options.addStringOption("-release", "${targetCompatibility}")
+	options.addStringOption("-release", "${java.targetCompatibility}")
 }
 
 jar {
@@ -100,7 +96,6 @@ test {
 //			showStandardStreams true
 		}
 	}
-	jvmArgs(['--enable-preview'])
 	retry {
 		maxRetries = 2
 		maxFailures = 20
