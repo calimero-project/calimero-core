@@ -105,9 +105,7 @@ public class RFSettings extends KNXMediumSettings
 	}
 
 	/**
-	 * Returns the domain address in network byte order.
-	 *
-	 * @return domain address as byte array of length = 6
+	 * {@return the domain address in network byte order, address byte array length = 6}
 	 */
 	public final synchronized byte[] getDomainAddress()
 	{
@@ -115,9 +113,7 @@ public class RFSettings extends KNXMediumSettings
 	}
 
 	/**
-	 * Returns the serial number.
-	 *
-	 * @return serial number
+	 * {@return the RF device serial number}
 	 */
 	public final SerialNumber serialNumber() { return sno; }
 

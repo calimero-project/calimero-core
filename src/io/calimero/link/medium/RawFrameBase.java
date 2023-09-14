@@ -121,9 +121,7 @@ public abstract class RawFrameBase implements RawFrame
 	}
 
 	/**
-	 * Returns the KNX individual source address.
-	 *
-	 * @return address of type IndividualAddress
+	 * {@return the KNX individual source address}
 	 */
 	public final IndividualAddress getSource()
 	{
@@ -131,9 +129,7 @@ public abstract class RawFrameBase implements RawFrame
 	}
 
 	/**
-	 * Returns the KNX destination address.
-	 *
-	 * @return destination address of type KNXAddress
+	 * {@return the KNX destination address}
 	 */
 	public final KNXAddress getDestination()
 	{
@@ -141,9 +137,7 @@ public abstract class RawFrameBase implements RawFrame
 	}
 
 	/**
-	 * Returns the message priority used for this frame.
-	 *
-	 * @return the used Priority
+	 * {@return the message priority used for this frame}
 	 */
 	public final Priority getPriority()
 	{
@@ -151,9 +145,7 @@ public abstract class RawFrameBase implements RawFrame
 	}
 
 	/**
-	 * Returns the hop count of this frame.
-	 *
-	 * @return hop count in the range 0 &lt;= count &lt;= 7
+	 * {@return the hop count of this frame, in the range 0 &lt;= count &lt;= 7}
 	 */
 	public final int getHopcount()
 	{
@@ -174,10 +166,7 @@ public abstract class RawFrameBase implements RawFrame
 	}
 
 	/**
-	 * Returns a copy of the TPDU, if available.
-	 * <p>
-	 *
-	 * @return tpdu as byte array or {@code null} for L-polldata frames
+	 * {@return a copy of the TPDU, if available, or <code>null</code> for L-polldata frames}
 	 */
 	public final byte[] getTPDU()
 	{
@@ -229,8 +218,7 @@ public abstract class RawFrameBase implements RawFrame
 	}
 
 	/**
-	 * Inits the basic fields for TP1 and PL110 L-Data format reading the input
-	 * stream.
+	 * Inits the basic fields for TP1 and PL110 L-Data format reading the input stream.
 	 *
 	 * @param is
 	 * @param parseDoA parse domain address after control field

@@ -71,7 +71,7 @@ public final class SerialConnectionFactory {
 
 	static List<String> defaultPortPrefixes() { return defaultPortPrefixes; }
 
-	/** @return all available serial communication port identifiers. */
+	/** {@return all available serial communication port identifiers} */
 	public static Set<String> portIdentifiers() {
 		return factory.providers().map(SerialConnectionProvider::portIdentifiers).flatMap(Set::stream)
 				.collect(Collectors.toSet());
