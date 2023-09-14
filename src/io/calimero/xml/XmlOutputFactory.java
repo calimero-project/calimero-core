@@ -65,6 +65,9 @@ public class XmlOutputFactory // extends XMLOutputFactory
 		return new XmlOutputFactory();
 	}
 
+
+	public XmlOutputFactory() {}
+
 	/**
 	 * Creates a {@link XmlWriter} to write into the XML resource located by the specified identifier.
 	 *

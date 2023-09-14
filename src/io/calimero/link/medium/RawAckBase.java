@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2011 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -64,9 +64,9 @@ public abstract class RawAckBase implements RawFrame
 	 */
 	protected int ack;
 
-	/* (non-Javadoc)
-	 * @see io.calimero.link.medium.RawFrame#getFrameType()
-	 */
+
+	public RawAckBase() {}
+
 	@Override
 	public final int getFrameType()
 	{

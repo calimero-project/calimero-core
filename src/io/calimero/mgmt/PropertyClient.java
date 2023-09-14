@@ -789,6 +789,9 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		private static final String WRITE_ATTR = "writeEnabled";
 		private static final String USAGE_TAG = "usage";
 
+
+		public XmlPropertyDefinitions() {}
+
 		@Override
 		public Collection<Property> load(final String resource) throws KNXMLException
 		{

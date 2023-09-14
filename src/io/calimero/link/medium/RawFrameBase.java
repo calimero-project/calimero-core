@@ -112,6 +112,8 @@ public abstract class RawFrameBase implements RawFrame
 	private int eff; // extended frame format in extended ctrl field,
 
 
+	public RawFrameBase() {}
+
 	@Override
 	public final int getFrameType()
 	{
