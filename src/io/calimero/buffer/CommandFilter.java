@@ -90,8 +90,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 	public CommandFilter() {}
 
 	@Override
-	public void init(final Configuration c)
-	{}
+	public void init(final Configuration c) {}
 
 	/**
 	 * Sets the specified listener to receive notification of queue events of buffered

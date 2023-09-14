@@ -40,21 +40,21 @@ package io.calimero.link.medium;
  * Implementation of common functionality for raw acknowledgment frames.
  * <p>
  * Objects of this type are considered immutable.
- * 
+ *
  * @author B. Malinowsky
  */
 public abstract class RawAckBase implements RawFrame
 {
 	/**
 	 * Positive acknowledge type.
-	 * 
+	 *
 	 * @see #getAckType()
 	 */
 	public static final int ACK = 0xCC;
 
 	/**
 	 * Negative acknowledge type.
-	 * 
+	 *
 	 * @see #getAckType()
 	 */
 	public static final int NAK = 0x0C;
@@ -74,10 +74,7 @@ public abstract class RawAckBase implements RawFrame
 	}
 
 	/**
-	 * Returns the acknowledge type transmitted with this frame.
-	 * <p>
-	 * 
-	 * @return type of acknowledge as unsigned byte
+	 * {@return the acknowledge type transmitted with this frame as unsigned byte}
 	 */
 	public final int getAckType()
 	{
@@ -85,10 +82,7 @@ public abstract class RawAckBase implements RawFrame
 	}
 
 	/**
-	 * Returns a textual representation of this acknowledgment frame information.
-	 * <p>
-	 * 
-	 * @return string representation of the object
+	 * {@return a textual representation of this acknowledgment frame information}
 	 */
 	@Override
 	public String toString()
