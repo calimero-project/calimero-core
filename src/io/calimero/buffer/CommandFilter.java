@@ -86,6 +86,9 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 		}
 	};
 
+
+	public CommandFilter() {}
+
 	@Override
 	public void init(final Configuration c)
 	{}

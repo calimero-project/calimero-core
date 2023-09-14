@@ -64,6 +64,9 @@ public final class SerialConnectionFactory {
 					? List.of("\\\\.\\COM")
 					: List.of("/dev/ttyS", "/dev/ttyACM", "/dev/ttyUSB", "/dev/ttyAMA");
 
+
+	private SerialConnectionFactory() {}
+
 	static List<String> defaultPortPrefixes() { return defaultPortPrefixes; }
 
 	/** @return all available serial communication port identifiers. */

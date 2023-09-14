@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2022, 2022 B. Malinowsky
+    Copyright (c) 2022, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,6 +45,8 @@ import io.calimero.serial.usb.spi.UsbConnectionProvider;
 public final class UsbConnectionFactory {
 	private static final ConnectionFactory<UsbConnectionProvider, UsbConnection> factory = new ConnectionFactory<>(
 			UsbConnectionProvider.class);
+
+	private UsbConnectionFactory() {}
 
 	public static UsbConnection open(final int vendorId, final int productId) throws KNXException {
 		try {
