@@ -205,7 +205,7 @@ public class ManagementClientImpl implements ManagementClient
 			}
 			catch (final RuntimeException rte) {
 				final var cemi = e.getFrame();
-				final var src = cemi instanceof CEMILData cemild ? cemild.getDestination() : "cEMI server";
+				final var src = cemi instanceof final CEMILData cemild ? cemild.getDestination() : "cEMI server";
 				logger.log(WARNING, "on indication from {0}", src, rte);
 			}
 		}
@@ -1314,7 +1314,7 @@ public class ManagementClientImpl implements ManagementClient
 					if (responseServiceType != DataUnitBuilder.getAPDUService(apdu))
 						continue;
 
-					final IndividualAddress source = frame instanceof CEMILData cemild ? cemild.getSource() : new IndividualAddress(0);
+					final IndividualAddress source = frame instanceof final CEMILData cemild ? cemild.getSource() : new IndividualAddress(0);
 					if (apdu.length < minAsduLen + 2 || apdu.length > maxAsduLen + 2) {
 						final String s = "invalid ASDU response length " + (apdu.length - 2) + " bytes, expected "
 								+ minAsduLen + " to " + maxAsduLen;
