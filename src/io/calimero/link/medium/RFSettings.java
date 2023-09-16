@@ -137,7 +137,7 @@ public class RFSettings extends KNXMediumSettings
 	@Override
 	public String toString()
 	{
-		return super.toString() + " domain 0x" + HexFormat.of().formatHex(doa) + " s/n "
+		return super.toString() + " domain 0x" + HexFormat.of().formatHex(doa) + " S/N "
 				+ sno + (unidir ? " unidirectional" : "");
 	}
 }
