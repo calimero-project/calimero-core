@@ -123,7 +123,7 @@ class DefaultXmlReader implements XmlReader
 			read('<');
 			String str = read('>');
 			// if no comment and no closing tag
-			if (str.length() == 0 || skipComment(str) || skipInstruction(str))
+			if (str.isEmpty() || skipComment(str) || skipInstruction(str))
 				continue;
 			final StringBuilder buf = new StringBuilder();
 			if (readCDATASection(str, buf)) {
@@ -261,7 +261,7 @@ class DefaultXmlReader implements XmlReader
 			// cut off attribute name
 			final String att = s.substring(0, equal).trim();
 			s = s.substring(equal + 1).trim();
-			if (s.length() == 0)
+			if (s.isEmpty())
 				break;
 			final boolean quote = s.charAt(0) == '\'' || s.charAt(0) == '\"';
 			if (att.length() > 0 && quote) {

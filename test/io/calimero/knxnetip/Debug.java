@@ -117,20 +117,12 @@ public final class Debug
 	public static void printTP1Frame(final RawFrame tp1)
 	{
 		final StringBuilder buf = new StringBuilder();
-		final String type;
-		switch (tp1.getFrameType()) {
-		case RawFrame.ACK_FRAME:
-			type = "ack";
-			break;
-		case RawFrame.LDATA_FRAME:
-			type = "L-data";
-			break;
-		case RawFrame.LPOLLDATA_FRAME:
-			type = "poll-data";
-			break;
-		default:
-			type = "unknown";
-		}
+		final String type = switch (tp1.getFrameType()) {
+			case RawFrame.ACK_FRAME -> "ack";
+			case RawFrame.LDATA_FRAME -> "L-data";
+			case RawFrame.LPOLLDATA_FRAME -> "poll-data";
+			default -> "unknown";
+		};
 		buf.append("frametype=" + type);
 		if (tp1 instanceof TP1LData f) {
 			buf.append(", src=" + f.getSource());

@@ -188,18 +188,13 @@ public abstract class KNXMediumSettings
 	 */
 	public static String getMediumString(final int knxMedium)
 	{
-		switch (knxMedium) {
-		case MEDIUM_TP1:
-			return "TP1";
-		case MEDIUM_PL110:
-			return "PL110";
-		case MEDIUM_RF:
-			return "RF";
-		case MEDIUM_KNXIP:
-			return "KNX IP";
-		default:
-			return "unknown";
-		}
+		return switch (knxMedium) {
+			case MEDIUM_TP1 -> "TP1";
+			case MEDIUM_PL110 -> "PL110";
+			case MEDIUM_RF -> "RF";
+			case MEDIUM_KNXIP -> "KNX IP";
+			default -> "unknown";
+		};
 	}
 
 	/**

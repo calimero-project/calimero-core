@@ -944,7 +944,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 				if (s != null) {
 					if ("<tbd>".equals(s) || "-".equals(s))
 						return -1;
-					return s.length() == 0 ? 0 : Integer.decode(s);
+					return s.isEmpty() ? 0 : Integer.decode(s);
 				}
 			}
 			catch (final NumberFormatException e) {}

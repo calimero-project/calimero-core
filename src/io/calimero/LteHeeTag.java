@@ -52,7 +52,7 @@ public final class LteHeeTag {
 	// currently only geo tags with wildcards, broadcast, and unassigned (peripheral) in hex notation is supported
 	public static LteHeeTag from(final String tag) {
 		final String[] split = tag.replaceAll("\\*", "0").split("/", -1);
-		final List<Integer> levels = Arrays.stream(split).map(Integer::decode).collect(Collectors.toList());
+		final List<Integer> levels = Arrays.stream(split).map(Integer::decode).toList();
 		if (levels.size() == 1)
 			return new LteHeeTag(0x04 | 3, new GroupAddress(levels.get(0)));
 		return geoTag(levels.get(0), levels.get(1), levels.get(2));

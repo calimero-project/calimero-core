@@ -773,6 +773,6 @@ class DPTXlatorDateTimeTest {
 
 	private void assertFindNot(final String text, final String[] find) {
 		for (final String s : find)
-			assertTrue(!text.toLowerCase().contains(s.toLowerCase()));
+			assertFalse(text.toLowerCase().contains(s.toLowerCase()));
 	}
 }

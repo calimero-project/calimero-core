@@ -119,7 +119,7 @@ public abstract class Datapoint
 			throw new KNXMLException("missing attribute " + ATTR_NAME, r);
 		if ((dptId = r.getAttributeValue(null, ATTR_DPTID)) == null)
 			throw new KNXMLException("missing attribute " + ATTR_DPTID, r);
-		if (dptId.length() == 0)
+		if (dptId.isEmpty())
 			dptId = null;
 		String a = null;
 		try {

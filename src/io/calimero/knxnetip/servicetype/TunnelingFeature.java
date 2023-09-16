@@ -173,7 +173,6 @@ public final class TunnelingFeature implements io.calimero.ServiceType {
 			length = switch (featureId) {
 				case SupportedEmiTypes, DeviceDescriptorType0, Manufacturer, IndividualAddress, MaxApduLength -> 2;
 				case ConnectionStatus, ActiveEmiType, EnableFeatureInfoService -> 1;
-				default -> throw new IllegalStateException();
 			};
 		}
 		if (data.length != length)

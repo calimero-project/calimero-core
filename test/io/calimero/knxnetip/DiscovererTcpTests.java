@@ -36,10 +36,10 @@
 
 package io.calimero.knxnetip;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static io.calimero.knxnetip.util.Srp.withDeviceDescription;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.net.InetSocketAddress;
 import java.time.Duration;
@@ -49,8 +49,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import tag.KnxnetIP;
-import tag.KnxnetIPSequential;
 import io.calimero.FrameEvent;
 import io.calimero.KNXException;
 import io.calimero.KNXTimeoutException;
@@ -59,6 +57,8 @@ import io.calimero.cemi.CEMIDevMgmt;
 import io.calimero.knxnetip.KNXnetIPConnection.BlockingMode;
 import io.calimero.knxnetip.util.DIB;
 import io.calimero.knxnetip.util.Srp;
+import tag.KnxnetIP;
+import tag.KnxnetIPSequential;
 
 @KnxnetIP
 class DiscovererTcpTests {
@@ -82,7 +82,7 @@ class DiscovererTcpTests {
 		try (var connection = TcpConnection.newTcpConnection(Util.getLocalHost(), Util.getServer())) {
 			final var future = Discoverer.tcp(connection).search();
 			final var result = future.get();
-			assertTrue(!result.isEmpty());
+			assertFalse(result.isEmpty());
 		}
 	}
 
@@ -93,7 +93,7 @@ class DiscovererTcpTests {
 
 			final var future = Discoverer.secure(session).search();
 			final var result = future.get();
-			assertTrue(!result.isEmpty());
+			assertFalse(result.isEmpty());
 		}
 	}
 

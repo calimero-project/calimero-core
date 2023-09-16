@@ -124,7 +124,7 @@ class DiscovererTest
 	void clearSearchResponses() throws InterruptedException
 	{
 		ddef.startSearch(timeout, true);
-		assertTrue(!ddef.getSearchResponses().isEmpty());
+		assertFalse(ddef.getSearchResponses().isEmpty());
 		ddef.clearSearchResponses();
 		assertEquals(0, ddef.getSearchResponses().size());
 	}
@@ -189,7 +189,7 @@ class DiscovererTest
 	{
 		d.startSearch(timeout, true);
 		final List<Result<SearchResponse>> search = d.getSearchResponses();
-		assertTrue(!search.isEmpty());
+		assertFalse(search.isEmpty());
 		for (final Result<SearchResponse> result : search) {
 			final SearchResponse response = result.getResponse();
 			assertNotNull(response);
@@ -235,7 +235,7 @@ class DiscovererTest
 	{
 		d.startSearch(40000, Util.localInterface(), timeout, true);
 		final List<Result<SearchResponse>> search = d.getSearchResponses();
-		assertTrue(!search.isEmpty(), "search results > 0");
+		assertFalse(search.isEmpty(), "search results > 0");
 		for (final Result<SearchResponse> result : search) {
 			final SearchResponse response = result.getResponse();
 			assertNotNull(response);
@@ -297,7 +297,7 @@ class DiscovererTest
 		}
 		catch (final KNXIllegalArgumentException e) {}
 		final var result = d.timeout(Duration.ofSeconds(timeout)).search().get();
-		assertTrue(!result.isEmpty());
+		assertFalse(result.isEmpty());
 		assertFalse(d.isSearching());
 		final int responses = result.size();
 
