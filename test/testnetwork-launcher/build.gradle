@@ -24,4 +24,7 @@ repositories {
 
 dependencies {
     implementation  group:group, name:'calimero-testnetwork', version:version
+    
+    runtimeOnly 'org.slf4j:slf4j-jdk-platform-logging:2.0.9'
+    runtimeOnly 'org.slf4j:slf4j-simple:2.0.9'
 }
