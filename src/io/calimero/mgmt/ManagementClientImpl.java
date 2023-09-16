@@ -459,7 +459,7 @@ public class ManagementClientImpl implements ManagementClient
 			if (apdu.length == 5) {
 				final String s = receivedPid == 0xff ? receivedIot == 0xffff ? "object type" : "PID" : "response";
 				logger.log(INFO, "network parameter read response from {0} for interface object type {1} "
-						+ "PID {}: unsupported {}", responder, objectType, pid, s);
+						+ "PID {2}: unsupported {3}", responder, objectType, pid, s);
 				return Optional.empty();
 			}
 			return receivedIot == objectType && receivedPid == pid ? Optional.of(apdu) : Optional.empty();
@@ -492,7 +492,7 @@ public class ManagementClientImpl implements ManagementClient
 			if (apdu.length == 5) {
 				final String s = receivedPid == 0xff ? receivedIot == 0xffff ? "object type" : "PID" : "response";
 				logger.log(INFO, "network parameter read response from {0} for interface object type {1} "
-						+ "PID {}: unsupported {}", responder, objectType, pid, s);
+						+ "PID {2}: unsupported {3}", responder, objectType, pid, s);
 				return Optional.empty();
 			}
 			if (receivedIot == objectType && receivedPid == pid) {
@@ -559,7 +559,7 @@ public class ManagementClientImpl implements ManagementClient
 			if (apdu.length == 6) {
 				final String s = receivedPid == 0xff ? receivedIot == 0xffff ? "object type" : "PID" : "response";
 				logger.log(INFO, "system network parameter read response from {0} for interface object type {1} "
-						+ "PID {}: unsupported {}", responder, objectType, pid, s);
+						+ "PID {2}: unsupported {3}", responder, objectType, pid, s);
 				return Optional.empty();
 			}
 			final int receivedOperand = apdu[6] & 0xff;
