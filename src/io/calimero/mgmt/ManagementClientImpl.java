@@ -1311,7 +1311,7 @@ public class ManagementClientImpl implements ManagementClient
 					if (responseServiceType != DataUnitBuilder.getAPDUService(apdu))
 						continue;
 
-					final IndividualAddress source = frame instanceof CEMILData cemild ? cemild.getSource() : new IndividualAddress(0);
+					final IndividualAddress source = frame instanceof final CEMILData cemild ? cemild.getSource() : new IndividualAddress(0);
 					if (apdu.length < minAsduLen + 2 || apdu.length > maxAsduLen + 2) {
 						final String s = "invalid ASDU response length " + (apdu.length - 2) + " bytes, expected "
 								+ minAsduLen + " to " + maxAsduLen;
