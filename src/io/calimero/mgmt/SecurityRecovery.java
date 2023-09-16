@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2022, 2022 B. Malinowsky
+    Copyright (c) 2022, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -105,7 +105,7 @@ public final class SecurityRecovery {
 		final var ourInterface = interfaces.stream().filter(intf -> intf.address().equals(ourAddress)).findFirst()
 				.orElseThrow(() -> new KnxSecureException(
 						ourAddress + " is not configured as secure interface in the keyring"));
-		final var interfaceAddresses = interfaces.stream().map(Interface::address).collect(Collectors.toList());
+		final var interfaceAddresses = interfaces.stream().map(Interface::address).toList();
 
 		final var linkedDevices = ourInterface.groups().values().stream().flatMap(Set::stream).distinct()
 				.filter(Predicate.not(interfaceAddresses::contains)).collect(Collectors.toList());

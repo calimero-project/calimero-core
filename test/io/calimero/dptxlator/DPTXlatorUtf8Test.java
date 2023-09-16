@@ -159,8 +159,7 @@ class DPTXlatorUtf8Test
 	}
 
 	@Test
-	void setValues() throws KNXFormatException, UnsupportedEncodingException
-	{
+	void setValues() throws KNXFormatException {
 		final String signs = "ÆÐÑØý";
 		final String german = "ü ö ä Ä Ü Ö ß";
 		final String greek = "ΕΘΨθψϘϨϸ";

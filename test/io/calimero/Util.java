@@ -142,7 +142,7 @@ public final class Util
 			try {
 				d = new Discoverer(getLocalHost().getAddress(), getLocalHost().getPort(), false, false);
 				d.startSearch(2, true);
-				if (d.getSearchResponses().size() == 0)
+				if (d.getSearchResponses().isEmpty())
 					return null;
 				device = d.getSearchResponses().get(0).getResponse().getDevice().getAddress();
 			}
@@ -264,8 +264,11 @@ public final class Util
 					return server;
 				}
 			}
-			System.err.println("\nA unit test case requests the KNX test server, but no running instance was found!\n"
-					+ "\t--> Most tests requiring KNXnet/IP will fail.\n");
+			System.err.println("""
+
+					A unit test case requests the KNX test server, but no running instance was found!
+					\t--> Most tests requiring KNXnet/IP will fail.
+					""");
 			fail("no KNXnet/IP test-server found!");
 		}
 		return server;

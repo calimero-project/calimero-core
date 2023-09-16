@@ -143,29 +143,30 @@ public class RoutingSystemBroadcast extends ServiceType {
 	private static boolean subnetSystemBroadcast(final byte[] tpdu) {
 		return switch (DataUnitBuilder.getAPDUService(tpdu)) {
 			case SystemNetworkParamRead ->
-					// pdu: 2 bytes APCI + 2 bytes obj type + 2 bytes PID + 1 byte operand
-					tpdu.length == 7 && tpdu[2] == 0 && tpdu[3] == 0 && tpdu[4] == 0 && (tpdu[5] & 0xff) == (11 << 4)
+				// pdu: 2 bytes APCI + 2 bytes obj type + 2 bytes PID + 1 byte operand
+				tpdu.length == 7 && tpdu[2] == 0 && tpdu[3] == 0 && tpdu[4] == 0 && (tpdu[5] & 0xff) == (11 << 4)
 							&& tpdu[6] == 1;
-			case DoASerialNumberWrite -> // DoA serial number write service with IP domain
-					tpdu.length == 2 + 6 + 4; // APCI + SNo + mcast group
 
-			case SecureService -> // we look for secure data or sync request, and require tool access, system broadcast, A+C
-					secureService(tpdu, SecureDataPdu, SecureSyncRequest);
+			// DoA serial number write service with IP domain
+			case DoASerialNumberWrite -> tpdu.length == 2 + 6 + 4; // APCI + SNo + mcast group
+
+			// we look for secure data or sync request, and require tool access, system broadcast, A+C
+			case SecureService -> secureService(tpdu, SecureDataPdu, SecureSyncRequest);
 			default -> false;
 		};
 	}
 
 	private static boolean ipSystemBroadcast(final byte[] tpdu) {
-		switch (DataUnitBuilder.getAPDUService(tpdu)) {
-		case SystemNetworkParamResponse:
-			// pdu: 2 bytes APCI + 2 bytes obj type + 2 bytes PID + 1 byte operand + 6 bytes serial no
-			return tpdu.length == 13 && tpdu[2] == 0 && tpdu[3] == 0 && tpdu[4] == 0 && (tpdu[5] & 0xff) == (11 << 4)
-					&& tpdu[6] == 1;
+		return switch (DataUnitBuilder.getAPDUService(tpdu)) {
+			case SystemNetworkParamResponse ->
+				// pdu: 2 bytes APCI + 2 bytes obj type + 2 bytes PID + 1 byte operand + 6 bytes serial no
+				tpdu.length == 13 && tpdu[2] == 0 && tpdu[3] == 0 && tpdu[4] == 0 && (tpdu[5] & 0xff) == (11 << 4)
+						&& tpdu[6] == 1;
 
-		case SecureService: // we look for sync response, and require tool access, system broadcast, A+C
-			return secureService(tpdu, SecureSyncResponse, SecureSyncResponse);
-		}
-		return false;
+			// we look for sync response, and require tool access, system broadcast, A+C
+			case SecureService -> secureService(tpdu, SecureSyncResponse, SecureSyncResponse);
+			default -> false;
+		};
 	}
 
 	private static boolean secureService(final byte[] tpdu, final int svc1, final int svc2) {

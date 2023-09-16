@@ -103,9 +103,10 @@ import io.calimero.log.LogService.LogLevel;
  * <p>
  * Multicast considerations:<br>
  * The multicast loopback behavior defines whether multicast datagrams are looped back to the local socket, see
- * {@link MulticastSocket#setLoopbackMode(boolean)}. By default, the loopback mode of the multicast socket used for
- * sending multicast datagrams is enabled. This behavior can be changed by using a KNXnetIPRouting sub type and
- * initializing it by calling {@link #init(NetworkInterface, boolean, boolean)}.
+ * {@link MulticastSocket#setOption(java.net.SocketOption, Object)} with
+ * {@link java.net.StandardSocketOptions#IP_MULTICAST_LOOP}. By default, the loopback mode of the multicast
+ * socket used for sending multicast datagrams is enabled. This behavior can be changed by using a KNXnetIPRouting
+ * sub type and initializing it by calling {@link #init(NetworkInterface, boolean, boolean)}.
  * <p>
  * A multicast datagram sent with an initial hop count greater 1 may be delivered to the sending host on a different
  * interface (than the sending one), if the host is a member of the multicast group on that interface. The loopback mode
@@ -611,7 +612,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	{
 		final LostMessageEvent e = new LostMessageEvent(this, sender, lost.getDeviceState(), lost.getLostMessages());
 		listeners.fire(l -> {
-			if (l instanceof RoutingListener listener)
+			if (l instanceof final RoutingListener listener)
 				listener.lostMessage(e);
 		});
 	}
@@ -620,7 +621,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	{
 		final RoutingBusyEvent e = new RoutingBusyEvent(this, sender, busy);
 		listeners.fire(l -> {
-			if (l instanceof RoutingListener listener)
+			if (l instanceof final RoutingListener listener)
 				listener.routingBusy(e);
 		});
 	}
@@ -628,7 +629,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	private void fireRateLimit() {
 		final var e = new RateLimitEvent(this);
 		listeners.fire(l -> {
-			if (l instanceof RoutingListener listener)
+			if (l instanceof final RoutingListener listener)
 				listener.rateLimit(e);
 		});
 	}

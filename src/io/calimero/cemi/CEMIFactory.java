@@ -53,8 +53,7 @@ import io.calimero.Priority;
  */
 public final class CEMIFactory
 {
-	private CEMIFactory()
-	{}
+	private CEMIFactory() {}
 
 	/**
 	 * Creates a new cEMI message out of the given {@code data} byte stream.
@@ -66,46 +65,31 @@ public final class CEMIFactory
 	 * @throws KNXFormatException if no (valid) cEMI structure was found or unsupported cEMI message
 	 *         code
 	 */
-	public static CEMI create(final byte[] data, final int offset, final int length)
-		throws KNXFormatException
+	public static CEMI create(final byte[] data, final int offset, final int length) throws KNXFormatException
 	{
 		if (length < 1)
 			throw new KNXFormatException("buffer too short for cEMI frame", length);
 		final int mc = data[offset] & 0xff;
-		switch (mc) {
-		case CEMILData.MC_LDATA_REQ:
-		case CEMILData.MC_LDATA_CON:
-		case CEMILData.MC_LDATA_IND:
-			if (length < 26 && !isLteFrame(data, offset, length)) {
-				try {
-					return new CEMILData(data, offset, length);
+		return switch (mc) {
+			case CEMILData.MC_LDATA_REQ, CEMILData.MC_LDATA_CON, CEMILData.MC_LDATA_IND -> {
+				if (length < 26 && !isLteFrame(data, offset, length)) {
+					try {
+						yield new CEMILData(data, offset, length);
+					} catch (final KNXFormatException e) {
+						// fall-through and try if the extended cEMI works
+					}
 				}
-				catch (final KNXFormatException e) {
-					// fall-through and try if the extended cEMI works
-				}
+				yield new CEMILDataEx(data, offset, length);
 			}
-			return new CEMILDataEx(data, offset, length);
-		case CEMIDevMgmt.MC_PROPREAD_REQ:
-		case CEMIDevMgmt.MC_PROPREAD_CON:
-		case CEMIDevMgmt.MC_PROPWRITE_REQ:
-		case CEMIDevMgmt.MC_PROPWRITE_CON:
-		case CEMIDevMgmt.MC_FUNCPROP_CMD_REQ:
-		case CEMIDevMgmt.MC_FUNCPROP_READ_REQ:
-		case CEMIDevMgmt.MC_FUNCPROP_CON:
-		case CEMIDevMgmt.MC_PROPINFO_IND:
-		case CEMIDevMgmt.MC_RESET_REQ:
-		case CEMIDevMgmt.MC_RESET_IND:
-			return new CEMIDevMgmt(data, offset, length);
-		case CEMIBusMon.MC_BUSMON_IND:
-			return new CEMIBusMon(data, offset, length);
-		case CemiTData.IndividualRequest:
-		case CemiTData.IndividualIndication:
-		case CemiTData.ConnectedRequest:
-		case CemiTData.ConnectedIndication:
-			return new CemiTData(data, offset, length);
-		default:
-			throw new KNXFormatException("unsupported cEMI msg code", mc);
-		}
+			case CEMIDevMgmt.MC_PROPREAD_REQ, CEMIDevMgmt.MC_PROPREAD_CON, CEMIDevMgmt.MC_PROPWRITE_REQ,
+					CEMIDevMgmt.MC_PROPWRITE_CON, CEMIDevMgmt.MC_FUNCPROP_CMD_REQ, CEMIDevMgmt.MC_FUNCPROP_READ_REQ,
+					CEMIDevMgmt.MC_FUNCPROP_CON, CEMIDevMgmt.MC_PROPINFO_IND, CEMIDevMgmt.MC_RESET_REQ,
+					CEMIDevMgmt.MC_RESET_IND ->      new CEMIDevMgmt(data, offset, length);
+			case CEMIBusMon.MC_BUSMON_IND ->         new CEMIBusMon(data, offset, length);
+			case CemiTData.IndividualRequest, CemiTData.IndividualIndication, CemiTData.ConnectedRequest,
+					CemiTData.ConnectedIndication -> new CemiTData(data, offset, length);
+			default -> throw new KNXFormatException("unsupported cEMI msg code", mc);
+		};
 	}
 
 	private static boolean isLteFrame(final byte[] data, final int offset, final int length) {
@@ -138,30 +122,24 @@ public final class CEMIFactory
 	public static CEMI create(final int msgCode, final byte[] data, final CEMI original)
 		throws KNXFormatException
 	{
-		switch (msgCode) {
-		case CEMILData.MC_LDATA_REQ:
-		case CEMILData.MC_LDATA_CON:
-		case CEMILData.MC_LDATA_IND:
-			return create(msgCode, null, null, data, (CEMILData) original, false,
-					((CEMILData) original).isRepetition());
-		case CEMIDevMgmt.MC_PROPREAD_REQ:
-		case CEMIDevMgmt.MC_PROPREAD_CON:
-		case CEMIDevMgmt.MC_PROPWRITE_REQ:
-		case CEMIDevMgmt.MC_PROPWRITE_CON:
-		case CEMIDevMgmt.MC_PROPINFO_IND:
-		case CEMIDevMgmt.MC_RESET_REQ:
-		case CEMIDevMgmt.MC_RESET_IND: {
-			final CEMIDevMgmt f = (CEMIDevMgmt) original;
-			return new CEMIDevMgmt(msgCode, f.getObjectType(), f.getObjectInstance(), f.getPID(),
-					f.getStartIndex(), f.getElementCount(), data);
-		}
-		case CEMIBusMon.MC_BUSMON_IND:
-			final CEMIBusMon f = (CEMIBusMon) original;
-			return CEMIBusMon.newWithStatus(f.getStatus(), f.getTimestamp(),
-					f.getTimestampType() == CEMIBusMon.TYPEID_TIMESTAMP_EXT, data);
-		default:
-			throw new KNXFormatException("unsupported cEMI msg code", msgCode);
-		}
+		return switch (msgCode) {
+			case CEMILData.MC_LDATA_REQ, CEMILData.MC_LDATA_CON, CEMILData.MC_LDATA_IND ->
+				create(msgCode, null, null, data, (CEMILData) original, false,
+						((CEMILData) original).isRepetition());
+			case CEMIDevMgmt.MC_PROPREAD_REQ, CEMIDevMgmt.MC_PROPREAD_CON, CEMIDevMgmt.MC_PROPWRITE_REQ,
+					CEMIDevMgmt.MC_PROPWRITE_CON, CEMIDevMgmt.MC_PROPINFO_IND, CEMIDevMgmt.MC_RESET_REQ,
+					CEMIDevMgmt.MC_RESET_IND -> {
+				final CEMIDevMgmt f = (CEMIDevMgmt) original;
+				yield new CEMIDevMgmt(msgCode, f.getObjectType(), f.getObjectInstance(), f.getPID(),
+						f.getStartIndex(), f.getElementCount(), data);
+			}
+			case CEMIBusMon.MC_BUSMON_IND -> {
+				final CEMIBusMon f = (CEMIBusMon) original;
+				yield CEMIBusMon.newWithStatus(f.getStatus(), f.getTimestamp(),
+						f.getTimestampType() == CEMIBusMon.TYPEID_TIMESTAMP_EXT, data);
+			}
+			default -> throw new KNXFormatException("unsupported cEMI msg code", msgCode);
+		};
 	}
 
 	/**
@@ -375,7 +353,7 @@ public final class CEMIFactory
 	public static CEMI copy(final CEMI original)
 	{
 		// on original == null we just return null, too
-		if (original instanceof CEMILDataEx ex)
+		if (original instanceof final CEMILDataEx ex)
 			return ex.clone();
 		// all others are immutable
 		return original;

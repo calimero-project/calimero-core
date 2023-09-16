@@ -48,7 +48,7 @@ import io.calimero.buffer.cache.Cache.Statistic;
  */
 public record StatisticImpl(long hits, long misses) implements Statistic {
 	@Override
-	public final double hitRatio() {
+	public double hitRatio() {
 		final double total = hits + misses;
 		return total == 0.0 ? 0.0 : hits / total;
 	}

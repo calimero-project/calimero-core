@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2019 B. Malinowsky
+    Copyright (c) 2010, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -79,16 +79,6 @@ public interface PropertyAccess
 		int OBJECT_NAME = 2;
 
 		/**
-		 * ! to be defined ! Property name:
-		 */
-		// PDT,DPT: <tbd>
-		// int SEMAPHOR = 3;
-		/**
-		 * ! to be defined ! Property name:
-		 */
-		// PDT,DPT: <tbd>
-		// int GROUP_OBJECT_REFERENCE = 4;
-		/**
 		 * Global property "Load Control".
 		 * <p>
 		 * Access to load state machines.
@@ -126,13 +116,6 @@ public interface PropertyAccess
 		// PDT,DPT: PDT_UNSIGNED_CHAR
 		int FIRMWARE_REVISION = 9;
 
-		/**
-		 * ! to be defined ! Property name:
-		 * <p>
-		 * Services Supported.
-		 */
-		// PDT,DPT: <tbd>
-		// int SERVICES_SUPPORTED = 10;
 		/**
 		 * Global property "KNX Serial Number".
 		 * <p>
@@ -206,11 +189,6 @@ public interface PropertyAccess
 		int MANUFACTURER_DATA = 19;
 
 		/**
-		 * ! to be defined ! Property name:
-		 */
-		// PDT,DPT: <tbd>
-		// int ENABLE = 20;
-		/**
 		 * Global property "Description".
 		 * <p>
 		 * Description, Description of the device.
@@ -218,11 +196,6 @@ public interface PropertyAccess
 		// PDT,DPT: PDT_UNSIGNED_CHAR[ ]
 		int DESCRIPTION = 21;
 
-		/**
-		 * ! to be defined ! Property name:
-		 */
-		// PDT,DPT: <tbd>
-		// int FILE = 22;
 		/**
 		 * Global property "Address Table Format 0".
 		 * <p>
@@ -248,11 +221,6 @@ public interface PropertyAccess
 		// PDT,DPT: PDT_VERSION (U6U6U6)
 		int VERSION = 25;
 
-		/**
-		 * ! to be defined ! Property name: Group Address Assignment.
-		 */
-		// PDT,DPT: PDT_FUNCTION
-		// int GROUP_OBJECT_LINK = 26;
 		/**
 		 * Global property "Memory Control Table".
 		 * <p>

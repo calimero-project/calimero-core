@@ -655,7 +655,7 @@ public final class TcpConnection implements Closeable {
 		logger = LoggerFactory.getLogger("calimero.knxnetip.tcp " + hostPort(server));
 	}
 
-	protected TcpConnection(final InetSocketAddress local, final InetSocketAddress server) {
+	private TcpConnection(final InetSocketAddress local, final InetSocketAddress server) {
 		this(server);
 		InetSocketAddress bind = null;
 		try {

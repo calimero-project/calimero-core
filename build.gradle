@@ -33,7 +33,7 @@ tasks.withType(Jar).configureEach {
         include 'LICENSE.txt'
         into "META-INF"
     }
-    if (name.equals('sourcesJar')) {
+    if (name == 'sourcesJar') {
         from("${projectDir}") {
             include 'README.md'
         }

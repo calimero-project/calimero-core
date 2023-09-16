@@ -418,24 +418,24 @@ public final class BaosService implements ServiceType {
 	public static final int ServerItemIndication         = 0xC2;
 
 	private static String subServiceString(final int subService) {
-		switch (subService & ~ResponseFlag) {
-		case GetServerItem             : return "GetServerItem";
-		case SetServerItem             : return "SetServerItem";
-		case GetDatapointDescription   : return "GetDatapointDescription";
-		case GetDatapointDescriptionString: return "GetDescriptionString";
-		case GetDatapointValue         : return "GetDatapointValue";
-		case SetDatapointValue         : return "SetDatapointValue";
-		case GetParameterByte          : return "GetParameterByte";
-		case SetDatapointHistoryCommand: return "SetDatapointHistoryCommand";
-		case GetDatapointHistoryState  : return "GetDatapointHistoryState";
-		case GetDatapointHistory       : return "GetDatapointHistory";
-		case GetTimer                  : return "GetTimer";
-		case SetTimer                  : return "SetTimer";
-		}
-		return switch (subService) {
-			case DatapointValueIndication -> "DatapointValueIndication";
-			case ServerItemIndication -> "ServerItemIndication";
-			default -> "" + subService;
+		return switch (subService & ~ResponseFlag) {
+			case GetServerItem -> "GetServerItem";
+			case SetServerItem -> "SetServerItem";
+			case GetDatapointDescription -> "GetDatapointDescription";
+			case GetDatapointDescriptionString -> "GetDescriptionString";
+			case GetDatapointValue -> "GetDatapointValue";
+			case SetDatapointValue -> "SetDatapointValue";
+			case GetParameterByte -> "GetParameterByte";
+			case SetDatapointHistoryCommand -> "SetDatapointHistoryCommand";
+			case GetDatapointHistoryState -> "GetDatapointHistoryState";
+			case GetDatapointHistory -> "GetDatapointHistory";
+			case GetTimer -> "GetTimer";
+			case SetTimer -> "SetTimer";
+			default -> switch (subService) {
+				case DatapointValueIndication -> "DatapointValueIndication";
+				case ServerItemIndication -> "ServerItemIndication";
+				default -> "" + subService;
+			};
 		};
 	}
 
