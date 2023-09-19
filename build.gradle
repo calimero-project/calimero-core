@@ -20,10 +20,10 @@ ext.desc = 'Calimero, a free KNX network library'
 group = 'io.calimero'
 version = '3.0-SNAPSHOT'
 
-sourceCompatibility = 17
-targetCompatibility = 17
-
 java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
     withSourcesJar()
     withJavadocJar()
 }
