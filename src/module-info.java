@@ -74,7 +74,7 @@ module io.calimero.core {
 		io.calimero.testnetwork;
 
 	opens io.calimero.link to
-		io.calimero.device; // AbstractLink.conn
+		io.calimero.device, io.calimero.server; // AbstractLink.conn
 	opens io.calimero.knxnetip to
 		io.calimero.device; // KNXnetIPRouting.searchRequestCallback
 
