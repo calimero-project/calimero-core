@@ -60,7 +60,7 @@ tasks.named('compileJava') {
 }
 
 application {
-    mainModule = 'io.calimero.core' 
+    mainModule = 'io.calimero.core'
     mainClass = 'io.calimero.Settings'
 }
 
