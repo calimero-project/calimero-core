@@ -65,7 +65,7 @@ final class Net {
 			defaultNetif = s.getNetworkInterface();
 		}
 		catch (final IOException e) {
-			throw new ExceptionInInitializerError();
+			throw new ExceptionInInitializerError(e);
 		}
 	}
 
