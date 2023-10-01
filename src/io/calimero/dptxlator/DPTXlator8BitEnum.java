@@ -788,6 +788,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 	// End of enumerations
 	//
 
+	@SuppressWarnings("exports")
 	public static class EnumDpt<T extends Enum<T> & EnumBase<T>> extends EnumDptBase<T> {
 		public EnumDpt(final String typeID, final Class<T> elements, final String lower, final String upper) {
 			super(typeID, elements, lower, upper);
@@ -997,6 +998,7 @@ public class DPTXlator8BitEnum extends DPTXlator
 	 * @throws KNXFormatException if element is not in the enumeration specified by the used DPT ID
 	 * @see #getType()
 	 */
+	@SuppressWarnings("exports")
 	public final void setValue(final EnumBase<? extends EnumBase<?>> element)
 		throws KNXFormatException
 	{

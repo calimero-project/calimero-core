@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2022, 2022 B. Malinowsky
+    Copyright (c) 2022, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@
  * @uses io.calimero.serial.SerialConnectionFactory
  * @uses io.calimero.serial.usb.spi.UsbConnectionProvider
  */
+@SuppressWarnings("module")
 module io.calimero.core {
 	requires static java.xml;
 

@@ -70,6 +70,7 @@ public class DptXlator8BitSet extends DPTXlator
 {
 	private interface EnumBase<E extends Enum<E> & EnumBase<E>> extends EnumDptBase.EnumBase<E> {}
 
+	@SuppressWarnings("exports")
 	public static class EnumDpt<T extends Enum<T> & EnumBase<T>> extends EnumDptBase<T> {
 		public EnumDpt(final String typeId, final Class<T> elements) {
 			super(typeId, elements, "0", Integer.toString(maxValue(elements)));
