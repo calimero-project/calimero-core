@@ -160,6 +160,9 @@ public class SearchResponse extends ServiceType
 		return desc.getServiceFamilies();
 	}
 
+	/**
+	 * {@return the complete information contained in this response, as list of description information blocks (DIBs)}
+	 */
 	public final Collection<DIB> description() {
 		return desc.getDescription();
 	}

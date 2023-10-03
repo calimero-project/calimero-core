@@ -38,7 +38,6 @@ package io.calimero.knxnetip.servicetype;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.System.Logger.Level;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -169,7 +168,7 @@ public class DescriptionResponse extends ServiceType
 	 */
 	public final List<DIB> getDescription()
 	{
-		return Arrays.asList(dibs.values().toArray(new DIB[0]));
+		return List.copyOf(dibs.values());
 	}
 
 	/**
