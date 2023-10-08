@@ -146,7 +146,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		@Override
 		public void dataConnected(final FrameEvent e) {
 			final var frame = e.getFrame();
-			if (frame instanceof CEMILData data) {
+			if (frame instanceof final CEMILData data) {
 				final byte[] apdu = frame.getPayload();
 				final var source = data.getSource();
 				if (DataUnitBuilder.getAPDUService(apdu) == DEVICE_DESC_RESPONSE) {
@@ -155,7 +155,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 						dd0.accept(source, dd);
 					}
 					catch (final RuntimeException rte) { // KNXIllegalArgumentException for unknown DD0
-						logger.log(INFO, "{0} device descriptor 0 response", source, rte);
+						logger.log(INFO, source + " device descriptor 0 response", rte);
 					}
 				}
 			}

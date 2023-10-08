@@ -40,7 +40,6 @@ import static io.calimero.serial.usb.UsbConnection.EmiType.Cemi;
 import static io.calimero.serial.usb.UsbConnection.EmiType.Emi1;
 import static java.lang.System.Logger.Level.DEBUG;
 import static java.lang.System.Logger.Level.ERROR;
-import static java.lang.System.Logger.Level.INFO;
 import static java.lang.System.Logger.Level.TRACE;
 
 import java.util.EnumSet;
@@ -140,7 +139,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 				// report device descriptor before switching to link layer mode
 				// not all devices provide a device descriptor 0
 				final DD0 dd0 = conn.deviceDescriptor();
-				logger.log(INFO, "Device Descriptor (Mask Version) {0}", dd0);
+				logger.log(DEBUG, "KNX device descriptor 0 (Mask Version): {0}", dd0);
 			}
 			catch (final KNXTimeoutException expected) {}
 
