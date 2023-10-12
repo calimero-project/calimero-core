@@ -239,7 +239,7 @@ public final class Util
 	 *
 	 * @return socket address
 	 */
-	public synchronized static InetSocketAddress getServer()
+	public static synchronized InetSocketAddress getServer()
 	{
 		// we try once to find our running test server, on failure subsequent calls will
 		// immediately return to speed up tests
