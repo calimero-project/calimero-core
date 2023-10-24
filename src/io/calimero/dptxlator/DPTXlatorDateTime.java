@@ -982,7 +982,7 @@ public class DPTXlatorDateTime extends DPTXlator
 						int dow = DAYS.length - 1;
 						while (dow >= 0 && !DAYS[dow].toLowerCase().startsWith(prefix))
 							--dow;
-						final boolean anyday = dow == 0 && t.hasMoreTokens() && t.nextToken().equalsIgnoreCase("day");
+						final boolean anyday = dow == 0 && t.hasMoreTokens() && "day".equalsIgnoreCase(t.nextToken());
 						if (dow <= 0 && !anyday)
 							throw newException("wrong weekday", s, null);
 						set(dst, index, DOW, dow);
