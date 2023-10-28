@@ -65,6 +65,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
@@ -215,7 +216,7 @@ public class Discoverer
 
 		@Override
 		public String toString() {
-			return hostPort(local) + " (" + ni.getName() + ") <- " + response;
+			return hostPort(local) + (ni == null ? "" : " (" + ni.getName() + ")") + " <- " + response;
 		}
 
 		@Override
@@ -225,9 +226,10 @@ public class Discoverer
 				return true;
 			if (!(obj instanceof final Result<?> other))
 				return false;
-			return getNetworkInterface().equals(other.getNetworkInterface())
-					&& localEndpoint().equals(other.localEndpoint())
-					&& getResponse().equals(other.getResponse()) && remote.equals(other.remote);
+			return Objects.equals(getNetworkInterface(), other.getNetworkInterface())
+					&&  Objects.equals(localEndpoint(), other.localEndpoint())
+					&& Objects.equals(getResponse(), other.getResponse())
+					&& Objects.equals(remote, other.remote);
 		}
 
 		@Override
