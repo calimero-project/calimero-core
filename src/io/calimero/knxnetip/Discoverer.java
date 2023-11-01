@@ -66,6 +66,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -484,8 +485,13 @@ public class Discoverer
 		// loopback flag, so we start at most one local search
 		boolean lo = false;
 		final List<CompletableFuture<Void>> cfs = new ArrayList<>();
-		final var responses = Collections.<Result<SearchResponse>>newSetFromMap(new ConcurrentHashMap<>());
+		final Set<Result<SearchResponse>> responses = ConcurrentHashMap.newKeySet();
 		for (final NetworkInterface ni : nifs) {
+			try {
+				if (!ni.isUp())
+					continue;
+			}
+			catch (final SocketException ignore) {}
 			// find one IP address we can use for our search on this interface
 			for (final Enumeration<InetAddress> ea = ni.getInetAddresses(); ea.hasMoreElements();) {
 				final InetAddress a = ea.nextElement();
