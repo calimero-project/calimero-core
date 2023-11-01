@@ -144,7 +144,7 @@ public final class Util
 				d.startSearch(2, true);
 				if (d.getSearchResponses().isEmpty())
 					return null;
-				device = d.getSearchResponses().get(0).getResponse().getDevice().getAddress();
+				device = d.getSearchResponses().get(0).response().getDevice().getAddress();
 			}
 			catch (final InterruptedException e) {
 				e.printStackTrace();
@@ -255,7 +255,7 @@ public final class Util
 				e.printStackTrace();
 			}
 			for (final Result<SearchResponse> r : d.getSearchResponses()) {
-				final SearchResponse res = r.getResponse();
+				final SearchResponse res = r.response();
 				if (testServerId.equals(res.getDevice().getName())) {
 					final InetAddress addr = res.getControlEndpoint().getAddress();
 					server = new InetSocketAddress(addr, res.getControlEndpoint().getPort());
