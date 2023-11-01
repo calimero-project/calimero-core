@@ -420,7 +420,7 @@ public class Discoverer
 		final List<InetAddress> l = Optional.ofNullable(ni).map(NetworkInterface::getInetAddresses)
 				.map(Collections::list).orElse(new ArrayList<>());
 		// use any assigned (IPv4) address of netif, otherwise, use host
-		final InetAddress addr = l.stream().filter(ia -> nat || ia instanceof Inet4Address).findFirst().orElse(host(null));
+		final InetAddress addr = l.stream().filter(ia -> nat || ia instanceof Inet4Address && !ia.isAnyLocalAddress()).findFirst().orElse(host(null));
 
 		final CompletableFuture<Void> cf = search(addr, localPort, ni, Duration.ofSeconds(timeout), responses::add);
 		if (wait) {
@@ -758,7 +758,8 @@ public class Discoverer
 						throws IOException {
 			super(null, false, receiveBufferSize, 0, (int) timeout.toMillis());
 
-			nif = dc.getOption(StandardSocketOptions.IP_MULTICAST_IF);
+			final var mcastIf = dc.getOption(StandardSocketOptions.IP_MULTICAST_IF);
+			nif = mcastIf == null ? Net.defaultNetif : mcastIf;
 			this.localEndpoint = localEndpoint;
 			multicast = true;
 			server = null;
