@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2021 B. Malinowsky
+    Copyright (c) 2019, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ public final class BaosIp {
 
 
 	public static boolean supportsBaos(final Discoverer.Result<SearchResponse> result) {
-		final var mfrDib = result.getResponse().description().stream().filter(ManufacturerDIB.class::isInstance)
+		final var mfrDib = result.response().description().stream().filter(ManufacturerDIB.class::isInstance)
 				.map(ManufacturerDIB.class::cast).filter(dib -> dib.getStructLength() == 8).findFirst();
 		if (mfrDib.isEmpty())
 			return false;

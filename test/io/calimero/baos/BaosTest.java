@@ -76,7 +76,7 @@ class BaosTest {
 	static void init() throws InterruptedException, ExecutionException {
 		final var discoverer = new Discoverer(0, true);
 		list = new ArrayList<>(discoverer.timeout(Duration.ofSeconds(2)).search().get());
-		list.removeIf(r -> !r.getResponse().getDevice().getName()
+		list.removeIf(r -> !r.response().getDevice().getName()
 				.contains("calimero-core knx test-server"));
 		if (list.isEmpty())
 			fail("no KNX IP server found");

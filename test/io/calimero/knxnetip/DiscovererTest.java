@@ -36,6 +36,7 @@
 
 package io.calimero.knxnetip;
 
+import static io.calimero.knxnetip.util.Srp.withService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -43,7 +44,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static io.calimero.knxnetip.util.Srp.withService;
 
 import java.net.InetSocketAddress;
 import java.net.SocketException;
@@ -65,8 +65,6 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.opentest4j.AssertionFailedError;
 
-import tag.KnxnetIP;
-import tag.Slow;
 import io.calimero.KNXException;
 import io.calimero.KNXIllegalArgumentException;
 import io.calimero.Util;
@@ -75,6 +73,8 @@ import io.calimero.knxnetip.Discoverer.Result;
 import io.calimero.knxnetip.servicetype.DescriptionResponse;
 import io.calimero.knxnetip.servicetype.SearchResponse;
 import io.calimero.knxnetip.util.ServiceFamiliesDIB.ServiceFamily;
+import tag.KnxnetIP;
+import tag.Slow;
 
 
 @KnxnetIP
@@ -191,7 +191,7 @@ class DiscovererTest
 		final List<Result<SearchResponse>> search = d.getSearchResponses();
 		assertFalse(search.isEmpty());
 		for (final Result<SearchResponse> result : search) {
-			final SearchResponse response = result.getResponse();
+			final SearchResponse response = result.response();
 			assertNotNull(response);
 			assertNotNull(result.localEndpoint().getAddress());
 			assertNotEquals(0, result.localEndpoint().getPort());
@@ -237,7 +237,7 @@ class DiscovererTest
 		final List<Result<SearchResponse>> search = d.getSearchResponses();
 		assertFalse(search.isEmpty(), "search results > 0");
 		for (final Result<SearchResponse> result : search) {
-			final SearchResponse response = result.getResponse();
+			final SearchResponse response = result.response();
 			assertNotNull(response);
 		}
 
