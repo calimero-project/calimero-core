@@ -921,7 +921,7 @@ public class TpuartConnection implements Connection<byte[]>
 		private byte[] createBusmonInd(final byte[] tp1)
 		{
 			final int seq = busmonSequence;
-			busmonSequence = (busmonSequence + 1) % 8;
+			busmonSequence = (seq + 1) % 8;
 			// provide 32 bit timestamp with 1 us precision
 			final long timestamp = (System.nanoTime() / 1000) & 0xFFFFFFFFL;
 			// NYI we could at least set frame error in status
