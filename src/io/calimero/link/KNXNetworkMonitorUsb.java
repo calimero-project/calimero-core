@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2022 B. Malinowsky
+    Copyright (c) 2015, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ import io.calimero.link.BcuSwitcher.BcuMode;
 import io.calimero.link.medium.KNXMediumSettings;
 import io.calimero.link.medium.PLSettings;
 import io.calimero.serial.KNXPortClosedException;
+import io.calimero.serial.usb.Device;
 import io.calimero.serial.usb.UsbConnection;
 import io.calimero.serial.usb.UsbConnectionFactory;
 
@@ -84,7 +85,7 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 	public KNXNetworkMonitorUsb(final int vendorId, final int productId, final KNXMediumSettings settings)
 		throws KNXException, InterruptedException
 	{
-		this(UsbConnectionFactory.open(vendorId, productId), settings);
+		this(UsbConnectionFactory.open(new Device(vendorId, productId)), settings);
 	}
 
 	/**
