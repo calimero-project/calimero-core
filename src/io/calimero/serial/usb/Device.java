@@ -65,7 +65,7 @@ public record Device(int vendorId, int productId, String serialNumber, String ma
 
 	@Override
 	public String toString() {
-		var joiner = new StringJoiner(" ").add(String.format("%04x:%04x", vendorId, productId));
+		final var joiner = new StringJoiner(" ").add(String.format("%04x:%04x", vendorId, productId));
 		if (!manufacturer.isEmpty())
 			joiner.add(manufacturer);
 		if (!product.isEmpty())

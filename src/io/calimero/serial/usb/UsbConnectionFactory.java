@@ -50,7 +50,7 @@ public final class UsbConnectionFactory {
 
 	private UsbConnectionFactory() {}
 
-	public static UsbConnection open(Device device) throws KNXException {
+	public static UsbConnection open(final Device device) throws KNXException {
 		try {
 			return factory.open(p -> p.open(device));
 		}

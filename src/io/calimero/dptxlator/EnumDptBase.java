@@ -102,8 +102,8 @@ class EnumDptBase<T extends Enum<T> & EnumDptBase.EnumBase<T>> extends DPT {
 
 	@Override
 	public String toString() {
-		return getID() + ": " + getDescription() + ", enumeration [" +
-				getLowerValue() + ".." + getUpperValue() + "]";
+		return getID() + ": " + getDescription() + ", enumeration ["
+				+ getLowerValue() + ".." + getUpperValue() + "]";
 	}
 
 	private static final String regex = "(\\p{Lower})\\B([A-Z])";

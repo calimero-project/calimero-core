@@ -86,9 +86,9 @@ public final class Settings
 	{
 		if (!verbose)
 			return library + " " + version;
-		return library + " version " + version + " - " + desc + sep +
-				group + ", " + tuwien + sep +
-				copyright;
+		return library + " version " + version + " - " + desc + sep
+				+ group + ", " + tuwien + sep
+				+ copyright;
 	}
 
 	/**
