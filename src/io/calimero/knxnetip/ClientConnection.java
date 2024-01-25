@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2023 B. Malinowsky
+    Copyright (c) 2010, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@ import java.lang.System.Logger.Level;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -453,10 +454,14 @@ public abstract class ClientConnection extends ConnectionBase
 		private static final int HEARTBEAT_INTERVAL = 60;
 		private static final int MAX_REQUEST_ATTEMPTS = 4;
 
+		private static final Duration repetitionInterval = Duration.ofMillis(1000);
+
 		private volatile boolean stop;
 		private volatile Thread thread;
 		private final ReentrantLock lock = new ReentrantLock();
 		private final Condition received = lock.newCondition();
+
+		private ConnectionstateResponse response;
 
 		@Override
 		public void run()
@@ -467,22 +472,33 @@ public abstract class ClientConnection extends ConnectionBase
 			try {
 				while (!stop) {
 					Thread.sleep(HEARTBEAT_INTERVAL * 1000);
+
+					ConnectionstateResponse res = null;
 					int i = 0;
 					for (; i < MAX_REQUEST_ATTEMPTS; i++) {
 						logger.log(TRACE, "sending connection state request, attempt " + (i + 1));
 						lock.lock();
+						response = null;
 						try {
 							send(buf, ctrlEndpt);
-							if (received.await(CONNECTIONSTATE_REQ_TIMEOUT, TimeUnit.SECONDS))
-								break;
+							received.await(CONNECTIONSTATE_REQ_TIMEOUT, TimeUnit.SECONDS);
+							res = response;
 						}
 						finally {
 							lock.unlock();
 						}
+						// check if there was a response (or timeout)
+						if (res != null) {
+							if (res.getStatus() == ErrorCodes.NO_ERROR)
+								break;
+							logger.log(WARNING, "connection state response: {0} (channel {1})", res.getStatusString(), channelId);
+							Thread.sleep(repetitionInterval.toMillis());
+						}
 					}
-					// disconnect on no reply
+					// disconnect after max attempts
 					if (i == MAX_REQUEST_ATTEMPTS) {
-						close(CloseEvent.INTERNAL, "no heartbeat response", WARNING, null);
+						final String reason = res != null ? res.getStatusString() : "no heartbeat response";
+						close(CloseEvent.INTERNAL, reason, WARNING, null);
 						break;
 					}
 				}
@@ -512,19 +528,14 @@ public abstract class ClientConnection extends ConnectionBase
 			}
 		}
 
-		void setResponse(final ConnectionstateResponse res)
-		{
-			if (res.getStatus() == ErrorCodes.NO_ERROR) {
-				lock.lock();
-				try {
-					received.signal();
-				}
-				finally {
-					lock.unlock();
-				}
+		void setResponse(final ConnectionstateResponse res) {
+			lock.lock();
+			try {
+				response = res;
+				received.signal();
+			} finally {
+				lock.unlock();
 			}
-			else
-				logger.log(WARNING, "connection state response: {0} (channel {1})", res.getStatusString(), channelId);
 		}
 	}
 }
