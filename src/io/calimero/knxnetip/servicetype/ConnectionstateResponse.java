@@ -1,7 +1,7 @@
 /*
     Calimero 2 - A library for KNX network access
     Copyright (c) 2005 B. Erb
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -59,13 +59,11 @@ public class ConnectionstateResponse extends ServiceType
 	private final int status;
 
 	/**
-	 * Creates a connection state response out of a byte array.
-	 * <p>
+	 * Creates a connection-state response out of a byte array.
 	 *
-	 * @param data byte array containing a connection state response structure
+	 * @param data byte array containing a connection-state response structure
 	 * @param offset start offset of response in {@code data}
-	 * @throws KNXFormatException if no connection state response was found or invalid
-	 *         structure
+	 * @throws KNXFormatException if no connection state response was found or invalid structure
 	 */
 	public ConnectionstateResponse(final byte[] data, final int offset) throws KNXFormatException
 	{
@@ -77,8 +75,7 @@ public class ConnectionstateResponse extends ServiceType
 	}
 
 	/**
-	 * Creates a new connection state request.
-	 * <p>
+	 * Creates a new connection-state response.
 	 *
 	 * @param channelID communication channel ID passed with the corresponding connection
 	 *        state request, 0 &lt;= id &lt;= 255
@@ -96,10 +93,7 @@ public class ConnectionstateResponse extends ServiceType
 	}
 
 	/**
-	 * Returns the communication channel ID used for the response.
-	 * <p>
-	 *
-	 * @return channel ID as unsigned byte
+	 * {@return the communication channel ID used for the response, channel ID is an unsigned byte}
 	 */
 	public final int getChannelID()
 	{
@@ -107,10 +101,7 @@ public class ConnectionstateResponse extends ServiceType
 	}
 
 	/**
-	 * Returns the status of the connection.
-	 * <p>
-	 *
-	 * @return status code as unsigned byte
+	 * {@return the status code of the connection as unsigned byte}
 	 */
 	public final int getStatus()
 	{
@@ -118,10 +109,7 @@ public class ConnectionstateResponse extends ServiceType
 	}
 
 	/**
-	 * Returns a textual representation of the status code.
-	 * <p>
-	 *
-	 * @return short description of status as string
+	 * {@return a short textual description of the status code}
 	 */
 	public String getStatusString()
 	{

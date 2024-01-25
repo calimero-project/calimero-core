@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ import io.calimero.cemi.CEMI;
  * Point-to-point logical connections:<br>
  * Implementations with connectionless protocols, like UDP, shall provide heartbeat
  * monitoring as defined by the KNX specification to check the connection state.
- * Connection state messages are sent regularly, every 60 seconds, to the connected
+ * Connection-state messages are sent regularly, every 60 seconds, to the connected
  * server. If the message is not responded to within a timeout of 10 seconds, it is
  * repeated 3 times, and on no response the connection will be terminated.
  * <p>

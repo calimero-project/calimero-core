@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2021, 2022 B. Malinowsky
+    Copyright (c) 2021, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ import io.calimero.knxnetip.util.Srp;
 import io.calimero.link.medium.KNXMediumSettings;
 
 /**
- * KNXnet/IP discovery and retrieval of self description for TCP capable KNX devices, supporting both plain and
+ * KNXnet/IP discovery and retrieval of self-description for TCP capable KNX devices, supporting both plain and
  * KNX IP Secure connections.
  */
 public class DiscovererTcp {

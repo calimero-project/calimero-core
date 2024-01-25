@@ -334,7 +334,7 @@ public abstract class ClientConnection extends ConnectionBase
 			setStateNotify(ACK_ERROR);
 		}
 		else if (svc == KNXnetIPHeader.CONNECTIONSTATE_REQ)
-			logger.log(WARNING, "received connection state request - ignored");
+			logger.log(WARNING, "received connection-state request - ignored");
 		else if (svc == KNXnetIPHeader.CONNECTIONSTATE_RES) {
 			if (checkVersion(h))
 				heartbeat.setResponse(new ConnectionstateResponse(data, offset));
@@ -449,7 +449,7 @@ public abstract class ClientConnection extends ConnectionBase
 
 	private final class HeartbeatMonitor implements Runnable
 	{
-		// client SHALL wait 10 seconds for a connection state response from server
+		// client SHALL wait 10 seconds for a connection-state response from server
 		private static final int CONNECTIONSTATE_REQ_TIMEOUT = 10;
 		private static final int HEARTBEAT_INTERVAL = 60;
 		private static final int MAX_REQUEST_ATTEMPTS = 4;
@@ -476,7 +476,7 @@ public abstract class ClientConnection extends ConnectionBase
 					ConnectionstateResponse res = null;
 					int i = 0;
 					for (; i < MAX_REQUEST_ATTEMPTS; i++) {
-						logger.log(TRACE, "sending connection state request, attempt " + (i + 1));
+						logger.log(TRACE, "sending connection-state request, attempt " + (i + 1));
 						lock.lock();
 						response = null;
 						try {
@@ -491,7 +491,7 @@ public abstract class ClientConnection extends ConnectionBase
 						if (res != null) {
 							if (res.getStatus() == ErrorCodes.NO_ERROR)
 								break;
-							logger.log(WARNING, "connection state response: {0} (channel {1})", res.getStatusString(), channelId);
+							logger.log(INFO, "connection-state response (channel {0}): {1}", channelId, res.getStatusString());
 							Thread.sleep(repetitionInterval.toMillis());
 						}
 					}

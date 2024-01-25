@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ import io.calimero.link.KNXLinkClosedException;
  * Represents a transport layer logical connection destination.
  * <p>
  * It keeps the settings used for communication with a destination and maintains the logical
- * connection state. In connection oriented mode, a timer is used to detect the connection
+ * connection state. In connection-oriented mode, a timer is used to detect the connection
  * timeout and send a disconnect.<br>
  * The actual layer 4 communication is done by a {@link TransportLayer} (the aggregator
  * for the destination) specified with the {@link AggregatorProxy}.
