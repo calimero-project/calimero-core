@@ -1,7 +1,7 @@
 /*
     Calimero 2 - A library for KNX network access
     Copyright (c) 2005 B. Erb
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,9 +44,9 @@ import io.calimero.KNXIllegalArgumentException;
 import io.calimero.knxnetip.util.HPAI;
 
 /**
- * Represents a KNXnet/IP connection state request.
+ * Represents a KNXnet/IP connection-state request.
  * <p>
- * Connection state requests are sent by a client during an established client / server
+ * Connection-state requests are sent by a client during an established client/server
  * communication connection to check the connection state, i.e., they are part of a
  * heartbeat monitoring procedure.
  * <p>
@@ -62,12 +62,11 @@ public class ConnectionstateRequest extends ServiceType
 	private final HPAI endpt;
 
 	/**
-	 * Creates a connection state request out of a byte array.
-	 * <p>
+	 * Creates a connection-state request out of a byte array.
 	 *
-	 * @param data byte array containing a connection state request structure
+	 * @param data byte array containing a connection-state request structure
 	 * @param offset start offset of request in {@code data}
-	 * @throws KNXFormatException if no connection state request was found or invalid
+	 * @throws KNXFormatException if no connection-state request was found or invalid
 	 *         structure
 	 */
 	public ConnectionstateRequest(final byte[] data, final int offset) throws KNXFormatException
@@ -80,11 +79,9 @@ public class ConnectionstateRequest extends ServiceType
 	}
 
 	/**
-	 * Creates a new connection state request.
-	 * <p>
+	 * Creates a new connection-state request.
 	 *
-	 * @param channelID communication channel ID of the open connection, 0 &lt;= id &lt;=
-	 *        255
+	 * @param channelID communication channel ID of the open connection, 0 &lt;= id &lt;= 255
 	 * @param ctrlEP control endpoint of the client
 	 */
 	public ConnectionstateRequest(final int channelID, final HPAI ctrlEP)
@@ -97,11 +94,7 @@ public class ConnectionstateRequest extends ServiceType
 	}
 
 	/**
-	 * Returns the communication channel ID of the connection this connection state
-	 * request belongs to.
-	 * <p>
-	 *
-	 * @return channel ID as unsigned byte
+	 * {@return the communication channel ID this connection-state request belongs to, channel ID is an unsigned byte}
 	 */
 	public final int getChannelID()
 	{
@@ -109,10 +102,7 @@ public class ConnectionstateRequest extends ServiceType
 	}
 
 	/**
-	 * Returns the client control endpoint the server replies to.
-	 * <p>
-	 *
-	 * @return control endpoint in a HPAI
+	 * {@return the client control endpoint the server shall reply to}
 	 */
 	public final HPAI getControlEndpoint()
 	{
@@ -128,10 +118,6 @@ public class ConnectionstateRequest extends ServiceType
 		return 2 + endpt.getStructLength();
 	}
 
-	/* (non-Javadoc)
-	 * @see io.calimero.knxnetip.servicetype.ServiceType#toByteArray
-	 *      (java.io.ByteArrayOutputStream)
-	 */
 	@Override
 	byte[] toByteArray(final ByteArrayOutputStream os)
 	{

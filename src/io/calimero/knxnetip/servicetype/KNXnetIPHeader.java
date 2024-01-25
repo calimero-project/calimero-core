@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -75,12 +75,12 @@ public class KNXnetIPHeader
 	public static final int CONNECT_RES = 0x0206;
 
 	/**
-	 * Service type identifier for a connection state request.
+	 * Service type identifier for a connection-state request.
 	 */
 	public static final int CONNECTIONSTATE_REQ = 0x0207;
 
 	/**
-	 * Service type identifier for a connection state response.
+	 * Service type identifier for a connection-state response.
 	 */
 	public static final int CONNECTIONSTATE_RES = 0x0208;
 

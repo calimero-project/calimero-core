@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2023 B. Malinowsky
+    Copyright (c) 2010, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -329,7 +329,7 @@ public abstract class ClientConnection extends ConnectionBase
 			setStateNotify(ACK_ERROR);
 		}
 		else if (svc == KNXnetIPHeader.CONNECTIONSTATE_REQ)
-			logger.warn("received connection state request - ignored");
+			logger.warn("received connection-state request - ignored");
 		else if (svc == KNXnetIPHeader.CONNECTIONSTATE_RES) {
 			if (checkVersion(h))
 				heartbeat.setResponse(new ConnectionstateResponse(data, offset));
@@ -472,7 +472,7 @@ public abstract class ClientConnection extends ConnectionBase
 					ConnectionstateResponse res = null;
 					int i = 0;
 					for (; i < MAX_REQUEST_ATTEMPTS; i++) {
-						logger.trace("sending connection state request, attempt " + (i + 1));
+						logger.trace("sending connection-state request, attempt " + (i + 1));
 						lock.lock();
 						response = null;
 						try {
@@ -487,7 +487,7 @@ public abstract class ClientConnection extends ConnectionBase
 						if (res != null) {
 							if (res.getStatus() == ErrorCodes.NO_ERROR)
 								break;
-							logger.warn("connection state response: {} (channel {})", res.getStatusString(), channelId);
+							logger.warn("connection-state response: {} (channel {})", res.getStatusString(), channelId);
 							Thread.sleep(repetitionInterval.toMillis());
 						}
 					}
