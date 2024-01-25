@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2023 B. Malinowsky
+    Copyright (c) 2015, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -81,6 +81,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 
 	private final EnumSet<UsbConnection.EmiType> emiTypes;
 	private UsbConnection.EmiType activeEmi;
+	private volatile boolean offline;
 
 	/**
 	 * Creates a new network link for accessing the KNX network over a USB connection, using a USB
@@ -129,9 +130,6 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 	{
 		super(c, c.name(), settings);
 		try {
-			if (!conn.isKnxConnectionActive())
-				throw new KNXLinkClosedException("USB interface is not connected to KNX network");
-
 			emiTypes = conn.supportedEmiTypes();
 			if (!trySetActiveEmi(Cemi) && !trySetActiveEmi(UsbConnection.EmiType.Emi2) && !trySetActiveEmi(Emi1)) {
 				throw new KNXLinkClosedException("failed to set active any supported EMI type");
@@ -150,9 +148,14 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 				public void frameReceived(final FrameEvent e) {}
 
 				@ConnectionEvent
-				void connectionStatus(final ConnectionStatus status) { notifyConnectionStatus(status); }
+				void connectionStatus(final ConnectionStatus status) {
+					offline = status == ConnectionStatus.Offline;
+					notifyConnectionStatus(status);
+				}
 			});
 			notifier.registerEventType(ConnectionStatus.class);
+			// init offline variable to current knx connection status
+			conn.isKnxConnectionActive();
 
 			linkLayerMode();
 		}
@@ -169,6 +172,15 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 		mediumType();
 		setMaxApduLength();
 		disableFilters();
+	}
+
+	@Override
+	public void addLinkListener(NetworkLinkListener l) {
+		super.addLinkListener(l);
+		// make sure a new listener (which is probably the main link listener) gets an immediate notification
+		// if the usb knx connection is currently disrupted
+		if (offline)
+			notifyConnectionStatus(ConnectionStatus.Offline);
 	}
 
 	@Override
@@ -294,7 +306,5 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 		conn.send(frame.toByteArray(), BlockingMode.Confirmation);
 	}
 
-	private void notifyConnectionStatus(final ConnectionStatus status) {
-		notifier.dispatchCustomEvent(status);
-	}
+	private void notifyConnectionStatus(final ConnectionStatus status) { dispatchCustomEvent(status); }
 }

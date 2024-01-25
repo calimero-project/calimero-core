@@ -72,7 +72,7 @@ import io.calimero.log.LogService;
 public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNetworkMonitor
 {
 	/** Implements KNXListener to listen to the monitor connection. */
-	protected final MonitorNotifier notifier;
+	protected final EventNotifier<LinkListener> notifier;
 	protected final Logger logger;
 
 	final T conn;
@@ -196,7 +196,7 @@ public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNet
 	@Override
 	public final void setDecodeRawFrames(final boolean decode)
 	{
-		notifier.decode = decode;
+		((MonitorNotifier) notifier).decode = decode;
 		logger.log(INFO, (decode ? "enable" : "disable") + " decoding of raw frames");
 	}
 
@@ -239,7 +239,7 @@ public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNet
 	public String toString()
 	{
 		return "monitor " + getName() + " " + medium.getMediumString() + " medium"
-				+ (notifier.decode ? ", raw frame decoding" : "") + (closed ? " (closed)" : "");
+				+ (((MonitorNotifier) notifier).decode ? ", raw frame decoding" : "") + (closed ? " (closed)" : "");
 	}
 
 	/**
@@ -257,4 +257,8 @@ public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNet
 	@SuppressWarnings("unused")
 	protected void leaveBusmonitor() throws InterruptedException
 	{}
+
+	void dispatchCustomEvent(final Object event) {
+		notifier.dispatchCustomEvent(event);
+	}
 }

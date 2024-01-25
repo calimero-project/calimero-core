@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2023 B. Malinowsky
+    Copyright (c) 2015, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,14 +46,18 @@ import java.util.EnumSet;
 
 import io.calimero.Connection.BlockingMode;
 import io.calimero.DeviceDescriptor.DD0;
+import io.calimero.FrameEvent;
 import io.calimero.KNXException;
 import io.calimero.KNXFormatException;
+import io.calimero.KNXListener;
 import io.calimero.KNXTimeoutException;
 import io.calimero.cemi.CEMI;
 import io.calimero.cemi.CEMIDevMgmt;
 import io.calimero.link.BcuSwitcher.BcuMode;
 import io.calimero.link.medium.KNXMediumSettings;
 import io.calimero.link.medium.PLSettings;
+import io.calimero.serial.ConnectionEvent;
+import io.calimero.serial.ConnectionStatus;
 import io.calimero.serial.KNXPortClosedException;
 import io.calimero.serial.usb.Device;
 import io.calimero.serial.usb.UsbConnection;
@@ -71,6 +75,7 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 
 	private final EnumSet<UsbConnection.EmiType> emiTypes;
 	private UsbConnection.EmiType activeEmi;
+	private volatile boolean offline;
 
 	/**
 	 * Creates a new network monitor for accessing the KNX network over a USB connection.
@@ -117,8 +122,6 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 	{
 		super(c, c.name(), settings);
 		try {
-			if (!conn.isKnxConnectionActive())
-				throw new KNXLinkClosedException("USB interface is not connected to KNX network");
 			emiTypes = conn.supportedEmiTypes();
 			if (!trySetActiveEmi(Cemi) && !trySetActiveEmi(Emi2) && !trySetActiveEmi(Emi1)) {
 				throw new KNXLinkClosedException("failed to set active any supported EMI type");
@@ -133,13 +136,35 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 
 			final boolean extBusmon = settings instanceof PLSettings;
 			enterBusmonitor(extBusmon);
+			conn.addConnectionListener(notifier);
+			conn.addConnectionListener(new KNXListener() {
+				@Override
+				public void frameReceived(final FrameEvent e) {}
+
+				@ConnectionEvent
+				void connectionStatus(final ConnectionStatus status) {
+					offline = status == ConnectionStatus.Offline;
+					notifyConnectionStatus(status);
+				}
+			});
+			notifier.registerEventType(ConnectionStatus.class);
+			// init offline variable to current knx connection status
+			conn.isKnxConnectionActive();
 		}
 		catch (final KNXException e) {
 			close();
 			throw e;
 		}
 		logger.log(INFO, "in busmonitor mode - ready to receive");
-		conn.addConnectionListener(notifier);
+	}
+
+	@Override
+	public void addMonitorListener(final LinkListener l) {
+		super.addMonitorListener(l);
+		// make sure a new listener (which is probably the main link listener) gets an immediate notification
+		// if the usb knx connection is currently disrupted
+		if (offline)
+			notifyConnectionStatus(ConnectionStatus.Offline);
 	}
 
 	private boolean trySetActiveEmi(final UsbConnection.EmiType active)
@@ -196,4 +221,6 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 			conn.send(switchNormal, BlockingMode.Confirmation);
 		}
 	}
+
+	private void notifyConnectionStatus(final ConnectionStatus status) { dispatchCustomEvent(status); }
 }
