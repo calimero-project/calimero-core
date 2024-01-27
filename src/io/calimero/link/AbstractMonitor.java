@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2022 B. Malinowsky
+    Copyright (c) 2015, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -178,10 +178,7 @@ public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNet
 	}
 
 	@Override
-	public void addMonitorListener(final LinkListener l)
-	{
-		notifier.addListener(l);
-	}
+	public void addMonitorListener(final LinkListener l) { notifier.addListener(l); }
 
 	@Override
 	public void removeMonitorListener(final LinkListener l)
@@ -242,8 +239,7 @@ public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNet
 	 * Invoked on {@link #close()} to execute additional close sequences of the communication
 	 * protocol, or releasing link-specific resources.
 	 */
-	protected void onClose()
-	{}
+	protected void onClose() {}
 
 	/**
 	 * Invoked on {@link #close()} to allow the communication protocol to leave busmonitor mode.
@@ -251,8 +247,7 @@ public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNet
 	 * @throws InterruptedException on interrupted thread
 	 */
 	@SuppressWarnings("unused")
-	protected void leaveBusmonitor() throws InterruptedException
-	{}
+	protected void leaveBusmonitor() throws InterruptedException {}
 
 	void dispatchCustomEvent(final Object event) {
 		notifier.dispatchCustomEvent(event);

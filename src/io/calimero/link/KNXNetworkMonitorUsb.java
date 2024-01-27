@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2023 B. Malinowsky
+    Copyright (c) 2015, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -128,12 +128,14 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 				// report device descriptor before switching to busmonitor mode
 				// not all devices provide a device descriptor 0
 				final DD0 dd0 = conn.deviceDescriptor();
-				logger.info("Device Descriptor (Mask Version) {}", dd0);
+				logger.debug("KNX device descriptor 0 (Mask Version): {}", dd0);
 			}
 			catch (final KNXTimeoutException expected) {}
 
 			final boolean extBusmon = settings instanceof PLSettings;
 			enterBusmonitor(extBusmon);
+			logger.debug("in busmonitor mode - ready to receive");
+
 			conn.addConnectionListener(notifier);
 			conn.addConnectionListener(new KNXListener() {
 				@Override
@@ -153,7 +155,6 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 			close();
 			throw e;
 		}
-		logger.info("in busmonitor mode - ready to receive");
 	}
 
 	@Override
