@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2022 B. Malinowsky
+    Copyright (c) 2010, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -71,17 +71,6 @@ public abstract class UdpSocketLooper
 	private final boolean closeSocket;
 	private volatile boolean quit;
 
-	/**
-	 * Creates a socket looper for the supplied UDP socket.
-	 *
-	 * @param socket the UDP socket to loop on
-	 * @param closeSocket {@code true} to close the socket on {@link #quit()},
-	 *        {@code false} otherwise
-	 */
-	public UdpSocketLooper(final DatagramSocket socket, final boolean closeSocket)
-	{
-		this(socket, closeSocket, 512, 0, 0);
-	}
 
 	/**
 	 * Creates a socket looper for the supplied UDP socket and timeout parameters.
