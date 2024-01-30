@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,6 +35,8 @@
 */
 
 package io.calimero.datapoint;
+
+import java.util.Objects;
 
 import io.calimero.GroupAddress;
 import io.calimero.Priority;
@@ -294,6 +296,16 @@ public abstract class Datapoint
 		doSave(w);
 		w.writeEndElement();
 	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return (this == o) || (o instanceof final Datapoint dp)
+				&& stateBased == dp.stateBased && mainNo == dp.mainNo && Objects.equals(main, dp.main)
+				&& Objects.equals(name, dp.name) && Objects.equals(dptId, dp.dptId) && priority == dp.priority;
+	}
+
+	@Override
+	public int hashCode() { return Objects.hash(stateBased, main, name, mainNo, dptId, priority); }
 
 	@Override
 	public String toString()

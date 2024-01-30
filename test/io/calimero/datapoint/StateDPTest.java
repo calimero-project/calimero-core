@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ package io.calimero.datapoint;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -232,5 +233,24 @@ class StateDPTest
 		assertTrue(dp.isUpdating(new GroupAddress(2, 2, 2)));
 		dp.addInvalidatingAddress(new GroupAddress(1, 1, 1));
 		assertFalse(dp.isUpdating(new GroupAddress(1, 1, 1)));
+	}
+
+	@Test
+	void equals() {
+		final StateDP dp1 = new StateDP(ga, "test");
+		final StateDP dp2 = new StateDP(ga, "test", inv, upd);
+		assertNotEquals(dp1, dp2);
+
+		final StateDP dup = new StateDP(ga, "test", inv, upd);
+		assertEquals(dp2, dup);
+		dup.removeAddress(new GroupAddress(1, 1, 1));
+		assertNotEquals(dp2, dup);
+
+		final StateDP dp3 = new StateDP(ga, "test");
+		dp3.setExpirationTimeout(1000);
+
+		assertNotEquals(dp1, dp3);
+		dp3.setExpirationTimeout(0);
+		assertEquals(dp1, dp3);
 	}
 }

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import io.calimero.GroupAddress;
 import io.calimero.KNXIllegalArgumentException;
@@ -261,10 +262,22 @@ public class StateDP extends Datapoint
 	}
 
 	@Override
-	public String toString()
-	{
-		return "state DP " + locations + " " + super.toString();
+	public boolean equals(final Object o) {
+		if (this == o)
+			return true;
+		if (!(o instanceof final StateDP dp))
+			return false;
+		if (!super.equals(o))
+			return false;
+		return timeout == dp.timeout && Objects.equals(invalidating, dp.invalidating)
+				&& Objects.equals(updating, dp.updating) && Objects.equals(locations, dp.locations);
 	}
+
+	@Override
+	public int hashCode() { return Objects.hash(super.hashCode(), invalidating, updating, timeout, locations); }
+
+	@Override
+	public String toString() { return "state DP " + locations + " " + super.toString(); }
 
 	@Override
 	void doLoad(final XmlReader r) throws KNXMLException

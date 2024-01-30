@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 package io.calimero.datapoint;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.Test;
 
@@ -60,5 +61,16 @@ class DatapointTest {
 		assertEquals(Priority.LOW, dp.getPriority());
 		dp.setPriority(Priority.SYSTEM);
 		assertEquals(Priority.SYSTEM, dp.getPriority());
+	}
+
+	@Test
+	void equals() {
+		final Datapoint dp1 = new StateDP(ga, "name1", 1, "1.002");
+		final Datapoint dup = new StateDP(ga, "name1", 1, "1.002");
+		final Datapoint dp2 = new CommandDP(ga, "name1", 1, "1.002");
+
+		assertEquals(dp1, dp1);
+		assertEquals(dp1, dup);
+		assertNotEquals(dp1, dp2);
 	}
 }
