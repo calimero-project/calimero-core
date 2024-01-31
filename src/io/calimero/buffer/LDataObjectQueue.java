@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -63,46 +63,11 @@ public class LDataObjectQueue extends LDataObject
 {
 	/**
 	 * Represents an item in the queue, holding one L-Data frame and its timestamp.
+	 *
+	 * @param frame L-Data frame
+	 * @param timestamp timestamp
 	 */
-	public static final class QueueItem
-	{
-		private final CEMILData f;
-		private final long ts;
-
-		/**
-		 * Creates a new QueueItem.
-		 *
-		 * @param frame item L-Data frame
-		 * @param timestamp item timestamp
-		 */
-		public QueueItem(final CEMILData frame, final long timestamp)
-		{
-			f = frame;
-			ts = timestamp;
-		}
-
-		/**
-		 * Returns the timestamp for this item.
-		 * <p>
-		 *
-		 * @return timestamp as long
-		 */
-		public long getTimestamp()
-		{
-			return ts;
-		}
-
-		/**
-		 * Returns the L-Data frame for this item.
-		 * <p>
-		 *
-		 * @return L-Data frame
-		 */
-		public CEMILData getFrame()
-		{
-			return f;
-		}
-	}
+	public record QueueItem(CEMILData frame, long timestamp) {}
 
 	private static final int STD_BUFSIZE = 30;
 	private int next;

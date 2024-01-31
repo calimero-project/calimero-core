@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -708,8 +708,8 @@ public class ManagementClientImpl implements ManagementClient
 		int elemsInAsdu = elements;
 		if (elements > 1) {
 			final var data = readPropertyDesc(dst, objIndex, propertyId, 0);
-			final var desc = new Description(0, data);
-			final int typeSize = Math.max(8, PropertyTypes.bitSize(desc.getPDT()).orElse(8)) / 8;
+			final var desc = Description.from(0, data);
+			final int typeSize = Math.max(8, PropertyTypes.bitSize(desc.pdt()).orElse(8)) / 8;
 			elemsInAsdu = (maxAsduLength - 4) / typeSize;
 		}
 
@@ -932,7 +932,7 @@ public class ManagementClientImpl implements ManagementClient
 				throw new KNXRemoteException("property description type " + rcvPropDescType + " not supported");
 
 			if (objTypeOk && oiOk && pidOk && pidxOk)
-				return Description.of(0, Arrays.copyOfRange(apdu, 2, apdu.length));
+				return Description.fromExtended(0, Arrays.copyOfRange(apdu, 2, apdu.length));
 
 			logger.log(WARNING, "wrong description response for {0}({1})|{2} prop idx {3} (got {4}({5})|{6} (idx {7}))",
 					objectType, objInstance, propertyId, propertyIndex, rcvObjectType, rcvObjInstance, rcvPropertyId,
@@ -961,7 +961,7 @@ public class ManagementClientImpl implements ManagementClient
 	public Description readPropertyDescription(final Destination dst, final int objIndex, final int propertyId,
 			final int propertyIndex) throws KNXTimeoutException, KNXRemoteException, KNXDisconnectException,
 			KNXLinkClosedException, InterruptedException {
-		return new Description(0, readPropertyDesc(dst, objIndex, propertyId, propertyIndex));
+		return Description.from(0, readPropertyDesc(dst, objIndex, propertyId, propertyIndex));
 	}
 
 	private static final boolean useExtPropertyServices = false;

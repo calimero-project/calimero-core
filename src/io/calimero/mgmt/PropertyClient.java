@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import io.calimero.KNXException;
 import io.calimero.KNXFormatException;
@@ -220,221 +221,67 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 * associated property. If the property is defined globally, the global object type
 	 * {@link PropertyClient.PropertyKey#GLOBAL_OBJTYPE} is used.
 	 *
+	 * @param objectType object type of the property
+	 * @param pid property identifier
+	 *
 	 * @author B. Malinowsky
 	 */
-	public static final class PropertyKey implements Comparable<PropertyKey>
-	{
+	public record PropertyKey(int objectType, int pid) implements Comparable<PropertyKey> {
 		/** Identifier for a property defined with global object type. */
 		public static final int GLOBAL_OBJTYPE = -1;
-
-		private final int ot;
-		private final int id;
 
 		/**
 		 * Creates a new key for a global defined property.
 		 *
 		 * @param pid property identifier
 		 */
-		public PropertyKey(final int pid) {
-			ot = GLOBAL_OBJTYPE;
-			id = pid;
-		}
+		public PropertyKey(final int pid) { this(GLOBAL_OBJTYPE, pid); }
 
 		/**
-		 * Creates a new key for a property.
-		 *
-		 * @param objType object type of the property
-		 * @param pid property identifier
-		 */
-		public PropertyKey(final int objType, final int pid) {
-			ot = objType;
-			id = pid;
-		}
-
-		/**
-		 * {@return the property identifier (PID) part of this key as unsigned number}
-		 */
-		public int getPID() {
-			return id;
-		}
-
-		/**
-		 * Returns whether the property is defined with global object type.
+		 * Returns whether the property is defined within the global object type.
 		 *
 		 * @return {@code true} if property has global object type,
 		 *         {@code false} if property has a specific object type
 		 */
-		public boolean isGlobal() {
-			return ot == GLOBAL_OBJTYPE;
-		}
+		public boolean isGlobal() { return objectType == GLOBAL_OBJTYPE; }
 
 		@Override
-		public int hashCode() {
-			return ot << 16 | id;
-		}
+		public int compareTo(final PropertyKey o) { return Integer.compare(hashCode(), o.hashCode()); }
 
 		@Override
-		public boolean equals(final Object obj) {
-			if (obj instanceof final PropertyKey key)
-				return ot == key.ot && id == key.id;
-			return false;
-		}
-
-		@Override
-		public int compareTo(final PropertyKey o) {
-			final int rhs = o.hashCode();
-			return Integer.compare(hashCode(), rhs);
-		}
-
-		@Override
-		public String toString() {
-			return getObjectTypeName(ot) + " PID " + id;
-		}
+		public String toString() { return getObjectTypeName(objectType) + " PID " + pid; }
 	}
 
 	/**
 	 * Stores property definition information of one property, used for type translation
 	 * and property lookup by a property client.
 	 *
+	 * @param pid property identifier
+	 * @param pidName name of the property ID, i.e., the PID name as string representation
+	 * @param propertyName property name, a friendly readable name of the property
+	 * @param description property description
+	 * @param objectType interface object type the property belongs to
+	 * @param pdt property data type
+	 * @param dpt datapoint type, use {@code Optional.empty()} if no DPT is specified or to
+	 *        indicate default DPT usage
+	 * @param readLevel required access level for property read access, {@code level ≥ 0}
+	 * @param writeLevel required access level for property write access to a write-enabled property, {@code level ≥ 0};
+	 * 		             level is undefined for read-only property
+	 * @param accessPolicy access policy for security modes off/on, or 0 if no policy is set
 	 * @author B. Malinowsky
 	 */
-	public static class Property
-	{
-		final int id;
-		final String name;
-		final String propName;
-		final String description;
-		final int objType;
-		final int pdt;
-		final String dpt;
-		final int read;
-		final int write;
-		final int accessPolicy;
-
-		/**
-		 * Creates a new property object of the supplied information.
-		 *
-		 * @param pid property identifier
-		 * @param pidName name of the property ID
-		 * @param propertyName property name, a friendly readable name for the property
-		 * @param objectType object type the property belongs to
-		 * @param pdt property data type
-		 * @param dpt datapoint type, use {@code null} if no DPT specified or to
-		 *        indicate default DPT usage
-		 */
-		public Property(final int pid, final String pidName, final String propertyName,
-			final int objectType, final int pdt, final String dpt)
-		{
-			this(pid, pidName, propertyName, "n/a", objectType, pdt, dpt, 0, 0, 0);
-		}
-
-		Property(final int pid, final String pidName, final String propertyName, final String description,
-				final int objectType, final int pdt, final String dpt, final int readLevel, final int writeLevel,
-				final int accessPolicy) {
-			id = pid;
-			name = pidName;
-			propName = propertyName;
-			this.description = description;
-			objType = objectType;
-			this.pdt = pdt;
-			this.dpt = dpt;
-			read = readLevel;
-			write = writeLevel;
-			this.accessPolicy = accessPolicy;
-		}
-
-		/**
-		 * Returns the property identifier.
-		 * <p>
-		 *
-		 * @return the PID
-		 */
-		public final int getPID()
-		{
-			return id;
-		}
-
-		/**
-		 * Returns the PID name as string representation.
-		 *
-		 * @return the PID name as string
-		 */
-		public final String getPIDName()
-		{
-			return name;
-		}
-
-		/**
-		 * Returns the interface object type the property belongs to.
-		 * <p>
-		 *
-		 * @return the interface object type
-		 */
-		public final int getObjectType()
-		{
-			return objType;
-		}
-
-		/**
-		 * Returns the property data type used for the property elements.
-		 * <p>
-		 *
-		 * @return the PDT
-		 */
-		public final int getPDT()
-		{
-			return pdt;
-		}
-
-		/**
-		 * @return the datapoint type ID used for the property elements, or an empty optional if no DPT was set
-		 */
-		public final Optional<String> dpt() { return Optional.ofNullable(dpt); }
-
-		/**
-		 * Returns the property friendly name, a more readable name of the property.
-		 *
-		 * @return the property name
-		 */
-		public final String getName()
-		{
-			return propName;
-		}
-
-		public final String description() { return description; }
+	public record Property(int pid, String pidName, String propertyName, String description, int objectType, int pdt,
+	                       Optional<String> dpt, int readLevel, int writeLevel, int accessPolicy) {
 
 		/**
 		 * @return {@code true} if property is read-only, {@code false} if property is write-enabled
 		 */
-		public final boolean readOnly()
-		{
-			return write == -1;
-		}
-
-		/**
-		 * @return required access level for property write access to write-enabled property, {@code level ≥ 0};
-		 *         level is undefined for read-only property
-		 */
-		public final int writeLevel() {
-			return write;
-		}
-
-		/**
-		 * @return required access level for property read access, level &ge; 0
-		 */
-		public final int readLevel() {
-			return read;
-		}
-
-		/**
-		 * @return access policy for security modes off/on, or 0 if no policy is set
-		 */
-		public final int accessPolicy() { return accessPolicy; }
+		public boolean readOnly() { return writeLevel == -1; }
 
 		@Override
 		public String toString() {
-			return name + " (" + id + ") '" + propName + "'" + (objType == -1 ? "" : " OT " + objType) + " PDT " + pdt
-					+ dpt().map(s -> " DPT " + s).orElse("") + " r/w " + read + "/" + (readOnly() ? "-" : write)
+			return pidName + " (" + pid + ") '" + propertyName + "'" + (objectType == -1 ? "" : " OT " + objectType) + " PDT " + pdt
+					+ dpt().map(s -> " DPT " + s).orElse("") + " r/w " + readLevel + "/" + (readOnly() ? "-" : writeLevel)
 					+ accessPolicyString();
 		}
 
@@ -522,7 +369,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	public void addDefinitions(final Collection<Property> definitions)
 	{
 		for (final Property p : definitions) {
-			properties.put(new PropertyKey(p.objType, p.id), p);
+			properties.put(new PropertyKey(p.objectType(), p.pid()), p);
 		}
 	}
 
@@ -712,10 +559,11 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		catch (final KNXRemoteException e) {
 			logger.log(WARNING, "failed to get current number of elements for OI {0} PID {1}: {2}", oi, pid, e.getMessage());
 		}
-		final Description d = new Description(getObjectType(oi, true), Description.parseCurrentElements(data), desc);
-		// workaround for PDT on local DM
+		final Description d = Description.from(getObjectType(oi, true), Description.parseCurrentElements(data), desc);
+		// workaround for PDT on local DM, set pdt -1
 		if (local)
-			d.setPDT(-1);
+			return new Description(d.objectIndex(), d.objectType(), d.objectInstance(), d.pid(), d.propIndex(), -1,
+					d.dpt(), d.writeEnabled(), d.currentElements(), d.maxElements(), d.readLevel(), d.writeLevel());
 		return d;
 	}
 
@@ -752,9 +600,9 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		if (p == null && pid <= 50)
 			p = properties.get(new PropertyKey(pid));
 		if (p != null) {
-			if (p.dpt != null)
+			if (p.dpt().isPresent())
 				try {
-					final DPTXlator t = TranslatorTypes.createTranslator(0, p.dpt);
+					final DPTXlator t = TranslatorTypes.createTranslator(0, p.dpt().get());
 					t.setAppendUnit(false);
 					return t;
 				}
@@ -824,7 +672,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 							final String pidName = reader.getAttributeValue("", PIDNAME_ATTR);
 							final String friendly = reader.getAttributeValue("", NAME_ATTR);
 							final int pdt = toInt(reader.getAttributeValue("", PDT_ATTR));
-							final String dpt = reader.getAttributeValue("", DPT_ATTR);
+							final var dpt = Optional.ofNullable(reader.getAttributeValue("", DPT_ATTR));
 
 							final int[] rw = parseRW(reader.getAttributeValue("", RW_ATTR));
 							final boolean write = parseWriteEnabled(reader.getAttributeValue("", WRITE_ATTR));
@@ -868,23 +716,22 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 			final int noType = -2;
 			int objType = noType;
 			for (final Property p : definitions) {
-				if (p.objType != objType) {
+				if (p.objectType() != objType) {
 					if (objType != noType)
 						writer.writeEndElement();
-					objType = p.objType;
+					objType = p.objectType();
 					writer.writeStartElement(OBJECT_TAG);
 					writer.writeAttribute(OBJECTTYPE_ATTR, objType == -1 ? "global"
 							: Integer.toString(objType));
 				}
 				// property attributes
 				writer.writeStartElement(PROPERTY_TAG);
-				writer.writeAttribute(PID_ATTR, Integer.toString(p.id));
-				writer.writeAttribute(PIDNAME_ATTR, p.name);
-				writer.writeAttribute(NAME_ATTR, p.propName);
+				writer.writeAttribute(PID_ATTR, Integer.toString(p.pid()));
+				writer.writeAttribute(PIDNAME_ATTR, p.pidName());
+				writer.writeAttribute(NAME_ATTR, p.propertyName());
 				writer.writeAttribute(PDT_ATTR, p.pdt == -1 ? "<tbd>" : Integer.toString(p.pdt));
-				if (p.dpt != null && p.dpt.length() > 0)
-					writer.writeAttribute(DPT_ATTR, p.dpt);
-				writer.writeAttribute(RW_ATTR, String.format("%d/%d", p.read, p.write));
+				p.dpt().filter(Predicate.not(String::isEmpty)).ifPresent(dpt -> writer.writeAttribute(DPT_ATTR, dpt));
+				writer.writeAttribute(RW_ATTR, String.format("%d/%d", p.readLevel(), p.writeLevel()));
 				writer.writeAttribute(WRITE_ATTR, p.readOnly() ? "0" : "1");
 				// write property
 				writer.writeStartElement(USAGE_TAG);
