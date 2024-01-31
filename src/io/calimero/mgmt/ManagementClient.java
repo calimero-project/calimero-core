@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -330,26 +330,13 @@ public interface ManagementClient extends AutoCloseable
 	List<byte[]> readNetworkParameter(IndividualAddress remote, int objectType, int pid, byte... testInfo)
 		throws KNXException, InterruptedException;
 
-	final class TestResult {
-		private final IndividualAddress remote;
-		private final byte[] response;
-
-		TestResult(final IndividualAddress remote, final byte[] response) {
-			this.remote = remote;
-			this.response = response;
-		}
-
-		public IndividualAddress remote() {
-			return remote;
-		}
-
-		/**
-		 * @return byte array with response, {@code length > 0}
-		 */
-		public byte[] result() {
-			return response;
-		}
-	}
+	/**
+	 * Test result of reading the configuration of a network parameter using parameter-specific test information.
+	 *
+	 * @param remote address of the remote endpoint which answered the read request
+	 * @param result test result, {@code length > 0}
+	 */
+	record TestResult(IndividualAddress remote, byte[] result) {}
 
 	/**
 	 * Reads the current configuration of a network parameter using broadcast communication mode.
@@ -707,7 +694,7 @@ public interface ManagementClient extends AutoCloseable
 	 */
 	default Description readPropertyDescription(final Destination dst, final int objIndex, final int propertyId,
 			final int propertyIndex) throws KNXException, InterruptedException {
-		return new Description(0, readPropertyDesc(dst, objIndex, propertyId, propertyIndex));
+		return Description.from(0, readPropertyDesc(dst, objIndex, propertyId, propertyIndex));
 	}
 
 	/**

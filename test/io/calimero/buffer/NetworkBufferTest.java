@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,8 +52,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import tag.KnxnetIP;
-import tag.KnxnetIPSequential;
 import io.calimero.FrameEvent;
 import io.calimero.GroupAddress;
 import io.calimero.KNXAddress;
@@ -73,6 +71,8 @@ import io.calimero.link.NetworkLinkListener;
 import io.calimero.link.medium.TPSettings;
 import io.calimero.process.ProcessCommunicator;
 import io.calimero.process.ProcessCommunicatorImpl;
+import tag.KnxnetIP;
+import tag.KnxnetIPSequential;
 
 
 @KnxnetIP
@@ -388,12 +388,12 @@ class NetworkBufferTest
 		write(pc, invalidatingGroup, false);
 		assertTrue(f.hasNewIndication());
 		final QueueItem qi = f.getNextIndication();
-		Debug.printLData(qi.getFrame());
+		Debug.printLData(qi.frame());
 		assertTrue(f.hasNewIndication());
 
 		final QueueItem qi2 = f.getNextIndication();
-		Debug.printLData(qi2.getFrame());
-		assertTrue(qi.getTimestamp() <= (qi2.getTimestamp()), qi.getTimestamp() + ", " + qi2.getTimestamp());
+		Debug.printLData(qi2.frame());
+		assertTrue(qi.timestamp() <= (qi2.timestamp()), qi.timestamp() + ", " + qi2.timestamp());
 
 		assertFalse(f.hasNewIndication());
 
@@ -417,12 +417,12 @@ class NetworkBufferTest
 		assertTrue(f.hasNewIndication());
 
 		QueueItem qi3 = f.getNextIndication();
-		assertEquals(group1, qi3.getFrame().getDestination());
+		assertEquals(group1, qi3.frame().getDestination());
 		assertTrue(f.hasNewIndication());
 		for (int i = 0; i < 10; ++i) {
 			qi3 = f.getNextIndication();
-			assertNull(qi3.getFrame());
-			assertEquals(0, qi3.getTimestamp());
+			assertNull(qi3.frame());
+			assertEquals(0, qi3.timestamp());
 		}
 		assertFalse(f.hasNewIndication());
 	}

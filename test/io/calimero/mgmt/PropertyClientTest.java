@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,7 +51,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import tag.KnxnetIP;
 import io.calimero.CloseEvent;
 import io.calimero.IndividualAddress;
 import io.calimero.KNXException;
@@ -65,6 +64,7 @@ import io.calimero.link.medium.TPSettings;
 import io.calimero.mgmt.PropertyAccess.PID;
 import io.calimero.mgmt.PropertyClient.XmlPropertyDefinitions;
 import io.calimero.xml.XmlInputFactory;
+import tag.KnxnetIP;
 
 
 @KnxnetIP
@@ -201,15 +201,15 @@ class PropertyClientTest
 		printDesc(d = rem.getDescriptionByIndex(0, 1));
 		printDesc(d2 = local.getDescriptionByIndex(0, 1));
 
-		assertEquals(d.getObjectType(), d2.getObjectType());
-		assertEquals(d.getObjectIndex(), d2.getObjectIndex());
-		assertEquals(d.getPropIndex(), d2.getPropIndex());
+		assertEquals(d.objectType(), d2.objectType());
+		assertEquals(d.objectIndex(), d2.objectIndex());
+		assertEquals(d.propIndex(), d2.propIndex());
 
 		// we use two different devices for d and d2, the following asserts might not hold
-		assertEquals(-1, d2.getPDT());
-		assertEquals(d.getCurrentElements(), d2.getCurrentElements());
-		assertEquals(0, d2.getReadLevel());
-		assertEquals(0, d2.getWriteLevel());
+		assertEquals(-1, d2.pdt());
+		assertEquals(d.currentElements(), d2.currentElements());
+		assertEquals(0, d2.readLevel());
+		assertEquals(0, d2.writeLevel());
 	}
 
 	@Test
@@ -294,16 +294,16 @@ class PropertyClientTest
 	private void printDesc(final Description d)
 	{
 		final StringBuilder buf = new StringBuilder();
-		buf.append("OT=" + d.getObjectType());
-		buf.append(", OI=" + d.getObjectIndex());
-		buf.append(", PID=" + d.getPID());
-		buf.append(", P index=" + d.getPropIndex());
-		buf.append(", PDT=" + d.getPDT());
-		buf.append(", curr elems=" + d.getCurrentElements());
-		buf.append(", max elems=" + d.getMaxElements());
-		buf.append(", r-lvl=" + d.getReadLevel());
-		buf.append(", w-lvl=" + d.getWriteLevel());
-		buf.append(", writeenable=" + d.isWriteEnabled());
+		buf.append("OT=" + d.objectType());
+		buf.append(", OI=" + d.objectIndex());
+		buf.append(", PID=" + d.pid());
+		buf.append(", P index=" + d.propIndex());
+		buf.append(", PDT=" + d.pdt());
+		buf.append(", curr elems=" + d.currentElements());
+		buf.append(", max elems=" + d.maxElements());
+		buf.append(", r-lvl=" + d.readLevel());
+		buf.append(", w-lvl=" + d.writeLevel());
+		buf.append(", writeenable=" + d.writeEnabled());
 		Debug.out(buf);
 	}
 }

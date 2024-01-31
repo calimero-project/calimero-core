@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,12 @@
 
 package io.calimero.buffer;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.function.Consumer;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -48,8 +54,6 @@ import io.calimero.KNXIllegalArgumentException;
 import io.calimero.Priority;
 import io.calimero.cemi.CEMI;
 import io.calimero.cemi.CEMILData;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 
 class LDataObjectQueueTest
@@ -402,9 +406,9 @@ class LDataObjectQueueTest
 		ring.setFrame(frame3);
 		Thread.sleep(200);
 		final LDataObjectQueue.QueueItem item = ring.getItem();
-		assertEquals(frame2, item.getFrame());
-		assertTrue(item.getTimestamp() >= time[1] && item.getTimestamp() <= time[1] + 50,
-				"not in range: " + time[1] + " <= " + item.getTimestamp() + " <= " + (time[1] + 50));
+		assertEquals(frame2, item.frame());
+		assertTrue(item.timestamp() >= time[1] && item.timestamp() <= time[1] + 50,
+				"not in range: " + time[1] + " <= " + item.timestamp() + " <= " + (time[1] + 50));
 
 		time[3] = System.currentTimeMillis();
 		ring.setFrame(frame4);
@@ -499,15 +503,15 @@ class LDataObjectQueueTest
 		for (int i = 41; i < 61; ++i)
 			assertEquals(frame5, frames[i]);
 		LDataObjectQueue.QueueItem item = con.getItem();
-		assertNull(item.getFrame());
-		assertEquals(0, item.getTimestamp());
+		assertNull(item.frame());
+		assertEquals(0, item.timestamp());
 		con.setFrame(frame1);
 		con.setFrame(frame5);
 		item = con.getItem();
-		assertEquals(frame1, item.getFrame());
-		assertNotEquals(0, item.getTimestamp());
+		assertEquals(frame1, item.frame());
+		assertNotEquals(0, item.timestamp());
 		item = con.getItem();
-		assertEquals(frame5, item.getFrame());
-		assertNotEquals(0, item.getTimestamp());
+		assertEquals(frame5, item.frame());
+		assertNotEquals(0, item.timestamp());
 	}
 }

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -169,7 +169,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 				final CacheObject co = i.next();
 				if (co.getKey().equals(dst)) {
 					i.remove();
-					return ((LDataObjectQueue) co).getItem().getFrame();
+					return ((LDataObjectQueue) co).getItem().frame();
 				}
 			}
 		}

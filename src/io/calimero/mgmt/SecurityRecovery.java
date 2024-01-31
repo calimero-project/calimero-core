@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2022, 2023 B. Malinowsky
+    Copyright (c) 2022, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -185,7 +185,7 @@ public final class SecurityRecovery {
 		logger.trace("query sequence number of {}", dst.getAddress());
 		final var desc = mc.readPropertyDescription(dst, securityObject, 1, pidSeqSending, 0);
 
-		int objectIndex = desc.getObjectIndex();
+		int objectIndex = desc.objectIndex();
 		if (objectIndex == 0) {
 			objectIndex = indexByIoList(mc, dst);
 			if (objectIndex == 0)
@@ -203,15 +203,15 @@ public final class SecurityRecovery {
 		logger.trace("query {} for last valid sequence number of {}", dst.getAddress(), senderAddress);
 		final var desc = mc.readPropertyDescription(dst, securityObject, 1, pidSecIaTable, 0);
 
-		int objectIndex = desc.getObjectIndex();
+		int objectIndex = desc.objectIndex();
 		if (objectIndex == 0) {
 			objectIndex = indexByIoList(mc, dst);
 			if (objectIndex == 0)
 				return -1;
 		}
 
-		final int current = desc.getCurrentElements();
-		final int elements = current == 0 ? desc.getMaxElements() : current;
+		final int current = desc.currentElements();
+		final int elements = current == 0 ? desc.maxElements() : current;
 
 		final int key = senderAddress.getRawAddress();
 		int low = 1;
@@ -244,9 +244,9 @@ public final class SecurityRecovery {
 			KNXRemoteException, KNXDisconnectException, KNXLinkClosedException, InterruptedException {
 
 		final var desc = mc.readPropertyDescription(dst, 0, PropertyAccess.PID.IO_LIST, 0);
-		var elems = desc.getCurrentElements();
+		var elems = desc.currentElements();
 		if (elems == 0)
-			elems = desc.getMaxElements();
+			elems = desc.maxElements();
 
 		int objectIndex = 0;
 		final var data = ByteBuffer.wrap(mc.readProperty(dst, 0, PropertyAccess.PID.IO_LIST, 1, elems));
