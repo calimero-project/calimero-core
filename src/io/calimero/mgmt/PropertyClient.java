@@ -234,14 +234,6 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		 */
 		public PropertyKey(final int pid) { this(GLOBAL_OBJTYPE, pid); }
 
-		/**
-		 * Returns whether the property is defined within the global object type.
-		 *
-		 * @return {@code true} if property has global object type,
-		 *         {@code false} if property has a specific object type
-		 */
-		public boolean isGlobal() { return objectType == GLOBAL_OBJTYPE; }
-
 		@Override
 		public int compareTo(final PropertyKey o) { return Integer.compare(hashCode(), o.hashCode()); }
 

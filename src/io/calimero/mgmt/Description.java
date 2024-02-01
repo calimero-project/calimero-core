@@ -140,7 +140,7 @@ public record Description(int objectIndex, int objectType, int objectInstance, i
 		final int pid = (((data[3] & 0xf) << 8) | (data[4] & 0xff));
 		// property description type: only type 0 is currently defined
 		// reserved for later extensions, e.g., access control with roles
-		final int propDescType = (data[5] >> 4) & 0xf;
+//		final int propDescType = (data[5] >> 4) & 0xf;
 		final int pindex = (((data[5] & 0xf) << 8) | (data[6] & 0xff));
 
 		final int dptMain = (data[7] & 0xff) << 8 | data[8] & 0xff;

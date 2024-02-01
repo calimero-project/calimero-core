@@ -162,10 +162,7 @@ public abstract class Datapoint
 	}
 
 	/**
-	 * Returns the datapoint main address, a KNX group address identifying this datapoint.
-	 * <p>
-	 *
-	 * @return KNX group address
+	 * {@return the datapoint main address, a KNX group address identifying this datapoint}
 	 */
 	public final GroupAddress getMainAddress()
 	{
@@ -186,10 +183,7 @@ public abstract class Datapoint
 	}
 
 	/**
-	 * Returns the datapoint name.
-	 * <p>
-	 *
-	 * @return datapoint name as string
+	 * {@return the datapoint name as string}
 	 */
 	public final String getName()
 	{
@@ -197,11 +191,7 @@ public abstract class Datapoint
 	}
 
 	/**
-	 * Returns whether this datapoint is state or command based.
-	 * <p>
-	 *
-	 * @return {@code true} if datapoint is state based, {@code false} for
-	 *         command based
+	 * {@return whether this datapoint is state-based or command-based}
 	 */
 	public final boolean isStateBased()
 	{
@@ -219,10 +209,7 @@ public abstract class Datapoint
 	}
 
 	/**
-	 * Returns the KNX message priority assigned to this datapoint.
-	 * <p>
-	 *
-	 * @return priority value
+	 * {@return the KNX message priority assigned to this datapoint}
 	 */
 	public final Priority getPriority()
 	{
