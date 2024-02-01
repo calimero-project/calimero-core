@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2023 B. Malinowsky
+    Copyright (c) 2019, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -510,7 +510,7 @@ public final class BaosService implements ServiceType {
 	}
 
 	static BaosService response(final int subService, final int startItem, final Item<?>... items) {
-		final byte[] itemData = Stream.of(items).map(Item<?>::toByteArray).collect(ByteArrayOutputStream::new,
+		final byte[] itemData = Stream.of(items).map(Item::toByteArray).collect(ByteArrayOutputStream::new,
 				ByteArrayOutputStream::writeBytes, (c1, c2) -> c1.writeBytes(c2.toByteArray())).toByteArray();
 		return new BaosService(subService, true, startItem, items.length, itemData);
 	}

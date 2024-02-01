@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,8 +38,8 @@ package io.calimero.datapoint;
 
 import io.calimero.GroupAddress;
 import io.calimero.xml.KNXMLException;
-import io.calimero.xml.XmlWriter;
 import io.calimero.xml.XmlReader;
+import io.calimero.xml.XmlWriter;
 
 /**
  * Represents a command based KNX datapoint.
@@ -75,9 +75,7 @@ public class CommandDP extends Datapoint
 	 *        DPT translator, main number might be left 0
 	 * @param dptID the datapoint type ID used for translation in a DPT translator
 	 */
-	public CommandDP(final GroupAddress main, final String name, final int mainNumber,
-		final String dptID)
-	{
+	public CommandDP(final GroupAddress main, final String name, final int mainNumber, final String dptID) {
 		super(main, name, false);
 		setDPT(mainNumber, dptID);
 	}
@@ -91,8 +89,7 @@ public class CommandDP extends Datapoint
 	 * @param r a XML reader
 	 * @throws KNXMLException if the XML element is no datapoint or could not be read correctly
 	 */
-	public CommandDP(final XmlReader r) throws KNXMLException
-	{
+	public CommandDP(final XmlReader r) throws KNXMLException {
 		super(r);
 		if (isStateBased())
 			throw new KNXMLException("no command based KNX datapoint element", r);
@@ -100,20 +97,12 @@ public class CommandDP extends Datapoint
 		r.nextTag();
 	}
 
-	/* (non-Javadoc)
-	 * @see io.calimero.datapoint.Datapoint#toString()
-	 */
 	@Override
 	public String toString()
 	{
 		return "command DP " + super.toString();
 	}
 
-	/* (non-Javadoc)
-	 * @see io.calimero.datapoint.Datapoint#doSave(
-	 * io.calimero.xml.XmlWriter)
-	 */
 	@Override
-	void doSave(final XmlWriter w)
-	{}
+	void doSave(final XmlWriter w) {}
 }
