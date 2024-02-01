@@ -303,7 +303,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	private final Logger logger;
 
 	// maps object index to object type
-	private final List<Pair> objectTypes = new ArrayList<>();
+	private final Map<Integer, Integer> objectTypes = new HashMap<>();
 	private final DPTXlator2ByteUnsigned tObjType;
 
 	/**
@@ -561,10 +561,9 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 
 	private int getObjectType(final int objIndex, final boolean queryObject) throws KNXException, InterruptedException
 	{
-		for (final Pair p : objectTypes) {
-			if (p.oindex == objIndex)
-				return p.otype;
-		}
+		final Integer ot = objectTypes.get(objIndex);
+		if (ot != null)
+			return ot;
 		if (queryObject)
 			return queryObjectType(objIndex);
 		throw new KNXException("couldn't deduce object type");
@@ -574,12 +573,12 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	{
 		if (pa instanceof final LocalDeviceManagement<?> ldm) {
 			final int ot = ldm.getObjectType(objIndex);
-			objectTypes.add(new Pair(objIndex, ot));
+			objectTypes.put(objIndex, ot);
 			return ot;
 		}
 		final byte[] objectType = pa.getProperty(objIndex, PID.OBJECT_TYPE, 1, 1);
 		tObjType.setData(objectType);
-		objectTypes.add(new Pair(objIndex, tObjType.getValueUnsigned()));
+		objectTypes.put(objIndex, tObjType.getValueUnsigned());
 		return tObjType.getValueUnsigned();
 	}
 
@@ -788,18 +787,6 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 			}
 			catch (final NumberFormatException e) {}
 			throw new KNXFormatException("cannot convert to number", s);
-		}
-	}
-
-	private static final class Pair
-	{
-		final int oindex;
-		final int otype;
-
-		Pair(final int objIndex, final int objType)
-		{
-			oindex = objIndex;
-			otype = objType;
 		}
 	}
 }
