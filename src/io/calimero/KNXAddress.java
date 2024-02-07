@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,8 +47,8 @@ import io.calimero.xml.XmlWriter;
  * {@link GroupAddress} and {@link IndividualAddress}. Instances of {@code KNXAddress} are immutable.<br>
  * Loading and saving KNX addresses in XML format is supported.
  */
-public abstract class KNXAddress implements Comparable<KNXAddress>
-{
+public sealed abstract class KNXAddress implements Comparable<KNXAddress>
+		permits IndividualAddress, GroupAddress {
 	private static final String ATTR_TYPE = "type";
 	private static final String TAG_ADDRESS = "knxAddress";
 

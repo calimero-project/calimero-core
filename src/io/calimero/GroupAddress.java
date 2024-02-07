@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ import io.calimero.xml.XmlReader;
  * address, is reserved, but not in use for now. This bit is not checked for, but
  * nevertheless stored and returned by this implementation.
  */
-public class GroupAddress extends KNXAddress
+public final class GroupAddress extends KNXAddress
 {
 	/**
 	 * The KNX address used for broadcasts.
@@ -222,7 +222,7 @@ public class GroupAddress extends KNXAddress
 	 *
 	 * @return the main group value (5 most significant address bits)
 	 */
-	public final int getMainGroup()
+	public int getMainGroup()
 	{
 		return address >>> 11 & 0x1F;
 	}
@@ -235,7 +235,7 @@ public class GroupAddress extends KNXAddress
 	 *
 	 * @return the middle group value (3 bits)
 	 */
-	public final int getMiddleGroup()
+	public int getMiddleGroup()
 	{
 		return address >>> 8 & 0x07;
 	}
@@ -247,7 +247,7 @@ public class GroupAddress extends KNXAddress
 	 *
 	 * @return the sub group value (8 least significant address bits)
 	 */
-	public final int getSubGroup8()
+	public int getSubGroup8()
 	{
 		return address & 0xFF;
 	}
@@ -259,13 +259,13 @@ public class GroupAddress extends KNXAddress
 	 *
 	 * @return the sub group value (11 least significant address bits)
 	 */
-	public final int getSubGroup11()
+	public int getSubGroup11()
 	{
 		return address & 0x07FF;
 	}
 
 	@Override
-	public final String getType()
+	public String getType()
 	{
 		return ATTR_GROUP;
 	}

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ import io.calimero.xml.XmlReader;
  *
  * @see GroupAddress
  */
-public class IndividualAddress extends KNXAddress
+public final class IndividualAddress extends KNXAddress
 {
 	static final String ATTR_IND = "individual";
 
@@ -129,7 +129,7 @@ public class IndividualAddress extends KNXAddress
 	 *
 	 * @return the area value (high nibble of the address high byte)
 	 */
-	public final int getArea()
+	public int getArea()
 	{
 		return address >>> 12;
 	}
@@ -139,7 +139,7 @@ public class IndividualAddress extends KNXAddress
 	 *
 	 * @return the line value (low nibble of the address high byte)
 	 */
-	public final int getLine()
+	public int getLine()
 	{
 		return address >>> 8 & 0x0F;
 	}
@@ -149,13 +149,13 @@ public class IndividualAddress extends KNXAddress
 	 *
 	 * @return the device value (8 least significant bits)
 	 */
-	public final int getDevice()
+	public int getDevice()
 	{
 		return address & 0xFF;
 	}
 
 	@Override
-	public final String getType()
+	public String getType()
 	{
 		return ATTR_IND;
 	}
