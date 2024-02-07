@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -261,10 +261,6 @@ class KNXnetIPTunnelTest
 	@Test
 	void natSend() throws KNXException, InterruptedException
 	{
-		if (!Util.TEST_NAT) {
-			System.out.println("\n==== skip testNATSend ====\n");
-			return;
-		}
 		newNATTunnel();
 		doNATSend(frame, con, true);
 		doNATSend(frame2, con, true);
