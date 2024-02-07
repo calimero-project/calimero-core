@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -138,10 +138,6 @@ class DiscovererTest
 	@Test
 	void natGetDescription() throws KNXException
 	{
-		if (!Util.TEST_NAT) {
-			System.out.println("\n==== skip testNATGetDescription ====\n");
-			return;
-		}
 		try {
 			doGetDesc(dnat);
 		}
@@ -167,10 +163,6 @@ class DiscovererTest
 	@Test
 	void natGetSearchResponses() throws InterruptedException
 	{
-		if (!Util.TEST_NAT) {
-			System.out.println("\n==== skip testNATGetSearchResponses ====\n");
-			return;
-		}
 		try {
 			doGetSearchRes(dnat);
 		}
@@ -208,10 +200,6 @@ class DiscovererTest
 	@Test
 	void natStartSearchIntNetworkInterfaceIntBoolean() throws SocketException, InterruptedException
 	{
-		if (!Util.TEST_NAT) {
-			System.out.println("\n==== skip testNATStartSearchIntNetworkInterfaceIntBoolean ====\n");
-			return;
-		}
 		try {
 			doStartSearchIF(dnat, false);
 		}
@@ -265,10 +253,6 @@ class DiscovererTest
 	@Test
 	void natStartSearchIntBoolean() throws InterruptedException, ExecutionException
 	{
-		if (!Util.TEST_NAT) {
-			System.out.println("\n==== skip testNATStartSearchIntBoolean ====\n");
-			return;
-		}
 		try {
 			doSearch(dnat, false);
 		}
