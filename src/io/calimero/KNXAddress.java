@@ -201,7 +201,7 @@ public sealed abstract class KNXAddress implements Comparable<KNXAddress>
 
 	static String[] parse(final String address, final boolean groupAddress) throws KNXFormatException
 	{
-		StringTokenizer t = null;
+		StringTokenizer t;
 		if (groupAddress && address.indexOf('/') > -1)
 			t = new StringTokenizer(address, "/");
 		else if (!groupAddress && address.indexOf('.') > -1)
