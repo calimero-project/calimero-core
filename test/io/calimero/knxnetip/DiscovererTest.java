@@ -89,8 +89,8 @@ class DiscovererTest
 
 	@BeforeEach
 	void init() {
-		ddef = new Discoverer(0, false);
-		dnat = new Discoverer(0, true);
+		ddef = Discoverer.udp(false);
+		dnat = Discoverer.udp(true);
 		dmcast = new Discoverer(null, 0, false, true);
 	}
 
@@ -107,16 +107,8 @@ class DiscovererTest
 	@Test
 	void discoverer()
 	{
-		try {
-			ddef = new Discoverer(-1, false);
-			fail("negative port number");
-		}
-		catch (final KNXIllegalArgumentException e) {}
-		try {
-			ddef = new Discoverer(0x10000, false);
-			fail("port number too big");
-		}
-		catch (final RuntimeException e) {}
+		assertThrows(KNXIllegalArgumentException.class, () -> new Discoverer(-1, false), "negative port number");
+		assertThrows(RuntimeException.class, () -> new Discoverer(0x10000, false), "port number too big");
 		ddef = new Discoverer(0, false);
 	}
 
@@ -194,14 +186,14 @@ class DiscovererTest
 	void startSearchIntNetworkInterfaceIntBoolean()
 		throws SocketException, KNXException, InterruptedException
 	{
-		doStartSearchIF(ddef, false);
+		doStartSearchIF(ddef);
 	}
 
 	@Test
 	void natStartSearchIntNetworkInterfaceIntBoolean() throws SocketException, InterruptedException
 	{
 		try {
-			doStartSearchIF(dnat, false);
+			doStartSearchIF(dnat);
 		}
 		catch (final KNXException e) {
 			// don't fail, we might use an IPv6 socket, and on some OS IPv6 sockets can't join IPv4 multicast groups
@@ -215,10 +207,10 @@ class DiscovererTest
 	void mcastStartSearchIntNetworkInterfaceIntBoolean()
 		throws SocketException, KNXException, InterruptedException
 	{
-		doStartSearchIF(dmcast, true);
+		doStartSearchIF(dmcast);
 	}
 
-	private void doStartSearchIF(final Discoverer d, final boolean usesMulticast)
+	private void doStartSearchIF(final Discoverer d)
 		throws SocketException, KNXException, InterruptedException
 	{
 		d.startSearch(40000, Util.localInterface(), timeout, true);
@@ -247,14 +239,14 @@ class DiscovererTest
 	@Test
 	void startSearchIntBoolean() throws InterruptedException, ExecutionException
 	{
-		doSearch(ddef, false);
+		doSearch(ddef);
 	}
 
 	@Test
 	void natStartSearchIntBoolean() throws InterruptedException, ExecutionException
 	{
 		try {
-			doSearch(dnat, false);
+			doSearch(dnat);
 		}
 		catch (final AssertionFailedError e) {
 			fail("Probably no NAT support on router, " + e.getMessage());
@@ -264,7 +256,7 @@ class DiscovererTest
 	@Test
 	void mcastStartSearchIntBoolean() throws InterruptedException, ExecutionException
 	{
-		doSearch(dmcast, true);
+		doSearch(dmcast);
 	}
 
 	@Test
@@ -273,13 +265,9 @@ class DiscovererTest
 		assertThrows(KNXIllegalArgumentException.class, () -> ddef.timeout(Duration.ZERO));
 	}
 
-	private void doSearch(final Discoverer d, final boolean usesMulticast)
+	private void doSearch(final Discoverer d)
 			throws InterruptedException, ExecutionException {
-		try {
-			d.startSearch(-1, true);
-			fail("negative timeout");
-		}
-		catch (final KNXIllegalArgumentException e) {}
+		assertThrows(KNXIllegalArgumentException.class, () -> d.startSearch(-1, true), "negative timeout");
 		final var result = d.timeout(Duration.ofSeconds(timeout)).search().get();
 		assertFalse(result.isEmpty());
 		assertFalse(d.isSearching());

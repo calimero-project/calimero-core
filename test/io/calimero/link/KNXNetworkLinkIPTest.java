@@ -141,7 +141,7 @@ class KNXNetworkLinkIPTest
 	{
 		tnl = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false, new TPSettings());
 		rtr = new KNXNetworkLinkIP(KNXNetworkLinkIP.ROUTING, Util.getLocalHost(),
-				new InetSocketAddress(InetAddress.getByName(KNXnetIPRouting.DEFAULT_MULTICAST), 0), false,
+				new InetSocketAddress(KNXnetIPRouting.DefaultMulticast, 0), false,
 				new TPSettings());
 		ltnl = new NLListenerImpl();
 		lrtr = new NLListenerImpl();
@@ -168,30 +168,29 @@ class KNXNetworkLinkIPTest
 	void networkLinkIPConstructor() throws KNXException, InterruptedException
 	{
 		tnl.close();
-		try (KNXNetworkLink l = new KNXNetworkLinkIP(100, new InetSocketAddress(0), Util.getServer(), false,
-				new TPSettings())) {
-			fail("illegal arg");
-		}
-		catch (final KNXIllegalArgumentException e) {}
-		try (KNXNetworkLink l = KNXNetworkLinkIP.newTunnelingLink(new InetSocketAddress(0), Util.getServer(), false,
+		assertThrows(KNXIllegalArgumentException.class, () -> {
+			try (var l = new KNXNetworkLinkIP(100, new InetSocketAddress(0), Util.getServer(), false,
+					new TPSettings())) {}
+		}, "illegal arg");
+
+		try (var __ = KNXNetworkLinkIP.newTunnelingLink(new InetSocketAddress(0), Util.getServer(), false,
 				new TPSettings())) {}
-		catch (final KNXIllegalArgumentException e) {}
 	}
 
 	@Test
 	void tunnelingLinkFactoryMethod() throws KNXException, InterruptedException
 	{
-		try (KNXNetworkLink link = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false,
+		try (var __ = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), false,
 				new TPSettings())) {}
 
-		try (KNXNetworkLink link = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), true,
+		try (var __ = KNXNetworkLinkIP.newTunnelingLink(Util.getLocalHost(), Util.getServer(), true,
 				new TPSettings())) {}
 	}
 
 	@Test
 	void newRoutingLink() throws UnknownHostException, KNXException
 	{
-		try (KNXNetworkLinkIP link = KNXNetworkLinkIP.newRoutingLink((NetworkInterface) null,
+		try (var __ = KNXNetworkLinkIP.newRoutingLink((NetworkInterface) null,
 				InetAddress.getByName("224.0.23.14"), new TPSettings())) {}
 	}
 
@@ -422,7 +421,7 @@ class KNXNetworkLinkIPTest
 	void secureRoutingLink() throws KNXException, SocketException, InterruptedException {
 		final NetworkInterface netif = Util.localInterface();
 		final byte[] groupKey = new byte[16];
-		try (KNXNetworkLink link = KNXNetworkLinkIP.newSecureRoutingLink(netif, KNXNetworkLinkIP.DefaultMulticast, groupKey,
+		try (var __ = KNXNetworkLinkIP.newSecureRoutingLink(netif, KNXNetworkLinkIP.DefaultMulticast, groupKey,
 				Duration.ofMillis(2000), new TPSettings())) {}
 	}
 
