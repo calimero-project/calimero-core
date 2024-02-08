@@ -18,36 +18,36 @@ jobs:
 
     steps:
     - name: Checkout calimero-core
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: calimero-project/calimero-core
         path: calimero-core
     - name: Checkout calimero-device
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: calimero-project/calimero-device
         path: calimero-device
     - name: Checkout calimero-rxtx
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: calimero-project/calimero-rxtx
         path: calimero-rxtx
     - name: Checkout calimero-server
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: calimero-project/calimero-server
         path: calimero-server
     - name: Checkout calimero-testnetwork
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: calimero-project/calimero-testnetwork
         path: calimero-testnetwork
     - name: Checkout calimero-core
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: calimero-core
     - name: setup
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: temurin
         java-version: ${{ matrix.java }}
