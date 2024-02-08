@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2023 B. Malinowsky
+    Copyright (c) 2015, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -161,8 +161,9 @@ public interface DeviceDescriptor
 		/** */
 		TYPE_5705(0x5705, "System 7"), // limited to 255 group objects
 		/** */
-		TYPE_57B0(0x57B0, "System B IP");
+		TYPE_57B0(0x57B0, "System B IP"),
 
+		Invalid(0xFFFF, "Invalid");
 
 		private final int mv;
 		private final String profile;
