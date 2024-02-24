@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -473,6 +473,7 @@ public class TransportLayerImpl implements TransportLayer
 					d.destroy();
 				}
 
+				@SuppressWarnings({ "resource", "unused" }) // mute warnings for new Destination
 				final BiFunction<IndividualAddress, AggregatorProxy, AggregatorProxy> setupProxy = (__, proxy) -> {
 					if (proxy == null) {
 						// allow incoming connect requests (server)
