@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -147,6 +147,12 @@ public class DescriptionResponse extends ServiceType
 			final int type = dib.getDescTypeCode();
 			if (dibs.containsKey(type))
 				throw new KNXIllegalArgumentException("response contains duplicate DIB type " + type);
+			switch (dib.getDescTypeCode()) {
+				case DIB.TunnelingInfo -> throw new KNXIllegalArgumentException(
+						"description response shall not contain Tunneling Information DIB (0x07)");
+				case DIB.AdditionalDeviceInfo -> throw new KNXIllegalArgumentException(
+						"description response shall not contain Extended Device Information DIB (0x08)");
+			}
 			dibs.put(type, dib);
 		}
 	}
