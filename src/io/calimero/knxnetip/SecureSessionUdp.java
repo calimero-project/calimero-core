@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2022 B. Malinowsky
+    Copyright (c) 2018, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -123,8 +123,8 @@ final class SecureSessionUdp {
 		}
 		try (DatagramSocket local = new DatagramSocket(localEP)) {
 			localSocket = local;
-			final HPAI hpai = new HPAI(HPAI.IPV4_UDP,
-					useNat ? null : (InetSocketAddress) local.getLocalSocketAddress());
+			final HPAI hpai = useNat ? HPAI.Nat : new HPAI(HPAI.IPV4_UDP,
+					(InetSocketAddress) local.getLocalSocketAddress());
 			final byte[] sessionReq = PacketHelper.newChannelRequest(hpai, publicKey);
 			local.send(new DatagramPacket(sessionReq, sessionReq.length, serverCtrlEP));
 

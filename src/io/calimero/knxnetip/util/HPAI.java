@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,7 +42,6 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
-import java.util.Objects;
 
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
@@ -51,16 +50,14 @@ import io.calimero.KNXIllegalArgumentException;
  * KNXnet/IP Host Protocol Address Information (HPAI).
  * <p>
  * The address information is used to describe a communication channel. Its structure
- * varies according to the used underlying protocol. This class is implemented for IPv4.
- * <br>
- * For IP networks with NAT, consider use of {@link #HPAI(int, InetSocketAddress)}.
- * <p>
- * Objects of this type are immutable.
+ * is implemented for KNX IPv4 UDP/TCP. For TCP communication channels, use {@link #Tcp}.
+ * For IP networks with NAT (network address translation), use {@link #Nat}.
  *
+ * @param hostProtocol the host protocol code of this HPAI, {@link #IPV4_UDP} or {@link #IPV4_TCP}
+ * @param endpoint     IP address and port number
  * @author B. Malinowsky
  */
-public class HPAI
-{
+public record HPAI(int hostProtocol, InetSocketAddress endpoint) {
 	/**
 	 * Internet protocol version 4 address, UDP communication.
 	 */
@@ -71,50 +68,48 @@ public class HPAI
 	 */
 	public static final int IPV4_TCP = 0x02;
 
-	/** Host protocol address information for TCP, set to route back endpoint. */
-	public static final HPAI Tcp = new HPAI(IPV4_TCP, null);
+	/**
+	 * Host protocol address information for TCP, always set to route-back endpoint.
+	 */
+	public static final HPAI Tcp = new HPAI(IPV4_TCP, new InetSocketAddress(0));
+
+	/**
+	 * Host protocol address information for UDP with NAT.
+	 */
+	public static final HPAI Nat = new HPAI(IPV4_UDP, new InetSocketAddress(0));
+
 
 	private static final int HPAI_SIZE = 8;
 
-	private final int length;
-	private final int hostprot;
-	private final InetSocketAddress addr;
-
 	/**
-	 * Creates a HPAI out of a byte array.
+	 * Creates a new HPAI out of a byte array.
 	 *
-	 * @param data byte array containing the HPAI structure
+	 * @param data   byte array containing the HPAI structure
 	 * @param offset start offset of HPAI in {@code data}
 	 * @throws KNXFormatException if no HPAI found, invalid structure or unknown host protocol
 	 */
-	public HPAI(final byte[] data, final int offset) throws KNXFormatException
-	{
+	public static HPAI from(final byte[] data, final int offset) throws KNXFormatException {
 		if (data.length - offset < HPAI_SIZE)
 			throw new KNXFormatException("buffer too short for HPAI");
 		int i = offset;
-		length = data[i++] & 0xFF;
+		final int length = data[i++] & 0xFF;
 		if (length != HPAI_SIZE)
-			throw new KNXFormatException("unknown HPAI size", length);
-		hostprot = data[i++] & 0xFF;
-		if (hostprot != IPV4_UDP && hostprot != IPV4_TCP)
-			throw new KNXFormatException("unknown host protocol", hostprot);
+			throw new KNXFormatException("invalid HPAI size", length);
 
+		final int hostProtocol = data[i++] & 0xFF;
 		final byte[] address = Arrays.copyOfRange(data, i, i += 4);
 		final int port = ((data[i++] & 0xFF) << 8) | data[i] & 0xFF;
-		try {
-			addr = new InetSocketAddress(InetAddress.getByAddress(address), port);
-		}
-		catch (final UnknownHostException e) {
-			throw new KNXFormatException("invalid IPv4 address", e);
-		}
 
-		if (hostprot == IPV4_TCP && !isRouteBack())
-			throw new KNXFormatException("HPAI for TCP does not contain route back endpoint", hostPort());
+		try {
+			return new HPAI(hostProtocol, InetAddress.getByAddress(address), port);
+		} catch (UnknownHostException | KNXIllegalArgumentException e) {
+			throw new KNXFormatException(e.getMessage());
+		}
 	}
 
 	/**
-	 * Creates a HPAI for UDP communication with the given address information, using UDP as communication mode (default
-	 * in KNXnet/IP). The following first matching rule is used for the {@code addr} argument:<br>
+	 * Creates a HPAI for UDP communication with the given address information, using UDP as communication mode
+	 * (default in KNXnet/IP). The following first matching rule is used for the {@code addr} argument:<br>
 	 * 1) {@code addr} holds an {@link InetAddress}, use that address<br>
 	 * 2) {@code addr} is {@code null}, the local host is retrieved by {@link InetAddress#getLocalHost()}<br>
 	 * 3) if no local host could be found, fall back to safe state and initialize IP <b>and</b> port to 0 (NAT aware
@@ -123,8 +118,7 @@ public class HPAI
 	 * @param addr local IP address, use {@code null} for setting local host
 	 * @param port local port number to set, 0 &lt;= {@code port} &lt;= 0xFFFF
 	 */
-	public HPAI(final InetAddress addr, final int port)
-	{
+	public HPAI(final InetAddress addr, final int port) {
 		this(IPV4_UDP, addrOrDefault(addr), port);
 	}
 
@@ -132,82 +126,51 @@ public class HPAI
 	 * Creates a HPAI with the given address information.
 	 *
 	 * @param hostProtocol host protocol code (UDP or TCP on IP)
-	 * @param addr local IP address
-	 * @param port local port number to set, 0 &lt;= {@code port} &lt;= 0xFFFF
+	 * @param addr         local IP address
+	 * @param port         local port number to set, 0 &lt;= {@code port} &lt;= 0xFFFF
 	 */
-	public HPAI(final int hostProtocol, final InetAddress addr, final int port)
-	{
+	public HPAI(final int hostProtocol, final InetAddress addr, final int port) {
 		this(hostProtocol, new InetSocketAddress(addr, port));
 	}
 
-	/**
-	 * Creates a HPAI with the given address information.
-	 * <p>
-	 * To indicate the use of network address translation (NAT) to the receiver, leave
-	 * {@code addr} {@code null}.
-	 *
-	 * @param hostProtocol host protocol code (UDP or TCP, see class constants)
-	 * @param addr socket address with IP address and port number, if {@code addr} =
-	 *        {@code null} address and port are initialized to 0
-	 */
-	public HPAI(final int hostProtocol, final InetSocketAddress addr)
-	{
-		length = HPAI_SIZE;
+	public HPAI {
 		if (hostProtocol != IPV4_UDP && hostProtocol != IPV4_TCP)
-			throw new KNXIllegalArgumentException("unknown host protocol");
-		hostprot = hostProtocol;
+			throw new KNXIllegalArgumentException("unknown host protocol " + Integer.toHexString(hostProtocol));
 
-		if (addr != null) {
-			final InetAddress a = addr.getAddress();
-			if (a == null)
-				throw new KNXIllegalArgumentException(addr + " is an unresolved IP address");
-			if (!(a instanceof Inet4Address))
-				throw new KNXIllegalArgumentException(a + " is not an IPv4 address");
-			if (a.isAnyLocalAddress() && addr.getPort() != 0)
-				throw new KNXIllegalArgumentException(a + " is a wildcard IP address");
-			this.addr = addr;
-			if (hostprot == IPV4_TCP && !isRouteBack())
-				throw new KNXIllegalArgumentException("HPAI for TCP does not contain route back endpoint: " + hostPort());
-		}
-		else {
-			this.addr = new InetSocketAddress(0);
-		}
+		final InetAddress a = endpoint.getAddress();
+		if (a == null)
+			throw new KNXIllegalArgumentException(endpoint + " is an unresolved IP address");
+		if (!(a instanceof Inet4Address))
+			throw new KNXIllegalArgumentException(a + " is not an IPv4 address");
+		if (a.isAnyLocalAddress() && endpoint.getPort() != 0)
+			throw new KNXIllegalArgumentException(a + " is a wildcard IP address");
+		if (hostProtocol == IPV4_TCP && !routeBack(endpoint))
+			throw new KNXIllegalArgumentException("HPAI for TCP does not contain route-back endpoint: " + hostPort(endpoint));
 	}
 
 	/**
-	 * Returns the host protocol of this HPAI.
-	 *
-	 * @return host protocol code as unsigned byte
+	 * {@return {@code true} if this HPAI is a route-back HPAI (required for UDP NAT v2 and TCP connections), {@code false} otherwise}
 	 */
-	public final int getHostProtocol()
-	{
-		return hostprot;
+	public boolean isRouteBack() { return routeBack(endpoint); }
+
+	private static boolean routeBack(final InetSocketAddress endpoint) {
+		return endpoint.getAddress().isAnyLocalAddress() && endpoint.getPort() == 0;
 	}
 
 	/**
-	 * Indicates whether this HPAI is a route back HPAI, required for UDP NAT and TCP connections.
-	 *
-	 * @return {@code true} if this HPAI is a route back HPAI, {@code false} otherwise
+	 * {@return {@code true} if this HPAI indicates NAT (for UDP NAT), {@code false} otherwise}
 	 */
-	public final boolean isRouteBack() {
-		return addr.getAddress().isAnyLocalAddress() && addr.getPort() == 0;
+	public boolean nat() {
+		return endpoint.getAddress().isAnyLocalAddress() || endpoint.getPort() == 0;
 	}
-
-	/**
-	 * Returns the IP address and port number information.
-	 *
-	 * @return IP address and port number as InetSocketAddress
-	 */
-	public final InetSocketAddress endpoint() { return addr; }
 
 	/**
 	 * Returns the IP network address as {@link InetAddress} representation.
 	 *
 	 * @return IP address as InetAddress object
 	 */
-	public final InetAddress getAddress()
-	{
-		return addr.getAddress();
+	public InetAddress getAddress() {
+		return endpoint.getAddress();
 	}
 
 	/**
@@ -215,67 +178,43 @@ public class HPAI
 	 *
 	 * @return port as unsigned 16 bit value
 	 */
-	public final int getPort()
-	{
-		return addr.getPort();
+	public int getPort() {
+		return endpoint.getPort();
 	}
 
 	/**
-	 * Returns the structure length of this HPAI in bytes.
-	 *
-	 * @return structure length as unsigned byte
+	 * {@return structure length of this HPAI as unsigned byte}
 	 */
-	public final int getStructLength()
-	{
-		return length;
+	public int getStructLength() {
+		return HPAI_SIZE;
 	}
 
 	/**
-	 * Returns the byte representation of the whole HPAI structure.
-	 *
-	 * @return byte array containing structure
+	 * {@return the byte array representation of the whole HPAI structure}
 	 */
-	public final byte[] toByteArray()
-	{
+	public byte[] toByteArray() {
 		final ByteArrayOutputStream os = new ByteArrayOutputStream(HPAI_SIZE);
-		os.write(length);
-		os.write(hostprot);
-		os.write(addr.getAddress().getAddress(), 0, 4);
-		os.write(addr.getPort() >> 8);
-		os.write(addr.getPort());
+		os.write(HPAI_SIZE);
+		os.write(hostProtocol);
+		os.write(endpoint.getAddress().getAddress(), 0, 4);
+		os.write(endpoint.getPort() >> 8);
+		os.write(endpoint.getPort());
 		return os.toByteArray();
 	}
 
 	/**
-	 * Returns this HPAI representation in textual format.
-	 *
-	 * @return a string representation of the HPAI object
+	 * {@return a textual representation of this HPAI as string}
 	 */
 	@Override
 	public String toString() {
-		return hostPort() + " (IPv4 " + (hostprot == IPV4_UDP ? "UDP" : "TCP") + ")";
+		return hostPort(endpoint) + " (IPv4 " + (hostProtocol == IPV4_UDP ? "UDP" : "TCP") + ")";
 	}
 
-	@Override
-	public boolean equals(final Object obj)
-	{
-		if (this == obj)
-			return true;
-		if (!(obj instanceof final HPAI other))
-			return false;
-		return length == other.length && hostprot == other.hostprot && addr.equals(other.addr);
+	private static String hostPort(final InetSocketAddress endpoint) {
+		return endpoint.getAddress().getHostAddress() + ":" + endpoint.getPort();
 	}
 
-	@Override
-	public int hashCode()
-	{
-		return Objects.hash(length, hostprot, addr);
-	}
-
-	private String hostPort() { return addr.getAddress().getHostAddress() + ":" + addr.getPort(); }
-
-	private static InetAddress addrOrDefault(final InetAddress addr)
-	{
+	private static InetAddress addrOrDefault(final InetAddress addr) {
 		try {
 			return addr != null ? addr : InetAddress.getLocalHost();
 		}

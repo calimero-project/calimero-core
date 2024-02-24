@@ -76,7 +76,7 @@ public class DescriptionRequest extends ServiceType {
 	public DescriptionRequest(final byte[] data, final int offset) throws KNXFormatException
 	{
 		super(KNXnetIPHeader.DESCRIPTION_REQ);
-		endpoint = new HPAI(data, offset);
+		endpoint = HPAI.from(data, offset);
 	}
 
 	/**

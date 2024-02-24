@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019 B. Malinowsky
+    Copyright (c) 2019, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ class HPAITest {
 
 	@Test
 	void validTcpHpai() throws KNXFormatException {
-		new HPAI(HPAI.Tcp.toByteArray(), 0);
+		HPAI.from(HPAI.Tcp.toByteArray(), 0);
 	}
 
 	@Test
@@ -60,7 +60,7 @@ class HPAITest {
 		final var addr = InetAddress.getByName("192.168.10.1");
 		final var data = new HPAI(HPAI.IPV4_UDP, new InetSocketAddress(addr, 1)).toByteArray();
 		data[1] = HPAI.IPV4_TCP;
-		assertThrows(KNXFormatException.class, () -> new HPAI(data, 0));
+		assertThrows(KNXFormatException.class, () -> HPAI.from(data, 0));
 	}
 
 	@Test
@@ -68,7 +68,7 @@ class HPAITest {
 		final var addr = InetAddress.getByName("192.168.10.1");
 		final var data = new HPAI(HPAI.IPV4_UDP, new InetSocketAddress(addr, 0)).toByteArray();
 		data[1] = HPAI.IPV4_TCP;
-		assertThrows(KNXFormatException.class, () -> new HPAI(data, 0));
+		assertThrows(KNXFormatException.class, () -> HPAI.from(data, 0));
 	}
 
 	@Test
@@ -78,7 +78,13 @@ class HPAITest {
 
 	@Test
 	void natIsRouteBackHpai() {
-		assertTrue(new HPAI(HPAI.IPV4_UDP, null).isRouteBack());
+		assertTrue(new HPAI(HPAI.IPV4_UDP, new InetSocketAddress(0)).isRouteBack());
+	}
+
+	@Test
+	void natHpai() throws UnknownHostException {
+		final var addr = InetAddress.getByName("192.168.10.1");
+		assertTrue(new HPAI(HPAI.IPV4_UDP, new InetSocketAddress(addr, 0)).nat());
 	}
 
 	@Test

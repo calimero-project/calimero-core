@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2022 B. Malinowsky
+    Copyright (c) 2010, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -465,8 +465,8 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		lock.lock();
 		try {
 			final boolean tcp = ctrlSocket == null;
-			final var hpai = tcp ? HPAI.Tcp : new HPAI(HPAI.IPV4_UDP,
-					useNat ? null : (InetSocketAddress) ctrlSocket.getLocalSocketAddress());
+			final var hpai = tcp ? HPAI.Tcp : useNat ? HPAI.Nat : new HPAI(HPAI.IPV4_UDP,
+					(InetSocketAddress) ctrlSocket.getLocalSocketAddress());
 			logger.trace("sending disconnect request for {}", this);
 			final byte[] buf = PacketHelper.toPacket(new DisconnectRequest(channelId, hpai));
 			send(buf, ctrlEndpt);

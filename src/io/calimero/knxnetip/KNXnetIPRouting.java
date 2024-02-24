@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -514,7 +514,7 @@ public class KNXnetIPRouting extends ConnectionBase
 		if (callback == null)
 			return;
 		final HPAI endpoint = SearchRequest.from(h, data, offset).getEndpoint();
-		if (endpoint.getHostProtocol() != HPAI.IPV4_UDP) {
+		if (endpoint.hostProtocol() != HPAI.IPV4_UDP) {
 			logger.warn("KNX IP has protocol support for UDP/IP only");
 			return;
 		}
@@ -528,9 +528,7 @@ public class KNXnetIPRouting extends ConnectionBase
 
 	private static InetSocketAddress createResponseAddress(final HPAI endpoint, final InetSocketAddress sender) {
 		// NAT: if the data EP is incomplete or left empty, we fall back to the IP address and port of the sender.
-		if (endpoint.getAddress().isAnyLocalAddress() || endpoint.getPort() == 0)
-			return sender;
-		return new InetSocketAddress(endpoint.getAddress(), endpoint.getPort());
+		return endpoint.nat() ? sender : endpoint.endpoint();
 	}
 
 	@Override

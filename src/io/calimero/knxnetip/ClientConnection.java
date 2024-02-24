@@ -187,7 +187,7 @@ public abstract class ClientConnection extends ConnectionBase
 			final var lsa = localSocketAddress();
 			logger.debug("establish connection from {} to {} ({})", hostPort(lsa), hostPort(ctrlEndpt), tcp ? "tcp" : "udp");
 			// HPAI throws if wildcard local address (0.0.0.0) is supplied
-			final var hpai = tcp ? HPAI.Tcp : new HPAI(HPAI.IPV4_UDP, useNat ? null : lsa);
+			final var hpai = tcp ? HPAI.Tcp : useNat ? HPAI.Nat : new HPAI(HPAI.IPV4_UDP, lsa);
 			final byte[] buf = PacketHelper.toPacket(protocolVersion(), new ConnectRequest(cri, hpai, hpai));
 			send(buf, ctrlEndpt);
 		}
@@ -294,7 +294,7 @@ public abstract class ClientConnection extends ConnectionBase
 			final ConnectResponse res = new ConnectResponse(data, offset);
 			// address info is only != null on no error
 			final HPAI ep = res.getDataEndpoint();
-			if (res.getStatus() == ErrorCodes.NO_ERROR && tcp == (ep.getHostProtocol() == HPAI.IPV4_TCP)) {
+			if (res.getStatus() == ErrorCodes.NO_ERROR && tcp == (ep.hostProtocol() == HPAI.IPV4_TCP)) {
 				channelId = res.getChannelID();
 				if (tcp) {
 					if (!ep.isRouteBack()) {
@@ -321,7 +321,7 @@ public abstract class ClientConnection extends ConnectionBase
 				setStateNotify(OK);
 				return true;
 			}
-			if (ep != null && ep.getHostProtocol() != HPAI.IPV4_UDP)
+			if (ep != null && ep.hostProtocol() != HPAI.IPV4_UDP)
 				status = "server does not agree with UDP/IP";
 			else
 				status = res.getStatusString();
@@ -463,7 +463,7 @@ public abstract class ClientConnection extends ConnectionBase
 		public void run()
 		{
 			thread = Thread.currentThread();
-			final var hpai = tcp ? HPAI.Tcp : new HPAI(HPAI.IPV4_UDP, useNat ? null : localSocketAddress());
+			final var hpai = tcp ? HPAI.Tcp : useNat ? HPAI.Nat : new HPAI(HPAI.IPV4_UDP, localSocketAddress());
 			final byte[] buf = PacketHelper.toPacket(protocolVersion(), new ConnectionstateRequest(channelId, hpai));
 			try {
 				while (!stop) {

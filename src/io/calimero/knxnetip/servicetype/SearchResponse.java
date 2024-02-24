@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -97,7 +97,7 @@ public class SearchResponse extends ServiceType
 
 	private SearchResponse(final int svcType, final byte[] data, final int offset, final int length) throws KNXFormatException {
 		super(svcType);
-		endpt = new HPAI(data, offset);
+		endpt = HPAI.from(data, offset);
 		desc = new DescriptionResponse(data, offset + endpt.getStructLength(), length - endpt.getStructLength());
 	}
 
@@ -192,7 +192,7 @@ public class SearchResponse extends ServiceType
 	@Override
 	public String toString()
 	{
-		if (endpt.getHostProtocol() == HPAI.IPV4_TCP)
+		if (endpt.hostProtocol() == HPAI.IPV4_TCP)
 			return desc.toString();
 		return endpt + " " + desc;
 	}
