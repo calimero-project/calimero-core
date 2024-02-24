@@ -165,24 +165,6 @@ public record HPAI(int hostProtocol, InetSocketAddress endpoint) {
 	}
 
 	/**
-	 * Returns the IP network address as {@link InetAddress} representation.
-	 *
-	 * @return IP address as InetAddress object
-	 */
-	public InetAddress getAddress() {
-		return endpoint.getAddress();
-	}
-
-	/**
-	 * Returns the port number of this HPAI.
-	 *
-	 * @return port as unsigned 16 bit value
-	 */
-	public int getPort() {
-		return endpoint.getPort();
-	}
-
-	/**
 	 * {@return structure length of this HPAI as unsigned byte}
 	 */
 	public int getStructLength() {
