@@ -125,8 +125,18 @@ public class SearchResponse extends ServiceType
 	public SearchResponse(final boolean ext, final HPAI ctrlEndpoint, final List<DIB> dibs) {
 		super(ext ? KNXnetIPHeader.SearchResponse : KNXnetIPHeader.SEARCH_RES);
 		endpt = ctrlEndpoint;
-		if (!ext && dibs.size() < 2)
-			throw new KNXIllegalArgumentException("search response shall contain device & service families DIB");
+		if (!ext) {
+			if (dibs.size() < 2)
+				throw new KNXIllegalArgumentException("search response shall contain device & service families DIB");
+			for (final DIB dib : dibs) {
+				switch (dib.getDescTypeCode()) {
+					case DIB.TunnelingInfo -> throw new KNXIllegalArgumentException(
+							"search response shall not contain Tunneling Information DIB (0x07)");
+					case DIB.AdditionalDeviceInfo -> throw new KNXIllegalArgumentException(
+							"search response shall not contain Extended Device Information DIB (0x08)");
+				}
+			}
+		}
 		desc = new DescriptionResponse(dibs);
 	}
 
