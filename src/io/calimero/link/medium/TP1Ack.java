@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -75,16 +75,13 @@ public class TP1Ack extends RawAckBase
 		final int ctrl = data[offset] & 0xff;
 		if ((ctrl & 0x33) != 0x00)
 			throw new KNXFormatException("no TP1 ACK frame, invalid control field", ctrl);
-		if (ctrl == ACK)
-			ack = ACK;
-		else if (ctrl == NAK)
-			ack = NAK;
-		else if (ctrl == BUSY)
-			ack = BUSY;
-		else if (ctrl == NAK_BUSY)
-			ack = NAK_BUSY;
-		else
-			throw new KNXFormatException("no valid acknowledge type", ctrl);
+		ack = switch (ctrl) {
+			case ACK -> ACK;
+			case NAK -> NAK;
+			case BUSY -> BUSY;
+			case NAK_BUSY -> NAK_BUSY;
+			default -> throw new KNXFormatException("invalid acknowledge type", ctrl);
+		};
 	}
 
 	@Override
