@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -593,7 +593,7 @@ public class Discoverer
 				port);
 		try (var dc = newChannel(bind)) {
 			final var local = (InetSocketAddress) dc.getLocalAddress();
-			final byte[] buf = PacketHelper.toPacket(new DescriptionRequest(nat ? null : local));
+			final byte[] buf = PacketHelper.toPacket(nat ? DescriptionRequest.Nat : new DescriptionRequest(local));
 			dc.send(ByteBuffer.wrap(buf), server);
 			final ReceiverLoop looper = new ReceiverLoop(dc, 512, Duration.ofSeconds(timeout), server);
 			looper.loop();
