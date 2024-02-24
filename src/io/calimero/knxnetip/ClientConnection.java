@@ -291,28 +291,21 @@ public abstract class ClientConnection extends ConnectionBase
 		if (svc == KNXnetIPHeader.CONNECT_REQ)
 			logger.warn("received connect request - ignored");
 		else if (svc == KNXnetIPHeader.CONNECT_RES) {
-			final ConnectResponse res = new ConnectResponse(data, offset);
+			final ConnectResponse res;
+			try {
+				res = new ConnectResponse(data, offset);
+			} catch (final KNXFormatException e) {
+				close(CloseEvent.INTERNAL, e.getMessage(), LogLevel.ERROR, null);
+				throw e;
+			}
 			// address info is only != null on no error
 			final HPAI ep = res.getDataEndpoint();
 			if (res.getStatus() == ErrorCodes.NO_ERROR && tcp == (ep.hostProtocol() == HPAI.IPV4_TCP)) {
 				channelId = res.getChannelID();
-				if (tcp) {
-					if (!ep.isRouteBack()) {
-						final String msg = "connect response from " + src + ":" + port
-								+ " does not contain route-back data endpoint";
-						close(CloseEvent.INTERNAL, msg, LogLevel.ERROR, null);
-						return true;
-					}
+				if (tcp || (useNat && ep.nat()))
 					dataEndpt = new InetSocketAddress(src, port);
-				}
-				else if (useNat && (ep.getAddress().isAnyLocalAddress() || ep.getPort() == 0)) {
-					// in NAT aware mode, if the data EP is incomplete or left
-					// empty, we fall back to the IP address and port of the sender
-					dataEndpt = new InetSocketAddress(src, port);
-				}
-				else {
+				else
 					dataEndpt = ep.endpoint();
-				}
 
 				if (res.getCRD() instanceof TunnelCRD)
 					tunnelingAddress = ((TunnelCRD) res.getCRD()).getAssignedAddress();
