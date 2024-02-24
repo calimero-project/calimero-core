@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@
 
 package io.calimero.knxnetip;
 
+import static io.calimero.knxnetip.KNXnetIPConnection.BlockingMode.NonBlocking;
 import static java.nio.ByteBuffer.allocate;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -43,7 +44,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static io.calimero.knxnetip.KNXnetIPConnection.BlockingMode.NonBlocking;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -65,9 +65,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import tag.KnxnetIP;
-import tag.KnxnetIPSequential;
-import tag.Slow;
 import io.calimero.CloseEvent;
 import io.calimero.DataUnitBuilder;
 import io.calimero.FrameEvent;
@@ -87,6 +84,9 @@ import io.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import io.calimero.knxnetip.servicetype.RoutingBusy;
 import io.calimero.knxnetip.servicetype.RoutingSystemBroadcast;
 import io.calimero.mgmt.PropertyAccess.PID;
+import tag.KnxnetIP;
+import tag.KnxnetIPSequential;
+import tag.Slow;
 
 
 @KnxnetIP
