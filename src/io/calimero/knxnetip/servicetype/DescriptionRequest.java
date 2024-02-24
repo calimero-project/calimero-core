@@ -1,7 +1,7 @@
 /*
     Calimero 2 - A library for KNX network access
     Copyright (c) 2005 B. Erb
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -60,11 +60,11 @@ import io.calimero.knxnetip.util.HPAI;
  */
 public class DescriptionRequest extends ServiceType {
 	private static final DescriptionRequest tcpRequest = new DescriptionRequest(HPAI.Tcp);
+	public static DescriptionRequest tcpRequest() { return tcpRequest; }
+
+	public static DescriptionRequest Nat = new DescriptionRequest(HPAI.Nat);
 
 	private final HPAI endpoint;
-
-
-	public static DescriptionRequest tcpRequest() { return tcpRequest; }
 
 	/**
 	 * Creates a description request out of a byte array.
@@ -93,26 +93,12 @@ public class DescriptionRequest extends ServiceType {
 	/**
 	 * Creates a new UDP description request with the supplied address used for a description response.
 	 *
-	 * @param responseAddr address of client control endpoint used for response, use
-	 *        {@code null} if NAT is used on the IP network
+	 * @param responseAddr address of client control endpoint used for response
 	 */
 	public DescriptionRequest(final InetSocketAddress responseAddr)
 	{
 		super(KNXnetIPHeader.DESCRIPTION_REQ);
-		endpoint = new HPAI(HPAI.IPV4_UDP, responseAddr);
-	}
-
-	/**
-	 * Convenience constructor to create a new description request using the UDP transport
-	 * protocol and the system default local host with the supplied client port.
-	 *
-	 * @param responsePort port number of the client control endpoint used for response, 0
-	 *        &lt;= port &lt;= 0xFFFF
-	 */
-	public DescriptionRequest(final int responsePort)
-	{
-		super(KNXnetIPHeader.DESCRIPTION_REQ);
-		endpoint = new HPAI((InetAddress) null, responsePort);
+		endpoint = responseAddr == null ? HPAI.Nat : new HPAI(HPAI.IPV4_UDP, responseAddr);
 	}
 
 	/**
