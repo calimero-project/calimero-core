@@ -1,7 +1,7 @@
 /*
     Calimero 2 - A library for KNX network access
     Copyright (c) 2005 B. Erb
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
     Copyright (c) 2018 Karsten Heimrich
 
     This program is free software; you can redistribute it and/or modify
@@ -115,7 +115,7 @@ public class SearchRequest extends ServiceType
 		super(svc);
 		if (length < MinimumStructSize)
 			throw new KNXFormatException("wrong size for search.req, requires " + MinimumStructSize + " bytes", length);
-		endpoint = new HPAI(data, offset);
+		endpoint = HPAI.from(data, offset);
 
 		if (svc == KNXnetIPHeader.SearchRequest && length > MinimumStructSize) {
 			int index = endpoint.getStructLength();

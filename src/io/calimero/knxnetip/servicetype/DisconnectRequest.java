@@ -1,7 +1,7 @@
 /*
     Calimero 2 - A library for KNX network access
     Copyright (c) 2005 B. Erb
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -78,7 +78,7 @@ public class DisconnectRequest extends ServiceType
 		channelid = data[i++] & 0xFF;
 		// skip reserved field
 		++i;
-		endpt = new HPAI(data, i);
+		endpt = HPAI.from(data, i);
 	}
 
 	/**

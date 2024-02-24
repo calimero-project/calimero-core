@@ -75,7 +75,7 @@ public class ConnectionstateRequest extends ServiceType
 		if (data.length - offset < 3)
 			throw new KNXFormatException("buffer too short for request");
 		channelid = data[offset] & 0xFF;
-		endpt = new HPAI(data, offset + 2);
+		endpt = HPAI.from(data, offset + 2);
 	}
 
 	/**
