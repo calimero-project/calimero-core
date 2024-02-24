@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -402,15 +402,6 @@ public final class DataUnitBuilder
 			case 0x3f1 -> "S-A_Data";
 			default -> "APCI 0x" + Integer.toHexString(apci);
 		};
-	}
-
-	/**
-	 * @deprecated Use {@link HexFormat}.
-	 */
-	@Deprecated
-	public static String toHex(final byte[] data, final String sep)
-	{
-		return HexFormat.ofDelimiter(sep).formatHex(data);
 	}
 
 	/**
