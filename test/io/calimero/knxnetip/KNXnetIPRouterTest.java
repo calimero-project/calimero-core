@@ -346,6 +346,7 @@ class KNXnetIPRouterTest
 	}
 
 	@Test
+	@SuppressWarnings("resource")
 	void initWithSystemBroadcastSocket() {
 		assertDoesNotThrow(() ->  new KNXnetIPRouting(null, InetAddress.getByName("224.0.23.13")));
 	}

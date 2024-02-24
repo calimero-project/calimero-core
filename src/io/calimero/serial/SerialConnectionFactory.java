@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2022, 2023 B. Malinowsky
+    Copyright (c) 2022, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -90,6 +90,7 @@ public final class SerialConnectionFactory {
 	 * @return new connection for the specified serial communication port, port resource is in open state
 	 * @throws KNXException on failure to open or configure serial port, or no adapter available
 	 */
+	@SuppressWarnings("resource")
 	public static SerialCom open(final String portId, final int baudrate, final Duration readIntervalTimeout,
 			final Duration receiveTimeout) throws KNXException {
 		final int databits = 8;

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2023 B. Malinowsky
+    Copyright (c) 2010, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -833,6 +833,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	}
 
 	// work around for implementation in TL, which unconditionally throws if dst exists
+	@SuppressWarnings("resource")
 	private Destination getOrCreateDestination(final IndividualAddress device,
 		final boolean keepAlive, final boolean verifyByServer)
 	{
