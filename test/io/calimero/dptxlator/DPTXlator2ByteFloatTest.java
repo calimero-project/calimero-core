@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,20 +36,31 @@
 
 package io.calimero.dptxlator;
 
-import org.junit.jupiter.api.BeforeEach;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 
 class DPTXlator2ByteFloatTest
 {
-	private DPTXlator2ByteFloat t;
 	private final String min = "-671088.64";
-	private final String max = "670760.96";
+	private final String max = "670433.28";
+	private final String maxAlt = "670760";
 	private final String zero = "0.0";
 
 	private final String value1 = "735.763";
@@ -61,14 +72,15 @@ class DPTXlator2ByteFloatTest
 	private final double[] floats = { Double.parseDouble(min), Double.parseDouble(max),
 		Double.parseDouble(zero), Double.parseDouble(value1), Double.parseDouble(value2), };
 
-	private final byte[] dataMin = { (byte) 0xf8, 0, };
-	private final byte[] dataMax = { 0x7f, -1 };
+	private final byte[] dataMin = { (byte) 0xf8, 0 };
+	private final byte[] dataMax = { (byte) 0x7f, (byte) 0xfe }; // 670433.28
+	private final byte[] invalid = { 0x7f, (byte) 0xff };
 	private final byte[] dataZero = { 0, 0 };
-	private final byte[] dataValue1 = { (byte) 0x34, (byte) 0x7e, };
+	private final byte[] dataValue1 = { (byte) 0x34, (byte) 0x7e };
 	// 2 byte offset, 1 byte appended
 	private final byte[] dataValue2 = { 0, 0, (byte) 0x1c, (byte) 0xe2, 0 };
 
-	private final DPT[] dpts = { DPTXlator2ByteFloat.DPT_TEMPERATURE,
+	private static final DPT[] dpts = { DPTXlator2ByteFloat.DPT_TEMPERATURE,
 		DPTXlator2ByteFloat.DPT_TEMPERATURE_DIFFERENCE,
 		DPTXlator2ByteFloat.DPT_TEMPERATURE_GRADIENT, DPTXlator2ByteFloat.DPT_INTENSITY_OF_LIGHT,
 		DPTXlator2ByteFloat.DPT_WIND_SPEED, DPTXlator2ByteFloat.DPT_AIR_PRESSURE,
@@ -81,15 +93,66 @@ class DPTXlator2ByteFloatTest
 		DPTXlator2ByteFloat.DPT_WIND_SPEED_KMH, DPTXlator2ByteFloat.DptAbsoluteHumidity,
 		DPTXlator2ByteFloat.DptConcentration };
 
+	private static final DPT[] dptsLowerZero = { DPTXlator2ByteFloat.DPT_INTENSITY_OF_LIGHT,
+			DPTXlator2ByteFloat.DPT_WIND_SPEED, DPTXlator2ByteFloat.DPT_AIR_PRESSURE,
+			DPTXlator2ByteFloat.DPT_HUMIDITY, DPTXlator2ByteFloat.DPT_AIRQUALITY,
+			DPTXlator2ByteFloat.DPT_WIND_SPEED_KMH, DPTXlator2ByteFloat.DptAbsoluteHumidity,
+			DPTXlator2ByteFloat.DptConcentration };
 
-	@BeforeEach
-	void init() throws Exception
-	{
-		t = new DPTXlator2ByteFloat(DPTXlator2ByteFloat.DPT_RAIN_AMOUNT);
+
+	@ParameterizedTest
+	@MethodSource("allXlators")
+	void invalidData(final DPTXlator2ByteFloat t) {
+		t.setData(invalid);
 	}
 
-	@Test
-	void setValues() throws KNXFormatException
+	@ParameterizedTest
+	@MethodSource("allXlators")
+	void invalidValue(final DPTXlator2ByteFloat t) {
+		t.setData(invalid);
+		// TODO indicate invalid value in get(Numeric)Value
+		t.getValue();
+		t.getNumericValue();
+	}
+
+	@ParameterizedTest
+	@MethodSource("xlatorsLowerZero")
+	void min0(final DPTXlator2ByteFloat t) throws KNXFormatException {
+		t.setValue(0);
+		t.setValue(zero);
+
+		assertThrows(KNXFormatException.class, () -> t.setValue(Math.nextDown(0d)));
+		assertThrows(KNXFormatException.class, () -> t.setValue("-0.1"));
+		assertThrows(KNXFormatException.class, () -> t.setValue(min));
+		assertThrows(KNXFormatException.class, () -> t.setValue(Double.parseDouble(min)));
+	}
+
+	@ParameterizedTest
+	@MethodSource("tempXlators")
+	void minTemp(final DPTXlator2ByteFloat t, final double lowerLimit, final String sLowerLimit) throws KNXFormatException {
+		t.setValue(lowerLimit);
+		t.setValue(sLowerLimit);
+
+		assertThrows(KNXFormatException.class, () -> t.setValue(Math.nextDown(lowerLimit)));
+		assertThrows(KNXFormatException.class, () -> t.setValue("" + Math.nextDown(lowerLimit)));
+		assertThrows(KNXFormatException.class, () -> t.setValue(min));
+		assertThrows(KNXFormatException.class, () -> t.setValue(Double.parseDouble(min)));
+	}
+
+	@ParameterizedTest
+	@MethodSource("xlatorsMaxAlt")
+	void maxAlt(final DPTXlator2ByteFloat t) throws KNXFormatException {
+		t.setValue(maxAlt);
+		final double d = Double.parseDouble(maxAlt);
+		t.setValue(d);
+
+		assertThrows(KNXFormatException.class, () -> t.setValue(Math.nextUp(d)));
+		assertThrows(KNXFormatException.class, () -> t.setValue("" + Math.nextUp(d)));
+	}
+
+	@ParameterizedTest
+	@MethodSource("xlatorsMinMax")
+	void setValues(final DPTXlator2ByteFloat t) throws KNXFormatException
 	{
 		t.setValues();
 		assertEquals(1, t.getItems());
@@ -101,8 +164,9 @@ class DPTXlator2ByteFloatTest
 		t.setValues(t.getValue(), t.getValue());
 	}
 
-	@Test
-	void getAllValues() throws KNXFormatException
+	@ParameterizedTest
+	@MethodSource("xlatorsMinMax")
+	void getAllValues(final DPTXlator2ByteFloat t) throws KNXFormatException
 	{
 		assertEquals(t.getItems(), t.getItems());
 		assertEquals(0.0, t.getNumericValue(), 0);
@@ -114,8 +178,9 @@ class DPTXlator2ByteFloatTest
 			assertTrue(returned[i].contains(strings[i]));
 	}
 
-	@Test
-	void setValueString() throws KNXFormatException
+	@ParameterizedTest
+	@MethodSource("allXlators")
+	void setValueString(final DPTXlator2ByteFloat t) throws KNXFormatException
 	{
 		t.setValue(value1);
 		assertEquals(1, t.getItems());
@@ -126,8 +191,9 @@ class DPTXlator2ByteFloatTest
 		assertTrue(t.getValue().startsWith(value1Enc));
 	}
 
-	@Test
-	void setDataByteArrayInt()
+	@ParameterizedTest
+	@MethodSource("xlatorsMinMax")
+	void setDataByteArrayInt(final DPTXlator2ByteFloat t)
 	{
 		t.setData(dataMin, 0);
 		try {
@@ -151,8 +217,9 @@ class DPTXlator2ByteFloatTest
 		Helper.assertSimilar(new String[] { max, value1Enc }, t.getAllValues());
 	}
 
-	@Test
-	void getDataByteArrayInt() throws KNXFormatException
+	@ParameterizedTest
+	@MethodSource("xlatorsMinMax")
+	void getDataByteArrayInt(final DPTXlator2ByteFloat t) throws KNXFormatException
 	{
 		t.setData(dataValue2, 2);
 		final byte[] data = t.getData(new byte[5], 2);
@@ -177,8 +244,8 @@ class DPTXlator2ByteFloatTest
 	}
 
 	@Test
-	void getSubTypes()
-	{
+	void getSubTypes() throws KNXFormatException {
+		final var t = new DPTXlator2ByteFloat(dpts[0]);
 		assertEquals(dpts.length, t.getSubTypes().size());
 		t.getSubTypes().remove(dpts[0].getID());
 		assertEquals(dpts.length - 1, t.getSubTypes().size());
@@ -187,41 +254,33 @@ class DPTXlator2ByteFloatTest
 		assertEquals(dpts.length, t.getSubTypes().size());
 	}
 
-	@Test
-	void dptXlator2ByteFloatDPT() throws KNXFormatException
+	@ParameterizedTest
+	@MethodSource("allXlators")
+	void lowerUpperLimit(final DPTXlator2ByteFloat t) throws KNXFormatException
 	{
-		// do no similarity test because float type rounding issues
-		Helper.checkDPTs(dpts, false);
+		final DPT dpt = t.getType();
+		t.setValue(dpt.getLowerValue());
+		t.setAppendUnit(false);
+		double lower = Double.parseDouble(dpt.getLowerValue());
+		assertEquals(lower, Double.parseDouble(t.getValue()), 0.09);
 
-		for (DPT value : dpts) {
-			setValueFloatFail(new DPTXlator2ByteFloat(value),
-					Double.parseDouble(value.getLowerValue()) - 0.1d);
-			setValueFloatFail(new DPTXlator2ByteFloat(value),
-					Double.parseDouble(value.getUpperValue()) + 0.1d);
-		}
+		t.setValue(dpt.getUpperValue());
+		double upper = Double.parseDouble(dpt.getUpperValue());
+		assertEquals(upper, Double.parseDouble(t.getValue()), 0.96);
 
-		final DPT dpt = new DPT("0.00", "invalid", "invalid", "invalid", "invalid");
-		boolean failed = false;
-		try {
-			new DPTXlator2ByteFloat(dpt);
-		}
-		catch (final KNXFormatException e) {
-			failed = true;
-		}
-		assertTrue(failed);
-	}
-
-	private void setValueFloatFail(final DPTXlator2ByteFloat tr, final double d)
-	{
-		try {
-			tr.setValue(d);
-			fail("set value should fail: " + d);
-		}
-		catch (final KNXFormatException e) {}
+		assertThrows(KNXFormatException.class, () -> t.setValue(Math.nextDown(lower)));
+		assertThrows(KNXFormatException.class, () -> t.setValue(Math.nextUp(upper)));
 	}
 
 	@Test
-	void getNumericValue() throws KNXFormatException
+	void invalid() {
+		final DPT invalid = new DPT("0.00", "invalid", "invalid", "invalid", "invalid");
+		assertThrows(KNXFormatException.class, () -> new DPTXlator2ByteFloat(invalid));
+	}
+
+	@ParameterizedTest
+	@MethodSource("xlatorsMinMax")
+	void getNumericValue(final DPTXlator2ByteFloat t) throws KNXFormatException
 	{
 		assertEquals(0.0, t.getNumericValue(), 0);
 
@@ -242,8 +301,9 @@ class DPTXlator2ByteFloatTest
 		}
 	}
 
-	@Test
-	void setValueDouble() throws KNXFormatException
+	@ParameterizedTest
+	@MethodSource("xlatorsMinMax")
+	void setValueDouble(final DPTXlator2ByteFloat t) throws KNXFormatException
 	{
 		for (int i = 0; i < floats.length; i++) {
 			t.setValue(floats[i]);
@@ -252,19 +312,21 @@ class DPTXlator2ByteFloatTest
 		}
 	}
 
-	@Test
-	void testToString() throws KNXFormatException
+	@ParameterizedTest
+	@MethodSource("xlatorsMinMax")
+	void testToString(final DPTXlator2ByteFloat t) throws KNXFormatException
 	{
 		assertTrue(t.toString().contains("0.0"));
 		t.setValues(strings);
 		final String s = t.toString();
-		for (String string : strings) {
+		for (final String string : strings) {
 			assertTrue(s.contains(string));
 		}
 	}
 
-	@Test
-	void getValue() throws KNXFormatException
+	@ParameterizedTest
+	@MethodSource("allXlators")
+	void getValue(final DPTXlator2ByteFloat t) throws KNXFormatException
 	{
 		assertTrue(t.getValue().contains("0"));
 		assertTrue(t.getValue().contains(t.getType().getUnit()));
@@ -276,9 +338,49 @@ class DPTXlator2ByteFloatTest
 		assertTrue(t.getValue().contains(s));
 	}
 
-	@Test
-	void getType()
-	{
-		assertEquals(t.getType(), dpts[17]);
+	@ParameterizedTest
+	@MethodSource("allXlators")
+	void getType(final DPTXlator2ByteFloat t) throws KNXFormatException {
+		assertEquals(t.getType(), new DPTXlator2ByteFloat(t.getType().getID()).getType());
+	}
+
+
+	private static Stream<DPTXlator2ByteFloat> allXlators() {
+		return Stream.of(dpts).map(DPTXlator2ByteFloatTest::create);
+	}
+
+	// lower limit 0
+	private static Stream<DPTXlator2ByteFloat> xlatorsLowerZero() {
+		return Stream.of(dptsLowerZero).map(DPTXlator2ByteFloatTest::create);
+	}
+
+	// temperature DPTs have different lower limit
+	private static Stream<Arguments> tempXlators() throws KNXFormatException {
+		return Stream.of(
+				Arguments.of(new DPTXlator2ByteFloat(DPTXlator2ByteFloat.DPT_TEMPERATURE), -273, "-273.0"),
+				Arguments.of(new DPTXlator2ByteFloat(DPTXlator2ByteFloat.DPT_TEMP_F), -459.6, "-459.6"));
+	}
+
+	// alternative upper limit 670760
+	private static Stream<DPTXlator2ByteFloat> xlatorsMaxAlt() {
+		return Stream.of(DPTXlator2ByteFloat.DptAbsoluteHumidity, DPTXlator2ByteFloat.DptConcentration)
+				.map(DPTXlator2ByteFloatTest::create);
+	}
+
+	// default lower/upper limit
+	private static Stream<DPTXlator2ByteFloat> xlatorsMinMax() {
+		final var minMax = new ArrayList<>(Arrays.asList(dpts));
+		minMax.removeAll(Arrays.asList(dptsLowerZero));
+		minMax.remove(DPTXlator2ByteFloat.DPT_TEMPERATURE);
+		minMax.remove(DPTXlator2ByteFloat.DPT_TEMP_F);
+		return minMax.stream().map(DPTXlator2ByteFloatTest::create);
+	}
+
+	private static DPTXlator2ByteFloat create(final DPT dpt) {
+		try {
+			return new DPTXlator2ByteFloat(dpt.getID());
+		} catch (final KNXFormatException e) {
+			throw new IllegalStateException();
+		}
 	}
 }
