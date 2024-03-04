@@ -63,27 +63,25 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	/**
 	 * DPT ID 9.001, Temperature; values from <b>-273</b> to <b>670433.28</b> °C.
 	 */
-	public static final DPT DPT_TEMPERATURE =
-		new DPT("9.001", "Temperature", "-273", "670433.28", "°C");
+	public static final DPT DPT_TEMPERATURE = new DPT("9.001", "Temperature", "-273", "670433.28", "°C");
 
 	/**
 	 * DPT ID 9.002, Temperature difference; value range <b>-671088.64</b> to <b>670433.28</b> K.
 	 */
-	public static final DPT DPT_TEMPERATURE_DIFFERENCE =
-		new DPT("9.002", "Temperature difference", "-671088.64", "670433.28", "K");
+	public static final DPT DPT_TEMPERATURE_DIFFERENCE = new DPT("9.002", "Temperature difference", "-671088.64",
+			"670433.28", "K");
 
 	/**
 	 * DPT ID 9.003, Temperature gradient; value range <b>-671088.64</b> to <b>670433.28</b> K/h.
 	 */
-	public static final DPT DPT_TEMPERATURE_GRADIENT =
-		new DPT("9.003", "Temperature gradient", "-671088.64", "670433.28", "K/h");
+	public static final DPT DPT_TEMPERATURE_GRADIENT = new DPT("9.003", "Temperature gradient", "-671088.64",
+			"670433.28", "K/h");
 
 	/**
-	 * DPT ID 9.004, Intensity of light (Lux); values from <b>0</b> to <b>670433.28</b> lx. Note, the
-	 * unit of measure symbol used here is "lx", and not "Lux" as originally proposed for this DPT.
+	 * DPT ID 9.004, Intensity of light (Lux); values from <b>0</b> to <b>670433.28</b> lx. Note, the unit of measure
+	 * symbol used here is "lx", and not "Lux" as originally proposed for this DPT.
 	 */
-	public static final DPT DPT_INTENSITY_OF_LIGHT =
-		new DPT("9.004", "Light intensity", "0", "670433.28", "lx");
+	public static final DPT DPT_INTENSITY_OF_LIGHT = new DPT("9.004", "Light intensity", "0", "670433.28", "lx");
 
 	/**
 	 * DPT ID 9.005, Wind speed; values from <b>0</b> to <b>670433.28</b> m/s.
@@ -93,8 +91,7 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	/**
 	 * DPT ID 9.006, Air pressure; values from <b>0</b> to <b>670433.28</b> Pa.
 	 */
-	public static final DPT DPT_AIR_PRESSURE = new DPT("9.006", "Air pressure", "0", "670433.28",
-			"Pa");
+	public static final DPT DPT_AIR_PRESSURE = new DPT("9.006", "Air pressure", "0", "670433.28", "Pa");
 
 	/**
 	 * DPT ID 9.007, Humidity; values from <b>0</b> to <b>670433.28</b> %.
@@ -109,20 +106,17 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	/**
 	 * DPT ID 9.009, Air flow; value range <b>-671088.64</b> to <b>670433.28</b> m&sup3;/h; resolution 0.01 m&sup3;/h.
 	 */
-	public static final DPT DPT_AIR_FLOW = new DPT("9.009", "Air flow", "-671088.64", "670433.28",
-			"m³/h");
+	public static final DPT DPT_AIR_FLOW = new DPT("9.009", "Air flow", "-671088.64", "670433.28", "m³/h");
 
 	/**
 	 * DPT ID 9.010, Time difference in seconds; value range <b>-671088.64</b> to <b>670433.28</b> s.
 	 */
-	public static final DPT DPT_TIME_DIFFERENCE1 =
-		new DPT("9.010", "Time difference 1", "-671088.64", "670433.28", "s");
+	public static final DPT DPT_TIME_DIFFERENCE1 = new DPT("9.010", "Time difference 1", "-671088.64", "670433.28", "s");
 
 	/**
 	 * DPT ID 9.011, Time difference in milliseconds; value range <b>-671088.64</b> to <b>670433.28</b> ms.
 	 */
-	public static final DPT DPT_TIME_DIFFERENCE2 =
-		new DPT("9.011", "Time difference 2", "-671088.64", "670433.28", "ms");
+	public static final DPT DPT_TIME_DIFFERENCE2 = new DPT("9.011", "Time difference 2", "-671088.64", "670433.28", "ms");
 
 	/**
 	 * DPT ID 9.020, Voltage; value range <b>-671088.64</b> to <b>670433.28</b> mV.
@@ -132,20 +126,17 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	/**
 	 * DPT ID 9.021, Electrical current; value range <b>-671088.64</b> to <b>670433.28</b> mA.
 	 */
-	public static final DPT DPT_ELECTRICAL_CURRENT =
-		new DPT("9.021", "Electrical current", "-671088.64", "670433.28", "mA");
+	public static final DPT DPT_ELECTRICAL_CURRENT = new DPT("9.021", "Electrical current", "-671088.64", "670433.28", "mA");
 
 	/**
 	 * DPT ID 9.022, Power density; value range <b>-671088.64</b> to <b>670433.28</b> W/m<sup>2</sup>.
 	 */
-	public static final DPT DPT_POWERDENSITY =
-		new DPT("9.022", "Power density", "-671088.64", "670433.28", "W/m²");
+	public static final DPT DPT_POWERDENSITY = new DPT("9.022", "Power density", "-671088.64", "670433.28", "W/m²");
 
 	/**
 	 * DPT ID 9.023, Kelvin/percent; value range <b>-671088.64</b> to <b>670433.28</b> K/%.
 	 */
-	public static final DPT DPT_KELVIN_PER_PERCENT =
-		new DPT("9.023", "Kelvin/percent", "-671088.64", "670433.28", "K/%");
+	public static final DPT DPT_KELVIN_PER_PERCENT = new DPT("9.023", "Kelvin/percent", "-671088.64", "670433.28", "K/%");
 
 	/**
 	 * DPT ID 9.024, Power; value range <b>-671088.64</b> to <b>670433.28</b> kW.
@@ -155,29 +146,23 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	/**
 	 * DPT ID 9.025, Volume flow in liter/hour; value range <b>-671088.64</b> to <b>670433.28</b> l/h, resolution 0.01.
 	 */
-	public static final DPT DPT_VOLUME_FLOW = new DPT("9.025", "Volume flow", "-671088.64", "670433.28",
-			"l/h");
+	public static final DPT DPT_VOLUME_FLOW = new DPT("9.025", "Volume flow", "-671088.64", "670433.28", "l/h");
 
 	/**
-	 * DPT ID 9.026, Rain amount in liters per square meter; values from <b>-671088.64</b> to
-	 * <b>670433.28</b> l/m<sup>2</sup>, resolution 0.01.
+	 * DPT ID 9.026, Rain amount in liters per square meter; values from <b>-671088.64</b> to <b>670433.28</b>
+	 * l/m<sup>2</sup>, resolution 0.01.
 	 */
-	public static final DPT DPT_RAIN_AMOUNT = new DPT("9.026", "Rain amount", "-671088.64",
-			"670433.28", "l/m²");
+	public static final DPT DPT_RAIN_AMOUNT = new DPT("9.026", "Rain amount", "-671088.64", "670433.28", "l/m²");
 
 	/**
-	 * DPT ID 9.027, Temperature in Degree Fahrenheit; values from <b>-459.6</b> to
-	 * <b>670433.28</b> °F, resolution 0.01.
+	 * DPT ID 9.027, Temperature in Degree Fahrenheit; values from <b>-459.6</b> to <b>670433.28</b> °F, resolution 0.01.
 	 */
-	public static final DPT DPT_TEMP_F = new DPT("9.027", "Temperature", "-459.6", "670433.28",
-			"°F");
+	public static final DPT DPT_TEMP_F = new DPT("9.027", "Temperature", "-459.6", "670433.28", "°F");
 
 	/**
-	 * DPT ID 9.028, Wind speed in km/h; values from <b>0</b> to <b>670433.28</b> km/h, resolution
-	 * 0.01.
+	 * DPT ID 9.028, Wind speed in km/h; values from <b>0</b> to <b>670433.28</b> km/h, resolution 0.01.
 	 */
-	public static final DPT DPT_WIND_SPEED_KMH = new DPT("9.028", "Wind speed", "0", "670433.28",
-			"km/h");
+	public static final DPT DPT_WIND_SPEED_KMH = new DPT("9.028", "Wind speed", "0", "670433.28", "km/h");
 
 	/**
 	 * DPT ID 9.029, absolute humidity in g/m³; values from <b>0</b> to <b>670760</b> g/m³, resolution 0.01.
@@ -188,7 +173,6 @@ public class DPTXlator2ByteFloat extends DPTXlator
 	 * DPT ID 9.030, concentration in µg/m³; values from <b>0</b> to <b>670760</b> µg/m³, resolution 0.01.
 	 */
 	public static final DPT DptConcentration = new DPT("9.030", "concentration", "0", "670760", "µg/m³");
-
 
 
 	private static final Map<String, DPT> types = loadDatapointTypes(DPTXlator2ByteFloat.class);
