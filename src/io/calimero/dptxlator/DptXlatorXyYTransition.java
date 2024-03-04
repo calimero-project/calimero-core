@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2020, 2023 B. Malinowsky
+    Copyright (c) 2020, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,17 +47,17 @@ import io.calimero.KNXIllegalArgumentException;
 
 /**
  * Translator for KNX DPTs with main number 243, type <b>color transition xyY</b>. The KNX data
- * type width is 8 bytes. The default return value after creation is a time period of 0 seconds with invalid
- * coordinates and brightness ({@code 0 s}).
+ * type width is 8 bytes. The default return value after creation is a time period of 0 milliseconds with invalid
+ * coordinates and brightness ({@code 0 ms}).
  */
 public class DptXlatorXyYTransition extends DPTXlator {
 	public static final String Description = "color transition xyY";
 
 	/**
-	 * DPT ID 243.600, color transition xyY; values from <b>(0, 0) 0 % 0 s</b> to <b>(1, 1) 100 % 6553.5 s</b>.
+	 * DPT ID 243.600, color transition xyY; values from <b>(0, 0) 0 % 0 ms</b> to <b>(1, 1) 100 % 6553500 ms</b>.
 	 */
 	public static final DPT DptXyYTransition = new DPT("243.600", "color transition xyY",
-			"(0, 0) 0 % 0 s", "(1, 1) 100 % 6553.5 s");
+			"(0, 0) 0 % 0 ms", "(1, 1) 100 % 6553500 ms");
 
 	private static final Map<String, DPT> types = loadDatapointTypes(DptXlatorXyYTransition.class);
 
@@ -217,7 +217,7 @@ public class DptXlatorXyYTransition extends DPTXlator {
 		if (value.isEmpty())
 			return;
 		final String[] fields = value.split("[ ]+", 0);
-		// max fields defined by either "(x, y) Y % fade s"
+		// max fields defined by either "(x, y) Y % fade ms"
 		if (fields.length > 6 || fields.length < 1)
 			throw newException("unsupported format for color transition xyY", value);
 
@@ -255,7 +255,7 @@ public class DptXlatorXyYTransition extends DPTXlator {
 		}
 		t.setValue(fields[i]);
 		i++;
-		if (fields.length > i && "s".equals(fields[i]))
+		if (fields.length > i && "ms".equals(fields[i]))
 			i++;
 
 		if (i < fields.length)
@@ -290,10 +290,10 @@ public class DptXlatorXyYTransition extends DPTXlator {
 		catch (final KNXFormatException e) {
 			throw new KNXIllegalArgumentException(e.getMessage());
 		}
-		final var dur = t.getValueUnsigned() / 100;
+		final var d = t.getData();
 
-		data[0] = ubyte(dur >> 8);
-		data[1] = ubyte(dur);
+		data[0] = d[0];
+		data[1] = d[1];
 	}
 
 	private void setCoordinates(final double x, final double y) {
@@ -319,7 +319,7 @@ public class DptXlatorXyYTransition extends DPTXlator {
 		data[7] |= 0b01;
 	}
 
-	private int unscaled(final double value) {
+	private static int unscaled(final double value) {
 		if (value < 0 || value > 1)
 			throw new KNXIllegalArgumentException("coordinate " + value + " out of range [0..1]");
 		return (int) (value * 65_535);
