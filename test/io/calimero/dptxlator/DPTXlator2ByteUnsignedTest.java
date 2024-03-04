@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,21 +36,26 @@
 
 package io.calimero.dptxlator;
 
-import java.text.NumberFormat;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
-import io.calimero.KNXException;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 
 class DPTXlator2ByteUnsignedTest
 {
-	private DPTXlator2ByteUnsigned t;
-
 	private final String min = format(0);
 	private final String max = format(65535);
 	private final String value1 = format(735);
@@ -64,7 +69,7 @@ class DPTXlator2ByteUnsignedTest
 	private final byte[] data =
 		{ 2, (byte) 0xDF, 0, 0, (byte) 0xd5, (byte) 0xcc, (byte) 0xff, (byte) 0xff };
 
-	private final DPT[] dpts = {
+	private static final DPT[] dpts = {
 		DPTXlator2ByteUnsigned.DPT_VALUE_2_UCOUNT,
 		DPTXlator2ByteUnsigned.DPT_PROP_DATATYPE,
 		DPTXlator2ByteUnsigned.DPT_TIMEPERIOD,
@@ -80,14 +85,9 @@ class DPTXlator2ByteUnsignedTest
 	};
 
 
-	@BeforeEach
-	void init() throws Exception
-	{
-		t = new DPTXlator2ByteUnsigned(dpts[0]);
-	}
-
-	@Test
-	void setValues() throws KNXFormatException
+	@ParameterizedTest
+	@MethodSource("xlatorsNoScaled")
+	void setValues(final DPTXlator2ByteUnsigned t) throws KNXFormatException
 	{
 		t.setValues(strings);
 		assertEquals(strings.length, t.getItems());
@@ -105,8 +105,9 @@ class DPTXlator2ByteUnsignedTest
 		t.setValues(t.getValue(), t.getValue());
 	}
 
-	@Test
-	void getAllValues() throws KNXFormatException
+	@ParameterizedTest
+	@MethodSource("xlatorsNoScaled")
+	void getAllValues(final DPTXlator2ByteUnsigned t) throws KNXFormatException
 	{
 		assertEquals(1, t.getItems());
 		assertEquals(t.getItems(), t.getItems());
@@ -122,8 +123,9 @@ class DPTXlator2ByteUnsignedTest
 		Helper.assertSimilar(format(5000), t.getAllValues()[0]);
 	}
 
-	@Test
-	void setValueString() throws KNXFormatException
+	@ParameterizedTest
+	@MethodSource("xlatorsNoScaled")
+	void setValueString(final DPTXlator2ByteUnsigned t) throws KNXFormatException
 	{
 		t.setValue(value1);
 		Helper.assertSimilar(value1, t.getValue());
@@ -133,8 +135,9 @@ class DPTXlator2ByteUnsignedTest
 		assertEquals(s, t.getValue());
 	}
 
-	@Test
-	void getValue() throws KNXFormatException
+	@ParameterizedTest
+	@MethodSource("xlatorsNoScaled")
+	void getValue(final DPTXlator2ByteUnsigned t) throws KNXFormatException
 	{
 		Helper.assertSimilar(format(0), t.getValue());
 		t.setValues();
@@ -147,8 +150,9 @@ class DPTXlator2ByteUnsignedTest
 		Helper.assertSimilar(value1, t.getValue());
 	}
 
-	@Test
-	void setDataByteArrayInt()
+	@ParameterizedTest
+	@MethodSource("xlatorsNoScaled")
+	void setDataByteArrayInt(final DPTXlator2ByteUnsigned t)
 	{
 		t.setData(dataMin, 0);
 		try {
@@ -172,8 +176,9 @@ class DPTXlator2ByteUnsignedTest
 		Helper.assertSimilar(strings, t.getAllValues());
 	}
 
-	@Test
-	void getDataByteArrayInt() throws KNXFormatException
+	@ParameterizedTest
+	@MethodSource("xlatorsNoScaled")
+	void getDataByteArrayInt(final DPTXlator2ByteUnsigned t) throws KNXFormatException
 	{
 		assertEquals(4, t.getData(new byte[4], 1).length);
 		final byte[] empty = new byte[4];
@@ -197,8 +202,9 @@ class DPTXlator2ByteUnsignedTest
 	}
 
 	@Test
-	void getSubTypes()
+	void getSubTypes() throws KNXFormatException
 	{
+		final var t = new DPTXlator2ByteUnsigned(dpts[0]);
 		assertEquals(dpts.length, t.getSubTypes().size());
 		t.getSubTypes().remove(dpts[0].getID());
 		assertEquals(dpts.length - 1, t.getSubTypes().size());
@@ -207,38 +213,26 @@ class DPTXlator2ByteUnsignedTest
 		assertEquals(dpts.length, t.getSubTypes().size());
 	}
 
-	@Test
-	void dptXlator2ByteUnsignedDPT() throws KNXFormatException
+	@ParameterizedTest
+	@MethodSource("allXlators")
+	void dptXlator2ByteUnsignedDPT(final DPTXlator2ByteUnsigned t) throws KNXFormatException
 	{
-		checkDPTs(dpts, true);
-		for (DPT dpt : dpts) {
-			setValueIntFail(new DPTXlator2ByteUnsigned(dpt), Integer.parseInt(dpt
-					.getLowerValue()) - 1);
-			setValueDoubleFail(new DPTXlator2ByteUnsigned(dpt), Double.parseDouble(dpt
-					.getUpperValue()) + 1);
-		}
+		final String lower = format(Double.parseDouble(t.getType().getLowerValue()));
+		t.setValue(lower);
+		Helper.assertSimilar(lower, t.getValue());
+
+		final String upper = format(Double.parseDouble(t.getType().getUpperValue()));
+		t.setValue(upper);
+		Helper.assertSimilar(upper, t.getValue());
+
+		assertThrows(KNXFormatException.class,() -> t.setValue(Integer.parseInt(t.getType().getLowerValue()) - 1));
+		assertThrows(KNXFormatException.class,() -> t.setValue(Math.nextDown(Double.parseDouble(t.getType().getLowerValue()))));
+		assertThrows(KNXFormatException.class,() -> t.setValue(Math.nextUp(Double.parseDouble(t.getType().getUpperValue()))));
 	}
 
-	private void setValueIntFail(final DPTXlator2ByteUnsigned tr, final int v)
-	{
-		try {
-			tr.setValue(v);
-			fail("set value should fail: " + v);
-		}
-		catch (final KNXFormatException e) {}
-	}
-
-	private void setValueDoubleFail(final DPTXlator2ByteUnsigned tr, final double v)
-	{
-		try {
-			tr.setValue(v);
-			fail("set value should fail: " + v);
-		}
-		catch (final KNXFormatException e) {}
-	}
-
-	@Test
-	void getValueUnsigned() throws KNXFormatException
+	@ParameterizedTest
+	@MethodSource("xlatorsNoScaled")
+	void getValueUnsigned(final DPTXlator2ByteUnsigned t) throws KNXFormatException
 	{
 		assertEquals(0, t.getValueUnsigned());
 
@@ -257,47 +251,47 @@ class DPTXlator2ByteUnsignedTest
 		}
 	}
 
-	@Test
-	void setValueInt() throws KNXFormatException
+	@ParameterizedTest
+	@MethodSource("xlatorsNoScaled")
+	void setValueInt(final DPTXlator2ByteUnsigned t) throws KNXFormatException
 	{
 		for (int i = 0; i < ints.length; i++) {
 			t.setValue(ints[i]);
 			assertEquals(ints[i], t.getValueUnsigned());
 			Helper.assertSimilar(strings[i], t.getValue());
 		}
-		// check 10ms and 100ms timeperiods
-		DPTXlator2ByteUnsigned tr = new DPTXlator2ByteUnsigned(dpts[3]);
-		tr.setValue(655.35);
-		assertEquals(655350, tr.getValueUnsigned());
-		Helper.assertSimilar(format(655.35), tr.getValue());
-		// round up
-		tr.setValue(337777);
-		assertEquals(337780, tr.getValueUnsigned());
-		Helper.assertSimilar(format(337.78), tr.getValue());
-		// round off
-		tr.setValue(332222);
-		assertEquals(332220, tr.getValueUnsigned());
-		Helper.assertSimilar(format(332.22), tr.getValue());
+	}
 
-		tr = new DPTXlator2ByteUnsigned(dpts[4]);
-		tr.setValue(6553500);
-		assertEquals(6553500, tr.getValueUnsigned());
-		Helper.assertSimilar(format(6553.5), tr.getValue());
+	@Test
+	void setValueTimeperiod_10() throws KNXFormatException {
+		final var t = new DPTXlator2ByteUnsigned(dpts[3]);
+		t.setValue(655350);
+		assertEquals(655350, t.getValueUnsigned());
 		// round up
-		tr.setValue(3377751);
-		assertEquals(3377800, tr.getValueUnsigned());
-		Helper.assertSimilar(format(3377.8), tr.getValue());
+		t.setValue(337777);
+		assertEquals(337780, t.getValueUnsigned());
 		// round off
-		tr.setValue(3322249);
-		assertEquals(3322200, tr.getValueUnsigned());
-		Helper.assertSimilar(format(3322.2), tr.getValue());
+		t.setValue(332222);
+		assertEquals(332220, t.getValueUnsigned());
+	}
+
+	@Test
+	void setValueTimeperiod_100() throws KNXFormatException {
+		final var t = new DPTXlator2ByteUnsigned(dpts[4]);
+		t.setValue(6553500);
+		assertEquals(6553500, t.getValueUnsigned());
+		// round up
+		t.setValue(3377751);
+		assertEquals(3377800, t.getValueUnsigned());
+		// round off
+		t.setValue(3322249);
+		assertEquals(3322200, t.getValueUnsigned());
 	}
 
 	@Test
 	void setTimePeriod() throws KNXFormatException
 	{
-		final long[] max =
-			{ 65535L, 655350L, 6553500L, 65535000L, 65535L * 60000, 65535L * 3600000, };
+		final long[] max = { 65535L, 655350L, 6553500L, 65535000L, 65535L * 60000, 65535L * 3600000, };
 		for (int i = 2; i < 8; i++) {
 			final DPTXlator2ByteUnsigned tr = new DPTXlator2ByteUnsigned(dpts[i]);
 			tr.setTimePeriod(max[i - 2]);
@@ -322,25 +316,22 @@ class DPTXlator2ByteUnsignedTest
 		return formatter.format(v);
 	}
 
-	private static void checkDPTs(final DPT[] dpts, final boolean testSimilarity)
-	{
+	private static Stream<DPTXlator2ByteUnsigned> allXlators() {
+		return Stream.of(dpts).map(DPTXlator2ByteUnsignedTest::create);
+	}
+
+	private static Stream<DPTXlator2ByteUnsigned> xlatorsNoScaled() {
+		final var noScaled = new ArrayList<>(Arrays.asList(dpts));
+		noScaled.remove(DPTXlator2ByteUnsigned.DPT_TIMEPERIOD_10);
+		noScaled.remove(DPTXlator2ByteUnsigned.DPT_TIMEPERIOD_100);
+		return noScaled.stream().map(DPTXlator2ByteUnsignedTest::create);
+	}
+
+	private static DPTXlator2ByteUnsigned create(final DPT dpt) {
 		try {
-			for (DPT dpt : dpts) {
-				final DPTXlator t = TranslatorTypes.createTranslator(0, dpt.getID());
-
-				final String lower = format(Double.parseDouble(dpt.getLowerValue()));
-				t.setValue(lower);
-				if (testSimilarity)
-					Helper.assertSimilar(lower, t.getValue());
-
-				final String upper = format(Double.parseDouble(dpt.getUpperValue()));
-				t.setValue(upper);
-				if (testSimilarity)
-					Helper.assertSimilar(upper, t.getValue());
-			}
-		}
-		catch (final KNXException e) {
-			fail(e.getMessage());
+			return new DPTXlator2ByteUnsigned(dpt.getID());
+		} catch (final KNXFormatException e) {
+			throw new IllegalStateException();
 		}
 	}
 }

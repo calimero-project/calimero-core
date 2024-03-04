@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -71,16 +71,16 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 		new DPT("7.002", "Time period in ms", "0", "65535", "ms");
 
 	/**
-	 * DPT ID 7.003, Time period (resolution 10 ms); values from <b>0</b> to <b>655.35</b> s.
+	 * DPT ID 7.003, Time period (resolution 10 ms); values from <b>0</b> to <b>655350</b> ms.
 	 */
 	public static final DPT DPT_TIMEPERIOD_10 =
-		new DPT("7.003", "Time period (resolution 10 ms)", "0", "655.35", "s");
+		new DPT("7.003", "Time period (resolution 10 ms)", "0", "655350", "ms");
 
 	/**
-	 * DPT ID 7.004, Time period (resolution 100 ms); values from <b>0</b> to <b>6553.5</b> s.
+	 * DPT ID 7.004, Time period (resolution 100 ms); values from <b>0</b> to <b>6553500</b> ms.
 	 */
 	public static final DPT DPT_TIMEPERIOD_100 =
-		new DPT("7.004", "Time period (resolution 100 ms)", "0", "6553.5", "s");
+		new DPT("7.004", "Time period (resolution 100 ms)", "0", "6553500", "ms");
 
 	/**
 	 * DPT ID 7.005, Time period in seconds; values from <b>0</b> to <b>65535</b> s (~18,2 hours).
@@ -167,7 +167,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 		data = new short[2];
 		formatter.setMinimumFractionDigits(0);
 		formatter.setMaximumFractionDigits(2);
-		formatter.setParseIntegerOnly(dpt.equals(DPT_TIMEPERIOD_10) || dpt.equals(DPT_TIMEPERIOD_100) ? false : true);
+		formatter.setParseIntegerOnly(true);
 	}
 
 	@Override
@@ -179,16 +179,14 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	/**
 	 * Sets the value of the first translation item.
 	 * <p>
-	 * A value of DPT {@link #DPT_TIMEPERIOD_10} or {@link #DPT_TIMEPERIOD_100} is
-	 * expected in unit millisecond, i.e., a value of DPT_TIMEPERIOD_10 gets divided by 10,
-	 * a value of DPT_TIMEPERIOD_100 by 100. The result is rounded to the nearest
-	 * representable value (with 0.5 rounded up). On any other DPT the value is expected
-	 * according to its unit.
+	 * Note, a value of DPT {@link #DPT_TIMEPERIOD_10} gets divided by 10 and
+	 * a value of DPT_TIMEPERIOD_100 by 100, therefore, the resulting value is rounded to the nearest
+	 * representable value (with 0.5 rounded up).
 	 *
 	 * @param value unsigned value, 0 &lt;= value &lt;= max, with
 	 *        <ul>
-	 *        <li>max = 655350 on DPT {@link #DPT_TIMEPERIOD_10}</li>
-	 *        <li>max = 6553500 on DPT {@link #DPT_TIMEPERIOD_100}</li>
+	 *        <li>max = 655350 for DPT {@link #DPT_TIMEPERIOD_10}</li>
+	 *        <li>max = 6553500 for DPT {@link #DPT_TIMEPERIOD_100}</li>
 	 *        <li>max = 65535 otherwise</li>
 	 *        </ul>
 	 * @throws KNXFormatException on input value out of range for DPT
@@ -196,10 +194,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	 */
 	public final void setValue(final int value) throws KNXFormatException
 	{
-		if (dpt.equals(DPT_TIMEPERIOD_10) || dpt.equals(DPT_TIMEPERIOD_100))
-			setValue(value / 1000d);
-		else
-			setValue((double) value);
+		setValue((double) value);
 	}
 
 	@Override
@@ -212,27 +207,17 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 
 	/**
 	 * Returns the first translation item as unsigned value.
-	 * <p>
-	 * A value of DPT {@link #DPT_TIMEPERIOD_10} or {@link #DPT_TIMEPERIOD_100} is
-	 * returned in unit millisecond, i.e., a KNX DPT_TIMEPERIOD_10 data value is multiplied
-	 * with 10, DPT_TIMEPERIOD_100 with 100.<br>
-	 * On any other DPT the value is returned according to its unit.
 	 *
 	 * @return value as unsigned 16 Bit using type int
 	 * @see #getType()
 	 */
 	public final int getValueUnsigned()
 	{
-		return (int) fromDPT(0, true);
+		return (int) fromDPT(0);
 	}
 
 	/**
 	 * Returns the first translation item as unsigned value.
-	 * <p>
-	 * A value of DPT {@link #DPT_TIMEPERIOD_10} or {@link #DPT_TIMEPERIOD_100} is returned in unit
-	 * millisecond, i.e., a KNX DPT_TIMEPERIOD_10 data value is multiplied with 10,
-	 * DPT_TIMEPERIOD_100 with 100.<br>
-	 * On any other DPT the value is returned according to its unit.
 	 *
 	 * @return numeric value
 	 * @see io.calimero.dptxlator.DPTXlator#getNumericValue()
@@ -256,8 +241,7 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	/**
 	 * Sets the first translation item value from input of unit millisecond.
 	 * <p>
-	 * The method is for DPTs dealing with periods of time, in particular
-	 * {@link #DPT_TIMEPERIOD}, {@link #DPT_TIMEPERIOD_10}, {@link #DPT_TIMEPERIOD_100}
+	 * This method is for DPTs dealing with periods of time, in particular
 	 * {@link #DPT_TIMEPERIOD_SEC}, {@link #DPT_TIMEPERIOD_MIN} and
 	 * {@link #DPT_TIMEPERIOD_HOURS}. The milliseconds are converted to the unit of the
 	 * set DPT, with the result rounded to the nearest representable value (with 0.5
@@ -287,19 +271,19 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 		return types;
 	}
 
-	private double fromDPT(final int index, final boolean timeperiodMillis)
+	private double fromDPT(final int index)
 	{
 		final int v = (data[2 * index] << 8) | data[2 * index + 1];
 		if (dpt.equals(DPT_TIMEPERIOD_10))
-			return timeperiodMillis ? v * 10 : v / 100d;
-		else if (dpt.equals(DPT_TIMEPERIOD_100))
-			return timeperiodMillis ? v * 100 : v / 10d;
+			return v * 10;
+		if (dpt.equals(DPT_TIMEPERIOD_100))
+			return v * 100;
 		return v;
 	}
 
 	private String makeString(final int index)
 	{
-		return appendUnit(formatter.format(fromDPT(index, false)));
+		return appendUnit(formatter.format(fromDPT(index)));
 	}
 
 	@Override
@@ -307,16 +291,12 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	{
 		try {
 			final String s = removeUnit(value);
-			double v;
-			if (dpt.equals(DPT_TIMEPERIOD_10) || dpt.equals(DPT_TIMEPERIOD_100))
-				v = formatter.parse(s).doubleValue();
-			else {
-				try {
-					v = Integer.decode(s);
-				}
-				catch (final NumberFormatException e) {
-					v = formatter.parse(s).longValue();
-				}
+			long v;
+			try {
+				v = Integer.decode(s);
+			}
+			catch (final NumberFormatException e) {
+				v = formatter.parse(s).longValue();
 			}
 			toDPT(v, dst, index);
 		}
@@ -330,11 +310,9 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 		// prevent round up to 0 from negative milliseconds
 		if (ms < 0)
 			throw newException("negative input value", Long.toString(ms));
-		double v = ms;
+		long v = ms;
 
-		if (dpt.equals(DPT_TIMEPERIOD_10) || dpt.equals(DPT_TIMEPERIOD_100))
-			v = ms / 1000.0;
-		else if (dpt.equals(DPT_TIMEPERIOD_SEC))
+		if (dpt.equals(DPT_TIMEPERIOD_SEC))
 			v = Math.round(ms / 1000.0);
 		else if (dpt.equals(DPT_TIMEPERIOD_MIN))
 			v = Math.round(ms / 1000.0 / 60.0);
@@ -352,9 +330,9 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 							+ dpt.getLowerValue() + ".." + dpt.getUpperValue() + "]", Double.toString(value));
 		final int v;
 		if (dpt.equals(DPT_TIMEPERIOD_10))
-			v = (int) Math.round(value * 100);
+			v = (int) Math.round(value / 10);
 		else if (dpt.equals(DPT_TIMEPERIOD_100))
-			v = (int) Math.round(value * 10);
+			v = (int) Math.round(value / 100);
 		else
 			v = (int) value;
 		dst[2 * index] = ubyte(v >> 8);
@@ -364,11 +342,11 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	private double getLimit(final String limit) throws KNXFormatException
 	{
 		try {
-			final double d = Double.parseDouble(limit);
-			final double upper = dpt.equals(DPT_TIMEPERIOD_10) ? 655.35d : dpt
-					.equals(DPT_TIMEPERIOD_100) ? 6553.5d : 65535;
-			if (d >= 0 && d <= upper)
-				return d;
+			final int i = Integer.parseInt(limit);
+			final int upper = dpt.equals(DPT_TIMEPERIOD_10) ? 655350 : dpt
+					.equals(DPT_TIMEPERIOD_100) ? 6553500 : 65535;
+			if (i >= 0 && i <= upper)
+				return i;
 		}
 		catch (final NumberFormatException e) {}
 		throw newException("limit not in valid DPT range", limit);
