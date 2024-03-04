@@ -61,50 +61,42 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	/**
 	 * DPT ID 7.001, Unsigned count; values from <b>0</b> to <b>65535</b> pulses.
 	 */
-	public static final DPT DPT_VALUE_2_UCOUNT =
-		new DPT("7.001", "Unsigned count", "0", "65535", "pulses");
+	public static final DPT DPT_VALUE_2_UCOUNT = new DPT("7.001", "Unsigned count", "0", "65535", "pulses");
 
 	/**
 	 * DPT ID 7.002, Time period in ms; values from <b>0</b> to <b>65535</b> ms.
 	 */
-	public static final DPT DPT_TIMEPERIOD =
-		new DPT("7.002", "Time period in ms", "0", "65535", "ms");
+	public static final DPT DPT_TIMEPERIOD = new DPT("7.002", "Time period in ms", "0", "65535", "ms");
 
 	/**
 	 * DPT ID 7.003, Time period (resolution 10 ms); values from <b>0</b> to <b>655350</b> ms.
 	 */
-	public static final DPT DPT_TIMEPERIOD_10 =
-		new DPT("7.003", "Time period (resolution 10 ms)", "0", "655350", "ms");
+	public static final DPT DPT_TIMEPERIOD_10 = new DPT("7.003", "Time period (resolution 10 ms)", "0", "655350", "ms");
 
 	/**
 	 * DPT ID 7.004, Time period (resolution 100 ms); values from <b>0</b> to <b>6553500</b> ms.
 	 */
-	public static final DPT DPT_TIMEPERIOD_100 =
-		new DPT("7.004", "Time period (resolution 100 ms)", "0", "6553500", "ms");
+	public static final DPT DPT_TIMEPERIOD_100 = new DPT("7.004", "Time period (resolution 100 ms)", "0", "6553500", "ms");
 
 	/**
 	 * DPT ID 7.005, Time period in seconds; values from <b>0</b> to <b>65535</b> s (~18,2 hours).
 	 */
-	public static final DPT DPT_TIMEPERIOD_SEC =
-		new DPT("7.005", "Time period in seconds", "0", "65535", "s");
+	public static final DPT DPT_TIMEPERIOD_SEC = new DPT("7.005", "Time period in seconds", "0", "65535", "s");
 
 	/**
 	 * DPT ID 7.006, Time period in minutes; values from <b>0</b> to <b>65535</b> min (~45,5 days).
 	 */
-	public static final DPT DPT_TIMEPERIOD_MIN =
-		new DPT("7.006", "Time period in minutes", "0", "65535", "min");
+	public static final DPT DPT_TIMEPERIOD_MIN = new DPT("7.006", "Time period in minutes", "0", "65535", "min");
 
 	/**
 	 * DPT ID 7.007, Time period in hours; values from <b>0</b> to <b>65535</b> h (~7,4 years).
 	 */
-	public static final DPT DPT_TIMEPERIOD_HOURS =
-		new DPT("7.007", "Time period in hours", "0", "65535", "h");
+	public static final DPT DPT_TIMEPERIOD_HOURS = new DPT("7.007", "Time period in hours", "0", "65535", "h");
 
 	/**
 	 * DPT ID 7.010, Interface object property ID; values from <b>0</b> to <b>65535</b>.
 	 */
-	public static final DPT DPT_PROP_DATATYPE =
-		new DPT("7.010", "Interface object type", "0", "65535", "");
+	public static final DPT DPT_PROP_DATATYPE = new DPT("7.010", "Interface object type", "0", "65535", "");
 
 	/**
 	 * DPT ID 7.011, Length in millimeters; values from <b>0</b> to <b>65535</b>, resolution 1.
@@ -114,17 +106,14 @@ public class DPTXlator2ByteUnsigned extends DPTXlator
 	/**
 	 * DPT ID 7.012, Electrical current; values from <b>0</b> to <b>65535</b> mA.
 	 * <p>
-	 * A value of 0 indicates no bus power supply functionality available, 1 to 65535 is
-	 * the current in mA.
+	 * A value of 0 indicates no bus power supply functionality available, 1 to 65535 is the current in mA.
 	 */
-	public static final DPT DPT_ELECTRICAL_CURRENT =
-		new DPT("7.012", "Electrical current", "0", "65535", "mA");
+	public static final DPT DPT_ELECTRICAL_CURRENT = new DPT("7.012", "Electrical current", "0", "65535", "mA");
 
 	/**
 	 * DPT ID 7.013, Brightness (Lux); values from <b>0</b> to <b>65535</b> lx.
 	 * <p>
-	 * Note: the unit of measure symbol used here is "lx", and not "Lux" as originally
-	 * proposed for this DPT.
+	 * Note: the unit of measure symbol used here is "lx", and not "Lux" as originally proposed for this DPT.
 	 */
 	public static final DPT DPT_BRIGHTNESS = new DPT("7.013", "Brightness", "0", "65535", "lx");
 
