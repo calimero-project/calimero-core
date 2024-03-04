@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2020, 2023 B. Malinowsky
+    Copyright (c) 2020, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ class DptXlatorXyYTransitionTest {
 
 	@Test
 	void getValue() throws KNXFormatException {
-		assertEquals("0 s", t.getValue());
+		assertEquals("0 ms", t.getValue());
 		final String value = format(0.100, 0.50, 50);
 		t.setValue(value);
 		assertEquals(format(0.100, 0.50, 50.2), t.getValue());
@@ -161,7 +161,7 @@ class DptXlatorXyYTransitionTest {
 
 	@Test
 	void setValues() throws KNXFormatException {
-		t.setValues("(0, 0) 0", "(1, 1) 3 % 1 s", "(0.30 0,30) 0 s");
+		t.setValues("(0, 0) 0", "(1, 1) 3 % 1 ms", "(0.30 0,30) 0 ms");
 		assertEquals(3, t.getItems());
 		assertEquals(format(0.30, 0.30, -1, 0), t.getAllValues()[2]);
 	}
@@ -178,7 +178,7 @@ class DptXlatorXyYTransitionTest {
 		final double y = ((25 << 8) | 50) / 65_535d;
 		final double x = ((77 << 8) | 102) / 65_535d;
 		final double b = 50 * 100d / 255;
-		assertEquals(format(x, y, b, ((40 << 8) | 40) / 10d), t.getValue());
+		assertEquals(format(x, y, b, ((40 << 8) | 40) * 100), t.getValue());
 	}
 
 	@Test
@@ -233,26 +233,26 @@ class DptXlatorXyYTransitionTest {
 
 	@Test
 	void useNotValidComponent() throws KNXFormatException {
-		String value = "100 s";
+		String value = "100 ms";
 		t.setValue(value);
 		assertEquals(value, t.getValue());
 
-		value = "(1, 1) 3 s";
+		value = format(1, 1, -1, 3000);
 		t.setValue(value);
 		assertEquals(value, t.getValue());
 	}
 
 	private String format(final double x, final double y, final double b, final double time) {
 		final var timeFormatter = NumberFormat.getNumberInstance();
-		timeFormatter.setMaximumFractionDigits(1);
+		timeFormatter.setMaximumFractionDigits(0);
 		if (b == -1)
-			return String.format("(%s, %s) %s s", formatter.format(x), formatter.format(y),
+			return String.format("(%s, %s) %s ms", formatter.format(x), formatter.format(y),
 					timeFormatter.format(time));
-		return String.format("(%s, %s) %s %% %s s", formatter.format(x), formatter.format(y),
+		return String.format("(%s, %s) %s %% %s ms", formatter.format(x), formatter.format(y),
 				new DecimalFormat("##.#").format(b), timeFormatter.format(time));
 	}
 
 	private String format(final double x, final double y, final double b) {
-		return format(x, y, b, dur.toMillis() / 1000d);
+		return format(x, y, b, dur.toMillis());
 	}
 }
