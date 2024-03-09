@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2022, 2023 B. Malinowsky
+    Copyright (c) 2022, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ public final class ConnectionFactory<P, C> {
 		final var optC = providers().map(provider -> {
 			try {
 				final var conn = openFunc.open(provider);
-				logger.log(Level.DEBUG, "serial port setup: {0}", conn);
+				logger.log(Level.DEBUG, "{0} port setup: {1}", provider, conn);
 				return Optional.of(conn);
 			}
 			catch (KNXException | IOException | RuntimeException t) {
