@@ -751,7 +751,7 @@ public class TpuartConnection implements Connection<byte[]>
 			final long now = System.nanoTime() / 1000;
 			if (lastUartState + UartStateReadInterval < now) {
 				if (lastUartState != 0 && now > lastUartState + 2 * UartStateReadInterval + 100_000)
-					close(CloseEvent.INTERNAL, "communication not possible, TP1 medium not connected?");
+					close(CloseEvent.INTERNAL, "UART state communication not possible (TP1 medium not connected?)");
 				else
 					readUartState();
 			}

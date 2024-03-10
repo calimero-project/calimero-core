@@ -36,6 +36,7 @@
 
 package io.calimero.link;
 
+import static java.lang.System.Logger.Level.DEBUG;
 import static java.lang.System.Logger.Level.INFO;
 import static java.lang.System.Logger.Level.TRACE;
 import static java.lang.System.Logger.Level.WARNING;
@@ -102,7 +103,7 @@ public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNet
 				final CEMIBusMon mon;
 				if (frame == null)
 					mon = (CEMIBusMon) CEMIFactory.fromEmiBusmon(e.getFrameBytes());
-				else if (frame instanceof CEMIBusMon busMon)
+				else if (frame instanceof final CEMIBusMon busMon)
 					mon = busMon;
 				else {
 					logger.log(WARNING, "received unsupported frame type with msg code 0x"
@@ -141,7 +142,7 @@ public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNet
 		{
 			final var monitor = (AbstractMonitor<?>) source;
 			monitor.closed = true;
-			logger.log(INFO, "monitor closed");
+			logger.log(DEBUG, "monitor closed");
 			if (monitor.wrappedByConnector) {
 				getListeners().listeners().stream().filter(Connector.Link.class::isInstance)
 						.forEach(l -> l.linkClosed(e));
