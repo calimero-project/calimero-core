@@ -373,8 +373,15 @@ public final class Connector
 
 		private void scheduleConnect(final long remainingAttempts)
 		{
-			if (closed || remainingAttempts <= 0)
+			if (closed)
 				return;
+			if (remainingAttempts <= 0) {
+				closed = true;
+				final var closed = new CloseEvent(this, CloseEvent.INTERNAL,
+						"reached max. connect attempts of " + connector.maxAttempts);
+				listeners.forEach(l -> l.linkClosed(closed));
+				return;
+			}
 			final long max = connector.maxAttempts;
 			final long remaining = remainingAttempts - 1;
 			final long attempt = max - remaining;
