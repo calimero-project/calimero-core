@@ -54,6 +54,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.calimero.KNXFormatException;
+import io.calimero.dptxlator.DptXlator16BitSet.DhwControllerStatus;
 import io.calimero.dptxlator.DptXlator16BitSet.Medium;
 import io.calimero.dptxlator.DptXlator16BitSet.RhccStatus;
 
@@ -95,7 +96,7 @@ class DptXlator16BitSetTest {
 		t.setValues("SolarEnergyOnly, Fault");
 		assertEquals("solar energy only, fault", t.getValue());
 
-		t.setValue(TemperatureOptimizationShift.toString());
+		t.setValue(DhwControllerStatus.TemperatureOptimizationShift.toString());
 		assertEquals("temperature optimization shift", t.getValue());
 	}
 
