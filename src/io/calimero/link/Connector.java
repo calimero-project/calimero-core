@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2023 B. Malinowsky
+    Copyright (c) 2015, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -129,8 +129,8 @@ public final class Connector
 		return this;
 	}
 
-	public Connector connectionStatusNotifier(final Consumer<Boolean> notifiable) {
-		connectionStatusChanged = notifiable;
+	public Connector connectionStatusNotifier(final Consumer<Boolean> connected) {
+		connectionStatusChanged = connected;
 		return this;
 	}
 
@@ -149,7 +149,7 @@ public final class Connector
 	}
 
 	/**
-	 * Returns a new KNXNetworMonitor with the specified behavior for (re-)connection to the KNX network.
+	 * Returns a new KNXNetworkMonitor with the specified behavior for (re-)connection to the KNX network.
 	 *
 	 * @param creator supplies the specific KNX network monitor
 	 * @return a new KNX network monitor with the specified (re-)connection behavior configured
@@ -212,9 +212,9 @@ public final class Connector
 		public void setKNXMedium(final KNXMediumSettings settings)
 		{
 			final T t = impl;
-			if (t instanceof KNXNetworkLink link)
+			if (t instanceof final KNXNetworkLink link)
 				link.setKNXMedium(settings);
-			else if (t instanceof KNXNetworkMonitor monitor)
+			else if (t instanceof final KNXNetworkMonitor monitor)
 				monitor.setKNXMedium(settings);
 			this.settings = settings;
 		}
@@ -223,9 +223,9 @@ public final class Connector
 		public KNXMediumSettings getKNXMedium()
 		{
 			final T t = impl;
-			if (t instanceof KNXNetworkLink link)
+			if (t instanceof final KNXNetworkLink link)
 				return link.getKNXMedium();
-			if (t instanceof KNXNetworkMonitor monitor)
+			if (t instanceof final KNXNetworkMonitor monitor)
 				return monitor.getKNXMedium();
 			return settings;
 		}
@@ -233,7 +233,7 @@ public final class Connector
 		@Override
 		public void addLinkListener(final NetworkLinkListener l)
 		{
-			if (impl instanceof KNXNetworkLink link)
+			if (impl instanceof final KNXNetworkLink link)
 				link.addLinkListener(l);
 			listeners.add(l);
 		}
@@ -242,14 +242,14 @@ public final class Connector
 		public void removeLinkListener(final NetworkLinkListener l)
 		{
 			listeners.remove(l);
-			if (impl instanceof KNXNetworkLink link)
+			if (impl instanceof final KNXNetworkLink link)
 				link.removeLinkListener(l);
 		}
 
 		@Override
 		public void addMonitorListener(final LinkListener l)
 		{
-			if (impl instanceof KNXNetworkMonitor monitor)
+			if (impl instanceof final KNXNetworkMonitor monitor)
 				monitor.addMonitorListener(l);
 			listeners.add(l);
 		}
@@ -258,7 +258,7 @@ public final class Connector
 		public void removeMonitorListener(final LinkListener l)
 		{
 			listeners.remove(l);
-			if (impl instanceof KNXNetworkMonitor monitor)
+			if (impl instanceof final KNXNetworkMonitor monitor)
 				monitor.removeMonitorListener(l);
 		}
 
@@ -266,14 +266,14 @@ public final class Connector
 		public void setDecodeRawFrames(final boolean decode)
 		{
 			decodeRawFrames = decode;
-			if (impl instanceof KNXNetworkMonitor monitor)
+			if (impl instanceof final KNXNetworkMonitor monitor)
 				monitor.setDecodeRawFrames(decode);
 		}
 
 		@Override
 		public void setHopCount(final int count)
 		{
-			if (impl instanceof KNXNetworkLink link)
+			if (impl instanceof final KNXNetworkLink link)
 				link.setHopCount(count);
 			hopCount = count;
 		}
@@ -309,9 +309,9 @@ public final class Connector
 		public String getName()
 		{
 			final T t = impl;
-			if (t instanceof KNXNetworkLink link)
+			if (t instanceof final KNXNetworkLink link)
 				return link.getName();
-			if (t instanceof KNXNetworkMonitor monitor)
+			if (t instanceof final KNXNetworkMonitor monitor)
 				return monitor.getName();
 			return "connector";
 		}
@@ -459,9 +459,9 @@ public final class Connector
 		private boolean targetOpen()
 		{
 			final T t = impl;
-			if (t instanceof KNXNetworkLink link)
+			if (t instanceof final KNXNetworkLink link)
 				return link.isOpen();
-			if (t instanceof KNXNetworkMonitor monitor)
+			if (t instanceof final KNXNetworkMonitor monitor)
 				return monitor.isOpen();
 			return false;
 		}
