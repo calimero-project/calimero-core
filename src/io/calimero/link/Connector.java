@@ -42,9 +42,9 @@ import static java.lang.System.Logger.Level.WARNING;
 
 import java.lang.System.Logger;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -170,7 +170,7 @@ public final class Connector
 			implements KNXNetworkLink, KNXNetworkMonitor, NetworkLinkListener
 	{
 		private volatile T impl;
-		private final List<LinkListener> listeners = new ArrayList<>();
+		private final List<LinkListener> listeners = new CopyOnWriteArrayList<>();
 		private volatile KNXMediumSettings settings;
 		private volatile int hopCount;
 		// monitor: decode raw frames
