@@ -164,7 +164,7 @@ public class SearchRequest extends ServiceType
 	public SearchRequest(final int responsePort)
 	{
 		super(KNXnetIPHeader.SEARCH_REQ);
-		endpoint = new HPAI((InetAddress) null, responsePort);
+		endpoint = new HPAI(null, responsePort);
 	}
 
 	/**

@@ -406,7 +406,7 @@ public abstract class ClientConnection extends ConnectionBase
 	 * Checks for supported protocol version in KNX header.
 	 * <p>
 	 * On unsupported version,
-	 * {@link ClientConnection#close(int, String, Level, Throwable)} is invoked.
+	 * {@link ClientConnection#close(int, String, LogLevel, Throwable)} is invoked.
 	 *
 	 * @param h KNX header to check
 	 * @return {@code true} on supported version, {@code false} otherwise

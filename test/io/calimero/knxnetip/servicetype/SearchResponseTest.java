@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2022 B. Malinowsky
+    Copyright (c) 2018, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ import io.calimero.knxnetip.util.TunnelingDib;
 import io.calimero.knxnetip.util.TunnelingDib.SlotStatus;
 
 class SearchResponseTest {
-	private final HPAI hpai = new HPAI((InetAddress) null, 0);
+	private final HPAI hpai = new HPAI(null, 0);
 
 	private DeviceDIB device;
 	private final ServiceFamiliesDIB svcFamilies = new ServiceFamiliesDIB(

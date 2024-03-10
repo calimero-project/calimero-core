@@ -61,7 +61,7 @@ public class DescriptionRequest extends ServiceType {
 	private static final DescriptionRequest tcpRequest = new DescriptionRequest(HPAI.Tcp);
 	public static DescriptionRequest tcpRequest() { return tcpRequest; }
 
-	public static DescriptionRequest Nat = new DescriptionRequest(HPAI.Nat);
+	public static final DescriptionRequest Nat = new DescriptionRequest(HPAI.Nat);
 
 	private final HPAI endpoint;
 

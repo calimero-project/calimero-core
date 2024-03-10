@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2021, 2022 B. Malinowsky
+    Copyright (c) 2021, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -63,11 +63,11 @@ public interface SerialCom extends AutoCloseable {
 	}
 
 	@Deprecated
-	default List<String> portIdentifiers() { return List.of(); };
+	default List<String> portIdentifiers() { return List.of(); }
 
 	@Deprecated
 	@SuppressWarnings("unused")
-	default void open(final String portId) throws IOException, KNXException {};
+	default void open(final String portId) throws IOException, KNXException {}
 
 	@Deprecated
 	@SuppressWarnings("unused")
