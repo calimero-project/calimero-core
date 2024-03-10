@@ -168,24 +168,13 @@ public class Discoverer
 	/**
 	 * Discoverer result, either containing a {@link SearchResponse} or {@link DescriptionResponse}.
 	 */
-	public static final class Result<T>
-	{
-		private final T response;
-		private final NetworkInterface ni;
-		private final InetSocketAddress local;
-		private final InetSocketAddress remote;
-
-		Result(final T r, final NetworkInterface outgoing, final InetSocketAddress local, final InetSocketAddress remote)
-		{
-			response = r;
-			ni = outgoing;
-			this.local = local;
-			this.remote = remote;
-		}
-
+	// ??? extract interface to allow other implementations and hide ctor
+	public record Result<T>(T response, NetworkInterface networkInterface, InetSocketAddress localEndpoint,
+	                        InetSocketAddress remoteEndpoint) {
 		/**
 		 * @return the received discoverer response
 		 */
+		@Deprecated
 		public T getResponse()
 		{
 			return response;
@@ -194,44 +183,15 @@ public class Discoverer
 		/**
 		 * @return the local network interface used for the discovery or description request
 		 */
+		@Deprecated
 		public NetworkInterface getNetworkInterface()
 		{
-			return ni;
+			return networkInterface;
 		}
-
-		/**
-		 * @return local endpoint used for the discovery or description request
-		 */
-		public InetSocketAddress localEndpoint() { return local; }
-
-		/**
-		 * @return address of the remote endpoint which sent the response
-		 */
-		public InetSocketAddress remoteEndpoint() { return remote; }
 
 		@Override
 		public String toString() {
-			return hostPort(local) + " (" + ni.getName() + ") <- " + response;
-		}
-
-		@Override
-		public boolean equals(final Object obj)
-		{
-			if (this == obj)
-				return true;
-			if (!(obj instanceof final Result<?> other))
-				return false;
-			return getNetworkInterface().equals(other.getNetworkInterface())
-					&& localEndpoint().equals(other.localEndpoint())
-					&& getResponse().equals(other.getResponse()) && remote.equals(other.remote);
-		}
-
-		@Override
-		public int hashCode()
-		{
-			final int prime = 17;
-			return prime * (prime * (prime * getNetworkInterface().hashCode() + localEndpoint().hashCode())
-					+ getResponse().hashCode()) + remote.hashCode();
+			return hostPort(localEndpoint) + " (" + networkInterface.getName() + ") <- " + response;
 		}
 	}
 
@@ -326,13 +286,6 @@ public class Discoverer
 			throw new KNXIllegalArgumentException("IPv4 address required if NAT is not used (supplied " + host.getHostAddress() + ")");
 	}
 
-	Discoverer() {
-		host = null;
-		port = 0;
-		nat = false;
-		mcast = false;
-	}
-
 	/**
 	 * Sets the timeout used for subsequent KNXnet/IP discovery searches; the default timeout is 10 seconds.
 	 *
@@ -368,8 +321,7 @@ public class Discoverer
 			final InetSocketAddress local = (InetSocketAddress) dc.getLocalAddress();
 			logger.debug("search {} -> server control endpoint {}", hostPort(local), hostPort(serverControlEndpoint));
 
-			final boolean tcp = false;
-			final InetSocketAddress res = tcp || nat ? new InetSocketAddress(0) : local;
+			final InetSocketAddress res = nat ? new InetSocketAddress(0) : local;
 
 			final byte[] request = PacketHelper.toPacket(new SearchRequest(res, searchParameters));
 			dc.send(ByteBuffer.wrap(request), serverControlEndpoint);
