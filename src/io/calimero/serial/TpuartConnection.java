@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2014, 2023 B. Malinowsky
+    Copyright (c) 2014, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -684,7 +684,7 @@ public class TpuartConnection implements Connection<byte[]>
 					if (frame.length >= total) {
 						try {
 							final byte[] data = in.toByteArray();
-							logger.log(DEBUG, "received TP1 L-Data (length {0}): {2}", frame.length,
+							logger.log(DEBUG, "received TP1 L-Data (length {0}): {1}", frame.length,
 									HexFormat.ofDelimiter(" ").formatHex(data));
 							consecutiveFrameDrops = -1;
 							if (busmon) {
