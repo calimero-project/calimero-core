@@ -17,7 +17,7 @@ repositories {
 ext.junitJupiterVersion = '5.10.2'
 ext.desc = 'Calimero, a free KNX network library'
 
-group = 'io.calimero'
+group = 'com.github.calimero'
 version = '2.6-SNAPSHOT'
 
 java {
@@ -157,5 +157,5 @@ dependencies {
 
 	testImplementation "org.junit.jupiter:junit-jupiter:${junitJupiterVersion}"
 	// Eclipse treats circular dependencies as errors by default, see eclipseJdt task above
-//	testRuntimeOnly "io.calimero:calimero-rxtx:${version}"
+//	testRuntimeOnly "com.github.calimero:calimero-rxtx:${version}"
 }

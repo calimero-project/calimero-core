@@ -39,7 +39,7 @@ package performance.base;
 import java.io.PrintStream;
 import java.util.Arrays;
 
-import io.calimero.Util;
+import tuwien.auto.calimero.Util;
 
 
 public class PerfTestCase

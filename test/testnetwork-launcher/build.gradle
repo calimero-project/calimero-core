@@ -1,5 +1,5 @@
 apply plugin:'application'
-mainClassName = 'io.calimero.TestNetwork'
+mainClassName = 'tuwien.auto.calimero.TestNetwork'
 
 run {
     // for attaching to debugger, start with -Ddebug=true
@@ -11,7 +11,7 @@ run {
     standardInput = System.in
 }
 
-group = 'io.calimero'
+group = 'com.github.calimero'
 version = '2.6-SNAPSHOT'
 
 repositories {
