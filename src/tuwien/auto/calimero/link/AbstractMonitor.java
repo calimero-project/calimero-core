@@ -189,8 +189,11 @@ public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNet
 	@Override
 	public final void setDecodeRawFrames(final boolean decode)
 	{
-		((MonitorNotifier) notifier).decode = decode;
-		logger.info((decode ? "enable" : "disable") + " decoding of raw frames");
+		final var monitorNotifier = (MonitorNotifier) notifier;
+		if (monitorNotifier.decode != decode) {
+			monitorNotifier.decode = decode;
+			logger.info((decode ? "enable" : "disable") + " decoding of raw frames");
+		}
 	}
 
 	@Override
