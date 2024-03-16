@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2023 B. Malinowsky
+    Copyright (c) 2015, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,10 @@
 
 package tuwien.auto.calimero.dptxlator;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
@@ -46,8 +50,6 @@ import org.junit.jupiter.api.Test;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.dptxlator.DPTXlator8BitEnum.ApplicationArea;
 import tuwien.auto.calimero.dptxlator.DPTXlator8BitEnum.OccupancyMode;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class DPTXlator8BitEnumTest {
 	private DPTXlator8BitEnum t;
@@ -110,7 +112,7 @@ class DPTXlator8BitEnumTest {
 	@Test
 	void getSubTypes() {
 		final Map<String, DPT> subTypes = t.getSubTypes();
-		assertEquals(60, subTypes.size());
+		assertEquals(70, subTypes.size());
 	}
 
 	@Test
