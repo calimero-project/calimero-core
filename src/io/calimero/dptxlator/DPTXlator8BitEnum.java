@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2023 B. Malinowsky
+    Copyright (c) 2015, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -610,6 +610,44 @@ public class DPTXlator8BitEnum extends DPTXlator
 		LoadTypeDetected(final int element, final String description) { init(element, description); }
 	}
 
+	// 20.611
+	public enum ConverterTestControl implements EnumBase<ConverterTestControl> {
+		Reserved,
+		StartFunctionTest,
+		StartDurationTest,
+		StartPartialDurationTest,
+		StopTest,
+		ResetFunctionTestDoneFlag,
+		ResetDurationTestDone;
+
+		ConverterTestControl() { init(ordinal()); }
+	}
+	// 20.612
+	public enum ConverterControl implements EnumBase<ConverterControl> {
+		RestoreFactoryDefaultSettings,
+		GotoRestMode,
+		GotoInhibitMode,
+		ReLightResetInhibit,
+		ResetLampTime;
+
+		ConverterControl() { init(ordinal()); }
+	}
+	// 20.613
+	public enum ConverterDataRequest implements EnumBase<ConverterDataRequest> {
+		Reserved,
+		RequestConverterStatus,
+		RequestConverterTestResult,
+		RequestBatteryInfo,
+		RequestConverterFtInfo,
+		RequestConverterDtInfo,
+		RequestConverterPdtInfo,
+		RequestConverterInfo,
+		RequestConverterInfoFix;
+
+		ConverterDataRequest() { init(ordinal()); }
+	}
+
+
 	/** Sunblind Actuator Basic Exception Behavior. */
 	public enum SabExceptBehavior implements EnumBase<SabExceptBehavior> {
 		Up(0, "up"),
@@ -784,6 +822,70 @@ public class DPTXlator8BitEnum extends DPTXlator
 
 		GasMeasurementCondition(final int element, final String description) { init(element, description); }
 	}
+	// 20.1203
+	public enum BreakerStatus implements EnumBase<BreakerStatus> {
+		Closed,
+		OpenOnOverload,
+		OpenOnOvervoltage,
+		OpenOnLoadShedding,
+		OpenOnPlcEuridisCommand,
+		OpenOnOverheatCurrentOverMax,
+		OpenOnOverheatCurrentUnderMax;
+
+		BreakerStatus() { init(ordinal()); }
+	}
+	// 20.1204
+	public enum EuridisCommunicationInterfaceStatus implements EnumBase<EuridisCommunicationInterfaceStatus> {
+		Deactivated,
+		ActivatedWithoutSecurity,
+		ActivatedWithSecurity;
+
+		EuridisCommunicationInterfaceStatus() { init(ordinal()); }
+	}
+	// 20.1205
+	public enum PlcStatus implements EnumBase<PlcStatus> {
+		NewUnlock("New/Unlock (S-SFK) – Not Associated (G3-PLC)"),
+		NewLock("New/Lock (S-FSK) – Associated (G3-PLC)"),
+		Registered("Registered (S-FSK) – Reserved (G3-PLC)");
+
+		PlcStatus(final String description) { init(ordinal(), description); }
+	}
+	// 20.1206
+	public enum PeakEventNotice implements EnumBase<PeakEventNotice> {
+		NoNoticeInProgress,
+		NoticePE1InProgress,
+		NoticePE2InProgress,
+		NoticePE3InProgress;
+
+		PeakEventNotice() { init(ordinal()); }
+	}
+	// 20.1207
+	public enum PeakEvent implements EnumBase<PeakEvent> {
+		NoPeakEvent,
+		PE1InProgress,
+		PE2InProgress,
+		PE3InProgress;
+
+		PeakEvent() { init(ordinal()); }
+	}
+	// 20.1208
+	public enum TicType implements EnumBase<TicType> {
+		Historical,
+		Standard;
+
+		TicType() { init(ordinal()); }
+	}
+	// 20.1209
+	public enum TicChannelType implements EnumBase<TicChannelType> {
+		None,
+		HistoricalSinglePhase,
+		HistoricalThreePhase,
+		StandardSinglePhase,
+		StandardThreePhase;
+
+		TicChannelType() { init(ordinal()); }
+	}
+
 
 	//
 	// End of enumerations
@@ -886,6 +988,17 @@ public class DPTXlator8BitEnum extends DPTXlator
 			LoadTypeSet.class, "0", "2");
 	public static final EnumDpt<LoadTypeDetected> DptLoadTypeDetected = new EnumDpt<>("20.610",
 			LoadTypeDetected.class, "0", "3");
+
+
+	public static final EnumDpt<ConverterTestControl> DptConverterTestControl = new EnumDpt<>("20.611",
+			ConverterTestControl.class, "0", "6");
+	public static final EnumDpt<ConverterControl> DptConverterControl = new EnumDpt<>("20.612",
+			ConverterControl.class, "0", "4");
+	public static final EnumDpt<ConverterDataRequest> DptConverterDataRequest = new EnumDpt<>("20.613",
+			ConverterDataRequest.class, "0", "8");
+
+
+
 	/** DPT Sunblind Actuator Basic Exception Behavior. */
 	public static final EnumDpt<SabExceptBehavior> DptSabExceptBehavior = new EnumDpt<>("20.801",
 			"SAB Except Behavior", SabExceptBehavior.class, "0", "4");
@@ -922,6 +1035,14 @@ public class DPTXlator8BitEnum extends DPTXlator
 			"20.1200", "M-Bus Breaker/Valve State", MBusBreakerValveState.class, "0", "255");
 	public static final EnumDpt<GasMeasurementCondition> DptGasMeasurementCondition = new EnumDpt<>(
 			"20.1202", GasMeasurementCondition.class, "0", "3");
+	public static final EnumDpt<BreakerStatus> DptBreakerStatus = new EnumDpt<>("20.1203", BreakerStatus.class, "0", "6");
+	public static final EnumDpt<EuridisCommunicationInterfaceStatus> DptEuridisCommunicationInterfaceStatus
+			= new EnumDpt<>("20.1204", EuridisCommunicationInterfaceStatus.class, "0", "2");
+	public static final EnumDpt<PlcStatus> DptPlcStatus = new EnumDpt<>("20.1205", PlcStatus.class, "0", "2");
+	public static final EnumDpt<PeakEventNotice> DptPeakEventNotice = new EnumDpt<>("20.1206", PeakEventNotice.class, "0", "3");
+	public static final EnumDpt<PeakEvent> DptPeakEvent = new EnumDpt<>("20.1207", PeakEvent.class, "0", "3");
+	public static final EnumDpt<TicType> DptTicType = new EnumDpt<>("20.1208", TicType.class, "0", "1");
+	public static final EnumDpt<TicChannelType> DptTicChannelType = new EnumDpt<>("20.1209", TicChannelType.class, "0", "4");
 
 	// LTE-HEE Mode
 
