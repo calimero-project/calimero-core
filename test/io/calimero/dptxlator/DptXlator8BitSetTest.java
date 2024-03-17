@@ -36,23 +36,30 @@
 
 package io.calimero.dptxlator;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 import static io.calimero.dptxlator.DptXlator8BitSet.GeneralStatus.AlarmUnAck;
 import static io.calimero.dptxlator.DptXlator8BitSet.GeneralStatus.Fault;
 import static io.calimero.dptxlator.DptXlator8BitSet.GeneralStatus.InAlarm;
 import static io.calimero.dptxlator.DptXlator8BitSet.GeneralStatus.OutOfService;
 import static io.calimero.dptxlator.DptXlator8BitSet.GeneralStatus.Overridden;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import io.calimero.KNXFormatException;
+import io.calimero.dptxlator.DptXlator8BitSet.EnumDpt;
+import io.calimero.dptxlator.DptXlator8BitSet.VirtualDryContact;
 
 class DptXlator8BitSetTest
 {
@@ -111,19 +118,59 @@ class DptXlator8BitSetTest
 		t.setValue(1);
 		assertEquals(e3, t.getValue());
 
-		final DptXlator8BitSet x = new DptXlator8BitSet(DptXlator8BitSet.DptDeviceControl);
-		final int v = (int) x.getNumericValue();
-		assertEquals(0, v);
-		final int element = DptXlator8BitSet.DeviceControl.VerifyMode.value();
-		x.setValue(element);
-		assertEquals(element, x.getNumericValue());
+		{
+			final DptXlator8BitSet x = new DptXlator8BitSet(DptXlator8BitSet.DptDeviceControl);
+			final var v = x.getValue();
+			assertEquals("", v);
+			final var element = DptXlator8BitSet.DeviceControl.VerifyMode;
+			x.setValue(element.value());
+			assertEquals(element.description(), x.getValue());
+		}
+		{
+			final DptXlator8BitSet x = new DptXlator8BitSet(DptXlator8BitSet.DptVirtualDryContact);
+			final var v = x.getValue();
+			assertEquals("", v);
+			final var set = EnumSet.of(VirtualDryContact.Status2, VirtualDryContact.Status5);
+			x.setValue(set);
+			assertTrue(x.getValue().contains(VirtualDryContact.Status2.description()));
+			assertTrue(x.getValue().contains(VirtualDryContact.Status5.description()));
+		}
+		{
+			final DptXlator8BitSet x = new DptXlator8BitSet(DptXlator8BitSet.DptPhasesStatus);
+			final var v = x.getValue();
+			assertEquals("", v);
+			final var element = DptXlator8BitSet.PhasesStatus.Phase2;
+			x.setValue(EnumSet.of(element));
+			assertEquals(element.description(), x.getValue());
+		}
+	}
+
+	@ParameterizedTest
+	@MethodSource("allXlators")
+	void value(final DptXlator8BitSet t) throws KNXFormatException {
+		assertTrue(t.value().isEmpty());
+		final EnumDpt<?> dpt = (EnumDpt<?>) t.getType();
+		t.setValue(EnumSet.allOf(dpt.elements));
+		assertEquals(EnumSet.allOf(dpt.elements), t.value());
+	}
+
+	private static Stream<DptXlator8BitSet> allXlators() {
+		return DptXlator8BitSet.getSubTypesStatic().values().stream().map(DptXlator8BitSetTest::create);
+	}
+
+	private static DptXlator8BitSet create(final DPT dpt) {
+		try {
+			return new DptXlator8BitSet(dpt.getID());
+		} catch (final KNXFormatException e) {
+			throw new IllegalStateException();
+		}
 	}
 
 	@Test
 	void getSubTypes()
 	{
 		final Map<String, DPT> subTypes = t.getSubTypes();
-		assertEquals(14, subTypes.size());
+		assertEquals(16, subTypes.size());
 	}
 
 	@Test
