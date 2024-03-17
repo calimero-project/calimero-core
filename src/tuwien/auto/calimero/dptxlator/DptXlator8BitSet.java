@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2017, 2023 B. Malinowsky
+    Copyright (c) 2017, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,6 +50,7 @@ import tuwien.auto.calimero.KNXFormatException;
  * <li>HVAC</li>
  * <li>Lighting</li>
  * <li>System</li>
+ * <li>Metering</li>
  * </ul>
  * The KNX data type width is 1 byte. The default return value after creation is 0 for the defined bit array.
  * <p>
@@ -161,6 +162,37 @@ public class DptXlator8BitSet extends DPTXlator
 	public static final EnumDpt<ChannelActivationState> DptChannelActivation = new EnumDpt<>("21.1010",
 			ChannelActivationState.class);
 
+	// Metering
+
+	public enum VirtualDryContact implements EnumBase<VirtualDryContact> {
+		Status1, Status2, Status3, Status4, Status5, Status6, Status7, Status8
+    }
+	/**
+	 * DPT 21.1200 Virtual Dry Contact.<br>
+	 * Status bits are encoded as follows:
+	 * <ul>
+	 * <li>0: virtual contact open</li>
+	 * <li>1: virtual contact closed</li>
+	 * </ul>
+	 */
+	public static final EnumDpt<VirtualDryContact> DptVirtualDryContact = new EnumDpt<>("21.1200",
+			VirtualDryContact.class);
+
+	public enum PhasesStatus implements EnumBase<PhasesStatus> {
+		Phase1, Phase2, Phase3
+	}
+	/**
+	 * DPT 21.1201 Phases Status.<br>
+	 * Phase status is encoded as follows:
+	 * <ul>
+	 * <li>Cleared Bit (0): phase absent</li>
+	 * <li>Set Bit (1): phase present</li>
+	 * </ul>
+	 */
+	public static final EnumDpt<PhasesStatus> DptPhasesStatus = new EnumDpt<>("21.1201", PhasesStatus.class);
+
+
+
 	private static final Map<String, DPT> types = loadDatapointTypes(DptXlator8BitSet.class);
 
 	/**
@@ -219,6 +251,22 @@ public class DptXlator8BitSet extends DPTXlator
 	public final void setValue(final EnumSet<?> elements)
 	{
 		data = new short[] { toDpt(elements) };
+	}
+
+	/**
+	 * {@return the set bits of the first translation item}
+	 *
+	 * @throws KNXFormatException if the item has set an invalid bit value for the specified DPT
+	 */
+	public final EnumSet<?> value() throws KNXFormatException {
+		final short v = fromDpt(0);
+		final EnumSet<?> set = EnumSet.allOf(((EnumDpt<?>) dpt).elements);
+		for (final var i = set.iterator(); i.hasNext();) {
+			final var e = i.next();
+			if ((v & (1 << e.ordinal())) == 0)
+				i.remove();
+		}
+		return set;
 	}
 
 	@Override
