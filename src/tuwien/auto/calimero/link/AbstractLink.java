@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2023 B. Malinowsky
+    Copyright (c) 2015, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -222,13 +222,23 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		public void connectionClosed(final CloseEvent e)
 		{
 			AbstractLink.this.closed = true;
-			logger.debug("link closed");
+			logger.debug("link closed by {} ({})", initiator(e.getInitiator()), e.getReason());
 			if (wrappedByConnector) {
 				getListeners().listeners().stream().filter(Connector.Link.class::isInstance)
 					.forEach(l -> l.linkClosed(e));
 				return;
 			}
 			super.connectionClosed(e);
+		}
+
+		private static String initiator(int initiator) {
+			return switch (initiator) {
+				case CloseEvent.USER_REQUEST -> "link owner";
+				case CloseEvent.SERVER_REQUEST -> "server";
+				case CloseEvent.CLIENT_REQUEST -> "client";
+				case CloseEvent.INTERNAL -> "internal event";
+				default -> throw new IllegalStateException("unexpected initiator: " + initiator);
+			};
 		}
 	}
 
