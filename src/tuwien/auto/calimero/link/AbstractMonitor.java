@@ -141,6 +141,7 @@ public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNet
 			if (monitor.wrappedByConnector) {
 				getListeners().listeners().stream().filter(Connector.Link.class::isInstance)
 						.forEach(l -> l.linkClosed(e));
+ 				quit();
 				return;
 			}
 			super.connectionClosed(e);
