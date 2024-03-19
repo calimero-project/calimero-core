@@ -227,13 +227,23 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		public void connectionClosed(final CloseEvent e)
 		{
 			AbstractLink.this.closed = true;
-			logger.log(DEBUG, "link closed");
+			logger.log(DEBUG, "link closed by {0} ({1})", initiator(e.getInitiator()), e.getReason());
 			if (wrappedByConnector) {
 				getListeners().listeners().stream().filter(Connector.Link.class::isInstance)
 					.forEach(l -> l.linkClosed(e));
 				return;
 			}
 			super.connectionClosed(e);
+		}
+
+		private static String initiator(int initiator) {
+			return switch (initiator) {
+				case CloseEvent.USER_REQUEST -> "link owner";
+				case CloseEvent.SERVER_REQUEST -> "server";
+				case CloseEvent.CLIENT_REQUEST -> "client";
+				case CloseEvent.INTERNAL -> "internal event";
+				default -> throw new IllegalStateException("unexpected initiator: " + initiator);
+			};
 		}
 	}
 

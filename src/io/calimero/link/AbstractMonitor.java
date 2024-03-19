@@ -142,13 +142,23 @@ public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNet
 		{
 			final var monitor = (AbstractMonitor<?>) source;
 			monitor.closed = true;
-			logger.log(DEBUG, "monitor closed");
+			logger.log(DEBUG, "monitor closed by {0} ({1})", initiator(e.getInitiator()), e.getReason());
 			if (monitor.wrappedByConnector) {
 				getListeners().listeners().stream().filter(Connector.Link.class::isInstance)
 						.forEach(l -> l.linkClosed(e));
 				return;
 			}
 			super.connectionClosed(e);
+		}
+
+		private static String initiator(int initiator) {
+			return switch (initiator) {
+				case CloseEvent.USER_REQUEST -> "link owner";
+				case CloseEvent.SERVER_REQUEST -> "server";
+				case CloseEvent.CLIENT_REQUEST -> "client";
+				case CloseEvent.INTERNAL -> "internal event";
+				default -> throw new IllegalStateException("unexpected initiator: " + initiator);
+			};
 		}
 	}
 
