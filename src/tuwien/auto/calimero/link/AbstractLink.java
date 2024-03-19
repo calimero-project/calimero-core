@@ -182,7 +182,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 				}
 
 				final CEMI cemi = onReceive(e);
-				if (cemi instanceof CEMIDevMgmt mgmt)
+				if (cemi instanceof final CEMIDevMgmt mgmt)
 					onDevMgmt(mgmt);
 				else if (cemi instanceof final CemiTData tdata) {
 					final int mc = tdata.getMessageCode();
@@ -232,7 +232,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 			super.connectionClosed(e);
 		}
 
-		private static String initiator(int initiator) {
+		private static String initiator(final int initiator) {
 			return switch (initiator) {
 				case CloseEvent.USER_REQUEST -> "link owner";
 				case CloseEvent.SERVER_REQUEST -> "server";
@@ -402,9 +402,9 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 			throw new KNXLinkClosedException("link closed");
 		if (cEMI && !sendCEmiAsByteArray) {
 			final CEMI f = cEMI(mc, dst, p, nsdu);
-			if (f instanceof CEMILData data)
+			if (f instanceof final CEMILData data)
 				onSend(data, waitForCon);
-			else if (f instanceof CemiTData data)
+			else if (f instanceof final CemiTData data)
 				onSend(data);
 			return;
 		}
@@ -617,7 +617,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	private void addMediumInfo(final CEMILData msg)
 	{
 		String s = "";
-		if (medium instanceof PLSettings settings) {
+		if (medium instanceof final PLSettings settings) {
 			final CEMILDataEx f = (CEMILDataEx) msg;
 			if (f.getAdditionalInfo(AdditionalInfo.PlMedium) != null)
 				return;
@@ -639,7 +639,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 
 	private void addMediumInfo(final CemiTData msg) {
 		String s = "";
-		if (medium instanceof PLSettings settings) {
+		if (medium instanceof final PLSettings settings) {
 			if (msg.additionalInfo().stream().anyMatch(info -> info.type() == AdditionalInfo.PlMedium))
 				return;
 			msg.additionalInfo().add(AdditionalInfo.of(AdditionalInfo.PlMedium, settings.getDomainAddress()));
