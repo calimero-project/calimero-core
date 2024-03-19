@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2014, 2023 B. Malinowsky
+    Copyright (c) 2014, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -747,6 +747,9 @@ public class TpuartConnection implements Connection<byte[]>
 		}
 
 		private void checkUartState() throws IOException {
+			// TP-UART-IC doesn't respond to State.req if busmonitor mode is active
+			if (busmon)
+				return;
 			final long now = System.nanoTime() / 1000;
 			if (lastUartState + UartStateReadInterval < now) {
 				if (lastUartState != 0 && now > lastUartState + 2 * UartStateReadInterval + 100_000)
