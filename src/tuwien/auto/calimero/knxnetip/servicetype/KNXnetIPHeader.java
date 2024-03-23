@@ -359,8 +359,8 @@ public class KNXnetIPHeader
 		return switch (svcType) {
 			case CONNECT_REQ -> "connect.req";
 			case CONNECT_RES -> "connect.res";
-			case CONNECTIONSTATE_REQ -> "connectionstate.req";
-			case CONNECTIONSTATE_RES -> "connectionstate.res";
+			case CONNECTIONSTATE_REQ -> "connection-state.req";
+			case CONNECTIONSTATE_RES -> "connection-state.res";
 			case DISCONNECT_REQ -> "disconnect.req";
 			case DISCONNECT_RES -> "disconnect.res";
 			case DESCRIPTION_REQ -> "description.req";
