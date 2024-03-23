@@ -103,8 +103,8 @@ public final class Connector
 	// on successful connection, the attempts are reset to maxAttempts
 	public Connector maxConnectAttempts(final long maxAttempts)
 	{
-		if (maxAttempts < 1)
-			throw new KNXIllegalArgumentException("max. connect attempts " + maxAttempts + " < 1");
+		if (maxAttempts < 0)
+			throw new KNXIllegalArgumentException("max. connect attempts " + maxAttempts + " < 0");
 		this.maxAttempts = maxAttempts;
 		return this;
 	}
@@ -192,7 +192,7 @@ public final class Connector
 				connect();
 			}
 			catch (final KNXException e) {
-				if (!connector.initialError)
+				if (!connector.initialError || connector.maxAttempts <= 1)
 					throw e;
 				logger().error("initial connection attempt", e);
 				scheduleConnect(connector.maxAttempts - 1);
