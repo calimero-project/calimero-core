@@ -683,10 +683,10 @@ public class DPTXlator8BitEnum extends DPTXlator
 	}
 
 	public enum BlindsControlMode implements EnumBase<BlindsControlMode> {
-		AutomaticControl(0, "Automatic Control"),
-		ManualControl(1, "Manual Control");
+		AutomaticControl(0),
+		ManualControl(1);
 
-		BlindsControlMode(final int element, final String description) { init(element); }
+		BlindsControlMode(final int element) { init(element); }
 	}
 
 	// 20.1000
