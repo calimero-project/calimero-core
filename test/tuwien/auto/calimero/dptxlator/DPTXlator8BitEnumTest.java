@@ -37,7 +37,9 @@
 package tuwien.auto.calimero.dptxlator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Arrays;
@@ -107,6 +109,19 @@ class DPTXlator8BitEnumTest {
 		final int element = DPTXlator8BitEnum.AlarmClassType.ExtendedAlarm.value();
 		x.setValue(element);
 		assertEquals(element, x.getValueUnsigned());
+	}
+
+	@Test
+	void value() throws KNXFormatException {
+		final Enum<?> v = t.value();
+		assertInstanceOf(ApplicationArea.class, v);
+		assertEquals(ApplicationArea.NoFault, v);
+
+		t.setValue(ApplicationArea.HvacTerminalUnits);
+		assertEquals(ApplicationArea.HvacTerminalUnits, t.value());
+
+		t.setData(outOfRangeMaxData);
+		assertThrows(KNXFormatException.class, () -> t.value());
 	}
 
 	@Test
