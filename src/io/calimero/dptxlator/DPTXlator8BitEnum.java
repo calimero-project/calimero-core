@@ -36,6 +36,7 @@
 
 package io.calimero.dptxlator;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -1003,6 +1004,20 @@ public class DPTXlator8BitEnum extends DPTXlator
 		throws KNXFormatException
 	{
 		data = new short[] { toDPT(element.value()) };
+	}
+
+	/**
+	 * {@return the first translation item as enum element of the configured datapoint enum type}
+	 * @throws KNXFormatException if the value is not an element of the enum set of the configured DPT
+	 */
+	public final Enum<?> value() throws KNXFormatException {
+		final EnumDpt<?> enumDpt = (EnumDpt<?>) dpt;
+		final int v = getValueUnsigned();
+		for (final var e : EnumSet.allOf(enumDpt.elements)) {
+			if (e.value() == v)
+				return e;
+		}
+		throw new IllegalStateException("enum value " + v + " not found in " + enumDpt);
 	}
 
 	/**
