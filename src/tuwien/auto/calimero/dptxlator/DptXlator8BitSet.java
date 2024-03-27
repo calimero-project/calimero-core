@@ -165,7 +165,7 @@ public class DptXlator8BitSet extends DPTXlator
 	// Metering
 
 	public enum VirtualDryContact implements EnumBase<VirtualDryContact> {
-		Status1, Status2, Status3, Status4, Status5, Status6, Status7, Status8
+		Status0, Status1, Status2, Status3, Status4, Status5, Status6, Status7
     }
 	/**
 	 * DPT 21.1200 Virtual Dry Contact.<br>
