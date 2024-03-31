@@ -156,7 +156,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 
 			linkLayerMode();
 		}
-		catch (final KNXException e) {
+		catch (KNXException | RuntimeException e) {
 			notifier.quit();
 			conn.close();
 			throw e;
