@@ -152,7 +152,7 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 			// init offline variable to current knx connection status
 			conn.isKnxConnectionActive();
 		}
-		catch (final KNXException e) {
+		catch (KNXException | RuntimeException e) {
 			close();
 			throw e;
 		}

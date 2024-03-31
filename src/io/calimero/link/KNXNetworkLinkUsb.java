@@ -159,7 +159,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 
 			linkLayerMode();
 		}
-		catch (final KNXException e) {
+		catch (KNXException | RuntimeException e) {
 			notifier.quit();
 			conn.close();
 			throw e;
@@ -175,7 +175,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 	}
 
 	@Override
-	public void addLinkListener(NetworkLinkListener l) {
+	public void addLinkListener(final NetworkLinkListener l) {
 		super.addLinkListener(l);
 		// make sure a new listener (which is probably the main link listener) gets an immediate notification
 		// if the usb knx connection is currently disrupted
