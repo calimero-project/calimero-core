@@ -706,7 +706,7 @@ public class TpuartConnection implements Connection<byte[]>
 							}
 						}
 						catch (final Exception e) {
-							logger.log(ERROR, "error creating {0} from TP1 data (length {2}): {3}",
+							logger.log(ERROR, "error creating {0} from TP1 data (length {1}): {2}",
 									busmon ? "Busmon.ind" : "L-Data", frame.length, HexFormat.ofDelimiter(" ").formatHex(frame),
 									e);
 						}
