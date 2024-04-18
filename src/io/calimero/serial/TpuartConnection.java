@@ -693,8 +693,8 @@ public class TpuartConnection implements Connection<byte[]>
 							else {
 								// check repetition of a directly preceding correctly received frame
 								final boolean repeated = (data[0] & RepeatFlag) == 0;
-								if (repeated && Arrays.equals(lastReceived, 0, lastReceived.length - 2, frame, 0,
-										data.length - 2)) {
+								if (repeated && lastReceived.length > 2 &&
+										Arrays.equals(lastReceived, 0, lastReceived.length - 2, frame, 0, data.length - 2)) {
 									logger.log(DEBUG, "ignore repetition of directly preceding correctly received frame");
 								}
 								else {
