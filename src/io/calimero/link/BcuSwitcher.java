@@ -40,6 +40,7 @@ import static java.lang.System.Logger.Level.DEBUG;
 import static java.lang.System.Logger.Level.ERROR;
 import static java.lang.System.Logger.Level.INFO;
 import static java.lang.System.Logger.Level.TRACE;
+import static java.lang.System.Logger.Level.WARNING;
 
 import java.lang.System.Logger;
 import java.util.Arrays;
@@ -147,23 +148,75 @@ final class BcuSwitcher<T>
 		final KNXListener l = (final FrameEvent e) -> setResponse(e.getFrameBytes());
 		c.addConnectionListener(l);
 		try {
-			byte[] data = read(createGetValue(AddrExpectedPeiType, 1));
-			logger.log(INFO, "PEI type {0}", data[0] & 0xff);
-			data = read(createGetValue(AddrStartAddressTable, 1));
-			logger.log(DEBUG, "Address Table location {0}", HexFormat.of().formatHex(data));
-			data = read(createGetValue(AddrSystemState, 1));
-			logger.log(DEBUG, "Current operation mode {0}", OperationMode.of(data[0] & 0xff));
+			byte[] data;
+			// read expected PEI type
+			try {
+				data = read(createGetValue(AddrExpectedPeiType, 1));
+				logger.log(INFO, "PEI type {0}", data[0] & 0xff);
+			}
+			catch (final KNXTimeoutException e) {
+				logger.log(WARNING, "timeout reading PEI type ({0})", e.getMessage());
+			}
+
+			// read address table location
+			try {
+				data = read(createGetValue(AddrStartAddressTable, 1));
+				logger.log(DEBUG, "Address Table location {0}", HexFormat.of().formatHex(data));
+			}
+			catch (final KNXTimeoutException e) {
+				logger.log(WARNING, "timeout reading Address Table location ({0})", e.getMessage());
+			}
+
+			// read current system state
+			try {
+				data = read(createGetValue(AddrSystemState, 1));
+				logger.log(DEBUG, "current operation mode ({0})", OperationMode.of(data[0] & 0xff));
+			}
+			catch (final KNXTimeoutException e) {
+				logger.log(WARNING, "timeout reading current operation mode ({0})", e.getMessage());
+			}
+
 			// set PEI type 1: ensure that the application will not be started
-			writeVerify(AddrExpectedPeiType, new byte[] { 1 });
+			try {
+				writeVerify(AddrExpectedPeiType, new byte[] { 1 });
+			}
+			catch (final KNXTimeoutException e) {
+				logger.log(WARNING, "timeout setting PEI type 1 ({0})", e.getMessage());
+			}
+
 			// power line: set extended busmonitor to transmit domain address in .ind
-			setExtBusmon(mode == BcuMode.ExtBusmonitor);
+			try {
+				setExtBusmon(mode == BcuMode.ExtBusmonitor);
+			}
+			catch (final KNXTimeoutException e) {
+				logger.log(WARNING, "timeout setting busmonitor config ({0})", e.getMessage());
+			}
+
 			// set active operation mode, link layer or busmonitor
 			final OperationMode set = mode == BcuMode.LinkLayer ? OperationMode.LinkLayer : OperationMode.Busmonitor;
-			writeVerify(AddrSystemState, new byte[] { (byte) set.mode });
+			try {
+				writeVerify(AddrSystemState, new byte[] { (byte) set.mode });
+			}
+			catch (final KNXTimeoutException e) {
+				logger.log(WARNING, "timeout setting operation mode {0} ({1})", set, e.getMessage());
+			}
+
 			// set address table to 0
-			writeVerify(AddrStartAddressTable, new byte[] { 0 });
-			data = read(createGetValue(AddrIndividualAddress, 2));
-			logger.log(INFO, "KNX individual address " + new IndividualAddress(data));
+			try {
+				writeVerify(AddrStartAddressTable, new byte[] { 0 });
+			}
+			catch (final KNXTimeoutException e) {
+				logger.log(WARNING, "timeout setting address table ({0})", e.getMessage());
+			}
+
+			// read ind. address
+			try {
+				data = read(createGetValue(AddrIndividualAddress, 2));
+				logger.log(INFO, "KNX individual address " + new IndividualAddress(data));
+			}
+			catch (final KNXTimeoutException e) {
+				logger.log(WARNING, "timeout reading KNX individual address ({0})", e.getMessage());
+			}
 		}
 		finally {
 			c.removeConnectionListener(l);
@@ -312,8 +365,7 @@ final class BcuSwitcher<T>
 			wait(remaining);
 			remaining = end - System.currentTimeMillis();
 		}
-		throw new KNXTimeoutException("expected service confirmation msg code 0x"
-				+ Integer.toHexString(getValue_con));
+		throw new KNXTimeoutException("expected service confirmation msg code 0x" + Integer.toHexString(getValue_con));
 	}
 
 	private synchronized void setResponse(final byte[] frame)
@@ -321,7 +373,7 @@ final class BcuSwitcher<T>
 		final int msgCode = frame[0] & 0xff;
 		if (msgCode == getValue_con) {
 			response = frame;
-			notify();
+			notifyAll();
 		}
 	}
 
