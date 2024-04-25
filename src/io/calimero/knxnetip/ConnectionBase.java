@@ -484,7 +484,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 			// we have to also catch RTEs here, since if socket already failed
 			// before close(), getLocalSocketAddress() might throw illegal argument
 			// exception or return the wildcard address, indicating a messed up socket
-			logger.log(ERROR, "send disconnect failed", e);
+			logger.log(WARNING, "send disconnect failed", e);
 		}
 		finally {
 			lock.unlock();
