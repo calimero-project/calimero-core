@@ -132,6 +132,12 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 				logger.log(DEBUG, "KNX device descriptor 0 (Mask Version): {0}", dd0);
 			}
 			catch (final KNXTimeoutException expected) {}
+			try {
+				// support of device feature service for manufacturer code is optional
+				final int mfc = conn.manufacturerCode();
+				logger.log(DEBUG, "KNX manufacturer code: {0}", mfc);
+			}
+			catch (final KNXTimeoutException expected) {}
 
 			final boolean extBusmon = settings instanceof PLSettings;
 			enterBusmonitor(extBusmon);
