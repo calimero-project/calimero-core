@@ -141,7 +141,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 			try {
 				// support of device feature service for manufacturer code is optional
 				final int mfc = conn.manufacturerCode();
-				logger.log(DEBUG, "KNX manufacturer code: {0}", mfc);
+				logger.debug("KNX manufacturer code: {}", mfc);
 			}
 			catch (final KNXTimeoutException expected) {}
 
