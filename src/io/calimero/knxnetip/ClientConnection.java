@@ -341,9 +341,7 @@ public abstract class ClientConnection extends ConnectionBase
 			if (res.getStatus() != ErrorCodes.NO_ERROR)
 				logger.log(WARNING, "received disconnect response status 0x{0} ({1})",
 						Integer.toHexString(res.getStatus()), ErrorCodes.getErrorMessage(res.getStatus()));
-			// finalize closing
-			closing = 2;
-			setStateNotify(CLOSED);
+			finishClosingNotify();
 		}
 		else if (svc == serviceAck) {
 			// with tcp, service acks are not required and just ignored

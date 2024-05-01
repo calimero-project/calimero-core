@@ -465,8 +465,17 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		lock.lock();
 		try {
 			final boolean tcp = ctrlSocket == null;
-			final var hpai = tcp ? HPAI.Tcp : useNat ? HPAI.Nat : new HPAI(HPAI.IPV4_UDP,
-					(InetSocketAddress) ctrlSocket.getLocalSocketAddress());
+			final HPAI hpai;
+			if (tcp)
+				hpai = HPAI.Tcp;
+			else if (useNat)
+				hpai = HPAI.Nat;
+			else {
+				final var lsa = (InetSocketAddress) ctrlSocket.getLocalSocketAddress();
+				if (lsa == null) // ctrl socket got already closed
+					return;
+				hpai = new HPAI(HPAI.IPV4_UDP, lsa);
+			}
 			logger.log(TRACE, "sending disconnect request for {0}", this);
 			final byte[] buf = PacketHelper.toPacket(new DisconnectRequest(channelId, hpai));
 			send(buf, ctrlEndpt);
@@ -488,8 +497,16 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		}
 		finally {
 			lock.unlock();
+			cleanup(initiator, reason, level, t);
 		}
-		cleanup(initiator, reason, level, t);
+	}
+
+	protected final void finishClosingNotify() {
+		// if we are closing our endpoint, move on to closed state
+		if (closing == 1) {
+			closing = 2;
+			setStateNotify(CLOSED);
+		}
 	}
 
 	/**
