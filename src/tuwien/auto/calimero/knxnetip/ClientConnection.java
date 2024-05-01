@@ -337,9 +337,7 @@ public abstract class ClientConnection extends ConnectionBase
 				logger.warn("received disconnect response status 0x"
 						+ Integer.toHexString(res.getStatus()) + " ("
 						+ ErrorCodes.getErrorMessage(res.getStatus()) + ")");
-			// finalize closing
-			closing = 2;
-			setStateNotify(CLOSED);
+			finishClosingNotify();
 		}
 		else if (svc == serviceAck) {
 			// with tcp, service acks are not required and just ignored
@@ -438,7 +436,7 @@ public abstract class ClientConnection extends ConnectionBase
 
 	private final class HeartbeatMonitor implements Runnable
 	{
-		// client SHALL wait 10 seconds for a connection state response from server
+		// client SHALL wait 10 seconds for a connection-state response from server
 		private static final int CONNECTIONSTATE_REQ_TIMEOUT = 10;
 		private static final int HEARTBEAT_INTERVAL = 60;
 		private static final int MAX_REQUEST_ATTEMPTS = 4;
