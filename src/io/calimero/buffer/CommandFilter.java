@@ -225,7 +225,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 			copy = (CEMILData) CEMIFactory.create(CEMILData.MC_LDATA_IND, d, f);
 		}
 		catch (final KNXFormatException e) {
-			LogService.getLogger("io.calimero").log(ERROR, "create L_Data.ind for network buffer: {0}", f, e);
+			LogService.getLogger("io.calimero").log(ERROR, "create L_Data.ind for network buffer: " + f, e);
 			return;
 		}
 		CacheObject co = cache.get(dst);

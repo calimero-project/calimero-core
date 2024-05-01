@@ -869,7 +869,7 @@ public class Discoverer
 				logger.log(INFO, "ignore received packet from {0}, {1}", source, e.getMessage());
 			}
 			catch (final RuntimeException e) {
-				logger.log(WARNING, "error parsing received packet from {0}", source, e);
+				logger.log(WARNING, "error parsing received packet from " + source, e);
 			}
 		}
 

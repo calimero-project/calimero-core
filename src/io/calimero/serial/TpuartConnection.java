@@ -521,7 +521,7 @@ public class TpuartConnection implements Connection<byte[]>
 			}
 		}
 		catch (final RuntimeException e) {
-			LogService.getLogger("io.calimero.serial.tpuart").log(WARNING, "on checking property {0}", key, e);
+			LogService.getLogger("io.calimero.serial.tpuart").log(WARNING, "on checking property " + key, e);
 		}
 	}
 

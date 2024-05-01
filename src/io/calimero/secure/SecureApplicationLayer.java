@@ -1,6 +1,6 @@
 /*
     Calimero - A library for KNX network access
-    Copyright (c) 2019, 2023 B. Malinowsky
+    Copyright (c) 2019, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@ import java.lang.System.Logger;
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
+import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
@@ -924,7 +925,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 				send(sendDst, response);
 			}
 			catch (KNXTimeoutException | KNXLinkClosedException e) {
-				logger.log(WARNING, "error sending sync.res {0}->{1}", address(), sendDst, e);
+				logger.log(WARNING, MessageFormat.format("error sending sync.res {0}->{1}", address(), sendDst), e);
 			}
 		});
 	}

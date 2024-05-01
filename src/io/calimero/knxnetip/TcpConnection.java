@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2023 B. Malinowsky
+    Copyright (c) 2019, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ import static java.lang.System.Logger.Level.ERROR;
 import static java.lang.System.Logger.Level.INFO;
 import static java.lang.System.Logger.Level.TRACE;
 import static java.lang.System.Logger.Level.WARNING;
+import static java.text.MessageFormat.format;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -61,6 +62,7 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.interfaces.XECPublicKey;
+import java.text.MessageFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -238,7 +240,7 @@ public final class TcpConnection implements Closeable {
 				conn.send(newStatusInfo(sessionId, nextSendSeq(), Close));
 			}
 			catch (final IOException e) {
-				logger.log(INFO, "I/O error closing secure session {0}", sessionId, e);
+				logger.log(INFO, "I/O error closing secure session " + sessionId, e);
 			}
 		}
 
@@ -430,7 +432,7 @@ public final class TcpConnection implements Closeable {
 						client.handleServiceType(header, data, offset, conn.server);
 					}
 					catch (KNXFormatException | IOException e) {
-						logger.log(WARNING, "{0} error processing {1}", client, header, e);
+						logger.log(WARNING, format("{0} error processing {1}", client, header), e);
 					}
 				return;
 			}
@@ -457,7 +459,7 @@ public final class TcpConnection implements Closeable {
 					logger.log(WARNING, "communication channel {0} does not exist", channelId);
 			}
 			catch (KNXFormatException | IOException e) {
-				logger.log(WARNING, "{0} error processing {1}", connection, header, e);
+				logger.log(WARNING, format("{0} error processing {1}", connection, header), e);
 			}
 		}
 

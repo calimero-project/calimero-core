@@ -401,7 +401,7 @@ public final class Connector
 				}
 				catch (KNXException | RuntimeException | InterruptedException e) {
 					if (attempt == 1)
-						logger().log(WARNING, "connection attempt {0}", attempt, e);
+						logger().log(WARNING, "connection attempt " + attempt, e);
 					else {
 						final Throwable cause = e.getCause();
 						final String detail = cause != null && cause.getMessage() != null ? " (" + cause.getMessage() + ")" : "";

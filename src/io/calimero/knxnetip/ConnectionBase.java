@@ -525,8 +525,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	{
 		if (id == channelId)
 			return true;
-		logger.log(WARNING, "received service " + svcType + " with wrong channel ID " + id + ", expected " + channelId
-				+ " - ignored");
+		logger.log(WARNING, "received service {0} with wrong channel ID {1}, expected {2} - ignored", svcType, id, channelId);
 		return false;
 	}
 

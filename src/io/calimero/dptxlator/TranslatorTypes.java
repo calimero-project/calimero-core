@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -392,7 +392,7 @@ public final class TranslatorTypes
 			DPTXlator.logger.log(TRACE, "loaded DPT translator for {0}", desc);
 		}
 		catch (ReflectiveOperationException | RuntimeException e) {
-			DPTXlator.logger.log(WARNING, "lookup DPT translator class {0}", className, e);
+			DPTXlator.logger.log(WARNING, "lookup DPT translator class " + className, e);
 		}
 	}
 

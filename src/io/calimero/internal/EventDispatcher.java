@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2021, 2023 B. Malinowsky
+    Copyright (c) 2021, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -111,7 +111,7 @@ class EventDispatcher<T extends Annotation> {
 			logger.log(TRACE, "registered {0}", method);
 		}
 		catch (final Exception e) {
-			logger.log(WARNING, "failed to register {0}", method, e);
+			logger.log(WARNING, "failed to register " + method, e);
 		}
 	}
 

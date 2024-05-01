@@ -339,9 +339,8 @@ public abstract class ClientConnection extends ConnectionBase
 		else if (svc == KNXnetIPHeader.DISCONNECT_RES) {
 			final DisconnectResponse res = new DisconnectResponse(data, offset);
 			if (res.getStatus() != ErrorCodes.NO_ERROR)
-				logger.log(WARNING, "received disconnect response status 0x"
-						+ Integer.toHexString(res.getStatus()) + " ("
-						+ ErrorCodes.getErrorMessage(res.getStatus()) + ")");
+				logger.log(WARNING, "received disconnect response status 0x{0} ({1})",
+						Integer.toHexString(res.getStatus()), ErrorCodes.getErrorMessage(res.getStatus()));
 			// finalize closing
 			closing = 2;
 			setStateNotify(CLOSED);
