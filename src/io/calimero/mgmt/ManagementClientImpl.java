@@ -659,11 +659,9 @@ public class ManagementClientImpl implements ManagementClient
 			// a remote endpoint is allowed to not send a TL disconnect before restart, but
 			// a TL disconnect timeout shall not be treated as protocol error
 			final Object lock = new Object();
-			final TransportListener l = new TLListener()
-			{
+			final TransportListener l = new TLListener() {
 				@Override
-				public void disconnected(final Destination d)
-				{
+				public void disconnected(final Destination d) {
 					if (d.equals(dst))
 						synchronized (lock) {
 							lock.notify();
