@@ -78,6 +78,8 @@ module io.calimero.core {
 		io.calimero.device, io.calimero.server; // AbstractLink.conn
 	opens io.calimero.knxnetip to
 		io.calimero.device; // KNXnetIPRouting.searchRequestCallback
+	opens io.calimero.mgmt to
+		io.calimero.device; // TransportLayerImpl.proxies
 
 	uses io.calimero.serial.spi.SerialConnectionProvider;
 	uses io.calimero.serial.usb.spi.UsbConnectionProvider;
