@@ -316,7 +316,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	public final NetworkInterface networkInterface() {
 		try {
 			final NetworkInterface netif = dc.getOption(StandardSocketOptions.IP_MULTICAST_IF);
-			return netif == null ? Net.defaultNetif : netif;
+			return netif == null ? Net.defaultNetif() : netif;
 		}
 		catch (final IOException e) {
 			throw new KnxRuntimeException("socket error getting network interface", e);
@@ -387,7 +387,7 @@ public class KNXnetIPRouting extends ConnectionBase
 					dcSysBcast.setOption(StandardSocketOptions.IP_MULTICAST_IF, setNetif);
 			}
 			else
-				setNetif = Net.defaultNetif;
+				setNetif = Net.defaultNetif();
 
 			logger.log(DEBUG, "join multicast group {0} on {1}", multicast.getHostAddress(), setNetif.getName());
 			dc.join(multicast, setNetif);
@@ -720,7 +720,7 @@ public class KNXnetIPRouting extends ConnectionBase
 
 	private boolean sentByUs(final InetSocketAddress sender) {
 		final var netif = networkInterface();
-		if (netif == Net.defaultNetif) {
+		if (netif == Net.defaultNetif()) {
 			// check addresses of all netifs, in case no outgoing mcast netif was configured
 			try {
 				return NetworkInterface.networkInterfaces().flatMap(NetworkInterface::inetAddresses)
