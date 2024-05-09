@@ -48,6 +48,7 @@ import static java.util.stream.Collectors.toList;
 import java.io.ByteArrayOutputStream;
 import java.lang.System.Logger;
 import java.nio.ByteBuffer;
+import java.text.MessageFormat;
 import java.time.Duration;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -206,7 +207,7 @@ public class ManagementClientImpl implements ManagementClient
 			catch (final RuntimeException rte) {
 				final var cemi = e.getFrame();
 				final var src = cemi instanceof final CEMILData cemild ? cemild.getDestination() : "cEMI server";
-				logger.log(WARNING, "on indication from {0}", src, rte);
+				logger.log(WARNING, MessageFormat.format("on indication from {0}", src), rte);
 			}
 		}
 	}
