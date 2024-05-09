@@ -141,7 +141,7 @@ public class TpuartConnection implements Connection<byte[]>
 	private static final int Tp1BaudRate = 9_600;
 
 	private static final int OneBitTime = (int) Math.ceil(1d / Tp1BaudRate * 1_000_000);
-	private static final int BitTimes_50 = 50 * OneBitTime; // [us]
+	private static final int BitTimes_50 = 50 * OneBitTime; // [us] -> 5250 us for 9600 Bd
 
 	private static final int MaxSendAttempts = 4;
 
@@ -511,7 +511,7 @@ public class TpuartConnection implements Connection<byte[]>
 	// Defaults to 50 bit times [us]
 	private static final AtomicInteger maxInterByteDelay = new AtomicInteger(BitTimes_50);
 	static {
-		final var key = "calimero.serial.tpuart.maxInterByteDelay";
+		final var key = "io.calimero.serial.tpuart.maxInterByteDelay";
 		try {
 			final var delay = System.getProperty(key);
 			if (delay != null) {
@@ -638,8 +638,8 @@ public class TpuartConnection implements Connection<byte[]>
 
 		private int maxInterByteDelay()
 		{
-			// cond: consecutively losing 4 frames (1 msg w/ 1 .ind + 2 .ind repetitions, and 1st .ind of next msg)
-			if (consecutiveFrameDrops >= 3) {
+			// cond: consecutively losing 3 frames (1 msg w/ 1 .ind + 2 .ind repetitions)
+			if (consecutiveFrameDrops >= 2) {
 				maxDelay = maxInterByteDelay.accumulateAndGet(Math.min(maxDelay + 500, 20_000), Math::max);
 				logger.log(WARNING, "{0} partial frames discarded, increase max. inter-byte delay to {1} us",
 						consecutiveFrameDrops + 1, maxDelay);
