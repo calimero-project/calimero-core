@@ -714,7 +714,7 @@ public class Discoverer
 		final InetSocketAddress local = (InetSocketAddress) dc.getLocalAddress();
 		final NetworkInterface netif;
 		if (local.getAddress().isAnyLocalAddress())
-			netif = Net.defaultNetif;
+			netif = Net.defaultNetif();
 		else
 			netif = NetworkInterface.getByInetAddress(local.getAddress());
 
@@ -756,7 +756,7 @@ public class Discoverer
 			super(null, false, receiveBufferSize, 0, (int) timeout.toMillis());
 
 			final var mcastIf = dc.getOption(StandardSocketOptions.IP_MULTICAST_IF);
-			nif = mcastIf == null ? Net.defaultNetif : mcastIf;
+			nif = mcastIf == null ? Net.defaultNetif() : mcastIf;
 			this.localEndpoint = localEndpoint;
 			multicast = true;
 			server = null;

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2021, 2023 B. Malinowsky
+    Copyright (c) 2021, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -58,15 +58,19 @@ final class Net {
 
 	private static final Logger logger = LoggerFactory.getLogger("calimero.knxnetip.Net");
 
-
-	static final NetworkInterface defaultNetif;
-	static {
-		try (var s = new MulticastSocket()) {
-			defaultNetif = s.getNetworkInterface();
+	static NetworkInterface defaultNetif() {
+		class NetIf {
+			static final NetworkInterface defaultNetif;
+			static {
+				try (var s = new MulticastSocket()) {
+					defaultNetif = s.getNetworkInterface();
+				}
+				catch (final IOException e) {
+					throw new ExceptionInInitializerError(e);
+				}
+			}
 		}
-		catch (final IOException e) {
-			throw new ExceptionInInitializerError(e);
-		}
+		return NetIf.defaultNetif;
 	}
 
 	// finds a local IPv4 address with its network prefix "matching" the remote address
