@@ -138,7 +138,7 @@ public class TpuartConnection implements Connection<byte[]>
 	private static final int Tp1BaudRate = 9_600;
 
 	private static final int OneBitTime = (int) Math.ceil(1d / Tp1BaudRate * 1_000_000);
-	private static final int BitTimes_50 = 50 * OneBitTime; // [us]
+	private static final int BitTimes_50 = 50 * OneBitTime; // [us] -> 5250 us for 9600 Bd
 
 	private static final int MaxSendAttempts = 4;
 
@@ -636,8 +636,8 @@ public class TpuartConnection implements Connection<byte[]>
 
 		private int maxInterByteDelay()
 		{
-			// cond: consecutively losing 4 frames (1 msg w/ 1 .ind + 2 .ind repetitions, and 1st .ind of next msg)
-			if (consecutiveFrameDrops >= 3) {
+			// cond: consecutively losing 3 frames (1 msg w/ 1 .ind + 2 .ind repetitions)
+			if (consecutiveFrameDrops >= 2) {
 				maxDelay = maxInterByteDelay.accumulateAndGet(Math.min(maxDelay + 500, 20_000), Math::max);
 				logger.warn("{} partial frames discarded, increase max. inter-byte delay to {} us",
 						consecutiveFrameDrops + 1, maxDelay);
