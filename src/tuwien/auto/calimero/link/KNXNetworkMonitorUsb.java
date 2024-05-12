@@ -176,11 +176,10 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 		throws KNXPortClosedException, KNXTimeoutException, InterruptedException
 	{
 		if (emiTypes.contains(active)) {
-			// set & get/response of EMI type is only mandatory if > 1 EMI types are supported
-			if (emiTypes.size() > 1) {
-				conn.setActiveEmiType(active);
+			conn.setActiveEmiType(active);
+			// getting response of EMI type is only mandatory if > 1 EMI types are supported
+			if (emiTypes.size() > 1)
 				activeEmi = conn.activeEmiType();
-			}
 			else
 				activeEmi = active;
 			return activeEmi == active;
