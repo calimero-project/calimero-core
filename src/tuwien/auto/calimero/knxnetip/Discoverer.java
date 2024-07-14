@@ -666,7 +666,7 @@ public class Discoverer
 		}
 		catch (IOException | RuntimeException e) {
 			throw new KNXException("search request to " + SYSTEM_SETUP_MULTICAST.getHostAddress() + " failed on "
-					+ localAddr + ":" + localPort, e);
+					+ localAddr + ":" + bind.getPort(), e);
 		}
 	}
 

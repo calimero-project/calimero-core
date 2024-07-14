@@ -513,9 +513,8 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 			logger.debug("send {}{}", (waitForCon ? "(wait for confirmation) " : ""), msg);
 			conn.send(msg, waitForCon ? WaitForCon : WaitForAck);
 
-			if (msg instanceof CEMILData)
-				logger.trace("send {}->{} succeeded", ((CEMILData) msg).getSource(),
-						((CEMILData) msg).getDestination());
+			if (msg instanceof final CEMILData data)
+				logger.trace("send {}->{} succeeded", data.getSource(), data.getDestination());
 			else
 				logger.trace("send {}->{}:{} succeeded", "local", conn.getRemoteAddress().getAddress(),
 						conn.getRemoteAddress().getPort());

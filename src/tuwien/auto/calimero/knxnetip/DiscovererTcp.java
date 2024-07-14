@@ -115,7 +115,7 @@ public class DiscovererTcp {
 		}
 		catch (final ExecutionException e) {
 			final var cause = e.getCause();
-			if (cause instanceof KNXException exception)
+			if (cause instanceof final KNXException exception)
 				throw exception;
 			if (cause instanceof TimeoutException)
 				throw new KNXTimeoutException(cause.getMessage());
