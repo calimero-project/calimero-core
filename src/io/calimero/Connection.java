@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2021 B. Malinowsky
+    Copyright (c) 2015, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,6 +55,13 @@ public interface Connection<T> extends AutoCloseable {
 
 	void send(T frame, BlockingMode blockingMode) throws KNXException, InterruptedException;
 
+	/**
+	 * Returns the name of this connection, a brief textual representation to identify the connection.
+	 * The name does not have to be unique, but should allow distinguishing remote control endpoints for diagnostic,
+	 * logging, and visualization purposes.
+	 *
+	 * @return name for this connection as string
+	 */
 	String name();
 
 	@Override

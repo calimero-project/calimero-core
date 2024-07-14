@@ -185,7 +185,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	 *
 	 * @param netIf specifies the local network interface used to send outgoing multicast datagrams,
 	 *        and join the multicast group to receive multicast datagrams,
-	 *        use {@code null} for the default interface;
+	 *        use {@code null} for the default interface
 	 * @param mcGroup IP multicast address specifying the multicast group this connection shall join,
 	 *        use {@link #DefaultMulticast} for the default multicast group;
 	 *        value of {@code mcGroup ≥ }{@value #DEFAULT_MULTICAST}

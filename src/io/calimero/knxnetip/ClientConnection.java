@@ -299,7 +299,7 @@ public abstract class ClientConnection extends ConnectionBase
 			final ConnectResponse res;
 			try {
 				res = new ConnectResponse(data, offset);
-			} catch (KNXFormatException e) {
+			} catch (final KNXFormatException e) {
 				close(CloseEvent.INTERNAL, e.getMessage(), ERROR, null);
 				throw e;
 			}
