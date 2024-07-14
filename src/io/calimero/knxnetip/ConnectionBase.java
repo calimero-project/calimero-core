@@ -50,6 +50,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.net.UnixDomainSocketAddress;
 import java.util.HexFormat;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -99,6 +101,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 
 	/** Remote control endpoint. */
 	protected InetSocketAddress ctrlEndpt;
+	volatile SocketAddress controlEndpoint;
 	/** Remote data endpoint. */
 	protected InetSocketAddress dataEndpt;
 
@@ -313,6 +316,8 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	@Override
 	public String name()
 	{
+		if (ctrlEndpt == null)
+			return controlEndpoint.toString();
 		// only the control endpoint is set when our logger is initialized (the data
 		// endpoint gets assigned later in connect)
 		// to keep the name short, avoid a prepended host name as done by InetAddress
@@ -378,12 +383,18 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		listeners.fire(l -> l.frameReceived(fe));
 	}
 
-	boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset,
-			final InetSocketAddress source) throws KNXFormatException, IOException {
+	boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset, final SocketAddress source)
+			throws KNXFormatException, IOException {
 		final int hdrStart = offset - h.getStructLength();
-		logger.log(TRACE, "from {0}: {1}: {2}", Net.hostPort(source), h,
+		final var socketName = source instanceof final InetSocketAddress isa ? Net.hostPort(isa) : source;
+		logger.log(TRACE, "from {0}: {1}: {2}", socketName, h,
 				HexFormat.ofDelimiter(" ").formatHex(data, hdrStart, hdrStart + h.getTotalLength()));
-		return handleServiceType(h, data, offset, source.getAddress(), source.getPort());
+		if (source instanceof final InetSocketAddress isa)
+			return handleServiceType(h, data, offset, isa.getAddress(), isa.getPort());
+		else if (source instanceof UnixDomainSocketAddress)
+			return handleServiceType(h, data, offset, InetAddress.getByAddress(new byte[4]), 0); // TODO UDS remote
+		else
+			throw new IllegalStateException();
 	}
 
 	/**

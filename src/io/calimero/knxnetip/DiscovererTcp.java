@@ -54,9 +54,10 @@ import io.calimero.KNXException;
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
 import io.calimero.KNXTimeoutException;
+import io.calimero.ServiceType;
 import io.calimero.knxnetip.Discoverer.Result;
 import io.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
-import io.calimero.knxnetip.TcpConnection.SecureSession;
+import io.calimero.knxnetip.StreamConnection.SecureSession;
 import io.calimero.knxnetip.servicetype.DescriptionRequest;
 import io.calimero.knxnetip.servicetype.DescriptionResponse;
 import io.calimero.knxnetip.servicetype.KNXnetIPHeader;
@@ -72,13 +73,13 @@ import io.calimero.link.medium.KNXMediumSettings;
  * KNX IP Secure connections.
  */
 public class DiscovererTcp {
-	private final TcpConnection connection;
+	private final StreamConnection connection;
 	private final SecureSession session;
 
 	private volatile Duration timeout = Duration.ofSeconds(10);
 
 
-	DiscovererTcp(final TcpConnection c) {
+	DiscovererTcp(final StreamConnection c) {
 		this.connection = c;
 		this.session = null;
 	}
@@ -139,7 +140,7 @@ public class DiscovererTcp {
 	private final class Tunnel<T> extends KNXnetIPTunnel {
 		private final CompletableFuture<Result<T>> cf;
 
-		Tunnel(final TunnelingLayer knxLayer, final TcpConnection connection,
+		Tunnel(final TunnelingLayer knxLayer, final StreamConnection connection,
 				final IndividualAddress tunnelingAddress, final CompletableFuture<Result<T>> cf) throws KNXException,
 				InterruptedException {
 			super(knxLayer, connection, tunnelingAddress);
@@ -154,9 +155,16 @@ public class DiscovererTcp {
 			if (svc == KNXnetIPHeader.SearchResponse || svc == KNXnetIPHeader.DESCRIPTION_RES) {
 				final var sr = svc == KNXnetIPHeader.SearchResponse ? SearchResponse.from(h, data, offset)
 						: new DescriptionResponse(data, offset, h.getTotalLength() - h.getStructLength());
-				final var result = new Result<>(sr,
-						NetworkInterface.getByInetAddress(connection.localEndpoint().getAddress()),
-						connection.localEndpoint(), connection.server());
+
+				final Result<ServiceType> result;
+				if (connection instanceof final TcpConnection tcp)
+					result = new Result<>(sr, NetworkInterface.getByInetAddress(tcp.localEndpoint().getAddress()),
+							tcp.localEndpoint(), tcp.server());
+				else if (connection instanceof UnixDomainSocketConnection)
+					result = new Result<>(sr, Net.defaultNetif(), new InetSocketAddress(0), new InetSocketAddress(0));
+				else
+					throw new IllegalStateException();
+
 				complete(result);
 				return true;
 			}
@@ -170,11 +178,12 @@ public class DiscovererTcp {
 		public String name() {
 			final String lock = new String(Character.toChars(0x1F512));
 			final String secure = session != null ? (" " + lock) : "";
-			return "KNX IP" + secure + " Tunneling " + hostPort(ctrlEndpt);
+			final String remote = ctrlEndpt != null ? hostPort(ctrlEndpt) : controlEndpoint.toString();
+			return "KNX IP" + secure + " Tunneling " + remote;
 		}
 
 		@Override
-		protected void connect(final TcpConnection c, final CRI cri) throws KNXException, InterruptedException {
+		protected void connect(final StreamConnection c, final CRI cri) throws KNXException, InterruptedException {
 			if (session == null) {
 				super.connect(c, cri);
 				return;
@@ -183,7 +192,7 @@ public class DiscovererTcp {
 			session.ensureOpen();
 			session.registerConnectRequest(this);
 			try {
-				super.connect(c.localEndpoint(), c.server(), cri, false);
+				doConnect(c, cri);
 			}
 			finally {
 				session.unregisterConnectRequest(this);

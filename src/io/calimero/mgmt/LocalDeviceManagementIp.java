@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,12 +45,12 @@ import io.calimero.KNXException;
 import io.calimero.KNXTimeoutException;
 import io.calimero.cemi.CEMI;
 import io.calimero.cemi.CEMIDevMgmt;
-import io.calimero.knxnetip.TcpConnection;
-import io.calimero.knxnetip.TcpConnection.SecureSession;
 import io.calimero.knxnetip.KNXConnectionClosedException;
 import io.calimero.knxnetip.KNXnetIPConnection;
 import io.calimero.knxnetip.KNXnetIPDevMgmt;
 import io.calimero.knxnetip.SecureConnection;
+import io.calimero.knxnetip.StreamConnection.SecureSession;
+import io.calimero.knxnetip.TcpConnection;
 
 /**
  * Adapter for KNX property services using KNXnet/IP local device management.

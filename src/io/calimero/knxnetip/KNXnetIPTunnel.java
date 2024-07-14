@@ -135,10 +135,11 @@ public class KNXnetIPTunnel extends ClientConnection
 	private final TunnelingLayer layer;
 
 
-	public static KNXnetIPTunnel newTcpTunnel(final TunnelingLayer knxLayer, final TcpConnection connection,
+	public static KNXnetIPTunnel newTcpTunnel(final TunnelingLayer knxLayer, final StreamConnection connection,
 			final IndividualAddress tunnelingAddress) throws KNXException, InterruptedException {
 		return new KNXnetIPTunnel(knxLayer, connection, tunnelingAddress);
 	}
+
 
 	/**
 	 * Creates a new KNXnet/IP tunneling connection to a remote server.
@@ -174,7 +175,7 @@ public class KNXnetIPTunnel extends ClientConnection
 		connect(localEP, serverCtrlEP, cri, useNAT);
 	}
 
-	protected KNXnetIPTunnel(final TunnelingLayer knxLayer, final TcpConnection connection,
+	protected KNXnetIPTunnel(final TunnelingLayer knxLayer, final StreamConnection connection,
 			final IndividualAddress tunnelingAddress) throws KNXException, InterruptedException {
 		super(KNXnetIPHeader.TUNNELING_REQ, KNXnetIPHeader.TUNNELING_ACK, 1, TUNNELING_REQ_TIMEOUT, connection);
 		layer = Objects.requireNonNull(knxLayer, "Tunneling Layer");
@@ -334,7 +335,7 @@ public class KNXnetIPTunnel extends ClientConnection
 			return true;
 
 		// tunneling sequence and ack is only used over udp connections, not tcp
-		if (!tcp) {
+		if (!stream) {
 			final int seq = req.getSequenceNumber();
 			final boolean missed = ((seq - 1) & 0xFF) == getSeqRcv();
 			if (missed) {

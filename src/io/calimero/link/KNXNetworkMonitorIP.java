@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,8 +36,8 @@
 
 package io.calimero.link;
 
-import static java.lang.System.Logger.Level.INFO;
 import static io.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.BusMonitorLayer;
+import static java.lang.System.Logger.Level.INFO;
 
 import java.net.InetSocketAddress;
 
@@ -45,8 +45,8 @@ import io.calimero.KNXException;
 import io.calimero.knxnetip.KNXnetIPConnection;
 import io.calimero.knxnetip.KNXnetIPTunnel;
 import io.calimero.knxnetip.SecureConnection;
-import io.calimero.knxnetip.TcpConnection;
-import io.calimero.knxnetip.TcpConnection.SecureSession;
+import io.calimero.knxnetip.StreamConnection;
+import io.calimero.knxnetip.StreamConnection.SecureSession;
 import io.calimero.link.medium.KNXMediumSettings;
 
 /**
@@ -73,7 +73,7 @@ public class KNXNetworkMonitorIP extends AbstractMonitor<KNXnetIPConnection>
 	 * @throws KNXException on failure establishing the link
 	 * @throws InterruptedException on interrupted thread while establishing link
 	 */
-	public static KNXNetworkMonitorIP newMonitorLink(final TcpConnection connection, final KNXMediumSettings settings)
+	public static KNXNetworkMonitorIP newMonitorLink(final StreamConnection connection, final KNXMediumSettings settings)
 			throws KNXException, InterruptedException {
 		return new KNXNetworkMonitorIP(KNXnetIPTunnel.newTcpTunnel(BusMonitorLayer, connection,
 				settings.getDeviceAddress()), settings);
@@ -150,6 +150,8 @@ public class KNXNetworkMonitorIP extends AbstractMonitor<KNXnetIPConnection>
 
 	private static String monitorName(final InetSocketAddress remote)
 	{
+		if (remote == null)
+			return "monitor uds"; // TODO use UDS path
 		// do our own IP:port string, since InetAddress.toString() always prepends a '/'
 		final String host = (remote.isUnresolved() ? remote.getHostString() : remote.getAddress().getHostAddress());
 		return "monitor " + host + ":" + remote.getPort();

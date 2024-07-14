@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -63,7 +63,8 @@ import io.calimero.knxnetip.util.CRI;
 import io.calimero.log.LogService;
 
 /**
- * KNXnet/IP connection for KNX local device management, communication on OSI layer 4 is done using UDP.
+ * KNXnet/IP connection for KNX local device management, communication on OSI layer 4 is done using UDP, TCP, or
+ * Unix domain sockets (UDS).
  *
  * @author B. Malinowsky
  */
@@ -110,7 +111,7 @@ public class KNXnetIPDevMgmt extends ClientConnection
 	 * @throws KNXInvalidResponseException if connect response is in wrong format
 	 * @throws InterruptedException on interrupted thread while creating the management connection
 	 */
-	public KNXnetIPDevMgmt(final TcpConnection connection) throws KNXException, InterruptedException {
+	public KNXnetIPDevMgmt(final StreamConnection connection) throws KNXException, InterruptedException {
 		super(KNXnetIPHeader.DEVICE_CONFIGURATION_REQ, KNXnetIPHeader.DEVICE_CONFIGURATION_ACK, 4,
 				CONFIGURATION_REQ_TIMEOUT, connection);
 		connect(connection, cri);
@@ -159,7 +160,7 @@ public class KNXnetIPDevMgmt extends ClientConnection
 
 		final int status = h.getVersion() == KNXNETIP_VERSION_10 ? ErrorCodes.NO_ERROR
 				: ErrorCodes.VERSION_NOT_SUPPORTED;
-		if (!tcp) {
+		if (!stream) {
 			final int seq = req.getSequenceNumber();
 			if (seq == getSeqRcv()) {
 				final byte[] buf = PacketHelper.toPacket(new ServiceAck(serviceAck, channelId, seq, status));

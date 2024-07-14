@@ -66,7 +66,7 @@ import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
 import io.calimero.KNXTimeoutException;
 import io.calimero.SerialNumber;
-import io.calimero.knxnetip.TcpConnection.SecureSession;
+import io.calimero.knxnetip.StreamConnection.SecureSession;
 import io.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import io.calimero.knxnetip.servicetype.PacketHelper;
 import io.calimero.knxnetip.util.HPAI;
