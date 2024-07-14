@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2021, 2022 B. Malinowsky
+    Copyright (c) 2021, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -158,7 +158,7 @@ class ObjectServerConnection extends ClientConnection {
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return "KNX IP ObjectServer " + super.name();
 	}
 

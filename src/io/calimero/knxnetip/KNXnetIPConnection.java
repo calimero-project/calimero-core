@@ -200,15 +200,9 @@ public interface KNXnetIPConnection extends Connection<CEMI>
 	int getState();
 
 	/**
-	 * Returns the name of this connection, a brief textual representation to identify a
-	 * KNXnet/IP connection.
-	 * <p>
-	 * The name has to be unique at least for connections with different IP addresses for
-	 * the remote control endpoint.<br>
-	 * The returned name is used by this connection for the name of its log service.
-	 *
-	 * @return name for this connection as string
+	 * @deprecated Use {@link Connection#name()}.
 	 */
+	@Deprecated(forRemoval = true)
 	default String getName() { return name(); }
 
 	/**
