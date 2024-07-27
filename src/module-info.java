@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2022, 2023 B. Malinowsky
+    Copyright (c) 2022, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -70,6 +70,7 @@ module io.calimero.core {
 	exports io.calimero.internal to
 		io.calimero.device,
 		io.calimero.server,
+		io.calimero.tools,
 		io.calimero.gui,
 		io.calimero.usb.provider.javax,
 		io.calimero.testnetwork;
