@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,9 @@
 
 package io.calimero.cemi;
 
+import static java.lang.System.Logger.Level.INFO;
+import static java.lang.System.Logger.Level.WARNING;
+
 import java.util.Arrays;
 
 import io.calimero.DataUnitBuilder;
@@ -45,6 +48,7 @@ import io.calimero.KNXAddress;
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
 import io.calimero.Priority;
+import io.calimero.log.LogService;
 
 /**
  * Factory helper for creating and copying cEMI messages.
@@ -53,6 +57,26 @@ import io.calimero.Priority;
  */
 public final class CEMIFactory
 {
+	// Workaround for some non spec-conform USB sticks, which sets some control bits when sending EMI frames.
+	// Those bits are reserved and shall be 0, but the USB stick requires them to not reject the frame.
+	private static final boolean setReservedEmiCtrlBits;
+	static {
+		final String pkg = "io.calimero.cemi";
+		final String key = pkg + ".setReservedEmiCtrlBits";
+		boolean value = false;
+		try {
+			final String prop = System.getProperty(key);
+			value = (prop != null && prop.isEmpty()) || Boolean.parseBoolean(prop);
+			if (value)
+				LogService.getLogger(pkg).log(INFO, "using {0}", key);
+		}
+		catch (final RuntimeException e) {
+			LogService.getLogger(pkg).log(WARNING, "on checking property " + key, e);
+		}
+		setReservedEmiCtrlBits = value;
+	}
+
+
 	private CEMIFactory() {}
 
 	/**
@@ -324,6 +348,8 @@ public final class CEMIFactory
 		buf[0] = (byte) mc;
 
 		buf[1] = (byte) (p.value << 2);
+		if (setReservedEmiCtrlBits)
+			buf[1] |= (byte) 0xb0;
 		// repeat flag is only relevant for .con
 		final boolean rep = mc == Emi1_LData_con && repeat;
 		final int ctrl = (rep ? 0x20 : 0) | (ackRequest ? 0x02 : 0) | (positiveCon ? 0 : 0x01);
