@@ -739,6 +739,7 @@ public class Discoverer
 
 	private final class ReceiverLoop extends UdpSocketLooper implements Runnable
 	{
+		private final DatagramChannel dc;
 		private final boolean multicast;
 		private final InetSocketAddress server;
 		private final NetworkInterface nif;
@@ -764,6 +765,7 @@ public class Discoverer
 						throws IOException {
 			super(null, false, receiveBufferSize, 0, (int) timeout.toMillis());
 
+			this.dc = dc;
 			final var mcastIf = dc.getOption(StandardSocketOptions.IP_MULTICAST_IF);
 			nif = mcastIf == null ? Net.defaultNetif() : mcastIf;
 			this.localEndpoint = localEndpoint;
@@ -784,6 +786,8 @@ public class Discoverer
 		ReceiverLoop(final DatagramChannel dc, final int receiveBufferSize, final Duration timeout,
 				final InetSocketAddress queriedServer) throws IOException {
 			super(null, true, receiveBufferSize, 0, (int) timeout.toMillis());
+
+			this.dc = dc;
 			nif = null;
 			localEndpoint = null;
 			multicast = false;
@@ -877,20 +881,41 @@ public class Discoverer
 		protected void receive(final byte[] buf) throws IOException {
 			var remaining = timeout;
 			final var end = Instant.now().plus(remaining);
-			while (remaining.toMillis() > 0) {
+			while (selector.isOpen() && remaining.toMillis() > 0) {
 				if (selector.select(remaining.toMillis()) > 0) {
-					for (final var i = selector.selectedKeys().iterator(); i.hasNext();) {
-						final var key = i.next();
+					final Set<SelectionKey> selectedKeys;
+					// synchronize and copy to avoid CME if quit() closes selector
+					synchronized (this) {
+						selectedKeys = Set.copyOf(selector.selectedKeys());
+						selector.selectedKeys().clear();
+					}
+					for (final var key : selectedKeys) {
 						final var channel = key.channel();
 						final ByteBuffer buffer = ByteBuffer.wrap(buf);
 						final var source = ((DatagramChannel) channel).receive(buffer);
 						buffer.flip();
 						onReceive((InetSocketAddress) source, buf, buffer.position(), buffer.remaining());
-						i.remove();
 					}
 					return;
 				}
 				remaining = Duration.between(Instant.now(), end);
+			}
+		}
+
+		@Override
+		public void quit() {
+			super.quit();
+			try {
+				synchronized (this) {
+					selector.close();
+				}
+			}
+			catch (final IOException ignore) {}
+			finally {
+				try {
+					dc.close();
+				}
+				catch (final IOException ignore) {}
 			}
 		}
 	}
