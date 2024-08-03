@@ -45,6 +45,7 @@ import tuwien.auto.calimero.KNXAddress;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.Priority;
+import tuwien.auto.calimero.log.LogService;
 
 /**
  * Factory helper for creating and copying cEMI messages.
@@ -53,6 +54,26 @@ import tuwien.auto.calimero.Priority;
  */
 public final class CEMIFactory
 {
+	// Workaround for some non spec-conform USB sticks, which sets some control bits when sending EMI frames.
+	// Those bits are reserved and shall be 0, but the USB stick requires them to not reject the frame.
+	private static final boolean setReservedEmiCtrlBits;
+	static {
+		final String pkg = "calimero.cemi";
+		final String key = pkg + ".setReservedEmiCtrlBits";
+		boolean value = false;
+		try {
+			final String prop = System.getProperty(key);
+			value = (prop != null && prop.isEmpty()) || Boolean.parseBoolean(prop);
+			if (value)
+				LogService.getLogger(pkg).info("using {}", key);
+		}
+		catch (final RuntimeException e) {
+			LogService.getLogger(pkg).warn("on checking property " + key, e);
+		}
+		setReservedEmiCtrlBits = value;
+	}
+
+
 	private CEMIFactory() {}
 
 	/**
@@ -324,6 +345,8 @@ public final class CEMIFactory
 		buf[0] = (byte) mc;
 
 		buf[1] = (byte) (p.value << 2);
+		if (setReservedEmiCtrlBits)
+			buf[1] |= (byte) 0xb0;
 		// repeat flag is only relevant for .con
 		final boolean rep = mc == Emi1_LData_con && repeat;
 		final int ctrl = (rep ? 0x20 : 0) | (ackRequest ? 0x02 : 0) | (positiveCon ? 0 : 0x01);
