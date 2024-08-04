@@ -374,11 +374,11 @@ public class KNXnetIPRouting extends ConnectionBase
 	{
 		ctrlEndpt = new InetSocketAddress(multicast, DEFAULT_PORT);
 		dataEndpt = ctrlEndpt;
-		logger = LogService.getLogger("io.calimero.knxnetip." + name());
 
 		try {
 			dc = newChannel();
 			dcSysBcast = !multicast.equals(systemBroadcast) ? newChannel() : null;
+			logger = LogService.getLogger("io.calimero.knxnetip." + name());
 
 			var setNetif = netIf;
 			if (setNetif != null) {
