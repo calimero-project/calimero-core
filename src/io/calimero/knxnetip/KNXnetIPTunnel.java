@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -342,7 +342,7 @@ public class KNXnetIPTunnel extends ClientConnection
 				// we missed a single request, hence, the receive sequence is one behind. If the remote
 				// endpoint didn't terminate the connection, but continues to send requests, this workaround
 				// re-syncs with the sequence of the sender.
-				final String s = System.getProperty("calimero.knxnetip.tunneling.resyncSkippedRcvSeq");
+				final String s = System.getProperty("io.calimero.knxnetip.tunneling.resyncSkippedRcvSeq");
 				final boolean resync = "".equals(s) || "true".equalsIgnoreCase(s);
 				if (resync) {
 					logger.log(ERROR, "tunneling request with rcv-seq " + seq + ", expected " + getSeqRcv()
