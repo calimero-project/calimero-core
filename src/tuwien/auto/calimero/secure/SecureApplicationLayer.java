@@ -1,6 +1,6 @@
 /*
     Calimero - A library for KNX network access
-    Copyright (c) 2019, 2023 B. Malinowsky
+    Copyright (c) 2019, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -692,7 +692,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 		}
 
 		final int plainService = DataUnitBuilder.getAPDUService(plainApdu);
-		if (dst instanceof IndividualAddress address)
+		if (dst instanceof final IndividualAddress address)
 			checkGoDiagnosticsResponse(src, address, plainService, plainApdu);
 
 		if (!checkAccess(dst, plainService, securityCtrl)) {
@@ -927,7 +927,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 
 	private void syncWith(final KNXAddress dst, final boolean toolAccess) throws InterruptedException {
 		try {
-			final var device = dst instanceof GroupAddress ga ? surrogate(ga) : (IndividualAddress) dst;
+			final var device = dst instanceof final GroupAddress ga ? surrogate(ga) : (IndividualAddress) dst;
 			final var future = sendSyncRequest(device, toolAccess);
 			future.get();
 		}

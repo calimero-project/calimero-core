@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -422,7 +422,6 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 		// if we synchronize on method we would take into account
 		// a worst case blocking of response timeout seconds
 		synchronized (lnkListener) {
-			// wait of response time seconds
 			if (detached)
 				return null;
 			detached = true;
