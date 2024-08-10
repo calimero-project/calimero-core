@@ -193,13 +193,9 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	}
 
 	/**
-	 * Creates a new process communicator using the supplied secure application layer, attached to the supplied KNX
-	 * network link.
-	 *
-	 * @param link network link used for communication with a KNX network
-	 * @param sal secure application layer
-	 * @throws KNXLinkClosedException if the network link is closed
+	 * @deprecated Use {@link #ProcessCommunicatorImpl(KNXNetworkLink, SecureApplicationLayer, boolean)}.
 	 */
+	@Deprecated(forRemoval = true)
 	public ProcessCommunicatorImpl(final KNXNetworkLink link, final SecureApplicationLayer sal)
 			throws KNXLinkClosedException {
 		this(link, sal, true);
