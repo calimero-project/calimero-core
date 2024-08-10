@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,10 +40,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Vector;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -85,7 +85,7 @@ class PositiveListCacheTest
 	@Test
 	void positiveListCacheCollectionInt()
 	{
-		final List<Object> v = new Vector<>();
+		final List<Object> v = new ArrayList<>();
 		v.add("1");
 		v.add(o2.getKey());
 		v.add(o3.getKey());
@@ -116,7 +116,7 @@ class PositiveListCacheTest
 		// will be overwritten by setPositiveList()
 		fix.addToPositiveList("bogus");
 
-		final List<String> v = new Vector<>();
+		final List<String> v = new ArrayList<>();
 		v.add("1");
 		v.add("2");
 		fix.setPositiveList(v);
@@ -179,7 +179,7 @@ class PositiveListCacheTest
 		assertEquals(o1, fix.get(o1.getKey()));
 		assertEquals(o2, fix.get(o2.getKey()));
 
-		fix.setPositiveList(new Vector<String>());
+		fix.setPositiveList(List.of());
 		assertNull(fix.get(o1.getKey()));
 		assertNull(fix.get(o2.getKey()));
 	}
@@ -201,7 +201,7 @@ class PositiveListCacheTest
 		assertEquals(equal.getValue(), fix.get(o1.getKey()).getValue());
 		assertEquals(equal.getValue(), fix.get(equal.getKey()).getValue());
 
-		fix.setPositiveList(new Vector<String>());
+		fix.setPositiveList(List.of());
 		fix.put(equal);
 		assertNull(fix.get(equal.getKey()));
 	}

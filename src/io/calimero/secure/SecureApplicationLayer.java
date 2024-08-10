@@ -583,7 +583,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 		if (service == SecureDataPdu) {
 			if (isGroupDst) {
 				final var senders = security.groupSenders(address()).get(dst);
-				if (senders != null && !senders.isEmpty() && !senders.contains(src)) {
+				if (!senders.isEmpty() && !senders.contains(src)) {
 					logger.log(TRACE, "{0}->{1} sender not in group sender list of {2}, ignore", src, dst, address());
 					return new SalService(securityCtrl, new byte[0]);
 				}
@@ -697,7 +697,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 		}
 
 		final int plainService = DataUnitBuilder.getAPDUService(plainApdu);
-		if (dst instanceof IndividualAddress address)
+		if (dst instanceof final IndividualAddress address)
 			checkGoDiagnosticsResponse(src, address, plainService, plainApdu);
 
 		if (!checkAccess(dst, plainService, securityCtrl)) {
@@ -932,7 +932,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 
 	private void syncWith(final KNXAddress dst, final boolean toolAccess) throws InterruptedException {
 		try {
-			final var device = dst instanceof GroupAddress ga ? surrogate(ga) : (IndividualAddress) dst;
+			final var device = dst instanceof final GroupAddress ga ? surrogate(ga) : (IndividualAddress) dst;
 			final var future = sendSyncRequest(device, toolAccess);
 			future.get();
 		}
