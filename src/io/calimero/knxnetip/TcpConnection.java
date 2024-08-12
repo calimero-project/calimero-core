@@ -49,6 +49,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
@@ -81,6 +82,7 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
+import io.calimero.CloseEvent;
 import io.calimero.KNXException;
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
@@ -319,8 +321,9 @@ public final class TcpConnection implements Closeable {
 			}
 			catch (final IOException e) {
 				close();
-				conn.close();
-				throw new KNXConnectionClosedException("I/O error establishing secure session with " + hostPort, e);
+				final String reason = "I/O error establishing secure session with " + hostPort;
+				conn.close(CloseEvent.INTERNAL, reason);
+				throw new KNXConnectionClosedException(reason, e);
 			}
 			finally {
 				conn.sessionRequestLock.unlock();
@@ -471,7 +474,7 @@ public final class TcpConnection implements Closeable {
 				if (sessionState == SessionState.Authenticated && !conn.socket.isClosed()) {
 					logger.log(WARNING, "error sending keep-alive: {0}", e.getMessage());
 					close();
-					conn.close();
+					conn.close(CloseEvent.INTERNAL, "error sending keep-alive");
 				}
 			}
 		}
@@ -710,7 +713,11 @@ public final class TcpConnection implements Closeable {
 	 */
 	@Override
 	public void close() {
-		unsecuredConnections.values().forEach(ClientConnection::close);
+		close(CloseEvent.USER_REQUEST, "user request");
+	}
+
+	void close(final int initiator, final String reason) {
+		unsecuredConnections.values().forEach(t -> t.close(initiator, reason, Level.DEBUG, null));
 		unsecuredConnections.clear();
 
 		sessions.values().forEach(SecureSession::close);
@@ -766,6 +773,8 @@ public final class TcpConnection implements Closeable {
 		final byte[] data = new byte[rcvBufferSize];
 		int offset = 0;
 
+		int initiator = CloseEvent.USER_REQUEST;
+		String reason = "user request";
 		try {
 			final var in = socket.getInputStream();
 			while (!socket.isClosed()) {
@@ -801,8 +810,11 @@ public final class TcpConnection implements Closeable {
 				}
 
 				final int read = in.read(data, offset, data.length - offset);
-				if (read == -1)
+				if (read == -1) {
+					initiator = CloseEvent.SERVER_REQUEST;
+					reason = "server request";
 					return;
+				}
 				offset += read;
 			}
 		}
@@ -810,11 +822,14 @@ public final class TcpConnection implements Closeable {
 			Thread.currentThread().interrupt();
 		}
 		catch (IOException | RuntimeException e) {
-			if (!socket.isClosed())
+			if (!socket.isClosed()) {
+				initiator = CloseEvent.INTERNAL;
+				reason = e.getMessage();
 				logger.log(ERROR, "receiver communication failure", e);
+			}
 		}
 		finally {
-			close();
+			close(initiator, reason);
 		}
 	}
 
