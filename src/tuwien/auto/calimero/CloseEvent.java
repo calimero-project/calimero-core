@@ -83,7 +83,6 @@ public class CloseEvent extends EventObject
 
 	/**
 	 * Creates a new close event object.
-	 * <p>
 	 *
 	 * @param source the communication object to be closed
 	 * @param initiator the initiator of this close event, one of {@link #USER_REQUEST},
@@ -102,7 +101,7 @@ public class CloseEvent extends EventObject
 	 * this class or its sub-types.
 	 * <p>
 	 * For the base class {@link CloseEvent}, defined are {@link #USER_REQUEST},
-	 * {@link #SERVER_REQUEST}, and {@link #INTERNAL}.
+	 * {@link #SERVER_REQUEST}, {@link #CLIENT_REQUEST}, and {@link #INTERNAL}.
 	 *
 	 * @return identifier stating the initiator of this close event
 	 */
@@ -113,12 +112,32 @@ public class CloseEvent extends EventObject
 
 	/**
 	 * Returns a brief textual description why the close event was initiated.
-	 * <p>
 	 *
 	 * @return close reason as string
 	 */
 	public final String getReason()
 	{
 		return msg;
+	}
+
+	@Override
+	public String toString() {
+		return source + ", " + initiator() + reason();
+	}
+
+	private String initiator() {
+		return switch (initiator) {
+			case USER_REQUEST -> "user request";
+			case SERVER_REQUEST -> "server request";
+			case CLIENT_REQUEST -> "client request";
+			case INTERNAL -> "internal event";
+			default -> throw new IllegalStateException("initiator " + initiator);
+		};
+	}
+
+	private String reason() {
+		if (msg != null)
+			return " (" + msg + ")";
+		return "";
 	}
 }
