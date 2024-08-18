@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2023 B. Malinowsky
+    Copyright (c) 2018, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
 import io.calimero.SerialNumber;
 import io.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
-import io.calimero.knxnetip.TcpConnection.SecureSession;
+import io.calimero.knxnetip.StreamConnection.SecureSession;
 import io.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import io.calimero.link.medium.KNXMediumSettings;
 import io.calimero.secure.KnxSecureException;

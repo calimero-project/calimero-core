@@ -83,7 +83,7 @@ import io.calimero.KNXTimeoutException;
 import io.calimero.KnxRuntimeException;
 import io.calimero.internal.Executor;
 import io.calimero.internal.UdpSocketLooper;
-import io.calimero.knxnetip.TcpConnection.SecureSession;
+import io.calimero.knxnetip.StreamConnection.SecureSession;
 import io.calimero.knxnetip.servicetype.DescriptionRequest;
 import io.calimero.knxnetip.servicetype.DescriptionResponse;
 import io.calimero.knxnetip.servicetype.KNXnetIPHeader;
@@ -222,6 +222,10 @@ public class Discoverer
 	 * @return a {@link DiscovererTcp} instance
 	 */
 	public static DiscovererTcp tcp(final TcpConnection c) {
+		return new DiscovererTcp(c);
+	}
+
+	public static DiscovererTcp uds(final UnixDomainSocketConnection c) {
 		return new DiscovererTcp(c);
 	}
 

@@ -75,8 +75,9 @@ import io.calimero.knxnetip.RateLimitEvent;
 import io.calimero.knxnetip.RoutingBusyEvent;
 import io.calimero.knxnetip.RoutingListener;
 import io.calimero.knxnetip.SecureConnection;
+import io.calimero.knxnetip.StreamConnection;
+import io.calimero.knxnetip.StreamConnection.SecureSession;
 import io.calimero.knxnetip.TcpConnection;
-import io.calimero.knxnetip.TcpConnection.SecureSession;
 import io.calimero.knxnetip.TunnelingListener;
 import io.calimero.knxnetip.servicetype.TunnelingFeature;
 import io.calimero.knxnetip.servicetype.TunnelingFeature.InterfaceFeature;
@@ -173,7 +174,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 * @throws KNXException on failure establishing the link
 	 * @throws InterruptedException on interrupted thread while establishing link
 	 */
-	public static KNXNetworkLinkIP newTunnelingLink(final TcpConnection connection, final KNXMediumSettings settings)
+	public static KNXNetworkLinkIP newTunnelingLink(final StreamConnection connection, final KNXMediumSettings settings)
 			throws KNXException, InterruptedException {
 		return new KNXNetworkLinkIP(TunnelingV2, KNXnetIPTunnel.newTcpTunnel(LinkLayer, connection,
 				settings.getDeviceAddress()), settings);

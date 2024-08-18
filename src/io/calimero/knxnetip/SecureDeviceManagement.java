@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2021 B. Malinowsky
+    Copyright (c) 2018, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import io.calimero.KNXException;
-import io.calimero.knxnetip.TcpConnection.SecureSession;
+import io.calimero.knxnetip.StreamConnection.SecureSession;
 import io.calimero.knxnetip.util.CRI;
 
 final class SecureDeviceManagement extends KNXnetIPDevMgmt {
@@ -55,7 +55,7 @@ final class SecureDeviceManagement extends KNXnetIPDevMgmt {
 		session.registerConnectRequest(this);
 		try {
 			final var cri = CRI.createRequest(DEVICE_MGMT_CONNECTION);
-			super.connect(session.connection().localEndpoint(), session.connection().server(), cri, false);
+			doConnect(session.connection(), cri);
 		}
 		finally {
 			session.unregisterConnectRequest(this);
@@ -64,11 +64,12 @@ final class SecureDeviceManagement extends KNXnetIPDevMgmt {
 
 	@Override
 	public String name() {
-		return "KNX IP " + SecureConnection.secureSymbol + " Management " + hostPort(ctrlEndpt);
+		final var remote = remoteAddress() instanceof final InetSocketAddress isa ? hostPort(isa) : remoteAddress();
+		return "KNX IP " + SecureConnection.secureSymbol + " Management " + remote;
 	}
 
 	@Override
-	protected void connect(final TcpConnection c, final CRI cri) {
+	protected void connect(final StreamConnection c, final CRI cri) {
 		// we don't have session assigned yet, connect in ctor
 	}
 

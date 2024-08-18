@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2023 B. Malinowsky
+    Copyright (c) 2019, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,15 +42,15 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import tag.KnxnetIPSequential;
-import tag.Slow;
 import io.calimero.IndividualAddress;
 import io.calimero.KNXException;
 import io.calimero.Util;
 import io.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer;
-import io.calimero.knxnetip.TcpConnection.SecureSession;
+import io.calimero.knxnetip.StreamConnection.SecureSession;
 import io.calimero.link.medium.KNXMediumSettings;
 import io.calimero.secure.Keyring;
+import tag.KnxnetIPSequential;
+import tag.Slow;
 
 @KnxnetIPSequential
 class TcpConnectionTest {

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2021 B. Malinowsky
+    Copyright (c) 2018, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ import java.net.InetSocketAddress;
 
 import io.calimero.IndividualAddress;
 import io.calimero.KNXException;
-import io.calimero.knxnetip.TcpConnection.SecureSession;
+import io.calimero.knxnetip.StreamConnection.SecureSession;
 import io.calimero.knxnetip.util.CRI;
 import io.calimero.knxnetip.util.TunnelCRI;
 import io.calimero.link.medium.KNXMediumSettings;
@@ -60,7 +60,7 @@ final class SecureTunnel extends KNXnetIPTunnel {
 				: new TunnelCRI(knxLayer, tunnelingAddress);
 		session.registerConnectRequest(this);
 		try {
-			super.connect(session.connection().localEndpoint(), session.connection().server(), cri, false);
+			doConnect(session.connection(), cri);
 		}
 		finally {
 			session.unregisterConnectRequest(this);
@@ -69,11 +69,12 @@ final class SecureTunnel extends KNXnetIPTunnel {
 
 	@Override
 	public String name() {
-		return "KNX IP " + SecureConnection.secureSymbol + " Tunneling " + hostPort(ctrlEndpt);
+		final String remote = ctrlEndpt != null ? hostPort(ctrlEndpt) : controlEndpoint.toString();
+		return "KNX IP " + SecureConnection.secureSymbol + " Tunneling " + remote;
 	}
 
 	@Override
-	protected void connect(final TcpConnection c, final CRI cri) {
+	protected void connect(final StreamConnection c, final CRI cri) {
 		// we don't have session assigned yet, connect in ctor
 	}
 
