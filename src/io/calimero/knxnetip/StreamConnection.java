@@ -212,12 +212,16 @@ public sealed abstract class StreamConnection implements Closeable
 
 		@Override
 		public void close() {
+			close(CloseEvent.USER_REQUEST, "user request");
+		}
+
+		void close(final int initiator, final String reason) {
 			if (sessionState == SessionState.Idle)
 				return;
 
 			sessionState = SessionState.Idle;
 			keepAliveFuture.cancel(false);
-			securedConnections.values().forEach(ClientConnection::close);
+			securedConnections.values().forEach(c -> c.close(initiator, reason, Level.DEBUG, null));
 			securedConnections.clear();
 			conn.sessions.remove(sessionId);
 
@@ -647,7 +651,7 @@ public sealed abstract class StreamConnection implements Closeable
 		unsecuredConnections.values().forEach(t -> t.close(initiator, reason, Level.DEBUG, null));
 		unsecuredConnections.clear();
 
-		sessions.values().forEach(SecureSession::close);
+		sessions.values().forEach(s -> s.close(initiator, reason));
 		sessions.clear();
 	}
 
