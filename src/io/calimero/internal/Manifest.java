@@ -37,6 +37,7 @@
 package io.calimero.internal;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Optional;
 import java.util.jar.Attributes.Name;
 
@@ -54,19 +55,31 @@ public final class Manifest {
 	private Manifest() {}
 
 	public static BuildInfo buildInfo(final Class<?> lookup) {
-		String version = Settings.getLibraryVersion();
-		String revision = null;
-		String buildDate = null;
-		try (final var metaInf = lookup.getResourceAsStream("/META-INF/MANIFEST.MF")) {
-			if (metaInf != null) {
-				final var manifest = new java.util.jar.Manifest(metaInf);
+		try (final var is = manifestStream(lookup)) {
+			if (is != null) {
+				final var manifest = new java.util.jar.Manifest(is);
 				final var attributes = manifest.getMainAttributes();
-				version = attributes.getValue(Name.IMPLEMENTATION_VERSION);
-				revision = attributes.getValue("Revision");
-				buildDate = attributes.getValue("Build-Date");
+				return new BuildInfo(Optional.ofNullable(attributes.getValue(Name.IMPLEMENTATION_VERSION))
+								.orElse(Settings.getLibraryVersion()),
+						Optional.ofNullable(attributes.getValue("Revision")),
+						Optional.ofNullable(attributes.getValue("Build-Date")));
 			}
 		}
 		catch (IOException | RuntimeException ignore) {}
-		return new BuildInfo(version, Optional.ofNullable(revision), Optional.ofNullable(buildDate));
+		return new BuildInfo(Settings.getLibraryVersion(), Optional.empty(), Optional.empty());
+	}
+
+	private static InputStream manifestStream(final Class<?> lookup) throws IOException {
+		if (lookup.getModule().isNamed())
+			return lookup.getResourceAsStream("/META-INF/MANIFEST.MF"); // requires leading slash
+
+		// We could use ProtectionDomain of the lookup class, which won't work, e.g., on Android;
+		// also, the protection domain's code source or location might be null.
+		// final var f = new File(lookup.getProtectionDomain().getCodeSource().getLocation().toURI());
+		final String pkg = lookup.getPackageName();
+		final String id = pkg.substring(pkg.lastIndexOf('.') + 1).replace("calimero", "core");
+		final var url = lookup.getClassLoader().resources("META-INF/MANIFEST.MF")
+				.filter(u -> u.getPath().contains("calimero") && u.getPath().contains(id)).findFirst().orElse(null);
+		return url != null ? url.openStream() : null;
 	}
 }
