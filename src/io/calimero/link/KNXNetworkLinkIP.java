@@ -120,9 +120,15 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	}
 
 	/**
-	 * Service mode for link layer tunneling.
+	 * Service mode for link layer tunneling v1.
 	 */
-	protected static final int TUNNELING = 1;
+	protected static final int TunnelingV1 = 1;
+
+	/**
+	 * @deprecated Use {@link #TunnelingV1}.
+	 */
+	@Deprecated(forRemoval = true)
+	protected static final int TUNNELING = TunnelingV1;
 
 	/**
 	 * Service mode for link layer tunneling v2.
@@ -161,7 +167,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	public static KNXNetworkLinkIP newTunnelingLink(final InetSocketAddress localEP, final InetSocketAddress remoteEP,
 		final boolean useNAT, final KNXMediumSettings settings) throws KNXException, InterruptedException
 	{
-		return new KNXNetworkLinkIP(TUNNELING, localEP, remoteEP, useNAT, settings);
+		return new KNXNetworkLinkIP(TunnelingV1, localEP, remoteEP, useNAT, settings);
 	}
 
 	/**
@@ -323,7 +329,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 * Creates a new network link based on the KNXnet/IP protocol, using a {@link KNXnetIPConnection}.
 	 *
 	 * @param serviceMode mode of communication to open, {@code serviceMode} is one of the service mode constants
-	 *        (e.g. {@link #TUNNELING}); depending on the mode set, the expected local/remote endpoints might differ
+	 *        (e.g. {@link #TunnelingV1}); depending on the mode set, the expected local/remote endpoints might differ
 	 * @param localEP the local endpoint of the link to use;<br>
 	 *        - in tunneling mode (point-to-point), this is the client control endpoint, use {@code null} for the
 	 *        default local host and an ephemeral port number<br>
@@ -346,14 +352,14 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 		final boolean useNAT, final KNXMediumSettings settings) throws KNXException, InterruptedException
 	{
 		this(serviceMode, newConnection(serviceMode, localEP, remoteEP, useNAT), settings);
-		if (serviceMode == TUNNELING)
+		if (serviceMode == TunnelingV1)
 			configureWithServerSettings(localEP, remoteEP, useNAT);
 	}
 
 	/**
 	 * Creates a new network link with {@code serviceMode} based on the supplied KNXnet/IP connection.
 	 *
-	 * @param serviceMode mode of communication, one of the service mode constants {@link #TUNNELING},
+	 * @param serviceMode mode of communication, one of the service mode constants {@link #TunnelingV1},
 	 *        {@link #TunnelingV2}, or {@link #ROUTING}
 	 * @param c a KNXnet/IP tunneling or routing connection in open state
 	 * @param settings medium settings defining device and medium specifics needed for communication
