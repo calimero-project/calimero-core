@@ -158,7 +158,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 * @param remoteEP the remote endpoint of the link to communicate with; this is the KNXnet/IP server control
 	 *        endpoint
 	 * @param useNAT {@code true} to use network address translation (NAT) in tunneling service mode,
-	 *        {@code false} to use the default (non aware) mode
+	 *        {@code false} to use the default (non-aware) mode
 	 * @param settings medium settings defining device and KNX medium specifics for communication
 	 * @return the network link in open state
 	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
@@ -613,7 +613,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 
 	private static String createLinkName(final InetSocketAddress endpt)
 	{
-		if (endpt == null)
+		if (endpt == null) // TODO distinguish UDS, where endpt is also null
 			return KNXnetIPRouting.DEFAULT_MULTICAST;
 		// do our own IP:port string, since InetAddress.toString() always prepends a '/'
 		final String host = (endpt.isUnresolved() ? endpt.getHostString() : endpt.getAddress().getHostAddress());

@@ -218,7 +218,6 @@ public class KNXnetIPTunnel extends ClientConnection
 	}
 
 	// sends a tunneling feature-get service
-	// sendFeature / getFeature?
 	public void send(final InterfaceFeature feature) throws KNXConnectionClosedException, KNXTimeoutException,
 			InterruptedException {
 		lock.lock();
@@ -232,7 +231,6 @@ public class KNXnetIPTunnel extends ClientConnection
 	}
 
 	// sends a tunneling feature-set service
-	// sendFeature / setFeature?
 	public void send(final InterfaceFeature feature, final byte... featureValue)
 		throws KNXConnectionClosedException, KNXTimeoutException, InterruptedException {
 		lock.lock();
