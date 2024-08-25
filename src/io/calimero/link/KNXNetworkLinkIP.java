@@ -421,14 +421,15 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 			});
 			try {
 				tunnel.send(InterfaceFeature.EnableFeatureInfoService, (byte) 1);
+				getTunnelingFeature(tunnel, InterfaceFeature.IndividualAddress);
+				getTunnelingFeature(tunnel, InterfaceFeature.MaxApduLength);
+				getTunnelingFeature(tunnel, InterfaceFeature.DeviceDescriptorType0);
 			}
-			catch (final KNXAckTimeoutException e) {
+			catch (KNXAckTimeoutException | KNXConnectionClosedException | InterruptedException e) {
+				close();
 				throw e;
 			}
 			catch (final KNXTimeoutException ok) {}
-			getTunnelingFeature(tunnel, InterfaceFeature.IndividualAddress);
-			getTunnelingFeature(tunnel, InterfaceFeature.MaxApduLength);
-			getTunnelingFeature(tunnel, InterfaceFeature.DeviceDescriptorType0);
 		}
 		else if (c instanceof KNXnetIPRouting) {
 			notifier.registerEventType(LostMessageEvent.class);
