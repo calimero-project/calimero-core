@@ -585,27 +585,30 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	}
 
 	private static KNXnetIPConnection newConnection(final int serviceMode, final InetSocketAddress localEP,
-		final InetSocketAddress remoteEP, final boolean useNAT) throws KNXException, InterruptedException
-	{
-		switch (serviceMode) {
-		case TUNNELING:
-		case TunnelingV2:
-			final InetSocketAddress local = localEP == null ? new InetSocketAddress(0) : localEP;
-			return new KNXnetIPTunnel(LinkLayer, local, remoteEP, useNAT);
-		case ROUTING:
-			NetworkInterface netIf = null;
-			if (localEP != null && !localEP.isUnresolved())
-				try {
-					netIf = NetworkInterface.getByInetAddress(localEP.getAddress());
-				}
-				catch (final SocketException e) {
-					throw new KNXException("error getting network interface: " + e.getMessage());
-				}
-			final InetAddress mcast = remoteEP != null ? remoteEP.getAddress() : null;
-			return new KNXnetIPRouting(netIf, mcast);
-		default:
-			throw new KNXIllegalArgumentException("unknown service mode " + serviceMode);
+			final InetSocketAddress remoteEP, final boolean useNAT) throws KNXException, InterruptedException {
+		return switch (serviceMode) {
+			case TunnelingV1, TunnelingV2 -> new KNXnetIPTunnel(LinkLayer, localEndpoint(localEP), remoteEP, useNAT);
+			case ROUTING -> new KNXnetIPRouting(mcastNetif(localEP), mcastGroup(remoteEP));
+			default -> throw new KNXIllegalArgumentException("unknown service mode " + serviceMode);
+		};
+	}
+
+	private static InetSocketAddress localEndpoint(final InetSocketAddress localEP) {
+		return localEP != null ? localEP : new InetSocketAddress(0);
+	}
+
+	private static NetworkInterface mcastNetif(final InetSocketAddress localEP) throws KNXException {
+		if (localEP == null || localEP.isUnresolved())
+			return null;
+		try {
+			return NetworkInterface.getByInetAddress(localEP.getAddress());
+		} catch (final SocketException e) {
+			throw new KNXException("error getting network interface: " + e.getMessage());
 		}
+	}
+
+	private static InetAddress mcastGroup(final InetSocketAddress remoteEP) {
+		return remoteEP != null ? remoteEP.getAddress() : DefaultMulticast;
 	}
 
 	private static String createLinkName(final InetSocketAddress endpt)
