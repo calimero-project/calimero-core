@@ -41,7 +41,6 @@ import static java.lang.System.Logger.Level.ERROR;
 import static java.lang.System.Logger.Level.TRACE;
 import static java.lang.System.Logger.Level.WARNING;
 
-import java.lang.System.Logger.Level;
 import java.util.HexFormat;
 
 import io.calimero.FrameEvent;
