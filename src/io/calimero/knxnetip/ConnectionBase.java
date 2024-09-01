@@ -574,7 +574,6 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 
 	boolean waitForStateChange(final int initialState, final int timeout) throws InterruptedException
 	{
-		boolean changed = false;
 		long remaining = timeout * 1000L;
 		final long end = System.currentTimeMillis() + remaining;
 		lock.lock();
@@ -587,8 +586,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		finally {
 			lock.unlock();
 		}
-		changed = remaining > 0;
-		return changed;
+		return remaining > 0;
 	}
 
 	/**

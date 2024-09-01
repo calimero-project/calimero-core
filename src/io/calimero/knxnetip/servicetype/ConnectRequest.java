@@ -112,7 +112,7 @@ public class ConnectRequest extends ServiceType
 	{
 		super(KNXnetIPHeader.CONNECT_REQ);
 		cri = requestInfo;
-		ctrlPt = new HPAI((InetAddress) null, localPort);
+		ctrlPt = new HPAI(null, localPort);
 		dataPt = ctrlPt;
 	}
 

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2022 B. Malinowsky
+    Copyright (c) 2018, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -125,7 +125,7 @@ public class DptXlatorBrightnessClrTempTrans extends DPTXlator {
 		final int valid = data[5];
 		if ((valid & 2) == 2) {
 			int offset = 2;
-			final int temperature = (data[offset++] << 8) | data[offset++];
+			final int temperature = (data[offset++] << 8) | data[offset];
 			return Optional.of(temperature);
 		}
 		return Optional.empty();
@@ -135,7 +135,7 @@ public class DptXlatorBrightnessClrTempTrans extends DPTXlator {
 		final int valid = data[5];
 		if ((valid & 4) == 4) {
 			int offset = 0;
-			final long time = ((data[offset++] << 8) | data[offset++]) * 100;
+			final long time = ((data[offset++] << 8) | data[offset]) * 100;
 			return Optional.of(Duration.ofMillis(time));
 		}
 		return Optional.empty();
@@ -209,7 +209,7 @@ public class DptXlatorBrightnessClrTempTrans extends DPTXlator {
 		final double time = ((data[offset++] << 8) | data[offset++]) / 10d;
 		final int temperature = (data[offset++] << 8) | data[offset++];
 		final double brightness = data[offset++] * 100d / 255;
-		final int valid = data[offset++];
+		final int valid = data[offset];
 
 		final StringBuilder sb = new StringBuilder();
 		sb.append((valid & 1) == 1 ? formatter.format(brightness) : "-").append(appendUnit ? " % " : " ");

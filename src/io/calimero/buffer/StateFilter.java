@@ -176,7 +176,7 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		if (!(f.getDestination() instanceof final GroupAddress dst))
 			return;
 		final DatapointModel<?> m = c.getDatapointModel();
-		Datapoint dp = null;
+		Datapoint dp;
 		if (m != null && ((dp = m.get(dst)) == null || !dp.isStateBased()))
 			return;
 		final byte[] d = f.getPayload();

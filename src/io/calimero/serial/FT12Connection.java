@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -506,7 +506,7 @@ public class FT12Connection implements Connection<byte[]>
 		for (final byte b : data)
 			buf[i++] = b;
 		buf[i++] = checksum(buf, 4, data.length + 1);
-		buf[i++] = END;
+		buf[i] = END;
 
 		state = ACK_PENDING;
 		os.write(buf);
