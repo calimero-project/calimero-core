@@ -205,7 +205,7 @@ public class DptXlatorXyYTransition extends DPTXlator {
 		final double x = ((data[offset++] << 8) | data[offset++]) / 65_535d;
 		final double brightness = data[offset++] * 100d / 255;
 
-		final int valid = data[offset++];
+		final int valid = data[offset];
 		final boolean clrValid = (valid & 2) == 2;
 		final boolean brightnessValid = (valid & 1) == 1;
 
@@ -273,7 +273,7 @@ public class DptXlatorXyYTransition extends DPTXlator {
 		dst[offset++] = (short) (xRaw >> 8);
 		dst[offset++] = (short) (xRaw & 0xff);
 		dst[offset++] = brightnessRaw;
-		dst[offset++] = (short) valid;
+		dst[offset] = (short) valid;
 	}
 
 	private void toDpt(final double x, final double y, final double brightness, final Duration fadingTime) {

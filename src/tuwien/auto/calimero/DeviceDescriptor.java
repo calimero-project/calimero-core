@@ -338,7 +338,7 @@ public interface DeviceDescriptor
 			d[i++] = (byte) (channelInfo3 >> 8);
 			d[i++] = (byte) (channelInfo3);
 			d[i++] = (byte) (channelInfo4 >> 8);
-			d[i++] = (byte) (channelInfo4);
+			d[i] = (byte) (channelInfo4);
 		}
 
 		/**

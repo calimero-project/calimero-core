@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2022 B. Malinowsky
+    Copyright (c) 2018, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -167,7 +167,7 @@ public class DptXlatorBrightnessClrTempControl extends DPTXlator {
 
 	private String fromDpt(final int index) {
 		final int offset = index * 3;
-		String s = "";
+		String s;
 
 		t.setAppendUnit(appendUnit);
 		final int valid = data[offset + 2];

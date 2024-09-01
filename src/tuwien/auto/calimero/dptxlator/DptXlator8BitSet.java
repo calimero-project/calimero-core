@@ -261,11 +261,7 @@ public class DptXlator8BitSet extends DPTXlator
 	public final EnumSet<?> value() throws KNXFormatException {
 		final short v = fromDpt(0);
 		final EnumSet<?> set = EnumSet.allOf(((EnumDpt<?>) dpt).elements);
-		for (final var i = set.iterator(); i.hasNext();) {
-			final var e = i.next();
-			if ((v & (1 << e.ordinal())) == 0)
-				i.remove();
-		}
+		set.removeIf(e -> (v & (1 << e.ordinal())) == 0);
 		return set;
 	}
 

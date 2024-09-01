@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2020 B. Malinowsky
+    Copyright (c) 2006, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -119,9 +119,8 @@ public final class XmlResolver
 
 	Reader getInputReader(final InputStream is) throws KNXMLException
 	{
-		InputStream in = null;
 		try {
-			in = new BufferedInputStream(is);
+			final InputStream in = new BufferedInputStream(is);
 			in.mark(9000);
 			// deduce encoding from first 4 bytes of stream
 			final byte[] start = new byte[4];
@@ -231,10 +230,9 @@ public final class XmlResolver
 			}
 			else if (state == 1 || state == 2) {
 				if (s.startsWith("standalone")) {
-					standalone = getAttValue(s = s.substring(10));
+					standalone = getAttValue(s.substring(10));
 					if (!"yes".equals(standalone) && !"no".equals(standalone))
-						throw new KNXMLException("invalid standalone pseudo-attribute",
-							standalone, 0);
+						throw new KNXMLException("invalid standalone pseudo-attribute", standalone, 0);
 					break;
 				}
 			}

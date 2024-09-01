@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2022 B. Malinowsky
+    Copyright (c) 2015, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -315,7 +315,7 @@ abstract class LocalDeviceManagement<T> implements PropertyAdapter
 		final CEMIDevMgmt req = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, DEVICE_OBJECT, 1,
 				PropertyAccess.PID.IO_LIST, 0, 1);
 		send(req, BlockingMode.Confirmation);
-		int objects = 0;
+		int objects;
 		try {
 			final byte[] ret = findFrame(CEMIDevMgmt.MC_PROPREAD_CON, req);
 			objects = (ret[0] & 0xff) << 8 | (ret[1] & 0xff);

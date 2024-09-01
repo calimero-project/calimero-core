@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2018, 2023 B. Malinowsky
+    Copyright (c) 2018, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -185,7 +185,7 @@ public class DptXlatorXyY extends DPTXlator {
 		final double y = ((data[offset++] << 8) | data[offset++]) / 65_535d;
 		final double brightness = data[offset++] * 100d / 255;
 
-		final int valid = data[offset++];
+		final int valid = data[offset];
 		final boolean clrValid = (valid & 2) == 2;
 		final boolean brightnessValid = (valid & 1) == 1;
 
@@ -242,7 +242,7 @@ public class DptXlatorXyY extends DPTXlator {
 		dst[offset++] = (short) (yRaw >> 8);
 		dst[offset++] = ubyte(yRaw);
 		dst[offset++] = ubyte(brightnessRaw);
-		dst[offset++] = (short) valid;
+		dst[offset] = (short) valid;
 	}
 
 	private void toDpt(final double x, final double y, final double brightness) {
