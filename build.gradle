@@ -80,18 +80,19 @@ tasks.withType(Javadoc).configureEach {
     options.addStringOption("Xdoclint:-missing", '-quiet')
 }
 
-
-def gitHash = "git -C $projectDir rev-parse --verify --short HEAD".execute().text.trim()
-def buildDate = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z")
-                        .withZone(ZoneId.of("UTC"))
-                        .format(Instant.now())
-
 jar {
 	manifest {
+        def gitHash = providers.exec {
+            commandLine("git", "-C", "$projectDir", "rev-parse", "--verify", "--short", "HEAD")
+        }.standardOutput.asText.map { it.trim() }
+        def buildDate = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z")
+                .withZone(ZoneId.of("UTC"))
+                .format(Instant.now())
+
 		attributes(
 			'Main-Class': application.mainClass,
 			'Implementation-Version': project.version,
-			'Revision': "${gitHash}",
+			'Revision': gitHash.get(),
 			'Build-Date': "${buildDate}"
 		)
 	}
