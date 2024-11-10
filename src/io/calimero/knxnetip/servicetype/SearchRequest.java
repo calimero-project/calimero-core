@@ -39,7 +39,6 @@
 package io.calimero.knxnetip.servicetype;
 
 import java.io.ByteArrayOutputStream;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collections;

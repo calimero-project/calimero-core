@@ -37,7 +37,6 @@
 package io.calimero.knxnetip.servicetype;
 
 import java.io.ByteArrayOutputStream;
-import java.net.InetAddress;
 
 import io.calimero.KNXFormatException;
 import io.calimero.knxnetip.util.CRI;
