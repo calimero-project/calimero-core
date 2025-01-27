@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2024 B. Malinowsky
+    Copyright (c) 2010, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -353,7 +353,8 @@ public abstract class ClientConnection extends ConnectionBase
 			else {
 				if (!checkVersion(h))
 					return true;
-				incSeqSend();
+				if (res.getStatus() == ErrorCodes.NO_ERROR)
+					incSeqSend();
 				// update state and notify our lock
 				setStateNotify(res.getStatus() == ErrorCodes.NO_ERROR ? CEMI_CON_PENDING : ACK_ERROR);
 				if (logger.isTraceEnabled())
