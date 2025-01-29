@@ -46,6 +46,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
+import java.util.HexFormat;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -232,8 +233,11 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 				int attempt = 0;
 				for (; attempt < maxSendAttempts; ++attempt) {
 					if (logger.isTraceEnabled())
-						logger.trace("sending cEMI frame seq {}, {}, attempt {} (channel {}) {}", getSeqSend(), mode,
-								(attempt + 1), channelId, DataUnitBuilder.toHex(buf, " "));
+						if (serviceRequest == KNXnetIPHeader.ROUTING_IND)
+							logger.trace("sending cEMI frame, {} {}", mode, HexFormat.ofDelimiter(" ").formatHex(buf));
+						else
+							logger.trace("sending cEMI frame seq {}, {}, attempt {} (channel {}) {}", getSeqSend(), mode,
+									(attempt + 1), channelId, DataUnitBuilder.toHex(buf, " "));
 
 					send(buf, dataEndpt);
 					// shortcut for routing, don't switch into 'ack-pending'
