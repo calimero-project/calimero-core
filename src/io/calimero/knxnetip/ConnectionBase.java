@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2024 B. Malinowsky
+    Copyright (c) 2010, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -235,8 +235,11 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 				int attempt = 0;
 				for (; attempt < maxSendAttempts; ++attempt) {
 					if (logger.isLoggable(TRACE))
-						logger.log(TRACE, "sending cEMI frame seq {0}, {1}, attempt {2} (channel {3}) {4}", getSeqSend(), mode,
-								(attempt + 1), channelId, HexFormat.ofDelimiter(" ").formatHex(buf));
+						if (serviceRequest == KNXnetIPHeader.ROUTING_IND)
+							logger.log(TRACE, "sending cEMI frame, {0} {1}", mode, HexFormat.ofDelimiter(" ").formatHex(buf));
+						else
+							logger.log(TRACE, "sending cEMI frame seq {0}, {1}, attempt {2} (channel {3}) {4}", getSeqSend(), mode,
+									(attempt + 1), channelId, HexFormat.ofDelimiter(" ").formatHex(buf));
 
 					send(buf, dataEndpt);
 					// shortcut for routing, don't switch into 'ack-pending'
