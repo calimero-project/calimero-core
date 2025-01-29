@@ -57,6 +57,10 @@ tasks.named<JavaCompile>("compileJava") {
 	options.javaModuleVersion = project.version.toString()
 }
 
+tasks.named<JavaCompile>("compileTestJava") {
+	options.compilerArgs.add("-Xlint:-try")
+}
+
 application {
 	mainModule.set("io.calimero.core")
 	mainClass.set("io.calimero.Settings")
