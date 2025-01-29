@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2022, 2024 B. Malinowsky
+    Copyright (c) 2022, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,8 +38,6 @@ package io.calimero.serial;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -60,14 +58,7 @@ public final class SerialConnectionFactory {
 	private static final ConnectionFactory<SerialConnectionProvider, SerialCom> factory = new ConnectionFactory<>(
 			SerialConnectionProvider.class);
 
-	private static final List<String> defaultPortPrefixes = System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("windows")
-					? List.of("\\\\.\\COM")
-					: List.of("/dev/ttyS", "/dev/ttyACM", "/dev/ttyUSB", "/dev/ttyAMA");
-
-
 	private SerialConnectionFactory() {}
-
-	static List<String> defaultPortPrefixes() { return defaultPortPrefixes; }
 
 	/** {@return all available serial communication port identifiers} */
 	public static Set<String> portIdentifiers() {
