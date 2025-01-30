@@ -37,11 +37,11 @@
 package tuwien.auto.calimero.serial;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.ServiceLoader.Provider;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -70,30 +70,35 @@ public final class ConnectionFactory<P, C> {
 		svcName = service.getName();
 	}
 
-	public C open(final ThrowingFunction<P, C> openFunc) throws KNXException, IOException {
-		final var tref = new AtomicReference<Throwable>();
-		final var optC = providers().map(provider -> {
+	public C open(final String name, final ThrowingFunction<P, C> openFunc) throws KNXException, IOException {
+		final var providerExceptions = new ArrayList<Throwable>();
+		final var connOpt = providers().map(provider -> {
 			try {
 				final var conn = openFunc.open(provider);
 				logger.debug("{} port setup: {}", provider, conn);
 				return Optional.of(conn);
 			}
-			catch (KNXException | IOException | RuntimeException t) {
-				tref.set(t);
+			catch (KNXException | IOException | RuntimeException | ExceptionInInitializerError t) {
+				logger.debug("{} unsuccessful: {}", provider, t.getMessage());
+				providerExceptions.add(t);
 				return Optional.<C>empty();
 			}
 		}).flatMap(Optional::stream).findFirst();
-		if (optC.isPresent())
-			return optC.get();
+		if (connOpt.isPresent())
+			return connOpt.get();
 
-		final var t = tref.get();
-		if (t == null)
+		if (providerExceptions.isEmpty())
 			throw new KNXException("no service provider available for " + svcName);
-		if (t instanceof KNXException exception)
-			throw exception;
-		if (t instanceof IOException exception)
-			throw exception;
-		throw new KNXException("failed to open connection", t);
+		if (providerExceptions.size() == 1) {
+			final var x = providerExceptions.get(0);
+			if (x instanceof final KNXException e)
+				throw e;
+			if (x instanceof final IOException e)
+				throw e;
+		}
+		final var t = new KNXException("failed to open connection '" + name + "'");
+		providerExceptions.forEach(t::addSuppressed);
+		throw t;
 	}
 
 	public Stream<P> providers() {

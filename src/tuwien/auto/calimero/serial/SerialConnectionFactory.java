@@ -103,11 +103,11 @@ public final class SerialConnectionFactory {
 				flowControl, readIntervalTimeout, receiveTimeout);
 
 		try {
-			return factory.open(p -> p.open(settings));
+			return factory.open(portId, p -> p.open(settings));
 		}
 		catch (KNXException | IOException e) {
 			try {
-				return oldFactory.open(p -> {
+				return oldFactory.open(portId, p -> {
 					try {
 						p.open(portId);
 						p.setSerialPortParams(baudrate, databits, stopbits, parity);
