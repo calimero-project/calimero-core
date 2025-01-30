@@ -92,7 +92,7 @@ public final class SerialConnectionFactory {
 				flowControl, readIntervalTimeout, receiveTimeout);
 
 		try {
-			return factory.open(p -> p.open(settings));
+			return factory.open(portId, p -> p.open(settings));
 		}
 		catch (final IOException e) {
 			throw new KNXException("opening device " + portId, e);
