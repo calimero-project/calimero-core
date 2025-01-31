@@ -49,7 +49,6 @@ import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXListener;
 import tuwien.auto.calimero.KNXTimeoutException;
-import tuwien.auto.calimero.cemi.CEMI;
 import tuwien.auto.calimero.cemi.CEMIDevMgmt;
 import tuwien.auto.calimero.link.BcuSwitcher.BcuMode;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
@@ -187,23 +186,19 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 		return false;
 	}
 
-	private void enterBusmonitor(final boolean extBusmon)
-		throws KNXPortClosedException, KNXTimeoutException, KNXFormatException, InterruptedException
-	{
-		if (activeEmi == Cemi) {
-			final var frame = BcuSwitcher.commModeRequest(BcuSwitcher.Busmonitor);
-			conn.send(frame, BlockingMode.Confirmation);
-			// TODO close monitor if we cannot switch to busmonitor
-			// check for .con
-			//findFrame(CEMIDevMgmt.MC_PROPWRITE_CON);
-		}
-		else if (activeEmi == Emi1) {
-			new BcuSwitcher<>(conn, logger)
-				.enter(extBusmon ? BcuMode.ExtBusmonitor : BcuMode.Busmonitor);
-		}
-		else {
-			final byte[] switchBusmon = { (byte) PEI_SWITCH, (byte) 0x90, 0x18, 0x34, 0x56, 0x78, 0x0A, };
-			conn.send(switchBusmon, BlockingMode.Confirmation);
+	private static final byte[] peiSwitchBusmon = {(byte) PEI_SWITCH, (byte) 0x90, 0x18, 0x34, 0x56, 0x78, 0x0A,};
+	private static final byte[] peiSwitchNormal = {(byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A,};
+
+	private void enterBusmonitor(final boolean extBusmon) throws KNXPortClosedException, KNXTimeoutException,
+			KNXFormatException, InterruptedException {
+		switch (activeEmi) {
+			case Cemi -> {
+				conn.send(BcuSwitcher.commModeRequest(BcuSwitcher.Busmonitor), BlockingMode.Confirmation);
+				// check for .con
+				//findFrame(CEMIDevMgmt.MC_PROPWRITE_CON);
+			}
+			case Emi1 -> new BcuSwitcher<>(conn, logger).enter(extBusmon ? BcuMode.ExtBusmonitor : BcuMode.Busmonitor);
+			case Emi2 -> conn.send(peiSwitchBusmon, BlockingMode.Confirmation);
 		}
 	}
 
@@ -216,18 +211,11 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 		catch (final KNXPortClosedException | KNXTimeoutException e) {}
 	}
 
-	private void normalMode() throws KNXPortClosedException, KNXTimeoutException, InterruptedException
-	{
-		if (activeEmi == Cemi) {
-			final CEMI frame = new CEMIDevMgmt(CEMIDevMgmt.MC_RESET_REQ);
-			conn.send(frame.toByteArray(), BlockingMode.Confirmation);
-		}
-		else if (activeEmi == Emi1) {
-			new BcuSwitcher<>(conn, logger).reset();
-		}
-		else if (activeEmi == Emi2) {
-			final byte[] switchNormal = { (byte) PEI_SWITCH, 0x1E, 0x12, 0x34, 0x56, 0x78, (byte) 0x9A, };
-			conn.send(switchNormal, BlockingMode.Confirmation);
+	private void normalMode() throws KNXPortClosedException, KNXTimeoutException, InterruptedException {
+		switch (activeEmi) {
+			case Cemi -> conn.send(new CEMIDevMgmt(CEMIDevMgmt.MC_RESET_REQ).toByteArray(), BlockingMode.Confirmation);
+			case Emi1 -> new BcuSwitcher<>(conn, logger).reset();
+			case Emi2 -> conn.send(peiSwitchNormal, BlockingMode.Confirmation);
 		}
 	}
 
