@@ -1,6 +1,6 @@
 /*
     Calimero - A library for KNX network access
-    Copyright (c) 2019, 2024 B. Malinowsky
+    Copyright (c) 2019, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -583,7 +583,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 		if (service == SecureDataPdu) {
 			if (isGroupDst) {
 				final var senders = security.groupSenders(address()).get(dst);
-				if (!senders.isEmpty() && !senders.contains(src)) {
+				if (senders != null && !senders.isEmpty() && !senders.contains(src)) {
 					logger.log(TRACE, "{0}->{1} sender not in group sender list of {2}, ignore", src, dst, address());
 					return new SalService(securityCtrl, new byte[0]);
 				}
