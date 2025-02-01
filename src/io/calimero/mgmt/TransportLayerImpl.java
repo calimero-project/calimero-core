@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -126,7 +126,8 @@ public class TransportLayerImpl implements TransportLayer
 				// are we waiting for ack?
 				ackLock.lock();
 				try {
-					if (active != null && active.getDestination().getAddress().equals(src)) {
+					final var act = active;
+					if (act != null && act.getDestination().getAddress().equals(src)) {
 						indications.add(e);
 						ackCond.signal();
 						return;
@@ -186,7 +187,7 @@ public class TransportLayerImpl implements TransportLayer
 
 	// holds the mapping of connection destination address to proxy
 	private final Map<IndividualAddress, AggregatorProxy> proxies = new ConcurrentHashMap<>();
-	private AggregatorProxy active;
+	private volatile AggregatorProxy active;
 
 	private volatile int repeated;
 
@@ -348,32 +349,25 @@ public class TransportLayerImpl implements TransportLayer
 		// this lock guards between send and return (only one at a time)
 		sendLock.lock();
 		try {
-			// on indications lock we wait for incoming messages
-			ackLock.lock();
-			try {
-				active = ap;
-				for (repeated = 0; repeated < MAX_REPEAT + 1; ++repeated) {
-					try {
-						logger.log(TRACE, "sending data connected to {0}, attempt {1}", d.getAddress(), (repeated + 1));
-						// set state and timer
-						ap.setState(OpenWait);
-						lnk.sendRequestWait(d.getAddress(), p, tsdu);
-						if (waitForAck())
-							return;
-					}
-					catch (final KNXTimeoutException e) {}
-					// cancel repetitions if detached or destroyed
-					if (detached || d.getState() == Destroyed)
-						throw new KNXDisconnectException("send data connected failed", d);
+			active = ap;
+			for (repeated = 0; repeated < MAX_REPEAT + 1; ++repeated) {
+				try {
+					logger.log(TRACE, "sending data connected to {0}, attempt {1}", d.getAddress(), (repeated + 1));
+					// set state and timer
+					ap.setState(OpenWait);
+					lnk.sendRequestWait(d.getAddress(), p, tsdu);
+					if (waitForAck())
+						return;
 				}
-			}
-			finally {
-				active = null;
-				repeated = 0;
-				ackLock.unlock();
+				catch (final KNXTimeoutException e) {}
+				// cancel repetitions if detached or destroyed
+				if (detached || d.getState() == Destroyed)
+					throw new KNXDisconnectException("send data connected failed", d);
 			}
 		}
 		finally {
+			active = null;
+			repeated = 0;
 			sendLock.unlock();
 		}
 		disconnectIndicate(ap, true);
@@ -536,6 +530,7 @@ public class TransportLayerImpl implements TransportLayer
 	private boolean waitForAck() throws KNXTimeoutException, KNXDisconnectException, KNXLinkClosedException
 	{
 		boolean interrupted = false;
+		ackLock.lock();
 		try {
 			long remaining = ACK_TIMEOUT * 1000L;
 			final long end = System.currentTimeMillis() + remaining;
@@ -559,6 +554,7 @@ public class TransportLayerImpl implements TransportLayer
 			}
 		}
 		finally {
+			ackLock.unlock();
 			if (interrupted)
 				Thread.currentThread().interrupt();
 		}
