@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2023 B. Malinowsky
+    Copyright (c) 2015, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ import io.calimero.serial.KNXPortClosedException;
 import io.calimero.serial.TpuartConnection;
 
 /**
- * Implementation of the KNX network network link over TP-UART, using a {@link TpuartConnection}.
+ * Implementation of the KNX network link over TP-UART, using a {@link TpuartConnection}.
  * Once a link has been closed, it is not available for further communication, i.e. it can not be
  * reopened.
  *
@@ -128,11 +128,14 @@ public class KNXNetworkLinkTpuart extends AbstractLink<TpuartConnection>
 			logger.log(Level.TRACE, () -> "send cEMI " + HexFormat.ofDelimiter(" ").formatHex(msg));
 			conn.send(msg, waitForCon);
 		}
-		catch (final InterruptedException | KNXPortClosedException e) {
+		catch (final InterruptedException e) {
 			close();
-			if (e instanceof InterruptedException)
-				Thread.currentThread().interrupt();
-			throw new KNXLinkClosedException(getName(), e);
+			Thread.currentThread().interrupt();
+			throw new KNXLinkClosedException("link " + getName() + " closed (interrupted)", e);
+		}
+		catch (final KNXPortClosedException e) {
+			close();
+			throw new KNXLinkClosedException("link " + getName() + " closed (" + e.getMessage() + ")", e);
 		}
 	}
 
