@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -136,13 +136,14 @@ public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 				logger.trace("EMI {}", DataUnitBuilder.toHex(msg, " "));
 			conn.send(msg, waitForCon);
 			logger.trace("send to {} succeeded", dst);
-		}
-		catch (KNXPortClosedException | InterruptedException e) {
-			logger.error("send error, closing link", e);
+		} catch (final InterruptedException e) {
 			close();
-			if (e instanceof InterruptedException)
-				Thread.currentThread().interrupt();
-			throw new KNXLinkClosedException("link closed, " + e.getMessage());
+			Thread.currentThread().interrupt();
+			throw new KNXLinkClosedException("link " + getName() + " closed (interrupted)", e);
+		}
+		catch (final KNXPortClosedException e) {
+			close();
+			throw new KNXLinkClosedException("link " + getName() + " closed (" + e.getMessage() + ")", e);
 		}
 	}
 

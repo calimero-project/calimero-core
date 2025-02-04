@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -153,7 +153,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 * @param remoteEP the remote endpoint of the link to communicate with; this is the KNXnet/IP server control
 	 *        endpoint
 	 * @param useNAT {@code true} to use network address translation (NAT) in tunneling service mode,
-	 *        {@code false} to use the default (non aware) mode
+	 *        {@code false} to use the default (non-aware) mode
 	 * @param settings medium settings defining device and KNX medium specifics for communication
 	 * @return the network link in open state
 	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
@@ -529,11 +529,11 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 		catch (final InterruptedException e) {
 			close();
 			Thread.currentThread().interrupt();
-			throw new KNXLinkClosedException("link closed (interrupted)");
+			throw new KNXLinkClosedException("link " + getName() + " closed (interrupted)", e);
 		}
 		catch (final KNXConnectionClosedException e) {
 			close();
-			throw new KNXLinkClosedException("link closed, " + e.getMessage());
+			throw new KNXLinkClosedException("link " + getName() + " closed (" + e.getMessage() + ")", e);
 		}
 	}
 

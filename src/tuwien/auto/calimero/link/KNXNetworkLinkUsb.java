@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2023 B. Malinowsky
+    Copyright (c) 2015, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -197,9 +197,8 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 			logger.trace("send to {} succeeded", dst);
 		}
 		catch (final KNXPortClosedException e) {
-			logger.error("send error, closing link", e);
 			close();
-			throw new KNXLinkClosedException("link closed, " + e.getMessage());
+			throw new KNXLinkClosedException("link " + getName() + " closed (" + e.getMessage() + ")", e);
 		}
 	}
 
