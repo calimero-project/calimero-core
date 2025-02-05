@@ -169,7 +169,7 @@ plugins.withType<JavaPlugin>().configureEach {
 }
 
 dependencies {
-	api("org.slf4j:slf4j-api:2.0.12")
+	api("org.slf4j:slf4j-api:2.0.16")
 
 	testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
 	// Eclipse treats circular dependencies as errors by default, see eclipseJdt task above
