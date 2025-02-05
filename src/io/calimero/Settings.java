@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ public final class Settings
 
 	private static final String tuwien = "Vienna University of Technology";
 	private static final String group = "Automation Systems Group";
-	private static final String copyright = "Copyright © 2006-2024";
+	private static final String copyright = "Copyright © 2006-2025";
 
 	// just use newline, it's easier to deal with
 	private static final String sep = "\n";
