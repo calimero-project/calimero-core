@@ -47,12 +47,12 @@ import static java.lang.System.Logger.Level.TRACE;
 import static java.lang.System.Logger.Level.WARNING;
 
 import java.lang.System.Logger;
-import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -182,7 +182,7 @@ public class TransportLayerImpl implements TransportLayer
 	private volatile boolean detached;
 	private final KNXNetworkLink lnk;
 	private final NetworkLinkListener lnkListener = new NLListener();
-	private final Deque<FrameEvent> indications = new ArrayDeque<>();
+	private final Deque<FrameEvent> indications = new ConcurrentLinkedDeque<>();
 	private final EventListeners<TransportListener> listeners = new EventListeners<>();
 
 	// holds the mapping of connection destination address to proxy
@@ -530,20 +530,28 @@ public class TransportLayerImpl implements TransportLayer
 	private boolean waitForAck() throws KNXTimeoutException, KNXDisconnectException, KNXLinkClosedException
 	{
 		boolean interrupted = false;
-		ackLock.lock();
 		try {
 			long remaining = ACK_TIMEOUT * 1000L;
 			final long end = System.currentTimeMillis() + remaining;
 			final Destination d = active.getDestination();
 			while (remaining > 0) {
 				try {
-					while (!indications.isEmpty())
-						handleConnected((CEMILData) indications.remove().getFrame(), active);
-					if (d.getState() == Disconnected || d.getState() == Destroyed)
-						throw new KNXDisconnectException(d.getAddress() + " disconnected while awaiting ACK", d);
+					FrameEvent event;
+					while ((event = indications.poll()) != null)
+						handleConnected((CEMILData) event.getFrame(), active);
+
 					if (d.getState() == OpenIdle)
 						return true;
-					ackCond.await(remaining, TimeUnit.MILLISECONDS);
+					ackLock.lock();
+					try {
+						if (d.getState() == Disconnected || d.getState() == Destroyed)
+							throw new KNXDisconnectException(d.getAddress() + " disconnected while awaiting ACK", d);
+						if (indications.isEmpty())
+							ackCond.await(remaining, TimeUnit.MILLISECONDS);
+					}
+					finally {
+						ackLock.unlock();
+					}
 					if (d.getState() == Disconnected || d.getState() == Destroyed)
 						throw new KNXDisconnectException(d.getAddress() + " disconnected while awaiting ACK", d);
 				}
@@ -554,7 +562,6 @@ public class TransportLayerImpl implements TransportLayer
 			}
 		}
 		finally {
-			ackLock.unlock();
 			if (interrupted)
 				Thread.currentThread().interrupt();
 		}
