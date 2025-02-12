@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2021, 2021 B. Malinowsky
+    Copyright (c) 2021, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@ public final class BaosLinkIp extends AbstractLink<ObjectServerConnection> imple
 			c.send(service, BlockingMode.WaitForAck);
 		}
 		catch (final KNXConnectionClosedException e) {
-			throw new KNXLinkClosedException("link closed, " + e.getMessage());
+			throw new KNXLinkClosedException("link " + getName() + " closed (" + e.getMessage() + ")", e);
 		}
 	}
 
