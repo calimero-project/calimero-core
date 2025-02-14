@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -74,6 +74,13 @@ public class KNXPortClosedException extends KNXException
 	{
 		super(s);
 		id = portId;
+	}
+
+	@Override
+	public String getMessage() {
+		if (id != null)
+			return id + " " + super.getMessage();
+		return super.getMessage();
 	}
 
 	/**
