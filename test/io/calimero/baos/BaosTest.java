@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2021, 2023 B. Malinowsky
+    Copyright (c) 2021, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -103,7 +103,8 @@ class BaosTest {
 		try (var server = new BaosServer()) {
 			CompletableFuture.runAsync(server);
 			Thread.sleep(500);
-			try (var link = BaosLinkIp.newTcpLink(TcpConnection.newTcpConnection(new InetSocketAddress(0), objectServer))) {
+			try (var conn = TcpConnection.newTcpConnection(new InetSocketAddress(0), objectServer);
+					var link = BaosLinkIp.newTcpLink(conn)) {
 				final var rcv = new LinkedBlockingQueue<>();
 				link.addLinkListener(new NetworkLinkListener() {
 					@LinkEvent
