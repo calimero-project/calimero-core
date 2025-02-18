@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -387,6 +387,8 @@ public class KNXnetIPHeader
 			case TunnelingFeatureResponse -> "tunneling-feat.res";
 			case TunnelingFeatureSet -> "tunneling-feat.set";
 			case TunnelingFeatureInfo -> "tunneling-feat.info";
+			case ObjectServerRequest -> "object-server.req";
+			case ObjectServerAck -> "object-server.ack";
 			default -> "unknown service";
 		};
 	}
