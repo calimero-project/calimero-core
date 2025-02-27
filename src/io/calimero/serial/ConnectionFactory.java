@@ -80,7 +80,10 @@ public final class ConnectionFactory<P, C> {
 				return Optional.of(conn);
 			}
 			catch (KNXException | IOException | RuntimeException | ExceptionInInitializerError t) {
-				logger.log(Level.DEBUG, "{0} unsuccessful: {1}", provider, t.getMessage());
+				var msg = t.getMessage();
+				if (msg == null)
+					msg = t.getCause() != null ? t.getCause().getMessage() : t.getClass().getSimpleName();
+				logger.log(Level.DEBUG, "{0} unsuccessful: {1}", provider, msg);
 				providerExceptions.add(t);
 				return Optional.<C>empty();
 			}
