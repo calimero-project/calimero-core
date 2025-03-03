@@ -14,12 +14,12 @@ plugins {
 }
 
 repositories {
-	mavenLocal()
 	mavenCentral()
+	mavenLocal()
 	maven("https://s01.oss.sonatype.org/content/repositories/snapshots")
 }
 
-val junitJupiterVersion = "5.11.4"
+val junitJupiterVersion by rootProject.extra { "5.12.0" }
 val desc = "Calimero, a free KNX network library"
 
 group = "io.calimero"
@@ -102,17 +102,30 @@ tasks.named<Jar>("jar") {
 	}
 }
 
-tasks.named<Test>("test") {
-	useJUnitPlatform {
-		excludeTags("ft12", "slow")
-		testLogging {
-//			exceptionFormat = TestExceptionFormat.FULL
-//			showStandardStreams = true
+testing {
+	suites {
+		val test by getting(JvmTestSuite::class) {
+			useJUnitJupiter("${rootProject.extra.get("junitJupiterVersion")}")
+
+			targets {
+				all {
+					testTask.configure {
+						options {
+							val options = this as JUnitPlatformOptions
+							options.excludeTags("ft12", "slow")
+						}
+						testLogging {
+//							exceptionFormat = TestExceptionFormat.FULL
+//							showStandardStreams = true
+						}
+						retry {
+							maxRetries = 2
+							maxFailures = 20
+						}
+					}
+				}
+			}
 		}
-	}
-	retry {
-		maxRetries = 2
-		maxFailures = 20
 	}
 }
 
@@ -170,7 +183,6 @@ plugins.withType<JavaPlugin>().configureEach {
 }
 
 dependencies {
-	testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
 	// Eclipse treats circular dependencies as errors by default, see eclipseJdt task above
 //	testRuntimeOnly("io.calimero:calimero-rxtx:$version")
 }
