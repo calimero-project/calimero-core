@@ -335,8 +335,7 @@ public abstract class ClientConnection extends ConnectionBase
 		waitForStateChange(ClientConnection.CEMI_CON_PENDING, ClientConnection.CONFIRMATION_TIMEOUT);
 		// throw on no answer
 		if (internalState == ClientConnection.CEMI_CON_PENDING) {
-			final KNXTimeoutException e = new KNXTimeoutException("no confirmation reply received for " + keepForCon);
-			logger.log(WARNING, "response timeout waiting for confirmation", e);
+			final var e = new KNXTimeoutException("response timeout waiting for confirmation of " + keepForCon);
 			internalState = OK;
 			throw e;
 		}

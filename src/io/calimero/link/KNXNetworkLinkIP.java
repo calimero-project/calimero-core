@@ -573,7 +573,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 			setMaxApduLength();
 		}
 		catch (KNXException | RuntimeException e) {
-			logger.log(WARNING, "skip link configuration (use defaults)", e);
+			logger.log(DEBUG, "skip link configuration (use defaults)", e);
 		}
 	}
 
