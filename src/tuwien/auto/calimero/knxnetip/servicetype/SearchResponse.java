@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ import tuwien.auto.calimero.knxnetip.util.ServiceFamiliesDIB;
  * Represents a KNXnet/IP search response.
  * <p>
  * Such a response is used during device discovery and sent in reply to a search request.
- * It contains one server control endpoint and self description of the server device.<br>
+ * It contains one server control endpoint and self-description of the server device.<br>
  * An answering server, supporting more than one KNX connections at the same time, sends a
  * single search response for each of its control endpoints, i.e., one response for one
  * control endpoint.

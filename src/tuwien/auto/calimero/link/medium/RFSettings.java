@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -78,7 +78,7 @@ public class RFSettings extends KNXMediumSettings
 	 * @param domain byte array containing the domain address to use in KNX messages, address is given in network byte
 	 *        order, {@code domain.length} = 6, supplying {@code null} defaults to the broadcast domain
 	 * @param serialNumber serial number of the device
-	 * @param unidirectional {@code true} to indicate an unidirectional device, {@code false} otherwise
+	 * @param unidirectional {@code true} to indicate a unidirectional device, {@code false} otherwise
 	 */
 	public RFSettings(final IndividualAddress device, final byte[] domain, final SerialNumber serialNumber,
 			final boolean unidirectional) {

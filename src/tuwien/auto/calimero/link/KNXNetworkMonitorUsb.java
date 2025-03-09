@@ -93,7 +93,7 @@ public class KNXNetworkMonitorUsb extends AbstractMonitor<UsbConnection>
 	/**
 	 * Creates a new network monitor for accessing the KNX network over a USB connection.
 	 *
-	 * @param device an identifier to lookup the USB device, e.g., based on (part of) a device string like the product
+	 * @param device an identifier to look up the USB device, e.g., based on (part of) a device string like the product
 	 *        or manufacturer name, or USB vendor and product ID in the format {@code vendorId:productId}
 	 * @param settings medium settings defining the specific KNX medium needed for decoding raw frames received from the
 	 *        KNX network

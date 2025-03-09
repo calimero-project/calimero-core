@@ -51,7 +51,7 @@ import tuwien.auto.calimero.serial.FT12Connection;
 import tuwien.auto.calimero.serial.KNXPortClosedException;
 
 /**
- * Implementation of the KNX network network link based on the FT1.2 protocol, using a {@link FT12Connection}.
+ * Implementation of the KNX network link based on the FT1.2 protocol, using a {@link FT12Connection}.
  *
  * @author B. Malinowsky
  */

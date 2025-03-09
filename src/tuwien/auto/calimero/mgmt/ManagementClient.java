@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -178,7 +178,7 @@ public interface ManagementClient extends AutoCloseable
 			KNXLinkClosedException;
 
 	/**
-	 * Modifies the individual address of a communication partner identified using an
+	 * Modifies the individual address of a communication partner identified using a
 	 * unique serial number in the KNX network.
 	 * <p>
 	 * This service uses broadcast communication mode.<br>
@@ -196,7 +196,7 @@ public interface ManagementClient extends AutoCloseable
 	IndividualAddress readAddress(SerialNumber serialNumber) throws KNXException, InterruptedException;
 
 	/**
-	 * Reads the individual address of a communication partner identified using an unique
+	 * Reads the individual address of a communication partner identified using a unique
 	 * serial number in the KNX network.
 	 * <p>
 	 * This service uses broadcast communication mode.<br>
@@ -266,7 +266,7 @@ public interface ManagementClient extends AutoCloseable
 
 	/**
 	 * Reads the domain address of a communication partner in the KNX network, providing both the individual address of
-	 * the device as well as its domain address for all devices from which a response is received.
+	 * the device and its domain address for all devices from which a response is received.
 	 * <p>
 	 * This service is designed for open media and uses system broadcast communication mode.<br>
 	 * The communication partner is one or more devices in programming mode.
@@ -574,7 +574,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @param elements number of elements to read
 	 * @return byte array containing the property value data
 	 * @throws KNXTimeoutException on a timeout during send
-	 * @throws KNXRemoteException if tried to access a non existing property or forbidden
+	 * @throws KNXRemoteException if tried to access a non-existing property or forbidden
 	 *         property access (not sufficient access rights)
 	 * @throws KNXInvalidResponseException if received number of elements differ
 	 * @throws KNXDisconnectException on disconnect in connection-oriented mode
@@ -601,7 +601,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @param elements number of elements to write
 	 * @param data byte array containing property value data to write
 	 * @throws KNXTimeoutException on a timeout during send
-	 * @throws KNXRemoteException if tried to access a non existing property or forbidden
+	 * @throws KNXRemoteException if tried to access a non-existing property or forbidden
 	 *         property access (not sufficient access rights) or erroneous property data
 	 *         was written
 	 * @throws KNXInvalidResponseException if received number of elements differ or the
@@ -628,7 +628,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @param elements number of elements to write
 	 * @param data byte array containing property value data to write
 	 * @throws KNXTimeoutException on a timeout during send
-	 * @throws KNXRemoteException if tried to access a non existing property or forbidden property access (not
+	 * @throws KNXRemoteException if tried to access a non-existing property or forbidden property access (not
 	 *         sufficient access rights) or erroneous property data was written
 	 * @throws KNXInvalidResponseException if received number of elements differ or the data length read back differs
 	 *         from the written data length
@@ -660,7 +660,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @return the property description
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXRemoteException if the response contains no description (e.g. if tried
-	 *         to access a non existing property)
+	 *         to access a non-existing property)
 	 * @throws KNXDisconnectException on disconnect in connection-oriented mode
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws InterruptedException on interrupted thread
@@ -686,7 +686,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @return the property description
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXRemoteException if the response contains no description (e.g. if tried
-	 *         to access a non existing property)
+	 *         to access a non-existing property)
 	 * @throws KNXDisconnectException on disconnect in connection-oriented mode
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other read property description error
@@ -717,7 +717,7 @@ public interface ManagementClient extends AutoCloseable
 	 *         object index
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXRemoteException if the response contains no description (e.g. if tried
-	 *         to access a non existing property)
+	 *         to access a non-existing property)
 	 * @throws KNXDisconnectException on disconnect in connection-oriented mode
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other read property description error

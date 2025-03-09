@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ public class RoutingIndication extends ServiceType
 	 * Creates a routing indication out of a byte array.
 	 * <p>
 	 *
-	 * @param data byte array containing a indication structure
+	 * @param data byte array containing an indication structure
 	 * @param offset start offset of indication in {@code data}
 	 * @param length length in bytes of whole indication structure
 	 * @throws KNXFormatException if the contained cEMI frame could not be created

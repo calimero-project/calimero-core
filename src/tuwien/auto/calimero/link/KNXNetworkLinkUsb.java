@@ -66,7 +66,7 @@ import tuwien.auto.calimero.serial.usb.UsbConnection;
 import tuwien.auto.calimero.serial.usb.UsbConnectionFactory;
 
 /**
- * Implementation of the KNX network network link over USB, using a {@link UsbConnection}. Once a link has been closed,
+ * Implementation of the KNX network link over USB, using a {@link UsbConnection}. Once a link has been closed,
  * it is not available for further link communication, i.e., it cannot be reopened.
  *
  * @author B. Malinowsky
@@ -103,7 +103,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 	 * arguments for parameter {@code device} are not necessarily unique identifiers, the first
 	 * matching USB interface is selected.
 	 *
-	 * @param device an identifier to lookup the USB device, e.g., based on (part of) a device
+	 * @param device an identifier to look up the USB device, e.g., based on (part of) a device
 	 *        string like the product or manufacturer name, or USB vendor and product ID in the
 	 *        format {@code vendorId:productId}
 	 * @param settings KNX medium settings, with device and medium-specific communication settings

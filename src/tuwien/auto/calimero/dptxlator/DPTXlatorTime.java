@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -278,7 +278,7 @@ public class DPTXlatorTime extends DPTXlator
 
 	/**
 	 * Returns the time information in UTC milliseconds, using hour, minute, and second information. Note, since this is
-	 * UTC time information, the initially returned local time 00:00:00 does therefore not corresponding to 0
+	 * UTC time information, the initially returned local time 00:00:00 does therefore not correspond to 0
 	 * milliseconds, except in the case when the local time zone is GMT.
 	 *
 	 * @return the time in milliseconds as long, as used in {@link Calendar}

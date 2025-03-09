@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2009, 2023 B. Malinowsky
+    Copyright (c) 2009, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ import tuwien.auto.calimero.KNXFormatException;
  * non-zero literal of type float is 1.40239846e-45f. The negative minimum finite float literal is
  * -3.40282347e+38f. DPTs adjust the usable range to reasonable limits for its values, the translator
  * will check and enforce those DPT specific limits in all methods working with java values (e.g.
- * {@link #setValue(double)}). Data methods for KNX data (e.g. {@link #setData(byte[])} accept all
+ * {@link #setValue(double)}). Data methods for KNX data (e.g., {@link #setData(byte[])}) accept all
  * data within the maximum usable range. The DPTs 14.000 to 14.079 do not have any specific range
  * limits set.<br>
  * In value methods expecting a string type, the value is a float type representation.

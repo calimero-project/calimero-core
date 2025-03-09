@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -200,7 +200,7 @@ public interface ManagementProcedures extends AutoCloseable
 
 	/**
 	 * Reads the domain address of a communication partner in the KNX network, providing both the individual address of
-	 * the device as well as its domain address for all devices from which a response is received.
+	 * the device and its domain address for all devices from which a response is received.
 	 * <p>
 	 * This service is designed for open media and uses system broadcast communication mode.<br>
 	 * The communication partner is one or more devices in programming mode. The total response timeout granted to any
@@ -369,7 +369,7 @@ public interface ManagementProcedures extends AutoCloseable
 	// memory procedures
 
 	/**
-	 * Writes a contiguous block of data to a the specified memory address of a device.
+	 * Writes a contiguous block of data to the specified memory address of a device.
 	 * <p>
 	 * This method corresponds to the KNX <i>DM_MemWrite</i> (<i>DMP_MemWrite_RCo</i> and
 	 * <i>DMP_MemWrite_RCoV</i>) procedure.<br>

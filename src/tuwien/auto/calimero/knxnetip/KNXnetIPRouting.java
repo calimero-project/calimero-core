@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -106,7 +106,7 @@ import tuwien.auto.calimero.log.LogService.LogLevel;
  * {@link MulticastSocket#setOption(java.net.SocketOption, Object)} with
  * {@link java.net.StandardSocketOptions#IP_MULTICAST_LOOP}. By default, the loopback mode of the multicast
  * socket used for sending multicast datagrams is enabled. This behavior can be changed by using a KNXnetIPRouting
- * sub type and initializing it by calling {@link #init(NetworkInterface, boolean, boolean)}.
+ * subtype and initializing it by calling {@link #init(NetworkInterface, boolean, boolean)}.
  * <p>
  * A multicast datagram sent with an initial hop count greater 1 may be delivered to the sending host on a different
  * interface (than the sending one), if the host is a member of the multicast group on that interface. The loopback mode
@@ -213,7 +213,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	 * Sends a cEMI frame to the joined multicast group.
 	 *
 	 * @param frame cEMI message to send
-	 * @param mode arbitrary value, does not influence behavior, since routing is always a
+	 * @param mode arbitrary value, does not influence behavior, since routing is always an
 	 *        unconfirmed, nonblocking service
 	 */
 	@Override

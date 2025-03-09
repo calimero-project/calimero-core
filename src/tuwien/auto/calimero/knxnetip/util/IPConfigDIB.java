@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2024 B. Malinowsky
+    Copyright (c) 2015, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ public final class IPConfigDIB extends DIB
 	private final int assignment;
 
 	/**
-	 * Creates a IP configuration DIB out of a byte array.
+	 * Creates an IP configuration DIB out of a byte array.
 	 * <p>
 	 *
 	 * @param data byte array containing device DIB structure
@@ -94,7 +94,7 @@ public final class IPConfigDIB extends DIB
 	}
 
 	/**
-	 * Creates a IP configuration DIB using the supplied device information.
+	 * Creates an IP configuration DIB using the supplied device information.
 	 * <p>
 	 *
 	 * @param ip the configured fixed IP address, use {@code null} or 0.0.0.0 if the device

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ import tuwien.auto.calimero.xml.XmlWriter;
  * a resource to be used by the property client for lookup requests and property type
  * translation. Also, definitions can be saved to a resource. A global resource handler
  * takes care of working with the resources where those definitions are stored. Loaded
- * definitions can added to a property client for subsequent lookup.<br>
+ * definitions can be added to a property client for subsequent lookup.<br>
  * Nevertheless, adding any definitions is not required for a client to work properly,
  * i.e., this functionality is optional.
  * <p>

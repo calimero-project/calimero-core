@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ import tuwien.auto.calimero.cemi.CEMILData;
  * A {@link CacheObject} used for holding a list of {@link CEMILData} frames.
  * <p>
  * A KNX address is specified on creation, which will be used to generate the cache object
- * key. A LDataObjectQueue is used for frames having all the same key like the one
+ * key. A LDataObjectQueue is used for frames having all the same key as the one
  * supplied on creation of a new queue. For each frame inserted into the queue, its own
  * timestamp will get stored.<br>
  * These different queue behaviors are available (optional):<br>

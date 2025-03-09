@@ -112,7 +112,7 @@ public class KNXNetworkMonitorIP extends AbstractMonitor<KNXnetIPConnection>
 	 *        the same subnet as {@code remoteEP} and an ephemeral port number
 	 * @param remoteEP the remote endpoint of the link; this is the server control endpoint
 	 * @param useNAT {@code true} to use network address translation in the KNXnet/IP protocol, {@code false}
-	 *        to use the default (non aware) mode
+	 *        to use the default (non-aware) mode
 	 * @param settings medium settings defining the specific KNX medium needed for decoding raw frames received from the
 	 *        KNX network
 	 * @throws KNXException on failure establishing the link

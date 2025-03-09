@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -117,7 +117,7 @@ public final class ErrorCodes
 	 * For now, only common error codes are translated.<br>
 	 * On unknown error code, the string "error code 0x&lt;code&gt;" is returned.
 	 *
-	 * @param code error code to lookup the description
+	 * @param code error code to look up the description
 	 * @return string representation of error code
 	 */
 	public static String getErrorMessage(final int code)

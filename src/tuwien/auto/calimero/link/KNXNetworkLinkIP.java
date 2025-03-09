@@ -278,7 +278,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 *        the same subnet as {@code remoteEP} and an ephemeral port number
 	 * @param remoteEp the remote endpoint of the link to communicate with
 	 * @param useNat {@code true} to use network address translation (NAT) in tunneling service mode,
-	 *        {@code false} to use the default (non aware) mode
+	 *        {@code false} to use the default (non-aware) mode
 	 * @param settings medium settings defining device and KNX medium specifics for communication
 	 * @return the network link in open state
 	 * @throws KNXException on failure establishing the link
@@ -339,7 +339,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 *        use {@code null} for {@code remoteEP} or an unresolved IP address to take the default multicast
 	 *        group
 	 * @param useNAT {@code true} to use network address translation in tunneling service mode, {@code false}
-	 *        to use the default (non aware) mode; parameter is ignored for routing
+	 *        to use the default (non-aware) mode; parameter is ignored for routing
 	 * @param settings medium settings defining device and medium specifics needed for communication
 	 * @throws KNXException on failure establishing link using the KNXnet/IP connection
 	 * @throws InterruptedException on interrupted thread while establishing link
