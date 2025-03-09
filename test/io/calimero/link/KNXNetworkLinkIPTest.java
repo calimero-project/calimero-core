@@ -289,8 +289,8 @@ class KNXNetworkLinkIPTest
 		final KNXNetworkLink plrtr = new KNXNetworkLinkIP(KNXNetworkLinkIP.ROUTING, Util.getLocalHost(),
 				new InetSocketAddress(InetAddress.getByName(KNXnetIPRouting.DEFAULT_MULTICAST), 0), false,
 				new PLSettings());
-		plrtr.sendRequest(new GroupAddress(0, 0, 1), Priority.LOW,
-				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (byte) (0x80));
+		final byte[] nsdu = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (byte) (0x80) };
+		plrtr.sendRequest(new GroupAddress(0, 0, 1), Priority.LOW, nsdu);
 		plrtr.close();
 	}
 

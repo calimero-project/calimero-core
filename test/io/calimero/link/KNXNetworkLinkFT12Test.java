@@ -228,8 +228,8 @@ class KNXNetworkLinkFT12Test
 
 		// send an extended PL frame
 		try {
-			lnk.sendRequestWait(new GroupAddress(0, 0, 1), Priority.LOW,
-					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (byte) (0x80));
+			final byte[] nsdu = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (byte) (0x80) };
+			lnk.sendRequestWait(new GroupAddress(0, 0, 1), Priority.LOW, nsdu);
 		}
 		catch (final KNXIllegalArgumentException e) {}
 	}
