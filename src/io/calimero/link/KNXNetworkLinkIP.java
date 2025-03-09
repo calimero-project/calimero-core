@@ -476,7 +476,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 * domain (as opposite to system broadcast) by default. Specify {@code dst = null} for system broadcast.
 	 */
 	@Override
-	public void sendRequest(final KNXAddress dst, final Priority p, final byte[] nsdu)
+	public void sendRequest(final KNXAddress dst, final Priority p, final byte... nsdu)
 			throws KNXLinkClosedException, KNXTimeoutException {
 		send(msgCode(), dst, p, nsdu, false);
 	}
@@ -486,7 +486,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 * domain (as opposite to system broadcast) by default. Specify {@code dst null} for system broadcast.
 	 */
 	@Override
-	public void sendRequestWait(final KNXAddress dst, final Priority p, final byte[] nsdu)
+	public void sendRequestWait(final KNXAddress dst, final Priority p, final byte... nsdu)
 			throws KNXTimeoutException, KNXLinkClosedException {
 		send(msgCode(), dst, p, nsdu, true);
 	}

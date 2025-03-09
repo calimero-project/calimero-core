@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2024 B. Malinowsky
+    Copyright (c) 2015, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -324,14 +324,14 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	}
 
 	@Override
-	public void sendRequest(final KNXAddress dst, final Priority p, final byte[] nsdu)
+	public void sendRequest(final KNXAddress dst, final Priority p, final byte... nsdu)
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
 		send(CEMILData.MC_LDATA_REQ, dst, p, nsdu, false);
 	}
 
 	@Override
-	public void sendRequestWait(final KNXAddress dst, final Priority p, final byte[] nsdu)
+	public void sendRequestWait(final KNXAddress dst, final Priority p, final byte... nsdu)
 		throws KNXTimeoutException, KNXLinkClosedException
 	{
 		send(CEMILData.MC_LDATA_REQ, dst, p, nsdu, true);

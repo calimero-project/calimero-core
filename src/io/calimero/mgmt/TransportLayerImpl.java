@@ -494,14 +494,14 @@ public class TransportLayerImpl implements TransportLayer
 				Objects.requireNonNull(p);
 				p.restartTimeout();
 				if (seq == p.getSeqReceive()) {
-					lnk.sendRequest(sender, Priority.SYSTEM, new byte[] { (byte) (ACK | p.getSeqReceive() << 2) });
+					lnk.sendRequest(sender, Priority.SYSTEM, (byte) (ACK | p.getSeqReceive() << 2));
 					p.incSeqReceive();
 					fireFrameType(frame, 3);
 				}
 				else if (seq == (p.getSeqReceive() - 1 & 0xF))
-					lnk.sendRequest(sender, Priority.SYSTEM, new byte[] { (byte) (ACK | seq << 2) });
+					lnk.sendRequest(sender, Priority.SYSTEM, (byte) (ACK | seq << 2));
 				else
-					lnk.sendRequest(sender, Priority.SYSTEM, new byte[] { (byte) (NACK | seq << 2) });
+					lnk.sendRequest(sender, Priority.SYSTEM, (byte) (NACK | seq << 2));
 			}
 		}
 		else if ((ctrl & 0xC3) == ACK) {
@@ -603,12 +603,10 @@ public class TransportLayerImpl implements TransportLayer
 			sendDisconnect(frame.getSource());
 	}
 
-	private void sendDisconnect(final IndividualAddress addr) throws KNXLinkClosedException
-	{
-		final byte[] tpdu = { (byte) DISCONNECT };
+	private void sendDisconnect(final IndividualAddress addr) throws KNXLinkClosedException {
 		try {
 			logger.log(TRACE, "send disconnect to {0}", addr);
-			lnk.sendRequestWait(addr, Priority.SYSTEM, tpdu);
+			lnk.sendRequestWait(addr, Priority.SYSTEM, (byte) DISCONNECT);
 		}
 		catch (final KNXTimeoutException ignore) {
 			// do a warning, but otherwise can be ignored

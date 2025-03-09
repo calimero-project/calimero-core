@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2021 B. Malinowsky
+    Copyright (c) 2019, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -140,13 +140,13 @@ public final class BaosLinkAdapter implements BaosLink {
 	}
 
 	@Override
-	public void sendRequest(final KNXAddress dst, final Priority p, final byte[] nsdu)
+	public void sendRequest(final KNXAddress dst, final Priority p, final byte... nsdu)
 			throws KNXTimeoutException, KNXLinkClosedException {
 		link.sendRequest(dst, p, nsdu);
 	}
 
 	@Override
-	public void sendRequestWait(final KNXAddress dst, final Priority p, final byte[] nsdu)
+	public void sendRequestWait(final KNXAddress dst, final Priority p, final byte... nsdu)
 			throws KNXTimeoutException, KNXLinkClosedException {
 		link.sendRequestWait(dst, p, nsdu);
 	}
