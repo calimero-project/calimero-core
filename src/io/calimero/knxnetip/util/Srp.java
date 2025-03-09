@@ -1,7 +1,7 @@
 /*
     Calimero 2 - A library for KNX network access
     Copyright (c) 2018, 2022 K.Heimrich
-    Copyright (c) 2023, 2023 B. Malinowsky
+    Copyright (c) 2023, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ import io.calimero.knxnetip.util.ServiceFamiliesDIB.ServiceFamily;
 /**
  * Search Request Parameter Block (SRP).
  * <p>
- * A SRP is used to transfer additional information in a KNXnet/IP extended search request.
+ * An SRP is used to transfer additional information in a KNXnet/IP extended search request.
  * <p>
  * The mandatory flag of the SRP can be used to increase or limit the responses received
  * from an extended search request. If the mandatory flag of the SRP is set, KNXnet/IP router

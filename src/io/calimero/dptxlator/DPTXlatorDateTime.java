@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ import io.calimero.KNXIllegalArgumentException;
  * </ul>
  * The field usage of working day, year, date, time, and day of week is optional.<br>
  * By default, on setting date/time information, only general range checks are performed, no check is done whether the
- * information corresponds to a valid calendar time (see {@link #validate()}. All field-methods behave in non-lenient
+ * information corresponds to a valid calendar time (see {@link #validate()}). All field-methods behave in non-lenient
  * time value mode, i.e., no value overflow is allowed and values are not normalized or adjusted using the next, larger
  * field. For example, February 29<sup>th</sup> will not result in March 1<sup>st</sup> on no leap year.<br>
  * This type permits the hour set to 24 (with minute and second only valid if 0), representing midnight of the old day,
@@ -353,7 +353,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	/**
 	 * Sets the hour, minute and second information for the first date/time item.
 	 * <p>
-	 * On a hour value of 24, values of minute and second have to be 0.<br>
+	 * On an hour value of 24, values of minute and second have to be 0.<br>
 	 * This method does not reset other item data or discard other translation items.
 	 *
 	 * @param hour hour value, 0 &lt;= hour &lt;= 24
@@ -466,7 +466,7 @@ public class DPTXlatorDateTime extends DPTXlator
 	 * The method uses the year, month, day, DST and, optionally, hour, minute, second and
 	 * day of week field for calculation.<br>
 	 * On unused time field, 00:00:00 is used. If year, month or day field is unused (see
-	 * {@link #isValidField(int)}, or the field values do not represent a valid calendar
+	 * {@link #isValidField(int)}), or the field values do not represent a valid calendar
 	 * time, an exception is thrown. If time equals 24:00:00, it is represented as
 	 * 23:59:59.999, since the time ambiguity of midnight is resolved as midnight
 	 * belonging to the next day (00:00:00) in the used calendar. However, no field values

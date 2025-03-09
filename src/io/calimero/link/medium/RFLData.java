@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2023 B. Malinowsky
+    Copyright (c) 2015, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -104,7 +104,7 @@ public class RFLData implements RawFrame
 	     - point to point (unicast), CL/CO
 	     - point to all points (domain broadcast), CL
 	   KNX device serial number
-	     - point to multi point (multicast), CL
+	     - point to multipoint (multicast), CL
 	     - point to system (system broadcast), CL
 	*/
 

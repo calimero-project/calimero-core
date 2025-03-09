@@ -67,7 +67,7 @@ public interface KNXNetworkLink extends AutoCloseable
 	/**
 	 * Supplies medium information necessary for KNX communication.
 	 * <p>
-	 * These informations are differing between KNX media and depend on the KNX network
+	 * This information differs between KNX media and depends on the KNX network
 	 * this link is communicating with.<br>
 	 * The {@code settings} medium type has to match the medium type supplied to
 	 * the link in the first place.<br>
@@ -111,7 +111,7 @@ public interface KNXNetworkLink extends AutoCloseable
 	/**
 	 * Sets the hop count used as default in KNX messages.
 	 * <p>
-	 * It denotes how many sub networks a message is allowed to travel.<br>
+	 * It denotes how many subnetworks a message is allowed to travel.<br>
 	 * A message its hop count is decremented by KNX routers to limit distance and avoid
 	 * looping. On hop count value 0, the message is discarded from the network. A hop
 	 * count of 7 never gets decremented.<br>

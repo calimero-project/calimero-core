@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -144,7 +144,7 @@ public abstract class DPTXlator
 	 * If, and only if, all items in {@code values} can successfully be translated,
 	 * they get stored by the translator, replacing any old items. On
 	 * {@code values.length == 0}, no action is performed.<br>
-	 * Textual commands contained in {@code values} are treated case insensitive.
+	 * Textual commands contained in {@code values} are treated case-insensitive.
 	 *
 	 * @param values string array holding values for translation
 	 * @throws KNXFormatException if an item in {@code values} can't be translated
@@ -177,11 +177,11 @@ public abstract class DPTXlator
 	 * <p>
 	 * If, and only if, {@code value} can successfully be translated, it gets
 	 * stored by the translator, replacing any old items. Textual commands contained in
-	 * {@code value} are treated case insensitive.<br>
+	 * {@code value} are treated case-insensitive.<br>
 	 * The {@code value} string might have its unit of measure appended (units are
-	 * case sensitive).
+	 * case-sensitive).
 	 *
-	 * @param value value represented as string for translation, case insensitive
+	 * @param value value represented as string for translation, case-insensitive
 	 * @throws KNXFormatException if {@code value} can't be translated due to wrong
 	 *         formatted content, or if {@code value}doesn't fit into KNX data type
 	 */
@@ -284,7 +284,7 @@ public abstract class DPTXlator
 	 * The number of items copied depends on the usable {@code dst} range, i.e., how many items
 	 * completely fit into {@code dst.length - offset}. If the usable range is too short, no
 	 * item is copied at all, and {@code dst} is not modified.<br>
-	 * Datapoint types shorter than 1 bytes only change the affected lower bit positions, leaving
+	 * Datapoint types shorter than 1 byte only change the affected lower bit positions, leaving
 	 * the upper (high) bits of {@code dst} bytes untouched.
 	 *
 	 * @param dst byte array for storing DPT values
@@ -471,9 +471,9 @@ public abstract class DPTXlator
 	 * <p>
 	 * Note, since this is a class method, static binding is used.<br>
 	 * In particular, the method is invoked without reference to a particular object, and
-	 * hidden by declarations with the same signature in a sub type. A correct invocation
+	 * hidden by declarations with the same signature in a subtype. A correct invocation
 	 * is done using the declared type that actually contains the method declaration
-	 * returning the available sub types.
+	 * returning the available subtypes.
 	 *
 	 * @return subtypes as {@link Map}, key is the subtype ID of type string, value of
 	 *         type {@link DPT}

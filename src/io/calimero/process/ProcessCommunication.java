@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2022 B. Malinowsky
+    Copyright (c) 2010, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -189,7 +189,7 @@ public interface ProcessCommunication extends AutoCloseable
 		KNXLinkClosedException;
 
 	/**
-	 * Writes a 8 bit unsigned datapoint value to a group destination.
+	 * Writes an 8 bit unsigned datapoint value to a group destination.
 	 * <p>
 	 * The predefined scaling format constants are equal to DPT identifiers of the 8 Bit
 	 * DPT translator, any other suiting IDs of that type might be specified as well.

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -420,7 +420,7 @@ public final class TranslatorTypes
 		// strip off the DPTXlator prefix if we have that
 		if (name.toLowerCase().indexOf("dptxlator") == 0)
 			name = name.substring("dptxlator".length());
-		// create human readable name by inserting some spaces
+		// create human-readable name by inserting some spaces
 		return name.replaceAll("([A-Z])", " $1").trim();
 	}
 
@@ -510,7 +510,7 @@ public final class TranslatorTypes
 	 *
 	 * @param mainNumber data type main number, number &ge; 0; use 0 to infer translator type from {@code dptId}
 	 *        argument only
-	 * @param dptId datapoint type ID to lookup this particular kind of value translation
+	 * @param dptId datapoint type ID to look up this particular kind of value translation
 	 * @return {@code true} iff translator was found, {@code false} otherwise
 	 */
 	public static boolean hasTranslator(final int mainNumber, final String dptId)
@@ -529,8 +529,8 @@ public final class TranslatorTypes
 	 * <p>
 	 * The translation behavior of a DPT translator instance is uniquely defined by the supplied datapoint type ID.
 	 * <p>
-	 * If the {@code dptId} argument is built up the recommended way, that is "<i>main number</i>.<i>sub number</i>
-	 * ", the {@code mainNumber} argument might be left 0 to use the datapoint type ID only.<br>
+	 * If the {@code dptId} argument is built up the recommended way, that is "<i>main number</i>.<i>sub number</i>",
+	 * the {@code mainNumber} argument might be left 0 to use the datapoint type ID only.<br>
 	 * Note, that we don't enforce any particular or standardized format on the {@code dptId} structure, so using a
 	 * different formatted dptId solely without main number argument results in undefined behavior.
 	 *

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2021, 2024 B. Malinowsky
+    Copyright (c) 2021, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -91,7 +91,7 @@ class ObjectServerConnection extends ClientConnection {
 	private static final int ObjectServerProtocol = 0xf0;
 	private static final int ProtocolVersion = 0x20;
 
-	// client SHALL wait 1 second for acknowledgment response to a object server request from server
+	// client SHALL wait 1 second for acknowledgment response to an object server request from server
 	private static final int ReqTimeout = 1;
 
 	private final boolean tcp;

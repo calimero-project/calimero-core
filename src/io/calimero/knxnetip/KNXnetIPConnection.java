@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -122,7 +122,7 @@ public interface KNXnetIPConnection extends Connection<CEMI>
 	 * of an added listener will be invoked by the KNXnet/IP receiver, and not in the
 	 * context of the calling thread. Any lengthy processing tasks have to be avoided
 	 * during the notification, and should be moved to dedicated own worker thread.
-	 * Otherwise subsequent listener invocations will suffer from time delays since the
+	 * Otherwise, subsequent listener invocations will suffer from time delays since the
 	 * receiver can not move on.
 	 *
 	 * @param l the listener to add
@@ -174,7 +174,7 @@ public interface KNXnetIPConnection extends Connection<CEMI>
 	 * @throws KNXConnectionClosedException if no communication was established in the
 	 *         first place or communication was closed
 	 * @throws InterruptedException on thread interrupt
-	 * @throws IllegalStateException if the send is not permitted by the protocol
+	 * @throws IllegalStateException if sending is not permitted by the protocol
 	 */
 	void send(CEMI frame, BlockingMode mode)
 		throws KNXTimeoutException, KNXConnectionClosedException, InterruptedException;

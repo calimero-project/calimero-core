@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -304,7 +304,7 @@ public final class PropertyTypes
 	 */
 	public static final int PDT_FUNCTION = 0x3E;
 
-	// escape not used at all for now..
+	// escape not used at all for now...
 	/**
 	 * PDT_ESCAPE, PDT = 0x3F, format defined or undefined.
 	 */

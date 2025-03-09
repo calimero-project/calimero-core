@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2023 B. Malinowsky
+    Copyright (c) 2015, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -85,7 +85,7 @@ public final class RFMediumInfo extends AdditionalInfo
 	 * Constructs RF medium info from a byte array containing the additional RF medium information.
 	 *
 	 * @param info RF medium info data
-	 * @param systemBroadcast indicate whether {@code info} contains a RF domain address or
+	 * @param systemBroadcast indicate whether {@code info} contains an RF domain address or
 	 *        device S/N, the interpretation depends on the cEMI message control information
 	 */
 	public RFMediumInfo(final byte[] info, final boolean systemBroadcast)

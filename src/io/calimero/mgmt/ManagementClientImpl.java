@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -1017,8 +1017,8 @@ public class ManagementClientImpl implements ManagementClient
 
 	private byte[] functionProperty(final int cmd, final Destination dst, final int objectType, final int objInstance,
 			final int propertyId, final int service, final byte... info)
-			throws KNXLinkClosedException, KNXDisconnectException, KNXTimeoutException, KNXInvalidResponseException,
-			KNXRemoteException, InterruptedException {
+			throws KNXLinkClosedException, KNXDisconnectException, KNXTimeoutException, KNXRemoteException,
+			InterruptedException {
 
 		if (objectType < 0 || objectType > 0xffff || objInstance < 0 || objInstance > 0xfff || propertyId < 0
 				|| propertyId > 0xfff || service < 0 || service > 0xff)

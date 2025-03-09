@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ public interface KNXNetworkMonitor extends AutoCloseable
 	/**
 	 * Supplies medium information necessary for KNX communication.
 	 * <p>
-	 * These informations are differing between KNX media and depend on the KNX network
+	 * This information differs between KNX media and depends on the KNX network
 	 * this link is communicating with.<br>
 	 * The {@code settings} medium type has to match the medium type supplied to
 	 * the link in the first place.<br>

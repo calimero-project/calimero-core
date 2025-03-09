@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2024 B. Malinowsky
+    Copyright (c) 2010, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -289,7 +289,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		for (final var router : knxipRouters) {
 			final var dst = getOrCreateDestination(router);
 			try {
-				mc.callFunctionProperty(dst, routerObjectType, 1, pidIpSbcControl, (byte) 0, (byte) 1);
+				mc.callFunctionProperty(dst, routerObjectType, 1, pidIpSbcControl, 0, (byte) 1);
 				ipSbcEnabled.add(dst);
 			}
 			catch (KNXDisconnectException | KNXRemoteException e) {
@@ -769,7 +769,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		final var dst = getOrCreateDestination(deviceAddress);
 		final int pidSecurityMode = 51;
 		final int securityObjectType = 17;
-		mc.callFunctionProperty(dst, securityObjectType, 1, pidSecurityMode, (byte) 0, (byte) 1);
+		mc.callFunctionProperty(dst, securityObjectType, 1, pidSecurityMode, 0, (byte) 1);
 
 		if (usesFdsk) {
 			final int pidToolKey = 56;

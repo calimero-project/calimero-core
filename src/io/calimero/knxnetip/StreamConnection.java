@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2024 B. Malinowsky
+    Copyright (c) 2019, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -655,7 +655,7 @@ public sealed abstract class StreamConnection implements Closeable
 		sessions.clear();
 	}
 
-	abstract void send(final byte[] data) throws IOException;
+	abstract void send(byte[] data) throws IOException;
 
 	void registerConnectRequest(final ClientConnection c) { ongoingConnectRequests.add(c); }
 

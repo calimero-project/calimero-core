@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ import io.calimero.log.LogService;
  * datapoint messages.<br>
  * This filter might be used in a configuration to build up and maintain a process image
  * of the KNX network the used network link communicates with. The buffer will keep the
- * most up to date state to a KNX group address / datapoint.<br>
+ * most up-to-date state to a KNX group address / datapoint.<br>
  * KNX messages are buffered using a {@link LDataObject} (an object of this type is also
  * expected when the request method is invoked).
  * <p>
@@ -84,13 +84,13 @@ import io.calimero.log.LogService;
  * datapoint state values in the network buffer configuration when receiving a new KNX
  * message.<br>
  * To reflect subsequent changes of the datapoint model in the filter, the filter has to
- * be reinitialized (using {@link #init(Configuration)}.
+ * be reinitialized (using {@link #init(Configuration)}).
  *
  * @author B. Malinowsky
  */
 public class StateFilter implements NetworkFilter, RequestFilter
 {
-	// contains cross references of datapoints: which datapoint (key, of
+	// contains cross-references of datapoints: which datapoint (key, of
 	// type KNXAddress) invalidates/updates which datapoints (value,
 	// of type List with GroupAddress entries)
 	private Map<KNXAddress, List<GroupAddress>> invalidate;
@@ -184,7 +184,7 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		final int svc = d[0] & 0x03 | d[1] & 0xC0;
 		CEMILData copy;
 		if (svc == 0x40) {
-			// read.res could be in a L-Data.con, too
+			// read.res could be in an L-Data.con, too
 			if (f.getMessageCode() == CEMILData.MC_LDATA_CON)
 				try {
 					copy = (CEMILData) CEMIFactory.create(CEMILData.MC_LDATA_IND, d, f);

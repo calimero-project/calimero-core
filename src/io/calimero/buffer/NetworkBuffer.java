@@ -75,7 +75,7 @@ import io.calimero.link.medium.KNXMediumSettings;
  * points in the messages flow:
  * <ol>
  * <li>when messages arrive from the KNX network at the buffer, and</li>
- * <li>when the buffer shall answers a message request from a user.</li>
+ * <li>when the buffer shall answer a message request from a user.</li>
  * </ol>
  * Two types of filters exist for this:
  * <ol>

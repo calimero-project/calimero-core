@@ -1,7 +1,7 @@
 /*
     Calimero 2 - A library for KNX network access
     Copyright (c) 2005 B. Erb
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ public class DescriptionRequest extends ServiceType {
 	private static final DescriptionRequest tcpRequest = new DescriptionRequest(HPAI.Tcp);
 	public static DescriptionRequest tcpRequest() { return tcpRequest; }
 
-	public static DescriptionRequest Nat = new DescriptionRequest(HPAI.Nat);
+	public static final DescriptionRequest Nat = new DescriptionRequest(HPAI.Nat);
 
 	private final HPAI endpoint;
 
