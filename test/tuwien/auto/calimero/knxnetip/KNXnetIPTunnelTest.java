@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 package tuwien.auto.calimero.knxnetip;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -479,6 +480,27 @@ class KNXnetIPTunnelTest
 		try (final KNXnetIPTunnel snatch = new KNXnetIPTunnel(LinkLayer, Util.localEndpoint(), Util.getServer(), false, requestAddress)) {
 			assertThrows(KNXException.class, () -> new KNXnetIPTunnel(LinkLayer, Util.localEndpoint(), Util.getServer(), false, requestAddress));
 		}
+	}
+
+	@Test
+	void tunnelingAddressAssignedLinkLayer() throws KNXException, InterruptedException {
+		newTunnel();
+		assertNotNull(t.tunnelingAddress());
+	}
+
+	@Test
+	void tunnelingAddressAssignedBusMonitorLayer() throws KNXException, InterruptedException {
+		newMonitor();
+		assertNotNull(mon.tunnelingAddress());
+	}
+
+	@Test
+	void tunnelingAddressUpdatedByTunnelingFeatSetIA() throws KNXException, InterruptedException {
+		newTunnel();
+		var ia = new IndividualAddress(4, 5, 6);
+		assertNotEquals(ia, t.tunnelingAddress());
+		t.send(InterfaceFeature.IndividualAddress, ia.toByteArray());
+		assertEquals(ia, t.tunnelingAddress());
 	}
 
 	@ParameterizedTest

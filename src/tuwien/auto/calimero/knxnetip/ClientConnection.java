@@ -103,7 +103,7 @@ public abstract class ClientConnection extends ConnectionBase
 
 
 	private final HeartbeatMonitor heartbeat = new HeartbeatMonitor();
-	private IndividualAddress tunnelingAddress;
+	private volatile IndividualAddress tunnelingAddress;
 
 	// additional textual information about connection status
 	// only set on some errors in receiver, check before using it
@@ -306,8 +306,8 @@ public abstract class ClientConnection extends ConnectionBase
 				else
 					dataEndpt = ep.endpoint();
 
-				if (res.getCRD() instanceof TunnelCRD)
-					tunnelingAddress = ((TunnelCRD) res.getCRD()).getAssignedAddress();
+				if (res.getCRD() instanceof final TunnelCRD crd)
+					tunnelingAddress = crd.getAssignedAddress();
 
 				checkVersion(h);
 				setStateNotify(OK);
@@ -376,6 +376,10 @@ public abstract class ClientConnection extends ConnectionBase
 			default -> super.connectionState();
 		};
 	}
+
+	IndividualAddress tunnelingAddress() { return tunnelingAddress; }
+
+	void tunnelingAddress(final IndividualAddress address) { tunnelingAddress = address; }
 
 	private InetSocketAddress localSocketAddress() {
 		return (InetSocketAddress) (tcp ? connection.localEndpoint() : socket.getLocalSocketAddress());
