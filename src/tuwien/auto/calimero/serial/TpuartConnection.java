@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2014, 2024 B. Malinowsky
+    Copyright (c) 2014, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,7 +55,6 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import tuwien.auto.calimero.CloseEvent;
 import tuwien.auto.calimero.Connection;
@@ -91,6 +90,8 @@ import tuwien.auto.calimero.serial.spi.SerialCom;
  */
 public class TpuartConnection implements Connection<byte[]>
 {
+	private static final String tpuartPrefix = "calimero.serial.tpuart";
+
 	// UART services
 
 	private static final int Reset_req = 0x01;
@@ -134,7 +135,22 @@ public class TpuartConnection implements Connection<byte[]>
 	// time interval to check on TP UART state
 	private static final long UartStateReadInterval = 5_000_000; // [us]
 
-	private static final int UartBaudRate = 19_200;
+	private static final int UartBaudRate;
+	static {
+		int baudrate = 19_200;
+		final var key = tpuartPrefix + ".uartBaudRate";
+		try {
+			final var value = System.getProperty(key);
+			if (value != null) {
+				baudrate = Integer.parseUnsignedInt(value);
+				LogService.getLogger(tpuartPrefix).debug("using {} of {} Bd/s", key, baudrate);
+			}
+		}
+		catch (final RuntimeException e) {
+			LogService.getLogger(tpuartPrefix).warn("error getting property {}: {}", key, e.toString());
+		}
+		UartBaudRate = baudrate;
+	}
 	private static final int Tp1BaudRate = 9_600;
 
 	private static final int OneBitTime = (int) Math.ceil(1d / Tp1BaudRate * 1_000_000);
@@ -183,7 +199,7 @@ public class TpuartConnection implements Connection<byte[]>
 	public TpuartConnection(final String portId, final Collection<? extends KNXAddress> acknowledge) throws KNXException
 	{
 		this.portId = portId;
-		logger = LogService.getAsyncLogger("calimero.serial.tpuart:" + portId);
+		logger = LogService.getAsyncLogger(tpuartPrefix + ":" + portId);
 		com = SerialConnectionFactory.open(portId, UartBaudRate, Duration.ZERO, Duration.ofMillis(5));
 		os = com.outputStream();
 		is = com.inputStream();
@@ -509,17 +525,17 @@ public class TpuartConnection implements Connection<byte[]>
 	// Defaults to 50 bit times [us]
 	private static final AtomicInteger maxInterByteDelay = new AtomicInteger(BitTimes_50);
 	static {
-		final var key = "calimero.serial.tpuart.maxInterByteDelay";
+		final var key = tpuartPrefix + ".maxInterByteDelay";
 		try {
 			final var delay = System.getProperty(key);
 			if (delay != null) {
 				final int value = Integer.parseUnsignedInt(delay);
 				maxInterByteDelay.set(value);
-				LoggerFactory.getLogger("calimero.serial.tpuart").info("using {} of {} us", key, value);
+				LogService.getLogger(tpuartPrefix).info("using {} of {} us", key, value);
 			}
 		}
 		catch (final RuntimeException e) {
-			LoggerFactory.getLogger("calimero.serial.tpuart").warn("on checking property {}", key, e);
+			LogService.getLogger(tpuartPrefix).warn("on checking property {}", key, e);
 		}
 	}
 
