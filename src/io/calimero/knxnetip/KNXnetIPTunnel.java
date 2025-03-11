@@ -63,6 +63,7 @@ import io.calimero.KNXIllegalArgumentException;
 import io.calimero.KNXInvalidResponseException;
 import io.calimero.KNXRemoteException;
 import io.calimero.KNXTimeoutException;
+import io.calimero.ReturnCode;
 import io.calimero.cemi.AdditionalInfo;
 import io.calimero.cemi.CEMI;
 import io.calimero.cemi.CEMIBusMon;
@@ -197,6 +198,11 @@ public class KNXnetIPTunnel extends ClientConnection
 			throw new KNXException("server control endpoint is unresolved: " + serverCtrlEP);
 		logger = LogService.getLogger("io.calimero.knxnetip." + name());
 	}
+
+	/**
+	 * {@return the tunneling address assigned by the server for this connection}
+	 */
+	public final IndividualAddress tunnelingAddress() { return super.tunnelingAddress(); }
 
 	/**
 	 * Sends a cEMI frame to the remote server communicating with this endpoint.
@@ -380,8 +386,15 @@ public class KNXnetIPTunnel extends ClientConnection
 		if (svc >= KNXnetIPHeader.TunnelingFeatureGet && svc <= KNXnetIPHeader.TunnelingFeatureInfo) {
 			final TunnelingFeature feature = req.service();
 			logger.log(TRACE, "received {0}", feature);
-			setStateNotify(OK);
 
+			// check if we have to update our tunneling address in response to a tunneling-feat.set request
+			if (svc == KNXnetIPHeader.TunnelingFeatureResponse
+					&& feature.featureId() == InterfaceFeature.IndividualAddress
+					&& feature.status() == ReturnCode.Success) {
+				tunnelingAddress(new IndividualAddress(feature.featureValue().get()));
+			}
+
+			setStateNotify(OK);
 			listeners.listeners().stream().filter(TunnelingListener.class::isInstance)
 					.map(TunnelingListener.class::cast).forEach(tl -> notifyFeatureReceived(tl, svc, feature));
 			return true;
