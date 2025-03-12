@@ -223,7 +223,13 @@ public class KNXnetIPTunnel extends ClientConnection
 		super.send(frame, mode);
 	}
 
-	// sends a tunneling feature-get service
+	/**
+	 * Sends a tunneling feature-get service to the remote server communicating with this endpoint.
+	 * <p>
+	 * Sending in busmonitor mode is not permitted.
+	 *
+	 * @param feature interface feature to get
+	 */
 	public void send(final InterfaceFeature feature) throws KNXConnectionClosedException, KNXTimeoutException,
 			InterruptedException {
 		lock.lock();
@@ -236,7 +242,14 @@ public class KNXnetIPTunnel extends ClientConnection
 		}
 	}
 
-	// sends a tunneling feature-set service
+	/**
+	 * Sends a tunneling feature-set service to the remote server communicating with this endpoint.
+	 * <p>
+	 * Sending in busmonitor mode is not permitted.
+	 *
+	 * @param feature interface feature to set
+	 * @param featureValue value of the interface feature to set
+	 */
 	public void send(final InterfaceFeature feature, final byte... featureValue)
 		throws KNXConnectionClosedException, KNXTimeoutException, InterruptedException {
 		lock.lock();
