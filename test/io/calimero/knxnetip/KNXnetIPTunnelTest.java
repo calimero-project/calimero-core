@@ -497,7 +497,7 @@ class KNXnetIPTunnelTest
 	@Test
 	void tunnelingAddressUpdatedByTunnelingFeatSetIA() throws KNXException, InterruptedException {
 		newTunnel();
-		var ia = new IndividualAddress(4, 5, 6);
+		var ia = new IndividualAddress(1, 1, 250);
 		assertNotEquals(ia, t.tunnelingAddress());
 		t.send(InterfaceFeature.IndividualAddress, ia.toByteArray());
 		assertEquals(ia, t.tunnelingAddress());
