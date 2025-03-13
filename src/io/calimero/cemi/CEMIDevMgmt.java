@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -298,8 +298,7 @@ public class CEMIDevMgmt implements CEMI
 	 * @param startIndex start index into the property array, first element value has
 	 *        index 1, index 0 in the property contains the current number of valid
 	 *        elements (read only)
-	 * @param elements number of elements in the array of the property, in the range 1
-	 *        &lt;= elements &lt;= 0xFF;
+	 * @param elements number of elements in the array of the property, in the range 1 &lt;= elements &lt;= 0xF;
 	 */
 	public CEMIDevMgmt(final int msgCode, final int objType, final int objInstance,
 		final int propID, final int startIndex, final int elements)
@@ -324,7 +323,7 @@ public class CEMIDevMgmt implements CEMI
 	 * @param startIndex start index in the property, first element has index 1, index 0
 	 *        in the property contains the current number of valid elements (read only)
 	 * @param elements number of elements in the array of the property, in the range 0
-	 *        &lt;= elements &lt;= 0xFF; the number 0 is used to indicate a negative
+	 *        &lt;= elements &lt;= 0xF; the number 0 is used to indicate a negative
 	 *        response
 	 * @param data contains the data (or the error information, if numElems = 0) as byte
 	 *        array
