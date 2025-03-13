@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2024 B. Malinowsky
+    Copyright (c) 2015, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,8 @@
 
 package io.calimero.mgmt;
 
+import static io.calimero.cemi.CEMIDevMgmt.MC_PROPREAD_REQ;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -53,6 +55,7 @@ import io.calimero.KNXRemoteException;
 import io.calimero.ReturnCode;
 import io.calimero.cemi.CEMI;
 import io.calimero.cemi.CEMIDevMgmt;
+import io.calimero.mgmt.PropertyAccess.PID;
 
 abstract class LocalDeviceManagement<T> implements PropertyAdapter
 {
@@ -145,8 +148,7 @@ abstract class LocalDeviceManagement<T> implements PropertyAdapter
 			throw new IllegalStateException("adapter closed");
 		final int objectType = getObjectType(objIndex);
 		final int objectInstance = getObjectInstance(objIndex, objectType);
-		final CEMIDevMgmt req = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, objectType, objectInstance, pid, start,
-				elements);
+		final var req = new CEMIDevMgmt(MC_PROPREAD_REQ, objectType, objectInstance, pid, start, elements);
 		send(req, BlockingMode.Confirmation);
 		return findFrame(CEMIDevMgmt.MC_PROPREAD_CON, req);
 	}
@@ -312,10 +314,9 @@ abstract class LocalDeviceManagement<T> implements PropertyAdapter
 
 	protected void initInterfaceObjects() throws KNXException, InterruptedException
 	{
-		final CEMIDevMgmt req = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, DEVICE_OBJECT, 1,
-				PropertyAccess.PID.IO_LIST, 0, 1);
+		final var req = new CEMIDevMgmt(MC_PROPREAD_REQ, DEVICE_OBJECT, 1, PID.IO_LIST, 0, 1);
 		send(req, BlockingMode.Confirmation);
-		int objects;
+		final int objects;
 		try {
 			final byte[] ret = findFrame(CEMIDevMgmt.MC_PROPREAD_CON, req);
 			objects = (ret[0] & 0xff) << 8 | (ret[1] & 0xff);
@@ -326,13 +327,16 @@ abstract class LocalDeviceManagement<T> implements PropertyAdapter
 			interfaceObjects.add(8);
 			return;
 		}
-		final CEMIDevMgmt req2 = new CEMIDevMgmt(CEMIDevMgmt.MC_PROPREAD_REQ, DEVICE_OBJECT, 1,
-				PropertyAccess.PID.IO_LIST, 1, objects);
-		send(req2, BlockingMode.Confirmation);
-		final byte[] ret = findFrame(CEMIDevMgmt.MC_PROPREAD_CON, req2);
-		for (int i = 0; i < objects; ++i) {
-			final int objType = (ret[2 * i] & 0xff) << 8 | (ret[2 * i + 1] & 0xff);
-			interfaceObjects.add(objType);
+		final int stride = 15;
+		for (int startIndex = 1; startIndex <= objects; startIndex += stride) {
+			final int elements = Math.min(stride, objects - startIndex + 1);
+			final var req2 = new CEMIDevMgmt(MC_PROPREAD_REQ, DEVICE_OBJECT, 1, PID.IO_LIST, startIndex, elements);
+			send(req2, BlockingMode.Confirmation);
+			final byte[] ret = findFrame(CEMIDevMgmt.MC_PROPREAD_CON, req2);
+			for (int i = 0; i < elements; ++i) {
+				final int objType = (ret[2 * i] & 0xff) << 8 | (ret[2 * i + 1] & 0xff);
+				interfaceObjects.add(objType);
+			}
 		}
 	}
 
