@@ -60,6 +60,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import io.calimero.CloseEvent;
+import io.calimero.DataUnitBuilder;
 import io.calimero.DetachEvent;
 import io.calimero.FrameEvent;
 import io.calimero.GroupAddress;
@@ -331,7 +332,7 @@ public class TransportLayerImpl implements TransportLayer
 		if (detached)
 			throw new IllegalStateException("TL detached");
 		if (d.getState() != Destroyed && d.getState() != Disconnected)
-			disconnectIndicate(getProxy(d), true);
+			disconnectIndicate(getProxy(d), true, "local request");
 	}
 
 	@Override
@@ -370,7 +371,7 @@ public class TransportLayerImpl implements TransportLayer
 			repeated = 0;
 			sendLock.unlock();
 		}
-		disconnectIndicate(ap, true);
+		disconnectIndicate(ap, true, "send data connected failed");
 		throw new KNXDisconnectException("send data connected failed", d);
 	}
 
@@ -435,6 +436,7 @@ public class TransportLayerImpl implements TransportLayer
 		throws KNXLinkClosedException, KNXTimeoutException
 	{
 		final IndividualAddress sender = frame.getSource();
+		final KNXAddress dst = frame.getDestination();
 		final byte[] tpdu = frame.getPayload();
 		final int ctrl = tpdu[0] & 0xFF;
 		final int seq = (tpdu[0] & 0x3C) >>> 2;
@@ -446,7 +448,7 @@ public class TransportLayerImpl implements TransportLayer
 		if (ctrl == CONNECT) {
 			if (serverSide) {
 				final var device = lnk.getKNXMedium().getDeviceAddress();
-				if (!frame.getDestination().equals(device))
+				if (!dst.equals(device))
 					return;
 
 				// if we receive a new connect, but an old destination is still
@@ -484,7 +486,7 @@ public class TransportLayerImpl implements TransportLayer
 		}
 		else if (ctrl == DISCONNECT) {
 			if (d.getState() != Disconnected && sender.equals(d.getAddress()))
-				disconnectIndicate(p, false);
+				disconnectIndicate(p, false, DataUnitBuilder.decodeTPCI(ctrl, dst));
 		}
 		else if ((ctrl & 0xC0) == DATA_CONNECTED) {
 			if (d.getState() == Disconnected || !sender.equals(d.getAddress())) {
@@ -513,7 +515,7 @@ public class TransportLayerImpl implements TransportLayer
 				logger.log(TRACE, "positive ack by {0}", d.getAddress());
 			}
 			else
-				disconnectIndicate(p, true);
+				disconnectIndicate(p, true, DataUnitBuilder.decodeTPCI(ctrl, dst));
 		}
 		else if ((ctrl & 0xC3) == NACK) {
 			if (d.getState() == Disconnected || !sender.equals(d.getAddress()))
@@ -523,7 +525,7 @@ public class TransportLayerImpl implements TransportLayer
 				// do nothing, we will send message again
 			}
 			else
-				disconnectIndicate(p, true);
+				disconnectIndicate(p, true, DataUnitBuilder.decodeTPCI(ctrl, dst));
 		}
 	}
 
@@ -580,8 +582,8 @@ public class TransportLayerImpl implements TransportLayer
 		}
 	}
 
-	private void disconnectIndicate(final AggregatorProxy p,
-		final boolean sendDisconnectReq) throws KNXLinkClosedException
+	private void disconnectIndicate(final AggregatorProxy p, final boolean sendDisconnectReq, final String initiatedBy)
+			throws KNXLinkClosedException
 	{
 		p.setState(Disconnected);
 		// TODO add initiated by user and refactor into a method
@@ -589,7 +591,7 @@ public class TransportLayerImpl implements TransportLayer
 				: Destination.REMOTE_ENDPOINT;
 		try {
 			if (sendDisconnectReq)
-				sendDisconnect(p.getDestination().getAddress());
+				sendDisconnect(p.getDestination().getAddress(), initiatedBy);
 		}
 		finally {
 			fireDisconnected(p.getDestination());
@@ -610,13 +612,16 @@ public class TransportLayerImpl implements TransportLayer
 		if (act != null && act.getDestination().getAddress().equals(dst) && src.equals(matchDevice))
 			return;
 
-		if (matchDevice.equals(dst))
-			sendDisconnect(src);
+		if (matchDevice.equals(dst)) {
+			final byte[] tpdu = frame.getPayload();
+			final int ctrl = tpdu[0] & 0xFF;
+			sendDisconnect(src, "received " + DataUnitBuilder.decodeTPCI(ctrl, dst));
+		}
 	}
 
-	private void sendDisconnect(final IndividualAddress addr) throws KNXLinkClosedException {
+	private void sendDisconnect(final IndividualAddress addr, final String initiatedBy) throws KNXLinkClosedException {
 		try {
-			logger.log(TRACE, "send disconnect to {0}", addr);
+			logger.log(TRACE, "send disconnect to {0} ({1})", addr, initiatedBy);
 			lnk.sendRequestWait(addr, Priority.SYSTEM, (byte) DISCONNECT);
 		}
 		catch (final KNXTimeoutException ignore) {
