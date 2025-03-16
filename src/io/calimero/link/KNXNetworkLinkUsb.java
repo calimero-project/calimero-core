@@ -82,6 +82,8 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 	private final EnumSet<UsbConnection.EmiType> emiTypes;
 	private UsbConnection.EmiType activeEmi;
 	private volatile boolean offline;
+	private final Optional<IndividualAddress> usbInterfaceAddress;
+
 
 	/**
 	 * Creates a new network link for accessing the KNX network over a USB connection, using a USB
@@ -174,7 +176,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 		sendCEmiAsByteArray = true;
 
 		supportedCommModes();
-		deviceAddr();
+		usbInterfaceAddress = deviceAddr();
 		mediumType();
 		setMaxApduLength();
 		disableFilters();
@@ -224,6 +226,9 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 			throw new IllegalStateException("cEMI mode not active in KNX USB interface");
 		conn.send(frame.toByteArray(), BlockingMode.Confirmation);
 	}
+
+	@Override
+	Optional<IndividualAddress> assignedAddress() { return usbInterfaceAddress; }
 
 	private boolean trySetActiveEmi(final UsbConnection.EmiType active) throws KNXPortClosedException,
 		KNXTimeoutException, InterruptedException
@@ -289,14 +294,18 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 		return condition != 0 ? ifTrue : "";
 	}
 
-	private void deviceAddr() throws KNXException, InterruptedException {
+	private Optional<IndividualAddress> deviceAddr() throws KNXException, InterruptedException {
 		final int pidSubnet = 57;
 		final int pidDeviceAddr = 58;
+		IndividualAddress addr = null;
+
 		final Optional<byte[]> subnet = read(0, pidSubnet);
 		if (subnet.isPresent()) {
-			final int addr = read(0, pidDeviceAddr).map(data -> unsigned(subnet.get()[0], data[0])).orElse(0);
-			logger.log(DEBUG, "KNX interface address {0}", new IndividualAddress(addr));
+			addr = read(0, pidDeviceAddr).map(data -> unsigned(subnet.get()[0], data[0]))
+					.map(IndividualAddress::new).orElse(null);
+			logger.log(DEBUG, "KNX interface address {0}", addr == null ? "n/a" : addr);
 		}
+		return Optional.ofNullable(addr);
 	}
 
 	private void disableFilters() throws KNXException {

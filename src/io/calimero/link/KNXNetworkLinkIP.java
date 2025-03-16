@@ -50,6 +50,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.time.Duration;
+import java.util.Optional;
 
 import io.calimero.FrameEvent;
 import io.calimero.IndividualAddress;
@@ -541,6 +542,13 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 			close();
 			throw new KNXLinkClosedException("link " + getName() + " closed (" + e.getMessage() + ")", e);
 		}
+	}
+
+	@Override
+	Optional<IndividualAddress> assignedAddress() {
+		if (conn instanceof final KNXnetIPTunnel tunnel)
+			return Optional.of(tunnel.tunnelingAddress());
+		return super.assignedAddress();
 	}
 
 	@Override
