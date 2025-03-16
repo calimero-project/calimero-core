@@ -598,9 +598,20 @@ public class TransportLayerImpl implements TransportLayer
 	}
 
 	private void checkSendDisconnect(final CEMILData frame) throws KNXLinkClosedException {
-		final IndividualAddress device = lnk.getKNXMedium().getDeviceAddress();
-		if (device.getRawAddress() == 0 || device.equals(frame.getDestination()))
-			sendDisconnect(frame.getSource());
+		final var device = lnk.getKNXMedium().getDeviceAddress();
+		final var assignedOpt = lnk.getKNXMedium().assignedAddress();
+		final var matchDevice = device.getRawAddress() != 0 ? device : assignedOpt.orElse(device);
+
+		final var src = frame.getSource();
+		final var dst = frame.getDestination();
+
+		// if we received an .ind of a frame which was just sent by us, skip the disconnect because it's useless
+		final var act = active;
+		if (act != null && act.getDestination().getAddress().equals(dst) && src.equals(matchDevice))
+			return;
+
+		if (matchDevice.equals(dst))
+			sendDisconnect(src);
 	}
 
 	private void sendDisconnect(final IndividualAddress addr) throws KNXLinkClosedException {
