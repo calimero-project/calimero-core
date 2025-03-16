@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,6 +35,9 @@
 */
 
 package tuwien.auto.calimero.link.medium;
+
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
@@ -76,6 +79,8 @@ public abstract class KNXMediumSettings
 
 	// local device address if in transparent server mode
 	private IndividualAddress dev;
+	// supplies address assigned by protocol or specific to interface (which might not be used for actual transmission)
+	private volatile Supplier<Optional<IndividualAddress>> assigned = Optional::empty;
 
 	// max APDU can be between 15 and 254 bytes (255 is Escape code for extended L-Data frames)
 	// should be set according to PropertyAccess.PID.MAX_APDULENGTH, mandatory for new implementations after 2007
@@ -129,6 +134,12 @@ public abstract class KNXMediumSettings
 	{
 		return dev;
 	}
+
+	/**
+	 * {@return the assigned address for this device} Note, this address might not be used as source address in
+	 * the transmission of KNX frames by default.
+	 */
+	public final Optional<IndividualAddress> assignedAddress() { return assigned.get(); }
 
 	/**
 	 * Returns the KNX medium type identifier specifying the communication medium this

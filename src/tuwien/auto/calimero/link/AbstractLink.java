@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2015, 2024 B. Malinowsky
+    Copyright (c) 2015, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,9 +39,11 @@ package tuwien.auto.calimero.link;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.invoke.VarHandle;
 import java.nio.ByteBuffer;
 import java.util.Optional;
 import java.util.StringJoiner;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 
@@ -135,6 +137,18 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		catch (ClassNotFoundException | IllegalAccessException | NoSuchMethodException e) {}
 		baosServiceFactory_MH = mh;
 	}
+
+	private static final VarHandle assignedAddress_VH;
+	static {
+		try {
+			final var privateLookup = MethodHandles.privateLookupIn(KNXMediumSettings.class, MethodHandles.lookup());
+			assignedAddress_VH = privateLookup.findVarHandle(KNXMediumSettings.class, "assigned", Supplier.class);
+		}
+		catch (NoSuchFieldException | IllegalAccessException e) {
+			throw new ExceptionInInitializerError(e);
+		}
+	}
+
 
 	private final class LinkNotifier extends EventNotifier<NetworkLinkListener>
 	{
@@ -283,6 +297,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 				&& !medium.getClass().isAssignableFrom(settings.getClass()))
 			throw new KNXIllegalArgumentException("medium differs");
 		medium = settings;
+		assignedAddress_VH.setVolatile(medium, (Supplier<?>) this::assignedAddress);
 	}
 
 	@Override
@@ -528,6 +543,9 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		final int pidMaxApduLength = 56;
 		return read(0, pidMaxApduLength).map(AbstractLink::unsigned);
 	}
+
+	// override this when the used communication protocol provides a device address for a connection
+	Optional<IndividualAddress> assignedAddress() { return Optional.empty(); }
 
 	volatile boolean baosMode;
 
