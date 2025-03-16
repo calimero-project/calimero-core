@@ -40,7 +40,6 @@ import static io.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.BusMonitorLayer
 import static io.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.RawLayer;
 import static java.lang.System.Logger.Level.DEBUG;
 import static java.lang.System.Logger.Level.ERROR;
-import static java.lang.System.Logger.Level.INFO;
 import static java.lang.System.Logger.Level.TRACE;
 import static java.lang.System.Logger.Level.WARNING;
 
@@ -324,9 +323,8 @@ public class KNXnetIPTunnel extends ClientConnection
 		waitForStateChange(ClientConnection.CEMI_CON_PENDING, 3);
 		// throw on no answer
 		if (internalState == ClientConnection.CEMI_CON_PENDING) {
-			logger.log(WARNING, "response timeout waiting for response to {0}", tf);
 			internalState = OK;
-			throw new KNXTimeoutException("no response received for " + tf);
+			throw new KNXTimeoutException("timeout waiting for response to " + tf);
 		}
 	}
 
