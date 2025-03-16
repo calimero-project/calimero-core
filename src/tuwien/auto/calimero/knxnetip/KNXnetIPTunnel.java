@@ -319,9 +319,8 @@ public class KNXnetIPTunnel extends ClientConnection
 		waitForStateChange(ClientConnection.CEMI_CON_PENDING, 3);
 		// throw on no answer
 		if (internalState == ClientConnection.CEMI_CON_PENDING) {
-			logger.warn("response timeout waiting for response to {}", tf);
 			internalState = OK;
-			throw new KNXTimeoutException("no response received for " + tf);
+			throw new KNXTimeoutException("timeout waiting for response to " + tf);
 		}
 	}
 
