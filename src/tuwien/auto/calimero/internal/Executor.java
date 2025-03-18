@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2020, 2023 B. Malinowsky
+    Copyright (c) 2020, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,8 +36,11 @@
 
 package tuwien.auto.calimero.internal;
 
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.SynchronousQueue;
@@ -66,6 +69,7 @@ public final class Executor {
 			@Override
 			protected void afterExecute(final Runnable r, final Throwable t) {
 				Thread.currentThread().setName(idleThreadName);
+				checkFailedFuture(r);
 			}
 		};
 		executor = Executors.unconfigurableExecutorService(se);
@@ -75,6 +79,7 @@ public final class Executor {
 			@Override
 			protected void afterExecute(final Runnable r, final Throwable t) {
 				Thread.currentThread().setName(idleThreadName);
+				checkFailedFuture(r);
 			}
 		};
 		stpe.allowCoreThreadTimeOut(true);
@@ -82,6 +87,15 @@ public final class Executor {
 		scheduledExecutor = Executors.unconfigurableScheduledExecutorService(stpe);
 	}
 
+	private static void checkFailedFuture(final Runnable r) {
+		if (r instanceof Future<?> f && f.isDone()) try {
+			f.get();
+		}
+		catch (InterruptedException | CancellationException ignore) {}
+		catch (final ExecutionException e) {
+			e.getCause().printStackTrace();
+		}
+	}
 
 	public static void execute(final Runnable task) { executor.execute(task); }
 
