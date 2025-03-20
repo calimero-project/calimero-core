@@ -37,7 +37,7 @@
 package io.calimero.link;
 
 import static io.calimero.knxnetip.KNXnetIPTunnel.TunnelingLayer.BusMonitorLayer;
-import static java.lang.System.Logger.Level.INFO;
+import static java.lang.System.Logger.Level.DEBUG;
 
 import java.net.InetSocketAddress;
 
@@ -137,7 +137,7 @@ public class KNXNetworkMonitorIP extends AbstractMonitor<KNXnetIPConnection>
 	protected KNXNetworkMonitorIP(final KNXnetIPConnection conn, final KNXMediumSettings settings)
 	{
 		super(conn, monitorName(conn.getRemoteAddress()), settings);
-		logger.log(INFO, "in busmonitor mode - ready to receive");
+		logger.log(DEBUG, "in busmonitor mode - ready to receive");
 		conn.addConnectionListener(notifier);
 	}
 

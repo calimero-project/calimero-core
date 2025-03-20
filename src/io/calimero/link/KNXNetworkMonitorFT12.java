@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -108,7 +108,7 @@ public class KNXNetworkMonitorFT12 extends AbstractMonitor<FT12Connection>
 		super(conn, "monitor " + conn.getPortID(), settings);
 		this.cEMI = cEMI;
 		enterBusmonitor();
-		logger.log(Level.INFO, "in busmonitor mode - ready to receive");
+		logger.log(Level.DEBUG, "in busmonitor mode - ready to receive");
 		conn.addConnectionListener(notifier);
 	}
 
