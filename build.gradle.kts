@@ -76,6 +76,7 @@ sourceSets {
 }
 
 tasks.withType<Javadoc>().configureEach {
+	options.encoding = "UTF-8"
 	(options as CoreJavadocOptions).addStringOption("Xdoclint:-missing", "-quiet")
 }
 
