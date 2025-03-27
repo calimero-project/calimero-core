@@ -480,8 +480,7 @@ public class TransportLayerImpl implements TransportLayer
 			}
 			else {
 				// don't allow (client side)
-				if (d.getState() == Disconnected)
-					checkSendDisconnect(frame);
+				checkSendDisconnect(d, frame);
 			}
 		}
 		else if (ctrl == DISCONNECT) {
@@ -489,10 +488,7 @@ public class TransportLayerImpl implements TransportLayer
 				disconnectIndicate(p, false, DataUnitBuilder.decodeTPCI(ctrl, dst));
 		}
 		else if ((ctrl & 0xC0) == DATA_CONNECTED) {
-			if (d.getState() == Disconnected || !sender.equals(d.getAddress())) {
-				checkSendDisconnect(frame);
-			}
-			else {
+			if (!checkSendDisconnect(d, frame)) {
 				Objects.requireNonNull(p);
 				p.restartTimeout();
 				if (seq == p.getSeqReceive()) {
@@ -507,8 +503,8 @@ public class TransportLayerImpl implements TransportLayer
 			}
 		}
 		else if ((ctrl & 0xC3) == ACK) {
-			if (d.getState() == Disconnected || !sender.equals(d.getAddress()))
-				checkSendDisconnect(frame);
+			if (checkSendDisconnect(d, frame))
+				;
 			else if (d.getState() == OpenWait && seq == Objects.requireNonNull(p).getSeqSend()) {
 				p.incSeqSend();
 				p.setState(OpenIdle);
@@ -518,12 +514,10 @@ public class TransportLayerImpl implements TransportLayer
 				disconnectIndicate(p, true, DataUnitBuilder.decodeTPCI(ctrl, dst));
 		}
 		else if ((ctrl & 0xC3) == NACK) {
-			if (d.getState() == Disconnected || !sender.equals(d.getAddress()))
-				checkSendDisconnect(frame);
-			else if (d.getState() == OpenWait && seq == Objects.requireNonNull(p).getSeqSend()
-					&& repeated < MAX_REPEAT) {
-				// do nothing, we will send message again
-			}
+			if (checkSendDisconnect(d, frame))
+				;
+			else if (d.getState() == OpenWait && seq == Objects.requireNonNull(p).getSeqSend() && repeated < MAX_REPEAT)
+				; // do nothing, we will send message again
 			else
 				disconnectIndicate(p, true, DataUnitBuilder.decodeTPCI(ctrl, dst));
 		}
@@ -599,24 +593,27 @@ public class TransportLayerImpl implements TransportLayer
 		}
 	}
 
-	private void checkSendDisconnect(final CEMILData frame) throws KNXLinkClosedException {
+	private boolean checkSendDisconnect(final Destination d, final CEMILData frame) throws KNXLinkClosedException {
+		final var src = frame.getSource();
+		if (d.getState() != Disconnected && src.equals(d.getAddress()))
+			return false;
+
 		final var device = lnk.getKNXMedium().getDeviceAddress();
 		final var assignedOpt = lnk.getKNXMedium().assignedAddress();
 		final var matchDevice = device.getRawAddress() != 0 ? device : assignedOpt.orElse(device);
-
-		final var src = frame.getSource();
 		final var dst = frame.getDestination();
 
 		// if we received an .ind of a frame which was just sent by us, skip the disconnect because it's useless
 		final var act = active;
 		if (act != null && act.getDestination().getAddress().equals(dst) && src.equals(matchDevice))
-			return;
+			return true;
 
 		if (matchDevice.equals(dst)) {
 			final byte[] tpdu = frame.getPayload();
 			final int ctrl = tpdu[0] & 0xFF;
 			sendDisconnect(src, "received " + DataUnitBuilder.decodeTPCI(ctrl, dst));
 		}
+		return true;
 	}
 
 	private void sendDisconnect(final IndividualAddress addr, final String initiatedBy) throws KNXLinkClosedException {
