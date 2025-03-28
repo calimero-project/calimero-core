@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -136,7 +136,7 @@ public class KNXNetworkMonitorIP extends AbstractMonitor<KNXnetIPConnection>
 	protected KNXNetworkMonitorIP(final KNXnetIPConnection conn, final KNXMediumSettings settings)
 	{
 		super(conn, monitorName(conn.getRemoteAddress()), settings);
-		logger.info("in busmonitor mode - ready to receive");
+		logger.debug("in busmonitor mode - ready to receive");
 		conn.addConnectionListener(notifier);
 	}
 
