@@ -101,24 +101,6 @@ public interface ManagementProcedures extends AutoCloseable
 	IndividualAddress readAddress(SerialNumber serialNo) throws KNXException, InterruptedException;
 
 	/**
-	 * Reads the individual address of a KNX device with known serial number.
-	 * <p>
-	 * This method corresponds to the KNX <i>NM_IndividualAddress_SerialNumber_Read</i> procedure.
-	 *
-	 * @param serialNo byte array with serial number, {@code serialNo.length} = 6
-	 * @return the individual address of the device
-	 * @throws KNXTimeoutException on a timeout during send or no address response was received
-	 * @throws KNXInvalidResponseException on invalid read response message
-	 * @throws KNXLinkClosedException if network link to KNX network is closed
-	 * @throws KNXException on other read address errors
-	 * @throws InterruptedException on interrupted thread
-	 * @see #readAddress(SerialNumber)
-	 */
-	default IndividualAddress readAddress(final byte[] serialNo) throws KNXException, InterruptedException {
-		return readAddress(SerialNumber.from(serialNo));
-	}
-
-	/**
 	 * Writes the individual address of a single KNX device set to programming mode.
 	 * <p>
 	 * This method corresponds to the KNX <i>NM_IndividualAddress_Write</i> procedure.<br>
@@ -152,22 +134,6 @@ public interface ManagementProcedures extends AutoCloseable
 	 * @throws InterruptedException on interrupted thread
 	 */
 	boolean writeAddress(SerialNumber serialNo, IndividualAddress newAddress) throws KNXException, InterruptedException;
-
-	/**
-	 * Writes the individual address of a single KNX device with known serial number.
-	 *
-	 * @param serialNo the device serial number, {@code serialNo.length = 6}
-	 * @param newAddress the new address for the device identified by {@code serialNo}
-	 * @return {@code true} if the new address is set and was verified successfully,
-	 *         {@code false} if the device reports back a differing (e.g., old) address on verification
-	 * @throws KNXException on any errors attempting to write or verify the written individual device address
-	 * @throws InterruptedException on interrupted thread
-	 * @see #writeAddress(SerialNumber, IndividualAddress)
-	 */
-	default boolean writeAddress(final byte[] serialNo, final IndividualAddress newAddress) throws KNXException,
-			InterruptedException {
-		return writeAddress(SerialNumber.from(serialNo), newAddress);
-	}
 
 	/**
 	 * Sets the individual address of all devices which are in programming mode to the

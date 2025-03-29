@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2011, 2023 B. Malinowsky
+    Copyright (c) 2011, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,17 +46,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Isolated;
 
-import tag.KnxnetIP;
-import tag.Slow;
 import io.calimero.GroupAddress;
 import io.calimero.IndividualAddress;
 import io.calimero.KNXException;
 import io.calimero.KNXTimeoutException;
+import io.calimero.SerialNumber;
 import io.calimero.Util;
 import io.calimero.link.KNXLinkClosedException;
 import io.calimero.link.KNXNetworkLink;
 import io.calimero.link.KNXNetworkLinkIP;
 import io.calimero.link.medium.TPSettings;
+import tag.KnxnetIP;
+import tag.Slow;
 
 
 @KnxnetIP
@@ -86,7 +87,7 @@ class ManagementProceduresImplTest
 	@Test
 	void managementProceduresImpl() throws KNXLinkClosedException
 	{
-		try (ManagementProcedures test = new ManagementProceduresImpl(link)) {}
+		try (ManagementProcedures __ = new ManagementProceduresImpl(link)) {}
 	}
 
 	@Test
@@ -140,15 +141,14 @@ class ManagementProceduresImplTest
 	@Test
 	void readAddressByte() throws KNXException, InterruptedException
 	{
-		final byte[] serialNo = new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
-		mp.readAddress(serialNo);
+		mp.readAddress(SerialNumber.from(new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 }));
 	}
 
 	@Test
 	void writeAddressByteArrayIndividualAddress() throws KNXException, InterruptedException
 	{
-		final byte[] serialNo = new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
-		mp.writeAddress(serialNo, new IndividualAddress(1, 1, 5));
+		mp.writeAddress(SerialNumber.from(new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 }),
+				new IndividualAddress(1, 1, 5));
 	}
 
 	@Test

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,13 @@
 
 package io.calimero.mgmt;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
@@ -48,22 +55,21 @@ import org.junit.jupiter.api.parallel.Isolated;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import tag.KnxnetIP;
-import tag.KnxnetIPSequential;
 import io.calimero.IndividualAddress;
 import io.calimero.KNXException;
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
 import io.calimero.KNXTimeoutException;
 import io.calimero.Priority;
+import io.calimero.SerialNumber;
 import io.calimero.Util;
 import io.calimero.link.KNXLinkClosedException;
 import io.calimero.link.KNXNetworkLink;
 import io.calimero.link.KNXNetworkLinkIP;
 import io.calimero.link.medium.TPSettings;
 import io.calimero.mgmt.PropertyAccess.PID;
-
-import static org.junit.jupiter.api.Assertions.*;
+import tag.KnxnetIP;
+import tag.KnxnetIPSequential;
 
 
 @KnxnetIP
@@ -182,16 +188,8 @@ class ManagementClientImplTest
 	@Test
 	void readAddressByteArray() throws KNXException, InterruptedException
 	{
-		try {
-			mc.readAddress(new byte[] { 0x10, 0x10, 0x10, 0x10, 0x10 });
-			fail("invalid SN length");
-		}
-		catch (final KNXIllegalArgumentException e) {}
-
-		final byte[] sno = new byte[] { 0x1, 0x2, 0x3, 0x4, 0x5, 0x6 };
 		final IndividualAddress addr = Util.getKnxDeviceCO();
-
-		final IndividualAddress ia = mc.readAddress(sno);
+		final IndividualAddress ia = mc.readAddress(SerialNumber.from(new byte[] { 0x1, 0x2, 0x3, 0x4, 0x5, 0x6 }));
 		assertEquals(addr, ia);
 	}
 
@@ -348,7 +346,7 @@ class ManagementClientImplTest
 	@Test
 	void writeAddressByteArrayIndividualAddress() throws KNXException, InterruptedException
 	{
-		final byte[] sno = new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
+		final var sno = SerialNumber.from(new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 });
 		final IndividualAddress write = mc.readAddress(sno);
 		mc.writeAddress(sno, write);
 		final IndividualAddress read = mc.readAddress(sno);

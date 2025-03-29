@@ -158,26 +158,19 @@ public interface ManagementClient extends AutoCloseable
 	 */
 	IndividualAddress[] readAddress(boolean oneAddressOnly) throws KNXException, InterruptedException;
 
-	void writeAddress(SerialNumber serialNo, IndividualAddress newAddress) throws KNXTimeoutException,
-			KNXLinkClosedException;
-
 	/**
 	 * Modifies the individual address of a communication partner identified using a
 	 * unique serial number in the KNX network.
 	 * <p>
 	 * This service uses broadcast communication mode.<br>
 	 *
-	 * @param serialNo byte array with serial number, {@code serialNo.length} = 6
+	 * @param serialNo device serial number
 	 * @param newAddress new address
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 */
-	default void writeAddress(final byte[] serialNo, final IndividualAddress newAddress) throws KNXTimeoutException,
-			KNXLinkClosedException {
-		writeAddress(SerialNumber.from(serialNo), newAddress);
-	}
-
-	IndividualAddress readAddress(SerialNumber serialNumber) throws KNXException, InterruptedException;
+	void writeAddress(SerialNumber serialNo, IndividualAddress newAddress) throws KNXTimeoutException,
+			KNXLinkClosedException;
 
 	/**
 	 * Reads the individual address of a communication partner identified using a unique
@@ -185,18 +178,15 @@ public interface ManagementClient extends AutoCloseable
 	 * <p>
 	 * This service uses broadcast communication mode.<br>
 	 *
-	 * @param serialNo byte array with serial number, {@code serialNo.length} = 6
+	 * @param serialNo device serial number
 	 * @return the individual address
-	 * @throws KNXTimeoutException on a timeout during send or no address response was
-	 *         received
+	 * @throws KNXTimeoutException on a timeout during send or no address response was received
 	 * @throws KNXInvalidResponseException on invalid read response message
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other read address errors
 	 * @throws InterruptedException on interrupted thread
 	 */
-	default IndividualAddress readAddress(final byte[] serialNo) throws KNXException, InterruptedException {
-		return readAddress(SerialNumber.from(serialNo));
-	}
+	IndividualAddress readAddress(SerialNumber serialNo) throws KNXException, InterruptedException;
 
 	/**
 	 * Modifies the domain address of a communication partner in the KNX network which is in programming mode.
