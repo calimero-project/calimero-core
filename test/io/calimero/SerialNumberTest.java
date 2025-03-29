@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2021, 2025 B. Malinowsky
+    Copyright (c) 2025, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,64 +36,56 @@
 
 package io.calimero;
 
-import java.nio.ByteBuffer;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * Represents a KNX serial number.
- */
-public final class SerialNumber {
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-	/** Size of a KNX serial number in bytes. */
-	public static final int Size = 6;
-
-	/** Serial number 0. */
-	public static final SerialNumber Zero = SerialNumber.of(0);
-
-	private final long sno;
-
-	private SerialNumber(final long serialNumber) {
-		if (serialNumber < 0)
-			throw new KNXIllegalArgumentException("serial number " + serialNumber + " < 0");
-		sno = serialNumber & 0xffff_ffff_ffffL;
+class SerialNumberTest {
+	@Test
+	void of() {
+		final long l = 0xffff_eeeeeeeeL;
+		final var sn = SerialNumber.of(l);
+		assertEquals(l, sn.number());
 	}
 
-	/**
-	 * Returns a serial number of the supplied argument.
-	 *
-	 * @param serialNumber serial number, {@code serialNumber ≥ 0}
-	 * @return serial number instance
-	 */
-	public static SerialNumber of(final long serialNumber) { return new SerialNumber(serialNumber); }
-
-	/**
-	 * Parses the supplied byte array into a serial number.
-	 *
-	 * @param serialNumber serial number, {@code serialNumber.length = 6}
-	 * @return serial number instance
-	 */
-	public static SerialNumber from(final byte[] serialNumber) { return new SerialNumber(unsigned(serialNumber)); }
-
-	public long number() { return sno; }
-
-	public byte[] array() { return ByteBuffer.allocate(6).putShort((short) (sno >> 32)).putInt((int) sno).array(); }
-
-	@Override
-	public boolean equals(final Object obj) {
-		return obj instanceof final SerialNumber sn && sn.sno == sno;
+	@Test
+	void ofNumberTooBig() {
+		final long tooBig = 0x01ffff_eeeeeeeeL;
+		final long l = 0xffff_eeeeeeeeL;
+		final var sn = SerialNumber.of(tooBig);
+		assertEquals(l, sn.number());
 	}
 
-	@Override
-	public int hashCode() { return Long.hashCode(sno); }
+	@Test
+	void ofNegative() {
+		Assertions.assertThrows(KNXIllegalArgumentException.class, () -> SerialNumber.of(-1));
+		Assertions.assertThrows(KNXIllegalArgumentException.class, () -> SerialNumber.of(Long.MIN_VALUE));
+	}
 
-	@Override
-	public String toString() { return String.format("%04x:%08x", sno >> 32, sno & 0xffff_ffffL); }
+	@Test
+	void fromWithInvalidLength() {
+		Assertions.assertThrows(KNXIllegalArgumentException.class,
+				() -> SerialNumber.from(new byte[] { 0x10, 0x10, 0x10, 0x10, 0x10 }));
+	}
 
-	private static long unsigned(final byte[] data) {
-		if (data.length != Size)
-			throw new KNXIllegalArgumentException("invalid size for a KNX serial number");
-		long l = 0;
-		for (final byte b : data)
-			l = (l << 8) + (b & 0xff);
-		return l;
+	@Test
+	void testEquals() {
+		assertTrue(SerialNumber.of(100).equals(SerialNumber.of(100)));
+		assertTrue(SerialNumber.Zero.equals(SerialNumber.of(0)));
+	}
+
+	@Test
+	void testNotEquals() {
+		assertFalse(SerialNumber.of(1).equals(SerialNumber.of(2)));
+		assertFalse(SerialNumber.Zero.equals(SerialNumber.of(100)));
+	}
+
+	@Test
+	void testToString() {
+		assertEquals("0000:00000000", SerialNumber.Zero.toString());
+		assertEquals("1020:30405060", SerialNumber.of(0x102030405060L).toString());
 	}
 }
