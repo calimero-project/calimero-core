@@ -1,5 +1,5 @@
 /*
-    Calimero 2 - A library for KNX network access
+    Calimero 3 - A library for KNX network access
     Copyright (c) 2018, 2022 K.Heimrich
     Copyright (c) 2023, 2025 B. Malinowsky
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Calimero 2 KNX property definitions -->
+<!-- Calimero 3 KNX property definitions -->
 <propertyDefinitions>
     <object type="global">
         <property pid="1" pidName="PID_OBJECT_TYPE" name="Interface Object Type" pdt="4" dpt="7.010" rw="R" writeEnabled="0" accessPolicy="155/155">

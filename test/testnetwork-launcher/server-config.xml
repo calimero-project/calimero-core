@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Calimero 2 server settings -->
+<!-- Calimero 3 server settings -->
 <knxServer name="test-server" friendlyName="calimero-core knx test-server">
 	<discovery activate="true" listenNetIf="all" outgoingNetIf="all"/>
 	<serviceContainer activate="true" routing="true" listenNetIf="any"

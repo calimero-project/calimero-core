@@ -1,5 +1,5 @@
 /*
-    Calimero 2 - A library for KNX network access
+    Calimero 3 - A library for KNX network access
     Copyright (c) 2006, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
@@ -37,7 +37,7 @@
 package io.calimero;
 
 /**
- * The root checked exception type used in the Calimero 2 library.
+ * The root checked exception type used in the Calimero library.
  *
  * @author B. Malinowsky
  */
