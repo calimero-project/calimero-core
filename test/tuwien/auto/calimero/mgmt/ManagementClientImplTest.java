@@ -50,13 +50,16 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import tag.KnxnetIP;
 import tag.KnxnetIPSequential;
+import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
 import tuwien.auto.calimero.KNXException;
 import tuwien.auto.calimero.KNXFormatException;
 import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.KnxNegativeReturnCodeException;
 import tuwien.auto.calimero.Priority;
+import tuwien.auto.calimero.ReturnCode;
 import tuwien.auto.calimero.Util;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
@@ -641,6 +644,61 @@ class ManagementClientImplTest
 	@Test
 	void readMemoryExtended() throws KNXException, InterruptedException {
 		mc.readMemory(dco, 0x10000, 1);
+	}
+
+	@Test
+	void callFunctionProperty() throws KNXException, InterruptedException {
+		final int objIndex = 3;
+		final int pid = 66;
+		final var ga = new GroupAddress(1, 0, 1).toByteArray();
+		final byte[] data = { 0, 1, 0, ga[0], ga[1], 1 };
+		final var response = mc.callFunctionProperty(dco, objIndex, pid, data);
+		assertEquals(ReturnCode.Success, response.returnCode());
+		assertEquals(1, response.result()[0]);
+	}
+
+	@Test
+	void callFunctionPropertyWithWrongPdt() {
+		final int objIndex = 0;
+		final int pid = PID.PROGMODE;
+		final byte[] data = new byte[4];
+		assertThrows(KNXRemoteException.class, () -> mc.callFunctionProperty(dco, objIndex, pid, data));
+	}
+
+	@Test
+	void callFunctionPropertyWithError() {
+		final int objIndex = 4;
+		final int pid = 52; // operation mode
+		final byte[] data = { 0, 0, 2 }; // invalid operation mode 2
+		final var e = assertThrows(KnxNegativeReturnCodeException.class, () -> mc.callFunctionProperty(dco, objIndex, pid, data));
+		assertEquals(ReturnCode.of(0xA0), e.returnCode());
+	}
+
+	@Test
+	void readFunctionPropertyState() throws KNXException, InterruptedException {
+		final int objIndex = 4;
+		final int pid = 52;
+		final byte[] data = { 0, 0 };
+		final var response = mc.readFunctionPropertyState(dco, objIndex, pid, data);
+		final byte[] opMode = response.result();
+		assertEquals(0, opMode[0]);
+	}
+
+	@Test
+	void readFunctionPropertyStateWithWrongPdt() {
+		final int objIndex = 0;
+		final int pid = PID.PROGMODE;
+		final byte[] data = new byte[4];
+		assertThrows(KNXRemoteException.class, () -> mc.readFunctionPropertyState(dco, objIndex, pid, data));
+	}
+
+	@Test
+	void readFunctionPropertyStateWithError() {
+		final int objIndex = 3;
+		final int pid = 66;
+		final byte[] data = new byte[4];
+		final var e = assertThrows(KnxNegativeReturnCodeException.class, () -> mc.readFunctionPropertyState(dco, objIndex, pid, data));
+		assertEquals(ReturnCode.InvalidCommand, e.returnCode());
 	}
 
 	@ParameterizedTest

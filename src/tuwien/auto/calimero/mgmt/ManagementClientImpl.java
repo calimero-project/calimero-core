@@ -69,6 +69,7 @@ import tuwien.auto.calimero.KNXIllegalArgumentException;
 import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
+import tuwien.auto.calimero.KnxNegativeReturnCodeException;
 import tuwien.auto.calimero.Priority;
 import tuwien.auto.calimero.ReturnCode;
 import tuwien.auto.calimero.SerialNumber;
@@ -131,6 +132,10 @@ public class ManagementClientImpl implements ManagementClient
 	private static final int PROPERTY_READ = 0x03D5;
 	private static final int PROPERTY_RESPONSE = 0x03D6;
 	private static final int PROPERTY_WRITE = 0x03D7;
+
+	private static final int FunctionPropertyCommand = 0b1011000111;
+	private static final int FunctionPropertyStateRead = 0b1011001000;
+	private static final int FunctionPropertyStateResponse = 0b1011001001;
 
 	private static final int FunctionPropertyExtCommand = 0b0111010100;
 	private static final int FunctionPropertyExtStateRead =     0b0111010101;
@@ -999,6 +1004,51 @@ public class ManagementClientImpl implements ManagementClient
 					propertyId, propIndex, apdu[2] & 0xff, apdu[3] & 0xff, apdu[4] & 0xff);
 		}
 		throw new KNXTimeoutException("timeout occurred while waiting for data response");
+	}
+
+	@Override
+	public FuncPropResponse callFunctionProperty(final Destination dst, final int objIndex, final int propertyId,
+			final byte... data) throws KNXException, InterruptedException {
+		return functionProperty(FunctionPropertyCommand, dst, objIndex, propertyId, data);
+	}
+
+	@Override
+	public FuncPropResponse readFunctionPropertyState(final Destination dst, final int objIndex, final int propertyId,
+			final byte... data) throws KNXException, InterruptedException {
+		return functionProperty(FunctionPropertyStateRead, dst, objIndex, propertyId, data);
+	}
+
+	private FuncPropResponse functionProperty(final int cmd, final Destination dst, final int objIndex, final int propertyId,
+			final byte... data) throws KNXLinkClosedException, KNXDisconnectException,
+			KNXTimeoutException, KNXRemoteException, InterruptedException {
+
+		if (objIndex < 0 || objIndex > 0xff || propertyId < 0 || propertyId > 0xff)
+			throw new KNXIllegalArgumentException("argument value out of range");
+
+		final byte[] send = DataUnitBuilder.apdu(cmd).put(objIndex).put(propertyId).put(data).build();
+		final long startSend = send(dst, priority, send, FunctionPropertyStateResponse);
+		final var responses = waitForResponses(FunctionPropertyStateResponse, 2, 252, startSend, responseTimeout, true,
+				(source, apdu) -> {
+					if (source.equals(dst.getAddress()))
+						return extractFunctionPropertyData(objIndex, propertyId, apdu);
+					return Optional.empty();
+				});
+
+		final byte[] response = responses.get(0);
+		if (response.length == 0)
+			throw new KNXRemoteException(format("property %d|%d is not a function property", objIndex, propertyId));
+		final var returnCode = ReturnCode.of(response[0] & 0xff);
+		if (returnCode.code() > 0x9f)
+			throw new KnxNegativeReturnCodeException(format("function property response for %d|%d", objIndex, propertyId), returnCode);
+		final byte[] result = Arrays.copyOfRange(response, 1, response.length);
+		return new FuncPropResponse(returnCode, result);
+	}
+
+	private static Optional<byte[]> extractFunctionPropertyData(final int objIndex, final int propertyId, final byte[] apdu) {
+		final int receivedObjIdx = apdu[2] & 0xff;
+		final int receivedPid = apdu[3] & 0xff;
+		return receivedObjIdx == objIndex && receivedPid == propertyId
+				? Optional.of(Arrays.copyOfRange(apdu, 4, apdu.length)) : Optional.empty();
 	}
 
 	@Override
