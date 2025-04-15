@@ -819,8 +819,8 @@ public class ManagementClientImpl implements ManagementClient
 				responseFilter);
 		final var returnCode = ReturnCode.of(response.get(0)[8] & 0xff);
 		if (returnCode != ReturnCode.Success)
-			throw new KNXRemoteException(format("write property response for %d(%d)|%d: %s",
-					objectType, objectInstance, propertyId, returnCode.name()));
+			throw new KnxNegativeReturnCodeException(format("write property response for %d(%d)|%d",
+					objectType, objectInstance, propertyId), returnCode);
 	}
 
 	private long sendProperty(final int svc, final int svcRes, final Destination dst, final int objectType,
@@ -1089,8 +1089,8 @@ public class ManagementClientImpl implements ManagementClient
 		final byte[] response = responses.get(0);
 		final var returnCode = ReturnCode.of(response[0] & 0xff);
 		if (returnCode != ReturnCode.Success)
-			throw new KNXRemoteException(format("function property response for %d(%d)|%d service %d: %s",
-					objectType, objInstance, propertyId, service, returnCode.description()));
+			throw new KnxNegativeReturnCodeException(format("function property response for %d(%d)|%d service %d",
+					objectType, objInstance, propertyId, service), returnCode);
 		return response;
 	}
 
@@ -1139,8 +1139,7 @@ public class ManagementClientImpl implements ManagementClient
 			final byte[] apdu = sendWait(dst, priority, send, MemoryExtendedReadResponse, 4, 252);
 			final ReturnCode ret = ReturnCode.of(apdu[2] & 0xff);
 			if (ret != ReturnCode.Success)
-				throw new KNXRemoteException(
-						format("read memory from %s 0x%x: %s", dst.getAddress(), startAddr, ret.description()));
+				throw new KnxNegativeReturnCodeException(format("read memory from %s 0x%x", dst.getAddress(), startAddr), ret);
 			return Arrays.copyOfRange(apdu, 6, apdu.length);
 		}
 
@@ -1180,14 +1179,14 @@ public class ManagementClientImpl implements ManagementClient
 			final ReturnCode ret = ReturnCode.of(apdu[2] & 0xff);
 			if (ret == ReturnCode.Success)
 				return;
-			String desc = ret.description();
 			if (ret == ReturnCode.SuccessWithCrc) {
 				final int crc = ((apdu[6] & 0xff) << 8) | (apdu[7] & 0xff);
 				if (crc16Ccitt(asdu) == crc)
 					return;
-				desc = "data verification failed (crc mismatch)";
+				throw new KNXRemoteException(format("write memory to %s 0x%x: data verification failed (crc mismatch)",
+						dst.getAddress(), startAddr));
 			}
-			throw new KNXRemoteException(format("write memory to %s 0x%x: %s", dst.getAddress(), startAddr, desc));
+			throw new KnxNegativeReturnCodeException(format("write memory to %s 0x%x", dst.getAddress(), startAddr), ret);
 		}
 
 		final byte[] asdu = new byte[data.length + 3];
