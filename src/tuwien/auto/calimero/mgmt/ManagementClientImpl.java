@@ -1093,8 +1093,7 @@ public class ManagementClientImpl implements ManagementClient
 		}
 
 		final byte[] apdu = sendWait(dst, priority,
-				createLengthOptimizedAPDU(MEMORY_READ,
-						(byte) bytes, (byte) (startAddr >>> 8), (byte) startAddr),
+				createLengthOptimizedAPDU(MEMORY_READ, (byte) bytes, (byte) (startAddr >>> 8), (byte) startAddr),
 				MEMORY_RESPONSE, 2, 65);
 		int no = apdu[1] & 0x3F;
 		if (no == 0)
