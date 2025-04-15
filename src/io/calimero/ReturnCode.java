@@ -51,8 +51,8 @@ public final class ReturnCode {
 	// Generic positive return codes
 
 	public static final ReturnCode Success = new ReturnCode(0x00, "success",
-			"service, function or command executed sucessfully");
-	public static final ReturnCode SuccessWithCrc = new ReturnCode(0x01, "success with crc",
+			"service, function or command executed successfully");
+	public static final ReturnCode SuccessWithCrc = new ReturnCode(0x01, "success with CRC",
 			"positive message confirmation, CRC over original data");
 
 	public static final ReturnCode InvalidServiceCommand = new ReturnCode(0xa1, "invalid service command",
@@ -82,7 +82,7 @@ public final class ReturnCode {
 	public static final ReturnCode AccessReadOnly = new ReturnCode(0xfb, "access read-only",
 			"write access to read-only resource");
 	public static final ReturnCode AccessDenied = new ReturnCode(0xfc, "access denied",
-			"access to recource is not allowed because of authorization/security");
+			"access to resource is not allowed because of authorization/security");
 	public static final ReturnCode AddressVoid = new ReturnCode(0xfd, "address void", "resource is not present"); // address does not exist
 	public static final ReturnCode DataTypeConflict = new ReturnCode(0xfe, "data type conflict",
 			"write access with wrong datatype (datapoint length)");
