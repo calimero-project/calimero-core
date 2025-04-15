@@ -820,7 +820,7 @@ public class ManagementClientImpl implements ManagementClient
 		final var returnCode = ReturnCode.of(response.get(0)[8] & 0xff);
 		if (returnCode != ReturnCode.Success)
 			throw new KNXRemoteException(format("write property response for %d(%d)|%d: %s",
-					objectType, objectInstance, propertyId, returnCode.friendly()));
+					objectType, objectInstance, propertyId, returnCode.name()));
 	}
 
 	private long sendProperty(final int svc, final int svcRes, final Destination dst, final int objectType,

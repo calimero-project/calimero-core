@@ -58,7 +58,7 @@ public class KnxNegativeReturnCodeException extends KNXRemoteException {
 
 	@Override
 	public String getMessage() {
-		return super.getMessage() + ": " + rc.description() + " (" + rc.friendly() + ")";
+		return super.getMessage() + ": " + rc.description() + " (" + rc.name() + ")";
 	}
 
 	public final ReturnCode returnCode() { return rc; }

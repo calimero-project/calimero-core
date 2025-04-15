@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2019, 2023 B. Malinowsky
+    Copyright (c) 2019, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Unified return codes for KNX services and functions, providing a return code, friendly name, and description.
+ * Unified return codes for KNX services and functions, providing a return code, name, and description.
  * <p>
  * Note, that several older KNX services and functions do not use these return codes.
  */
@@ -108,7 +108,10 @@ public final class ReturnCode {
 
 	public int code() { return code; }
 
+	@Deprecated(forRemoval = true)
 	public String friendly() { return name; }
+
+	public String name() { return name; }
 
 	public String description() { return description; }
 

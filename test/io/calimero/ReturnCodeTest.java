@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2019 B. Malinowsky
+    Copyright (c) 2019, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -66,11 +66,11 @@ class ReturnCodeTest {
 
 	@ParameterizedTest
 	@MethodSource("values")
-	void friendlyCodeName(final ReturnCode c) {
+	void codeName(final ReturnCode c) {
 		// checks non-empty and formatting
 		if (c != ReturnCode.Success && c != ReturnCode.Error)
-			assertTrue(c.friendly().contains(" ") || c.friendly().startsWith("0x"), c.friendly());
-		assertTrue(c.friendly().length() > 0);
+			assertTrue(c.name().contains(" ") || c.name().startsWith("0x"), c.name());
+		assertTrue(c.name().length() > 0);
 	}
 
 	@ParameterizedTest
@@ -78,7 +78,7 @@ class ReturnCodeTest {
 	void description(final ReturnCode c) {
 		assertTrue(c.description().length() > 0);
 		assertTrue(c.description().contains(" "));
-		if (c.friendly().startsWith("0x"))
+		if (c.name().startsWith("0x"))
 			assertEquals("unknown return code", c.description());
 	}
 
