@@ -159,6 +159,9 @@ public class ManagementClientImpl implements ManagementClient
 
 	private static final int DomainAddressSerialNumberWrite = 0b1111101110;
 
+	private static final int PID_LOAD_STATE_CONTROL = 5;
+	private static final int PID_RUN_STATE_CONTROL = 6;
+
 	// serves as both req and res
 	private static final int RESTART = 0x0380;
 
@@ -787,10 +790,14 @@ public class ManagementClientImpl implements ManagementClient
 		if (data.length != apdu.length - 6)
 			throw new KNXInvalidResponseException("data lengths differ, bytes: "
 				+ data.length + " written, " + (apdu.length - 6) + " response");
+
 		// explicitly read back written properties
-		for (int i = 4; i < asdu.length; ++i)
-			if (apdu[2 + i] != asdu[i])
-				throw new KNXRemoteException("read back failed (erroneous property data)");
+		// skip if writing to load/run state control properties
+		if (propertyId != PID_LOAD_STATE_CONTROL && propertyId != PID_RUN_STATE_CONTROL) {
+			for (int i = 4; i < asdu.length; ++i)
+				if (apdu[2 + i] != asdu[i])
+					throw new KNXRemoteException("read back failed (erroneous property data)");
+		}
 	}
 
 	private static final int PropertyExtWrite = 0b0111001110;
