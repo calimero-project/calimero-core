@@ -566,7 +566,9 @@ public interface ManagementClient extends AutoCloseable
 	 * <p>
 	 * This service uses point-to-point connectionless or connection-oriented
 	 * communication mode.<br>
-	 * The value of the written property is explicitly read back after writing.<br>
+	 * The value of the written property is explicitly read back after writing.
+	 * Reading back the property value shall be skipped for properties returning a resulting
+	 * state code which may differ from the written value (e.g., properties of type {@code PDT_CONTROL}).<br>
 	 * Note that interface objects with active access protection are only accessible over
 	 * connection-oriented communication.
 	 *
