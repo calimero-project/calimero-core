@@ -37,9 +37,11 @@
 package io.calimero.mgmt;
 
 import static io.calimero.cemi.CEMIDevMgmt.MC_PROPREAD_REQ;
+import static java.lang.String.format;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
 import java.util.function.Consumer;
@@ -52,6 +54,7 @@ import io.calimero.KNXException;
 import io.calimero.KNXInvalidResponseException;
 import io.calimero.KNXListener;
 import io.calimero.KNXRemoteException;
+import io.calimero.KnxNegativeReturnCodeException;
 import io.calimero.ReturnCode;
 import io.calimero.cemi.CEMI;
 import io.calimero.cemi.CEMIDevMgmt;
@@ -207,27 +210,27 @@ abstract class LocalDeviceManagement<T> implements PropertyAdapter
 		return new byte[] { (byte) objIndex, (byte) p, (byte) propIndex, (byte) writeEnabled, 0, 0, 0 };
 	}
 
-	public void callFunctionProperty(final int objIndex, final int pid, final int serviceId, final byte... serviceInfo)
+	public FuncPropResponse callFunctionProperty(final int objIndex, final int pid, final int serviceId, final byte... serviceInfo)
 			throws KNXException, InterruptedException {
 		if (closed)
 			throw new IllegalStateException("adapter closed");
 		final int objectType = getObjectType(objIndex);
 		final int objectInstance = getObjectInstance(objIndex, objectType);
-		callFunctionProperty(objectType, objectInstance, pid, serviceId, serviceInfo);
+		return callFunctionProperty(objectType, objectInstance, pid, serviceId, serviceInfo);
 	}
 
 	@Override
-	public void callFunctionProperty(final int objectType, final int objectInstance, final int pid, final int serviceId,
-			final byte... serviceInfo) throws KNXException, InterruptedException {
+	public FuncPropResponse callFunctionProperty(final int objectType, final int objectInstance, final int pid,
+			final int serviceId, final byte... serviceInfo) throws KNXException, InterruptedException {
 		if (closed)
 			throw new IllegalStateException("adapter closed");
 		final var req = CEMIDevMgmt.newFunctionPropertyService(CEMIDevMgmt.MC_FUNCPROP_CMD_REQ, objectType,
 				objectInstance, pid, ReturnCode.Success, serviceId, serviceInfo);
 		send(req, BlockingMode.Confirmation);
-		findFrame(CEMIDevMgmt.MC_FUNCPROP_CON, req);
+		return funcPropResponse(req, serviceId);
 	}
 
-	public byte[] getFunctionPropertyState(final int objIndex, final int pid, final int serviceId,
+	public FuncPropResponse getFunctionPropertyState(final int objIndex, final int pid, final int serviceId,
 			final byte... serviceInfo) throws KNXException, InterruptedException {
 		if (closed)
 			throw new IllegalStateException("adapter closed");
@@ -237,14 +240,14 @@ abstract class LocalDeviceManagement<T> implements PropertyAdapter
 	}
 
 	@Override
-	public byte[] getFunctionPropertyState(final int objectType, final int objectInstance, final int pid,
+	public FuncPropResponse getFunctionPropertyState(final int objectType, final int objectInstance, final int pid,
 			final int serviceId, final byte... serviceInfo) throws KNXException, InterruptedException {
 		if (closed)
 			throw new IllegalStateException("adapter closed");
 		final var req = CEMIDevMgmt.newFunctionPropertyService(CEMIDevMgmt.MC_FUNCPROP_READ_REQ, objectType,
 				objectInstance, pid, ReturnCode.Success, serviceId, serviceInfo);
 		send(req, BlockingMode.Confirmation);
-		return findFrame(CEMIDevMgmt.MC_FUNCPROP_CON, req);
+		return funcPropResponse(req, serviceId);
 	}
 
 	@Override
@@ -285,14 +288,31 @@ abstract class LocalDeviceManagement<T> implements PropertyAdapter
 				throw new KNXRemoteException("received reset indication from server, connection closed");
 			}
 			else if (mc == messageCode && frame.getObjectType() == request.getObjectType()
-					&& frame.getObjectInstance() == request.getObjectInstance()
-					&& frame.getPID() == request.getPID()) {
+					&& frame.getObjectInstance() == request.getObjectInstance() && frame.getPID() == request.getPID()) {
 				if (frame.isNegativeResponse())
 					throw new KNXRemoteException(frame.getErrorMessage());
+
+				final byte[] payload = frame.getPayload();
+				// if a function property call was not to a property of type PDT_Function, .con does not contain return code and data
+				if (messageCode == CEMIDevMgmt.MC_FUNCPROP_CON && payload.length == 0)
+					throw new KNXRemoteException(format("property %d(%d)|%d is not a function property",
+							frame.getObjectType(), frame.getObjectInstance(), frame.getPID()));
+
 				if (frame.getElementCount() == request.getElementCount())
-					return frame.getPayload();
+					return payload;
 			}
 		}
+	}
+
+	private FuncPropResponse funcPropResponse(final CEMIDevMgmt req, final int serviceId)
+			throws KNXRemoteException, InterruptedException {
+		var response = findFrame(CEMIDevMgmt.MC_FUNCPROP_CON, req);
+		var returnCode = ReturnCode.of(response[0] & 0xff);
+		if (returnCode.code() > 0x7f)
+			throw new KnxNegativeReturnCodeException(format("function property response for %d(%d)|%d service %d",
+					req.getObjectType(), req.getObjectInstance(), req.getPID(), serviceId), returnCode);
+		final byte[] result = Arrays.copyOfRange(response, 1, response.length);
+		return new FuncPropResponse(returnCode, result);
 	}
 
 	protected int getObjectType(final int objIndex) throws KNXRemoteException

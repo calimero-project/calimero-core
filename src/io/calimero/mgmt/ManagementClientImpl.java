@@ -1040,7 +1040,7 @@ public class ManagementClientImpl implements ManagementClient
 		if (response.length == 0)
 			throw new KNXRemoteException(format("property %d|%d is not a function property", objIndex, propertyId));
 		final var returnCode = ReturnCode.of(response[0] & 0xff);
-		if (returnCode.code() > 0x9f)
+		if (returnCode.code() > 0x7f)
 			throw new KnxNegativeReturnCodeException(format("function property response for %d|%d", objIndex, propertyId), returnCode);
 		final byte[] result = Arrays.copyOfRange(response, 1, response.length);
 		return new FuncPropResponse(returnCode, result);
@@ -1054,7 +1054,7 @@ public class ManagementClientImpl implements ManagementClient
 	}
 
 	@Override
-	public byte[] callFunctionProperty(final Destination dst, final int objectType, final int objInstance,
+	public FuncPropResponse callFunctionProperty(final Destination dst, final int objectType, final int objInstance,
 			final int propertyId, final int serviceId, final byte... serviceInfo)
 			throws KNXException, InterruptedException {
 		return functionProperty(FunctionPropertyExtCommand, dst, objectType, objInstance, propertyId, serviceId,
@@ -1062,14 +1062,14 @@ public class ManagementClientImpl implements ManagementClient
 	}
 
 	@Override
-	public byte[] readFunctionPropertyState(final Destination dst, final int objectType, final int objInstance,
+	public FuncPropResponse readFunctionPropertyState(final Destination dst, final int objectType, final int objInstance,
 			final int propertyId, final int serviceId, final byte... serviceInfo)
 			throws KNXException, InterruptedException {
 		return functionProperty(FunctionPropertyExtStateRead, dst, objectType, objInstance, propertyId, serviceId,
 				serviceInfo);
 	}
 
-	private byte[] functionProperty(final int cmd, final Destination dst, final int objectType, final int objInstance,
+	private FuncPropResponse functionProperty(final int cmd, final Destination dst, final int objectType, final int objInstance,
 			final int propertyId, final int service, final byte... info)
 			throws KNXLinkClosedException, KNXDisconnectException, KNXTimeoutException, KNXRemoteException,
 			InterruptedException {
@@ -1092,10 +1092,11 @@ public class ManagementClientImpl implements ManagementClient
 
 		final byte[] response = responses.get(0);
 		final var returnCode = ReturnCode.of(response[0] & 0xff);
-		if (returnCode != ReturnCode.Success)
+		if (returnCode.code() > 0x7f)
 			throw new KnxNegativeReturnCodeException(format("function property response for %d(%d)|%d service %d",
 					objectType, objInstance, propertyId, service), returnCode);
-		return response;
+		final byte[] result = Arrays.copyOfRange(response, 1, response.length);
+		return new FuncPropResponse(returnCode, result);
 	}
 
 	private static Optional<byte[]> extractFunctionPropertyExtData(final int objectType, final int oinstance,
