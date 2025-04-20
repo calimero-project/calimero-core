@@ -592,7 +592,7 @@ public class CEMIDevMgmt implements CEMI
 
 	private void initHeader(final ByteArrayInputStream is) throws KNXFormatException
 	{
-		checkLength(is, 6);
+		checkLength(is, isFuncProp() ? 4 : 6);
 		header = isFuncProp() ? 5 : 7;
 		try {
 			final int objType = is.read() << 8 | is.read();
@@ -618,7 +618,8 @@ public class CEMIDevMgmt implements CEMI
 		if (isNegativeResponse())
 			data = new byte[] { (byte) is.read() };
 		else if (mc == MC_PROPREAD_CON || mc == MC_PROPWRITE_REQ || mc == MC_PROPINFO_IND || isFuncProp()) {
-			checkLength(is, 1);
+			// if a function property call was not to a property of type PDT_Function, .con does not contain return code and data
+			checkLength(is, mc == MC_FUNCPROP_CON ? 0 : 1);
 			data = new byte[is.available()];
 			is.read(data, 0, data.length);
 		}
