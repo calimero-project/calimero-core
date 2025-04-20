@@ -37,7 +37,6 @@
 package tuwien.auto.calimero.mgmt;
 
 import java.time.Duration;
-import java.util.HexFormat;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -48,7 +47,6 @@ import tuwien.auto.calimero.KNXInvalidResponseException;
 import tuwien.auto.calimero.KNXRemoteException;
 import tuwien.auto.calimero.KNXTimeoutException;
 import tuwien.auto.calimero.Priority;
-import tuwien.auto.calimero.ReturnCode;
 import tuwien.auto.calimero.SerialNumber;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
@@ -741,11 +739,6 @@ public interface ManagementClient extends AutoCloseable
 	byte[] readPropertyDesc(Destination dst, int objIndex, int propertyId, int propIndex)
 		throws KNXException, InterruptedException;
 
-	record FuncPropResponse(ReturnCode returnCode, byte[] result) {
-		@Override
-		public String toString() { return returnCode + ", result " + HexFormat.of().formatHex(result); }
-	}
-
 	/**
 	 * Calls a function property of an interface object of a communication partner.
 	 * <p>
@@ -804,7 +797,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @param propertyId property identifier
 	 * @param serviceId service identifier for call service
 	 * @param serviceInfo service info
-	 * @return byte array containing the function result
+	 * @return function property response containing the positive return code and function result
 	 * @throws KNXTimeoutException on send or service timeout
 	 * @throws KNXRemoteException if accessing a non-existing property or forbidden property access (not
 	 *         sufficient access rights)
@@ -814,7 +807,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @throws KNXException on other read error
 	 * @throws InterruptedException on interrupted thread
 	 */
-	byte[] callFunctionProperty(Destination dst, int objectType, int objInstance, int propertyId, int serviceId,
+	FuncPropResponse callFunctionProperty(Destination dst, int objectType, int objInstance, int propertyId, int serviceId,
 			byte... serviceInfo) throws KNXException, InterruptedException;
 
 	/**
@@ -829,7 +822,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @param propertyId property identifier
 	 * @param serviceId service identifier for read service
 	 * @param serviceInfo service info
-	 * @return byte array containing the function property state
+	 * @return function property response containing the return code and function property state
 	 * @throws KNXTimeoutException on send or service timeout
 	 * @throws KNXRemoteException if accessing a non-existing property or forbidden property access (not
 	 *         sufficient access rights)
@@ -839,7 +832,7 @@ public interface ManagementClient extends AutoCloseable
 	 * @throws KNXException on other read error
 	 * @throws InterruptedException on interrupted thread
 	 */
-	byte[] readFunctionPropertyState(Destination dst, int objectType, int objInstance, int propertyId, int serviceId,
+	FuncPropResponse readFunctionPropertyState(Destination dst, int objectType, int objInstance, int propertyId, int serviceId,
 			byte... serviceInfo) throws KNXException, InterruptedException;
 
 	/**

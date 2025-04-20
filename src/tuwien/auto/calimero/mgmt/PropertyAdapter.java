@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -78,10 +78,10 @@ public interface PropertyAdapter extends AutoCloseable
 	 */
 	byte[] getProperty(int objIndex, int pid, int start, int elements) throws KNXException, InterruptedException;
 
-	void callFunctionProperty(int objectType, int objectInstance, int pid, int serviceId, byte... serviceInfo)
+	FuncPropResponse callFunctionProperty(int objectType, int objectInstance, int pid, int serviceId, byte... serviceInfo)
 			throws KNXException, InterruptedException;
 
-	byte[] getFunctionPropertyState(int objectType, int objectInstance, int pid, int serviceId, byte... serviceInfo)
+	FuncPropResponse getFunctionPropertyState(int objectType, int objectInstance, int pid, int serviceId, byte... serviceInfo)
 			throws KNXException, InterruptedException;
 
 	/**
