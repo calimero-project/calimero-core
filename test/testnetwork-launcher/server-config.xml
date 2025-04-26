@@ -2,7 +2,7 @@
 <!-- Calimero 2 server settings -->
 <knxServer name="test-server" friendlyName="calimero-core knx test-server">
 	<discovery activate="true" listenNetIf="all" outgoingNetIf="all"/>
-	<serviceContainer activate="true" routing="true" listenNetIf="any"
+	<serviceContainer activate="true" routing="true" netif="any"
 		networkMonitoring="true" udpPort="3671" keyfile="../calimero-core/test/resources/keyfile" securedServices="optional">
 		<knxAddress type="individual">1.1.0</knxAddress>
 		<routing>224.0.23.12</routing>
@@ -67,4 +67,4 @@
 			<knxAddress type="individual">1.1.30</knxAddress>
 		</additionalAddresses>
 	</serviceContainer>
-</knxServer>        
+</knxServer>
