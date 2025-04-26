@@ -41,8 +41,6 @@ package io.calimero;
  * {@link ReturnCode}.
  */
 public class KnxNegativeReturnCodeException extends KNXRemoteException {
-	private static final long serialVersionUID = 1L;
-
 	private final ReturnCode rc;
 
 	/**

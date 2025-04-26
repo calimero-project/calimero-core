@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2017, 2019 B. Malinowsky
+    Copyright (c) 2017, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,8 +40,6 @@ package io.calimero;
  * The root runtime exception type used by Calimero.
  */
 public class KnxRuntimeException extends RuntimeException {
-	private static final long serialVersionUID = -1;
-
 	public KnxRuntimeException(final String message, final Throwable cause) {
 		super(message, cause);
 	}

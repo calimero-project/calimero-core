@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2021, 2021 B. Malinowsky
+    Copyright (c) 2021, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,8 +45,6 @@ import io.calimero.KnxRuntimeException;
  * Experimental.
  */
 public final class LteProcessEvent extends ProcessEvent {
-	private static final long serialVersionUID = 1L;
-
 	private final int extFrameFormat;
 
 	public LteProcessEvent(final ProcessCommunicator source, final IndividualAddress src, final int extFrameFormat,

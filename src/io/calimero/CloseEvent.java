@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2015 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -74,8 +74,6 @@ public class CloseEvent extends EventObject
 	 * example, initiated by an unsupported protocol version.
 	 */
 	public static final int INTERNAL = 3;
-
-	private static final long serialVersionUID = 1L;
 
 	private final int initiator;
 

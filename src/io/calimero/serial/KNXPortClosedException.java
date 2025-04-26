@@ -45,8 +45,6 @@ import io.calimero.KNXException;
  */
 public class KNXPortClosedException extends KNXException
 {
-	private static final long serialVersionUID = 1L;
-
 	private final String id;
 
 	/**

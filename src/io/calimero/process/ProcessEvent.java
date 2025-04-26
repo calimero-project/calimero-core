@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,8 +51,6 @@ import io.calimero.IndividualAddress;
  */
 public class ProcessEvent extends EventObject
 {
-	private static final long serialVersionUID = 1L;
-
 	private final IndividualAddress src;
 	private final GroupAddress dst;
 	// 	one of GROUP_READ (0x0), GROUP_RESPONSE (0x40), GROUP_WRITE (0x80)

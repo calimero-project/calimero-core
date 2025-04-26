@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2016, 2021 B. Malinowsky
+    Copyright (c) 2016, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,8 +44,6 @@ import io.calimero.knxnetip.servicetype.RoutingBusy;
 
 public class RoutingBusyEvent extends EventObject
 {
-	private static final long serialVersionUID = 1L;
-
 	private final InetSocketAddress from;
 	private final RoutingBusy busy;
 
