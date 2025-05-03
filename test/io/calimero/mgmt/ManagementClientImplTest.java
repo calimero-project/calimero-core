@@ -330,6 +330,39 @@ class ManagementClientImplTest
 	}
 
 	@Test
+	void readPropertyDescription() throws KNXTimeoutException, KNXRemoteException, KNXDisconnectException,
+			KNXLinkClosedException, InterruptedException {
+		var desc = mc.readPropertyDescription(dco, 0, 1, PID.OBJECT_TYPE, 0);
+		assertEquals(0, desc.objectType());
+		assertEquals(1, desc.objectInstance());
+		assertEquals(0, desc.objectIndex()); // object index is not transmitted
+		assertEquals(PID.OBJECT_TYPE, desc.pid());
+		assertEquals(0, desc.propIndex());
+		assertEquals(0, desc.currentElements()); // current elements are not transmitted
+		assertEquals(1, desc.maxElements());
+		assertFalse(desc.writeEnabled());
+
+		desc = mc.readPropertyDescription(dco, 1, 1, PID.OBJECT_NAME, 0);
+		assertEquals(1, desc.objectType());
+		assertEquals(1, desc.objectInstance());
+		assertEquals(0, desc.objectIndex()); // object index is not transmitted
+		assertEquals(PID.OBJECT_NAME, desc.pid());
+		assertEquals(1, desc.propIndex());
+		assertEquals(0, desc.currentElements()); // current elements are not transmitted
+		assertEquals(19, desc.maxElements());
+		assertFalse(desc.writeEnabled());
+	}
+
+	@Test
+	void readPropertyDescriptionNonExisting() {
+		assertThrows(KNXRemoteException.class, () -> mc.readPropertyDescription(dco, 0xffff, 1, PID.OBJECT_TYPE, 0));
+		assertThrows(KNXRemoteException.class, () -> mc.readPropertyDescription(dco, 1, 0xfff, PID.OBJECT_TYPE, 0));
+		assertThrows(KNXRemoteException.class, () -> mc.readPropertyDescription(dco, 1, 1, PID.ADDITIONAL_INDIVIDUAL_ADDRESSES, 0));
+		assertThrows(KNXRemoteException.class, () -> mc.readPropertyDescription(dco, 1, 1, 0xfff, 0));
+		assertThrows(KNXRemoteException.class, () -> mc.readPropertyDescription(dco, 1, 1, 0, 0xfff));
+	}
+
+	@Test
 	void writeAddressIndividualAddress() throws InterruptedException, KNXException
 	{
 		final IndividualAddress[] orig = mc.readAddress(true);
