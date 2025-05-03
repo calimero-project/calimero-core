@@ -202,7 +202,7 @@
         <property pid="86" pidName="PID_GROUP_TELEGR_RATE_LIMIT_NO_OF_TELEGR" name="Group telegram rate limitation number of telegrams" pdt="4" rw="R/W" writeEnabled="1">
             <usage>Telegram rate limitation number</usage>
         </property>
-        <property pid="89" pidName="PID_FEATURES_SUPPORTED" name="Supported Features" pdt="26" rw="3/1" writeEnabled="0">
+        <property pid="89" pidName="PID_FEATURES_SUPPORTED" name="Supported Features" pdt="26" rw="3/1" writeEnabled="0" accessPolicy="3FF/0CC">
             <usage>Indicates the functionality of a device</usage>
         </property>
         <property pid="101" pidName="PID_CHANNEL_01_PARAM" name="&lt;tbd&gt;" pdt="17" rw="" writeEnabled="">

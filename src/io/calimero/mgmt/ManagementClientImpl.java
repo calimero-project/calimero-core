@@ -41,6 +41,7 @@ import static io.calimero.DataUnitBuilder.createLengthOptimizedAPDU;
 import static java.lang.String.format;
 import static java.lang.System.Logger.Level.DEBUG;
 import static java.lang.System.Logger.Level.INFO;
+import static java.lang.System.Logger.Level.TRACE;
 import static java.lang.System.Logger.Level.WARNING;
 import static java.nio.ByteBuffer.allocate;
 import static java.util.stream.Collectors.toList;
@@ -54,6 +55,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -1137,16 +1139,9 @@ public class ManagementClientImpl implements ManagementClient
 		if (!dst.isConnectionOriented())
 			throw new KNXIllegalArgumentException("read memory requires connection-oriented mode: " + dst);
 
-		// use extended read service for memory access above 65 K
-		if (startAddr > 0xffff) {
-			final byte[] send = createAPDU(MemoryExtendedRead,
-					(byte) bytes, (byte) (startAddr >>> 16), (byte) (startAddr >>> 8), (byte) startAddr);
-			final byte[] apdu = sendWait(dst, priority, send, MemoryExtendedReadResponse, 4, 252);
-			final ReturnCode ret = ReturnCode.of(apdu[2] & 0xff);
-			if (ret != ReturnCode.Success)
-				throw new KnxNegativeReturnCodeException(format("read memory from %s 0x%x", dst.getAddress(), startAddr), ret);
-			return Arrays.copyOfRange(apdu, 6, apdu.length);
-		}
+		// use extended memory read service for memory access above 64 KiB
+		if (startAddr > 0xffff)
+			return readMemoryExt(dst, startAddr, bytes);
 
 		final byte[] apdu = sendWait(dst, priority,
 				createLengthOptimizedAPDU(MEMORY_READ, (byte) bytes, (byte) (startAddr >>> 8), (byte) startAddr),
@@ -1159,6 +1154,17 @@ public class ManagementClientImpl implements ManagementClient
 		while (--no >= 0)
 			mem[no] = apdu[4 + no];
 		return mem;
+	}
+
+	private byte[] readMemoryExt(final Destination dst, final int startAddr, final int bytes) throws KNXTimeoutException,
+			KNXDisconnectException, KNXRemoteException, KNXLinkClosedException, InterruptedException {
+		final byte[] send = createAPDU(MemoryExtendedRead,
+				(byte) bytes, (byte) (startAddr >>> 16), (byte) (startAddr >>> 8), (byte) startAddr);
+		final byte[] apdu = sendWait(dst, priority, send, MemoryExtendedReadResponse, 4, 252);
+		final ReturnCode ret = ReturnCode.of(apdu[2] & 0xff);
+		if (ret != ReturnCode.Success)
+			throw new KnxNegativeReturnCodeException(format("read memory from %s 0x%x", dst.getAddress(), startAddr), ret);
+		return Arrays.copyOfRange(apdu, 6, apdu.length);
 	}
 
 	@Override
@@ -1413,6 +1419,109 @@ public class ManagementClientImpl implements ManagementClient
 			KNXTimeoutException, KNXInvalidResponseException, KNXLinkClosedException, InterruptedException {
 		final long start = send(d, p, apdu, responseServiceType);
 		return waitForResponse(d.getAddress(), responseServiceType, minAsduLen, maxAsduLen, start, timeout);
+	}
+
+	enum SupportedServiceGroup {
+		PropertyMulticast,
+		ExtProperties,
+		ConfirmedRestart,
+		ExtMemory,
+		VerifyMode,
+		FileStream,
+		Authorize,
+		LinkServices,
+		SecureAL,
+		EasyMode,
+		ConfigurationSignature,
+		ExtFrames,
+		TLConnectionOriented,
+		TLNewStyle,
+		GroupObjectDiagnostic,
+		LocalDownloadIP,
+		LocalDownloadUsb;
+	}
+
+	boolean supportsFeature(final Destination dst, final SupportedServiceGroup feature) throws KNXTimeoutException,
+			KNXLinkClosedException, KNXDisconnectException, InterruptedException {
+		return supportedFeatures(dst).contains(feature);
+	}
+
+	private EnumSet<SupportedServiceGroup> supportedFeatures(final Destination dst) throws KNXTimeoutException,
+			KNXLinkClosedException, KNXDisconnectException, InterruptedException {
+		final var featuresOpt = dst.supportedFeatures();
+		if (featuresOpt.isPresent())
+			return featuresOpt.get();
+		final var features = readSupportedFeatures(dst);
+		logger.log(TRACE, "{0} supported feature/service groups = {1}", dst.getAddress(), features);
+		dst.supportedFeatures(features);
+		return features;
+	}
+
+	private EnumSet<SupportedServiceGroup> readSupportedFeatures(final Destination dst) throws KNXTimeoutException,
+			KNXLinkClosedException, KNXDisconnectException, InterruptedException {
+		final var supported = new ArrayList<SupportedServiceGroup>();
+		try {
+			final int pidFeaturesSupported = 89;
+			final byte[] value = readProperty(dst, 0, pidFeaturesSupported, 1, 1);
+			if (value.length != 10)
+				logger.log(DEBUG, "reading {0} property 0|89 (Device Object | Features Supported): expected 10 bytes, "
+								+ "received {1} - ignore ", dst.getAddress(), value.length);
+			else {
+				final int mask = unsigned(value); // only bits 0 - 16 are used, so that's fine
+				for (final var v : SupportedServiceGroup.values())
+					if ((mask & (1 << v.ordinal())) != 0)
+						supported.add(v);
+			}
+		}
+		catch (KNXRemoteException | KNXTimeoutException | KNXDisconnectException e) {
+			// property doesn't exist, or we couldn't access it
+			final boolean altDiscovery = true;
+			final String alt = altDiscovery ? " - try alternative feature/service discovery" : "";
+			logger.log(TRACE, "could not read {0} property 0|89 (Device Object | Features Supported): {1}{2}",
+					dst.getAddress(), e.getMessage(), alt);
+
+			if (altDiscovery) {
+				try {
+					readPropertyDescription(dst, 0, 1, PID.OBJECT_TYPE, 0);
+					supported.add(SupportedServiceGroup.ExtProperties);
+				}
+				catch (KNXRemoteException | KNXTimeoutException | KNXDisconnectException ignore) {}
+				try {
+					try {
+						readMemoryExt(dst, 0x10000, 1);
+					}
+					catch (final KnxNegativeReturnCodeException ok) {}
+					supported.add(SupportedServiceGroup.ExtMemory);
+				}
+				catch (KNXRemoteException | KNXTimeoutException | KNXDisconnectException ignore) {}
+				try {
+					if (unsigned(readProperty(dst, 0, PID.MAX_APDULENGTH, 1, 1)) > 15)
+						supported.add(SupportedServiceGroup.ExtFrames);
+				}
+				catch (KNXRemoteException | KNXTimeoutException | KNXDisconnectException ignore) {}
+				try {
+					writeProperty(dst, 0, PID.SERVICE_CONTROL, 1, 1, new byte[] {0, 1 << 3});
+					supported.add(SupportedServiceGroup.VerifyMode);
+				}
+				catch (KNXRemoteException | KNXTimeoutException | KNXDisconnectException ignore) {}
+				try {
+					// XXX usually adds timeout delay
+					readDeviceDesc(dst, 2);
+					supported.add(SupportedServiceGroup.EasyMode);
+				}
+				catch (KNXRemoteException | KNXTimeoutException | KNXDisconnectException ignore) {}
+				try {
+					// TODO we have to use CO mode here, and TL doesn't allow another temporary destination in case
+					//  dst was configured CL
+					if (dst.isConnectionOriented()) {
+						readDeviceDesc(dst, 0);
+						supported.add(SupportedServiceGroup.TLConnectionOriented);
+					}
+				}
+				catch (KNXRemoteException | KNXTimeoutException | KNXDisconnectException ignore) {}
+			}
+		}
+		return EnumSet.copyOf(supported);
 	}
 
 	private int maxApduLength(final Destination dst) throws KNXLinkClosedException, InterruptedException {

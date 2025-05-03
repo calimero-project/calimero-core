@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@ import static io.calimero.mgmt.Destination.State.Disconnected;
 import static io.calimero.mgmt.Destination.State.OpenIdle;
 import static io.calimero.mgmt.Destination.State.OpenWait;
 
+import java.util.EnumSet;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -422,6 +423,17 @@ public class Destination implements AutoCloseable
 	}
 
 	final void maxApduLength(final int max) { maxApduLength = max; }
+
+
+	private volatile EnumSet<ManagementClientImpl.SupportedServiceGroup> supportedFeatures;
+
+	Optional<EnumSet<ManagementClientImpl.SupportedServiceGroup>> supportedFeatures() {
+		return Optional.ofNullable(supportedFeatures);
+	}
+
+	void supportedFeatures(final EnumSet<ManagementClientImpl.SupportedServiceGroup> features) {
+		supportedFeatures = features;
+	}
 
 	int getDisconnectedBy()
 	{

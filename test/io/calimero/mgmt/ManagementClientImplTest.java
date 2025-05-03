@@ -54,6 +54,7 @@ import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.junit.jupiter.api.parallel.Isolated;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import io.calimero.GroupAddress;
 import io.calimero.IndividualAddress;
@@ -71,6 +72,7 @@ import io.calimero.link.KNXLinkClosedException;
 import io.calimero.link.KNXNetworkLink;
 import io.calimero.link.KNXNetworkLinkIP;
 import io.calimero.link.medium.TPSettings;
+import io.calimero.mgmt.ManagementClientImpl.SupportedServiceGroup;
 import io.calimero.mgmt.PropertyAccess.PID;
 import tag.KnxnetIP;
 import tag.KnxnetIPSequential;
@@ -677,5 +679,28 @@ class ManagementClientImplTest
 		final byte[] test = msg.getBytes(StandardCharsets.US_ASCII);
 		final int value = ManagementClientImpl.crc16Ccitt(test);
 		assertEquals((int) Integer.decode(crc), value);
+	}
+
+	@Test
+	void destinationSupportedFeaturesAreInitiallyUnknown() {
+		assertTrue(dco.supportedFeatures().isEmpty());
+	}
+
+	@ParameterizedTest
+	@EnumSource( names= { "Authorize", "ConfirmedRestart", "ExtMemory", "ExtProperties" })
+	void destinationSupportsFeature(final SupportedServiceGroup feature) throws KNXTimeoutException, KNXLinkClosedException,
+			KNXDisconnectException, InterruptedException {
+		final var impl = (ManagementClientImpl) mc;
+		assertTrue(impl.supportsFeature(dco, feature));
+		assertTrue(dco.supportedFeatures().isPresent());
+	}
+
+	@ParameterizedTest
+	@EnumSource( names= { "FileStream", "LinkServices" })
+	void destinationDoesNotSupportFeature(final SupportedServiceGroup feature) throws KNXTimeoutException, KNXLinkClosedException,
+			KNXDisconnectException, InterruptedException {
+		final var impl = (ManagementClientImpl) mc;
+		assertFalse(impl.supportsFeature(dco, feature));
+		assertTrue(dco.supportedFeatures().isPresent());
 	}
 }
