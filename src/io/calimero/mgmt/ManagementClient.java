@@ -447,7 +447,16 @@ public interface ManagementClient extends AutoCloseable
 		 */
 		ResetLinks,
 		/** Reset the device to its ex-factory state, the device address(es) shall not be reset. */
-		FactoryResetWithoutIndividualAddress;
+		FactoryResetWithoutIndividualAddress,
+		/**
+		 * Persistently stored application data shall become invalid.
+		 * Depending on the channel number, reset behaves as follows:
+		 * <ul>
+		 *     <li>channel = 0: persistently stored application data of all channels shall be reset</li>
+		 *     <li>channel ≠ 0: persistently stored application data of only this channel shall be reset</li>
+		 * </ul>
+		 */
+		ErasePersistentlyStoredApplicationData;
 
 		public static EraseCode of(final int eraseCode) {
 			if (eraseCode > 0 && eraseCode <= values().length)
@@ -466,8 +475,9 @@ public interface ManagementClient extends AutoCloseable
 	 * device individual address to the (medium-dependent) default address, and subsequently performs a basic
 	 * restart.<br>
 	 * The {@code channel} parameter is used with erase codes {@link EraseCode#FactoryReset},
-	 * {@link EraseCode#ResetApplicationParameters}, {@link EraseCode#ResetLinks}, and
-	 * {@link EraseCode#FactoryResetWithoutIndividualAddress}. For erase codes {@link EraseCode#ConfirmedRestart},
+	 * {@link EraseCode#ResetApplicationParameters}, {@link EraseCode#ResetLinks},
+	 * {@link EraseCode#FactoryResetWithoutIndividualAddress}, and {@link EraseCode#ErasePersistentlyStoredApplicationData}.
+	 * For erase codes {@link EraseCode#ConfirmedRestart},
 	 * {@link EraseCode#ResetIndividualAddress}, and {@link EraseCode#ResetApplicationProgram}, {@code channel} should
 	 * be 0.<br>
 	 * If the requested master reset exceeds a processing time of 5 seconds, this is indicated by the KNX device using a
