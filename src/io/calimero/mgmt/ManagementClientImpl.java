@@ -935,7 +935,7 @@ public class ManagementClientImpl implements ManagementClient
 			final int writeLevel = apdu[16] & 0xf;
 			if (rcvPropDescType == 0 && dptMain == 0 && dptSub == 0 && !writeable && pdt == 0 && maxElems == 0
 					&& readLevel == 0 && writeLevel == 0) {
-				throw new KNXRemoteException("problem with property description request (IOT or PID non-existant?)");
+				throw new KNXRemoteException("problem with property description request (IOT or PID non-existent?)");
 			}
 
 			if (rcvPropDescType != 0)
@@ -1000,7 +1000,7 @@ public class ManagementClientImpl implements ManagementClient
 				// max_nr_elem field is a 4bit exponent + 12bit unsigned
 				// on problem this field is 0
 				if (apdu[6] == 0 && apdu[7] == 0)
-					throw new KNXRemoteException("got no property description (object non-existant?)");
+					throw new KNXRemoteException("got no property description (object non-existent?)");
 				return new byte[] { apdu[2], apdu[3], apdu[4], apdu[5], apdu[6], apdu[7], apdu[8] };
 			}
 

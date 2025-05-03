@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -177,7 +177,7 @@ class TranslatorTypesTest
 		TranslatorTypes.createTranslator(DPTXlator2ByteFloat.DPT_HUMIDITY);
 		try {
 			TranslatorTypes.createTranslator(new DPT("1000.1000", "", "-1", "1"));
-			fail("not existant DPT");
+			fail("non-existent DPT");
 		}
 		catch (final KNXException e) {}
 	}
