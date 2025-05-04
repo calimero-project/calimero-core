@@ -138,6 +138,15 @@ public class ManagementClientImpl implements ManagementClient
 	private static final int PROPERTY_RESPONSE = 0x03D6;
 	private static final int PROPERTY_WRITE = 0x03D7;
 
+	private static final int PropertyExtDescRead = 0b0111010010;
+	private static final int PropertyExtDescResponse = 0b0111010011;
+
+	private static final int PropertyExtRead = 0b0111001100;
+	private static final int PropertyExtReadResponse = 0b0111001101;
+
+	private static final int PropertyExtWrite = 0b0111001110;
+	private static final int PropertyExtWriteResponse = 0b0111001111;
+
 	private static final int FunctionPropertyCommand = 0b1011000111;
 	private static final int FunctionPropertyStateRead = 0b1011001000;
 	private static final int FunctionPropertyStateResponse = 0b1011001001;
@@ -434,7 +443,7 @@ public class ManagementClientImpl implements ManagementClient
 				return Optional.of(apdu1);
 			});
 		}
-		catch (final KNXTimeoutException e) {}
+		catch (final KNXTimeoutException ignore) {}
 	}
 
 	@Override
@@ -765,9 +774,6 @@ public class ManagementClientImpl implements ManagementClient
 		return responses;
 	}
 
-	private static final int PropertyExtRead = 0b0111001100;
-	private static final int PropertyExtReadResponse = 0b0111001101;
-
 	@Override
 	public byte[] readProperty(final Destination dst, final int objectType, final int objectInstance,
 			final int propertyId, final int start, final int elements) throws KNXException, InterruptedException {
@@ -841,9 +847,6 @@ public class ManagementClientImpl implements ManagementClient
 		}
 	}
 
-	private static final int PropertyExtWrite = 0b0111001110;
-	private static final int PropertyExtWriteResponse = 0b0111001111;
-
 	@Override
 	public void writeProperty(final Destination dst, final int objectType, final int objectInstance,
 			final int propertyId, final int start, final int elements, final byte[] data) throws KNXException,
@@ -875,7 +878,8 @@ public class ManagementClientImpl implements ManagementClient
 			final int objectInstance, final int propertyId, final int start, final int elements, final byte[] data)
 			throws KNXTimeoutException, KNXDisconnectException, KNXLinkClosedException, InterruptedException {
 
-		if (objectType < 0 || objectType > 0xffff || propertyId < 0 || propertyId > 0xfff || start < 0 || start > 0xffff
+		if (objectType < 0 || objectType > 0xffff || objectInstance < 0 || objectInstance > 0xfff
+				|| propertyId < 0 || propertyId > 0xfff || start < 0 || start > 0xffff
 				|| elements < 0 || elements > 255 || data.length == 0)
 			throw new KNXIllegalArgumentException("argument value out of range");
 
@@ -909,9 +913,6 @@ public class ManagementClientImpl implements ManagementClient
 				Arrays.fill(updateToolKey, (byte) 0);
 		}
 	}
-
-	private static final int PropertyExtDescRead = 0b0111010010;
-	private static final int PropertyExtDescResponse = 0b0111010011;
 
 	private int[] getOrQueryInterfaceObjectList(final Destination dst)
 			throws KNXTimeoutException, KNXDisconnectException, KNXLinkClosedException, InterruptedException {

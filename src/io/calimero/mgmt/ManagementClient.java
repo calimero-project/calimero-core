@@ -615,13 +615,11 @@ public interface ManagementClient extends AutoCloseable
 	 * @param elements number of elements to write
 	 * @param data byte array containing property value data to write
 	 * @throws KNXTimeoutException on a timeout during send
-	 * @throws KNXRemoteException if tried to access a non-existing property or forbidden property access (not
-	 *         sufficient access rights) or erroneous property data was written
-	 * @throws KNXInvalidResponseException if received number of elements differ or the data length read back differs
-	 *         from the written data length
+	 * @throws KnxNegativeReturnCodeException on response with negative return code
+	 * @throws KNXInvalidResponseException if the response contains an ASDU of the wrong length
 	 * @throws KNXDisconnectException on disconnect in connection-oriented mode
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
-	 * @throws KNXException on other read property error
+	 * @throws KNXException on other property write error
 	 * @throws InterruptedException on interrupted thread
 	 */
 	void writeProperty(Destination dst, int objectType, int objectInstance, int propertyId, int start, int elements,

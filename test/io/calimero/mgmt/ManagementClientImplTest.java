@@ -183,11 +183,11 @@ class ManagementClientImplTest
 	@KnxnetIPSequential
 	void readAddressBoolean() throws InterruptedException, KNXException
 	{
-		IndividualAddress[] ias = mc.readAddress(true);
+		final IndividualAddress[] ias = mc.readAddress(true);
 		assertTrue(ias.length <= 1);
 
 		final long start = System.currentTimeMillis();
-		ias = mc.readAddress(false);
+		mc.readAddress(false);
 		assertTrue(System.currentTimeMillis() - start >= mc.responseTimeout().toMillis());
 	}
 
