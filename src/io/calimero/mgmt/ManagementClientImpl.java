@@ -765,6 +765,48 @@ public class ManagementClientImpl implements ManagementClient
 		return responses;
 	}
 
+	private static final int PropertyExtRead = 0b0111001100;
+	private static final int PropertyExtReadResponse = 0b0111001101;
+
+	@Override
+	public byte[] readProperty(final Destination dst, final int objectType, final int objectInstance,
+			final int propertyId, final int start, final int elements) throws KNXException, InterruptedException {
+		if (objectType < 0 || objectType > 0xffff || objectInstance < 0 || objectInstance > 0xfff
+				|| propertyId < 0 || propertyId > 0xfff || start < 0 || start > 0xffff
+				|| elements < 1 || elements > 255 || (start == 0 && elements != 1))
+			throw new KNXIllegalArgumentException("argument value out of range");
+
+		final BiFunction<IndividualAddress, byte[], Optional<byte[]>> responseFilter = (responder, apdu) -> {
+			if (!responder.equals(dst.getAddress()) || apdu.length < 11)
+				return Optional.empty();
+			final int receivedIot = (apdu[2] & 0xff) << 8 | (apdu[3] & 0xff);
+			final int receivedObjInst = (apdu[4] & 0xff) << 4 | (apdu[5] & 0xf0) >> 4;
+			final int receivedPid = (apdu[5] & 0xf) << 8 | apdu[6] & 0xff;
+			final int receivedElems = apdu[7] & 0xff;
+			final int receivedStart = (apdu[8] & 0xff) << 8 | apdu[9] & 0xff;
+			return receivedIot == objectType && receivedObjInst == objectInstance && receivedPid == propertyId
+					&& (receivedElems == 0 || receivedElems == elements) && receivedStart == start
+					? Optional.of(apdu) : Optional.empty();
+		};
+
+		final var apdu = DataUnitBuilder.apdu(PropertyExtRead).putShort(objectType)
+				.putShort((objectInstance << 4) | propertyId >> 8).put(propertyId).put(elements).putShort(start).build();
+
+		final long ts = send(dst, priority, apdu, PropertyExtReadResponse);
+		final byte[] res = waitForResponses(PropertyExtReadResponse, 9, 250, ts, responseTimeout, true, responseFilter).get(0);
+		final int resElems = res[7] & 0xff;
+		if (resElems == 0) {
+			if (res.length != 11)
+				throw new KNXInvalidResponseException(format("read property error response for %d(%d)|%d: " +
+						"expected return code (1 byte), received %d bytes", objectType, objectInstance, propertyId,
+						(res.length - 10)));
+			final var returnCode = ReturnCode.of(res[10] & 0xff);
+			throw new KnxNegativeReturnCodeException(format("read property response for %d(%d)|%d",
+					objectType, objectInstance, propertyId), returnCode);
+		}
+		return Arrays.copyOfRange(res, 10, res.length);
+	}
+
 	@Override
 	public void writeProperty(final Destination dst, final int objIndex, final int propertyId, final int start,
 		final int elements, final byte[] data) throws KNXTimeoutException, KNXRemoteException, KNXDisconnectException,

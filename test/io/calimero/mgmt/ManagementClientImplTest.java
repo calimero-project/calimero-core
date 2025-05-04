@@ -363,6 +363,49 @@ class ManagementClientImplTest
 	}
 
 	@Test
+	void readPropertyExtCurrentElements() throws KNXException, InterruptedException {
+		byte[] elems = mc.readProperty(dco, 0, 1, PID.OBJECT_TYPE, 0, 1);
+		assertEquals(2, elems.length);
+		assertEquals(0, elems[0]);
+		assertEquals(1, elems[1]);
+
+		elems = mc.readProperty(dco, 1, 1, PID.OBJECT_NAME, 0, 1);
+		assertEquals(2, elems.length);
+		assertEquals(0, elems[0]);
+		assertEquals(19, elems[1]);
+	}
+
+	@Test
+	void readPropertyExtCurrentElementsWithWrongIndex() {
+		assertThrows(KNXIllegalArgumentException.class, () -> mc.readProperty(dco, 0, 1, PID.OBJECT_TYPE, 0, 10));
+	}
+
+	@Test
+	void readPropertyExtCurrentElementsWithInvalidIndex() {
+		assertThrows(KNXIllegalArgumentException.class, () -> mc.readProperty(dco, 0, 1, PID.OBJECT_TYPE, 0, 0));
+	}
+
+	@Test
+	void readPropertyExt() throws KNXException, InterruptedException {
+		byte[] data = mc.readProperty(dco, 0, 1, PID.OBJECT_TYPE, 1, 1);
+		assertEquals(2, data.length);
+		assertEquals(0, data[0]);
+
+		data = mc.readProperty(dco, 1, 1, PID.OBJECT_NAME, 1, 19);
+		assertEquals(19, data.length);
+	}
+
+	@Test
+	void readPropertyExtNonExisting() {
+		assertThrows(KnxNegativeReturnCodeException.class, () -> mc.readProperty(dco, 0xffff, 1, PID.OBJECT_TYPE, 1, 1));
+		assertThrows(KnxNegativeReturnCodeException.class, () -> mc.readProperty(dco, 1, 0xfff, PID.OBJECT_TYPE, 1, 1));
+		assertThrows(KnxNegativeReturnCodeException.class, () -> mc.readProperty(dco, 1, 1, PID.ADDITIONAL_INDIVIDUAL_ADDRESSES, 1, 1));
+		assertThrows(KnxNegativeReturnCodeException.class, () -> mc.readProperty(dco, 1, 1, 0xfff, 1, 1));
+		assertThrows(KnxNegativeReturnCodeException.class, () -> mc.readProperty(dco, 1, 1, PID.OBJECT_NAME, 0xffff, 1));
+		assertThrows(KnxNegativeReturnCodeException.class, () -> mc.readProperty(dco, 1, 1, PID.OBJECT_NAME, 0x1, 20));
+	}
+
+	@Test
 	void writeAddressIndividualAddress() throws InterruptedException, KNXException
 	{
 		final IndividualAddress[] orig = mc.readAddress(true);

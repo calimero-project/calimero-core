@@ -46,6 +46,7 @@ import io.calimero.KNXIllegalArgumentException;
 import io.calimero.KNXInvalidResponseException;
 import io.calimero.KNXRemoteException;
 import io.calimero.KNXTimeoutException;
+import io.calimero.KnxNegativeReturnCodeException;
 import io.calimero.Priority;
 import io.calimero.SerialNumber;
 import io.calimero.link.KNXLinkClosedException;
@@ -654,6 +655,33 @@ public interface ManagementClient extends AutoCloseable
 	Description readPropertyDescription(Destination dst, int objectType, int objInstance, int propertyId,
 			int propertyIndex) throws KNXTimeoutException, KNXRemoteException, KNXDisconnectException,
 			KNXLinkClosedException, InterruptedException;
+
+	/**
+	 * Reads the value of a property of an interface object of a communication partner using data property <i>extended</i> services.
+	 * <p>
+	 * This service uses point-to-point connectionless or connection-oriented communication mode.<br>
+	 * One value element in the returned data byte array consumes {@code (data.length / elements)} bytes.<br>
+	 * The byte offset into the returned data to access a property value element with
+	 * index {@code i} (zero based) is calculated the following way: {@code offset = (data.length / elements) * i}.<br>
+	 * Note that interface objects with active access protection are only accessible over connection-oriented communication.
+	 *
+	 * @param dst destination to read from
+	 * @param objectType interface object type
+	 * @param objectInstance interface object instance
+	 * @param propertyId property identifier
+	 * @param start start index in the property value to start reading from
+	 * @param elements number of elements to read
+	 * @return byte array containing the property value data
+	 * @throws KNXTimeoutException on a timeout during send
+	 * @throws KnxNegativeReturnCodeException on response with negative return code
+	 * @throws KNXInvalidResponseException if the response contains an ASDU of the wrong length
+	 * @throws KNXDisconnectException on disconnect in connection-oriented mode
+	 * @throws KNXLinkClosedException if network link to KNX network is closed
+	 * @throws KNXException on other read property error
+	 * @throws InterruptedException on interrupted thread
+	 */
+	byte[] readProperty(Destination dst, int objectType, int objectInstance, int propertyId, int start, int elements)
+			throws KNXException, InterruptedException;
 
 	/**
 	 * Reads the description of a property of an interface object of a communication partner.
