@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -221,11 +221,6 @@ class ManagementClientImplTest
 
 		final byte[] mem = mc.readMemory(dco2, 0x105, 2);
 		Util.out("read mem from 0x105", mem);
-	}
-
-	@Test
-	void readMemoryCLThrows() {
-		assertThrows(KNXIllegalArgumentException.class, () -> mc.readMemory(dcl, 0x105, 2));
 	}
 
 	@Test

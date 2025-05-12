@@ -1081,8 +1081,6 @@ public class ManagementClientImpl implements ManagementClient
 		final int maxBytes = extMemoryServices ? 248 : 63;
 		if (startAddr < 0 || startAddr > maxStartAddress || bytes < 1 || bytes > maxBytes)
 			throw new KNXIllegalArgumentException("argument value out of range");
-		if (!dst.isConnectionOriented())
-			throw new KNXIllegalArgumentException("read memory requires connection-oriented mode: " + dst);
 
 		// use extended read service for memory access above 65 K
 		if (startAddr > 0xffff) {
@@ -1118,9 +1116,6 @@ public class ManagementClientImpl implements ManagementClient
 		final int maxBytes = extMemoryServices ? 250 : 63;
 		if (startAddr < 0 || startAddr > maxStartAddress || data.length == 0 || data.length > maxBytes)
 			throw new KNXIllegalArgumentException("argument value out of range");
-
-		if (!dst.isConnectionOriented())
-			throw new KNXIllegalArgumentException("write memory requires connection-oriented mode: " + dst);
 
 		// use extended write service for memory access above 65 K
 		if (startAddr > 0xffff) {
