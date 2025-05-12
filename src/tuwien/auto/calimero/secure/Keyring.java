@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2019, 2024 B. Malinowsky
+    Copyright (c) 2019, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -460,7 +460,7 @@ public final class Keyring {
 					final var groupKey = val != null ? decode(val) : null;
 
 					val = reader.getAttributeValue(null, "Latency");
-					final var latency = val != null ? Duration.ofMillis(Integer.parseInt(val)) : Duration.ZERO;
+					final var latency = val != null ? Duration.ofMillis(Integer.parseUnsignedInt(val)) : Duration.ZERO;
 
 					backbone = new Backbone(mcastGroup, groupKey, latency);
 				}
@@ -473,7 +473,7 @@ public final class Keyring {
 					final var host = attr != null ? new IndividualAddress(attr) : new IndividualAddress(0);
 					attr = reader.getAttributeValue(null, "IndividualAddress");
 					final var addr = attr != null ? new IndividualAddress(attr) : new IndividualAddress(0);
-					final var user = readAttribute(reader, "UserID", Integer::parseInt, 0);
+					final var user = readAttribute(reader, "UserID", Integer::parseUnsignedInt, 0);
 					final var pwd = readAttribute(reader, "Password", Keyring::decode, null);
 					final var auth = readAttribute(reader, "Authentication", Keyring::decode, null);
 

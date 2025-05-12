@@ -766,8 +766,8 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 			if (attribute == null || attribute.isEmpty())
 				return 0;
 			final int slash = attribute.indexOf('/');
-			final int off = Integer.parseInt(attribute.substring(0, slash), 16);
-			final int on = Integer.parseInt(attribute.substring(slash + 1), 16);
+			final int off = Integer.parseUnsignedInt(attribute.substring(0, slash), 16);
+			final int on = Integer.parseUnsignedInt(attribute.substring(slash + 1), 16);
 			if (off > 0x3ff || on > 0x3ff)
 				throw new KNXFormatException("invalid access policy", attribute);
 			return (off << 10) | on;
