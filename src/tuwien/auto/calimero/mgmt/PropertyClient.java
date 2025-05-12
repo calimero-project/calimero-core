@@ -337,7 +337,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 */
 	public static String getObjectTypeName(final int objType)
 	{
-		if (objType < OBJECT_TYPE_NAMES.length)
+		if (objType >= 0 && objType < OBJECT_TYPE_NAMES.length)
 			return OBJECT_TYPE_NAMES[objType];
 		return "";
 	}
