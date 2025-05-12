@@ -665,32 +665,11 @@ public class ManagementProceduresImpl implements ManagementProcedures
 				1, 1, ctrl);
 		}
 
-		// create structure to write
-		/*
-		 Byte structure of data transmitted in ASDUs:
-		 | 0    | 1     | 2 3 4 5            | 6 7 8 9      |10 11 12 13 |14..31|
-		 | code | flags | dataBlockStartAddr | startAddress | endAddress | data |
-		 | 0x20 | ...   | ...                | ...          | ...        | ...  |
-		*/
-		final int dataBlockStartAddress = 0;
-		// int flags = dataBlockStartAddress == 0 ? 0x01 : 0;
-		int flags = 0x01;
-		flags |= verifyWrite ? 0x02 : 0;
-		final long endAddress = startAddress + data.length;
-
-		final int offset = 14;
-		final byte[] write = new byte[offset + data.length];
-		write[0] = 0x20;
-		write[1] = (byte) flags;
-		setAddress(write, 2, dataBlockStartAddress);
-		setAddress(write, 6, startAddress);
-		setAddress(write, 10, endAddress);
-		System.arraycopy(data, 0, write, 14, data.length);
-
-		// write memory in chunks matching the maximum asdu length of the device
+        // write memory in chunks with a maximum length of asduLength
 		final int asduLength = readMaxAsduLength(d);
-		for (int i = 0; i < write.length; i += asduLength) {
-			final byte[] range = Arrays.copyOfRange(write, i, i + asduLength);
+		for (int i = 0; i < data.length; i += asduLength) {
+            int remainingBytes = data.length - i;
+			final byte[] range = Arrays.copyOfRange(data, i, i + Math.min(asduLength, remainingBytes));
 
 			// on server verification, our mgmt client will already compare the response value
 			mc.writeMemory(d, (int) startAddress + i, range);
@@ -962,11 +941,5 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		parity ^= parity >> 2;
 		parity ^= parity >> 1;
 		return (parity & 0x1) != 0;
-	}
-
-	private static void setAddress(final byte[] data, final int from, final long address)
-	{
-		for (int i = 0; i < 4; ++i)
-			data[from + i] = (byte) (address >> (3 - i) & 0xff);
 	}
 }
