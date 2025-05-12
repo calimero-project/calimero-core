@@ -228,8 +228,6 @@ public class ManagementClientImpl implements ManagementClient
 		}
 	}
 
-    private static final boolean extMemoryServices = true;
-
 	private final TransportLayer tl;
 	private final TLListener tlListener = new TLListener();
 	private final SecureManagement sal;
@@ -1175,15 +1173,15 @@ public class ManagementClientImpl implements ManagementClient
 		throws KNXTimeoutException, KNXDisconnectException, KNXRemoteException,
 		KNXLinkClosedException, InterruptedException
 	{
+		final boolean extMemoryServices = supportsFeature(dst, SupportedServiceGroup.ExtMemory);
 		final int maxStartAddress = extMemoryServices ? 0xffffff : 0xffff;
-		final int maxBytes = extMemoryServices ? 248 : 63;
+		final int maxBytes = extMemoryServices ? 250 : 63;
 		if (startAddr < 0 || startAddr > maxStartAddress || bytes < 1 || bytes > maxBytes)
 			throw new KNXIllegalArgumentException("argument value out of range");
 		if (!dst.isConnectionOriented())
 			throw new KNXIllegalArgumentException("read memory requires connection-oriented mode: " + dst);
 
-		// use extended memory read service for memory access above 64 KiB
-		if (startAddr > 0xffff)
+		if (extMemoryServices)
 			return readMemoryExt(dst, startAddr, bytes);
 
 		final byte[] apdu = sendWait(dst, priority,
@@ -1215,6 +1213,7 @@ public class ManagementClientImpl implements ManagementClient
 		throws KNXDisconnectException, KNXTimeoutException, KNXRemoteException,
 		KNXLinkClosedException, InterruptedException
 	{
+		final boolean extMemoryServices = supportsFeature(dst, SupportedServiceGroup.ExtMemory);
 		final int maxStartAddress = extMemoryServices ? 0xffffff : 0xffff;
 		final int maxBytes = extMemoryServices ? 250 : 63;
 		if (startAddr < 0 || startAddr > maxStartAddress || data.length == 0 || data.length > maxBytes)
@@ -1223,23 +1222,9 @@ public class ManagementClientImpl implements ManagementClient
 		if (!dst.isConnectionOriented())
 			throw new KNXIllegalArgumentException("write memory requires connection-oriented mode: " + dst);
 
-		// use extended write service for memory access above 65 K
-		if (startAddr > 0xffff) {
-			final byte[] addrBytes = { (byte) (startAddr >>> 16), (byte) (startAddr >>> 8), (byte) startAddr };
-			final byte[] asdu = allocate(4 + data.length).put((byte) data.length).put(addrBytes).put(data).array();
-			final byte[] send = createAPDU(MemoryExtendedWrite, asdu);
-			final byte[] apdu = sendWait(dst, priority, send, MemoryExtendedWriteResponse, 4, 252);
-			final ReturnCode ret = ReturnCode.of(apdu[2] & 0xff);
-			if (ret == ReturnCode.Success)
-				return;
-			if (ret == ReturnCode.SuccessWithCrc) {
-				final int crc = ((apdu[6] & 0xff) << 8) | (apdu[7] & 0xff);
-				if (crc16Ccitt(asdu) == crc)
-					return;
-				throw new KNXRemoteException(format("write memory to %s 0x%x: data verification failed (crc mismatch)",
-						dst.getAddress(), startAddr));
-			}
-			throw new KnxNegativeReturnCodeException(format("write memory to %s 0x%x", dst.getAddress(), startAddr), ret);
+		if (extMemoryServices) {
+			writeMemoryExt(dst, startAddr, data);
+			return;
 		}
 
 		final byte[] asdu = new byte[data.length + 3];
@@ -1262,6 +1247,26 @@ public class ManagementClientImpl implements ManagementClient
 		else {
 			send(dst, priority, send);
 		}
+	}
+
+	private void writeMemoryExt(final Destination dst, final int startAddr, final byte[] data)
+			throws KNXDisconnectException, KNXTimeoutException, KNXLinkClosedException, InterruptedException,
+			KNXRemoteException {
+		final byte[] addrBytes = { (byte) (startAddr >>> 16), (byte) (startAddr >>> 8), (byte) startAddr};
+		final byte[] asdu = allocate(4 + data.length).put((byte) data.length).put(addrBytes).put(data).array();
+		final byte[] send = createAPDU(MemoryExtendedWrite, asdu);
+		final byte[] apdu = sendWait(dst, priority, send, MemoryExtendedWriteResponse, 4, 252);
+		final ReturnCode ret = ReturnCode.of(apdu[2] & 0xff);
+		if (ret == ReturnCode.Success)
+			return;
+		if (ret == ReturnCode.SuccessWithCrc) {
+			final int crc = ((apdu[6] & 0xff) << 8) | (apdu[7] & 0xff);
+			if (crc16Ccitt(asdu) == crc)
+				return;
+			throw new KNXRemoteException(format("write memory to %s 0x%x: data verification failed (crc mismatch)",
+					dst.getAddress(), startAddr));
+		}
+		throw new KnxNegativeReturnCodeException(format("write memory to %s 0x%x", dst.getAddress(), startAddr), ret);
 	}
 
 	static int crc16Ccitt(final byte[] input) {
@@ -1500,8 +1505,8 @@ public class ManagementClientImpl implements ManagementClient
 		return features;
 	}
 
-	private EnumSet<SupportedServiceGroup> readSupportedFeatures(final Destination dst) throws KNXTimeoutException,
-			KNXLinkClosedException, KNXDisconnectException, InterruptedException {
+	private EnumSet<SupportedServiceGroup> readSupportedFeatures(final Destination dst) throws KNXLinkClosedException,
+			InterruptedException {
 		final var supported = new ArrayList<SupportedServiceGroup>();
 		try {
 			final int pidFeaturesSupported = 89;
