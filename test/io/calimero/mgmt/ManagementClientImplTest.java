@@ -228,11 +228,6 @@ class ManagementClientImplTest
 	}
 
 	@Test
-	void readMemoryCLThrows() {
-		assertThrows(KNXIllegalArgumentException.class, () -> mc.readMemory(dcl, 0x105, 2));
-	}
-
-	@Test
 	void readPropertyDestinationIntIntIntInt() throws KNXException, InterruptedException
 	{
 		try {

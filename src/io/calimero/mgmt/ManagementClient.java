@@ -857,7 +857,7 @@ public interface ManagementClient extends AutoCloseable
 	/**
 	 * Reads memory data from the address space of a communication partner its controller.
 	 * <p>
-	 * This service uses point-to-point connection-oriented communication mode.<br>
+	 * This service uses point-to-point connectionless or point-to-point connection-oriented communication mode.<br>
 	 * Note that a remote application layer shall ignore a memory read if the amount of
 	 * read memory does not fit into an APDU of maximum length.
 	 *
@@ -880,7 +880,7 @@ public interface ManagementClient extends AutoCloseable
 	/**
 	 * Writes memory data in the address space of a communication partner its controller.
 	 * <p>
-	 * This service uses point-to-point connection-oriented communication mode.<br>
+	 * This service uses point-to-point connectionless or point-to-point connection-oriented communication mode.<br>
 	 * If verify mode is enabled for the destination, this method will wait for a memory
 	 * write response and do an explicit read back of the written memory.<br>
 	 * Note that a remote application layer shall ignore a memory write if the amount of
