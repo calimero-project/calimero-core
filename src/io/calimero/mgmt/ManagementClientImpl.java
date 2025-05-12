@@ -1567,7 +1567,7 @@ public class ManagementClientImpl implements ManagementClient
 		return EnumSet.copyOf(supported);
 	}
 
-	private int maxApduLength(final Destination dst) throws KNXLinkClosedException, InterruptedException {
+	int maxApduLength(final Destination dst) throws KNXLinkClosedException, InterruptedException {
 		final Optional<Integer> max = dst.maxApduLength();
 		if (max.isPresent())
 			return max.get();

@@ -78,6 +78,7 @@ import io.calimero.link.medium.KNXMediumSettings;
 import io.calimero.log.LogService;
 import io.calimero.mgmt.ManagementClient.EraseCode;
 import io.calimero.mgmt.ManagementClient.TestResult;
+import io.calimero.mgmt.ManagementClientImpl.SupportedServiceGroup;
 import io.calimero.mgmt.PropertyAccess.PID;
 import io.calimero.secure.SecureApplicationLayer;
 import io.calimero.secure.Security;
@@ -653,8 +654,11 @@ public class ManagementProceduresImpl implements ManagementProcedures
 				"verify write and verify by server not both applicable");
 
 		final Destination d = getOrCreateDestination(device, false, verifyByServer);
+		final boolean extMemoryServices = ((ManagementClientImpl) mc).supportsFeature(d, SupportedServiceGroup.ExtMemory);
+
 		// if automatic server verification is requested, turn verify flag on
-		if (verifyByServer) {
+		// with extended memory services, the verify mode setting of the server is ignored
+		if (!extMemoryServices && verifyByServer) {
 			// reading description checks whether property exists
 			/* final byte[] desc = */mc.readPropertyDesc(d, DEVICE_OBJECT_INDEX,
 				PropertyAccess.PID.DEVICE_CONTROL, 0);
@@ -668,7 +672,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		}
 
         // write memory in chunks with a maximum length of asduLength
-		final int asduLength = readMaxAsduLength(d);
+		final int asduLength = maxApduLength(d) - (extMemoryServices ? 5 : 3);
 		for (int i = 0; i < data.length; i += asduLength) {
             int remainingBytes = data.length - i;
 			final byte[] range = Arrays.copyOfRange(data, i, i + Math.min(asduLength, remainingBytes));
@@ -699,9 +703,10 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		// + "(hope you know what you are doing)");
 
 		final Destination d = getOrCreateDestination(device);
+		final boolean extMemoryServices = ((ManagementClientImpl) mc).supportsFeature(d, SupportedServiceGroup.ExtMemory);
 
 		final byte[] read = new byte[bytes];
-		final int asduLength = readMaxAsduLength(d);
+		final int asduLength = maxApduLength(d) - (extMemoryServices ? 5 : 3);
 		for (int i = 0; i < read.length; i += asduLength) {
 			final int size = i + asduLength <= read.length ? asduLength : read.length - i;
 			final byte[] range = mc.readMemory(d, (int) startAddress + i, size);
@@ -914,16 +919,13 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		catch (final KNXDisconnectException ignore) {}
 	}
 
-	private int readMaxAsduLength(final Destination d) throws InterruptedException
+	private int maxApduLength(final Destination d) throws InterruptedException
 	{
-		// asdu is 3 bytes shorter than apdu
 		try {
-			final byte[] data = mc.readProperty(d, DEVICE_OBJECT_INDEX,
-				PropertyAccess.PID.MAX_APDULENGTH, 1, 1);
-			return toUnsigned(data) - 3;
+			return ((ManagementClientImpl) mc).maxApduLength(d);
 		}
-		catch (final KNXException e) {
-			return defaultApduLength - 3;
+		catch (final KNXLinkClosedException e) {
+			return defaultApduLength;
 		}
 	}
 
