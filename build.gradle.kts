@@ -179,7 +179,7 @@ plugins.withType<JavaPlugin>().configureEach {
 }
 
 dependencies {
-	api("org.slf4j:slf4j-api:2.0.16")
+	api("org.slf4j:slf4j-api:2.0.17")
 
 	// Eclipse treats circular dependencies as errors by default, see eclipseJdt task above
 //	testRuntimeOnly("com.github.calimero:calimero-rxtx:$version")
