@@ -23,7 +23,7 @@ val junitJupiterVersion by rootProject.extra { "5.12.0" }
 val desc = "Calimero, a free KNX network library"
 
 group = "com.github.calimero"
-version = "2.6-rc2"
+version = "2.6"
 
 java {
 	toolchain {
