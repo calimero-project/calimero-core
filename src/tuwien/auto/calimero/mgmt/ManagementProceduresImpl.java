@@ -665,11 +665,15 @@ public class ManagementProceduresImpl implements ManagementProcedures
 				1, 1, ctrl);
 		}
 
-        // write memory in chunks with a maximum length of asduLength
-		final int asduLength = readMaxAsduLength(d);
-		for (int i = 0; i < data.length; i += asduLength) {
+		// mgmt client uses ext. write only for start addresses > 0xffff
+		final boolean extMemoryServices = startAddress > 0xffff;
+		final int apduLength = readMaxApduLength(d);
+		// write memory in chunks with a maximum length of dataLength
+		final int dataLength = extMemoryServices ? Math.min(249, apduLength - 5) : Math.min(63, apduLength - 3);
+
+		for (int i = 0; i < data.length; i += dataLength) {
             int remainingBytes = data.length - i;
-			final byte[] range = Arrays.copyOfRange(data, i, i + Math.min(asduLength, remainingBytes));
+			final byte[] range = Arrays.copyOfRange(data, i, i + Math.min(dataLength, remainingBytes));
 
 			// on server verification, our mgmt client will already compare the response value
 			mc.writeMemory(d, (int) startAddress + i, range);
@@ -691,17 +695,16 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			throw new KNXIllegalArgumentException("start address is no 32 Bit address");
 		if (bytes < 0)
 			throw new KNXIllegalArgumentException("bytes to read require a positive number");
-		// sanity check, at least emit a warning
-		// if (bytes > 4096)
-		// logger.warn("reading over 4K of device memory "
-		// + "(hope you know what you are doing)");
 
 		final Destination d = getOrCreateDestination(device);
 
 		final byte[] read = new byte[bytes];
-		final int asduLength = readMaxAsduLength(d);
-		for (int i = 0; i < read.length; i += asduLength) {
-			final int size = i + asduLength <= read.length ? asduLength : read.length - i;
+		// mgmt client uses ext. write only for start addresses > 0xffff
+		final boolean extMemoryServices = startAddress > 0xffff;
+		final int apduLength = readMaxApduLength(d);
+		final int dataLength = extMemoryServices ? Math.min(249, apduLength - 5) : Math.min(63, apduLength - 3);
+		for (int i = 0; i < read.length; i += dataLength) {
+			final int size = i + dataLength <= read.length ? dataLength : read.length - i;
 			final byte[] range = mc.readMemory(d, (int) startAddress + i, size);
 			System.arraycopy(range, 0, read, i, range.length);
 		}
@@ -912,16 +915,14 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		catch (final KNXDisconnectException ignore) {}
 	}
 
-	private int readMaxAsduLength(final Destination d) throws InterruptedException
+	private int readMaxApduLength(final Destination d) throws InterruptedException
 	{
-		// asdu is 3 bytes shorter than apdu
 		try {
-			final byte[] data = mc.readProperty(d, DEVICE_OBJECT_INDEX,
-				PropertyAccess.PID.MAX_APDULENGTH, 1, 1);
-			return toUnsigned(data) - 3;
+			final byte[] data = mc.readProperty(d, DEVICE_OBJECT_INDEX, PropertyAccess.PID.MAX_APDULENGTH, 1, 1);
+			return toUnsigned(data);
 		}
 		catch (final KNXException e) {
-			return defaultApduLength - 3;
+			return defaultApduLength;
 		}
 	}
 

@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2011, 2023 B. Malinowsky
+    Copyright (c) 2011, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -233,13 +233,23 @@ class ManagementProceduresImplTest
 	@Test
 	void writeMemoryLong() throws KNXException, InterruptedException
 	{
-		final byte[] data = new byte[32];
+		final byte[] data = new byte[2 * 63 + 10];
 
-		mp.writeMemory(device, 0x10, data, false, false);
+		mp.writeMemory(device, 0x1000, data, false, false);
 
-		mp.writeMemory(device, 0x10, data, true, false);
+		mp.writeMemory(device, 0x1000, data, true, false);
 
-		mp.writeMemory(device, 0x10, data, false, true);
+		mp.writeMemory(device, 0x1000, data, false, true);
+	}
+
+	@Test
+	void writeMemoryExt() throws KNXException, InterruptedException {
+		final byte[] data = new byte[2 * 149 + 10];
+		final int startAddress = 0x10000;
+
+		mp.writeMemory(Util.getRouterAddress(), startAddress, data, false, false);
+		mp.writeMemory(Util.getRouterAddress(), startAddress, data, true, false);
+		mp.writeMemory(Util.getRouterAddress(), startAddress, data, false, true);
 	}
 
 	@Test
@@ -251,6 +261,12 @@ class ManagementProceduresImplTest
 	@Test
 	void readMemoryLong() throws KNXException, InterruptedException
 	{
-		/*final byte[] data =*/ mp.readMemory(device, 0x20, 17);
+		/*final byte[] data =*/ mp.readMemory(device, 0x20, 2 * 63 + 10);
+	}
+
+	@Test
+	void readMemoryExt() throws KNXException, InterruptedException {
+		final int startAddress = 0x10000;
+		mp.readMemory(Util.getRouterAddress(), startAddress, 2 * 249 + 10);
 	}
 }
