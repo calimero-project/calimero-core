@@ -1129,7 +1129,7 @@ public class ManagementClientImpl implements ManagementClient
 		KNXLinkClosedException, InterruptedException
 	{
 		final int maxStartAddress = extMemoryServices ? 0xffffff : 0xffff;
-		final int maxBytes = extMemoryServices ? 248 : 63;
+		final int maxBytes = extMemoryServices ? 250 : 63;
 		if (startAddr < 0 || startAddr > maxStartAddress || bytes < 1 || bytes > maxBytes)
 			throw new KNXIllegalArgumentException("argument value out of range");
 
@@ -1137,13 +1137,15 @@ public class ManagementClientImpl implements ManagementClient
 		if (startAddr > 0xffff) {
 			final byte[] send = createAPDU(MemoryExtendedRead,
 					(byte) bytes, (byte) (startAddr >>> 16), (byte) (startAddr >>> 8), (byte) startAddr);
-			final byte[] apdu = sendWait(dst, priority, send, MemoryExtendedReadResponse, 4, 252);
+			final byte[] apdu = sendWait(dst, priority, send, MemoryExtendedReadResponse, 4, 254);
 			final ReturnCode ret = ReturnCode.of(apdu[2] & 0xff);
 			if (ret != ReturnCode.Success)
 				throw new KnxNegativeReturnCodeException(format("read memory from %s 0x%x", dst.getAddress(), startAddr), ret);
 			return Arrays.copyOfRange(apdu, 6, apdu.length);
 		}
 
+		if (bytes > 63)
+			throw new KNXIllegalArgumentException("data length " + bytes + " out of range [1..63]");
 		final byte[] apdu = sendWait(dst, priority,
 				createLengthOptimizedAPDU(MEMORY_READ, (byte) bytes, (byte) (startAddr >>> 8), (byte) startAddr),
 				MEMORY_RESPONSE, 2, 65);
@@ -1172,20 +1174,29 @@ public class ManagementClientImpl implements ManagementClient
 			final byte[] addrBytes = { (byte) (startAddr >>> 16), (byte) (startAddr >>> 8), (byte) startAddr };
 			final byte[] asdu = allocate(4 + data.length).put((byte) data.length).put(addrBytes).put(data).array();
 			final byte[] send = createAPDU(MemoryExtendedWrite, asdu);
-			final byte[] apdu = sendWait(dst, priority, send, MemoryExtendedWriteResponse, 4, 252);
+			final byte[] apdu = sendWait(dst, priority, send, MemoryExtendedWriteResponse, 4, 6);
 			final ReturnCode ret = ReturnCode.of(apdu[2] & 0xff);
-			if (ret == ReturnCode.Success)
+			if (ret == ReturnCode.Success) {
+				if (apdu.length != 6)
+					throw new KNXInvalidResponseException(format("write memory to %s 0x%x: invalid APDU length %s", dst.getAddress(), startAddr, apdu.length));
 				return;
+			}
 			if (ret == ReturnCode.SuccessWithCrc) {
+				if (apdu.length != 8)
+					throw new KNXInvalidResponseException(format("write memory to %s 0x%x: invalid APDU length %s", dst.getAddress(), startAddr, apdu.length));
 				final int crc = ((apdu[6] & 0xff) << 8) | (apdu[7] & 0xff);
 				if (crc16Ccitt(asdu) == crc)
 					return;
 				throw new KNXRemoteException(format("write memory to %s 0x%x: data verification failed (crc mismatch)",
 						dst.getAddress(), startAddr));
 			}
+			if (apdu.length != 6)
+				throw new KNXInvalidResponseException(format("write memory to %s 0x%x: invalid APDU length %s", dst.getAddress(), startAddr, apdu.length));
 			throw new KnxNegativeReturnCodeException(format("write memory to %s 0x%x", dst.getAddress(), startAddr), ret);
 		}
 
+		if (data.length > 63)
+			throw new KNXIllegalArgumentException("data length " + data.length + " out of range [1..63]");
 		final byte[] asdu = new byte[data.length + 3];
 		asdu[0] = (byte) data.length;
 		asdu[1] = (byte) (startAddr >> 8);
