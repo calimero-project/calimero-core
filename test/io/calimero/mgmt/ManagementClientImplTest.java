@@ -220,7 +220,7 @@ class ManagementClientImplTest
 	@Test
 	void readMemoryMaxDataLength() throws KNXException, InterruptedException {
 		try {
-			mc.readMemory(dco, 0x1000, 63);
+			mc.readMemory(dcl, 0x1000, 63);
 		}
 		catch (KNXTimeoutException ok) {
 			// dst max apdu < 66, read is ignored
@@ -233,7 +233,7 @@ class ManagementClientImplTest
 
 	@Test
 	void readMemoryDataLengthOutOfRange() {
-		assertThrows(KNXIllegalArgumentException.class, () -> mc.readMemory(dco, 0x1000, 64));
+		assertThrows(KNXIllegalArgumentException.class, () -> mc.readMemory(dcl, 0x1000, 64));
 	}
 
 	@Test
@@ -499,7 +499,7 @@ class ManagementClientImplTest
 
 	@Test
 	void writeMemoryTooMuchData() {
-		assertThrows(KNXIllegalArgumentException.class, () -> mc.writeMemory(dco, 0x105, new byte[64]));
+		assertThrows(KNXIllegalArgumentException.class, () -> mc.writeMemory(dcl, 0x105, new byte[64]));
 	}
 
 	@Test

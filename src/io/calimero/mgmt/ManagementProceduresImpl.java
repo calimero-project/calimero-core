@@ -671,11 +671,12 @@ public class ManagementProceduresImpl implements ManagementProcedures
 				1, 1, ctrl);
 		}
 
-        // write memory in chunks with a maximum length of asduLength
-		final int asduLength = maxApduLength(d) - (extMemoryServices ? 5 : 3);
-		for (int i = 0; i < data.length; i += asduLength) {
-            int remainingBytes = data.length - i;
-			final byte[] range = Arrays.copyOfRange(data, i, i + Math.min(asduLength, remainingBytes));
+		final int apduLength = maxApduLength(d);
+		// write memory in chunks with a maximum length of dataLength
+		final int dataLength = extMemoryServices ? Math.min(249, apduLength - 5) : Math.min(63, apduLength - 3);
+		for (int i = 0; i < data.length; i += dataLength) {
+			int remainingBytes = data.length - i;
+			final byte[] range = Arrays.copyOfRange(data, i, i + Math.min(dataLength, remainingBytes));
 
 			// on server verification, our mgmt client will already compare the response value
 			mc.writeMemory(d, (int) startAddress + i, range);
@@ -697,18 +698,15 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			throw new KNXIllegalArgumentException("start address is no 32 Bit address");
 		if (bytes < 0)
 			throw new KNXIllegalArgumentException("bytes to read require a positive number");
-		// sanity check, at least emit a warning
-		// if (bytes > 4096)
-		// logger.log(WARNING, "reading over 4K of device memory "
-		// + "(hope you know what you are doing)");
 
 		final Destination d = getOrCreateDestination(device);
 		final boolean extMemoryServices = ((ManagementClientImpl) mc).supportsFeature(d, SupportedServiceGroup.ExtMemory);
 
+		final int apduLength = maxApduLength(d);
+		final int dataLength = extMemoryServices ? Math.min(249, apduLength - 5) : Math.min(63, apduLength - 3);
 		final byte[] read = new byte[bytes];
-		final int asduLength = maxApduLength(d) - (extMemoryServices ? 5 : 3);
-		for (int i = 0; i < read.length; i += asduLength) {
-			final int size = i + asduLength <= read.length ? asduLength : read.length - i;
+		for (int i = 0; i < read.length; i += dataLength) {
+			final int size = i + dataLength <= read.length ? dataLength : read.length - i;
 			final byte[] range = mc.readMemory(d, (int) startAddress + i, size);
 			System.arraycopy(range, 0, read, i, range.length);
 		}

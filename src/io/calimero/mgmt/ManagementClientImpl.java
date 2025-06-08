@@ -1201,7 +1201,7 @@ public class ManagementClientImpl implements ManagementClient
 			KNXDisconnectException, KNXRemoteException, KNXLinkClosedException, InterruptedException {
 		final byte[] send = createAPDU(MemoryExtendedRead,
 				(byte) bytes, (byte) (startAddr >>> 16), (byte) (startAddr >>> 8), (byte) startAddr);
-		final byte[] apdu = sendWait(dst, priority, send, MemoryExtendedReadResponse, 4, 252);
+		final byte[] apdu = sendWait(dst, priority, send, MemoryExtendedReadResponse, 4, 253);
 		final ReturnCode ret = ReturnCode.of(apdu[2] & 0xff);
 		if (ret != ReturnCode.Success)
 			throw new KnxNegativeReturnCodeException(format("read memory from %s 0x%x", dst.getAddress(), startAddr), ret);

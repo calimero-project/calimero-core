@@ -67,6 +67,7 @@ class ManagementProceduresImplTest
 	private ManagementProcedures mp;
 	private KNXNetworkLink link;
 	private final IndividualAddress device = Util.getKnxDeviceCO();
+	private final IndividualAddress deviceNoExtMem = Util.getKnxDevice();
 	private final IndividualAddress deviceInProgMode = Util.getKnxDevice();
 	private IndividualAddress nonexist;
 
@@ -223,34 +224,50 @@ class ManagementProceduresImplTest
 	{
 		final byte[] data = new byte[8];
 
-		mp.writeMemory(device, 0x10, data, false, false);
+		mp.writeMemory(deviceNoExtMem, 0x10, data, false, false);
 
-		mp.writeMemory(device, 0x10, data, true, false);
+		mp.writeMemory(deviceNoExtMem, 0x10, data, true, false);
 
-		mp.writeMemory(device, 0x10, data, false, true);
+		mp.writeMemory(deviceNoExtMem, 0x10, data, false, true);
 	}
 
 	@Test
 	void writeMemoryLong() throws KNXException, InterruptedException
 	{
-		final byte[] data = new byte[32];
+		final byte[] data = new byte[2 * 63 + 10];
 
-		mp.writeMemory(device, 0x10, data, false, false);
+		mp.writeMemory(deviceNoExtMem, 0x1000, data, false, false);
 
-		mp.writeMemory(device, 0x10, data, true, false);
+		mp.writeMemory(deviceNoExtMem, 0x1000, data, true, false);
 
-		mp.writeMemory(device, 0x10, data, false, true);
+		mp.writeMemory(deviceNoExtMem, 0x1000, data, false, true);
+	}
+
+	@Test
+	void writeMemoryExt() throws KNXException, InterruptedException {
+		final byte[] data = new byte[2 * 149 + 10];
+		final int startAddress = 0x10000;
+
+		mp.writeMemory(Util.getRouterAddress(), startAddress, data, false, false);
+		mp.writeMemory(Util.getRouterAddress(), startAddress, data, true, false);
+		mp.writeMemory(Util.getRouterAddress(), startAddress, data, false, true);
 	}
 
 	@Test
 	void readMemoryShort() throws KNXException, InterruptedException
 	{
-		/*final byte[] data =*/ mp.readMemory(device, 0x10, 8);
+		/*final byte[] data =*/ mp.readMemory(deviceNoExtMem, 0x10, 8);
 	}
 
 	@Test
 	void readMemoryLong() throws KNXException, InterruptedException
 	{
-		/*final byte[] data =*/ mp.readMemory(device, 0x20, 17);
+		/*final byte[] data =*/ mp.readMemory(deviceNoExtMem, 0x20, 2 * 63 + 10);
+	}
+
+	@Test
+	void readMemoryExt() throws KNXException, InterruptedException {
+		final int startAddress = 0x10000;
+		mp.readMemory(Util.getRouterAddress(), startAddress, 2 * 249 + 10);
 	}
 }
