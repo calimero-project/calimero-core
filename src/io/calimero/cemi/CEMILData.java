@@ -227,8 +227,10 @@ public class CEMILData implements CEMI
 		// set address type
 		if (dst instanceof GroupAddress)
 			ctrl2 |= 0x80;
-		if (!isValidTPDULength(tpdu))
-			throw new KNXIllegalArgumentException("maximum TPDU length is 16 in standard frame");
+		if (!isValidTPDULength(tpdu)) {
+			final String detail = this instanceof CEMILDataEx ? "255 in L-Data.ext frames" : "16 in L-Data frames";
+			throw new KNXIllegalArgumentException("maximum TPDU length is " + detail);
+		}
 		data = tpdu.clone();
 		setPriority(p);
 		setRepeat(repeat);
