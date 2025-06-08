@@ -207,24 +207,55 @@ class ManagementClientImplTest
 			fail("invalid mem address");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-//		try {
-//			mc.readMemory(dco, 0x10000, 2);
-//			fail("invalid mem address");
-//		}
-//		catch (final KNXIllegalArgumentException e) {}
 		try {
 			mc.readMemory(dco, 0x100, -1);
 			fail("invalid mem range");
 		}
 		catch (final KNXIllegalArgumentException e) {}
-//		try {
-//			mc.readMemory(dco, 0x100, 64);
-//			fail("invalid mem range");
-//		}
-//		catch (final KNXIllegalArgumentException e) {}
 
 		final byte[] mem = mc.readMemory(dco2, 0x105, 2);
 		Util.out("read mem from 0x105", mem);
+	}
+
+	@Test
+	void readMemoryMaxDataLength() throws KNXException, InterruptedException {
+		try {
+			mc.readMemory(dco, 0x1000, 63);
+		}
+		catch (KNXTimeoutException ok) {
+			// dst max apdu < 66, read is ignored
+		}
+
+		try (var server = mc.createDestination(Util.getRouterAddress(), true)) {
+			mc.readMemory(server, 0x1000, 63);
+		}
+	}
+
+	@Test
+	void readMemoryDataLengthOutOfRange() {
+		assertThrows(KNXIllegalArgumentException.class, () -> mc.readMemory(dco, 0x1000, 64));
+	}
+
+	@Test
+	void readMemoryExtMaxDataLength() throws KNXException, InterruptedException {
+		KnxNegativeReturnCodeException e = assertThrows(KnxNegativeReturnCodeException.class, () -> mc.readMemory(dco, 0x10000, 250));
+		assertEquals(ReturnCode.ExceedsMaxApduLength, e.returnCode());
+
+		try (var server = mc.createDestination(Util.getRouterAddress(), true)) {
+			mc.readMemory(server, 0x10000, 249);
+		}
+	}
+
+	@Test
+	void readMemoryExtDataLengthOutOfRange() {
+		assertThrows(KNXIllegalArgumentException.class, () -> mc.readMemory(dco, 0x10000, 251));
+	}
+
+	@Test
+	void readMemoryExtendedPastDeviceMemory() {
+		try (var server = mc.createDestination(Util.getRouterAddress(), true)) {
+			assertThrows(KnxNegativeReturnCodeException.class, () -> mc.readMemory(server, 0x101F0, 20));
+		}
 	}
 
 	@Test
@@ -467,6 +498,11 @@ class ManagementClientImplTest
 	}
 
 	@Test
+	void writeMemoryTooMuchData() {
+		assertThrows(KNXIllegalArgumentException.class, () -> mc.writeMemory(dco, 0x105, new byte[64]));
+	}
+
+	@Test
 	void createDestination() throws KNXFormatException
 	{
 		mc.createDestination(new IndividualAddress("1.1.1"), false);
@@ -673,15 +709,25 @@ class ManagementClientImplTest
 	}
 
 	@Test
-	void writeMemoryExtendedMaxData() {
-		final byte[] mem = new byte[250];
-		assertThrows(KNXIllegalArgumentException.class, () -> mc.writeMemory(dco, 0x10000, mem));
+	void writeMemoryExtendedMaxData() throws KNXException, InterruptedException {
+		final byte[] mem = new byte[249];
+		try (var server = mc.createDestination(Util.getRouterAddress(), true)) {
+			mc.writeMemory(server, 0x10000, mem);
+		}
 	}
 
 	@Test
 	void writeMemoryExtendedTooMuchData() {
 		final byte[] mem = new byte[251];
 		assertThrows(KNXIllegalArgumentException.class, () -> mc.writeMemory(dco, 0x10000, mem));
+	}
+
+	@Test
+	void writeMemoryExtendedPastDeviceMemory() {
+		final byte[] mem = new byte[20];
+		try (var server = mc.createDestination(Util.getRouterAddress(), true)) {
+			assertThrows(KnxNegativeReturnCodeException.class, () -> mc.writeMemory(server, 0x101F0, mem));
+		}
 	}
 
 	@Test
