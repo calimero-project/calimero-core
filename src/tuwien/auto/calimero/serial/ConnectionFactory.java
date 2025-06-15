@@ -56,7 +56,7 @@ import tuwien.auto.calimero.KNXException;
  * @param <C> Connection
  */
 public final class ConnectionFactory<P, C> {
-	private static final Logger logger = LoggerFactory.getLogger("tuwien.auto.calimero.serial");
+	private static final Logger logger = LoggerFactory.getLogger("calimero.serial");
 
 	private final ServiceLoader<P> sl;
 	private final String svcName;
