@@ -1419,7 +1419,7 @@ public class ManagementClientImpl implements ManagementClient
 		return waitForResponse(d.getAddress(), responseServiceType, minAsduLen, maxAsduLen, start, timeout);
 	}
 
-	private int maxApduLength(final Destination dst) throws KNXLinkClosedException, InterruptedException {
+	int maxApduLength(final Destination dst) throws KNXLinkClosedException, InterruptedException {
 		final Optional<Integer> max = dst.maxApduLength();
 		if (max.isPresent())
 			return max.get();

@@ -918,8 +918,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	private int readMaxApduLength(final Destination d) throws InterruptedException
 	{
 		try {
-			final byte[] data = mc.readProperty(d, DEVICE_OBJECT_INDEX, PropertyAccess.PID.MAX_APDULENGTH, 1, 1);
-			return toUnsigned(data);
+			return ((ManagementClientImpl) mc).maxApduLength(d);
 		}
 		catch (final KNXException e) {
 			return defaultApduLength;
@@ -929,11 +928,6 @@ public class ManagementProceduresImpl implements ManagementProcedures
 	private static void waitFor(final int ms) throws InterruptedException
 	{
 		Thread.sleep(ms);
-	}
-
-	private static int toUnsigned(final byte[] data)
-	{
-		return ((data[0] & 0xff) << 8) | (data[1] & 0xff);
 	}
 
 	private static boolean isOddParity(final int bite)
