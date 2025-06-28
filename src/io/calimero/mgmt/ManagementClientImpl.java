@@ -1267,7 +1267,7 @@ public class ManagementClientImpl implements ManagementClient
 			final int crc = ((apdu[6] & 0xff) << 8) | (apdu[7] & 0xff);
 			if (crc16Ccitt(asdu) == crc)
 				return;
-			throw new KNXRemoteException(format("write memory to %s 0x%x: data verification failed (crc mismatch)",
+			throw new KNXRemoteException(format("write memory to %s 0x%x: data verification failed (CRC mismatch)",
 					dst.getAddress(), startAddr));
 		}
 		if (apdu.length != 6)
