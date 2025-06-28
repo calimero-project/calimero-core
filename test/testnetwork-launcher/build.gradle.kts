@@ -11,7 +11,7 @@ tasks.named<JavaExec>("run") {
 	if (System.getProperty("debug", "false") == "true") {
 		jvmArgs("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=8000")
 	}
-	systemProperties(System.getProperties() as Map<String?, *>)
+	systemProperties(System.getProperties() as Map<String, *>)
 	args("server-config.xml")
 	standardInput = System.`in`
 }
