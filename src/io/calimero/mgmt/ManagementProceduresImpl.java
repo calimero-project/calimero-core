@@ -934,11 +934,6 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		Thread.sleep(ms);
 	}
 
-	private static int toUnsigned(final byte[] data)
-	{
-		return ((data[0] & 0xff) << 8) | (data[1] & 0xff);
-	}
-
 	private static boolean isOddParity(final int bite)
 	{
 		int parity = bite ^ (bite >> 4);
