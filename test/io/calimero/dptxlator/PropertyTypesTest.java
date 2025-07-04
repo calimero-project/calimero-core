@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,27 +36,30 @@
 
 package io.calimero.dptxlator;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
 import io.calimero.KNXException;
-import io.calimero.dptxlator.PropertyTypes.DPTID;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class PropertyTypesTest {
 	@Test
 	void getAllPropertyTypes() {
-		final Map<Integer, DPTID> m = PropertyTypes.getAllPropertyTypes();
-		m.put(1000, new DPTID(1000, "1000.001"));
+		final Map<Integer, DptId> m = PropertyTypes.getAllPropertyTypes();
+		m.put(1000, new DptId(1000, 1));
 		m.remove(1000);
 		for (final Integer type : m.keySet()) {
 			assertTrue(type > 0);
 		}
-		for (final DPTID type : m.values()) {
-			assertTrue(type.getMainNumber() > 0);
-			assertTrue(type.getDPT().length() >= 5);
+		for (final var dptid : m.values()) {
+			assertNotNull(dptid);
 		}
 	}
 

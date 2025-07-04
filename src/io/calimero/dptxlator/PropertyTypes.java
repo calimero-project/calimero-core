@@ -59,57 +59,6 @@ import io.calimero.dptxlator.TranslatorTypes.MainType;
 public final class PropertyTypes
 {
 	/**
-	 * Type for a value entry in the map of property types, returned by
-	 * {@link PropertyTypes#getAllPropertyTypes()}.
-	 * <p>
-	 * Objects of this type are immutable.<br>
-	 * For a more detailed description of main numbers and DPTs, see
-	 * {@link TranslatorTypes}.
-	 */
-	public static class DPTID
-	{
-		private final int main;
-		private final String dpt;
-
-		/**
-		 * Creates a new DPTID used to identify a DPT translator.
-		 *
-		 * @param mainNumber DPT main number identifying a data type matching the property
-		 *        data type
-		 * @param dpt appropriate datapoint type for the property type
-		 */
-		public DPTID(final int mainNumber, final String dpt)
-		{
-			main = mainNumber;
-			this.dpt = dpt;
-		}
-
-		/**
-		 * Returns the main number of the translator data type.
-		 * <p>
-		 * If the datapoint type returned by {@link #getDPT()} is formatted the preferred
-		 * way as described in {@link TranslatorTypes}, the main number might be 0.
-		 *
-		 * @return main number (or 0) as int
-		 */
-		public final int getMainNumber()
-		{
-			return main;
-		}
-
-		/**
-		 * Returns the datapoint type ID to be used in the translator.
-		 * <p>
-		 *
-		 * @return datapoint type as string
-		 */
-		public final String getDPT()
-		{
-			return dpt;
-		}
-	}
-
-	/**
 	 * PDT_CONTROL, PDT = 0x00, usage dependent.
 	 */
 	public static final int PDT_CONTROL = 0x00;
@@ -310,32 +259,32 @@ public final class PropertyTypes
 	 */
 	// private static final int PDT_ESCAPE = 0x3F;
 
-	private static final Map<Integer, DPTID> pt = Collections.synchronizedMap(new HashMap<>());
+	private static final Map<Integer, DptId> pt = Collections.synchronizedMap(new HashMap<>());
 
 	static {
-		pt.put(PDT_CHAR, new DPTID(TranslatorTypes.TYPE_8BIT_SIGNED, "6.010"));
-		pt.put(PDT_UNSIGNED_CHAR, new DPTID(TranslatorTypes.TYPE_8BIT_UNSIGNED, "5.010"));
-		pt.put(PDT_INT, new DPTID(TranslatorTypes.TYPE_2OCTET_SIGNED, "8.001"));
-		pt.put(PDT_UNSIGNED_INT, new DPTID(TranslatorTypes.TYPE_2OCTET_UNSIGNED, "7.001"));
-		pt.put(PDT_KNX_FLOAT, new DPTID(TranslatorTypes.TYPE_2OCTET_FLOAT, "9.002"));
-		pt.put(PDT_DATE, new DPTID(TranslatorTypes.TYPE_DATE, "11.001"));
-		pt.put(PDT_TIME, new DPTID(TranslatorTypes.TYPE_TIME, "10.001"));
-		pt.put(PDT_LONG, new DPTID(TranslatorTypes.TYPE_4OCTET_SIGNED, "13.001"));
-		pt.put(PDT_UNSIGNED_LONG, new DPTID(TranslatorTypes.TYPE_4OCTET_UNSIGNED, "12.001"));
-		pt.put(PDT_FLOAT, new DPTID(TranslatorTypes.TYPE_4OCTET_FLOAT, "14.005"));
+		pt.put(PDT_CHAR, new DptId(6, 10));
+		pt.put(PDT_UNSIGNED_CHAR, new DptId(5, 10));
+		pt.put(PDT_INT, new DptId(8, 1));
+		pt.put(PDT_UNSIGNED_INT, new DptId(7, 1));
+		pt.put(PDT_KNX_FLOAT, new DptId(9, 2));
+		pt.put(PDT_DATE, new DptId(11, 1));
+		pt.put(PDT_TIME, new DptId(10, 1));
+		pt.put(PDT_LONG, new DptId(13, 1));
+		pt.put(PDT_UNSIGNED_LONG, new DptId(12, 1));
+		pt.put(PDT_FLOAT, new DptId(14, 5));
 		// p.put(PDT_DOUBLE), );
-		pt.put(PDT_CHAR_BLOCK, new DPTID(24, "24.001"));
+		pt.put(PDT_CHAR_BLOCK, new DptId(24, 1));
 		// p.put(PDT_POLL_GROUP_SETTINGS), );
-		pt.put(PDT_SHORT_CHAR_BLOCK, new DPTID(24, "24.001"));
-		pt.put(PDT_DATE_TIME, new DPTID(TranslatorTypes.TYPE_DATE_TIME, "19.001"));
-		pt.put(PDT_VARIABLE_LENGTH, new DPTID(24, "24.001"));
-		pt.put(PDT_VERSION, new DPTID(217, "217.001"));
-		pt.put(PDT_ALARM_INFO, new DPTID(219, "219.001"));
-		pt.put(PDT_BINARY_INFORMATION, new DPTID(TranslatorTypes.TYPE_BOOLEAN, "1.002"));
-		pt.put(PDT_BITSET8, new DPTID(21, "21.001"));
-		pt.put(PDT_BITSET16, new DPTID(22, "22.100"));
-		pt.put(PDT_ENUM8, new DPTID(20, "20.1000"));
-		pt.put(PDT_SCALING, new DPTID(TranslatorTypes.TYPE_8BIT_UNSIGNED, "5.001"));
+		pt.put(PDT_SHORT_CHAR_BLOCK, new DptId(24, 1));
+		pt.put(PDT_DATE_TIME, new DptId(19, 1));
+		pt.put(PDT_VARIABLE_LENGTH, new DptId(24, 1));
+		pt.put(PDT_VERSION, new DptId(217, 1));
+		pt.put(PDT_ALARM_INFO, new DptId(219, 1));
+		pt.put(PDT_BINARY_INFORMATION, new DptId(1, 2));
+		pt.put(PDT_BITSET8, new DptId(21, 1));
+		pt.put(PDT_BITSET16, new DptId(22, 100));
+		pt.put(PDT_ENUM8, new DptId(20, 1000));
+		pt.put(PDT_SCALING, new DptId(5, 1));
 	}
 
 	// @formatter:off
@@ -388,17 +337,9 @@ public final class PropertyTypes
 	private PropertyTypes() {}
 
 	/**
-	 * Returns all property types which have an associated (but not necessarily
-	 * implemented/available) DPT translator.
-	 * <p>
-	 * A map key is of type Integer, holding the PDT, a map value is of type {@link DPTID}.
-	 *
-	 * @return property type map
+	 * {@return all property types that have an associated (but not necessarily implemented or available) DPT translator}
 	 */
-	public static Map<Integer, DPTID> getAllPropertyTypes()
-	{
-		return pt;
-	}
+	public static Map<Integer, DptId> getAllPropertyTypes() { return pt; }
 
 	/**
 	 * Returns the bit size of the supplied property data type, if a size is specified for that type.
@@ -423,14 +364,14 @@ public final class PropertyTypes
 	 */
 	public static boolean hasTranslator(final int dataType)
 	{
-		final DPTID dpt = pt.get(dataType);
-		if (dpt != null)
+		final var dptid = pt.get(dataType);
+		if (dptid != null)
 			try {
-				final MainType t = TranslatorTypes.getMainType(dpt.getMainNumber());
+				final MainType t = TranslatorTypes.getMainType(dptid.mainNumber());
 				if (t != null)
-					return t.getSubTypes().get(dpt.getDPT()) != null;
+					return t.getSubTypes().get(dptid.toString()) != null;
 			}
-			catch (final NumberFormatException | KNXException e) {}
+			catch (final KNXException e) {}
 		return false;
 	}
 
@@ -447,11 +388,10 @@ public final class PropertyTypes
 	 */
 	public static DPTXlator createTranslator(final int dataType) throws KNXException
 	{
-		final DPTID dpt = pt.get(dataType);
-		if (dpt == null)
+		final var dptid = pt.get(dataType);
+		if (dptid == null)
 			throw new KNXException("PDT not found");
-		final DPTXlator t = TranslatorTypes.createTranslator(dpt.getMainNumber(),
-			dpt.getDPT());
+		final DPTXlator t = TranslatorTypes.createTranslator(dptid);
 		t.setAppendUnit(false);
 		return t;
 	}
