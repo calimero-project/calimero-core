@@ -194,40 +194,29 @@ public final class TranslatorTypes
 	/**
 	 * Maps a data type main number to a corresponding translator class doing the DPT translations. Objects of this type
 	 * are immutable.
+	 *
+	 * @param mainNumber main number assigned to the data type
+	 * @param translator represents a translator class of type {@link DPTXlator}
+	 * @param description textual information describing this data type to a user, use {@code null} for no description
 	 */
-	public static class MainType
-	{
-		private final Class<? extends DPTXlator> xlator;
-		private final String desc;
-		private final int main;
-
-		/**
-		 * Creates a new main number to translator mapping.
-		 *
-		 * @param mainNumber main number assigned to the data type
-		 * @param translator represents a translator class of type {@link DPTXlator}
-		 * @param description textual information describing this data type to a user, use {@code null} for no
-		 *        description
-		 */
-		public MainType(final int mainNumber, final Class<? extends DPTXlator> translator, final String description)
-		{
+	public record MainType(int mainNumber, Class<? extends DPTXlator> translator, String description) {
+		public MainType {
 			if (mainNumber <= 0)
 				throw new KNXIllegalArgumentException("invalid main number");
 			if (!DPTXlator.class.isAssignableFrom(translator) || DPTXlator.class.equals(translator))
 				throw new KNXIllegalArgumentException(translator.getName() + " is not a valid DPT translator type");
-			main = mainNumber;
-			xlator = translator;
-			desc = description == null ? "" : description;
+			description = description == null ? "" : description;
 		}
 
 		/**
-		 * Returns the data type main number.
+		 * @deprecated Returns the data type main number.
 		 *
 		 * @return main number as int
 		 */
-		public final int getMainNumber()
+		@Deprecated(forRemoval = true)
+		public int getMainNumber()
 		{
-			return main;
+			return mainNumber;
 		}
 
 		/**
@@ -239,13 +228,13 @@ public final class TranslatorTypes
 		 * @throws KNXFormatException to forward all target exceptions thrown in the constructor of the translator
 		 * @throws KNXException thrown on translator class creation errors (e.g. security / access problems)
 		 */
-		public final DPTXlator createTranslator(final DPT dpt) throws KNXException
+		public DPTXlator createTranslator(final DPT dpt) throws KNXException
 		{
 			return createTranslator(dpt.getID());
 		}
 
 		/**
-		 * Creates a new instance of the translator for the given datapoint type ID.
+		 * @deprecated Creates a new instance of the translator for the given datapoint type ID.
 		 *
 		 * @param dptId datapoint type ID for selecting a particular kind of value translation; if the datapoint type ID
 		 *        is not part of the translator of this main type, a {@link KNXFormatException} is thrown
@@ -253,10 +242,11 @@ public final class TranslatorTypes
 		 * @throws KNXFormatException to forward all target exceptions thrown in the constructor of the translator
 		 * @throws KNXException thrown on translator class creation errors (e.g. security / access problems)
 		 */
+		@Deprecated(forRemoval = true)
 		public DPTXlator createTranslator(final String dptId) throws KNXException
 		{
 			try {
-				return xlator.getConstructor(String.class).newInstance(dptId);
+				return translator.getConstructor(String.class).newInstance(dptId);
 			}
 			catch (final InvocationTargetException e) {
 				// try to forward encapsulated target exception
@@ -281,12 +271,12 @@ public final class TranslatorTypes
 		 *        is not part of the translator of this main type, a {@link KNXFormatException} is thrown
 		 * @return the new {@link DPTXlator} instance
 		 * @throws KNXFormatException to forward all target exceptions thrown in the constructor of the translator
-		 * @throws KNXException thrown on translator class creation errors (e.g. security/access problems)
+		 * @throws KNXException thrown on translator class creation errors (e.g., security/access problems)
 		 */
 		public DPTXlator createTranslator(final DptId dptId) throws KNXException
 		{
 			try {
-				return xlator.getConstructor(String.class).newInstance(dptId.toString());
+				return translator.getConstructor(String.class).newInstance(dptId.toString());
 			}
 			catch (final InvocationTargetException e) {
 				// try to forward encapsulated target exception
@@ -305,25 +295,15 @@ public final class TranslatorTypes
 		}
 
 		/**
-		 * Returns the translator class used for this main type.
-		 * <p>
-		 *
-		 * @return the translator class as {@link Class} object
-		 */
-		public Class<? extends DPTXlator> getTranslator()
-		{
-			return xlator;
-		}
-
-		/**
-		 * Returns the description to this main type, if any.
+		 * @deprecated Returns the description to this main type, if any.
 		 * <p>
 		 *
 		 * @return description as String, or the empty string if no description set
 		 */
-		public final String getDescription()
+		@Deprecated(forRemoval = true)
+		public String getDescription()
 		{
-			return desc;
+			return description;
 		}
 
 		/**
@@ -331,14 +311,14 @@ public final class TranslatorTypes
 		 * <p>
 		 *
 		 * @return available subtypes as {@link Map}
-		 * @throws KNXException thrown on problems accessing the translator while retrieving sub types (e.g. security /
+		 * @throws KNXException thrown on problems accessing the translator while retrieving sub types (e.g., security /
 		 *         access problem) for external, user supplied translators
 		 * @see DPTXlator#getSubTypes()
 		 */
 		public Map<String, DPT> getSubTypes() throws KNXException
 		{
 			try {
-				return subTypes(xlator);
+				return subTypes(translator);
 			}
 			catch (final Exception e) {
 				// for SecurityException and IllegalAccessException
@@ -350,7 +330,7 @@ public final class TranslatorTypes
 		@Override
 		public String toString()
 		{
-			return getDescription();
+			return description();
 		}
 	}
 
@@ -468,8 +448,8 @@ public final class TranslatorTypes
 	/**
 	 * Returns all available data types which have a DPT translator implementation assigned.
 	 * <p>
-	 * The map returned is the same used by this class for type lookup. Map entries can be added, likewise entries might
-	 * be removed to change future lookup results.
+	 * The map returned is the same used by this class for type lookup. Map entries can be added or
+	 * removed to change future lookup results.
 	 *
 	 * @return a {@link Map} containing all data types as {@link MainType} objects
 	 */

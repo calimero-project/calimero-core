@@ -75,10 +75,9 @@ class TranslatorTypesTest
 		}
 
 		for (MainType type : types) {
-			final MainType t = TranslatorTypes.getMainType(type.getMainNumber());
-			assertEquals(t.getMainNumber(), type.getMainNumber());
-			t.createTranslator(t.getSubTypes().values().iterator().next()
-					.getID());
+			final MainType t = TranslatorTypes.getMainType(type.mainNumber());
+			assertEquals(t.mainNumber(), type.mainNumber());
+			t.createTranslator(t.getSubTypes().values().iterator().next().getID());
 		}
 	}
 
@@ -154,7 +153,7 @@ class TranslatorTypesTest
 	{
 		// with main number
 		for (MainType mainType : types) {
-			final int main = mainType.getMainNumber();
+			final int main = mainType.mainNumber();
 			final String dptID = TranslatorTypes.getMainType(main).getSubTypes()
 					.values().iterator().next().getID();
 			TranslatorTypes.createTranslator(main, dptID);
@@ -162,7 +161,7 @@ class TranslatorTypesTest
 
 		// without main number
 		for (MainType type : types) {
-			final int main = type.getMainNumber();
+			final int main = type.mainNumber();
 			final String dptID = TranslatorTypes.getMainType(main).getSubTypes()
 					.values().iterator().next().getID();
 			TranslatorTypes.createTranslator(0, dptID);
