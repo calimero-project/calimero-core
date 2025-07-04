@@ -64,10 +64,10 @@ import io.calimero.KnxRuntimeException;
  * added or removed by the user.
  * <p>
  * A datapoint type consists of a data type and a dimension. The data type is referred to through a main number, the
- * existing dimensions of a data type are listed through sub numbers. The data type specifies format and encoding, while
+ * existing dimensions of a data type are listed through subnumbers. The data type specifies format and encoding, while
  * dimension specifies the range and unit.<br>
  * A datapoint type identifier (DPT ID or dptId for short), stands for one particular datapoint type. The preferred -
- * but not enforced - way of naming a dptId is using the expression "<i>main number</i>.<i>sub number</i>".<br>
+ * but not enforced - way of naming a dptId is using the expression "<i>main number</i>.<i>subnumber</i>".<br>
  * In short, a datapoint type has a dptId and standardizes one combination of format, encoding, range and unit.
  *
  * @author B. Malinowsky
@@ -567,7 +567,7 @@ public final class TranslatorTypes
 	 * <p>
 	 * The translation behavior of a DPT translator instance is uniquely defined by the supplied datapoint type ID.
 	 * <p>
-	 * If the {@code dptId} argument is built up the recommended way, that is "<i>main number</i>.<i>sub number</i>",
+	 * If the {@code dptId} argument is built up the recommended way, that is "<i>main number</i>.<i>subnumber</i>",
 	 * the {@code mainNumber} argument might be left 0 to use the datapoint type ID only.<br>
 	 * Note, that we don't enforce any particular or standardized format on the {@code dptId} structure, so using a
 	 * different formatted dptId solely without main number argument results in undefined behavior.
@@ -595,10 +595,10 @@ public final class TranslatorTypes
 	}
 
 	/**
-	 * Creates a DPT translator for the given datapoint type main/sub number.
+	 * Creates a DPT translator for the given datapoint type main/subnumber.
 	 *
 	 * @param mainNumber datapoint type main number, 0 &lt; mainNumber
-	 * @param subNumber datapoint type sub number selecting a particular kind of value translation; use 0 to request any
+	 * @param subNumber datapoint type subnumber selecting a particular kind of value translation; use 0 to request any
 	 *        type ID of that translator (in that case, appending the physical unit for string values is disabled)
 	 * @param data (optional) KNX datapoint data to set in the created translator for translation
 	 * @return the new {@link DPTXlator} object
@@ -659,7 +659,7 @@ public final class TranslatorTypes
 	/**
 	 * Creates a DPT translator for the given datapoint type ID.
 	 *
-	 * @param dptId datapoint type ID, formatted as {@code <main number>.<sub number>} with sub
+	 * @param dptId datapoint type ID, formatted as {@code <main number>.<subnumber>} with sub
 	 *        numbers &lt; 100 zero-padded to 3 digits, e.g. "1.001"
 	 * @param data (optional) KNX datapoint data to set in the created translator for translation
 	 * @return the new {@link DPTXlator} object
