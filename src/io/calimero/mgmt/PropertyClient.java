@@ -51,7 +51,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 import io.calimero.KNXException;
 import io.calimero.KNXFormatException;
@@ -61,6 +60,7 @@ import io.calimero.KNXTimeoutException;
 import io.calimero.Settings;
 import io.calimero.dptxlator.DPTXlator;
 import io.calimero.dptxlator.DPTXlator2ByteUnsigned;
+import io.calimero.dptxlator.DptId;
 import io.calimero.dptxlator.PropertyTypes;
 import io.calimero.dptxlator.TranslatorTypes;
 import io.calimero.log.LogService;
@@ -263,7 +263,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	 * @author B. Malinowsky
 	 */
 	public record Property(int pid, String pidName, String propertyName, String description, int objectType, int pdt,
-	                       Optional<String> dpt, int readLevel, int writeLevel, int accessPolicy) {
+	                       Optional<DptId> dpt, int readLevel, int writeLevel, int accessPolicy) {
 
 		/**
 		 * @return {@code true} if property is read-only, {@code false} if property is write-enabled
@@ -273,7 +273,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		@Override
 		public String toString() {
 			return pidName + " (" + pid + ") '" + propertyName + "'" + (objectType == -1 ? "" : " OT " + objectType) + " PDT " + pdt
-					+ dpt().map(s -> " DPT " + s).orElse("") + " r/w " + readLevel + "/" + (readOnly() ? "-" : writeLevel)
+					+ dpt().map(id -> " DPT " + id).orElse("") + " r/w " + readLevel + "/" + (readOnly() ? "-" : writeLevel)
 					+ accessPolicyString();
 		}
 
@@ -593,7 +593,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		if (p != null) {
 			if (p.dpt().isPresent())
 				try {
-					final DPTXlator t = TranslatorTypes.createTranslator(0, p.dpt().get());
+					final DPTXlator t = TranslatorTypes.createTranslator(0, p.dpt().get().toString());
 					t.setAppendUnit(false);
 					return t;
 				}
@@ -663,7 +663,8 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 							final String pidName = reader.getAttributeValue("", PIDNAME_ATTR);
 							final String friendly = reader.getAttributeValue("", NAME_ATTR);
 							final int pdt = toInt(reader.getAttributeValue("", PDT_ATTR));
-							final var dpt = Optional.ofNullable(reader.getAttributeValue("", DPT_ATTR));
+							final String dptAttr = reader.getAttributeValue("", DPT_ATTR);
+							final var dpt = dptAttr == null ? Optional.<DptId>empty() : Optional.of(DptId.from(dptAttr));
 
 							final int[] rw = parseRW(reader.getAttributeValue("", RW_ATTR));
 							final boolean write = parseWriteEnabled(reader.getAttributeValue("", WRITE_ATTR));
@@ -721,7 +722,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 				writer.writeAttribute(PIDNAME_ATTR, p.pidName());
 				writer.writeAttribute(NAME_ATTR, p.propertyName());
 				writer.writeAttribute(PDT_ATTR, p.pdt == -1 ? "<tbd>" : Integer.toString(p.pdt));
-				p.dpt().filter(Predicate.not(String::isEmpty)).ifPresent(dpt -> writer.writeAttribute(DPT_ATTR, dpt));
+				p.dpt().ifPresent(dpt -> writer.writeAttribute(DPT_ATTR, dpt.toString()));
 				writer.writeAttribute(RW_ATTR, String.format("%d/%d", p.readLevel(), p.writeLevel()));
 				writer.writeAttribute(WRITE_ATTR, p.readOnly() ? "0" : "1");
 				// write property
