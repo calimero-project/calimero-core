@@ -275,6 +275,36 @@ public final class TranslatorTypes
 		}
 
 		/**
+		 * Creates a new instance of the translator for the given datapoint type ID.
+		 *
+		 * @param dptId datapoint type ID for selecting a particular kind of value translation; if the datapoint type ID
+		 *        is not part of the translator of this main type, a {@link KNXFormatException} is thrown
+		 * @return the new {@link DPTXlator} instance
+		 * @throws KNXFormatException to forward all target exceptions thrown in the constructor of the translator
+		 * @throws KNXException thrown on translator class creation errors (e.g. security/access problems)
+		 */
+		public DPTXlator createTranslator(final DptId dptId) throws KNXException
+		{
+			try {
+				return xlator.getConstructor(String.class).newInstance(dptId.toString());
+			}
+			catch (final InvocationTargetException e) {
+				// try to forward encapsulated target exception
+				if (e.getTargetException() instanceof KNXFormatException)
+					throw (KNXFormatException) e.getTargetException();
+				// throw generic message
+				throw new KNXFormatException("failed to init translator", dptId.toString());
+			}
+			catch (final NoSuchMethodException e) {
+				throw new KnxRuntimeException("interface specification error, no public constructor(String dptId)");
+			}
+			catch (final Exception e) {
+				// for SecurityException, InstantiationException, IllegalAccessException
+				throw new KNXException("failed to create translator", e);
+			}
+		}
+
+		/**
 		 * Returns the translator class used for this main type.
 		 * <p>
 		 *
@@ -524,6 +554,14 @@ public final class TranslatorTypes
 		return false;
 	}
 
+	public static DPTXlator createTranslator(final DptId dpt) throws KNXException {
+		final MainType type = map.get(dpt.mainNumber());
+		if (type == null)
+			throw new KNXException("no DPT translator available for " + dpt);
+
+		return type.createTranslator(dpt);
+	}
+
 	/**
 	 * Creates a DPT translator for the given datapoint type ID.
 	 * <p>
@@ -575,7 +613,7 @@ public final class TranslatorTypes
 			throw new KNXException("no DPT translator available for main number " + mainNumber);
 
 		final boolean withSub = subNumber != 0;
-		final String id = withSub ? String.format("%d.%03d", mainNumber, subNumber)
+		final String id = withSub ? new DptId(mainNumber, subNumber).toString()
 				: type.getSubTypes().keySet().iterator().next();
 		final DPTXlator t = type.createTranslator(id);
 		t.setAppendUnit(withSub);

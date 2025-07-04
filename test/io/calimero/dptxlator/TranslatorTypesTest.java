@@ -228,7 +228,7 @@ class TranslatorTypesTest
 		try {
 			TranslatorTypes.createTranslator(9, -1);
 		}
-		catch (final KNXFormatException expected) {}
+		catch (final KNXIllegalArgumentException expected) {}
 		try {
 			TranslatorTypes.createTranslator(0, 1);
 		}
