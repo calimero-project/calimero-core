@@ -9,15 +9,15 @@ Calimero was developed with a focus on applications that run on embedded devices
 
 Code examples for using this library are shown in the [introduction](https://github.com/calimero-project/introduction).
 
-**Changes with Calimero v3 snapshots**
+**Changes with Calimero 3**
 
-|                          | Prior                  | =>  | New           |
-|--------------------------|------------------------|-----|---------------|
-| _Maven group ID_         | com.github.calimero    |     | io.calimero   |
-| _Modules_                | n/a                    |     | io.calimero.* |
-| _Packages_               | tuwien.auto.calimero.* |     | io.calimero.* |
-| _Logging prefix_         | calimero.*             |     | io.calimero.* |
-| _Logging API_            | SLF4J                  |     | System.Logger |
+|                          | v2                     | ⇨ | v3            |
+|--------------------------|------------------------|---|---------------|
+| _Maven group ID_         | com.github.calimero    |   | io.calimero   |
+| _Modules_                | n/a                    |   | io.calimero.* |
+| _Packages_               | tuwien.auto.calimero.* |   | io.calimero.* |
+| _Logging prefix_         | calimero.*             |   | io.calimero.* |
+| _Logging API_            | SLF4J                  |   | System.Logger |
 
 Supported Features
 --------
