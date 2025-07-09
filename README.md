@@ -1,4 +1,4 @@
-Calimero-core [![CI with Gradle](https://github.com/calimero-project/calimero-core/actions/workflows/gradle.yml/badge.svg)](https://github.com/calimero-project/calimero-core/actions/workflows/gradle.yml)
+Calimero-core [![CI with Gradle](https://github.com/calimero-project/calimero-core/actions/workflows/gradle.yml/badge.svg)](https://github.com/calimero-project/calimero-core/actions/workflows/gradle.yml) [![](https://jitpack.io/v/calimero-project/calimero-core.svg)](https://jitpack.io/#calimero-project/calimero-core) [![](https://img.shields.io/badge/jitpack-master-brightgreen?label=JitPack)](https://jitpack.io/#calimero-project/calimero-core/master)
 =============
 ~~~ sh
 git clone https://github.com/calimero-project/calimero-core.git
