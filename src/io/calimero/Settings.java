@@ -45,7 +45,7 @@ import io.calimero.internal.Manifest;
  */
 public final class Settings
 {
-	private static final String version = "3.0-SNAPSHOT";
+	private static final String version = "3.0-M1";
 	private static final String library = "Calimero";
 	private static final String desc = "A library for KNX network access";
 
