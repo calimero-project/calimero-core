@@ -53,7 +53,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Isolated;
 
 import io.calimero.KNXException;
-import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
 import io.calimero.dptxlator.TranslatorTypes.MainType;
 
@@ -74,10 +73,10 @@ class TranslatorTypesTest
 				fail("not found but in type list");
 		}
 
-		for (MainType type : types) {
+		for (final MainType type : types) {
 			final MainType t = TranslatorTypes.getMainType(type.mainNumber());
 			assertEquals(t.mainNumber(), type.mainNumber());
-			t.createTranslator(t.getSubTypes().values().iterator().next().getID());
+			t.createTranslator(t.getSubTypes().values().iterator().next());
 		}
 	}
 
@@ -152,7 +151,7 @@ class TranslatorTypesTest
 	void createTranslator() throws KNXException
 	{
 		// with main number
-		for (MainType mainType : types) {
+		for (final MainType mainType : types) {
 			final int main = mainType.mainNumber();
 			final String dptID = TranslatorTypes.getMainType(main).getSubTypes()
 					.values().iterator().next().getID();
@@ -160,7 +159,7 @@ class TranslatorTypesTest
 		}
 
 		// without main number
-		for (MainType type : types) {
+		for (final MainType type : types) {
 			final int main = type.mainNumber();
 			final String dptID = TranslatorTypes.getMainType(main).getSubTypes()
 					.values().iterator().next().getID();
