@@ -171,7 +171,6 @@ public final class Connector
 	{
 		private volatile T impl;
 		private final List<LinkListener> listeners = new CopyOnWriteArrayList<>();
-		private volatile KNXMediumSettings settings;
 		private volatile int hopCount;
 		// monitor: decode raw frames
 		private volatile boolean decodeRawFrames;
@@ -211,16 +210,8 @@ public final class Connector
 			return impl;
 		}
 
-		@Override
-		public void setKNXMedium(final KNXMediumSettings settings)
-		{
-			final T t = impl;
-			if (t instanceof final KNXNetworkLink link)
-				link.setKNXMedium(settings);
-			else if (t instanceof final KNXNetworkMonitor monitor)
-				monitor.setKNXMedium(settings);
-			this.settings = settings;
-		}
+		@SuppressWarnings("removal")
+		public void setKNXMedium(final KNXMediumSettings settings) {}
 
 		@Override
 		public KNXMediumSettings getKNXMedium()
@@ -230,7 +221,7 @@ public final class Connector
 				return link.getKNXMedium();
 			if (t instanceof final KNXNetworkMonitor monitor)
 				return monitor.getKNXMedium();
-			return settings;
+			return null;
 		}
 
 		@Override
@@ -427,7 +418,6 @@ public final class Connector
 							settings = link.getKNXMedium();
 							hopCount = link.getHopCount();
 						}
-						link.setKNXMedium(settings);
 						link.setHopCount(hopCount);
 						link.addLinkListener(this);
 						if (link instanceof final AbstractLink<?> abstractLink)

@@ -65,19 +65,13 @@ import io.calimero.link.medium.KNXMediumSettings;
 public interface KNXNetworkLink extends AutoCloseable
 {
 	/**
-	 * Supplies medium information necessary for KNX communication.
-	 * <p>
-	 * This information differs between KNX media and depends on the KNX network
-	 * this link is communicating with.<br>
-	 * The {@code settings} medium type has to match the medium type supplied to
-	 * the link in the first place.<br>
-	 * The {@code settings} object is not copied internally to allow subsequent
-	 * changes to medium settings by the user which should take effect immediately.
+	 * @deprecated
 	 *
 	 * @param settings medium settings to use, the expected subtype is according to the
 	 *        KNX network medium
 	 */
-	void setKNXMedium(KNXMediumSettings settings);
+	@Deprecated(forRemoval = true)
+	default void setKNXMedium(KNXMediumSettings settings) {}
 
 	/**
 	 * Returns the KNX medium settings used by this network link.

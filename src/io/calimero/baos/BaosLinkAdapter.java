@@ -108,9 +108,6 @@ public final class BaosLinkAdapter implements BaosLink {
 	}
 
 	@Override
-	public void setKNXMedium(final KNXMediumSettings settings) { link.setKNXMedium(settings); }
-
-	@Override
 	public KNXMediumSettings getKNXMedium() { return link.getKNXMedium(); }
 
 	@Override

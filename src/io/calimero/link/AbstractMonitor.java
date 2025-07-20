@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2015, 2024 B. Malinowsky
+    Copyright (c) 2015, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNet
 
 	volatile boolean wrappedByConnector;
 	private volatile boolean closed;
-	private KNXMediumSettings medium;
+	private final KNXMediumSettings medium;
 	private final String name;
 
 	private static final class MonitorNotifier extends EventNotifier<LinkListener>
@@ -168,23 +168,14 @@ public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNet
 		this.name = name;
 		logger = LogService.getLogger("io.calimero.link." + getName());
 
-		if (settings instanceof PLSettings)
-			logger.log(INFO, "power-line medium, assuming BCU has extended busmonitor enabled");
-
-		setKNXMedium(settings);
-		notifier = new MonitorNotifier(this, logger, settings instanceof PLSettings);
-		notifier.start();
-	}
-
-	@Override
-	public final void setKNXMedium(final KNXMediumSettings settings)
-	{
 		if (settings == null)
 			throw new KNXIllegalArgumentException("medium settings are mandatory");
-		if (medium != null && !settings.getClass().isAssignableFrom(medium.getClass())
-				&& !medium.getClass().isAssignableFrom(settings.getClass()))
-			throw new KNXIllegalArgumentException("medium differs");
 		medium = settings;
+		if (medium instanceof PLSettings)
+			logger.log(INFO, "power-line medium, assuming BCU has extended busmonitor enabled");
+
+		notifier = new MonitorNotifier(this, logger, settings instanceof PLSettings);
+		notifier.start();
 	}
 
 	@Override

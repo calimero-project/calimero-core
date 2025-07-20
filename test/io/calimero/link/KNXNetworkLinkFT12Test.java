@@ -46,7 +46,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import tag.FT12;
 import io.calimero.CloseEvent;
 import io.calimero.FrameEvent;
 import io.calimero.GroupAddress;
@@ -58,8 +57,8 @@ import io.calimero.Priority;
 import io.calimero.Util;
 import io.calimero.cemi.CEMILData;
 import io.calimero.knxnetip.Debug;
-import io.calimero.link.medium.PLSettings;
 import io.calimero.link.medium.TPSettings;
+import tag.FT12;
 
 @FT12
 class KNXNetworkLinkFT12Test
@@ -151,30 +150,6 @@ class KNXNetworkLinkFT12Test
 		catch (final KNXException e) {
 			System.out.println(e.getMessage());
 		}
-	}
-
-	@Test
-	void setKNXMedium()
-	{
-		try {
-			lnk.setKNXMedium(new PLSettings());
-			fail("different medium");
-		}
-		catch (final KNXIllegalArgumentException e) {}
-		final class TPSettingsSubClass extends TPSettings
-		{
-			TPSettingsSubClass()
-			{
-				super();
-			}
-		}
-		// replace basetype with subtype
-		lnk.setKNXMedium(new TPSettingsSubClass());
-		// replace subtype with its supertype
-		lnk.setKNXMedium(new TPSettings());
-
-		lnk.setKNXMedium(new TPSettings(new IndividualAddress(200)));
-		assertEquals(200, lnk.getKNXMedium().getDeviceAddress().getRawAddress());
 	}
 
 	@Test

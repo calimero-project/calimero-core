@@ -202,30 +202,6 @@ class KNXNetworkLinkIPTest
 	}
 
 	@Test
-	void setKNXMedium()
-	{
-		try {
-			tnl.setKNXMedium(new PLSettings());
-			fail("different medium");
-		}
-		catch (final KNXIllegalArgumentException e) {}
-		final class TPSettingsSubClass extends TPSettings
-		{
-			TPSettingsSubClass()
-			{
-				super();
-			}
-		}
-		// replace basetype with subtype
-		tnl.setKNXMedium(new TPSettingsSubClass());
-		// replace subtype with its supertype
-		tnl.setKNXMedium(new TPSettings());
-
-		tnl.setKNXMedium(new TPSettings(new IndividualAddress(200)));
-		assertEquals(200, tnl.getKNXMedium().getDeviceAddress().getRawAddress());
-	}
-
-	@Test
 	void getKNXMedium()
 	{
 		assertTrue(tnl.getKNXMedium() instanceof TPSettings);

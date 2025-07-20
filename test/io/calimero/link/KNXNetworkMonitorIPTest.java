@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,19 +49,17 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import tag.KnxnetIPSequential;
-import tag.Slow;
 import io.calimero.CloseEvent;
 import io.calimero.FrameEvent;
-import io.calimero.IndividualAddress;
 import io.calimero.KNXException;
 import io.calimero.KNXIllegalArgumentException;
 import io.calimero.Util;
 import io.calimero.cemi.CEMIBusMon;
 import io.calimero.knxnetip.Debug;
-import io.calimero.link.medium.PLSettings;
 import io.calimero.link.medium.RawFrame;
 import io.calimero.link.medium.TPSettings;
+import tag.KnxnetIPSequential;
+import tag.Slow;
 
 
 @KnxnetIPSequential
@@ -124,30 +122,6 @@ class KNXNetworkMonitorIPTest
 				new TPSettings())) {}
 		catch (final KNXIllegalArgumentException e) {}
 		mon = new KNXNetworkMonitorIP(null, Util.getServer(), false, new TPSettings());
-	}
-
-	@Test
-	void setKNXMedium()
-	{
-		try {
-			mon.setKNXMedium(new PLSettings());
-			fail("different medium");
-		}
-		catch (final KNXIllegalArgumentException e) {}
-		final class TPSettingsSubClass extends TPSettings
-		{
-			TPSettingsSubClass()
-			{
-				super();
-			}
-		}
-		// replace basetype with subtype
-		mon.setKNXMedium(new TPSettingsSubClass());
-		// replace subtype with its supertype
-		mon.setKNXMedium(new TPSettings());
-
-		mon.setKNXMedium(new TPSettings(new IndividualAddress(200)));
-		assertEquals(200, mon.getKNXMedium().getDeviceAddress().getRawAddress());
 	}
 
 	@Test

@@ -123,7 +123,7 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	private final String name;
 	private volatile boolean closed;
 	private volatile int hopCount = 6;
-	private KNXMediumSettings medium;
+	private final KNXMediumSettings medium;
 
 	final T conn;
 
@@ -287,23 +287,15 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 
 	private AbstractLink(final String name, final KNXMediumSettings settings, final T connection) {
 		this.name = name;
-		setKNXMedium(settings);
+		if (settings == null)
+			throw new KNXIllegalArgumentException("medium settings are mandatory");
+		medium = settings;
+		assignedAddress_VH.setVolatile(medium, (Supplier<?>) this::assignedAddress);
+
 		conn = connection;
 		// init logger before notifier, as it is referenced in LinkNotifier ctor
 		logger = LogService.getLogger("io.calimero.link." + getName());
 		notifier = new LinkNotifier();
-	}
-
-	@Override
-	public final synchronized void setKNXMedium(final KNXMediumSettings settings)
-	{
-		if (settings == null)
-			throw new KNXIllegalArgumentException("medium settings are mandatory");
-		if (medium != null && !settings.getClass().isAssignableFrom(medium.getClass())
-				&& !medium.getClass().isAssignableFrom(settings.getClass()))
-			throw new KNXIllegalArgumentException("medium differs");
-		medium = settings;
-		assignedAddress_VH.setVolatile(medium, (Supplier<?>) this::assignedAddress);
 	}
 
 	@Override

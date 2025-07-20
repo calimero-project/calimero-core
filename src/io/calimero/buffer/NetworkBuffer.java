@@ -176,12 +176,6 @@ public final class NetworkBuffer implements AutoCloseable
 			}
 
 			@Override
-			public void setKNXMedium(final KNXMediumSettings a)
-			{
-				base.setKNXMedium(a);
-			}
-
-			@Override
 			public void sendRequest(final KNXAddress dst, final Priority p, final byte... nsdu)
 					throws KNXLinkClosedException, KNXTimeoutException
 			{
