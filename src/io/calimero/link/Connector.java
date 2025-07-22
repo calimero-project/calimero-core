@@ -42,6 +42,7 @@ import static java.lang.System.Logger.Level.WARNING;
 
 import java.lang.System.Logger;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -60,6 +61,8 @@ import io.calimero.Priority;
 import io.calimero.cemi.CEMILData;
 import io.calimero.internal.Executor;
 import io.calimero.link.medium.KNXMediumSettings;
+import io.calimero.link.medium.PLSettings;
+import io.calimero.link.medium.RFSettings;
 import io.calimero.log.LogService;
 
 /**
@@ -414,9 +417,23 @@ public final class Connector
 				try {
 					final T t = creator.get();
 					if (t instanceof final KNXNetworkLink link) {
-						if (impl == null) {
-							settings = link.getKNXMedium();
+						var old = getKNXMedium();
+						if (old == null) {
 							hopCount = link.getHopCount();
+						}
+						else {
+							// adjust some medium settings of the new link with the old ones if appropriate
+							var adjust = link.getKNXMedium();
+							if (!adjust.getDeviceAddress().equals(old.getDeviceAddress()))
+								adjust.setDeviceAddress(old.getDeviceAddress());
+							if (adjust.maxApduLength() != old.maxApduLength())
+								adjust.setMaxApduLength(old.maxApduLength());
+							if (adjust instanceof PLSettings pl && old instanceof PLSettings plOld
+									&& !Arrays.equals(pl.getDomainAddress(), plOld.getDomainAddress()))
+								pl.setDomainAddress(plOld.getDomainAddress());
+							if (adjust instanceof RFSettings rf && old instanceof RFSettings rfOld
+									&& !Arrays.equals(rf.getDomainAddress(), rfOld.getDomainAddress()))
+								rf.setDomainAddress(rfOld.getDomainAddress());
 						}
 						link.setHopCount(hopCount);
 						link.addLinkListener(this);
