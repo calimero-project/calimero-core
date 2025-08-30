@@ -175,7 +175,6 @@ public abstract class AbstractMonitor<T extends AutoCloseable> implements KNXNet
 			logger.log(INFO, "power-line medium, assuming BCU has extended busmonitor enabled");
 
 		notifier = new MonitorNotifier(this, logger, settings instanceof PLSettings);
-		notifier.start();
 	}
 
 	@Override

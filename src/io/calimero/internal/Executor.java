@@ -36,6 +36,8 @@
 
 package io.calimero.internal;
 
+import java.lang.System.Logger.Level;
+import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -43,52 +45,59 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 
-/**
- * Access to executors using daemon threads.
- */
 public final class Executor {
-	private static final String idleThreadName = "Calimero idle thread";
+	private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
-	private static final ThreadFactory threadFactory = r -> {
-		final Thread t = new Thread(r, idleThreadName);
-		t.setDaemon(true);
-		return t;
+	private static final ThreadFactory vtFactory = Thread.ofVirtual().name("calimero vt ", 0)
+			.inheritInheritableThreadLocals(false).factory();
+
+
+	@SuppressWarnings("serial")
+	private static final class KillThreadAfterExecuteException extends RuntimeException { }
+
+	private static Runnable withExitLogger(final Runnable r) {
+		return () -> {
+			r.run();
+			trace("exit " + Thread.currentThread().getName());
+		};
+	}
+
+	private static final ThreadFactory vtWrapperFactory = r -> {
+		final var thread = vtFactory.newThread(withExitLogger(r));
+		thread.setUncaughtExceptionHandler((t, e) -> {
+			if (e instanceof KillThreadAfterExecuteException)
+				trace("killed " + t.getName());
+			else
+				t.getThreadGroup().uncaughtException(t, e);
+		});
+
+		trace("create " + thread.getName());
+		return thread;
 	};
 
-	private static final ExecutorService executor;
-	private static final ScheduledExecutorService scheduledExecutor;
+	private static final ScheduledExecutorService vtScheduledExecutor;
 	static {
-		final var se = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS,
-				new SynchronousQueue<>(), threadFactory) {
-			@Override
-			protected void afterExecute(final Runnable r, final Throwable t) {
-				Thread.currentThread().setName(idleThreadName);
-				checkFailedFuture(r);
-			}
-		};
-		executor = Executors.unconfigurableExecutorService(se);
-
 		// STPE acts as a fixed-sized pool using corePoolSize threads and an unbounded queue
-		final var stpe = new ScheduledThreadPoolExecutor(10, threadFactory) {
+		final var stpe = new ScheduledThreadPoolExecutor(Integer.MAX_VALUE, vtWrapperFactory) {
+
 			@Override
 			protected void afterExecute(final Runnable r, final Throwable t) {
-				Thread.currentThread().setName(idleThreadName);
 				checkFailedFuture(r);
+				throw new KillThreadAfterExecuteException();
 			}
 		};
 		stpe.allowCoreThreadTimeOut(true);
-		stpe.setKeepAliveTime(61, TimeUnit.SECONDS);
-		scheduledExecutor = Executors.unconfigurableScheduledExecutorService(stpe);
+		stpe.setKeepAliveTime(10, TimeUnit.SECONDS);
+
+		vtScheduledExecutor = Executors.unconfigurableScheduledExecutorService(stpe);
 	}
 
 	private static void checkFailedFuture(final Runnable r) {
-		if (r instanceof Future<?> f && f.isDone()) try {
+		if (r instanceof final Future<?> f && f.isDone()) try {
 			f.get();
 		}
 		catch (InterruptedException | CancellationException ignore) {}
@@ -97,16 +106,23 @@ public final class Executor {
 		}
 	}
 
-	public static void execute(final Runnable task) { executor.execute(task); }
+	private static final ExecutorService vtExecutor = Executors.newThreadPerTaskExecutor(vtWrapperFactory);
+
+
+
+	public static void execute(final Runnable task) { vtExecutor.execute(task); }
 
 	public static Thread execute(final Runnable task, final String name) {
-		final var thread = new Thread(task, name);
-		thread.setDaemon(true);
+		final var thread = Thread.ofVirtual().inheritInheritableThreadLocals(false).name(name).unstarted(withExitLogger(task));
+		trace("create " + thread.getName());
 		thread.start();
 		return thread;
 	}
 
-	public static ExecutorService executor() { return executor; }
+	public static ExecutorService executor() { return vtExecutor; }
 
-	public static ScheduledExecutorService scheduledExecutor() { return scheduledExecutor; }
+	public static ScheduledExecutorService scheduledExecutor() { return vtScheduledExecutor; }
+
+
+	private static void trace(final String s) { logger.log(Level.TRACE, s); }
 }

@@ -50,8 +50,6 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.AfterEach;
@@ -60,7 +58,6 @@ import org.junit.jupiter.api.Test;
 
 import tag.KnxSecure;
 import tag.KnxnetIP;
-import tag.KnxnetIPSequential;
 import io.calimero.CloseEvent;
 import io.calimero.FrameEvent;
 import io.calimero.GroupAddress;
@@ -369,27 +366,6 @@ class KNXNetworkLinkIPTest
 		n = rtr.getName();
 		assertNotNull(n);
 		assertTrue(n.contains(KNXnetIPRouting.DEFAULT_MULTICAST));
-	}
-
-	@Test
-	@KnxnetIPSequential
-	void runNotifierOnlyAfterEstablishingConnection()
-	{
-		// create some links that fail during construction
-		final InetSocketAddress sa = new InetSocketAddress(0);
-		assertThrows(KNXException.class, () -> KNXNetworkLinkIP.newTunnelingLink(sa, sa, false, new TPSettings()),
-				"no KNXnet/IP server with wildcard IP");
-		assertThrows(KNXException.class, () -> KNXNetworkLinkIP.newTunnelingLink(sa,
-				new InetSocketAddress("1.0.0.1", 3671), false, new TPSettings()), "no KNXnet/IP server with that IP");
-
-		final Thread[] threads = new Thread[Thread.activeCount() + 10];
-		final int active = Thread.enumerate(threads);
-		assertTrue(active <= threads.length);
-
-		final List<Thread> list = Arrays.asList(threads).subList(0, active);
-		final long cnt = list.stream().map(Thread::getName).filter("Calimero link notifier"::equals).count();
-		// we should only have our two initial link notifiers running, not the failed ones
-		assertEquals(2, cnt, "running notifiers");
 	}
 
 	@Test

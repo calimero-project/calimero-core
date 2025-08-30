@@ -271,7 +271,6 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	protected AbstractLink(final T connection, final String name, final KNXMediumSettings settings)
 	{
 		this(name, settings, connection);
-		notifier.start();
 	}
 
 	/**

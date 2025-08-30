@@ -48,7 +48,6 @@ import io.calimero.KNXException;
 import io.calimero.KNXListener;
 import io.calimero.KNXTimeoutException;
 import io.calimero.cemi.CEMILData;
-import io.calimero.internal.Executor;
 import io.calimero.link.medium.KNXMediumSettings;
 import io.calimero.serial.ConnectionEvent;
 import io.calimero.serial.ConnectionStatus;
@@ -156,20 +155,22 @@ public class KNXNetworkLinkFT12 extends AbstractLink<FT12Connection>
 		}
 	}
 
+	// this is called by a link notification thread, don't run this on the same notification thread!
+	// not an issue with virtual threads
 	private void connectionReset() {
-		// don't run this in notification thread!
-		final Runnable modeSetter = () -> {
-			try {
-				if (baosMode)
-					baosMode(true);
-				else
-					linkLayerMode();
-			}
-			catch (KNXException | InterruptedException e) {
-				close();
-			}
-		};
-		Executor.execute(modeSetter, "FT1.2 connection reset mode switcher");
+		try {
+			if (baosMode)
+				baosMode(true);
+			else
+				linkLayerMode();
+		}
+		catch (final KNXException e) {
+			close();
+		}
+		catch (final InterruptedException e) {
+			close();
+			Thread.currentThread().interrupt();
+		}
 	}
 
 	private void linkLayerMode() throws KNXException {

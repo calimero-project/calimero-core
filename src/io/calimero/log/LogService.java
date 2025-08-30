@@ -37,10 +37,6 @@
 package io.calimero.log;
 
 import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
-import java.util.ResourceBundle;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * LogService provides access to {@link System.Logger}.
@@ -52,14 +48,6 @@ import java.util.concurrent.Executors;
  * @author B. Malinowsky
  */
 public final class LogService {
-	private static final String loggerThreadName = "Calimero Async Logging";
-	private static final ExecutorService dispatcher = Executors.newFixedThreadPool(1, r -> {
-		final Thread t = Executors.defaultThreadFactory().newThread(r);
-		t.setName(loggerThreadName);
-		t.setDaemon(true);
-		return t;
-	});
-
 	private LogService() {}
 
 	/**
@@ -83,21 +71,5 @@ public final class LogService {
 	 */
 	public static Logger getAsyncLogger(final String name) {
 		return new AsyncLogger(getLogger(name));
-	}
-
-	static void async(final Logger l, final Level level, final ResourceBundle bundle, final String format,
-			final Throwable t, final Object... o) {
-		if (!l.isLoggable(level))
-			return;
-		final Thread thread = Thread.currentThread();
-		dispatcher.execute(() -> {
-			final Thread logger = Thread.currentThread();
-			logger.setName(thread.getName());
-			if (t != null)
-				l.log(level, bundle, format, t);
-			else
-				l.log(level, bundle, format, o);
-			logger.setName(loggerThreadName);
-		});
 	}
 }
