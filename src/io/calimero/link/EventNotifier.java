@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -70,7 +70,6 @@ public abstract class EventNotifier<T extends LinkListener> implements KNXListen
 	public void connectionClosed(final CloseEvent e)
 	{
 		addEvent(l -> l.linkClosed(new CloseEvent(source, e.getInitiator(), e.getReason())));
-		quit();
 	}
 
 	public EventListeners<T> getListeners()
@@ -107,8 +106,6 @@ public abstract class EventNotifier<T extends LinkListener> implements KNXListen
 	{
 		listeners.remove(l);
 	}
-
-	final void quit() {}
 
 	private void fire(final Consumer<? super T> c)
 	{

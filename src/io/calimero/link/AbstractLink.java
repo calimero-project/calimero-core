@@ -245,7 +245,6 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 			if (wrappedByConnector) {
 				getListeners().listeners().stream().filter(Connector.Link.class::isInstance)
 					.forEach(l -> l.linkClosed(e));
-				quit();
 				return;
 			}
 			super.connectionClosed(e);
@@ -379,7 +378,6 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 				conn.close();
 		}
 		catch (final Exception ignore) {}
-		notifier.quit();
 	}
 
 	@Override
