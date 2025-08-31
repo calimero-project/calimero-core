@@ -1258,12 +1258,12 @@ public class ManagementClientImpl implements ManagementClient
 		final ReturnCode ret = ReturnCode.of(apdu[2] & 0xff);
 		if (ret == ReturnCode.Success) {
 			if (apdu.length != 6)
-				throw new KNXInvalidResponseException(format("write memory to %s 0x%x: invalid APDU length %s", dst.getAddress(), startAddr, apdu.length));
+				throw writeInvalidLengthException(dst, startAddr, apdu);
 			return;
 		}
 		if (ret == ReturnCode.SuccessWithCrc) {
 			if (apdu.length != 8)
-				throw new KNXInvalidResponseException(format("write memory to %s 0x%x: invalid APDU length %s", dst.getAddress(), startAddr, apdu.length));
+				throw writeInvalidLengthException(dst, startAddr, apdu);
 			final int crc = ((apdu[6] & 0xff) << 8) | (apdu[7] & 0xff);
 			if (crc16Ccitt(asdu) == crc)
 				return;
@@ -1271,8 +1271,14 @@ public class ManagementClientImpl implements ManagementClient
 					dst.getAddress(), startAddr));
 		}
 		if (apdu.length != 6)
-			throw new KNXInvalidResponseException(format("write memory to %s 0x%x: invalid APDU length %s", dst.getAddress(), startAddr, apdu.length));
+			throw writeInvalidLengthException(dst, startAddr, apdu);
 		throw new KnxNegativeReturnCodeException(format("write memory to %s 0x%x", dst.getAddress(), startAddr), ret);
+	}
+
+	private static KNXInvalidResponseException writeInvalidLengthException(final Destination dst, final int startAddr,
+			final byte[] apdu) {
+		return new KNXInvalidResponseException(format("write memory to %s 0x%x: invalid APDU length %s",
+				dst.getAddress(), startAddr, apdu.length));
 	}
 
 	static int crc16Ccitt(final byte[] input) {
