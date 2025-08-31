@@ -263,28 +263,13 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 	}
 
 	/**
-	 * @param connection if not {@code null}, the link object will close this resource as last
+	 * @param connection the link object will close this resource as last
 	 *        action before returning from {@link #close()}, relinquishing any underlying resources
 	 * @param name the link name
 	 * @param settings medium settings of the accessed KNX network
 	 */
 	protected AbstractLink(final T connection, final String name, final KNXMediumSettings settings)
 	{
-		this(name, settings, connection);
-	}
-
-	/**
-	 * This constructor does not start the event notifier.
-	 *
-	 * @param name the link name
-	 * @param settings medium settings of the accessed KNX network
-	 */
-	protected AbstractLink(final String name, final KNXMediumSettings settings)
-	{
-		this(name, settings, null);
-	}
-
-	private AbstractLink(final String name, final KNXMediumSettings settings, final T connection) {
 		this.name = name;
 		if (settings == null)
 			throw new KNXIllegalArgumentException("medium settings are mandatory");
@@ -295,6 +280,15 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 		// init logger before notifier, as it is referenced in LinkNotifier ctor
 		logger = LogService.getLogger("io.calimero.link." + getName());
 		notifier = new LinkNotifier();
+	}
+
+	/**
+	 * @param name the link name
+	 * @param settings medium settings of the accessed KNX network
+	 */
+	protected AbstractLink(final String name, final KNXMediumSettings settings)
+	{
+		this(null, name, settings);
 	}
 
 	@Override
