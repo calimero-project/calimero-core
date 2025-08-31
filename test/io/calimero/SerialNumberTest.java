@@ -37,8 +37,7 @@
 package io.calimero;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -73,14 +72,14 @@ class SerialNumberTest {
 
 	@Test
 	void testEquals() {
-		assertTrue(SerialNumber.of(100).equals(SerialNumber.of(100)));
-		assertTrue(SerialNumber.Zero.equals(SerialNumber.of(0)));
+		assertEquals(SerialNumber.of(100), SerialNumber.of(100));
+		assertEquals(SerialNumber.Zero, SerialNumber.of(0));
 	}
 
 	@Test
 	void testNotEquals() {
-		assertFalse(SerialNumber.of(1).equals(SerialNumber.of(2)));
-		assertFalse(SerialNumber.Zero.equals(SerialNumber.of(100)));
+		assertNotEquals(SerialNumber.of(1), SerialNumber.of(2));
+		assertNotEquals(SerialNumber.Zero, SerialNumber.of(100));
 	}
 
 	@Test
