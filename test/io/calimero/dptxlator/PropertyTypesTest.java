@@ -39,6 +39,7 @@ package io.calimero.dptxlator;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -66,7 +67,7 @@ class PropertyTypesTest {
 	@Test
 	void createTranslatorInt() throws KNXException {
 		final DPTXlator t = PropertyTypes.createTranslator(PropertyTypes.PDT_BINARY_INFORMATION);
-		assertTrue(t instanceof DPTXlatorBoolean);
+		assertInstanceOf(DPTXlatorBoolean.class, t);
 		try {
 			PropertyTypes.createTranslator(PropertyTypes.PDT_SHORT_CHAR_BLOCK);
 			fail("we really have such a translator?");
