@@ -112,8 +112,8 @@ class TranslatorTypesTest
 		newMainTypeFail(2000, DPTXlator.class);
 		final MainType mt = new MainType(2000, DPTXlatorBoolean.class, "DPTXlatorBoolean.class");
 		TranslatorTypes.getAllMainTypes().put(2000, mt);
-		assertEquals(TranslatorTypes.getMainType(2000).createTranslator(
-			DPTXlatorBoolean.DPT_ENABLE).getClass(), DPTXlatorBoolean.class);
+		assertEquals(DPTXlatorBoolean.class, TranslatorTypes.getMainType(2000).createTranslator(
+			DPTXlatorBoolean.DPT_ENABLE).getClass());
 	}
 
 	@Test
