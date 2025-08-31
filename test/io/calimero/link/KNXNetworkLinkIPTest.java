@@ -38,6 +38,7 @@ package io.calimero.link;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -201,7 +202,7 @@ class KNXNetworkLinkIPTest
 	@Test
 	void getKNXMedium()
 	{
-		assertTrue(tnl.getKNXMedium() instanceof TPSettings);
+		assertInstanceOf(TPSettings.class, tnl.getKNXMedium());
 		assertEquals(0, tnl.getKNXMedium().getDeviceAddress().getRawAddress());
 	}
 

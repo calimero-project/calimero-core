@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ package io.calimero.mgmt;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -125,7 +126,7 @@ class TransportLayerImplTest
 			assertNotNull(e, "data-individual frame event");
 			ind.add(e.getFrame());
 			final CEMILData f = (CEMILData) e.getFrame();
-			assertTrue(f.getDestination() instanceof IndividualAddress);
+			assertInstanceOf(IndividualAddress.class, f.getDestination());
 			Debug.printLData("data individual: ", f);
 		}
 
@@ -142,7 +143,7 @@ class TransportLayerImplTest
 			assertNotNull(e, "group frame event");
 			group.add(e.getFrame());
 			final CEMILData f = (CEMILData) e.getFrame();
-			assertTrue(f.getDestination() instanceof GroupAddress);
+			assertInstanceOf(GroupAddress.class, f.getDestination());
 			Debug.printLData("group data: ", f);
 		}
 

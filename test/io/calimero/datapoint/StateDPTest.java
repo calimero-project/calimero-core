@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ package io.calimero.datapoint;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -163,7 +164,7 @@ class StateDPTest
 	void create() throws KNXMLException
 	{
 		final XmlReader r = XmlInputFactory.newInstance().createXMLReader(Util.getPath() + filename);
-		assertTrue(Datapoint.create(r) instanceof StateDP);
+		assertInstanceOf(StateDP.class, Datapoint.create(r));
 		r.close();
 	}
 

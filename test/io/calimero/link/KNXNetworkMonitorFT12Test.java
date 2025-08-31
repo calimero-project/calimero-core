@@ -38,6 +38,7 @@ package io.calimero.link;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -73,7 +74,7 @@ class KNXNetworkMonitorFT12Test
 		public void indication(final FrameEvent e)
 		{
 			assertNotNull(e);
-			assertTrue(e instanceof MonitorFrameEvent);
+			assertInstanceOf(MonitorFrameEvent.class, e);
 			assertEquals(mon, e.getSource());
 			ind = (CEMIBusMon) e.getFrame();
 			raw = ((MonitorFrameEvent) e).getRawFrame();
