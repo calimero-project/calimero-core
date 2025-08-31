@@ -273,9 +273,9 @@ class KeyringTest {
 		final var secIf = interfaces.get(host).getFirst();
 		final var tunnelInterface = secIf.decrypt(keyringPwd);
 
-		assertEquals(tunnelInterface.type(), Type.Tunneling);
+		assertEquals(Type.Tunneling, tunnelInterface.type());
 		assertTrue(tunnelInterface.user() > 0);
-		assertEquals(tunnelInterface.userKey().length, 16);
-		assertEquals(tunnelInterface.deviceAuthCode().length, 16);
+		assertEquals(16, tunnelInterface.userKey().length);
+		assertEquals(16, tunnelInterface.deviceAuthCode().length);
 	}
 }

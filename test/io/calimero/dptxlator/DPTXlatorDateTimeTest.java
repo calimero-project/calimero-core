@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -143,7 +143,7 @@ class DPTXlatorDateTimeTest {
 	@Test
 	void setValue() throws KNXFormatException {
 		t.setValue(dateday);
-		assertEquals(t.getItems(), 1);
+		assertEquals(1, t.getItems());
 		assertNotEquals(t.getValue(), def);
 	}
 
@@ -336,11 +336,11 @@ class DPTXlatorDateTimeTest {
 
 		t.setValue("2007/2/28 00:00:00");
 		final var zero = t.localDateTime();
-		assertEquals(zero.toLocalTime(), LocalTime.MIN);
+		assertEquals(LocalTime.MIN, zero.toLocalTime());
 
 		t.setValue("2007/2/28 24:00:00");
 		final var cheat = t.localDateTime();
-		assertEquals(cheat.toLocalTime(), LocalTime.MAX);
+		assertEquals(LocalTime.MAX, cheat.toLocalTime());
 
 		t.setFaultyClock(true);
 		assertThrows(KNXFormatException.class, t::localDateTime);
@@ -568,70 +568,70 @@ class DPTXlatorDateTimeTest {
 	@Test
 	void isFaultyClock() {
 		assertFalse(t.isFaultyClock());
-		assertEquals(t.getData()[6] & 0x80, 0x00);
+		assertEquals(0x00, t.getData()[6] & 0x80);
 		t.setFaultyClock(true);
 		assertTrue(t.isFaultyClock());
-		assertEquals(t.getData()[6] & 0x80, 0x80);
+		assertEquals(0x80, t.getData()[6] & 0x80);
 	}
 
 	@Test
 	void isWorkdaySet() {
 		assertFalse(t.isValidField(DPTXlatorDateTime.WORKDAY));
-		assertEquals(t.getData()[6] & 0x20, 0x20);
+		assertEquals(0x20, t.getData()[6] & 0x20);
 		t.setValidField(DPTXlatorDateTime.WORKDAY, true);
 		assertTrue(t.isValidField(DPTXlatorDateTime.WORKDAY));
-		assertEquals(t.getData()[6] & 0x20, 0x00);
+		assertEquals(0x00, t.getData()[6] & 0x20);
 		t.setValidField(DPTXlatorDateTime.WORKDAY, false);
 		assertFalse(t.isValidField(DPTXlatorDateTime.WORKDAY));
-		assertEquals(t.getData()[6] & 0x20, 0x20);
+		assertEquals(0x20, t.getData()[6] & 0x20);
 	}
 
 	@Test
 	void isYearSet() {
 		assertTrue(t.isValidField(DPTXlatorDateTime.YEAR));
-		assertEquals(t.getData()[6] & 0x10, 0x00);
+		assertEquals(0x00, t.getData()[6] & 0x10);
 		t.setValidField(DPTXlatorDateTime.YEAR, false);
 		assertFalse(t.isValidField(DPTXlatorDateTime.YEAR));
-		assertEquals(t.getData()[6] & 0x10, 0x10);
+		assertEquals(0x10, t.getData()[6] & 0x10);
 		t.setValidField(DPTXlatorDateTime.YEAR, true);
 		assertTrue(t.isValidField(DPTXlatorDateTime.YEAR));
-		assertEquals(t.getData()[6] & 0x10, 0x00);
+		assertEquals(0x00, t.getData()[6] & 0x10);
 	}
 
 	@Test
 	void isDateSet() {
 		assertTrue(t.isValidField(DPTXlatorDateTime.DATE));
-		assertEquals(t.getData()[6] & 0x08, 0x00);
+		assertEquals(0x00, t.getData()[6] & 0x08);
 		t.setValidField(DPTXlatorDateTime.DATE, false);
 		assertFalse(t.isValidField(DPTXlatorDateTime.DATE));
-		assertEquals(t.getData()[6] & 0x08, 0x08);
+		assertEquals(0x08, t.getData()[6] & 0x08);
 		t.setValidField(DPTXlatorDateTime.DATE, true);
 		assertTrue(t.isValidField(DPTXlatorDateTime.DATE));
-		assertEquals(t.getData()[6] & 0x08, 0x00);
+		assertEquals(0x00, t.getData()[6] & 0x08);
 	}
 
 	@Test
 	void isDayOfWeekSet() {
 		assertFalse(t.isValidField(DPTXlatorDateTime.DAY_OF_WEEK));
-		assertEquals(t.getData()[6] & 0x04, 0x04);
+		assertEquals(0x04, t.getData()[6] & 0x04);
 		t.setValidField(DPTXlatorDateTime.DAY_OF_WEEK, true);
 		assertTrue(t.isValidField(DPTXlatorDateTime.DAY_OF_WEEK));
-		assertEquals(t.getData()[6] & 0x04, 0x00);
+		assertEquals(0x00, t.getData()[6] & 0x04);
 		t.setValidField(DPTXlatorDateTime.DAY_OF_WEEK, false);
 		assertFalse(t.isValidField(DPTXlatorDateTime.DAY_OF_WEEK));
-		assertEquals(t.getData()[6] & 0x04, 0x04);
+		assertEquals(0x04, t.getData()[6] & 0x04);
 	}
 
 	@Test
 	void isTimeSet() {
 		assertTrue(t.isValidField(DPTXlatorDateTime.TIME));
-		assertEquals(t.getData()[6] & 0x02, 0x00);
+		assertEquals(0x00, t.getData()[6] & 0x02);
 		t.setValidField(DPTXlatorDateTime.TIME, false);
 		assertFalse(t.isValidField(DPTXlatorDateTime.TIME));
-		assertEquals(t.getData()[6] & 0x02, 0x02);
+		assertEquals(0x02, t.getData()[6] & 0x02);
 		t.setValidField(DPTXlatorDateTime.TIME, true);
 		assertTrue(t.isValidField(DPTXlatorDateTime.TIME));
-		assertEquals(t.getData()[6] & 0x02, 0x00);
+		assertEquals(0x00, t.getData()[6] & 0x02);
 	}
 
 	@Test
