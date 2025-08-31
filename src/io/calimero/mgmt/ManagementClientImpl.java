@@ -1492,16 +1492,16 @@ public class ManagementClientImpl implements ManagementClient
 		TLNewStyle,
 		GroupObjectDiagnostic,
 		LocalDownloadIP,
-		LocalDownloadUsb;
+		LocalDownloadUsb
 	}
 
-	boolean supportsFeature(final Destination dst, final SupportedServiceGroup feature) throws KNXTimeoutException,
-			KNXLinkClosedException, KNXDisconnectException, InterruptedException {
+	boolean supportsFeature(final Destination dst, final SupportedServiceGroup feature) throws KNXLinkClosedException,
+			InterruptedException {
 		return supportedFeatures(dst).contains(feature);
 	}
 
-	private EnumSet<SupportedServiceGroup> supportedFeatures(final Destination dst) throws KNXTimeoutException,
-			KNXLinkClosedException, KNXDisconnectException, InterruptedException {
+	private EnumSet<SupportedServiceGroup> supportedFeatures(final Destination dst) throws KNXLinkClosedException,
+			InterruptedException {
 		final var featuresOpt = dst.supportedFeatures();
 		if (featuresOpt.isPresent())
 			return featuresOpt.get();

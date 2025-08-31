@@ -1,6 +1,6 @@
 /*
     Calimero - A library for KNX network access
-    Copyright (c) 2019, 2023 B. Malinowsky
+    Copyright (c) 2019, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -238,10 +238,10 @@ class SecureApplicationLayerTest {
 
 		final int pidGroupKeyTable = 53;
 		final byte[] asdu = new byte[4 + data.length];
-		asdu[0] = (byte) objIndex;
-		asdu[1] = (byte) pidGroupKeyTable;
-		asdu[2] = (byte) ((elements << 4) | ((start >>> 8) & 0x0f));
-		asdu[3] = (byte) start;
+		asdu[0] = objIndex;
+		asdu[1] = pidGroupKeyTable;
+		asdu[2] = ((elements << 4) | ((start >>> 8) & 0x0f));
+		asdu[3] = start;
 		System.arraycopy(data, 0, asdu, 4, data.length);
 
 		return asdu;

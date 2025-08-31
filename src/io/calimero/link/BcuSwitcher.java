@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2015, 2024 B. Malinowsky
+    Copyright (c) 2015, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -142,8 +142,7 @@ final class BcuSwitcher<T>
 		ExtBusmonitor
 	}
 
-	void enter(final BcuMode mode) throws KNXFormatException, KNXPortClosedException,
-		KNXTimeoutException, InterruptedException
+	void enter(final BcuMode mode) throws KNXFormatException, KNXPortClosedException, InterruptedException
 	{
 		final KNXListener l = (final FrameEvent e) -> setResponse(e.getFrameBytes());
 		c.addConnectionListener(l);

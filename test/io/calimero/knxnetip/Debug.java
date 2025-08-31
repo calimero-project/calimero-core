@@ -124,34 +124,33 @@ public final class Debug
 			default -> "unknown";
 		};
 		buf.append("frametype=" + type);
-		if (tp1 instanceof TP1LData f) {
-			buf.append(", src=" + f.getSource());
-			buf.append(", dst=" + f.getDestination());
-			buf.append(", prio=" + f.getPriority());
-			buf.append(", rep=" + f.isRepetition());
-			buf.append(", chksum=" + f.getChecksum());
-		}
-		else if (tp1 instanceof TP1Ack f) {
-			final int acktype = f.getAckType();
-			String ack;
-			if (acktype == RawAckBase.ACK)
-				ack = "ACK";
-			else if (acktype == RawAckBase.NAK)
-				ack = "NAK";
-			else if (acktype == TP1Ack.BUSY)
-				ack = "BUSY";
-			else if (acktype == TP1Ack.NAK_BUSY)
-				ack = "NAK_BUSY";
-			else
-				ack = "unknown";
-			buf.append(", ack=" + ack);
-		}
-		else if (tp1 instanceof TP1LPollData f) {
-			buf.append(", src=" + f.getSource());
-			buf.append(", dst=" + f.getDestination());
-			buf.append(", prio=" + f.getPriority());
-			buf.append(", rep=" + f.getExpectedDataLength());
-			buf.append(", chksum=" + f.getChecksum());
+		switch (tp1) {
+			case TP1LData f -> {
+				buf.append(", src=" + f.getSource());
+				buf.append(", dst=" + f.getDestination());
+				buf.append(", prio=" + f.getPriority());
+				buf.append(", rep=" + f.isRepetition());
+				buf.append(", chksum=" + f.getChecksum());
+			}
+			case TP1Ack f -> {
+				final int acktype = f.getAckType();
+				final String ack = switch (acktype) {
+					case RawAckBase.ACK  -> "ACK";
+					case RawAckBase.NAK  -> "NAK";
+					case TP1Ack.BUSY     -> "BUSY";
+					case TP1Ack.NAK_BUSY -> "NAK_BUSY";
+					default -> "unknown";
+				};
+				buf.append(", ack=" + ack);
+			}
+			case TP1LPollData f -> {
+				buf.append(", src=" + f.getSource());
+				buf.append(", dst=" + f.getDestination());
+				buf.append(", prio=" + f.getPriority());
+				buf.append(", rep=" + f.getExpectedDataLength());
+				buf.append(", chksum=" + f.getChecksum());
+			}
+			default -> {}
 		}
 		if (printToSystemOut) {
 			synchronized (System.out) {

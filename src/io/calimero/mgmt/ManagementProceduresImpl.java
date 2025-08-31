@@ -345,7 +345,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		finally {
 			for (final var dst : ipSbcEnabled) {
 				try {
-					mc.callFunctionProperty(dst, routerObjectType, 1, pidIpSbcControl, (byte) 0, (byte) 0);
+					mc.callFunctionProperty(dst, routerObjectType, 1, pidIpSbcControl, 0, (byte) 0);
 				}
 				catch (KNXDisconnectException | KNXRemoteException ignore) {}
 			}
