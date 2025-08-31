@@ -85,13 +85,13 @@ class BaosTest {
 	@Test
 	@Disabled
 	void supportsBaos() {
-		final Result<SearchResponse> result = list.get(0);
+		final Result<SearchResponse> result = list.getFirst();
 		assertTrue(BaosIp.supportsBaos(result));
 	}
 
 	@Test
 	void doesNotSupportsBaos() {
-		final Result<SearchResponse> result = list.get(0);
+		final Result<SearchResponse> result = list.getFirst();
 		assertFalse(BaosIp.supportsBaos(result));
 	}
 

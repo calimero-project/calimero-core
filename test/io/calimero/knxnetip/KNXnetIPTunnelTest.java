@@ -230,7 +230,7 @@ class KNXnetIPTunnelTest
 		}
 
 		final Callable<Void> sender = () -> {
-			final CEMILData f = frames.remove(0);
+			final CEMILData f = frames.removeFirst();
 			t.send(f, con);
 			return null;
 		};

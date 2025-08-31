@@ -94,7 +94,7 @@ public final class ConnectionFactory<P, C> {
 		if (providerExceptions.isEmpty())
 			throw new KNXException("no service provider available for " + svcName);
 		if (providerExceptions.size() == 1) {
-			final var x = providerExceptions.get(0);
+			final var x = providerExceptions.getFirst();
 			if (x instanceof final KNXException e)
 				throw e;
 			if (x instanceof final IOException e)

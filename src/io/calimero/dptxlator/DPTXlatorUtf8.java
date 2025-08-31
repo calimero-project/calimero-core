@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2015, 2023 B. Malinowsky
+    Copyright (c) 2015, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -183,7 +183,7 @@ public class DPTXlatorUtf8 extends DPTXlator
 				}
 				catch (final KNXFormatException ignore) {}
 				final int to = i + 1;
-				l.get(l.size() - 1).data = Arrays.copyOfRange(data, from, to);
+				l.getLast().data = Arrays.copyOfRange(data, from, to);
 				from = to;
 			}
 		}

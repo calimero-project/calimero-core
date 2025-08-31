@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2018, 2021 B. Malinowsky
+    Copyright (c) 2018, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -74,7 +74,7 @@ class SearchRequestTest {
 		assertEquals(KNXnetIPHeader.SearchRequest, h.getServiceType());
 
 		final SearchRequest req = SearchRequest.from(h, packet, h.getStructLength());
-		assertArrayEquals(dibBytes, req.searchParameters().get(0).data(), "SRP mismatch");
+		assertArrayEquals(dibBytes, req.searchParameters().getFirst().data(), "SRP mismatch");
 	}
 
 	@Test
@@ -87,7 +87,7 @@ class SearchRequestTest {
 		assertEquals(KNXnetIPHeader.SearchRequest, h.getServiceType());
 
 		final SearchRequest req = SearchRequest.from(h, data, offset + h.getStructLength());
-		assertArrayEquals(dibBytes, req.searchParameters().get(0).data(), "SRP mismatch");
+		assertArrayEquals(dibBytes, req.searchParameters().getFirst().data(), "SRP mismatch");
 	}
 
 	@Test
@@ -109,11 +109,11 @@ class SearchRequestTest {
 	@Test
 	void newRequestWithSrps() {
 		final SearchRequest req = new SearchRequest(responseAddr, dib);
-		assertArrayEquals(dibBytes, req.searchParameters().get(0).data(), "SRP mismatch");
+		assertArrayEquals(dibBytes, req.searchParameters().getFirst().data(), "SRP mismatch");
 
 		final byte[] dib = {0x01, 0x02};
 		final SearchRequest shortReq = new SearchRequest(responseAddr, new Srp(Srp.Type.RequestDibs, false, dib));
-		assertArrayEquals(dib, shortReq.searchParameters().get(0).data(), "SRP mismatch");
+		assertArrayEquals(dib, shortReq.searchParameters().getFirst().data(), "SRP mismatch");
 	}
 
 	@Test

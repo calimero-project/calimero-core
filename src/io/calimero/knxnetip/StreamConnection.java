@@ -435,7 +435,7 @@ public sealed abstract class StreamConnection implements Closeable
 			if (connection == null) {
 				synchronized (ongoingConnectRequests) {
 					if (!ongoingConnectRequests.isEmpty())
-						connection = ongoingConnectRequests.remove(0);
+						connection = ongoingConnectRequests.removeFirst();
 				}
 			}
 
@@ -773,7 +773,7 @@ public sealed abstract class StreamConnection implements Closeable
 		if (connection == null) {
 			synchronized (ongoingConnectRequests) {
 				if (!ongoingConnectRequests.isEmpty())
-					connection = ongoingConnectRequests.remove(0);
+					connection = ongoingConnectRequests.removeFirst();
 			}
 		}
 

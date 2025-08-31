@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2019, 2023 B. Malinowsky
+    Copyright (c) 2019, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -171,7 +171,7 @@ class KeyringTest {
 		final var keyring = Keyring.load(keyringUri);
 
 		final List<Interface> ifaces = keyring.interfaces().get(host);
-		final Interface iface = ifaces.get(0);
+		final Interface iface = ifaces.getFirst();
 		final GroupAddress group = new GroupAddress(1, 1, 1);
 		assertTrue(iface.groups().containsKey(group));
 
@@ -270,7 +270,7 @@ class KeyringTest {
 	void decryptInterface() {
 		final var keyring = Keyring.load(keyringUri);
 		final var interfaces = keyring.interfaces();
-		final var secIf = interfaces.get(host).get(0);
+		final var secIf = interfaces.get(host).getFirst();
 		final var tunnelInterface = secIf.decrypt(keyringPwd);
 
 		assertEquals(tunnelInterface.type(), Type.Tunneling);

@@ -723,7 +723,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			list = readSerialNumber();
 		if (list.size() != 1)
 			throw new KNXRemoteException((list.isEmpty() ? "no" : list.size()) + " devices in programming mode");
-		final var sno = list.get(0);
+		final var sno = list.getFirst();
 
 		final var link = ((TransportLayerImpl) tl).link();
 		final int medium = link.getKNXMedium().getMedium();

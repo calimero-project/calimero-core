@@ -379,7 +379,7 @@ public class ManagementClientImpl implements ManagementClient
 		tl.broadcast(false, Priority.SYSTEM, createAPDU(IND_ADDR_SN_READ, serialNumber.array()));
 		final byte[] address = waitForResponses(IND_ADDR_SN_RESPONSE, 10, 10, start, responseTimeout, true,
 				(source, apdu) -> Arrays.equals(serialNumber.array(), 0, 6, apdu, 2, 8)
-						? Optional.of(source.toByteArray()) : Optional.empty()).get(0);
+						? Optional.of(source.toByteArray()) : Optional.empty()).getFirst();
 		return new IndividualAddress(address);
 	}
 
@@ -704,7 +704,7 @@ public class ManagementClientImpl implements ManagementClient
 		final int start, final int elements) throws KNXTimeoutException, KNXRemoteException,
 		KNXDisconnectException, KNXLinkClosedException, InterruptedException
 	{
-		return readProperty(dst, objIndex, propertyId, start, elements, true).get(0);
+		return readProperty(dst, objIndex, propertyId, start, elements, true).getFirst();
 	}
 
 	List<byte[]> readProperty(final Destination dst, final int objIndex, final int propertyId, final int start,
@@ -757,7 +757,7 @@ public class ManagementClientImpl implements ManagementClient
 
 		if (responses.isEmpty()) {
 			if (exceptions.size() == 1)
-				throw exceptions.get(0);
+				throw exceptions.getFirst();
 			final KNXRemoteException e = new KNXRemoteException(
 					"reading property " + dst.getAddress() + " OI " + objIndex + " PID " + propertyId + " failed");
 			if (!exceptions.isEmpty())
@@ -797,7 +797,7 @@ public class ManagementClientImpl implements ManagementClient
 				.putShort((objectInstance << 4) | propertyId >> 8).put(propertyId).put(elements).putShort(start).build();
 
 		final long ts = send(dst, priority, apdu, PropertyExtReadResponse);
-		final byte[] res = waitForResponses(PropertyExtReadResponse, 9, 250, ts, responseTimeout, true, responseFilter).get(0);
+		final byte[] res = waitForResponses(PropertyExtReadResponse, 9, 250, ts, responseTimeout, true, responseFilter).getFirst();
 		final int resElems = res[7] & 0xff;
 		if (resElems == 0) {
 			if (res.length != 11)
@@ -866,7 +866,7 @@ public class ManagementClientImpl implements ManagementClient
 
 		final var response = waitForResponses(PropertyExtWriteResponse, 9, 9, startSend, responseTimeout, true,
 				responseFilter);
-		final var returnCode = ReturnCode.of(response.get(0)[8] & 0xff);
+		final var returnCode = ReturnCode.of(response.getFirst()[8] & 0xff);
 		if (returnCode != ReturnCode.Success)
 			throw new KnxNegativeReturnCodeException(format("write property response for %d(%d)|%d",
 					objectType, objectInstance, propertyId), returnCode);
@@ -1079,7 +1079,7 @@ public class ManagementClientImpl implements ManagementClient
 					return Optional.empty();
 				});
 
-		final byte[] response = responses.get(0);
+		final byte[] response = responses.getFirst();
 		if (response.length == 0)
 			throw new KNXRemoteException(format("property %d|%d is not a function property", objIndex, propertyId));
 		final var returnCode = ReturnCode.of(response[0] & 0xff);
@@ -1133,7 +1133,7 @@ public class ManagementClientImpl implements ManagementClient
 					return Optional.empty();
 				});
 
-		final byte[] response = responses.get(0);
+		final byte[] response = responses.getFirst();
 		final var returnCode = ReturnCode.of(response[0] & 0xff);
 		if (returnCode.code() > 0x7f)
 			throw new KnxNegativeReturnCodeException(format("function property response for %d(%d)|%d service %d",
@@ -1653,7 +1653,7 @@ public class ManagementClientImpl implements ManagementClient
 		final int maxAsduLen, final long start, final Duration timeout)
 				throws KNXInvalidResponseException, KNXTimeoutException, InterruptedException {
 		return waitForResponses(serviceType, minAsduLen, maxAsduLen, start, timeout, true,
-				(source, apdu) -> source.equals(from) ? Optional.of(apdu) : Optional.empty()).get(0);
+				(source, apdu) -> source.equals(from) ? Optional.of(apdu) : Optional.empty()).getFirst();
 	}
 
 	private List<byte[]> readBroadcast(final Priority p, final byte[] apdu,

@@ -464,7 +464,7 @@ public final class NetworkBuffer implements AutoCloseable
 	{
 		synchronized (configs) {
 			while (!configs.isEmpty())
-				removeConfiguration(configs.get(configs.size() - 1));
+				removeConfiguration(configs.getLast());
 		}
 	}
 }
