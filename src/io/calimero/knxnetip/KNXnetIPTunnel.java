@@ -45,7 +45,6 @@ import static java.lang.System.Logger.Level.WARNING;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.HexFormat;
@@ -172,7 +171,9 @@ public class KNXnetIPTunnel extends ClientConnection
 		this(knxLayer, serverCtrlEP);
 		final var cri = tunnelingAddress.equals(KNXMediumSettings.BackboneRouter) ? new TunnelCRI(knxLayer)
 				: new TunnelCRI(knxLayer, tunnelingAddress);
-		connect(localEP, serverCtrlEP, cri, useNAT);
+		if (localEP == null)
+			throw new KNXIllegalArgumentException("no local endpoint specified");
+		connect(new UdpEndpointAddress(localEP), new UdpEndpointAddress(serverCtrlEP), cri, useNAT);
 	}
 
 	protected KNXnetIPTunnel(final TunnelingLayer knxLayer, final StreamConnection connection,
@@ -192,9 +193,9 @@ public class KNXnetIPTunnel extends ClientConnection
 		layer = Objects.requireNonNull(knxLayer, "Tunneling Layer");
 		if (knxLayer == RawLayer)
 			throw new KNXIllegalArgumentException("Raw tunnel to KNX network not supported");
-		ctrlEndpt = serverCtrlEP;
-		if (ctrlEndpt.isUnresolved())
-			throw new KNXException("server control endpoint is unresolved: " + serverCtrlEP);
+		if (serverCtrlEP.isUnresolved())
+			throw new KNXException("server control endpoint is unresolved: " + ctrlEp);
+		ctrlEp = new UdpEndpointAddress(serverCtrlEP);
 		logger = LogService.getLogger("io.calimero.knxnetip." + name());
 	}
 
@@ -282,7 +283,7 @@ public class KNXnetIPTunnel extends ClientConnection
 				logger.log(TRACE, "sending {0}, attempt {1}", tunnelingFeature, attempt + 1);
 				updateState = false;
 
-				send(buf, dataEndpt);
+				send(buf, dataEp);
 				// skip ack transition if we're using a tcp socket
 				if (socket == null) {
 					internalState = ClientConnection.CEMI_CON_PENDING;
@@ -336,9 +337,8 @@ public class KNXnetIPTunnel extends ClientConnection
 
 	@Override
 	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset,
-		final InetAddress src, final int port) throws KNXFormatException, IOException
-	{
-		if (super.handleServiceType(h, data, offset, src, port))
+			final EndpointAddress src) throws KNXFormatException, IOException {
+		if (super.handleServiceType(h, data, offset, src))
 			return true;
 		final int svc = h.getServiceType();
 		// { tunneling.req/ack, tunneling-feat.x }
@@ -349,8 +349,8 @@ public class KNXnetIPTunnel extends ClientConnection
 		if (!checkChannelId(req.getChannelID(), "request"))
 			return true;
 
-		// tunneling sequence and ack is only used over udp connections, not tcp
-		if (!stream) {
+		// tunneling sequence and ack is only used over udp connections, not tcp/uds
+		if (ctrlEp instanceof UdpEndpointAddress) {
 			final int seq = req.getSequenceNumber();
 			final boolean missed = ((seq - 1) & 0xFF) == getSeqRcv();
 			if (missed) {
@@ -374,7 +374,7 @@ public class KNXnetIPTunnel extends ClientConnection
 				final int status = h.getVersion() == KNXNETIP_VERSION_10 ? ErrorCodes.NO_ERROR
 						: ErrorCodes.VERSION_NOT_SUPPORTED;
 				final byte[] buf = PacketHelper.toPacket(new ServiceAck(serviceAck, channelId, seq, status));
-				send(buf, dataEndpt);
+				send(buf, dataEp);
 				if (status == ErrorCodes.VERSION_NOT_SUPPORTED) {
 					close(CloseEvent.INTERNAL, "protocol version changed", ERROR, null);
 					return true;

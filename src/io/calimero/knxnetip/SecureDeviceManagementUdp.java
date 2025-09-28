@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2018, 2022 B. Malinowsky
+    Copyright (c) 2018, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,10 +38,8 @@ package io.calimero.knxnetip;
 
 import static java.lang.System.Logger.Level.TRACE;
 import static java.lang.System.Logger.Level.WARNING;
-import static io.calimero.knxnetip.Net.hostPort;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 import io.calimero.KNXException;
@@ -52,7 +50,7 @@ import io.calimero.knxnetip.util.CRI;
 final class SecureDeviceManagementUdp extends KNXnetIPDevMgmt {
 	private final SecureSessionUdp udp;
 
-	SecureDeviceManagementUdp(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP,
+	SecureDeviceManagementUdp(final UdpEndpointAddress localEP, final UdpEndpointAddress serverCtrlEP,
 			final boolean useNAT, final SecureSessionUdp udp) throws KNXException, InterruptedException {
 		super(serverCtrlEP);
 		this.udp = udp;
@@ -61,26 +59,26 @@ final class SecureDeviceManagementUdp extends KNXnetIPDevMgmt {
 	}
 
 	@Override
-	protected void connect(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP, final CRI cri,
+	protected void connect(final EndpointAddress localEP, final EndpointAddress remoteCtrlEP, final CRI cri,
 			final boolean useNAT) throws KNXException, InterruptedException {
-		final var local = Net.matchRemoteEndpoint(localEP, serverCtrlEP, useNAT);
-		udp.setupSecureSession(this, local, serverCtrlEP, useNAT);
+		final var local = new UdpEndpointAddress(Net.matchRemoteEndpoint((InetSocketAddress) localEP.address(), (InetSocketAddress) remoteCtrlEP.address(), useNAT));
+		udp.setupSecureSession(this, local, remoteCtrlEP, useNAT);
 
-		super.connect(local, serverCtrlEP, cri, useNAT);
+		super.connect(local, remoteCtrlEP, cri, useNAT);
 	}
 
 	@Override
-	public String name() { return "KNX/IP " + SecureConnection.secureSymbol + " Management " + hostPort(ctrlEndpt); }
+	public String name() { return "KNX/IP " + SecureConnection.secureSymbol + " Management " + ctrlEp; }
 
 	@Override
-	protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
+	protected void send(final byte[] packet, final EndpointAddress dst) throws IOException {
 		final byte[] wrapped = udp.newSecurePacket(packet);
 		super.send(wrapped, dst);
 	}
 
 	@Override
 	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset,
-			final InetAddress src, final int port) throws KNXFormatException, IOException {
+			final EndpointAddress src) throws KNXFormatException, IOException {
 
 		final int svc = h.getServiceType();
 		if (!h.isSecure()) {
@@ -89,8 +87,7 @@ final class SecureDeviceManagementUdp extends KNXnetIPDevMgmt {
 		}
 
 		if (svc == SecureConnection.SecureSessionResponse) {
-			final var source = new InetSocketAddress(src, port);
-			udp.sessionAuth(h, data, offset, source);
+			udp.sessionAuth(h, data, offset, src);
 		}
 		else if (svc == SecureConnection.SecureSvc) {
 			final Object[] fields = udp.unwrap(h, data, offset);
@@ -102,7 +99,7 @@ final class SecureDeviceManagementUdp extends KNXnetIPDevMgmt {
 			}
 			else {
 				// let base class handle decrypted knxip packet
-				return super.handleServiceType(containedHeader, packet, containedHeader.getStructLength(), src, port);
+				return super.handleServiceType(containedHeader, packet, containedHeader.getStructLength(), src);
 			}
 		}
 		else

@@ -144,8 +144,6 @@ public class KNXnetIPRouting extends ConnectionBase
 	// we will only warn about it once, to avoid spamming the log
 	private boolean loggedGiraUnsupportedSvcType;
 
-	private final InetAddress multicast;
-
 	private DatagramChannel dc;
 	private DatagramChannel dcSysBcast;
 
@@ -206,12 +204,11 @@ public class KNXnetIPRouting extends ConnectionBase
 	protected KNXnetIPRouting(final InetAddress mcGroup)
 	{
 		super(KNXnetIPHeader.ROUTING_IND, 0, 1, 0);
-		if (mcGroup == null)
-			multicast = DefaultMulticast;
-		else if (!isValidRoutingMulticast(mcGroup))
-			throw new KNXIllegalArgumentException("non-valid routing multicast " + mcGroup);
-		else
-			multicast = mcGroup;
+		final var mc = mcGroup == null ? DefaultMulticast : mcGroup;
+		if (!isValidRoutingMulticast(mc))
+			throw new KNXIllegalArgumentException("non-valid KNX routing multicast " + mcGroup);
+
+		ctrlEp = new UdpEndpointAddress(new InetSocketAddress(mc, DEFAULT_PORT));
 	}
 
 	/**
@@ -363,18 +360,20 @@ public class KNXnetIPRouting extends ConnectionBase
 	 * @param useMulticastLoopback {@code true} to loopback multicast packets to the
 	 *        local socket, {@code false} otherwise; this parameter is only
 	 *        interpreted as a hint by the operating system
-	 * @param startReceiver {@code true} to start a threaded receiver loop which
-	 *        dispatches to
-	 *        {@link #handleServiceType(KNXnetIPHeader, byte[], int, InetAddress, int)},
+	 * @param startReceiver {@code true} to start a threaded receiver loop which dispatches to
+	 *        {@link #handleServiceType(KNXnetIPHeader, byte[], int, EndpointAddress)},
 	 *        {@code false} if received socket datagrams are handled by other means
 	 * @throws KNXException on failed creation or initialization of multicast socket
 	 */
 	protected void init(final NetworkInterface netIf, final boolean useMulticastLoopback,
 		final boolean startReceiver) throws KNXException
 	{
-		ctrlEndpt = new InetSocketAddress(multicast, DEFAULT_PORT);
+		dataEp = ctrlEp;
+		ctrlEndpt = (InetSocketAddress) ctrlEp.address();
 		dataEndpt = ctrlEndpt;
 
+
+		final var multicast = ((InetSocketAddress) ctrlEp.address()).getAddress();
 		try {
 			dc = newChannel();
 			dcSysBcast = !multicast.equals(systemBroadcast) ? newChannel() : null;
@@ -474,8 +473,9 @@ public class KNXnetIPRouting extends ConnectionBase
 
 	@Override
 	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data,
-			final int offset, final InetAddress src, final int port) throws KNXFormatException, IOException {
+			final int offset, final EndpointAddress src) throws KNXFormatException, IOException {
 		final int svc = h.getServiceType();
+		final var sender = (InetSocketAddress) src.address();
 		if (h.getVersion() != KNXNETIP_VERSION_10)
 			close(CloseEvent.INTERNAL, "protocol version changed", ERROR, null);
 		else if (svc == KNXnetIPHeader.ROUTING_IND) {
@@ -488,19 +488,20 @@ public class KNXnetIPRouting extends ConnectionBase
 		}
 		else if (svc == KNXnetIPHeader.ROUTING_LOST_MSG) {
 			final RoutingLostMessage lost = new RoutingLostMessage(data, offset);
-			fireLostMessage(new InetSocketAddress(src, port), lost);
+			fireLostMessage(sender, lost);
 		}
 		else if (svc == KNXnetIPHeader.ROUTING_BUSY) {
 			final RoutingBusy busy = new RoutingBusy(data, offset);
-			updateRoutingFlowControl(busy, new InetSocketAddress(src, port));
+			updateRoutingFlowControl(busy, sender);
 
-			fireRoutingBusy(new InetSocketAddress(src, port), busy);
+			fireRoutingBusy(sender, busy);
 		}
-		else if (svc == KNXnetIPHeader.RoutingSystemBroadcast && multicast.equals(systemBroadcast)) {
+		else if (svc == KNXnetIPHeader.RoutingSystemBroadcast
+				&& ((InetSocketAddress) ctrlEp.address()).getAddress().equals(systemBroadcast)) {
 			return systemBroadcast(h, data, offset);
 		}
 		else if (svc == KNXnetIPHeader.SEARCH_REQ || svc == KNXnetIPHeader.SearchRequest)
-			searchRequest(new InetSocketAddress(src, port), h, data, offset);
+			searchRequest(sender, h, data, offset);
 		else if (svc == GiraUnsupportedSvcType) {
 			if (!loggedGiraUnsupportedSvcType)
 				logger.log(WARNING, "received unsupported Gira-specific service type 0x538, will be silently ignored: {0}",
@@ -509,7 +510,7 @@ public class KNXnetIPRouting extends ConnectionBase
 		}
 		// skip multicast packets from searches & secure services, to avoid logged warnings about unknown frames
 		else if (!h.isSecure() && svc != KNXnetIPHeader.SEARCH_RES && svc != KNXnetIPHeader.SearchResponse)
-			return super.handleServiceType(h, data, offset, src, port);
+			return super.handleServiceType(h, data, offset, src);
 		return true;
 	}
 
@@ -575,7 +576,7 @@ public class KNXnetIPRouting extends ConnectionBase
 			throw new IllegalStateException("in error state, send aborted");
 		}
 		try {
-			send(packet, dataEndpt);
+			send(packet, dataEp);
 			setState(OK);
 		}
 		catch (final InterruptedIOException e) {
@@ -590,8 +591,8 @@ public class KNXnetIPRouting extends ConnectionBase
 	}
 
 	@Override
-	protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
-		dc.send(ByteBuffer.wrap(packet), dst);
+	protected void send(final byte[] packet, final EndpointAddress dst) throws IOException {
+		dc.send(ByteBuffer.wrap(packet), dst.address());
 	}
 
 	private boolean systemBroadcast(final KNXnetIPHeader h, final byte[] data, final int offset)

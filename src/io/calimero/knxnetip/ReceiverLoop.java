@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2010, 2022 B. Malinowsky
+    Copyright (c) 2010, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@
 package io.calimero.knxnetip;
 
 import static java.lang.System.Logger.Level.ERROR;
-import static java.lang.System.Logger.Level.INFO;
 import static java.lang.System.Logger.Level.WARNING;
 
 import java.io.IOException;
@@ -92,9 +91,9 @@ class ReceiverLoop extends UdpSocketLooper implements Runnable
 			else if (h.getServiceType() == 0)
 				// check service type for 0 (invalid type), so unused service types of us can stay 0 by default
 				logger.log(WARNING, "received frame with service type 0x0 - ignored");
-			else if (!conn.handleServiceType(h, data, offset + h.getStructLength(), source))
-				logger.log(INFO, "received unknown frame with service type 0x"
-						+ Integer.toHexString(h.getServiceType()) + " - ignored");
+			else
+				conn.receivedServiceType(new UdpEndpointAddress(source), h, data, offset + h.getStructLength());
+
 		}
 		catch (KNXFormatException | RuntimeException e) {
 			logger.log(WARNING, "received invalid frame", e);

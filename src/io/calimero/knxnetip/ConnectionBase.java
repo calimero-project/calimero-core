@@ -50,8 +50,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.net.UnixDomainSocketAddress;
 import java.util.HexFormat;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -100,10 +98,14 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	protected DatagramSocket socket;
 
 	/** Remote control endpoint. */
+	@Deprecated
 	protected InetSocketAddress ctrlEndpt;
-	volatile SocketAddress controlEndpoint;
 	/** Remote data endpoint. */
+	@Deprecated
 	protected InetSocketAddress dataEndpt;
+
+	volatile EndpointAddress ctrlEp;
+	volatile EndpointAddress dataEp;
 
 	/** Connection KNX channel identifier. */
 	protected int channelId;
@@ -241,7 +243,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 							logger.log(TRACE, "sending cEMI frame seq {0}, {1}, attempt {2} (channel {3}) {4}", getSeqSend(), mode,
 									(attempt + 1), channelId, HexFormat.ofDelimiter(" ").formatHex(buf));
 
-					send(buf, dataEndpt);
+					send(buf, dataEp);
 					// shortcut for routing, don't switch into 'ack-pending'
 					if (serviceRequest == KNXnetIPHeader.ROUTING_IND)
 						return;
@@ -294,6 +296,15 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		}
 	}
 
+	protected void send(final byte[] packet, final EndpointAddress dst) throws IOException {
+		final DatagramPacket p = new DatagramPacket(packet, packet.length, dst.address());
+		if (dst.equals(dataEp))
+			socket.send(p);
+		else
+			ctrlSocket.send(p);
+	}
+
+	@Deprecated
 	protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
 		final DatagramPacket p = new DatagramPacket(packet, packet.length, dst);
 		if (dst.equals(dataEndpt))
@@ -319,12 +330,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	@Override
 	public String name()
 	{
-		if (ctrlEndpt == null)
-			return controlEndpoint.toString();
-		// only the control endpoint is set when our logger is initialized (the data
-		// endpoint gets assigned later in connect)
-		// to keep the name short, avoid a prepended host name as done by InetAddress
-		return Net.hostPort(ctrlEndpt);
+		return ctrlEp.toString();
 	}
 
 	@Override
@@ -337,6 +343,14 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	public String toString() {
 		return name() + (channelId != 0 ? (" channel " + channelId) : "") + " (state " + connectionState() + ")";
 	}
+
+	protected EndpointAddress ctrlEp() { return ctrlEp; }
+
+	protected void ctrlEp(final EndpointAddress addr) { ctrlEp = addr; }
+
+	protected EndpointAddress dataEp() { return dataEp; }
+
+	protected void dataEp(final EndpointAddress addr) { dataEp = addr; }
 
 	/**
 	 * Returns the protocol's current receive sequence number.
@@ -386,18 +400,32 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		listeners.fire(l -> l.frameReceived(fe));
 	}
 
-	boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset, final SocketAddress source)
+	void receivedServiceType(final EndpointAddress source, final KNXnetIPHeader h, final byte[] data, final int offset)
 			throws KNXFormatException, IOException {
 		final int hdrStart = offset - h.getStructLength();
-		final var socketName = source instanceof final InetSocketAddress isa ? Net.hostPort(isa) : source;
-		logger.log(TRACE, "from {0}: {1}: {2}", socketName, h,
+		logger.log(TRACE, "from {0}: {1}: {2}", source, h,
 				HexFormat.ofDelimiter(" ").formatHex(data, hdrStart, hdrStart + h.getTotalLength()));
-		if (source instanceof final InetSocketAddress isa)
-			return handleServiceType(h, data, offset, isa.getAddress(), isa.getPort());
-		else if (source instanceof UnixDomainSocketAddress)
-			return handleServiceType(h, data, offset, InetAddress.getByAddress(new byte[4]), 0); // TODO UDS remote
-		else
-			throw new IllegalStateException();
+		if (!handleServiceType(h, data, offset, source))
+			logger.log(DEBUG, "received unknown frame with service type 0x{0} - ignored",
+					Integer.toHexString(h.getServiceType()));
+	}
+
+	/**
+	 * This stub always returns false.
+	 *
+	 * @param h received KNXnet/IP header
+	 * @param data received datagram data
+	 * @param offset datagram data start offset
+	 * @param src sender endpoint address
+	 * @return {@code true} if service type is known and handled (successfully or not), {@code false} otherwise
+	 * @throws KNXFormatException on service type parsing or data format errors
+	 * @throws IOException on socket problems
+	 */
+	@SuppressWarnings("unused")
+	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset,
+			final EndpointAddress src) throws KNXFormatException, IOException {
+		// at this subtype level, we don't care about any service type
+		return false;
 	}
 
 	/**
@@ -408,12 +436,13 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	 * @param offset datagram data start offset
 	 * @param src sender IP address
 	 * @param port sender UDP port
-	 * @return {@code true} if service type was known and handled (successfully or not), {@code false}
+	 * @return {@code true} if service type is known and handled (successfully or not), {@code false}
 	 *         otherwise
 	 * @throws KNXFormatException on service type parsing or data format errors
 	 * @throws IOException on socket problems
 	 */
 	@SuppressWarnings("unused")
+	@Deprecated
 	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset,
 		final InetAddress src, final int port) throws KNXFormatException, IOException
 	{
@@ -492,7 +521,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 			}
 			logger.log(TRACE, "sending disconnect request for {0}", this);
 			final byte[] buf = PacketHelper.toPacket(new DisconnectRequest(channelId, hpai));
-			send(buf, ctrlEndpt);
+			send(buf, ctrlEp);
 			long remaining = CONNECT_REQ_TIMEOUT * 1000L;
 			final long end = System.currentTimeMillis() + remaining;
 			while (closing == 1 && remaining > 0) {

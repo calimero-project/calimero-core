@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2018, 2024 B. Malinowsky
+    Copyright (c) 2018, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -106,8 +106,8 @@ final class SecureSessionUdp {
 	}
 
 	// session.req -> session.res -> auth.req -> session-status
-	void setupSecureSession(final ClientConnection conn, final InetSocketAddress localEP,
-			final InetSocketAddress serverCtrlEP, final boolean useNat)
+	void setupSecureSession(final ClientConnection conn, final UdpEndpointAddress localEP,
+			final EndpointAddress serverCtrlEP, final boolean useNat)
 		throws KNXException {
 
 		logger.log(DEBUG, "setup secure session with {0}", serverCtrlEP);
@@ -122,12 +122,12 @@ final class SecureSessionUdp {
 		catch (final Throwable e) {
 			throw new KnxSecureException("error creating secure key pair for " + serverCtrlEP, e);
 		}
-		try (DatagramSocket local = new DatagramSocket(localEP)) {
+		try (DatagramSocket local = new DatagramSocket(localEP.address())) {
 			localSocket = local;
 			final HPAI hpai = useNat ? HPAI.Nat : new HPAI(HPAI.IPV4_UDP,
 					(InetSocketAddress) local.getLocalSocketAddress());
 			final byte[] sessionReq = PacketHelper.newChannelRequest(hpai, publicKey);
-			local.send(new DatagramPacket(sessionReq, sessionReq.length, serverCtrlEP));
+			local.send(new DatagramPacket(sessionReq, sessionReq.length, serverCtrlEP.address()));
 
 			setupLoop = new ReceiverLoop(conn, local, 512, 0, sessionSetupTimeout);
 			setupLoop.run();
@@ -149,7 +149,7 @@ final class SecureSessionUdp {
 		}
 	}
 
-	void sessionAuth(final KNXnetIPHeader h, final byte[] data, final int offset, final InetSocketAddress source)
+	void sessionAuth(final KNXnetIPHeader h, final byte[] data, final int offset, final EndpointAddress source)
 			throws KNXFormatException, IOException {
 		try {
 			final Object[] res = newSessionResponse(h, data, offset, source);
@@ -158,7 +158,7 @@ final class SecureSessionUdp {
 			final byte[] auth = newSessionAuth(serverPublicKey);
 			final byte[] packet = newSecurePacket(auth);
 			logger.log(DEBUG, "secure session {0}, request access for user {1}", sessionId, session.user());
-			localSocket.send(new DatagramPacket(packet, packet.length, source));
+			localSocket.send(new DatagramPacket(packet, packet.length, source.address()));
 		}
 		catch (final RuntimeException e) {
 			sessionStatus = AuthFailed;
@@ -168,7 +168,7 @@ final class SecureSessionUdp {
 	}
 
 	Object[] newSessionResponse(final KNXnetIPHeader h, final byte[] data, final int offset,
-		final InetSocketAddress src) throws KNXFormatException {
+		final EndpointAddress src) throws KNXFormatException {
 
 		if (h.getServiceType() != SecureConnection.SecureSessionResponse)
 			throw new KNXIllegalArgumentException("no secure channel response");
@@ -190,7 +190,7 @@ final class SecureSessionUdp {
 
 		final boolean skipDeviceAuth = Arrays.equals(session.deviceAuthKey().getEncoded(), new byte[16]);
 		if (skipDeviceAuth) {
-			logger.log(WARNING, "skipping device authentication of {0} (no device key)", hostPort(src));
+			logger.log(WARNING, "skipping device authentication of {0} (no device key)", src);
 		}
 		else {
 			final ByteBuffer mac = SecureConnection.decrypt(buffer, session.deviceAuthKey(),

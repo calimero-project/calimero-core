@@ -43,7 +43,6 @@ import static java.lang.System.Logger.Level.WARNING;
 
 import java.io.IOException;
 import java.lang.System.Logger.Level;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.concurrent.CompletableFuture;
@@ -64,8 +63,10 @@ import io.calimero.baos.BaosService;
 import io.calimero.baos.BaosService.Property;
 import io.calimero.cemi.CEMI;
 import io.calimero.knxnetip.ClientConnection;
+import io.calimero.knxnetip.EndpointAddress;
 import io.calimero.knxnetip.KNXConnectionClosedException;
 import io.calimero.knxnetip.TcpConnection;
+import io.calimero.knxnetip.UdpEndpointAddress;
 import io.calimero.knxnetip.servicetype.ErrorCodes;
 import io.calimero.knxnetip.servicetype.KNXnetIPHeader;
 import io.calimero.knxnetip.servicetype.PacketHelper;
@@ -94,7 +95,6 @@ class ObjectServerConnection extends ClientConnection {
 	// client SHALL wait 1 second for acknowledgment response to an object server request from server
 	private static final int ReqTimeout = 1;
 
-	private final boolean tcp;
 	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 	private final Future<?> keepAlive;
 
@@ -102,16 +102,15 @@ class ObjectServerConnection extends ClientConnection {
 	ObjectServerConnection(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP)
 			throws KNXException, InterruptedException {
 		super(KNXnetIPHeader.ObjectServerRequest, KNXnetIPHeader.ObjectServerAck, 2, ReqTimeout);
-		tcp = false;
 		keepAlive = CompletableFuture.completedFuture(Void.TYPE);
-		connect(localEP, serverCtrlEP, CRI.createRequest(ObjectServerProtocol), false);
+		connect(new UdpEndpointAddress(localEP), new UdpEndpointAddress(serverCtrlEP), CRI.createRequest(ObjectServerProtocol), false);
 	}
 
 	ObjectServerConnection(final TcpConnection c) throws KNXException {
 		super(KNXnetIPHeader.ObjectServerRequest, KNXnetIPHeader.ObjectServerAck, 1, ReqTimeout, c);
-		ctrlEndpt = c.server();
+		ctrlEp(c.server());
+		dataEp(c.server());
 		logger = LogService.getLogger("io.calimero.baos." + name());
-		tcp = true;
 		try {
 			c.connect();
 		}
@@ -144,12 +143,13 @@ class ObjectServerConnection extends ClientConnection {
 		if (mode == BlockingMode.WaitForCon)
 			throw new KNXIllegalArgumentException(mode + " is not supported");
 		try {
-			final int chid = tcp ? 0 : channelId;
-			final int seq = tcp ? 0 : getSeqSend();
+			final boolean udp = ctrlEp() instanceof UdpEndpointAddress;
+			final int chid = udp ? channelId : 0;
+			final int seq = udp ? getSeqSend() : 0;
 			final var buf = PacketHelper.toPacket(new ServiceRequest<>(serviceRequest, chid, seq, svc));
 
 			// NYI udp: we need a send method like for cEMI
-			send(buf, dataEndpt);
+			send(buf, dataEp());
 		}
 		catch (final IOException e) {
 			close(CloseEvent.INTERNAL, "communication failure", ERROR, e);
@@ -164,8 +164,8 @@ class ObjectServerConnection extends ClientConnection {
 
 	@Override
 	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset,
-		final InetAddress src, final int port) throws KNXFormatException, IOException {
-		if (super.handleServiceType(h, data, offset, src, port))
+			final EndpointAddress src) throws KNXFormatException, IOException {
+		if (super.handleServiceType(h, data, offset, src))
 			return true;
 		final int svc = h.getServiceType();
 		if (svc < serviceRequest || svc > serviceAck)
@@ -185,7 +185,7 @@ class ObjectServerConnection extends ClientConnection {
 			return true;
 
 		// req sequence and ack is only used over udp connections, not tcp
-		if (!tcp) {
+		if (ctrlEp() instanceof UdpEndpointAddress) {
 			final int seq = req.getSequenceNumber();
 			final boolean expected = seq == getSeqRcv();
 			final boolean repeated = ((seq + 1) & 0xFF) == getSeqRcv();
@@ -195,7 +195,7 @@ class ObjectServerConnection extends ClientConnection {
 				final int status = h.getVersion() == ProtocolVersion ? ErrorCodes.NO_ERROR
 						: ErrorCodes.VERSION_NOT_SUPPORTED;
 				final byte[] buf = PacketHelper.toPacket(new ServiceAck(serviceAck, channelId, seq, status));
-				send(buf, dataEndpt);
+				send(buf, dataEp());
 				if (status == ErrorCodes.VERSION_NOT_SUPPORTED) {
 					close(CloseEvent.INTERNAL, "protocol version changed", ERROR, null);
 					return true;
@@ -230,14 +230,14 @@ class ObjectServerConnection extends ClientConnection {
 
 	@Override
 	protected void close(final int initiator, final String reason, final Level level, final Throwable t) {
-		if (tcp) {
+		if (ctrlEp() instanceof UdpEndpointAddress)
+			super.close(initiator, reason, level, t);
+		else {
 //			closing = 2; // XXX needed?
 			cleanup(initiator, reason, level, t);
 			keepAlive.cancel(true);
 			scheduler.shutdown();
 		}
-		else
-			super.close(initiator, reason, level, t);
 	}
 
 	@Override

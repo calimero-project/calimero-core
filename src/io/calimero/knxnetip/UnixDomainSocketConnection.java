@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2024, 2024 B. Malinowsky
+    Copyright (c) 2024, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@
 package io.calimero.knxnetip;
 
 import java.io.IOException;
-import java.net.SocketAddress;
 import java.net.StandardProtocolFamily;
 import java.net.UnixDomainSocketAddress;
 import java.nio.ByteBuffer;
@@ -57,7 +56,7 @@ public final class UnixDomainSocketConnection extends StreamConnection {
 
 
 	private UnixDomainSocketConnection(final Path path) throws IOException {
-		super(UnixDomainSocketAddress.of(path));
+		super(new UdsEndpointAddress(UnixDomainSocketAddress.of(path), 0));
 		channel = SocketChannel.open(StandardProtocolFamily.UNIX);
 	}
 
@@ -65,7 +64,7 @@ public final class UnixDomainSocketConnection extends StreamConnection {
 	public synchronized void connect() throws IOException {
 		if (isConnected())
 			return;
-		channel.connect(server());
+		channel.connect(server().address());
 		startReceiver();
 	}
 
@@ -73,10 +72,7 @@ public final class UnixDomainSocketConnection extends StreamConnection {
 	public boolean isConnected() { return channel.isConnected(); }
 
 	@Override
-	SocketAddress localEndpoint() { return UnixDomainSocketAddress.of(""); }
-
-	@Override
-	public UnixDomainSocketAddress server() { return (UnixDomainSocketAddress) super.server(); }
+	UdsEndpointAddress localEndpoint() { return new UdsEndpointAddress(UnixDomainSocketAddress.of(""), 0); }
 
 	@Override
 	void close(final int initiator, final String reason) {
@@ -90,14 +86,11 @@ public final class UnixDomainSocketConnection extends StreamConnection {
 	@Override
 	public String toString() {
 		final var state = channel.isOpen() ? channel.isConnected() ? "connected" : "open" : "closed";
-		return socketName(server()) + " (" + state +")";
+		return server() + " (" + state +")";
 	}
 
 	@Override
 	void send(final byte[] data) throws IOException { channel.write(ByteBuffer.wrap(data)); }
-
-	@Override
-	String socketName(final SocketAddress addr) { return addr.toString(); }
 
 	@Override
 	boolean streamClosed() { return !channel.isOpen(); }

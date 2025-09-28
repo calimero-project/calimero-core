@@ -50,7 +50,6 @@ import java.io.InterruptedIOException;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.math.BigInteger;
-import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.security.Key;
@@ -98,7 +97,7 @@ import io.calimero.secure.KnxSecureException;
 public sealed abstract class StreamConnection implements Closeable
 		permits TcpConnection, UnixDomainSocketConnection {
 
-	private final SocketAddress server;
+	private final EndpointAddress server;
 	private final Logger logger;
 
 	// session ID -> secure session
@@ -194,7 +193,7 @@ public sealed abstract class StreamConnection implements Closeable
 
 			sno = serialNumber;
 
-			logger = LogService.getLogger("io.calimero.knxnetip." + secureSymbol + " Session " + conn.socketName(conn.server));
+			logger = LogService.getLogger("io.calimero.knxnetip." + secureSymbol + " Session " + conn.server);
 		}
 
 		/**
@@ -279,7 +278,7 @@ public sealed abstract class StreamConnection implements Closeable
 		private void setupSecureSession()
 				throws KNXTimeoutException, KNXConnectionClosedException, InterruptedException {
 			conn.sessionRequestLock.lock();
-			final var socketName = socketName(conn.server);
+			final var socketName = conn.server;
 			try {
 				if (sessionState == SessionState.Authenticated)
 					return;
@@ -348,7 +347,7 @@ public sealed abstract class StreamConnection implements Closeable
 				}
 			}
 			if (remaining <= 0)
-				throw new KNXTimeoutException("timeout establishing secure session with " + socketName(conn.server));
+				throw new KNXTimeoutException("timeout establishing secure session with " + conn.server);
 		}
 
 		boolean acceptServiceType(final KNXnetIPHeader h, final byte[] data, final int offset, final int length)
@@ -421,7 +420,7 @@ public sealed abstract class StreamConnection implements Closeable
 			if (svcType == KNXnetIPHeader.SearchResponse || svcType == KNXnetIPHeader.DESCRIPTION_RES) {
 				for (final var client : securedConnections.values())
 					try {
-						client.handleServiceType(header, data, offset, conn.server);
+						client.receivedServiceType(conn.server, header, data, offset);
 					}
 					catch (KNXFormatException | IOException e) {
 						logger.log(WARNING, format("{0} error processing {1}", client, header), e);
@@ -441,7 +440,7 @@ public sealed abstract class StreamConnection implements Closeable
 
 			try {
 				if (connection != null) {
-					connection.handleServiceType(header, data, offset, conn.server);
+					connection.receivedServiceType(conn.server, header, data, offset);
 					if (header.getServiceType() == KNXnetIPHeader.DISCONNECT_RES) {
 						logger.log(TRACE, "remove connection {0}", connection);
 						securedConnections.remove(channelId);
@@ -467,10 +466,6 @@ public sealed abstract class StreamConnection implements Closeable
 					conn.close(CloseEvent.INTERNAL, "error sending keep-alive");
 				}
 			}
-		}
-
-		private String socketName(final SocketAddress addr) {
-			return conn.socketName(addr);
 		}
 
 		private byte[] wrap(final byte[] plainPacket) {
@@ -499,7 +494,7 @@ public sealed abstract class StreamConnection implements Closeable
 		}
 
 		private byte[] parseSessionResponse(final KNXnetIPHeader h, final byte[] data, final int offset,
-				final SocketAddress remote) throws KNXFormatException {
+				final EndpointAddress remote) throws KNXFormatException {
 
 			if (h.getServiceType() != SecureSessionResponse)
 				throw new KNXIllegalArgumentException("no secure channel response");
@@ -526,7 +521,7 @@ public sealed abstract class StreamConnection implements Closeable
 
 			final boolean skipDeviceAuth = Arrays.equals(deviceAuthKey.getEncoded(), new byte[16]);
 			if (skipDeviceAuth) {
-				logger.log(WARNING, "skipping device authentication of {0} (no device key)", socketName(remote));
+				logger.log(WARNING, "skipping device authentication of {0} (no device key)", remote);
 			}
 			else {
 				final ByteBuffer mac = SecureConnection.decrypt(buffer, deviceAuthKey,
@@ -606,9 +601,9 @@ public sealed abstract class StreamConnection implements Closeable
 		}
 	}
 
-	StreamConnection(final SocketAddress server) {
+	StreamConnection(final EndpointAddress server) {
 		this.server = server;
-		logger = LogService.getLogger("io.calimero.knxnetip." + socketName(server));
+		logger = LogService.getLogger("io.calimero.knxnetip." + server);
 	}
 
 	/**
@@ -631,9 +626,9 @@ public sealed abstract class StreamConnection implements Closeable
 		return newSecureSession(tunnelInterface.user(), tunnelInterface.userKey(), tunnelInterface.deviceAuthCode());
 	}
 
-	abstract SocketAddress localEndpoint();
+	abstract EndpointAddress localEndpoint();
 
-	public SocketAddress server() { return server; }
+	public EndpointAddress server() { return server; }
 
 	public abstract boolean isConnected();
 
@@ -672,10 +667,8 @@ public sealed abstract class StreamConnection implements Closeable
 	public abstract void connect() throws IOException;
 
 	void startReceiver() {
-		Executor.execute(this::runReceiveLoop, "KNXnet/IP receiver " + socketName(server()));
+		Executor.execute(this::runReceiveLoop, "KNXnet/IP receiver " + server());
 	}
-
-	abstract String socketName(SocketAddress addr);
 
 	void runReceiveLoop() {
 		final int rcvBufferSize = 512;
@@ -764,7 +757,7 @@ public sealed abstract class StreamConnection implements Closeable
 		final int svcType = header.getServiceType();
 		if (svcType == KNXnetIPHeader.SearchResponse || svcType == KNXnetIPHeader.DESCRIPTION_RES) {
 			for (final var client : unsecuredConnections.values())
-				client.handleServiceType(header, data, offset, server);
+				client.receivedServiceType(server, header, data, offset);
 			return;
 		}
 
@@ -778,7 +771,7 @@ public sealed abstract class StreamConnection implements Closeable
 		}
 
 		if (connection != null) {
-			connection.handleServiceType(header, data, offset, server);
+			connection.receivedServiceType(server, header, data, offset);
 			if (svcType == KNXnetIPHeader.DISCONNECT_RES)
 				unsecuredConnections.remove(channelId);
 		}

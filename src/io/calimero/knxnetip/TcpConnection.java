@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2019, 2024 B. Malinowsky
+    Copyright (c) 2019, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.SocketException;
 import java.time.Duration;
 import java.util.Arrays;
@@ -59,7 +58,7 @@ public final class TcpConnection extends StreamConnection {
 
 	private static final Duration connectionTimeout = Duration.ofMillis(5000);
 
-	private volatile InetSocketAddress localEndpoint;
+	private volatile TcpEndpointAddress localEndpoint;
 	private final Socket socket;
 
 
@@ -85,9 +84,9 @@ public final class TcpConnection extends StreamConnection {
 	}
 
 	private TcpConnection(final InetSocketAddress server) {
-		super(server);
+		super(new TcpEndpointAddress(server));
 		socket = new Socket();
-		localEndpoint = new InetSocketAddress(0);
+		localEndpoint = new TcpEndpointAddress(new InetSocketAddress(0));
 	}
 
 	private TcpConnection(final InetSocketAddress local, final InetSocketAddress server) {
@@ -97,7 +96,7 @@ public final class TcpConnection extends StreamConnection {
 			bind = Net.matchRemoteEndpoint(local, server, false);
 			socket.bind(bind);
 			// socket returns any-local after socket is closed, so keep actual address after bind
-			localEndpoint = (InetSocketAddress) socket.getLocalSocketAddress();
+			localEndpoint = new TcpEndpointAddress((InetSocketAddress) socket.getLocalSocketAddress());
 		}
 		catch (final KNXException e) {
 			throw new KnxRuntimeException("no local host address available", e.getCause());
@@ -118,7 +117,7 @@ public final class TcpConnection extends StreamConnection {
 	 */
 	@Override
 	public SecureSession newSecureSession(final int user, final byte[] userKey, final byte[] deviceAuthCode) {
-		final SerialNumber sno = deriveSerialNumber(this.localEndpoint());
+		final SerialNumber sno = deriveSerialNumber(localEndpoint().address());
 		return new SecureSession(this, user, userKey, deviceAuthCode, sno);
 	}
 
@@ -143,7 +142,9 @@ public final class TcpConnection extends StreamConnection {
 		return SerialNumber.Zero;
 	}
 
-	InetSocketAddress localEndpoint() { return localEndpoint; }
+	TcpEndpointAddress localEndpoint() { return localEndpoint; }
+
+	public TcpEndpointAddress server() { return (TcpEndpointAddress) super.server(); }
 
 	Socket socket() { return socket; }
 
@@ -151,12 +152,7 @@ public final class TcpConnection extends StreamConnection {
 	public String toString() {
 		final var state = socket.isClosed() ? "closed"
 				: socket.isConnected() ? "connected" : socket.isBound() ? "bound" : "unbound";
-		return socketName(localEndpoint) + "<=>" + socketName(server()) + " (" + state +")";
-	}
-
-	@Override
-	String socketName(final SocketAddress addr) {
-		return Net.hostPort((InetSocketAddress) addr);
+		return localEndpoint + "<=>" + server() + " (" + state +")";
 	}
 
 	void send(final byte[] data) throws IOException {
@@ -168,14 +164,11 @@ public final class TcpConnection extends StreamConnection {
 	@Override
 	public synchronized void connect() throws IOException {
 		if (!socket.isConnected()) {
-			socket.connect(server(), (int) connectionTimeout.toMillis());
-			localEndpoint = (InetSocketAddress) socket.getLocalSocketAddress();
+			socket.connect(server().address(), (int) connectionTimeout.toMillis());
+			localEndpoint = new TcpEndpointAddress((InetSocketAddress) socket.getLocalSocketAddress());
 			startReceiver();
 		}
 	}
-
-	@Override
-	public InetSocketAddress server() { return (InetSocketAddress) super.server(); }
 
 	@Override
 	public boolean isConnected() {

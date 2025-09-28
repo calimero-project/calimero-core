@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -645,9 +645,9 @@ public class Discoverer
 			if (mcast)
 				channel.join(SYSTEM_SETUP_MULTICAST, ni);
 
-			// create a new socket address with the address from a, since the socket might
+			// create a new socket address with the address from localAddr, since the channel might
 			// return the wildcard address for loopback or default host address; but port
-			// is necessarily queried from socket since in a it might be 0 (for ephemeral port)
+			// is necessarily queried from the channel since localPort might be 0 (for ephemeral port)
 			final String nifName = ni != null ? ni.getName() + " " : "";
 			final int realLocalPort = ((InetSocketAddress) channel.getLocalAddress()).getPort();
 			final var localEndpoint = new InetSocketAddress(localAddr, realLocalPort);

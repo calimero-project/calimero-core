@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2021, 2024 B. Malinowsky
+    Copyright (c) 2021, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,10 +36,7 @@
 
 package io.calimero.knxnetip;
 
-import static io.calimero.knxnetip.Net.hostPort;
-
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.time.Duration;
@@ -149,7 +146,7 @@ public class DiscovererTcp {
 
 		@Override
 		protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset,
-				final InetAddress src, final int port) throws KNXFormatException, IOException {
+				final EndpointAddress src) throws KNXFormatException, IOException {
 
 			final int svc = h.getServiceType();
 			if (svc == KNXnetIPHeader.SearchResponse || svc == KNXnetIPHeader.DESCRIPTION_RES) {
@@ -158,8 +155,8 @@ public class DiscovererTcp {
 
 				final Result<ServiceType> result;
 				if (connection instanceof final TcpConnection tcp)
-					result = new Result<>(sr, NetworkInterface.getByInetAddress(tcp.localEndpoint().getAddress()),
-							tcp.localEndpoint(), tcp.server());
+					result = new Result<>(sr, NetworkInterface.getByInetAddress(tcp.localEndpoint().address().getAddress()),
+							tcp.localEndpoint().address(), tcp.server().address());
 				else if (connection instanceof UnixDomainSocketConnection)
 					result = new Result<>(sr, Net.defaultNetif(), new InetSocketAddress(0), new InetSocketAddress(0));
 				else
@@ -168,7 +165,7 @@ public class DiscovererTcp {
 				complete(result);
 				return true;
 			}
-			return super.handleServiceType(h, data, offset, src, port);
+			return super.handleServiceType(h, data, offset, src);
 		}
 
 		@SuppressWarnings("unchecked")
@@ -178,8 +175,7 @@ public class DiscovererTcp {
 		public String name() {
 			final String lock = new String(Character.toChars(0x1F512));
 			final String secure = session != null ? (" " + lock) : "";
-			final String remote = ctrlEndpt != null ? hostPort(ctrlEndpt) : controlEndpoint.toString();
-			return "KNX IP" + secure + " Tunneling " + remote;
+			return "KNX IP" + secure + " Tunneling " + ctrlEp;
 		}
 
 		@Override
@@ -192,7 +188,7 @@ public class DiscovererTcp {
 			session.ensureOpen();
 			session.registerConnectRequest(this);
 			try {
-				doConnect(c, cri);
+				connect(c.localEndpoint(), c.server(), cri, false);
 			}
 			finally {
 				session.unregisterConnectRequest(this);
@@ -200,7 +196,7 @@ public class DiscovererTcp {
 		}
 
 		@Override
-		protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
+		protected void send(final byte[] packet, final EndpointAddress dst) throws IOException {
 			var send = packet;
 			if (session != null)
 				send = SecureConnection.newSecurePacket(session.id(), session.nextSendSeq(), session.serialNumber(), 0,
@@ -208,6 +204,6 @@ public class DiscovererTcp {
 			super.send(send, dst);
 		}
 
-		void send(final byte[] packet) throws IOException { send(packet, new InetSocketAddress(0)); }
+		void send(final byte[] packet) throws IOException { send(packet, new TcpEndpointAddress(new InetSocketAddress(0))); }
 	}
 }

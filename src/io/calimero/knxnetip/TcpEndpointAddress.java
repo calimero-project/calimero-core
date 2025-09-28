@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2018, 2025 B. Malinowsky
+    Copyright (c) 2024, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,49 +36,15 @@
 
 package io.calimero.knxnetip;
 
-import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.util.Objects;
 
-import io.calimero.IndividualAddress;
-import io.calimero.KNXException;
-import io.calimero.knxnetip.StreamConnection.SecureSession;
-import io.calimero.knxnetip.util.CRI;
-import io.calimero.knxnetip.util.TunnelCRI;
-import io.calimero.link.medium.KNXMediumSettings;
-
-final class SecureTunnel extends KNXnetIPTunnel {
-	private final SecureSession session;
-
-	SecureTunnel(final SecureSession session, final TunnelingLayer knxLayer,
-			final IndividualAddress tunnelingAddress) throws KNXException, InterruptedException {
-		super(knxLayer, session.connection(), tunnelingAddress);
-		this.session = session;
-
-		final var cri = tunnelingAddress.equals(KNXMediumSettings.BackboneRouter) ? new TunnelCRI(knxLayer)
-				: new TunnelCRI(knxLayer, tunnelingAddress);
-		session.registerConnectRequest(this);
-		try {
-			final StreamConnection c = session.connection();
-			connect(c.localEndpoint(), c.server(), cri, false);
-		}
-		finally {
-			session.unregisterConnectRequest(this);
-		}
-	}
+public record TcpEndpointAddress(InetSocketAddress address) implements EndpointAddress {
+	public TcpEndpointAddress { Objects.requireNonNull(address); }
 
 	@Override
-	public String name() {
-		return "KNX IP " + SecureConnection.secureSymbol + " Tunneling " + ctrlEp;
-	}
+	public String protocol() { return "tcp"; }
 
 	@Override
-	protected void connect(final StreamConnection c, final CRI cri) {
-		// we don't have session assigned yet, connect in ctor
-	}
-
-	@Override
-	protected void send(final byte[] packet, final EndpointAddress dst) throws IOException {
-		final byte[] wrapped = SecureConnection.newSecurePacket(session.id(), session.nextSendSeq(),
-				session.serialNumber(), 0, packet, session.secretKey);
-		super.send(wrapped, dst);
-	}
+	public String toString() { return protocol() + "://" + address.getAddress().getHostAddress() + ":" + address.getPort(); }
 }

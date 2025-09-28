@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2018, 2024 B. Malinowsky
+    Copyright (c) 2018, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,10 +36,7 @@
 
 package io.calimero.knxnetip;
 
-import static io.calimero.knxnetip.Net.hostPort;
-
 import java.io.IOException;
-import java.net.InetSocketAddress;
 
 import io.calimero.KNXException;
 import io.calimero.knxnetip.StreamConnection.SecureSession;
@@ -55,7 +52,8 @@ final class SecureDeviceManagement extends KNXnetIPDevMgmt {
 		session.registerConnectRequest(this);
 		try {
 			final var cri = CRI.createRequest(DEVICE_MGMT_CONNECTION);
-			doConnect(session.connection(), cri);
+			final StreamConnection c = session.connection();
+			connect(c.localEndpoint(), c.server(), cri, false);
 		}
 		finally {
 			session.unregisterConnectRequest(this);
@@ -64,8 +62,7 @@ final class SecureDeviceManagement extends KNXnetIPDevMgmt {
 
 	@Override
 	public String name() {
-		final var remote = remoteAddress() instanceof final InetSocketAddress isa ? hostPort(isa) : remoteAddress();
-		return "KNX IP " + SecureConnection.secureSymbol + " Management " + remote;
+		return "KNX IP " + SecureConnection.secureSymbol + " Management " + ctrlEp();
 	}
 
 	@Override
@@ -74,7 +71,7 @@ final class SecureDeviceManagement extends KNXnetIPDevMgmt {
 	}
 
 	@Override
-	protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
+	protected void send(final byte[] packet, final EndpointAddress dst) throws IOException {
 		final byte[] wrapped = SecureConnection.newSecurePacket(session.id(), session.nextSendSeq(),
 				session.serialNumber(), 0, packet, session.secretKey);
 		super.send(wrapped, dst);

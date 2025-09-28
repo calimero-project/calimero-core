@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@ import static java.lang.System.Logger.Level.ERROR;
 
 import java.io.IOException;
 import java.lang.System.Logger.Level;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 import io.calimero.CloseEvent;
@@ -96,8 +95,8 @@ public class KNXnetIPDevMgmt extends ClientConnection
 	public KNXnetIPDevMgmt(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP, final boolean useNAT)
 		throws KNXException, InterruptedException
 	{
-		this(serverCtrlEP);
-		connect(localEP, serverCtrlEP, cri, useNAT);
+		this(new UdpEndpointAddress(serverCtrlEP));
+		connect(new UdpEndpointAddress(localEP), ctrlEp, cri, useNAT);
 	}
 
 	/**
@@ -117,10 +116,10 @@ public class KNXnetIPDevMgmt extends ClientConnection
 		connect(connection, cri);
 	}
 
-	KNXnetIPDevMgmt(final InetSocketAddress serverCtrlEP) {
+	KNXnetIPDevMgmt(final EndpointAddress serverCtrlEP) {
 		super(KNXnetIPHeader.DEVICE_CONFIGURATION_REQ, KNXnetIPHeader.DEVICE_CONFIGURATION_ACK, 4,
 				CONFIGURATION_REQ_TIMEOUT);
-		ctrlEndpt = serverCtrlEP;
+		ctrlEp = serverCtrlEP;
 		logger = LogService.getLogger("io.calimero.knxnetip." + name());
 	}
 
@@ -146,9 +145,9 @@ public class KNXnetIPDevMgmt extends ClientConnection
 
 	@Override
 	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset,
-		final InetAddress src, final int port) throws KNXFormatException, IOException
+		final EndpointAddress src) throws KNXFormatException, IOException
 	{
-		if (super.handleServiceType(h, data, offset, src, port))
+		if (super.handleServiceType(h, data, offset, src))
 			return true;
 		final int svc = h.getServiceType();
 		if (svc != serviceRequest)
@@ -160,11 +159,11 @@ public class KNXnetIPDevMgmt extends ClientConnection
 
 		final int status = h.getVersion() == KNXNETIP_VERSION_10 ? ErrorCodes.NO_ERROR
 				: ErrorCodes.VERSION_NOT_SUPPORTED;
-		if (!stream) {
+		if (ctrlEp instanceof UdpEndpointAddress) {
 			final int seq = req.getSequenceNumber();
 			if (seq == getSeqRcv()) {
 				final byte[] buf = PacketHelper.toPacket(new ServiceAck(serviceAck, channelId, seq, status));
-				send(buf, dataEndpt);
+				send(buf, dataEp);
 				incSeqRcv();
 			}
 			else

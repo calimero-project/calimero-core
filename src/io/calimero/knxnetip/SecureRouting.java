@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2018, 2023 B. Malinowsky
+    Copyright (c) 2018, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,6 @@
 
 package io.calimero.knxnetip;
 
-import static io.calimero.knxnetip.Net.hostPort;
 import static io.calimero.knxnetip.SecureConnection.securityInfo;
 import static java.lang.System.Logger.Level.DEBUG;
 import static java.lang.System.Logger.Level.INFO;
@@ -152,7 +151,7 @@ public final class SecureRouting extends KNXnetIPRouting {
 
 	@Override
 	public String name() {
-		return "KNX/IP " + SecureConnection.secureSymbol + " Routing " + ctrlEndpt.getAddress().getHostAddress();
+		return "KNX/IP " + SecureConnection.secureSymbol + " Routing " + ctrlEp;
 	}
 
 	@Override
@@ -161,28 +160,29 @@ public final class SecureRouting extends KNXnetIPRouting {
 	}
 
 	@Override
-	protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
+	protected void send(final byte[] packet, final EndpointAddress dst) throws IOException {
 		final int tag = routingCount.getAndIncrement() % 0x10000;
 		final byte[] wrapped = newSecurePacket(timestamp(), tag, packet);
-		channel().send(ByteBuffer.wrap(wrapped), dst);
+		channel().send(ByteBuffer.wrap(wrapped), dst.address());
 		scheduleGroupSync(periodicNotifyDelay());
 	}
 
 	@Override
 	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset,
-		final InetAddress src, final int port) throws KNXFormatException, IOException {
+		final EndpointAddress src) throws KNXFormatException, IOException {
 		final int svc = h.getServiceType();
 		if (svc == KNXnetIPHeader.SEARCH_REQ || svc == KNXnetIPHeader.SearchRequest)
-			return super.handleServiceType(h, data, offset, src, port);
+			return super.handleServiceType(h, data, offset, src);
 		if (!h.isSecure()) {
 			logger.log(TRACE, "received insecure service type 0x{0} - ignore", Integer.toHexString(svc));
 			return true;
 		}
 
+		final var ip = ((InetSocketAddress) src.address()).getAddress();
 		if (svc == SecureGroupSync) {
 			try {
 				final Object[] fields = newGroupSync(h, data, offset);
-				onGroupSync(src, (long) fields[0], true, (SerialNumber) fields[1], (int) fields[2]);
+				onGroupSync(ip, (long) fields[0], true, (SerialNumber) fields[1], (int) fields[2]);
 			}
 			catch (final KnxSecureException e) {
 				logger.log(DEBUG, "group sync {0}", e.getMessage());
@@ -192,9 +192,8 @@ public final class SecureRouting extends KNXnetIPRouting {
 		else if (svc == SecureConnection.SecureSvc) {
 			final Object[] fields = unwrap(h, data, offset);
 			final long timestamp = (long) fields[1];
-			if (!withinTolerance(src, timestamp, (SerialNumber) fields[2], (int) fields[3])) {
-				final var source = new InetSocketAddress(src, port);
-				logger.log(WARNING, "{0} timestamp {1} outside latency tolerance of {2} ms (local {3}) - ignore", hostPort(source),
+			if (!withinTolerance(ip, timestamp, (SerialNumber) fields[2], (int) fields[3])) {
+				logger.log(WARNING, "{0} timestamp {1} outside latency tolerance of {2} ms (local {3}) - ignore", src,
 						timestamp, mcastLatencyTolerance, timestamp());
 				return true;
 			}
@@ -203,7 +202,7 @@ public final class SecureRouting extends KNXnetIPRouting {
 			final KNXnetIPHeader containedHeader = new KNXnetIPHeader(packet, 0);
 
 			// let base class handle contained in decrypted knxip packet
-			return super.handleServiceType(containedHeader, packet, containedHeader.getStructLength(), src, port);
+			return super.handleServiceType(containedHeader, packet, containedHeader.getStructLength(), src);
 		}
 		else
 			logger.log(WARNING, "received unsupported secure service type 0x{0} - ignore", Integer.toHexString(svc));
@@ -339,7 +338,7 @@ public final class SecureRouting extends KNXnetIPRouting {
 			// schedule next sync before send to maintain happens-before with sync rcv
 			becomeTimeKeeper();
 			scheduleGroupSync(periodicNotifyDelay());
-			channel().send(ByteBuffer.wrap(sync), dataEndpt);
+			channel().send(ByteBuffer.wrap(sync), dataEp.address());
 		}
 		catch (IOException | RuntimeException e) {
 			if (!channel().isOpen()) {
