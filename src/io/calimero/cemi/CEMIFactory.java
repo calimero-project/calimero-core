@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -141,28 +141,17 @@ public final class CEMIFactory
 	 * @param data the data for the frame
 	 * @param original the original frame providing all necessary information for the new frame
 	 * @return the new cEMI frame adjusted with message code and data
-	 * @throws KNXFormatException if cEMI message code is unsupported or frame creation failed
+	 * @throws KNXFormatException if cEMI type is unsupported or frame creation failed
 	 */
-	public static CEMI create(final int msgCode, final byte[] data, final CEMI original)
-		throws KNXFormatException
-	{
-		return switch (msgCode) {
-			case CEMILData.MC_LDATA_REQ, CEMILData.MC_LDATA_CON, CEMILData.MC_LDATA_IND ->
-				create(msgCode, null, null, data, (CEMILData) original, false,
-						((CEMILData) original).isRepetition());
-			case CEMIDevMgmt.MC_PROPREAD_REQ, CEMIDevMgmt.MC_PROPREAD_CON, CEMIDevMgmt.MC_PROPWRITE_REQ,
-					CEMIDevMgmt.MC_PROPWRITE_CON, CEMIDevMgmt.MC_PROPINFO_IND, CEMIDevMgmt.MC_RESET_REQ,
-					CEMIDevMgmt.MC_RESET_IND -> {
-				final CEMIDevMgmt f = (CEMIDevMgmt) original;
-				yield new CEMIDevMgmt(msgCode, f.getObjectType(), f.getObjectInstance(), f.getPID(),
-						f.getStartIndex(), f.getElementCount(), data);
-			}
-			case CEMIBusMon.MC_BUSMON_IND -> {
-				final CEMIBusMon f = (CEMIBusMon) original;
-				yield CEMIBusMon.newWithStatus(f.getStatus(), f.getTimestamp(),
-						f.getTimestampType() == CEMIBusMon.TYPEID_TIMESTAMP_EXT, data);
-			}
-			default -> throw new KNXFormatException("unsupported cEMI msg code", msgCode);
+	@SuppressWarnings("unchecked")
+	public static <T extends CEMI> T create(final int msgCode, final byte[] data, final T original)
+			throws KNXFormatException {
+		return (T) switch (original) {
+			case CEMILData ldata -> create(msgCode, null, null, data, ldata, false, ldata.isRepetition());
+			case CEMIDevMgmt dm -> new CEMIDevMgmt(msgCode, dm.getObjectType(), dm.getObjectInstance(), dm.getPID(),
+					dm.getStartIndex(), dm.getElementCount(), data);
+			case CEMIBusMon mon -> newCemiBusMon(msgCode, data, mon);
+			default -> throw new KNXFormatException("unsupported cEMI type " + original.getClass());
 		};
 	}
 
@@ -182,7 +171,7 @@ public final class CEMIFactory
 	public static CEMILData create(final IndividualAddress src, final KNXAddress dst,
 		final CEMILData original, final boolean extended)
 	{
-		return (CEMILData) create(0, src, dst, null, original, extended, original.isRepetition());
+		return create(0, src, dst, null, original, extended, original.isRepetition());
 	}
 
 	/**
@@ -204,7 +193,7 @@ public final class CEMIFactory
 	public static CEMILData create(final IndividualAddress src, final KNXAddress dst,
 		final CEMILData original, final boolean extended, final boolean repeat)
 	{
-		return (CEMILData) create(0, src, dst, null, original, extended, repeat);
+		return create(0, src, dst, null, original, extended, repeat);
 	}
 
 	private static final int Emi1_LData_ind = 0x49;
@@ -386,10 +375,11 @@ public final class CEMIFactory
 	}
 
 	// leave msgcode/src/dst/data null/0 to use from original
-	private static CEMI create(final int msgCode, final IndividualAddress src,
-		final KNXAddress dst, final byte[] data, final CEMILData original, final boolean ext,
-		final boolean repeat)
-	{
+	private static CEMILData create(final int msgCode, final IndividualAddress src, final KNXAddress dst,
+			final byte[] data, final CEMILData original, final boolean ext, final boolean repeat) {
+		if (msgCode != 0 && msgCode != CEMILData.MC_LDATA_REQ && msgCode != CEMILData.MC_LDATA_CON && msgCode != CEMILData.MC_LDATA_IND)
+			throw new KNXIllegalArgumentException("unsupported cEMI L-Data msg code 0x" + Integer.toHexString(msgCode));
+
 		final int mc = msgCode != 0 ? msgCode : original.getMessageCode();
 		final IndividualAddress s = src != null ? src : original.getSource();
 		final KNXAddress d = dst != null ? dst : original.getDestination();
@@ -407,5 +397,12 @@ public final class CEMIFactory
 		if (ext)
 			return new CEMILDataEx(mc, s, d, content, original.getPriority(), repeat, original.getHopCount());
 		return new CEMILData(mc, s, d, content, original.getPriority(), repeat, original.getHopCount());
+	}
+
+	private static CEMIBusMon newCemiBusMon(final int msgCode, final byte[] data, final CEMIBusMon mon) {
+		if (msgCode != CEMIBusMon.MC_BUSMON_IND)
+			throw new KNXIllegalArgumentException("unsupported cEMI BusMon msg code 0x" + Integer.toHexString(msgCode));
+		return CEMIBusMon.newWithStatus(mon.getStatus(), mon.getTimestamp(),
+				mon.getTimestampType() == CEMIBusMon.TYPEID_TIMESTAMP_EXT, data);
 	}
 }

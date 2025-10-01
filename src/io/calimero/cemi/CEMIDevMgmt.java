@@ -304,7 +304,7 @@ public class CEMIDevMgmt implements CEMI
 		final int propID, final int startIndex, final int elements)
 	{
 		if (msgCode < MC_OFFSET || !msgCodes.get(msgCode - MC_OFFSET))
-			throw new KNXIllegalArgumentException("unknown message code");
+			throw new KNXIllegalArgumentException("unknown cEMI DevMgmt msg code 0x" + Integer.toHexString(msgCode));
 		mc = msgCode;
 		header = 7;
 		checkSetHeaderInfo(objType, objInstance, propID, startIndex, elements);

@@ -187,7 +187,7 @@ public class StateFilter implements NetworkFilter, RequestFilter
 			// read.res could be in an L-Data.con, too
 			if (f.getMessageCode() == CEMILData.MC_LDATA_CON)
 				try {
-					copy = (CEMILData) CEMIFactory.create(CEMILData.MC_LDATA_IND, d, f);
+					copy = CEMIFactory.create(CEMILData.MC_LDATA_IND, d, f);
 				}
 				catch (final KNXFormatException e) {
 					LogService.getLogger("io.calimero").log(ERROR, "create L_Data.ind for network buffer: " + f, e);
@@ -200,7 +200,7 @@ public class StateFilter implements NetworkFilter, RequestFilter
 			// adjust to read response frame
 			d[1] = (byte) (d[1] & 0x3f | 0x40);
 			try {
-				copy = (CEMILData) CEMIFactory.create(CEMILData.MC_LDATA_IND, d, f);
+				copy = CEMIFactory.create(CEMILData.MC_LDATA_IND, d, f);
 			}
 			catch (final KNXFormatException e) {
 				LogService.getLogger("io.calimero").log(ERROR, "create L_Data.ind for network buffer: " + f, e);

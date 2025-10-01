@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -222,7 +222,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 			return;
 		final CEMILData copy;
 		try {
-			copy = (CEMILData) CEMIFactory.create(CEMILData.MC_LDATA_IND, d, f);
+			copy = CEMIFactory.create(CEMILData.MC_LDATA_IND, d, f);
 		}
 		catch (final KNXFormatException e) {
 			LogService.getLogger("io.calimero").log(ERROR, "create L_Data.ind for network buffer: " + f, e);
