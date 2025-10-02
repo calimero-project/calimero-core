@@ -248,7 +248,7 @@ public class StateFilter implements NetworkFilter, RequestFilter
 	public CEMILData request(final KNXAddress dst, final Configuration c)
 	{
 		final Cache cache = c.getCache();
-		if (cache == null || !(dst instanceof GroupAddress))
+		if (cache == null || !(dst instanceof final GroupAddress ga))
 			return null;
 		final LDataObject o = (LDataObject) cache.get(dst);
 		if (o == null)
@@ -256,7 +256,7 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		// check if there is an expiration timeout for a state based value
 		final Datapoint dp;
 		final DatapointModel<?> m = c.getDatapointModel();
-		if (m != null && (dp = m.get((GroupAddress) dst)) != null && dp.isStateBased()) {
+		if (m != null && (dp = m.get(ga)) != null && dp.isStateBased()) {
 			final int t = ((StateDP) dp).getExpirationTimeout() * 1000;
 			if (t != 0 && System.currentTimeMillis() > o.getTimestamp() + t)
 				return null;

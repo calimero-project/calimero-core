@@ -159,11 +159,11 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 	@Override
 	public CEMILData request(final KNXAddress dst, final Configuration c)
 	{
-		if (!(dst instanceof GroupAddress))
+		if (!(dst instanceof final GroupAddress ga))
 			return null;
 		final DatapointModel<?> m = c.getDatapointModel();
 		if (m != null) {
-			final Datapoint dp = m.get((GroupAddress) dst);
+			final Datapoint dp = m.get(ga);
 			if (dp == null || dp.isStateBased())
 				return null;
 		}
