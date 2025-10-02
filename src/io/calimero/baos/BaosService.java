@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2019, 2024 B. Malinowsky
+    Copyright (c) 2019, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -644,19 +644,14 @@ public final class BaosService implements ServiceType {
 			else
 				id = buf.getShort() & 0xffff;
 
-			Object info = null;
-			if (subService == GetDatapointValue || subService == DatapointValueIndication)
-				info = new DatapointState(buf.get() & 0xff);
-			else if (subService == GetDatapointHistoryState) {
-				final int dpState = buf.get() & 0xff;
-				info = dpState;
-			}
-			else if (subService == SetDatapointValue) {
-				final var command = DatapointCommand.of(buf.get() & 0xff);
-				info = command;
-			}
-			else if (subService == GetServerItem || subService == SetServerItem)
-				info = Property.of(id);
+			final Object info = switch (subService) {
+				case GetDatapointValue, DatapointValueIndication -> new DatapointState(buf.get() & 0xff);
+				case GetDatapointHistoryState -> buf.get() & 0xff;
+				case SetDatapointValue -> DatapointCommand.of(buf.get() & 0xff);
+				case GetServerItem, SetServerItem -> Property.of(id);
+				case GetDatapointHistory -> Instant.ofEpochSecond(buf.getInt() & 0xffff_ffffL);
+				default -> null;
+			};
 
 			// datapoint description and history state don't have length field
 			if (subService == GetDatapointDescription || subService == GetDatapointHistoryState) {
@@ -666,15 +661,9 @@ public final class BaosService implements ServiceType {
 				list.add(new Item<>(id, info, data));
 			}
 			else {
-				if (subService == GetDatapointHistory) { // parse extra timestamp field
-					final long timestamp = buf.getInt() & 0xffff_ffffL;
-					info = Instant.ofEpochSecond(timestamp);
-				}
-
 				final byte[] data = getWithLengthPrefix(buf);
 				list.add(new Item<>(id, info, data));
 			}
-
 		}
 		if (buf.remaining() > 0)
 			throw new KNXFormatException(

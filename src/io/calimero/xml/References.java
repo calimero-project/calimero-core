@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -107,18 +107,14 @@ final class References
 		final StringBuilder mod = new StringBuilder((int) (1.5f * text.length()));
 		for (int i = 0; i < text.length(); ++i) {
 			final char c = text.charAt(i);
-			if (c == '&')
-				mod.append("&amp;");
-			else if (c == '<')
-				mod.append("&lt;");
-			else if (c == '>')
-				mod.append("&gt;");
-			else if (c == '"')
-				mod.append("&quot;");
-			else if (c == '\'')
-				mod.append("&apos;");
-			else
-				mod.append(c);
+			mod.append(switch (c) {
+				case '&' -> "&amp;";
+				case '<' -> "&lt;";
+				case '>' -> "&gt;";
+				case '"' -> "&quot;";
+				case '\'' -> "&apos;";
+				default -> c;
+			});
 		}
 		return mod.toString();
 	}

@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2020, 2022 B. Malinowsky
+    Copyright (c) 2020, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -121,26 +121,12 @@ public class DptXlatorRelativeControlRgbw extends DPTXlator {
 
 	private Optional<StepControl> component(final Component what) {
 		final int offset;
-		final int validBit;
-		if (what == Component.Red) {
-			offset = 0;
-			validBit = 8;
-		}
-		else if (what == Component.Green) {
-			offset = 1;
-			validBit = 4;
-		}
-		else if (what == Component.Blue) {
-			offset = 2;
-			validBit = 2;
-		}
-		else if (what == Component.White) {
-			offset = 3;
-			validBit = 1;
-		}
-		else
-			throw new Error("illegal control value");
-
+		final int validBit = switch (what) {
+			case Red   -> { offset = 0; yield 8; }
+			case Green -> { offset = 1; yield 4; }
+			case Blue  -> { offset = 2; yield 2; }
+			case White -> { offset = 3; yield 1; }
+		};
 		if ((data[4] & validBit) == 0)
 			return Optional.empty();
 		return Optional.of(StepControl.from(data[offset]));

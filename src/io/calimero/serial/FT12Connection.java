@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -597,15 +597,13 @@ public class FT12Connection implements Connection<byte[]>
 			try {
 				while (!quit) {
 					final int c = is.read();
-					if (c > -1) {
-						if (c == ACK)
-							signalAck();
-						else if (c == START)
-							readFrame();
-						else if (c == START_FIXED)
-							readShortFrame();
-						else
-							logger.log(TRACE, "received unexpected start byte 0x" + Integer.toHexString(c) + " - ignored");
+					switch (c) {
+						case -1 -> {}
+						case ACK -> signalAck();
+						case START -> readFrame();
+						case START_FIXED -> readShortFrame();
+						default -> logger.log(TRACE,
+								"received unexpected start byte 0x" + Integer.toHexString(c) + " - ignored");
 					}
 				}
 			}

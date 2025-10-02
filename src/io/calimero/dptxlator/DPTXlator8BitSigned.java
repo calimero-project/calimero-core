@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -264,14 +264,12 @@ public class DPTXlator8BitSigned extends DPTXlator
 					throw new KNXFormatException("invalid status", c);
 			}
 			final char c = value.charAt(10);
-			if  (c == '0')
-				d += 1;
-			else if  (c == '1')
-				d += 2;
-			else if (c == '2')
-				d += 4;
-			else
-				throw new KNXFormatException("invalid mode", c);
+			d += (short) switch (c) {
+				case '0' -> 1;
+				case '1' -> 2;
+				case '2' -> 4;
+				default -> throw new KNXFormatException("invalid mode", c);
+			};
 			dst[index] = d;
 			return;
 		}

@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -318,15 +318,12 @@ public final class GroupAddress extends KNXAddress
 	private static int parse(final String address) throws KNXFormatException {
 		final String[] tokens = parse(address, true);
 		try {
-			int value;
-			if (tokens.length == 1)
-				value = Integer.decode(tokens[0]);
-			else if (tokens.length == 2)
-				value = address(Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1]));
-			else if (tokens.length == 3)
-				value = address(Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
-			else
-				throw new KNXFormatException("wrong group address syntax with " + tokens.length + " levels", address);
+			final int value = switch (tokens.length) {
+				case 1 -> Integer.decode(tokens[0]);
+				case 2 -> address(Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1]));
+				case 3 -> address(Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
+				default -> throw new KNXFormatException("wrong group address syntax with " + tokens.length + " levels", address);
+			};
 
 			if (value < 0 || value > 0xffff)
 				throw new KNXFormatException("group address out of range [0..0xffff]", value);

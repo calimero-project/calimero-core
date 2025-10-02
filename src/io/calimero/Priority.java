@@ -77,15 +77,13 @@ public enum Priority {
 	 */
 	public static Priority get(final int value)
 	{
-		if (value == 1)
-			return NORMAL;
-		if (value == 0)
-			return SYSTEM;
-		if (value == 3)
-			return LOW;
-		if (value == 2)
-			return URGENT;
-		throw new KNXIllegalArgumentException("invalid priority value");
+		return switch (value) {
+			case 0 -> SYSTEM;
+			case 1 -> NORMAL;
+			case 3 -> LOW;
+			case 2 -> URGENT;
+			default -> throw new KNXIllegalArgumentException("invalid priority value");
+		};
 	}
 
 	/**
@@ -113,7 +111,7 @@ public enum Priority {
 			return URGENT;
 		if ("low".equalsIgnoreCase(value))
 			return LOW;
-		throw new KNXIllegalArgumentException("invalid priority value");
+		throw new KNXIllegalArgumentException("invalid priority value '" + value + "'");
 	}
 
 	/**
@@ -131,6 +129,12 @@ public enum Priority {
 	@Override
 	public String toString()
 	{
-		return value == 0 ? "system" : value == 1 ? "normal" : value == 2 ? "urgent" : "low";
+		return switch (value) {
+			case 0 -> "system";
+			case 1 -> "normal";
+			case 2 -> "urgent";
+			case 3 -> "low";
+			default -> throw new IllegalStateException("invalid priority value " + value);
+		};
 	}
 }

@@ -535,26 +535,22 @@ public class CEMIDevMgmt implements CEMI
 	{
 		final StringBuilder buf = new StringBuilder(30);
 		buf.append("DM ");
-		if (mc == MC_PROPREAD_REQ)
-			buf.append("prop-read.req");
-		else if (mc == MC_PROPREAD_CON)
-			buf.append("prop-read.con");
-		else if (mc == MC_PROPWRITE_REQ)
-			buf.append("prop-write.req");
-		else if (mc == MC_PROPWRITE_CON)
-			buf.append("prop-write.con");
-		else if (mc == MC_PROPINFO_IND)
-			buf.append("prop-info.ind");
-		else if (mc == MC_FUNCPROP_CMD_REQ)
-			buf.append("funcprop-cmd.req");
-		else if (mc == MC_FUNCPROP_READ_REQ)
-			buf.append("funcprop-read.req");
-		else if (mc == MC_FUNCPROP_CON)
-			buf.append("funcprop.con");
-		else if (mc == MC_RESET_REQ)
-			return "DM reset.req";
-		else if (mc == MC_RESET_IND)
-			return "DM reset.ind";
+		buf.append(switch (mc) {
+			case MC_PROPREAD_REQ      -> "prop-read.req";
+			case MC_PROPREAD_CON      -> "prop-read.con";
+			case MC_PROPWRITE_REQ     -> "prop-write.req";
+			case MC_PROPWRITE_CON     -> "prop-write.con";
+			case MC_PROPINFO_IND      -> "prop-info.ind";
+			case MC_FUNCPROP_CMD_REQ  -> "funcprop-cmd.req";
+			case MC_FUNCPROP_READ_REQ -> "funcprop-read.req";
+			case MC_FUNCPROP_CON      -> "funcprop.con";
+			case MC_RESET_REQ         -> "reset.req";
+			case MC_RESET_IND         -> "reset.ind";
+			default -> throw new IllegalStateException("invalid message code 0x%02x".formatted(mc));
+		});
+		if (mc == MC_RESET_REQ || mc == MC_RESET_IND)
+			return buf.toString();
+
 		buf.append(" objtype ").append(iot);
 		buf.append(" instance ").append(oi);
 		buf.append(" pid ").append(pid);

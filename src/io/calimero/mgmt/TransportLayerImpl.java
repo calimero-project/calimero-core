@@ -636,17 +636,13 @@ public class TransportLayerImpl implements TransportLayer
 	private void fireFrameType(final CEMI frame, final int type)
 	{
 		final FrameEvent e = new FrameEvent(this, frame);
-		final Consumer<? super TransportListener> c;
-		if (type == 0)
-			c = l -> l.broadcast(e);
-		else if (type == 1)
-			c = l -> l.group(e);
-		else if (type == 2)
-			c = l -> l.dataIndividual(e);
-		else if (type == 3)
-			c = l -> l.dataConnected(e);
-		else
-			return;
+		final Consumer<? super TransportListener> c = switch (type) {
+			case 0 -> l -> l.broadcast(e);
+			case 1 -> l -> l.group(e);
+			case 2 -> l -> l.dataIndividual(e);
+			case 3 -> l -> l.dataConnected(e);
+			default -> throw new IllegalStateException("invalid tpdu type " + type);
+		};
 		listeners.fire(c);
 	}
 
