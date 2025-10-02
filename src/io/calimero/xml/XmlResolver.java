@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -101,7 +101,7 @@ public final class XmlResolver
 		}
 	}
 
-	OutputStream resolveOutput(final String systemID)
+	static OutputStream resolveOutput(final String systemID)
 	{
 		try {
 			try {
@@ -119,10 +119,10 @@ public final class XmlResolver
 		}
 	}
 
-	Reader getInputReader(final InputStream is) throws KNXMLException
+	static Reader getInputReader(final InputStream is) throws KNXMLException
 	{
 		try {
-			InputStream in = new BufferedInputStream(is);
+			final InputStream in = new BufferedInputStream(is);
 			in.mark(9000);
 			// deduce encoding from first 4 bytes of stream
 			final byte[] start = new byte[4];

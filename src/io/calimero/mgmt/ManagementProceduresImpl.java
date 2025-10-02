@@ -675,7 +675,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		// write memory in chunks with a maximum length of dataLength
 		final int dataLength = extMemoryServices ? Math.min(249, apduLength - 5) : Math.min(63, apduLength - 3);
 		for (int i = 0; i < data.length; i += dataLength) {
-			int remainingBytes = data.length - i;
+			final int remainingBytes = data.length - i;
 			final byte[] range = Arrays.copyOfRange(data, i, i + Math.min(dataLength, remainingBytes));
 
 			// on server verification, our mgmt client will already compare the response value
@@ -769,7 +769,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		assignDomainAndDeviceAddress(domainAddress, deviceAddress, fdsk, toolKey, maxLookup, List.of());
 	}
 
-	private Object[] broadacstSync(final SecureApplicationLayer sal, final boolean systemBroadcast,
+	private static Object[] broadacstSync(final SecureApplicationLayer sal, final boolean systemBroadcast,
 			final SerialNumber serialNo, final byte[] fdsk, final byte[] toolKey) throws KNXException,
 			InterruptedException {
 

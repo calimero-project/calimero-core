@@ -51,6 +51,7 @@ import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.SocketOption;
 import java.net.StandardProtocolFamily;
 import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
@@ -108,8 +109,8 @@ import io.calimero.log.LogService;
  * <p>
  * Multicast considerations:<br>
  * The multicast loopback behavior defines whether multicast datagrams are looped back to the local socket, see
- * {@link MulticastSocket#setOption(java.net.SocketOption, Object)} with
- * {@link java.net.StandardSocketOptions#IP_MULTICAST_LOOP}. By default, the loopback mode of the multicast
+ * {@link MulticastSocket#setOption(SocketOption, Object)} with
+ * {@link StandardSocketOptions#IP_MULTICAST_LOOP}. By default, the loopback mode of the multicast
  * socket used for sending multicast datagrams is enabled. This behavior can be changed by using a KNXnetIPRouting
  * subtype and initializing it by calling {@link #init(NetworkInterface, boolean, boolean)}.
  * <p>
@@ -209,6 +210,7 @@ public class KNXnetIPRouting extends ConnectionBase
 			throw new KNXIllegalArgumentException("non-valid KNX routing multicast " + mcGroup);
 
 		ctrlEp = new UdpEndpointAddress(new InetSocketAddress(mc, DEFAULT_PORT));
+		dataEp = ctrlEp;
 	}
 
 	/**
@@ -368,7 +370,6 @@ public class KNXnetIPRouting extends ConnectionBase
 	protected void init(final NetworkInterface netIf, final boolean useMulticastLoopback,
 		final boolean startReceiver) throws KNXException
 	{
-		dataEp = ctrlEp;
 		ctrlEndpt = (InetSocketAddress) ctrlEp.address();
 		dataEndpt = ctrlEndpt;
 
@@ -479,8 +480,7 @@ public class KNXnetIPRouting extends ConnectionBase
 		if (h.getVersion() != KNXNETIP_VERSION_10)
 			close(CloseEvent.INTERNAL, "protocol version changed", ERROR, null);
 		else if (svc == KNXnetIPHeader.ROUTING_IND) {
-			final RoutingIndication ind = new RoutingIndication(data, offset, h.getTotalLength()
-					- h.getStructLength());
+			final var ind = new RoutingIndication(data, offset, h.getTotalLength() - h.getStructLength());
 			final CEMI frame = ind.getCEMI();
 			if (discardLoopbackFrame(frame))
 				return true;
@@ -727,7 +727,7 @@ public class KNXnetIPRouting extends ConnectionBase
 				return NetworkInterface.networkInterfaces().flatMap(NetworkInterface::inetAddresses)
 						.anyMatch(sender.getAddress()::equals);
 			}
-			catch (final SocketException e) {}
+			catch (final SocketException ignore) {}
 		}
 
 		// this will give a false positive if we and sending device use the same local netif
@@ -777,11 +777,9 @@ public class KNXnetIPRouting extends ConnectionBase
 			}
 			if (++datagramCount > MaxDatagramsPerSecond) {
 				final long remaining = 1_000 - diff / 1_000_000;
-				if (remaining > 0) {
-					fireRateLimit();
-					logger.log(DEBUG, "reached max. datagrams/second, wait {0} ms ...", remaining);
-					Thread.sleep(remaining);
-				}
+				fireRateLimit();
+				logger.log(DEBUG, "reached max. datagrams/second, wait {0} ms ...", remaining);
+				Thread.sleep(remaining);
 			}
 		}
 		finally {

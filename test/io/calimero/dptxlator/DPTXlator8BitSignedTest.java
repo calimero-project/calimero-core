@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2015, 2023 B. Malinowsky
+    Copyright (c) 2015, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,12 @@
 
 package io.calimero.dptxlator;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -43,8 +49,6 @@ import org.junit.jupiter.api.Test;
 
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 
 class DPTXlator8BitSignedTest
@@ -278,7 +282,7 @@ class DPTXlator8BitSignedTest
 	@Test
 	void setValueInt() throws KNXFormatException
 	{
-		for (DPT dpt : dpts) {
+		for (final DPT dpt : dpts) {
 			setValueIntFail(new DPTXlator8BitSigned(dpt),
 					Integer.parseInt(dpt.getLowerValue()) - 1);
 			setValueIntFail(new DPTXlator8BitSigned(dpt),
@@ -348,7 +352,7 @@ class DPTXlator8BitSignedTest
 		catch (final IllegalStateException expected) {}
 	}
 
-	private void setValueIntFail(final DPTXlator8BitSigned tr, final int v)
+	private static void setValueIntFail(final DPTXlator8BitSigned tr, final int v)
 	{
 		try {
 			tr.setValue(v);

@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2018, 2023 B. Malinowsky
+    Copyright (c) 2018, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -217,12 +217,12 @@ public class DptXlatorRgbw extends DPTXlator {
 		dst[index * 6 + 5] = (short) valid;
 	}
 
-	private short[] toDpt(final double red, final double green, final double blue, final double white) {
+	private static short[] toDpt(final double red, final double green, final double blue, final double white) {
 		final int valid = 0b1111;
 		return new short[] { toDpt(red), toDpt(green), toDpt(blue), toDpt(white), 0, valid };
 	}
 
-	private short toDpt(final double value) {
+	private static short toDpt(final double value) {
 		if (value < 0 || value > 100)
 			throw new KNXIllegalArgumentException("RGBW component " + value + " out of range [0..100]");
 		return (short) Math.round(value * 255 / 100);

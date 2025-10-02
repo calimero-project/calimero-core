@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2018, 2024 B. Malinowsky
+    Copyright (c) 2018, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -264,7 +264,7 @@ public class DptXlatorBrightnessClrTempTrans extends DPTXlator {
 		dst[offset] = (short) valid;
 	}
 
-	private short[] toDpt(final double brightness, final int temperature, final Duration timePeriod) {
+	private static short[] toDpt(final double brightness, final int temperature, final Duration timePeriod) {
 		rangeCheck(brightness, temperature, timePeriod);
 
 		final int valid = 0b111;

@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -104,7 +104,7 @@ public final class XmlInputFactory // extends XMLInputFactory
 			l.log(TRACE, "no StaX implementation found ({0}), using internal XMLStreamReader", e.toString());
 			// we fall back on our own minimal implementation
 		}
-		return new DefaultXmlReader(resolver.getInputReader(is), true);
+		return new DefaultXmlReader(XmlResolver.getInputReader(is), true);
 	}
 
 	public XmlReader createXMLStreamReader(final Reader reader)

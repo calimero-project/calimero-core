@@ -417,21 +417,21 @@ public final class Connector
 				try {
 					final T t = creator.get();
 					if (t instanceof final KNXNetworkLink link) {
-						var old = getKNXMedium();
+						final var old = getKNXMedium();
 						if (old == null) {
 							hopCount = link.getHopCount();
 						}
 						else {
 							// adjust some medium settings of the new link with the old ones if appropriate
-							var adjust = link.getKNXMedium();
+							final var adjust = link.getKNXMedium();
 							if (!adjust.getDeviceAddress().equals(old.getDeviceAddress()))
 								adjust.setDeviceAddress(old.getDeviceAddress());
 							if (adjust.maxApduLength() != old.maxApduLength())
 								adjust.setMaxApduLength(old.maxApduLength());
-							if (adjust instanceof PLSettings pl && old instanceof PLSettings plOld
+							if (adjust instanceof final PLSettings pl && old instanceof final PLSettings plOld
 									&& !Arrays.equals(pl.getDomainAddress(), plOld.getDomainAddress()))
 								pl.setDomainAddress(plOld.getDomainAddress());
-							if (adjust instanceof RFSettings rf && old instanceof RFSettings rfOld
+							if (adjust instanceof final RFSettings rf && old instanceof final RFSettings rfOld
 									&& !Arrays.equals(rf.getDomainAddress(), rfOld.getDomainAddress()))
 								rf.setDomainAddress(rfOld.getDomainAddress());
 						}

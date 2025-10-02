@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -403,7 +403,7 @@ class KNXnetIPRouterTest
 		return new CEMILDataEx(CEMILData.MC_LDATA_IND, src, dst, tpdu, Priority.SYSTEM, false, false, false, 6);
 	}
 
-	private byte[] systemNetworkParamResponse() {
+	private static byte[] systemNetworkParamResponse() {
 		final int objectType = 0;
 		final int pid = PID.SERIAL_NUMBER;
 		final int operand = 1;
@@ -416,7 +416,7 @@ class KNXnetIPRouterTest
 		return tsdu;
 	}
 
-	private void assertSystemBroadcast(final CEMILData expected, final CEMILData actual) {
+	private static void assertSystemBroadcast(final CEMILData expected, final CEMILData actual) {
 		assertEquals(CEMILData.MC_LDATA_IND, actual.getMessageCode());
 		assertEquals(expected.getSource(), actual.getSource());
 		assertEquals(expected.getDestination(), actual.getDestination());

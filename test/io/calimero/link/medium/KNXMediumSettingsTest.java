@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2013, 2022 B. Malinowsky
+    Copyright (c) 2013, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ class KNXMediumSettingsTest {
 		}
 	}
 
-	private void testCreate(final int medium, final Class<? extends KNXMediumSettings> type) {
+	private static void testCreate(final int medium, final Class<? extends KNXMediumSettings> type) {
 		final KNXMediumSettings settings = KNXMediumSettings.create(medium, null);
 		assertEquals(settings.getClass(), type);
 		assertEquals(medium, settings.getMedium());

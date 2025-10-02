@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2021, 2023 B. Malinowsky
+    Copyright (c) 2021, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General @Test License as published by
@@ -36,15 +36,18 @@
 
 package io.calimero.dptxlator;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.text.NumberFormat;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.calimero.KNXException;
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class DptXlator2ByteSignedTests {
 	private DptXlator2ByteSigned t;
@@ -196,7 +199,7 @@ class DptXlator2ByteSignedTests {
 	@Test
 	void dptLimits() throws KNXFormatException {
 		checkDPTs(dpts, true);
-		for (DPT dpt : dpts) {
+		for (final DPT dpt : dpts) {
 			final var tr = new DptXlator2ByteSigned(dpt);
 			if (dpt.equals(DptXlator2ByteSigned.DptPercent)) {
 				setValueFail(tr, Double.parseDouble(dpt.getLowerValue()) - 1);
@@ -208,7 +211,7 @@ class DptXlator2ByteSignedTests {
 		}
 	}
 
-	private void setValueFail(final DptXlator2ByteSigned tr, final double v) {
+	private static void setValueFail(final DptXlator2ByteSigned tr, final double v) {
 		try {
 			tr.setValue(v);
 			fail("set value should fail: " + v);
@@ -300,7 +303,7 @@ class DptXlator2ByteSignedTests {
 	// TODO copied from Helper because we need to adjust numbers for current locale
 	private static void checkDPTs(final DPT[] dpts, final boolean testSimilarity) {
 		try {
-			for (DPT dpt : dpts) {
+			for (final DPT dpt : dpts) {
 				final DPTXlator t = TranslatorTypes.createTranslator(0, dpt.getID());
 
 				final String lower = format(Double.parseDouble(dpt.getLowerValue()));

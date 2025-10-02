@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2014, 2019 B. Malinowsky
+    Copyright (c) 2014, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -102,7 +102,7 @@ class KNXAddressTest {
 		assertThrows(KNXMLException.class, () -> KNXAddress.create(reader), "element should not contain valid address");
 	}
 
-	private InputStream newInputStream(final String s) {
+	private static InputStream newInputStream(final String s) {
 		return new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8));
 	}
 }

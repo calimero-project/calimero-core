@@ -146,8 +146,6 @@ public final class TcpConnection extends StreamConnection {
 
 	public TcpEndpointAddress server() { return (TcpEndpointAddress) super.server(); }
 
-	Socket socket() { return socket; }
-
 	@Override
 	public String toString() {
 		final var state = socket.isClosed() ? "closed"

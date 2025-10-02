@@ -137,7 +137,7 @@ class TranslatorTypesTest
 		assertEquals(0, ofBitSize.size());
 	}
 
-	private void newMainTypeFail(final int mainNo, final Class<? extends DPTXlator> cl)
+	private static void newMainTypeFail(final int mainNo, final Class<? extends DPTXlator> cl)
 	{
 		try {
 			new MainType(mainNo, cl, "faulty main type");

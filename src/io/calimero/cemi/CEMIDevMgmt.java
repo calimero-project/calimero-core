@@ -533,7 +533,7 @@ public class CEMIDevMgmt implements CEMI
 	@Override
 	public String toString()
 	{
-		final StringBuilder buf = new StringBuilder(30);
+		final StringBuilder buf = new StringBuilder(100);
 		buf.append("DM ");
 		buf.append(switch (mc) {
 			case MC_PROPREAD_REQ      -> "prop-read.req";

@@ -766,12 +766,12 @@ class DPTXlatorDateTimeTest {
 		assertEquals(sec, t.getSecond());
 	}
 
-	private void assertFind(final String text, final String[] find) {
+	private static void assertFind(final String text, final String[] find) {
 		for (final String s : find)
 			assertTrue(text.toLowerCase().contains(s.toLowerCase()));
 	}
 
-	private void assertFindNot(final String text, final String[] find) {
+	private static void assertFindNot(final String text, final String[] find) {
 		for (final String s : find)
 			assertFalse(text.toLowerCase().contains(s.toLowerCase()));
 	}

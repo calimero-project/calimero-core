@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@
 
 package io.calimero.dptxlator;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -257,12 +258,5 @@ class DPTXlatorStringTest
 	void dptXlatorStringDPT() throws KNXFormatException
 	{
 		new DPTXlatorString(DPTXlatorString.DPT_STRING_8859_1);
-	}
-
-	private void assertArrayEquals(final String[] exp, final String[] actual)
-	{
-		assertEquals(exp.length, actual.length);
-		for (int i = 0; i < exp.length; ++i)
-			assertEquals(exp[i], actual[i]);
 	}
 }
