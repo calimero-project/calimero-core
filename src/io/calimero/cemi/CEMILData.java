@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,7 +38,9 @@ package io.calimero.cemi;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 import java.util.HexFormat;
+import java.util.Objects;
 
 import io.calimero.GroupAddress;
 import io.calimero.IndividualAddress;
@@ -433,9 +435,16 @@ public class CEMILData implements CEMI
 		return BASIC_LENGTH + data.length;
 	}
 
-	/* (non-Javadoc)
-	 * @see io.calimero.cemi.CEMI#toByteArray()
-	 */
+	@Override
+	public boolean equals(final Object o) {
+		return o instanceof final CEMILData ldata && mc == ldata.mc && ctrl1 == ldata.ctrl1 && ctrl2 == ldata.ctrl2
+				&& p == ldata.p && source.equals(ldata.source) && dst.equals(ldata.dst)
+				&& Arrays.equals(data, ldata.data);
+	}
+
+	@Override
+	public int hashCode() { return Objects.hash(mc, ctrl1, ctrl2, p, source, dst, Arrays.hashCode(data)); }
+
 	@Override
 	public byte[] toByteArray()
 	{

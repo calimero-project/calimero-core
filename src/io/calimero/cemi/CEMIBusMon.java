@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,7 +37,9 @@
 package io.calimero.cemi;
 
 import java.io.ByteArrayInputStream;
+import java.util.Arrays;
 import java.util.HexFormat;
+import java.util.Objects;
 
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
@@ -365,6 +367,15 @@ public class CEMIBusMon implements CEMI
 	{
 		return 7 + (tstampType == TYPEID_TIMESTAMP ? 2 : 4) + raw.length;
 	}
+
+	@Override
+	public final boolean equals(final Object o) {
+		return o instanceof final CEMIBusMon mon && status == mon.status && tstamp == mon.tstamp
+				&& tstampType == mon.tstampType && Arrays.equals(raw, mon.raw);
+	}
+
+	@Override
+	public int hashCode() { return Objects.hash(status, tstamp, tstampType, Arrays.hashCode(raw)); }
 
 	@Override
 	public byte[] toByteArray()

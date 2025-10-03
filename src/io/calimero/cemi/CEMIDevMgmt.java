@@ -37,8 +37,10 @@
 package io.calimero.cemi;
 
 import java.io.ByteArrayInputStream;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HexFormat;
+import java.util.Objects;
 
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
@@ -508,6 +510,15 @@ public class CEMIDevMgmt implements CEMI
 	{
 		return header + data.length;
 	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return o instanceof final CEMIDevMgmt dm && mc == dm.mc && iot == dm.iot && oi == dm.oi && pid == dm.pid
+				&& elems == dm.elems && start == dm.start && header == dm.header && Arrays.equals(data, dm.data);
+	}
+
+	@Override
+	public int hashCode() { return Objects.hash(mc, iot, oi, pid, elems, start, header, Arrays.hashCode(data)); }
 
 	@Override
 	public byte[] toByteArray()

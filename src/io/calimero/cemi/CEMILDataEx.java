@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import io.calimero.GroupAddress;
 import io.calimero.IndividualAddress;
@@ -297,6 +298,14 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	{
 		super.setPriority(p);
 	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return o instanceof final CEMILDataEx ldataEx && super.equals(o) && Objects.equals(addInfo, ldataEx.addInfo);
+	}
+
+	@Override
+	public int hashCode() { return Objects.hash(super.hashCode(), addInfo); }
 
 	@Override
 	public synchronized byte[] toByteArray()
