@@ -201,7 +201,7 @@ public abstract class ClientConnection extends ConnectionBase
 			final var lsa = localSocketAddress();
 			logger.log(DEBUG, "establish connection from {0} to {1}", lsa, ctrlEp);
 			// HPAI throws if wildcard local address (0.0.0.0) is supplied
-			final var hpai = stream ? HPAI.Tcp : useNat ? HPAI.Nat : new HPAI(HPAI.IPV4_UDP, (InetSocketAddress) lsa.address());
+			final var hpai = stream ? HPAI.Tcp : useNat ? HPAI.Nat : new HPAI((UdpEndpointAddress) lsa);
 			final byte[] buf = PacketHelper.toPacket(protocolVersion(), new ConnectRequest(cri, hpai, hpai));
 			send(buf, ctrlEp);
 		}
@@ -506,7 +506,7 @@ public abstract class ClientConnection extends ConnectionBase
 		public void run()
 		{
 			thread = Thread.currentThread();
-			final var hpai = stream ? HPAI.Tcp : useNat ? HPAI.Nat : new HPAI(HPAI.IPV4_UDP, (InetSocketAddress) localSocketAddress().address());
+			final var hpai = stream ? HPAI.Tcp : useNat ? HPAI.Nat : new HPAI((UdpEndpointAddress) localSocketAddress());
 			final byte[] buf = PacketHelper.toPacket(protocolVersion(), new ConnectionstateRequest(channelId, hpai));
 			try {
 				while (!stop) {

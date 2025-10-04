@@ -103,7 +103,7 @@ public final class SecureConnection {
 
 		final byte[] devAuth = deviceAuthCode.length == 0 ? new byte[16] : deviceAuthCode;
 		final var tunnelingAddress = KNXMediumSettings.BackboneRouter;
-		final var udp = new SecureSessionUdp(userId, userKey, devAuth, serverCtrlEP);
+		final var udp = new SecureSessionUdp(userId, userKey, devAuth, new UdpEndpointAddress(serverCtrlEP));
 		return new SecureTunnelUdp(knxLayer, localEP, serverCtrlEP, useNat, tunnelingAddress, udp);
 	}
 
@@ -152,7 +152,7 @@ public final class SecureConnection {
 			final byte[] userKey) throws KNXException, InterruptedException {
 
 		final byte[] devAuth = deviceAuthCode.length == 0 ? new byte[16] : deviceAuthCode;
-		final var udp = new SecureSessionUdp(1, userKey, devAuth, serverCtrlEP);
+		final var udp = new SecureSessionUdp(1, userKey, devAuth, new UdpEndpointAddress(serverCtrlEP));
 		return new SecureDeviceManagementUdp(new UdpEndpointAddress(localEP), new UdpEndpointAddress(serverCtrlEP), useNat, udp);
 	}
 

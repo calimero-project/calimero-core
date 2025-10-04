@@ -36,7 +36,6 @@
 
 package io.calimero.knxnetip;
 
-import static io.calimero.knxnetip.Net.hostPort;
 import static io.calimero.knxnetip.SecureConnection.secureSymbol;
 import static java.lang.System.Logger.Level.DEBUG;
 import static java.lang.System.Logger.Level.ERROR;
@@ -99,16 +98,15 @@ final class SecureSessionUdp {
 
 
 	SecureSessionUdp(final int userId, final byte[] userKey, final byte[] deviceAuthCode,
-			final InetSocketAddress serverCtrlEP) {
+			final UdpEndpointAddress serverCtrlEP) {
 		session = TcpConnection.Udp.newSecureSession(userId, userKey, deviceAuthCode);
 		this.logger = LogService.getLogger(
-				"io.calimero.knxnetip.KNX/IP " + SecureConnection.secureSymbol + " Session " + hostPort(serverCtrlEP));
+				"io.calimero.knxnetip.KNX/IP " + SecureConnection.secureSymbol + " Session " + serverCtrlEP);
 	}
 
 	// session.req -> session.res -> auth.req -> session-status
 	void setupSecureSession(final ClientConnection conn, final UdpEndpointAddress localEP,
-			final EndpointAddress serverCtrlEP, final boolean useNat)
-		throws KNXException {
+			final EndpointAddress serverCtrlEP, final boolean useNat) throws KNXException {
 
 		logger.log(DEBUG, "setup secure session with {0}", serverCtrlEP);
 		try {

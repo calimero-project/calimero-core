@@ -492,8 +492,7 @@ public class KNXnetIPRouting extends ConnectionBase
 		}
 		else if (svc == KNXnetIPHeader.ROUTING_BUSY) {
 			final RoutingBusy busy = new RoutingBusy(data, offset);
-			updateRoutingFlowControl(busy, sender);
-
+			updateRoutingFlowControl(busy, (UdpEndpointAddress) src);
 			fireRoutingBusy(sender, busy);
 		}
 		else if (svc == KNXnetIPHeader.RoutingSystemBroadcast
@@ -674,9 +673,9 @@ public class KNXnetIPRouting extends ConnectionBase
 		}
 	}
 
-	private void updateRoutingFlowControl(final RoutingBusy busy, final InetSocketAddress sender) {
+	private void updateRoutingFlowControl(final RoutingBusy busy, final UdpEndpointAddress sender) {
 		// in case we sent the routing busy notification, ignore it
-		if (sentByUs(sender))
+		if (sentByUs(sender.address().getAddress()))
 			return;
 
 		// setup timing for routing busy flow control
@@ -689,7 +688,7 @@ public class KNXnetIPRouting extends ConnectionBase
 			level = DEBUG;
 			update = true;
 		}
-		logger.log(level, "device {0} sent {1}", Net.hostPort(sender), busy);
+		logger.log(level, "device {0} sent {1}", sender, busy);
 
 		// increment random wait scaling iff >= 10 ms have passed since the last counted routing busy
 		if (now.isAfter(lastRoutingBusy.plusMillis(10))) {
@@ -719,19 +718,19 @@ public class KNXnetIPRouting extends ConnectionBase
 				initialDelay, 5, TimeUnit.MILLISECONDS);
 	}
 
-	private boolean sentByUs(final InetSocketAddress sender) {
+	private boolean sentByUs(final InetAddress sender) {
 		final var netif = networkInterface();
 		if (netif == Net.defaultNetif()) {
 			// check addresses of all netifs, in case no outgoing mcast netif was configured
 			try {
 				return NetworkInterface.networkInterfaces().flatMap(NetworkInterface::inetAddresses)
-						.anyMatch(sender.getAddress()::equals);
+						.anyMatch(sender::equals);
 			}
 			catch (final SocketException ignore) {}
 		}
 
 		// this will give a false positive if we and sending device use the same local netif
-		return netif.inetAddresses().anyMatch(sender.getAddress()::equals);
+		return netif.inetAddresses().anyMatch(sender::equals);
 	}
 
 	private void decrementBusyCounter() {

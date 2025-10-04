@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ import java.util.Arrays;
 
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
+import io.calimero.knxnetip.UdpEndpointAddress;
 
 /**
  * KNXnet/IP Host Protocol Address Information (HPAI).
@@ -106,6 +107,8 @@ public record HPAI(int hostProtocol, InetSocketAddress endpoint) {
 			throw new KNXFormatException(e.getMessage());
 		}
 	}
+
+	public HPAI(final UdpEndpointAddress addr) { this(IPV4_UDP, addr.address()); }
 
 	/**
 	 * Creates a HPAI for UDP communication with the given address information, using UDP as communication mode
