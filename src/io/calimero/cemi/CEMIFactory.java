@@ -150,6 +150,7 @@ public final class CEMIFactory
 			case CEMIDevMgmt dm -> new CEMIDevMgmt(msgCode, dm.getObjectType(), dm.getObjectInstance(), dm.getPID(),
 					dm.getStartIndex(), dm.getElementCount(), data);
 			case CEMIBusMon mon -> newCemiBusMon(msgCode, data, mon);
+			case CemiTData tdata -> newCemiTData(msgCode, data, tdata);
 			default -> throw new KNXIllegalArgumentException("unsupported cEMI type " + original.getClass());
 		};
 	}
@@ -364,13 +365,12 @@ public final class CEMIFactory
 	 * @param original the frame to copy
 	 * @return the {@code original} frame if immutable, a copy of it otherwise
 	 */
-	public static CEMI copy(final CEMI original)
-	{
-		// on original == null we just return null, too
-		if (original instanceof final CEMILDataEx ex)
-			return ex.clone();
-		// all others are immutable
-		return original;
+	public static CEMI copy(final CEMI original) {
+		return switch (original) {
+			case final CEMILDataEx ex  -> ex.clone();
+			case final CemiTData tdata -> newCemiTData(0, null, tdata);
+			case null, default         -> original; // all others are immutable, on null we return null
+		};
 	}
 
 	// leave msgcode/src/dst/data null/0 to use from original
@@ -403,5 +403,13 @@ public final class CEMIFactory
 			throw new KNXIllegalArgumentException("unsupported cEMI BusMon msg code 0x" + Integer.toHexString(msgCode));
 		return CEMIBusMon.newWithStatus(mon.getStatus(), mon.getTimestamp(),
 				mon.getTimestampType() == CEMIBusMon.TYPEID_TIMESTAMP_EXT, data);
+	}
+
+	private static CemiTData newCemiTData(final int msgCode, final byte[] data, final CemiTData original) {
+		final int mc = msgCode != 0 ? msgCode : original.getMessageCode();
+		final byte[] tpdu = data != null ? data : original.getPayload();
+		var tdata = new CemiTData(mc, tpdu);
+		tdata.additionalInfo().addAll(original.additionalInfo());
+		return tdata;
 	}
 }
