@@ -141,17 +141,16 @@ public final class CEMIFactory
 	 * @param data the data for the frame
 	 * @param original the original frame providing all necessary information for the new frame
 	 * @return the new cEMI frame adjusted with message code and data
-	 * @throws KNXFormatException if cEMI type is unsupported or frame creation failed
+	 * @throws KNXIllegalArgumentException if cEMI type is unsupported or frame creation failed
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends CEMI> T create(final int msgCode, final byte[] data, final T original)
-			throws KNXFormatException {
+	public static <T extends CEMI> T create(final int msgCode, final byte[] data, final T original) {
 		return (T) switch (original) {
 			case CEMILData ldata -> create(msgCode, null, null, data, ldata, false, ldata.isRepetition());
 			case CEMIDevMgmt dm -> new CEMIDevMgmt(msgCode, dm.getObjectType(), dm.getObjectInstance(), dm.getPID(),
 					dm.getStartIndex(), dm.getElementCount(), data);
 			case CEMIBusMon mon -> newCemiBusMon(msgCode, data, mon);
-			default -> throw new KNXFormatException("unsupported cEMI type " + original.getClass());
+			default -> throw new KNXIllegalArgumentException("unsupported cEMI type " + original.getClass());
 		};
 	}
 

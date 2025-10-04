@@ -36,8 +36,6 @@
 
 package io.calimero.buffer;
 
-import static java.lang.System.Logger.Level.ERROR;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -46,7 +44,6 @@ import java.util.Map;
 
 import io.calimero.GroupAddress;
 import io.calimero.KNXAddress;
-import io.calimero.KNXFormatException;
 import io.calimero.buffer.Configuration.NetworkFilter;
 import io.calimero.buffer.Configuration.RequestFilter;
 import io.calimero.buffer.cache.Cache;
@@ -61,7 +58,6 @@ import io.calimero.datapoint.Datapoint;
 import io.calimero.datapoint.DatapointMap;
 import io.calimero.datapoint.DatapointModel;
 import io.calimero.datapoint.StateDP;
-import io.calimero.log.LogService;
 
 /**
  * Predefined filter for filtering KNX messages of datapoints with state semantic into the
@@ -186,26 +182,14 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		if (svc == 0x40) {
 			// read.res could be in an L-Data.con, too
 			if (f.getMessageCode() == CEMILData.MC_LDATA_CON)
-				try {
-					copy = CEMIFactory.create(CEMILData.MC_LDATA_IND, d, f);
-				}
-				catch (final KNXFormatException e) {
-					LogService.getLogger("io.calimero").log(ERROR, "create L_Data.ind for network buffer: " + f, e);
-					return;
-				}
+				copy = CEMIFactory.create(CEMILData.MC_LDATA_IND, d, f);
 			else
 				copy = f;
 		}
 		else if (svc == 0x80) {
 			// adjust to read response frame
 			d[1] = (byte) (d[1] & 0x3f | 0x40);
-			try {
-				copy = CEMIFactory.create(CEMILData.MC_LDATA_IND, d, f);
-			}
-			catch (final KNXFormatException e) {
-				LogService.getLogger("io.calimero").log(ERROR, "create L_Data.ind for network buffer: " + f, e);
-				return;
-			}
+			copy = CEMIFactory.create(CEMILData.MC_LDATA_IND, d, f);
 		}
 		else
 			return;

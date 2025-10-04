@@ -46,7 +46,6 @@ import java.util.function.Consumer;
 
 import io.calimero.GroupAddress;
 import io.calimero.KNXAddress;
-import io.calimero.KNXFormatException;
 import io.calimero.buffer.Configuration.NetworkFilter;
 import io.calimero.buffer.Configuration.RequestFilter;
 import io.calimero.buffer.LDataObjectQueue.QueueItem;
@@ -220,14 +219,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 		final int svc = d[0] & 0x03 | d[1] & 0xC0;
 		if (svc != 0x40 && svc != 0x80)
 			return;
-		final CEMILData copy;
-		try {
-			copy = CEMIFactory.create(CEMILData.MC_LDATA_IND, d, f);
-		}
-		catch (final KNXFormatException e) {
-			LogService.getLogger("io.calimero").log(ERROR, "create L_Data.ind for network buffer: " + f, e);
-			return;
-		}
+		final CEMILData copy = CEMIFactory.create(CEMILData.MC_LDATA_IND, d, f);
 		CacheObject co = cache.get(dst);
 		if (co == null)
 			co = new LDataObjectQueue(dst, true, 10, false, queueFull);

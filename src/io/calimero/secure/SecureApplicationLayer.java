@@ -76,7 +76,6 @@ import io.calimero.GroupAddress;
 import io.calimero.IndividualAddress;
 import io.calimero.KNXAddress;
 import io.calimero.KNXException;
-import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
 import io.calimero.KNXTimeoutException;
 import io.calimero.Priority;
@@ -520,7 +519,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 			catch (final KnxSecureException kse) {
 				logger.log(INFO, kse.toString());
 			}
-			catch (KNXFormatException | RuntimeException ex) {
+			catch (final RuntimeException ex) {
 				logger.log(WARNING, ex.toString());
 			}
 			return Optional.empty();
