@@ -398,11 +398,12 @@ public final class CEMIFactory
 		return new CEMILData(mc, s, d, content, original.getPriority(), repeat, original.getHopCount());
 	}
 
-	private static CEMIBusMon newCemiBusMon(final int msgCode, final byte[] data, final CEMIBusMon mon) {
+	private static CEMIBusMon newCemiBusMon(final int msgCode, final byte[] data, final CEMIBusMon original) {
 		if (msgCode != CEMIBusMon.MC_BUSMON_IND)
 			throw new KNXIllegalArgumentException("unsupported cEMI BusMon msg code 0x" + Integer.toHexString(msgCode));
-		return CEMIBusMon.newWithStatus(mon.getStatus(), mon.getTimestamp(),
-				mon.getTimestampType() == CEMIBusMon.TYPEID_TIMESTAMP_EXT, data);
+		final byte[] raw = data != null ? data : original.getPayload();
+		return CEMIBusMon.newWithStatus(original.getStatus(), original.getTimestamp(),
+				original.getTimestampType() == CEMIBusMon.TYPEID_TIMESTAMP_EXT, raw);
 	}
 
 	private static CemiTData newCemiTData(final int msgCode, final byte[] data, final CemiTData original) {
