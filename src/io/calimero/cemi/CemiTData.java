@@ -151,12 +151,14 @@ public class CemiTData implements CEMI {
 
 	@Override
 	public String toString() {
-		final String svc = mc == IndividualRequest ? "Individual.req" : mc == IndividualIndication ? "Individual.ind"
-				: mc == ConnectedIndication ? "Connected.ind" : mc == ConnectedRequest ? "Connected.req" : "Unknown";
-
 		final StringBuilder buf = new StringBuilder();
-		buf.append("T-Data");
-		buf.append(svc);
+		buf.append("T-Data").append(switch (mc) {
+			case IndividualRequest    -> "Individual.req";
+			case IndividualIndication -> "Individual.ind";
+			case ConnectedIndication  -> "Connected.ind";
+			case ConnectedRequest     -> "Connected.req";
+			default                   -> "Unknown";
+		});
 
 		for (final AdditionalInfo additionalInfo : additionalInfo) {
 			buf.append(" ");

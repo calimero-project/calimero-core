@@ -397,7 +397,7 @@ class KNXnetIPRouterTest
 		assertSystemBroadcast(sysBcast, (CEMILData) l.received.poll(2, TimeUnit.SECONDS));
 	}
 
-	private CEMILDataEx newSystemBroadcastFrame(final byte[] tpdu) {
+	private static CEMILDataEx newSystemBroadcastFrame(final byte[] tpdu) {
 		final IndividualAddress src = new IndividualAddress(1, 1, 200);
 		final KNXAddress dst = GroupAddress.Broadcast;
 		return new CEMILDataEx(CEMILData.MC_LDATA_IND, src, dst, tpdu, Priority.SYSTEM, false, false, false, 6);
