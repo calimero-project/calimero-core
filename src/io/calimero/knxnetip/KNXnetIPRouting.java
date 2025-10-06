@@ -754,8 +754,7 @@ public class KNXnetIPRouting extends ConnectionBase
 			final Instant now = Instant.now();
 			final long sleep = Duration.between(now, pauseSendingUntil).toMillis();
 			if (sleep > 0) {
-				logger.log(DEBUG, "applying routing flow control for {0}, wait {1} ms ...",
-						getRemoteAddress().getAddress().getHostAddress(), sleep);
+				logger.log(DEBUG, "applying routing flow control for {0}, wait {1} ms ...", remoteAddress(), sleep);
 				Thread.sleep(sleep);
 			}
 			else if (now.isBefore(throttleUntil)) {

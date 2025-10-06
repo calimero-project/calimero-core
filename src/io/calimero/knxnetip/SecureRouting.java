@@ -282,7 +282,7 @@ public final class SecureRouting extends KNXnetIPRouting {
 
 		scheduleGroupSync(periodicNotifyDelay());
 		if (!syncedWithGroup && tag == sentGroupSyncTag && sno.equals(sn)) {
-			logger.log(INFO, "synchronized with group {0}", getRemoteAddress().getAddress().getHostAddress());
+			logger.log(INFO, "synchronized with group {0}", remoteAddress().address().getAddress().getHostAddress());
 			syncedWithGroup = true;
 			synchronized (this) {
 				notifyAll();

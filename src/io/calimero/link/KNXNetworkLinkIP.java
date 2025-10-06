@@ -370,7 +370,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	 */
 	protected KNXNetworkLinkIP(final int serviceMode, final KNXnetIPConnection c, final KNXMediumSettings settings)
 		throws KNXAckTimeoutException, KNXConnectionClosedException, InterruptedException {
-		super(c, createLinkName(c.getRemoteAddress()), settings);
+		super(c, c.remoteAddress().toString(), settings);
 		cEMI = true;
 
 		mode = serviceMode;
@@ -530,8 +530,7 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 				logger.log(TRACE, "send {0}->{1} succeeded", data.getSource(),
 						data.getDestination());
 			else
-				logger.log(TRACE, "send {0}->{1}:{2} succeeded", "local", conn.getRemoteAddress().getAddress(),
-						conn.getRemoteAddress().getPort());
+				logger.log(TRACE, "send {0}->{1} succeeded", "local", conn.remoteAddress());
 		}
 		catch (final InterruptedException e) {
 			close();
@@ -617,18 +616,6 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 
 	private static InetAddress mcastGroup(final InetSocketAddress remoteEP) {
 		return remoteEP != null ? remoteEP.getAddress() : DefaultMulticast;
-	}
-
-	private static String createLinkName(final InetSocketAddress endpt)
-	{
-		if (endpt == null) // TODO distinguish UDS, where endpt is also null
-			return KNXnetIPRouting.DEFAULT_MULTICAST;
-		// do our own IP:port string, since InetAddress.toString() always prepends a '/'
-		final String host = (endpt.isUnresolved() ? endpt.getHostString() : endpt.getAddress().getHostAddress());
-		final int p = endpt.getPort();
-		if (p > 0)
-			return host + ":" + p;
-		return host;
 	}
 
 	private static NetworkInterface netif(final InetAddress addr) throws SocketException, KNXException {

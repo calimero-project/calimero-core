@@ -136,7 +136,7 @@ public class KNXNetworkMonitorIP extends AbstractMonitor<KNXnetIPConnection>
 	 */
 	protected KNXNetworkMonitorIP(final KNXnetIPConnection conn, final KNXMediumSettings settings)
 	{
-		super(conn, monitorName(conn.getRemoteAddress()), settings);
+		super(conn, "monitor " + conn.remoteAddress(), settings);
 		logger.log(DEBUG, "in busmonitor mode - ready to receive");
 		conn.addConnectionListener(notifier);
 	}
@@ -146,14 +146,5 @@ public class KNXNetworkMonitorIP extends AbstractMonitor<KNXnetIPConnection>
 		if (local != null)
 			return local;
 		return new InetSocketAddress(0);
-	}
-
-	private static String monitorName(final InetSocketAddress remote)
-	{
-		if (remote == null)
-			return "monitor uds"; // TODO use UDS path
-		// do our own IP:port string, since InetAddress.toString() always prepends a '/'
-		final String host = (remote.isUnresolved() ? remote.getHostString() : remote.getAddress().getHostAddress());
-		return "monitor " + host + ":" + remote.getPort();
 	}
 }
