@@ -321,6 +321,8 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 		return ctrlEndpt;
 	}
 
+	public EndpointAddress remoteAddress() { return ctrlEp; }
+
 	@Override
 	public final int getState()
 	{

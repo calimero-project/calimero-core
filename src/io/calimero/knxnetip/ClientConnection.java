@@ -426,9 +426,6 @@ public abstract class ClientConnection extends ConnectionBase
 
 	void tunnelingAddress(final IndividualAddress address) { tunnelingAddress = address; }
 
-	/** Experimental; do not use. */
-	public EndpointAddress remoteAddress() { return ctrlEp; }
-
 	private EndpointAddress localSocketAddress() {
 		return stream ? connection.localEndpoint() : new UdpEndpointAddress((InetSocketAddress) socket.getLocalSocketAddress());
 	}

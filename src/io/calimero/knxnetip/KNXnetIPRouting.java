@@ -322,6 +322,9 @@ public class KNXnetIPRouting extends ConnectionBase
 		}
 	}
 
+	@Override
+	public UdpEndpointAddress remoteAddress() { return (UdpEndpointAddress) super.remoteAddress(); }
+
 	/**
 	 * Returns whether this KNXnet/IP routing instance has local loopback of KNXnet/IP
 	 * routing multicast datagrams enabled or not.

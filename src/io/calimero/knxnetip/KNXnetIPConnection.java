@@ -192,6 +192,8 @@ public interface KNXnetIPConnection extends Connection<CEMI>
 	 */
 	InetSocketAddress getRemoteAddress();
 
+	EndpointAddress remoteAddress();
+
 	/**
 	 * Returns information about the current KNXnet/IP communication state.
 	 *
