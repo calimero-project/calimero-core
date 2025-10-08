@@ -282,13 +282,13 @@ class PropertyClientTest
 	@Test
 	void setPropertyIntIntIntString() throws KNXException, InterruptedException
 	{
-		final int knxParamsIndex = 8;
-		final int pidProjectId = PID.PROJECT_INSTALLATION_ID;
-		final String s = rem.getProperty(knxParamsIndex, pidProjectId);
-		rem.setProperty(knxParamsIndex, pidProjectId, 1, "3");
-		final String s2 = rem.getProperty(knxParamsIndex, pidProjectId);
-		assertTrue(s2.startsWith("3"));
-		rem.setProperty(knxParamsIndex, pidProjectId, 1, s);
+		final int deviceObject = 0;
+		final int pidDeviceControl = PID.DEVICE_CONTROL;
+		final String s = rem.getProperty(deviceObject, pidDeviceControl);
+		rem.setProperty(deviceObject, pidDeviceControl, 1, "VerifyMode");
+		final String s2 = rem.getProperty(deviceObject, pidDeviceControl);
+		assertTrue(s2.startsWith("verify mode"));
+		rem.setProperty(deviceObject, pidDeviceControl, 1, s);
 	}
 
 	private static void printDesc(final Description d)
