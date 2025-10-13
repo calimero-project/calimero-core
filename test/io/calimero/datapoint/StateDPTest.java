@@ -41,7 +41,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -153,8 +152,8 @@ class StateDPTest
 		assertEquals(ga, dp.getMainAddress());
 		assertEquals("testSave2", dp.getName());
 		assertTrue(dp.isStateBased());
-		assertEquals(0, dp.getMainNumber());
-		assertNull(dp.getDPT());
+		assertEquals(0xffff, dp.getMainNumber());
+		assertNotNull(dp.getDPT());
 		assertEquals(15, dp.getExpirationTimeout());
 		assertEquals(upd, new ArrayList<>(dp.getAddresses(true)));
 		assertEquals(inv, new ArrayList<>(dp.getAddresses(false)));

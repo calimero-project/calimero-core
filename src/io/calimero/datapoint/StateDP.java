@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,6 +44,7 @@ import java.util.Objects;
 
 import io.calimero.GroupAddress;
 import io.calimero.KNXIllegalArgumentException;
+import io.calimero.dptxlator.DptId;
 import io.calimero.xml.KNXMLException;
 import io.calimero.xml.XmlReader;
 import io.calimero.xml.XmlWriter;
@@ -81,20 +82,31 @@ public class StateDP extends Datapoint
 	private final List<String> locations = Collections.synchronizedList(new ArrayList<>());
 
 	/**
-	 * Creates a new state based datapoint with a name.
+	 * Creates a new state-based datapoint with a name and datapoint type ID.
+	 *
+	 * @param main the group address used to identify this datapoint
+	 * @param name user defined datapoint name
+	 * @param dptId datapoint type ID
+	 */
+	public StateDP(final GroupAddress main, final String name, final DptId dptId) {
+		super(main, name, dptId);
+		invalidating = Collections.synchronizedList(new ArrayList<>());
+		updating = Collections.synchronizedList(new ArrayList<>());
+	}
+
+	/**
+	 * Creates a new state-based datapoint with a name.
 	 *
 	 * @param main the group address used to identify this datapoint
 	 * @param name user defined datapoint name
 	 */
 	public StateDP(final GroupAddress main, final String name)
 	{
-		super(main, name, true);
-		invalidating = Collections.synchronizedList(new ArrayList<>());
-		updating = Collections.synchronizedList(new ArrayList<>());
+		this(main, name, new DptId(0xffff, 0xffff));
 	}
 
 	/**
-	 * Creates a new datapoint with a name and specifies datapoint translation type.
+	 * Creates a new state-based datapoint with a name and specifies the datapoint translation type.
 	 *
 	 * @param main the group address used to identify this datapoint
 	 * @param name user defined datapoint name
@@ -103,11 +115,8 @@ public class StateDP extends Datapoint
 	 *        DPT translator, main number might be left 0
 	 * @param dptID the datapoint type ID used for translation in a DPT translator
 	 */
-	public StateDP(final GroupAddress main, final String name, final int mainNumber,
-		final String dptID)
-	{
-		this(main, name);
-		setDPT(mainNumber, dptID);
+	public StateDP(final GroupAddress main, final String name, final int mainNumber, final String dptID) {
+		this(main, name, dptId(mainNumber, dptID));
 	}
 
 	/**
@@ -124,7 +133,7 @@ public class StateDP extends Datapoint
 		final Collection<GroupAddress> invalidatingAddresses,
 		final Collection<GroupAddress> updatingAddresses)
 	{
-		super(main, name, true);
+		super(main, name, new DptId(0xffff, 0xffff));
 		invalidating = Collections.synchronizedList(new ArrayList<>(invalidatingAddresses));
 		updating = Collections.synchronizedList(new ArrayList<>(updatingAddresses));
 	}

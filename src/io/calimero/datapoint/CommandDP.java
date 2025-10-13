@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 package io.calimero.datapoint;
 
 import io.calimero.GroupAddress;
+import io.calimero.dptxlator.DptId;
 import io.calimero.xml.KNXMLException;
 import io.calimero.xml.XmlReader;
 import io.calimero.xml.XmlWriter;
@@ -52,7 +53,18 @@ import io.calimero.xml.XmlWriter;
 public class CommandDP extends Datapoint
 {
 	/**
-	 * Creates a new command based datapoint with a name.
+	 * Creates a new command-based datapoint with a name and datapoint type ID.
+	 *
+	 * @param main the group address used to identify this datapoint
+	 * @param name user defined datapoint name
+	 * @param dptId datapoint type ID
+	 */
+	public CommandDP(final GroupAddress main, final String name, final DptId dptId) {
+		super(main, name, dptId);
+	}
+
+	/**
+	 * Creates a new command-based datapoint with a name.
 	 * <p>
 	 *
 	 * @param main the group address used to identify this datapoint
@@ -60,7 +72,7 @@ public class CommandDP extends Datapoint
 	 */
 	public CommandDP(final GroupAddress main, final String name)
 	{
-		super(main, name, false);
+		this(main, name, new DptId(0xffff, 0xffff));
 	}
 
 	/**
@@ -76,8 +88,7 @@ public class CommandDP extends Datapoint
 	 * @param dptID the datapoint type ID used for translation in a DPT translator
 	 */
 	public CommandDP(final GroupAddress main, final String name, final int mainNumber, final String dptID) {
-		super(main, name, false);
-		setDPT(mainNumber, dptID);
+		this(main, name, dptId(mainNumber, dptID));
 	}
 
 	/**

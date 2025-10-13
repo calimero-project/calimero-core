@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ import java.util.Objects;
 
 import io.calimero.GroupAddress;
 import io.calimero.Priority;
+import io.calimero.dptxlator.DptId;
 import io.calimero.xml.KNXMLException;
 import io.calimero.xml.XmlReader;
 import io.calimero.xml.XmlWriter;
@@ -77,25 +78,24 @@ public abstract class Datapoint
 	private GroupAddress main;
 	private volatile String name;
 
-	// DPT translation, a not set DPT is identified through mainNo=0 and dptID=null
-	private volatile int mainNo;
-	private volatile String dptId;
+	private volatile DptId dptId;
+
 	// message priority for this datapoint
 	private volatile Priority priority = Priority.LOW;
 
 	/**
-	 * Creates a new datapoint with a name and specifies state/command based semantics.
+	 * Creates a new datapoint with a name and datapoint type ID.
 	 *
 	 * @param main the group address used to identify this datapoint
 	 * @param name user defined datapoint name
-	 * @param stateBased {@code true} for state based datapoint, {@code false}
-	 *        for command based datapoint
+	 * @param dptId datapoint type ID
 	 */
-	Datapoint(final GroupAddress main, final String name, final boolean stateBased)
+	Datapoint(final GroupAddress main, final String name, final DptId dptId)
 	{
 		this.main = main;
 		this.name = name;
-		this.stateBased = stateBased;
+		this.stateBased = this instanceof StateDP;
+		this.dptId = dptId;
 	}
 
 	/**
@@ -119,18 +119,18 @@ public abstract class Datapoint
 		stateBased = readDPType(r);
 		if ((name = r.getAttributeValue(null, ATTR_NAME)) == null)
 			throw new KNXMLException("missing attribute " + ATTR_NAME, r);
-		if ((dptId = r.getAttributeValue(null, ATTR_DPTID)) == null)
+		final String dptAttr = r.getAttributeValue(null, ATTR_DPTID);
+		if (dptAttr == null)
 			throw new KNXMLException("missing attribute " + ATTR_DPTID, r);
-		if (dptId.isEmpty())
-			dptId = null;
-		String a;
 		try {
-			a = r.getAttributeValue(null, ATTR_MAINNUMBER);
+			String a = r.getAttributeValue(null, ATTR_MAINNUMBER);
+			int mainNo = 0;
 			if (a != null)
 				mainNo = Integer.decode(a);
 			a = r.getAttributeValue(null, ATTR_PRIORITY);
 			if (a != null)
 				priority = Priority.get(a);
+			dptId = dptId(mainNo, dptAttr);
 		}
 		catch (final RuntimeException rte) {
 			throw new KNXMLException("malformed attribute, " + rte.getMessage(), r);
@@ -217,33 +217,21 @@ public abstract class Datapoint
 	}
 
 	/**
-	 * Sets the datapoint type to use for translation of datapoint values.
-	 * <p>
-	 * A datapoint type is used with {@code DPTXlator}s for value translation.
-	 *
-	 * @param mainNumber main number of the data type used for translation of a datapoint
-	 *        value; if the used {@code dptID} argument unambiguously identifies a
-	 *        DPT translator, main number might be left 0
-	 * @param dptID the datapoint type used for translation in a DPT translator
+	 * @deprecated Set during construction.
 	 */
+	@Deprecated(forRemoval = true)
 	public final void setDPT(final int mainNumber, final String dptID)
 	{
-		mainNo = mainNumber;
-		dptId = dptID;
+		dptId = dptId(mainNumber, dptID);
 	}
 
 	/**
-	 * Returns the main number of the data type to use for datapoint value translation.
-	 * <p>
-	 * If the DPT (see {@link #getDPT()}) assigned to this datapoint unambiguously
-	 * identifies the DPT translator, the returned main number might be left 0 by the user
-	 * of this datapoint.
-	 *
-	 * @return main number as int or 0
+	 * @deprecated Use {@link #dptId()}
 	 */
+	@Deprecated(forRemoval = true)
 	public final int getMainNumber()
 	{
-		return mainNo;
+		return dptId.mainNumber();
 	}
 
 	/**
@@ -255,8 +243,11 @@ public abstract class Datapoint
 	 */
 	public final String getDPT()
 	{
-		return dptId;
+		return dptId.toString();
 	}
+
+	/** {@return the datapoint type ID of this datapoint} */
+	public final DptId dptId() { return dptId; }
 
 	/**
 	 * Saves this datapoint in XML format to the supplied XML writer.
@@ -276,8 +267,8 @@ public abstract class Datapoint
 		w.writeStartElement(TAG_DATAPOINT);
 		w.writeAttribute(ATTR_STATEBASED, Boolean.toString(stateBased));
 		w.writeAttribute(ATTR_NAME, name);
-		w.writeAttribute(ATTR_MAINNUMBER, Integer.toString(mainNo));
-		w.writeAttribute(ATTR_DPTID, dptId == null ? "" : dptId);
+		w.writeAttribute(ATTR_MAINNUMBER, Integer.toString(dptId.mainNumber()));
+		w.writeAttribute(ATTR_DPTID, dptId.toString());
 		w.writeAttribute(ATTR_PRIORITY, priority.toString());
 		main.save(w);
 		doSave(w);
@@ -287,18 +278,16 @@ public abstract class Datapoint
 	@Override
 	public boolean equals(final Object o) {
 		return (this == o) || (o instanceof final Datapoint dp)
-				&& stateBased == dp.stateBased && mainNo == dp.mainNo && Objects.equals(main, dp.main)
+				&& stateBased == dp.stateBased && Objects.equals(main, dp.main)
 				&& Objects.equals(name, dp.name) && Objects.equals(dptId, dp.dptId) && priority == dp.priority;
 	}
 
 	@Override
-	public int hashCode() { return Objects.hash(stateBased, main, name, mainNo, dptId, priority); }
+	public int hashCode() { return Objects.hash(stateBased, main, name, dptId, priority); }
 
 	@Override
-	public String toString()
-	{
-		return main.toString() + " '" + name + "', DPT" + (mainNo != 0 ? " main " + mainNo : "") + " "
-				+ (dptId == null ? "-" : dptId) + ", " + priority.toString() + " priority";
+	public String toString() {
+		return main.toString() + " '" + name + "', DPT " + dptId + ", " + priority.toString() + " priority";
 	}
 
 	void doLoad(final XmlReader r) throws KNXMLException
@@ -321,5 +310,13 @@ public abstract class Datapoint
 		if ("true".equalsIgnoreCase(a))
 			return true;
 		throw new KNXMLException("malformed attribute " + ATTR_STATEBASED, r);
+	}
+
+	static DptId dptId(final int mainNumber, final String dptId) {
+		final var mainSub = dptId.split("\\.", 0);
+		final int main = mainNumber != 0 ? mainNumber : mainSub.length > 0 && !mainSub[0].isEmpty()
+				? Integer.parseUnsignedInt(mainSub[0]) : 0xffff;
+		final int subNumber = mainSub.length > 1 ? Integer.parseUnsignedInt(mainSub[1]) : 0xffff;
+		return new DptId(main, subNumber);
 	}
 }
