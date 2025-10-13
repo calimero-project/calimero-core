@@ -78,7 +78,6 @@ class CommandDPTest {
 		assertEquals(ga, dp.getMainAddress());
 		assertEquals("test", dp.getName());
 		assertFalse(dp.isStateBased());
-		assertEquals(1, dp.getMainNumber());
 		assertEquals("1.001", dp.getDPT());
 	}
 
@@ -95,7 +94,6 @@ class CommandDPTest {
 		assertEquals(ga, dp.getMainAddress());
 		assertEquals("testSave", dp.getName());
 		assertFalse(dp.isStateBased());
-		assertEquals(4, dp.getMainNumber());
 		assertEquals("4.001", dp.getDPT());
 	}
 

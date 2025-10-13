@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -306,16 +306,14 @@ class ProcessCommunicatorTest {
 
 	@Test
 	void read() throws KNXException, InterruptedException {
-		final Datapoint dp = new StateDP(dpString, "test datapoint");
-		dp.setDPT(0, DPTXlatorString.DPT_STRING_8859_1.getID());
+		final Datapoint dp = new StateDP(dpString, "test datapoint", 0, DPTXlatorString.DPT_STRING_8859_1.getID());
 		final String res = pc2.read(dp);
 		assertTrue(res.length() > 0);
 	}
 
 	@Test
 	void concurrentRead() throws InterruptedException, ExecutionException {
-		final Datapoint dp = new StateDP(dpString, "test datapoint");
-		dp.setDPT(0, DPTXlatorString.DPT_STRING_8859_1.getID());
+		final Datapoint dp = new StateDP(dpString, "test datapoint", 0, DPTXlatorString.DPT_STRING_8859_1.getID());
 
 		final Callable<Integer> task = () -> pc2.read(dp).length() > 0 ? 1 : 0;
 		final var tasks = Collections.nCopies(10, task);
@@ -364,8 +362,7 @@ class ProcessCommunicatorTest {
 
 	@Test
 	void writeDatapointString() throws KNXException {
-		final Datapoint dp = new StateDP(dpUnsigned1, "test datapoint");
-		dp.setDPT(0, DPTXlator8BitUnsigned.DPT_PERCENT_U8.getID());
+		final Datapoint dp = new StateDP(dpUnsigned1, "test datapoint", 0, DPTXlator8BitUnsigned.DPT_PERCENT_U8.getID());
 		pc2.write(dp, "80");
 	}
 

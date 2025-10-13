@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -75,6 +75,7 @@ import io.calimero.dptxlator.DPTXlator4ByteFloat;
 import io.calimero.dptxlator.DPTXlator8BitUnsigned;
 import io.calimero.dptxlator.DPTXlatorBoolean;
 import io.calimero.dptxlator.DPTXlatorString;
+import io.calimero.dptxlator.DptId;
 import io.calimero.dptxlator.TranslatorTypes;
 import io.calimero.internal.EventListeners;
 import io.calimero.link.KNXLinkClosedException;
@@ -385,9 +386,9 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	public String read(final Datapoint dp) throws KNXException, InterruptedException
 	{
 		final byte[] apdu = readFromGroup(dp.getMainAddress(), dp.getPriority(), 0, 14);
-		if (dp.getDPT() == null)
+		if (dp.dptId().equals(new DptId(0xffff, 0xffff)))
 			return HexFormat.ofDelimiter(" ").formatHex(DataUnitBuilder.extractASDU(apdu));
-		final DPTXlator t = TranslatorTypes.createTranslator(dp.getMainNumber(), dp.getDPT());
+		final DPTXlator t = TranslatorTypes.createTranslator(dp.dptId());
 		extractGroupASDU(apdu, t);
 		return t.getValue();
 	}
@@ -395,7 +396,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	@Override
 	public void write(final Datapoint dp, final String value) throws KNXException
 	{
-		final DPTXlator t = TranslatorTypes.createTranslator(dp.getMainNumber(), dp.getDPT());
+		final DPTXlator t = TranslatorTypes.createTranslator(dp.dptId());
 		t.setValue(value);
 		write(dp.getMainAddress(), dp.getPriority(), t);
 	}
@@ -404,7 +405,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	public double readNumeric(final Datapoint dp) throws KNXException, InterruptedException
 	{
 		final byte[] apdu = readFromGroup(dp.getMainAddress(), dp.getPriority(), 0, 8);
-		if (dp.getMainNumber() == 0 && dp.getDPT() == null) {
+		if (dp.dptId().equals(new DptId(0xffff, 0xffff))) {
 			apdu[1] &= 0x3f;
 			// we're parsing the asdu as signed long
 			long l = 0;
@@ -413,7 +414,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 				l = (l << 8) + (apdu[i] & 0xff);
 			return l;
 		}
-		final DPTXlator t = TranslatorTypes.createTranslator(dp.getMainNumber(), dp.getDPT());
+		final DPTXlator t = TranslatorTypes.createTranslator(dp.dptId());
 		extractGroupASDU(apdu, t);
 		return t.getNumericValue();
 	}

@@ -104,7 +104,6 @@ class StateDPTest
 		assertEquals(ga, dp.getMainAddress());
 		assertEquals("test", dp.getName());
 		assertTrue(dp.isStateBased());
-		assertEquals(1, dp.getMainNumber());
 		assertEquals("1.001", dp.getDPT());
 	}
 
@@ -152,8 +151,7 @@ class StateDPTest
 		assertEquals(ga, dp.getMainAddress());
 		assertEquals("testSave2", dp.getName());
 		assertTrue(dp.isStateBased());
-		assertEquals(0xffff, dp.getMainNumber());
-		assertNotNull(dp.getDPT());
+		assertNotNull(dp.dptId());
 		assertEquals(15, dp.getExpirationTimeout());
 		assertEquals(upd, new ArrayList<>(dp.getAddresses(true)));
 		assertEquals(inv, new ArrayList<>(dp.getAddresses(false)));
