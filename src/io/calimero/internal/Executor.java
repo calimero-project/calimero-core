@@ -36,8 +36,6 @@
 
 package io.calimero.internal;
 
-import java.lang.System.Logger.Level;
-import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -50,8 +48,6 @@ import java.util.concurrent.TimeUnit;
 
 
 public final class Executor {
-	private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
-
 	private static final ThreadFactory vtFactory = Thread.ofVirtual().name("calimero vt ", 0)
 			.inheritInheritableThreadLocals(false).factory();
 
@@ -59,23 +55,14 @@ public final class Executor {
 	@SuppressWarnings("serial")
 	private static final class KillThreadAfterExecuteException extends RuntimeException { }
 
-	private static Runnable withExitLogger(final Runnable r) {
-		return () -> {
-			r.run();
-			trace("exit " + Thread.currentThread().getName());
-		};
-	}
-
 	private static final ThreadFactory vtWrapperFactory = r -> {
-		final var thread = vtFactory.newThread(withExitLogger(r));
+		final var thread = vtFactory.newThread(r);
 		thread.setUncaughtExceptionHandler((t, e) -> {
 			if (e instanceof KillThreadAfterExecuteException)
-				trace("killed " + t.getName());
-			else
-				t.getThreadGroup().uncaughtException(t, e);
+				return;
+			t.getThreadGroup().uncaughtException(t, e);
 		});
 
-		trace("create " + thread.getName());
 		return thread;
 	};
 
@@ -113,8 +100,7 @@ public final class Executor {
 	public static void execute(final Runnable task) { vtExecutor.execute(task); }
 
 	public static Thread execute(final Runnable task, final String name) {
-		final var thread = Thread.ofVirtual().inheritInheritableThreadLocals(false).name(name).unstarted(withExitLogger(task));
-		trace("create " + thread.getName());
+		final var thread = Thread.ofVirtual().inheritInheritableThreadLocals(false).name(name).unstarted(task);
 		thread.start();
 		return thread;
 	}
@@ -122,7 +108,4 @@ public final class Executor {
 	public static ExecutorService executor() { return vtExecutor; }
 
 	public static ScheduledExecutorService scheduledExecutor() { return vtScheduledExecutor; }
-
-
-	private static void trace(final String s) { logger.log(Level.TRACE, s); }
 }
