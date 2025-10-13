@@ -73,7 +73,6 @@ public abstract class Datapoint
 	private static final String ATTR_DPTID = "dptID";
 	private static final String ATTR_PRIORITY = "priority";
 
-	private final boolean stateBased;
 	// main group address is actually final, but left mutable for easier XML loading
 	private GroupAddress main;
 	private volatile String name;
@@ -94,7 +93,6 @@ public abstract class Datapoint
 	{
 		this.main = main;
 		this.name = name;
-		this.stateBased = this instanceof StateDP;
 		this.dptId = dptId;
 	}
 
@@ -116,7 +114,11 @@ public abstract class Datapoint
 			r.nextTag();
 		if (r.getEventType() != XmlReader.START_ELEMENT || !r.getLocalName().equals(TAG_DATAPOINT))
 			throw new KNXMLException("no KNX datapoint element", r);
-		stateBased = readDPType(r);
+		final boolean stateBased = readDPType(r);
+		if (stateBased != this instanceof StateDP) {
+			final String type = this instanceof StateDP ? "state" : "command";
+			throw new KNXMLException("no %s-based KNX datapoint element".formatted(type), r);
+		}
 		if ((name = r.getAttributeValue(null, ATTR_NAME)) == null)
 			throw new KNXMLException("missing attribute " + ATTR_NAME, r);
 		final String dptAttr = r.getAttributeValue(null, ATTR_DPTID);
@@ -190,12 +192,10 @@ public abstract class Datapoint
 		return name;
 	}
 
-	/**
-	 * {@return whether this datapoint is state-based or command-based}
-	 */
+	@Deprecated(forRemoval = true)
 	public final boolean isStateBased()
 	{
-		return stateBased;
+		return this instanceof StateDP;
 	}
 
 	/**
@@ -265,7 +265,7 @@ public abstract class Datapoint
 		 </datapoint>
 		*/
 		w.writeStartElement(TAG_DATAPOINT);
-		w.writeAttribute(ATTR_STATEBASED, Boolean.toString(stateBased));
+		w.writeAttribute(ATTR_STATEBASED, Boolean.toString(this instanceof StateDP));
 		w.writeAttribute(ATTR_NAME, name);
 		w.writeAttribute(ATTR_MAINNUMBER, Integer.toString(dptId.mainNumber()));
 		w.writeAttribute(ATTR_DPTID, dptId.toString());
@@ -277,13 +277,12 @@ public abstract class Datapoint
 
 	@Override
 	public boolean equals(final Object o) {
-		return (this == o) || (o instanceof final Datapoint dp)
-				&& stateBased == dp.stateBased && Objects.equals(main, dp.main)
+		return (this == o) || (o instanceof final Datapoint dp) && Objects.equals(main, dp.main)
 				&& Objects.equals(name, dp.name) && Objects.equals(dptId, dp.dptId) && priority == dp.priority;
 	}
 
 	@Override
-	public int hashCode() { return Objects.hash(stateBased, main, name, dptId, priority); }
+	public int hashCode() { return Objects.hash(main, name, dptId, priority); }
 
 	@Override
 	public String toString() {

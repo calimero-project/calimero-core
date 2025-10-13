@@ -93,8 +93,7 @@ class StateDPTest
 	@Test
 	void stateDPGroupAddressString()
 	{
-		final Datapoint dp2 = new StateDP(ga, "test");
-		assertTrue(dp2.isStateBased());
+		final Datapoint __ = new StateDP(ga, "test");
 	}
 
 	@Test
@@ -103,7 +102,6 @@ class StateDPTest
 		final Datapoint dp = new StateDP(ga, "test", 1, "1.001");
 		assertEquals(ga, dp.getMainAddress());
 		assertEquals("test", dp.getName());
-		assertTrue(dp.isStateBased());
 		assertEquals("1.001", dp.getDPT());
 	}
 
@@ -113,7 +111,6 @@ class StateDPTest
 		final StateDP dp = new StateDP(ga, "test", inv, upd);
 		assertEquals(ga, dp.getMainAddress());
 		assertEquals("test", dp.getName());
-		assertTrue(dp.isStateBased());
 
 		Collection<GroupAddress> c = dp.getAddresses(false);
 		assertEquals(3, c.size());
@@ -150,7 +147,6 @@ class StateDPTest
 		r.close();
 		assertEquals(ga, dp.getMainAddress());
 		assertEquals("testSave2", dp.getName());
-		assertTrue(dp.isStateBased());
 		assertNotNull(dp.dptId());
 		assertEquals(15, dp.getExpirationTimeout());
 		assertEquals(upd, new ArrayList<>(dp.getAddresses(true)));

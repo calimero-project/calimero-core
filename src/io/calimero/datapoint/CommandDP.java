@@ -102,8 +102,6 @@ public class CommandDP extends Datapoint
 	 */
 	public CommandDP(final XmlReader r) throws KNXMLException {
 		super(r);
-		if (isStateBased())
-			throw new KNXMLException("no command based KNX datapoint element", r);
 		doLoad(r);
 		r.nextTag();
 	}

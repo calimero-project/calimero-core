@@ -37,7 +37,6 @@
 package io.calimero.datapoint;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -69,7 +68,6 @@ class CommandDPTest {
 		final Datapoint dp = new CommandDP(ga, "test");
 		assertEquals(ga, dp.getMainAddress());
 		assertEquals("test", dp.getName());
-		assertFalse(dp.isStateBased());
 	}
 
 	@Test
@@ -77,7 +75,6 @@ class CommandDPTest {
 		final Datapoint dp = new CommandDP(ga, "test", 1, "1.001");
 		assertEquals(ga, dp.getMainAddress());
 		assertEquals("test", dp.getName());
-		assertFalse(dp.isStateBased());
 		assertEquals("1.001", dp.getDPT());
 	}
 
@@ -93,7 +90,6 @@ class CommandDPTest {
 		r.close();
 		assertEquals(ga, dp.getMainAddress());
 		assertEquals("testSave", dp.getName());
-		assertFalse(dp.isStateBased());
 		assertEquals("4.001", dp.getDPT());
 	}
 

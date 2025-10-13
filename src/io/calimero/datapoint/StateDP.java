@@ -150,8 +150,6 @@ public class StateDP extends Datapoint
 	public StateDP(final XmlReader r) throws KNXMLException
 	{
 		super(r);
-		if (!isStateBased())
-			throw new KNXMLException("no state based KNX datapoint element", r);
 		invalidating = Collections.synchronizedList(new ArrayList<>());
 		updating = Collections.synchronizedList(new ArrayList<>());
 		doLoad(r);
