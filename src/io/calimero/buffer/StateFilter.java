@@ -172,8 +172,7 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		if (!(f.getDestination() instanceof final GroupAddress dst))
 			return;
 		final DatapointModel<?> m = c.getDatapointModel();
-		Datapoint dp;
-		if (m != null && ((dp = m.get(dst)) == null || !dp.isStateBased()))
+		if (m != null && !(m.get(dst) instanceof StateDP))
 			return;
 		final byte[] d = f.getPayload();
 		// filter for A-Group write (0x80) and read.res (0x40) services
@@ -238,10 +237,9 @@ public class StateFilter implements NetworkFilter, RequestFilter
 		if (o == null)
 			return null;
 		// check if there is an expiration timeout for a state based value
-		final Datapoint dp;
 		final DatapointModel<?> m = c.getDatapointModel();
-		if (m != null && (dp = m.get(ga)) != null && dp.isStateBased()) {
-			final int t = ((StateDP) dp).getExpirationTimeout() * 1000;
+		if (m != null && m.get(ga) instanceof StateDP dp) {
+			final int t = dp.getExpirationTimeout() * 1000;
 			if (t != 0 && System.currentTimeMillis() > o.getTimestamp() + t)
 				return null;
 		}

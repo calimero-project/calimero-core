@@ -54,6 +54,7 @@ import io.calimero.buffer.cache.CacheObject;
 import io.calimero.cemi.CEMI;
 import io.calimero.cemi.CEMIFactory;
 import io.calimero.cemi.CEMILData;
+import io.calimero.datapoint.CommandDP;
 import io.calimero.datapoint.Datapoint;
 import io.calimero.datapoint.DatapointModel;
 import io.calimero.log.LogService;
@@ -163,7 +164,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 		final DatapointModel<?> m = c.getDatapointModel();
 		if (m != null) {
 			final Datapoint dp = m.get(ga);
-			if (dp == null || dp.isStateBased())
+			if (!(dp instanceof CommandDP))
 				return null;
 		}
 		synchronized (indicationKeys) {
@@ -211,7 +212,7 @@ public class CommandFilter implements NetworkFilter, RequestFilter
 		final DatapointModel<?> m = c.getDatapointModel();
 		if (m != null) {
 			final Datapoint dp = m.get(dst);
-			if (dp == null || dp.isStateBased())
+			if (!(dp instanceof CommandDP))
 				return;
 		}
 		final byte[] d = f.getPayload();
