@@ -468,7 +468,7 @@ public final class Connector
 						lock.wait();
 				}
 				if (!targetOpen())
-					throw new KNXLinkClosedException("ongoing connect attempt we waited for failed");
+					throw new KNXLinkClosedException("ongoing connect attempt failed");
 			}
 			return impl;
 		}

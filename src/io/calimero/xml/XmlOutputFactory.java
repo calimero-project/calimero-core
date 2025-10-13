@@ -80,7 +80,6 @@ public class XmlOutputFactory // extends XMLOutputFactory
 	 */
 	public XmlWriter createXMLWriter(final String systemId) throws KNXMLException
 	{
-		final XmlResolver res = new XmlResolver();
 		final OutputStream os = XmlResolver.resolveOutput(systemId);
 		return create(os, true);
 	}

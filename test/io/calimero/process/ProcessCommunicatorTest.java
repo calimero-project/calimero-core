@@ -55,7 +55,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
-import tag.KnxnetIP;
 import io.calimero.DetachEvent;
 import io.calimero.GroupAddress;
 import io.calimero.KNXException;
@@ -74,6 +73,7 @@ import io.calimero.internal.Executor;
 import io.calimero.link.KNXNetworkLink;
 import io.calimero.link.KNXNetworkLinkIP;
 import io.calimero.link.medium.TPSettings;
+import tag.KnxnetIP;
 
 @KnxnetIP
 @ResourceLock("calimero.datapoint")

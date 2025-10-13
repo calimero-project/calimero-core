@@ -50,7 +50,7 @@ import io.calimero.xml.XmlReader;
 import io.calimero.xml.XmlWriter;
 
 /**
- * Represents a state based KNX datapoint.
+ * Represents a state-based KNX datapoint.
  * <p>
  * State based datapoint interaction leads to transitions between states (so a datapoint
  * value associated to a certain datapoint represents a particular state over an amount of
@@ -120,7 +120,7 @@ public class StateDP extends Datapoint
 	}
 
 	/**
-	 * Creates a new state based datapoint and adds invalidating and updating addresses.
+	 * Creates a new state-based datapoint and adds invalidating and updating addresses.
 	 *
 	 * @param main the group address used to identify this datapoint
 	 * @param name user defined datapoint name
@@ -139,7 +139,7 @@ public class StateDP extends Datapoint
 	}
 
 	/**
-	 * Creates a new state based datapoint from XML input.
+	 * Creates a new state-based datapoint from XML input.
 	 * <p>
 	 * If the current XML element position is no start tag, the next element tag is read. The
 	 * datapoint element is then expected to be the current element in the reader.

@@ -105,8 +105,7 @@ public abstract class Datapoint
 	 * the next position.
 	 *
 	 * @param r a XML reader
-	 * @throws KNXMLException if the XML element is no datapoint or could not be read
-	 *         correctly
+	 * @throws KNXMLException if the XML element is no datapoint or could not be read correctly
 	 */
 	Datapoint(final XmlReader r) throws KNXMLException
 	{
@@ -148,8 +147,7 @@ public abstract class Datapoint
 	 *
 	 * @param r a XML reader
 	 * @return the created datapoint, either of type {@link StateDP} or {@link CommandDP}
-	 * @throws KNXMLException if the XML element is no datapoint or could not be read
-	 *         correctly
+	 * @throws KNXMLException if the XML element is no datapoint or could not be read correctly
 	 */
 	public static Datapoint create(final XmlReader r) throws KNXMLException
 	{
@@ -252,7 +250,7 @@ public abstract class Datapoint
 	/**
 	 * Saves this datapoint in XML format to the supplied XML writer.
 	 *
-	 * @param w a XML writer
+	 * @param w an XML writer
 	 * @throws KNXMLException on error saving this datapoint
 	 */
 	public void save(final XmlWriter w) throws KNXMLException

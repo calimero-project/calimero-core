@@ -43,7 +43,7 @@ import io.calimero.xml.XmlReader;
 import io.calimero.xml.XmlWriter;
 
 /**
- * Represents a command based KNX datapoint.
+ * Represents a command-based KNX datapoint.
  * <p>
  * Interaction of command based datapoints is done solely with events (i.e., "commands"),
  * not telling anything about a datapoint state.
@@ -76,7 +76,7 @@ public class CommandDP extends Datapoint
 	}
 
 	/**
-	 * Creates a new command based datapoint with a name, and specifies datapoint
+	 * Creates a new command-based datapoint with a name, and specifies datapoint
 	 * translation type.
 	 * <p>
 	 *
@@ -92,7 +92,7 @@ public class CommandDP extends Datapoint
 	}
 
 	/**
-	 * Creates a new command based datapoint from XML input.
+	 * Creates a new command-based datapoint from XML input.
 	 * <p>
 	 * If the current XML element position is no start tag, the next element tag is read. The
 	 * datapoint element is then expected to be the current element in the reader.
