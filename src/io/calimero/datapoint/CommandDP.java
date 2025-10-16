@@ -107,6 +107,12 @@ public class CommandDP extends Datapoint
 	}
 
 	@Override
+	public boolean equals(final Object o) { return o instanceof CommandDP && super.equals(o); }
+
+	@Override
+	public int hashCode() { return super.hashCode(); }
+
+	@Override
 	public String toString()
 	{
 		return "command DP " + super.toString();
