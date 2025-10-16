@@ -208,7 +208,7 @@ public final class Connector
 		 * @return the currently used connection instance of type {@link KNXNetworkLink} or
 		 *         {@link KNXNetworkMonitor}, or null
 		 */
-		public AutoCloseable target()
+		public T target()
 		{
 			return impl;
 		}
