@@ -500,8 +500,8 @@ public class Discoverer
 			for (final Enumeration<InetAddress> ea = ni.getInetAddresses(); ea.hasMoreElements();) {
 				final InetAddress a = ea.nextElement();
 				// without NAT, we only try IPv4 addresses
-				if (!nat && a.getAddress().length != 4)
-					logger.log(DEBUG, "skip {0}, not an IPv4 address", a);
+				if (!nat && !(a instanceof Inet4Address))
+					logger.log(TRACE, "skip {0}, not an IPv4 address", a);
 				else
 					try {
 						if (!(lo && a.isLoopbackAddress())) {

@@ -284,7 +284,8 @@ public abstract class Datapoint
 
 	@Override
 	public String toString() {
-		return main.toString() + " '" + name + "', DPT " + dptId + ", " + priority.toString() + " priority";
+		return main.toString() + (name.isEmpty() ? "" : " '" + name + "'") + ", DPT " + dptId + ", "
+				+ priority.toString() + " priority";
 	}
 
 	void doLoad(final XmlReader r) throws KNXMLException

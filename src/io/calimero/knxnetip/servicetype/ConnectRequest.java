@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -81,13 +81,12 @@ public class ConnectRequest extends ServiceType
 	 * Creates a connect request with the specific information of the CRI, and the
 	 * endpoint information of the client.
 	 * <p>
-	 * The control and data endpoint specified are allowed to be equal, i.e all
+	 * The control and data endpoint specified are allowed to be equal, i.e, all
 	 * communication is handled through the same endpoint at the client.
 	 *
 	 * @param requestInfo connection specific options, depending on connection type
 	 * @param ctrlEndpoint return address information of the client's control endpoint
-	 * @param dataEndpoint address information of the client's data endpoint for the
-	 *        requested connection
+	 * @param dataEndpoint address information of the client's data endpoint for the requested connection
 	 */
 	public ConnectRequest(final CRI requestInfo, final HPAI ctrlEndpoint, final HPAI dataEndpoint)
 	{
@@ -103,8 +102,7 @@ public class ConnectRequest extends ServiceType
 	 * <p>
 	 *
 	 * @param requestInfo connection specific options, depending on connection type
-	 * @param localPort local port of client used for connection, 0 &lt;= port &lt;=
-	 *        0xFFFF
+	 * @param localPort local port of client used for connection, 0 &le; port &le; 0xFFFF
 	 * @see CRI
 	 */
 	public ConnectRequest(final CRI requestInfo, final int localPort)

@@ -272,19 +272,16 @@ public class StateDP extends Datapoint
 	public boolean equals(final Object o) {
 		if (this == o)
 			return true;
-		if (!(o instanceof final StateDP dp))
-			return false;
-		if (!super.equals(o))
-			return false;
-		return timeout == dp.timeout && Objects.equals(invalidating, dp.invalidating)
-				&& Objects.equals(updating, dp.updating) && Objects.equals(locations, dp.locations);
+		return o instanceof final StateDP dp && super.equals(o) && timeout == dp.timeout
+				&& Objects.equals(invalidating, dp.invalidating) && Objects.equals(updating, dp.updating)
+				&& Objects.equals(locations, dp.locations);
 	}
 
 	@Override
 	public int hashCode() { return Objects.hash(super.hashCode(), invalidating, updating, timeout, locations); }
 
 	@Override
-	public String toString() { return "state DP " + locations + " " + super.toString(); }
+	public String toString() { return "state DP " + (locations.isEmpty() ? "" : locations + " ") + super.toString(); }
 
 	@Override
 	void doLoad(final XmlReader r) throws KNXMLException
