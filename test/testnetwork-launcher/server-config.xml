@@ -6,7 +6,7 @@
 		networkMonitoring="true" udpPort="3671" keyfile="../calimero-core/test/resources/keyfile" securedServices="optional">
 		<knxAddress type="individual">1.1.0</knxAddress>
 		<routing>224.0.23.12</routing>
-<!--		<unixSocket>/tmp/calimero/unix/.socket</unixSocket>-->
+		<unixSocket>/tmp/calimero.socket</unixSocket>
 		<disruptionBuffer expirationTimeout="30" udpPort="5555-5559"/>
 		<knxSubnet type="virtual" medium="pl110" domainAddress="6c">KnxTestNetwork</knxSubnet>
 		<groupAddressFilter>
