@@ -89,6 +89,17 @@ final class Net {
 	}
 	static InetAddress anyLocalIPv4Address() { return anyLocalIPv4Address; }
 
+	private static final InetAddress defaultMulticast;
+	static {
+		try {
+			defaultMulticast = InetAddress.getByName("224.0.23.12");
+		}
+		catch (final UnknownHostException e) {
+			throw new InternalError(e);
+		}
+	}
+	static InetAddress defaultMulticast() { return defaultMulticast; }
+
 	// finds a local IPv4 address with its network prefix "matching" the remote address
 	static Optional<InetAddress> onSameSubnet(final InetAddress remote) {
 		try {

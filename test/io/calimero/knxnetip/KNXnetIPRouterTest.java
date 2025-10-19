@@ -353,7 +353,7 @@ class KNXnetIPRouterTest
 
 	@Test
 	void systemBroadcastWithDefaultSocket() throws KNXException, IOException, InterruptedException {
-		sysBroadcast(Discoverer.SYSTEM_SETUP_MULTICAST, Discoverer.SYSTEM_SETUP_MULTICAST);
+		sysBroadcast(KNXnetIPRouting.DefaultMulticast, KNXnetIPRouting.DefaultMulticast);
 	}
 
 	@Test
@@ -375,7 +375,7 @@ class KNXnetIPRouterTest
 		try (KNXnetIPRouting sender = new KNXnetIPRouting(null, senderGroup);
 				MulticastSocket verify = new MulticastSocket(KNXnetIPConnection.DEFAULT_PORT)) {
 
-			verify.joinGroup(new InetSocketAddress(Discoverer.SYSTEM_SETUP_MULTICAST, 0), null);
+			verify.joinGroup(new InetSocketAddress(KNXnetIPRouting.DefaultMulticast, 0), null);
 			verify.setSoTimeout(1000);
 
 			sender.send(sysBcast, BlockingMode.NonBlocking);

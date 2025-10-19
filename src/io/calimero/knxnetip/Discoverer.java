@@ -142,17 +142,7 @@ public class Discoverer
 	public static final int SEARCH_PORT = KNXnetIPConnection.DEFAULT_PORT;
 
 	private static final Logger logger = LogService.getLogger(LOG_SERVICE);
-	static final InetAddress SYSTEM_SETUP_MULTICAST;
-	static {
-		InetAddress a = null;
-		try {
-			a = InetAddress.getByName(SEARCH_MULTICAST);
-		}
-		catch (final UnknownHostException e) {
-			logger.log(ERROR, "on resolving system setup multicast " + SEARCH_MULTICAST, e);
-		}
-		SYSTEM_SETUP_MULTICAST = a;
-	}
+	private static final InetAddress SYSTEM_SETUP_MULTICAST = Net.defaultMulticast();
 
 	// local host/port
 	private InetAddress host;

@@ -135,9 +135,9 @@ public class KNXnetIPRouting extends ConnectionBase
 	/**
 	 * Address of the default multicast group assigned to KNX IP routers.
 	 */
-	public static final InetAddress DefaultMulticast = Discoverer.SYSTEM_SETUP_MULTICAST;
+	public static final InetAddress DefaultMulticast = Net.defaultMulticast();
 
-	private static final InetAddress systemBroadcast = Discoverer.SYSTEM_SETUP_MULTICAST;
+	private static final InetAddress systemBroadcast = Net.defaultMulticast();
 
 	// newer Gira servers have a "reliable communication" option, which uses the
 	// following unsupported service type; not part of the knx spec
