@@ -342,7 +342,8 @@ public abstract class ClientConnection extends ConnectionBase
 				channelId = res.getChannelID();
 				if (stream || (useNat && ep.nat())) {
 					dataEp = src;
-					dataEndpt = (InetSocketAddress) dataEp.address();
+					if (dataEp.address() instanceof final InetSocketAddress isa)
+						dataEndpt = isa;
 				}
 				else {
 					dataEp = switch (ctrlEp) {
@@ -350,7 +351,8 @@ public abstract class ClientConnection extends ConnectionBase
 						case final TcpEndpointAddress __ -> new TcpEndpointAddress(ep.endpoint());
 						case final UdsEndpointAddress uds -> uds;
 					};
-					dataEndpt = (InetSocketAddress) dataEp.address();
+					if (dataEp.address() instanceof final InetSocketAddress isa)
+						dataEndpt = isa;
 				}
 
 
