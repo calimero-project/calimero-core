@@ -36,6 +36,7 @@
 
 package io.calimero.knxnetip;
 
+import static io.calimero.knxnetip.Net.anyLocalIPv4Address;
 import static io.calimero.knxnetip.Net.hostPort;
 import static io.calimero.knxnetip.util.Srp.withDeviceDescription;
 import static java.lang.System.Logger.Level.DEBUG;
@@ -335,7 +336,7 @@ public class Discoverer
 			final InetSocketAddress local = (InetSocketAddress) dc.getLocalAddress();
 			logger.log(DEBUG, "search {0} -> server control endpoint {1}", hostPort(local), hostPort(serverControlEndpoint));
 
-			final InetSocketAddress res = nat ? new InetSocketAddress(0) : local;
+			final InetSocketAddress res = nat ? new InetSocketAddress(anyLocalIPv4Address(), 0) : local;
 
 			final byte[] request = PacketHelper.toPacket(new SearchRequest(res, searchParameters));
 			dc.send(ByteBuffer.wrap(request), serverControlEndpoint);
@@ -602,8 +603,8 @@ public class Discoverer
 			throw new KNXIllegalArgumentException("timeout out of range");
 
 		final var localhost = host(server.getAddress());
-		final var bind = new InetSocketAddress(nat ? null : Net.onSameSubnet(server.getAddress()).orElse(localhost),
-				port);
+		final var bind = new InetSocketAddress(nat ? anyLocalIPv4Address()
+				: Net.onSameSubnet(server.getAddress()).orElse(localhost), port);
 		try (var dc = newChannel(bind)) {
 			final var local = (InetSocketAddress) dc.getLocalAddress();
 			final byte[] buf = PacketHelper.toPacket(nat ? DescriptionRequest.Nat : new DescriptionRequest(local));
@@ -637,7 +638,7 @@ public class Discoverer
 	private CompletableFuture<Void> search(final InetAddress localAddr, final int localPort, final NetworkInterface ni,
 			final Duration timeout, final Consumer< Result<SearchResponse>> notifyResponse,
 			final Srp... searchParameters) throws KNXException {
-		final var bind = mcast ? new InetSocketAddress(SEARCH_PORT) : new InetSocketAddress(localAddr, localPort);
+		final var bind = mcast ? new InetSocketAddress(anyLocalIPv4Address(), SEARCH_PORT) : new InetSocketAddress(localAddr, localPort);
 		try {
 			final var channel = newChannel(bind);
 			if (ni != null)
@@ -656,7 +657,7 @@ public class Discoverer
 			// IP multicast responses MUST be forwarded by NAT without
 			// modifications to IP/port, hence, we can safely state them in our HPAI
 			final InetSocketAddress res = mcast ? new InetSocketAddress(SYSTEM_SETUP_MULTICAST, realLocalPort)
-					: nat ? new InetSocketAddress(0) : localEndpoint;
+					: nat ? new InetSocketAddress(anyLocalIPv4Address(), 0) : localEndpoint;
 
 			final var dst = new InetSocketAddress(SYSTEM_SETUP_MULTICAST, SEARCH_PORT);
 

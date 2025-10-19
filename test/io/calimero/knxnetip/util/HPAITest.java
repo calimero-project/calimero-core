@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2019, 2024 B. Malinowsky
+    Copyright (c) 2019, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -77,8 +77,11 @@ class HPAITest {
 	}
 
 	@Test
-	void natIsRouteBackHpai() {
-		assertTrue(new HPAI(HPAI.IPV4_UDP, new InetSocketAddress(0)).isRouteBack());
+	void natIsRouteBackHpai() throws UnknownHostException {
+		assertTrue(HPAI.Nat.isRouteBack());
+
+		final var anyLocal = InetAddress.getByAddress(new byte[4]);
+		assertTrue(new HPAI(HPAI.IPV4_UDP, new InetSocketAddress(anyLocal, 0)).isRouteBack());
 	}
 
 	@Test

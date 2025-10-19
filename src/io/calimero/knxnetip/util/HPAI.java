@@ -40,8 +40,11 @@ import java.io.ByteArrayOutputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.function.Predicate;
 
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
@@ -69,15 +72,26 @@ public record HPAI(int hostProtocol, InetSocketAddress endpoint) {
 	 */
 	public static final int IPV4_TCP = 0x02;
 
+
+	private static final InetAddress anyLocalIPv4Address;
+	static {
+		try {
+			anyLocalIPv4Address = InetAddress.getByAddress(new byte[4]);
+		}
+		catch (final UnknownHostException e) {
+			throw new InternalError(e);
+		}
+	}
+
 	/**
 	 * Host protocol address information for TCP, always set to route-back endpoint.
 	 */
-	public static final HPAI Tcp = new HPAI(IPV4_TCP, new InetSocketAddress(0));
+	public static final HPAI Tcp = new HPAI(IPV4_TCP, new InetSocketAddress(anyLocalIPv4Address, 0));
 
 	/**
 	 * Host protocol address information for UDP with NAT.
 	 */
-	public static final HPAI Nat = new HPAI(IPV4_UDP, new InetSocketAddress(0));
+	public static final HPAI Nat = new HPAI(IPV4_UDP, new InetSocketAddress(anyLocalIPv4Address, 0));
 
 
 	private static final int HPAI_SIZE = 8;
@@ -200,16 +214,28 @@ public record HPAI(int hostProtocol, InetSocketAddress endpoint) {
 	}
 
 	private static InetAddress addrOrDefault(final InetAddress addr) {
+		if (addr != null)
+			return addr;
 		try {
-			return addr != null ? addr : InetAddress.getLocalHost();
+			return InetAddress.getLocalHost() instanceof Inet4Address inet4 ? inet4 : anyIPv4Address();
 		}
-		catch (final UnknownHostException e) {
-			try {
-				return InetAddress.getByAddress(new byte[4]);
-			}
-			catch (final UnknownHostException unreachable) {
-				throw new Error("raw IPv4 addresses should always work", unreachable);
-			}
+		catch (UnknownHostException | SocketException e) {
+			return anyLocalIPv4Address;
 		}
+	}
+
+	private static InetAddress anyIPv4Address() throws SocketException {
+		return NetworkInterface.networkInterfaces().filter(HPAI::suitableNetif)
+				.flatMap(NetworkInterface::inetAddresses)
+				.filter(Predicate.not(InetAddress::isLoopbackAddress))
+				.filter(Inet4Address.class::isInstance).findFirst().orElse(anyLocalIPv4Address);
+	}
+
+	private static boolean suitableNetif(final NetworkInterface nif) {
+		try {
+			return nif.isUp() && !nif.isLoopback() && !nif.isVirtual();
+		}
+		catch (final SocketException __) {}
+		return false;
 	}
 }

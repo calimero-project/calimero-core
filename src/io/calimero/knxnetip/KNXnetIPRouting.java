@@ -445,7 +445,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	private static DatagramChannel newChannel() throws IOException {
 		return DatagramChannel.open(StandardProtocolFamily.INET)
 				.setOption(StandardSocketOptions.SO_REUSEADDR, true)
-				.bind(new InetSocketAddress(DEFAULT_PORT))
+				.bind(new InetSocketAddress(Net.anyLocalIPv4Address(), DEFAULT_PORT))
 				.setOption(StandardSocketOptions.IP_MULTICAST_TTL, 64);
 	}
 

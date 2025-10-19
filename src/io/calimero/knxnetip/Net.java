@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2021, 2024 B. Malinowsky
+    Copyright (c) 2021, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -62,16 +62,32 @@ final class Net {
 		class NetIf {
 			static final NetworkInterface defaultNetif;
 			static {
-				try (var s = new MulticastSocket()) {
-					defaultNetif = s.getNetworkInterface();
+				try (final var s = new MulticastSocket()) {
+					var nif = s.getNetworkInterface();
+					if (nif.inetAddresses().noneMatch(Inet4Address.class::isInstance)) {
+						s.connect(KNXnetIPRouting.DefaultMulticast, KNXnetIPRouting.DEFAULT_PORT);
+						nif = NetworkInterface.getByInetAddress(s.getLocalAddress());
+					}
+					defaultNetif = nif;
 				}
 				catch (final IOException e) {
-					throw new ExceptionInInitializerError(e);
+					throw new InternalError(e);
 				}
 			}
 		}
 		return NetIf.defaultNetif;
 	}
+
+	private static final InetAddress anyLocalIPv4Address;
+	static {
+		try {
+			anyLocalIPv4Address = InetAddress.getByAddress(new byte[4]);
+		}
+		catch (UnknownHostException e) {
+			throw new InternalError(e);
+		}
+	}
+	static InetAddress anyLocalIPv4Address() { return anyLocalIPv4Address; }
 
 	// finds a local IPv4 address with its network prefix "matching" the remote address
 	static Optional<InetAddress> onSameSubnet(final InetAddress remote) {
