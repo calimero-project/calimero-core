@@ -67,5 +67,11 @@
 			<knxAddress type="individual">1.1.29</knxAddress>
 			<knxAddress type="individual">1.1.30</knxAddress>
 		</additionalAddresses>
+		<timeServer>
+			<datapoint stateBased="true" name="current time" dptID="10.001" priority="low">
+				<knxAddress type="group">3/4/5</knxAddress>
+				<expiration timeout="600" />
+			</datapoint>
+		</timeServer>
 	</serviceContainer>
 </knxServer>
