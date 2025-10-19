@@ -378,7 +378,6 @@ public class KNXnetIPRouting extends ConnectionBase
 		try {
 			dc = newChannel();
 			dcSysBcast = !multicast.equals(systemBroadcast) ? newChannel() : null;
-			logger = LogService.getLogger("io.calimero.knxnetip." + name());
 
 			var setNetif = netIf;
 			if (setNetif != null) {
@@ -389,6 +388,7 @@ public class KNXnetIPRouting extends ConnectionBase
 			else
 				setNetif = Net.defaultNetif();
 
+			logger = LogService.getLogger("io.calimero.knxnetip." + name());
 			logger.log(DEBUG, "join multicast group {0} on {1}", multicast.getHostAddress(), setNetif.getName());
 			dc.join(multicast, setNetif);
 			if (dcSysBcast != null)
