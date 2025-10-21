@@ -534,12 +534,23 @@ public final class TranslatorTypes
 		return false;
 	}
 
-	public static DPTXlator createTranslator(final DptId dpt) throws KNXException {
-		final MainType type = map.get(dpt.mainNumber());
+	/**
+	 * Creates a DPT translator for the given datapoint type and optionally sets the datapoint data to translate.
+	 *
+	 * @param dptId datapoint type ID
+	 * @param data (optional) KNX datapoint data to set in the created translator for translation
+	 * @return the new {@link DPTXlator}
+	 * @throws KNXException if no matching DPT translator is available or creation failed
+	 */
+	public static DPTXlator createTranslator(final DptId dptId, final byte... data) throws KNXException {
+		final MainType type = map.get(dptId.mainNumber());
 		if (type == null)
-			throw new KNXException("no DPT translator available for " + dpt);
+			throw new KNXException("no DPT translator available for " + dptId);
 
-		return type.createTranslator(dpt);
+		var t = type.createTranslator(dptId);
+		if (data.length > 0)
+			t.setData(data);
+		return t;
 	}
 
 	/**
