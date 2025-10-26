@@ -243,7 +243,7 @@ public class KNXnetIPRouting extends ConnectionBase
 				if (dcSysBcast != null)
 					dcSysBcast.send(buf, dst);
 				else
-					dc.send(buf, dst);
+					channel().send(buf, dst);
 			}
 			else {
 				applyRoutingFlowControl();
@@ -289,7 +289,7 @@ public class KNXnetIPRouting extends ConnectionBase
 		if (hopCount < 0 || hopCount > 255)
 			throw new KNXIllegalArgumentException("hop count out of range");
 		try {
-			dc.setOption(StandardSocketOptions.IP_MULTICAST_TTL, hopCount);
+			channel().setOption(StandardSocketOptions.IP_MULTICAST_TTL, hopCount);
 		}
 		catch (final IOException e) {
 			logger.log(ERROR, "failed to set hop count", e);
@@ -305,7 +305,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	public final int getHopCount()
 	{
 		try {
-			return dc.getOption(StandardSocketOptions.IP_MULTICAST_TTL);
+			return channel().getOption(StandardSocketOptions.IP_MULTICAST_TTL);
 		}
 		catch (final IOException e) {
 			logger.log(ERROR, "failed to get hop count", e);
@@ -315,7 +315,7 @@ public class KNXnetIPRouting extends ConnectionBase
 
 	public final NetworkInterface networkInterface() {
 		try {
-			final NetworkInterface netif = dc.getOption(StandardSocketOptions.IP_MULTICAST_IF);
+			final NetworkInterface netif = channel().getOption(StandardSocketOptions.IP_MULTICAST_IF);
 			return netif == null ? Net.defaultNetif() : netif;
 		}
 		catch (final IOException e) {
@@ -332,7 +332,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	public final boolean usesMulticastLoopback()
 	{
 		try {
-			return dc.getOption(StandardSocketOptions.IP_MULTICAST_LOOP);
+			return channel().getOption(StandardSocketOptions.IP_MULTICAST_LOOP);
 		}
 		catch (final IOException e) {
 			// if we can't access loopback mode, we assume that we also couldn't set it
@@ -379,6 +379,7 @@ public class KNXnetIPRouting extends ConnectionBase
 			dc = newChannel();
 			dcSysBcast = !multicast.equals(systemBroadcast) ? newChannel() : null;
 
+			final var dc = channel();
 			var setNetif = netIf;
 			if (setNetif != null) {
 				dc.setOption(StandardSocketOptions.IP_MULTICAST_IF, setNetif);
@@ -411,7 +412,7 @@ public class KNXnetIPRouting extends ConnectionBase
 		}
 
 		if (startReceiver)
-			startChannelReceiver(new ChannelReceiver(this, dc), "KNXnet/IP receiver");
+			startChannelReceiver(new ChannelReceiver(this, channel()), "KNXnet/IP receiver");
 		if (dcSysBcast != null) {
 			final var sysBcastLooper = new ChannelReceiver(this, dcSysBcast) {
 				@Override
@@ -526,7 +527,7 @@ public class KNXnetIPRouting extends ConnectionBase
 		final var response = callback.apply(h, ByteBuffer.wrap(data).position(offset));
 		if (response != null) {
 			@SuppressWarnings("resource")
-			final var channel = dcSysBcast != null ? dcSysBcast : dc;
+			final var channel = dcSysBcast != null ? dcSysBcast : channel();
 			channel.send(ByteBuffer.wrap(PacketHelper.toPacket(response)), createResponseAddress(endpoint, source));
 		}
 	}
@@ -546,7 +547,7 @@ public class KNXnetIPRouting extends ConnectionBase
 
 		logger.log(level, "close connection - " + reason, t);
 
-		closeSilently(dc, null);
+		closeSilently(channel(), null);
 		closeSilently(dcSysBcast, null);
 
 		cleanup(initiator, reason, level, t);
@@ -591,7 +592,7 @@ public class KNXnetIPRouting extends ConnectionBase
 
 	@Override
 	protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
-		dc.send(ByteBuffer.wrap(packet), dst);
+		channel().send(ByteBuffer.wrap(packet), dst);
 	}
 
 	private boolean systemBroadcast(final KNXnetIPHeader h, final byte[] data, final int offset)
