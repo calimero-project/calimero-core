@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2018, 2023 B. Malinowsky
+    Copyright (c) 2018, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -213,7 +213,9 @@ public final class SecureRouting extends KNXnetIPRouting {
 
 	@Override
 	protected void close(final int initiator, final String reason, final Level level, final Throwable t) {
-		groupSync.cancel(true);
+		synchronized (this) {
+			groupSync.cancel(true);
+		}
 		super.close(initiator, reason, level, t);
 	}
 
@@ -322,9 +324,11 @@ public final class SecureRouting extends KNXnetIPRouting {
 
 	private void scheduleGroupSync(final long initialDelay) {
 		logger.log(TRACE, "schedule group sync (initial delay {0} ms)", initialDelay);
-		groupSync.cancel(false);
-		groupSync = Executor.scheduledExecutor().scheduleWithFixedDelay(this::sendGroupSync, initialDelay,
-				syncQueryInterval, TimeUnit.MILLISECONDS);
+		synchronized (this) {
+			groupSync.cancel(false);
+			groupSync = Executor.scheduledExecutor().scheduleWithFixedDelay(this::sendGroupSync, initialDelay,
+					syncQueryInterval, TimeUnit.MILLISECONDS);
+		}
 	}
 
 	private void sendGroupSync() {
@@ -343,7 +347,9 @@ public final class SecureRouting extends KNXnetIPRouting {
 		}
 		catch (IOException | RuntimeException e) {
 			if (!channel().isOpen()) {
-				groupSync.cancel(true);
+				synchronized (this) {
+					groupSync.cancel(true);
+				}
 				throw new CancellationException("stop group sync for " + this);
 			}
 			logger.log(WARNING, "sending group sync failed", e);
