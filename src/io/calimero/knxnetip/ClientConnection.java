@@ -199,7 +199,8 @@ public abstract class ClientConnection extends ConnectionBase
 			}
 
 			final var lsa = localSocketAddress();
-			logger.log(DEBUG, "establish connection from {0} to {1}", lsa, ctrlEp);
+			final String natSuffix = useNat ? " (NAT)" : "";
+			logger.log(DEBUG, "establish connection from {0} to {1}{2}", lsa, ctrlEp, natSuffix);
 			// HPAI throws if wildcard local address (0.0.0.0) is supplied
 			final var hpai = stream ? HPAI.Tcp : useNat ? HPAI.Nat : new HPAI((UdpEndpointAddress) lsa);
 			final byte[] buf = PacketHelper.toPacket(protocolVersion(), new ConnectRequest(cri, hpai, hpai));
