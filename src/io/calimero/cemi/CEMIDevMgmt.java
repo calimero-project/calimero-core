@@ -128,6 +128,21 @@ public class CEMIDevMgmt implements CEMI
 		 */
 		public static final int ACCESS_DENIED = 0x0B;
 
+		private static final String[] messages = new String[] {
+				"unspecified Error (unknown error)",
+				"out of range (write value not allowed)",
+				"out of max. range (write value too high)",
+				"out of min. range (write value too low)",
+				"memory error (memory can not be written or only with faults)",
+				"read-only (write access to a read-only or write-protected property)",
+				"illegal command (command not valid or not supported)",
+				"void DP (read/write access to nonexistent property)",
+				"type conflict (write access with a wrong data type (datapoint length))",
+				"property index/range error (read/write access to nonexistent property index)",
+				"the property exists but can at this moment not be written with a new value",
+				"property access not allowed due to enabled security"
+		};
+
 		// enforce non-instantiability
 		private ErrorCodes() {}
 	}
@@ -178,21 +193,6 @@ public class CEMIDevMgmt implements CEMI
 	private static final int MC_OFFSET = 0xF0;
 
 	private static final byte[] empty = new byte[0];
-
-	private static final String[] errors = new String[] {
-		"unspecified Error (unknown error)",
-		"out of range (write value not allowed)",
-		"out of max. range (write value too high)",
-		"out of min. range (write value too low)",
-		"memory error (memory can not be written or only with faults)",
-		"read-only (write access to a read-only or write-protected property)",
-		"illegal command (command not valid or not supported)",
-		"void DP (read/write access to nonexistent property)",
-		"type conflict (write access with a wrong data type (datapoint length))",
-		"property index/range error (read/write access to nonexistent property index)",
-		"the property exists but can at this moment not be written with a new value",
-		"property access not allowed due to enabled security"
-	};
 
 	private final int mc;
 	private int iot;
@@ -362,9 +362,9 @@ public class CEMIDevMgmt implements CEMI
 	{
 		if (errorCode < 0)
 			throw new KNXIllegalArgumentException("error code has to be >= 0");
-		if (errorCode > errors.length - 1)
+		if (errorCode > ErrorCodes.messages.length - 1)
 			return "unknown error code";
-		return errors[errorCode];
+		return ErrorCodes.messages[errorCode];
 	}
 
 	@Override
