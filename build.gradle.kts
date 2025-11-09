@@ -8,7 +8,7 @@ plugins {
 	application
 	`maven-publish`
 	signing
-	id("org.gradle.test-retry") version "1.6.2"
+	id("org.gradle.test-retry") version "1.6.4"
 	id("com.github.ben-manes.versions") version "0.53.0"
 	eclipse
 }
