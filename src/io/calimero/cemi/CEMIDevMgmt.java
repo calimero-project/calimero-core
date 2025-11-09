@@ -123,6 +123,11 @@ public class CEMIDevMgmt implements CEMI
 		 */
 		public static final int VALUE_NOT_WRITEABLE_NOW = 0x0A;
 
+		/**
+		 * Property access not allowed due to enabled security, used in negative read/write message confirmations.
+		 */
+		public static final int ACCESS_DENIED = 0x0B;
+
 		// enforce non-instantiability
 		private ErrorCodes() {}
 	}
@@ -185,7 +190,8 @@ public class CEMIDevMgmt implements CEMI
 		"void DP (read/write access to nonexistent property)",
 		"type conflict (write access with a wrong data type (datapoint length))",
 		"property index/range error (read/write access to nonexistent property index)",
-		"the property exists but can at this moment not be written with a new value"
+		"the property exists but can at this moment not be written with a new value",
+		"property access not allowed due to enabled security"
 	};
 
 	private final int mc;
