@@ -614,7 +614,7 @@ public final class Keyring {
 	 * @param input encrypted password
 	 * @param keyringPassword the password of this keyring
 	 * @return decrypted password as char array
-	 * @throws KnxSecureException for cryptographic setup/algorithm problems
+	 * @throws KnxSecureException for cryptographic setup/algorithm problems or invalid keyring password
 	 */
 	public char[] decryptPassword(final byte[] input, final char[] keyringPassword) {
 		final var keyringPwdHash = hashKeyringPwd(keyringPassword);
@@ -626,6 +626,7 @@ public final class Keyring {
 			Arrays.fill(pwdData, (byte) 0);
 			return chars;
 		}
+		catch (KnxSecureException e) { throw e; }
 		catch (GeneralSecurityException | RuntimeException e) {
 			throw new KnxSecureException("decrypting password data", e);
 		}
@@ -724,7 +725,11 @@ public final class Keyring {
 		if (data.length == 0)
 			return emptyPwd;
 		final int b = data[data.length - 1] & 0xff;
-		final byte[] range = Arrays.copyOfRange(data, 8, data.length - b);
+		final int from = 8;
+		final int to = data.length - b;
+		if (from > to || to > data.length)
+			throw new KnxSecureException("invalid password");
+		final byte[] range = Arrays.copyOfRange(data, from, to);
 		return range;
 	}
 
