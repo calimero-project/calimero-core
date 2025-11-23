@@ -48,7 +48,6 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
@@ -220,7 +219,7 @@ public sealed abstract class StreamConnection implements Closeable
 
 			sessionState = SessionState.Idle;
 			keepAliveFuture.cancel(false);
-			securedConnections.values().forEach(c -> c.close(initiator, reason, Level.DEBUG, null));
+			securedConnections.values().forEach(c -> c.close(initiator, reason, DEBUG, null));
 			securedConnections.clear();
 			conn.sessions.remove(sessionId);
 
@@ -643,7 +642,7 @@ public sealed abstract class StreamConnection implements Closeable
 	}
 
 	void close(final int initiator, final String reason) {
-		unsecuredConnections.values().forEach(t -> t.close(initiator, reason, Level.DEBUG, null));
+		unsecuredConnections.values().forEach(t -> t.close(initiator, reason, DEBUG, null));
 		unsecuredConnections.clear();
 
 		sessions.values().forEach(s -> s.close(initiator, reason));
