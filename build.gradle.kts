@@ -9,6 +9,7 @@ plugins {
 	`maven-publish`
 	signing
 	id("org.gradle.test-retry") version "1.6.4"
+	id("org.graalvm.buildtools.native") version "0.11.3"
 	id("com.github.ben-manes.versions") version "0.53.0"
 	eclipse
 }
@@ -126,6 +127,27 @@ testing {
 					}
 				}
 			}
+		}
+	}
+}
+
+graalvmNative {
+//	toolchainDetection = true // only works reliably if a single JDK is installed, which is GraalVM
+	agent {
+//		enabled = true
+		defaultMode = "standard"
+	}
+	binaries {
+		named("main") {
+//			verbose = true
+			buildArgs.addAll(
+				listOf(
+					"--initialize-at-build-time",
+					"--no-fallback",
+					"--exact-reachability-metadata",
+					"-H:+ReportExceptionStackTraces",
+				)
+			)
 		}
 	}
 }

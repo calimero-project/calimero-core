@@ -1,0 +1,339 @@
+{
+  "reflection": [
+    {
+      "type": "io.calimero.KNXListener"
+    },
+    {
+      "type": "io.calimero.baos.BaosService",
+      "methods": [
+        {
+          "name": "from",
+          "parameterTypes": [
+            "java.nio.ByteBuffer"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.calimero.knxnetip.RoutingListener"
+    },
+    {
+      "type": "io.calimero.link.AbstractLink$LinkNotifier"
+    },
+    {
+      "type": "io.calimero.link.Connector$Link"
+    },
+    {
+      "type": "io.calimero.link.KNXNetworkLink"
+    },
+    {
+      "type": "io.calimero.link.KNXNetworkLinkIP$2"
+    },
+    {
+      "type": "io.calimero.link.KNXNetworkMonitor"
+    },
+    {
+      "type": "io.calimero.link.NetworkLinkListener"
+    },
+    {
+      "type": "io.calimero.link.medium.KNXMediumSettings",
+      "fields": [
+        {
+          "name": "assigned"
+        }
+      ]
+    },
+    {
+      "type": "io.calimero.mgmt.TransportLayerImpl$NLListener"
+    },
+    {
+      "type": "io.calimero.mgmt.TransportListener"
+    },
+    {
+      "type": "io.calimero.mgmt.SecureManagement$1"
+    },
+    {
+      "type": "io.calimero.mgmt.ManagementClientImpl$TLListener"
+    },
+    {
+      "type": "io.calimero.mgmt.LocalDeviceManagement$KNXListenerImpl"
+    },
+    {
+      "type": "io.calimero.mgmt.RemotePropertyServiceAdapter$1"
+    },
+    {
+      "type": "io.calimero.process.ProcessListener"
+    },
+    {
+      "type": "io.calimero.process.ProcessCommunicatorImpl$NLListener"
+    },
+    {
+      "type": "io.calimero.secure.SecureApplicationLayer$1"
+    },
+    {
+      "type": "io.calimero.dptxlator.DPTXlator1BitControlled",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DPTXlator2ByteFloat",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DptXlator2ByteSigned",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DPTXlator2ByteUnsigned",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DPTXlator3BitControlled",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DPTXlator4ByteFloat",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DPTXlator4ByteSigned",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DPTXlator4ByteUnsigned",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DPTXlator8BitEnum",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DptXlator8BitSet",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DPTXlator8BitSigned",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DPTXlator8BitUnsigned",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DptXlator16BitSet",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DPTXlator64BitSigned",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DPTXlatorBoolean",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DptXlatorBrightnessClrTempControl",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DptXlatorBrightnessClrTempTrans",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DPTXlatorDate",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DPTXlatorDateTime",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DptXlatorMeteringValue",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DptXlatorRelativeControlRgb",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DptXlatorRelativeControlRgbw",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DptXlatorRelativeControlXyY",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DPTXlatorRGB",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DptXlatorRgbw",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DPTXlatorSceneControl",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DPTXlatorSceneNumber",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DPTXlatorString",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DPTXlatorTime",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DPTXlatorUtf8",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DptXlatorXyY",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    },
+    {
+      "type": "io.calimero.dptxlator.DptXlatorXyYTransition",
+      "methods": [
+        { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
+        { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
+        { "name": "getSubTypesStatic" }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "module:": "io.calimero.core",
+      "glob": "properties.xml"
+    },
+    {
+      "glob": "META-INF/services/java.net.spi.InetAddressResolverProvider"
+    }
+  ]
+}
