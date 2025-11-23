@@ -37,10 +37,14 @@
 package io.calimero.knxnetip;
 
 import java.net.InetSocketAddress;
-import java.util.Objects;
+
+import io.calimero.KNXIllegalArgumentException;
 
 public record TcpEndpointAddress(InetSocketAddress address) implements EndpointAddress {
-	public TcpEndpointAddress { Objects.requireNonNull(address); }
+	public TcpEndpointAddress {
+		if (address.isUnresolved())
+			throw new KNXIllegalArgumentException("unresolved address " + address);
+	}
 
 	@Override
 	public String protocol() { return "tcp"; }
