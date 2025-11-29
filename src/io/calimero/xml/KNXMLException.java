@@ -79,7 +79,7 @@ public class KNXMLException extends KnxRuntimeException
 	 */
 	public KNXMLException(final String s, final String badItem, final int lineNumber)
 	{
-		super(s);
+		super(createMsg(s, badItem, lineNumber));
 		item = badItem;
 		line = lineNumber;
 	}
@@ -97,6 +97,14 @@ public class KNXMLException extends KnxRuntimeException
 		super(createMsg(s, r));
 		item = r.getLocalName();
 		line = r.getLocation().getLineNumber();
+	}
+
+	private static String createMsg(final String s, final String badItem, final int lineNumber) {
+		final var sb = new StringBuilder().append(s).append(" (");
+		if (lineNumber > 0)
+			sb.append("line ").append(lineNumber).append(", ");
+		sb.append("element ").append(badItem).append(")");
+		return sb.toString();
 	}
 
 	private static String createMsg(final String s, final XmlReader r)
