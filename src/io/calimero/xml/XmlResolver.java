@@ -143,7 +143,7 @@ public final class XmlResolver
 			// check for "encoding" pseudo-attribute
 			String javaEncoding = encoding;
 			if (att[1] != null) {
-				final String ianaEncoding = att[1].toUpperCase(Locale.ENGLISH);
+				final String ianaEncoding = att[1].toUpperCase(Locale.ROOT);
 				javaEncoding = javaNames.get(ianaEncoding);
 				if (javaEncoding == null)
 					javaEncoding = ianaEncoding;

@@ -36,6 +36,8 @@
 
 package io.calimero.dptxlator;
 
+import java.util.Locale;
+
 import io.calimero.KNXIllegalArgumentException;
 
 /**
@@ -61,6 +63,6 @@ public record DptId(int mainNumber, int subNumber) {
 
 	@Override
 	public String toString() {
-		return "%d.%03d".formatted(mainNumber, subNumber);
+		return String.format(Locale.ROOT, "%d.%03d", mainNumber, subNumber);
 	}
 }
