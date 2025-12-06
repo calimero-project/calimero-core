@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -274,7 +274,7 @@ class DPTXlator2ByteFloatTest
 
 	@Test
 	void invalid() {
-		final DPT invalid = new DPT("0.00", "invalid", "invalid", "invalid", "invalid");
+		final DPT invalid = new DPT("1.1000", "invalid", "invalid", "invalid", "invalid");
 		assertThrows(KNXFormatException.class, () -> new DPTXlator2ByteFloat(invalid));
 	}
 

@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2022 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,19 +45,35 @@ package io.calimero.dptxlator;
  * representation of a low value, if possible the lower bound of the supported value
  * range, and the second contains a corresponding upper bound string value representation.
  * <br>
- * Even though not enforced, the preferred way for identifying a DPT is to use a datapoint
- * type ID (dptID) value in the format "[main number].[sub number]".<br>
+ * A DPT is identified using a datapoint type ID of the format "[main number].[sub number]".<br>
  * Instances of this type are immutable.
  *
  * @author B. Malinowsky
  */
 public class DPT
 {
-	private final String id;
+	private final DptId dptId;
 	private final String desc;
 	private final String v1;
 	private final String v2;
 	private final String unit;
+
+	/**
+	 * Creates a new datapoint type information structure.
+	 *
+	 * @param dptId datapoint type identifier
+	 * @param description short textual description
+	 * @param lower lower value information
+	 * @param upper upper value information
+	 * @param unit unit of measure, use "" or {@code null} for no unit
+	 */
+	public DPT(final DptId dptId, final String description, final String lower, final String upper, final String unit) {
+		this.dptId = dptId;
+		desc = description;
+		v1 = lower;
+		v2 = upper;
+		this.unit = unit == null ? "" : unit;
+	}
 
 	/**
 	 * Creates a new datapoint type information structure.
@@ -68,14 +84,8 @@ public class DPT
 	 * @param upper upper value information
 	 * @param unit unit of measure, use "" or {@code null} for no unit
 	 */
-	public DPT(final String typeID, final String description, final String lower,
-		final String upper, final String unit)
-	{
-		id = typeID;
-		desc = description;
-		v1 = lower;
-		v2 = upper;
-		this.unit = unit == null ? "" : unit;
+	public DPT(final String typeID, final String description, final String lower, final String upper, final String unit) {
+		this(DptId.from(typeID), description, lower, upper, unit);
 	}
 
 	/**
@@ -98,8 +108,11 @@ public class DPT
 	 */
 	public final String getID()
 	{
-		return id;
+		return dptId().toString();
 	}
+
+	/** {@return the DPT identifier} */
+	public final DptId dptId() { return dptId; }
 
 	/**
 	 * Returns the DPT description.
@@ -160,7 +173,7 @@ public class DPT
 	public String toString()
 	{
 		final StringBuilder sb = new StringBuilder(50);
-		sb.append(id).append(": ").append(desc);
+		sb.append(dptId).append(": ").append(desc);
 		if (!v1.isEmpty())
 			sb.append(" [").append(v1);
 		if (v2.length() > 0)
@@ -175,12 +188,12 @@ public class DPT
 	@Override
 	public boolean equals(final Object obj)
 	{
-		return obj == this || obj instanceof DPT dpt && dpt.id.equals(id);
+		return obj == this || obj instanceof DPT dpt && dpt.dptId.equals(dptId);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return id.hashCode();
+		return dptId.hashCode();
 	}
 }
