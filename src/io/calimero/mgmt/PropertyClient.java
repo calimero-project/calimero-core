@@ -593,7 +593,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		if (p != null) {
 			if (p.dpt().isPresent())
 				try {
-					final DPTXlator t = TranslatorTypes.createTranslator(0, p.dpt().get().toString());
+					final DPTXlator t = TranslatorTypes.createTranslator(p.dpt().get());
 					t.setAppendUnit(false);
 					return t;
 				}

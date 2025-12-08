@@ -304,7 +304,7 @@ class DptXlator2ByteSignedTests {
 	private static void checkDPTs(final DPT[] dpts, final boolean testSimilarity) {
 		try {
 			for (final DPT dpt : dpts) {
-				final DPTXlator t = TranslatorTypes.createTranslator(0, dpt.getID());
+				final DPTXlator t = TranslatorTypes.createTranslator(dpt.dptId());
 
 				final String lower = format(Double.parseDouble(dpt.getLowerValue()));
 				t.setValue(lower);

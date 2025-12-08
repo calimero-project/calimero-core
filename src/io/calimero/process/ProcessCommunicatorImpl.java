@@ -396,8 +396,7 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 	@Override
 	public void write(final Datapoint dp, final String value) throws KNXException
 	{
-		final DPTXlator t = TranslatorTypes.createTranslator(dp.dptId());
-		t.setValue(value);
+		final DPTXlator t = TranslatorTypes.createTranslator(dp.dptId(), value);
 		write(dp.getMainAddress(), dp.getPriority(), t);
 	}
 

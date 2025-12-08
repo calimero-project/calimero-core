@@ -230,7 +230,7 @@ public final class TranslatorTypes
 		 */
 		public DPTXlator createTranslator(final DPT dpt) throws KNXException
 		{
-			return createTranslator(dpt.getID());
+			return createTranslator(dpt.dptId());
 		}
 
 		/**
