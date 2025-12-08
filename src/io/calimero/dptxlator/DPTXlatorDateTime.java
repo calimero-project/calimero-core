@@ -883,15 +883,12 @@ public class DPTXlatorDateTime extends DPTXlator
 	{
 		checkRange(field, v);
 		final int i = 8 * index + field;
-		if (field == YEAR)
-			dst[i] = (short) (v - MIN_YEAR);
-		else if (field == DOW)
-			// NOTE: DoW id is not field index
-			dst[i - 3] = (short) (v << 5 | (dst[i - 3] & 0x1F));
-		else if (field == HOUR)
-			dst[i] = (short) (v | (dst[i] & 0xE0));
-		else
-			dst[i] = (short) v;
+		switch (field) {
+			case YEAR -> dst[i] = (short) (v - MIN_YEAR);
+			case DOW  -> dst[i - 3] = (short) (v << 5 | (dst[i - 3] & 0x1F)); // NOTE: DoW id is not field index
+			case HOUR -> dst[i] = (short) (v | (dst[i] & 0xE0));
+			default   -> dst[i] = (short) v;
+		}
 	}
 
 	private void setBit(final int index, final int mask, final boolean bit)
