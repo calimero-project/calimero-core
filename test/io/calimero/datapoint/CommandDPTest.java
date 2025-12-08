@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.calimero.dptxlator.DptId;
 import org.junit.jupiter.api.Test;
 
 import io.calimero.GroupAddress;
@@ -75,7 +76,7 @@ class CommandDPTest {
 		final Datapoint dp = new CommandDP(ga, "test", 1, "1.001");
 		assertEquals(ga, dp.getMainAddress());
 		assertEquals("test", dp.getName());
-		assertEquals("1.001", dp.getDPT());
+		assertEquals(new DptId(1, 1), dp.dptId());
 	}
 
 	@Test
@@ -90,7 +91,7 @@ class CommandDPTest {
 		r.close();
 		assertEquals(ga, dp.getMainAddress());
 		assertEquals("testSave", dp.getName());
-		assertEquals("4.001", dp.getDPT());
+		assertEquals(new DptId(4, 1), dp.dptId());
 	}
 
 	@Test

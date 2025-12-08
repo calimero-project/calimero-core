@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import io.calimero.dptxlator.DptId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -102,7 +103,7 @@ class StateDPTest
 		final Datapoint dp = new StateDP(ga, "test", 1, "1.001");
 		assertEquals(ga, dp.getMainAddress());
 		assertEquals("test", dp.getName());
-		assertEquals("1.001", dp.getDPT());
+		assertEquals(new DptId(1, 1), dp.dptId());
 	}
 
 	@Test
