@@ -232,4 +232,24 @@ class TranslatorTypesTest
 		}
 		catch (final KNXException expected) {}
 	}
+
+	@Test
+	void createTranslatorWithDptId() throws KNXException
+	{
+		final DPTXlator t = TranslatorTypes.createTranslator(DPTXlator2ByteFloat.DPT_TEMPERATURE.dptId());
+		assertEquals(DPTXlator2ByteFloat.DPT_TEMPERATURE, t.getType());
+		assertTrue(t.getValue().endsWith("C"));
+
+		final byte[] data = new byte[] { (byte) 0xc, (byte) 0xe2 };
+		final DPTXlator t2 = TranslatorTypes.createTranslator(new DptId(9, 1), data);
+		assertArrayEquals(data, t2.getData());
+	}
+
+	@Test
+	void createTranslatorWithDptIdAndValue() throws KNXException
+	{
+		final String value = "670433.28 mA";
+		var t = TranslatorTypes.createTranslator(DPTXlator2ByteFloat.DPT_ELECTRICAL_CURRENT.dptId(), value);
+		assertEquals(value, t.getValue());
+	}
 }
