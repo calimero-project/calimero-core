@@ -61,15 +61,6 @@ import io.calimero.log.LogService;
 public interface KNXNetworkMonitor extends AutoCloseable
 {
 	/**
-	 * @deprecated
-	 *
-	 * @param settings medium settings to use, the expected subtype is according to the
-	 *        KNX network medium
-	 */
-	@Deprecated(forRemoval = true)
-	default void setKNXMedium(KNXMediumSettings settings) {}
-
-	/**
 	 * Returns the KNX medium settings used by this monitor link.
 	 * <p>
 	 * The returned object is a reference to the one used by this link (not a copy).

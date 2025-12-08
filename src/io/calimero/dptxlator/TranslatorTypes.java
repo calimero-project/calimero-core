@@ -209,17 +209,6 @@ public final class TranslatorTypes
 		}
 
 		/**
-		 * @deprecated Returns the data type main number.
-		 *
-		 * @return main number as int
-		 */
-		@Deprecated(forRemoval = true)
-		public int getMainNumber()
-		{
-			return mainNumber;
-		}
-
-		/**
 		 * Creates a new translator for the given datapoint type.
 		 *
 		 * @param dpt datapoint type specifying the particular translation behavior; if the datapoint type is not part
@@ -292,18 +281,6 @@ public final class TranslatorTypes
 				// for SecurityException, InstantiationException, IllegalAccessException
 				throw new KNXException("failed to create translator", e);
 			}
-		}
-
-		/**
-		 * @deprecated Returns the description to this main type, if any.
-		 * <p>
-		 *
-		 * @return description as String, or the empty string if no description set
-		 */
-		@Deprecated(forRemoval = true)
-		public String getDescription()
-		{
-			return description;
 		}
 
 		/**

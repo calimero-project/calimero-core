@@ -108,9 +108,6 @@ public final class ReturnCode {
 
 	public int code() { return code; }
 
-	@Deprecated(forRemoval = true)
-	public String friendly() { return name; }
-
 	public String name() { return name; }
 
 	public String description() { return description; }

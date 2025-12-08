@@ -126,12 +126,6 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 	protected static final int TunnelingV1 = 1;
 
 	/**
-	 * @deprecated Use {@link #TunnelingV1}.
-	 */
-	@Deprecated(forRemoval = true)
-	protected static final int TUNNELING = TunnelingV1;
-
-	/**
 	 * Service mode for link layer tunneling v2.
 	 */
 	protected static final int TunnelingV2 = 3;

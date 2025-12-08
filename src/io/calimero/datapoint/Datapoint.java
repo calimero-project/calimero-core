@@ -77,7 +77,7 @@ public abstract class Datapoint
 	private GroupAddress main;
 	private volatile String name;
 
-	private volatile DptId dptId;
+	private final DptId dptId;
 
 	// message priority for this datapoint
 	private volatile Priority priority = Priority.LOW;
@@ -190,12 +190,6 @@ public abstract class Datapoint
 		return name;
 	}
 
-	@Deprecated(forRemoval = true)
-	public final boolean isStateBased()
-	{
-		return this instanceof StateDP;
-	}
-
 	/**
 	 * Sets the priority used for KNX messages of this datapoint.
 	 *
@@ -212,24 +206,6 @@ public abstract class Datapoint
 	public final Priority getPriority()
 	{
 		return priority;
-	}
-
-	/**
-	 * @deprecated Set during construction.
-	 */
-	@Deprecated(forRemoval = true)
-	public final void setDPT(final int mainNumber, final String dptID)
-	{
-		dptId = dptId(mainNumber, dptID);
-	}
-
-	/**
-	 * @deprecated Use {@link #dptId()}
-	 */
-	@Deprecated(forRemoval = true)
-	public final int getMainNumber()
-	{
-		return dptId.mainNumber();
 	}
 
 	/**

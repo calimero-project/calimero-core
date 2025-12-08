@@ -213,9 +213,6 @@ public final class Connector
 			return impl;
 		}
 
-		@SuppressWarnings("removal")
-		public void setKNXMedium(final KNXMediumSettings settings) {}
-
 		@Override
 		public KNXMediumSettings getKNXMedium()
 		{
