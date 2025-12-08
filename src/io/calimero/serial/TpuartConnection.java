@@ -465,7 +465,7 @@ public class TpuartConnection implements Connection<byte[]>
 			System.arraycopy(frame, skipToCtrl1, tp1, 0, frame.length - skipToCtrl1);
 
 			// ensure not repeated ext frame
-			tp1[0] &= ~StdFrameFormat;
+			tp1[0] &= (byte) ~StdFrameFormat;
 			tp1[0] |= ExtFrameFormat | RepeatFlag;
 		}
 		// last byte is checksum
@@ -882,7 +882,7 @@ public class TpuartConnection implements Connection<byte[]>
 			frame[0] = CEMILData.MC_LDATA_CON;
 			if (pos) {
 				// set confirm bit to no error
-				frame[2] &= 0xfe;
+				frame[2] &= (byte) 0xfe;
 			}
 			else {
 				// set confirm bit to error

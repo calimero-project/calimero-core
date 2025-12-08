@@ -351,7 +351,7 @@ public final class CEMIFactory
 
 		buf[6] = (byte) (hopCount << 4 | (nsdu.length - 1));
 		if (dst instanceof GroupAddress)
-			buf[6] |= 0x80;
+			buf[6] |= (byte) 0x80;
 		System.arraycopy(nsdu, 0, buf, 7, nsdu.length);
 		return buf;
 	}

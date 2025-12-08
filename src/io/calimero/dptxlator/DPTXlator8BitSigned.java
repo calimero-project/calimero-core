@@ -259,7 +259,7 @@ public class DPTXlator8BitSigned extends DPTXlator
 			for (int i = 0; i < 5; i++) {
 				final char c = value.charAt(2 * i);
 				if (c == '1')
-					d |=  1 << (7 - i);
+					d |= (short) (1 << (7 - i));
 				else if (c != '0')
 					throw new KNXFormatException("invalid status", c);
 			}

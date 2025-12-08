@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -194,7 +194,7 @@ public final class DataUnitBuilder
 		apdu[1] = (byte) service;
 		if (asdu != null && asdu.length > 0) {
 			// maximum of 6 bits in asdu[0] are valid
-			apdu[1] |= asdu[0] & 0x3F;
+			apdu[1] |= (byte) (asdu[0] & 0x3F);
 			System.arraycopy(asdu, 1, apdu, 2, asdu.length - 1);
 		}
 		return apdu;
@@ -263,7 +263,7 @@ public final class DataUnitBuilder
 
 		// some ASDUs have length 0, e.g., DoA.read
 		if (asdu.length > 0)
-			asdu[0] &= mask;
+			asdu[0] &= (byte) mask;
 		return asdu;
 	}
 

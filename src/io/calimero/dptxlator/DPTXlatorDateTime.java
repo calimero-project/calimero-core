@@ -902,9 +902,9 @@ public class DPTXlatorDateTime extends DPTXlator
 	private static void setBit(final short[] dst, final int index, final int mask, final boolean bit)
 	{
 		if (bit)
-			dst[8 * index + 6] |= mask;
+			dst[8 * index + 6] |= (short) mask;
 		else
-			dst[8 * index + 6] &= ~mask;
+			dst[8 * index + 6] &= (short) ~mask;
 	}
 
 	private void setBitEx(final int index, final int mask, final boolean bit)
@@ -915,9 +915,9 @@ public class DPTXlatorDateTime extends DPTXlator
 	private static void setBitEx(final short[] v, final int index, final int mask, final boolean bit)
 	{
 		if (bit)
-			v[8 * index + 7] |= mask;
+			v[8 * index + 7] |= (short) mask;
 		else
-			v[8 * index + 7] &= ~mask;
+			v[8 * index + 7] &= (short) ~mask;
 	}
 
 	// dst is assumed to be cleared
