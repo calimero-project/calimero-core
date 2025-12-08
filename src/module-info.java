@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2022, 2024 B. Malinowsky
+    Copyright (c) 2022, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@
 /**
  * Defines the Calimero API.
  *
- * @uses io.calimero.serial.SerialConnectionFactory
+ * @uses io.calimero.serial.spi.SerialConnectionProvider
  * @uses io.calimero.serial.usb.spi.UsbConnectionProvider
  */
 @SuppressWarnings("module")
