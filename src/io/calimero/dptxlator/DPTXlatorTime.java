@@ -302,7 +302,7 @@ public class DPTXlatorTime extends DPTXlator
 			throw new KNXIllegalArgumentException("illegal offset " + offset);
 		final int size = (data.length - offset) / 3 * 3;
 		if (size == 0)
-			throw new KNXIllegalArgumentException("DPT " + dpt.getID() + " " + dpt.getDescription() + ": data length "
+			throw new KNXIllegalArgumentException("DPT " + dpt.dptId() + " " + dpt.getDescription() + ": data length "
 					+ size + " < required datapoint type width " + Math.max(1, getTypeSize()));
 		final short[] buf = new short[size];
 		int item = 0;
@@ -311,7 +311,7 @@ public class DPTXlatorTime extends DPTXlator
 					buf, item++);
 			// check reserved bits
 			if ((data[i + MINUTE] & ~0x3F) + (data[i + SECOND] & ~0x3F) != 0)
-				logger.log(Level.WARNING, "DPT " + dpt.getID() + " " + dpt.getDescription() + ": reserved bit not 0");
+				logger.log(Level.WARNING, "DPT " + dpt.dptId() + " " + dpt.getDescription() + ": reserved bit not 0");
 		}
 		this.data = buf;
 	}

@@ -306,14 +306,14 @@ class ProcessCommunicatorTest {
 
 	@Test
 	void read() throws KNXException, InterruptedException {
-		final Datapoint dp = new StateDP(dpString, "test datapoint", 0, DPTXlatorString.DPT_STRING_8859_1.getID());
+		final Datapoint dp = new StateDP(dpString, "test datapoint", DPTXlatorString.DPT_STRING_8859_1.dptId());
 		final String res = pc2.read(dp);
 		assertTrue(res.length() > 0);
 	}
 
 	@Test
 	void concurrentRead() throws InterruptedException, ExecutionException {
-		final Datapoint dp = new StateDP(dpString, "test datapoint", 0, DPTXlatorString.DPT_STRING_8859_1.getID());
+		final Datapoint dp = new StateDP(dpString, "test datapoint", DPTXlatorString.DPT_STRING_8859_1.dptId());
 
 		final Callable<Integer> task = () -> pc2.read(dp).length() > 0 ? 1 : 0;
 		final var tasks = Collections.nCopies(10, task);
@@ -362,7 +362,7 @@ class ProcessCommunicatorTest {
 
 	@Test
 	void writeDatapointString() throws KNXException {
-		final Datapoint dp = new StateDP(dpUnsigned1, "test datapoint", 0, DPTXlator8BitUnsigned.DPT_PERCENT_U8.getID());
+		final Datapoint dp = new StateDP(dpUnsigned1, "test datapoint", DPTXlator8BitUnsigned.DPT_PERCENT_U8.dptId());
 		pc2.write(dp, "80");
 	}
 

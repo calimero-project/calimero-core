@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2021, 2023 B. Malinowsky
+    Copyright (c) 2021, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -95,14 +95,14 @@ class EnumDptBase<T extends Enum<T> & EnumDptBase.EnumBase<T>> extends DPT {
 		if (e != null)
 			return e.description();
 		throw new KNXIllegalArgumentException(
-				getID() + " " + elements.getSimpleName() + " has no element " + element + " specified");
+				dptId() + " " + elements.getSimpleName() + " has no element " + element + " specified");
 	}
 
 	String name() { return elements.getSimpleName(); }
 
 	@Override
 	public String toString() {
-		return getID() + ": " + getDescription() + ", enumeration ["
+		return dptId() + ": " + getDescription() + ", enumeration ["
 				+ getLowerValue() + ".." + getUpperValue() + "]";
 	}
 

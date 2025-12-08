@@ -631,7 +631,7 @@ public final class TranslatorTypes
 
 	private static DPTXlator createTranslator(final DPT dpt) throws KNXException {
 		try {
-			return createTranslator(0, dpt.getID());
+			return createTranslator(dpt.dptId());
 		}
 		catch (final KNXException e) {
 			for (final MainType type : map.values())
@@ -640,7 +640,7 @@ public final class TranslatorTypes
 				}
 				catch (final KNXException ignore) {}
 		}
-		throw new KNXException("failed to create translator for DPT " + dpt.getID());
+		throw new KNXException("failed to create translator for DPT " + dpt.dptId());
 	}
 
 	/**

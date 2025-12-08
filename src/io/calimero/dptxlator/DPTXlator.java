@@ -260,7 +260,7 @@ public abstract class DPTXlator
 		final int size = Math.max(1, getTypeSize());
 		final int length = (data.length - offset) / size * size;
 		if (length == 0)
-			throw new KNXIllegalArgumentException("DPT " + dpt.getID() + " " + dpt.getDescription() + ": data length "
+			throw new KNXIllegalArgumentException("DPT " + dpt.dptId() + " " + dpt.getDescription() + ": data length "
 					+ (data.length - offset) + " < required datapoint type width " + size);
 		this.data = new short[length];
 		for (int i = 0; i < length; ++i)
@@ -300,7 +300,7 @@ public abstract class DPTXlator
 		final int end = typeSize > 0 ? min / typeSize * typeSize : min;
 		if (min > 0 && end == 0) {
 			throw new KNXIllegalArgumentException("insufficient space in destination range "
-					+ "for DPT " + dpt.getID() + " (data length " + min + " < "
+					+ "for DPT " + dpt.dptId() + " (data length " + min + " < "
 					+ Math.max(1, getTypeSize()) + ")");
 		}
 		for (int i = 0; i < end; ++i)
@@ -425,7 +425,7 @@ public abstract class DPTXlator
 	@Override
 	public String toString()
 	{
-		return "DPT " + dpt.getID() + " " + Arrays.asList(getAllValues());
+		return "DPT " + dpt.dptId() + " " + Arrays.asList(getAllValues());
 	}
 
 	/**
@@ -527,7 +527,7 @@ public abstract class DPTXlator
 
 	final KNXFormatException newException(final String msg, final String item, final Exception cause)
 	{
-		final String s = dpt.getID() + " " + dpt.getDescription() + ": " + msg;
+		final String s = dpt.dptId() + " " + dpt.getDescription() + ": " + msg;
 		return new KNXFormatException(s, item, cause);
 	}
 
