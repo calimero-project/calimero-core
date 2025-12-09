@@ -127,8 +127,8 @@ public class DptXlatorMeteringValue extends DPTXlator
 			data = toDpt(dimensionlessCounter, value);
 		}
 		catch (final KNXFormatException e) {
-			logger.log(ERROR, "{0} {1} coding {2} (value {3}) should alway have correct format", dpt.dptId(),
-					dpt.getDescription(), binary(dimensionlessCounter), value, e);
+			throw new AssertionError(String.format("%s %s dimensionless counter should always have correct format",
+					dpt.dptId(), dpt.getDescription()), e);
 		}
 	}
 
