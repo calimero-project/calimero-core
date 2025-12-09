@@ -111,7 +111,7 @@ Access via KNXnet/IP, KNX USB, KNX RF USB, TP-UART, and FT1.2
 Logging
 -------
 
-Calimero uses the [System.Logger](https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/System.Logger.html). Bind any desired logging frameworks of your choice.
+Calimero uses the [System.Logger](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/System.Logger.html). Bind any desired logging frameworks of your choice.
 
 
 Testing
