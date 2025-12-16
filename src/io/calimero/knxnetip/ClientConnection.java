@@ -115,7 +115,7 @@ public abstract class ClientConnection extends ConnectionBase
 	private volatile boolean cleanup;
 
 	@Deprecated
-	final boolean stream;
+	private final boolean stream;
 	private final StreamConnection connection;
 
 	// logger is initialized in connect, when name of connection is available

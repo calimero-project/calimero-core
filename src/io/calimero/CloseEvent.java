@@ -97,7 +97,7 @@ public class CloseEvent
 
 	/**
 	 * Returns the initiator of the close event, see the declared initiator constants of
-	 * this class or its sub-types.
+	 * this class or its subtypes.
 	 * <p>
 	 * For the base class {@link CloseEvent}, defined are {@link #USER_REQUEST},
 	 * {@link #SERVER_REQUEST}, {@link #CLIENT_REQUEST}, and {@link #INTERNAL}.
