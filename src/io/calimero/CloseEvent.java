@@ -36,8 +36,6 @@
 
 package io.calimero;
 
-import java.util.EventObject;
-
 import io.calimero.link.LinkListener;
 
 /**
@@ -51,7 +49,7 @@ import io.calimero.link.LinkListener;
  * @see LinkListener
  * @see KNXListener
  */
-public class CloseEvent extends EventObject
+public class CloseEvent
 {
 	/**
 	 * Identifies the close event to originate from the user (or owner) of the network
@@ -75,6 +73,7 @@ public class CloseEvent extends EventObject
 	 */
 	public static final int INTERNAL = 3;
 
+	private final Object source;
 	private final int initiator;
 
 	private final String msg;
@@ -89,10 +88,12 @@ public class CloseEvent extends EventObject
 	 */
 	public CloseEvent(final Object source, final int initiator, final String reason)
 	{
-		super(source);
+		this.source = source;
 		this.initiator = initiator;
 		msg = reason;
 	}
+
+	public Object getSource() { return source; }
 
 	/**
 	 * Returns the initiator of the close event, see the declared initiator constants of

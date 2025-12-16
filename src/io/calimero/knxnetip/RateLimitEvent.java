@@ -36,12 +36,8 @@
 
 package io.calimero.knxnetip;
 
-import java.util.EventObject;
-
-public class RateLimitEvent extends EventObject {
-	public RateLimitEvent(final KNXnetIPRouting source) {
-		super(source);
-	}
+public class RateLimitEvent {
+	public RateLimitEvent(final KNXnetIPRouting source) {}
 
 	/**
 	 * {@return the reached rate limit in datagrams per second}

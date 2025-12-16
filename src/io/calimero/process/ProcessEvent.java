@@ -36,7 +36,6 @@
 
 package io.calimero.process;
 
-import java.util.EventObject;
 import java.util.HexFormat;
 
 import io.calimero.DataUnitBuilder;
@@ -49,7 +48,7 @@ import io.calimero.IndividualAddress;
  * @author B. Malinowsky
  * @see ProcessCommunicator
  */
-public class ProcessEvent extends EventObject
+public class ProcessEvent
 {
 	private final IndividualAddress src;
 	private final GroupAddress dst;
@@ -77,7 +76,6 @@ public class ProcessEvent extends EventObject
 	public ProcessEvent(final ProcessCommunicator source, final IndividualAddress src,
 		final GroupAddress dst, final int svcCode, final byte[] asdu, final boolean optimized)
 	{
-		super(source);
 		this.src = src;
 		this.dst = dst;
 		this.svcCode = svcCode;

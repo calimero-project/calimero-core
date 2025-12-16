@@ -36,22 +36,17 @@
 
 package io.calimero;
 
-import java.util.EventObject;
-
 /**
  * Informs about the detaching of an object from a KNX link.
  *
  * @author B. Malinowsky
  */
-public class DetachEvent extends EventObject
+public class DetachEvent
 {
 	/**
 	 * Creates a new detach event with the object being detached.
 	 *
 	 * @param source the object which is detached from the link
 	 */
-	public DetachEvent(final Object source)
-	{
-		super(source);
-	}
+	public DetachEvent(final Object source) {}
 }

@@ -38,18 +38,16 @@ package io.calimero.knxnetip;
 
 import java.net.InetSocketAddress;
 import java.time.Duration;
-import java.util.EventObject;
 
 import io.calimero.knxnetip.servicetype.RoutingBusy;
 
-public class RoutingBusyEvent extends EventObject
+public class RoutingBusyEvent
 {
 	private final InetSocketAddress from;
 	private final RoutingBusy busy;
 
 	public RoutingBusyEvent(final KNXnetIPRouting source, final InetSocketAddress sender, final RoutingBusy busy)
 	{
-		super(source);
 		from = sender;
 		this.busy = busy;
 	}

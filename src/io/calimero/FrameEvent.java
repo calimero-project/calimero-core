@@ -36,7 +36,6 @@
 
 package io.calimero;
 
-import java.util.EventObject;
 import java.util.Optional;
 
 import io.calimero.cemi.CEMI;
@@ -52,8 +51,9 @@ import io.calimero.secure.SecurityControl;
  *
  * @see KNXListener
  */
-public class FrameEvent extends EventObject
+public class FrameEvent
 {
+	private final Object source;
 	private final long id;
 	private final CEMI c;
 	private final byte[] b;
@@ -95,7 +95,7 @@ public class FrameEvent extends EventObject
 	 */
 	public FrameEvent(final Object source, final CEMI frame, final boolean systemBroadcast,
 			final SecurityControl securityCtrl) {
-		super(source);
+		this.source = source;
 		id = System.nanoTime();
 		c = frame;
 		b = null;
@@ -111,7 +111,7 @@ public class FrameEvent extends EventObject
 	 */
 	public FrameEvent(final Object source, final byte[] frame)
 	{
-		super(source);
+		this.source = source;
 		id = System.nanoTime();
 		b = frame;
 		c = null;
@@ -144,4 +144,6 @@ public class FrameEvent extends EventObject
 	public final boolean systemBroadcast() { return systemBroadcast; }
 
 	public final Optional<SecurityControl> security() { return Optional.ofNullable(securityCtrl); }
+
+	public Object getSource() { return source; }
 }

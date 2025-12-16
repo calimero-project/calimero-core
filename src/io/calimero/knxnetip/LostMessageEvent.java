@@ -37,7 +37,6 @@
 package io.calimero.knxnetip;
 
 import java.net.InetSocketAddress;
-import java.util.EventObject;
 
 import io.calimero.knxnetip.servicetype.RoutingLostMessage;
 
@@ -54,7 +53,7 @@ import io.calimero.knxnetip.servicetype.RoutingLostMessage;
  * @author B. Malinowsky
  * @see KNXnetIPRouting
  */
-public class LostMessageEvent extends EventObject
+public class LostMessageEvent
 {
 	private final InetSocketAddress from;
 	private final int state;
@@ -74,7 +73,6 @@ public class LostMessageEvent extends EventObject
 	public LostMessageEvent(final KNXnetIPRouting source, final InetSocketAddress sender,
 		final int deviceState, final int lostMessages)
 	{
-		super(source);
 		from = sender;
 		state = deviceState;
 		lost = lostMessages;
