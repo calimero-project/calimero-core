@@ -21,6 +21,9 @@
       "type": "io.calimero.link.AbstractLink$LinkNotifier"
     },
     {
+      "type": "io.calimero.link.AbstractMonitor$MonitorNotifier"
+    },
+    {
       "type": "io.calimero.link.Connector$Link"
     },
     {
@@ -30,7 +33,45 @@
       "type": "io.calimero.link.KNXNetworkLinkIP$2"
     },
     {
+      "type": {
+        "lambda": {
+          "declaringClass": "io.calimero.link.KNXNetworkLinkIP",
+          "interfaces": [
+            "io.calimero.KNXListener"
+          ]
+        }
+      }
+    },
+    {
+      "type": "io.calimero.link.KNXNetworkLinkUsb$1",
+      "methods": [
+        {
+          "name": "connectionStatus",
+          "parameterTypes": [
+            "io.calimero.serial.ConnectionStatus"
+          ]
+        }
+      ]
+    },
+    {
       "type": "io.calimero.link.KNXNetworkMonitor"
+    },
+    {
+      "type": "io.calimero.link.AbstractMonitor$MonitorNotifier"
+    },
+    {
+      "type": "io.calimero.link.KNXNetworkMonitorUsb$1",
+      "methods": [
+        {
+          "name": "connectionStatus",
+          "parameterTypes": [
+            "io.calimero.serial.ConnectionStatus"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.calimero.link.LinkListener"
     },
     {
       "type": "io.calimero.link.NetworkLinkListener"
@@ -54,6 +95,9 @@
     },
     {
       "type": "io.calimero.mgmt.ManagementClientImpl$TLListener"
+    },
+    {
+      "type": "io.calimero.mgmt.ManagementProceduresImpl$TLListener"
     },
     {
       "type": "io.calimero.mgmt.LocalDeviceManagement$KNXListenerImpl"
