@@ -15,7 +15,13 @@
       ]
     },
     {
+      "type": "io.calimero.buffer.NetworkBuffer$ConfigImpl$SquirrelListener"
+    },
+    {
       "type": "io.calimero.knxnetip.RoutingListener"
+    },
+    {
+      "type": "io.calimero.knxnetip.TunnelingListener"
     },
     {
       "type": "io.calimero.link.AbstractLink$LinkNotifier"
@@ -28,6 +34,9 @@
     },
     {
       "type": "io.calimero.link.KNXNetworkLink"
+    },
+    {
+      "type": "io.calimero.link.KNXNetworkLinkIP$1"
     },
     {
       "type": "io.calimero.link.KNXNetworkLinkIP$2"
