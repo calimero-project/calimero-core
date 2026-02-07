@@ -93,10 +93,10 @@ public final class XmlInputFactory // extends XMLInputFactory
 	{
 		final XmlResolver res = new XmlResolver();
 		final InputStream is = (InputStream) res.resolveEntity(null, null, baseUri, null);
-		return create(res, is);
+		return create(is);
 	}
 
-	private static XmlReader create(final XmlResolver resolver, final InputStream is)
+	private static XmlReader create(final InputStream is)
 	{
 		if (jvm) {
 			try {
