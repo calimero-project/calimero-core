@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2010, 2025 B. Malinowsky
+    Copyright (c) 2010, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,7 +43,6 @@ import static java.lang.System.Logger.Level.TRACE;
 import static java.lang.System.Logger.Level.WARNING;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.net.DatagramPacket;
@@ -274,9 +273,6 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 				state = internalState;
 				if (mode != BlockingMode.WaitForAck)
 					doExtraBlockingModes();
-			}
-			catch (final InterruptedIOException e) {
-				throw new InterruptedException("interrupted I/O, " + e);
 			}
 			catch (final IOException e) {
 				close(CloseEvent.INTERNAL, "communication failure", ERROR, e);

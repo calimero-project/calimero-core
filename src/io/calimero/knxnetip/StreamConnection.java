@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2019, 2025 B. Malinowsky
+    Copyright (c) 2019, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,7 +46,6 @@ import static java.text.MessageFormat.format;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.lang.System.Logger;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -717,9 +716,6 @@ public sealed abstract class StreamConnection implements Closeable
 				}
 				offset += read;
 			}
-		}
-		catch (final InterruptedIOException e) {
-			Thread.currentThread().interrupt();
 		}
 		catch (IOException | RuntimeException e) {
 			if (!streamClosed()) {

@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,7 +44,6 @@ import static java.lang.System.Logger.Level.TRACE;
 import static java.lang.System.Logger.Level.WARNING;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.HexFormat;
@@ -304,9 +303,6 @@ public class KNXnetIPTunnel extends ClientConnection
 			// always forward this state to user
 			state = internalState;
 			waitForTunnelingFeatureResponse(tunnelingFeature);
-		}
-		catch (final InterruptedIOException e) {
-			throw new InterruptedException("interrupted I/O, " + e);
 		}
 		catch (final IOException e) {
 			close(CloseEvent.INTERNAL, "communication failure", ERROR, e);

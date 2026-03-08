@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,7 +43,6 @@ import static java.lang.System.Logger.Level.WARNING;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.lang.System.Logger;
 import java.time.Duration;
@@ -382,9 +381,6 @@ public class FT12Connection implements Connection<byte[]>
 				throw new KNXAckTimeoutException("no acknowledge reply received");
 			if (!con)
 				throw new KNXTimeoutException("no confirmation reply received for " + keepForCon);
-		}
-		catch (final InterruptedIOException e) {
-			throw new InterruptedException(e.getMessage());
 		}
 		catch (final IOException e) {
 			close(false, e.getMessage());

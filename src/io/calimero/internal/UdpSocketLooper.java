@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2010, 2024 B. Malinowsky
+    Copyright (c) 2010, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@
 package io.calimero.internal;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.io.UncheckedIOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -132,9 +131,6 @@ public abstract class UdpSocketLooper
 					reboundSocket = false;
 				}
 			}
-		}
-		catch (final InterruptedIOException e) {
-			Thread.currentThread().interrupt();
 		}
 		catch (final ClosedChannelException ignore) {}
 		catch (IOException | UncheckedIOException e) {

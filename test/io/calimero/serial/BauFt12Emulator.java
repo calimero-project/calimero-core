@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2020, 2022 B. Malinowsky
+    Copyright (c) 2020, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,6 @@ import static io.calimero.serial.FT12Connection.START;
 import static io.calimero.serial.FT12Connection.START_FIXED;
 
 import java.io.InputStream;
-import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -101,7 +100,7 @@ class BauFt12Emulator implements SerialCom {
 
 	private final InputStream is = new InputStream() {
 		@Override
-		public int read() throws InterruptedIOException {
+		public int read() {
 			try {
 				final int b = queue.take() & 0xff;
 				if (b == ACK && replyWithAck)
@@ -114,8 +113,8 @@ class BauFt12Emulator implements SerialCom {
 
 				return b;
 			}
-			catch (final InterruptedException e) {
-				throw new InterruptedIOException();
+			catch (InterruptedException e) {
+				throw new RuntimeException(e);
 			}
 		}
 	};

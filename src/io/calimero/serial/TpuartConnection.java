@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2014, 2025 B. Malinowsky
+    Copyright (c) 2014, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,7 +45,6 @@ import static java.lang.System.Logger.Level.WARNING;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.lang.System.Logger;
 import java.time.Duration;
@@ -370,9 +369,6 @@ public class TpuartConnection implements Connection<byte[]>
 			}
 			throw new KNXAckTimeoutException("no ACK for L-Data.con");
 		}
-		catch (final InterruptedIOException e) {
-			throw new InterruptedException(e.getMessage());
-		}
 		catch (final IOException e) {
 			close();
 			throw new KNXPortClosedException("I/O error", portId, e);
@@ -393,9 +389,6 @@ public class TpuartConnection implements Connection<byte[]>
 		// best-effort, as we might already have hit an I/O error
 		try {
 			reset();
-		}
-		catch (final InterruptedIOException e) {
-			Thread.currentThread().interrupt();
 		}
 		catch (final IOException ignore) {}
 		closeResources();
