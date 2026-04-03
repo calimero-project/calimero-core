@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -402,13 +402,12 @@ class KNXnetIPTunnelTest
 	}
 
 	@Test
-	void getRemoteAddress() throws KNXException, InterruptedException
+	void remoteAddress() throws KNXException, InterruptedException
 	{
 		newTunnel();
-		assertEquals(Util.getServer(), t.getRemoteAddress());
+		assertEquals(Util.server(), t.remoteAddress());
 		t.close();
-		assertTrue(t.getRemoteAddress().getAddress().isAnyLocalAddress());
-		assertEquals(0, t.getRemoteAddress().getPort());
+		assertEquals(Util.server(), t.remoteAddress());
 	}
 
 	@Test
@@ -533,7 +532,7 @@ class KNXnetIPTunnelTest
 	void tcpConnection() throws KNXException, InterruptedException {
 		newTcpTunnel();
 		assertEquals(KNXnetIPConnection.OK, t.getState());
-		assertEquals(Util.getServer(), t.getRemoteAddress());
+		assertEquals(Util.server().address(), t.remoteAddress().address());
 	}
 
 	@Test

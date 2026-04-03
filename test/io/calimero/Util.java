@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,6 +52,7 @@ import java.util.Optional;
 
 import io.calimero.knxnetip.Discoverer;
 import io.calimero.knxnetip.Discoverer.Result;
+import io.calimero.knxnetip.UdpEndpointAddress;
 import io.calimero.knxnetip.servicetype.SearchResponse;
 import io.calimero.serial.SerialConnectionFactory;
 
@@ -267,6 +268,8 @@ public final class Util
 		}
 		return server;
 	}
+
+	public static UdpEndpointAddress server() { return new UdpEndpointAddress(getServer()); }
 
 	/**
 	 * Returns the serial port identifier to use for testing the FT1.2 protocol.

@@ -192,6 +192,14 @@ public interface KNXnetIPConnection extends Connection<CEMI>
 	 */
 	InetSocketAddress getRemoteAddress();
 
+	/**
+	 * Returns the remote address this connection endpoint is communicating to.
+	 * <p>
+	 * The address returned is equal to the one used to establish the communication (e.g.,
+	 * the control endpoint address), although internally, different addresses might be used.
+	 *
+	 * @return endpoint address
+	 */
 	EndpointAddress remoteAddress();
 
 	/**

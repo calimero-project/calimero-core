@@ -298,6 +298,7 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	}
 
 	@Override
+	@Deprecated(forRemoval = true)
 	public final InetSocketAddress getRemoteAddress()
 	{
 		if (state == CLOSED)

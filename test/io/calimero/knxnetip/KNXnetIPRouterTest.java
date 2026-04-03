@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -264,19 +264,19 @@ class KNXnetIPRouterTest
 	}
 
 	@Test
-	void getRemoteAddress() throws KNXException, SocketException, UnknownHostException
+	void remoteAddress() throws KNXException, SocketException, UnknownHostException
 	{
-		assertEquals(new InetSocketAddress(KNXnetIPRouting.DEFAULT_MULTICAST, KNXnetIPConnection.DEFAULT_PORT),
-				r.getRemoteAddress());
+		final var def = new InetSocketAddress(KNXnetIPRouting.DefaultMulticast, KNXnetIPConnection.DEFAULT_PORT);
+		assertEquals(def, r.remoteAddress().address());
 		r.close();
-		assertTrue(r.getRemoteAddress().getAddress().isAnyLocalAddress());
-		assertEquals(0, r.getRemoteAddress().getPort());
+		assertEquals(def, r.remoteAddress().address());
 
-		r = new KNXnetIPRouting(Util.localInterface(), InetAddress.getByName("224.0.23.33"));
-		assertEquals(new InetSocketAddress("224.0.23.33", KNXnetIPConnection.DEFAULT_PORT), r.getRemoteAddress());
+		final var otherMcastGroup = InetAddress.getByName("224.0.23.33");
+		r = new KNXnetIPRouting(Util.localInterface(), otherMcastGroup);
+		final var other = new InetSocketAddress(otherMcastGroup, KNXnetIPConnection.DEFAULT_PORT);
+		assertEquals(other, r.remoteAddress().address());
 		r.close();
-		assertTrue(r.getRemoteAddress().getAddress().isAnyLocalAddress());
-		assertEquals(0, r.getRemoteAddress().getPort());
+		assertEquals(other, r.remoteAddress().address());
 	}
 
 	@Test

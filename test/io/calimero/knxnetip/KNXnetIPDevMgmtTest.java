@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,7 +38,6 @@ package io.calimero.knxnetip;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.net.InetAddress;
@@ -173,13 +172,12 @@ class KNXnetIPDevMgmtTest
 	}
 
 	@Test
-	void getRemoteAddress() throws KNXException, InterruptedException
+	void remoteAddress() throws KNXException, InterruptedException
 	{
 		newMgmt();
-		assertEquals(Util.getServer(), m.getRemoteAddress());
+		assertEquals(Util.server(), m.remoteAddress());
 		m.close();
-		assertTrue(m.getRemoteAddress().getAddress().isAnyLocalAddress());
-		assertEquals(0, m.getRemoteAddress().getPort());
+		assertEquals(Util.server(), m.remoteAddress());
 	}
 
 	@Test
@@ -209,7 +207,7 @@ class KNXnetIPDevMgmtTest
 	void tcpConnection() throws KNXException, InterruptedException {
 		newTcpMgmt();
 		assertEquals(KNXnetIPConnection.OK, m.getState());
-		assertEquals(Util.getServer(), m.getRemoteAddress());
+		assertEquals(Util.server().address(), m.remoteAddress().address());
 	}
 
 	@Test
