@@ -38,6 +38,7 @@ package io.calimero.knxnetip;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.net.InetAddress;
@@ -67,8 +68,6 @@ import io.calimero.knxnetip.KNXnetIPConnection.BlockingMode;
 @KnxnetIP
 class KNXnetIPDevMgmtTest
 {
-//	private static KNXnetIPConnection.BlockingMode noblock = KNXnetIPConnection.BlockingMode.NonBlocking;
-//	private static KNXnetIPConnection.BlockingMode ack = KNXnetIPConnection.BlockingMode.WaitForAck;
 	private static final KNXnetIPConnection.BlockingMode con = KNXnetIPConnection.BlockingMode.WaitForCon;
 
 	private KNXnetIPDevMgmt m;
@@ -163,11 +162,7 @@ class KNXnetIPDevMgmtTest
 		newMgmt();
 		m.close();
 		assertEquals(KNXnetIPConnection.CLOSED, m.getState());
-		try {
-			m.send(frame, con);
-			fail("we are closed");
-		}
-		catch (final KNXConnectionClosedException e) {}
+		assertThrows(KNXConnectionClosedException.class, () -> m.send(frame, con));
 		assertEquals(KNXnetIPConnection.CLOSED, m.getState());
 	}
 

@@ -47,7 +47,6 @@ import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.HexFormat;
 import java.util.concurrent.TimeUnit;
