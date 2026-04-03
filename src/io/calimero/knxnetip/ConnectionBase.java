@@ -99,9 +99,6 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	/** Remote control endpoint. */
 	@Deprecated
 	protected InetSocketAddress ctrlEndpt;
-	/** Remote data endpoint. */
-	@Deprecated
-	protected InetSocketAddress dataEndpt;
 
 	volatile EndpointAddress ctrlEp;
 	volatile EndpointAddress dataEp;
@@ -300,15 +297,6 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 			ctrlSocket.send(p);
 	}
 
-	@Deprecated
-	protected void send(final byte[] packet, final InetSocketAddress dst) throws IOException {
-		final DatagramPacket p = new DatagramPacket(packet, packet.length, dst);
-		if (dst.equals(dataEndpt))
-			socket.send(p);
-		else
-			ctrlSocket.send(p);
-	}
-
 	@Override
 	public final InetSocketAddress getRemoteAddress()
 	{
@@ -422,28 +410,6 @@ public abstract class ConnectionBase implements KNXnetIPConnection
 	@SuppressWarnings("unused")
 	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset,
 			final EndpointAddress src) throws KNXFormatException, IOException {
-		// at this subtype level, we don't care about any service type
-		return false;
-	}
-
-	/**
-	 * This stub always returns false.
-	 *
-	 * @param h received KNXnet/IP header
-	 * @param data received datagram data
-	 * @param offset datagram data start offset
-	 * @param src sender IP address
-	 * @param port sender UDP port
-	 * @return {@code true} if service type is known and handled (successfully or not), {@code false}
-	 *         otherwise
-	 * @throws KNXFormatException on service type parsing or data format errors
-	 * @throws IOException on socket problems
-	 */
-	@SuppressWarnings("unused")
-	@Deprecated
-	protected boolean handleServiceType(final KNXnetIPHeader h, final byte[] data, final int offset,
-		final InetAddress src, final int port) throws KNXFormatException, IOException
-	{
 		// at this subtype level, we don't care about any service type
 		return false;
 	}

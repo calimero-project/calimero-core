@@ -373,8 +373,6 @@ public class KNXnetIPRouting extends ConnectionBase
 		final boolean startReceiver) throws KNXException
 	{
 		ctrlEndpt = (InetSocketAddress) ctrlEp.address();
-		dataEndpt = ctrlEndpt;
-
 
 		final var multicast = ((InetSocketAddress) ctrlEp.address()).getAddress();
 		try {

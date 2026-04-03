@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -200,12 +200,6 @@ public interface KNXnetIPConnection extends Connection<CEMI>
 	 * @return state enumeration
 	 */
 	int getState();
-
-	/**
-	 * @deprecated Use {@link Connection#name()}.
-	 */
-	@Deprecated(forRemoval = true)
-	default String getName() { return name(); }
 
 	/**
 	 * Ends communication with the remote server/client as specified by the used protocol.

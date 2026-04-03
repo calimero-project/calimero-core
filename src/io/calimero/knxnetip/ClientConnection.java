@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2010, 2025 B. Malinowsky
+    Copyright (c) 2010, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -246,33 +246,6 @@ public abstract class ClientConnection extends ConnectionBase
 		}
 	}
 
-	/**
-	 * Opens a new IP communication channel to a remote server.
-	 * <p>
-	 * The communication state of this object is assumed to be closed state. This method
-	 * is designed to be called only once during the object's lifetime!
-	 *
-	 * @param localEP the local endpoint to use for communication channel
-	 * @param serverCtrlEP the remote server control endpoint used for connect request
-	 * @param cri connect request information used to configure the communication
-	 *        attributes
-	 * @param useNAT {@code true} to use a NAT (network address translation) aware
-	 *        communication mechanism, {@code false} to use the default way
-	 * @throws KNXException on socket communication error
-	 * @throws KNXTimeoutException on no connect response before connect timeout
-	 * @throws KNXRemoteException if response indicates an error condition at the server
-	 *         concerning the request
-	 * @throws KNXInvalidResponseException if connect response is in wrong format
-	 * @throws InterruptedException on interrupted thread during connect, all resources
-	 *         are cleaned up before passing on this exception
-	 */
-	@Deprecated
-	protected void connect(final InetSocketAddress localEP, final InetSocketAddress serverCtrlEP,
-		final CRI cri, final boolean useNAT) throws KNXException, InterruptedException
-	{
-		connect(new UdpEndpointAddress(localEP), new UdpEndpointAddress(serverCtrlEP) , cri, useNAT);
-	}
-
 	@Override
 	protected void send(final byte[] packet, final EndpointAddress dst) throws IOException {
 		switch (dst) {
@@ -343,8 +316,6 @@ public abstract class ClientConnection extends ConnectionBase
 				channelId = res.getChannelID();
 				if (stream || (useNat && ep.nat())) {
 					dataEp = src;
-					if (dataEp.address() instanceof final InetSocketAddress isa)
-						dataEndpt = isa;
 				}
 				else {
 					dataEp = switch (ctrlEp) {
@@ -352,8 +323,6 @@ public abstract class ClientConnection extends ConnectionBase
 						case final TcpEndpointAddress __ -> new TcpEndpointAddress(ep.endpoint());
 						case final UdsEndpointAddress uds -> uds;
 					};
-					if (dataEp.address() instanceof final InetSocketAddress isa)
-						dataEndpt = isa;
 				}
 
 
