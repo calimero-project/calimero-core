@@ -131,6 +131,11 @@ testing {
 	}
 }
 
+tasks.named<JavaExec>("run") {
+	// Work around https://github.com/graalvm/native-build-tools/issues/743
+	outputs.upToDateWhen { false }
+}
+
 graalvmNative {
 //	toolchainDetection = true // only works reliably if a single JDK is installed, which is GraalVM
 	agent {
