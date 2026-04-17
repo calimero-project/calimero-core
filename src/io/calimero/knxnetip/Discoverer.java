@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -96,7 +96,7 @@ import io.calimero.knxnetip.util.Srp;
 import io.calimero.log.LogService;
 
 /**
- * Does KNXnet/IP discovery and retrieval of self description from other KNX IP devices.
+ * Does KNXnet/IP discovery and retrieval of self-description from other KNX IP devices.
  * <p>
  * Both searches for server discovery and description requests can be run in blocking mode
  * or asynchronous in the background.
@@ -777,7 +777,7 @@ public class Discoverer
 			receivers.add(this);
 		}
 
-		// unicast search to specific server endpoint, and descrption request
+		// unicast search to specific server endpoint, and description request
 		ReceiverLoop(final DatagramChannel dc, final int receiveBufferSize, final Duration timeout,
 				final InetSocketAddress queriedServer) throws IOException {
 			super(null, true, receiveBufferSize, 0, (int) timeout.toMillis());
