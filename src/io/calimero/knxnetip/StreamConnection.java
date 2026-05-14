@@ -620,7 +620,7 @@ public sealed abstract class StreamConnection implements Closeable
 
 	public SecureSession newSecureSession(final Keyring.DecryptedInterface tunnelInterface) {
 		if (tunnelInterface.type() != Type.Tunneling)
-			throw new IllegalArgumentException("'" + tunnelInterface + "' is not a tunneling interface");
+			throw new KNXIllegalArgumentException("'" + tunnelInterface + "' is not a tunneling interface");
 		return newSecureSession(tunnelInterface.user(), tunnelInterface.userKey(), tunnelInterface.deviceAuthCode());
 	}
 
