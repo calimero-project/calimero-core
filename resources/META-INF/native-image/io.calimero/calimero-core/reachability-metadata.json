@@ -382,7 +382,7 @@
   ],
   "resources": [
     {
-      "module:": "io.calimero.core",
+      "module": "io.calimero.core",
       "glob": "properties.xml"
     },
     {
