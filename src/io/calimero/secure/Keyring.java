@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2019, 2025 B. Malinowsky
+    Copyright (c) 2019, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -442,7 +442,7 @@ public final class Keyring {
 			for (reader.next(); reader.getEventType() != XmlReader.END_DOCUMENT; reader.next()) {
 				final var event = reader.getEventType();
 
-				if (reader.getEventType() != XmlReader.START_ELEMENT) {
+				if (event != XmlReader.START_ELEMENT) {
 					if (event == XmlReader.END_ELEMENT && "Interface".equals(reader.getLocalName()) && iface != null) {
 						iface.groups = Map.copyOf(iface.groups);
 						logger.log(TRACE, "add {0}", iface);
