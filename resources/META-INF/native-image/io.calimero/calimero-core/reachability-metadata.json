@@ -129,7 +129,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DPTXlator2ByteFloat",
@@ -137,7 +138,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DptXlator2ByteSigned",
@@ -145,7 +147,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DPTXlator2ByteUnsigned",
@@ -153,7 +156,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DPTXlator3BitControlled",
@@ -161,7 +165,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DPTXlator4ByteFloat",
@@ -169,7 +174,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DPTXlator4ByteSigned",
@@ -177,7 +183,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DPTXlator4ByteUnsigned",
@@ -185,7 +192,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DPTXlator8BitEnum",
@@ -193,7 +201,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DptXlator8BitSet",
@@ -201,7 +210,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DPTXlator8BitSigned",
@@ -209,7 +219,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DPTXlator8BitUnsigned",
@@ -217,7 +228,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DptXlator16BitSet",
@@ -225,7 +237,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DPTXlator64BitSigned",
@@ -233,7 +246,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DPTXlatorBoolean",
@@ -241,7 +255,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DptXlatorBrightnessClrTempControl",
@@ -249,7 +264,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DptXlatorBrightnessClrTempTrans",
@@ -257,7 +273,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DPTXlatorDate",
@@ -265,7 +282,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DPTXlatorDateTime",
@@ -273,7 +291,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DptXlatorMeteringValue",
@@ -281,7 +300,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DptXlatorRelativeControlRgb",
@@ -289,7 +309,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DptXlatorRelativeControlRgbw",
@@ -297,7 +318,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DptXlatorRelativeControlXyY",
@@ -305,7 +327,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DPTXlatorRGB",
@@ -313,7 +336,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DptXlatorRgbw",
@@ -321,7 +345,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DPTXlatorSceneControl",
@@ -329,7 +354,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DPTXlatorSceneNumber",
@@ -337,7 +363,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DPTXlatorString",
@@ -345,7 +372,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DPTXlatorTime",
@@ -353,7 +381,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DPTXlatorUtf8",
@@ -361,7 +390,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DptXlatorXyY",
@@ -369,7 +399,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     },
     {
       "type": "io.calimero.dptxlator.DptXlatorXyYTransition",
@@ -377,7 +408,8 @@
         { "name": "<init>", "parameterTypes": [ "java.lang.String" ] },
         { "name": "<init>", "parameterTypes": [ "io.calimero.dptxlator.DPT" ] },
         { "name": "getSubTypesStatic" }
-      ]
+      ],
+      "allPublicFields": true
     }
   ],
   "resources": [
