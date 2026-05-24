@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2015, 2025 B. Malinowsky
+    Copyright (c) 2015, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -725,5 +725,9 @@ public abstract class AbstractLink<T extends AutoCloseable> implements KNXNetwor
 
 	void dispatchCustomEvent(final Object event) {
 		notifier.dispatchCustomEvent(event);
+	}
+
+	void dispatchCustomEvent(final Object event, final NetworkLinkListener l) {
+		notifier.dispatchCustomEvent(event, l);
 	}
 }

@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -83,8 +83,9 @@ public abstract class EventNotifier<T extends LinkListener> implements KNXListen
 
 	private interface CustomEventConsumer<T> extends Consumer<T> {}
 
-	public void dispatchCustomEvent(final Object event) {
-		final CustomEventConsumer<T> cec = __ -> listeners.dispatchCustomEvent(event);
+	@SafeVarargs
+	public final void dispatchCustomEvent(final Object event, final T... filter) {
+		final CustomEventConsumer<T> cec = __ -> listeners.dispatchCustomEvent(event, filter);
 		addEvent(cec);
 	}
 

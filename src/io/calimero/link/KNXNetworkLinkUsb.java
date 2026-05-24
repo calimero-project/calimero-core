@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2015, 2025 B. Malinowsky
+    Copyright (c) 2015, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -187,7 +187,7 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 		// make sure a new listener (which is probably the main link listener) gets an immediate notification
 		// if the usb knx connection is currently disrupted
 		if (offline)
-			notifyConnectionStatus(ConnectionStatus.Offline);
+			notifyConnectionStatus(ConnectionStatus.Offline, l);
 	}
 
 	@Override
@@ -324,4 +324,6 @@ public class KNXNetworkLinkUsb extends AbstractLink<UsbConnection>
 	}
 
 	private void notifyConnectionStatus(final ConnectionStatus status) { dispatchCustomEvent(status); }
+
+	private void notifyConnectionStatus(final ConnectionStatus status, final NetworkLinkListener l) { dispatchCustomEvent(status, l); }
 }

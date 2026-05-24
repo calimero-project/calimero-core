@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2021, 2024 B. Malinowsky
+    Copyright (c) 2021, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -115,13 +116,16 @@ class EventDispatcher<T extends Annotation> {
 		}
 	}
 
-	void dispatchCustomEvent(final Object event) {
+	void dispatchCustomEvent(final Object event, final Object... filter) {
+		final var filterList = Arrays.asList(filter);
 		customEvents.getOrDefault(event.getClass(), Set.of()).forEach(lmh -> {
-			try {
-				lmh.mh.invoke(event);
-			}
-			catch (final Throwable e) {
-				logger.log(WARNING, "invoking custom event", e);
+			if (filterList.isEmpty() || filterList.contains(lmh.listener)) {
+				try {
+					lmh.mh.invoke(event);
+				}
+				catch (final Throwable e) {
+					logger.log(WARNING, "invoking custom event", e);
+				}
 			}
 		});
 	}
