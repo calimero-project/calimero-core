@@ -197,7 +197,7 @@ public final class TranslatorTypes
 	 *
 	 * @param mainNumber main number assigned to the data type
 	 * @param translator represents a translator class of type {@link DPTXlator}
-	 * @param description textual information describing this data type to a user, use {@code null} for no description
+	 * @param description textual information describing this data type to a user
 	 */
 	public record MainType(int mainNumber, Class<? extends DPTXlator> translator, String description) {
 		public MainType {
@@ -205,7 +205,8 @@ public final class TranslatorTypes
 				throw new KNXIllegalArgumentException("invalid main number");
 			if (!DPTXlator.class.isAssignableFrom(translator) || DPTXlator.class.equals(translator))
 				throw new KNXIllegalArgumentException(translator.getName() + " is not a valid DPT translator type");
-			description = description == null ? "" : description;
+			if (description == null)
+				throw new KNXIllegalArgumentException("missing description");
 		}
 
 		/**
