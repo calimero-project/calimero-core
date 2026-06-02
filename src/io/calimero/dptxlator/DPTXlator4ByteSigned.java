@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2009, 2023 B. Malinowsky
+    Copyright (c) 2009, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -126,13 +126,13 @@ public class DPTXlator4ByteSigned extends DPTXlator
 	 * DPT ID 13.1200, volume liquid [l] for water/heat meter total consumption; values from <b>-2147483648</b> to
 	 * <b>2147483647</b> liter.
 	 */
-	public static final DPT DPT_DELTA_VOLUME_LIQUID_LITER = new DPT("13.1200", "volume liquid [l]", "-2147483648", "2147483647", "l");
+	public static final DPT DPT_DELTA_VOLUME_LIQUID_LITER = new DPT("13.1200", "volume liquid", "-2147483648", "2147483647", "l");
 
 	/**
 	 * DPT ID 13.1201, volume [m³] for gas/water/heat meter total consumption; values from <b>-2147483648</b> to
 	 * <b>2147483647</b> m³.
 	 */
-	public static final DPT DPT_DELTA_VOLUME_M3 = new DPT("13.1201", "volume [m³]", "-2147483648", "2147483647", "m³");
+	public static final DPT DPT_DELTA_VOLUME_M3 = new DPT("13.1201", "volume", "-2147483648", "2147483647", "m³");
 
 	private static final Map<String, DPT> types = loadDatapointTypes(DPTXlator4ByteSigned.class);
 

@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2023 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -64,13 +64,13 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 			"4294967295", "counter pulses");
 
 	/** DPT ID 12.100, counter time [s]; values from <b>0</b> to <b>4294967295</b> s. */
-	public static final DPT DptTimePeriodSec = new DPT("12.100", "counter time [s]", "0", "4294967295", "s");
+	public static final DPT DptTimePeriodSec = new DPT("12.100", "counter time", "0", "4294967295", "s");
 
 	/** DPT ID 12.101, counter time [min]; values from <b>0</b> to <b>4294967295</b> min. */
-	public static final DPT DptTimePeriodMin = new DPT("12.101", "counter time [min]", "0", "4294967295", "min");
+	public static final DPT DptTimePeriodMin = new DPT("12.101", "counter time", "0", "4294967295", "min");
 
 	/** DPT ID 12.102, counter time [h]; values from <b>0</b> to <b>4294967295</b> h. */
-	public static final DPT DptTimePeriodHours = new DPT("12.102", "counter time [h]", "0", "4294967295", "h");
+	public static final DPT DptTimePeriodHours = new DPT("12.102", "counter time", "0", "4294967295", "h");
 
 	// metering
 
@@ -78,13 +78,13 @@ public class DPTXlator4ByteUnsigned extends DPTXlator
 	 * DPT ID 12.1200, volume liquid [liter] for water/heat meter total consumption; values from <b>0</b> to
 	 * <b>4294967295</b> liter.
 	 */
-	public static final DPT DptVolumeLiquid = new DPT("12.1200", "volume liquid [liter]", "0", "4294967295", "l");
+	public static final DPT DptVolumeLiquid = new DPT("12.1200", "volume liquid", "0", "4294967295", "l");
 
 	/**
 	 * DPT ID 12.1201, volume [m³] for gas/water/heat meter total consumption; values from <b>0</b> to
 	 * <b>4294967295</b> m³.
 	 */
-	public static final DPT DptVolume = new DPT("12.1201", "volume [m³]", "0", "4294967295", "m³");
+	public static final DPT DptVolume = new DPT("12.1201", "volume", "0", "4294967295", "m³");
 
 
 	private static final Map<String, DPT> types = loadDatapointTypes(DPTXlator4ByteUnsigned.class);
