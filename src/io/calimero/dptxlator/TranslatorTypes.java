@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -307,7 +307,7 @@ public final class TranslatorTypes
 		@Override
 		public String toString()
 		{
-			return description();
+			return description() + " (main number " + mainNumber + ")";
 		}
 	}
 
@@ -373,7 +373,7 @@ public final class TranslatorTypes
 			final Map<String, DPT> dpts = subTypes(x);
 			final String id = dpts.values().iterator().next().getID();
 			final int mainNumber = getMainNumber(0, id);
-			final String desc = descriptionFor(x) + " (main number " + mainNumber + ")";
+			final String desc = descriptionFor(x);
 
 			map.put(mainNumber, new MainType(mainNumber, x, desc));
 			DPTXlator.logger.log(TRACE, "loaded DPT translator for {0}", desc);
