@@ -202,7 +202,7 @@ public final class TranslatorTypes
 	public record MainType(int mainNumber, Class<? extends DPTXlator> translator, String description) {
 		public MainType {
 			if (mainNumber <= 0)
-				throw new KNXIllegalArgumentException("invalid main number");
+				throw new KNXIllegalArgumentException("invalid main number " +  mainNumber);
 			if (!DPTXlator.class.isAssignableFrom(translator) || DPTXlator.class.equals(translator))
 				throw new KNXIllegalArgumentException(translator.getName() + " is not a valid DPT translator type");
 			if (description == null)
