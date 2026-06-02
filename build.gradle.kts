@@ -20,7 +20,7 @@ repositories {
 	maven("https://central.sonatype.com/repository/maven-snapshots/")
 }
 
-val junitJupiterVersion by rootProject.extra { "6.0.0" }
+val junitJupiterVersion by rootProject.extra { "6.1.0" }
 val desc = "Calimero, a free KNX network library"
 
 group = "io.calimero"
