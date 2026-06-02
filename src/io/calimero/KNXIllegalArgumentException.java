@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,6 +44,17 @@ package io.calimero;
 public class KNXIllegalArgumentException extends KnxRuntimeException
 {
 	private final String arg;
+
+	/**
+	 * Constructs a new {@code KNXIllegalArgumentException} with the specified cause.
+	 *
+	 * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method).
+	 */
+	public KNXIllegalArgumentException(final Throwable cause)
+	{
+		super(null, cause);
+		arg = null;
+	}
 
 	/**
 	 * Constructs a new {@code KNXIllegalArgumentException} with the specified detail message.
