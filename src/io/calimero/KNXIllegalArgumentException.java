@@ -68,6 +68,17 @@ public class KNXIllegalArgumentException extends KnxRuntimeException
 	}
 
 	/**
+	 * Constructs a new {@code KNXIllegalArgumentException} with the specified detail message and argument.
+	 *
+	 * @param s the detail message
+	 * @param arg the offending argument
+	 */
+	public KNXIllegalArgumentException(final String s, final String arg) {
+		super(s);
+		this.arg = arg;
+	}
+
+	/**
 	 * Constructs a new {@code KNXIllegalArgumentException} with the specified detail message and cause.
 	 *
 	 * @param s the detail message
@@ -77,6 +88,11 @@ public class KNXIllegalArgumentException extends KnxRuntimeException
 	{
 		super(s, cause);
 		arg = null;
+	}
+
+	@Override
+	public String getMessage() {
+		return arg != null ? super.getMessage() + " '" + arg + "'" : super.getMessage();
 	}
 
 	/**
