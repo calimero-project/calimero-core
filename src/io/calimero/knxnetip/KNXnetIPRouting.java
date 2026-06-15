@@ -129,7 +129,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	 * <p>
 	 * This is the standard system setup multicast address used in KNXnet/IP.
 	 */
-	public static final String DEFAULT_MULTICAST = Discoverer.SEARCH_MULTICAST;
+	public static final String DEFAULT_MULTICAST = "224.0.23.12";
 
 	/**
 	 * Address of the default multicast group assigned to KNX IP routers.

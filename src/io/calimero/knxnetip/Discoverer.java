@@ -134,6 +134,7 @@ public class Discoverer
 	/**
 	 * Multicast IP address used for discovery, multicast group is {@value}.
 	 */
+	@Deprecated(forRemoval = true)
 	public static final String SEARCH_MULTICAST = "224.0.23.12";
 
 	/**
@@ -175,7 +176,7 @@ public class Discoverer
 		/**
 		 * @deprecated Use {@link #response()}
 		 */
-		@Deprecated
+		@Deprecated(forRemoval = true)
 		public T getResponse()
 		{
 			return response;
@@ -184,7 +185,7 @@ public class Discoverer
 		/**
 		 * @deprecated Use {@link #networkInterface()}
 		 */
-		@Deprecated
+		@Deprecated(forRemoval = true)
 		public NetworkInterface getNetworkInterface()
 		{
 			return networkInterface;
