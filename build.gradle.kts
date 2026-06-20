@@ -20,7 +20,7 @@ repositories {
 	maven("https://central.sonatype.com/repository/maven-snapshots/")
 }
 
-val junitJupiterVersion by rootProject.extra { "6.1.0" }
+rootProject.extra.set("junitJupiterVersion", "6.1.0")
 val desc = "Calimero, a free KNX network library"
 
 group = "io.calimero"
@@ -106,7 +106,7 @@ tasks.named<Jar>("jar") {
 
 testing {
 	suites {
-		val test by getting(JvmTestSuite::class) {
+		val test = named<JvmTestSuite>("test") {
 			useJUnitJupiter("${rootProject.extra.get("junitJupiterVersion")}")
 
 			targets {
@@ -201,16 +201,4 @@ signing {
 	if (project.hasProperty("signing.keyId")) {
 		sign(publishing.publications["mavenJava"])
 	}
-}
-
-plugins.withType<JavaPlugin>().configureEach {
-	eclipse {
-		// Eclipse's view of projects treats circular dependencies as errors by default
-		jdt.file.withProperties { set("org.eclipse.jdt.core.circularClasspath", "warning") }
-	}
-}
-
-dependencies {
-	// Eclipse treats circular dependencies as errors by default, see eclipseJdt task above
-//	testRuntimeOnly("io.calimero:calimero-rxtx:$version")
 }
