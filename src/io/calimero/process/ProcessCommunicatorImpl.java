@@ -469,7 +469,8 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 			throws KNXTimeoutException, KNXLinkClosedException, InterruptedException {
 		if (useGoDiagnostics && sal.security().groupKeys().containsKey(dst)) {
 			try {
-				final var future = sal.writeGroupObjectDiagnostics(dst, t == null ? new byte[0] : t.getData());
+			    final boolean shortFormEligible = (t != null) && (t.getItems() == 1) && (t.getTypeSize() == 0);
+				final var future = sal.writeGroupObjectDiagnostics(dst, t == null ? new byte[0] : t.getData(), shortFormEligible);
 				final var returnCode = future.get();
 				if (returnCode != ReturnCode.Success)
 					logger.log(WARNING, "{0} {1}", dst, returnCode);
