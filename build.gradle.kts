@@ -10,7 +10,7 @@ plugins {
 	signing
 	id("org.gradle.test-retry") version "1.6.5"
 	id("org.graalvm.buildtools.native") version "1.1.12"
-	id("com.github.ben-manes.versions") version "0.62.0"
+	id("io.github.ben-manes.versions") version "0.62.0"
 	eclipse
 }
 
