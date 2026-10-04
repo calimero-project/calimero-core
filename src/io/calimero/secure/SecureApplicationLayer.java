@@ -275,7 +275,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 		return secureData(src, dst, apdu, SecurityControl.of(security, toolAccess));
 	}
 
-	public CompletableFuture<ReturnCode> writeGroupObjectDiagnostics(final GroupAddress group, final byte[] value)
+	public CompletableFuture<ReturnCode> writeGroupObjectDiagnostics(final GroupAddress group, final byte[] value, final boolean shortFormEligible)
 			throws KNXTimeoutException, KNXLinkClosedException, InterruptedException {
 		final int oinstance = 1;
 
@@ -290,8 +290,10 @@ public class SecureApplicationLayer implements AutoCloseable {
 		// GO diagnostics shall not have lower security access to a GO than the access through group services
 		final var diagSecCtrl = DataSecurity.AuthConf;
 		final int secFlags = diagSecCtrl == DataSecurity.AuthConf ? 3 : diagSecCtrl == DataSecurity.Auth ? 1 : 0;
-		final boolean longApdu = value.length == 1 && value[0] < 64 ? false : false;
-		final int flags = (longApdu ? 0x80 : 0) | secFlags;
+		// longApdu reflects the DPT's own encoding capability, not the numeric value.
+	    // shortFormEligible is true only for DPTs packed into <8 bits (bool, 2-bit, 3-bit control).
+	    final boolean longApdu = value.length > 0 && !shortFormEligible;		
+	    final int flags = (longApdu ? 0x80 : 0) | secFlags;
 
 		final var asdu = ByteBuffer.allocate(10 + value.length).putShort((short) GroupObjectTableType)
 				.put((byte) (oinstance >> 4)).put((byte) (((oinstance & 0xf) << 4) | (pidGoDiagnostics >> 8)))
