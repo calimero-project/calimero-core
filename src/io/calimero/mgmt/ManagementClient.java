@@ -506,34 +506,9 @@ public interface ManagementClient extends AutoCloseable
 			KNXRemoteException, KNXDisconnectException, KNXLinkClosedException, InterruptedException;
 
 	/**
-	 * Initiates a master reset of the controller of a communication partner.
-	 * <p>
-	 * Available erase codes:
-	 * <ul>
-	 * <li>1: confirmed restart (basic restart with confirmation)</li>
-	 * <li>2: factory reset (used together with {@code channel})</li>
-	 * <li>3: reset the device individual address to its default</li>
-	 * <li>4: reset application program memory to default application</li>
-	 * <li>5: reset application parameter memory (used together with {@code channel})</li>
-	 * <li>6: reset links (used together with {@code channel}</li>
-	 * <li>7: factory reset without resetting the device individual address (used together with {@code channel})</li>
-	 * </ul>
-	 *
-	 * @param dst destination to reset
-	 * @param eraseCode specifies the resources that shall be reset prior to restarting the device
-	 * @param channel the number of the application channel that shall be reset and the application
-	 *        parameters set to default values, use 0 to clear all link information in the group
-	 *        address table and group object association table and reset all application parameters
-	 * @return the worst case execution time of the device for the requested master reset in seconds
-	 *         or a default of 0, with time &ge; 0 (time is returned conforming to the datapoint
-	 *         encoding with DPT ID 7.005 (DPT_TimePeriodSec))
-	 * @throws KNXTimeoutException on a timeout during send
-	 * @throws KNXRemoteException on error to restart the communication partner
-	 * @throws KNXDisconnectException on transport layer disconnect in connection-oriented mode
-	 * @throws KNXLinkClosedException if network link to KNX network is closed
-	 * @throws InterruptedException on interrupted thread
-	 * @see #restart(Destination, EraseCode, int)
+	 * @deprecated Use {@link #restart(Destination, EraseCode, int)}
 	 */
+	@Deprecated(forRemoval = true)
 	default int restart(final Destination dst, final int eraseCode, final int channel) throws KNXTimeoutException,
 			KNXRemoteException, KNXDisconnectException, KNXLinkClosedException, InterruptedException {
 		return (int) restart(dst, EraseCode.of(eraseCode), channel).toSeconds();
