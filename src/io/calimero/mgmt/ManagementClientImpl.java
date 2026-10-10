@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -655,6 +655,8 @@ public class ManagementClientImpl implements ManagementClient
 			send(dst, priority, DataUnitBuilder.createLengthOptimizedAPDU(RESTART));
 		}
 		else {
+			if (channel < 0 || channel > 0xff)
+				throw new KNXIllegalArgumentException("channel number " + channel + " out of range [0..0xff]");
 			final byte[] sdu = new byte[] { 0x01, (byte) eraseCode.code(), (byte) channel, };
 			final byte[] send = DataUnitBuilder.createLengthOptimizedAPDU(RESTART, sdu);
 			final byte[] apdu = sendWait(dst, priority, send, RESTART, 3, 3);

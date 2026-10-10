@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -492,8 +492,8 @@ public interface ManagementClient extends AutoCloseable
 	 * @param dst destination to reset
 	 * @param eraseCode specifies the resources that shall be reset prior to restarting the device
 	 * @param channel the number of the application channel that shall be reset and the application parameters set to
-	 *        default values, use 0 to clear all link information in the group address table and group object
-	 *        association table and reset all application parameters
+	 *        default values, {@code 0 ≤ channel ≤ 255}; use 0 to clear all link information in the group address table
+	 *        and group object association table and reset all application parameters
 	 * @return the worst case execution time of the device for the requested master reset or a default of 0, with time
 	 *         &ge; 0
 	 * @throws KNXTimeoutException on a timeout during send
