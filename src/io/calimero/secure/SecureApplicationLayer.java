@@ -275,8 +275,9 @@ public class SecureApplicationLayer implements AutoCloseable {
 		return secureData(src, dst, apdu, SecurityControl.of(security, toolAccess));
 	}
 
-	public CompletableFuture<ReturnCode> writeGroupObjectDiagnostics(final GroupAddress group, final byte[] value, final boolean shortFormEligible)
-			throws KNXTimeoutException, KNXLinkClosedException, InterruptedException {
+	// useOptimizedApdu: used with group value write, true only for DPTs packed into ≤ 6 bits (boolean, 2-bit, 3-bit control)
+	public CompletableFuture<ReturnCode> writeGroupObjectDiagnostics(final GroupAddress group, final byte[] value,
+			final boolean useOptimizedApdu) throws KNXTimeoutException, KNXLinkClosedException, InterruptedException {
 		final int oinstance = 1;
 
 		// write service IDs
@@ -285,15 +286,14 @@ public class SecureApplicationLayer implements AutoCloseable {
 //		final int sendLocalGOValueOnBus = 2;
 		final int sendGroupValueRead = 3;
 //		final int limitGroupServiceSenders = 4;
-		final int service = value.length == 0 ? sendGroupValueRead : sendGroupValueWrite;
+		final boolean read = value.length == 0;
+		final int service = read ? sendGroupValueRead : sendGroupValueWrite;
 
 		// GO diagnostics shall not have lower security access to a GO than the access through group services
 		final var diagSecCtrl = DataSecurity.AuthConf;
 		final int secFlags = diagSecCtrl == DataSecurity.AuthConf ? 3 : diagSecCtrl == DataSecurity.Auth ? 1 : 0;
-		// longApdu reflects the DPT's own encoding capability, not the numeric value.
-	    // shortFormEligible is true only for DPTs packed into <8 bits (bool, 2-bit, 3-bit control).
-	    final boolean longApdu = value.length > 0 && !shortFormEligible;		
-	    final int flags = (longApdu ? 0x80 : 0) | secFlags;
+		final boolean optimizedApdu = value.length == 1 && useOptimizedApdu;
+	    final int flags = (read || optimizedApdu ? 0 : 0x80) | secFlags;
 
 		final var asdu = ByteBuffer.allocate(10 + value.length).putShort((short) GroupObjectTableType)
 				.put((byte) (oinstance >> 4)).put((byte) (((oinstance & 0xf) << 4) | (pidGoDiagnostics >> 8)))

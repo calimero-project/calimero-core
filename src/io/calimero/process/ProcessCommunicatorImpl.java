@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -469,8 +469,8 @@ public class ProcessCommunicatorImpl implements ProcessCommunicator
 			throws KNXTimeoutException, KNXLinkClosedException, InterruptedException {
 		if (useGoDiagnostics && sal.security().groupKeys().containsKey(dst)) {
 			try {
-			    final boolean shortFormEligible = (t != null) && (t.getItems() == 1) && (t.getTypeSize() == 0);
-				final var future = sal.writeGroupObjectDiagnostics(dst, t == null ? new byte[0] : t.getData(), shortFormEligible);
+			    final boolean useOptimizedApdu = t != null && t.getItems() == 1 && t.bitSize() <= 6;
+				final var future = sal.writeGroupObjectDiagnostics(dst, t == null ? new byte[0] : t.getData(), useOptimizedApdu);
 				final var returnCode = future.get();
 				if (returnCode != ReturnCode.Success)
 					logger.log(WARNING, "{0} {1}", dst, returnCode);
