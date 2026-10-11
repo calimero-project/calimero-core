@@ -480,10 +480,7 @@ public interface ManagementClient extends AutoCloseable
 	 * {@link EraseCode#FactoryResetWithoutIndividualAddress}, and {@link EraseCode#ErasePersistentlyStoredApplicationData}.
 	 * For erase codes {@link EraseCode#ConfirmedRestart},
 	 * {@link EraseCode#ResetIndividualAddress}, and {@link EraseCode#ResetApplicationProgram}, {@code channel} should
-	 * be 0.<br>
-	 * If the requested master reset exceeds a processing time of 5 seconds, this is indicated by the KNX device using a
-	 * worst-case process time, which is returned by this method. Otherwise, the process time indication might be left
-	 * at its default value of 0 by the remote endpoint.
+	 * be 0.
 	 * <p>
 	 * This service uses point-to-point connectionless or connection-oriented communication mode.<br>
 	 * Invoking this method may result in a termination of the transport layer connection (i.e., transition to
@@ -494,8 +491,8 @@ public interface ManagementClient extends AutoCloseable
 	 * @param channel the number of the application channel that shall be reset and the application parameters set to
 	 *        default values, {@code 0 ≤ channel ≤ 255}; use 0 to clear all link information in the group address table
 	 *        and group object association table and reset all application parameters
-	 * @return the worst case execution time of the device for the requested master reset or a default of 0, with time
-	 *         &ge; 0
+	 * @return the worst-case execution time in seconds returned by the device for the requested master reset,
+	 *        with time &ge; 0; value may be 0 if processing time for restart is ≤ 5 seconds
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXRemoteException on error to restart the communication partner
 	 * @throws KNXDisconnectException on transport layer disconnect in connection-oriented mode
