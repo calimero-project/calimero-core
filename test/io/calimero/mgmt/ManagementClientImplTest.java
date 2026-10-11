@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -314,45 +314,20 @@ class ManagementClientImplTest
 	}
 
 	@Test
-	void readPropertyDescDestinationIntIntInt() throws KNXException, InterruptedException
-	{
-		try {
-			mc.readPropertyDesc(dco, -1, 2, 1);
-			fail("invalid arg");
-		}
-		catch (final KNXIllegalArgumentException e) {}
-		try {
-			mc.readPropertyDesc(dco, 256, 2, 1);
-			fail("invalid arg");
-		}
-		catch (final KNXIllegalArgumentException e) {}
-		try {
-			mc.readPropertyDesc(dco, 1, -1, 1);
-			fail("invalid arg");
-		}
-		catch (final KNXIllegalArgumentException e) {}
-		try {
-			mc.readPropertyDesc(dco, 1, 256, 1);
-			fail("invalid arg");
-		}
-		catch (final KNXIllegalArgumentException e) {}
-		try {
-			mc.readPropertyDesc(dco, 0, 2, -1);
-			fail("invalid arg");
-		}
-		catch (final KNXIllegalArgumentException e) {}
-		try {
-			mc.readPropertyDesc(dco, -1, 2, 256);
-			fail("invalid arg");
-		}
-		catch (final KNXIllegalArgumentException e) {}
+	void readPropertyDescriptionByIndex() throws KNXException, InterruptedException {
+		assertThrows(KNXIllegalArgumentException.class, () -> mc.readPropertyDescription(dco, -1, 2, 1));
+		assertThrows(KNXIllegalArgumentException.class, () -> mc.readPropertyDescription(dco, 256, 2, 1));
+		assertThrows(KNXIllegalArgumentException.class, () -> mc.readPropertyDescription(dco, 1, -1, 1));
+		assertThrows(KNXIllegalArgumentException.class, () -> mc.readPropertyDescription(dco, 1, 256, 1));
+		assertThrows(KNXIllegalArgumentException.class, () -> mc.readPropertyDescription(dco, 0, 2, -1));
+		assertThrows(KNXIllegalArgumentException.class, () -> mc.readPropertyDescription(dco, -1, 2, 256));
 
-		/*byte[] desc =*/ mc.readPropertyDesc(dco2, 0, 51, 5);
-		/*desc =*/ mc.readPropertyDesc(dco2, 0, 0, 1);
+		mc.readPropertyDescription(dco2, 0, 51, 5);
+		mc.readPropertyDescription(dco2, 0, 0, 1);
 
-		/*final byte[] cmp =*/ mc.readPropertyDesc(dco2, 0, 1, 5);
-		/*desc =*/ mc.readPropertyDesc(dco2, 0, 0, 0);
-		//assertTrue(Arrays.equals(desc, cmp));
+		final var byId = mc.readPropertyDescription(dco2, 0, PID.OBJECT_TYPE, 5);
+		final var byIndex = mc.readPropertyDescription(dco2, 0, 0, 0); // property index 0 is object type
+		assertEquals(byIndex, byId);
 	}
 
 	@Test

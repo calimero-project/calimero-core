@@ -244,6 +244,9 @@ public class ManagementClientImpl implements ManagementClient
 
 	private final EventListeners<Consumer<FrameEvent>> listeners = new EventListeners<>();
 
+	private static final boolean useExtPropertyServices = false;
+
+
 	SecureManagement secureApplicationLayer() { return sal; }
 
 	/**
@@ -722,8 +725,7 @@ public class ManagementClientImpl implements ManagementClient
 
 		int elemsInAsdu = elements;
 		if (elements > 1) {
-			final var data = readPropertyDesc(dst, objIndex, propertyId, 0);
-			final var desc = Description.from(0, data);
+			final var desc = readPropertyDescription(dst, objIndex, propertyId, 0);
 			final int typeSize = Math.max(8, PropertyTypes.bitSize(desc.pdt()).orElse(8)) / 8;
 			elemsInAsdu = (maxAsduLength - 4) / typeSize;
 		}
@@ -1014,41 +1016,32 @@ public class ManagementClientImpl implements ManagementClient
 	public Description readPropertyDescription(final Destination dst, final int objIndex, final int propertyId,
 			final int propertyIndex) throws KNXTimeoutException, KNXRemoteException, KNXDisconnectException,
 			KNXLinkClosedException, InterruptedException {
-		return Description.from(0, readPropertyDesc(dst, objIndex, propertyId, propertyIndex));
-	}
-
-	private static final boolean useExtPropertyServices = false;
-
-	@Override
-	public byte[] readPropertyDesc(final Destination dst, final int objIndex, final int propertyId, final int propIndex)
-		throws KNXTimeoutException, KNXRemoteException, KNXDisconnectException, KNXLinkClosedException,
-			InterruptedException {
 		if (useExtPropertyServices) {
-			final var desc = readPropertyExtDescription(dst, objIndex, propertyId, propIndex);
+			final var desc = readPropertyExtDescription(dst, objIndex, propertyId, propertyIndex);
 			if (desc != null)
-				return desc.toByteArray();
+				return desc;
 		}
 
-		if (objIndex < 0 || objIndex > 255 || propertyId < 0 || propertyId > 255 || propIndex < 0 || propIndex > 255)
+		if (objIndex < 0 || objIndex > 255 || propertyId < 0 || propertyId > 255 || propertyIndex < 0 || propertyIndex > 255)
 			throw new KNXIllegalArgumentException("argument value out of range");
-		final byte[] send = DataUnitBuilder.createAPDU(PROPERTY_DESC_READ, (byte) objIndex, (byte) propertyId, (byte) (propertyId == 0 ? propIndex : 0));
+		final byte[] send = DataUnitBuilder.createAPDU(PROPERTY_DESC_READ, (byte) objIndex, (byte) propertyId, (byte) (propertyId == 0 ? propertyIndex : 0));
 
 		for (int i = 0; i < 2; i++) {
 			final byte[] apdu = sendWait(dst, priority, send, PROPERTY_DESC_RESPONSE, 7, 7);
 			// make sure the response contains the requested description
 			final boolean oiOk = objIndex == (apdu[2] & 0xff);
 			final boolean pidOk = propertyId == 0 || propertyId == (apdu[3] & 0xff);
-			final boolean pidxOk = propertyId != 0 || propIndex == (apdu[4] & 0xff);
+			final boolean pidxOk = propertyId != 0 || propertyIndex == (apdu[4] & 0xff);
 			if (oiOk && pidOk && pidxOk) {
 				// max_nr_elem field is a 4bit exponent + 12bit unsigned
 				// on problem this field is 0
 				if (apdu[6] == 0 && apdu[7] == 0)
 					throw new KNXRemoteException("got no property description (object non-existent?)");
-				return new byte[] { apdu[2], apdu[3], apdu[4], apdu[5], apdu[6], apdu[7], apdu[8] };
+				return Description.from(0, Arrays.copyOfRange(apdu, 2, 9));
 			}
 
 			logger.log(WARNING, "wrong description response for OI {0} PID {1} prop idx {2} (got {3}|{4} (idx {5}))",
-					objIndex, propertyId, propIndex, apdu[2] & 0xff, apdu[3] & 0xff, apdu[4] & 0xff);
+					objIndex, propertyId, propertyIndex, apdu[2] & 0xff, apdu[3] & 0xff, apdu[4] & 0xff);
 		}
 		throw new KNXTimeoutException("timeout occurred while waiting for data response");
 	}

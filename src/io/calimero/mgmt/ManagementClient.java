@@ -676,40 +676,17 @@ public interface ManagementClient extends AutoCloseable
 	 * @throws KNXException on other read property description error
 	 * @throws InterruptedException on interrupted thread
 	 */
-	default Description readPropertyDescription(final Destination dst, final int objIndex, final int propertyId,
-			final int propertyIndex) throws KNXException, InterruptedException {
-		return Description.from(0, readPropertyDesc(dst, objIndex, propertyId, propertyIndex));
-	}
+	Description readPropertyDescription(Destination dst, int objIndex, int propertyId, int propertyIndex)
+			throws KNXException, InterruptedException;
 
 	/**
-	 * Reads the description of a property of an interface object of a communication
-	 * partner.
-	 * <p>
-	 * This service uses point-to-point connectionless or connection-oriented
-	 * communication mode.<br>
-	 * The property of the object is addressed either with a the {@code propertyId}
-	 * or with the {@code propIndex}. The property index is only used if the property
-	 * identifier is 0, otherwise the index is ignored.<br>
-	 * When using the property ID for access, the property index in the returned
-	 * description is either the correct property index of the addressed property or 0.
-	 *
-	 * @param dst destination to read from
-	 * @param objIndex interface object index
-	 * @param propertyId property identifier, specify 0 to use the property index
-	 * @param propIndex property index, starts with index 0 for the first property
-	 * @return byte array containing the property description, starting with the property
-	 *         object index
-	 * @throws KNXTimeoutException on a timeout during send
-	 * @throws KNXRemoteException if the response contains no description (e.g. if tried
-	 *         to access a non-existing property)
-	 * @throws KNXDisconnectException on disconnect in connection-oriented mode
-	 * @throws KNXLinkClosedException if network link to KNX network is closed
-	 * @throws KNXException on other read property description error
-	 * @throws InterruptedException on interrupted thread
-	 * @see #readPropertyDescription(Destination, int, int, int)
+	 * @deprecated Use {@link #readPropertyDescription(Destination, int, int, int)}
 	 */
-	byte[] readPropertyDesc(Destination dst, int objIndex, int propertyId, int propIndex)
-		throws KNXException, InterruptedException;
+	@Deprecated(forRemoval = true)
+	default byte[] readPropertyDesc(final Destination dst, final int objIndex, final int propertyId, final int propIndex)
+		throws KNXException, InterruptedException {
+		return readPropertyDescription(dst, objIndex, propertyId, propIndex).toByteArray();
+	}
 
 	/**
 	 * Calls a function property of an interface object of a communication partner.

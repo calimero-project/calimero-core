@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2010, 2025 B. Malinowsky
+    Copyright (c) 2010, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -660,8 +660,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 		// with extended memory services, the verify mode setting of the server is ignored
 		if (!extMemoryServices && verifyByServer) {
 			// reading description checks whether property exists
-			/* final byte[] desc = */mc.readPropertyDesc(d, DEVICE_OBJECT_INDEX,
-				PropertyAccess.PID.DEVICE_CONTROL, 0);
+			mc.readPropertyDescription(d, DEVICE_OBJECT_INDEX, PropertyAccess.PID.DEVICE_CONTROL, 0);
 			final byte[] ctrl = mc.readProperty(d, DEVICE_OBJECT_INDEX,
 				PropertyAccess.PID.DEVICE_CONTROL, 1, 1);
 			// bit 2 is set for automatic management server verification (responds on
