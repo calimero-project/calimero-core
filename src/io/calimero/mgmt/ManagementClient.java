@@ -38,6 +38,7 @@ package io.calimero.mgmt;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.BiConsumer;
 
 import io.calimero.IndividualAddress;
@@ -466,6 +467,11 @@ public interface ManagementClient extends AutoCloseable
 		}
 
 		public int code() { return ordinal() + 1; }
+
+		@Override
+		public String toString() {
+			return name().replaceAll("(\\p{javaLowerCase})(\\p{javaUpperCase})", "$1 $2").toLowerCase(Locale.ROOT);
+		}
 	}
 
 	/**
