@@ -269,7 +269,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	@Override
 	public String name()
 	{
-		return "KNXnet/IP Routing " + super.name();
+		return "KNXnet/IP Routing " + ((UdpEndpointAddress) ctrlEp).address().getAddress().getHostAddress();
 	}
 
 	/**
