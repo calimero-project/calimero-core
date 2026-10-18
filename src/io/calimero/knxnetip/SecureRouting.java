@@ -60,6 +60,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import io.calimero.KNXException;
@@ -87,6 +88,9 @@ public final class SecureRouting extends KNXnetIPRouting {
 
 	// offset to adjust local clock upon receiving a valid secure packet or group sync response
 	private long timestampOffset = -System.nanoTime() / 1_000_000L; // [ms]
+
+	private static final long HighTimestamp = 0xff00_0000_0000L;
+	private final AtomicReference<InetAddress> highTimestampWarning = new AtomicReference<>(null);
 
 	private volatile boolean syncedWithGroup;
 	private volatile int sentGroupSyncTag;
@@ -231,6 +235,9 @@ public final class SecureRouting extends KNXnetIPRouting {
 		if (timestamp > local) {
 			logger.log(DEBUG, "sync timestamp +{0} ms", timestamp - local);
 			timestampOffset += timestamp - local;
+			if (timestamp >= HighTimestamp && highTimestampWarning.compareAndSet(null, src))
+				logger.log(WARNING, "received excessively high group-sync timestamp in group {0} from {1}",
+						remoteAddress().address().getAddress().getHostAddress(), src.getHostAddress());
 			syncedWithGroup(byTimerNotify, sn, tag);
 		}
 		else if (timestamp > (local - syncLatencyTolerance)) {
