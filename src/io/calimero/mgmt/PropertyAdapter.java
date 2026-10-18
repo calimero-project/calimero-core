@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -85,18 +85,17 @@ public interface PropertyAdapter extends AutoCloseable
 			throws KNXException, InterruptedException;
 
 	/**
-	 * Reads the description of a property of an interface object, returning a property description layout according the
-	 * application layer property description service.
+	 * Reads the description of a property of an interface object.
 	 *
 	 * @param objIndex interface object index
 	 * @param pid property identifier, specify 0 to use the property index
 	 * @param propIndex property index, starts with index 0 for the first property
-	 * @return byte array containing the property description, starting with the property object index
+	 * @return the property description
 	 * @throws KNXException on error getting the property description
 	 * @throws IllegalStateException if adapter was already closed
 	 * @throws InterruptedException on interrupted thread
 	 */
-	byte[] getDescription(int objIndex, int pid, int propIndex) throws KNXException, InterruptedException;
+	Description getDescription(int objIndex, int pid, int propIndex) throws KNXException, InterruptedException;
 
 	/**
 	 * Returns the name for identifying this adapter and its destination.

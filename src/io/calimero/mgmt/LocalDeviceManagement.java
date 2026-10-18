@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2015, 2025 B. Malinowsky
+    Copyright (c) 2015, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -157,7 +157,7 @@ abstract class LocalDeviceManagement<T> implements PropertyAdapter
 	}
 
 	@Override
-	public byte[] getDescription(final int objIndex, final int pid, final int propIndex)
+	public Description getDescription(final int objIndex, final int pid, final int propIndex)
 		throws KNXException, InterruptedException
 	{
 		// imitate property description:
@@ -194,12 +194,12 @@ abstract class LocalDeviceManagement<T> implements PropertyAdapter
 		else
 			ret = getProperty(objIndex, p, 0, 1);
 
-		int writeEnabled = 0;
+		boolean writeEnabled = false;
 		if (checkRW) {
 			// check out if write enabled or read only
 			try {
 				setProperty(objIndex, p, 0, 1, ret);
-				writeEnabled = 0x80;
+				writeEnabled = true;
 			}
 			catch (final KNXRemoteException e) {}
 		}
@@ -207,7 +207,7 @@ abstract class LocalDeviceManagement<T> implements PropertyAdapter
 		// int elements = 0;
 		// for (int i = 0; i < ret.length; ++i)
 		// 	elements = elements << 8 | ret[i] & 0xff;
-		return new byte[] { (byte) objIndex, (byte) p, (byte) propIndex, (byte) writeEnabled, 0, 0, 0 };
+		return new Description(objIndex, 0, p, propIndex, 0, writeEnabled, 0, 0, 0, 0);
 	}
 
 	public FuncPropResponse callFunctionProperty(final int objIndex, final int pid, final int serviceId, final byte... serviceInfo)

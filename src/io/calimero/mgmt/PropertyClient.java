@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -541,9 +541,9 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		return i;
 	}
 
-	private Description createDesc(final int oi, final byte[] desc) throws KNXException, InterruptedException
+	private Description createDesc(final int oi, final Description desc) throws KNXException, InterruptedException
 	{
-		final int pid = desc[1] & 0xff;
+		final int pid = desc.pid();
 		byte[] data = new byte[4];
 		try {
 			data = pa.getProperty(oi, pid, 0, 1);
@@ -551,12 +551,11 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		catch (final KNXRemoteException e) {
 			logger.log(WARNING, "failed to get current number of elements for OI {0} PID {1}: {2}", oi, pid, e.getMessage());
 		}
-		final Description d = Description.from(getObjectType(oi, true), Description.parseCurrentElements(data), desc);
 		// workaround for PDT on local DM, set pdt -1
-		if (local)
-			return new Description(d.objectIndex(), d.objectType(), d.objectInstance(), d.pid(), d.propIndex(), -1,
-					d.dpt(), d.writeEnabled(), d.currentElements(), d.maxElements(), d.readLevel(), d.writeLevel());
-		return d;
+		final int pdt = local ? -1 : desc.pdt();
+		return new Description(desc.objectIndex(), getObjectType(oi, true), desc.objectInstance(), pid,
+				desc.propIndex(), pdt, desc.dpt(), desc.writeEnabled(), Description.parseCurrentElements(data),
+				desc.maxElements(), desc.readLevel(), desc.writeLevel());
 	}
 
 	private int getObjectType(final int objIndex, final boolean queryObject) throws KNXException, InterruptedException
@@ -606,7 +605,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 		// if we didn't get pdt from definitions, query property description,
 		// in local dev.mgmt, no pdt description is available
 		if (pdt == -1 && !local)
-			pdt = pa.getDescription(objIndex, pid, 0)[3] & 0x3f;
+			pdt = pa.getDescription(objIndex, pid, 0).pdt();
 		if (PropertyTypes.hasTranslator(pdt)) {
 			final DPTXlator t = PropertyTypes.createTranslator(pdt);
 			t.setAppendUnit(false);
