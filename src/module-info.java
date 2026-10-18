@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2022, 2025 B. Malinowsky
+    Copyright (c) 2022, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -78,7 +78,8 @@ module io.calimero.core {
 	opens io.calimero.link to
 		io.calimero.device, io.calimero.server; // AbstractLink.conn
 	opens io.calimero.knxnetip to
-		io.calimero.device; // KNXnetIPRouting.searchRequestCallback
+		io.calimero.device, // KNXnetIPRouting.searchRequestCallback
+		io.calimero.server; // KNXnetIPRouting::channel
 	opens io.calimero.mgmt to
 		io.calimero.device; // TransportLayerImpl.proxies
 
