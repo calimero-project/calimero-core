@@ -1,6 +1,6 @@
 /*
     Calimero - A library for KNX network access
-    Copyright (c) 2019, 2025 B. Malinowsky
+    Copyright (c) 2019, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ package io.calimero.secure;
 
 import static java.lang.String.format;
 import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
 import static java.lang.System.Logger.Level.INFO;
 import static java.lang.System.Logger.Level.TRACE;
 import static java.lang.System.Logger.Level.WARNING;
@@ -51,6 +52,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.HashSet;
 import java.util.HexFormat;
 import java.util.Map;
 import java.util.Objects;
@@ -112,6 +114,12 @@ public class SecureApplicationLayer implements AutoCloseable {
 	private static final int SeqSize = 6;
 
 	private static final String secureSymbol = new String(Character.toChars(0x1F512));
+
+	private static final long HighSequenceNumber = 0xff00_0000_0000L;
+	private static final long MaxSequenceNumber = 0xffff_ffff_ffffL;
+
+	private record HighSequenceNumber(IndividualAddress device, boolean toolAccess) {}
+	private final Set<HighSequenceNumber> highSequenceNumberWarnings = new HashSet<>();
 
 
 	private final KNXNetworkLink link;
@@ -820,6 +828,8 @@ public class SecureApplicationLayer implements AutoCloseable {
 			sequenceNumberToolAccess = seqNo;
 		else
 			sequenceNumber = seqNo;
+
+		checkWarnHighSequenceNumber(seqNo, null, toolAccess);
 	}
 
 	protected long lastValidSequenceNumber(final boolean toolAccess, final IndividualAddress remote) {
@@ -833,6 +843,25 @@ public class SecureApplicationLayer implements AutoCloseable {
 			lastValidSequenceToolAccess.put(remote, seqNo);
 		else
 			lastValidSequence.put(remote, seqNo);
+
+		checkWarnHighSequenceNumber(seqNo, remote, toolAccess);
+	}
+
+	protected void checkWarnHighSequenceNumber(final long seqNo, final IndividualAddress remote, final boolean toolAccess) {
+		final String device = remote != null ? "device " + remote : "this device";
+		final String seqType = toolAccess ? " for tool access" : "";
+		final int next = remote == null ? 1 : 0; // distinguish if we check the next seq or the last valid one
+		final long maxSeq = MaxSequenceNumber + next;
+
+		if (seqNo >= maxSeq)
+			logger.log(ERROR, "{0} reached the security sequence number{1} limit, no further sending possible!",
+					device, seqType);
+		else if (seqNo >= MaxSequenceNumber - 20)
+			logger.log(WARNING, "{0} is approaching the security sequence number{1} limit (only {2} remaining)!",
+					device, seqType, maxSeq - seqNo);
+		else if (seqNo >= HighSequenceNumber && highSequenceNumberWarnings.add(new HighSequenceNumber(remote, toolAccess)))
+			logger.log(WARNING, "{0} has an excessively high security sequence number{1}, consider performing a factory reset",
+					device, seqType);
 	}
 
 	protected boolean checkAccess(final KNXAddress dst, final int service, final SecurityControl securityCtrl) {
