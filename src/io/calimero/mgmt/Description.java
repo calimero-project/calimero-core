@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -163,10 +163,11 @@ public record Description(int objectIndex, int objectType, int objectInstance, i
 	 */
 	@Override
 	public String toString() {
+		final String pdtString = pdt == -1 ? "" : "PDT " + pdt;
 		final String dptString = dpt.map(s -> " DPT " + s).orElse("");
-		return "OT " + objectType + " OI " + objectIndex + " PID " + pid + " PI " + propIndex + " PDT "
-				+ (pdt == -1 ? "-" : pdt) + dptString + ", " + currentElements
-				+ " elements (max " + maxElements + "), r/w access " + readLevel + "/" + (writeLevel == -1 ? "-" : writeLevel)
+		return "OT " + objectType + " OI " + objectIndex + " PID " + pid + " PI " + propIndex + ", "
+				+ pdtString + dptString + ", " + currentElements
+				+ " elements (max. " + maxElements + "), r/w access " + readLevel + "/" + (writeLevel == -1 ? "-" : writeLevel)
 				+ (writeEnabled ? " write-enabled" : " read-only");
 	}
 
