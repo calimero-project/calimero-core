@@ -87,7 +87,7 @@
             <usage>error code when load state machine indicates "error"</usage>
         </property>
         <property pid="29" pidName="PID_OBJECT_INDEX" name="Object Index" pdt="2" dpt="5.010" rw="(3/x)" writeEnabled="0">
-            <usage>Access to Object Index of any FB</usage>
+            <usage>Object index of the interface object in which it is located</usage>
         </property>
         <property pid="30" pidName="PID_DOWNLOAD_COUNTER" name="Download Counter" pdt="4" dpt="7.010" rw="(3/x)" writeEnabled="0">
             <usage>Download Counter</usage>

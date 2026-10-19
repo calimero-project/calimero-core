@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2010, 2023 B. Malinowsky
+    Copyright (c) 2010, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -240,7 +240,7 @@ public interface PropertyAccess
 		/**
 		 * Global property "Object Index".
 		 * <p>
-		 * Access to the object index of a function block.
+		 * Object index of the interface object in which it is located.
 		 */
 		// PDT,DPT: PDT_UNSIGNED_CHAR
 		int OBJECT_INDEX = 29;
