@@ -697,7 +697,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 		}
 
 		if (src.equals(address())) {
-			logger.log(TRACE, "update next {0}seq -> {1}", toolAccess ? "tool access " : "", receivedSeq);
+			logger.log(TRACE, "update next {0}seq -> {1}", toolAccess ? "tool access " : "", receivedSeq + 1);
 			updateSequenceNumber(toolAccess, receivedSeq + 1);
 		}
 		else {
