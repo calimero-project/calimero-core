@@ -447,7 +447,8 @@ public class SecureApplicationLayer implements AutoCloseable {
 		if (!syncRes)
 			secureApdu.put(seq);
 
-		final var associatedData = ByteBuffer.allocate(syncReq ? 7 : 1).put((byte) scf);
+		final int associatedDataLen = syncReq ? 7 : secCtrl.security() == DataSecurity.AuthConf ? 1 : 1 + apdu.length;
+		final var associatedData = ByteBuffer.allocate(associatedDataLen).put((byte) scf);
 		final byte[] seqOrRand = seqOrRand(service, seq.array());
 		if (syncReq) {
 			final byte[] sno = dstSno.array();
@@ -462,11 +463,10 @@ public class SecureApplicationLayer implements AutoCloseable {
 		}
 
 		final int extendedFrameFormat = 0;
-		final byte[] iv = block0(seqOrRand, src, dst, extendedFrameFormat, tpci, SecureService, apdu.length);
 		final var ctr0 = blockCtr0(seqOrRand, src, dst);
-
 		try {
 			if (secCtrl.security() == DataSecurity.AuthConf) {
+				final byte[] iv = block0(seqOrRand, src, dst, extendedFrameFormat, tpci, SecureService, apdu.length);
 				final byte[] mac = confMac(associatedData.array(), apdu, key, iv);
 				final byte[] input = ByteBuffer.allocate(MacSize + apdu.length).put(mac).put(apdu).array();
 				final byte[] encrypted = encrypt(input, key, ctr0);
@@ -475,7 +475,8 @@ public class SecureApplicationLayer implements AutoCloseable {
 			}
 			else {
 				secureApdu.put(apdu);
-				final byte[] mac = mac(apdu, key, iv, ctr0);
+				final byte[] iv = block0(seqOrRand, src, dst, extendedFrameFormat, tpci, SecureService, 0);
+				final byte[] mac = mac(associatedData.put(apdu).array(), key, iv, ctr0);
 				secureApdu.put(mac);
 			}
 		}
@@ -640,14 +641,13 @@ public class SecureApplicationLayer implements AutoCloseable {
 		asdu.get(mac);
 
 		final int extendedFrameFormat = 0;
-		final byte[] iv = block0(seq, src, dst, extendedFrameFormat, tpci, SecureService, apdu.length);
-
 		final byte[] plainApdu;
 		if (securityCtrl.security() == DataSecurity.Auth) {
 			plainApdu = apdu;
-
+			final byte[] iv = block0(seq, src, dst, extendedFrameFormat, tpci, SecureService, 0);
+			final var associatedData = ByteBuffer.allocate(1 + plainApdu.length).put((byte) scf).put(plainApdu);
 			try {
-				final byte[] calculated = mac(plainApdu, key, iv, ctr0);
+				final byte[] calculated = mac(associatedData.array(), key, iv, ctr0);
 				verifyMac(mac, calculated, src, dst, receivedSeq);
 			}
 			catch (final GeneralSecurityException e) {
@@ -672,6 +672,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 			final var associatedData = ByteBuffer.allocate(syncReq ? 7 : 1).put((byte) scf);
 			if (syncReq)
 				associatedData.put(sno);
+			final byte[] iv = block0(seq, src, dst, extendedFrameFormat, tpci, SecureService, apdu.length);
 			try {
 				final byte[] calculated = confMac(associatedData.array(), plainApdu, key, iv);
 				verifyMac(decryptedMac, calculated, src, dst, receivedSeq);
@@ -1054,11 +1055,11 @@ public class SecureApplicationLayer implements AutoCloseable {
 		return seq;
 	}
 
-	private static byte[] mac(final byte[] apdu, final byte[] key, final byte[] iv, final byte[] ctr0)
+	private static byte[] mac(final byte[] associatedData, final byte[] key, final byte[] iv, final byte[] ctr0)
 			throws GeneralSecurityException {
-		final ByteBuffer buf = ByteBuffer.allocate(2 + apdu.length);
-		buf.putShort((short) apdu.length);
-		buf.put(apdu);
+		final ByteBuffer buf = ByteBuffer.allocate(2 + associatedData.length);
+		buf.putShort((short) associatedData.length);
+		buf.put(associatedData);
 		final byte[] y = aesCbc(buf.array(), key, iv);
 		final byte[] msbY = Arrays.copyOfRange(y, 0, MacSize);
 		final byte[] result = encrypt(msbY, key, ctr0);
