@@ -132,8 +132,9 @@ public class SecureApplicationLayer implements AutoCloseable {
 			Map<IndividualAddress, Long> lastValidSequenceNumbersToolAccess) {
 
 		public SequenceNumbers {
-			if (sequenceNumber < 0 || sequenceNumberToolAccess < 0)
-				throw new KNXIllegalArgumentException("negative sequence number");
+			validateSequenceNumber(sequenceNumber, false);
+			validateSequenceNumber(sequenceNumberToolAccess, true);
+
 			sequenceNumberToolAccess = Math.max(1, sequenceNumberToolAccess);
 			lastValidSequenceNumbers = Map.copyOf(lastValidSequenceNumbers);
 			lastValidSequenceNumbersToolAccess = Map.copyOf(lastValidSequenceNumbersToolAccess);
@@ -263,6 +264,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 		this.logger = LogService.getLogger("io.calimero.secure." + secureSymbol + "-AL " + link.getName());
 
 		this.security = security;
+		validateSequenceNumber(sequenceNumber, false);
 		this.sequenceNumber = sequenceNumber;
 		sequenceNumberToolAccess = 1;
 	}
@@ -817,9 +819,20 @@ public class SecureApplicationLayer implements AutoCloseable {
 		return null;
 	}
 
+	private static void validateSequenceNumber(final long seq, final boolean toolAccess) {
+		final String seqType = toolAccess ? "tool access " : "";
+		if (seq < 0)
+			throw new KNXIllegalArgumentException("negative %ssecurity sequence number %d".formatted(seqType, seq));
+		if (seq > MaxSequenceNumber)
+			throw new KnxSecureException("security %ssequence number %d exceeds maximum 0x%x"
+					.formatted(seqType, seq, MaxSequenceNumber));
+	}
+
 	// returns next outgoing sequence number for secure communication
 	long nextSequenceNumber(final boolean toolAccess) {
-		return toolAccess ? sequenceNumberToolAccess : sequenceNumber;
+		long seq = toolAccess ? sequenceNumberToolAccess : sequenceNumber;
+		validateSequenceNumber(seq, toolAccess);
+		return seq;
 	}
 
 	// stores next outgoing sequence number for secure communication
@@ -839,6 +852,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 	}
 
 	protected void updateLastValidSequence(final boolean toolAccess, final IndividualAddress remote, final long seqNo) {
+		validateSequenceNumber(seqNo, toolAccess);
 		if (toolAccess)
 			lastValidSequenceToolAccess.put(remote, seqNo);
 		else

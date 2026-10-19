@@ -1,6 +1,6 @@
 /*
     Calimero - A library for KNX network access
-    Copyright (c) 2019, 2025 B. Malinowsky
+    Copyright (c) 2019, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
+import io.calimero.KNXIllegalArgumentException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -321,5 +322,32 @@ class SecureApplicationLayerTest {
 		final var e = assertThrows(ExecutionException.class,
 				() -> sal.broadcastSyncRequest(nonExistingSerialNo, toolKey, true, false).get());
 		assertEquals(TimeoutException.class, e.getCause().getClass());
+	}
+
+	@Test
+	void rejectNegativeSequenceNumber() {
+		final long neg = -1;
+		assertThrows(KNXIllegalArgumentException.class, () -> new SecureApplicationLayer.SequenceNumbers(neg, 0, Map.of(), Map.of()));
+		assertThrows(KNXIllegalArgumentException.class, () -> new SecureApplicationLayer.SequenceNumbers(0, neg, Map.of(), Map.of()));
+	}
+
+	@Test
+	void validateSequenceNumberWithinMax() {
+		final long max = 0xffff_ffff_ffffL;
+		final long exceed = max + 1;
+		new SecureApplicationLayer.SequenceNumbers(max, 0, Map.of(), Map.of());
+		new SecureApplicationLayer.SequenceNumbers(0, max, Map.of(), Map.of());
+		assertThrows(KnxSecureException.class, () -> new SecureApplicationLayer.SequenceNumbers(exceed, 0, Map.of(), Map.of()));
+		assertThrows(KnxSecureException.class, () -> new SecureApplicationLayer.SequenceNumbers(0, exceed, Map.of(), Map.of()));
+	}
+
+	@Test
+	void validateSequenceNumberInSalCtor() {
+		new SecureApplicationLayer(link, SerialNumber.Zero, 0, Map.of());
+		assertThrows(KNXIllegalArgumentException.class,
+				() -> new SecureApplicationLayer(link, SerialNumber.Zero, -1, Map.of()));
+		final long max = 0xffff_ffff_ffffL;
+		assertThrows(KnxSecureException.class,
+				() -> new SecureApplicationLayer(link, SerialNumber.Zero, max + 1, Map.of()));
 	}
 }
