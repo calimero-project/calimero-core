@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2022, 2025 B. Malinowsky
+    Copyright (c) 2022, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ public final class UsbConnectionFactory {
 			return factory.open(device.toString(), p -> p.open(device));
 		}
 		catch (final IOException e) {
-			throw new KNXException(String.format("open USB connection %s", device), e);
+			throw new KNXException("open USB connection %s".formatted(device), e);
 		}
 	}
 
@@ -66,7 +66,7 @@ public final class UsbConnectionFactory {
 			return factory.open(device, p -> p.open(device));
 		}
 		catch (final IOException e) {
-			throw new KNXException(String.format("open USB connection %s", device), e);
+			throw new KNXException("open USB connection %s".formatted(device), e);
 		}
 	}
 

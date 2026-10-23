@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2023, 2023 B. Malinowsky
+    Copyright (c) 2023, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ public record Device(int vendorId, int productId, String serialNumber, String ma
 
 	@Override
 	public String toString() {
-		final var joiner = new StringJoiner(" ").add(String.format("%04x:%04x", vendorId, productId));
+		final var joiner = new StringJoiner(" ").add("%04x:%04x".formatted(vendorId, productId));
 		if (!manufacturer.isEmpty())
 			joiner.add(manufacturer);
 		if (!product.isEmpty())

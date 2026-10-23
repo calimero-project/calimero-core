@@ -717,9 +717,9 @@ public class ManagementClientImpl implements ManagementClient
 			KNXDisconnectException, KNXLinkClosedException, InterruptedException {
 		if (objIndex < 0 || objIndex > 255 || propertyId < 0 || propertyId > 255
 			|| start < 0 || start > 0xFFF || elements < 0 || elements > 15)
-			throw new KNXIllegalArgumentException(String.format("argument value out of range: "
-					+ "OI 0 < %d < 256, PID 0 < %d < 256, start 0 < %d < 256, elems 0 < %d < 16",
-					objIndex, propertyId, start, elements));
+			throw new KNXIllegalArgumentException(
+					"argument value out of range: OI 0 < %d < 256, PID 0 < %d < 256, start 0 < %d < 256, elems 0 < %d < 16"
+							.formatted(objIndex, propertyId, start, elements));
 
 		final int maxAsduLength = maxAsduLength(dst);
 
@@ -1685,16 +1685,15 @@ public class ManagementClientImpl implements ManagementClient
 		final int oi = apdu[2] & 0xff;
 		final int pid = apdu[3] & 0xff;
 		if (oi != objIndex || pid != propertyId)
-			throw new KNXInvalidResponseException(
-					String.format("property response mismatch, expected OI %d PID %d (received %d|%d)", objIndex,
-							propertyId, oi, pid));
+			throw new KNXInvalidResponseException("property response mismatch, expected OI %d PID %d (received %d|%d)"
+							.formatted(objIndex, propertyId, oi, pid));
 		// check if number of elements is 0, indicates access problem
 		final int number = (apdu[4] & 0xFF) >>> 4;
 		if (number == 0)
 			throw new KNXRemoteException("property access OI " + oi + " PID " + pid + " failed/forbidden");
 		if (number != elements)
-			throw new KNXInvalidResponseException(String.format(
-					"property access OI %d PID %d expected %d elements (received %d)", oi, pid, elements, number));
+			throw new KNXInvalidResponseException("property access OI %d PID %d expected %d elements (received %d)"
+					.formatted(oi, pid, elements, number));
 		final byte[] prop = new byte[apdu.length - 6];
 		System.arraycopy(apdu, 6, prop, 0, prop.length);
 		return prop;

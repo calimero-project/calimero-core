@@ -1026,7 +1026,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 		}
 		if (systemBroadcast) {
 			if (!toolAccess)
-				throw new KnxSecureException(String.format("%s->%s system broadcast requires tool access", src, dst));
+				throw new KnxSecureException("%s->%s system broadcast requires tool access".formatted(src, dst));
 			if (authOnly)
 				logger.log(WARNING, "auth-only system broadcast not supported");
 		}

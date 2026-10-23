@@ -352,7 +352,7 @@ public sealed abstract class StreamConnection implements Closeable
 				throws KNXFormatException {
 			final int svc = h.getServiceType();
 			if (!h.isSecure())
-				throw new KnxSecureException(String.format("dispatched insecure service type 0x%h to %s", svc, this));
+				throw new KnxSecureException("dispatched insecure service type 0x%h to %s".formatted(svc, this));
 
 			// ensure minimum secure wrapper frame size (6 header, 16 security info, 6 encapsulated header, 16 MAC)
 			if (h.getTotalLength() < 44)

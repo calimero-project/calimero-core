@@ -277,8 +277,7 @@ abstract class LocalDeviceManagement<T> implements PropertyAdapter
 			final CEMIDevMgmt frame;
 			synchronized (frames) {
 				if (frames.isEmpty())
-					throw new KNXInvalidResponseException(
-							String.format("confirmation expected (msg code 0x%x)", messageCode));
+					throw new KNXInvalidResponseException("confirmation expected (msg code 0x%x)".formatted(messageCode));
 				frame = (CEMIDevMgmt) frames.remove();
 			}
 			final int mc = frame.getMessageCode();

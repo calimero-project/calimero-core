@@ -772,7 +772,7 @@ public class ManagementProceduresImpl implements ManagementProcedures
 			final SerialNumber serialNo, final byte[] fdsk, final byte[] toolKey) throws KNXException,
 			InterruptedException {
 
-		final String errMsg = String.format("sync.req with device S/N %s failed", serialNo);
+		final String errMsg = "sync.req with device S/N %s failed".formatted(serialNo);
 		final boolean toolAccess = true;
 		if (fdsk.length != 0) {
 			try {

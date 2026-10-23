@@ -166,7 +166,7 @@ public record HPAI(int hostProtocol, InetSocketAddress endpoint) {
 
 	public HPAI {
 		if (hostProtocol != IPV4_UDP && hostProtocol != IPV4_TCP)
-			throw new KNXIllegalArgumentException("unknown host protocol " + Integer.toHexString(hostProtocol));
+			throw new KNXIllegalArgumentException("invalid host protocol code 0x%02x".formatted(hostProtocol));
 
 		final InetAddress a = endpoint.getAddress();
 		if (a == null)
