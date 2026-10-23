@@ -266,14 +266,14 @@ public class DptXlatorXyYTransition extends DPTXlator {
 		final int yRaw = (int) Math.round(y * 65_535);
 
 		int offset = index * typeSize;
-		dst[offset++] = (short) (ms >> 8);
-		dst[offset++] = (short) (ms & 0xff);
-		dst[offset++] = (short) (xRaw >> 8);
-		dst[offset++] = (short) (xRaw & 0xff);
-		dst[offset++] = (short) (yRaw >> 8);
-		dst[offset++] = (short) (yRaw & 0xff);
+		dst[offset++] = ubyte(ms >> 8);
+		dst[offset++] = ubyte(ms);
+		dst[offset++] = ubyte(xRaw >> 8);
+		dst[offset++] = ubyte(xRaw);
+		dst[offset++] = ubyte(yRaw >> 8);
+		dst[offset++] = ubyte(yRaw);
 		dst[offset++] = brightnessRaw;
-		dst[offset] = (short) valid;
+		dst[offset] = ubyte(valid);
 	}
 
 	private void toDpt(final double x, final double y, final double brightness, final Duration fadingTime) {
