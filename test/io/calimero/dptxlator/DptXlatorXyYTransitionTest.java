@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2020, 2024 B. Malinowsky
+    Copyright (c) 2020, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -175,8 +175,8 @@ class DptXlatorXyYTransitionTest {
 	void setData() {
 		final byte[] data = { 40, 40, 25, 50, 77, 102, 50, 0b11 };
 		t.setData(data);
-		final double y = ((25 << 8) | 50) / 65_535d;
-		final double x = ((77 << 8) | 102) / 65_535d;
+		final double x = ((25 << 8) | 50) / 65_535d;
+		final double y = ((77 << 8) | 102) / 65_535d;
 		final double b = 50 * 100d / 255;
 		assertEquals(format(x, y, b, ((40 << 8) | 40) * 100), t.getValue());
 	}

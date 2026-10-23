@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2020, 2024 B. Malinowsky
+    Copyright (c) 2020, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -173,8 +173,8 @@ public class DptXlatorXyYTransition extends DPTXlator {
 
 		final int valid = data[offset + 7];
 		if ((valid & 0x2) == 2) {
-			final double y = ushort(offset + 2) / 65_535d;
-			final double x = ushort(offset + 4) / 65_535d;
+			final double x = ushort(offset + 2) / 65_535d;
+			final double y = ushort(offset + 4) / 65_535d;
 			joiner.add("(" + formatter.format(x) + ", " + formatter.format(y) + ")");
 		}
 		if ((valid & 0x1) == 1) {
@@ -201,8 +201,8 @@ public class DptXlatorXyYTransition extends DPTXlator {
 		int offset = index * typeSize;
 
 		final double time = ((data[offset++] << 8) | data[offset++]);
-		final double y = ((data[offset++] << 8) | data[offset++]) / 65_535d;
 		final double x = ((data[offset++] << 8) | data[offset++]) / 65_535d;
+		final double y = ((data[offset++] << 8) | data[offset++]) / 65_535d;
 		final double brightness = data[offset++] * 100d / 255;
 
 		final int valid = data[offset];
@@ -268,10 +268,10 @@ public class DptXlatorXyYTransition extends DPTXlator {
 		int offset = index * typeSize;
 		dst[offset++] = (short) (ms >> 8);
 		dst[offset++] = (short) (ms & 0xff);
-		dst[offset++] = (short) (yRaw >> 8);
-		dst[offset++] = (short) (yRaw & 0xff);
 		dst[offset++] = (short) (xRaw >> 8);
 		dst[offset++] = (short) (xRaw & 0xff);
+		dst[offset++] = (short) (yRaw >> 8);
+		dst[offset++] = (short) (yRaw & 0xff);
 		dst[offset++] = brightnessRaw;
 		dst[offset] = (short) valid;
 	}
@@ -300,10 +300,10 @@ public class DptXlatorXyYTransition extends DPTXlator {
 		final int xUnscaled = unscaled(x);
 		final int yUnscaled = unscaled(y);
 
-		data[2] = ubyte(yUnscaled >> 8);
-		data[3] = ubyte(yUnscaled);
-		data[4] = ubyte(xUnscaled >> 8);
-		data[5] = ubyte(xUnscaled);
+		data[2] = ubyte(xUnscaled >> 8);
+		data[3] = ubyte(xUnscaled);
+		data[4] = ubyte(yUnscaled >> 8);
+		data[5] = ubyte(yUnscaled);
 		data[7] |= 0b10;
 	}
 
