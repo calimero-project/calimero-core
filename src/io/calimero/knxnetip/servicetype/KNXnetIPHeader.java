@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -156,11 +156,6 @@ public class KNXnetIPHeader
 	 */
 	public static final int RoutingSystemBroadcast = 0x0533;
 
-	/**
-	 * Version identifier for KNXnet/IP protocol version 1.0.
-	 */
-	public static final int KNXNETIP_VERSION_10 = 0x10;
-
 	// Search for KNX IP Secure Unicasts Setups
 
 	public static final int SearchRequest = 0x20b;
@@ -187,8 +182,12 @@ public class KNXnetIPHeader
 	public static final int ObjectServerRequest = 0xf080;
 	public static final int ObjectServerAck = 0xf081;
 
+	/**
+	 * Version identifier for KNXnet/IP protocol version 1.0.
+	 */
+	public static final int KNXNETIP_VERSION_10 = 0x10;
 
-	private static final int HEADER_SIZE_10 = 0x06;
+	static final int HEADER_SIZE_10 = 0x06;
 
 	private final int headersize;
 	private final int service;
@@ -207,7 +206,13 @@ public class KNXnetIPHeader
 
 		final int version = buf.get() & 0xFF;
 		final int service = buf.getShort() & 0xffff;
+		final int expectedVersion = version(service);
+		if (version != expectedVersion)
+			throw new KNXFormatException("unsupported KNXnet/IP protocol version %d.%d (expected %d.%d)"
+					.formatted(version >> 4, version & 0xf, expectedVersion >> 4, expectedVersion & 0xf));
 		final int totalsize = buf.getShort() & 0xffff;
+		if (totalsize < HEADER_SIZE_10)
+			throw new KNXFormatException("KNXnet/IP header contains invalid total length < %d".formatted(HEADER_SIZE_10), totalsize);
 		return new KNXnetIPHeader(service, version, totalsize - HEADER_SIZE_10);
 	}
 
@@ -238,11 +243,10 @@ public class KNXnetIPHeader
 			throw new KNXFormatException("unsupported header size, expected " + HEADER_SIZE_10, headersize);
 		final int expectedVersion = version(service);
 		if (version != expectedVersion)
-			throw new KNXFormatException(
-					String.format("unsupported KNXnet/IP protocol version, expected 0x%1h", expectedVersion), version);
+			throw new KNXFormatException("unsupported KNXnet/IP protocol version %d.%d (expected %d.%d)"
+					.formatted(version >> 4, version & 0xf, expectedVersion >> 4, expectedVersion & 0xf));
 		if (totalsize < HEADER_SIZE_10)
-			throw new KNXFormatException(
-					String.format("KNXnet/IP header contains invalid total length < %d", HEADER_SIZE_10), totalsize);
+			throw new KNXFormatException("KNXnet/IP header contains invalid total length < %d".formatted(HEADER_SIZE_10), totalsize);
 	}
 
 	/**
