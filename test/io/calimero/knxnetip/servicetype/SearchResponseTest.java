@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2018, 2025 B. Malinowsky
+    Copyright (c) 2018, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,13 +41,10 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.calimero.IndividualAddress;
@@ -64,10 +61,11 @@ import io.calimero.knxnetip.util.TunnelingDib;
 import io.calimero.knxnetip.util.TunnelingDib.SlotStatus;
 
 class SearchResponseTest {
-	private final HPAI hpai = new HPAI(null, 0);
+	private static final HPAI hpai = new HPAI(null, 1);
 
-	private DeviceDIB device;
-	private final ServiceFamiliesDIB svcFamilies = new ServiceFamiliesDIB(
+	private static final DeviceDIB device = new DeviceDIB("test", 0, 0, DeviceDIB.MEDIUM_TP1, new IndividualAddress(1234),
+			SerialNumber.Zero, KNXnetIPRouting.DefaultMulticast, new byte[6]);
+	private static final ServiceFamiliesDIB svcFamilies = new ServiceFamiliesDIB(
 			Map.of(ServiceFamily.Core, 1, ServiceFamily.DeviceManagement, 1, ServiceFamily.Tunneling, 1));
 
 	private static final Map<ServiceFamily, Integer> families = Map.of(ServiceFamily.DeviceManagement, 1, ServiceFamily.Tunneling, 1);
@@ -76,11 +74,6 @@ class SearchResponseTest {
 	private final TunnelingDib tunneling = new TunnelingDib(
 			Map.of(new IndividualAddress(1, 2, 3), EnumSet.of(SlotStatus.Free)));
 
-	@BeforeEach
-	void init() throws UnknownHostException {
-		device = new DeviceDIB("test", 0, 0, DeviceDIB.MEDIUM_TP1, new IndividualAddress(1234), SerialNumber.Zero,
-				InetAddress.getByName(KNXnetIPRouting.DEFAULT_MULTICAST), new byte[6]);
-	}
 
 	@Test
 	void structLengthOfBasicResponse() {
@@ -160,5 +153,34 @@ class SearchResponseTest {
 		dib = new TunnelingDib(Map.of(new IndividualAddress(1, 2, 3), EnumSet.allOf(SlotStatus.class)));
 		bytes = new byte[]{(byte) 0x08, (byte) 0x07, (byte) 0x00, (byte) 0xfe, (byte) 0x12, (byte) 0x03, (byte) 0xff, (byte) 0xff};
 		assertArrayEquals(bytes, dib.toByteArray());
+	}
+
+	@Test
+	void rejectNonUdpSearchResponse() throws KNXFormatException {
+		assertThrows(KNXIllegalArgumentException.class, () -> new SearchResponse(HPAI.Tcp, device, svcFamilies));
+		assertThrows(KNXIllegalArgumentException.class, () -> new SearchResponse(false, HPAI.Tcp, List.of(device, svcFamilies)));
+		assertThrows(KNXIllegalArgumentException.class, () -> new SearchResponse(true, HPAI.Tcp, List.of(device, svcFamilies)));
+
+		// test tcp response, other host protocols not in {UDP, TCP} are already rejected by HPAI
+		{
+			final byte[] packet = tcpResponse(false); // std response
+			final var hdr = new KNXnetIPHeader(packet, 0);
+			assertThrows(KNXFormatException.class, () -> SearchResponse.from(hdr, packet, hdr.getStructLength()));
+			assertThrows(KNXFormatException.class, () -> new SearchResponse(packet, hdr.getStructLength(),
+					hdr.getTotalLength() - hdr.getStructLength()));
+		}
+		{
+			final byte[] packet = tcpResponse(true); // ext response
+			final var hdr = new KNXnetIPHeader(packet, 0);
+			assertThrows(KNXFormatException.class, () -> SearchResponse.from(hdr, packet, hdr.getStructLength()));
+		}
+	}
+
+	private static byte[] tcpResponse(final boolean extended) {
+		final var res = new SearchResponse(extended, hpai, List.of(device, svcFamilies));
+		final byte[] packet = PacketHelper.toPacket(res);
+		final byte[] hpai = HPAI.Tcp.toByteArray();
+		System.arraycopy(hpai, 0, packet, KNXnetIPHeader.HEADER_SIZE_10, hpai.length);
+		return packet;
 	}
 }

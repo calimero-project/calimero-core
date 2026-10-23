@@ -98,6 +98,8 @@ public class SearchResponse extends ServiceType
 	private SearchResponse(final int svcType, final byte[] data, final int offset, final int length) throws KNXFormatException {
 		super(svcType);
 		endpt = HPAI.from(data, offset);
+		if (endpt.hostProtocol() != HPAI.IPV4_UDP)
+			throw new KNXFormatException("search response requires a UDP endpoint address", endpt.toString());
 		desc = new DescriptionResponse(data, offset + endpt.getStructLength(), length - endpt.getStructLength());
 	}
 
@@ -121,6 +123,8 @@ public class SearchResponse extends ServiceType
 	 */
 	public SearchResponse(final boolean ext, final HPAI ctrlEndpoint, final List<DIB> dibs) {
 		super(ext ? KNXnetIPHeader.SearchResponse : KNXnetIPHeader.SEARCH_RES);
+		if (ctrlEndpoint.hostProtocol() != HPAI.IPV4_UDP)
+			throw new KNXIllegalArgumentException("search response requires a UDP endpoint address: " + ctrlEndpoint);
 		endpt = ctrlEndpoint;
 		if (!ext) {
 			if (dibs.size() < 2)
