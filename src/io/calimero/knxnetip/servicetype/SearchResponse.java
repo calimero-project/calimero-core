@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -108,11 +108,8 @@ public class SearchResponse extends ServiceType
 	 * @param device server device description information
 	 * @param svcFamilies supported service families by the server
 	 */
-	public SearchResponse(final HPAI ctrlEndpoint, final DeviceDIB device, final ServiceFamiliesDIB svcFamilies)
-	{
-		super(KNXnetIPHeader.SEARCH_RES);
-		endpt = ctrlEndpoint;
-		desc = new DescriptionResponse(device, svcFamilies);
+	public SearchResponse(final HPAI ctrlEndpoint, final DeviceDIB device, final ServiceFamiliesDIB svcFamilies) {
+		this(false, ctrlEndpoint, List.of(device, svcFamilies));
 	}
 
 	/**
