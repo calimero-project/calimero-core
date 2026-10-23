@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -178,7 +178,7 @@ public record HPAI(int hostProtocol, InetSocketAddress endpoint) {
 	 * {@return {@code true} if this HPAI indicates NAT (for UDP NAT), {@code false} otherwise}
 	 */
 	public boolean nat() {
-		return endpoint.getAddress().isAnyLocalAddress() || endpoint.getPort() == 0;
+		return hostProtocol == IPV4_UDP && (endpoint.getAddress().isAnyLocalAddress() || endpoint.getPort() == 0);
 	}
 
 	/**
