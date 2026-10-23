@@ -51,10 +51,10 @@ import io.calimero.knxnetip.util.ServiceFamiliesDIB;
  * Represents a KNXnet/IP search response.
  * <p>
  * Such a response is used during device discovery and sent in reply to a search request.
- * It contains one server control endpoint and self-description of the server device.<br>
- * An answering server, supporting more than one KNX connections at the same time, sends a
- * single search response for each of its control endpoints, i.e., one response for one
- * control endpoint.
+ * It contains one server control endpoint or a KNX IP device endpoint, as well as self-description of the server/device.<br>
+ * An answering server sends a single search response for each of its control endpoints, i.e., one response for one
+ * control endpoint.<br>
+ * Supports both KNXnet/IP version 1 search responses and version 2 extended search responses.
  * <p>
  * Objects of this type are immutable.
  *

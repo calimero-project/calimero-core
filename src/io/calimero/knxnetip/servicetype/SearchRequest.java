@@ -1,7 +1,7 @@
 /*
     Calimero 3 - A library for KNX network access
     Copyright (c) 2005 B. Erb
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
     Copyright (c) 2018 Karsten Heimrich
 
     This program is free software; you can redistribute it and/or modify
@@ -53,9 +53,9 @@ import io.calimero.knxnetip.util.Srp;
  * Represents a KNXnet/IP search request.
  * <p>
  * Such request is sent during KNXnet/IP device discovery destined to the discovery
- * endpoint of listening servers. The communication is done multicast, i.e., using the UDP
- * transport protocol.<br>
- * The counterpart sent in reply to the request are search responses.
+ * endpoint of listening servers and KNX IP devices.<br>
+ * Supports both KNXnet/IP version 1 search requests and version 2 extended search requests.<br>
+ * The counterpart sent in reply to a search request are search responses.
  * <p>
  * Objects of this type are immutable.
  *
@@ -139,7 +139,7 @@ public class SearchRequest extends ServiceType
 	}
 
 	/**
-	 * Creates a new search request with the given response address and search parameters.
+	 * Creates a new extended search request with the given response address and search parameters.
 	 *
 	 * @param responseAddr address of the client discovery endpoint used for the response; to create a NAT aware search
 	 *        request, use the anylocal/wildcard address with port 0 ({@code new InetSocketAddress(0)})
@@ -177,7 +177,8 @@ public class SearchRequest extends ServiceType
 	}
 
 	/**
-	 * {@return unmodifiable list of search request parameter (SRP) blocks}
+	 * {@return an unmodifiable list of search request parameter (SRP) blocks used with an extended search request;
+	 * empty list for a KNXnet/IP version 1 search request}
 	 */
 	public final List<Srp> searchParameters() {
 		return Collections.unmodifiableList(srps);
