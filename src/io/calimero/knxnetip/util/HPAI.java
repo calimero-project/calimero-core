@@ -116,13 +116,13 @@ public record HPAI(int hostProtocol, InetSocketAddress endpoint) {
 		final int port = ((data[i++] & 0xFF) << 8) | data[i] & 0xFF;
 
 		try {
-			return new HPAI(hostProtocol, InetAddress.getByAddress(address), port);
+			return new HPAI(hostProtocol, new InetSocketAddress(InetAddress.getByAddress(address), port));
 		} catch (UnknownHostException | KNXIllegalArgumentException e) {
 			throw new KNXFormatException(e.getMessage());
 		}
 	}
 
-	public HPAI(final UdpEndpointAddress addr) { this(IPV4_UDP, addr.address()); }
+	public HPAI(final UdpEndpointAddress addr) { this(IPV4_UDP, validateEndpoint(IPV4_UDP, addr.address())); }
 
 	/**
 	 * Creates a HPAI for UDP communication with the given address information, using UDP as communication mode
@@ -147,7 +147,21 @@ public record HPAI(int hostProtocol, InetSocketAddress endpoint) {
 	 * @param port         local port number to set, 0 &lt;= {@code port} &lt;= 0xFFFF
 	 */
 	public HPAI(final int hostProtocol, final InetAddress addr, final int port) {
-		this(hostProtocol, new InetSocketAddress(addr, port));
+		this(hostProtocol, validateEndpoint(hostProtocol, new InetSocketAddress(addr, port)));
+	}
+
+	// UDP: require both IP and port to be initialized to non-zero values, unless this is a route-back HPAI.
+	// NAT requires a route-back HPAI, but for backwards compatibility, _parsing_ a HPAI
+	// also accepts only IP or port zeroed out; so don't do this validation in the canonical constructor.
+	private static InetSocketAddress validateEndpoint(final int hostProtocol, final InetSocketAddress endpoint) {
+		if (hostProtocol == IPV4_UDP) {
+			final boolean anyLocal = endpoint.getAddress().isAnyLocalAddress();
+			if (anyLocal && endpoint.getPort() != 0)
+				throw new KNXIllegalArgumentException(endpoint.getAddress() + " is a wildcard IP address");
+			if (!anyLocal && endpoint.getPort() == 0)
+				throw new KNXIllegalArgumentException("UDP port is 0");
+		}
+		return endpoint;
 	}
 
 	public HPAI {
@@ -159,8 +173,6 @@ public record HPAI(int hostProtocol, InetSocketAddress endpoint) {
 			throw new KNXIllegalArgumentException(endpoint + " is an unresolved IP address");
 		if (!(a instanceof Inet4Address))
 			throw new KNXIllegalArgumentException(a + " is not an IPv4 address");
-		if (a.isAnyLocalAddress() && endpoint.getPort() != 0)
-			throw new KNXIllegalArgumentException(a + " is a wildcard IP address");
 		if (hostProtocol == IPV4_TCP && !routeBack(endpoint))
 			throw new KNXIllegalArgumentException("HPAI for TCP does not contain route-back endpoint: " + hostPort(endpoint));
 	}

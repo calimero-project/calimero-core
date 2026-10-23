@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2019, 2025 B. Malinowsky
+    Copyright (c) 2019, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,11 +44,19 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
+import io.calimero.KNXIllegalArgumentException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.calimero.KNXFormatException;
 
 class HPAITest {
+	private InetAddress iaddr;
+
+	@BeforeEach
+	void setUp() throws UnknownHostException {
+		iaddr = InetAddress.getByName("192.168.10.1");
+	}
 
 	@Test
 	void validTcpHpai() throws KNXFormatException {
@@ -57,17 +65,18 @@ class HPAITest {
 
 	@Test
 	void tcpHpaiWithNonZeroPort() throws UnknownHostException {
-		final var addr = InetAddress.getByName("192.168.10.1");
-		final var data = new HPAI(HPAI.IPV4_UDP, new InetSocketAddress(addr, 1)).toByteArray();
-		data[1] = HPAI.IPV4_TCP;
+		final var data = HPAI.Tcp.toByteArray();
+		data[6] = 1;
+		assertThrows(KNXFormatException.class, () -> HPAI.from(data, 0));
+		data[6] = 0;
+		data[7] = 1;
 		assertThrows(KNXFormatException.class, () -> HPAI.from(data, 0));
 	}
 
 	@Test
 	void tcpHpaiWithInvalidIpAddress() throws UnknownHostException {
-		final var addr = InetAddress.getByName("192.168.10.1");
-		final var data = new HPAI(HPAI.IPV4_UDP, new InetSocketAddress(addr, 0)).toByteArray();
-		data[1] = HPAI.IPV4_TCP;
+		final var data = HPAI.Tcp.toByteArray();
+		System.arraycopy(iaddr.getAddress(), 0, data, 2, iaddr.getAddress().length);
 		assertThrows(KNXFormatException.class, () -> HPAI.from(data, 0));
 	}
 
@@ -85,13 +94,32 @@ class HPAITest {
 	}
 
 	@Test
-	void natHpai() throws UnknownHostException {
-		final var addr = InetAddress.getByName("192.168.10.1");
-		assertTrue(new HPAI(HPAI.IPV4_UDP, new InetSocketAddress(addr, 0)).nat());
+	void rejectNatWithNonZeroIpAndZeroPort() {
+		assertThrows(KNXIllegalArgumentException.class, () -> new HPAI(HPAI.IPV4_UDP, iaddr, 0));
 	}
 
 	@Test
-	void nonRouteBackHpai() throws UnknownHostException {
-		assertFalse(new HPAI(HPAI.IPV4_UDP, InetAddress.getByName("127.0.0.1"), 1234).isRouteBack());
+	void rejectNatWithZeroIpAndNonZeroPort() {
+		assertThrows(KNXIllegalArgumentException.class,
+				() -> new HPAI(HPAI.IPV4_UDP, InetAddress.getByAddress(new byte[4]), 0xffff));
+	}
+
+	@Test
+	void parsingNatAllowsNonZeroIpAndZeroPort() throws KNXFormatException {
+		final byte[] hpai = HPAI.Nat.toByteArray();
+		System.arraycopy(iaddr.getAddress(), 0, hpai, 2, iaddr.getAddress().length);
+		assertTrue(HPAI.from(hpai, 0).nat());
+	}
+
+	@Test
+	void parsingNatAllowsZeroIpAndNonZeroPort() throws KNXFormatException {
+		final byte[] hpai = HPAI.Nat.toByteArray();
+		hpai[7] = 1;
+		assertTrue(HPAI.from(hpai, 0).nat());
+	}
+
+	@Test
+	void nonRouteBackHpai() {
+		assertFalse(new HPAI(HPAI.IPV4_UDP, iaddr, 1234).isRouteBack());
 	}
 }
