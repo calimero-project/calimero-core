@@ -321,6 +321,10 @@ public class Discoverer
 				: Net.onSameSubnet(serverControlEndpoint.getAddress()).orElseGet(Discoverer::localHost);
 		try {
 			final var dc = newChannel(new InetSocketAddress(addr, port));
+			// in case we have not set a local address (primarily with NAT), let connect()
+			// look up a route to the server and select a local address for the channel
+			if (((InetSocketAddress) dc.getLocalAddress()).getAddress().isAnyLocalAddress())
+				dc.connect(serverControlEndpoint);
 			// create a new socket address with host, since the socket might
 			// return the wildcard address for loopback or default host address; but port
 			// is necessarily queried from socket since it might have been 0 before (for ephemeral port)
@@ -597,7 +601,13 @@ public class Discoverer
 		final var bind = new InetSocketAddress(nat ? anyLocalIPv4Address()
 				: Net.onSameSubnet(server.getAddress()).orElse(localhost), port);
 		try (var dc = newChannel(bind)) {
-			final var local = (InetSocketAddress) dc.getLocalAddress();
+			var local = (InetSocketAddress) dc.getLocalAddress();
+			// in case we have not set a local address (primarily with NAT), let connect()
+			// look up a route to the server and select a local address for the channel
+			if (local.getAddress().isAnyLocalAddress()) {
+				dc.connect(server);
+				local = (InetSocketAddress) dc.getLocalAddress();
+			}
 			final byte[] buf = PacketHelper.toPacket(nat ? DescriptionRequest.Nat : new DescriptionRequest(local));
 			dc.send(ByteBuffer.wrap(buf), server);
 			final ReceiverLoop looper = new ReceiverLoop(dc, 512, Duration.ofSeconds(timeout), server);
