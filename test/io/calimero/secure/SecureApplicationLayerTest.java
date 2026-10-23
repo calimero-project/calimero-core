@@ -329,6 +329,11 @@ class SecureApplicationLayerTest {
 		final long neg = -1;
 		assertThrows(KNXIllegalArgumentException.class, () -> new SecureApplicationLayer.SequenceNumbers(neg, 0, Map.of(), Map.of()));
 		assertThrows(KNXIllegalArgumentException.class, () -> new SecureApplicationLayer.SequenceNumbers(0, neg, Map.of(), Map.of()));
+
+		assertThrows(KNXIllegalArgumentException.class, () -> new SecureApplicationLayer.SequenceNumbers(0, 0,
+				Map.of(remote, neg), Map.of()));
+		assertThrows(KNXIllegalArgumentException.class, () -> new SecureApplicationLayer.SequenceNumbers(0, 0,
+				Map.of(), Map.of(remote, neg)));
 	}
 
 	@Test
@@ -339,6 +344,11 @@ class SecureApplicationLayerTest {
 		new SecureApplicationLayer.SequenceNumbers(0, max, Map.of(), Map.of());
 		assertThrows(KnxSecureException.class, () -> new SecureApplicationLayer.SequenceNumbers(exceed, 0, Map.of(), Map.of()));
 		assertThrows(KnxSecureException.class, () -> new SecureApplicationLayer.SequenceNumbers(0, exceed, Map.of(), Map.of()));
+
+		assertThrows(KnxSecureException.class, () -> new SecureApplicationLayer.SequenceNumbers(0, 0,
+				Map.of(remote, exceed), Map.of()));
+		assertThrows(KnxSecureException.class, () -> new SecureApplicationLayer.SequenceNumbers(0, 0,
+				Map.of(), Map.of(remote, exceed)));
 	}
 
 	@Test

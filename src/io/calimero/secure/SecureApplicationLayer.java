@@ -136,8 +136,12 @@ public class SecureApplicationLayer implements AutoCloseable {
 			validateSequenceNumber(sequenceNumberToolAccess, true);
 
 			sequenceNumberToolAccess = Math.max(1, sequenceNumberToolAccess);
+
 			lastValidSequenceNumbers = Map.copyOf(lastValidSequenceNumbers);
+			lastValidSequenceNumbers.forEach((addr, seq) -> validateSequenceNumber(seq, false, addr));
+
 			lastValidSequenceNumbersToolAccess = Map.copyOf(lastValidSequenceNumbersToolAccess);
+			lastValidSequenceNumbersToolAccess.forEach((addr, seq) -> validateSequenceNumber(seq, true, addr));
 		}
 	}
 
@@ -821,12 +825,18 @@ public class SecureApplicationLayer implements AutoCloseable {
 	}
 
 	private static void validateSequenceNumber(final long seq, final boolean toolAccess) {
+		validateSequenceNumber(seq, toolAccess, null);
+	}
+
+	private static void validateSequenceNumber(final long seq, final boolean toolAccess, final IndividualAddress addr) {
 		final String seqType = toolAccess ? "tool access " : "";
+		final String addrPrefix = addr != null ? addr + " " : "";
 		if (seq < 0)
-			throw new KNXIllegalArgumentException("negative %ssecurity sequence number %d".formatted(seqType, seq));
+			throw new KNXIllegalArgumentException("%snegative %ssecurity sequence number %d"
+					.formatted(addrPrefix, seqType, seq));
 		if (seq > MaxSequenceNumber)
-			throw new KnxSecureException("security %ssequence number %d exceeds maximum 0x%x"
-					.formatted(seqType, seq, MaxSequenceNumber));
+			throw new KnxSecureException("%ssecurity %ssequence number %d exceeds maximum 0x%x"
+					.formatted(addrPrefix, seqType, seq, MaxSequenceNumber));
 	}
 
 	// returns next outgoing sequence number for secure communication
@@ -853,7 +863,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 	}
 
 	protected void updateLastValidSequence(final boolean toolAccess, final IndividualAddress remote, final long seqNo) {
-		validateSequenceNumber(seqNo, toolAccess);
+		validateSequenceNumber(seqNo, toolAccess, remote);
 		if (toolAccess)
 			lastValidSequenceToolAccess.put(remote, seqNo);
 		else
