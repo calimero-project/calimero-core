@@ -1431,9 +1431,9 @@ public class ManagementClientImpl implements ManagementClient
 					if (apdu.length < minAsduLen + 2 || apdu.length > maxAsduLen + 2) {
 						final String s = "invalid ASDU response length " + (apdu.length - 2) + " bytes, expected "
 								+ minAsduLen + " to " + maxAsduLen;
-						logger.log(WARNING, "received response from " + source + " with " + s);
 						if (oneResponseOnly)
 							throw new KNXInvalidResponseException(s);
+						logger.log(WARNING, "received response from " + source + " with " + s);
 					}
 					responseFilter.apply(source, apdu).ifPresent(response -> {
 						responses.add(response);
