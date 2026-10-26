@@ -358,7 +358,7 @@ public class KNXnetIPTunnel extends ClientConnection
 				final boolean resync = "".equals(s) || "true".equalsIgnoreCase(s);
 				if (resync) {
 					logger.log(ERROR, "tunneling request with rcv-seq " + seq + ", expected " + getSeqRcv()
-							+ " -> re-sync with server (1 tunneled msg lost)");
+							+ " → re-sync with server (1 tunneled msg lost)");
 					incSeqRcv();
 				}
 			}
@@ -416,7 +416,7 @@ public class KNXnetIPTunnel extends ClientConnection
 		}
 		else if (mc == CEMILData.MC_LDATA_CON) {
 			// invariant: notify listener before return from blocking send
-			logger.log(DEBUG, "received request seq {0} (channel {1}) cEMI L-Data.con {2}->{3}", req.getSequenceNumber(),
+			logger.log(DEBUG, "received request seq {0} (channel {1}) cEMI L-Data.con {2}→{3}", req.getSequenceNumber(),
 					channelId, ((CEMILData) cemi).getSource(), ((CEMILData) cemi).getDestination());
 			// TODO move notification to after we know it's a valid .con (we should keep it out of the lock, though)
 			fireFrameReceived(cemi);

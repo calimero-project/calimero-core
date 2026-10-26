@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -318,7 +318,7 @@ public class CEMILDataEx extends CEMILData implements Cloneable
 	{
 		final String s = super.toString();
 		final StringBuilder buf = new StringBuilder(s.length() + 50);
-		buf.append(getSource()).append("->");
+		buf.append(getSource()).append("→");
 		// check LTE for destination
 		if ((ctrl2 & 0x04) == 0x04)
 			buf.append(LteHeeTag.from(ctrl2, (GroupAddress) getDestination())).append(" LTE");

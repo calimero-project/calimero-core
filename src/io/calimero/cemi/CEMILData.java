@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -466,7 +466,7 @@ public class CEMILData implements CEMI
 	public String toString()
 	{
 		final StringBuilder buf = new StringBuilder();
-		buf.append(source).append("->").append(dst);
+		buf.append(source).append("→").append(dst);
 		buf.append(" L_Data");
 		buf.append(mc == MC_LDATA_IND ? ".ind" : mc == MC_LDATA_REQ ? ".req" : ".con");
 		if (mc == MC_LDATA_CON)

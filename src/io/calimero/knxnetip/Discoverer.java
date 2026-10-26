@@ -329,7 +329,7 @@ public class Discoverer
 			// return the wildcard address for loopback or default host address; but port
 			// is necessarily queried from socket since it might have been 0 before (for ephemeral port)
 			final InetSocketAddress local = (InetSocketAddress) dc.getLocalAddress();
-			logger.log(DEBUG, "search {0} -> server control endpoint {1}", hostPort(local), hostPort(serverControlEndpoint));
+			logger.log(DEBUG, "search {0} → server control endpoint {1}", hostPort(local), hostPort(serverControlEndpoint));
 
 			final InetSocketAddress res = nat ? new InetSocketAddress(anyLocalIPv4Address(), 0) : local;
 

@@ -319,7 +319,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 		final var secCtrl = SecurityControl.of(DataSecurity.AuthConf, true);
 		final var secureApdu = secureData(address(), surrogate, apdu, secCtrl)
 				.orElseThrow(() -> new KnxSecureException("no device toolkey for " + address()));
-		logger.log(TRACE, "{0}->{1} GO diagnostics {2} {3}", address(), surrogate, service, HexFormat.ofDelimiter(" ").formatHex(value));
+		logger.log(TRACE, "{0}→{1} GO diagnostics {2} {3}", address(), surrogate, service, HexFormat.ofDelimiter(" ").formatHex(value));
 		send(surrogate, secureApdu);
 
 		final var future = new CompletableFuture<ReturnCode>().orTimeout(3, TimeUnit.SECONDS);
@@ -344,7 +344,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 			return;
 		final var returnCode = ReturnCode.of(data.get() & 0xff);
 		final int goService = data.get() & 0xff;
-		logger.log(TRACE, "{0}->{1} GO diagnostics {2} {3}", src, dst, goService, returnCode);
+		logger.log(TRACE, "{0}→{1} GO diagnostics {2} {3}", src, dst, goService, returnCode);
 
 		final var future = pendingGoDiagnostics.get(src);
 		if (future != null)
@@ -486,7 +486,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 		}
 		catch (final GeneralSecurityException e) {
 			securityFailure(CryptoError, src, dst, seqSend);
-			throw new KnxSecureException(format("securing %s->%s", src, dst), e);
+			throw new KnxSecureException(format("securing %s→%s", src, dst), e);
 		}
 
 		return Optional.of(secureApdu.array());
@@ -592,7 +592,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 		// using tool access for group service where a group key is available is considered an attack
 		if (isGroupDst && toolAccess) {
 			securityFailure(AccessAndRoleError, src, dst, receivedSeq);
-			throw new KnxSecureException(format("%s->%s group service with tool access", src, dst));
+			throw new KnxSecureException(format("%s→%s group service with tool access", src, dst));
 		}
 
 		final byte[] sno = new byte[6];
@@ -600,7 +600,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 			if (isGroupDst) {
 				final var senders = security.groupSenders(address()).get(dst);
 				if (senders != null && !senders.isEmpty() && !senders.contains(src)) {
-					logger.log(TRACE, "{0}->{1} sender not in group sender list of {2}, ignore", src, dst, address());
+					logger.log(TRACE, "{0}→{1} sender not in group sender list of {2}, ignore", src, dst, address());
 					return new SalService(securityCtrl, new byte[0]);
 				}
 			}
@@ -608,7 +608,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 			final long expectedSeq = lastValidSequenceNumber(toolAccess, src) + 1;
 			if (receivedSeq < expectedSeq) {
 				securityFailure(SeqNoError, src, dst, receivedSeq);
-				throw new KnxSecureException(format("%s->%s received sequence number %d < %d (expected)", src, dst,
+				throw new KnxSecureException(format("%s→%s received sequence number %d < %d (expected)", src, dst,
 						receivedSeq, expectedSeq));
 			}
 		}
@@ -634,7 +634,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 
 		final var s = service == SecureSyncRequest ? "sync.req"
 				: service == SecureSyncResponse ? "sync.res" : "S-A_Data";
-		logger.log(DEBUG, "{0}->{1} decrypt {2} ({3})", src, dst, s, securityCtrl);
+		logger.log(DEBUG, "{0}→{1} decrypt {2} ({3})", src, dst, s, securityCtrl);
 
 		final byte[] apdu = new byte[asdu.remaining() - MacSize];
 		asdu.get(apdu);
@@ -656,7 +656,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 			}
 			catch (final GeneralSecurityException e) {
 				securityFailure(CryptoError, src, dst, receivedSeq);
-				throw new KnxSecureException(format("calculating MAC %s->%s", src, dst), e);
+				throw new KnxSecureException(format("calculating MAC %s→%s", src, dst), e);
 			}
 		}
 		else { // auth+conf
@@ -667,7 +667,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 			}
 			catch (final GeneralSecurityException e) {
 				securityFailure(CryptoError, src, dst, receivedSeq);
-				throw new KnxSecureException(format("decrypting %s->%s", src, dst), e);
+				throw new KnxSecureException(format("decrypting %s→%s", src, dst), e);
 			}
 
 			final var decryptedMac = Arrays.copyOfRange(decrypted, 0, MacSize);
@@ -683,7 +683,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 			}
 			catch (final GeneralSecurityException e) {
 				securityFailure(CryptoError, src, dst, receivedSeq);
-				throw new KnxSecureException(format("calculating MAC %s->%s", src, dst), e);
+				throw new KnxSecureException(format("calculating MAC %s→%s", src, dst), e);
 			}
 
 			// prevent a sync.req sent by us to trigger sync notification, this happens if we provide our own tool key
@@ -704,11 +704,11 @@ public class SecureApplicationLayer implements AutoCloseable {
 		}
 
 		if (src.equals(address())) {
-			logger.log(TRACE, "update next {0}seq -> {1}", toolAccess ? "tool access " : "", receivedSeq + 1);
+			logger.log(TRACE, "update next {0}seq → {1}", toolAccess ? "tool access " : "", receivedSeq + 1);
 			updateSequenceNumber(toolAccess, receivedSeq + 1);
 		}
 		else {
-			logger.log(TRACE, "update last valid {0}seq of {1} -> {2}", toolAccess ? "tool access " : "", src, receivedSeq);
+			logger.log(TRACE, "update last valid {0}seq of {1} → {2}", toolAccess ? "tool access " : "", src, receivedSeq);
 			updateLastValidSequence(toolAccess, src, receivedSeq);
 		}
 
@@ -718,7 +718,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 
 		if (!checkAccess(dst, plainService, securityCtrl)) {
 			securityFailure(AccessAndRoleError, src, dst, receivedSeq);
-			throw new KnxSecureException(format("%s->%s denied access for %s (%s)", src, dst,
+			throw new KnxSecureException(format("%s→%s denied access for %s (%s)", src, dst,
 					DataUnitBuilder.decodeAPCI(plainService), securityCtrl));
 		}
 		return new SalService(securityCtrl, plainApdu);
@@ -728,7 +728,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 			final KNXAddress dst, final long receivedSeq) {
 		if (!Arrays.equals(calculated, mac)) {
 			securityFailure(CryptoError, src, dst, receivedSeq);
-			throw new KnxSecureException(format("MAC mismatch %s->%s", src, dst));
+			throw new KnxSecureException(format("MAC mismatch %s→%s", src, dst));
 		}
 	}
 
@@ -940,7 +940,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 			updateLastValidSequence(toolAccess, src, nextRemoteSeq - 1);
 			nextSeq = nextRemoteSeq;
 		}
-		logger.log(DEBUG, "{0}->{1} {2}sync.req with {3}seq {4} (next {5}), challenge {6}", src, dst,
+		logger.log(DEBUG, "{0}→{1} {2}sync.req with {3}seq {4} (next {5}), challenge {6}", src, dst,
 				sysBcast ? "SBC " : "", tool, nextRemoteSeq, nextSeq, challenge);
 		syncChallenge.set(challenge);
 		final var secCtrl = sysBcast ? SecurityControl.SystemBroadcast
@@ -954,13 +954,13 @@ public class SecureApplicationLayer implements AutoCloseable {
 
 		final long last = lastValidSequenceNumber(toolAccess, remote);
 		if (remoteSeq - 1 > last) {
-			logger.log(DEBUG, "sync.res update {0} last valid {1} seq -> {2}", remote, toolAccess ? "tool access" : "p2p", remoteSeq -1);
+			logger.log(DEBUG, "sync.res update {0} last valid {1} seq → {2}", remote, toolAccess ? "tool access" : "p2p", remoteSeq -1);
 			updateLastValidSequence(toolAccess, remote, remoteSeq - 1);
 		}
 
 		final long next = nextSequenceNumber(toolAccess);
 		if (localSeq > next) {
-			logger.log(DEBUG, "sync.res update local next {0} seq -> {1}", toolAccess ? "tool access" : "p2p", localSeq);
+			logger.log(DEBUG, "sync.res update local next {0} seq → {1}", toolAccess ? "tool access" : "p2p", localSeq);
 			updateSequenceNumber(toolAccess, localSeq);
 		}
 	}
@@ -980,7 +980,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 				send(sendDst, response);
 			}
 			catch (KNXTimeoutException | KNXLinkClosedException e) {
-				logger.log(WARNING, MessageFormat.format("error sending sync.res {0}->{1}", address(), sendDst), e);
+				logger.log(WARNING, MessageFormat.format("error sending sync.res {0}→{1}", address(), sendDst), e);
 			}
 		});
 	}
@@ -1026,7 +1026,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 		}
 		if (systemBroadcast) {
 			if (!toolAccess)
-				throw new KnxSecureException("%s->%s system broadcast requires tool access".formatted(src, dst));
+				throw new KnxSecureException("%s→%s system broadcast requires tool access".formatted(src, dst));
 			if (authOnly)
 				logger.log(WARNING, "auth-only system broadcast not supported");
 		}

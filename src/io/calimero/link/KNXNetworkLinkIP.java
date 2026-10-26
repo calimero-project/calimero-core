@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -521,10 +521,10 @@ public class KNXNetworkLinkIP extends AbstractLink<KNXnetIPConnection>
 			conn.send(msg, waitForCon ? WaitForCon : WaitForAck);
 
 			if (msg instanceof final CEMILData data)
-				logger.log(TRACE, "send {0}->{1} succeeded", data.getSource(),
+				logger.log(TRACE, "send {0}→{1} succeeded", data.getSource(),
 						data.getDestination());
 			else
-				logger.log(TRACE, "send {0}->{1} succeeded", "local", conn.remoteAddress());
+				logger.log(TRACE, "send {0}→{1} succeeded", "local", conn.remoteAddress());
 		}
 		catch (final InterruptedException e) {
 			close();

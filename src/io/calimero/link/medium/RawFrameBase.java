@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2024 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -199,7 +199,7 @@ public abstract class RawFrameBase implements RawFrame
 		final var dstAddr = lte ? LteHeeTag.from(eff, (GroupAddress) dst) : dst;
 
 		final StringBuilder sb = new StringBuilder();
-		sb.append(src).append("->").append(dstAddr);
+		sb.append(src).append("→").append(dstAddr);
 		sb.append(type == LDATA_FRAME ? " L-Data" : " L-Polldata").append(".req");
 		if (ext)
 			sb.append(" (ext)");

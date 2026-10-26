@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2015, 2025 B. Malinowsky
+    Copyright (c) 2015, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -404,7 +404,7 @@ public class RFLData implements RawFrame
 		if (lteExt)
 			sb.append("LTE ");
 		sb.append(getFrameType(ctrl >>> 4));
-		sb.append(" ").append(src).append("->");
+		sb.append(" ").append(src).append("→");
 		if (lteExt)
 			sb.append(LteHeeTag.from(ctrl, (GroupAddress) dst));
 		else
