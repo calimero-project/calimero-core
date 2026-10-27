@@ -1576,7 +1576,7 @@ public class ManagementClientImpl implements ManagementClient
 				catch (KNXRemoteException | KNXTimeoutException | KNXDisconnectException ignore) {}
 			}
 		}
-		return EnumSet.copyOf(supported);
+		return supported.isEmpty() ? EnumSet.noneOf(SupportedServiceGroup.class) : EnumSet.copyOf(supported);
 	}
 
 	int maxApduLength(final Destination dst) throws KNXLinkClosedException, InterruptedException {
