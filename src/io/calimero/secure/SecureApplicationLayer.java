@@ -51,7 +51,6 @@ import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.HashSet;
 import java.util.HexFormat;
 import java.util.Map;
@@ -460,10 +459,8 @@ public class SecureApplicationLayer implements AutoCloseable {
 			associatedData.put(sno);
 		}
 		else if (syncRes) {
-			final BitSet rndXorChallenge = BitSet.valueOf(seqOrRand);
 			final ByteBuffer challenge = sixBytes(syncChallenge.get());
-			rndXorChallenge.xor(BitSet.valueOf(challenge));
-			secureApdu.put(rndXorChallenge.toByteArray());
+			secureApdu.put(xor6(seqOrRand, challenge.array()));
 		}
 
 		final int extendedFrameFormat = 0;
@@ -626,10 +623,8 @@ public class SecureApplicationLayer implements AutoCloseable {
 		else if (syncRes) {
 			// in a sync.res, seq actually contains our challenge from sync.req xored with a random value
 			// extract the random value and store it in seq to use it for block0 and ctr0
-			final var challengeXorRandom = BitSet.valueOf(seq);
-			final var challenge = BitSet.valueOf(sixBytes(Objects.requireNonNull(request).challenge));
-			challengeXorRandom.xor(challenge);
-			seq = challengeXorRandom.toByteArray();
+			final var challenge = sixBytes(Objects.requireNonNull(request).challenge);
+			seq = xor6(seq, challenge.array());
 		}
 
 		final var s = service == SecureSyncRequest ? "sync.req"
@@ -1110,6 +1105,8 @@ public class SecureApplicationLayer implements AutoCloseable {
 	// b0: B0 or block counter 0
 	private static byte[] ccmBlock(final boolean b0, final byte[] seqOrRand, final IndividualAddress src,
 			final KNXAddress dst, final int extendedFrameFormat, final int tpci, final int apci, final int payloadLength) {
+		if (seqOrRand.length != 6)
+			throw new KNXIllegalArgumentException("invalid sequence/random length: " + seqOrRand.length + " bytes (expected 6)");
 		final ByteBuffer block = ByteBuffer.allocate(16);
 		block.put(seqOrRand);
 		block.put(src.toByteArray());
@@ -1150,5 +1147,12 @@ public class SecureApplicationLayer implements AutoCloseable {
 
 		cipher.init(Cipher.DECRYPT_MODE, secretKey, params);
 		return cipher.doFinal(input);
+	}
+
+	private static byte[] xor6(final byte[] a, final byte[] b) {
+		final byte[] r = new byte[6];
+		for (int i = 0; i < 6; i++)
+			r[i] = (byte) (a[i] ^ b[i]);
+		return r;
 	}
 }
