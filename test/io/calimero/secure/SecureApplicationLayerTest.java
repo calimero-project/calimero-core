@@ -40,6 +40,7 @@ import static io.calimero.DataUnitBuilder.fromHex;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.ByteBuffer;
 import java.util.HexFormat;
@@ -53,10 +54,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.calimero.DataUnitBuilder;
+import io.calimero.FrameEvent;
 import io.calimero.GroupAddress;
 import io.calimero.IndividualAddress;
 import io.calimero.KNXAddress;
 import io.calimero.KNXException;
+import io.calimero.Priority;
 import io.calimero.SerialNumber;
 import io.calimero.cemi.CEMILData;
 import io.calimero.link.AbstractLink;
@@ -359,5 +362,21 @@ class SecureApplicationLayerTest {
 		final long max = 0xffff_ffff_ffffL;
 		assertThrows(KnxSecureException.class,
 				() -> new SecureApplicationLayer(link, SerialNumber.Zero, max + 1, Map.of()));
+	}
+
+	@Test
+	void discardPlainFrameOnlyForGroupWithKey() {
+		final var withKey = new GroupAddress(1, 0, 4);
+		final var withoutKey = new GroupAddress(1, 0, 5);
+
+		try (var groupSal = new SecureApplicationLayer(link, Map.of(withKey, new byte[16]), Map.of(), Map.of())) {
+			assertTrue(groupSal.extract(plainGroupValueWrite(withKey)).isEmpty());
+			assertTrue(groupSal.extract(plainGroupValueWrite(withoutKey)).isPresent());
+		}
+	}
+
+	private FrameEvent plainGroupValueWrite(final GroupAddress dst) {
+		final byte[] tpdu = { 0, (byte) 0x81 };
+		return new FrameEvent(this, new CEMILData(CEMILData.MC_LDATA_IND, remote, dst, tpdu, Priority.LOW));
 	}
 }
