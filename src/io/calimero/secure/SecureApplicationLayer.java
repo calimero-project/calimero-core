@@ -522,8 +522,16 @@ public class SecureApplicationLayer implements AutoCloseable {
 				final var salData = extract(ldata);
 				if (salData.apdu().length == 0)
 					return Optional.empty();
-				if (salData.security() == SecurityControl.Plain)
+				if (salData.security() == SecurityControl.Plain) {
+					// a group with a key only accepts secured telegrams
+					if (ldata.getDestination() instanceof final GroupAddress group
+							&& security.groupKeys().containsKey(group)) {
+						logger.log(WARNING, "{0}->{1} plain telegram for a group with a key, ignore", ldata.getSource(),
+								group);
+						return Optional.empty();
+					}
 					return Optional.of(e);
+				}
 
 				final var plain = CEMIFactory.create(cemi.getMessageCode(), salData.apdu(), cemi);
 				final var extracted = new FrameEvent(e.getSource(), plain, e.systemBroadcast(),
