@@ -553,8 +553,18 @@ public final class Keyring {
 	 * @throws KnxSecureException if generating the secret key for the password hash fails
 	 */
 	public boolean verifySignature(final char[] keyringPassword) {
+		final var pwdHash = hashKeyringPwd(keyringPassword);
 		try {
-			return verifySignature(hashKeyringPwd(keyringPassword));
+			return signatureMatches(pwdHash);
+		}
+		finally {
+			Arrays.fill(pwdHash, (byte) 0);
+		}
+	}
+
+	boolean signatureMatches(final byte[] pwdHash) {
+		try {
+			return verifySignature(pwdHash);
 		}
 		catch (final GeneralSecurityException e) {
 			return false;
@@ -597,13 +607,19 @@ public final class Keyring {
 	public byte[] decryptKey(final byte[] input, final char[] keyringPassword) {
 		final var pwdHash = hashKeyringPwd(keyringPassword);
 		try {
+			return decryptKey(input, pwdHash);
+		}
+		finally {
+			Arrays.fill(pwdHash, (byte) 0);
+		}
+	}
+
+	byte[] decryptKey(final byte[] input, final byte[] pwdHash) {
+		try {
 			return aes128Cbc(input, pwdHash, createdHash);
 		}
 		catch (GeneralSecurityException | RuntimeException e) {
 			throw new KnxSecureException("decrypting key data", e);
-		}
-		finally {
-			Arrays.fill(pwdHash, (byte) 0);
 		}
 	}
 
@@ -733,7 +749,7 @@ public final class Keyring {
 		return range;
 	}
 
-	private static byte[] hashKeyringPwd(final char[] keyringPwd) {
+	static byte[] hashKeyringPwd(final char[] keyringPwd) {
 		try {
 			return pbkdf2WithHmacSha256(keyringPwd, keyringSalt);
 		}
