@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -183,7 +183,7 @@ public final class XmlResolver
 			}
 		if (count == 4) {
 			final byte[][] arrays = {
-			// UCS-4, big endian
+				// UCS-4, big endian
 				{ (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x3C },
 				// UCS-4, little endian
 				{ (byte) 0x3C, (byte) 0x00, (byte) 0x00, (byte) 0x00 },
