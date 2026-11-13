@@ -446,21 +446,21 @@ public class SecureApplicationLayer implements AutoCloseable {
 		if (seqSend == 0)
 			throw new KnxSecureException("0 is not a valid sequence number");
 		logger.log(TRACE, "use {0}sequence {1}", toolAccess ? "tool access " : "", seqSend);
-		final ByteBuffer seq = sixBytes(seqSend);
+		final byte[] seq = sixBytes(seqSend);
 		if (!syncRes)
 			secureApdu.put(seq);
 
 		final int associatedDataLen = syncReq ? 7 : secCtrl.security() == DataSecurity.AuthConf ? 1 : 1 + apdu.length;
 		final var associatedData = ByteBuffer.allocate(associatedDataLen).put((byte) scf);
-		final byte[] seqOrRand = seqOrRand(service, seq.array());
+		final byte[] seqOrRand = seqOrRand(service, seq);
 		if (syncReq) {
 			final byte[] sno = dstSno.array();
 			secureApdu.put(sno);
 			associatedData.put(sno);
 		}
 		else if (syncRes) {
-			final ByteBuffer challenge = sixBytes(syncChallenge.get());
-			secureApdu.put(xor6(seqOrRand, challenge.array()));
+			final byte[] challenge = sixBytes(syncChallenge.get());
+			secureApdu.put(xor6(seqOrRand, challenge));
 		}
 
 		final int extendedFrameFormat = 0;
@@ -623,8 +623,8 @@ public class SecureApplicationLayer implements AutoCloseable {
 		else if (syncRes) {
 			// in a sync.res, seq actually contains our challenge from sync.req xored with a random value
 			// extract the random value and store it in seq to use it for block0 and ctr0
-			final var challenge = sixBytes(Objects.requireNonNull(request).challenge);
-			seq = xor6(seq, challenge.array());
+			final byte[] challenge = sixBytes(Objects.requireNonNull(request).challenge);
+			seq = xor6(seq, challenge);
 		}
 
 		final var s = service == SecureSyncRequest ? "sync.req"
@@ -730,7 +730,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 	public CompletableFuture<Void> sendSyncRequest(final IndividualAddress remote, final boolean toolAccess)
 			throws KNXTimeoutException, KNXLinkClosedException {
 		final var challenge = ThreadLocalRandom.current().nextLong();
-		final byte[] secureApdu = secure(SecureSyncRequest, address(), remote, sixBytes(challenge).array(),
+		final byte[] secureApdu = secure(SecureSyncRequest, address(), remote, sixBytes(challenge),
 				SecurityControl.of(DataSecurity.AuthConf, toolAccess)).get();
 		logger.log(DEBUG, "sync {0} seq with {1}", toolAccess ? "tool access" : "p2p", remote);
 
@@ -756,7 +756,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 				: SecurityControl.of(DataSecurity.AuthConf, toolAccess);
 
 		final byte[] secureApdu = secure(SecureSyncRequest, address(), serialNumber, GroupAddress.Broadcast,
-				sixBytes(challenge).array(), secCtrl, key).get();
+				sixBytes(challenge), secCtrl, key).get();
 		logger.log(DEBUG, "{0} sync for S/N {1} ({2})", systemBroadcast ? "SBC" : "broadcast", serialNumber,
 				toolAccess ? "tool access" : "p2p");
 
@@ -1038,8 +1038,8 @@ public class SecureApplicationLayer implements AutoCloseable {
 		return scf;
 	}
 
-	private static ByteBuffer sixBytes(final long num) {
-		return ByteBuffer.allocate(6).putShort((short) (num >> 32)).putInt((int) num).flip();
+	private static byte[] sixBytes(final long num) {
+		return ByteBuffer.allocate(6).putShort((short) (num >> 32)).putInt((int) num).flip().array();
 	}
 
 	private static long toLong(final byte[] data) {
