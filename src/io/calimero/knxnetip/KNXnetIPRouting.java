@@ -45,6 +45,7 @@ import static java.lang.System.Logger.Level.WARNING;
 
 import java.io.IOException;
 import java.lang.System.Logger.Level;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
@@ -350,7 +351,7 @@ public class KNXnetIPRouting extends ConnectionBase
 	 */
 	public static boolean isValidRoutingMulticast(final InetAddress address)
 	{
-		return address != null && address.isMulticastAddress()
+		return address instanceof Inet4Address && address.isMulticastAddress()
 				&& toLong(address) >= toLong(DefaultMulticast);
 	}
 
