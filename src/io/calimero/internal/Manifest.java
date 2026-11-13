@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2024, 2024 B. Malinowsky
+    Copyright (c) 2024, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,7 +38,9 @@ package io.calimero.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.jar.Attributes.Name;
 
 import io.calimero.Settings;
@@ -69,6 +71,8 @@ public final class Manifest {
 		return new BuildInfo(Settings.getLibraryVersion(), Optional.empty(), Optional.empty());
 	}
 
+	private static final String ManifestSuffix = "META-INF/MANIFEST.MF";
+
 	private static InputStream manifestStream(final Class<?> lookup) throws IOException {
 		if (lookup.getModule().isNamed())
 			return lookup.getResourceAsStream("/META-INF/MANIFEST.MF"); // requires leading slash
@@ -76,10 +80,26 @@ public final class Manifest {
 		// We could use ProtectionDomain of the lookup class, which won't work, e.g., on Android;
 		// also, the protection domain's code source or location might be null.
 		// final var f = new File(lookup.getProtectionDomain().getCodeSource().getLocation().toURI());
+		final String lookupName = lookup.getName().replace('.', '/') + ".class";
+		final var lookupOrigin = Optional.ofNullable(lookup.getClassLoader().getResource(lookupName))
+				.map(URL::toString).filter(loc -> loc.endsWith(lookupName))
+				.map(loc -> loc.substring(0, loc.length() - lookupName.length()));
+
 		final String pkg = lookup.getPackageName();
 		final String id = pkg.substring(pkg.lastIndexOf('.') + 1).replace("calimero", "core");
-		final var url = lookup.getClassLoader().resources("META-INF/MANIFEST.MF")
-				.filter(u -> u.getPath().contains("calimero") && u.getPath().contains(id)).findFirst().orElse(null);
+		// lookup origin serves as filter to compare any manifest resource location against;
+		// without origin, fallback to calimero package suffix
+		final Predicate<URL> ourManifest = lookupOrigin.map(origin -> (Predicate<URL>) url -> ourManifest(url, origin))
+				.orElse(url -> url.getPath().contains("calimero") && url.getPath().contains(id));
+
+		final var url = lookup.getClassLoader().resources(ManifestSuffix).filter(ourManifest).findFirst().orElse(null);
 		return url != null ? url.openStream() : null;
+	}
+
+	private static boolean ourManifest(final URL manifest, final String lookupOrigin) {
+		final String manifestLoc = manifest.toString();
+		if (manifestLoc.endsWith(ManifestSuffix))
+			return lookupOrigin.equals(manifestLoc.substring(0, manifestLoc.length() - ManifestSuffix.length()));
+		return false;
 	}
 }
