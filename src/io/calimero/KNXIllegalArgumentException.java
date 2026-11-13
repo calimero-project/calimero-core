@@ -36,6 +36,8 @@
 
 package io.calimero;
 
+import java.util.Optional;
+
 /**
  * Thrown to indicate that a method has been passed an illegal or inappropriate argument.
  *
@@ -43,7 +45,7 @@ package io.calimero;
  */
 public class KNXIllegalArgumentException extends KnxRuntimeException
 {
-	private final String arg;
+	private final Optional<Object> arg;
 
 	/**
 	 * Constructs a new {@code KNXIllegalArgumentException} with the specified cause.
@@ -53,7 +55,7 @@ public class KNXIllegalArgumentException extends KnxRuntimeException
 	public KNXIllegalArgumentException(final Throwable cause)
 	{
 		super(null, cause);
-		arg = null;
+		arg = Optional.empty();
 	}
 
 	/**
@@ -64,7 +66,7 @@ public class KNXIllegalArgumentException extends KnxRuntimeException
 	public KNXIllegalArgumentException(final String s)
 	{
 		super(s);
-		arg = null;
+		arg = Optional.empty();
 	}
 
 	/**
@@ -73,9 +75,9 @@ public class KNXIllegalArgumentException extends KnxRuntimeException
 	 * @param s the detail message
 	 * @param arg the offending argument
 	 */
-	public KNXIllegalArgumentException(final String s, final String arg) {
+	public KNXIllegalArgumentException(final String s, final Object arg) {
 		super(s);
-		this.arg = arg;
+		this.arg = Optional.ofNullable(arg);
 	}
 
 	/**
@@ -87,21 +89,23 @@ public class KNXIllegalArgumentException extends KnxRuntimeException
 	public KNXIllegalArgumentException(final String s, final Throwable cause)
 	{
 		super(s, cause);
-		arg = null;
+		arg = Optional.empty();
 	}
 
 	@Override
 	public String getMessage() {
-		return arg != null ? super.getMessage() + " '" + arg + "'" : super.getMessage();
+		return arg.map(arg -> super.getMessage() + " '" + arg + "'" ).orElse(super.getMessage());
 	}
 
 	/**
-	 * Returns the argument which caused the exception.
-	 *
-	 * @return argument as string, or {@code null} if no argument was set
+	 * @deprecated Use {@link #argument()}
 	 */
+	@Deprecated(forRemoval = true)
 	public final String getArgument()
 	{
-		return arg;
+		return arg.map(String::valueOf).orElse(null);
 	}
+
+	/** {@return the argument which caused the exception, or an empty {@link Optional} if no argument was set} */
+	public final Optional<Object> argument() { return arg; }
 }
