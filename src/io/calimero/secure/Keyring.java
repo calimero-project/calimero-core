@@ -58,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -78,6 +79,7 @@ import io.calimero.GroupAddress;
 import io.calimero.IndividualAddress;
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
+import io.calimero.SerialNumber;
 import io.calimero.knxnetip.KNXnetIPRouting;
 import io.calimero.knxnetip.SecureConnection;
 import io.calimero.log.LogService;
@@ -247,21 +249,32 @@ public final class Keyring {
 
 	public static final class Device {
 		private final IndividualAddress addr;
+		private final SerialNumber sno;
 		private final byte[] toolkey;
-		private final byte[] pwd;
+		private final byte[] mgmtPwd;
 		private final byte[] auth;
 		private final long sequence;
+		private final byte[] fdsk;
+		private final byte[] pwd;
 
-		Device(final IndividualAddress addr, final byte[] toolkey, final byte[] pwd, final byte[] auth,
-			final long sequence) {
+		Device(final IndividualAddress addr, final SerialNumber sno, final byte[] toolkey, final byte[] mgmtPwd,
+				final byte[] auth, final long sequence, final byte[] fdsk, final byte[] pwd) {
 			this.addr = addr;
+			this.sno = sno;
 			this.toolkey = toolkey;
-			this.pwd = pwd;
+			this.mgmtPwd = mgmtPwd;
 			this.auth = auth;
 			if (sequence < 0 || sequence > 0xffff_ffff_ffffL)
 				throw new KNXIllegalArgumentException("sequence number %d is out of range [0..0xffffffffffff]".formatted(sequence));
 			this.sequence = sequence;
+			this.fdsk = fdsk;
+			this.pwd = pwd;
 		}
+
+		/**
+		 * {@return the serial number of this device, or an empty {@link Optional} if no serial number is provided in the keyring}
+		 */
+		public Optional<SerialNumber> serialNumber() { return Optional.ofNullable(sno); }
 
 		/**
 		 * Returns the optional encrypted tool key of this device.
@@ -275,7 +288,7 @@ public final class Keyring {
 		 *
 		 * @return optional byte array containing encrypted password
 		 */
-		public Optional<byte[]> password() { return optional(pwd); }
+		public Optional<byte[]> password() { return optional(mgmtPwd); }
 
 		/**
 		 * Returns the optional encrypted authentication code of this device.
@@ -283,6 +296,11 @@ public final class Keyring {
 		 * @return optional byte array containing encrypted authentication code
 		 */
 		public Optional<byte[]> authentication() { return optional(auth); }
+
+		/**
+		 * {@return the Factory Default Setup Key (FDSK) of this device, or an empty {@link Optional} if no FDSK is provided in the keyring}
+		 */
+		public Optional<byte[]> fdsk() { return optional(fdsk); }
 
 		/**
 		 * Returns the last known valid sequence number received by this device.
@@ -297,23 +315,29 @@ public final class Keyring {
 				return true;
 			if (!(o instanceof final Device other))
 				return false;
-			return Objects.equals(addr, other.addr) && Arrays.equals(auth, other.auth) && Arrays.equals(pwd, other.pwd)
-					&& sequence == other.sequence && Arrays.equals(toolkey, other.toolkey);
+			return addr.equals(other.addr) && Objects.equals(sno, other.sno) && Arrays.equals(toolkey, other.toolkey)
+					&& Arrays.equals(mgmtPwd, other.mgmtPwd) && Arrays.equals(auth, other.auth)
+					&& sequence == other.sequence && Arrays.equals(fdsk, other.fdsk) && Arrays.equals(pwd, other.pwd);
 		}
 
 		@Override
 		public int hashCode() {
 			final int prime = 31;
-			int result = 1;
-			result = prime * result + Arrays.hashCode(auth);
-			result = prime * result + Arrays.hashCode(pwd);
+			int result = addr.hashCode();
+			result = prime * result + Objects.hashCode(sno);
 			result = prime * result + Arrays.hashCode(toolkey);
-			result = prime * result + Objects.hash(addr, sequence);
+			result = prime * result + Arrays.hashCode(mgmtPwd);
+			result = prime * result + Arrays.hashCode(auth);
+			result = prime * result + Long.hashCode(sequence);
+			result = prime * result + Arrays.hashCode(fdsk);
+			result = prime * result + Arrays.hashCode(pwd);
 			return result;
 		}
 
 		@Override
-		public String toString() { return "device " + addr + " (seq " + sequence + ")"; }
+		public String toString() {
+			return "device " + addr + " (" + serialNumber().map(sn -> "SN " + sn + ", ").orElse("") + "seq " + sequence + ")";
+		}
 	}
 
 	public static final class Backbone {
@@ -516,10 +540,13 @@ public final class Keyring {
 					// rest is optional
 					final var toolkey = readAttribute(reader, "ToolKey", Keyring::decode, null);
 					final var seq = readAttribute(reader, "SequenceNumber", Long::parseLong, (long) 0);
-					final var pwd = readAttribute(reader, "ManagementPassword", Keyring::decode, null);
+					final var mgmtPwd = readAttribute(reader, "ManagementPassword", Keyring::decode, null);
 					final var auth = readAttribute(reader, "Authentication", Keyring::decode, null);
+					final var fdsk = readAttribute(reader, "FDSK", Keyring::decode, null);
+					final var pwd = readAttribute(reader, "Password", Keyring::decode, null);
+					final var sno = readAttribute(reader, "SerialNumber", Keyring::serialNumber, null);
 
-					final var device = new Device(addr, toolkey, pwd, auth, seq);
+					final var device = new Device(addr, sno, toolkey, mgmtPwd, auth, seq, fdsk, pwd);
 					devices.put(addr, device);
 					logger.log(TRACE, "add {0}", device);
 				}
@@ -719,6 +746,10 @@ public final class Keyring {
 
 	private static byte[] decode(final String base64) {
 		return Base64.getDecoder().decode(base64);
+	}
+
+	private static SerialNumber serialNumber(final String hex) {
+		return SerialNumber.from(HexFormat.of().parseHex(hex));
 	}
 
 	private static byte[] extractPassword(final byte[] data) {
