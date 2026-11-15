@@ -597,7 +597,7 @@ public class SecureApplicationLayer implements AutoCloseable {
 			if (isGroupDst) {
 				final var senders = security.groupSenders(address()).get(dst);
 				if (senders != null && !senders.isEmpty() && !senders.contains(src)) {
-					logger.log(TRACE, "{0}→{1} sender not in group sender list of {2}, ignore", src, dst, address());
+					logger.log(TRACE, "{0}→{1} sender not in group sender list of {2}, discarding message", src, dst, address());
 					return new SalService(securityCtrl, new byte[0]);
 				}
 			}
