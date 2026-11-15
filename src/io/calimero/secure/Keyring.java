@@ -96,7 +96,7 @@ public final class Keyring {
 
 	public static final class Interface {
 		public enum Type {
-			Backbone, Tunneling, Usb;
+			Backbone, Tunneling, Usb, Internal;
 
 			// parse value from xsd Type enumeration
 			static Type from(final String type) {
@@ -104,6 +104,7 @@ public final class Keyring {
 					case "Backbone" -> Backbone;
 					case "Tunneling" -> Tunneling;
 					case "USB" -> Usb; // important: USB is specified upper-case
+					case "Internal" -> Internal;
 					default -> throw new KNXIllegalArgumentException("unknown interface type " + type);
 				};
 			}
