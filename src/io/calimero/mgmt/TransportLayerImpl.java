@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -621,9 +621,9 @@ public class TransportLayerImpl implements TransportLayer
 			logger.log(TRACE, "send disconnect to {0} ({1})", addr, initiatedBy);
 			lnk.sendRequestWait(addr, Priority.SYSTEM, (byte) DISCONNECT);
 		}
-		catch (final KNXTimeoutException ignore) {
+		catch (final KNXTimeoutException e) {
 			// do a warning, but otherwise can be ignored
-			logger.log(WARNING, "disconnected not gracefully (timeout)", ignore);
+			logger.log(WARNING, "disconnected not gracefully (timeout)", e);
 		}
 	}
 
