@@ -36,8 +36,8 @@
 
 package io.calimero.mgmt;
 
+import static java.lang.System.Logger.Level.DEBUG;
 import static java.lang.System.Logger.Level.ERROR;
-import static java.lang.System.Logger.Level.INFO;
 import static java.lang.System.Logger.Level.WARNING;
 
 import java.lang.System.Logger;
@@ -506,7 +506,7 @@ public class PropertyClient implements PropertyAccess, AutoCloseable
 	{
 		if (pa.isOpen()) {
 			pa.close();
-			logger.log(INFO, "closed property client");
+			logger.log(DEBUG, "closed property client");
 		}
 	}
 
