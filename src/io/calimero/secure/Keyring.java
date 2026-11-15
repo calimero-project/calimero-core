@@ -78,6 +78,7 @@ import io.calimero.GroupAddress;
 import io.calimero.IndividualAddress;
 import io.calimero.KNXFormatException;
 import io.calimero.KNXIllegalArgumentException;
+import io.calimero.knxnetip.KNXnetIPRouting;
 import io.calimero.knxnetip.SecureConnection;
 import io.calimero.log.LogService;
 import io.calimero.secure.Keyring.Interface.Type;
@@ -455,7 +456,7 @@ public final class Keyring {
 				line = reader.getLocation().getLineNumber();
 				if ("Backbone".equals(name)) { // [0, 1]
 					final var mcastGroup = InetAddress.getByName(reader.getAttributeValue(null, "MulticastAddress"));
-					if (!validRoutingMulticast(mcastGroup))
+					if (!KNXnetIPRouting.isValidRoutingMulticast(mcastGroup))
 						throw new KNXMLException("loading keyring '" + keyringUri + "': " + mcastGroup.getHostAddress()
 								+ " is not a valid KNX multicast address");
 
@@ -675,19 +676,6 @@ public final class Keyring {
 			result = prime * result + Arrays.hashCode(e.getValue());
 		}
 		return result;
-	}
-
-	private static final long DefaultMulticast = unsigned(new byte[] { (byte) 224, 0, 23, 12 });
-
-	private static boolean validRoutingMulticast(final InetAddress address) {
-		return address != null && address.isMulticastAddress() && unsigned(address.getAddress()) >= DefaultMulticast;
-	}
-
-	private static long unsigned(final byte[] data) {
-		long l = 0;
-		for (final byte b : data)
-			l = l << 8 | (b & 0xff);
-		return l;
 	}
 
 	private static <R> R readAttribute(final XmlReader reader, final String attribute, final Function<String, R> parser,
