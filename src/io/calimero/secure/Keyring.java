@@ -367,6 +367,7 @@ public final class Keyring {
 	private byte[] signature;
 
 	private volatile String project;
+	private volatile String createdBy;
 	private volatile Backbone backbone;
 	// TODO clarify the use of optional field 'host' for interface types Backbone/USB
 	// this mapping works for tunneling interfaces: host -> Interface
@@ -413,6 +414,7 @@ public final class Keyring {
 				throw new KNXMLException("keyring '" + keyringUri + "' requires 'Keyring' element");
 
 			project = reader.getAttributeValue(null, "Project");
+			createdBy = reader.getAttributeValue(null, "CreatedBy");
 			final var createdBy = reader.getAttributeValue(null, "CreatedBy");
 			final var created = reader.getAttributeValue(null, "Created");
 			logger.log(DEBUG, "read keyring for project ''{0}'', created by {1} on {2}", project, createdBy, created);
@@ -561,6 +563,10 @@ public final class Keyring {
 			return false;
 		}
 	}
+
+	public String project() { return project; }
+
+	public String createdBy() { return createdBy; }
 
 	public Optional<Backbone> backbone() { return Optional.ofNullable(backbone); }
 
