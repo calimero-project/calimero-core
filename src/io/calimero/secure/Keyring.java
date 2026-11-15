@@ -499,7 +499,7 @@ public final class Keyring {
 					final var senders = reader.getAttributeValue(null, "Senders"); // optional, (empty) list of addresses
 					final var list = new ArrayList<IndividualAddress>();
 					if (senders != null) {
-						final Matcher matcher = Pattern.compile("[^\\s]+").matcher(senders);
+						final Matcher matcher = Pattern.compile("\\S+").matcher(senders);
 						while (matcher.find())
 							list.add(new IndividualAddress(matcher.group()));
 					}
