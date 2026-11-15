@@ -120,6 +120,11 @@ class SecureApplicationLayerTest {
 			}
 
 			@Override
+			long syncReqSequenceNumberToolAccess() {
+				return nextSequenceNumber(true);
+			}
+
+			@Override
 			protected long lastValidSequenceNumber(final boolean toolAccess, final IndividualAddress remote) {
 				if (toolAccess)
 					return sequenceNumberToolAccess - 1;

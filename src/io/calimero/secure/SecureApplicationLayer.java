@@ -50,6 +50,10 @@ import java.security.SecureRandom;
 import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.HexFormat;
@@ -113,6 +117,9 @@ public class SecureApplicationLayer implements AutoCloseable {
 	private static final int SeqSize = 6;
 
 	private static final String secureSymbol = new String(Character.toChars(0x1F512));
+
+	private static final Instant DataSecureSpecPublication = LocalDate.of(2018, Month.JANUARY, 5)
+			.atStartOfDay(ZoneOffset.UTC).toInstant();
 
 	private static final long HighSequenceNumber = 0xff00_0000_0000L;
 	private static final long MaxSequenceNumber = 0xffff_ffff_ffffL;
@@ -442,9 +449,12 @@ public class SecureApplicationLayer implements AutoCloseable {
 		final int scf = toSecurityCtrlField(service, secCtrl);
 		secureApdu.put((byte) scf);
 
-		final long seqSend = nextSequenceNumber(toolAccess);
+		long seqSend = nextSequenceNumber(toolAccess);
 		if (seqSend == 0)
 			throw new KnxSecureException("0 is not a valid sequence number");
+
+		if (syncReq && toolAccess && seqSend == 1)
+			seqSend = syncReqSequenceNumberToolAccess();
 		logger.log(TRACE, "use {0}sequence {1}", toolAccess ? "tool access " : "", seqSend);
 		final byte[] seq = sixBytes(seqSend);
 		if (!syncRes)
@@ -839,6 +849,19 @@ public class SecureApplicationLayer implements AutoCloseable {
 		long seq = toolAccess ? sequenceNumberToolAccess : sequenceNumber;
 		validateSequenceNumber(seq, toolAccess);
 		return seq;
+	}
+
+	// for an S-A_Sync.req, a client shall use the current timestamp of the Data Secure spec as sequence number
+	long syncReqSequenceNumberToolAccess() {
+		final var now = Instant.now();
+		final var millis = DataSecureSpecPublication.until(now, ChronoUnit.MILLIS);
+		final var excessiveMillis = Duration.ofDays(500 * 365).toMillis();
+		// invariant: now > spec publication, and cap if now is too far in the future -> leave seq = 1 in these cases
+		if (millis < 1 || millis > excessiveMillis)
+			logger.log(WARNING, "detected implausible system time: " + now);
+		else
+			sequenceNumberToolAccess = millis;
+		return sequenceNumberToolAccess;
 	}
 
 	// stores next outgoing sequence number for secure communication
