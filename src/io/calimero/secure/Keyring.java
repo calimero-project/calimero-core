@@ -121,6 +121,8 @@ public final class Keyring {
 			this.keyring = keyring;
 			this.type = type;
 			this.addr = addr;
+			if (user < 0 || user > 127)
+				throw new KNXIllegalArgumentException("user %d is out of range [0..127]".formatted(user));
 			this.user = user;
 			this.pwd = pwd;
 			this.auth = auth;
@@ -256,6 +258,8 @@ public final class Keyring {
 			this.toolkey = toolkey;
 			this.pwd = pwd;
 			this.auth = auth;
+			if (sequence < 0 || sequence > 0xffff_ffff_ffffL)
+				throw new KNXIllegalArgumentException("sequence number %d is out of range [0..0xffffffffffff]".formatted(sequence));
 			this.sequence = sequence;
 		}
 
@@ -315,11 +319,13 @@ public final class Keyring {
 	public static final class Backbone {
 		private final InetAddress mcGroup;
 		private final byte[] groupKey;
-		private final Duration latency;
+		private final Duration latency; // [0, 8000] ms
 
 		Backbone(final InetAddress multicastGroup, final byte[] groupKey, final Duration latency) {
 			this.mcGroup = multicastGroup;
 			this.groupKey = groupKey;
+			if (latency.isNegative() || latency.toMillis() > 8_000)
+				throw new KNXIllegalArgumentException("latency tolerance %d ms is out of range [0..8000] ms".formatted(latency.toMillis()));
 			this.latency = latency;
 		}
 
