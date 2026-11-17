@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2006, 2025 B. Malinowsky
+    Copyright (c) 2006, 2026 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -111,6 +111,9 @@ public final class DataUnitBuilder
 		}
 		// memory codes
 		else if (apci4 == 8 || apci4 == 9 || apci4 == 10)
+			return apci4 << 6;
+		// device descriptor read/res
+		else if (apci4 == 12 || apci4 == 13)
 			return apci4 << 6;
 		// master reset uses same apci as restart, but with bit flags for restart type and response
 		else if (apci4 == 14 && (apci6 == 1 || apci6 == 0b100001))
