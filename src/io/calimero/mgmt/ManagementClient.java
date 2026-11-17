@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.BiConsumer;
 
+import io.calimero.DeviceDescriptor;
 import io.calimero.IndividualAddress;
 import io.calimero.KNXException;
 import io.calimero.KNXIllegalArgumentException;
@@ -417,6 +418,32 @@ public interface ManagementClient extends AutoCloseable
 	 * @throws InterruptedException on interrupted thread
 	 */
 	byte[] readDeviceDesc(Destination dst, int descType) throws KNXException, InterruptedException;
+
+	/**
+	 * Reads the device descriptor of a communication partner its controller.
+	 * <p>
+	 * This service uses point-to-point connectionless or connection-oriented communication mode.
+	 * <p>
+	 * A special case exists with enabled security mode in the management server of the communication partner: if
+	 * descriptor type 0 is requested but not authorized by the access policy of the device
+	 * descriptor type, the response contains the device descriptor {@link DeviceDescriptor.DD0#Invalid}.
+	 *
+	 * @param dst destination to read from
+	 * @param descType device descriptor type, {@code 0 ≤ descType < 64}, only descriptor types 0 and 2 are currently
+	 *                 specified; the types 1 and 3 to 63 are reserved and shall not be used in implementations
+	 * @return the device descriptor
+	 * @throws KNXTimeoutException on a timeout during send
+	 * @throws KNXInvalidResponseException on invalid read response message
+	 * @throws KNXRemoteException on error response, indicating either an unsupported descriptor type or the request is not authorized
+	 * @throws KNXDisconnectException on disconnect in connection-oriented mode
+	 * @throws KNXLinkClosedException if network link to KNX network is closed
+	 * @throws KNXException on other read device descriptor errors
+	 * @throws InterruptedException on interrupted thread
+	 */
+	default DeviceDescriptor readDeviceDescriptor(final Destination dst, final int descType)
+			throws KNXException, InterruptedException {
+		return DeviceDescriptor.from(readDeviceDesc(dst, descType));
+	}
 
 	/**
 	 * Initiates a basic restart of the controller of a communication partner.
