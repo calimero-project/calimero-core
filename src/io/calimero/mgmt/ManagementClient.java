@@ -389,12 +389,14 @@ public interface ManagementClient extends AutoCloseable
 	 * <p>
 	 * The returned descriptor information format for device descriptor type 0 is as
 	 * follows (MSB to LSB):<br>
-	 * {@code | mask type (8 bit) | firmware version (8 bit) |}<br>
-	 * with the mask type split up into<br>
-	 * {@code | Medium Type (4 bit) | Firmware Type (4 bit)|}<br>
-	 * and the firmware version split up into<br>
-	 * {@code | version (4 bit) | sub code (4 bit) |}<br>
-	 * <br>
+	 * {@code | mask type (8 bit) | firmware version (8 bit) |},<br>
+	 * with the mask type split up into {@code | Medium Type (4 bit) | Firmware Type (4 bit)|},<br>
+	 * and the firmware version split up into {@code | version (4 bit) | sub code (4 bit) |}.
+	 * <p>
+	 * A special case exists with enabled security mode in the management server of the communication partner: if
+	 * descriptor type 0 is requested but not authorized by the access policy of the device
+	 * descriptor type, the response contains the device descriptor {@link DeviceDescriptor.DD0#Invalid}.
+	 * <p>
 	 * The returned descriptor information format for device descriptor type 2 is as
 	 * follows (MSB to LSB):<br>
 	 * <code>| application manufacturer (16 bit) | device type (16 bit) | version (8 bit) |<br>
@@ -403,10 +405,12 @@ public interface ManagementClient extends AutoCloseable
 	 * with {@code CI = channel info}
 	 *
 	 * @param dst destination to read from
-	 * @param descType device descriptor type, 0 for type 0 or 2 for type 2
+	 * @param descType device descriptor type, {@code 0 ≤ descType < 64}, only descriptor types 0 and 2 are currently
+	 *                 specified; the types 1 and 3 to 63 are reserved and shall not be used in implementations
 	 * @return byte array containing device descriptor information
 	 * @throws KNXTimeoutException on a timeout during send
 	 * @throws KNXInvalidResponseException on invalid read response message
+	 * @throws KNXRemoteException on error response, indicating either an unsupported descriptor type or the request is not authorized
 	 * @throws KNXDisconnectException on disconnect in connection-oriented mode
 	 * @throws KNXLinkClosedException if network link to KNX network is closed
 	 * @throws KNXException on other read device descriptor errors

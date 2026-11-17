@@ -620,14 +620,14 @@ public class ManagementClientImpl implements ManagementClient
 	}
 
 	@Override
-	public byte[] readDeviceDesc(final Destination dst, final int descType)
-		throws KNXInvalidResponseException, KNXDisconnectException, KNXTimeoutException,
-		KNXLinkClosedException, InterruptedException
-	{
+	public byte[] readDeviceDesc(final Destination dst, final int descType) throws KNXRemoteException,
+			KNXDisconnectException, KNXTimeoutException, KNXLinkClosedException, InterruptedException {
 		if (descType < 0 || descType > 63)
 			throw new KNXIllegalArgumentException("descriptor type out of range [0..63]");
 		final byte[] apdu = sendWait(dst, priority, DataUnitBuilder.createLengthOptimizedAPDU(
-				DEVICE_DESC_READ, (byte) descType), DEVICE_DESC_RESPONSE, 2, 14);
+				DEVICE_DESC_READ, (byte) descType), DEVICE_DESC_RESPONSE, 0, 14);
+		if ((apdu[1] & 0x3f) == 0x3f || apdu.length == 2)
+			throw new KNXRemoteException("unsupported descriptor type " + descType + ", or not authorized");
 		final byte[] dd = new byte[apdu.length - 2];
 		System.arraycopy(apdu, 2, dd, 0, apdu.length - 2);
 		return dd;
