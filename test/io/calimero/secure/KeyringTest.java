@@ -278,4 +278,17 @@ class KeyringTest {
 		assertEquals(16, tunnelInterface.userKey().length);
 		assertEquals(16, tunnelInterface.deviceAuthCode().length);
 	}
+
+	@Test
+	void useKeyringDecryptsAllKeys() {
+		final var keyring = Keyring.load(keyringUri);
+		final var security = Security.newSecurity();
+		security.useKeyring(keyring, keyringPwd);
+
+		assertEquals(keyring.groups().size(), security.groupKeys().size());
+		keyring.groups().forEach((addr, key) ->
+				assertArrayEquals(keyring.decryptKey(key, keyringPwd), security.groupKeys().get(addr)));
+		keyring.devices().forEach((addr, device) -> device.toolKey().ifPresent(key ->
+				assertArrayEquals(keyring.decryptKey(key, keyringPwd), security.deviceToolKeys().get(addr))));
+	}
 }

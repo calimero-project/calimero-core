@@ -36,6 +36,7 @@
 
 package io.calimero.secure;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -95,14 +96,21 @@ public final class Security {
 	 * @param password keyring password
 	 */
 	public void useKeyring(final Keyring keyring, final char[] password) {
-		if (!keyring.verifySignature(password))
-			throw new KnxSecureException("keyring signature mismatch (invalid keyring or wrong password)");
+		// hashing the password is slow, so do it once and not for every key
+		final var pwdHash = Keyring.hashKeyringPwd(password);
+		try {
+			if (!keyring.signatureMatches(pwdHash))
+				throw new KnxSecureException("keyring signature mismatch (invalid keyring or wrong password)");
 
-		final var devices = keyring.devices();
-		devices.forEach((addr, device) -> device.toolKey().ifPresent(
-				toolkey -> deviceToolKeys.put(addr, keyring.decryptKey(toolkey, password))));
+			final var devices = keyring.devices();
+			devices.forEach((addr, device) -> device.toolKey().ifPresent(
+					toolkey -> deviceToolKeys.put(addr, keyring.decryptKey(toolkey, pwdHash))));
 
-		keyring.groups().forEach((addr, key) -> groupKeys.put(addr, keyring.decryptKey(key, password)));
+			keyring.groups().forEach((addr, key) -> groupKeys.put(addr, keyring.decryptKey(key, pwdHash)));
+		}
+		finally {
+			Arrays.fill(pwdHash, (byte) 0);
+		}
 
 
 		final var interfaceAddresses = keyring.interfaces().values().stream().flatMap(List::stream)
